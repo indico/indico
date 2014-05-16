@@ -3971,7 +3971,6 @@ from indico.modules.rb.controllers.user.rooms import (
 from indico.modules.rb.controllers.user.reservations import (
     RHRoomBookingBookingDetails,
     RHRoomBookingBookingForm,
-    RHRoomBookingBookingList,
     RHRoomBookingCloneBooking,
     RHRoomBookingSaveBooking
 
@@ -4111,7 +4110,7 @@ class RHConfModifRoomBookingRoomList( RHConferenceModifRoomBookingBase, RHRoomBo
         p = conferences.WPConfModifRoomBookingRoomList( self )
         return p.display()
 
-class RHConfModifRoomBookingList( RHConferenceModifRoomBookingBase, RHRoomBookingBookingList ):
+class RHConfModifRoomBookingList(RHConferenceModifRoomBookingBase):
     _uh = urlHandlers.UHConfModifRoomBookingList
 
     def _checkParams( self, params ):

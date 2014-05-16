@@ -23,7 +23,7 @@ from MaKaC.webinterface.wcomponents import WTemplated
 
 class WPRoomBookingBlockingDetails(WPRoomBookingBase):
     def _setCurrentMenuItem(self):
-        self._blockRooms.setActive(True)
+        self._blockRoomsOpt.setActive(True)
 
     def _getBody(self, params):
         return WTemplated('RoomBookingBlockingDetails').getHTML(params)
@@ -31,7 +31,7 @@ class WPRoomBookingBlockingDetails(WPRoomBookingBase):
 
 class WPRoomBookingBlockingForm(WPRoomBookingBase):
     def _setCurrentMenuItem(self):
-        self._blockRooms.setActive(True)
+        self._blockRoomsOpt.setActive(True)
 
     def _getBody(self, params):
         return WTemplated('RoomBookingBlockingForm').getHTML(params)
@@ -47,7 +47,7 @@ class WPRoomBookingBlockingList(WPRoomBookingBase):
 
 class WPRoomBookingBlockingsForMyRooms(WPRoomBookingBase):
     def _setCurrentMenuItem(self):
-        self._usersBlockings.setActive(True)
+        self._usersBlockingsOpt.setActive(True)
 
     def _getBody(self, params):
         return WTemplated('RoomBookingBlockingsForMyRooms').getHTML(params)

@@ -25,7 +25,8 @@ from flask import request
 from indico.core.config import Config
 from indico.web.flask.util import send_file
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.models.rooms import Photo, Room
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.photos import Photo
 
 
 class RHRoomPhoto(RHRoomBookingBase):

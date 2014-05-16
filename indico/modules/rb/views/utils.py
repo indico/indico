@@ -24,7 +24,8 @@ from MaKaC.webinterface import urlHandlers as UH
 
 class Bar(Serializer):
     __public__ = [
-        'forReservation', 'startDT', 'endDT', ('kind', 'type'), 'blocking'
+        'forReservation', 'startDT', 'endDT', ('kind', 'type'), 'blocking', ('reservation_start', 'resvStartDT'),
+        ('reservation_end', 'resvEndDT')
     ]
 
     BLOCKED, PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, PRECONFLICT, CONFLICT = range(7)
@@ -44,10 +45,17 @@ class Bar(Serializer):
         self.reservation = reservation
 
         if reservation is not None:
+            self.reservation_start = reservation.start_date
+            self.reservation_end = reservation.end_date
+            self.room_id = reservation.room_id
             if not overlapping:
                 kind = Bar.UNAVAILABLE if reservation.is_confirmed else Bar.PREBOOKED
             else:
                 kind = Bar.CONFLICT if reservation.is_confirmed else Bar.PRECONFLICT
+        else:
+            self.reservation_start = None
+            self.reservation_end = None
+            self.room_id = None
 
         self.kind = kind
         self.blocking = blocking
@@ -60,35 +68,21 @@ class Bar(Serializer):
             self.start.date(),
             self.start.strftime('%H:%M'),
             self.end.strftime('%H:%M'),
-            self.reservation.id,
+            self.reservation.id if self.reservation else None,
             self._mapping[self.kind]
         )
 
     @classmethod
+    def from_candidate(cls, candidate, room_id, resv_start, resv_end):
+        self = cls(candidate.start, candidate.end)
+        self.room_id = room_id
+        self.reservation_start = resv_start
+        self.reservation_end = resv_end
+        return self
+
+    @classmethod
     def from_occurrence(cls, occurrence):
-        return cls(
-            start=occurrence.start,
-            end=occurrence.end,
-            reservation=occurrence.reservation)
-
-    @staticmethod
-    def get_kind(rid, is_confirmed):
-        if rid:
-            return Bar.UNAVAILABLE if is_confirmed else Bar.PREBOOKED
-        else:
-            return Bar.CANDIDATE
-
-    @staticmethod
-    def get_mutual_kind(rid1, is_confirmed1, rid2, is_confirmed2):
-        if is_confirmed1:
-            return Bar.CONFLICT
-        else:
-            if not rid2:
-                return Bar.PRECONFLICT
-            elif is_confirmed2:
-                return Bar.CONFLICT
-            else:
-                return Bar.PRECONCURRENT
+        return cls(occurrence.start, occurrence.end, reservation=occurrence.reservation)
 
     @property
     def date(self):

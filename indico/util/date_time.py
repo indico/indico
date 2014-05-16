@@ -19,10 +19,10 @@
 
 import calendar
 import time
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 import pytz
-from babel.dates import get_timezone
+from flask import request
 from babel.dates import format_datetime as _format_datetime
 from babel.dates import format_time as _format_time
 from babel.dates import format_date as _format_date
@@ -198,3 +198,27 @@ def get_overlap(range1, range2):
 
 def iterdays(start, end):
     return rrule(DAILY, dtstart=start, until=end)
+
+
+def get_datetime_from_request(prefix='', default=None, source=None):
+    """Retrieves date and time from request data."""
+    if source is None:
+        source = request.values
+
+    if default is None:
+        default = datetime.now()
+
+    date_str = source.get('{}date'.format(prefix), '')
+    time_str = source.get('{}time'.format(prefix), '')
+
+    try:
+        parsed_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    except ValueError:
+        parsed_date = default.date()
+
+    try:
+        parsed_time = datetime.strptime(time_str, '%H:%M').time()
+    except ValueError:
+        parsed_time = default.time()
+
+    return datetime.combine(parsed_date, parsed_time)

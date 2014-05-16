@@ -20,14 +20,15 @@
 """
 Schema of a reservation
 """
+from collections import defaultdict
 
 from copy import deepcopy
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from operator import attrgetter
 
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.config import Config
@@ -36,7 +37,7 @@ from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.utils import apply_filters
 from indico.util.date_time import now_utc, format_date, format_datetime
-from indico.util.i18n import _, N_
+from indico.util.i18n import _, N_, ngettext
 from indico.util.string import return_ascii
 from indico.web.flask.util import url_for
 from .reservation_edit_logs import ReservationEditLog
@@ -48,6 +49,10 @@ from MaKaC.errors import MaKaCError
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.common.info import HelperMaKaCInfo
+
+
+class ConflictingOccurrences(Exception):
+    pass
 
 
 class RepeatUnit(object):
@@ -252,8 +257,9 @@ class Reservation(Serializer, db.Model):
     def details_url(self):
         return url_for('rooms.roomBooking-bookingDetails', self, _external=True)
 
-    def is_archival(self):
-        return not self.is_live
+    @hybrid_property
+    def is_archived(self):
+        return self.end_date < now_utc()
 
     @staticmethod
     def getReservationWithDefaults():
@@ -375,8 +381,44 @@ class Reservation(Serializer, db.Model):
             .filter(func.DATE(ReservationOccurrence.start) == d) \
             .update({'is_cancelled': True}, synchronize_session='fetch')
 
-    def create_occurrences(self, excluded=None):
-        ReservationOccurrence.create_series_for_reservation(self, excluded)
+    def get_conflicting_occurrences(self):
+        query = ReservationOccurrence.find(Reservation.room == self.room,
+                                           Reservation.id != self.id,
+                                           ~ReservationOccurrence.is_cancelled,
+                                           _eager=ReservationOccurrence.reservation, _join=Reservation)
+        criteria = []
+        for occurrence in self.occurrences:
+            criteria += [
+                # other starts after or at our start time         & other starts before our end time
+                (ReservationOccurrence.start >= occurrence.start) & (ReservationOccurrence.start < occurrence.end),
+                # other ends after our start time              & other ends before or when we end
+                (ReservationOccurrence.end > occurrence.start) & (ReservationOccurrence.end <= occurrence.end)
+            ]
+        query = query.filter(or_(*criteria))
+        colliding_occurrences = query.all()
+        conflicts = defaultdict(lambda: dict(confirmed=[], pending=[]))
+        for occurrence in self.occurrences:
+            for colliding in colliding_occurrences:
+                if occurrence.overlaps(colliding):
+                    key = 'confirmed' if colliding.reservation.is_confirmed else 'pending'
+                    conflicts[occurrence][key].append(colliding)
+        return conflicts
+
+    def create_occurrences(self, skip_conflicts):
+        ReservationOccurrence.create_series_for_reservation(self)
+        conflicting_occurrences = self.get_conflicting_occurrences()
+        for occurrence, conflicts in conflicting_occurrences.iteritems():
+            if conflicts['confirmed']:
+                if not skip_conflicts:
+                    raise ConflictingOccurrences()
+                # Cancel OUR occurrence
+                msg = u'Skipped due to collision with {} reservation(s)'
+                occurrence.rejection_reason = msg.format(len(conflicts['confirmed']))
+                occurrence.cancel(msg)
+            elif conflicts['pending'] and self.is_confirmed:
+                # Reject OTHER occurrences
+                for conflict in conflicts['pending']:
+                    conflict.reject(u'Rejected due to collision with a confirmed reservation')
 
     def getSoonestOccurrence(self, d):
         return self.occurrences.filter(ReservationOccurrence.start >= d).first()

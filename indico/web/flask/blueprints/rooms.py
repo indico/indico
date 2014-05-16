@@ -51,19 +51,24 @@ rooms.add_url_rule('/map/widget',
 
 rooms.add_url_rule('/calendar', 'calendar', reservation_handlers.RHRoomBookingCalendar)
 
-rooms.add_url_rule('/bookings',
-                   'roomBooking-bookingList',
-                   reservation_handlers.RHRoomBookingBookingList,
+rooms.add_url_rule('/bookings/search/', 'roomBooking-search4Bookings', reservation_handlers.RHRoomBookingSearchBookings,
                    methods=('GET', 'POST'))
+
+rooms.add_url_rule('/bookings/search/mine/', 'my_bookings', reservation_handlers.RHRoomBookingSearchMyBookings,
+                   methods=('GET', 'POST'))
+
+rooms.add_url_rule('/bookings/search/mine/pending', 'my_pending_bookings',
+                   reservation_handlers.RHRoomBookingSearchMyPendingBookings, methods=('GET', 'POST'))
+
+rooms.add_url_rule('/bookings/search/my-rooms/', 'bookings_my_rooms',
+                   reservation_handlers.RHRoomBookingSearchBookingsMyRooms, methods=('GET', 'POST'))
+
+rooms.add_url_rule('/bookings/search/my-rooms/pending', 'pending_bookings_my_rooms',
+                   reservation_handlers.RHRoomBookingSearchPendingBookingsMyRooms, methods=('GET', 'POST'))
 
 rooms.add_url_rule('/rooms',
                    'roomBooking-roomList',
                    room_handlers.RHRoomBookingRoomList,
-                   methods=('GET', 'POST'))
-
-rooms.add_url_rule('/search/bookings',
-                   'roomBooking-search4Bookings',
-                   reservation_handlers.RHRoomBookingSearch4Bookings,
                    methods=('GET', 'POST'))
 
 rooms.add_url_rule('/search/rooms',
@@ -73,25 +78,7 @@ rooms.add_url_rule('/search/rooms',
 
 
 # Booking a room
-rooms.add_url_rule('/book/',
-                   'roomBooking-bookRoom',
-                   reservation_handlers.RHRoomBookingBookRoom)
-
-rooms.add_url_rule('/book/search',
-                   'roomBooking-bookingListForBooking',
-                   reservation_handlers.RHRoomBookingBookingList,
-                   methods=('GET', 'POST'),
-                   defaults={'is_new_booking': 'y'})
-
-rooms.add_url_rule('/book/confirm',
-                   'roomBooking-bookingForm',
-                   reservation_handlers.RHRoomBookingBookingForm,
-                   methods=('GET', 'POST'))
-
-rooms.add_url_rule('/book/save',
-                   'roomBooking-saveBooking',
-                   reservation_handlers.RHRoomBookingSaveBooking,
-                   methods=('GET', 'POST'))
+rooms.add_url_rule('/book', 'book', reservation_handlers.RHRoomBookingNewBooking, methods=('GET', 'POST'))
 
 
 # Modify a booking

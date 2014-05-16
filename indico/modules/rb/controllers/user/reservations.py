@@ -18,23 +18,35 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 from ast import literal_eval
-from datetime import datetime, time
+from datetime import datetime, time, timedelta, date
 
 from flask import request, session
+from werkzeug.datastructures import MultiDict
+from indico.core.db import db
 
 from indico.core.errors import IndicoError, FormValuesError
+from indico.util.date_time import server_to_utc, get_datetime_from_request
 from indico.util.i18n import _
+from indico.util.string import natural_sort_key
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.controllers.forms import ReservationForm, BookingListForm
-from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.controllers.forms import BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm, \
+    FormDefaults, NewBookingConfirmForm
+from indico.modules.rb.models.reservations import Reservation, RepeatMapping
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.utils import getRoomBookingOption
 from indico.modules.rb.views.user import reservations as reservation_views
+from indico.modules.rb.views.user.reservations import (WPRoomBookingSearchBookings, WPRoomBookingSearchBookingsResults,
+                                                       WPRoomBookingCalendar, WPRoomBookingNewBookingSelectRoom,
+                                                       WPRoomBookingNewBookingSelectPeriod,
+                                                       WPRoomBookingNewBookingConfirm)
+from indico.web.flask.util import url_for
 
 
 class RHRoomBookingBookRoom(RHRoomBookingBase):
     def _process(self):
-        self._rooms = Room.getRoomsWithData('equipment', 'photo')
+        self._rooms = sorted(Room.getRoomsWithData('equipment'),
+                             key=lambda x: natural_sort_key(x['room'].getFullName()))
         self._max_capacity = Room.getMaxCapacity()
         return reservation_views.WPRoomBookingBookRoom(self).display()
 
@@ -50,56 +62,223 @@ class RHRoomBookingBookingDetails(RHRoomBookingBase):
         return reservation_views.WPRoomBookingBookingDetails(self).display()
 
 
-class RHRoomBookingBookingList(RHRoomBookingBase):
-    def __getTitle(self):
-        return {
-            (True, False, False, False, False): _('Select a Room'),
-            (False, False, False, False, False): _('Bookings'),
-            (False, True, False, False, False): _('PRE-Bookings'),
-            (False, False, True, False, False): _('My Bookings'),
-            (False, True, True, False, False): _('My PRE-Bookings'),
-            (False, False, False, True, False): _('Bookings for my rooms'),
-            (False, True, False, True, False): _('Pre-Bookings for my rooms'),
-            (False, False, True, True, False): _('My Bookings for my rooms'),
-            (False, True, True, True, False): _('My Pre-Bookings for my rooms'),
-            (False, False, True, True, True): _('Search My Bookings for my rooms'),
-            (False, True, True, True, True): _('Search My Pre-Bookings for my rooms'),
-            (False, False, True, False, True): _('Search My Bookings'),
-            (False, True, True, False, True): _('Search My Pre-Bookings'),
-            (False, False, False, True, True): _('Search Bookings for my rooms'),
-            (False, True, False, True, True): _('Search Pre-Bookings for my rooms'),
-            (False, False, False, False, True): _('Search Bookings'),
-            (False, True, False, False, True): _('Search Pre-Bookings'),
-        }.get((self._form.is_new_booking.data,
-               self._form.is_only_pre_bookings.data,
-               self._form.is_only_mine.data,
-               self._form.is_only_my_rooms.data,
-               self._form.is_search.data),
-              _('{} Booking(s) found').format(self._reservation_count))
+class RHRoomBookingSearchBookings(RHRoomBookingBase):
+    menu_item = 'bookingListSearch'
+
+    def _get_form_data(self):
+        return request.form
 
     def _checkParams(self):
-        self._form = BookingListForm(request.values)
+        self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.getFullName()))
+        self._form_data = self._get_form_data()
+        self._form = BookingSearchForm(self._form_data)
+        self._form.room_id_list.choices = [(r.id, None) for r in self._rooms]
+
+    def _is_submitted(self):
+        return self._form.is_submitted()
 
     def _process(self):
-        if self._form.validate():
-            if self._form.is_search.data:
-                self._reservations = Room.getFilteredReservationsInSpecifiedRooms(
-                    self._form,
-                    self._getUser()
-                )
-            else:
-                self._reservations = Room.getReservationsForAvailability(
-                    self._form.start_date.data,
-                    self._form.end_date.data,
-                    self._form.room_id_list.data
-                )
-            self._reservation_count = len(self._reservations)
+        form = self._form
+        if self._is_submitted() and form.validate():
+            occurrences = ReservationOccurrence.find_with_filters(form.data, session.user).all()
+            rooms = [r for r in self._rooms if r.id in set(form.room_id_list.data)]
+            return WPRoomBookingSearchBookingsResults(self, rooms=rooms, occurrences=occurrences,
+                                                      start_dt=form.start_dt.data, end_dt=form.end_dt.data,
+                                                      form=form, form_data=self._form_data,
+                                                      menu_item=self.menu_item).display()
+
+        return WPRoomBookingSearchBookings(self, errors=form.error_list, rooms=self._rooms,
+                                           user_has_rooms=session.user.has_rooms).display()
+
+
+class RHRoomBookingSearchBookingsShortcutBase(RHRoomBookingSearchBookings):
+    """Base class for searches with predefined criteria"""
+    search_criteria = {}
+
+    def _is_submitted(self):
+        return True
+
+    def _get_form_data(self):
+        if request.method == 'POST':
+            # Actual form submission (when using the period selector widget)
+            return RHRoomBookingSearchBookings._get_form_data(self)
+
+        # Class-specific criteria + default times
+        data = MultiDict(self.search_criteria)
+        data['start_time'] = '00:00'
+        data['end_time'] = '23:59'
+        data['start_date'] = date.today().strftime('%d/%m/%Y')
+        data['end_date'] = (date.today() + timedelta(weeks=1)).strftime('%d/%m/%Y')
+        data.setlist('room_id_list', [r.id for r in self._rooms])
+        return data
+
+
+class RHRoomBookingSearchMyBookings(RHRoomBookingSearchBookingsShortcutBase):
+    menu_item = 'myBookingList'
+    search_criteria = {
+        'is_only_mine': True
+    }
+
+
+class RHRoomBookingSearchMyPendingBookings(RHRoomBookingSearchBookingsShortcutBase):
+    menu_item = 'myPendingBookingList'
+    search_criteria = {
+        'is_only_mine': True,
+        'is_only_pending_bookings': True
+    }
+
+
+class RHRoomBookingSearchBookingsMyRooms(RHRoomBookingSearchBookingsShortcutBase):
+    menu_item = 'usersBookings'
+    search_criteria = {
+        'is_only_my_rooms': True
+    }
+
+
+class RHRoomBookingSearchPendingBookingsMyRooms(RHRoomBookingSearchBookingsShortcutBase):
+    menu_item = 'usersPendingBookings'
+    search_criteria = {
+        'is_only_my_rooms': True,
+        'is_only_pending_bookings': True
+    }
+
+
+class RHRoomBookingNewBooking(RHRoomBookingBase):
+    def _checkParams(self):
+        try:
+            self._step = int(request.form.get('step', 1))
+        except ValueError:
+            self._step = 1
+
+    def _make_select_room_form(self):
+        self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.getFullName()))
+        form = NewBookingCriteriaForm()
+        form.room_ids.choices = [(r.id, None) for r in self._rooms]
+        return form
+
+    def _make_select_period_form(self, defaults=None):
+        if self._step == 1:
+            return NewBookingPeriodForm(formdata=None, obj=defaults)
         else:
-            # TODO: actually this case shouldn't happen
-            self._reservations = []
-            self._reservation_count = 0
-        self._title = self.__getTitle()
-        return reservation_views.WPRoomBookingBookingList(self).display()
+            return NewBookingPeriodForm()
+
+    def _make_confirm_form(self, room, defaults=None):
+        if self._step == 2:
+            defaults.equipments = []
+            form = NewBookingConfirmForm(formdata=MultiDict(), obj=defaults)
+        else:
+            form = NewBookingConfirmForm()
+
+        form.equipments.query = room.find_available_video_conference()
+        return form
+
+    def _process_select_room(self):
+        form = self._make_select_room_form()
+        if form.validate_on_submit():
+            flexible_days = form.flexible_dates_range.data
+            day_start_dt = datetime.combine(form.start_date.data.date(), time())
+            day_end_dt = datetime.combine(form.end_date.data.date(), time(23, 59))
+
+            occurrences = ReservationOccurrence.find_all(
+                Reservation.room_id.in_(form.room_ids.data),
+                ReservationOccurrence.start >= server_to_utc(day_start_dt) - timedelta(days=flexible_days),
+                ReservationOccurrence.end <= server_to_utc(day_end_dt) + timedelta(days=flexible_days),
+                ~ReservationOccurrence.is_cancelled,
+                _join=Reservation,
+                _eager=ReservationOccurrence.reservation
+            )
+
+            candidates = {}
+            for days in xrange(-flexible_days, flexible_days + 1):
+                offset = timedelta(days=days)
+                series_start = server_to_utc(form.start_date.data) + offset
+                series_end = server_to_utc(form.end_date.data) + offset
+                candidates[series_start, series_end] = ReservationOccurrence.create_series(series_start, series_end,
+                                                                                           (form.repeat_unit.data,
+                                                                                            form.repeat_step.data))
+
+            selected_rooms = [r for r in self._rooms if r.id in form.room_ids.data]
+            period_form_defaults = FormDefaults(repeat_step=form.repeat_step.data, repeat_unit=form.repeat_unit.data)
+            period_form = self._make_select_period_form(period_form_defaults)
+
+            # step2 template
+            return WPRoomBookingNewBookingSelectPeriod(self, rooms=selected_rooms, occurrences=occurrences,
+                                                       candidates=candidates, start_dt=day_start_dt,
+                                                       end_dt=day_end_dt, period_form=period_form, form=form,
+                                                       repeat_unit=form.repeat_unit.data,
+                                                       repeat_step=form.repeat_step.data,
+                                                       flexible_days=flexible_days).display()
+
+        # step1 template
+        return WPRoomBookingNewBookingSelectRoom(self, errors=form.error_list, rooms=self._rooms,
+                                                 max_room_capacity=Room.getMaxCapacity()).display()
+
+    def _process_select_period(self):
+        form = self._make_select_period_form()
+        if form.is_submitted():
+            # Errors in here are only caused by users messing with the submitted data so it's not
+            # worth making the code more complex to show the errors nicely on the originating page.
+            if not form.validate():
+                raise IndicoError('<br>'.join(form.error_list))
+            room = Room.get(form.room_id.data)
+            if not room:
+                raise IndicoError('Invalid room')
+            # step3 template
+            confirm_form_defaults = FormDefaults(form.data,
+                                                 booked_for_id=session.user.id,
+                                                 booked_for_name=session.user.getStraightFullName().decode('utf-8'),
+                                                 contact_email=session.user.getEmail().decode('utf-8'),
+                                                 contact_phone=session.user.getPhone().decode('utf-8'))
+            return self._show_confirm(room, form, confirm_form_defaults)
+
+    def _show_confirm(self, room, form, defaults=None):
+        # form can be PeriodForm or Confirmform
+        if not isinstance(form, NewBookingConfirmForm):
+            confirm_form = self._make_confirm_form(room, defaults)
+        else:
+            # Step3 => Step3 due to an error
+            confirm_form = form
+        repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
+
+        return WPRoomBookingNewBookingConfirm(self, form=confirm_form, room=room, start_dt=form.start_date.data,
+                                              end_dt=form.end_date.data, repeat_unit=form.repeat_unit.data,
+                                              repeat_step=form.repeat_step.data, repeat_msg=repeat_msg,
+                                              errors=confirm_form.error_list).display()
+
+    def _process_confirm(self):
+        room = Room.get(int(request.form['room_id']))
+        form = self._make_confirm_form(room)
+        if form.validate_on_submit():
+            self._create_booking(form, room)
+            return 'ok'
+        return self._show_confirm(room, form)
+
+    def _create_booking(self, form, room):
+        skip_conflicts = form.skip_conflicts.data
+
+        reservation = Reservation()
+        form.populate_obj(reservation, skip={'start_date', 'end_date'}, existing_only=True)
+        reservation.room = room
+        reservation.is_confirmed = True  # TODO: check permissions
+        reservation.created_by_user = session.user
+        reservation.start_date = server_to_utc(form.start_date.data)
+        reservation.end_date = server_to_utc(form.end_date.data)
+        reservation.create_occurrences(skip_conflicts)
+        db.session.add(reservation)
+        db.session.flush()
+        print reservation.id
+        #db.session.rollback()
+
+
+    def _process(self):
+        if self._step == 1:
+            return self._process_select_room()
+        elif self._step == 2:
+            return self._process_select_period()
+        elif self._step == 3:
+            return self._process_confirm()
+        else:
+            self._redirect(url_for('rooms.book'))
 
 
 class RHRoomBookingBookingForm(RHRoomBookingBase):
@@ -142,7 +321,29 @@ class RHRoomBookingBookingForm(RHRoomBookingBase):
 
     def _process(self):
         self._rooms = Room.find_all()
-        return reservation_views.WPRoomBookingBookingForm(self).display()
+
+        start_dt = server_to_utc(self._form.start_date.data)
+        end_dt = server_to_utc(self._form.end_date.data)
+
+        day_start_dt = server_to_utc(datetime.combine(self._form.start_date.data.date(), time()))
+        day_end_dt = server_to_utc(datetime.combine(self._form.end_date.data.date(), time(23, 59)))
+
+        occurrences = ReservationOccurrence.find_all(
+            Reservation.room_id == self._room.id,
+            ReservationOccurrence.start >= day_start_dt,
+            ReservationOccurrence.end <= day_end_dt,
+            ~ReservationOccurrence.is_cancelled,
+            _join=Reservation,
+            _eager=ReservationOccurrence.reservation
+        )
+
+        candidates = ReservationOccurrence.create_series(
+            start_dt, end_dt,
+            (self._form.repeat_unit.data, self._form.repeat_step.data)
+        )
+
+        return reservation_views.WPRoomBookingBookingForm(self, occurrences=occurrences,
+                                                          candidates=candidates).display()
 
     def __populate_form(self, request):
         sDT = {
@@ -162,9 +363,9 @@ class RHRoomBookingBookingForm(RHRoomBookingBase):
         repeatability = request.values.get('repeatability')
 
         self._form.booked_for_id.data = session.user.getId()
-        self._form.booked_for_name.data = session.user.getFullName()
-        self._form.contact_email.data = session.user.getEmail()
-        self._form.contact_phone.data = session.user.getPhone()
+        self._form.booked_for_name.data = session.user.getFullName().decode('utf-8')
+        self._form.contact_email.data = session.user.getEmail().decode('utf-8')
+        self._form.contact_phone.data = session.user.getPhone().decode('utf-8')
 
         for data in [sDT, sTime, eDT, eTime]:
             for k, v in data.iteritems():
@@ -186,14 +387,32 @@ class RHRoomBookingBookingForm(RHRoomBookingBase):
 
 
 class RHRoomBookingCalendar(RHRoomBookingBase):
+    MAX_DAYS = 365 * 2
+
     def _checkParams(self):
         today = datetime.now().date()
-        self._check_start(default=datetime.combine(today, time(0, 0)))
-        self._check_end(default=datetime.combine(self.start.date(), time(23, 59)))
+        self.start_dt = get_datetime_from_request('start_', default=datetime.combine(today, time(0, 0)))
+        self.end_dt = get_datetime_from_request('end_', default=datetime.combine(self.start_dt.date(), time(23, 59)))
+        period = self.end_dt.date() - self.start_dt.date() + timedelta(days=1)
+        self._overload = period.days > self.MAX_DAYS
 
     def _process(self):
-        rooms = Room.find_all()
-        return reservation_views.WPRoomBookingCalendar(self, rooms, self.start, self.end).display()
+        if self._overload:
+            rooms = []
+            occurrences = []
+        else:
+            rooms = Room.find_all(is_active=True)
+            occurrences = ReservationOccurrence.find_all(
+                Reservation.room_id.in_(room.id for room in rooms),
+                ReservationOccurrence.start >= server_to_utc(self.start_dt),
+                ReservationOccurrence.end <= server_to_utc(self.end_dt),
+                ~ReservationOccurrence.is_cancelled,
+                _join=Reservation,
+                _eager=ReservationOccurrence.reservation
+            )
+
+        return WPRoomBookingCalendar(self, rooms=rooms, occurrences=occurrences, start_dt=self.start_dt,
+                                     end_dt=self.end_dt, overload=self._overload, max_days=self.MAX_DAYS).display()
 
 
 class RHRoomBookingSaveBooking(RHRoomBookingBase):
@@ -757,10 +976,3 @@ class RHRoomBookingRejectALlConflicting(RHRoomBookingBase):
             GenericMailer.send(notification)
         url = urlHandlers.UHRoomBookingBookingList.getURL(ofMyRooms=True, onlyPrebookings=True, autoCriteria=True)
         self._redirect(url)  # Redirect to booking details
-
-
-class RHRoomBookingSearch4Bookings(RHRoomBookingBase):
-    def _process(self):
-        self._rooms = Room.getRoomsWithData('photo')
-        self._max_capacity = Room.getMaxCapacity()
-        return reservation_views.WPRoomBookingSearch4Bookings(self).display()

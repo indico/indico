@@ -23,7 +23,7 @@ Schema of a room
 
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
-from sqlalchemy import and_, func, exists, extract, not_, or_, type_coerce
+from sqlalchemy import and_, func, exists, extract, or_, type_coerce
 from sqlalchemy.dialects.postgresql.base import ARRAY as sa_array
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql.expression import cast, literal
@@ -41,7 +41,6 @@ from indico.core.db.sqlalchemy.custom import greatest, least, static_array
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
-from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
@@ -282,7 +281,7 @@ class Room(db.Model, Serializer):
     def booking_url(self):
         if self.id is None:
             return None
-        return str(UH.UHRoomBookingBookingForm.getURL(target=self))
+        return '#'
 
     @property
     def details_url(self):
@@ -361,8 +360,15 @@ class Room(db.Model, Serializer):
 
     @property
     def available_video_conference(self):
-        # TODO: return children of 'Video conference' equipment
-        pass
+        return self.find_available_video_conference().all()
+
+    def find_available_video_conference(self):
+        vc_equipment = self.equipments \
+                           .correlate(Room) \
+                           .with_entities(RoomEquipment.id) \
+                           .filter_by(name='video conference') \
+                           .as_scalar()
+        return self.equipments.filter(RoomEquipment.parent_id == vc_equipment)
 
     def getAttributeByName(self, attribute_name):
         return self.attributes \
@@ -475,11 +481,8 @@ class Room(db.Model, Serializer):
                 outerjoin(RoomEquipmentAssociation).\
                 outerjoin(RoomEquipment)
 
-        if 'photo' in args:
-            entities.append(Photo)
-            query = query.\
-                outerjoin(Photo, Photo.id == Room.photo_id).\
-                group_by(Photo.id)
+        if not entities:
+            raise ValueError('No data provided')
 
         query = query.with_entities(*entities) \
                      .outerjoin(Location, Location.id == Room.location_id) \
@@ -489,7 +492,7 @@ class Room(db.Model, Serializer):
         if only_active:
             query = query.filter(Room.is_active == True)
 
-        for r in query:
+        for r in query.all():
             res = {'room': r[0]}
             for i, arg in enumerate(args):
                 res[arg] = r[i + 1]
@@ -595,68 +598,6 @@ class Room(db.Model, Serializer):
 
     def getLocationName(self):
         return self.location.name
-
-    @staticmethod
-    def getFilteredReservationsInSpecifiedRooms(f, avatar=None):
-        q = Room.query \
-                .outerjoin(Reservation, Room.id == Reservation.room_id) \
-                .join(ReservationOccurrence, Reservation.id == ReservationOccurrence.reservation_id) \
-                .filter(
-                    or_(
-                        and_(
-                            ReservationOccurrence.start >= f.start_date.data,
-                            ReservationOccurrence.start <= f.end_date.data,
-                        ),
-                        and_(
-                            ReservationOccurrence.end >= f.start_date.data,
-                            ReservationOccurrence.end <= f.end_date.data,
-                        )
-                    )
-                )
-
-        if f.is_only_my_rooms.data and avatar:
-            q = q.filter(Room.owner_id == avatar.id)
-        elif f.room_id_list.data and -1 not in f.room_id_list.data:
-            q = q.filter(Room.id.in_(f.room_id_list.data))
-
-        if f.is_only_bookings.data:
-            q = q.filter(Reservation.is_confirmed == True)
-        if f.is_only_pre_bookings.data:
-            q = q.filter(Reservation.is_confirmed == False)
-
-        if f.is_only_mine.data and avatar:
-            q = q.filter(Reservation.booked_for_id == avatar.id)
-        elif f.booked_for_name.data:
-            qs = u'%{}%'.format(f.booked_for_name.data)
-            q = q.filter(Reservation.booked_for_name.ilike(qs))
-
-        if f.reason.data:
-            qs = u'%{}%'.format(f.reason.data)
-            q = q.filter(Reservation.reason.ilike(qs))
-
-        if f.is_rejected.data:
-            q = q.filter(
-                or_(
-                    Reservation.is_rejected == True,
-                    ReservationOccurrence.is_rejected == True
-                )
-            )
-        if f.is_cancelled.data:
-            q = q.filter(
-                or_(
-                    Reservation.is_cancelled == True,
-                    ReservationOccurrence.is_cancelled == True
-                )
-            )
-        if f.is_archival.data:
-            q = q.filter(Reservation.is_archival == True)
-        if f.uses_video_conference.data:
-            q = q.filter(Reservation.uses_video_conference == True)
-        if f.needs_video_conference_setup.data:
-            q = q.filter(Reservation.needs_video_conference_setup == True)
-        if f.needs_general_assistance.data:
-            q = q.filter(Reservation.needs_general_assistance == True)
-        return q.all()
 
     @staticmethod
     def getReservationsForAvailability(start_date, end_date, room_id_list):

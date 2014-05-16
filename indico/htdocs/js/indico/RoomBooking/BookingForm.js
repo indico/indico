@@ -92,7 +92,7 @@ function saveFormData() {
         "filter":  filterData.search,
         "selectedRooms":  selectedRooms,
         "finishDate": $('#finishDate').val(),
-        "flexibleDatesRange": $("#flexibleDates input[name=flexibleDatesRange]:checked").val(),
+        "flexibleDatesRange": $("#flexibleDates input[name=flexible_dates_range]:checked").val(),
         "repeatability": $('#repeatability input[name=repeatability]:checked').val()
     };
 

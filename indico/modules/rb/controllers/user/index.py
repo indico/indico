@@ -21,6 +21,7 @@ from MaKaC.webinterface import urlHandlers as UH
 
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.locations import Location
+from indico.web.flask.util import url_for
 
 
 class RHRoomBookingWelcome(RHRoomBookingBase):
@@ -29,4 +30,4 @@ class RHRoomBookingWelcome(RHRoomBookingBase):
         if default_location and default_location.isMapAvailable():
             self._redirect(UH.UHRoomBookingMapOfRooms.getURL())
         else:
-            self._redirect(UH.UHRoomBookingBookRoom.getURL())
+            self._redirect(url_for('rooms.book'))

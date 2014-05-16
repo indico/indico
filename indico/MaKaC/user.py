@@ -1054,6 +1054,13 @@ class Avatar(Persistent, Fossilizable):
                 return True
         return False
 
+    @property
+    def has_rooms(self):
+        """Does the user own any rooms?"""
+        from indico.modules.rb.models.rooms import Room  # avoid circular import
+
+        return Room.isAvatarResponsibleForRooms(self)
+
     def getRooms(self):
         """
         Returns list of rooms (RoomBase derived objects) this

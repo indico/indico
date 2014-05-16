@@ -122,7 +122,6 @@
 
             self._restoreHighlight();
             if (self.validate()) {
-                console.log('hi');
                 var sTime = self.__getTime(self.startTime.val());
                 var eTime = self.__getTime(self.endTime.val());
                 self.slider.slider('values', 0, sTime).slider('values', 1, eTime);

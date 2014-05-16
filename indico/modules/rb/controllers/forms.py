@@ -25,19 +25,20 @@ from functools import partial
 
 from flask.ext.wtf import Form
 from flask.ext.wtf.file import FileField
-from wtforms import BooleanField, Field, IntegerField, SelectField, StringField, validators, HiddenField, TextAreaField
+from wtforms import BooleanField, Field, IntegerField, StringField, HiddenField, TextAreaField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
-from wtforms.fields.core import FloatField, FieldList, FormField
-from wtforms.validators import any_of, optional, number_range, required
+from wtforms.fields.core import FloatField, FieldList, FormField, SelectMultipleField
+from wtforms.validators import AnyOf, Optional, NumberRange, DataRequired, ValidationError, StopValidation, \
+    InputRequired
 from wtforms.ext.dateutil.fields import DateTimeField, DateField
-from wtforms.widgets import CheckboxInput
+from wtforms.widgets import CheckboxInput, HiddenInput
 from wtforms_alchemy import model_form_factory
 from wtforms_components import TimeField
 
 from indico.core.errors import IndicoError
 from indico.util.i18n import _
 from indico.util.string import is_valid_mail
-from indico.modules.rb.models.reservations import Reservation, RepeatUnit, RepeatMapping
+from indico.modules.rb.models.reservations import RepeatUnit, RepeatMapping
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.rooms import Room
@@ -68,17 +69,25 @@ def repeat_step_check(form, field):
         elif form.repeat_unit.data == RepeatUnit.YEAR:
             pass
     else:  # this part may be removed
-        raise validators.ValidationError('Repeat Step only makes sense with Repeat Unit')
+        raise ValidationError('Repeat Step only makes sense with Repeat Unit')
 
 
 def repeatibility_check(form, field):
     if form.availability.validate(form):
         if form.availability.data == AVAILABILITY_VALUES[1]:
             if field.data >= 5:
-                raise validators.ValidationError('Unrecognized repeatability')
+                raise ValidationError('Unrecognized repeatability')
+
+
+class DataWrapper(object):
+    """Wrapper for the return value of generated_data properties"""
+    def __init__(self, data):
+        self.data = data
 
 
 class IndicoForm(Form):
+    __generated_data__ = ()
+
     def populate_obj(self, obj, fields=None, skip=None, existing_only=False):
         """Populates the given object with form data.
 
@@ -108,6 +117,14 @@ class IndicoForm(Form):
                     all_errors.append('{}: {}'.format(self[field_name].label.text, error))
         return all_errors
 
+    @property
+    def data(self):
+        """Extends form.data with generated data from properties"""
+        data = super(IndicoForm, self).data
+        for key in self.__generated_data__:
+            data[key] = getattr(self, key).data
+        return data
+
 
 class UsedIf(object):
     """Makes a WTF field "used" if a given condition evaluates to True.
@@ -121,23 +138,28 @@ class UsedIf(object):
         if self.condition in {True, False}:
             if not self.condition:
                 field.errors[:] = []
-                raise validators.StopValidation()
+                raise StopValidation()
         elif not self.condition(form, field):
             field.errors[:] = []
-            raise validators.StopValidation()
+            raise StopValidation()
 
 
 class EmailList(object):
+    """Validates one or more email addresses"""
     def __init__(self, multi=True):
         self.multi = multi
 
     def __call__(self, form, field):
         if field.data and not is_valid_mail(field.data, self.multi):
             msg = _('Invalid email address list') if self.multi else _('Invalid email address')
-            raise validators.ValidationError(msg)
+            raise ValidationError(msg)
 
 
 class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
+    """Like the parent, but with a callback that allows you to modify the list
+
+    The callback can return a new list or yield items, and you can use it e.g. to sort the list.
+    """
     def __init__(self, *args, **kwargs):
         self.modify_object_list = kwargs.pop('modify_object_list', None)
         super(IndicoQuerySelectMultipleField, self).__init__(*args, **kwargs)
@@ -205,22 +227,6 @@ class IndicoField(Field):
         self.process_filters()
 
 
-class BooleanIndicoField(IndicoField, BooleanField):
-    pass
-
-
-class IntegerIndicoField(IndicoField, IntegerField):
-    pass
-
-
-class SelectIndicoField(IndicoField, SelectField):
-    pass
-
-
-class StringIndicoField(IndicoField, StringField):
-    pass
-
-
 class DateTimeIndicoField(IndicoField, DateTimeField):
     def process_formdata(self, raw_data):
         if raw_data:
@@ -246,28 +252,6 @@ class DateTimeIndicoField(IndicoField, DateTimeField):
                 self.process_formdata(self.raw_data)
             except ValueError as e:
                 self.process_errors.append(e.args[0])
-
-
-class SelectMultipleCustomIndicoField(IndicoField):
-    def __init__(self, *args, **kw):
-        self.min_check = kw.pop('min_check', None)
-        super(SelectMultipleCustomIndicoField, self).__init__(*args, **kw)
-
-    def process_formdata(self, valuelist):
-        if valuelist:
-            try:
-                self.data = map(int, valuelist)
-            except ValueError:
-                self.data = []
-                raise ValueError(_('Id must be integer'))
-        else:
-            self.data = []
-
-    def pre_validate(self, form):
-        if not self.data:
-            raise validators.StopValidation(_('At least one integer id must be supplied'))
-        elif self.min_check and min(self.data) < self.min_check:
-            raise validators.StopValidation(_('Minimum id can be at least {}').format(self.min_check))
 
 
 class MultipleCheckboxIndicoField(IndicoField):
@@ -310,6 +294,7 @@ class FormDefaults(object):
 
     def __init__(self, obj=None, attrs=None, skip_attrs=None, **defaults):
         self.__obj = obj
+        self.__use_items = hasattr(obj, 'iteritems') and hasattr(obj, 'get')  # smells like a dict
         self.__obj_attrs = attrs
         self.__obj_attrs_skip = skip_attrs
         self.__defaults = defaults
@@ -335,94 +320,135 @@ class FormDefaults(object):
 
     def __getattr__(self, item):
         if self.__valid_attr(item):
-            return getattr(self.__obj, item, self.__defaults.get(item))
+            if self.__use_items:
+                return self.__obj.get(item, self.__defaults.get(item))
+            else:
+                return getattr(self.__obj, item, self.__defaults.get(item))
         elif item in self.__defaults:
             return self.__defaults[item]
         else:
             raise AttributeError(item)
 
 
-class BookingListForm(Form):
-    is_only_pre_bookings = BooleanField('Only Prebookings', [validators.Optional()], default=False)
-    is_only_bookings = BooleanField('Only Bookings', [validators.Optional()], default=False)
-    is_only_mine = BooleanField('Only Mine', [validators.Optional()], default=False)
-    is_only_my_rooms = BooleanField('Only My Rooms', [validators.Optional()], default=False)
-    is_search = BooleanField('Search', [validators.Optional()], default=True)
-    is_new_booking = BooleanField('New Booking', [validators.Optional()], default=False)
-    is_auto = BooleanField('Auto', [validators.Optional()], default=False)
-    is_today = BooleanField('Today', [validators.Optional()], default=False)
-    is_archival = BooleanField('Is Archival', [validators.Optional()], default=False)
+class BookingSearchForm(IndicoForm):
+    __generated_data__ = ('start_dt', 'end_dt')
 
-    flexible_dates_range = IntegerField('Flexible Date Range', [validators.Optional()], default=0)
-    finish_date = BooleanField('Finish Date Exists', [validators.Optional()], default=True)
+    room_id_list = SelectMultipleField('Rooms', [DataRequired()], coerce=int)
 
-    repeat_unit = IntegerField('Repeat Unit', [validators.Optional(),
-                                               validators.NumberRange(min=RepeatUnit.NEVER, max=RepeatUnit.YEAR)],
-                               default=RepeatUnit.NEVER)
-    repeat_step = IntegerField('Repeat Step', [validators.Optional(), repeat_step_check],
-                               default=0)
+    start_date = DateField('Start Date', [InputRequired()], parse_kwargs={'dayfirst': True})
+    start_time = TimeField('Start Time', [InputRequired()])
+    end_date = DateField('End Date', [InputRequired()], parse_kwargs={'dayfirst': True})
+    end_time = TimeField('End Time', [InputRequired()])
 
-    room_id_list = SelectMultipleCustomIndicoField('Room ID List', min_check=-1)
+    booked_for_name = StringField('Booked For Name')
+    reason = StringField('Reason')
 
-    is_cancelled = BooleanField('Is Cancelled', [validators.optional()])
-    is_rejected = BooleanField('Is Cancelled', [validators.optional()])
+    is_only_mine = BooleanField('Only Mine')
+    is_only_my_rooms = BooleanField('Only My Rooms')
+    is_only_confirmed_bookings = BooleanField('Only Confirmed Bookings')
+    is_only_pending_bookings = BooleanField('Only Prebookings')
 
-    booked_for_name = StringField('Booked For Name', [validators.optional()])
-    reason = StringField('Reason', [validators.optional()])
+    is_rejected = BooleanField('Is Rejected')
+    is_cancelled = BooleanField('Is Cancelled')
+    is_archived = BooleanField('Is Archived')
 
-    start_date = DateTimeField('Start Date', [validators.required()],
-                               parse_kwargs={'dayfirst': True}, default=auto_datetime)
-    end_date = DateTimeField('End Date', [validators.required()],
-                             parse_kwargs={'dayfirst': True}, default=partial(auto_datetime, timedelta(7)))
+    uses_video_conference = BooleanField('Uses Video Conference')
+    needs_video_conference_setup = BooleanField('Video Conference Setup Assistance')
+    needs_general_assistance = BooleanField('General Assistance')
 
-    uses_video_conference = BooleanField('Uses Video Conference',
-                                         [validators.optional()], default=False)
-    needs_video_conference_setup = BooleanField('Video Conference Setup Assistance',
-                                                [validators.optional()], default=False)
-    needs_general_assistance = BooleanField('General Assistance',
-                                            [validators.optional()], default=False)
+    @property
+    def start_dt(self):
+        return DataWrapper(datetime.combine(self.start_date.data, self.start_time.data))
 
-    def __getattr__(self, attr):
-        if attr == 'is_all_rooms':
-            return self.room_id_list.data and -1 in self.room_id_list.data
-        raise IndicoError('{} has no attribute: {}'.format(self.__class__.__name__, attr))
+    @property
+    def end_dt(self):
+        return DataWrapper(datetime.combine(self.end_date.data, self.end_time.data))
 
 
-class ReservationForm(ModelForm):
-    class Meta:
-        model = Reservation
+class NewBookingFormBase(IndicoForm):
+    start_date = DateTimeField('Start date', validators=[InputRequired()], parse_kwargs={'dayfirst': True},
+                               display_format='%d/%m/%Y %H:%M')
+    end_date = DateTimeField('End date', validators=[InputRequired()], parse_kwargs={'dayfirst': True},
+                             display_format='%d/%m/%Y %H:%M')
+    repeat_unit = IntegerField('Repeat unit', validators=[NumberRange(0, 3)])
+    repeat_step = IntegerField('Repeat step', validators=[NumberRange(0, 3)])
 
-    booked_for_id = HiddenField()
+    def validate_repeat_step(self, field):
+        if (self.repeat_unit.data, self.repeat_step.data) not in RepeatMapping._mapping:
+            raise ValidationError('Invalid repeat step')
+
+    def validate_flexible_dates_range(self, field):
+        if self.repeat_unit.data == RepeatUnit.DAY:
+            field.data = 0
+
+    def validate_end_date(self, field):
+        start_date = self.start_date.data
+        end_date = self.end_date.data
+        if start_date.time() >= end_date.time():
+            raise ValidationError('Invalid times')
+        if self.repeat_unit.data == RepeatUnit.NEVER:
+            field.data = datetime.combine(start_date.date(), field.data.time())
+        elif start_date.date() >= end_date.date():
+            raise ValidationError('Invalid period')
 
 
-class RoomListForm(Form):
-    location_id = IntegerIndicoField(validators=[required(), number_range(min=1)],
-                                     parameter_name='roomLocation')
-    free_search = StringIndicoField(validators=[optional()])
-    capacity = IntegerIndicoField(validators=[optional(), number_range(min=1)])
+class NewBookingCriteriaForm(NewBookingFormBase):
+    room_ids = SelectMultipleField('Rooms', [DataRequired()], coerce=int)
+    flexible_dates_range = IntegerField('Flexible days', validators=[NumberRange(0, 3)], default=0)
+
+
+class NewBookingPeriodForm(NewBookingFormBase):
+    room_id = IntegerField('Room', [DataRequired()], widget=HiddenInput())
+    skip_conflicts = BooleanField('Skip conflicts')
+
+
+class NewBookingConfirmForm(NewBookingPeriodForm):
+    booked_for_id = HiddenField(_('User'), [InputRequired()])
+    booked_for_name = StringField()  # just for displaying
+    contact_email = StringField(_('Contact email'), [InputRequired(), EmailList()])
+    contact_phone = StringField(_('Telephone'))
+    booking_reason = TextAreaField(_('Reason'), [DataRequired()])
+    uses_video_conference = BooleanField(_('I will use Video Conference equipment.'))
+    equipments = IndicoQuerySelectMultipleCheckboxField(_('VC equipment'), get_label=lambda x: x.name)
+    needs_video_conference_setup = BooleanField(_('Request assistance for the startup of the videoconference session. '
+                                                  'This support is usually performed remotely.'))
+    needs_general_assistance = BooleanField(_('Request assistance for the startup of your meeting. A technician will '
+                                              'be physically present 10 to 15 minutes before the event to help you '
+                                              'start up the room equipment (microphone, projector, etc.).'))
+
+    def validate_equipments(self, field):
+        if field.data and not self.uses_video_conference.data:
+            raise ValidationError('Video Conference equipment is not used.')
+        elif not field.data and self.uses_video_conference.data:
+            raise ValidationError('You need to select some Video Conference equipment')
+
+    def validate_needs_video_conference_setup(self, field):
+        if field.data and not self.uses_video_conference.data:
+            raise ValidationError('Video Conference equipment is not used.')
+
+
+class RoomListForm(IndicoForm):
+    location_id = IntegerField(validators=[DataRequired(), NumberRange(min=1)])
+    free_search = StringField()
+    capacity = IntegerField(validators=[NumberRange(min=0)])
     equipments = MultipleCheckboxIndicoField('equipments_')
 
-    availability = StringIndicoField(validators=[required(), any_of(values=AVAILABILITY_VALUES)],
+    availability = StringField(validators=[DataRequired(), AnyOf(values=AVAILABILITY_VALUES)],
                                      default='Don\'t care')
-    repeatibility = IntegerIndicoField(validators=[optional(), repeatibility_check])
+    repeatibility = IntegerField(validators=[repeatibility_check])
 
-    includes_pending_blockings = BooleanIndicoField(validators=[required()], default=False,
-                                                    parameter_name='includePendingBlockings')
-    includes_pre_bookings = BooleanIndicoField(validators=[required()], default=False,
-                                               parameter_name='includePrebookings')
+    includes_pending_blockings = BooleanField(validators=[DataRequired()], default=False)
+    includes_pre_bookings = BooleanField(validators=[DataRequired()], default=False)
 
-    is_public = BooleanIndicoField(validators=[optional()], default=True,
-                                   parameter_name='isReservable')
-    is_only_my_rooms = BooleanIndicoField(validators=[optional()], default=False,
-                                          parameter_name='is_only_mine')
-    is_auto_confirm = BooleanIndicoField(validators=[optional()], default=True,
-                                         parameter_name='isAutoConfirmed')
-    is_active = BooleanIndicoField(validators=[optional()], default=True)
+    is_public = BooleanField(default=True)
+    is_only_my_rooms = BooleanField(default=False)
+    is_auto_confirm = BooleanField(default=True)
+    is_active = BooleanField(default=True)
 
-    start_date = DateTimeIndicoField(validators=[optional()],
+    start_date = DateTimeIndicoField(validators=[Optional()],
                                      parameter_name=('sYear', 'sMonth', 'sDay', 'sTime'),
                                      default=partial(auto_date, time(8, 30)))
-    end_date = DateTimeIndicoField(validators=[optional()],
+    end_date = DateTimeIndicoField(validators=[Optional()],
                                    parameter_name=('eYear', 'eMonth', 'eDay', 'eTime'),
                                    default=partial(auto_date, time(17, 30)))
 
@@ -433,7 +459,7 @@ class RoomListForm(Form):
 
 
 class BlockingForm(IndicoForm):
-    reason = TextAreaField(_('Reason'), [validators.DataRequired()])
+    reason = TextAreaField(_('Reason'), [DataRequired()])
     principals = JSONField(default=[])
     blocked_rooms = JSONField(default=[])
 
@@ -442,11 +468,11 @@ class BlockingForm(IndicoForm):
             field.data = map(int, field.data)
         except Exception as e:
             # In case someone sent crappy data
-            raise validators.ValidationError(str(e))
+            raise ValidationError(str(e))
 
         # Make sure all room ids are valid
         if len(field.data) != Room.find(Room.id.in_(field.data)).count():
-            raise validators.ValidationError('Invalid rooms')
+            raise ValidationError('Invalid rooms')
 
         if hasattr(self, '_blocking'):
             start_date = self._blocking.start_date
@@ -467,7 +493,7 @@ class BlockingForm(IndicoForm):
         )
         if overlap:
             msg = 'Your blocking for {} is overlapping with another blocking.'.format(overlap.room.getFullName())
-            raise validators.ValidationError(msg)
+            raise ValidationError(msg)
 
     def validate_principals(self, field):
         for item in field.data:
@@ -475,21 +501,21 @@ class BlockingForm(IndicoForm):
                 type_ = item['_type']
                 id_ = item['id']
             except Exception as e:
-                raise validators.ValidationError('Invalid principal data: {}'.format(e))
+                raise ValidationError('Invalid principal data: {}'.format(e))
             if type_ not in ('Avatar', 'Group', 'LDAPGroup'):
-                raise validators.ValidationError('Invalid principal data: type={}'.format(type_))
+                raise ValidationError('Invalid principal data: type={}'.format(type_))
             holder = AvatarHolder() if type_ == 'Avatar' else GroupHolder()
             if not holder.getById(id_):
-                raise validators.ValidationError('Invalid principal: {}:{}'.format(type_, id_))
+                raise ValidationError('Invalid principal: {}:{}'.format(type_, id_))
 
 
 class CreateBlockingForm(BlockingForm):
-    start_date = DateField(_('Start date'), [validators.DataRequired()])
-    end_date = DateField(_('End date'), [validators.DataRequired()])
+    start_date = DateField(_('Start date'), [DataRequired()])
+    end_date = DateField(_('End date'), [DataRequired()])
 
     def validate_start_date(self, field):
         if self.start_date.data > self.end_date.data:
-            raise validators.ValidationError('Blocking may not end before it starts!')
+            raise ValidationError('Blocking may not end before it starts!')
 
     validate_end_date = validate_start_date
 
@@ -522,7 +548,7 @@ class _TimePair(IndicoForm):
 
     def validate_start(self, field):
         if self.start.data and self.end.data and self.start.data >= self.end.data:
-            raise validators.ValidationError('The start time must be earlier than the end time.')
+            raise ValidationError('The start time must be earlier than the end time.')
 
     validate_end = validate_start
 
@@ -533,7 +559,7 @@ class _DateTimePair(IndicoForm):
 
     def validate_start(self, field):
         if self.start.data and self.end.data and self.start.data >= self.end.data:
-            raise validators.ValidationError('The start date must be earlier than the end date.')
+            raise ValidationError('The start date must be earlier than the end date.')
 
     validate_end = validate_start
 
@@ -541,26 +567,26 @@ class _DateTimePair(IndicoForm):
 class RoomForm(IndicoForm):
     name = StringField(_('Name'))
     site = StringField(_('Site'))
-    building = StringField(_('Building'), [validators.DataRequired()])
-    floor = StringField(_('Floor'), [validators.DataRequired()])
-    number = StringField(_('Number'), [validators.DataRequired()])
-    longitude = FloatField(_('Longitude'), [validators.Optional(), validators.NumberRange(min=0)])
-    latitude = FloatField(_('Latitude'), [validators.Optional(), validators.NumberRange(min=0)])
+    building = StringField(_('Building'), [DataRequired()])
+    floor = StringField(_('Floor'), [DataRequired()])
+    number = StringField(_('Number'), [DataRequired()])
+    longitude = FloatField(_('Longitude'), [Optional(), NumberRange(min=0)])
+    latitude = FloatField(_('Latitude'), [Optional(), NumberRange(min=0)])
     is_active = BooleanField(_('Active'))
     is_reservable = BooleanField(_('Public'))
     reservations_need_confirmation = BooleanField(_('Confirmations'))
     notification_for_assistance = BooleanField(_('Assistance'))
     notification_for_start = IntegerField(_('Notification on booking start - X days before'),
-                                          [validators.Optional(), validators.NumberRange(min=0, max=9)])
+                                          [Optional(), NumberRange(min=0, max=9)])
     notification_for_end = BooleanField(_('Notification on booking end'))
     notification_for_responsible = BooleanField(_('Notification to responsible, too'))
-    owner_id = HiddenField(_('Responsible user'), [validators.DataRequired()])
+    owner_id = HiddenField(_('Responsible user'), [DataRequired()])
     key_location = StringField(_('Where is key?'))
     telephone = StringField(_('Telephone'))
-    capacity = IntegerField(_('Capacity'), [validators.DataRequired(), validators.NumberRange(min=1)])
+    capacity = IntegerField(_('Capacity'), [DataRequired(), NumberRange(min=1)])
     division = StringField(_('Department'))
-    surface_area = IntegerField(_('Surface area'), [validators.NumberRange(min=0)])
-    max_advance_days = IntegerField(_('Maximum advance time for bookings'), [validators.NumberRange(min=1)])
+    surface_area = IntegerField(_('Surface area'), [NumberRange(min=0)])
+    max_advance_days = IntegerField(_('Maximum advance time for bookings'), [NumberRange(min=1)])
     comments = TextAreaField(_('Comments'))
     delete_photos = BooleanField(_('Delete photos'))
     large_photo = FileField(_('Large photo'))
@@ -573,8 +599,8 @@ class RoomForm(IndicoForm):
 
     def validate_large_photo(self, field):
         if not field.data and self.small_photo.data:
-            raise validators.ValidationError(_('When uploading a small photo you need to upload a large photo, too.'))
+            raise ValidationError(_('When uploading a small photo you need to upload a large photo, too.'))
 
     def validate_small_photo(self, field):
         if not field.data and self.large_photo.data:
-            raise validators.ValidationError(_('When uploading a large photo you need to upload a small photo, too.'))
+            raise ValidationError(_('When uploading a large photo you need to upload a small photo, too.'))

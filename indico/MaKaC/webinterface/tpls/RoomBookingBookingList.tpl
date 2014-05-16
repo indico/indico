@@ -54,30 +54,29 @@
   </div>
 </div>
 
-<script type="text/javascript">
-
+<script>
   % if numRooms or not ofMyRooms:
     var roomBookingCalendar = new RoomBookingCalendar(
-      ${ jsonEncode(barsFossil) },
-      ${ dayAttrs | n,j },
-      ${ dayLimit | n,j },
-      ${ overload | n,j },
-      {
-        'prevURL': '${ prevURL }',
-        'nextURL': '${ nextURL }',
-        'formUrl': '${ calendarFormUrl }',
-        'startD': '${ startD }',
-        'endD': '${ endD }',
-        'periodName': '${ periodName }',
-        'search': ${ search | n,j },
-        'params': ${ calendarParams | n,j },
-        'newBooking': ${ newBooking | n,j }
-      },
-      ${ manyRooms | n,j },
-      '${ repeatability }',
-      '${ finishDate | n,j }',
-      '${ flexibleDatesRange }'
-      ${ showRejectAllButton * (',"{}"'.format(urlHandlers.UHRoomBookingRejectAllConflicting.getURL())) }
+        ${ bars | n, j },
+        ${ day_attrs | n, j },
+        ${ dayLimit | n, j },
+        ${ overload | n, j },
+        {
+            'prevURL': '${ prevURL }',
+            'nextURL': '${ nextURL }',
+            'formUrl': '${ calendarFormUrl }',
+            'startD': '${ startD }',
+            'endD': '${ endD }',
+            'periodName': '${ periodName }',
+            'search': ${ search | n,j },
+            'params': ${ calendarParams | n,j },
+            'newBooking': ${ newBooking | n,j }
+        },
+        ${ manyRooms | n, j },
+        '${ repeatability }',
+        '${ finishDate | n, j }',
+        '${ flexibleDatesRange }'
+        ${ showRejectAllButton * (',"{}"'.format(urlHandlers.UHRoomBookingRejectAllConflicting.getURL())) }
     );
     $E('roomBookingCal').set(roomBookingCalendar.draw());
     roomBookingCalendar.addRepeatabilityBarsHovers();

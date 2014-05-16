@@ -11,7 +11,20 @@
     ${ _('Search bookings') }
 </h2>
 
-<form method="post" action="${ roomBookingBookingListURL }" id="searchBookings">
+% if errors:
+    <div class="error-message-box">
+        <div class="message-text">
+            ${ _("There are some errors in the search criteria:") }
+            <ul>
+                % for error in errors:
+                    <li>${ error }</li>
+                % endfor
+            </ul>
+        </div>
+    </div>
+% endif
+
+<form method="post" action="" id="searchBookings">
     <h2 class="group-title">
         <i class="icon-location"></i>
         ${ _('Taking place in') }
@@ -90,7 +103,7 @@
             </div>
         </div>
 
-        % if isResponsibleForRooms:
+        % if user_has_rooms:
         <div class="toolbar thin table">
             <div class="group i-selection">
                 <span class="i-button label">
@@ -194,7 +207,8 @@
     </div>
 </form>
 
-<script type="text/javascript">
+<script>
+    var rooms = ${ [r.to_serializable('__public_exhaustive__') for r in rooms] | j, n };
 
     function adjustDates(s, e) {
         if (s.datepicker('getDate') > e.datepicker('getDate'))
@@ -204,7 +218,7 @@
     function initWidgets() {
         $('#roomselector').roomselector({
             allowEmpty: false,
-            rooms: ${ rooms | j, n },
+            rooms: rooms,
             selectName: 'room_id_list',
             simpleMode: true
         });
@@ -217,7 +231,7 @@
         $('#start_date, #end_date').datepicker({
             onSelect: function() {
                 adjustDates(s, e);
-                $('searchBookings').trigger('change');
+                $('#searchBookings').trigger('change');
             }
         });
         s.datepicker('setDate', '+0');
@@ -292,10 +306,6 @@
             }
             else if(!confirm_search()) {
                 e.preventDefault();
-            }
-            else {
-                $('#start_date').val($('#start_date').val() + ' ' + $('#sTime').val());
-                $('#end_date').val($('#end_date').val() + ' ' + $('#eTime').val());
             }
         });
     });

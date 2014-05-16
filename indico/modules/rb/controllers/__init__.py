@@ -18,7 +18,7 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
-from flask import session
+from flask import session, request
 
 from MaKaC.plugins.base import PluginsHolder
 from MaKaC.webinterface.rh.base import RHProtected
@@ -55,50 +55,6 @@ class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtect
     def _checkProtection(self):
         RHRoomBookingProtected._checkProtection(self)
 
-
-    # Resv
-
-    def _check_start(self, default=None):
-        if default is None:
-            default = datetime.now()
-
-        sdate = request.values.get('sdate', '')
-        stime = request.values.get('stime', '')
-
-        try:
-            sdate = datetime.strptime(sdate, '%Y-%m-%d').date()
-        except ValueError:
-            sdate = default.date()
-
-        try:
-            stime = datetime.strptime(stime, '%H:%M').time()
-        except ValueError:
-            stime = default.time()
-
-        self.start = datetime.combine(sdate, stime)
-
-
-    def _check_end(self, default=None):
-        if default is None:
-            default = datetime.now()
-
-        edate = request.values.get('edate', '')
-        etime = request.values.get('etime', '')
-
-        try:
-            edate = datetime.strptime(edate, '%Y-%m-%d').date()
-        except ValueError:
-            edate = default.date()
-
-        try:
-            etime = datetime.strptime(etime, '%H:%M').time()
-        except ValueError:
-            etime = default.time()
-
-        self.end = datetime.combine(edate, etime)
-
-    def _checkAndSetParamsForReservation(self):
-        pass
 
     def _saveResvCandidateToSession(self, c):
         if self._formMode == FormMode.MODIF:

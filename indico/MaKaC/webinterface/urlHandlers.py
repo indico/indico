@@ -421,10 +421,6 @@ class UHRoomBookingSearch4Bookings(URLHandler):
     _endpoint = 'rooms.roomBooking-search4Bookings'
 
 
-class UHRoomBookingBookRoom(URLHandler):
-    _endpoint = 'rooms.roomBooking-bookRoom'
-
-
 class UHRoomBookingRoomList(BooleanMixin, URLHandler):
     _endpoint = 'rooms.roomBooking-roomList'
 
@@ -434,6 +430,7 @@ class UHRoomBookingBookingList(BooleanMixin, URLHandler):
 
     @classmethod
     def getURL(cls, **kw):
+        return '#'
         url = cls._getURL()
         url.setParams(kw)
         return url

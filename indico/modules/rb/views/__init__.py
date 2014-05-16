@@ -72,11 +72,11 @@ class WPRoomBookingBase(WPMainBase):
                                           or self._getAW().getUser().isAdmin()
                                           or self._getAW().getUser().isRBAdmin()))
 
-        self._roomsBookingOpt = SideMenuSection(currentPage=urlHandlers.UHRoomBookingBookRoom.getURL())
+        self._roomsBookingOpt = SideMenuSection(currentPage=url_for('rooms.book'))
 
         self._bookRoomNewOpt = SideMenuItem(
             _('Book a Room'),
-            urlHandlers.UHRoomBookingBookRoom.getURL(),
+            url_for('rooms.book'),
             enabled=True
         )
 
@@ -106,25 +106,25 @@ class WPRoomBookingBase(WPMainBase):
 
         self._myBookingListOpt = SideMenuItem(
             _('My bookings'),
-            urlHandlers.UHRoomBookingBookingList.getURL(is_only_mine=True, is_auto=True),
+            url_for('rooms.my_bookings'),
             enabled=True
         )
 
-        self._myPreBookingListOpt = SideMenuItem(
-            _('My PRE-bookings'),
-            urlHandlers.UHRoomBookingBookingList.getURL(is_only_mine=True, is_only_pre_bookings=True, is_auto=True),
+        self._myPendingBookingListOpt = SideMenuItem(
+            _('My Pre-bookings'),
+            url_for('rooms.my_pending_bookings'),
             enabled=True
         )
 
-        self._usersBookings = SideMenuItem(
+        self._usersBookingsOpt = SideMenuItem(
             _('Bookings in my rooms'),
-            urlHandlers.UHRoomBookingBookingList.getURL(is_only_my_rooms=True, is_auto=True),
+            url_for('rooms.bookings_my_rooms'),
             enabled=self._showResponsible
         )
 
-        self._usersPrebookings = SideMenuItem(
-            _('PRE-bookings in my rooms'),
-            urlHandlers.UHRoomBookingBookingList.getURL(is_only_my_rooms=True, is_only_pre_bookings=True, is_auto=True),
+        self._usersPendingBookingsOpt = SideMenuItem(
+            _('Pre-bookings in my rooms'),
+            url_for('rooms.pending_bookings_my_rooms'),
             enabled=self._showResponsible
         )
 
@@ -136,7 +136,7 @@ class WPRoomBookingBase(WPMainBase):
 
         self._blockingsOpt = SideMenuSection(_('Room Blocking'))
 
-        self._usersBlockings = SideMenuItem(
+        self._usersBlockingsOpt = SideMenuItem(
             _('Blockings for my rooms'),
             url_for('rooms.blocking_my_rooms', state='pending'),
             enabled=self._showResponsible
@@ -172,7 +172,7 @@ class WPRoomBookingBase(WPMainBase):
                 enabled=True
             )
 
-        self._blockRooms = SideMenuItem(
+        self._blockRoomsOpt = SideMenuItem(
             _('Block rooms'),
             url_for('rooms.create_blocking'),
             enabled=self._showResponsible
@@ -198,14 +198,14 @@ class WPRoomBookingBase(WPMainBase):
         self._leftMenu.addSection(self._bookingsOpt)
         self._bookingsOpt.addItem(self._bookARoomOpt)
         self._bookingsOpt.addItem(self._myBookingListOpt)
-        self._bookingsOpt.addItem(self._myPreBookingListOpt)
-        self._bookingsOpt.addItem(self._usersBookings)
-        self._bookingsOpt.addItem(self._usersPrebookings)
+        self._bookingsOpt.addItem(self._myPendingBookingListOpt)
+        self._bookingsOpt.addItem(self._usersBookingsOpt)
+        self._bookingsOpt.addItem(self._usersPendingBookingsOpt)
         self._bookingsOpt.addItem(self._bookingListSearchOpt)
         self._leftMenu.addSection(self._blockingsOpt)
-        self._blockingsOpt.addItem(self._blockRooms)
+        self._blockingsOpt.addItem(self._blockRoomsOpt)
         self._blockingsOpt.addItem(self._myBlockingListOpt)
-        self._blockingsOpt.addItem(self._usersBlockings)
+        self._blockingsOpt.addItem(self._usersBlockingsOpt)
         self._leftMenu.addSection(self._roomsOpt)
         self._roomsOpt.addItem(self._roomSearchOpt)
         self._roomsOpt.addItem(self._myRoomListOpt)
