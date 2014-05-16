@@ -1161,6 +1161,11 @@ type ("BookingPopup", ["ExclusivePopupWithButtons"],
 
 type ("SearchBookingList", ["SelectableDynamicListWidget"],
     {
+
+        _updateOffset: function() {
+            this.offset = this.new_offset;
+        },
+
         _prepareItems: function(itemsRaw) {
             var items = {};
 
@@ -1170,6 +1175,12 @@ type ("SearchBookingList", ["SelectableDynamicListWidget"],
 
             return items;
         },
+
+        _extractResult: function(result) {
+            this.new_offset = result.offset;
+            return result.results;
+        },
+
         _drawItem: function(pair) {
             var elem = pair.get(); // elem is a WatchObject
             var item = $('<div/>');
