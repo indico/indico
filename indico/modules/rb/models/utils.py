@@ -37,6 +37,7 @@ from sqlalchemy.orm import class_mapper
 from MaKaC import user as user_mod
 from MaKaC.accessControl import AdminList
 from MaKaC.plugins.base import PluginsHolder
+from MaKaC.user import Avatar
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.util.date_time import iterdays
@@ -152,7 +153,7 @@ def accessChecked(func):
             def isAuthorized(entity):
                 if isinstance(entity, user_mod.Group):
                     return entity.containsUser(avatar)
-                elif isinstance(entity, avatar):
+                elif isinstance(entity, Avatar):
                     return entity == avatar
                 else:
                     raise RuntimeError('Unexpected entity type')
