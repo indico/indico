@@ -23,6 +23,7 @@ from operator import attrgetter
 
 from itertools import groupby
 from flask import session
+from werkzeug.datastructures import MultiDict
 
 from MaKaC.common import Config
 from MaKaC.webinterface import urlHandlers as UH
@@ -65,6 +66,11 @@ class RoomBookingCalendarWidget(object):
         elif self.rooms is None:
             self.rooms = Room.find_all(is_active=True)
         self.rooms = sorted(self.rooms, key=lambda x: natural_sort_key(x.getFullName()))
+
+        self.blocked_rooms = BlockedRoom.find_with_filters({'room_ids': [r.id for r in self.rooms],
+                                                            'state': BlockedRoom.State.accepted,
+                                                            'start_date': self.start_dt.date(),
+                                                            'end_date': self.end_dt.date()})
 
         self._produce_bars()
 
@@ -171,9 +177,23 @@ class RoomBookingCalendarWidget(object):
         self.bars += map(Bar.from_occurrence, self.occurrences)
 
     def _produce_candidate_bars(self):
+        blocked_rooms_by_room = MultiDict((br.room_id, br) for br in self.blocked_rooms)
+
         for room in self.rooms:
+            blocked_rooms = blocked_rooms_by_room.getlist(room.id)
             for (start_dt, end_dt), candidates in self.candidates.iteritems():
-                self.bars.extend(Bar.from_candidate(cand, room.id, start_dt, end_dt) for cand in candidates)
+                # Check if there's a blocking
+                for blocked_room in blocked_rooms:
+                    blocking = blocked_room.blocking
+                    if blocking.start_date <= start_dt.date() <= blocking.end_date:
+                        break
+                else:
+                    # In case we didn't break the loop due to a match
+                    blocking = None
+
+                for cand in candidates:
+                    bar = Bar.from_candidate(cand, room.id, start_dt, end_dt, blocking)
+                    self.bars.append(bar)
 
     def _produce_prereservation_overlap_bars(self):
         for _, occurrences in groupby((o for o in self.occurrences if not o.reservation.is_confirmed),
@@ -198,12 +218,7 @@ class RoomBookingCalendarWidget(object):
                         self.bars.append(Bar(start, end, overlapping=True, reservation=occurrence.reservation))
 
     def _produce_blocking_bars(self):
-        blocked_rooms = BlockedRoom.find_with_filters({'room_ids': [r.id for r in self.rooms],
-                                                       'state': BlockedRoom.State.accepted,
-                                                       'start_date': self.start_dt.date(),
-                                                       'end_date': self.end_dt.date()})
-
-        for blocked_room in blocked_rooms:
+        for blocked_room in self.blocked_rooms:
             blocking = blocked_room.blocking
             self.bars.extend(Bar.from_blocked_room(blocked_room, day)
                              for day in self.iter_days()

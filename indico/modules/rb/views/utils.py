@@ -58,7 +58,8 @@ class Bar(Serializer):
                 kind = Bar.UNAVAILABLE if reservation.is_confirmed else Bar.PREBOOKED
             else:
                 kind = Bar.CONFLICT if reservation.is_confirmed else Bar.PRECONFLICT
-        elif blocking is not None:
+
+        if blocking is not None:
             self.blocking = blocking
 
         self.kind = kind
@@ -76,8 +77,8 @@ class Bar(Serializer):
         )
 
     @classmethod
-    def from_candidate(cls, candidate, room_id, resv_start, resv_end):
-        self = cls(candidate.start, candidate.end)
+    def from_candidate(cls, candidate, room_id, resv_start, resv_end, blocking=None):
+        self = cls(candidate.start, candidate.end, blocking=blocking)
         self.room_id = room_id
         self.reservation_start = resv_start
         self.reservation_end = resv_end

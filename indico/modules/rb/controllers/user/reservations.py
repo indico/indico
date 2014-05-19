@@ -257,7 +257,7 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
         return self._show_confirm(room, form)
 
     def _create_booking(self, form, room):
-        is_admin = session.user.isAdmin() and not session.user.isRBAdmin()
+        is_admin = session.user.isRBAdmin()
         skip_conflicts = form.skip_conflicts.data
 
         reservation = Reservation()

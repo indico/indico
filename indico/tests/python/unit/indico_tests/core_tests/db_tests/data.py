@@ -476,7 +476,7 @@ ATTRIBUTE_KEYS = [
         'is_for_reservations': False
     },
     {
-        'name': 'Allowed Booking Group',
+        'name': 'allowed booking group',
         'is_for_rooms': True,
         'is_for_reservations': False
     },

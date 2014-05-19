@@ -19,6 +19,7 @@
 
 from indico.core.config import Config
 from indico.modules.rb.controllers.mixins import RoomBookingAvailabilityParamsMixin
+from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from MaKaC.services.implementation.base import LoggedOnlyService, ServiceBase
@@ -135,14 +136,14 @@ class RoomBookingLocationsAndRoomsGetLink(ServiceBase):
 
 class BookingPermission(LoggedOnlyService):
     def _checkParams(self):
-        self._room = CrossLocationQueries.getRooms(roomID=self._params["room_id"])[0]
         blocking_id = self._params.get('blocking_id')
-        self._blocking = RoomBlockingBase.getById(blocking_id) if blocking_id else None
+        self._room = Room.get(self._params['room_id'])
+        self._blocking = Blocking.get(blocking_id) if blocking_id else None
 
     def _getAnswer(self):
         user = self._aw.getUser()
         return {
-            'blocked': not self._blocking.canOverride(user) if self._blocking else False,
-            'can_book': self._room.canBook(user) or self._room.canPrebook(user),
-            'group': self._room.customAtts.get('Booking Simba List')
+            'blocked': not self._blocking.can_be_overridden(user, self._room) if self._blocking else False,
+            'can_book': self._room.can_be_booked(user) or self._room.can_be_prebooked(user),
+            'group': self._room.get_attribute_value('allowed booking group')
         }

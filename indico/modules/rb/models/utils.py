@@ -144,8 +144,7 @@ def accessChecked(func):
         try:
             avatar = args[-1]
         except IndexError:
-            IndicoError(_('accessChecked decorator expects '
-                          'an avatar as a positional argument'))
+            IndicoError(_('accessChecked decorator expects an avatar as a positional argument'))
 
         if AdminList.getInstance().isAdmin(avatar):
             return True

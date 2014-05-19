@@ -108,13 +108,13 @@ type ("RoomBookingCalendarBar", [],
             // TODO missing canReject and rejectURL
             this.canReject = barInfo.canReject;
             this.rejectURL = barInfo.rejectURL;
+            this.blocking = barInfo.blocking_data;
             if (barInfo.forReservation) {
                 this.reason = barInfo.forReservation.reason;
                 this.owner = barInfo.forReservation.bookedForName;
                 this.url = barInfo.forReservation.bookingUrl;
                 this.inDB = barInfo.forReservation.id !== null;
-            } else if (barInfo.blocking_data) {
-                this.blocking = barInfo.blocking_data;
+            } else if (barInfo.type == 0) {
                 this.url = barInfo.blocking_data.blocking_url;
                 this.inDB = true
             } else {
@@ -311,7 +311,7 @@ type ("RoomBookingCalendarDrawer", [],
              * Checks if the bar corresponds to a protected room. In that case, checks if the user has permission to book it.
              * @param  {RoomBookingCalendarBar} bar  The bar containing the information of the room.
              */
-            _ajaxClick: function(bar, url, element) {
+            _ajaxClick: function(bar, element) {
                 // get conflicts per occurrence
                 var conflicts = $('.barDefaultHover').closest('.dayCalendarDiv').map(function() {
                     return $(this).find('.barConf').length;

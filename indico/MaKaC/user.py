@@ -1005,30 +1005,29 @@ class Avatar(Persistent, Fossilizable):
 
     # Room booking related
 
-    def isMemberOfSimbaList(self, simbaListName):
-
+    def is_member_of_group(self, group_name):
         # Try to get the result from the cache
         try:
-            if simbaListName in self._v_isMember.keys():
-                return self._v_isMember[simbaListName]
-        except:
+            if group_name in self._v_isMember.keys():
+                return self._v_isMember[group_name]
+        except Exception:
             self._v_isMember = {}
 
         groups = []
         try:
             # try to get the exact match first, which is what we expect since
             # there shouldn't be uppercase letters
-            groups.append(GroupHolder().getById(simbaListName))
+            groups.append(GroupHolder().getById(group_name))
         except KeyError:
-            groups = GroupHolder().match({ 'name': simbaListName }, searchInAuthenticators = False, exact=True)
+            groups = GroupHolder().match({'name': group_name}, searchInAuthenticators=False, exact=True)
             if not groups:
-                groups = GroupHolder().match({ 'name': simbaListName }, exact=True)
+                groups = GroupHolder().match({'name': group_name}, exact=True)
 
         if groups:
             result = groups[0].containsUser(self)
-            self._v_isMember[simbaListName] = result
+            self._v_isMember[group_name] = result
             return result
-        self._v_isMember[simbaListName] = False
+        self._v_isMember[group_name] = False
         return False
 
     def isAdmin(self):

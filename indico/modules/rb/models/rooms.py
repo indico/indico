@@ -314,7 +314,7 @@ class Room(db.Model, Serializer):
         return self.query \
                    .outerjoin(RoomAttributeAssociation) \
                    .outerjoin(RoomAttribute) \
-                   .filter(RoomAttribute.name == 'Allowed Booking Group', Room.is_reservable == True) \
+                   .filter(RoomAttribute.name == 'allowed booking group', Room.is_reservable) \
                    .count() == 0
 
     @property
@@ -381,7 +381,7 @@ class Room(db.Model, Serializer):
 
     @property
     def has_booking_groups(self):
-        return self.has_attribute('Allowed Booking Group')
+        return self.has_attribute('allowed booking group')
 
     @property
     def kind(self):
@@ -798,7 +798,7 @@ class Room(db.Model, Serializer):
     #                      .first())
     #     return attribute
 
-    def getAttributeValueByName(self, name):
+    def get_attribute_value(self, name):
         attr = self.getAttributeByName(name)
         if attr:
             return attr.value
@@ -843,38 +843,33 @@ class Room(db.Model, Serializer):
         return True
 
     @utils.accessChecked
-    def canBeBookedByProcess(self, avatar, pre=False):
-        """
-        Execution for canBeBookedBy and canBePreBookedBy methods
-        """
-        if self.is_active and self.is_reservable and (pre or not self.reservations_need_confirmation):
-            # TODO:
-            # allowed_groups = self.getAttributeByName('Allowed Booking Group')
-            allowed_groups = []
-            if not allowed_groups or allowed_groups.contains(avatar):
-                return True
-
+    def _can_be_booked(self, avatar, prebook=False):
         if not avatar:
             return False
 
         if avatar.isRBAdmin() or (self.isOwnedBy(avatar) and self.is_active):
             return True
 
+        if self.is_active and self.is_reservable and (prebook or not self.reservations_need_confirmation):
+            group_name = self.get_attribute_value('allowed booking group')
+            if not group_name or avatar.is_member_of_group(group_name):
+                return True
+
         return False
 
-    def canBeBookedBy(self, avatar):
+    def can_be_booked(self, avatar):
         """
         Reservable rooms which does not require pre-booking can be booked by anyone.
         Other rooms - only by their responsibles.
         """
-        return self.canBeBookedByProcess(avatar)
+        return self._can_be_booked(avatar)
 
-    def canBePreBookedBy(self, avatar):
+    def can_be_prebooked(self, avatar):
         """
         Reservable rooms can be pre-booked by anyone.
         Other rooms - only by their responsibles.
         """
-        return self.canBeBookedByProcess(avatar, pre=True)
+        return self._can_be_booked(avatar, prebook=True)
 
     def canBeModifiedBy(self, accessWrapper):
         """Only admin can modify rooms."""
@@ -914,8 +909,8 @@ class Room(db.Model, Serializer):
         return GroupHolder().match({'name': group_name}, exact=True)
 
     def getAllManagers(self):
-        managers = set([self.responsible_id])
-        manager_groups = self.getAttributeValueByName('Manager Group')
+        managers = {self.owner_id}
+        manager_groups = self.get_attribute_value('Manager Group')
         for group_name in (manager_groups and manager_groups['is_equipped']):
             groups = self.getGroups(group_name)
             if groups and len(groups) == 1:
