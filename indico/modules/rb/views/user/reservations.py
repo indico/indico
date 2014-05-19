@@ -28,6 +28,7 @@ from MaKaC.common import Config
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.wcomponents import WTemplated
 from indico.modules.rb.controllers.utils import getRoomBookingOption
+from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatMapping
@@ -70,7 +71,7 @@ class RoomBookingCalendarWidget(object):
     def render(self, show_empty_rooms=True, show_empty_days=True, form_data=None, show_summary=True, show_navbar=True,
                can_navigate=True):
         bars = self.build_bars_data(show_empty_rooms, show_empty_days)
-        days = self.build_days_attrs() if bars else {}
+        days = self.build_days_attrs() if self.specific_room and bars else {}
 
         period = self.end_dt.date() - self.start_dt.date() + timedelta(days=1)
 
@@ -164,6 +165,7 @@ class RoomBookingCalendarWidget(object):
         if self.candidates is not None:
             self._produce_candidate_bars()
             self._produce_conflict_bars()
+        self._produce_blocking_bars()
 
     def _produce_reservation_bars(self):
         self.bars += map(Bar.from_occurrence, self.occurrences)
@@ -194,6 +196,18 @@ class RoomBookingCalendarWidget(object):
                         start, end = candidate.get_overlap(occurrence)
                         self.conflicts += occurrence.reservation.is_confirmed
                         self.bars.append(Bar(start, end, overlapping=True, reservation=occurrence.reservation))
+
+    def _produce_blocking_bars(self):
+        blocked_rooms = BlockedRoom.find_with_filters({'room_ids': [r.id for r in self.rooms],
+                                                       'state': BlockedRoom.State.accepted,
+                                                       'start_date': self.start_dt.date(),
+                                                       'end_date': self.end_dt.date()})
+
+        for blocked_room in blocked_rooms:
+            blocking = blocked_room.blocking
+            self.bars.extend(Bar.from_blocked_room(blocked_room, day)
+                             for day in self.iter_days()
+                             if blocking.start_date <= day <= blocking.end_date)
 
 
 class WPRoomBookingBookRoom(WPRoomBookingBase):
@@ -347,8 +361,9 @@ class WPRoomBookingSearchBookingsResults(WPRoomBookingBase):
 
     def _getBody(self, params):
         params['summary'] = self._get_criteria_summary(params)
-        params['calendar'] = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
-                                                       rooms=params['rooms']).render(form_data=params['form_data'])
+        calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
+                                             rooms=params['rooms'])
+        params['calendar'] = calendar.render(form_data=params['form_data'])
         return WTemplated('RoomBookingSearchBookingsResults').getHTML(params)
 
 

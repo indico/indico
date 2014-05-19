@@ -111,15 +111,18 @@ type ("RoomBookingCalendarBar", [],
             if (barInfo.forReservation) {
                 this.reason = barInfo.forReservation.reason;
                 this.owner = barInfo.forReservation.bookedForName;
-                this.bookingUrl = barInfo.forReservation.bookingUrl;
+                this.url = barInfo.forReservation.bookingUrl;
                 this.inDB = barInfo.forReservation.id !== null;
+            } else if (barInfo.blocking_data) {
+                this.blocking = barInfo.blocking_data;
+                this.url = barInfo.blocking_data.blocking_url;
+                this.inDB = true
             } else {
                 this.inDB = false;
             }
-            this.resvStartDT = IndicoUtil.parseJsonDate(barInfo.resvStartDT);
-            this.resvEndDT = IndicoUtil.parseJsonDate(barInfo.resvEndDT);
-            this.blocking = barInfo.blocking;
             this.type = barClasses[parseInt(barInfo.type)];
+            this.resvStartDT = barInfo.resvStartDT && IndicoUtil.parseJsonDate(barInfo.resvStartDT);
+            this.resvEndDT = barInfo.resvEndDT && IndicoUtil.parseJsonDate(barInfo.resvEndDT);
         }
         );
 
@@ -251,8 +254,8 @@ type ("RoomBookingCalendarDrawer", [],
                     resvInfo = $T("Click to book it") + '<br>' + bar.startDT.print("%H:%M") + "  -  " + bar.endDT.print("%H:%M");
                 } else if (bar.type == "barBlocked") {
                     resvInfo = $T("Room blocked by") + ":<br/>" +
-                                  bar.blocking["creator"] + "<br/>" +
-                                  $T('Reason') + ': ' + bar.blocking["message"];
+                                  bar.blocking.creator + "<br/>" +
+                                  $T('Reason') + ': ' + bar.blocking.reason;
                 } else {
                     resvInfo = bar.startDT.print("%H:%M") + "  -  " +
                                bar.endDT.print("%H:%M") + "<br />" +
@@ -271,7 +274,7 @@ type ("RoomBookingCalendarDrawer", [],
 
                 if(bar.inDB) {
                     barDiv.observeClick(function(){
-                        window.location = bar.bookingUrl;
+                        window.location = bar.url;
                     });
                 }
 
@@ -703,7 +706,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                 if(!(bar.type == 'barPreC' || bar.type == 'barConf' || bar.type == 'barPreConc')) {
                     var showBookingLink = Html.p({className:"fakeLink"}, $T("Show"));
                     showBookingLink.observeClick(function(){
-                        window.open(bar.bookingUrl);
+                        window.open(bar.url);
                     });
                     var rejectionLink;
                     if (bar.canReject){
@@ -724,7 +727,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
 
                     var attrs = {}, cursorStyle = '';
                     if(bar.inDB || bar.type == 'barCand') {
-                        attrs.onclick = "window.location='" + bar.bookingUrl + "';";
+                        attrs.onclick = "window.location='" + bar.url + "';";
                         cursorStyle = 'pointer';
                     }
                     return Html.div({ onmouseover : "this.style.backgroundColor='#f0f0f0';", onmouseout : "this.style.backgroundColor='#ffffff';", style:{clear:'both', overflow:'auto', cursor:cursorStyle}},

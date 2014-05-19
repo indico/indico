@@ -21,10 +21,12 @@ from ast import literal_eval
 from datetime import datetime, time, timedelta, date
 
 from flask import request, session
+from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from werkzeug.datastructures import MultiDict
 from indico.core.db import db
 
 from indico.core.errors import IndicoError, FormValuesError
+from indico.modules.rb.models.blockings import Blocking
 from indico.util.date_time import server_to_utc, get_datetime_from_request
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key

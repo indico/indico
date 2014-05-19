@@ -26,6 +26,7 @@ from operator import attrgetter
 from indico.core.db import db
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
+from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
@@ -74,6 +75,18 @@ class BlockedRoom(db.Model):
     @property
     def state_name(self):
         return self.State(self.state).title
+
+    @classmethod
+    def find_with_filters(cls, filters):
+        q = cls.find(_eager=BlockedRoom.blocking, _join=Blocking)
+        if filters.get('room_ids'):
+            q = q.filter(BlockedRoom.room_id.in_(filters['room_ids']))
+        if filters.get('start_date') and filters.get('end_date'):
+            q = q.filter(Blocking.start_date <= filters['end_date'],
+                         Blocking.end_date >= filters['start_date'])
+        if filters.get('state'):
+            q = q.filter(BlockedRoom.state == filters['state'])
+        return q
 
     def reject(self, user=None, reason=None):
         """Reject the room blocking."""

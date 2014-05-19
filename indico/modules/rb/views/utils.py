@@ -16,6 +16,8 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from datetime import datetime, time
+from indico.web.flask.util import url_for
 
 from indico.modules.rb.models.utils import Serializer
 from indico.util.date_time import format_time
@@ -24,7 +26,7 @@ from MaKaC.webinterface import urlHandlers as UH
 
 class Bar(Serializer):
     __public__ = [
-        'forReservation', 'startDT', 'endDT', ('kind', 'type'), 'blocking', ('reservation_start', 'resvStartDT'),
+        'forReservation', 'blocking_data', 'startDT', 'endDT', ('kind', 'type'), ('reservation_start', 'resvStartDT'),
         ('reservation_end', 'resvEndDT')
     ]
 
@@ -43,6 +45,10 @@ class Bar(Serializer):
         self.start = start
         self.end = end
         self.reservation = reservation
+        self.reservation_start = None
+        self.reservation_end = None
+        self.room_id = None
+        self.blocking = None
 
         if reservation is not None:
             self.reservation_start = reservation.start_date
@@ -52,13 +58,10 @@ class Bar(Serializer):
                 kind = Bar.UNAVAILABLE if reservation.is_confirmed else Bar.PREBOOKED
             else:
                 kind = Bar.CONFLICT if reservation.is_confirmed else Bar.PRECONFLICT
-        else:
-            self.reservation_start = None
-            self.reservation_end = None
-            self.room_id = None
+        elif blocking is not None:
+            self.blocking = blocking
 
         self.kind = kind
-        self.blocking = blocking
 
     def __cmp__(self, other):
         return cmp(self.kind, other.kind)
@@ -84,6 +87,13 @@ class Bar(Serializer):
     def from_occurrence(cls, occurrence):
         return cls(occurrence.start, occurrence.end, reservation=occurrence.reservation)
 
+    @classmethod
+    def from_blocked_room(cls, blocked_room, day):
+        bar = cls(datetime.combine(day, time()), datetime.combine(day, time(23, 59)), Bar.BLOCKED,
+                  blocking=blocked_room.blocking)
+        bar.room_id = blocked_room.room_id
+        return bar
+
     @property
     def date(self):
         return self.start.date()
@@ -102,6 +112,17 @@ class Bar(Serializer):
                     resvID=self.reservation.id
                 ))
             }
+
+    @property
+    def blocking_data(self):
+        if not self.blocking:
+            return None
+        return {
+            'id': self.blocking.id,
+            'creator': self.blocking.created_by_user.getFullName(),
+            'reason': self.blocking.reason,
+            'blocking_url': url_for('rooms.blocking_details', blocking_id=self.blocking.id)
+        }
 
     @property
     def importance(self):
