@@ -53,18 +53,5 @@ class BookableTime(db.Model):
             self.end_time
         )
 
-    def toDict(self):
-        return {
-            'start_time': self.start_time,
-            'end_time': self.end_time
-        }
-
-    def saveFromDict(self, d):
-        if 'start_time' in d:
-            self.start_time = d['start_time']
-
-        if 'end_time' in d:
-            self.start_time = d['end_time']
-
-    def isFit(self, st, et):
-        return self.start_time >= st and self.end_time <= et
+    def fits_period(self, st, et):
+        return self.start_time <= st and self.end_time >= et

@@ -422,7 +422,7 @@ def migrate_reservations(rb_root):
 
                 el = ReservationEditLog(
                     timestamp=ts,
-                    avatar_id=h._responsibleUser,
+                    user_name=h._responsibleUser,
                     info=convert_to_unicode('```'.join(h._info))
                 )
                 r.edit_logs.append(el)

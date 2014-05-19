@@ -764,48 +764,14 @@ class Room(db.Model, Serializer):
     def belongsTo(self, avatar):
         raise NotImplementedError('todo')
 
-    # bookable times
-
     def getBookableTimes(self):
         return self.bookable_times.all()
-
-    def getBookableTimesOrDefault(self):
-        return self.getBookableTimes() or [BookableTime(start_time=None, end_time=None)]
-
-    def addBookableTime(self, bookable_time):
-        self.bookable_times.append(bookable_time)
-
-    # TODO: better remove
-    def clearBookableTimes(self):
-        for bt in self.bookable_times.all():
-            self.bookable_times.remove(bt)
-
-    def setBookableTimes(self, bookable_times):
-        self.clearBookableTimes()
-        self.bookable_times.extend(bookable_times)
-
-    # nonbookable dates
 
     def getNonBookableDates(self, skip_past=False):
         q = self.nonbookable_dates
         if skip_past:
             q = q.filter(NonBookableDate.start_date >= nowutc())
         return q.all()
-
-    def getNonBookableDatesOrDefault(self):
-        return self.getNonBookableDates() or [NonBookableDate(start_date=None, end_date=None)]
-
-    def addNonBookableDate(self, nonbookable_date):
-        self.nonbookable_dates.append(nonbookable_date)
-
-    # TODO: better remove
-    def clearNonBookableDates(self):
-        for nbd in self.nonbookable_dates.all():
-            self.nonbookable_dates.remove(nbd)
-
-    def setNonBookableDates(self, nonbookable_dates):
-        self.clearNonBookableDates()
-        self.nonbookable_dates.extend(nonbookable_dates)
 
     # blocked rooms
 

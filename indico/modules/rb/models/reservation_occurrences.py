@@ -207,16 +207,26 @@ class ReservationOccurrence(db.Model):
         return date_time.get_overlap((self.start, self.end), (occurrence.start, occurrence.end))
 
     def cancel(self, reason):
+        print 'CANCEL', self, reason
         self.is_cancelled = True
         self.rejection_reason = reason
 
     def reject(self, reason):
         # TODO: is_rejected
+        print 'REJECT', self, reason
         self.cancel(reason)
 
     @hybrid_property
     def is_rejected(self):
         return self.is_cancelled
+
+    @hybrid_property
+    def is_valid(self):
+        return not self.is_rejected and not self.is_cancelled
+
+    @is_valid.expression
+    def is_valid(self):
+        return ~self.is_rejected & ~self.is_cancelled
 
     def notify_rejection(self, reason=''):
         return self.reservation.notify_rejection(reason, self.date)

@@ -30,9 +30,12 @@ from indico.util.string import return_ascii
 class ReservationEditLog(db.Model):
     __tablename__ = 'reservation_edit_logs'
 
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
     timestamp = db.Column(
         UTCDateTime,
-        primary_key=True,
         nullable=False,
         default=now_utc
     )
@@ -40,22 +43,20 @@ class ReservationEditLog(db.Model):
         db.String,
         nullable=False
     )
-    avatar_id = db.Column(
+    user_name = db.Column(
         db.String,
-        primary_key=True,
         nullable=False
     )
     reservation_id = db.Column(
         db.Integer,
         db.ForeignKey('reservations.id'),
-        primary_key=True,
         nullable=False
     )
 
     @return_ascii
     def __repr__(self):
         return u'<ReservationEditLog({0}, {1}, {2}, {3})>'.format(
-            self.avatar_id,
+            self.user_name,
             self.reservation_id,
             self.timestamp,
             self.info

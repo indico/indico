@@ -354,7 +354,7 @@
                           <span class="titleCellFormat">${ _('Actions') }</span>
                         </td>
                         <td colspan="2">
-                          <form id="submits" name="submits" action="${ booking_form_url }" method="post">
+                          <form id="submits" name="submits" action="#" method="post">
                             <ul id="button-menu" class="ui-list-menu ui-list-menu-level ui-list-menu-level-0" style="float:left;">
                               % if room.canBeBookedBy(user):
                                 <li class="button" style="margin-left: 10px" onclick="$('#submits').submit(); return false;">

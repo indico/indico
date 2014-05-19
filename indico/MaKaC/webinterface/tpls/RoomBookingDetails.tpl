@@ -189,14 +189,14 @@
                         </a>
                       </td>
                     </tr>
-                    % if reservation.room.photoId != None:
+                    % if reservation.room.photo_id is not None:
                       <tr>
                         <td class="subFieldWidth" align="right" valign="top">
                           ${ _('Interior') }&nbsp;&nbsp;
                         </td>
                         <td align="left" class="thumbnail">
-                          <a href="${ reservation.room.getPhotoURL() }" nofollow="lightbox" title="${ reservation.room.photoId }">
-                            <img border="1px" src="${ reservation.room.getSmallPhotoURL() }"/>
+                          <a href="${ reservation.room.large_photo_url }" nofollow="lightbox">
+                            <img border="1px" src="${ reservation.room.small_photo_url }"/>
                           </a>
                         </td>
                       </tr>
@@ -240,7 +240,7 @@
                         ${ _('Hours') }&nbsp;&nbsp;
                       </td>
                       <td align="left" class="blacktext">
-                        ${ verbose_t(reservation.start_date.time()) } &mdash; ${ verbose_t(reservation.end_date.time()) }
+                        ${ formatTime(reservation.start_date, server_tz=True) } &mdash; ${ formatTime(reservation.end_date, server_tz=True) }
                       </td>
                     </tr>
                       <tr>
@@ -248,7 +248,7 @@
                           ${ _('Type') }&nbsp;&nbsp;
                         </td>
                         <td align="left" class="blacktext">
-                          ${ reservation.verboseRepetition }${contextHelp('repetitionTypeHelp') }
+                          ${ repetition }${contextHelp('repetitionTypeHelp') }
                         </td>
                       </tr>
                     </table>
@@ -267,7 +267,7 @@
                           ${ _('Name') }&nbsp;&nbsp;
                         </td>
                         <td align="left" class="blacktext">
-                          ${ verbose(reservation.bookedForName) }
+                          ${ verbose(reservation.booked_for_name) }
                         </td>
                       </tr>
                       <tr>
@@ -303,7 +303,7 @@
                           ${ _('By') }&nbsp;&nbsp;
                         </td>
                         <td align="left" class="blacktext">
-                          ${ reservation.verbose_created_by }
+                          ${ reservation.created_by_user.getFullName() if reservation.created_by_user else '' }
                         </td>
                       </tr>
                       <tr>
@@ -311,7 +311,7 @@
                           ${ _('Date') }&nbsp;&nbsp;
                         </td>
                         <td align="left" class="blacktext">
-                          ${ verbose_dt(reservation.created_date) } ${contextHelp('createdHelp') }
+                          ${ formatDateTime(reservation.created_at) } ${contextHelp('createdHelp') }
                         </td>
                       </tr>
                       <tr>
@@ -319,7 +319,7 @@
                           ${ _('Reason') }&nbsp;&nbsp;
                         </td>
                         <td align="left" class="blacktext">
-                          ${ reservation.reason }
+                          ${ reservation.booking_reason }
                         </td>
                       </tr>
                       % if reservation.room.needs_video_conference_setup:
@@ -327,10 +327,11 @@
                           <td class="subFieldWidth" align="right" valign="top">
                             ${ _('Video-conf.') }&nbsp;&nbsp;
                           </td>
-                          <!-- TODO: getUseVC -->
                           <td align="left" class="blacktext">
-                            ${ verbose(reservation.uses_video_conference, 'no') }
-                            <font color="grey">(${ ', '.join(reservation.getUseVC()) })</font>
+                            ${ _('yes') if reservation.uses_video_conference else _('no') }
+                            % if vc_equipment:
+                              <span style="color: grey;">(${ vc_equipment })</span>
+                            % endif
                             ${ contextHelp('iWillUseVideoConferencing') }
                           </td>
                         </tr>
@@ -344,8 +345,7 @@
                           </td>
                         </tr>
                       % endif
-                      <!-- TODO: Email setup -->
-                      % if rh._isAssistenceEmailSetup and reservation.room.notification_for_assistance:
+                      % if assistence_emails and reservation.room.notification_for_assistance:
                         <tr>
                           <td class="subFieldWidth" align="right" valign="top" nowrap>
                             ${ _('Startup Assistance') }&nbsp;&nbsp;
@@ -370,7 +370,8 @@
                             ${ _('Status') }&nbsp;&nbsp;
                           </td>
                           <td align="left" class="blacktext">
-                            ${ reservation.verbose_status }${contextHelp('statusHelp') }
+                            ${ reservation.status_string }
+                            ${contextHelp('statusHelp') }
                           </td>
                         </tr>
                       </table>
@@ -383,44 +384,31 @@
                     </td>
                     <td>
                     <form id="submits" name="submits" action="" method="post">
-                      <ul id="button-menu" class="ui-list-menu ui-list-menu-level ui-list-menu-level-0 " style="float:left; padding-top: 15px">
+                      <div style="float:left; padding-top: 15px;">
                         % if not reservation.is_cancelled and not reservation.is_rejected:
-                          % if canCancel:
-                            <li class="button" style="margin-left: 10px" onclick="submit_cancel(${[str(formatDate(period.startDT.date(), format='d MMM yyyy')) for period in reservation.splitToPeriods()]});return false;">
-                              <a href="#" onClick="return false;">${ _('Cancel Booking') }</a>
-                            </li>
+                          % if can_be_cancelled:
+                            <a class="i-button" href="#" onclick="submit_cancel(); return false;">${ _('Cancel') }</a>
                           % endif
-                          % if canReject and not reservation.is_confirmed:
-                            <li class="button" style="margin-left: 10px" onclick="submit_accept()   ;return false; return false;">
-                              <a href="#" onClick="return false;">${ _('Accept') }</a>
-                            </li>
+                          % if can_be_rejected and not reservation.is_confirmed:
+                            <a class="i-button" href="#" onclick="submit_accept(); return false;">${ _('Accept') }</a>
                           % endif
-                          % if canReject:
-                            <li class="button" style="margin-left: 10px" onclick="submit_reject(${[str(formatDate(period.startDT.date(), format='d MMM yyyy')) for period in reservation.splitToPeriods()]});return false;">
-                              <a href="#" onClick="return false;">${ _('Reject') }</a>
-                            </li>
+                          % if can_be_rejected:
+                            <a class="i-button" href="#" onclick="submit_reject(); return false;">${ _('Reject') }</a>
                           % endif
-                          % if reservation.canBeModifiedBy(user):
-                            <li class="button" style="margin-left: 10px" onclick="submit_modify();return false;">
-                              <a href="#" onClick="return false;">${ _('Modify') }</a>
-                            </li>
+                          % if reservation.can_be_modified(user):
+                            <a class="i-button" href="#" onclick="submit_modify(); return false;">${ _('Modify') }</a>
                           % endif
                         % endif
-                        % if reservation.canBeDeletedBy(user):
-                          <li class="button" style="margin-left: 10px" onclick="submit_delete();return false;">
-                            <a href="#" onClick="return false;">${ _('Delete') }</a>
-                          </li>
+                        % if reservation.can_be_deleted(user):
+                          <a class="i-button" href="#" onclick="submit_delete(); return false;">${ _('Delete') }</a>
                         % endif
-                        <li class="button" style="margin-left: 10px" onclick="submit_clone();return false;">
-                          <a href="#" onClick="return false;">${ _('Clone') }</a>
-                        </li>
-                        <li style="display: none"></li>
-                      </ul>
+                        <a class="i-button" href="#" onclick="submit_clone(); return false;">${ _('Clone') }</a>
+                      </div>
                     </form>
                   </td>
                 </tr>
                 <!-- TODO: history methods -->
-                % if reservation.getResvHistory().hasHistory() and (reservation.isOwnedBy(user) or reservation.room.isOwnedBy(user) or user.isAdmin()):
+                % if edit_logs and (reservation.created_by_user == user or reservation.room.isOwnedBy(user) or user.isAdmin()):
                   <tr><td>&nbsp;</td></tr>
                   <!-- BOOKING HISTORY -->
                   <script type="text/javascript">
@@ -431,8 +419,8 @@
                         // TODO: fakeLink
                         $E('bookingEntryMoreInfo' + entryNum).dom.className = "fakeLink bookingDisplayEntryMoreInfo";
                          } else {
-                             IndicoUI.Effect.slide('bookingEntryLine' + entryNum,  val('height' + entryNum));
-                             $E('bookingEntryMoreInfo' + entryNum).set('Hide Info' ;
+                             IndicoUI.Effect.slide('bookingEntryLine' + entryNum,  eval('height' + entryNum));
+                             $E('bookingEntryMoreInfo' + entryNum).set('Hide Info');
                              $E('bookingEntryMoreInfo' + entryNum).dom.className = "fakeLink bookingDisplayEntryHideInfo";
                          }
                          return !state
@@ -444,18 +432,19 @@
                   </td>
                   <td>
                     <% count = 0 %>
-                    % for entry in reservation.getResvHistory().getEntries() :
-                      % if count == 1 :
+                    % for entry in edit_logs:
+                      <% info = entry.info.split('```') %>
+                      % if count == 1:
                         <!-- Construct the divs needed by the sliding effect -->
                         <div id="bookingHistoryLine" style="visibility: hidden; overflow: hidden;">
                         <div class="bookingDisplayBookingHistoryLine">
                       % endif
                       <div class="bookingHistoryEntry">
                         <span class="bookingDisplayHistoryTimestamp">
-                          ${ entry.getTimestamp() }
+                          ${ formatDateTime(entry.timestamp) }
                         </span>
-                        <span class="bookingDisplayHistoryInfo">${ entry.getInfo()[0] } ${ _('by') } ${ entry.getResponsibleUser() }
-                        % if len(entry.getInfo()) > 1 :
+                        <span class="bookingDisplayHistoryInfo">${ info[0] } ${ _('by') } ${ entry.user_name }
+                        % if len(info) > 1:
                             <span class='fakeLink bookingDisplayEntryMoreInfo' id='bookingEntryMoreInfo${ count }'>
                               ${ _('More Info') }
                             </span>
@@ -463,10 +452,8 @@
                           <div id="bookingEntryLine${ count }"  style="visibility: hidden; overflow: hidden;">
                             <div class="bookingDisplayEntryLine">
                               <ul>
-                                % for elem in entry.getInfo():
-                                  % if entry.getInfo().index(elem) != 0:
-                                    <li>${ elem }</li>
-                                  % endif
+                                % for elem in info[1:]:
+                                  <li>${ elem }</li>
                                 % endfor
                               </ul>
                             </div>
@@ -477,7 +464,7 @@
                                     $E('bookingEntryMoreInfo${ count }').dom, event,
                                     '<div class="bookingHistoryTooltip">Click here to show / hide detailed information.</div>'
                                 );
-                            }
+                            };
                             var showEntryMoreState${ count } = false;
                             var height${ count } = IndicoUI.Effect.prepareForSlide('bookingEntryLine${ count }', true);
                             $E('bookingEntryMoreInfo${ count }').observeClick(function () {
@@ -492,7 +479,7 @@
                         <% count += 1 %>
                       </div>
                     % endfor
-                    % if count > 1 :
+                    % if count > 1:
                       </div>
                       </div>
                       <div class="bookingShowHideHistory">
@@ -505,7 +492,7 @@
                           IndicoUI.Widgets.Generic.tooltip($E('bookingShowHistory').dom, event,
                             '<div class="bookingHistoryTooltip">Click here to show / hide detailed information.</div>'
                           );
-                        }
+                        };
                         var height = IndicoUI.Effect.prepareForSlide('bookingHistoryLine', true);
                         var showHistoryState = false;
                         $E('bookingShowHistory').observeClick(function() {
@@ -527,7 +514,7 @@
                   </td>
                 </tr>
               % endif
-              % if reservation.does_repeat and reservation.getExcludedDays():
+              % if reservation.repeat_unit and excluded_days:
                 <tr><td>&nbsp;</td></tr>
                 <!-- Excluded dates -->
                 <tr>
@@ -541,8 +528,8 @@
                           ${ _('These days are NOT booked.') }
                         </td>
                         <td align="left" class="excluded" class="blacktext">
-                          % for day in reservation.getExcludedDays():
-                            ${ formatDate(day) } <br />
+                          % for occurrence in excluded_days:
+                            ${ formatDate(occurrence.date) } (${ occurrence.rejection_reason })<br />
                           % endfor
                         </td>
                       </tr>
@@ -550,7 +537,7 @@
                   </td>
                 </tr>
               % endif
-              % if reservation.does_repeat:
+              % if reservation.repeat_unit:
                 <tr><td>&nbsp;</td></tr>
                 <!-- Occurrences -->
                 <tr>
@@ -564,16 +551,15 @@
                           ${ _('These days are booked.') }
                         </td>
                         <td align="left" class="blacktext">
-                          % for period in reservation.splitToPeriods():
-                            ${ formatDate(period.start_date.date()) }
+                          % for occurrence in reservation.occurrences.filter_by(is_valid=True).all():
+                          ${ formatDate(occurrence.start.date()) }
                             % if can_be_rejected:
-                              <a class="roomBookingRejectOccurrence" href="#" onclick="submit_reject_occurrence('${ urlHandlers.UHRoomBookingRejectBookingOccurrence.getURL(reservation, date=formatDate(period.start_date.date(), format='%Y-%m-%d')) }', '${ formatDate(period.start_date.date(), format='%d %b %Y') }');return false;">
+                              <a class="roomBookingRejectOccurrence" href="#" onclick="submit_reject_occurrence('${ url_for('rooms.roomBooking-rejectBookingOccurrence', reservation, date=formatDate(occurrence.start.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start.date()) }'); return false;">
                                 ${ _('Reject') }
                               </a>
->>>>>>> cc1bdfa... [FIX] param refactoring for resv details
                             % endif
                             % if can_be_cancelled:
-                              <a class="roomBookingCancelOccurrence" href="#" onclick="submit_cancel_occurrence('${ urlHandlers.UHRoomBookingCancelBookingOccurrence.getURL(reservation, date=formatDate(period.start_date.date(), format='%Y-%m-%d')) }', '${ formatDate(period.start_date.date(), format='%d %b %Y') }');return false;">
+                              <a class="roomBookingCancelOccurrence" href="#" onclick="submit_cancel_occurrence('${ url_for('rooms.roomBooking-cancelBookingOccurrence', reservation, date=formatDate(occurrence.start.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start.date()) }'); return false;">
                                 ${ _('Cancel') }
                               </a>
                             % endif
@@ -585,8 +571,7 @@
                   </td>
                 </tr>
               % endif
-              % if ((reservation.room.isOwnedBy(user) or user.isRBAdmin()) and
-                    not reservation.is_confirmed and collisions):
+              % if ((reservation.room.isOwnedBy(user) or user.isRBAdmin()) and not reservation.is_confirmed and collisions):
                 <tr><td>&nbsp;</td></tr>
                 <!-- Occurrences -->
                 <tr>

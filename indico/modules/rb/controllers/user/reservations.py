@@ -29,8 +29,8 @@ from indico.util.date_time import server_to_utc, get_datetime_from_request
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.controllers.forms import BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm, \
-    FormDefaults, NewBookingConfirmForm
+from indico.modules.rb.controllers.forms import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
+                                                 FormDefaults, NewBookingConfirmForm)
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
@@ -54,7 +54,7 @@ class RHRoomBookingBookRoom(RHRoomBookingBase):
 class RHRoomBookingBookingDetails(RHRoomBookingBase):
     def _checkParams(self):
         resv_id = request.view_args.get('resvID')
-        self._reservation = Reservation.getById(request.view_args.get('resvID'))
+        self._reservation = Reservation.get(request.view_args['resvID'])
         if not self._reservation:
             raise IndicoError('No booking with id: {}'.format(resv_id))
 
@@ -249,11 +249,13 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
         room = Room.get(int(request.form['room_id']))
         form = self._make_confirm_form(room)
         if form.validate_on_submit():
-            self._create_booking(form, room)
-            return 'ok'
+            booking = self._create_booking(form, room)
+            url = url_for('rooms.roomBooking-bookingDetails', booking)
+            self._redirect(url)
         return self._show_confirm(room, form)
 
     def _create_booking(self, form, room):
+        is_admin = session.user.isAdmin() and not session.user.isRBAdmin()
         skip_conflicts = form.skip_conflicts.data
 
         reservation = Reservation()
@@ -263,12 +265,20 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
         reservation.created_by_user = session.user
         reservation.start_date = server_to_utc(form.start_date.data)
         reservation.end_date = server_to_utc(form.end_date.data)
-        reservation.create_occurrences(skip_conflicts)
+        if not is_admin:
+            bookable_times = room.bookable_times.all()
+            if bookable_times:
+                for bt in room.bookable_times:
+                    if bt.fits_period(form.start_date.data.time(), form.end_date.data.time()):
+                        break
+                else:
+                    raise IndicoError('Room cannot be booked at this time')
+        reservation.create_occurrences(skip_conflicts, check_nonbookable_dates=not is_admin)
+        if not any(occ.is_valid for occ in reservation.occurrences):
+            raise IndicoError('Reservation has no valid occurrences')
         db.session.add(reservation)
         db.session.flush()
-        print reservation.id
-        #db.session.rollback()
-
+        return reservation
 
     def _process(self):
         if self._step == 1:

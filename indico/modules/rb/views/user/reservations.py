@@ -27,7 +27,10 @@ from flask import session
 from MaKaC.common import Config
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.wcomponents import WTemplated
+from indico.modules.rb.controllers.utils import getRoomBookingOption
+from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservations import RepeatMapping
 from indico.util.i18n import _
 from indico.util.date_time import iterdays
 from indico.util.string import natural_sort_key
@@ -226,10 +229,6 @@ class WRoomBookingBookRoom(WTemplated):
 
 
 class WPRoomBookingBookingDetails(WPRoomBookingBase):
-    def __init__(self, rh):
-        WPRoomBookingBase.__init__(self, rh)
-        self._rh = rh
-
     def _setCurrentMenuItem(self):
         self._bookRoomNewOpt.setActive(True)
 
@@ -240,7 +239,7 @@ class WPRoomBookingBookingDetails(WPRoomBookingBase):
 class WRoomBookingDetails(WTemplated):
     def __init__(self, rh, conference=None):
         self._rh = rh
-        self._resv = rh._resv
+        self._reservation = rh._reservation
         self._conf = conference
         self._standalone = (conference is None)
 
@@ -248,27 +247,32 @@ class WRoomBookingDetails(WTemplated):
         wvars = WTemplated.getVars(self)
         wvars['standalone'] = self._standalone
         wvars['reservation'] = self._reservation
-        wvars['collisions'] = self._rh._collisions
+        #wvars['collisions'] = self._rh._collisions
         wvars['config'] = Config.getInstance()
-        wvars['actionSucceeded'] = self._rh._afterActionSucceeded
-        if self._rh._afterActionSucceeded:
-            wvars['title'] = self._rh._title
-            wvars['description'] = self._rh._description
+        # wvars['actionSucceeded'] = self._rh._afterActionSucceeded
+        # if self._rh._afterActionSucceeded:
+        #     wvars['title'] = self._rh._title
+        #     wvars['description'] = self._rh._description
 
         if self._standalone:
             wvars['roomDetailsUH'] = UH.UHRoomBookingRoomDetails
             wvars['modifyBookingUH'] = UH.UHRoomBookingModifyBookingForm
-            wvars['cloneURL'] = UH.UHRoomBookingCloneBooking.getURL(self._resv)
+            wvars['cloneURL'] = UH.UHRoomBookingCloneBooking.getURL(self._reservation)
         else:
             wvars['roomDetailsUH'] = UH.UHConfModifRoomBookingRoomDetails
             wvars['modifyBookingUH'] = UH.UHConfModifRoomBookingModifyBookingForm
-            wvars['cloneURL'] = UH.UHConfModifRoomBookingCloneBooking.getURL(self._resv)
+            wvars['cloneURL'] = UH.UHConfModifRoomBookingCloneBooking.getURL(self._reservation)
 
         wvars['isPreBooking'] = not self._reservation.is_confirmed
         wvars['bookMessage'] = _('PRE-Booking') if wvars['isPreBooking'] else _('Booking')
 
-        wvars['canBeRejectedBy'] = None
-        wvars['canBeCancelledBy'] = None
+        wvars['can_be_rejected'] = self._reservation.can_be_rejected(session.user)
+        wvars['can_be_cancelled'] = self._reservation.can_be_cancelled(session.user)
+        wvars['repetition'] = RepeatMapping.getMessage(self._reservation.repeat_unit, self._reservation.repeat_step)
+        wvars['vc_equipment'] = ', '.join(eq.name for eq in self._reservation.get_vc_equipment())
+        wvars['assistence_emails'] = getRoomBookingOption('assistanceNotificationEmails')
+        wvars['edit_logs'] = self._reservation.edit_logs.order_by(ReservationEditLog.timestamp.asc()).all()
+        wvars['excluded_days'] = self._reservation.find_excluded_days().all()
 
         return wvars
 
@@ -346,8 +350,6 @@ class WPRoomBookingSearchBookingsResults(WPRoomBookingBase):
         params['calendar'] = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
                                                        rooms=params['rooms']).render(form_data=params['form_data'])
         return WTemplated('RoomBookingSearchBookingsResults').getHTML(params)
-
-
 
 
 class WPRoomBookingNewBookingBase(WPRoomBookingBase):

@@ -96,32 +96,32 @@ rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/cancel',
                    reservation_handlers.RHRoomBookingCancelBooking,
                    methods=('POST',))
 
-rooms.add_url_rule('/booking/<roomLocation>/<resvID>/accept',
+rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/accept',
                    'roomBooking-acceptBooking',
                    reservation_handlers.RHRoomBookingAcceptBooking,
                    methods=('POST',))
 
-rooms.add_url_rule('/booking/<roomLocation>/<resvID>/reject',
+rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/reject',
                    'roomBooking-rejectBooking',
                    reservation_handlers.RHRoomBookingRejectBooking,
                    methods=('POST',))
 
-rooms.add_url_rule('/booking/<roomLocation>/<resvID>/delete',
+rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/delete',
                    'roomBooking-deleteBooking',
                    reservation_admin_handlers.RHRoomBookingDeleteBooking,
                    methods=('POST',))
 
-rooms.add_url_rule('/booking/<roomLocation>/<resvID>/clone',
+rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/clone',
                    'roomBooking-cloneBooking',
                    reservation_handlers.RHRoomBookingCloneBooking,
                    methods=('POST',))
 
-rooms.add_url_rule('/booking/<roomLocation>/<resvID>/<date>/cancel',
+rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/<date>/cancel',
                    'roomBooking-cancelBookingOccurrence',
                    reservation_handlers.RHRoomBookingCancelBookingOccurrence,
                    methods=('POST',))
 
-rooms.add_url_rule('/booking/<roomLocation>/<resvID>/<date>/reject',
+rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/<date>/reject',
                    'roomBooking-rejectBookingOccurrence',
                    reservation_handlers.RHRoomBookingRejectBookingOccurrence,
                    methods=('POST',))

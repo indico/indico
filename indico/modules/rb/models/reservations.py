@@ -35,14 +35,14 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.modules.rb.models import utils
+from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.modules.rb.models.utils import apply_filters
-from indico.util.date_time import now_utc, format_date, format_datetime
-from indico.util.i18n import _, N_, ngettext
+from indico.util.date_time import now_utc, format_date, format_datetime, overlaps
+from indico.util.i18n import _, N_
 from indico.util.string import return_ascii
 from indico.web.flask.util import url_for
-from .reservation_edit_logs import ReservationEditLog
 from .reservation_occurrences import ReservationOccurrence
-from .room_equipments import ReservationEquipmentAssociation
+from .room_equipments import ReservationEquipmentAssociation, RoomEquipment
 from .utils import next_day_skip_if_weekend, unimplemented, Serializer
 from MaKaC.common.Locators import Locator
 from MaKaC.errors import MaKaCError
@@ -261,6 +261,32 @@ class Reservation(Serializer, db.Model):
     def is_archived(self):
         return self.end_date < now_utc()
 
+    @property
+    def status_string(self):
+        parts = []
+        if self.is_valid:
+            parts.append(_("Valid"))
+        else:
+            if self.is_cancelled:
+                parts.append(_("Cancelled"))
+            if self.is_rejected:
+                parts.append(_("Rejected"))
+            if not self.is_confirmed:
+                parts.append(_("Not confirmed"))
+        if self.is_archived:
+            parts.append(_("Archived"))
+        else:
+            parts.append(_("Live"))
+        return ', '.join(parts)
+
+    def get_vc_equipment(self):
+        vc_equipment = self.room.equipments \
+                           .correlate(ReservationOccurrence) \
+                           .with_entities(RoomEquipment.id) \
+                           .filter_by(name='video conference') \
+                           .as_scalar()
+        return self.equipments.filter(RoomEquipment.parent_id == vc_equipment)
+
     @staticmethod
     def getReservationWithDefaults():
         dt = next_day_skip_if_weekend()
@@ -343,28 +369,13 @@ class Reservation(Serializer, db.Model):
     def add_edit_log(self, edit_log):
         self.edit_logs.append(edit_log)
 
-    def remove_edit_log(self, edit_log):
-        self.edit_logs.remove(edit_log)
-
-    def clear_edit_logs(self):
-        del self.edit_logs[:]
-
-    def get_edit_logs(self, **filters):
-        return apply_filters(self.edit_logs, ReservationEditLog, **filters).all()
-
-    def has_edit_logs(self):
-        return self.edit_logs.exists()
-
     # ================================================
 
     def getOccurrences(self):
         return self.occurrences.all()
 
-    def getExcludedDays(self):
-        return self.occurrences.filter_by(is_cancelled=False).all()
-
-    def getNumberOfExcludedDays(self):
-        return self.occurrences.filter_by(is_cancelled=False).count()
+    def find_excluded_days(self):
+        return self.occurrences.filter(ReservationOccurrence.is_cancelled | ReservationOccurrence.is_rejected)
 
     def cancelOccurrences(self, ds):
         # XXX: Is this method useful/needed?
@@ -384,10 +395,11 @@ class Reservation(Serializer, db.Model):
     def get_conflicting_occurrences(self):
         query = ReservationOccurrence.find(Reservation.room == self.room,
                                            Reservation.id != self.id,
-                                           ~ReservationOccurrence.is_cancelled,
+                                           ReservationOccurrence.is_valid,
                                            _eager=ReservationOccurrence.reservation, _join=Reservation)
         criteria = []
-        for occurrence in self.occurrences:
+        valid_occurrences = [occ for occ in self.occurrences if occ.is_valid]
+        for occurrence in valid_occurrences:
             criteria += [
                 # other starts after or at our start time         & other starts before our end time
                 (ReservationOccurrence.start >= occurrence.start) & (ReservationOccurrence.start < occurrence.end),
@@ -397,15 +409,28 @@ class Reservation(Serializer, db.Model):
         query = query.filter(or_(*criteria))
         colliding_occurrences = query.all()
         conflicts = defaultdict(lambda: dict(confirmed=[], pending=[]))
-        for occurrence in self.occurrences:
+        for occurrence in valid_occurrences:
             for colliding in colliding_occurrences:
                 if occurrence.overlaps(colliding):
                     key = 'confirmed' if colliding.reservation.is_confirmed else 'pending'
                     conflicts[occurrence][key].append(colliding)
         return conflicts
 
-    def create_occurrences(self, skip_conflicts):
+    def create_occurrences(self, skip_conflicts, check_nonbookable_dates=True):
         ReservationOccurrence.create_series_for_reservation(self)
+
+        # Check for conflicts with nonbookable periods
+        if check_nonbookable_dates:
+            nonbookable_dates = self.room.nonbookable_dates.filter(NonBookableDate.end_date > self.start_date)
+            for occurrence in self.occurrences:
+                for nbd in nonbookable_dates:
+                    if overlaps((nbd.start_date, nbd.end_date), (occurrence.start, occurrence.end)):
+                        if not skip_conflicts:
+                            raise ConflictingOccurrences()
+                        occurrence.cancel(u'Skipped due to nonbookable date')
+                        break
+
+        # Check for conflicts with other occurrences
         conflicting_occurrences = self.get_conflicting_occurrences()
         for occurrence, conflicts in conflicting_occurrences.iteritems():
             if conflicts['confirmed']:
@@ -413,8 +438,7 @@ class Reservation(Serializer, db.Model):
                     raise ConflictingOccurrences()
                 # Cancel OUR occurrence
                 msg = u'Skipped due to collision with {} reservation(s)'
-                occurrence.rejection_reason = msg.format(len(conflicts['confirmed']))
-                occurrence.cancel(msg)
+                occurrence.cancel(msg.format(len(conflicts['confirmed'])))
             elif conflicts['pending'] and self.is_confirmed:
                 # Reject OTHER occurrences
                 for conflict in conflicts['pending']:
@@ -789,40 +813,18 @@ class Reservation(Serializer, db.Model):
         """
         return True
 
-    def canBeModified(self, accessWrapper):
-        """
-        The following people are authorized to modify a booking:
-        - owner (the one who created the booking)
-        - responsible for a room
-        - admin (of course)
-        """
-        if accessWrapper is None:
-            return False
-
-        user = None
-        if isinstance(accessWrapper, AccessWrapper):
-            user = accessWrapper.getUser()
-        elif isinstance(accessWrapper, Avatar):
-            user = accessWrapper
-        else:
-            raise MaKaCError(_('canModify requires either AccessWrapper or Avatar object'))
-
+    def can_be_modified(self, user):
         if not user:
             return False
-        return (user.isRBAdmin() or self.isOwnedBy(user) or
-                self.room.isOwnedBy(user) or self.isBookedFor(user))
+        return user.isRBAdmin() or self.created_by_user == user or self.room.isOwnedBy(user) or self.isBookedFor(user)
 
-    def canBeCancelled(self, user):
-        """ Owner can cancel """
-        return user and (self.isOwnedBy(user) or
-                         user.isRBAdmin() or self.isBookedFor(user))
+    def can_be_cancelled(self, user):
+        return user and (self.isOwnedBy(user) or user.isRBAdmin() or self.isBookedFor(user))
 
-    def canBeRejected(self, user):
-        """ Responsible can reject """
+    def can_be_rejected(self, user):
         return user and (user.isRBAdmin() or self.room.isOwnedBy(user))
 
-    def canBeDeleted(self, user):
-        """ Only admin can delete """
+    def can_be_deleted(self, user):
         return user and user.isRBAdmin()
 
     def isOwnedBy(self, avatar):

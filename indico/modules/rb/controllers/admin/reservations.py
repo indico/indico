@@ -17,20 +17,27 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+from flask import request
+from indico.core.db import db
+
+from indico.core.errors import IndicoError
+from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
 
 
 class RHRoomBookingDeleteBooking(RHRoomBookingAdminBase):
-    def _checkParams(self, params):
-        resvID = int(params.get("resvID"))
-        roomLocation = params.get("roomLocation")
-        self._resv = CrossLocationQueries.getReservations(resvID=resvID, location=roomLocation)
-        self._target = self._resv
+    def _checkParams(self):
+        resv_id = request.view_args.get('resvID')
+        self._reservation = Reservation.get(request.view_args['resvID'])
+        if not self._reservation:
+            raise IndicoError('No booking with id: {}'.format(resv_id))
 
     def _process(self):
         # Booking deletion is always possible - just delete
-        self._resv.remove()
-        session['rbTitle'] = _("Booking has been deleted.")
-        session['rbDescription'] = _("You have successfully deleted the booking.")
-        url = urlHandlers.UHRoomBookingStatement.getURL()
-        self._redirect(url)  # Redirect to deletion confirmation
+        db.session.delete(self._reservation)
+        # TODO: flash message, redirect to <somewhere>
+        # session['rbTitle'] = _("Booking has been deleted.")
+        # session['rbDescription'] = _("You have successfully deleted the booking.")
+        # url = urlHandlers.UHRoomBookingStatement.getURL()
+        # self._redirect(url)  # Redirect to deletion confirmation
+        return 'Deleted.'
