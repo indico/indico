@@ -386,6 +386,8 @@ class LDAPConnector(object):
         Opens an anonymous LDAP connection
         """
         self.l = ldap.initialize(self.ldapUri)
+        self.l.set_option(ldap.OPT_REFERRALS, 0)
+
         self.l.protocol_version = ldap.VERSION3
 
         if self.ldapUseTLS:
