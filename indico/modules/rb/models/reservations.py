@@ -938,16 +938,6 @@ class Reservation(Serializer, db.Model):
         # TODO: dictdiffer
         return list(diff(self.getSnapShot(), old))
 
-    @staticmethod
-    def getLiveReservationCount(**filters):
-        q = apply_filters(Reservation.query, Reservation, **filters)
-        return q.filter_by(is_live=True).count()
-
-    @staticmethod
-    def getNumberOfArchivalReservations(**filters):
-        q = apply_filters(Reservation.query, Reservation, **filters)
-        return q.filter_by(is_live=False).count()
-
     def getLocationName(self):
         return self.room.location.name
 

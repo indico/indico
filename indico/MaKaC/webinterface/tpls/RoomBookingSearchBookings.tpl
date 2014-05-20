@@ -1,12 +1,3 @@
-<!-- CONTEXT HELP DIVS -->
-<div id="tooltipPool" style="display: none">
-  <!-- Choose Button -->
-  <div id="chooseButtonHelp" class="tip">
-    ${ _('Directly choose the room.') }
-  </div>
-</div>
-<!-- END OF CONTEXT HELP DIVS -->
-
 <h2 class="page-title">
     ${ _('Search bookings') }
 </h2>
@@ -156,8 +147,8 @@
                     title="${ _('Filter by cancelled bookings') }">
                     ${ _('Cancelled') }
                 </label>
-                <input type="checkbox" id="is_archival" name="is_archival"/>
-                <label for="is_archival" class="i-button"
+                <input type="checkbox" id="is_archived" name="is_archived"/>
+                <label for="is_archived" class="i-button"
                     title="${ _('Filter by archived bookings') }">
                     ${ _('Archived') }
                 </label>

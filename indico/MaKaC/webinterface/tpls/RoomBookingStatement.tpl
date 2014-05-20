@@ -13,8 +13,6 @@
                             ${ title }
                         </p>
                         <p style="margin-left: 6px;">${ description }</p>
-<!--                        ${ _("You have successfully deleted the room. All its archival, cancelled and rejected bookings have also been deleted.")}
--->                        <br />
                     </td>
                 </tr>
             </table>

@@ -193,9 +193,9 @@ def stats_to_dict(results):
         'liveValid': 0,
         'liveCancelled': 0,
         'liveRejected': 0,
-        'archivalValid': 0,
-        'archivalCancelled': 0,
-        'archivalRejected': 0
+        'archivedValid': 0,
+        'archivedCancelled': 0,
+        'archivedRejected': 0
     }
     for is_live, is_cancelled, is_rejected, c in results:
         assert not (is_cancelled and is_rejected)

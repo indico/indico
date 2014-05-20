@@ -58,9 +58,8 @@ class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
             # Possible - delete
             db.session.delete(self._room)
             session['rbTitle'] = _('Room has been deleted.')
-            session['rbDescription'] = _('You have successfully deleted the room. '
-                                         'All its archival, cancelled and rejected '
-                                         'bookings have also been deleted.')
+            session['rbDescription'] = _(
+                'You have successfully deleted the room. All its bookings have also been deleted.')
             self._redirect(UH.UHRoomBookingStatement.getURL())  # deletion confirmation
 
 

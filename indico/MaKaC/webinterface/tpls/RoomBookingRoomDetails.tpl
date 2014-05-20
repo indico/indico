@@ -7,7 +7,7 @@
 
   function submit_delete() {
     if (confirm(
-          "${ _('THIS ACTION IS IRREVERSIBLE. Please note that all archival BOOKINGS WILL BE DELETED with the room. Are you sure you want to DELETE the room?') }"
+          "${ _('THIS ACTION IS IRREVERSIBLE. Please note that all archived BOOKINGS WILL BE DELETED with the room. Are you sure you want to DELETE the room?') }"
         )
     ) {
       var frm = document.forms['submits'];

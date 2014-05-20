@@ -117,7 +117,7 @@
         ${ _('<b>Live</b> - the booking will take place in the future.') }
       </li>
       <li class="tip-no-borders">
-        ${ _('<b>Archival</b> - the booking already past. It will never repeat in the future.') }
+        ${ _('<b>Archived</b> - the booking already passed and it will never repeat in the future.') }
       </li>
     </ul>
   </div>
