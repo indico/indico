@@ -300,5 +300,7 @@
             $('#eMonth').val(parseInt(edate.getMonth() + 1));
             $('#eYear').val(edate.getFullYear());
         }
+
+        validateForm();
     });
 </script>
