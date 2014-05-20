@@ -559,7 +559,7 @@ class CSBooking(CSBookingBase):
     def _search(cls, user, query, offset=0, limit=None):
 
         if query.strip() == "":
-            return []
+            return [], None
 
         ask_for_more = True
         allowed_rooms = []
@@ -569,7 +569,7 @@ class CSBooking(CSBookingBase):
 
             if isinstance(result, VidyoError):
                 # query held no results? there's nothing left.
-                return result
+                return result, offset
 
             if not result:
                 # set offset to None, meaning that the bottom of the "search stream" has been reached
