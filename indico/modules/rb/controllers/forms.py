@@ -28,11 +28,10 @@ from flask.ext.wtf.file import FileField
 from wtforms import BooleanField, Field, IntegerField, StringField, HiddenField, TextAreaField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.core import FloatField, FieldList, FormField, SelectMultipleField
-from wtforms.validators import AnyOf, Optional, NumberRange, DataRequired, ValidationError, StopValidation, \
-    InputRequired
+from wtforms.validators import (AnyOf, Optional, NumberRange, DataRequired, ValidationError, StopValidation,
+                                InputRequired)
 from wtforms.ext.dateutil.fields import DateTimeField, DateField
 from wtforms.widgets import CheckboxInput, HiddenInput
-from wtforms_alchemy import model_form_factory
 from wtforms_components import TimeField
 
 from indico.core.errors import IndicoError
@@ -44,8 +43,6 @@ from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.rooms import Room
 from MaKaC.user import GroupHolder, AvatarHolder
 
-
-ModelForm = model_form_factory(Form, strip_string_fields=True)
 
 AVAILABILITY_VALUES = ['Available', 'Booked', "Don't care"]
 
@@ -144,9 +141,9 @@ class UsedIf(object):
             raise StopValidation()
 
 
-class EmailList(object):
+class IndicoEmail(object):
     """Validates one or more email addresses"""
-    def __init__(self, multi=True):
+    def __init__(self, multi=False):
         self.multi = multi
 
     def __call__(self, form, field):
@@ -405,7 +402,7 @@ class NewBookingPeriodForm(NewBookingFormBase):
 class NewBookingConfirmForm(NewBookingPeriodForm):
     booked_for_id = HiddenField(_('User'), [InputRequired()])
     booked_for_name = StringField()  # just for displaying
-    contact_email = StringField(_('Contact email'), [InputRequired(), EmailList()])
+    contact_email = StringField(_('Contact email'), [InputRequired(), IndicoEmail(multi=True)])
     contact_phone = StringField(_('Telephone'))
     booking_reason = TextAreaField(_('Reason'), [DataRequired()])
     uses_video_conference = BooleanField(_('I will use Video Conference equipment.'))
