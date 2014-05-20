@@ -377,21 +377,6 @@ class Reservation(Serializer, db.Model):
     def find_excluded_days(self):
         return self.occurrences.filter(ReservationOccurrence.is_cancelled | ReservationOccurrence.is_rejected)
 
-    def cancelOccurrences(self, ds):
-        # XXX: Is this method useful/needed?
-        # We probably want to send notifications which we can't when doing a bulk update like this
-        if ds:
-            self.occurrences \
-                .filter(func.DATE(ReservationOccurrence.start).in_(ds)) \
-                .update({'is_cancelled': True}, synchronize_session='fetch')
-
-    def cancelOccurrence(self, d):
-        # XXX: Is this method useful/needed?
-        # We probably want to send notifications which we can't when doing a bulk update like this
-        self.occurrences \
-            .filter(func.DATE(ReservationOccurrence.start) == d) \
-            .update({'is_cancelled': True}, synchronize_session='fetch')
-
     def get_conflicting_occurrences(self):
         query = ReservationOccurrence.find(Reservation.room == self.room,
                                            Reservation.id != self.id,
