@@ -333,7 +333,7 @@ class FormDefaults(object):
 class BookingSearchForm(IndicoForm):
     __generated_data__ = ('start_dt', 'end_dt')
 
-    room_id_list = SelectMultipleField('Rooms', [DataRequired()], coerce=int)
+    room_ids = SelectMultipleField('Rooms', [DataRequired()], coerce=int)
 
     start_date = DateField('Start Date', [InputRequired()], parse_kwargs={'dayfirst': True})
     start_time = TimeField('Start Time', [InputRequired()])

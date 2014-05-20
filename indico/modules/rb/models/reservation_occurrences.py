@@ -156,8 +156,8 @@ class ReservationOccurrence(db.Model):
             q = q.filter(Room.owner_id == avatar.id)
         if filters.get('is_only_mine') and avatar:
             q = q.filter(Reservation.booked_for_id == avatar.id)
-        if filters.get('room_id_list'):
-            q = q.filter(Room.id.in_(filters['room_id_list']))
+        if filters.get('room_ids'):
+            q = q.filter(Room.id.in_(filters['room_ids']))
 
         if filters.get('is_only_confirmed_bookings') and not filters.get('is_only_pending_bookings'):
             q = q.filter(Reservation.is_confirmed)

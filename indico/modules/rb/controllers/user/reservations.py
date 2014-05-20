@@ -74,7 +74,7 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
         self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.getFullName()))
         self._form_data = self._get_form_data()
         self._form = BookingSearchForm(self._form_data)
-        self._form.room_id_list.choices = [(r.id, None) for r in self._rooms]
+        self._form.room_ids.choices = [(r.id, None) for r in self._rooms]
 
     def _is_submitted(self):
         return self._form.is_submitted()
@@ -83,7 +83,7 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
         form = self._form
         if self._is_submitted() and form.validate():
             occurrences = ReservationOccurrence.find_with_filters(form.data, session.user).all()
-            rooms = [r for r in self._rooms if r.id in set(form.room_id_list.data)]
+            rooms = [r for r in self._rooms if r.id in set(form.room_ids.data)]
             return WPRoomBookingSearchBookingsResults(self, rooms=rooms, occurrences=occurrences,
                                                       start_dt=form.start_dt.data, end_dt=form.end_dt.data,
                                                       form=form, form_data=self._form_data,
@@ -111,7 +111,7 @@ class RHRoomBookingSearchBookingsShortcutBase(RHRoomBookingSearchBookings):
         data['end_time'] = '23:59'
         data['start_date'] = date.today().strftime('%d/%m/%Y')
         data['end_date'] = (date.today() + timedelta(weeks=1)).strftime('%d/%m/%Y')
-        data.setlist('room_id_list', [r.id for r in self._rooms])
+        data.setlist('room_ids', [r.id for r in self._rooms])
         return data
 
 

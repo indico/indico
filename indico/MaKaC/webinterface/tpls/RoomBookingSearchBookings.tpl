@@ -210,7 +210,7 @@
         $('#roomselector').roomselector({
             allowEmpty: false,
             rooms: rooms,
-            selectName: 'room_id_list',
+            selectName: 'room_ids',
             simpleMode: true
         });
 
