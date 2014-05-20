@@ -265,23 +265,6 @@
         // Time period
         isValid = isValid && $('#timerange').timerange('validate');
 
-        // Holidays warning
-        if (isValid && !onSubmit) {
-            var lastDateInfo = searchForm.data('lastDateInfo');
-            var dateInfo = $('#start_date, #sTime, #end_date, #eTime').serialize();
-            if (dateInfo != lastDateInfo) {
-                searchForm.data('lastDateInfo', dateInfo);
-                var holidaysWarning = indicoSource(
-                    'roomBooking.getDateWarning', searchForm.serializeObject()
-                );
-
-                holidaysWarning.state.observe(function(state) {
-                    if (state == SourceState.Loaded) {
-                        $E('holidays-warning').set(holidaysWarning.get());
-                    }
-                });
-            }
-        }
         return isValid;
     }
 

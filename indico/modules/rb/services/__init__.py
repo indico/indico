@@ -17,22 +17,17 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
-
-from indico.modules.rb.models.utils import is_weekend
+from indico.util.date_time import get_datetime_from_request
 from indico.util.i18n import _
+from indico.modules.rb.models.utils import is_weekend
 from MaKaC.common.utils import HolidaysHolder
 from MaKaC.services.implementation.base import ServiceBase
 
 
 class GetDateWarning(ServiceBase):
     def _checkParams(self):
-        self._start_date = datetime.strptime('{} {}'.format(self._params.get('start_date'),
-                                                            self._params.get('start_time')),
-                                             '%d-%m-%Y %H:%M')
-        self._end_date = datetime.strptime('{} {}'.format(self._params.get('end_date'),
-                                                          self._params.get('end_time')),
-                                           '%d-%m-%Y %H:%M')
+        self._start_dt = get_datetime_from_request(prefix='start_', source=self._params)
+        self._end_dt = get_datetime_from_request(prefix='end_', source=self._params)
 
     def _getAnswer(self):
         if not self._start_date or not self._end_date:
