@@ -230,9 +230,6 @@ class WPRoomBookingBookRoom(WPRoomBookingBase):
         WPRoomBookingBase.__init__(self, rh)
         self._rh = rh
 
-    def getJSFiles(self):
-        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
-
     def _getTitle(self):
         return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Book a Room'))
 
@@ -307,9 +304,6 @@ class WRoomBookingDetails(WTemplated):
 
 
 class WPRoomBookingCalendar(WPRoomBookingBase):
-    def getJSFiles(self):
-        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
-
     def _setCurrentMenuItem(self):
         self._bookingListCalendarOpt.setActive(True)
 
@@ -320,9 +314,6 @@ class WPRoomBookingCalendar(WPRoomBookingBase):
 
 
 class WPRoomBookingSearchBookings(WPRoomBookingBase):
-    def getJSFiles(self):
-        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
-
     def _setCurrentMenuItem(self):
         self._bookingListSearchOpt.setActive(True)
 
@@ -355,9 +346,6 @@ class WPRoomBookingSearchBookingsResults(WPRoomBookingBase):
         self._menu_item = menu_item
         WPRoomBookingBase.__init__(self, rh, **kwargs)
 
-    def getJSFiles(self):
-        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
-
     def _setCurrentMenuItem(self):
         getattr(self, '_{}Opt'.format(self._menu_item)).setActive(True)
 
@@ -383,9 +371,6 @@ class WPRoomBookingSearchBookingsResults(WPRoomBookingBase):
 
 
 class WPRoomBookingNewBookingBase(WPRoomBookingBase):
-    def getJSFiles(self):
-        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
-
     def _setCurrentMenuItem(self):
         self._bookRoomNewOpt.setActive(True)
 
@@ -411,9 +396,6 @@ class WPRoomBookingNewBookingConfirm(WPRoomBookingNewBookingBase):
 
 
 class WPRoomBookingBookingForm(WPRoomBookingBase):
-    def getJSFiles(self):
-        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
-
     def _setCurrentMenuItem(self):
         self._bookRoomNewOpt.setActive(True)
 

@@ -34,7 +34,7 @@ class WPRoomBookingBase(WPMainBase):
         return '{} - {}'.format(WPMainBase._getTitle(self), _('Room Booking'))
 
     def getJSFiles(self):
-        return WPMainBase.getJSFiles(self) + self._includeJSPackage('Management')
+        return WPMainBase.getJSFiles(self) + self._includeJSPackage(['Management', 'RoomBooking'])
 
     def getCSSFiles(self):
         return WPMainBase.getCSSFiles(self) + self._asset_env['roombooking_sass'].urls()
