@@ -356,11 +356,11 @@
                         <td colspan="2">
                           <form id="submits" name="submits" action="#" method="post">
                             <ul id="button-menu" class="ui-list-menu ui-list-menu-level ui-list-menu-level-0" style="float:left;">
-                              % if room.canBeBookedBy(user):
+                              % if room.can_be_booked(user):
                                 <li class="button" style="margin-left: 10px" onclick="$('#submits').submit(); return false;">
                                   <a href="#" onClick="return false;">${ _('Book') }</a>
                                 </li>
-                              % elif room.canPreBookedBy(user):
+                              % elif room.can_be_prebooked(user):
                                 <li class="button" style="margin-left: 10px" onclick="$('#submits').submit(); return false;">
                                   <a href="#" onClick="return false;">${ _('PRE-Book')}</a>
                                 </li>

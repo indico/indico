@@ -336,7 +336,7 @@ type ("RoomBookingCalendarDrawer", [],
                     if (bar.room.type != "privateRoom" && !blocked) {
                         this._proceedToBooking(bar);
                     } else {
-                        this._handleProtected(element, bar.room.id, bar.blocking.id, bar);
+                        this._handleProtected(element, bar.room.id, bar.blocking && bar.blocking.id, bar);
                     }
                 }
             },
