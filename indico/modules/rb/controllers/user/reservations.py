@@ -153,18 +153,23 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
             self._step = 1
 
     def _make_select_room_form(self):
+        # Step 1
         self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.getFullName()))
         form = NewBookingCriteriaForm()
         form.room_ids.choices = [(r.id, None) for r in self._rooms]
         return form
 
     def _make_select_period_form(self, defaults=None):
+        # Step 2
+        # If we come from a successful step 1 submission we use the default values provided by that step.
         if self._step == 1:
-            return NewBookingPeriodForm(formdata=None, obj=defaults)
+            return NewBookingPeriodForm(formdata=MultiDict(), obj=defaults)
         else:
             return NewBookingPeriodForm()
 
     def _make_confirm_form(self, room, defaults=None):
+        # Step 3
+        # If we come from a successful step 2 we take default values from that step once again
         if self._step == 2:
             defaults.equipments = []
             form = NewBookingConfirmForm(formdata=MultiDict(), obj=defaults)
@@ -175,6 +180,7 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
         return form
 
     def _process_select_room(self):
+        # Step 1: Room(s), dates, repetition selection
         form = self._make_select_room_form()
         if form.validate_on_submit():
             flexible_days = form.flexible_dates_range.data
@@ -203,7 +209,7 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
             period_form_defaults = FormDefaults(repeat_step=form.repeat_step.data, repeat_unit=form.repeat_unit.data)
             period_form = self._make_select_period_form(period_form_defaults)
 
-            # step2 template
+            # Show step 2 page
             return WPRoomBookingNewBookingSelectPeriod(self, rooms=selected_rooms, occurrences=occurrences,
                                                        candidates=candidates, start_dt=day_start_dt,
                                                        end_dt=day_end_dt, period_form=period_form, form=form,
@@ -211,7 +217,7 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
                                                        repeat_step=form.repeat_step.data,
                                                        flexible_days=flexible_days).display()
 
-        # step1 template
+        # GET or form errors => show step 1 page
         return WPRoomBookingNewBookingSelectRoom(self, errors=form.error_list, rooms=self._rooms,
                                                  max_room_capacity=Room.getMaxCapacity()).display()
 
@@ -220,12 +226,14 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
         if form.is_submitted():
             # Errors in here are only caused by users messing with the submitted data so it's not
             # worth making the code more complex to show the errors nicely on the originating page.
+            # Doing so would be very hard anyway as we don't keep all data necessary to show step 2
+            # when it's not a step 1 form submission.
             if not form.validate():
                 raise IndicoError('<br>'.join(form.error_list))
             room = Room.get(form.room_id.data)
             if not room:
                 raise IndicoError('Invalid room')
-            # step3 template
+            # Show step 3 page
             confirm_form_defaults = FormDefaults(form.data,
                                                  booked_for_id=session.user.id,
                                                  booked_for_name=session.user.getStraightFullName().decode('utf-8'),
@@ -234,14 +242,14 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
             return self._show_confirm(room, form, confirm_form_defaults)
 
     def _show_confirm(self, room, form, defaults=None):
-        # form can be PeriodForm or Confirmform
-        if not isinstance(form, NewBookingConfirmForm):
+        # form can be PeriodForm or Confirmform depending on the step we come from
+        if self._step == 2:
             confirm_form = self._make_confirm_form(room, defaults)
         else:
-            # Step3 => Step3 due to an error
+            # Step3 => Step3 due to an error in the form
             confirm_form = form
-        repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
 
+        repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
         prebook_only = not room.can_be_booked(session.user) and room.can_be_prebooked(session.user)
         return WPRoomBookingNewBookingConfirm(self, form=confirm_form, room=room, start_dt=form.start_date.data,
                                               end_dt=form.end_date.data, repeat_unit=form.repeat_unit.data,
@@ -250,12 +258,15 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
                                               errors=confirm_form.error_list).display()
 
     def _process_confirm(self):
+        # The form needs the room to create the equipment list, so we need to get it "manually"...
         room = Room.get(int(request.form['room_id']))
         form = self._make_confirm_form(room)
         if form.validate_on_submit():
             booking = self._create_booking(form, room)
             url = url_for('rooms.roomBooking-bookingDetails', booking)
             self._redirect(url)
+            return
+        # There was an error in the form
         return self._show_confirm(room, form)
 
     def _create_booking(self, form, room):
