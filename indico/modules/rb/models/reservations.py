@@ -34,10 +34,11 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
+from indico.core.errors import IndicoError
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.modules.rb.models.utils import apply_filters
-from indico.util.date_time import now_utc, format_date, format_datetime, overlaps
+from indico.util.date_time import now_utc, format_date, format_datetime, overlaps, server_to_utc
 from indico.util.i18n import _, N_
 from indico.util.string import return_ascii
 from indico.web.flask.util import url_for
@@ -428,6 +429,44 @@ class Reservation(Serializer, db.Model):
                 # Reject OTHER occurrences
                 for conflict in conflicts['pending']:
                     conflict.reject(u'Rejected due to collision with a confirmed reservation')
+
+    @classmethod
+    def create_from_form(cls, room, form, user, prebook=None):
+        """Creates a new reservation based on a NewbookingConfirmForm.
+
+        :param room: The Room that's being booked.
+        :param form: A :class:`NewBookingConfirmForm` instance containing the
+                     data for the booking.
+        :param user: The :class:`Avatar` who creates the booking.
+        :param prebook: Instead of determining the booking type from the user's
+                        permissions, always use the given mode.
+        """
+
+        if prebook is None:
+            prebook = not room.can_be_booked(user)
+            if prebook and not room.can_be_prebooked(user):
+                raise IndicoError('You cannot book this room')
+
+        reservation = cls()
+        form.populate_obj(reservation, skip={'start_date', 'end_date', 'booked_for_name'}, existing_only=True)
+        reservation.room = room
+        reservation.booked_for_name = reservation.booked_for_user.getStraightFullName()
+        reservation.is_confirmed = not prebook
+        reservation.created_by_user = user
+        reservation.start_date = server_to_utc(form.start_date.data)
+        reservation.end_date = server_to_utc(form.end_date.data)
+        if not user.isRBAdmin():
+            bookable_times = room.bookable_times.all()
+            if bookable_times:
+                for bt in room.bookable_times:
+                    if bt.fits_period(form.start_date.data.time(), form.end_date.data.time()):
+                        break
+                else:
+                    raise IndicoError('Room cannot be booked at this time')
+        reservation.create_occurrences(form.skip_conflicts.data, check_nonbookable_dates=not user.isRBAdmin())
+        if not any(occ.is_valid for occ in reservation.occurrences):
+            raise IndicoError('Reservation has no valid occurrences')
+        return reservation
 
     def getSoonestOccurrence(self, d):
         return self.occurrences.filter(ReservationOccurrence.start >= d).first()

@@ -171,7 +171,7 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
         # Step 3
         # If we come from a successful step 2 we take default values from that step once again
         if self._step == 2:
-            defaults.equipments = []
+            defaults.equipments = []  # wtforms bug; avoid `foo in None` check
             form = NewBookingConfirmForm(formdata=MultiDict(), obj=defaults)
         else:
             form = NewBookingConfirmForm()
@@ -270,31 +270,7 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
         return self._show_confirm(room, form)
 
     def _create_booking(self, form, room):
-        is_admin = session.user.isRBAdmin()
-        skip_conflicts = form.skip_conflicts.data
-
-        can_book = room.can_be_booked(session.user)
-        if not can_book and not room.can_be_prebooked(session.user):
-            raise IndicoError('You cannot book this room')
-
-        reservation = Reservation()
-        form.populate_obj(reservation, skip={'start_date', 'end_date'}, existing_only=True)
-        reservation.room = room
-        reservation.is_confirmed = can_book
-        reservation.created_by_user = session.user
-        reservation.start_date = server_to_utc(form.start_date.data)
-        reservation.end_date = server_to_utc(form.end_date.data)
-        if not is_admin:
-            bookable_times = room.bookable_times.all()
-            if bookable_times:
-                for bt in room.bookable_times:
-                    if bt.fits_period(form.start_date.data.time(), form.end_date.data.time()):
-                        break
-                else:
-                    raise IndicoError('Room cannot be booked at this time')
-        reservation.create_occurrences(skip_conflicts, check_nonbookable_dates=not is_admin)
-        if not any(occ.is_valid for occ in reservation.occurrences):
-            raise IndicoError('Reservation has no valid occurrences')
+        reservation = Reservation.create_from_form(room, form, session.user)
         db.session.add(reservation)
         db.session.flush()
         return reservation
