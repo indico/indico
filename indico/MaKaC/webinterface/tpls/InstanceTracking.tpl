@@ -1,36 +1,17 @@
 <div class="groupTitle"> ${ _("Instance Tracking settings") }</div>
 
+<div class="warning-message-box out-of-sync-popup">
+    <div class="message-text">
+        ${ _('It seems like your data is out of sync with the data we have in our server or an error occured during connection.') }<br>
+        ${ _('You can choose here whether to sync it or not or just disable the Instance Tracking service.') }
+    </div>
+</div>
+
 <form id="it-form" action="${ postURL }" method="POST">
     <input id="hidden-button-pressed" type="hidden" name="button_pressed" value="none">
     <input id="hidden-update-type" type="hidden" name="update_it_type" value="none">
 
     <div>
-
-        <div class="instance-tracking-description">
-            <h3>${ _('Let us know that you exist!') }</h3>
-            ${ _('Be part of the ever growing Indico community and choose to receive updated news on latest releases (2-3 times per year) as well as important security warnings.') }<br>
-            <br>
-            ${ _('The following data will be sent back to us:') }
-            <ul>
-                <li>${ _('Contact person') }</li>
-                <li>${ _('Contact email') }</li>
-                <li>${ _('Server URL') }</li>
-                <li>${ _('Name of the organisation') }</li>
-            </ul>
-            ${ _('Please note that <strong>no private information</strong> will ever be sent to the Indico Project and that you can disable it anytime.') }<br>
-            <br>
-            <div class="additional-description">
-                ${ _('Alongside to the previous information, the following data (strictly public) might be collected by us:') }
-                <ul>
-                    <li>${ _('Server default language') }</li>
-                    <li>${ _('Indico version installed') }</li>
-                    <li>${ _('Python version used') }</li>
-                    <li>${ _('Statistics data (number of events, contributions, etc...)') }</li>
-                </ul>
-                ${ _('It might happen that sometime your data will be out of sync with the data we have in our server.') }<br>
-                ${ _('When it happens you will be notified and you will be able to choose whether to sync it or not.') }
-            </div>
-        </div>
 
         <div class="instance-tracking-settings">
             <div class="clearfix">
@@ -65,7 +46,7 @@
             </div>
             <div class="clearfix">
                 <div class="field-label">
-                    <label class="dataCaptionFormat" for="email">${ _("URL") }</label>
+                    <label class="dataCaptionFormat">${ _("URL") }</label>
                 </div>
                 <div class="field-input">
                     <span>${ url }</span>
@@ -74,7 +55,7 @@
             </div>
             <div class="clearfix">
                 <div class="field-label">
-                    <label class="dataCaptionFormat" for="email">${ _("Organisation") }</label>
+                    <label class="dataCaptionFormat">${ _("Organisation") }</label>
                 </div>
                 <div class="field-input">
                     <span>${ organisation }</span>
@@ -84,7 +65,7 @@
             % if itEnabled:
                 <div class="clearfix">
                     <div class="field-label">
-                        <label class="dataCaptionFormat" for="email">${ _("Status") }</label>
+                        <label class="dataCaptionFormat">${ _("Status") }</label>
                     </div>
                     <div id="sync-status" class="field-input">
                         <img src="${ Config.getInstance().getSystemIconURL('loading') }"/>
@@ -93,20 +74,39 @@
             % endif
             <div class="toolbar clearfix">
                 <div class="group">
-                    <a id="button-sync" class="i-button disabled" href="#">
-                        ${ _('Sync') }
-                        <i class="icon-loop"></i>
-                    </a>
+                    <a id="button-sync" class="i-button icon-loop disabled" href="#">${ _('Sync') }</a>
                 </div>
                 <div id="save-cancel-group" class="group">
-                    <a id="button-save" class="i-button disabled" href="#">
-                        ${ _('Save') }
-                        <i class="icon-disk"></i>
-                    </a>
-                    <a id="button-cancel" class="i-button disabled" href="#">
-                        ${ _('Cancel') }
-                        <i class="icon-close2"></i>
-                    </a>
+                    <a id="button-save" class="i-button icon-disk disabled" href="#">${ _('Save') }</a>
+                    <a id="button-cancel" class="i-button icon-close2 disabled" href="#">${ _('Cancel') }</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="i-box titled instance-tracking-description">
+            <div class="i-box-header">
+                <div class="i-box-title">${ _('Let us know that you exist!') }</div>
+            </div>
+            <div class="i-box-content">
+                ${ _('Be part of the ever growing Indico community and choose to receive updated news on latest releases (2-3 times per year) as well as important security warnings.') }<br>
+                <br>
+                ${ _('The following data will be sent back to us:') }
+                <ul>
+                    <li>${ _('Contact person') }</li>
+                    <li>${ _('Contact email') }</li>
+                    <li>${ _('Server URL') }</li>
+                    <li>${ _('Name of the organisation') }</li>
+                </ul>
+                ${ _('Please note that <strong>no private information</strong> will ever be sent to the Indico Project and that you can disable it anytime.') }<br>
+                <br>
+                <div class="additional-description">
+                    ${ _('Alongside the previous data, the following public information will be periodically collected by us:') }
+                    <ul>
+                        <li>${ _('Server default language') }</li>
+                        <li>${ _('Indico version installed') }</li>
+                        <li>${ _('Python version used') }</li>
+                        <li>${ _('Statistics data (number of events, contributions, etc...)') }</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -163,17 +163,15 @@
                 for (var key in fields) {
                     if (response[key] != fields[key]) {
                         $('#out-of-sync-' + key).show();
-                        if (key != 'enabled') {
-                            $('#out-of-sync-' + key).qtip({
-                                content: {
-                                    text: 'Value on server: \"' + response[key] + '\"'
-                                },
-                                position: {
-                                    at: 'right center',
-                                    my: 'left center'
-                                }
-                            });
-                        }
+                        $('#out-of-sync-' + key).qtip({
+                            content: {
+                                text: 'Value on server: \"' + response[key] + '\"'
+                            },
+                            position: {
+                                at: 'right center',
+                                my: 'left center'
+                            }
+                        });
                         ok = false;
                     }
                 }
@@ -187,17 +185,48 @@
                     $('#button-sync').removeClass('disabled');
                     syncMessage.text('Out of sync!');
                     syncMessage.addClass('data-out-of-sync');
+                    $('.out-of-sync-popup').show();
                 } else {
                     syncMessage.text('Synced!');
                     syncMessage.addClass('data-synced');
                 }
             },
-            error: function(){
+            error: function(xhr, textStatus, errorThrown){
+                $('.out-of-sync-popup').show();
                 hiddenUpdate.val("register");
-                $('#out-of-sync-enabled').show();
-                $('#button-sync').removeClass('disabled');
                 syncStatus.children('img').remove();
-                $('<span>', {text: 'Out of sync!', class: 'data-out-of-sync'}).appendTo(syncStatus);
+                var syncMessage = $('<span>');
+                syncMessage.appendTo(syncStatus);
+                var syncIcon = $('<i>', {class: 'icon-out-of-sync icon-warning'});
+                syncIcon.appendTo(syncStatus);
+                syncIcon.show();
+                code = xhr.status;
+                if (code == 404) {
+                    $('#button-sync').removeClass('disabled');
+                    syncMessage.text('Out of sync!');
+                    syncMessage.addClass('data-out-of-sync');
+                    syncIcon.qtip({
+                        content: {
+                            text: 'Instance not found on server'
+                        },
+                        position: {
+                            at: 'right center',
+                            my: 'left center'
+                        }
+                    });
+                } else {
+                    syncMessage.text('Connection error!');
+                    syncMessage.addClass('connection-error');
+                    syncIcon.qtip({
+                        content: {
+                            text: 'AJAX request failed: ' + errorThrown
+                        },
+                        position: {
+                            at: 'right center',
+                            my: 'left center'
+                        }
+                    });
+                }
             }
         });
     % endif

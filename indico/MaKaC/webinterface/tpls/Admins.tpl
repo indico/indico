@@ -10,7 +10,7 @@
 
 <div class="groupTitle">${ _("General System Information") }</div>
 
-<div class="warning-message-box out-of-sync-message">
+<div class="warning-message-box out-of-sync-popup admin-popup">
     <div class="message-text">${ _('Instance Tracking data out of sync!') }</div>
     <div class="group">
         <a id="button-learn-more" class="i-button" href="#">${ _('Learn more') }</a>
@@ -107,7 +107,7 @@
             {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ administrators | n,j});
 
     % if itActive:
-        var outOfSyncMessage = $('.out-of-sync-message');
+        var outOfSyncMessage = $('.out-of-sync-popup');
         $.ajax({
             url: "${ updateURL }${ uuid }",
             type: "GET",

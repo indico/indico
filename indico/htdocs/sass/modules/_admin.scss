@@ -3,8 +3,6 @@
 .instance-tracking-description {
     float: left;
     width: 500px;
-    margin-right: 120px;
-    margin-bottom: 40px;
 
     .additional-description {
         color: $gray;
@@ -14,6 +12,8 @@
 .instance-tracking-settings {
     float: left;
     width: 500px;
+    margin-right: 120px;
+    margin-bottom: 40px;
 
     .clearfix {
         margin-bottom: 20px;
@@ -42,6 +42,10 @@
 
             .data-synced {
                 color: $green;
+            }
+
+            .connection-error {
+                color: $red;
             }
         }
 
@@ -152,16 +156,19 @@
     }
 }
 
-.out-of-sync-message {
+.out-of-sync-popup {
     display: none;
-    height: 22px;
 
-    .message-text {
-        float: left;
-        padding-top: 0.2em;
-    }
+    &.admin-popup {
+        height: 22px;
 
-    .group {
-        float: right;
+        .message-text {
+            float: left;
+            padding-top: 0.2em;
+        }
+
+        .group {
+            float: right;
+        }
     }
 }

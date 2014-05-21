@@ -527,7 +527,7 @@ class Config:
         'PDFLatexProgram'           : 'pdflatex',
         'StrictLatex'               : True,
         'WorkerName'                : socket.getfqdn(),
-        'TrackerURL'                : 'http://localhost:5000/api'
+        'TrackerURL'                : 'http://pcituds06.cern.ch:5000/api' # to be changed!!!
     }
 
     if sys.platform == 'win32':
