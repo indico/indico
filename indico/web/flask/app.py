@@ -21,8 +21,10 @@ from __future__ import absolute_import
 
 import os
 import re
+
 from flask import send_from_directory, request
 from flask import current_app as app
+from sqlalchemy.orm import configure_mappers
 from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
 
@@ -166,6 +168,7 @@ def configure_db(app):
 
     db.init_app(app)
     apply_db_loggers(app.debug)
+    configure_mappers()  # Make sure all backrefs are set
     if cfg.getCreateTables():
         with app.app_context():
             delete_all_tables(db)  # favorable to `drop_all` under foreign keys
