@@ -22,7 +22,7 @@
 %message-box {
     @include border-radius();
 
-    padding: 8px 14px 8px 14px;
+    padding: 0 14px;
     margin-bottom: 18px;
 
     &:before {
@@ -30,13 +30,15 @@
         display: block;
         float: left;
         font-size: 1.5em;
-        padding-top: 0.05em;
+        padding-top: 0.25em;
     }
 
     & .message-text {
         color: #777;
         font-size: 1.2em;
         padding-left: 2em;
+        padding-top: 1px;
+        margin: 0.5em 0;
     }
 }
 
