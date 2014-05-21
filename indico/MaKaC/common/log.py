@@ -20,7 +20,6 @@
 from persistent import Persistent
 
 from indico.util.contextManager import ContextManager
-from indico.util.struct import iterators
 from MaKaC.common.timezoneUtils import nowutc
 
 class ModuleNames:
