@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
+
 from indico.core.config import Config
 from indico.modules.rb.controllers.mixins import RoomBookingAvailabilityParamsMixin
 from indico.modules.rb.models.blockings import Blocking
@@ -141,7 +143,7 @@ class BookingPermission(LoggedOnlyService):
         self._blocking = Blocking.get(blocking_id) if blocking_id else None
 
     def _getAnswer(self):
-        user = self._aw.getUser()
+        user = session.user
         return {
             'blocked': not self._blocking.can_be_overridden(user, self._room) if self._blocking else False,
             'can_book': self._room.can_be_booked(user) or self._room.can_be_prebooked(user),

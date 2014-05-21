@@ -242,9 +242,11 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
             confirm_form = form
         repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
 
+        prebook_only = not room.can_be_booked(session.user) and room.can_be_prebooked(session.user)
         return WPRoomBookingNewBookingConfirm(self, form=confirm_form, room=room, start_dt=form.start_date.data,
                                               end_dt=form.end_date.data, repeat_unit=form.repeat_unit.data,
                                               repeat_step=form.repeat_step.data, repeat_msg=repeat_msg,
+                                              prebook_only=prebook_only,
                                               errors=confirm_form.error_list).display()
 
     def _process_confirm(self):
@@ -260,10 +262,14 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
         is_admin = session.user.isRBAdmin()
         skip_conflicts = form.skip_conflicts.data
 
+        can_book = room.can_be_booked(session.user)
+        if not can_book and not room.can_be_prebooked(session.user):
+            raise IndicoError('You cannot book this room')
+
         reservation = Reservation()
         form.populate_obj(reservation, skip={'start_date', 'end_date'}, existing_only=True)
         reservation.room = room
-        reservation.is_confirmed = True  # TODO: check permissions
+        reservation.is_confirmed = can_book
         reservation.created_by_user = session.user
         reservation.start_date = server_to_utc(form.start_date.data)
         reservation.end_date = server_to_utc(form.end_date.data)

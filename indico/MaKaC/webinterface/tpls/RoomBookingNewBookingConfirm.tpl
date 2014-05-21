@@ -149,7 +149,7 @@
 
     <h2 class="group-title"></h2>
     <div>
-        <button type="submit" class="i-button highlight">${ _('Create booking') }</button>
+        <button type="submit" class="i-button highlight">${ _('Create booking') if not prebook_only else _('Create pre-booking') }</button>
         ${ form.skip_conflicts() } ${ form.skip_conflicts.label() }
     </div>
 </form>
