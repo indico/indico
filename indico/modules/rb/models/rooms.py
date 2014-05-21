@@ -843,11 +843,11 @@ class Room(db.Model, Serializer):
         return True
 
     @utils.accessChecked
-    def _can_be_booked(self, avatar, prebook=False):
+    def _can_be_booked(self, avatar, prebook=False, ignore_admin=False):
         if not avatar:
             return False
 
-        if avatar.isRBAdmin() or (self.isOwnedBy(avatar) and self.is_active):
+        if (not ignore_admin and avatar.isRBAdmin()) or (self.isOwnedBy(avatar) and self.is_active):
             return True
 
         if self.is_active and self.is_reservable and (prebook or not self.reservations_need_confirmation):
@@ -857,19 +857,19 @@ class Room(db.Model, Serializer):
 
         return False
 
-    def can_be_booked(self, avatar):
+    def can_be_booked(self, avatar, ignore_admin=False):
         """
         Reservable rooms which does not require pre-booking can be booked by anyone.
         Other rooms - only by their responsibles.
         """
-        return self._can_be_booked(avatar)
+        return self._can_be_booked(avatar, ignore_admin=ignore_admin)
 
-    def can_be_prebooked(self, avatar):
+    def can_be_prebooked(self, avatar, ignore_admin=False):
         """
         Reservable rooms can be pre-booked by anyone.
         Other rooms - only by their responsibles.
         """
-        return self._can_be_booked(avatar, prebook=True)
+        return self._can_be_booked(avatar, prebook=True, ignore_admin=ignore_admin)
 
     def canBeModifiedBy(self, accessWrapper):
         """Only admin can modify rooms."""

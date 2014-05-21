@@ -149,7 +149,12 @@
 
     <h2 class="group-title"></h2>
     <div>
-        <button type="submit" class="i-button highlight">${ _('Create booking') if not prebook_only else _('Create pre-booking') }</button>
+        % if form.submit_prebook:
+            ${ form.submit_prebook(class_='i-button highlight') }
+        % endif
+        % if form.submit_book:
+            ${ form.submit_book(class_='i-button highlight') }
+        % endif
         ${ form.skip_conflicts() } ${ form.skip_conflicts.label() }
     </div>
 </form>

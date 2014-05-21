@@ -25,7 +25,7 @@ from functools import partial
 
 from flask.ext.wtf import Form
 from flask.ext.wtf.file import FileField
-from wtforms import BooleanField, Field, IntegerField, StringField, HiddenField, TextAreaField
+from wtforms import BooleanField, Field, IntegerField, StringField, HiddenField, TextAreaField, SubmitField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.core import FloatField, FieldList, FormField, SelectMultipleField
 from wtforms.validators import (AnyOf, Optional, NumberRange, DataRequired, ValidationError, StopValidation,
@@ -412,6 +412,8 @@ class NewBookingConfirmForm(NewBookingPeriodForm):
     needs_general_assistance = BooleanField(_('Request assistance for the startup of your meeting. A technician will '
                                               'be physically present 10 to 15 minutes before the event to help you '
                                               'start up the room equipment (microphone, projector, etc.).'))
+    submit_book = SubmitField(_('Create booking'))
+    submit_prebook = SubmitField(_('Create pre-booking'))
 
     def validate_equipments(self, field):
         if field.data and not self.uses_video_conference.data:

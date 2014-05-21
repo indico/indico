@@ -176,6 +176,17 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
         else:
             form = NewBookingConfirmForm()
 
+        can_book = room.can_be_booked(session.user)
+        can_prebook = room.can_be_prebooked(session.user)
+        if not can_book and not can_prebook:
+            raise IndicoError('You cannot book this room')
+        if can_book and room.can_be_booked(session.user, True):
+            # The user has actually the permission to book (not just because he's an admin)
+            del form.submit_prebook
+        if not can_book:
+            # User can only prebook
+            del form.submit_book
+
         form.equipments.query = room.find_available_video_conference()
         return form
 
@@ -250,11 +261,9 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
             confirm_form = form
 
         repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
-        prebook_only = not room.can_be_booked(session.user) and room.can_be_prebooked(session.user)
         return WPRoomBookingNewBookingConfirm(self, form=confirm_form, room=room, start_dt=form.start_date.data,
                                               end_dt=form.end_date.data, repeat_unit=form.repeat_unit.data,
                                               repeat_step=form.repeat_step.data, repeat_msg=repeat_msg,
-                                              prebook_only=prebook_only,
                                               errors=confirm_form.error_list).display()
 
     def _process_confirm(self):
@@ -270,7 +279,13 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
         return self._show_confirm(room, form)
 
     def _create_booking(self, form, room):
-        reservation = Reservation.create_from_form(room, form, session.user)
+        if 'submit_book' in form and 'submit_prebook' in form:
+            # Admins have the choice
+            prebook = form.submit_prebook.data
+        else:
+            # Otherwise the existence of the book submit button means the user can book
+            prebook = 'submit_book' not in form
+        reservation = Reservation.create_from_form(room, form, session.user, prebook)
         db.session.add(reservation)
         db.session.flush()
         return reservation
