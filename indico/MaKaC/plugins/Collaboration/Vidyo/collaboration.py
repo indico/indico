@@ -558,7 +558,7 @@ class CSBooking(CSBookingBase):
     @classmethod
     def _search(cls, user, query, offset=0, limit=None):
 
-        if query.strip() == "":
+        if not query.strip():
             return [], None
 
         ask_for_more = True
