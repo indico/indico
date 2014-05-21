@@ -34,7 +34,7 @@ import MaKaC.common.info as info
 from MaKaC.plugins.base import PluginsHolder
 import xml.sax.saxutils
 
-from indico.util.date_time import format_number
+from indico.util.date_time import format_number, format_datetime, format_date, format_time
 from indico.util.i18n import ngettext
 from indico.util.contextManager import ContextManager
 from indico.util.mdx_latex import latex_escape
@@ -364,6 +364,12 @@ def registerHelpers(objDict):
         objDict['formatTime'] = formatTime
     if not 'formatDate' in objDict:
         objDict['formatDate'] = formatDate
+    if not 'format_datetime' in objDict:
+        objDict['format_datetime'] = format_datetime
+    if not 'format_date' in objDict:
+        objDict['format_date'] = format_date
+    if not 'format_time' in objDict:
+        objDict['format_time'] = format_time
     if not 'systemIcon' in objDict:
         objDict['systemIcon'] = systemIcon
     if not 'formatDateTime' in objDict:

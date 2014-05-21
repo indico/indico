@@ -125,6 +125,29 @@ class ReservationOccurrence(db.Model):
         raise IndicoError('Unexpected frequency')
 
     @staticmethod
+    def build_overlap_criteria(occurrences):
+        criteria = []
+        for occurrence in occurrences:
+            criteria += [
+                # other starts after or at our start time         & other starts before our end time
+                (ReservationOccurrence.start >= occurrence.start) & (ReservationOccurrence.start < occurrence.end),
+                # other ends after our start time              & other ends before or when we end
+                (ReservationOccurrence.end > occurrence.start) & (ReservationOccurrence.end <= occurrence.end)
+            ]
+        return or_(*criteria)
+
+    @staticmethod
+    def find_overlapping_with(room, occurrences, reservation_id=None):
+        from indico.modules.rb.models.reservations import Reservation
+
+        return ReservationOccurrence.find(Reservation.room == room,
+                                          Reservation.id != reservation_id,
+                                          ReservationOccurrence.is_valid,
+                                          ReservationOccurrence.build_overlap_criteria(occurrences),
+                                          _eager=ReservationOccurrence.reservation,
+                                          _join=Reservation)
+
+    @staticmethod
     def find_with_filters(filters, avatar=None):
         from indico.modules.rb.models.rooms import Room
         from indico.modules.rb.models.reservations import Reservation

@@ -19,12 +19,13 @@
 
 from ast import literal_eval
 from datetime import datetime, time, timedelta, date
+from collections import defaultdict
 
 from flask import request, session
 from werkzeug.datastructures import MultiDict
-from indico.core.db import db
 
-from indico.core.errors import IndicoError, FormValuesError
+from indico.core.db import db
+from indico.core.errors import IndicoError
 from indico.util.date_time import get_datetime_from_request
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
@@ -258,10 +259,28 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
             # Step3 => Step3 due to an error in the form
             confirm_form = form
 
+        start_dt = form.start_date.data
+        end_dt = form.end_date.data
+        repeat_unit = form.repeat_step.data
+        repeat_step = form.repeat_step.data
+
+        occurrences = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_unit, repeat_step))
+        preoccurences = ReservationOccurrence.find_overlapping_with(room, occurrences).filter(~Reservation.is_confirmed)
+
+        pre_overlapping = defaultdict(list)
+        for occ in occurrences:
+            for preocc in preoccurences:
+                if occ.overlaps(preocc):
+                    pre_overlapping[occ].append(preocc)
+
         repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
-        return WPRoomBookingNewBookingConfirm(self, form=confirm_form, room=room, start_dt=form.start_date.data,
-                                              end_dt=form.end_date.data, repeat_unit=form.repeat_unit.data,
-                                              repeat_step=form.repeat_step.data, repeat_msg=repeat_msg,
+        return WPRoomBookingNewBookingConfirm(self, form=confirm_form, room=room,
+                                              start_dt=form.start_date.data,
+                                              end_dt=form.end_date.data,
+                                              repeat_unit=form.repeat_unit.data,
+                                              repeat_step=form.repeat_step.data,
+                                              repeat_msg=repeat_msg,
+                                              pre_overlapping=pre_overlapping,
                                               errors=confirm_form.error_list).display()
 
     def _process_confirm(self):
@@ -433,264 +452,11 @@ class RHRoomBookingCalendar(RHRoomBookingBase):
                                      end_dt=self.end_dt, overload=self._overload, max_days=self.MAX_DAYS).display()
 
 
+# TODO remove with legacy MaKaC code
 class RHRoomBookingSaveBooking(RHRoomBookingBase):
-    """
-    Performs physical INSERT or UPDATE.
-    When succeeded redirects to booking details, otherwise returns to booking
-    form.
-    """
 
-    def _checkParams(self, params):
-
-        self._roomLocation = params.get("roomLocation")
-        self._roomID = params.get("roomID")
-        self._resvID = params.get("resvID")
-        if self._resvID == 'None':
-            self._resvID = None
-
-        # if the user is not logged in it will be redirected
-        # to the login page by the _checkProtection, so we don't
-        # need to store info in the session or process the other params
-        if not self._getUser():
-            return
-
-        self._answer = params.get("answer", None)
-
-        self._skipConflicting = False
-
-        # forceAddition is set by the confirmation dialog, so that
-        # prebookings that conflict with other prebookings are
-        # silently added
-
-        self._forceAddition = params.get("forceAddition", "False")
-        if self._forceAddition == 'True':
-            self._forceAddition = True
-        else:
-            self._forceAddition = False
-
-        candResv = None
-        if self._resvID:
-            self._formMode = FormMode.MODIF
-            self._resvID = int(self._resvID)
-            _candResv = CrossLocationQueries.getReservations(resvID=self._resvID, location=self._roomLocation)
-            self._orig_candResv = _candResv
-
-            # Creates a "snapshot" of the reservation's attributes before modification
-            self._resvAttrsBefore = self._orig_candResv.createSnapshot()
-
-            import copy
-
-            candResv = copy.copy(_candResv)
-
-            if self._forceAddition:
-                # booking data comes from session if confirmation was required
-                self._loadResvCandidateFromSession(candResv, params)
-            else:
-                self._loadResvCandidateFromParams(candResv, params)
-
-            # Creates a "snapshot" of the reservation's attributes after modification
-            self._resvAttrsAfter = candResv.createSnapshot()
-
-        else:
-            self._formMode = FormMode.NEW
-            candResv = Location.parse(self._roomLocation).factory.newReservation()
-            candResv.createdDT = datetime.now()
-            candResv.createdBy = str(self._getUser().id)
-            candResv.isRejected = False
-            candResv.isCancelled = False
-
-            if self._forceAddition:
-                # booking data comes from session if confirmation was required
-                self._loadResvCandidateFromSession(candResv, params)
-            else:
-                self._loadResvCandidateFromParams(candResv, params)
-
-            self._resvID = None
-
-        user = self._getUser()
-        self._candResv = candResv
-
-        if not (user.isAdmin() or user.isRBAdmin()):
-            for nbd in self._candResv.room.getNonBookableDates():
-                if nbd.doesPeriodOverlap(self._candResv.startDT, self._candResv.endDT):
-                    raise FormValuesError(_("You cannot book this room during the following periods: %s") % ("; ".join(
-                        map(lambda x: "from %s to %s" % (
-                            x.getStartDate().strftime("%d/%m/%Y (%H:%M)"), x.getEndDate().strftime("%d/%m/%Y (%H:%M)")),
-                            self._candResv.room.getNonBookableDates()))))
-
-            if self._candResv.room.getDailyBookablePeriods():
-                for nbp in self._candResv.room.getDailyBookablePeriods():
-                    if nbp.doesPeriodFit(self._candResv.startDT.time(), self._candResv.endDT.time()):
-                        break
-                else:
-                    raise FormValuesError(_("You must book this room in one of the following time periods: %s") % (
-                        ", ".join(map(lambda x: "from %s to %s" % (x.getStartTime(), x.getEndTime()),
-                                      self._candResv.room.getDailyBookablePeriods()))))
-
-        days = self._candResv.room.maxAdvanceDays
-        if not (user.isRBAdmin() or user.getId() == self._candResv.room.responsibleId) and days > 0:
-            if dateAdvanceAllowed(self._candResv.endDT, days):
-                raise FormValuesError(_("You cannot book this room more than %s days in advance.") % days)
-
-        self._params = params
-        self._clearSessionState()
-
-    def _checkProtection(self):
-        # If the user is not logged in, we redirect the same reservation page
-        if not self._getUser():
-            self._redirect(urlHandlers.UHSignIn.getURL(
-                returnURL=urlHandlers.UHRoomBookingBookingForm.getURL(
-                    roomID=self._roomID,
-                    resvID=self._resvID,
-                    roomLocation=self._roomLocation)))
-            self._doProcess = False
-        else:
-            RHRoomBookingBase._checkProtection(self)
-            if not self._candResv.room.isActive and not self._getUser().isRBAdmin():
-                raise MaKaCError("You are not authorized to book this room.")
-
-            if self._formMode == FormMode.MODIF:
-                if not self._orig_candResv.canModify(self.getAW()):
-                    raise MaKaCError("You are not authorized to take this action.")
-
-    def _businessLogic(self):
-
-        candResv = self._candResv
-        emailsToBeSent = []
-        self._confirmAdditionFirst = False
-
-        # Set confirmation status
-        candResv.isConfirmed = True
-        user = self._getUser()
-        if not candResv.room.canBook(user):
-            candResv.isConfirmed = False
-
-        errors = self._getErrorsOfResvCandidate(candResv)
-
-        if not errors and self._answer != 'No':
-
-            isConfirmed = candResv.isConfirmed
-            candResv.isConfirmed = None
-            # find pre-booking collisions
-            self._collisions = candResv.getCollisions(sansID=candResv.id)
-            candResv.isConfirmed = isConfirmed
-
-            if not self._forceAddition and self._collisions:
-                # save the reservation to the session
-                self._saveResvCandidateToSession(candResv)
-                # ask for confirmation about the pre-booking
-                self._confirmAdditionFirst = True
-
-
-            # approved pre-booking or booking
-            if not self._confirmAdditionFirst:
-
-                # Form is OK and (no conflicts or skip conflicts)
-                if self._formMode == FormMode.NEW:
-                    candResv.insert()
-                    emailsToBeSent += candResv.notifyAboutNewReservation()
-                    if candResv.isConfirmed:
-                        session['rbTitle'] = _('You have successfully made a booking.')
-                        session['rbDescription'] = _(
-                            'NOTE: Your booking is complete. However, be <b>aware</b> that in special cases the person responsible for a room may reject your booking. In that case you would be instantly notified by e-mail.')
-                    else:
-                        session['rbTitle'] = _(
-                            'You have successfully made a <span style="color: Red;">PRE</span>-booking.')
-                        session['rbDescription'] = _(
-                            'NOTE: PRE-bookings are subject to acceptance or rejection. Expect an e-mail with acceptance/rejection information.')
-                elif self._formMode == FormMode.MODIF:
-                    self._orig_candResv.unindexDayReservations()
-                    self._orig_candResv.clearCalendarCache()
-                    if self._forceAddition:
-                        self._loadResvCandidateFromSession(self._orig_candResv, self._params)
-                    else:
-                        self._loadResvCandidateFromParams(self._orig_candResv, self._params)
-                    self._orig_candResv.update()
-                    self._orig_candResv.indexDayReservations()
-                    emailsToBeSent += self._orig_candResv.notifyAboutUpdate(self._resvAttrsBefore)
-
-                    # Add entry to the log
-                    info = []
-                    self._orig_candResv.getResvHistory().getResvModifInfo(info, self._resvAttrsBefore,
-                                                                          self._resvAttrsAfter)
-
-                    # If no modification was observed ("Save" was pressed but no field
-                    # was changed) no entry is added to the log
-                    if len(info) > 1:
-                        histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
-                        self._orig_candResv.getResvHistory().addHistoryEntry(histEntry)
-
-                    session['rbTitle'] = _('Booking updated.')
-                    session['rbDescription'] = _('Please review details below.')
-
-                session['rbActionSucceeded'] = True
-
-                # Booking - reject all colliding PRE-Bookings
-                if candResv.isConfirmed and self._collisions:
-                    rejectionReason = "Conflict with booking: %s" % urlHandlers.UHRoomBookingBookingDetails.getURL(
-                        candResv)
-                    for coll in self._collisions:
-                        collResv = coll.withReservation
-                        if collResv.repeatability is None:  # not repeatable -> reject whole booking. easy :)
-                            collResv.rejectionReason = rejectionReason
-                            collResv.reject()  # Just sets isRejected = True
-                            collResv.update()
-                            emails = collResv.notifyAboutRejection()
-                            emailsToBeSent += emails
-
-                            # Add entry to the booking history
-                            info = []
-                            info.append("Booking rejected")
-                            info.append("Reason: '%s'" % collResv.rejectionReason)
-                            histEntry = ResvHistoryEntry(self._getUser(), info, emails)
-                            collResv.getResvHistory().addHistoryEntry(histEntry)
-                        else:  # repeatable -> only reject the specific days
-                            rejectDate = coll.startDT.date()
-                            collResv.excludeDay(rejectDate, unindex=True)
-                            collResv.update()
-                            emails = collResv.notifyAboutRejection(date=rejectDate, reason=rejectionReason)
-                            emailsToBeSent += emails
-
-                            # Add entry to the booking history
-                            info = []
-                            info.append("Booking occurence of the %s rejected" % rejectDate.strftime("%d %b %Y"))
-                            info.append("Reason: '%s'" % rejectionReason)
-                            histEntry = ResvHistoryEntry(self._getUser(), info, emails)
-                            collResv.getResvHistory().addHistoryEntry(histEntry)
-
-        else:
-            session['rbCandDataInSession'] = True
-            session['rbErrors'] = errors
-
-            if self._answer == 'No':
-                session['rbActionSucceeded'] = True
-            else:
-                session['rbActionSucceeded'] = False
-                session['rbShowErrors'] = True
-                session['rbThereAreConflicts'] = self._thereAreConflicts
-
-            self._saveResvCandidateToSession(candResv)
-
-        # Form is not properly filled OR there are conflicts
-        self._errors = errors
-
-        for notification in emailsToBeSent:
-            GenericMailer.send(notification)
-
-    def _process(self):
-
-        self._businessLogic()
-
-        if self._errors or self._answer == 'No':
-            url = urlHandlers.UHRoomBookingBookingForm.getURL(self._candResv.room, resvID=self._resvID,
-                                                              infoBookingMode=True)
-        elif self._confirmAdditionFirst:
-            p = roomBooking_wp.WPRoomBookingConfirmBooking(self)
-            return p.display()
-        else:
-            url = urlHandlers.UHRoomBookingBookingDetails.getURL(self._candResv)
-
-        self._redirect(url)
+    def __init__(self):
+        raise NotImplementedError
 
 
 class RHRoomBookingStatement(RHRoomBookingBase):

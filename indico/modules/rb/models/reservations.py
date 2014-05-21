@@ -28,7 +28,6 @@ from operator import attrgetter
 
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
-from sqlalchemy import func, or_
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.config import Config
@@ -370,28 +369,23 @@ class Reservation(Serializer, db.Model):
 
     # ================================================
 
-    def getOccurrences(self):
-        return self.occurrences.all()
-
     def find_excluded_days(self):
         return self.occurrences.filter(ReservationOccurrence.is_cancelled | ReservationOccurrence.is_rejected)
 
+    @staticmethod
+    def find_overlapping_with(room, occurrences, reservation_id=None):
+        return Reservation.find(Reservation.room == room,
+                                Reservation.id != reservation_id,
+                                ReservationOccurrence.is_valid,
+                                ReservationOccurrence.build_overlap_criteria(occurrences),
+                                _join=ReservationOccurrence)
+
+    def find_overlapping(self):
+        return Reservation.find_overlapping_with(self.room, self.occurrencies, self.id)
+
     def get_conflicting_occurrences(self):
-        query = ReservationOccurrence.find(Reservation.room == self.room,
-                                           Reservation.id != self.id,
-                                           ReservationOccurrence.is_valid,
-                                           _eager=ReservationOccurrence.reservation, _join=Reservation)
-        criteria = []
         valid_occurrences = [occ for occ in self.occurrences if occ.is_valid]
-        for occurrence in valid_occurrences:
-            criteria += [
-                # other starts after or at our start time         & other starts before our end time
-                (ReservationOccurrence.start >= occurrence.start) & (ReservationOccurrence.start < occurrence.end),
-                # other ends after our start time              & other ends before or when we end
-                (ReservationOccurrence.end > occurrence.start) & (ReservationOccurrence.end <= occurrence.end)
-            ]
-        query = query.filter(or_(*criteria))
-        colliding_occurrences = query.all()
+        colliding_occurrences = ReservationOccurrence.find_overlapping_with(self.room, valid_occurrences, self.id).all()
         conflicts = defaultdict(lambda: dict(confirmed=[], pending=[]))
         for occurrence in valid_occurrences:
             for colliding in colliding_occurrences:

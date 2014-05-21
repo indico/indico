@@ -490,51 +490,6 @@ class WRoomBookingBookingForm(WTemplated):
 #         return wvars
 
 
-class WPRoomBookingConfirmBooking(WPRoomBookingBase):
-    def __init__(self, rh):
-        self._rh = rh
-        super(WPRoomBookingConfirmBooking, self).__init__(rh)
-
-    def _getBody(self, params):
-        return WRoomBookingConfirmBooking(self._rh, standalone=True).getHTML(params)
-
-
-class WRoomBookingConfirmBooking(WRoomBookingBookingForm):
-    def getVars(self):
-        wvars = super(WRoomBookingConfirmBooking, self).getVars()
-
-        wvars["candResv"] = self._candResv
-
-        wvars["standalone"] = self._standalone
-        wvars["formMode"] = self._rh._formMode
-        wvars["FormMode"] = FormMode
-        wvars["collisions"] = self._rh._collisions
-
-        # If we are here, we are either in booking mode and trying to overwrite PRE-Bookings...
-        bookingMessage = "Book"
-        bookingMessageOther = "PRE-Book"
-        wvars["rejectOthers"] = True
-        room = self._candResv.room
-        user = self._rh._getUser()
-        if room.canPrebook(user) and not room.canBook(user):
-            # ...or we are in PRE-booking mode and conflicting with another PRE-Booking
-            bookingMessage = "PRE-Book"
-            bookingMessageOther = "PRE-Book"
-            wvars["rejectOthers"] = False
-        wvars["bookingMessage"] = bookingMessage
-        wvars["bookingMessageOther"] = bookingMessageOther
-
-        if self._standalone:
-            wvars["conf"] = None
-            wvars["saveBookingUH"] = urlHandlers.UHRoomBookingSaveBooking
-            wvars["roomDetailsUH"] = urlHandlers.UHRoomBookingRoomDetails
-        else:
-            wvars["conf"] = self._rh._conf
-            wvars["saveBookingUH"] = urlHandlers.UHConfModifRoomBookingSaveBooking
-            wvars["roomDetailsUH"] = urlHandlers.UHConfModifRoomBookingRoomDetails
-        return wvars
-
-
 class WPRoomBookingStatement(WPRoomBookingBase):
     def _getBody(self, params):
         return WRoomBookingStatement(self._rh).getHTML(params)
