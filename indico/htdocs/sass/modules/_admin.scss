@@ -2,27 +2,24 @@
 
 .instance-tracking-description {
     float: left;
-    width: 500px;
-
-    .additional-description {
-        color: $gray;
-    }
+    width: 400px;
 }
 
 .instance-tracking-settings {
     float: left;
-    width: 500px;
+    width: 600px;
+    margin-left: 50px;
     margin-right: 120px;
     margin-bottom: 40px;
 
     .clearfix {
-        margin-bottom: 20px;
+        margin-bottom: 30px;
 
         .field-input {
             float: right;
 
             &:not(.toggle-button) {
-                width: 300px;
+                width: 400px;
             }
 
             .icon-out-of-sync {
@@ -72,7 +69,7 @@
         }
 
         a:not(.i-button), input {
-            width: 260px;
+            width: 360px;
         }
 
         &.toolbar {
