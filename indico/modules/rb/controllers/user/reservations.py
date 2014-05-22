@@ -265,7 +265,9 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
         repeat_step = form.repeat_step.data
 
         occurrences = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_unit, repeat_step))
-        preoccurences = ReservationOccurrence.find_overlapping_with(room, occurrences).filter(~Reservation.is_confirmed)
+        preoccurences = ReservationOccurrence.find_overlapping_with(room, occurrences) \
+                                             .filter(~Reservation.is_confirmed) \
+                                             .all()
 
         pre_overlapping = defaultdict(list)
         for occ in occurrences:
@@ -273,12 +275,12 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
                 if occ.overlaps(preocc):
                     pre_overlapping[occ].append(preocc)
 
-        repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
+        repeat_msg = RepeatMapping.getMessage(repeat_unit, repeat_step)
         return WPRoomBookingNewBookingConfirm(self, form=confirm_form, room=room,
-                                              start_dt=form.start_date.data,
-                                              end_dt=form.end_date.data,
-                                              repeat_unit=form.repeat_unit.data,
-                                              repeat_step=form.repeat_step.data,
+                                              start_dt=start_dt,
+                                              end_dt=end_dt,
+                                              repeat_unit=repeat_unit,
+                                              repeat_step=repeat_step,
                                               repeat_msg=repeat_msg,
                                               pre_overlapping=pre_overlapping,
                                               errors=confirm_form.error_list).display()
