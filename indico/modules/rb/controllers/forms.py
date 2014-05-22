@@ -23,6 +23,7 @@ from collections import defaultdict
 from datetime import datetime, time, timedelta
 from functools import partial
 
+from flask import session
 from flask.ext.wtf import Form
 from flask.ext.wtf.file import FileField
 from wtforms import BooleanField, Field, IntegerField, StringField, HiddenField, TextAreaField, SubmitField
@@ -377,6 +378,10 @@ class NewBookingFormBase(IndicoForm):
     def validate_flexible_dates_range(self, field):
         if self.repeat_unit.data == RepeatUnit.DAY:
             field.data = 0
+
+    def validate_start_date(self, field):
+        if field.data < datetime.now() and not session.user.isAdmin():
+            raise ValidationError(_('The start time cannot be in the past.'))
 
     def validate_end_date(self, field):
         start_date = self.start_date.data

@@ -196,11 +196,16 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
             flexible_days = form.flexible_dates_range.data
             day_start_dt = datetime.combine(form.start_date.data.date(), time())
             day_end_dt = datetime.combine(form.end_date.data.date(), time(23, 59))
+            today_start_dt = datetime.combine(date.today(), time())
+            flexible_start_dt = day_start_dt - timedelta(days=flexible_days)
+            if not session.user.isAdmin():
+                flexible_start_dt = max(today_start_dt, flexible_start_dt)
+            flexible_end_dt = day_end_dt + timedelta(days=flexible_days)
 
             occurrences = ReservationOccurrence.find_all(
                 Reservation.room_id.in_(form.room_ids.data),
-                ReservationOccurrence.start >= day_start_dt - timedelta(days=flexible_days),
-                ReservationOccurrence.end <= day_end_dt + timedelta(days=flexible_days),
+                ReservationOccurrence.start >= flexible_start_dt,
+                ReservationOccurrence.end <= flexible_end_dt,
                 ~ReservationOccurrence.is_cancelled,
                 _join=Reservation,
                 _eager=ReservationOccurrence.reservation
@@ -211,6 +216,8 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
                 offset = timedelta(days=days)
                 series_start = form.start_date.data + offset
                 series_end = form.end_date.data + offset
+                if series_start < flexible_start_dt:
+                    continue
                 candidates[series_start, series_end] = ReservationOccurrence.create_series(series_start, series_end,
                                                                                            (form.repeat_unit.data,
                                                                                             form.repeat_step.data))
