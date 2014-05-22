@@ -443,7 +443,7 @@ class Reservation(Serializer, db.Model):
         reservation = cls()
         form.populate_obj(reservation, skip={'start_date', 'end_date', 'booked_for_name'}, existing_only=True)
         reservation.room = room
-        reservation.booked_for_name = reservation.booked_for_user.getStraightFullName()
+        reservation.booked_for_name = reservation.booked_for_user.getFullName()
         reservation.is_confirmed = not prebook
         reservation.created_by_user = user
         reservation.start_date = form.start_date.data
