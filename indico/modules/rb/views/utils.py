@@ -41,7 +41,7 @@ class Bar(Serializer):
         UNAVAILABLE: 'unavailable'          # A confirmed reservation
     }
 
-    def __init__(self, start, end, kind=CANDIDATE, reservation=None, overlapping=False, blocking=None):
+    def __init__(self, start, end, kind=None, reservation=None, overlapping=False, blocking=None):
         self.start = start
         self.end = end
         self.reservation = reservation
@@ -54,10 +54,11 @@ class Bar(Serializer):
             self.reservation_start = reservation.start_date
             self.reservation_end = reservation.end_date
             self.room_id = reservation.room_id
-            if not overlapping:
-                kind = Bar.UNAVAILABLE if reservation.is_confirmed else Bar.PREBOOKED
-            else:
-                kind = Bar.CONFLICT if reservation.is_confirmed else Bar.PRECONFLICT
+            if kind is None:
+                if not overlapping:
+                    kind = Bar.UNAVAILABLE if reservation.is_confirmed else Bar.PREBOOKED
+                else:
+                    kind = Bar.CONFLICT if reservation.is_confirmed else Bar.PRECONFLICT
 
         if blocking is not None:
             self.blocking = blocking
@@ -78,7 +79,7 @@ class Bar(Serializer):
 
     @classmethod
     def from_candidate(cls, candidate, room_id, resv_start, resv_end, blocking=None):
-        self = cls(candidate.start, candidate.end, blocking=blocking)
+        self = cls(candidate.start, candidate.end, cls.CANDIDATE, blocking=blocking)
         self.room_id = room_id
         self.reservation_start = resv_start
         self.reservation_end = resv_end

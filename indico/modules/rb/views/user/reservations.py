@@ -210,8 +210,6 @@ class RoomBookingCalendarWidget(object):
         for candidates in self.candidates.itervalues():
             for candidate in candidates:
                 for occurrence in self.occurrences:
-                    if not occurrence.reservation.is_confirmed:
-                        continue
                     if candidate.overlaps(occurrence, skip_self=True):
                         start, end = candidate.get_overlap(occurrence)
                         self.conflicts += occurrence.reservation.is_confirmed

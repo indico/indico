@@ -23,7 +23,7 @@ var START_H = 6;
 // Width of the calendar
 var DAY_WIDTH_PX = 35 * 12 * 2;
 // Room types, used for selecting proper CSS classes
-var barClasses = ['barBlocked', 'barPreB', 'barPreC', 'barUnaval', 'barCand', 'barPreConc', 'barConf'];
+var barClasses = ['barBlocked', 'barPreB', 'barPreConc', 'barUnaval', 'barCand', 'barPreC', 'barConf'];
 
 
 // Compares two rooms. Mainly used for sorting.
