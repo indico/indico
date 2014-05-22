@@ -38,7 +38,7 @@ from indico.core.errors import IndicoError
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.modules.rb.models.utils import apply_filters
-from indico.util.date_time import now_utc, format_date, format_datetime, overlaps, server_to_utc
+from indico.util.date_time import now_utc, format_date, format_datetime, overlaps
 from indico.util.i18n import _, N_
 from indico.util.string import return_ascii
 from indico.web.flask.util import url_for
@@ -115,11 +115,11 @@ class Reservation(Serializer, db.Model):
         default=now_utc
     )
     start_date = db.Column(
-        UTCDateTime,
+        db.DateTime,
         nullable=False
     )
     end_date = db.Column(
-        UTCDateTime,
+        db.DateTime,
         nullable=False
     )
     # repeatibility
@@ -216,10 +216,8 @@ class Reservation(Serializer, db.Model):
     )
     occurrences = db.relationship(
         'ReservationOccurrence',
-        backref=db.backref(
-            'reservation',
-            order_by='ReservationOccurrence.start'
-        ),
+        backref='reservation',
+        order_by='ReservationOccurrence.start',
         cascade='all, delete-orphan',
         lazy='dynamic'
     )
@@ -244,7 +242,7 @@ class Reservation(Serializer, db.Model):
 
     @hybrid_property
     def is_live(self):
-        return self.end_date >= now_utc()
+        return self.end_date >= datetime.now()
 
     @hybrid_property
     def is_repeating(self):
@@ -252,7 +250,7 @@ class Reservation(Serializer, db.Model):
 
     @property
     def repetition(self):
-        return (self.repeat_unit, self.repeat_step)
+        return self.repeat_unit, self.repeat_step
 
     @property
     def details_url(self):
@@ -260,7 +258,7 @@ class Reservation(Serializer, db.Model):
 
     @hybrid_property
     def is_archived(self):
-        return self.end_date < now_utc()
+        return self.end_date < datetime.now()
 
     @property
     def status_string(self):
@@ -307,7 +305,7 @@ class Reservation(Serializer, db.Model):
 
     @property
     def created_by_user(self):
-        return AvatarHolder().getById(self.created_by)
+        return AvatarHolder().getById(self.created_by) if self.created_by else None
 
     @created_by_user.setter
     def created_by_user(self, user):
@@ -315,7 +313,7 @@ class Reservation(Serializer, db.Model):
 
     @property
     def booked_for_user(self):
-        return AvatarHolder().getById(self.booked_for_id)
+        return AvatarHolder().getById(self.booked_for_id) if self.booked_for_id else None
 
     @booked_for_user.setter
     def booked_for_user(self, user):
@@ -410,6 +408,7 @@ class Reservation(Serializer, db.Model):
             nonbookable_dates = self.room.nonbookable_dates.filter(NonBookableDate.end_date > self.start_date)
             for occurrence in self.occurrences:
                 for nbd in nonbookable_dates:
+                    # TODO: Use NonBookableDate.overlaps or remove that method
                     if overlaps((nbd.start_date, nbd.end_date), (occurrence.start, occurrence.end)):
                         if not skip_conflicts:
                             raise ConflictingOccurrences()
@@ -453,8 +452,8 @@ class Reservation(Serializer, db.Model):
         reservation.booked_for_name = reservation.booked_for_user.getStraightFullName()
         reservation.is_confirmed = not prebook
         reservation.created_by_user = user
-        reservation.start_date = server_to_utc(form.start_date.data)
-        reservation.end_date = server_to_utc(form.end_date.data)
+        reservation.start_date = form.start_date.data
+        reservation.end_date = form.end_date.data
         if not user.isRBAdmin():
             bookable_times = room.bookable_times.all()
             if bookable_times:
@@ -512,8 +511,8 @@ class Reservation(Serializer, db.Model):
         else:
             occurrence_text = ''
             try:
-                formatted_start_date = format_datetime(self.start_date, server_tz=True)
-            except Exception:
+                formatted_start_date = format_datetime(self.start_date)
+            except Exception:  # XXX: why would this ever fail?!
                 formatted_start_date = ''
         return formatted_start_date, occurrence_text
 
@@ -807,7 +806,7 @@ class Reservation(Serializer, db.Model):
     @staticmethod
     def getClosestReservation(resvs=[], after=None):
         if not after:
-            after = datetime.utcnow()
+            after = datetime.now()
         if not resvs:
             resvs = sorted(filter(lambda r: r.start_date >= after, resvs),
                            key=attrgetter('start_date'))
@@ -919,14 +918,6 @@ class Reservation(Serializer, db.Model):
 
     def getNotifications(self):
         return self.notifications.all()
-
-    def getLocalizedStartDateTime(self):
-        tz = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
-        return timezone(tz).localize(self.start_date)
-
-    def getLocalizedEndDateTime(self):
-        tz = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
-        return timezone(tz).localize(self.end_date)
 
     # reservations
 

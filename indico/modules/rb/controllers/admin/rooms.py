@@ -28,7 +28,6 @@ from indico.modules.rb.models.room_attributes import RoomAttributeAssociation, R
 from MaKaC.webinterface import urlHandlers as UH
 from indico.core.db import db
 from indico.core.errors import NotFoundError
-from indico.util.date_time import server_to_utc, utc_to_server
 from indico.util.i18n import _
 from indico.modules.rb.controllers.decorators import requires_location
 from indico.modules.rb.models.room_bookable_times import BookableTime
@@ -37,10 +36,6 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.views.admin import rooms as room_views
 from . import RHRoomBookingAdminBase
-
-
-class CandidateDataFrom(object):
-    DEFAULTS, PARAMS, SESSION = range(3)
 
 
 class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
@@ -94,8 +89,8 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
             for i, nbd in enumerate(room.nonbookable_dates.all()):
                 if i >= len(form.nonbookable_dates.entries):
                     form.nonbookable_dates.append_entry()
-                form.nonbookable_dates[i].start.data = utc_to_server(nbd.start_date)
-                form.nonbookable_dates[i].end.data = utc_to_server(nbd.end_date)
+                form.nonbookable_dates[i].start.data = nbd.start_date
+                form.nonbookable_dates[i].end.data = nbd.end_date
 
             for i, bt in enumerate(room.bookable_times.all()):
                 if i >= len(form.bookable_times.entries):
@@ -131,8 +126,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         room.bookable_times = [BookableTime(start_time=bt['start'], end_time=bt['end'])
                                for bt in form.bookable_times.data if all(bt.viewvalues())]
         # Nonbookable dates
-        room.nonbookable_dates = [NonBookableDate(start_date=server_to_utc(nbd['start']),
-                                                  end_date=server_to_utc(nbd['end']))
+        room.nonbookable_dates = [NonBookableDate(start_date=nbd['start'], end_date=nbd['end'])
                                   for nbd in form.nonbookable_dates.data if all(nbd.viewvalues())]
 
     def _process(self):

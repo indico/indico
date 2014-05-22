@@ -277,8 +277,8 @@ class WRoomBookingRoomDetails(WTemplated):
 
         wvars['owner_name'] = room.getResponsibleName()
 
-        wvars['bookable_times'] = room.getBookableTimes()
-        wvars['nonbookable_dates'] = room.getNonBookableDates()
+        wvars['bookable_times'] = room.bookable_times.all()
+        wvars['nonbookable_dates'] = room.nonbookable_dates.all()
 
         # URLs
         wvars['stats_url'] = UH.UHRoomBookingRoomStats.getURL(room)
@@ -296,7 +296,7 @@ class WRoomBookingRoomDetails(WTemplated):
 
         s, e = self._rh._searching_start, self._rh._searching_end
         if s and e:
-            s = datetime.utcnow()
+            s = datetime.now()
             e = s + self.__class__.DEFAULT_CALENDAR_RANGE
         wvars['calendar_start'], wvars['calendar_end'] = s, e
 

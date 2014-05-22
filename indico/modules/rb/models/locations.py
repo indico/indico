@@ -21,7 +21,7 @@
 Holder of rooms in a place and its map view related data
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date, time
 
 import pytz
 from sqlalchemy import func, or_, and_
@@ -305,9 +305,9 @@ class Location(db.Model):
     # location helpers
 
     def getAverageOccupation(self):
-        now = datetime.utcnow()
-        end_date = datetime(now.year, now.month, now.day, 17, 30, tzinfo=pytz.utc)
-        start_date = end_date - timedelta(30, 9 * 3600)  # 30 days + 9 hours
+        today = date.today()
+        end_date = datetime.combine(today, time(17, 30))
+        start_date = end_date - timedelta(days=30, hours=9)
 
         booked_time = self.getTotalBookedTimeInLastMonth(start_date, end_date)
         bookable_time = self.getTotalBookableTime(start_date, end_date)

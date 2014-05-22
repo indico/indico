@@ -31,7 +31,7 @@ from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.notifications.blockings import blocking_processed
-from indico.util.date_time import as_utc, format_date
+from indico.util.date_time import format_date
 from indico.util.string import return_ascii
 from indico.util.struct.enum import TitledIntEnum
 
@@ -102,8 +102,8 @@ class BlockedRoom(db.Model):
         self.state = self.State.accepted
 
         # Get colliding reservations
-        start_dt = as_utc(datetime.combine(self.blocking.start_date, time()))
-        end_dt = as_utc(datetime.combine(self.blocking.end_date, time(23, 59, 59)))
+        start_dt = datetime.combine(self.blocking.start_date, time())
+        end_dt = datetime.combine(self.blocking.end_date, time(23, 59, 59))
 
         reservation_criteria = [
             Reservation.room_id == self.room_id,

@@ -305,8 +305,8 @@ def migrate_rooms(rb_root, photo_path):
         for old_bookable_time in old_room.getDailyBookablePeriods():
             r.bookable_times.append(
                 BookableTime(
-                    start_time=convert_date(old_bookable_time._startTime),
-                    end_time=convert_date(old_bookable_time._endTime)
+                    start_time=old_bookable_time._startTime,
+                    end_time=old_bookable_time._endTime
                 )
             )
             print cformat('  %{blue!}Bookable:%{reset} {}').format(r.bookable_times[-1])
@@ -314,8 +314,8 @@ def migrate_rooms(rb_root, photo_path):
         for old_nonbookable_date in old_room.getNonBookableDates():
             r.nonbookable_dates.append(
                 NonBookableDate(
-                    start_date=convert_date(old_nonbookable_date._startDate),
-                    end_date=convert_date(old_nonbookable_date._endDate)
+                    start_date=old_nonbookable_date._startDate,
+                    end_date=old_nonbookable_date._endDate
                 )
             )
             print cformat('  %{blue!}Nonbookable:%{reset} {}').format(r.nonbookable_dates[-1])
@@ -378,14 +378,14 @@ def migrate_reservations(rb_root):
 
         r = Reservation(
             id=v.id,
-            created_at=convert_date(v._utcCreatedDT),
-            start_date=convert_date(v._utcStartDT),
-            end_date=convert_date(v._utcEndDT),
-            booked_for_id=convert_to_unicode(v.bookedForId or u'1073'),
+            created_at=convert_date(v._utcCreatedDT),  # TODO: simply use as_utc?
+            start_date=v.startDT,
+            end_date=v.endDT,
+            booked_for_id=convert_to_unicode(v.bookedForId) or None,
             booked_for_name=convert_to_unicode(v.bookedForName),
             contact_email=convert_to_unicode(v.contactEmail),
             contact_phone=convert_to_unicode(v.contactPhone),
-            created_by=convert_to_unicode(v.createdBy or u'1073'),
+            created_by=convert_to_unicode(v.createdBy) or None,
             is_cancelled=v.isCancelled,
             is_confirmed=v.isConfirmed,
             is_rejected=v.isRejected,
@@ -407,7 +407,7 @@ def migrate_reservations(rb_root):
         if getattr(v, 'resvHistory', None):
             entries = set()
             for h in reversed(v.resvHistory._entries):
-                ts = convert_date(h._timestamp)
+                ts = convert_date(h._timestamp)  # TODO: simply use as_utc?
                 while ts in entries:
                     ts += timedelta(milliseconds=1)
                 entries.add(ts)
@@ -423,7 +423,7 @@ def migrate_reservations(rb_root):
                 el = ReservationEditLog(
                     timestamp=ts,
                     user_name=h._responsibleUser,
-                    info=convert_to_unicode('```'.join(h._info))
+                    info=convert_to_unicode('```'.join(h._info))  # TODO: store this properly!
                 )
                 r.edit_logs.append(el)
 
@@ -432,8 +432,8 @@ def migrate_reservations(rb_root):
         for period in v.splitToPeriods():
             d = period.startDT.date()
             occ = ReservationOccurrence(
-                start=convert_date(period.startDT),
-                end=convert_date(period.endDT),
+                start=period.startDT,
+                end=period.endDT,
                 is_sent=r.is_cancelled or r.is_rejected or d in notifications,
                 is_cancelled=(d in excluded_days),
                 rejection_reason=(convert_to_unicode(occurrence_rejection_reasons[d])
@@ -464,9 +464,9 @@ def migrate_blockings(rb_root):
         b = Blocking(
             id=old_blocking.id,
             created_by=convert_to_unicode(old_blocking._createdBy),
-            created_at=convert_date(old_blocking._utcCreatedDT),
-            start_date=convert_date(datetime.combine(old_blocking.startDate, dt_time.min)),
-            end_date=convert_date(datetime.combine(old_blocking.endDate, dt_time.max)),
+            created_at=convert_date(old_blocking._utcCreatedDT),  # TODO: simply use as_utc?
+            start_date=old_blocking.startDate,
+            end_date=old_blocking.endDate,
             reason=convert_to_unicode(old_blocking.message)
         )
 

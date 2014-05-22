@@ -21,13 +21,11 @@ from ast import literal_eval
 from datetime import datetime, time, timedelta, date
 
 from flask import request, session
-from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from werkzeug.datastructures import MultiDict
 from indico.core.db import db
 
 from indico.core.errors import IndicoError, FormValuesError
-from indico.modules.rb.models.blockings import Blocking
-from indico.util.date_time import server_to_utc, get_datetime_from_request
+from indico.util.date_time import get_datetime_from_request
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.modules.rb.controllers import RHRoomBookingBase
@@ -200,8 +198,8 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
 
             occurrences = ReservationOccurrence.find_all(
                 Reservation.room_id.in_(form.room_ids.data),
-                ReservationOccurrence.start >= server_to_utc(day_start_dt) - timedelta(days=flexible_days),
-                ReservationOccurrence.end <= server_to_utc(day_end_dt) + timedelta(days=flexible_days),
+                ReservationOccurrence.start >= day_start_dt - timedelta(days=flexible_days),
+                ReservationOccurrence.end <= day_end_dt + timedelta(days=flexible_days),
                 ~ReservationOccurrence.is_cancelled,
                 _join=Reservation,
                 _eager=ReservationOccurrence.reservation
@@ -210,8 +208,8 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
             candidates = {}
             for days in xrange(-flexible_days, flexible_days + 1):
                 offset = timedelta(days=days)
-                series_start = server_to_utc(form.start_date.data) + offset
-                series_end = server_to_utc(form.end_date.data) + offset
+                series_start = form.start_date.data + offset
+                series_end = form.end_date.data + offset
                 candidates[series_start, series_end] = ReservationOccurrence.create_series(series_start, series_end,
                                                                                            (form.repeat_unit.data,
                                                                                             form.repeat_step.data))
@@ -342,11 +340,11 @@ class RHRoomBookingBookingForm(RHRoomBookingBase):
     def _process(self):
         self._rooms = Room.find_all()
 
-        start_dt = server_to_utc(self._form.start_date.data)
-        end_dt = server_to_utc(self._form.end_date.data)
+        start_dt = self._form.start_date.data
+        end_dt = self._form.end_date.data
 
-        day_start_dt = server_to_utc(datetime.combine(self._form.start_date.data.date(), time()))
-        day_end_dt = server_to_utc(datetime.combine(self._form.end_date.data.date(), time(23, 59)))
+        day_start_dt = datetime.combine(self._form.start_date.data.date(), time())
+        day_end_dt = datetime.combine(self._form.end_date.data.date(), time(23, 59))
 
         occurrences = ReservationOccurrence.find_all(
             Reservation.room_id == self._room.id,
@@ -424,8 +422,8 @@ class RHRoomBookingCalendar(RHRoomBookingBase):
             rooms = Room.find_all(is_active=True)
             occurrences = ReservationOccurrence.find_all(
                 Reservation.room_id.in_(room.id for room in rooms),
-                ReservationOccurrence.start >= server_to_utc(self.start_dt),
-                ReservationOccurrence.end <= server_to_utc(self.end_dt),
+                ReservationOccurrence.start >= self.start_dt,
+                ReservationOccurrence.end <= self.end_dt,
                 ~ReservationOccurrence.is_cancelled,
                 _join=Reservation,
                 _eager=ReservationOccurrence.reservation

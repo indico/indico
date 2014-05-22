@@ -21,17 +21,16 @@
 Sent notifications of a reservation
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from dateutil import rrule
 from sqlalchemy import or_
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy import UTCDateTime
 from indico.core.errors import IndicoError
 from indico.util import date_time
-from indico.util.date_time import server_to_utc, iterdays, as_utc
+from indico.util.date_time import iterdays
 from indico.util.string import return_ascii
 
 
@@ -45,12 +44,12 @@ class ReservationOccurrence(db.Model):
         primary_key=True
     )
     start = db.Column(
-        UTCDateTime,
+        db.DateTime,
         nullable=False,
         primary_key=True
     )
     end = db.Column(
-        UTCDateTime,
+        db.DateTime,
         nullable=False
     )
     is_sent = db.Column(
@@ -94,7 +93,6 @@ class ReservationOccurrence(db.Model):
     def iter_create_occurrences(cls, start, end, repetition):
         for start in cls.iter_start_time(start, end, repetition):
             end = datetime.combine(start.date(), end.time())
-            end = start.tzinfo.localize(end)
             yield ReservationOccurrence(start=start, end=end)
 
     @staticmethod
@@ -135,17 +133,13 @@ class ReservationOccurrence(db.Model):
                                        _eager=ReservationOccurrence.reservation)
 
         if 'start_dt' in filters and 'end_dt' in filters:
-            start_dt = server_to_utc(filters['start_dt'])
-            end_dt = server_to_utc(filters['end_dt'])
+            start_dt = filters['start_dt']
+            end_dt = filters['end_dt']
             criteria = []
             # We have to check the time range for EACH DAY
             for day_start_dt in iterdays(start_dt, end_dt):
                 # Same date, but the end time
-                day_end_dt = as_utc(datetime.combine(day_start_dt.date(), end_dt.time()))
-                # But this breaks wih some times because converting to UTC may cause the date to change
-                # In this case we can simply fix the end date by adding 1 day
-                if day_end_dt < day_start_dt:
-                    day_end_dt += timedelta(days=1)
+                day_end_dt = datetime.combine(day_start_dt.date(), end_dt.time())
                 criteria += [
                     (ReservationOccurrence.start >= day_start_dt) & (ReservationOccurrence.start < day_end_dt),
                     (ReservationOccurrence.end > day_start_dt) & (ReservationOccurrence.end <= day_end_dt)

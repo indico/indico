@@ -240,7 +240,7 @@
                         ${ _('Hours') }&nbsp;&nbsp;
                       </td>
                       <td align="left" class="blacktext">
-                        ${ formatTime(reservation.start_date, server_tz=True) } &mdash; ${ formatTime(reservation.end_date, server_tz=True) }
+                        ${ formatTime(reservation.start_date) } &mdash; ${ formatTime(reservation.end_date) }
                       </td>
                     </tr>
                       <tr>

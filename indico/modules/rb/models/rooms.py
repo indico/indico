@@ -33,7 +33,6 @@ from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.Locators import Locator
 from MaKaC.common.cache import GenericCache
-from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.errors import MaKaCError
 from MaKaC.user import Avatar, AvatarHolder, GroupHolder
 from indico.core.db.sqlalchemy import db
@@ -208,10 +207,8 @@ class Room(db.Model, Serializer):
 
     bookable_times = db.relationship(
         'BookableTime',
-        backref=db.backref(
-            'room',
-            order_by='BookableTime.start_time'
-        ),
+        backref='room',
+        order_by=BookableTime.start_time,
         cascade='all, delete-orphan',
         lazy='dynamic'
     )
@@ -763,15 +760,6 @@ class Room(db.Model, Serializer):
 
     def belongsTo(self, avatar):
         raise NotImplementedError('todo')
-
-    def getBookableTimes(self):
-        return self.bookable_times.all()
-
-    def getNonBookableDates(self, skip_past=False):
-        q = self.nonbookable_dates
-        if skip_past:
-            q = q.filter(NonBookableDate.start_date >= nowutc())
-        return q.all()
 
     # blocked rooms
 
