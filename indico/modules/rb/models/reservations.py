@@ -27,7 +27,6 @@ from datetime import datetime, timedelta
 from operator import attrgetter
 
 from dateutil.relativedelta import relativedelta
-from pytz import timezone
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.config import Config
@@ -48,7 +47,6 @@ from MaKaC.common.Locators import Locator
 from MaKaC.errors import MaKaCError
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.wcomponents import WTemplated
-from MaKaC.common.info import HelperMaKaCInfo
 
 
 class ConflictingOccurrences(Exception):
@@ -216,7 +214,8 @@ class Reservation(Serializer, db.Model):
     occurrences = db.relationship(
         'ReservationOccurrence',
         backref='reservation',
-        order_by='ReservationOccurrence.start',
+        # This breaks update() with synchronize_session
+        # order_by='ReservationOccurrence.start',
         cascade='all, delete-orphan',
         lazy='dynamic'
     )
@@ -344,17 +343,18 @@ class Reservation(Serializer, db.Model):
     def getReservationById(rid):
         return Reservation.query.get(rid)
 
-    def cancel(self):
+    def cancel(self, reason=None):
         self.is_cancelled = True
-        self.occurrences.update({'is_cancelled': True}, synchronize_session='fetch')
+        self.rejection_reason = reason
+        self.occurrences.filter_by(is_valid=True).update({'is_cancelled': True, 'rejection_reason': reason},
+                                                         synchronize_session='fetch')
 
     def reject(self, reason):
         self.is_rejected = True
         self.rejection_reason = reason
-        self.occurrences \
-            .filter_by(is_cancelled=False) \
-            .update({'is_cancelled': True, 'rejection_reason': reason},
-                    synchronize_session='fetch')
+        # TODO: use is_rejected once we have it for occurrences
+        self.occurrences.filter_by(is_valid=True).update({'is_cancelled': True, 'rejection_reason': reason},
+                                                         synchronize_session='fetch')
 
     def notify_rejection(self, reason, occurrence_date=None):
         return self.notifyAboutRejection(occurrence_date, reason)
@@ -888,7 +888,7 @@ class Reservation(Serializer, db.Model):
             periods.append(period)
 
     def is_valid(self):
-        return self.is_confirmed and not self.is_rejected and not self.is_cancelled
+        return self.is_confirmed and not (self.is_rejected or self.is_cancelled)
 
     def is_heavy(self):
         """
