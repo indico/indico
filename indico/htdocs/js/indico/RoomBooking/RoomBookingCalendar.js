@@ -1036,7 +1036,7 @@ type ("RoomBookingCalendar", [],
                 // Repeat daily booking hover support
                 var flexibleNumber = this.data.repeatUnit ? (2 * this.data.flexibleDays + 1) : 0;
                 $('.wholeDayCalendarDiv').each(function(indexDiv) {
-                    var flexibleIndex = indexDiv % flexibleNumber;
+                    var flexibleIndex = flexibleNumber ? indexDiv % flexibleNumber : indexDiv;
                     $(this).find('.barCand').each(function(indexCand) {
                         var flexibility = 'repetition-{0}-{1}'.format(indexCand, flexibleIndex);
                         $(this).addClass(flexibility).data('flexibility', flexibility);
