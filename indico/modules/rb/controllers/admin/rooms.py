@@ -20,6 +20,7 @@
 from flask import request, session
 from wtforms import TextField
 from wtforms.validators import DataRequired
+from MaKaC.common.cache import GenericCache
 from MaKaC.user import AvatarHolder
 from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.modules.rb.controllers.forms import RoomForm, FormDefaults, IndicoEmail
@@ -36,6 +37,8 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.views.admin import rooms as room_views
 from . import RHRoomBookingAdminBase
+
+_cache = GenericCache('Rooms')
 
 
 class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
@@ -113,9 +116,11 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         form.populate_obj(room, skip=('bookable_times', 'nonbookable_dates'), existing_only=True)
         # Photos
         if form.small_photo.data and form.large_photo.data:
+            _cache.delete_multi('photo-{}-{}'.format(room.id, size) for size in {'small', 'large'})
             room.photo = Photo(small_content=form.small_photo.data.read(),
                                large_content=form.large_photo.data.read())
         elif form.delete_photos.data:
+            _cache.delete_multi('photo-{}-{}'.format(room.id, size) for size in {'small', 'large'})
             room.photo = None
         # Custom attributes
         room.attributes = [RoomAttributeAssociation(value=form['attribute_{}'.format(attr.id)].data,

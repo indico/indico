@@ -611,10 +611,6 @@ class UHConfModifRoomBookingSaveBooking(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-roomBookingSaveBooking'
 
 
-class UHRoomPhoto(URLHandler):
-    _endpoint = 'rooms.photo'
-
-
 class UHConferenceClose(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-close'
 

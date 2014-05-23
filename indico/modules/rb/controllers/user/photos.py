@@ -17,27 +17,37 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import posixpath
 from io import BytesIO
-from flask import request
+from flask import redirect
 
 from indico.core.config import Config
 from indico.web.flask.util import send_file
-from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.photos import Photo
+from MaKaC.common.cache import GenericCache
 
 
-class RHRoomPhoto(RHRoomBookingBase):
-    def _checkParams(self):
-        self._size = request.view_args['size']
-        self._photo = Photo.find_first(Room.id == request.view_args['roomID'], _join=Photo.room)
+_cache = GenericCache('Rooms')
 
-    def _process(self):
-        if self._photo is None:
-            self._redirect(posixpath.join(Config.getInstance().getImagesBaseURL(),
-                                          'rooms/{}_photos/NoPhoto.jpg'.format(self._size)))
-            return
-        io = BytesIO(getattr(self._photo, '{}_content'.format(self._size)))
-        return send_file('photo-{}.jpg'.format(self._size), io, 'image/jpeg', no_cache=False)
+
+def _redirect_no_photo(size):
+    return redirect(posixpath.join(Config.getInstance().getImagesBaseURL(), 'rooms/{}_photos/NoPhoto.jpg'.format(size)))
+
+
+def room_photo(roomID, size, **kw):
+    cache_key = 'photo-{}-{}'.format(roomID, size)
+    photo_data = _cache.get(cache_key)
+
+    if photo_data == '*':
+        return _redirect_no_photo(size)
+    elif photo_data is None:
+        photo = Photo.find_first(Room.id == roomID, _join=Photo.room)
+        if photo is None:
+            _cache.set(cache_key, '*')
+            return _redirect_no_photo(size)
+        photo_data = getattr(photo, '{}_content'.format(size))
+        _cache.set(cache_key, photo_data)
+
+    io = BytesIO(photo_data)
+    return send_file('photo-{}.jpg'.format(size), io, 'image/jpeg', no_cache=False)

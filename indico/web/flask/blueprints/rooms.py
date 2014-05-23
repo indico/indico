@@ -33,7 +33,7 @@ rooms = IndicoBlueprint('rooms', __name__, url_prefix='/rooms')
 
 # Photos
 rooms.add_url_rule('/room/<roomLocation>/<int:roomID>/photo-<any(small,large):size>.jpg', 'photo',
-                   photo_handlers.RHRoomPhoto)
+                   photo_handlers.room_photo)
 
 
 # Home, map, lists, search

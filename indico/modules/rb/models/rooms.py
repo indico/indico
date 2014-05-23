@@ -48,6 +48,7 @@ from indico.modules.rb.models.room_equipments import RoomEquipment, RoomEquipmen
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.util.i18n import _
 from indico.util.string import return_ascii, natural_sort_key
+from indico.web.flask.util import url_for
 from .utils import Serializer
 
 
@@ -290,13 +291,13 @@ class Room(db.Model, Serializer):
     def large_photo_url(self):
         if self.id is None:
             return None
-        return str(UH.UHRoomPhoto.getURL(self, size='large'))
+        return url_for('rooms.photo', self, size='large')
 
     @property
     def small_photo_url(self):
         if self.id is None:
             return None
-        return str(UH.UHRoomPhoto.getURL(self, size='small'))
+        return url_for('rooms.photo', self, size='small')
 
     @property
     def has_photo(self):
