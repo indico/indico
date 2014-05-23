@@ -311,7 +311,7 @@ class Room(db.Model, Serializer):
         return self.query \
                    .outerjoin(RoomAttributeAssociation) \
                    .outerjoin(RoomAttribute) \
-                   .filter(RoomAttribute.name == 'allowed booking group', Room.is_reservable) \
+                   .filter(RoomAttribute.name == 'allowed-booking-group', Room.is_reservable) \
                    .count() == 0
 
     @property
@@ -378,7 +378,7 @@ class Room(db.Model, Serializer):
 
     @property
     def has_booking_groups(self):
-        return self.has_attribute('allowed booking group')
+        return self.has_attribute('allowed-booking-group')
 
     @property
     def kind(self):
@@ -824,7 +824,7 @@ class Room(db.Model, Serializer):
 
     def hasAllowedBookingGroups(self):
         return False
-        # return self.getAttributeByName('Allowed Booking Group') is not None
+        # return self.getAttributeByName('allowed-booking-group') is not None
 
     def canBeViewedBy(self, accessWrapper):
         """Room details are public - anyone can view."""
@@ -839,7 +839,7 @@ class Room(db.Model, Serializer):
             return True
 
         if self.is_active and self.is_reservable and (prebook or not self.reservations_need_confirmation):
-            group_name = self.get_attribute_value('allowed booking group')
+            group_name = self.get_attribute_value('allowed-booking-group')
             if not group_name or avatar.is_member_of_group(group_name):
                 return True
 
@@ -885,7 +885,7 @@ class Room(db.Model, Serializer):
             return None
         if self.owner_id == avatar.id:
             return True
-        manager_groups = self.getAttributeByName('Manager Group')
+        manager_groups = self.getAttributeByName('manager-group')
         if not manager_groups:
             return False
         return manager_groups.contains(avatar)
@@ -898,7 +898,7 @@ class Room(db.Model, Serializer):
 
     def getAllManagers(self):
         managers = {self.owner_id}
-        manager_groups = self.get_attribute_value('Manager Group')
+        manager_groups = self.get_attribute_value('manager-group')
         for group_name in (manager_groups and manager_groups['is_equipped']):
             groups = self.getGroups(group_name)
             if groups and len(groups) == 1:
@@ -906,7 +906,7 @@ class Room(db.Model, Serializer):
         return managers
 
     def checkManagerGroupExistence(self):
-        attribute = self.getAttributeByName('Manager Group')
+        attribute = self.getAttributeByName('manager-group')
         if attribute:
             for group_name in attribute.value.get('is_equipped', []):
                 if not self.getGroups(group_name):
@@ -914,7 +914,7 @@ class Room(db.Model, Serializer):
                     break
 
     def hasManagerGroup(self):
-        attribute = self.getAttributeByName('Manager Group')
+        attribute = self.getAttributeByName('manager-group')
         return attribute and attribute.value.get('is_equipped', [])
 
     def notifyAboutResponsibility(self):

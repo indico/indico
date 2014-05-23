@@ -18,6 +18,7 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 from flask import request
+from indico.modules.rb.models.room_attributes import RoomAttribute
 
 from MaKaC.webinterface import urlHandlers
 from indico.core.errors import IndicoError, FormValuesError
@@ -103,7 +104,7 @@ class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
         self._attr = request.args.get('removeCustomAttributeName', '')
 
     def _process(self):
-        self._location.removeAttributeByName(self._attr)
+        self._location.attributes.filter_by(name=self._attr).delete()
         db.session.add(self._location)
         self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
 
@@ -115,7 +116,8 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
         if not self._location:
             raise IndicoError(_('Unknown Location: {0}').format(name))
 
-        self._attrName = request.form.get('newCustomAttributeName', default='').strip()
+        self._attrTitle = request.form.get('newCustomAttributeName', default='').strip()
+        self._attrName = self._attrTitle.replace(' ', '-').lower()
         if self._attrName:
             if self._location.getAttributeByName(self._attrName):
                 raise FormValuesError(_('There is already an attribute named: {0}').format(self._attrName))
@@ -128,7 +130,7 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
 
     # TODO: update logic should be in location model
     def _process(self):
-        for attr in self._location.getAttributes():
+        for attr in self._location.attributes:
             val = attr.value
             val.update({
                 'is_required': request.form.get('cattr_req_{0}'.format(attr.name), '') == 'on',
@@ -136,7 +138,9 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
             })
             attr.value = val
         if self._attrName:
-            self._location.addAttribute(self._attrName, self._value)
+            attr = RoomAttribute(name=self._attrName, title=self._attrTitle)
+            attr.value = self._value
+            self._location.attributes.append(attr)
 
         db.session.add(self._location)
         self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))

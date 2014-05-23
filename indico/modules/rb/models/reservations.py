@@ -334,9 +334,9 @@ class Reservation(Serializer, db.Model):
     # TODO: attribute names to the top
     def getNotificationEmailList(self):
         return []  # TODO: re-enable once getAttributeByName works
-        notification_list = self.getAttributeByName('Notification Email')
+        notification_list = self.getAttributeByName('notification-email')
         if notification_list:
-            return notification_list.split(',')
+            return notification_list.value.split(',')
         return []
 
     @staticmethod

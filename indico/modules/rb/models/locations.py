@@ -266,21 +266,8 @@ class Location(db.Model):
 
     # attribute management
 
-    def addAttribute(self, name, value=None):
-        if value is None:
-            value = {}
-        attr = RoomAttribute(name=name)
-        attr.value = value
-        self.attributes.append(attr)
-
-    def removeAttributeByName(self, name):
-        self.attributes.filter_by(name=name).delete()
-
     def getAttributeByName(self, name):
         return self.attributes.filter_by(name=name).first()
-
-    def getAttributes(self):
-        return self.attributes.all()
 
     # equipment management
 

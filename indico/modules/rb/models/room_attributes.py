@@ -83,6 +83,10 @@ class RoomAttribute(JSONStringBridgeMixin, db.Model):
         nullable=False,
         index=True
     )
+    title = db.Column(
+        db.String,
+        nullable=False
+    )
     location_id = db.Column(
         db.Integer,
         db.ForeignKey('locations.id')

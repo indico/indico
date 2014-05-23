@@ -59,8 +59,8 @@ month_names = [(str(i), name[:3].encode('utf-8').lower())
                for i, name in dates.get_month_names(locale='fr_FR').iteritems()]
 
 attribute_map = {
-    'simba list': 'manager group',
-    'booking simba list': 'allowed booking group'
+    'Simba List': 'Manager Group',
+    'Booking Simba List': 'Allowed Booking Group'
 }
 
 
@@ -186,16 +186,15 @@ def migrate_locations(main_root, rb_root):
         for ca in custom_attributes_dict.get(l.name, []):
             if ca['type'] != 'str':
                 raise RuntimeError('Non-str custom attributes are unsupported: {}'.format(ca))
-            attr_name = ca['name'].lower()
-            attr_name = attribute_map.get(attr_name, attr_name)
-            attr = RoomAttribute(name=attr_name)
+            attr_name = attribute_map.get(ca['name'], ca['name'])
+            attr = RoomAttribute(name=attr_name.replace(' ', '-').lower(), title=attr_name)
             attr.value = {
                 'is_required': ca['required'],
                 'is_hidden': ca['hidden'],
                 'type': ca['type']
             }
             l.attributes.append(attr)
-            print cformat('  %{blue!}Attribute:%{reset} {}').format(attr.name)
+            print cformat('  %{blue!}Attribute:%{reset} {}').format(attr.title)
 
         # add new created location
         db.session.add(l)
@@ -323,8 +322,7 @@ def migrate_rooms(rb_root, photo_path):
             value = convert_to_unicode(value)
             if not value or ('Simba' in attr_name and value == u'Error: unknown mailing list'):
                 continue
-            attr_name = attr_name.lower()
-            attr_name = attribute_map.get(attr_name, attr_name)
+            attr_name = attribute_map.get(attr_name, attr_name).replace(' ', '-').lower()
             ca = l.getAttributeByName(attr_name)
             if not ca:
                 print cformat('  %{blue!}Attribute:%{reset} {} %{red!}not found').format(attr_name)
@@ -333,7 +331,7 @@ def migrate_rooms(rb_root, photo_path):
             attr.value = value
             attr.attribute = ca
             r.attributes.append(attr)
-            print cformat('  %{blue!}Attribute:%{reset} {} = {}').format(attr.attribute.name, attr.value)
+            print cformat('  %{blue!}Attribute:%{reset} {} = {}').format(attr.attribute.title, attr.value)
 
         l.rooms.append(r)
         db.session.add(l)

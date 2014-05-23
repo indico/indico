@@ -74,7 +74,7 @@ class WRoomBookingAdminLocation(WTemplated):
         wvars = WTemplated.getVars(self)
         wvars['location'] = self._location
         wvars['possibleEquipments'] = self._location.getEquipmentNames()
-        wvars['attributes'] = self._location.getAttributes()
+        wvars['attributes'] = self._location.attributes.all()
 
         # TODO: rest
         wvars['keys'] = RoomAttribute
