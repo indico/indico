@@ -23,12 +23,14 @@ from argparse import ArgumentParser
 from urlparse import urlparse
 from collections import defaultdict
 from datetime import datetime
+from operator import itemgetter
 from itertools import ifilter
 from time import clock
 
 import pytz
 from babel import dates
 from flask import Flask
+from sqlalchemy.sql import func, select
 from ZODB import DB, FileStorage
 from ZEO.ClientStorage import ClientStorage
 
@@ -461,11 +463,29 @@ def migrate_blockings(rb_root):
     db.session.commit()
 
 
+def fix_sequences():
+    for name, cls in sorted(db.Model._decl_class_registry.iteritems(), key=itemgetter(0)):
+        table = getattr(cls, '__table__', None)
+        if table is None:
+            continue
+        # Check if we have a single autoincrementing primary key
+        candidates = [col for col in table.c if col.autoincrement and col.primary_key]
+        if len(candidates) != 1 or not isinstance(candidates[0].type, db.Integer):
+            continue
+        serial_col = candidates[0]
+        sequence_name = '{}_{}_seq'.format(cls.__tablename__, serial_col.name)
+
+        query = select([func.setval(sequence_name, func.max(serial_col) + 1)], table)
+        db.session.execute(query)
+    db.session.commit()
+
+
 def migrate(main_root, rb_root, photo_path):
     migrate_locations(main_root, rb_root)
     migrate_rooms(rb_root, photo_path)
-    migrate_reservations(rb_root)
     migrate_blockings(rb_root)
+    migrate_reservations(rb_root)
+    fix_sequences()
 
 
 def main(main_uri, rb_uri, sqla_uri, photo_path, drop):
