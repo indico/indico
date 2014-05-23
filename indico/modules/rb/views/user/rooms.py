@@ -270,7 +270,7 @@ class WRoomBookingRoomDetails(WTemplated):
         #         if attribute['name'] == 'notification email':
         #             wvars["attrs"][attribute['name']] = wvars["attrs"][attribute['name']].replace(',', ', ')
 
-        wvars['attrs'] = []
+        wvars['attrs'] = {attr.attribute.name: attr for attr in room.attributes}
 
         wvars['actionSucceeded'] = self._rh._afterActionSucceeded
         wvars['deletionFailed'] = self._rh._afterDeletionFailed

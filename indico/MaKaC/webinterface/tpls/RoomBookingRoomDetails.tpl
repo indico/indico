@@ -136,9 +136,9 @@
                       </table>
                     </td>
                     <td width="20%" align="right" class="thumbnail">
-                      % if False: # room.photoId:
-                        <a href="${ room.getPhotoURL() }" nofollow="lightbox" title="${ room.photoId }">
-                          <img border="1px" height="100" src="${ room.getPhotoURL() }" alt="${ str( room.photoId ) }"/>
+                      % if room.photo_id:
+                        <a href="${ room.large_photo_url }" nofollow="lightbox" title="${ _('Room Photo') }">
+                          <img border="1px" height="100" src="${ room.small_photo_url }" alt="${ _('Room Photo') }">
                         </a>
                       % endif
                     </td>
@@ -281,10 +281,10 @@
                                   ${ _('Bookings for this room are automatically accepted') }
                                 </span>
                             % endif
-                            % if False: # attrs.get('Booking Simba List'):
+                            % if attrs.get('allowed-booking-group'):
                               <br>
                               <span class="privateRoom">
-                                ${ _('Bookings for this room are restricted to members of the <strong>{0}</strong> listbox').format(attrs.get('Booking Simba List')) }
+                                ${ _('Bookings for this room are restricted to members of the <strong>{0}</strong> group').format(attrs['allowed-booking-group'].value) }
                               </span>
                             % endif
                             </td>
@@ -301,13 +301,13 @@
                         </td>
                         <td colspan="2">
                           <table width="100%">
-                            % for name, value in {}: # attrs.iteritems():
+                            % for attr in attrs.itervalues():
                               <tr>
                                 <td class="subFieldWidth" align="right" valign="top">
-                                  ${ name }&nbsp;&nbsp;
+                                  ${ attr.attribute.title }&nbsp;&nbsp;
                                 </td>
                                 <td align="left" class="blacktext">
-                                  ${ verbose( value ) }
+                                  ${ attr.value }
                                 </td>
                               </tr>
                             % endfor
@@ -328,20 +328,8 @@
                                 ${ _('Room has') }:&nbsp;&nbsp;
                               </td>
                               <td align="left" class="blacktext">
-                                <% l = [] %>
-                                % for eq in []: # room.getEquipment():
-                                  <% el = [] %>
-                                  <% el.append(eq) %>
-                                  % if 'video conference' in eq.lower():
-                                    <% VCs = room.getAvailableVC() %>
-                                      % if 'I don\'t know' in VCs:
-                                        <% VCs.remove('I don\'t know') %>
-                                      % endif
-                                        <% el.append( """<font color="grey">(%s) </font>"""%(", ".join(VCs))) %>
-                                  % endif
-                                  <% l.append(''.join(el)) %>
-                                % endfor
-                                ${ ', '.join(l) }
+                                <!-- TODO: Show nested equipment nicely, e.g. VC children. Needs a helper function! -->
+                                ${ ', '.join(eq.name.title() for eq in room.equipments) }
                               </td>
                             </tr>
                           </table>
