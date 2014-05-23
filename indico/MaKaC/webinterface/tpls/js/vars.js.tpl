@@ -126,6 +126,7 @@ var Indico = {
             category: ${ urlHandlers.UHCategoryAddMaterial.getURL(_ignore_static=True).js_router | j,n }
         },
 
+        RoomBookingBookRoom: ${ url_rule_to_js('rooms.room_book') | j,n },
         RoomBookingBook: ${ url_rule_to_js('rooms.book') | j,n },
         RoomBookingDetails: ${ urlHandlers.UHRoomBookingRoomDetails.getURL(_ignore_static=True).js_router | j,n },
         ConfModifSchedule: ${ urlHandlers.UHConfModifSchedule.getURL(_ignore_static=True).js_router | j,n },

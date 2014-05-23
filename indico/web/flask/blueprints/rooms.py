@@ -79,6 +79,10 @@ rooms.add_url_rule('/search/rooms',
 
 # Booking a room
 rooms.add_url_rule('/book', 'book', reservation_handlers.RHRoomBookingNewBooking, methods=('GET', 'POST'))
+rooms.add_url_rule('/room/<roomLocation>/<int:roomID>/book',
+                   'room_book',
+                   reservation_handlers.RHRoomBookingNewBookingSimple,
+                   methods=('GET', 'POST'))
 
 
 # Modify a booking

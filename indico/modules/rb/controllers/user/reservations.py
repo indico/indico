@@ -31,7 +31,7 @@ from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.forms import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
-                                                 FormDefaults, NewBookingConfirmForm)
+                                                 FormDefaults, NewBookingConfirmForm, NewBookingSimpleForm)
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
@@ -40,7 +40,8 @@ from indico.modules.rb.views.user import reservations as reservation_views
 from indico.modules.rb.views.user.reservations import (WPRoomBookingSearchBookings, WPRoomBookingSearchBookingsResults,
                                                        WPRoomBookingCalendar, WPRoomBookingNewBookingSelectRoom,
                                                        WPRoomBookingNewBookingSelectPeriod,
-                                                       WPRoomBookingNewBookingConfirm)
+                                                       WPRoomBookingNewBookingConfirm,
+                                                       WPRoomBookingNewBookingSimple)
 from indico.web.flask.util import url_for
 
 
@@ -144,7 +145,164 @@ class RHRoomBookingSearchPendingBookingsMyRooms(RHRoomBookingSearchBookingsShort
     }
 
 
-class RHRoomBookingNewBooking(RHRoomBookingBase):
+class RHRoomBookingNewBookingBase(RHRoomBookingBase):
+    def _make_confirm_form(self, room, step=None, defaults=None, form_class=NewBookingConfirmForm):
+        # Step 3
+        # If we come from a successful step 2 we take default values from that step once again
+        if step == 2:
+            defaults.equipments = []  # wtforms bug; avoid `foo in None` check
+            form = form_class(formdata=MultiDict(), obj=defaults)
+        else:
+            form = form_class(obj=defaults)
+
+        can_book = room.can_be_booked(session.user)
+        can_prebook = room.can_be_prebooked(session.user)
+        if can_book and room.can_be_booked(session.user, True):
+            # The user has actually the permission to book (not just because he's an admin)
+            del form.submit_prebook
+        if not can_book:
+            # User can only prebook
+            del form.submit_book
+
+        form.equipments.query = room.find_available_video_conference()
+        return form
+
+    def _show_confirm(self, room, form, step=None, defaults=None):
+        # form can be PeriodForm or Confirmform depending on the step we come from
+        if step == 2:
+            confirm_form = self._make_confirm_form(room, step, defaults)
+        else:
+            # Step3 => Step3 due to an error in the form
+            confirm_form = form
+
+        conflicts, pre_conflicts = self._get_all_conflicts(room, form)
+        repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
+        return WPRoomBookingNewBookingConfirm(self, form=confirm_form, room=room,
+                                              start_dt=form.start_date.data,
+                                              end_dt=form.end_date.data,
+                                              repeat_unit=form.repeat_unit.data,
+                                              repeat_step=form.repeat_step.data,
+                                              repeat_msg=repeat_msg,
+                                              conflicts=conflicts,
+                                              pre_conflicts=pre_conflicts,
+                                              errors=confirm_form.error_list).display()
+
+    def _get_all_conflicts(self, room, form):
+        conflicts = defaultdict(list)
+        pre_conflicts = defaultdict(list)
+
+        candidates = ReservationOccurrence.create_series(form.start_date.data, form.end_date.data,
+                                                         (form.repeat_step.data, form.repeat_step.data))
+        occurences = ReservationOccurrence.find_overlapping_with(room, candidates).all()
+
+        for cand in candidates:
+            for occ in occurences:
+                if cand.overlaps(occ):
+                    if occ.reservation.is_confirmed:
+                        conflicts[cand].append(occ)
+                    else:
+                        pre_conflicts[cand].append(occ)
+
+        return conflicts, pre_conflicts
+
+    def _get_all_occurrences(self, room_ids, form, flexible_days=0):
+        start_dt = form.start_date.data
+        end_dt = form.end_date.data
+        repeat_unit = form.repeat_unit.data
+        repeat_step = form.repeat_step.data
+        day_start_dt = datetime.combine(start_dt.date(), time())
+        day_end_dt = datetime.combine(end_dt.date(), time(23, 59))
+        today_start_dt = datetime.combine(date.today(), time())
+        flexible_start_dt = day_start_dt - timedelta(days=flexible_days)
+        if not session.user.isAdmin():
+            flexible_start_dt = max(today_start_dt, flexible_start_dt)
+        flexible_end_dt = day_end_dt + timedelta(days=flexible_days)
+
+        occurrences = ReservationOccurrence.find_all(
+            Reservation.room_id.in_(room_ids),
+            ReservationOccurrence.start >= flexible_start_dt,
+            ReservationOccurrence.end <= flexible_end_dt,
+            ReservationOccurrence.is_valid,
+            _join=Reservation,
+            _eager=ReservationOccurrence.reservation
+        )
+
+        candidates = {}
+        for days in xrange(-flexible_days, flexible_days + 1):
+            offset = timedelta(days=days)
+            series_start = start_dt + offset
+            series_end = end_dt + offset
+            if series_start < flexible_start_dt:
+                    continue
+            candidates[series_start, series_end] = ReservationOccurrence.create_series(series_start, series_end,
+                                                                                       (repeat_unit, repeat_step))
+        return occurrences, candidates
+
+    def _create_booking(self, form, room):
+        if 'submit_book' in form and 'submit_prebook' in form:
+            # Admins have the choice
+            prebook = form.submit_prebook.data
+        else:
+            # Otherwise the existence of the book submit button means the user can book
+            prebook = 'submit_book' not in form
+        reservation = Reservation.create_from_form(room, form, session.user, prebook)
+        db.session.add(reservation)
+        db.session.flush()
+        return reservation
+
+
+class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
+    def _checkParams(self):
+        self._room = Room.get(int(request.view_args['roomID']))
+
+    def _make_form(self):
+        if 'start_date' in request.args:
+            start_date = datetime.strptime(request.args['start_date'], '%Y-%m-%d').date()
+        else:
+            start_date = date.today()
+        defaults = FormDefaults(room_id=self._room.id,
+                                start_date=datetime.combine(start_date, time(8, 30)),
+                                end_date=datetime.combine(start_date, time(17, 30)),
+                                booked_for_id=session.user.id,
+                                booked_for_name=session.user.getStraightFullName().decode('utf-8'),
+                                contact_email=session.user.getEmail().decode('utf-8'),
+                                contact_phone=session.user.getPhone().decode('utf-8'))
+
+        return self._make_confirm_form(self._room, defaults=defaults, form_class=NewBookingSimpleForm)
+
+    def _process(self):
+        room = self._room
+        rooms = Room.find_all()
+        form = self._make_form()
+
+        if form.is_submitted() and not form.validate():
+            occurrences = {}
+            candidates = {}
+            conflicts = {}
+            pre_conflicts = {}
+        else:
+            occurrences, candidates = self._get_all_occurrences([self._room.id], form)
+            conflicts, pre_conflicts = self._get_all_conflicts(self._room, form)
+
+        if form.validate_on_submit():
+            if not form.submit_check.data:
+                booking = self._create_booking(form, room)
+                url = url_for('rooms.roomBooking-bookingDetails', booking)
+                self._redirect(url)
+                return
+
+        return WPRoomBookingNewBookingSimple(self, form=form, room=room, rooms=rooms,
+                                             occurrences=occurrences,
+                                             candidates=candidates,
+                                             conflicts=conflicts,
+                                             pre_conflicts=pre_conflicts,
+                                             start_dt=form.start_date.data,
+                                             end_dt=form.end_date.data,
+                                             repeat_unit=form.repeat_unit.data,
+                                             repeat_step=form.repeat_step.data).display()
+
+
+class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
     def _checkParams(self):
         try:
             self._step = int(request.form.get('step', 1))
@@ -154,7 +312,11 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
     def _make_select_room_form(self):
         # Step 1
         self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.getFullName()))
-        form = NewBookingCriteriaForm()
+
+        defaults = FormDefaults(start_date=datetime.combine(date.today(), time(8, 30)),
+                                end_date=datetime.combine(date.today(), time(17, 30)))
+
+        form = NewBookingCriteriaForm(obj=defaults)
         form.room_ids.choices = [(r.id, None) for r in self._rooms]
         return form
 
@@ -166,29 +328,6 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
         else:
             return NewBookingPeriodForm()
 
-    def _make_confirm_form(self, room, defaults=None):
-        # Step 3
-        # If we come from a successful step 2 we take default values from that step once again
-        if self._step == 2:
-            defaults.equipments = []  # wtforms bug; avoid `foo in None` check
-            form = NewBookingConfirmForm(formdata=MultiDict(), obj=defaults)
-        else:
-            form = NewBookingConfirmForm()
-
-        can_book = room.can_be_booked(session.user)
-        can_prebook = room.can_be_prebooked(session.user)
-        if not can_book and not can_prebook:
-            raise IndicoError('You cannot book this room')
-        if can_book and room.can_be_booked(session.user, True):
-            # The user has actually the permission to book (not just because he's an admin)
-            del form.submit_prebook
-        if not can_book:
-            # User can only prebook
-            del form.submit_book
-
-        form.equipments.query = room.find_available_video_conference()
-        return form
-
     def _process_select_room(self):
         # Step 1: Room(s), dates, repetition selection
         form = self._make_select_room_form()
@@ -196,33 +335,10 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
             flexible_days = form.flexible_dates_range.data
             day_start_dt = datetime.combine(form.start_date.data.date(), time())
             day_end_dt = datetime.combine(form.end_date.data.date(), time(23, 59))
-            today_start_dt = datetime.combine(date.today(), time())
-            flexible_start_dt = day_start_dt - timedelta(days=flexible_days)
-            if not session.user.isAdmin():
-                flexible_start_dt = max(today_start_dt, flexible_start_dt)
-            flexible_end_dt = day_end_dt + timedelta(days=flexible_days)
-
-            occurrences = ReservationOccurrence.find_all(
-                Reservation.room_id.in_(form.room_ids.data),
-                ReservationOccurrence.start >= flexible_start_dt,
-                ReservationOccurrence.end <= flexible_end_dt,
-                ~ReservationOccurrence.is_cancelled,
-                _join=Reservation,
-                _eager=ReservationOccurrence.reservation
-            )
-
-            candidates = {}
-            for days in xrange(-flexible_days, flexible_days + 1):
-                offset = timedelta(days=days)
-                series_start = form.start_date.data + offset
-                series_end = form.end_date.data + offset
-                if series_start < flexible_start_dt:
-                    continue
-                candidates[series_start, series_end] = ReservationOccurrence.create_series(series_start, series_end,
-                                                                                           (form.repeat_unit.data,
-                                                                                            form.repeat_step.data))
 
             selected_rooms = [r for r in self._rooms if r.id in form.room_ids.data]
+            occurrences, candidates = self._get_all_occurrences(form.room_ids.data, form, flexible_days)
+
             period_form_defaults = FormDefaults(repeat_step=form.repeat_step.data, repeat_unit=form.repeat_unit.data)
             period_form = self._make_select_period_form(period_form_defaults)
 
@@ -235,7 +351,7 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
                                                        flexible_days=flexible_days).display()
 
         # GET or form errors => show step 1 page
-        return WPRoomBookingNewBookingSelectRoom(self, errors=form.error_list, rooms=self._rooms,
+        return WPRoomBookingNewBookingSelectRoom(self, errors=form.error_list, rooms=self._rooms, form=form,
                                                  max_room_capacity=Room.getMaxCapacity()).display()
 
     def _process_select_period(self):
@@ -256,46 +372,14 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
                                                  booked_for_name=session.user.getStraightFullName().decode('utf-8'),
                                                  contact_email=session.user.getEmail().decode('utf-8'),
                                                  contact_phone=session.user.getPhone().decode('utf-8'))
-            return self._show_confirm(room, form, confirm_form_defaults)
-
-    def _show_confirm(self, room, form, defaults=None):
-        # form can be PeriodForm or Confirmform depending on the step we come from
-        if self._step == 2:
-            confirm_form = self._make_confirm_form(room, defaults)
-        else:
-            # Step3 => Step3 due to an error in the form
-            confirm_form = form
-
-        start_dt = form.start_date.data
-        end_dt = form.end_date.data
-        repeat_unit = form.repeat_step.data
-        repeat_step = form.repeat_step.data
-
-        occurrences = ReservationOccurrence.create_series(start_dt, end_dt, (repeat_unit, repeat_step))
-        preoccurences = ReservationOccurrence.find_overlapping_with(room, occurrences) \
-                                             .filter(~Reservation.is_confirmed) \
-                                             .all()
-
-        pre_overlapping = defaultdict(list)
-        for occ in occurrences:
-            for preocc in preoccurences:
-                if occ.overlaps(preocc):
-                    pre_overlapping[occ].append(preocc)
-
-        repeat_msg = RepeatMapping.getMessage(repeat_unit, repeat_step)
-        return WPRoomBookingNewBookingConfirm(self, form=confirm_form, room=room,
-                                              start_dt=start_dt,
-                                              end_dt=end_dt,
-                                              repeat_unit=repeat_unit,
-                                              repeat_step=repeat_step,
-                                              repeat_msg=repeat_msg,
-                                              pre_overlapping=pre_overlapping,
-                                              errors=confirm_form.error_list).display()
+            return self._show_confirm(room, form, self._step, confirm_form_defaults)
 
     def _process_confirm(self):
         # The form needs the room to create the equipment list, so we need to get it "manually"...
         room = Room.get(int(request.form['room_id']))
         form = self._make_confirm_form(room)
+        if not room.can_be_booked(session.user) and not room.can_be_prebooked(session.user):
+            raise IndicoError('You cannot book this room')
         if form.validate_on_submit():
             booking = self._create_booking(form, room)
             url = url_for('rooms.roomBooking-bookingDetails', booking)
@@ -303,18 +387,6 @@ class RHRoomBookingNewBooking(RHRoomBookingBase):
             return
         # There was an error in the form
         return self._show_confirm(room, form)
-
-    def _create_booking(self, form, room):
-        if 'submit_book' in form and 'submit_prebook' in form:
-            # Admins have the choice
-            prebook = form.submit_prebook.data
-        else:
-            # Otherwise the existence of the book submit button means the user can book
-            prebook = 'submit_book' not in form
-        reservation = Reservation.create_from_form(room, form, session.user, prebook)
-        db.session.add(reservation)
-        db.session.flush()
-        return reservation
 
     def _process(self):
         if self._step == 1:

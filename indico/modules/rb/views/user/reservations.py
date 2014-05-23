@@ -44,7 +44,7 @@ from indico.modules.rb.views.utils import Bar
 
 class RoomBookingCalendarWidget(object):
     def __init__(self, occurrences, start_dt, end_dt, candidates=None, rooms=None, specific_room=None,
-                 repeat_unit=None, repeat_step=None, flexible_days=None):
+                 repeat_unit=None, repeat_step=None, flexible_days=0):
         self.occurrences = occurrences
         self.start_dt = start_dt
         self.end_dt = end_dt
@@ -97,7 +97,7 @@ class RoomBookingCalendarWidget(object):
         })
 
     def iter_days(self):
-        if self.repeat_unit is None and self.repeat_step is None and self.flexible_days is None:
+        if self.repeat_unit is None and self.repeat_step is None:
             for dt in iterdays(self.start_dt, self.end_dt):
                 yield dt.date()
         else:
@@ -391,6 +391,19 @@ class WPRoomBookingNewBookingSelectPeriod(WPRoomBookingNewBookingBase):
 class WPRoomBookingNewBookingConfirm(WPRoomBookingNewBookingBase):
     def _getBody(self, params):
         return WTemplated('RoomBookingNewBookingConfirm').getHTML(params)
+
+
+class WPRoomBookingNewBookingSimple(WPRoomBookingNewBookingBase):
+    def _getBody(self, params):
+        if params['start_dt'] and params['end_dt']:
+            calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
+                                                 candidates=params['candidates'],
+                                                 specific_room=params['room'], repeat_unit=params['repeat_unit'],
+                                                 repeat_step=params['repeat_step'])
+            params['calendar'] = calendar.render(show_navbar=False)
+        else:
+            params['calendar'] = ''
+        return WTemplated('RoomBookingNewBookingSimple').getHTML(params)
 
 
 class WPRoomBookingBookingForm(WPRoomBookingBase):

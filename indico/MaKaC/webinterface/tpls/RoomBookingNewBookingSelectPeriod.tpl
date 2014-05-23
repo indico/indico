@@ -11,8 +11,8 @@
 
 <form id="periodForm" method="POST" action="">
     <input type="hidden" name="step" value="2">
+    ${ period_form.repeat_unit(style='display: none') }
     ${ period_form.repeat_step(type='hidden') }
-    ${ period_form.repeat_unit(type='hidden') }
     ${ period_form.start_date(type='hidden') }
     ${ period_form.end_date(type='hidden') }
     ${ period_form.skip_conflicts(type='hidden') }

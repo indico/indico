@@ -125,7 +125,8 @@ indico_room_booking = Bundle(
                'MapOfRooms.js',
                'BookingForm.js',
                'RoomBookingCalendar.js',
-               'roomselector.js'),
+               'roomselector.js',
+               'validation.js'),
     filters='rjsmin', output='js/indico_room_booking_%(version)s.min.js')
 
 indico_admin = Bundle(

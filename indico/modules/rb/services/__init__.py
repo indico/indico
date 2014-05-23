@@ -30,10 +30,10 @@ class GetDateWarning(ServiceBase):
         self._end_dt = get_datetime_from_request(prefix='end_', source=self._params)
 
     def _getAnswer(self):
-        if not self._start_date or not self._end_date:
+        if not self._start_dt or not self._end_dt:
             return ''
-        elif HolidaysHolder.isWorkingDay(self._start_date) and HolidaysHolder.isWorkingDay(self._end_date):
+        elif HolidaysHolder.isWorkingDay(self._start_dt) and HolidaysHolder.isWorkingDay(self._end_dt):
             return ''
-        elif is_weekend(self._start_date) or is_weekend(self._end_date):
+        elif is_weekend(self._start_dt) or is_weekend(self._end_dt):
             return _('weekend chosen')
         return _('holidays chosen')

@@ -26,7 +26,7 @@ from functools import partial
 from flask import session
 from flask.ext.wtf import Form
 from flask.ext.wtf.file import FileField
-from wtforms import BooleanField, Field, IntegerField, StringField, HiddenField, TextAreaField, SubmitField
+from wtforms import BooleanField, Field, IntegerField, StringField, HiddenField, TextAreaField, SubmitField, RadioField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.core import FloatField, FieldList, FormField, SelectMultipleField
 from wtforms.validators import (AnyOf, Optional, NumberRange, DataRequired, ValidationError, StopValidation,
@@ -368,16 +368,13 @@ class NewBookingFormBase(IndicoForm):
                                display_format='%d/%m/%Y %H:%M')
     end_date = DateTimeField('End date', validators=[InputRequired()], parse_kwargs={'dayfirst': True},
                              display_format='%d/%m/%Y %H:%M')
-    repeat_unit = IntegerField('Repeat unit', validators=[NumberRange(0, 3)])
-    repeat_step = IntegerField('Repeat step', validators=[NumberRange(0, 3)])
+    repeat_unit = RadioField('Repeat unit', coerce=int, default=0, validators=[InputRequired()],
+                             choices=[(0, _('Once')), (1, _('Daily')), (2, _('Weekly')), (3, _('Monthly'))])
+    repeat_step = IntegerField('Repeat step', validators=[NumberRange(0, 3)], default=0)
 
     def validate_repeat_step(self, field):
         if (self.repeat_unit.data, self.repeat_step.data) not in RepeatMapping._mapping:
             raise ValidationError('Invalid repeat step')
-
-    def validate_flexible_dates_range(self, field):
-        if self.repeat_unit.data == RepeatUnit.DAY:
-            field.data = 0
 
     def validate_start_date(self, field):
         if field.data < datetime.now() and not session.user.isAdmin():
@@ -396,7 +393,15 @@ class NewBookingFormBase(IndicoForm):
 
 class NewBookingCriteriaForm(NewBookingFormBase):
     room_ids = SelectMultipleField('Rooms', [DataRequired()], coerce=int)
-    flexible_dates_range = IntegerField('Flexible days', validators=[NumberRange(0, 3)], default=0)
+    flexible_dates_range = RadioField('Flexibile days', coerce=int, default=0, validators=[InputRequired()],
+                                      choices=[(0, _('Exact')),
+                                               (1, '&plusmn;{}'.format(_('1 day'))),
+                                               (2, '&plusmn;{}'.format(_('2 days'))),
+                                               (3, '&plusmn;{}'.format(_('3 days')))])
+
+    def validate_flexible_dates_range(self, field):
+        if self.repeat_unit.data == RepeatUnit.DAY:
+            field.data = 0
 
 
 class NewBookingPeriodForm(NewBookingFormBase):
@@ -407,7 +412,7 @@ class NewBookingPeriodForm(NewBookingFormBase):
 class NewBookingConfirmForm(NewBookingPeriodForm):
     booked_for_id = HiddenField(_('User'), [InputRequired()])
     booked_for_name = StringField()  # just for displaying
-    contact_email = StringField(_('Contact email'), [InputRequired(), IndicoEmail(multi=True)])
+    contact_email = StringField(_('Email'), [InputRequired(), IndicoEmail(multi=True)])
     contact_phone = StringField(_('Telephone'))
     booking_reason = TextAreaField(_('Reason'), [DataRequired()])
     uses_video_conference = BooleanField(_('I will use Video Conference equipment.'))
@@ -429,6 +434,12 @@ class NewBookingConfirmForm(NewBookingPeriodForm):
     def validate_needs_video_conference_setup(self, field):
         if field.data and not self.uses_video_conference.data:
             raise ValidationError('Video Conference equipment is not used.')
+
+
+class NewBookingSimpleForm(NewBookingConfirmForm):
+    submit_check = SubmitField(_('Check conflicts'))
+    booking_reason = TextAreaField(_('Reason'), [UsedIf(lambda form, field: not form.submit_check.data),
+                                                 DataRequired()])
 
 
 class RoomListForm(IndicoForm):

@@ -315,6 +315,8 @@ a.weekday {
 
     #sDatePlaceTitle,
     #eDatePlaceTitle {
+        font-size: 1.1em;
+        padding-bottom: 10px;
         text-align: center;
     }
 }
@@ -322,7 +324,7 @@ a.weekday {
 
 
 .bookDateDiv {
-    float: left;
+    display: inline-block;
     margin-right: 35px;
     padding: 10px;
     background-color: #FAFAFA;
@@ -339,4 +341,33 @@ a.weekday {
 .bookingTitle {
    border-bottom: 1px solid #eaeaea;
    padding-top: 15px;
+}
+
+#bookedForInfo {
+    .group {
+        position: relative;
+
+        i.info-helper {
+            position: absolute;
+            right: -18px;
+            top: 6px;
+        }
+    }
+
+    .i-button.label {
+        width: 130px;
+    }
+
+    input[type=text] {
+        width: 240px;
+    }
+
+    textarea {
+        @include border-radius();
+        width: 370px;
+    }
+}
+
+#holidays-warning {
+    display: inline-block;
 }

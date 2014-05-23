@@ -22,7 +22,7 @@
 .barLegend {
     @include border-radius();
 
-    float: left;
+    display: inline-block;
     position: relative;
     height: 12px;
     margin: 4px;

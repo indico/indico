@@ -26,7 +26,8 @@
             wrapInToolbar: true,
             thinToolbar: true,
             errorHighlight: true,
-            sliderWidth: '230px'
+            sliderWidth: '230px',
+            change: null
         },
 
         _create: function() {
@@ -105,6 +106,7 @@
                 },
                 slide: function(e, ui) {
                     self._updateInputs(e, ui);
+                    self._trigger('change', this);
                 }
             });
         },
@@ -125,6 +127,7 @@
                 var sTime = self.__getTime(self.startTime.val());
                 var eTime = self.__getTime(self.endTime.val());
                 self.slider.slider('values', 0, sTime).slider('values', 1, eTime);
+                self._trigger('change', this);
             }
         },
 

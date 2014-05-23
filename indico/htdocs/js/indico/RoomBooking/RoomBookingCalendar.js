@@ -37,7 +37,7 @@ function compareRooms(elem1, elem2){
     return 0;
 }
 
-var calendarLegend = Html.div({style:{cssFloat: 'left', clear: 'both', padding: pixels(5), marginBottom: pixels(10), border: "1px solid #eaeaea", textAlign: "center", borderRadius: pixels(10)}},
+var calendarLegend = Html.div({style:{clear: 'both', padding: pixels(5), marginBottom: pixels(10), border: "1px solid #eaeaea", borderRadius: pixels(2)}},
         Html.div( {className:'barLegend', style:{color: 'black'}}, $T('Legend:')),
         Html.div( {className:'barLegend barCand'}, $T('Available')),
         Html.div( {className:'barLegend barConf'}, $T('Conflict')),
@@ -83,6 +83,7 @@ type ("RoomBookingRoom", [],
             this.number = roomData.number;
             this.floor = roomData.floor;
             this.building = roomData.building;
+            this.location_name = roomData.location_data;
             this.name = roomData.name;
             this.type = roomData.kind;
             this.details_url = roomData.details_url;
@@ -586,9 +587,15 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
                     if(tt) {
                         tt = tt.replace(/\n/g, '<br>');
                     }
-                    alert('FIXME');
-                    var link = Html.a({href:this.room.getBookingFormUrl(day.date, this.data.repeatability, this.data.flexibleDatesRange, false, false, null, null, true),  className : 'dateLink ' + dateClass},
-                                      Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d"));
+
+                    var link = Html.a({
+                        href: build_url(Indico.Urls.RoomBookingBookRoom, {
+                            start_date: day.date,
+                            roomLocation: this.room.location_name,
+                            roomID: this.room.id
+                        }),
+                        className: 'dateLink ' + dateClass
+                    }, Util.formatDateTime(day.date, IndicoDateTimeFormats.DefaultHourless, "%Y-%m-%d"));
 
                     var container = $('<div class="room-row">').append(
                         $('<div class="link">').append(link.dom),
@@ -601,7 +608,7 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
                             },
                             position: {
                                 target: 'mouse',
-                                adjust: { mouse: true, x: 11, y: 13 }
+                                adjust: {mouse: true, x: 11, y: 13}
                             }
                         });
                     }
@@ -611,9 +618,11 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
 
             drawHeader: function(){
                 if (this.room)
-                    var singleDayHeader = Html.div({className:"bookingTitle", style:{marginBottom: pixels(20), marginTop: pixels(18)}}, Html.span({className:"groupTitle bookingTitle", style:{borderBottom: pixels(0), paddingTop: pixels(0)}},
-                                          $T("Availability for "), this.data.days[0].rooms[0].room.getFullName(false)), Html.a({href:this.room.details_url, style:{paddingLeft: pixels(5), fontSize:"x-small"}}, $T("( show 3 months preview )" )));
-                return Html.div({}, singleDayHeader, calendarLegend, this.RoomBookingCalendarDrawer.prototype.drawHeader.call(this));
+                    var singleDayHeader = Html.div({
+                        className:"bookingTitle",
+                        style:{marginBottom: pixels(20), marginTop: pixels(18)}
+                    }, Html.a({href:this.room.details_url, style:{paddingLeft: pixels(5), fontSize:"x-small"}}, $T("( show 3 months preview )" )));
+                return Html.div({}, singleDayHeader, this.RoomBookingCalendarDrawer.prototype.drawHeader.call(this));
             },
             /**
              * Draws a day cell and all its rooms and reservations
