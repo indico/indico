@@ -22,7 +22,7 @@ import re
 from argparse import ArgumentParser
 from urlparse import urlparse
 from collections import defaultdict
-from datetime import datetime, time as dt_time, timedelta
+from datetime import datetime
 from itertools import ifilter
 from time import clock
 
@@ -44,16 +44,22 @@ from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatMapping, Reservation
-from indico.modules.rb.models.room_attributes import RoomAttributeAssociation
+from indico.modules.rb.models.room_attributes import RoomAttributeAssociation, RoomAttribute
 from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.modules.rb.models.rooms import Room
 from indico.util.console import colored, cformat
+from indico.util.date_time import as_utc
 
 
 month_names = [(str(i), name[:3].encode('utf-8').lower())
                for i, name in dates.get_month_names(locale='fr_FR').iteritems()]
+
+attribute_map = {
+    'simba list': 'manager group',
+    'booking simba list': 'allowed booking group'
+}
 
 
 def get_storage(zodb_uri):
@@ -125,34 +131,11 @@ def get_room_id(guid):
     return int(guid.split('|')[1].strip())
 
 
-def convert_date(ds):
-    if isinstance(ds, str):
-        try:
-            ds = datetime.strptime(ds, '%d %b %Y %H:%M')
-        except ValueError:
-
-            for i, n in month_names:
-                if n in ds:
-                    ds = ds.lower().replace(n, i)
-                    break
-            try:
-                ds = datetime.strptime(ds, '%d %m %Y %H:%M')
-            except:
-                raise RuntimeError(ds)
-    if isinstance(ds, datetime):
-        if not ds.tzinfo:
-            ds = tz.localize(ds)
-    elif isinstance(ds, dt_time):
-        hour_diff = datetime.now(pytz.utc).hour - datetime.now(tz).hour
-        ds = ds.replace(hour=(ds.hour+hour_diff) % 24)  # day light save time?
-    return ds
-
-
 def convert_to_unicode(val):
     if isinstance(val, str):
         try:
             return unicode(val, 'utf-8')
-        except:
+        except UnicodeError:
             return unicode(val, 'latin1')
     elif isinstance(val, unicode):
         return val
@@ -161,25 +144,6 @@ def convert_to_unicode(val):
     elif val is None:
         return u''
     raise RuntimeError('Unexpected type is found for unicode conversion')
-
-
-def merge_custom_attributes(attrs):
-    res = defaultdict(dict)
-    for attr in attrs:
-        if isinstance(attr, str):
-            name = convert_to_unicode(attr)
-            value = {}
-        elif isinstance(old_custom_attribute, dict):
-            if 'name' in attr:
-                name = convert_to_unicode(attr.pop('name'))
-            else:
-                name = 'unknown'
-            value = attr
-        else:
-            raise RuntimeError('Unexpected custom attribute type')
-
-        res[name.lower()].update(value)
-    return res
 
 
 def migrate_locations(main_root, rb_root):
@@ -218,12 +182,18 @@ def migrate_locations(main_root, rb_root):
 
         # add custom attributes
         for ca in custom_attributes_dict.get(l.name, []):
-            l.addAttribute(ca['name'].lower(), {
+            if ca['type'] != 'str':
+                raise RuntimeError('Non-str custom attributes are unsupported: {}'.format(ca))
+            attr_name = ca['name'].lower()
+            attr_name = attribute_map.get(attr_name, attr_name)
+            attr = RoomAttribute(name=attr_name)
+            attr.value = {
                 'is_required': ca['required'],
                 'is_hidden': ca['hidden'],
-                'type': 'str'
-            })
-            print cformat('  %{blue!}Attribute:%{reset} {}').format(l.attributes[-1].name)
+                'type': ca['type']
+            }
+            l.attributes.append(attr)
+            print cformat('  %{blue!}Attribute:%{reset} {}').format(attr.name)
 
         # add new created location
         db.session.add(l)
@@ -347,16 +317,21 @@ def migrate_rooms(rb_root, photo_path):
         if new_eq:
             print cformat('  %{blue!}Equipment:%{reset} {}').format(', '.join(sorted(x.name for x in new_eq)))
 
-        for name, value in merge_custom_attributes(getattr(old_room, 'customAtts', [])).iteritems():
-            ca = l.getAttributeByName(name)
-            if ca:
-                attr = RoomAttributeAssociation()
-                attr.value = value
-                attr.attribute = ca
-                r.attributes.append(attr)
-                print cformat('  %{blue!}Attribute:%{reset} {} = {}').format(attr.attribute, attr.value)
-            else:
-                print name, value, old_room.id, l.id  # these are already deleted from location
+        for attr_name, value in getattr(old_room, 'customAtts', {}).iteritems():
+            value = convert_to_unicode(value)
+            if not value or ('Simba' in attr_name and value == u'Error: unknown mailing list'):
+                continue
+            attr_name = attr_name.lower()
+            attr_name = attribute_map.get(attr_name, attr_name)
+            ca = l.getAttributeByName(attr_name)
+            if not ca:
+                print cformat('  %{blue!}Attribute:%{reset} {} %{red!}not found').format(attr_name)
+                continue
+            attr = RoomAttributeAssociation()
+            attr.value = value
+            attr.attribute = ca
+            r.attributes.append(attr)
+            print cformat('  %{blue!}Attribute:%{reset} {} = {}').format(attr.attribute.name, attr.value)
 
         l.rooms.append(r)
         db.session.add(l)
@@ -378,7 +353,7 @@ def migrate_reservations(rb_root):
 
         r = Reservation(
             id=v.id,
-            created_at=convert_date(v._utcCreatedDT),  # TODO: simply use as_utc?
+            created_at=as_utc(v._utcCreatedDT),
             start_date=v.startDT,
             end_date=v.endDT,
             booked_for_id=convert_to_unicode(v.bookedForId) or None,
@@ -405,12 +380,8 @@ def migrate_reservations(rb_root):
 
         occurrence_rejection_reasons = {}
         if getattr(v, 'resvHistory', None):
-            entries = set()
             for h in reversed(v.resvHistory._entries):
-                ts = convert_date(h._timestamp)  # TODO: simply use as_utc?
-                while ts in entries:
-                    ts += timedelta(milliseconds=1)
-                entries.add(ts)
+                ts = as_utc(h._timestamp)
 
                 if len(h._info) == 2:
                     possible_rejection_date, possible_rejection_reason = h._info
@@ -464,7 +435,7 @@ def migrate_blockings(rb_root):
         b = Blocking(
             id=old_blocking.id,
             created_by=convert_to_unicode(old_blocking._createdBy),
-            created_at=convert_date(old_blocking._utcCreatedDT),  # TODO: simply use as_utc?
+            created_at=as_utc(old_blocking._utcCreatedDT),
             start_date=old_blocking.startDate,
             end_date=old_blocking.endDate,
             reason=convert_to_unicode(old_blocking.message)

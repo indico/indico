@@ -101,40 +101,11 @@ class RoomAttribute(JSONStringBridgeMixin, db.Model):
         )
     )
 
-    @staticmethod
-    def supportsAttributeManagement():
-        return True
-
     @return_ascii
     def __repr__(self):
-        return u'<AttributeKey({0}, {1}, {2}, {3})>'.format(
+        return u'<RoomAttribute({0}, {1}, {2}, {3})>'.format(
             self.id,
             self.name,
             self.location_id,
             self.raw_data
         )
-
-    # @staticmethod
-    # def getKeyByName(name):
-    #     return AttributeKey.query.filter_by(name=name).first()
-
-    # @staticmethod
-    # def getAllKeys():
-    #     return AttributeKey.query.all()
-
-    # @staticmethod
-    # def getAllReservationKeys():
-    #     """All keys are also reservation key"""
-    #     return AttributeKey.query.filter_by(is_for_reservations=True).all()
-
-    # @staticmethod
-    # def getAllRoomKeys():
-    #     return AttributeKey.query.filter_by(is_for_rooms=True).all()
-
-    # @staticmethod
-    # def supportsAttributeManagement():
-    #     return True
-
-    # @staticmethod
-    # def getLocationAttributes(location_name):
-    #     AttributeKey.location_attributes

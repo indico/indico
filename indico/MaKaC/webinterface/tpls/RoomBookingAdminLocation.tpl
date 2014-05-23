@@ -80,7 +80,6 @@
         <span class="titleCellFormat">${ _('Possible equipment') }</span>
       </td>
       <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
-        % if keys.supportsAttributeManagement():
           <p style="color: Green;">
             ${ _('This location supports dynamic equipment management.') }
           </p>
@@ -114,11 +113,6 @@
               ${ _('On new room creation form, you will be able to choose equipment from this set.') }
             </li>
           </ul>
-        % else:
-          <span style="color: Red;">
-            ${ _('This location does not support dynamic equipment management.') }
-          </span><br />
-        % endif
       </td>
     </tr>
     <tr><td colspan="2"><hr /></td></tr>
@@ -129,7 +123,6 @@
         </span>
       </td>
       <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
-        % if keys.supportsAttributeManagement():
             <p style="color: Green;">
                 ${ _('This location supports dynamic attributes management.') }
             </p>
@@ -200,11 +193,6 @@
                 ${ _('Custom attributes does not have type. They are kept as free text. It is impossible to add any kind of validation without coding.') }
               </li>
             </ul>
-        % else:
-          <span style="color: Red;">
-            ${ _('This location does not support dynamic attributes management.') }
-          </span><br />
-        % endif
       </td>
     </tr>
     <tr><td colspan="2"><hr /></td></tr>
