@@ -132,8 +132,8 @@ class Reservation(Serializer, db.Model):
     )  # 1, 2, 3, etc.
     # user
     booked_for_id = db.Column(
-        db.String,
-        nullable=False
+        db.String
+        # Must be nullable for legacy data :(
     )
     booked_for_name = db.Column(
         db.String,
