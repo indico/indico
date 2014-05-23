@@ -433,6 +433,7 @@ def migrate_blockings(rb_root):
         True: BlockedRoom.State.accepted
     }
 
+    print cformat('%{white!}migrating blockings')
     for old_blocking_id, old_blocking in rb_root['RoomBlocking']['Blockings'].iteritems():
         b = Blocking(
             id=old_blocking.id,
@@ -443,15 +444,18 @@ def migrate_blockings(rb_root):
             reason=convert_to_unicode(old_blocking.message)
         )
 
+        print cformat(u'- %{cyan}{}').format(b.reason)
         for old_blocked_room in old_blocking.blockedRooms:
             br = BlockedRoom(
                 state=state_map[old_blocked_room.active],
                 rejected_by=old_blocked_room.rejectedBy,
                 rejection_reason=convert_to_unicode(old_blocked_room.rejectionReason),
             )
-            room = Room.getRoomById(get_room_id(old_blocked_room.roomGUID))
+            room = Room.get(get_room_id(old_blocked_room.roomGUID))
             room.blocked_rooms.append(br)
             b.blocked_rooms.append(br)
+            print cformat(u'  %{blue!}Room:%{reset} {} ({})').format(room.getFullName(),
+                                                                     BlockedRoom.State(br.state).title)
 
         for old_principal in old_blocking.allowed:
             bp = BlockingPrincipal(
@@ -459,6 +463,7 @@ def migrate_blockings(rb_root):
                 entity_id=old_principal._id
             )
             b.allowed.append(bp)
+            print cformat(u'  %{blue!}Allowed:%{reset} {}({})').format(bp.entity_type, bp.entity_id)
         db.session.add(b)
     db.session.commit()
 
