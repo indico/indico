@@ -119,9 +119,9 @@ def _getDataFiles(x):
 
 
 def _getInstallRequires():
-    '''Returns external packages required by Indico
+    """Returns external packages required by Indico
 
-    These are the ones needed for runtime.'''
+    These are the ones needed for runtime."""
 
     base = ['ZODB3==3.10.5', 'zope.index==3.6.4', 'zope.interface==3.8.0',
             'pytz', 'lxml', 'cds-indico-extras', 'zc.queue==1.3',
@@ -131,22 +131,18 @@ def _getInstallRequires():
             'Flask==0.10', 'bcrypt==1.0.2', 'beautifulsoup4==4.2.1', 'pycountry==1.2', 'Pillow==2.1.0', 'qrcode==3.0',
             'markdown', 'bleach', 'Whoosh==2.6.0']
 
-    #for Python older than 2.7
-    if sys.version_info[0] <= 2 and sys.version_info[1] < 7:
-        base += ['argparse', 'ordereddict']
-
     return base
 
 
 def _versionInit():
-        '''Retrieves the version number from indico/MaKaC/__init__.py and returns it'''
+    """Retrieves the version number from indico/MaKaC/__init__.py and returns it"""
 
-        from indico.MaKaC import __version__
-        v = __version__
+    from indico.MaKaC import __version__
+    v = __version__
 
-        print('Indico %s' % v)
+    print('Indico %s' % v)
 
-        return v
+    return v
 
 
 ###  Commands ###########################################################
