@@ -25,61 +25,30 @@ import pprint
 import time
 import traceback
 
+from flask import current_app
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listens_for
 
-# Optional dependencies for pretty SQL logging
-try:
-    import sqlparse
-except ImportError:
-    sqlparse = None
-
-try:
-    from pygments import highlight
-    from pygments.lexers import SqlLexer, PythonLexer
-    from pygments.formatters import Terminal256Formatter
-except ImportError:
-    has_pygments = False
-else:
-    has_pygments = True
-
 
 def _prettify_sql(statement):
-    if sqlparse:
-        statement = sqlparse.format(statement, keyword_case='upper', reindent=True)
-    statement = '    ' + statement.replace('\n', '\n    ')
-    if not has_pygments or os.environ.get('INDICO_COLORED_LOG') != '1':
-        return statement
-    return highlight(statement, SqlLexer(), Terminal256Formatter(style='native'))
+    return '    ' + statement.replace('\n', '\n    ')
 
 
 def _prettify_params(args):
-    args = pprint.pformat(args)
-    args = '    ' + args.replace('\n', '\n    ')
-    if not has_pygments or os.environ.get('INDICO_COLORED_LOG') != '1':
-        return args
-    return highlight(args, PythonLexer(), Terminal256Formatter(style='native')).rstrip()
-
-def _prettify_traceback(args):
-    args = pprint.pformat(args)
-    args = args.replace('\n', '')
-    if not has_pygments or os.environ.get('INDICO_COLORED_LOG') != '1':
-        return args
-    return highlight(args, PythonLexer(), Terminal256Formatter(style='native')).strip()
+    return '    ' + pprint.pformat(args).replace('\n', '\n    ')
 
 
 def _get_sql_line():
-    import indico
-
-    indico_path = os.path.dirname(os.path.abspath(indico.__file__))
+    indico_path = current_app.root_path
     root_path = "{}/".format(os.path.dirname(indico_path))
-    stack = traceback.extract_stack()
-    for item in reversed(stack):
+    stack = list(reversed(traceback.extract_stack()))
+    for i, item in enumerate(stack):
         if item[0].startswith(indico_path) and 'logging' not in item[0] and 'sqlalchemy' not in item[0]:
             module_name = os.path.splitext(item[0].replace(root_path, ''))[0].replace(os.sep, '.')
-            return '{}:{} {}'.format(_prettify_traceback(module_name),
-                                     _prettify_traceback(item[1]),
-                                     _prettify_traceback(item[2]))
+            return {'module': module_name,
+                    'line': item[1],
+                    'function': item[2],
+                    'items': stack[i:i+3]}
 
 
 def apply_db_loggers(debug=False):
@@ -93,11 +62,17 @@ def apply_db_loggers(debug=False):
     @listens_for(Engine, 'before_cursor_execute')
     def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
         context._query_start_time = time.time()
-        msg = 'Start Query:\n    {}\n\n{}\n{}'
-        logger.debug(msg.format(_get_sql_line(), _prettify_sql(statement),
-                                _prettify_params(parameters) if parameters else '').rstrip())
+        msg = 'Start Query:\n    {0[module]}:{0[line]} {0[function]}\n\n{1}\n{2}'
+        source_line = _get_sql_line()
+        logger.debug(msg.format(source_line, _prettify_sql(statement),
+                                _prettify_params(parameters) if parameters else '').rstrip(),
+                     extra={'sql_log_type': 'start',
+                            'sql_source': source_line['items'],
+                            'sql_statement': statement,
+                            'sql_params': parameters})
 
     @listens_for(Engine, 'after_cursor_execute')
     def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
         total = time.time() - context._query_start_time
-        logger.debug('Query complete; total time: {}'.format(total))
+        logger.debug('Query complete; total time: {}'.format(total), extra={'sql_log_type': 'end',
+                                                                            'sql_duration': total})
