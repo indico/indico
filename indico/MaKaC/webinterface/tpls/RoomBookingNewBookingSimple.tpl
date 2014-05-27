@@ -55,14 +55,16 @@
     <%include file="RoomBookingNewBookingConflictsWidget.tpl" args="form=form"/>
 
     % if form.submit_book or form.submit_prebook:
-        ${ form.submit_check(class_='i-button') }
+        ${ form.submit_check(**{'class_': 'i-button', 'data-validation': 'check'}) }
     % endif
 
     % if form.submit_book:
         ${ form.submit_book(class_='i-button highlight') }
-    % elif form.submit_prebook:
+    % endif
+    % if form.submit_prebook:
         ${ form.submit_prebook(class_='i-button highlight') }
-    % else:
+    % endif
+    % if not form.submit_book and not form.submit_prebook:
         <div class="info-message-box">
             <div class="message-text">
                 ${ _("You don't have rights to book this room") }

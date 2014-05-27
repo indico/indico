@@ -22,6 +22,7 @@ Schema of a room
 """
 
 from datetime import date, datetime, timedelta
+
 from dateutil.relativedelta import relativedelta
 from sqlalchemy import and_, func, exists, extract, or_, type_coerce
 from sqlalchemy.dialects.postgresql.base import ARRAY as sa_array
@@ -280,7 +281,7 @@ class Room(db.Model, Serializer):
     def booking_url(self):
         if self.id is None:
             return None
-        return '#'
+        return url_for('rooms.room_book', self)
 
     @property
     def details_url(self):

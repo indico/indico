@@ -36,14 +36,16 @@ function validateForm() {
     }
 
     // Booked for validator
-    if ($('#contact_email, #booking_reason').length == 2 && !validatingConflicts) {
-        $('#contact_email, #booking_reason').each(function() {
-            var $this = $(this);
+    $('#contact_email, #booking_reason').each(function() {
+        var $this = $(this);
+        if (!validatingConflicts) {
             var valid = !!$this.val().trim();
             isValid = isValid && valid;
             $this.toggleClass('hasError', !valid);
-        });
-    }
+        } else {
+            $this.removeClass('hasError');
+        }
+    });
 
     // Collaboration validation
     if ($('#uses_video_conference').length) {
@@ -138,21 +140,18 @@ $(function() {
         }
     });
 
-    $('#submit_prebook, #submit_book').on('click', function(e) {
-        validatingConflicts = false;
-        validatingBooking = true;
-        if (!validateForm()) {
-            e.preventDefault();
-            new AlertPopup($T("Error"), $T('There are errors in the form. Please correct fields with red background.')).open();
+    $('#submit_check, #submit_prebook, #submit_book').on('click', function(e) {
+        if ($(e.target).data('validation') == 'check') {
+            validatingConflicts = true;
+            validatingBooking = false;
+        } else {
+            validatingConflicts = false;
+            validatingBooking = true;
         }
-    });
 
-    $('#submit_check').on('click', function(e) {
-        validatingConflicts = true;
-        validatingBooking = false;
         if (!validateForm()) {
             e.preventDefault();
-            new AlertPopup($T("Error"), $T('There are errors in the form. Please correct fields with red background.')).open();
+            new AlertPopup($T("Error"), $T('There are some errors in the form.')).open();
         }
     });
 
