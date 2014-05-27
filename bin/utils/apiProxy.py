@@ -66,6 +66,8 @@ def indico_request(path):
     except urllib2.HTTPError, e:
         conn = e # yuck!
         content_type = 'application/json'
+    except urllib2.URLError as e:
+        return 'text/plain', str(e)
     else:
         # No exception -> get the real content type
         info = conn.info()
