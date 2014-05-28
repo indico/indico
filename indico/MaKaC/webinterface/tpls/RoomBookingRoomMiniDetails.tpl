@@ -10,7 +10,7 @@
                     ${ room.getFullName() }
                 </a>
             % else:
-                <select name="roomName" id="roomName" onchange="isBookable()" style="width:220px">
+                <select name="roomName" id="roomName" class="js-go-to-room" style="width:220px">
                     % for roomItem in rooms:
                         <% selected = '' %>
                         % if room.name == roomItem.name:
@@ -78,3 +78,13 @@
         ${ _("The conference room you have chosen is equipped for video-conferencing and video-projection. If you need this equipment, <strong>do not forget</strong> to select it. If you don't need any of this equipment please <strong>choose another room</strong>, if a suitable one is free on a suitable location for your meeting. Thank you for your understanding.") }
     </div>
 % endif
+
+<script>
+    $(function() {
+        $('select.js-go-to-room').on('change', function() {
+            var roomLocation = $("#roomName option:selected").data("location");
+            var roomId = $("#roomName option:selected").data("id");
+            go_to_room(roomLocation, roomId);
+        });
+    });
+</script>

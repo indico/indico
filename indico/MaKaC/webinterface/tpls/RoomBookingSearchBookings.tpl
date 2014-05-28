@@ -247,19 +247,19 @@
 
         // Clean up - make all textboxes white again
         var searchForm = $('#searchBookings');
-        $(':input', searchForm).removeClass('invalid');
+        $(':input', searchForm).removeClass('hasError');
 
         // Init
         var isValid = true;
 
         // Datepicker
-        if (!is_date_valid($('#start_date').val())) {
+        if (!moment($('#start_date').val(), 'DD/MM/YYYY').isValid()) {
             isValid = false;
-            $('#start_date').addClass('invalid');
+            $('#start_date').addClass('hasError');
         }
-        if (!is_date_valid($('#end_date').val())) {
+        if (!moment($('#end_date').val(), 'DD/MM/YYYY').isValid()) {
             isValid = false;
-            $('#end_date').addClass('invalid');
+            $('#end_date').addClass('hasError');
         }
 
         // Time period

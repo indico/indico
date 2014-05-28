@@ -15,52 +15,25 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-function is_date_valid(v) {
-    if (!v)
-        return false;
+function go_to_room(roomLocation, roomId) {
+    url = build_url(Indico.Urls.RoomBookingBookRoom, {
+        roomLocation: roomLocation,
+        roomID: roomId
+    });
 
-    // Checks for dd/mm/yyyy format.
-    var dt = v.match(/^(\d{1,2})[:\|\/\\-](\d{1,2})[:\|\/\\-](\d{4})$/);
-    if (dt == null) return false;
-
-    day = parseInt(dt[1]);
-    month = parseInt(dt[2]);
-    year = parseInt(dt[3]);
-
-    if (year < 1900 || year > 2100)
-        return false;
-    else if (month < 1 || month > 12)
-        return false;
-    else if (day < 1 || day > 31)
-        return false;
-    else if ([4, 6, 9, 11].indexOf(month) != -1 && day == 31)
-        return false;
-    else if (month == 2) {
-        var isleap = (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
-        if (day > 29 || (day == 29 && !isleap))
-            return false;
-    }
-    return true;
-}
-
-
-function is_time_valid(v) {
-    if (!v) return false;
-
-    var t = v.match(/^(\d{1,2})[:-](\d{1,2})$/);
-    if (t == null) return false;
-
-    hour = parseInt(t[1]);
-    min = parseInt(t[2]);
-
-    return hour >= 0 && hour <= 23 && min >= 0 && min <= 59;
-}
-
-
-function is_datetime_valid(v) {
-    if(!v) return false;
-
-    var dt = v.split(/\s+/)
-    if (!dt || a.length != 2) return false;
-    return is_date_valid(dt[0]) && is_time_valid(dt[1])
+    indicoRequest('roomBooking.room.bookingPermission',
+        {room_id: roomId},
+        function(result, error) {
+            if(!error) {
+                if (result.can_book) {
+                    window.location.href = url;
+                } else {
+                    var popup = new AlertPopup('Booking Not Allowed', "You're not allowed to book this room");
+                    popup.open();
+                }
+            } else {
+                IndicoUtil.errorReport(error);
+            }
+        }
+    );
 }
