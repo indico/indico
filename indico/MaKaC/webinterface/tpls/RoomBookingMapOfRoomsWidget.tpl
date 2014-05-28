@@ -58,7 +58,7 @@
         </tr>
         <tr id="hoursTR" >
             <td align="right" >
-                small> ${ _('Hours') }&nbsp;</small>
+                <small>${ _('Hours') }&nbsp;</small>
             </td>
             <td align="left" class="blacktext">
                 <input name="sTime" id="sTime" maxlength="5" size="4" type="text" value="${ startT }" onchange="" /> &nbsp;&mdash;&nbsp;
@@ -74,7 +74,7 @@
                 <select name="repeatability" id="repeatability" style="width:144px; margin-right:6px;">
                     % for k, v in repeat_mapping.items():
                         <option ${ 'selected' if k == default_repeat else '' } value="${ k }">
-                            ${ v }
+                            ${ v[0] }
                         </option>
                     % endfor
                 </select>
