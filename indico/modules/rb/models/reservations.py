@@ -140,8 +140,8 @@ class Reservation(Serializer, db.Model):
         nullable=False
     )
     created_by = db.Column(
-        db.String,
-        nullable=False
+        db.String
+        # Must be nullable for legacy data :(
     )
     # room
     room_id = db.Column(

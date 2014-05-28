@@ -133,6 +133,18 @@ def get_room_id(guid):
     return int(guid.split('|')[1].strip())
 
 
+def parse_dt_string(value):
+    try:
+        return datetime.strptime(value, '%d %b %Y %H:%M')
+    except ValueError:
+        # French month name
+        for num, name in month_names:
+            if name in value:
+                value = value.lower().replace(name, num)
+                break
+        return datetime.strptime(value, '%d %m %Y %H:%M')
+
+
 def convert_to_unicode(val):
     if isinstance(val, str):
         try:
@@ -381,7 +393,7 @@ def migrate_reservations(rb_root):
         occurrence_rejection_reasons = {}
         if getattr(v, 'resvHistory', None):
             for h in reversed(v.resvHistory._entries):
-                ts = as_utc(h._timestamp)
+                ts = as_utc(parse_dt_string(h._timestamp))
 
                 if len(h._info) == 2:
                     possible_rejection_date, possible_rejection_reason = h._info
