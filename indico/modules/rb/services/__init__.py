@@ -35,5 +35,5 @@ class GetDateWarning(ServiceBase):
         elif HolidaysHolder.isWorkingDay(self._start_dt) and HolidaysHolder.isWorkingDay(self._end_dt):
             return ''
         elif is_weekend(self._start_dt) or is_weekend(self._end_dt):
-            return _('weekend chosen')
-        return _('holidays chosen')
+            return _('Weekend chosen')
+        return _('Holidays chosen')

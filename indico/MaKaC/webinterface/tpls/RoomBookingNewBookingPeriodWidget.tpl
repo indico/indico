@@ -34,7 +34,18 @@
         <div id='eDatePlaceTitle' class='label'>${ _('End date') }</div>
         <div id="eDatePlace"></div>
     </div>
-    <div class="infoMessage" id="holidays-warning" style="display: none"></div>
+    <div class="datepicker-info">
+        % if room.max_advance_days:
+            <div class="info-message-box">
+                <div class="message-text">
+                    ${ _('This room can only be booked {0} days in advance'.format(room.max_advance_days)) }
+                </div>
+            </div>
+        % endif
+        <div id="holidays-warning" class="info-message-box" style="display: none">
+            <div class="message-text"></div>
+        </div>
+    </div>
 </div>
 
 ${ form.start_date(type='hidden') }
@@ -58,16 +69,19 @@ ${ form.repeat_step(type='hidden') }
         $('#sDatePlace, #eDatePlace').datepicker({
             dateformat: 'dd/mm/yy',
             minDate: 0,
+            maxDate: ${ room.max_advance_days if room.max_advance_days else 'null' },
             showButtonPanel: true,
             changeMonth: true,
             changeYear: true,
+            showOn: 'focus',
             onSelect: function(selectedDate) {
                 if ($('#sDatePlace').datepicker('getDate') > $('#eDatePlace').datepicker('getDate')) {
                     $('#eDatePlace').datepicker('setDate', $('#sDatePlace').datepicker('getDate'));
                 }
+                $('#eDatePlace').datepicker('option', 'minDate', $('#sDatePlace').datepicker('getDate'));
 
                 combineDatetime();
-                checkHolydays();
+                checkHolidays();
                 validateForm();
             }
         });
@@ -109,15 +123,21 @@ ${ form.repeat_step(type='hidden') }
             $('#end_date').val('{0} {1}'.format(end_date, end_time));
         }
 
-        function checkHolydays() {
-            var data = {
-                start_date: moment($('#start_date').val(), 'D/MM/YYYY H:m').format('YYYY-MM-D'),
-                end_date: moment($('#end_date').val(), 'D/MM/YYYY H:m').format('YYYY-MM-D')
+        function checkHolidays() {
+            var data = {};
+            var repeat_unit = $('input[name=repeat_unit]:checked').val();
+
+            data.start_date = moment($('#start_date').val(), 'D/MM/YYYY H:m').format('YYYY-MM-D');
+            if (repeat_unit !== '0') {
+                data.end_date = moment($('#end_date').val(), 'D/MM/YYYY H:m').format('YYYY-MM-D')
+            } else {
+                data.end_date = data.start_date;
             }
+
             var holidaysWarning = indicoSource('roomBooking.getDateWarning', data);
             holidaysWarning.state.observe(function(state) {
                 if (state == SourceState.Loaded) {
-                    $('#holidays-warning').html(holidaysWarning.get());
+                    $('#holidays-warning .message-text').html(holidaysWarning.get());
                     if (holidaysWarning.get() == '')
                         $('#holidays-warning').hide();
                     else
@@ -126,6 +146,6 @@ ${ form.repeat_step(type='hidden') }
             });
         }
 
-        checkHolydays();
+        checkHolidays();
     });
 </script>

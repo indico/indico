@@ -440,14 +440,13 @@ class Reservation(Serializer, db.Model):
             if prebook and not room.can_be_prebooked(user):
                 raise IndicoError('You cannot book this room')
 
-        reservation = cls()
-        form.populate_obj(reservation, skip={'start_date', 'end_date', 'booked_for_name'}, existing_only=True)
-        reservation.room = room
-        reservation.booked_for_name = reservation.booked_for_user.getFullName()
-        reservation.is_confirmed = not prebook
-        reservation.created_by_user = user
-        reservation.start_date = form.start_date.data
-        reservation.end_date = form.end_date.data
+        if not user.isRBAdmin() and not room.isOwnedBy(user):
+            if room.max_advance_days != 0:
+                advance_days = form.end_date.data.date() - datetime.today().date()
+                if advance_days.days >= room.max_advance_days:
+                    raise IndicoError('You cannot book this room more than {} days in advance'
+                                      .format(room.max_advance_days))
+
         if not user.isRBAdmin():
             bookable_times = room.bookable_times.all()
             if bookable_times:
@@ -456,6 +455,15 @@ class Reservation(Serializer, db.Model):
                         break
                 else:
                     raise IndicoError('Room cannot be booked at this time')
+
+        reservation = cls()
+        form.populate_obj(reservation, skip={'start_date', 'end_date', 'booked_for_name'}, existing_only=True)
+        reservation.room = room
+        reservation.booked_for_name = reservation.booked_for_user.getFullName()
+        reservation.is_confirmed = not prebook
+        reservation.created_by_user = user
+        reservation.start_date = form.start_date.data
+        reservation.end_date = form.end_date.data
         reservation.create_occurrences(form.skip_conflicts.data, check_nonbookable_dates=not user.isRBAdmin())
         if not any(occ.is_valid for occ in reservation.occurrences):
             raise IndicoError('Reservation has no valid occurrences')
