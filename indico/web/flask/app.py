@@ -27,6 +27,7 @@ from flask import current_app as app
 from sqlalchemy.orm import configure_mappers
 from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
+from webassets.env import RegisterError
 
 import indico.util.date_time as date_time_util
 from indico.core.config import Config
@@ -136,8 +137,11 @@ def setup_jinja(app):
 
 
 def setup_assets():
-    register_all_js(core_env)
-    register_all_css(core_env, Config.getInstance().getCssStylesheetName())
+    try:
+        register_all_js(core_env)
+        register_all_css(core_env, Config.getInstance().getCssStylesheetName())
+    except RegisterError:
+        pass
 
 
 def configure_db(app):
