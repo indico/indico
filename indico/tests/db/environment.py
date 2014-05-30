@@ -46,16 +46,11 @@ class DBTest(TestCase):
         return dict((k, v) for k, v in d.items() if k not in ks)
 
     def init_db(self):
-        # first add attribute keys
-
-        db.session.add_all([AttributeKey(**k) for k in ATTRIBUTE_KEYS])
-        db.session.add_all([RoomEquipment(name=k) for k in ROOM_EQUIPMENTS])
-        transaction.commit()
 
         # locations
         for loc in LOCATIONS:
             location = Location(
-                **self.get_without(loc, ['aspects', 'rooms', 'attributes', 'default_aspect_id'])
+                **self.get_without(loc, ['aspects', 'rooms', 'attributes', 'default_aspect_id', 'room_equipment'])
             )
 
             # aspects
@@ -68,11 +63,19 @@ class DBTest(TestCase):
 
             # location attributes
             for attr in loc.get('attributes', []):
-                k = AttributeKey.getKeyByName(attr['name'])
-                v = LocationAttribute(**self.get_without(attr, ['name']))
-                k.location_attributes.append(v)
+                v = RoomAttribute(**self.get_without(attr, ['raw_data']))
                 location.attributes.append(v)
 
+            # location attributes
+            for equip in loc.get('room_equipment', []):
+                location.equipments.append(equip)
+
+            db.session.add(location)
+
+        transaction.commit()
+
+        for loc in LOCATIONS:
+            location = Location.query.filter_by(name=loc['name']).one()
             # rooms
             for r in loc.get('rooms', []):
                 only_r = self.get_without(r, [
@@ -80,17 +83,17 @@ class DBTest(TestCase):
                     'bookable_times',
                     'equipments',
                     'nonbookable_dates',
-                    'photos',
+                    'photo',
                     'reservations',
                 ])
                 room = Room(**only_r)
 
                 # room attributes
                 for attr in r.get('attributes', []):
-                    k = AttributeKey.getKeyByName(attr['name'])
-                    v = RoomAttribute(**self.get_without(attr, ['name']))
-                    k.room_attributes.append(v)
-                    room.attributes.append(v)
+                    attribute = RoomAttribute.query.filter_by(name=attr['name']).one()
+                    assoc = RoomAttributeAssociation(attribute_id=attribute.id, room_id=room.id,
+                                                     raw_data=attr['raw_data'])
+                    room.attributes.append(assoc)
 
                 # room equipments
                 room.equipments.extend([
@@ -108,9 +111,10 @@ class DBTest(TestCase):
                 ])
 
                 # room photos
-                room.photos.extend([Photo(**p) for p in r.get('photos', [])])
+                room.photo = Photo(**r.get('photos', {}))
 
-                # reservations
+                location.rooms.append(room)
+
                 for resv in r.get('reservations', []):
                     only_resv = self.get_without(resv, [
                         'attributes',
@@ -118,24 +122,23 @@ class DBTest(TestCase):
                         'excluded_days',
                     ])
                     reservation = Reservation(**only_resv)
+                    reservation.room = room
 
+                    # TODO: re-enable when reservation atributes work (?)
                     # reservation attributes
-                    for attr in resv.get('attributes', []):
-                        k = AttributeKey.getKeyByName(attr['name'])
-                        v = ReservationAttribute(**self.get_without(attr, ['name']))
-                        k.reservation_attributes.append(v)
-                        reservation.attributes.append(v)
+                    # for attr in resv.get('attributes', []):
+                    #     v = ReservationAttribute(**attr)
+                    #     reservation.attributes.append(v)
 
                     # reservation edit_logs
                     reservation.edit_logs.extend([
                         ReservationEditLog(**ed) for ed in resv.get('edit_logs', [])
                     ])
 
-                    # reservation occurrences and excluded days
-                    reservation.create_occurrences(excluded=resv.get('excluded_days', []))
+                    # reservation occurrences
+                    reservation.create_occurrences(True)
 
                     room.reservations.append(reservation)
-                location.rooms.append(room)
             db.session.add(location)
         transaction.commit()
 

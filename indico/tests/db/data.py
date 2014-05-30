@@ -20,8 +20,13 @@
 from datetime import date, datetime, time, timedelta
 from random import randint
 from os import urandom
+from pytz import timezone
 
 from indico.modules.rb.models.reservations import RepeatUnit
+
+
+def _create_utc_dt(*args):
+    return timezone('UTC').localize(datetime(*args))
 
 
 BLOCKING_PRINCIPALS = [
@@ -34,8 +39,14 @@ BLOCKING_PRINCIPALS = [
 
 BLOCKED_ROOMS = [
     {
-        'is_active': True,
-        'notification_sent': True,
+        'state': 2,
+        'rejected_by': 'tim',
+        'rejection_reason': 'radioactive contamination',
+        'room': 'reception'
+    },
+
+    {
+        'state': 0,
         'rejected_by': None,
         'rejection_reason': None,
         'room': 'main-meeting-hall'
@@ -46,7 +57,7 @@ BLOCKED_ROOMS = [
 BLOCKINGS = [
     {
         'created_by': 'admin',
-        'created_at': datetime(2013, 11, 1, 8),
+        'created_at': _create_utc_dt(2013, 11, 1, 8),
         'start_date': datetime(2013, 12, 15, 8),
         'end_date': datetime(2013, 12, 15, 17, 30),
         'reason': 'maintenance',
@@ -78,13 +89,13 @@ RESERVATION_ATTRIBUTES = [
 
 RESERVATION_EDIT_LOGS = [
     {
-        'timestamp': datetime(2013, 12, 2, 11, 33, 57),
-        'avatar_id': 'johhny',
+        'timestamp': _create_utc_dt(2013, 12, 2, 11, 33, 57),
+        'user_name': 'johhny',
         'info': 'name updated```flag is cleared'
     },
     {
-        'timestamp': datetime(2013, 12, 2, 11, 34, 17),
-        'avatar_id': 'admin',
+        'timestamp': _create_utc_dt(2013, 12, 2, 11, 34, 17),
+        'user_name': 'admin',
         'info': 'removed bad words from reason```some value changed```set flag'
     }
 ]
@@ -94,22 +105,9 @@ RESERVATION_NOTIFICATIONS = [
     # auto generated
 ]
 
-
-RESERVATION_EXCLUDED_DAYS = [
-    date(2013, 12, 8),
-    date(2014, 4, 6),
-    date(2013, 12, 19),
-    date(2014, 1, 1),
-    date(2014, 1, 2),
-    date(2014, 1, 3),
-    date(2014, 1, 4),
-    date(2014, 1, 5),
-]
-
-
 RESERVATIONS = [
     {
-        'created_at': datetime(2013, 12, 2, 11, 30),
+        'created_at': _create_utc_dt(2013, 12, 2, 11, 30),
         'start_date': datetime(2013, 12, 5, 10),
         'end_date': datetime(2013, 12, 5, 12),
         'repeat_unit': RepeatUnit.NEVER,
@@ -117,12 +115,12 @@ RESERVATIONS = [
         'booked_for_name': 'admin',
         'created_by': 'admin',
         'is_confirmed': True,
-        'reason': 'This is what I want',
+        'booking_reason': 'This is what I want',
         'attributes': RESERVATION_ATTRIBUTES,
-        'edit_logs': RESERVATION_EDIT_LOGS,
+        'edit_logs': RESERVATION_EDIT_LOGS
     },
     {
-        'created_at': datetime(2013, 11, 2, 11, 30),
+        'created_at': _create_utc_dt(2013, 11, 2, 11, 30),
         'start_date': datetime(2013, 12, 1, 8),
         'end_date': datetime(2013, 12, 30, 10),
         'repeat_unit': RepeatUnit.WEEK,
@@ -131,13 +129,12 @@ RESERVATIONS = [
         'booked_for_name': 'admin root',
         'created_by': 'admin',
         'is_confirmed': True,
-        'reason': 'weekly group meetings',
+        'booking_reason': 'weekly group meetings',
         'contact_email': 'admin@cern.ch',
-        'attributes': RESERVATION_ATTRIBUTES[1:3],
-        'excluded_days': RESERVATION_EXCLUDED_DAYS[:1]
+        'attributes': RESERVATION_ATTRIBUTES[1:3]
     },
     {
-        'created_at': datetime(2013, 11, 30, 17),
+        'created_at': _create_utc_dt(2013, 11, 30, 17),
         'start_date': datetime(2013, 12, 1, 15),
         'end_date': datetime(2014, 12, 1, 15),
         'repeat_unit': RepeatUnit.MONTH,
@@ -146,12 +143,11 @@ RESERVATIONS = [
         'booked_for_name': 'admin root',
         'created_by': 'admin',
         'is_confirmed': True,
-        'reason': 'confidential',
-        'attributes': RESERVATION_ATTRIBUTES[1:3],
-        'excluded_days': RESERVATION_EXCLUDED_DAYS[1:2]
+        'booking_reason': 'confidential',
+        'attributes': RESERVATION_ATTRIBUTES[1:3]
     },
     {
-        'created_at': datetime(2013, 12, 1, 11, 30),
+        'created_at': _create_utc_dt(2013, 12, 1, 11, 30),
         'start_date': datetime(2013, 12, 1, 12),
         'end_date': datetime(2013, 12, 2, 14),
         'repeat_unit': RepeatUnit.NEVER,
@@ -160,11 +156,11 @@ RESERVATIONS = [
         'created_by': 'admin',
         'is_confirmed': True,
         'is_cancelled': True,
-        'reason': 'can not be null',
+        'booking_reason': 'can not be null',
         'attributes': RESERVATION_ATTRIBUTES[3:],
     },
     {
-        'created_at': datetime(2013, 12, 20),
+        'created_at': _create_utc_dt(2013, 12, 20),
         'start_date': datetime(2014, 1, 1, 8),
         'end_date': datetime(2014, 1, 1, 12),
         'repeat_unit': RepeatUnit.NEVER,
@@ -173,11 +169,11 @@ RESERVATIONS = [
         'created_by': 'john',
         'is_confirmed': False,
         'is_rejected': True,
-        'reason': 'extra',
+        'booking_reason': 'extra',
         'attributes': RESERVATION_ATTRIBUTES[3:],
     },
     {
-        'created_at': datetime(2012, 1, 1, 12),
+        'created_at': _create_utc_dt(2012, 1, 1, 12),
         'start_date': datetime(2013, 12, 5, 10),
         'end_date': datetime(2013, 12, 5, 12),
         'repeat_unit': RepeatUnit.NEVER,
@@ -185,11 +181,11 @@ RESERVATIONS = [
         'booked_for_name': 'fred williams',
         'created_by': 'frankenstein',
         'is_confirmed': True,
-        'reason': 'no reason, he just wanted me to book',
+        'booking_reason': 'no reason, he just wanted me to book',
         'attributes': RESERVATION_ATTRIBUTES,
     },
     {
-        'created_at': datetime(2008, 3, 3, 3, 3, 3),
+        'created_at': _create_utc_dt(2008, 3, 3, 3, 3, 3),
         'start_date': datetime(2013, 12, 5, 10),
         'end_date': datetime(2013, 12, 5, 12),
         'repeat_unit': RepeatUnit.NEVER,
@@ -197,11 +193,11 @@ RESERVATIONS = [
         'booked_for_name': 'tim',
         'created_by': 'admin',
         'is_confirmed': True,
-        'reason': 'big day for me',
+        'booking_reason': 'big day for me',
         'attributes': RESERVATION_ATTRIBUTES,
     },
     {
-        'created_at': datetime(2013, 11, 11, 11, 1, 1),
+        'created_at': _create_utc_dt(2013, 11, 11, 11, 1, 1),
         'start_date': datetime(2013, 12, 5, 10),
         'end_date': datetime(2013, 1, 2, 12),
         'repeat_unit': RepeatUnit.WEEK,
@@ -211,12 +207,11 @@ RESERVATIONS = [
         'created_by': 'felmas',
         'is_confirmed': False,
         'is_rejected': True,
-        'reason': 'testing',
-        'attributes': RESERVATION_ATTRIBUTES,
-        'excluded_days': RESERVATION_EXCLUDED_DAYS[2:3]
+        'booking_reason': 'testing',
+        'attributes': RESERVATION_ATTRIBUTES
     },
     {
-        'created_at': datetime(2013, 12, 1, 23, 59),
+        'created_at': _create_utc_dt(2013, 12, 1, 23, 59),
         'start_date': datetime(2013, 9, 17, 8),
         'end_date': datetime(2014, 3, 15, 17),
         'repeat_unit': RepeatUnit.DAY,
@@ -225,12 +220,11 @@ RESERVATIONS = [
         'booked_for_name': 'ferhat elmas',
         'created_by': 'pferreir',
         'is_confirmed': True,
-        'reason': 'special testing',
-        'attributes': RESERVATION_ATTRIBUTES,
-        'excluded_days': RESERVATION_EXCLUDED_DAYS[3:]
+        'booking_reason': 'special testing',
+        'attributes': RESERVATION_ATTRIBUTES
     },
     {
-        'created_at': datetime(2013, 12, 31, 23, 59),
+        'created_at': _create_utc_dt(2013, 12, 31, 23, 59),
         'start_date': datetime(2014, 1, 1, 0),
         'end_date': datetime(2014, 1, 1, 1),
         'repeat_unit': RepeatUnit.NEVER,
@@ -239,29 +233,32 @@ RESERVATIONS = [
         'booked_for_name': 'ferhat elmas',
         'created_by': 'pferreir',
         'is_confirmed': True,
-        'reason': 'special testing',
+        'booking_reason': 'special testing',
     }
 ]
 
 
 ROOM_ATTRIBUTES = [
     {
-        'name': 'Manager Group',
+        'name': 'manager-group',
+        'title': 'Manager Group',
         'raw_data': '{"access_list": ["a@abc.com", "b@abc.com"]}'
     },
     {
-        'name': 'Map URL',
+        'name': 'map-url',
+        'title': 'Map URL',
         'raw_data': '{"google": "http://maps.google.com",'
-                     '"openstreetmap": "http://openstreetmap.org"}'
+                    '"openstreetmap": "http://openstreetmap.org"}'
     },
     {
-        'name': 'Test',
+        'name': 'test',
+        'title': 'Test',
         'raw_data': '{"comment": "test_room"}'
     }
 ]
 
 
-ROOM_EQUIPMENTS = [
+ROOM_EQUIPMENT = [
     'Blackboard',
     'Computer Projector',
     'Ethernet',
@@ -296,16 +293,10 @@ ROOM_NONBOOKABLE_DATES = [
 ]
 
 
-PHOTOS = [
-    {
-        'small_content': urandom(randint(0, 1024)),
-        'large_content': urandom(randint(1025, 4096))
-    },
-    {
-        'small_content': urandom(randint(0, 1024)),
-        'large_content': urandom(randint(1025, 4096))
-    }
-]
+PHOTOS = {
+    'small_content': urandom(randint(0, 1024)),
+    'large_content': urandom(randint(1025, 4096))
+}
 
 
 ROOMS = [
@@ -322,7 +313,7 @@ ROOMS = [
         'nonbookable_dates': ROOM_NONBOOKABLE_DATES,
         'bookable_times': ROOM_BOOKABLE_TIMES[:1],
         'reservations': RESERVATIONS[:9],
-        'photos': PHOTOS,
+        'photo': PHOTOS,
         'equipments': ['PC']
     },
     {
@@ -410,18 +401,6 @@ ASPECTS = [
 ]
 
 
-LOCATION_ATTRIBUTES = [
-    {
-        'name': 'Live Webcast',
-        'raw_data': '{"hidden": true, "required": false, "type": "str"}'
-    },
-    {
-        'name': 'Test',
-        'raw_data': '{"hidden": true, "required": true, "type": "str"}'
-    },
-]
-
-
 LOCATIONS = [
     {
         'name': 'CERN',
@@ -430,11 +409,13 @@ LOCATIONS = [
         'aspects': ASPECTS,
         'default_aspect_id': 0,
         'rooms': ROOMS[:3],
-        'attributes': LOCATION_ATTRIBUTES
+        'attributes': ROOM_ATTRIBUTES,
+        'room_equipment': ROOM_EQUIPMENT[:5]
     },
     {
         'name': 'FermiLab',
-        'rooms': ROOMS[3:]
+        'rooms': ROOMS[3:],
+        'room_equipment': ROOM_EQUIPMENT[5:]
     }
 ]
 

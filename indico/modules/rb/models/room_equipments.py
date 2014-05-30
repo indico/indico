@@ -134,4 +134,4 @@ class RoomEquipment(db.Model):
 
     @staticmethod
     def getEquipmentByName(name):
-        return RoomEquipment.query.filter_by(name=name).first()
+        return RoomEquipment.query.filter_by(name=name).one()
