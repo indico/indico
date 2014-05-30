@@ -226,7 +226,6 @@ class ReservationOccurrence(db.Model):
 
     @single_occurrence_to_reservation
     def cancel(self, reason):
-        print 'CANCEL', self, reason
         self.is_cancelled = True
         self.rejection_reason = reason
 
