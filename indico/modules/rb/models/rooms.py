@@ -47,6 +47,7 @@ from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_equipments import RoomEquipment, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.util.i18n import _
+from indico.util import json
 from indico.util.string import return_ascii, natural_sort_key
 from indico.web.flask.util import url_for
 from .utils import Serializer
@@ -884,12 +885,21 @@ class Room(db.Model, Serializer):
         # legacy check, currently every room must be owned by someone
         if not self.owner_id:
             return None
+
         if self.owner_id == avatar.id:
             return True
-        manager_groups = self.getAttributeByName('manager-group')
-        if not manager_groups:
+
+        manager_group = self.getAttributeByName('manager-group')
+
+        if not manager_group:
             return False
-        return manager_groups.contains(avatar)
+
+        group_name = json.loads(manager_group.raw_data)
+
+        if not group_name:
+            return False
+
+        return avatar.is_member_of_group(group_name)
 
     def getGroups(self, group_name):
         groups = GroupHolder().match({'name': group_name}, exact=True, searchInAuthenticators=False)
