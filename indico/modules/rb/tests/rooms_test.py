@@ -26,9 +26,9 @@ from indico.core.db import db
 from indico.modules.rb.models.room_attributes import RoomAttribute
 from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.modules.rb.models.rooms import Room
-from ..data import *
-from ..db import DBTest
-from ..util import diff
+from indico.tests.db.data import *
+from indico.tests.db.environment import DBTest
+from indico.tests.db.util import diff
 
 
 class TestRoom(DBTest):
