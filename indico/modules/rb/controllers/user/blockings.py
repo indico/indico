@@ -80,9 +80,6 @@ class RHRoomBookingCreateBlocking(RHRoomBookingCreateModifyBlockingBase):
         RHRoomBookingCreateModifyBlockingBase._checkProtection(self)
         if not self._doProcess:  # we are not logged in
             return
-        if not (self._getUser().isAdmin() or self._getUser().isRBAdmin()
-                or Room.isAvatarResponsibleForRooms(self._getUser())):
-            raise IndicoError(_('Only users who own at least one room are allowed to create blockings.'))
 
     def _save(self):
         self._blocking = blocking = Blocking()

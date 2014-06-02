@@ -856,9 +856,9 @@ class Reservation(Serializer, db.Model):
         Returns True if user is the one who is booked for the reservation.
         False otherwise.
         """
-        return user and (self.contactEmail in user.getEmails() or
+        return user and (self.contact_email in user.getEmails() or
                          (utils.getRoomBookingOption('bookingsForRealUsers') and
-                          self.bookedForUser == user))
+                          self.booked_for_user == user))
 
     def getAccessKey(self):
         return ''

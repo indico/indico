@@ -39,7 +39,7 @@ class WPRoomBookingBlockingForm(WPRoomBookingBase):
 
 class WPRoomBookingBlockingList(WPRoomBookingBase):
     def _setCurrentMenuItem(self):
-        self._myBlockingListOpt.setActive(True)
+        self._blockingListOpt.setActive(True)
 
     def _getBody(self, params):
         return WTemplated('RoomBookingBlockingList').getHTML(params)

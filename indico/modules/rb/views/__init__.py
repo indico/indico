@@ -159,23 +159,15 @@ class WPRoomBookingBase(WPMainBase):
             enabled=self._showResponsible
         )
 
-        if self._showResponsible:
-            self._myBlockingListOpt = SideMenuItem(
-                _('My blockings'),
-                url_for('rooms.blocking_list', only_mine=True, timeframe='recent'),
-                enabled=True
-            )
-        else:
-            self._myBlockingListOpt = SideMenuItem(
-                _('Blockings'),
-                url_for('rooms.blocking_list', timeframe='recent'),
-                enabled=True
-            )
+        self._blockingListOpt = SideMenuItem(
+            _('Blockings'),
+            url_for('rooms.blocking_list', only_mine=True, timeframe='recent'),
+            enabled=True
+        )
 
         self._blockRoomsOpt = SideMenuItem(
             _('Block rooms'),
-            url_for('rooms.create_blocking'),
-            enabled=self._showResponsible
+            url_for('rooms.create_blocking')
         )
 
         if self._rh._getUser().isRBAdmin():
@@ -204,7 +196,7 @@ class WPRoomBookingBase(WPMainBase):
         self._bookingsOpt.addItem(self._bookingListSearchOpt)
         self._leftMenu.addSection(self._blockingsOpt)
         self._blockingsOpt.addItem(self._blockRoomsOpt)
-        self._blockingsOpt.addItem(self._myBlockingListOpt)
+        self._blockingsOpt.addItem(self._blockingListOpt)
         self._blockingsOpt.addItem(self._usersBlockingsOpt)
         self._leftMenu.addSection(self._roomsOpt)
         self._roomsOpt.addItem(self._roomSearchOpt)
