@@ -17,8 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import unittest, logging
+import logging
 from indico.ext.livesync import PushSyncAgent, ActionWrapper, SyncManager
+from indico.tests.python.unit.util import IndicoTestCase
 
 
 class ObjectStub(object):
@@ -98,7 +99,7 @@ class RemoteServiceStub(object):
         return set(self._records.itervalues())
 
 
-class _TestAgentBehavior(unittest.TestCase):
+class _TestAgentBehavior(IndicoTestCase):
 
     def _initialize(self):
         self._srvc1 = RemoteServiceStub()

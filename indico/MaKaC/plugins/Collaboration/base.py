@@ -698,13 +698,13 @@ class CSBookingManager(Persistent, Observer):
                 booking.unindex_instances()
                 booking.index_instances()
 
-                if booking.hasStartDate():
-                    if startDateChanged:
-                        try:
-                            self._changeConfStartDateInIndex(booking, oldStartDate, newStartDate)
-                        except Exception, e:
-                            Logger.get('VideoServ').error("Exception while reindexing a booking in the event start date index because its event's start date changed: " + str(e))
+                if startDateChanged:
+                    try:
+                        self._changeConfStartDateInIndex(booking, oldStartDate, newStartDate)
+                    except Exception, e:
+                        Logger.get('VideoServ').error("Exception while reindexing a booking in the event start date index because its event's start date changed: " + str(e))
 
+                if booking.hasStartDate():
                     if booking.needsToBeNotifiedOfDateChanges():
                         Logger.get("VideoServ").info("""CSBookingManager: notifying date changes to booking %s of event %s""" %
                                                      (str(booking.getId()), str(self._conf.getId())))

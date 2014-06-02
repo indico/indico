@@ -130,6 +130,9 @@ class EmailLogItem(LogItem):
     def getLogToList(self):
         return self._logInfo.get("toList", "No receptors")
 
+    def getLogContentType(self):
+        return self._logInfo.get("contentType", "text/html")
+
     def getLogInfoList(self):
         """
         Return a list of pairs with the caption and the pre-processed

@@ -123,13 +123,8 @@ def _getInstallRequires():
 
     These are the ones needed for runtime."""
 
-    base = ['ZODB3==3.10.5', 'zope.index==3.6.4', 'zope.interface==3.8.0',
-            'pytz', 'lxml', 'cds-indico-extras', 'zc.queue==1.3',
-            'python-dateutil<2.0', 'pypdf', 'mako==0.9.1', 'babel',
-            'icalendar==3.2', 'pyatom', 'jsmin', 'cssmin', 'webassets', 'pojson>=0.4',
-            'requests>=1.2.0', 'simplejson>=2.1.0', 'reportlab==2.5', 'Pillow', 'oauth2', 'pyscss==1.1.5', 'Werkzeug==0.9',
-            'Flask==0.10', 'bcrypt==1.0.2', 'beautifulsoup4==4.2.1', 'pycountry==1.2', 'Pillow==2.1.0', 'qrcode==3.0',
-            'markdown', 'bleach', 'Whoosh==2.6.0']
+    with open(os.path.join(os.path.dirname(__file__), 'requirements.txt'), 'r') as f:
+        base = [dep.strip() for dep in f.readlines() if not (dep.startswith('-') or '://' in dep)]
 
     return base
 
@@ -221,8 +216,8 @@ class develop_config(develop_indico):
             shutil.copy('etc/indico.conf.sample', local)
 
         upgrade_indico_conf(local, 'etc/indico.conf.sample', {
-                'BaseURL': 'http://localhost:{0}/indico'.format(self.http_port),
-                'BaseSecureURL': 'https://localhost:{0}/indico'.format(self.https_port),
+                'BaseURL': 'http://localhost:{0}'.format(self.http_port),
+                'BaseSecureURL': 'https://localhost:{0}'.format(self.https_port),
                 'DBConnectionParams': ("localhost", int(self.zodb_port)),
                 'SmtpServer': ("localhost", int(self.smtp_port))
                 })
@@ -313,8 +308,8 @@ class test_indico(test.test):
                     ('html', None, "Make an HTML report (when possible)"),
                     ('record', None, "Record tests (for --functional)"),
                     ('silent', None, "Don't output anything in the console, just generate the report"),
-                    ('killself', None,
-                     "Kill this script right after the tests finished without waiting for db shutdown.")])
+                    ('clean-shutdown', None,
+                     "Do not kill this script right after the tests finished without waiting for db shutdown.")])
     boolean_options = []
 
     specify = None
@@ -330,7 +325,7 @@ class test_indico(test.test):
     silent = False
     mode = None
     server_url = None
-    killself = True
+    clean_shutdown = False
     html = False
     record = False
     log = False
@@ -354,7 +349,7 @@ class test_indico(test.test):
         if self.jsspecify and 'jsunit' not in testsToRun:
             testsToRun.append('jsunit')
 
-        if testsToRun == []:
+        if not testsToRun:
             testsToRun = allTests
         self.testsToRun = testsToRun
 
@@ -368,7 +363,7 @@ class test_indico(test.test):
         from indico.tests import TestManager
 
         options = {'silent': self.silent,
-                   'killself': self.killself,
+                   'killself': not self.clean_shutdown,
                    'html': self.html,
                    'browser': self.browser,
                    'mode': self.mode,
@@ -571,7 +566,7 @@ if __name__ == '__main__':
           include_package_data=True,
           namespace_packages=['indico', 'indico.ext'],
           install_requires=_getInstallRequires(),
-          tests_require=['nose', 'rednose', 'twill', 'selenium', 'figleaf'],
+          tests_require=['nose', 'rednose', 'twill', 'selenium', 'figleaf', 'contextlib2'],
           data_files=dataFiles,
           dependency_links=DEPENDENCY_URLS
           )

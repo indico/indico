@@ -20,20 +20,12 @@
 """
 Tests for `indico.util.string` module
 """
-import unittest
 
-from MaKaC.common import utils
-
-from indico.util.string import (
-    fix_broken_string,
-    is_valid_mail,
-    permissive_format,
-    remove_extra_spaces,
-    remove_tags
-)
+from indico.tests.python.unit.util import IndicoTestCase
+from indico.util.string import permissive_format, remove_extra_spaces, remove_tags, fix_broken_string
 
 
-class TestPermissiveFormat(unittest.TestCase):
+class TestPermissiveFormat(IndicoTestCase):
 
     def testTextParenthesesFormatting(self):
         params = dict(url="www.cern.ch", name="My Name", other="Nothing")
@@ -58,7 +50,7 @@ class TestPermissiveFormat(unittest.TestCase):
             self.assertEqual(permissive_format(text, params), result)
 
 
-class TestRemoveTags(unittest.TestCase):
+class TestRemoveTags(IndicoTestCase):
 
     def testTextRemoveExtraSpaces(self):
         texts = [
@@ -93,7 +85,7 @@ class TestRemoveTags(unittest.TestCase):
             self.assertEqual(remove_tags(text), result)
 
 
-class TestDecodingEncoding(unittest.TestCase):
+class TestDecodingEncoding(IndicoTestCase):
 
     def testUnicodeDecoding(self):
         string_value = "mettre à l'essai"
@@ -105,7 +97,7 @@ class TestDecodingEncoding(unittest.TestCase):
         self.assertEqual(string_value.decode("latin1").encode("utf-8"), fixed_string)
 
 
-class TestIsValidEmail(unittest.TestCase):
+class TestIsValidEmail(IndicoTestCase):
 
     def testOneValidEmail(self):
         emails = [

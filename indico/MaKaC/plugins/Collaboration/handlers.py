@@ -341,7 +341,7 @@ class RHAdminCollaboration(RHAdminBase):
         self._queryParams["indexName"] = params.get('indexName', None)
         self._queryParams["viewBy"] = params.get('viewBy', 'startDate')
         self._queryParams["orderBy"] = params.get('orderBy', '')
-        self._queryParams["sinceDate"] = params.get('sinceDate', '').strip()
+        self._queryParams["sinceDate"] = params.get('fromDate', '').strip()
         self._queryParams["toDate"] = params.get('toDate', '').strip()
         self._queryParams["fromDays"] = params.get('fromDays', '').strip()
         self._queryParams["toDays"] = params.get('toDays', '').strip()

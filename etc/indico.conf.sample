@@ -98,11 +98,11 @@ CSRFLevel = 2
 #------------------------------------------------------------------------------
 # BaseURL is the url where Indico will be accessed:
 
-BaseURL              = "http://localhost:8000/indico"
+BaseURL              = "http://localhost:8000"
 
 # BaseSecureURL is the HTTPS location of Indico. Set empty string if you want to use http.
 
-BaseSecureURL        = "https://localhost:8443/indico"
+BaseSecureURL        = "https://localhost:8443"
 
 
 # If you are using a custom user authentication system (see below) uncomment

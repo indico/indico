@@ -20,18 +20,19 @@
 """
 Tests for scheduler base classes
 """
-import unittest, threading, multiprocessing
-import time
+
 from datetime import timedelta
 from dateutil import rrule
+import threading
+import multiprocessing
+import os
 
 from indico.core.db import DBMgr
-
-from indico.util.date_time import nowutc
 from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
 from indico.modules.scheduler.tasks import OneShotTask
 from indico.modules.scheduler.tasks.periodic import PeriodicTask
-from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase
+from indico.tests.python.unit.util import IndicoTestCase
+
 
 terminated = None
 
@@ -108,7 +109,7 @@ class SchedulerThread(threading.Thread):
 
 
 class _TestScheduler(IndicoTestCase):
-
+    _slow = True
     _requires = ['db.DummyUser']
 
     def tearDown(self):

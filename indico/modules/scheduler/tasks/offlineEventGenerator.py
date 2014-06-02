@@ -18,6 +18,7 @@
 # along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import os
+from flask import current_app
 from indico.core.db import DBMgr
 from indico.core.config import Config
 from MaKaC.common.mail import GenericMailer
@@ -42,10 +43,7 @@ class OfflineEventGeneratorTask(OneShotTask):
         self._task = task
 
     def run(self):
-        from indico.web.flask.app import make_app
-
-        app = make_app()
-        with app.test_request_context():
+        with current_app.test_request_context():
             self._run()
 
     def _run(self):

@@ -42,7 +42,7 @@ class TestZEOServer(Process):
     """
     Creates a standalone ZEO server for tests
     """
-    def __init__(self, port, fd, hostname="localhost"):
+    def __init__(self, port, fd, hostname="127.0.0.1"):
         Process.__init__(self)
         self.addr = (hostname, port)
         self.fd = fd

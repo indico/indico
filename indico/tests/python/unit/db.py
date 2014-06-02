@@ -20,6 +20,7 @@
 # ZODB imports
 import ZODB
 from ZODB import ConflictResolution, MappingStorage
+from indico.tests.python.functional.seleniumTestCase import SeleniumTestCase
 import transaction
 from ZODB.POSException import ConflictError
 
@@ -117,8 +118,10 @@ class DummyUser_Feature(IndicoTestFeature):
     def start(self, obj):
         super(DummyUser_Feature, self).start(obj)
 
+        use_password = isinstance(obj, SeleniumTestCase)
+
         with obj._context('database', sync=True):
-            obj._avatars = default_actions.create_dummy_users()
+            obj._avatars = default_actions.create_dummy_users(use_password)
             for i in xrange(1, 5):
                 setattr(obj, '_avatar%d' % i, obj._avatars[i])
             setattr(obj, '_dummy', obj._avatars[0])

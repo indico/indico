@@ -12,6 +12,25 @@
     % endif
 </%def>
 
+<%def name="render_info(item, log_entry)">
+    <% caption = item[0] %>
+    <% value = item[1] %>
+    <% mime = "" %>
+
+    % if log_entry.getLogType() == "emailLog":
+        % if caption == "Body":
+            % if log_entry.getLogContentType() == "text/plain":
+                <% mime = "plain-text-email" %>
+            % endif
+        % endif
+    % endif
+
+    <tr class="i-table content">
+        <td class="i-table caption log-caption">${caption}</td>
+        <td class="i-table value searchable ${mime}">${value}</td>
+    </tr>
+</%def>
+
 <div class="groupTitle">
     <span class="icon-clipboard" aria-hidden="true"></span>
     <span>${_("Event Log")}</span>
@@ -62,7 +81,13 @@
         <tr class="i-table interactive ${line.getLogType()}" >
                 <td class="i-table ${get_icon(line.getLogType())}" aria-hidden="true"></td>
                 <td class="i-table log-module searchable">${line.getModule()}</td>
-                <td class="i-table log-subject searchable">${line.getLogSubject()}</td>
+                <td class="i-table log-subject searchable">
+                    % if line.getLogSubject():
+                        ${line.getLogSubject()}
+                    % else:
+                        <span class="text-superfluous">(${ _("no subject") })</span>
+                    % endif
+                </td>
                 <td class="i-table log-stamp text-superfluous">
                 % if line.getResponsibleName() != "System":
                     ${_("by {user} at {time}").format(user='<span class="text-normal searchable user-name">{0}</span>'.format(line.getResponsibleName()),
@@ -82,12 +107,7 @@
                         </tr>
                         % else:
                             % for info in line.getLogInfoList():
-                            <% caption = info[0]%>
-                            <% value = info[1]%>
-                            <tr class="i-table content">
-                                <td class="i-table caption log-caption">${caption}</td>
-                                <td class="i-table value searchable">${value}</td>
-                            </tr>
+                                ${ render_info(info, line) }
                             % endfor
                         % endif
                 </table>
@@ -101,7 +121,7 @@
 
 
 <script>
-$(document).ready(function(){
+$(document).ready(function() {
 
     /* Initializations */
     if ($(".log-table").length === 0) {
@@ -126,7 +146,7 @@ $(document).ready(function(){
     }
 
     var expandRow = function(interactive_row) {
-        interactive_row.addClass("active border-bottom-none");
+        interactive_row.addClass("active no-border-bottom");
         interactive_row.next().removeClass("weak-hidden")
                               .children("td")
                               .wrapInner('<div style="display: none;" />')
@@ -148,7 +168,7 @@ $(document).ready(function(){
                               .slideUp(400, function() {
                                   var $set = $(this);
                                   $set.replaceWith($set.contents());
-                                  interactive_row.removeClass("border-bottom-none");
+                                  interactive_row.removeClass("no-border-bottom");
                                   interactive_row.next().addClass("weak-hidden");
                               });
     };
@@ -169,12 +189,12 @@ $(document).ready(function(){
     /* Action buttons behavior */
     $("#expandAll").click(function(e) {
         e.preventDefault();
-        $("tr.i-table.interactive:visible").addClass("active border-bottom-none").next().removeClass("weak-hidden");
+        $("tr.i-table.interactive:visible").addClass("active no-border-bottom").next().removeClass("weak-hidden");
     });
 
     $("#collapseAll").click(function(e) {
         e.preventDefault();
-        $("tr.i-table.interactive").removeClass("active border-bottom-none").next().addClass("weak-hidden");
+        $("tr.i-table.interactive").removeClass("active no-border-bottom").next().addClass("weak-hidden");
     });
 
     $("#searchInput").realtimefilter({

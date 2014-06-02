@@ -22,7 +22,7 @@ from __future__ import absolute_import
 import os
 import re
 
-from flask import send_from_directory, request
+from flask import send_from_directory, request, _app_ctx_stack
 from flask import current_app as app
 from sqlalchemy.orm import configure_mappers
 from werkzeug.exceptions import NotFound
@@ -136,12 +136,15 @@ def setup_jinja(app):
     app.jinja_env.assets_environment = core_env
 
 
+ASSETS_REGISTERED = False
 def setup_assets():
-    try:
-        register_all_js(core_env)
-        register_all_css(core_env, Config.getInstance().getCssStylesheetName())
-    except RegisterError:
-        pass
+    global ASSETS_REGISTERED
+    if ASSETS_REGISTERED:
+        # Avoid errors when forking after creating an app (e.g. in scheduler tests)
+        return
+    ASSETS_REGISTERED = True
+    register_all_js(core_env)
+    register_all_css(core_env, Config.getInstance().getCssStylesheetName())
 
 
 def configure_db(app):
@@ -238,6 +241,9 @@ def make_app(set_path=False, db_setup=True):
     # reason to access it outside this method without being inside an application context.
     # When set_path is enabled, SERVER_NAME and APPLICATION_ROOT are set according to BaseURL
     # so URLs can be generated without an app context, e.g. in the indico shell
+    if _app_ctx_stack.top:
+        Logger.get('flask').warn('make_app({}) called within app context, using existing app'.format(set_path))
+        return _app_ctx_stack.top.app
     app = IndicoFlask('indico', static_folder=None, template_folder='web/templates')
     fix_root_path(app)
     configure_app(app, set_path)

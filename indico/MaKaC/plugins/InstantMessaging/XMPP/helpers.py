@@ -126,7 +126,7 @@ class LogLinkGenerator(LinkGenerator):
             dates += '&edate='+eDate
         return 'https://'+ \
                 PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('chatServerHost') + \
-                '/code.py/?cr=' + \
+                '/logs/?cr=' + \
                 self._chatroom.getTitle().lower() + \
                 '@conference.' + \
                 self._chatroom.getHost() + \
@@ -140,7 +140,7 @@ class DeleteLogLinkGenerator(LinkGenerator):
     def generate(self):
         return 'https://'+ \
                 PluginFieldsWrapper('InstantMessaging', 'XMPP').getOption('chatServerHost') + \
-                '/code.py/delete?cr=' + \
+                '/logs/delete?cr=' + \
                 self._chatroom.getTitle() + \
                 '@conference.' + \
                 self._chatroom.getHost()

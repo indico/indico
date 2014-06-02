@@ -21,15 +21,14 @@
 Tests for `indico.modules.scheduler.queue` module
 """
 
-import unittest
-
-from indico.core.db import DBMgr
+from indico.tests.python.unit.util import IndicoTestCase
 from indico.util.struct.queue import PersistentWaitingQueue, DuplicateElementException
 
 
-class TestPersistentWaitingQueue(unittest.TestCase):
+class TestPersistentWaitingQueue(IndicoTestCase):
 
     def setUp(self):
+        super(TestPersistentWaitingQueue, self).setUp()
         self._q = PersistentWaitingQueue()
 
     def _enqueueSomeElements(self):

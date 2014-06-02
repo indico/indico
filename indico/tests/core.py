@@ -40,6 +40,7 @@ from indico.util.console import colored
 from indico.util.shell import WerkzeugServer
 from indico.util.contextManager import ContextManager
 from indico.web.flask.app import make_app
+from indico.web.assets import core_env
 from indico.tests.config import TestConfig
 from indico.tests.base import TestOptionException, FakeMailThread
 from indico.tests.runners import *
@@ -136,7 +137,7 @@ class TestManager(object):
             serverAddr = self._runFakeWebServer()
             baseURL = "http://{0}:{1}".format(*serverAddr)
         else:
-            baseURL = "http://localhost:8000/indico"
+            baseURL = "http://localhost:8000"
 
         self._cfg._configVars.update({"BaseURL": baseURL})
         ContextManager.set('test_env', True)
@@ -172,7 +173,6 @@ class TestManager(object):
         Sets a fake configuration for the current process, using a temporary directory
         """
         config = Config.getInstance()
-        test_config = TestConfig.getInstance()
 
         temp = tempfile.mkdtemp(prefix="indico_")
         self._info('Using %s as temporary dir' % temp)
@@ -187,19 +187,19 @@ class TestManager(object):
         # minimal defaults
         defaults = {
             'Debug': True,
-            'BaseURL': 'http://localhost:8000/indico',
+            'BaseURL': 'http://localhost:8000',
             'BaseSecureURL': '',
             'AuthenticatorList': [('Local', {})],
             'SmtpServer': ('localhost', 58025),
             'SmtpUseTLS': 'no',
-            'DBConnectionParams': ('localhost', TestConfig.getInstance().getFakeDBPort()),
+            'DBConnectionParams': ('127.0.0.1', TestConfig.getInstance().getFakeDBPort()),
             'LogDir': os.path.join(temp, 'log'),
             'XMLCacheDir': os.path.join(temp, 'cache'),
             'HtdocsDir': htdocsDir,
             'ArchiveDir': os.path.join(temp, 'archive'),
             'UploadedFilesTempDir': os.path.join(temp, 'tmp'),
             'ConfigurationDir': etcDir
-            }
+        }
 
         defaults.update(custom)
 
@@ -208,6 +208,14 @@ class TestManager(object):
 
         Config.setInstance(config)
         self._cfg = config
+
+        # Update assets environment
+        core_env.directory = core_env.directory.replace('/opt/indico/htdocs', config.getHtdocsDir())
+        core_env.load_path = [path.replace('/opt/indico/htdocs', config.getHtdocsDir()) for path in core_env.load_path]
+        core_env.url_mapping = {path.replace('/opt/indico/htdocs', config.getHtdocsDir()): url for path, url in
+                                core_env.url_mapping.iteritems()}
+        core_env.config['PYSCSS_LOAD_PATHS'] = [x.replace('/opt/indico/htdocs', config.getHtdocsDir()) for x in
+                                                core_env.config['PYSCSS_LOAD_PATHS']]
 
         # re-configure logging and template generator, so that paths are updated
         from MaKaC.common import TemplateExec
@@ -221,7 +229,7 @@ class TestManager(object):
         port = TestConfig.getInstance().getFakeDBPort()
 
         self._info("Starting fake DB in port %s" % port)
-        self._startFakeDB('localhost', port)
+        self._startFakeDB('127.0.0.1', port)
 
     def _stopManageDB(self, killself=False):
         """

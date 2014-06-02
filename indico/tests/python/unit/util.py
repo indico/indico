@@ -22,13 +22,17 @@ Some utils for unit tests
 """
 
 # system imports
+from contextlib import contextmanager
+from contextlib2 import ExitStack
 from flask import session
 from functools import wraps
+import os
 import unittest
 import new
 import contextlib
 
 # indico imports
+from indico.util.benchmark import Benchmark
 from indico.util.contextManager import ContextManager
 from indico.util.fossilize import clearCache
 from indico.util.i18n import setLocale
@@ -179,30 +183,41 @@ class IndicoTestCase(unittest.TestCase, FeatureLoadingObject):
     """
 
     _requires = []
+    _slow = False
 
     def __init__(self, *args, **kwargs):
+        self._benchmark = Benchmark()
         unittest.TestCase.__init__(self, *args, **kwargs)
         FeatureLoadingObject.__init__(self)
 
     def setUp(self):
+        if os.environ.get('INDICO_SKIP_SLOW_TESTS') == '1':
+            if self._slow:
+                self.skipTest('Slow tests disabled')
+            testMethod = getattr(self, self._testMethodName)
+            if getattr(testMethod, '_slow', False):
+                self.skipTest('Slow tests disabled')
         setLocale('en_GB')
         Logger.removeHandler('smtp')
         clearCache()  # init/clear fossil cache
         self._configFeatures(self)
+        self._benchmark.start()
 
     def tearDown(self):
+        self._benchmark.stop()
         self._unconfigFeatures(self)
 
     @contextlib.contextmanager
     def _context(self, *contexts, **kwargs):
-        ctxs = []
-        res = []
-        for ctxname in contexts:
-            ctx = getattr(self, '_context_%s' % ctxname)(**kwargs)
-            res.append(ctx.next())
-            ctxs.append(ctx)
+        with ExitStack() as stack:
+            res = []
+            for ctxname in contexts:
+                ctx = contextmanager(getattr(self, '_context_%s' % ctxname))
+                res.append(stack.enter_context(ctx(**kwargs)))
+            yield res if len(res) > 1 else res[0]
 
-        yield res if len(res) > 1 else res[0]
-
-        for ctx in ctxs[::-1]:
-            ctx.next()
+    def run(self, result=None):
+        res = super(IndicoTestCase, self).run(result)
+        if os.environ.get('INDICO_BENCHMARK_TESTS') == '1':
+            self._benchmark.print_result(1, 2.5)
+        return res

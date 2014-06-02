@@ -102,9 +102,8 @@ doCleanUp = True
 doRemove = True
 
 def setup_module():
-    #this test is a performance test and takes too much time to execute
-    import nose
-    raise nose.SkipTest
+    # this test is a performance test and takes too much time to execute
+    raise unittest.SkipTest('extremely slow performance test, always skipped')
 
 class TestResponsiveness(unittest.TestCase):
 

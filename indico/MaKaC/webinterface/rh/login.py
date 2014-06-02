@@ -79,7 +79,7 @@ class RHSignInBase(base.RH):
                     self._redirect(self._disabledAccountURL(av))
                 else:
                     self._redirect(self._unactivatedAccountURL(av))
-                return _("your account is not activate\nPlease active it and retry")
+                return _("Your account is not active\nPlease activate it and try again")
             else:
                 self._setSessionVars(av)
             self._addExtraParamsToURL()

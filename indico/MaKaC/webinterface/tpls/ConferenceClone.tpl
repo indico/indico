@@ -112,7 +112,7 @@
             <li><input type="checkbox" name="cloneAccess" id="cloneAccess" value="1" checked />
                 ${ _("Access and management privileges")}</li>
             <li><input type="checkbox" name="cloneAlerts" id="cloneAlerts" checked value="1" />
-                ${ _("Alerts")}</li>
+                ${ _("Alarms")}</li>
 
             ${ cloneOptions }
         </ul>

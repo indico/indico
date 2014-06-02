@@ -248,8 +248,8 @@ class TestAbstractAcceptation(TestReviewBase):
         self.assertEqual(c_auth.getPhone(), auth2.getTelephone())
 
     @with_context('database')
-    def testIdCollission(self):
-        #checks that no collission with contributions can happen regarding
+    def testIdCollision(self):
+        #checks that no collision with contributions can happen regarding
         #   the ids
         contrib = conference.Contribution()
         self._conf.addContribution(contrib)

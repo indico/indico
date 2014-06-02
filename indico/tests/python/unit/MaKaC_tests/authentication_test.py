@@ -21,21 +21,20 @@ from MaKaC.user import Avatar, AvatarHolder, Group, GroupHolder, LoginInfo
 from MaKaC.authentication import AuthenticatorMgr
 from indico.tests.python.unit.util import IndicoTestCase, with_context
 
-class TestAuthentication(IndicoTestCase):
 
+class TestAuthentication(IndicoTestCase):
     _requires = ['db.Database']
 
     def setUp(self):
         super(TestAuthentication, self).setUp()
 
         with self._context("database"):
-
             # Create few users and groups
             gh = GroupHolder()
             ah = AvatarHolder()
             self._authMgr = AuthenticatorMgr()
 
-            for i in xrange(1, 5):
+            for i in xrange(1, 3):
                 group = Group()
                 group.setName("fake-group-%d" % i)
                 group.setDescription("fake")
@@ -63,18 +62,20 @@ class TestAuthentication(IndicoTestCase):
         ah = AvatarHolder()
         self.assertEqual(ah.getById("fake-1").getName(), "fake-1")
         self.assertEqual(ah.match({"name": "fake-1"}, searchInAuthenticators=False)[0].getEmail(), "fake1@fake.fake")
-        self.assertEqual(len(ah.matchFirstLetter("name", "f" ,searchInAuthenticators=False)), 4)
+        self.assertEqual(len(ah.matchFirstLetter("name", "f", searchInAuthenticators=False)), 2)
 
     @with_context('database')
     def testGroupHolder(self):
         gh = GroupHolder()
         ah = AvatarHolder()
         self.assert_(gh.getById("fake-group-1").containsUser(ah.getById("fake-1")))
-        self.assertEqual(gh.match({"groupname": "fake-group-1"}, searchInAuthenticators=False)[0].getEmail(), "fake-group-1@fake.fake")
-        self.assertEqual(len(gh.matchFirstLetter("f" ,searchInAuthenticators=False)), 4)
+        self.assertEqual(gh.match({"groupname": "fake-group-1"}, searchInAuthenticators=False)[0].getEmail(),
+                         "fake-group-1@fake.fake")
+        self.assertEqual(len(gh.matchFirstLetter("f", searchInAuthenticators=False)), 2)
 
     @with_context('database')
     def testIdentities(self):
         ah = AvatarHolder()
-        for i in xrange(1, 5):
-            self.assertEqual(self._authMgr.getAvatar(LoginInfo("fake-%d"%i, "fake-%d"%i)), ah.getById("fake-%d"%i))
+        for i in xrange(1, 3):
+            self.assertEqual(self._authMgr.getAvatar(LoginInfo("fake-%d" % i, "fake-%d" % i)),
+                             ah.getById("fake-%d" % i))
