@@ -1,3 +1,5 @@
+
+
 # -*- coding: utf-8 -*-
 ##
 ##
@@ -97,7 +99,7 @@ class DBTest(TestCase):
 
                 # room equipments
                 room.equipments.extend([
-                    RoomEquipment.getEquipmentByName(eq) for eq in r.get('equipments', [])
+                    location.getEquipmentByName(eq) for eq in r.get('equipments', [])
                 ])
 
                 # room bookable times

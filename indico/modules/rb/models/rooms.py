@@ -337,13 +337,8 @@ class Room(db.Model, Serializer):
 
         return ', '.join(infos)
 
-    def getEquipmentByName(self, equipment_name):
-        return self.equipments \
-                   .filter_by(name=func.lower(equipment_name)) \
-                   .first()
-
     def has_equipment(self, equipment_name):
-        return self.getEquipmentByName(equipment_name) is not None
+        return self.equipments.filter_by(name=equipment_name).count() > 0
 
     @property
     def needs_video_conference_setup(self):
@@ -708,14 +703,6 @@ class Room(db.Model, Serializer):
 
     def getEquipmentIds(self):
         return self.equipments.with_entities(RoomEquipment.id).all()
-
-    def addEquipments(self, equipment_names):
-        self.equipment_names.extend(equipment_names)
-
-    def addEquipment(self, equipment_name):
-        eq = self.getEquipmentByName(equipment_name)
-        if not eq:
-            self.equipment_names.append(equipment_name)
 
     def removeEquipments(self, equipment_names):
         del self.equipments[:]

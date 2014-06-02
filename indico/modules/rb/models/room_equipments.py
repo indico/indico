@@ -131,7 +131,3 @@ class RoomEquipment(db.Model):
     @staticmethod
     def getEquipmentNames():
         return RoomEquipment.query.with_entities(RoomEquipment.name).all()
-
-    @staticmethod
-    def getEquipmentByName(name):
-        return RoomEquipment.query.filter_by(name=name).one()

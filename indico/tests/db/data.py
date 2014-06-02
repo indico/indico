@@ -314,7 +314,7 @@ ROOMS = [
         'bookable_times': ROOM_BOOKABLE_TIMES[:1],
         'reservations': RESERVATIONS[:9],
         'photo': PHOTOS,
-        'equipments': ['PC']
+        'equipments': ROOM_EQUIPMENT[:2]
     },
     {
         'name': 'main-meeting-hall',
@@ -335,7 +335,7 @@ ROOMS = [
         'max_advance_days': 45,
         'bookable_times': ROOM_BOOKABLE_TIMES[:1],
         'nonbookable_dates': ROOM_NONBOOKABLE_DATES,
-        'equipments': ['PC', 'Video conference'],
+        'equipments': ROOM_EQUIPMENT[:2],
         'attributes': ROOM_ATTRIBUTES[:2]
     },
     {
@@ -362,7 +362,7 @@ ROOMS = [
         'floor': '0',
         'number': '1',
         'owner_id': 'fred',
-        'equipments': ['Whiteboard'],
+        'equipments': ROOM_EQUIPMENT[5:7],
         'bookable_times': ROOM_BOOKABLE_TIMES[:1]
     },
     {
