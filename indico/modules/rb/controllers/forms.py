@@ -438,7 +438,7 @@ class RoomListForm(IndicoForm):
     equipments = MultipleCheckboxIndicoField('equipments_')
 
     availability = StringField(validators=[DataRequired(), AnyOf(values=AVAILABILITY_VALUES)],
-                                     default='Don\'t care')
+                               default='Don\'t care')
     repeatibility = IntegerField(validators=[repeatibility_check])
 
     includes_pending_blockings = BooleanField(validators=[DataRequired()], default=False)
@@ -514,8 +514,8 @@ class BlockingForm(IndicoForm):
 
 
 class CreateBlockingForm(BlockingForm):
-    start_date = DateField(_('Start date'), [DataRequired()])
-    end_date = DateField(_('End date'), [DataRequired()])
+    start_date = DateField(_('Start date'), [DataRequired()], parse_kwargs={'dayfirst': True})
+    end_date = DateField(_('End date'), [DataRequired()], parse_kwargs={'dayfirst': True})
 
     def validate_start_date(self, field):
         if self.start_date.data > self.end_date.data:
