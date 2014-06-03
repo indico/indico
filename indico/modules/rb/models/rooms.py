@@ -876,18 +876,10 @@ class Room(db.Model, Serializer):
 
         if self.owner_id == avatar.id:
             return True
-
-        manager_group = self.getAttributeByName('manager-group')
-
+        manager_group = self.get_attribute_value('manager-group')
         if not manager_group:
             return False
-
-        group_name = json.loads(manager_group.raw_data)
-
-        if not group_name:
-            return False
-
-        return avatar.is_member_of_group(group_name)
+        return avatar.is_member_of_group(manager_group)
 
     def getGroups(self, group_name):
         groups = GroupHolder().match({'name': group_name}, exact=True, searchInAuthenticators=False)
@@ -897,11 +889,10 @@ class Room(db.Model, Serializer):
 
     def getAllManagers(self):
         managers = {self.owner_id}
-        manager_groups = self.get_attribute_value('manager-group')
-        for group_name in (manager_groups and manager_groups['is_equipped']):
-            groups = self.getGroups(group_name)
-            if groups and len(groups) == 1:
-                managers |= set(groups[0].getMemberList())
+        manager_group = self.get_attribute_value('manager-group')
+        groups = self.getGroups(manager_group) if manager_group else None
+        if groups and len(groups) == 1:
+            managers |= set(groups[0].getMemberList())
         return managers
 
     def checkManagerGroupExistence(self):
