@@ -183,7 +183,7 @@
                             ${ _('Capacity') }&nbsp;&nbsp;
                           </td>
                           <td align="left" class="blacktext">
-                            ${ room.capacity } ${ _('people') }
+                            ${ room.capacity } ${ _('seats') }
                           </td>
                         </tr>
                         <tr>

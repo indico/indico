@@ -45,7 +45,7 @@
                 ${ _('Capacity') }
             </td>
             <td align="left" class="blacktext">
-                ${ room.capacity }&nbsp;${ _('people') }
+                ${ room.capacity }&nbsp;${ _('seats') }
             </td>
         </tr>
     % endif

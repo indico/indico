@@ -206,7 +206,7 @@
                         ${ _('Capacity') }&nbsp;&nbsp;
                       </td>
                       <td align="left" class="blacktext">
-                        ${ reservation.room.capacity }&nbsp;${ _('people') }
+                        ${ reservation.room.capacity }&nbsp;${ _('seats') }
                       </td>
                     </tr>
                     <tr>

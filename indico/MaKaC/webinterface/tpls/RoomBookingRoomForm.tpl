@@ -261,7 +261,7 @@
                                 <%
                                     fields = ['capacity', 'division', 'surface_area', 'max_advance_days', 'comments']
                                     field_after = {
-                                        'capacity': _('people'),
+                                        'capacity': _('seats'),
                                         'surface_area': _('m<sup>2</sup>'),
                                         'max_advance_days': _('days'),
                                     }

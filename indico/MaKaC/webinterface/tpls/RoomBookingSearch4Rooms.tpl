@@ -198,7 +198,7 @@
                         <tr>
                             <td align="left" class="blacktext">
                                 <input size="3" type="text" id="capacity" name="capacity"/>
-                                ${ _('people') }
+                                ${ _('seats') }
                                 ${ contextHelp('capacityHelp') }
                             </td>
                         </tr>
