@@ -48,7 +48,6 @@ from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_equipments import RoomEquipment, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.util.i18n import _
-from indico.util import json
 from indico.util.string import return_ascii, natural_sort_key
 from indico.web.flask.util import url_for
 from .utils import Serializer

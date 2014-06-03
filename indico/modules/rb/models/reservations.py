@@ -339,10 +339,6 @@ class Reservation(Serializer, db.Model):
             return notification_list.value.split(',')
         return []
 
-    @staticmethod
-    def getReservationById(rid):
-        return Reservation.query.get(rid)
-
     def cancel(self, reason=None):
         self.is_cancelled = True
         self.rejection_reason = reason
