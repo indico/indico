@@ -86,6 +86,20 @@
                 value: opt.initEndTime
             }).attr('placeholder', 'hh:mm')
                 .typeWatch(typeWatchOptions);
+
+            self.element.on('keydown', 'input', function(e) {
+                if ($(e.target).prop('name') == opt.startTimeName) {
+                    if (e.which == K.TAB) {
+                        e.preventDefault();
+                        self.endTime.focus().select();
+                    }
+                } else if ($(e.target).prop('name') == opt.endTimeName) {
+                    if (e.which == K.TAB && e.shiftKey) {
+                        e.preventDefault();
+                        self.startTime.focus().select();
+                    }
+                }
+            });
         },
 
         _createSlider: function() {
