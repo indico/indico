@@ -82,12 +82,12 @@
             var name = self.options.selectName;
             var rooms = self.options.rooms;
 
-            self.select = $("<select name='" + name + "' multiple='multiple'/>").appendTo(self.element);
+            self.select = $("<select id='" + name + "' name='" + name + "' multiple='multiple'/>").appendTo(self.element);
 
             jQuery.map(rooms, function(room, i) {
                 var roomLoc = room.building + "-" + room.floor + "-" + room.number;
                 var roomName = roomLoc + (roomLoc == room.name ?  '' : ' - ' + room.name);
-                option = $("<option/>")
+                var option = $("<option/>")
                     .attr("label",
                         room.needs_video_conference_setup + ":" +
                         room.has_webcast_recording + ":" +
@@ -146,6 +146,9 @@
             });
 
             self.select.multiselect("refresh");
+            $('input[name=multiselect_{0}]'.format(self.options.selectName)).each(function(idx, elem) {
+                $(elem).prop('name', '');
+            });
             self._restoreData();
         },
 
@@ -193,7 +196,15 @@
             // Searchbox
             header.find(".ui-multiselect-filter").addClass("group").empty()
                 .append($("<span class='i-button label icon-search'/>"))
-                .append(filter.search);
+                .append(filter.search)
+                .on('click', 'a', function(e) {
+                    e.stopPropagation();
+                })
+                .on('keydown', 'input', function(e){
+                    if (e.which == K.ENTER) {
+                        e.preventDefault();
+                    }
+                });
             filter.search.realtimefilter({
                 callback: function() {
                     self._updateFilter();

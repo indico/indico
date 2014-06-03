@@ -132,7 +132,7 @@ rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/<date>/reject',
 
 rooms.add_url_rule('/bookings/reject-all-conflicting',
                    'roomBooking-rejectAllConflicting',
-                   reservation_handlers.RHRoomBookingRejectALlConflicting)
+                   reservation_handlers.RHRoomBookingRejectAllConflicting)
 
 
 # Booking info

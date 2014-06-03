@@ -790,7 +790,7 @@ class RHRoomBookingRejectBookingOccurrence(RHRoomBookingBase):
         self._redirect(url)  # Redirect to booking details
 
 
-class RHRoomBookingRejectALlConflicting(RHRoomBookingBase):
+class RHRoomBookingRejectAllConflicting(RHRoomBookingBase):
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
         user = self._getUser()

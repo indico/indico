@@ -57,7 +57,7 @@
                 rooms: rooms,
                 roomMaxCapacity: maxRoomCapacity,
                 userData: rbUserData,
-                selectName: 'room_ids'
+                selectName: '${ form.room_ids.name }'
             });
         }
 
