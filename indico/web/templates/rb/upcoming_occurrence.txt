@@ -1,0 +1,7 @@
+Dear {{ owner.getName() }},
+
+This is a reminder about a booking you have made:
+
+Room: {{ occurrence.reservation.room.name }}
+Date: {{ occurrence.start | format_date }}
+Time: {{ occurrence.start | format_time }} - {{ occurrence.end | format_time }}

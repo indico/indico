@@ -780,29 +780,6 @@ class Reservation(Serializer, db.Model):
             )
         ])
 
-    def requestProlongation(self):
-        """
-        Heavy reservations require user confirmation every x weeks.
-        This method sends user an e-mail, asking him to confirm (prolong)
-        the reservation for the next x weeks.
-        """
-
-        return [self._getCreatorAndContactEmail(
-            subject_message='Request for Booking Prolongation on',
-            template_name='RoomBookingEmail_2UserRequestProlongation'
-        )]
-
-    def notifyAboutLackOfProlongation(self):
-        """
-        Notifies (e-mails) responsible that user
-        did not prolong his HEAVY booking.
-        """
-
-        return [self._getCreatorAndContactEmail(
-            subject_message='Consider Rejecting This Booking',
-            template_name='RoomBookingEmail_2ResponsibleConsiderRejecting'
-        )]
-
     # ===============================================================
 
     @staticmethod

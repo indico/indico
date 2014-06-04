@@ -17,10 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Sent notifications of a reservation
-"""
-
 from datetime import datetime
 
 from dateutil import rrule
@@ -247,9 +243,8 @@ class ReservationOccurrence(db.Model):
     def is_valid(self):
         return ~self.is_rejected & ~self.is_cancelled
 
-    def notify_rejection(self, reason=''):
-        return self.reservation.notify_rejection(reason, self.date)
-
     def notify_cancellation(self):
         return self.reservation.notify_cancellation(self.date)
 
+    def notify_rejection(self, reason=''):
+        return self.reservation.notify_rejection(reason, self.date)
