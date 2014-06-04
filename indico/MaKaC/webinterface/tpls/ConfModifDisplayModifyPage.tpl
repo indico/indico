@@ -1,4 +1,4 @@
-<table width="100%"">
+<table width="100%">
     <tr>
         <form action=${ modifyDataURL } method="POST" onsubmit="return parseForm(this)">
         <td bgcolor="white" width="90%" valign="top" style="padding-left:20px">
@@ -41,7 +41,7 @@
 </table>
 <br>
 <script type="text/javascript">
-    var editor = new ParsedRichTextWidget(500, 200,"", "rich", "IndicoFull");
+    var editor = new ParsedRichTextWidget(600, 400, "", "rich");
     editor.set("${ content }", true);
     $E('contentField').set(editor.draw());
 

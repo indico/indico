@@ -539,10 +539,10 @@ extend(IndicoUI.Dialogs,
                useragent = useragent.toLowerCase();
 
                if (useragent.indexOf('iphone') != -1 || useragent.indexOf('symbianos') != -1 || useragent.indexOf('ipad') != -1 || useragent.indexOf('ipod') != -1 || useragent.indexOf('android') != -1 || useragent.indexOf('blackberry') != -1 || useragent.indexOf('samsung') != -1 || useragent.indexOf('nokia') != -1 || useragent.indexOf('windows ce') != -1 || useragent.indexOf('sonyericsson') != -1 || useragent.indexOf('webos') != -1 || useragent.indexOf('wap') != -1 || useragent.indexOf('motor') != -1 || useragent.indexOf('symbian') != -1 ) {
-                   rtWidget = new ParsedRichTextWidget(700, 400,'','plain','IndicoMinimal',true);
+                   rtWidget = new ParsedRichTextWidget(700, 400, '', 'plain', true);
                }
                else {
-                   rtWidget = new ParsedRichTextEditor(700, 400,'IndicoFull');
+                   rtWidget = new ParsedRichTextEditor(700, 400);
                }
 
                var saveButton;
