@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, time
+from datetime import datetime
 
 import pytz
 from babel.dates import get_timezone
@@ -25,15 +25,16 @@ from sqlalchemy import Time, Date
 from sqlalchemy.sql import cast
 from werkzeug.datastructures import OrderedMultiDict
 
-from MaKaC.common.info import HelperMaKaCInfo
+from indico.core.config import Config
+from indico.modules.rb.controllers import rb_check_user_access
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
-from indico.web.http_api.responses import HTTPAPIError
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.util.date_time import utc_to_server
-from indico.modules.rb.controllers import rb_check_user_access
 from indico.web.http_api import HTTPAPIHook
+from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
+from MaKaC.common.info import HelperMaKaCInfo
 
 
 class RoomBookingHookBase(HTTPAPIHook):
@@ -46,7 +47,8 @@ class RoomBookingHookBase(HTTPAPIHook):
         self._occurrences = get_query_parameter(self._queryParams, ['occ', 'occurrences'], 'no') == 'yes'
 
     def _hasAccess(self, aw):
-        # TODO: fail if RB is not active
+        if not Config.getInstance().getIsRoomBookingActive():
+            return False
         return rb_check_user_access(aw.getUser())
 
 
@@ -107,7 +109,7 @@ class RoomNameHook(RoomBookingHookBase):
 
     def _hasAccess(self, aw):
         # Access to RB data (no reservations) is public
-        return True
+        return Config.getInstance().getIsRoomBookingActive()
 
     def export_roomName(self, aw):
         loc = Location.find_first(name=self._location)
