@@ -1,53 +1,38 @@
-﻿/*
-Copyright (c) 2003-2012, CKSource - Frederico Knabben. All rights reserved.
-For licensing, see LICENSE.html or http://ckeditor.com/license
-*/
+/**
+ * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.html or http://ckeditor.com/license
+ */
 
-CKEDITOR.editorConfig = function( config )
-{
-    config.toolbar = 'IndicoMinimal';
+CKEDITOR.editorConfig = function( config ) {
+	// Define changes to default configuration here.
+	// For complete reference see:
+	// http://docs.ckeditor.com/#!/api/CKEDITOR.config
 
-    config.toolbar_IndicoFull =
-    [
-        ['Source','-','Preview','Templates'],
-        ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print'],
-        ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
-        ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
-        ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
-        ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-        ['Link','Unlink','Anchor'],
-        ['Image','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'],
-        '/',
-        ['Styles','Format','Font','FontSize'],
-        ['TextColor','BGColor'],
-        ['Maximize', 'ShowBlocks','-','About']
-    ];
+	// The toolbar groups arrangement, optimized for two toolbar rows.
+	config.toolbarGroups = [
+		{ name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
+		{ name: 'editing',     groups: [ 'find', 'selection', 'spellchecker' ] },
+		{ name: 'links' },
+		{ name: 'insert' },
+		{ name: 'forms' },
+		{ name: 'tools' },
+		{ name: 'document',	   groups: [ 'mode', 'document', 'doctools' ] },
+		{ name: 'others' },
+		'/',
+		{ name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+		{ name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
+		{ name: 'styles' },
+		{ name: 'colors' },
+		{ name: 'about' }
+	];
 
-    config.toolbar_IndicoMinimal =
-     [
-        ['Source','-','Preview','Templates'],
-        ['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript','-'],
-        ['Outdent', 'Indent', '-', 'NumberedList','BulletedList','Blockquote','-','Link','Unlink','Anchor'],
-        ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-        ['SpecialChar','-','About']
-     ] ;
+	// Remove some buttons provided by the standard plugins, which are
+	// not needed in the Standard(s) toolbar.
+	config.removeButtons = 'Underline,Subscript,Superscript';
 
-    config.contentsCss = CKEDITOR.basePath + '../../css/Default.css';
+	// Set the most common block elements.
+	config.format_tags = 'p;h1;h2;h3;pre';
 
-    config.resize_enabled = false;
-
-    config.toolbarStartupExpanded = true;
-
-    config.toolbarCanCollapse = false;
-
-    config.extraPlugins = 'onchange';
-
-    //url int angle brackets
-    config.protectedSource.push(/<[^<>\s]+:\/\/[^<>\s]+>/g);
-
-    //email address in angle brackets
-    config.protectedSource.push(/<[^<>=]+@[^<>]+>/g);
-
-    //done to avoid wrapping paragraphs with <p></p> tags
-    config.enterMode = CKEDITOR.ENTER_BR
+	// Simplify the dialog windows.
+	config.removeDialogTabs = 'image:advanced;link:advanced';
 };
