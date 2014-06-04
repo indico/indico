@@ -93,6 +93,7 @@ class RoomHook(RoomBookingHookBase):
 
 @HTTPAPIHook.register
 class RoomNameHook(RoomBookingHookBase):
+    # e.g. /export/roomName/CERN/pump.json
     GUEST_ALLOWED = True
     TYPES = ('roomName', )
     RE = r'(?P<location>[\w\s]+)/(?P<room_name>[\w\s\-]+)'
@@ -125,6 +126,7 @@ class RoomNameHook(RoomBookingHookBase):
 
 @HTTPAPIHook.register
 class ReservationHook(RoomBookingHookBase):
+    # e.g. /export/reservation/CERN.json
     TYPES = ('reservation', )
     RE = r'(?P<loclist>[\w\s]+(?:-[\w\s]+)*)'
     DEFAULT_DETAIL = 'reservations'
@@ -182,7 +184,13 @@ def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None
 
 
 def _serializable_room(room_data, reservations=None):
+    """Serializable room data
+
+    :param room_data: Room data
+    :param reservations: MultiDict mapping for room id => reservations
+    """
     data = room_data['room'].to_serializable('__api_public__')
+    data['_type'] = 'Room'
     data['avc'] = bool(room_data['vc_equipment'])
     data['vcList'] = room_data['vc_equipment']
     data['equipment'] = room_data['non_vc_equipment']
@@ -191,15 +199,31 @@ def _serializable_room(room_data, reservations=None):
     return data
 
 
+def _serializable_room_minimal(room):
+    """Serializable minimal room data (inside reservations)
+
+    :param room: A `Room`
+    """
+    data = room.to_serializable('__api_minimal_public__')
+    data['_type'] = 'Room'
+    return data
+
+
 def _serializable_reservation(reservation_data, include_room=False):
+    """Serializable reservation (standalone or inside room)
+
+    :param reservation_data: Reservation data
+    :param include_room: Include minimal room information
+    """
     reservation = reservation_data['reservation']
     data = reservation.to_serializable('__api_public__', converters={datetime: _add_server_tz})
+    data['_type'] = 'Reservation'
     data['repeatability'] = None
     if reservation.repeat_unit:
         data['repeatability'] = RepeatMapping.get_short_name(reservation.repeat_unit, reservation.repeat_step)
     data['vcList'] = reservation_data['vc_equipment']
     if include_room:
-        data['room'] = reservation_data['reservation'].room.to_serializable('__api_minimal_public__')
+        data['room'] = _serializable_room_minimal(reservation_data['reservation'].room)
     if 'occurrences' in reservation_data:
         data['occurrences'] = [o.to_serializable('__api_public__', converters={datetime: _add_server_tz})
                                for o in reservation_data['occurrences']]
