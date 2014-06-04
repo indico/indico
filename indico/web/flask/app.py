@@ -27,7 +27,6 @@ from flask import current_app as app
 from sqlalchemy.orm import configure_mappers
 from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
-from webassets.env import RegisterError
 
 import indico.util.date_time as date_time_util
 from indico.core.config import Config
