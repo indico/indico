@@ -33,6 +33,7 @@ from functools import wraps
 from random import randrange
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import class_mapper
+from sqlalchemy.sql import over, func
 
 from MaKaC import user as user_mod
 from MaKaC.accessControl import AdminList
@@ -552,11 +553,38 @@ def single_occurrence_to_reservation(f):
     return wrapper
 
 
+def limit_groups(query, model, partition_by, order_by, limit=None, offset=0):
+    """Limits the number of rows returned for each group
+
+
+    This utility allows you to apply a limit/offset to grouped rows of a query.
+    Note that the query will only contain the data from `model`; i.e. you cannot
+    add additional entities.
+
+    :param query: The original query, including filters, joins, etc.
+    :param model: The model class for `query`
+    :param partition_by: The column to group by
+    :param order_by: The column to order the partitions by
+    :param limit: The maximum number of rows for each partition
+    :param offset: The number of rows to skip in each partition
+    """
+    inner = query.add_columns(over(func.row_number(), partition_by=partition_by,
+                                   order_by=order_by).label('rownum')).subquery()
+
+    query = model.query.select_entity_from(inner)
+    if limit:
+        return query.filter(offset < inner.c.rownum, inner.c.rownum <= (limit + offset))
+    else:
+        return query.filter(offset < inner.c.rownum)
+
+
 class Serializer(object):
     __public__ = []
 
-    def to_serializable(self, attr='__public__'):
+    def to_serializable(self, attr='__public__', converters=None):
         j = {}
+        if converters is None:
+            converters = {}
         for k in getattr(self, attr):
             try:
                 if isinstance(k, tuple):
@@ -574,6 +602,8 @@ class Serializer(object):
                 elif isinstance(v, dict):
                     v = dict((k, vv.to_serializable() if isinstance(vv, Serializer) else vv)
                              for k, vv in v.iteritems())
+                if type(v) in converters:
+                    v = converters[type(v)](v)
                 j[name] = v
             except Exception:
                 import traceback

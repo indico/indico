@@ -77,6 +77,15 @@ class Room(db.Model, Serializer):
         'id', 'building', 'name', 'floor', 'number', 'kind', 'booking_url', 'details_url', 'location_name'
     ]
 
+    __api_public__ = (
+        'id', 'building', 'name', 'floor', 'longitude', 'latitude', ('number', 'roomNr'), ('location_name', 'location'),
+        ('full_name', 'fullName'), ('booking_url', 'bookingUrl')
+    )
+
+    __api_minimal_public__ = (
+        'id', ('full_name', 'fullName')
+    )
+
     # columns
 
     id = db.Column(
@@ -335,7 +344,7 @@ class Room(db.Model, Serializer):
         if self.needs_video_conference_setup:
             infos.append(_('video conference'))
 
-        return ', '.join(infos)
+        return ', '.join(map(unicode, infos))
 
     def has_equipment(self, equipment_name):
         return self.equipments.filter_by(name=equipment_name).count() > 0
@@ -409,6 +418,10 @@ class Room(db.Model, Serializer):
         else:
             return u'{}'.format(self.generateName())
 
+    @property
+    def full_name(self):
+        return self.getFullName()
+
     def updateName(self):
         if not self.name and self.building and self.floor and self.number:
             self.name = self.generateName()
@@ -463,6 +476,8 @@ class Room(db.Model, Serializer):
         from .locations import Location
 
         only_active = kwargs.pop('only_active', True)
+        filters = kwargs.pop('filters', None)
+        order = kwargs.pop('order', [Location.name, Room.building, Room.floor, Room.number, Room.name])
         if kwargs:
             raise ValueError('Unexpected kwargs: {}'.format(kwargs))
 
@@ -471,26 +486,56 @@ class Room(db.Model, Serializer):
 
         if 'equipment' in args:
             entities.append(static_array.array_agg(RoomEquipment.name))
-            query = query.\
-                outerjoin(RoomEquipmentAssociation).\
-                outerjoin(RoomEquipment)
+            query = query.outerjoin(RoomEquipmentAssociation).outerjoin(RoomEquipment)
+        if 'vc_equipment' in args or 'non_vc_equipment' in args:
+            vc_id_subquery = db.session.query(RoomEquipment.id) \
+                                       .correlate(Room) \
+                                       .filter_by(name='video conference') \
+                                       .join(RoomEquipmentAssociation) \
+                                       .filter(RoomEquipmentAssociation.c.room_id == Room.id) \
+                                       .as_scalar()
+
+            if 'vc_equipment' in args:
+                # noinspection PyTypeChecker
+                entities.append(static_array.array(
+                    db.session.query(RoomEquipment.name)
+                    .join(RoomEquipmentAssociation)
+                    .filter(
+                        RoomEquipmentAssociation.c.room_id == Room.id,
+                        RoomEquipment.parent_id == vc_id_subquery
+                    )
+                    .order_by(RoomEquipment.name)
+                    .as_scalar()
+                ))
+            if 'non_vc_equipment' in args:
+                # noinspection PyTypeChecker
+                entities.append(static_array.array(
+                    db.session.query(RoomEquipment.name)
+                    .join(RoomEquipmentAssociation)
+                    .filter(
+                        RoomEquipmentAssociation.c.room_id == Room.id,
+                        (RoomEquipment.parent_id == None) | (RoomEquipment.parent_id != vc_id_subquery)
+                    )
+                    .order_by(RoomEquipment.name)
+                    .as_scalar()
+                ))
 
         if not entities:
             raise ValueError('No data provided')
 
         query = query.with_entities(*entities) \
                      .outerjoin(Location, Location.id == Room.location_id) \
-                     .group_by(Location.name, Room.id) \
-                     .order_by(Location.name, Room.building, Room.floor, Room.number, Room.name)
+                     .group_by(Location.name, Room.id)
 
         if only_active:
-            query = query.filter(Room.is_active == True)
+            query = query.filter(Room.is_active)
+        if filters:
+            query = query.filter(*filters)
+        if order:
+            query = query.order_by(*order)
 
-        for r in query.all():
-            res = {'room': r[0]}
-            for i, arg in enumerate(args):
-                res[arg] = r[i + 1]
-            yield res
+        keys = ('room',) + tuple(args)
+        return (dict(zip(keys, row if args else [row])) for row in query)
 
     @staticmethod
     def getMaxCapacity():

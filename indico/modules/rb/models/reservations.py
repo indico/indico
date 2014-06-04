@@ -20,29 +20,31 @@
 """
 Schema of a reservation
 """
-from collections import defaultdict
-
+from collections import defaultdict, OrderedDict
 from copy import deepcopy
 from datetime import datetime, timedelta
 from operator import attrgetter
 
 from dateutil.relativedelta import relativedelta
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import joinedload
+from werkzeug.datastructures import OrderedMultiDict
 
 from indico.core.config import Config
 from indico.core.db import db
+from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.errors import IndicoError
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
-from indico.modules.rb.models.utils import apply_filters
+from indico.modules.rb.models.room_equipments import (ReservationEquipmentAssociation, RoomEquipment,
+                                                      RoomEquipmentAssociation)
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.utils import apply_filters, limit_groups, unimplemented, Serializer
 from indico.util.date_time import now_utc, format_date, format_datetime, overlaps
 from indico.util.i18n import _, N_
 from indico.util.string import return_ascii
 from indico.web.flask.util import url_for
-from .reservation_occurrences import ReservationOccurrence
-from .room_equipments import ReservationEquipmentAssociation, RoomEquipment
-from .utils import next_day_skip_if_weekend, unimplemented, Serializer
 from MaKaC.common.Locators import Locator
 from MaKaC.errors import MaKaCError
 from MaKaC.user import AvatarHolder
@@ -59,12 +61,12 @@ class RepeatUnit(object):
 
 class RepeatMapping(object):
     _mapping = {
-        (RepeatUnit.NEVER, 0): (N_('Single reservation'), None),
-        (RepeatUnit.DAY, 1): (N_('Repeat daily'), 0),
-        (RepeatUnit.WEEK, 1): (N_('Repeat once a week'), 1),
-        (RepeatUnit.WEEK, 2): (N_('Repeat once every two week'), 2),
-        (RepeatUnit.WEEK, 3): (N_('Repeat once every three week'), 3),
-        (RepeatUnit.MONTH, 1): (N_('Repeat every month'), 4)
+        (RepeatUnit.NEVER, 0): (N_('Single reservation'), None, 'none'),
+        (RepeatUnit.DAY, 1): (N_('Repeat daily'), 0, 'daily'),
+        (RepeatUnit.WEEK, 1): (N_('Repeat once a week'), 1, 'weekly'),
+        (RepeatUnit.WEEK, 2): (N_('Repeat once every two week'), 2, 'everyTwoWeeks'),
+        (RepeatUnit.WEEK, 3): (N_('Repeat once every three week'), 3, 'everyThreeWeeks'),
+        (RepeatUnit.MONTH, 1): (N_('Repeat every month'), 4, 'monthly')
     }
 
     @classmethod
@@ -76,6 +78,12 @@ class RepeatMapping(object):
     @unimplemented(exceptions=(KeyError,), message=_('Unimplemented repetition pair'))
     def getOldMapping(cls, repeat_unit, repeat_step):
         return cls._mapping[(repeat_unit, repeat_step)][1]
+
+    @classmethod
+    @unimplemented(exceptions=(KeyError,), message=_('Unimplemented repetition pair'))
+    def get_short_name(cls, repeat_unit, repeat_step):
+        # for the API
+        return cls._mapping[(repeat_unit, repeat_step)][2]
 
     @classmethod
     @unimplemented(exceptions=(KeyError,), message=_('Unknown old repeatability'))
@@ -97,6 +105,13 @@ class Reservation(Serializer, db.Model):
     __public__ = []
     __calendar_public__ = [
         'id', ('booked_for_name', 'bookedForName'), ('booking_reason', 'reason'), ('details_url', 'bookingUrl')
+    ]
+    __api_public__ = [
+        'id', ('start_date', 'startDT'), ('end_date', 'endDT'), 'repeat_unit', 'repeat_step',
+        ('booked_for_name', 'bookedForName'), ('details_url', 'bookingUrl'), ('booking_reason', 'reason'),
+        ('uses_video_conference', 'usesAVC'), ('needs_video_conference_setup', 'needsAVCSupport'),
+        'needs_general_assistance', ('is_confirmed', 'isConfirmed'), ('is_valid', 'isValid'), 'is_cancelled',
+        'is_rejected'
     ]
 
     # columns
@@ -285,15 +300,58 @@ class Reservation(Serializer, db.Model):
         return self.equipments.filter(RoomEquipment.parent_id == vc_equipment)
 
     @staticmethod
-    def getReservationWithDefaults():
-        dt = next_day_skip_if_weekend()
+    def get_with_data(*args, **kwargs):
+        filters = kwargs.pop('filters', None)
+        limit = kwargs.pop('limit', None)
+        offset = kwargs.pop('offset', 0)
+        order = kwargs.pop('order', Reservation.start_date)
+        limit_per_room = kwargs.pop('limit_per_room', False)
+        if kwargs:
+            raise ValueError('Unexpected kwargs: {}'.format(kwargs))
 
-        return Reservation(
-            start_date=dt,
-            end_date=dt,
-            repeat_unit=RepeatUnit.NEVER,
-            repeat_step=0
-        )
+        query = Reservation.query.options(joinedload(Reservation.room))
+        if filters:
+            query = query.filter(*filters)
+        if limit_per_room and (limit or offset):
+            query = limit_groups(query, Reservation, Reservation.room_id, order, limit, offset)
+
+        query = query.order_by(order, Reservation.created_at)
+
+        if not limit_per_room:
+            if limit:
+                query = query.limit(limit)
+            if offset:
+                query = query.offset(offset)
+
+        result = OrderedDict((r.id, {'reservation': r}) for r in query)
+
+        if 'vc_equipment' in args:
+            vc_id_subquery = db.session.query(RoomEquipment.id) \
+                .correlate(Reservation) \
+                .filter_by(name='video conference') \
+                .join(RoomEquipmentAssociation) \
+                .filter(RoomEquipmentAssociation.c.room_id == Reservation.room_id) \
+                .as_scalar()
+
+            # noinspection PyTypeChecker
+            vc_equipment_data = dict(db.session.query(Reservation.id, static_array.array_agg(RoomEquipment.name))
+                                     .join(ReservationEquipmentAssociation, RoomEquipment)
+                                     .filter(Reservation.id.in_(result.iterkeys()))
+                                     .filter(RoomEquipment.parent_id == vc_id_subquery)
+                                     .group_by(Reservation.id))
+
+            for id_, data in result.iteritems():
+                data['vc_equipment'] = vc_equipment_data.get(id_, ())
+
+        if 'occurrences' in args:
+            occurrence_data = OrderedMultiDict(db.session.query(ReservationOccurrence.reservation_id,
+                                                                ReservationOccurrence)
+                                               .filter(ReservationOccurrence.reservation_id.in_(result.iterkeys()))
+                                               .order_by(ReservationOccurrence.start))
+            for id_, data in result.iteritems():
+                data['occurrences'] = occurrence_data.getlist(id_)
+
+        return result.values()
 
     # reservations
 
@@ -868,6 +926,7 @@ class Reservation(Serializer, db.Model):
             start_date = period.start_date
             periods.append(period)
 
+    @property
     def is_valid(self):
         return self.is_confirmed and not (self.is_rejected or self.is_cancelled)
 

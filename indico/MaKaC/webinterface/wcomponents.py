@@ -74,8 +74,6 @@ from indico.core.db import DBMgr
 from indico.util.i18n import i18nformat, parseLocale, getLocaleDisplayNames
 from indico.util.date_time import utc_timestamp, is_same_month
 from indico.core.index import Catalog
-from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
-from indico.web.http_api.util import generate_public_auth_request
 
 MIN_PRESENT_EVENTS = 6
 OPTIMAL_PRESENT_EVENTS = 10
@@ -405,6 +403,9 @@ class WConferenceHeader(WHeader):
         self._locTZ = tzUtil.getDisplayTZ()
 
     def getVars( self ):
+        from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
+        from indico.web.http_api.util import generate_public_auth_request
+
         vars = WHeader.getVars( self )
         vars["categurl"] = urlHandlers.UHCategoryDisplay.getURL(self._conf.getOwnerList()[0])
 

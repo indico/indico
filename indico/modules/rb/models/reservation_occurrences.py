@@ -25,14 +25,15 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.errors import IndicoError
-from indico.modules.rb.models.utils import single_occurrence_to_reservation
+from indico.modules.rb.models.utils import single_occurrence_to_reservation, Serializer
 from indico.util import date_time
 from indico.util.date_time import iterdays
 from indico.util.string import return_ascii
 
 
-class ReservationOccurrence(db.Model):
+class ReservationOccurrence(db.Model, Serializer):
     __tablename__ = 'reservation_occurrences'
+    __api_public__ = (('start', 'startDT'), ('end', 'endDT'), 'is_cancelled', 'is_rejected')
 
     reservation_id = db.Column(
         db.Integer,

@@ -48,7 +48,7 @@ from indico.web.http_api.util import get_query_parameter
 from indico.util.fossilize import fossilize, IFossil
 from indico.util.fossilize.conversion import Conversion
 
-globalHTTPAPIHooks = ['RoomHook', 'RoomNameHook', 'ReservationHook', 'BookRoomHook']
+#globalHTTPAPIHooks = ['RoomHook', 'RoomNameHook', 'ReservationHook', 'BookRoomHook']
 MAX_DATETIME = datetime(2099, 12, 31, 23, 59, 00)
 MIN_DATETIME = datetime(2000, 1, 1, 00, 00, 00)
 

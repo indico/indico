@@ -26,6 +26,7 @@ from indico.web.http_api.exceptions import LimitExceededException
 from indico.web.http_api.hooks.file import FileHook
 from indico.web.http_api.hooks.registration import RegistrantsHook
 from indico.web.http_api.hooks.user import UserInfoHook
+import indico.modules.rb.api
 
 
 API_MODE_KEY            = 0  # public requests without API key, authenticated requests with api key
