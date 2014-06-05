@@ -26,9 +26,10 @@ from functools import partial
 from flask import session
 from flask.ext.wtf import Form
 from flask.ext.wtf.file import FileField
-from wtforms import BooleanField, Field, IntegerField, StringField, HiddenField, TextAreaField, SubmitField, RadioField
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
-from wtforms.fields.core import FloatField, FieldList, FormField, SelectMultipleField
+from wtforms.fields.core import (Field, BooleanField, FloatField, IntegerField, StringField, FieldList, FormField,
+                                 RadioField, SelectMultipleField)
+from wtforms.fields.simple import HiddenField, TextAreaField, SubmitField
 from wtforms.validators import (AnyOf, Optional, NumberRange, DataRequired, ValidationError, StopValidation,
                                 InputRequired)
 from wtforms.ext.dateutil.fields import DateTimeField, DateField

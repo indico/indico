@@ -284,12 +284,10 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
             occurrences, candidates = self._get_all_occurrences([self._room.id], form)
             conflicts, pre_conflicts = self._get_all_conflicts(self._room, form)
 
-        if form.validate_on_submit():
-            if not form.submit_check.data:
-                booking = self._create_booking(form, room)
-                url = url_for('rooms.roomBooking-bookingDetails', booking)
-                self._redirect(url)
-                return
+        if form.validate_on_submit() and not form.submit_check.data:
+            booking = self._create_booking(form, room)
+            self._redirect(url_for('rooms.roomBooking-bookingDetails', booking))
+            return
 
         return WPRoomBookingNewBookingSimple(self, form=form, room=room, rooms=rooms,
                                              occurrences=occurrences,
