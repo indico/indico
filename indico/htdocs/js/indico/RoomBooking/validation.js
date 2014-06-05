@@ -15,147 +15,148 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-var validatingBooking = false;
-var validatingConflicts = false;
+(function() {
+    var validatingBooking = false;
+    var validatingConflicts = false;
 
-function validateForm() {
-    var isValid = true;
+    window.validateForm = function validateForm() {
+        var isValid = true;
 
-    if (!validatingBooking && !validatingConflicts) {
-        return true;
-    }
+        if (!validatingBooking && !validatingConflicts) {
+            return true;
+        }
 
-    // timerange
-    if ($('#timerange').length) {
-        isValid = isValid && $('#timerange').timerange('validate');
-    }
+        // timerange
+        if ($('#timerange').length) {
+            isValid = isValid && $('#timerange').timerange('validate');
+        }
 
-    // repeatability
-    if ($('#repeatability').length) {
-        isValid = isValid && validate_repeatability();
-    }
+        // repeatability
+        if ($('#repeatability').length) {
+            isValid = isValid && validate_repeatability();
+        }
 
-    // Booked for validator
-    $('#contact_email, #booking_reason').each(function() {
-        var $this = $(this);
-        if (!validatingConflicts) {
-            var valid = !!$this.val().trim();
-            isValid = isValid && valid;
-            $this.toggleClass('hasError', !valid);
+        // Booked for validator
+        $('#contact_email, #booking_reason').each(function() {
+            var $this = $(this);
+            if (!validatingConflicts) {
+                var valid = !!$this.val().trim();
+                isValid = isValid && valid;
+                $this.toggleClass('hasError', !valid);
+            } else {
+                $this.removeClass('hasError');
+            }
+        });
+
+        // Collaboration validation
+        if ($('#uses_video_conference').length) {
+            var vcEnabled = $('#uses_video_conference').prop('checked');
+            var vcErrors = vcEnabled != !!$('.js-vc-row input:not(#needs_video_conference_setup):checked').length;
+            var vcLabel = $('label[for="uses_video_conference"]');
+            vcLabel.toggleClass('text-error', vcErrors);
+            if (vcErrors) {
+                vcLabel.attr('title', 'You need to select at least one piece of Video Conference equipment');
+            }
+            else {
+                vcLabel.qtip('destroy', true).removeAttr('title');
+            }
+            isValid = isValid && !vcErrors;
+        }
+
+        return isValid;
+    };
+
+    function validate_repeatability() {
+        var valid = true;
+        var single_day = false;
+
+        var repeat_unit = $('input[name=repeat_unit]:checked').val();
+        var repeatability;
+        var message;
+
+        switch (repeat_unit) {
+            // Single Day
+            case "0":
+                single_day = true;
+                break;
+            // Repeat daily
+            case "1":
+                repeatability = 'days';
+                message = $T("Period shorter than 1 day");
+                break;
+            // Repeat weekly
+            case "2":
+                repeatability = 'weeks';
+                message = $T("Period shorter than 1 week");
+                break;
+            // Repeat monthly
+            case "3":
+                repeatability = 'months';
+                message = $T("Period shorter than 1 month");
+                break;
+            default:
+                valid = false;
+        }
+
+        if (valid && !single_day) {
+            var start_date = moment($('#sDatePlace').datepicker('getDate'));
+            var end_date = moment($('#eDatePlace').datepicker('getDate'));
+
+            if (end_date.diff(start_date, repeatability) < 1) {
+                valid = false;
+            }
+        }
+
+        var label = $('#repeatability .label');
+        if (!valid) {
+            if (typeof label.data('qtip') !== "object") {
+                label.qtip({content: {text: message}});
+            } else {
+                label.qtip("api").set("content.text", message);
+            }
+            label.addClass('invalid');
+            $('#edate').addClass('invalid');
         } else {
-            $this.removeClass('hasError');
+            label.removeClass('invalid');
+            if (typeof label.data('qtip') === "object") {
+                label.qtip("api").destroy();
+            }
         }
-    });
 
-    // Collaboration validation
-    if ($('#uses_video_conference').length) {
-        var vcEnabled = $('#uses_video_conference').prop('checked');
-        var vcErrors = vcEnabled != !!$('.js-vc-row input:not(#needs_video_conference_setup):checked').length;
-        var vcLabel = $('label[for="uses_video_conference"]');
-        vcLabel.toggleClass('text-error', vcErrors);
-        if (vcErrors) {
-            vcLabel.attr('title', 'You need to select at least one piece of Video Conference equipment');
-        }
-        else {
-            vcLabel.qtip('destroy', true).removeAttr('title');
-        }
-        isValid = isValid && !vcErrors;
+        return valid;
     }
 
-    return isValid;
-}
 
-function validate_repeatability() {
-    var valid = true;
-    var single_day = false;
-
-    var repeat_unit = $('input[name=repeat_unit]:checked').val();
-    var repeatability;
-    var message;
-
-    switch(repeat_unit) {
-        // Single Day
-        case "0":
-            single_day = true;
-            break;
-        // Repeat daily
-        case "1":
-            repeatability = 'days'
-            message = $T("Period shorter than 1 day");
-            break;
-        // Repeat weekly
-        case "2":
-            repeatability = 'weeks'
-            message = $T("Period shorter than 1 week");
-            break;
-        // Repeat monthly
-        case "3":
-            repeatability = 'months'
-            message = $T("Period shorter than 1 month");
-            break;
-        default:
-            valid = false;
-    }
-
-    if (valid && !single_day) {
-        var start_date = moment($('#sDatePlace').datepicker('getDate'));
-        var end_date = moment($('#eDatePlace').datepicker('getDate'));
-
-        if (end_date.diff(start_date, repeatability) < 1) {
-            valid = false;
-        }
-    }
-
-    var label = $('#repeatability .label');
-    if (!valid) {
-        if (typeof label.data('qtip') !== "object") {
-            label.qtip({content: {text: message}});
-        } else {
-            label.qtip("api").set("content.text", message);
-        }
-        label.addClass('invalid');
-        $('#edate').addClass('invalid');
-        isValid = false;
-    } else {
-        label.removeClass('invalid');
-        if (typeof label.data('qtip') === "object") {
-            label.qtip("api").destroy();
-        }
-    }
-
-    return valid;
-}
-
-
-$(function() {
-    $('#searchForm').on('submit', function(e) {
-        validatingBooking = true;
-        if (!validateForm()) {
-            e.preventDefault();
-        } else if (!$("#roomselector").roomselector("validate")) {
-            new AlertPopup($T("Error"), $T('Please select a room (or several rooms).')).open();
-            e.preventDefault();
-        } else {
-            saveFormData();
-        }
-    });
-
-    $('#submit_check, #submit_prebook, #submit_book').on('click', function(e) {
-        if ($(e.target).data('validation') == 'check') {
-            validatingConflicts = true;
-            validatingBooking = false;
-        } else {
-            validatingConflicts = false;
+    $(function() {
+        $('#searchForm').on('submit', function(e) {
             validatingBooking = true;
-        }
+            if (!validateForm()) {
+                e.preventDefault();
+            } else if (!$("#roomselector").roomselector("validate")) {
+                new AlertPopup($T("Error"), $T('Please select a room (or several rooms).')).open();
+                e.preventDefault();
+            } else {
+                saveFormData();
+            }
+        });
 
-        if (!validateForm()) {
-            e.preventDefault();
-            new AlertPopup($T("Error"), $T('There are some errors in the form.')).open();
-        }
-    });
+        $('#submit_check, #submit_prebook, #submit_book').on('click', function(e) {
+            if ($(this).data('validation') == 'check') {
+                validatingConflicts = true;
+                validatingBooking = false;
+            } else {
+                validatingConflicts = false;
+                validatingBooking = true;
+            }
 
-    $('#bookingForm :input').on('input change', function() {
-        validateForm();
+            if (!validateForm()) {
+                e.preventDefault();
+                new AlertPopup($T("Error"), $T('There are some errors in the form.')).open();
+            }
+        });
+
+        $('#bookingForm :input').on('input change', function() {
+            validateForm();
+        });
     });
-});
+})();
