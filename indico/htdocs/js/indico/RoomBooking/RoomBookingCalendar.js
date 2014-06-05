@@ -90,8 +90,7 @@ type ("RoomBookingRoom", [],
             this.bookingUrl = build_url(roomData.booking_url, {
                 day: date.substring(8, 10),
                 month: date.substring(5, 7),
-                year: date.substring(0, 4),
-                ignoreSession: 1
+                year: date.substring(0, 4)
             });
         });
 

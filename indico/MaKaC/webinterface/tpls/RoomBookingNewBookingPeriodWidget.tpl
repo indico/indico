@@ -116,7 +116,7 @@ ${ form.repeat_step(type='hidden') }
             var start_date = moment($('#sDatePlace').datepicker('getDate')).format('D/MM/YYYY');
             var end_date = moment($('#eDatePlace').datepicker('getDate')).format('D/MM/YYYY');
             var start_time = $('#timerange').timerange('getStartTime');
-            var end_time = $('#timerange').timerange('getEndTime')
+            var end_time = $('#timerange').timerange('getEndTime');
 
 
             $('#start_date').val('{0} {1}'.format(start_date, start_time));
@@ -137,11 +137,9 @@ ${ form.repeat_step(type='hidden') }
             var holidaysWarning = indicoSource('roomBooking.getDateWarning', data);
             holidaysWarning.state.observe(function(state) {
                 if (state == SourceState.Loaded) {
-                    $('#holidays-warning .message-text').html(holidaysWarning.get());
-                    if (holidaysWarning.get() == '')
-                        $('#holidays-warning').hide();
-                    else
-                        $('#holidays-warning').show();
+                    var msg = holidaysWarning.get();
+                    $('#holidays-warning .message-text').html(msg);
+                    $('#holidays-warning').toggle(!!msg);
                 }
             });
         }

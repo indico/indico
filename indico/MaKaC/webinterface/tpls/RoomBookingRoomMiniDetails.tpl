@@ -82,8 +82,9 @@
 <script>
     $(function() {
         $('select.js-go-to-room').on('change', function() {
-            var roomLocation = $("#roomName option:selected").data("location");
-            var roomId = $("#roomName option:selected").data("id");
+            var option = $('#roomName option:selected');
+            var roomLocation = option.data('location');
+            var roomId = option.data('id');
             go_to_room(roomLocation, roomId);
         });
     });
