@@ -46,7 +46,7 @@ class RoomBookingHookBase(HTTPAPIHook):
         super(RoomBookingHookBase, self)._getParams()
         self._fromDT = utc_to_server(self._fromDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._fromDT else None
         self._toDT = utc_to_server(self._toDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._toDT else None
-        self._occurrences = get_query_parameter(self._queryParams, ['occ', 'occurrences'], 'no') == 'yes'
+        self._occurrences = _yesno(get_query_parameter(self._queryParams, ['occ', 'occurrences'], 'no'))
 
     def _hasAccess(self, aw):
         if not Config.getInstance().getIsRoomBookingActive():
