@@ -251,7 +251,12 @@ type ("RoomBookingCalendarDrawer", [],
                 }
 
                 if (bar.type == "barCand") {
-                    resvInfo = $T("Click to book it") + '<br>' + bar.startDT.print("%H:%M") + "  -  " + bar.endDT.print("%H:%M");
+                    if (showCandidateTip) {
+                        resvInfo = $T("Click to book it") + '<br>' + bar.startDT.print("%H:%M") + "  -  " + bar.endDT.print("%H:%M");
+                    }
+                    else {
+                        resvInfo = $T('This bar indicates the time which will be booked.');
+                    }
                 } else if (bar.type == "barBlocked") {
                     resvInfo = $T("Room blocked by") + ":<br/>" +
                                   bar.blocking.creator + "<br/>" +
