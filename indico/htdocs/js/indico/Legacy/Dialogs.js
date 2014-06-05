@@ -539,10 +539,10 @@ extend(IndicoUI.Dialogs,
                useragent = useragent.toLowerCase();
 
                if (useragent.indexOf('iphone') != -1 || useragent.indexOf('symbianos') != -1 || useragent.indexOf('ipad') != -1 || useragent.indexOf('ipod') != -1 || useragent.indexOf('android') != -1 || useragent.indexOf('blackberry') != -1 || useragent.indexOf('samsung') != -1 || useragent.indexOf('nokia') != -1 || useragent.indexOf('windows ce') != -1 || useragent.indexOf('sonyericsson') != -1 || useragent.indexOf('webos') != -1 || useragent.indexOf('wap') != -1 || useragent.indexOf('motor') != -1 || useragent.indexOf('symbian') != -1 ) {
-                   rtWidget = new ParsedRichTextWidget(700, 400, '', 'plain', true);
+                  rtWidget = new ParsedRichTextWidget(700, 400, '', 'plain', true);
                }
                else {
-                   rtWidget = new ParsedRichTextEditor(700, 400);
+                  rtWidget = new ParsedRichTextEditor(700, 400);
                }
 
                var saveButton;
@@ -587,24 +587,21 @@ extend(IndicoUI.Dialogs,
                        IndicoUtil.errorReport(req.error.get());
                    } else if (state == SourceState.Loaded) {
 
-                       rtWidget.set(req.get(), !req.get());
+                      if (rtWidget.get() != req.get()) {
+                        rtWidget.set(req.get(), !req.get());
+                      }
 
-                       _.defer(function(){
-                               rtWidget.onChange(function(ev){
-                                   changedText.set(true);
-                               });
-                       });
-                       if (killProgress) {
-                           killProgress();
-                           changedText.set(false);
-                           wasChanged = true;
-                           saveButton.button('disable');
-                           if (saveAndClose) {
-                               closeMinutes();
-                           }
-                       }
-                   }
-               });
+                      if (killProgress) {
+                          killProgress();
+                          changedText.set(false);
+                          wasChanged = true;
+                          saveButton.button('disable');
+                          if (saveAndClose) {
+                              closeMinutes();
+                          }
+                      }
+                  }
+              });
 
                changedText.observe(
                    function(value) {
@@ -618,16 +615,16 @@ extend(IndicoUI.Dialogs,
                        if(rtWidget.clean()){
                            changedText.set(false);
                            wasChanged = true;
-                       saveButton.button('disable');
+                           saveButton.button('disable');
                            req.set(rtWidget.get());
                        }
                        killProgress();
                };
 
                popup.commitChangesAndClose = function() {
-                       saveAndClose = true;
-                   this.commitChanges();
-                   };
+                    saveAndClose = true;
+                    this.commitChanges();
+               };
 
                popup.closeMinutesPopup = function(){
                    var self = this;
@@ -654,6 +651,14 @@ extend(IndicoUI.Dialogs,
                    var content = Html.div({}, rtWidget.draw());
                    return this.ExclusivePopupWithButtons.prototype.draw.call(this, content);
                };
+
+               popup.postDraw = function() {
+                  _.defer(function() {
+                           rtWidget.onChange(function(ev){
+                               changedText.set(true);
+                           });
+                     });
+                  };
 
                popup._getButtons = function() {
                    return [

@@ -17,7 +17,6 @@
 
 
 if(!window.indicoOfflineSite) {
-    include(ScriptRoot + "ckeditor/add_url.patch.js");
     include(ScriptRoot + "ckeditor/ckeditor.js");
 }
 
