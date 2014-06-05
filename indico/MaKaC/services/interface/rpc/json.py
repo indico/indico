@@ -34,7 +34,7 @@ from MaKaC.services.interface.rpc.common import (
 from MaKaC.services.interface.rpc.process import ServiceRunner
 
 from indico.core.logger import Logger
-from indico.util.json import dumps
+from indico.util.json import dumps, loads
 from indico.util.string import fix_broken_obj
 
 
@@ -43,7 +43,7 @@ def encode(obj):
 
 
 def decode(s):
-    return unicodeToUtf8(s)
+    return unicodeToUtf8(loads(s))
 
 
 def unicodeToUtf8(obj):
