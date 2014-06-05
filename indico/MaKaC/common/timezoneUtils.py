@@ -16,7 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import session
+from flask import session, has_request_context
 
 from pytz import timezone, all_timezones
 from datetime import datetime, timedelta
@@ -172,7 +172,10 @@ class DisplayTZ:
 
     def __init__(self, aw=None, conf=None, useServerTZ=0):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        sessTimezone = session.timezone
+        if not has_request_context():
+            sessTimezone = 'LOCAL'
+        else:
+            sessTimezone = session.timezone
         if sessTimezone == 'LOCAL':
             if useServerTZ == 0 and conf is not None:
                 sessTimezone = conf.getTimezone()
