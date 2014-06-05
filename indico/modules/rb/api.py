@@ -31,7 +31,7 @@ from indico.modules.rb.controllers import rb_check_user_access
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping, RepeatUnit
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
-from indico.util.date_time import utc_to_server, server_to_utc
+from indico.util.date_time import utc_to_server
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.metadata import ical
 from indico.web.http_api.responses import HTTPAPIError
@@ -139,7 +139,7 @@ class ReservationHook(RoomBookingHookBase):
 
     @property
     def serializer_args(self):
-        return {'ical_serializer': ical_serialize_reservation}
+        return {'ical_serializer': _ical_serialize_reservation}
 
     def _getParams(self):
         super(ReservationHook, self)._getParams()
@@ -236,7 +236,7 @@ def _serializable_reservation(reservation_data, include_room=False):
     return data
 
 
-def ical_serialize_repeatability(data):
+def _ical_serialize_repeatability(data):
     start_dt_utc = data['startDT'].astimezone(pytz.utc)
     end_dt_utc = data['endDT'].astimezone(pytz.utc)
     WEEK_DAYS = 'MO TU WE TH FR SA SU'.split()
@@ -253,7 +253,7 @@ def ical_serialize_repeatability(data):
     return recur
 
 
-def ical_serialize_reservation(cal, data, now):
+def _ical_serialize_reservation(cal, data, now):
     start_dt_utc = data['startDT'].astimezone(pytz.utc)
     end_dt_utc = datetime.combine(data['startDT'].date(), data['endDT'].timetz()).astimezone(pytz.utc)
 
@@ -267,7 +267,7 @@ def ical_serialize_reservation(cal, data, now):
     event.set('location', u'{}: {}'.format(data['location'], data['room']['fullName']))
     event.set('description', data['reason'].decode('utf-8') + '\n\n' + data['bookingUrl'])
     if data['repeat_unit'] != RepeatUnit.NEVER:
-        event.set('rrule', ical_serialize_repeatability(data))
+        event.set('rrule', _ical_serialize_repeatability(data))
     cal.add_component(event)
 
 
