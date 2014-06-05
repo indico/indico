@@ -114,7 +114,8 @@ class ServiceRunner(Observable):
 
     def invokeMethod(self, method, params):
         cfg = Config.getInstance()
-        forced_conflicts, max_retries = cfg.getForceConflicts(), cfg.getMaxRetries()
+        forced_conflicts = cfg.getForceConflicts()
+        max_retries = cfg.getMaxRetries()
         result = None
 
         self._invokeMethodBefore()
