@@ -19,6 +19,7 @@
 
 from datetime import datetime
 
+import icalendar
 import pytz
 from babel.dates import get_timezone
 from sqlalchemy import Time, Date
@@ -27,11 +28,12 @@ from werkzeug.datastructures import OrderedMultiDict
 
 from indico.core.config import Config
 from indico.modules.rb.controllers import rb_check_user_access
-from indico.modules.rb.models.reservations import Reservation, RepeatMapping
+from indico.modules.rb.models.reservations import Reservation, RepeatMapping, RepeatUnit
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
-from indico.util.date_time import utc_to_server
+from indico.util.date_time import utc_to_server, server_to_utc
 from indico.web.http_api import HTTPAPIHook
+from indico.web.http_api.metadata import ical
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 from MaKaC.common.info import HelperMaKaCInfo
@@ -135,6 +137,10 @@ class ReservationHook(RoomBookingHookBase):
     }
     VALID_FORMATS = ('json', 'jsonp', 'xml', 'ics')
 
+    @property
+    def serializer_args(self):
+        return {'ical_serializer': ical_serialize_reservation}
+
     def _getParams(self):
         super(ReservationHook, self)._getParams()
         self._locations = self._pathParams['loclist'].split('-')
@@ -228,6 +234,41 @@ def _serializable_reservation(reservation_data, include_room=False):
         data['occurrences'] = [o.to_serializable('__api_public__', converters={datetime: _add_server_tz})
                                for o in reservation_data['occurrences']]
     return data
+
+
+def ical_serialize_repeatability(data):
+    start_dt_utc = data['startDT'].astimezone(pytz.utc)
+    end_dt_utc = data['endDT'].astimezone(pytz.utc)
+    WEEK_DAYS = 'MO TU WE TH FR SA SU'.split()
+    recur = ical.vRecur()
+    recur['until'] = end_dt_utc
+    if data['repeat_unit'] == RepeatUnit.DAY:
+        recur['freq'] = 'daily'
+    elif data['repeat_unit'] == RepeatUnit.WEEK:
+        recur['freq'] = 'weekly'
+        recur['interval'] = data['repeat_step']
+    elif data['repeat_unit'] == RepeatUnit.MONTH:
+        recur['freq'] = 'monthly'
+        recur['byday'] = '{}{}'.format(start_dt_utc.day // 7, WEEK_DAYS[start_dt_utc.weekday()])
+    return recur
+
+
+def ical_serialize_reservation(cal, data, now):
+    start_dt_utc = data['startDT'].astimezone(pytz.utc)
+    end_dt_utc = datetime.combine(data['startDT'].date(), data['endDT'].timetz()).astimezone(pytz.utc)
+
+    event = icalendar.Event()
+    event.set('uid', 'indico-resv-%s@cern.ch' % data['id'])
+    event.set('dtstamp', now)
+    event.set('dtstart', start_dt_utc)
+    event.set('dtend', end_dt_utc)
+    event.set('url', data['bookingUrl'])
+    event.set('summary', data['reason'])
+    event.set('location', u'{}: {}'.format(data['location'], data['room']['fullName']))
+    event.set('description', data['reason'].decode('utf-8') + '\n\n' + data['bookingUrl'])
+    if data['repeat_unit'] != RepeatUnit.NEVER:
+        event.set('rrule', ical_serialize_repeatability(data))
+    cal.add_component(event)
 
 
 def _add_server_tz(dt):

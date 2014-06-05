@@ -153,6 +153,10 @@ class HTTPAPIHook(object):
     def _hasAccess(self, aw):
         return True
 
+    @property
+    def serializer_args(self):
+        return {}
+
     def _getMethodName(self):
         return self.PREFIX + '_' + self._type
 

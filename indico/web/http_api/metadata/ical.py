@@ -18,7 +18,6 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 # python stdlib imports
-import datetime
 import icalendar as ical
 from lxml import html
 
@@ -26,11 +25,7 @@ from lxml import html
 from indico.web.http_api.metadata.serializer import Serializer
 
 # legacy indico imports
-from MaKaC.rb_reservation import RepeatabilityEnum
-from MaKaC.rb_tools import weekNumber
 from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate
-
-WEEK_DAYS = 'MO TU WE TH FR SA SU'.split()
 
 
 class vRecur(ical.vRecur):
@@ -83,39 +78,6 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
     cal.add_component(event)
 
 
-def serialize_repeatability(startDT, endDT, repType):
-    intervals = { RepeatabilityEnum.onceAWeek: 1, RepeatabilityEnum.onceEvery2Weeks: 2, RepeatabilityEnum.onceEvery3Weeks: 3 }
-    recur = ical.vRecur()
-    recur['until'] = endDT
-    if repType == RepeatabilityEnum.daily:
-        recur['freq'] = 'daily'
-    elif repType in intervals.keys():
-        recur['freq'] = 'weekly'
-        recur['interval'] = intervals[repType]
-    elif repType == RepeatabilityEnum.onceAMonth:
-        recur['freq'] = 'monthly'
-        recur['byday'] = str(weekNumber(startDT)) + WEEK_DAYS[startDT.weekday()]
-    return recur
-
-
-def serialize_reservation(cal, fossil, now):
-    event = ical.Event()
-    event.set('uid', 'indico-resv-%s@cern.ch' % fossil['id'])
-    event.set('dtstamp', now)
-    event.set('dtstart', getAdjustedDate(fossil['startDT'], None, "UTC"))
-    event.set('dtend', getAdjustedDate(datetime.datetime.combine(fossil['startDT'].date(), fossil['endDT'].timetz()), None, "UTC"))
-    event.set('url', fossil['bookingUrl'])
-    event.set('summary', fossil['reason'])
-    event.set('location', fossil['location'].decode('utf-8') + ': ' + fossil['room']['fullName'].decode('utf-8'))
-    event.set('description', fossil['reason'].decode('utf-8') + '\n\n' + fossil['bookingUrl'])
-    rrule = None
-    if fossil['repeatability'] is not None:
-        rrule = serialize_repeatability(fossil['startDT'], fossil['endDT'], RepeatabilityEnum.shortname2rep[fossil['repeatability']])
-    if rrule:
-        event.set('rrule', rrule)
-    cal.add_component(event)
-
-
 def serialize_contribs(cal, fossil, now):
     if len(fossil['contributions']) == 0:
         serialize_event(cal, fossil, now)
@@ -156,8 +118,7 @@ class ICalSerializer(Serializer):
         'sessionMetadata': serialize_session,
         'conferenceMetadataWithContribs': serialize_contribs,
         'conferenceMetadataWithSessions': serialize_sessions,
-        'sessionMetadataWithContributions': serialize_contribs,
-        'reservationMetadata': serialize_reservation
+        'sessionMetadataWithContributions': serialize_contribs
     }
 
     @classmethod
@@ -174,7 +135,10 @@ class ICalSerializer(Serializer):
         cal.set('prodid', '-//CERN//INDICO//EN')
         now = nowutc()
         for fossil in results:
-            mapper = ICalSerializer._mappers.get(fossil['_fossil'])
+            if '_fossil' in fossil:
+                mapper = ICalSerializer._mappers.get(fossil['_fossil'])
+            else:
+                mapper = self._extra_args.get('ical_serializer')
             if mapper:
                 mapper(cal, fossil, now)
 

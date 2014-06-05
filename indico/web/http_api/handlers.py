@@ -289,7 +289,7 @@ def handler(prefix, path):
             logger.info('API request: %s?%s' % (path, query))
 
         serializer = Serializer.create(dformat, pretty=pretty, typeMap=typeMap,
-                                       **queryParams)
+                                       **hook.serializer_args)
         if error:
             if not serializer.schemaless:
                 # if our serializer has a specific schema (HTML, ICAL, etc...)

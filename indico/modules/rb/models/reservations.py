@@ -111,7 +111,7 @@ class Reservation(Serializer, db.Model):
         ('booked_for_name', 'bookedForName'), ('details_url', 'bookingUrl'), ('booking_reason', 'reason'),
         ('uses_video_conference', 'usesAVC'), ('needs_video_conference_setup', 'needsAVCSupport'),
         'needs_general_assistance', ('is_confirmed', 'isConfirmed'), ('is_valid', 'isValid'), 'is_cancelled',
-        'is_rejected'
+        'is_rejected', ('location_name', 'location')
     ]
 
     # columns
@@ -260,6 +260,10 @@ class Reservation(Serializer, db.Model):
     @hybrid_property
     def is_repeating(self):
         return self.repeat_unit != RepeatUnit.NEVER
+
+    @property
+    def location_name(self):
+        return self.room.location.name
 
     @property
     def repetition(self):
@@ -988,7 +992,7 @@ class Reservation(Serializer, db.Model):
         return list(diff(self.getSnapShot(), old))
 
     def getLocationName(self):
-        return self.room.location.name
+        return self.location_name
 
     def getReservationModificationInformation(self, old):
         changes, info = self.getSnapShotDiff(old), []
