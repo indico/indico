@@ -394,7 +394,7 @@ class NewBookingFormBase(IndicoForm):
 
 class NewBookingCriteriaForm(NewBookingFormBase):
     room_ids = SelectMultipleField('Rooms', [DataRequired()], coerce=int)
-    flexible_dates_range = RadioField('Flexibile days', coerce=int, default=0, validators=[InputRequired()],
+    flexible_dates_range = RadioField('Flexible days', coerce=int, default=0,
                                       choices=[(0, _('Exact')),
                                                (1, '&plusmn;{}'.format(_('1 day'))),
                                                (2, '&plusmn;{}'.format(_('2 days'))),
