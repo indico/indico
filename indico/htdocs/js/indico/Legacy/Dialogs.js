@@ -577,7 +577,7 @@ extend(IndicoUI.Dialogs,
                        'contribId': intToStr(contId),
                        'subContId': intToStr(subContId),
                        'compile': compileMinutes
-                   });
+                   }, {}, true);
 
                req.state.observe(function(state){
                    if (state == SourceState.Error) {
@@ -602,6 +602,8 @@ extend(IndicoUI.Dialogs,
                       }
                   }
               });
+
+               req.refresh();
 
                changedText.observe(
                    function(value) {
