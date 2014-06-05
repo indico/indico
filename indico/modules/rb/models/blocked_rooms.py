@@ -36,14 +36,17 @@ from indico.util.string import return_ascii
 from indico.util.struct.enum import TitledIntEnum
 
 
+class BlockedRoomState(TitledIntEnum):
+    __titles__ = ['Pending', 'Accepted', 'Rejected']
+    pending = 0
+    accepted = 1
+    rejected = 2
+
+
 class BlockedRoom(db.Model):
     __tablename__ = 'blocked_rooms'
 
-    class State(TitledIntEnum):
-        __titles__ = ['Pending', 'Accepted', 'Rejected']
-        pending = 0
-        accepted = 1
-        rejected = 2
+    State = BlockedRoomState  # make it available here for convenience
 
     # columns
     id = db.Column(
