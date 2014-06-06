@@ -460,8 +460,7 @@ class Reservation(Serializer, db.Model):
             nonbookable_dates = self.room.nonbookable_dates.filter(NonBookableDate.end_date > self.start_date)
             for occurrence in self.occurrences:
                 for nbd in nonbookable_dates:
-                    # TODO: Use NonBookableDate.overlaps or remove that method
-                    if overlaps((nbd.start_date, nbd.end_date), (occurrence.start, occurrence.end)):
+                    if nbd.overlaps(occurrence.start, occurrence.end):
                         if not skip_conflicts:
                             raise ConflictingOccurrences()
                         occurrence.cancel(u'Skipped due to nonbookable date')

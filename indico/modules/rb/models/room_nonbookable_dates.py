@@ -58,4 +58,4 @@ class NonBookableDate(db.Model):
         )
 
     def overlaps(self, st, et):
-        return not (self.start_date >= et or self.end_date <= st)
+        return self.start_date < et and self.end_date > st
