@@ -1,7 +1,35 @@
 <%page args="form=None"/>
 
-% if pre_conflicts and form.submit_prebook:
+% if conflicts:
     <div class="warning-message-box">
+        <div class="message-text">
+            ${ _('Some of your days will not be booked as they overlap with other existing bookings.') }
+            <ul>
+                % for occurrence, overlap in conflicts.iteritems():
+                <li>
+                    ${ format_date(occurrence.start, format='full') }:
+                    <ul>
+                        % for occ in overlap:
+                        <li>
+                            <small>
+                                ${ format_time(occ.start) } -
+                                ${ format_time(occ.end) }
+                                ${ _('by') }
+                                ${ occ.reservation.booked_for_name }
+                                (<a href="${ occ.reservation.details_url }">more info</a>)
+                            </small>
+                        </li>
+                        % endfor
+                    </ul>
+                </li>
+                % endfor
+            </ul>
+        </div>
+    </div>
+% endif
+
+% if pre_conflicts and form.submit_prebook:
+    <div class="info-message-box">
         <div class="message-text">
             % if form.submit_book:
                 <div>
