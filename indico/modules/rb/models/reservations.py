@@ -503,7 +503,7 @@ class Reservation(Serializer, db.Model):
 
         if not user.isRBAdmin() and not room.isOwnedBy(user):
             if room.max_advance_days != 0:
-                advance_days = data['end_date'].data.date() - datetime.today().date()
+                advance_days = data['end_date'].date() - datetime.today().date()
                 if advance_days.days >= room.max_advance_days:
                     msg = 'You cannot book this room more than {} days in advance'
                     raise IndicoError(msg.format(room.max_advance_days))
@@ -512,7 +512,7 @@ class Reservation(Serializer, db.Model):
             bookable_times = room.bookable_times.all()
             if bookable_times:
                 for bt in room.bookable_times:
-                    if bt.fits_period(data['start_date'].data.time(), data['end_date'].data.time()):
+                    if bt.fits_period(data['start_date'].time(), data['end_date'].time()):
                         break
                 else:
                     raise IndicoError('Room cannot be booked at this time')
