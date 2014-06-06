@@ -103,6 +103,13 @@
         % if form.submit_book:
             ${ form.submit_book(class_='i-button highlight') }
         % endif
+        % if not form.submit_book and not form.submit_prebook:
+            <div class="info-message-box">
+                <div class="message-text">
+                    ${ _("You don't have the permission to book this room") }
+                </div>
+            </div>
+        % endif
         ${ form.skip_conflicts() } ${ form.skip_conflicts.label() }
     </div>
 </form>
