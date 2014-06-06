@@ -29,7 +29,6 @@ from indico.modules.rb.models.reservations import RepeatMapping, RepeatUnit
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.utils import next_work_day
 from indico.modules.rb.views import WPRoomBookingBase
-from indico.modules.rb.views.utils import makePercentageString
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
@@ -378,7 +377,7 @@ class WRoomBookingRoomStats(WTemplated):
         wvars['room'] = self._rh._room
         wvars["standalone"] = self._standalone
         wvars["period"] = self._rh._period
-        wvars["kpiAverageOccupation"] = makePercentageString(self._rh._kpiAverageOccupation)
+        wvars["kpiAverageOccupation"] = '{0:.02f}%'.format(self._rh._kpiAverageOccupation * 100)
         # Bookings
         wvars["kbiTotalBookings"] = self._rh._totalBookings
         # Next 9 KPIs

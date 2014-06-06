@@ -23,7 +23,6 @@ Holder of rooms in a place and its map view related data
 
 from datetime import datetime, timedelta, date, time
 
-import pytz
 from sqlalchemy import func, or_, and_
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import select
@@ -177,10 +176,6 @@ class Location(db.Model):
 
     # aspects
 
-    @utils.filtered
-    def filterAspects(self, **filters):
-        return Aspect, self.aspects
-
     def getAspects(self):
         return self.aspects.all()
 
@@ -209,10 +204,6 @@ class Location(db.Model):
         return self.aspects.count() > 0
 
     # room management
-
-    @utils.filtered
-    def filterRooms(self, **filters):
-        return Room, self.rooms
 
     def getRooms(self):
         return self.rooms.all()

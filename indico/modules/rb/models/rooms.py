@@ -445,22 +445,6 @@ class Room(db.Model, Serializer):
             max_advance_days=30
         )
 
-    @staticmethod
-    def getRoomById(rid):
-        return Room.query.get(rid)
-
-    @staticmethod
-    def getRoomsByIds(id_list):
-        q = Room.query
-        if id_list and -1 not in id_list:
-            q = q.filter(Room.id.in_(id_list))
-        return q.all()
-
-    @staticmethod
-    @utils.filtered
-    def filterRooms(**filters):
-        return Room, Room.query
-
     @classmethod
     def find_all(cls, *args, **kwargs):
         """
@@ -739,10 +723,6 @@ class Room(db.Model, Serializer):
 
     # equipments
 
-    @utils.filtered
-    def filterEquipments(self, **filters):
-        return RoomEquipment, self.equipments
-
     def getEquipmentNames(self):
         return self.equipment_names
 
@@ -807,10 +787,6 @@ class Room(db.Model, Serializer):
                    .first()
 
     # attributes
-
-    @utils.filtered
-    def filterAttributes(self, **filters):
-        return RoomAttribute, self.attributes
 
     # def getAttributeByName(self, name):
     #     attribute = (self.attributes

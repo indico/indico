@@ -186,27 +186,3 @@ class DayBar(Serializer):
 
     def __cmp__(self, other):
         return cmp(self.room_details, other.room_details)
-
-
-def updateOldDateStyle(d):
-    for t in ['e', 's']:
-        dt = d['start_date' if t == 's' else 'end_date']
-        for p in ['Day', 'Month', 'Year']:
-            d[t + p] = getattr(dt, p.lower())
-
-
-def getNewDictOnlyWith(d, keys=[], **kw):
-    for k in keys:
-        if k in d:
-            kw[k] = d[k]
-    return kw
-
-
-def makePercentageString(val):
-    """ Converts a float in [0, 1] to a percentage string
-        ex:
-            0.626333 -> 63%
-            0.623333 -> 62%
-    """
-    assert 0 <= val <= 1
-    return '{0:.02f}%'.format(val * 100)

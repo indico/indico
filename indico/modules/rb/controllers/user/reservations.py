@@ -398,9 +398,10 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
 
 
 class RHRoomBookingBookingForm(RHRoomBookingBase):
+    # This class is unused and should be removed soon!
     def _checkParams(self):
         self._form = ReservationForm(prefix='reservation')
-        self._room = Room.getRoomById(int(request.values.get('roomID')))
+        self._room = Room.get(int(request.values.get('roomID')))
         self._infoBookingMode = 'infoBookingMode' in request.values
         self._isAssistenceEmailSetup = getRoomBookingOption('assistanceNotificationEmails')
         self._requireRealUsers = getRoomBookingOption('bookingsForRealUsers')

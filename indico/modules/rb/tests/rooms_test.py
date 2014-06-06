@@ -92,9 +92,9 @@ class TestRoom(DBTest):
         e1 = RoomEquipment(name='eq1')
         e2 = RoomEquipment(name='eq2')
 
-        room = Room.getRoomById(5)
+        room = Room.get(5)
         room.equipments.extend([e1, e2])
         db.session.add(room)
         db.session.commit()
 
-        assert ','.join(['eq1', 'eq2']) == Room.getRoomById(5).getVerboseEquipment()
+        assert ','.join(['eq1', 'eq2']) == Room.get(5).getVerboseEquipment()

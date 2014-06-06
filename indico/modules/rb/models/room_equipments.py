@@ -120,11 +120,6 @@ class RoomEquipment(db.Model):
         return RoomEquipment.query.get(eid)
 
     @staticmethod
-    @utils.filtered
-    def filterEquipments(**filters):
-        return RoomEquipment, RoomEquipment.query
-
-    @staticmethod
     def getEquipments():
         return RoomEquipment.query.all()
 

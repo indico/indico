@@ -40,7 +40,7 @@ from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.modules.rb.models.room_equipments import (ReservationEquipmentAssociation, RoomEquipment,
                                                       RoomEquipmentAssociation)
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.utils import apply_filters, limit_groups, unimplemented, Serializer
+from indico.modules.rb.models.utils import limit_groups, unimplemented, Serializer
 from indico.util.date_time import now_utc, format_date, format_datetime, overlaps
 from indico.util.i18n import _, N_
 from indico.util.string import return_ascii
@@ -961,10 +961,6 @@ class Reservation(Serializer, db.Model):
         return self.notifications.all()
 
     # reservations
-
-    @staticmethod
-    def getReservationCount(**filters):
-        return apply_filters(Reservation.query, Reservation, **filters).count()
 
     def getExcludedDays(self):
         return self.excluded_days.all()

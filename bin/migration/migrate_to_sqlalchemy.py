@@ -356,7 +356,7 @@ def migrate_reservations(rb_root):
     i = 1
     for rid, v in rb_root['Reservations'].iteritems():
         l = Location.getLocationByName(v.locationName)
-        room = Room.getRoomById(v.room.id)
+        room = Room.get(v.room.id)
         if room is None:
             print cformat('  %{red!}skipping resv for dead room {0.room.id}: {0.id} ({0._utcCreatedDT})').format(v)
             continue

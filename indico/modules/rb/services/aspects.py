@@ -20,7 +20,6 @@
 from indico.core.db import db
 from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.utils import intOrDefault
 from MaKaC.services.implementation.base import ServiceBase
 from MaKaC.services.interface.rpc.common import ServiceError
 
@@ -37,11 +36,15 @@ class RoomBookingMapCreateAspect(RoomBookingMapBase):
     def _checkParams(self):
         self._location = Location.getLocationByName(self._param('location'))
         aspect_data = self._param('aspect')
+        try:
+            zoom_level = int(aspect_data.get('zoom_level', '0'))
+        except ValueError:
+            zoom_level = 0
         self._aspect = Aspect(
             name=aspect_data.get('name', ''),
             center_latitude=aspect_data.get('center_latitude', ''),
             center_longitude=aspect_data.get('center_longitude', ''),
-            zoom_level=intOrDefault(aspect_data.get('zoom_level', '0'), default=0),
+            zoom_level=zoom_level,
             top_left_latitude=aspect_data.get('top_left_latitude', ''),
             top_left_longitude=aspect_data.get('top_left_longitude', ''),
             bottom_right_latitude=aspect_data.get('bottom_right_latitude', ''),
