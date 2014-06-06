@@ -24,11 +24,14 @@ import pytz
 from babel.dates import get_timezone
 from sqlalchemy import Time, Date
 from sqlalchemy.sql import cast
-from werkzeug.datastructures import OrderedMultiDict
+from werkzeug.datastructures import OrderedMultiDict, MultiDict
 
 from indico.core.config import Config
+from indico.core.db import db
+from indico.core.errors import IndicoError
 from indico.modules.rb.controllers import rb_check_user_access
-from indico.modules.rb.models.reservations import Reservation, RepeatMapping, RepeatUnit
+from indico.modules.rb.controllers.forms import NewBookingSimpleForm
+from indico.modules.rb.models.reservations import Reservation, RepeatMapping, RepeatUnit, ConflictingOccurrences
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.util.date_time import utc_to_server
@@ -36,6 +39,7 @@ from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.metadata import ical
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
+from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common.info import HelperMaKaCInfo
 
 
@@ -49,9 +53,7 @@ class RoomBookingHookBase(HTTPAPIHook):
         self._occurrences = _yesno(get_query_parameter(self._queryParams, ['occ', 'occurrences'], 'no'))
 
     def _hasAccess(self, aw):
-        if not Config.getInstance().getIsRoomBookingActive():
-            return False
-        return rb_check_user_access(aw.getUser())
+        return Config.getInstance().getIsRoomBookingActive() and rb_check_user_access(aw.getUser())
 
 
 @HTTPAPIHook.register
@@ -152,6 +154,82 @@ class ReservationHook(RoomBookingHookBase):
 
         for room_id, reservation in _export_reservations(self, False, True):
             yield reservation
+
+
+@HTTPAPIHook.register
+class BookRoomHook(HTTPAPIHook):
+    PREFIX = 'api'
+    TYPES = ('roomBooking',)
+    RE = r'bookRoom'
+    GUEST_ALLOWED = False
+    VALID_FORMATS = ('json', 'xml')
+    COMMIT = True
+    HTTP_POST = True
+
+    def _getParams(self):
+        super(BookRoomHook, self)._getParams()
+        self._fromDT = utc_to_server(self._fromDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._fromDT else None
+        self._toDT = utc_to_server(self._toDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._toDT else None
+        if not self._fromDT or not self._toDT or self._fromDT.date() != self._toDT.date():
+            raise HTTPAPIError('from/to must be on the same day')
+
+        username = get_query_parameter(self._queryParams, 'username')
+        avatars = username and filter(None, AuthenticatorMgr().getAvatarByLogin(username).itervalues())
+        if not avatars:
+            raise HTTPAPIError('Username does not exist')
+        elif len(avatars) != 1:
+            raise HTTPAPIError('Ambiguous username ({} users found)'.format(len(avatars)))
+        avatar = avatars[0]
+
+        self._params = {
+            'room_id': get_query_parameter(self._queryParams, 'roomid'),
+            'reason': get_query_parameter(self._queryParams, 'reason'),
+            'booked_for': avatar,
+            'from': self._fromDT,
+            'to': self._toDT
+        }
+        missing = [key for key, val in self._params.iteritems() if not val]
+        if missing:
+            raise HTTPAPIError('Required params missing: {}'.format(', '.join(missing)))
+        self._room = Room.get(self._params['room_id'])
+        if not self._room:
+            raise HTTPAPIError('A room with this ID does not exist')
+
+    def _hasAccess(self, aw):
+        if not Config.getInstance().getIsRoomBookingActive() or not rb_check_user_access(aw.getUser()):
+            return False
+        if self._room.can_be_booked(aw.getUser()):
+            return True
+        elif self._room.can_be_prebooked(aw.getUser()):
+            raise HTTPAPIError('The API only supports direct bookings but this room only allows pre-bookings.')
+        return False
+
+    def api_roomBooking(self, aw):
+        formdata = MultiDict({
+            'start_date': self._params['from'].strftime('%d/%m/%Y %H:%M'),
+            'end_date': self._params['to'].strftime('%d/%m/%Y %H:%M'),
+            'repeat_unit': str(RepeatUnit.NEVER),
+            'repeat_step': '0',
+            'room_id': str(self._room.id),
+            'booked_for_id': self._params['booked_for'].getId(),
+            'contact_email': self._params['booked_for'].getEmail(),
+            'contact_phone': self._params['booked_for'].getTelephone(),
+            'booking_reason': self._params['reason'],
+            'submit_book': True
+        })
+        form = NewBookingSimpleForm(formdata=formdata)
+        form.equipments.query = self._room.find_available_video_conference()
+        if not form.validate():
+            raise HTTPAPIError('Failed to create the booking: {}'.format('  '.join(form.error_list)))
+        try:
+            reservation = Reservation.create_from_form(self._room, form, aw.getUser())
+        except ConflictingOccurrences:
+            raise HTTPAPIError('Failed to create the booking due to conflicts with other bookings')
+        except IndicoError as e:
+            raise HTTPAPIError('Failed to create the booking: {}'.format(e))
+        db.session.add(reservation)
+        db.session.flush()
+        return {'reservationID': reservation.id}
 
 
 def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None):
