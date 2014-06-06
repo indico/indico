@@ -178,6 +178,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
 
         conflicts, pre_conflicts = self._get_all_conflicts(room, form)
         repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
+        can_override = room.can_be_overriden(session.user)
         return WPRoomBookingNewBookingConfirm(self, form=confirm_form, room=room,
                                               start_dt=form.start_date.data,
                                               end_dt=form.end_date.data,
@@ -186,6 +187,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
                                               repeat_msg=repeat_msg,
                                               conflicts=conflicts,
                                               pre_conflicts=pre_conflicts,
+                                              can_override=can_override,
                                               errors=confirm_form.error_list).display()
 
     def _get_all_conflicts(self, room, form):
@@ -290,6 +292,7 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
             self._redirect(url_for('rooms.roomBooking-bookingDetails', booking))
             return
 
+        can_override = room.can_be_overriden(session.user)
         return WPRoomBookingNewBookingSimple(self, form=form, room=room, rooms=rooms,
                                              occurrences=occurrences,
                                              candidates=candidates,
@@ -298,7 +301,8 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
                                              start_dt=form.start_date.data,
                                              end_dt=form.end_date.data,
                                              repeat_unit=form.repeat_unit.data,
-                                             repeat_step=form.repeat_step.data).display()
+                                             repeat_step=form.repeat_step.data,
+                                             can_override=can_override).display()
 
 
 class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):

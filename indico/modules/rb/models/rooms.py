@@ -863,6 +863,9 @@ class Room(db.Model, Serializer):
         """
         return self._can_be_booked(avatar, ignore_admin=ignore_admin)
 
+    def can_be_overriden(self, avatar):
+        return avatar.isRBAdmin() or self.isOwnedBy(avatar)
+
     def can_be_prebooked(self, avatar, ignore_admin=False):
         """
         Reservable rooms can be pre-booked by anyone.
