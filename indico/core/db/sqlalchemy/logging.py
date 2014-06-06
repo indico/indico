@@ -62,12 +62,22 @@ def apply_db_loggers(debug=False):
     @listens_for(Engine, 'before_cursor_execute')
     def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
         context._query_start_time = time.time()
-        msg = 'Start Query:\n    {0[module]}:{0[line]} {0[function]}\n\n{1}\n{2}'
         source_line = _get_sql_line()
-        logger.debug(msg.format(source_line, _prettify_sql(statement),
-                                _prettify_params(parameters) if parameters else '').rstrip(),
+        if source_line:
+            log_msg = 'Start Query:\n    {0[module]}:{0[line]} {0[function]}\n\n{1}\n{2}'.format(
+                source_line,
+                _prettify_sql(statement),
+                _prettify_params(parameters) if parameters else ''
+            ).rstrip()
+        else:
+            # UPDATEs can't be traced back to their source since they are executed only on flush
+            log_msg = 'Start Query:\n{0}\n{1}'.format(
+                _prettify_sql(statement),
+                _prettify_params(parameters) if parameters else ''
+            ).rstrip()
+        logger.debug(log_msg,
                      extra={'sql_log_type': 'start',
-                            'sql_source': source_line['items'],
+                            'sql_source': source_line['items'] if source_line else None,
                             'sql_statement': statement,
                             'sql_params': parameters})
 
