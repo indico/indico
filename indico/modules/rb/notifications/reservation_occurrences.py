@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 from flask import render_template
 
@@ -6,7 +6,7 @@ from indico.core.config import Config
 
 
 def upcoming_occurrence(occurrence):
-    if occurrence.start.date() < datetime.today().date():
+    if occurrence.start.date() < date.today():
         raise ValueError('This reservation occurrence started in the past')
 
     owner = occurrence.reservation.booked_for_user
