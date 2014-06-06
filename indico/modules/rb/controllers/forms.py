@@ -57,20 +57,6 @@ def auto_date(specified_time):
     return datetime.combine(auto_datetime(), specified_time)
 
 
-def repeat_step_check(form, field):
-    if form.repeat_unit.validate(form):
-        if form.repeat_unit.data == RepeatUnit.DAY:
-            pass
-        elif form.repeat_unit.data == RepeatUnit.WEEK:
-            pass
-        elif form.repeat_unit.data == RepeatUnit.MONTH:
-            pass
-        elif form.repeat_unit.data == RepeatUnit.YEAR:
-            pass
-    else:  # this part may be removed
-        raise ValidationError('Repeat Step only makes sense with Repeat Unit')
-
-
 def repeatibility_check(form, field):
     if form.availability.validate(form):
         if form.availability.data == AVAILABILITY_VALUES[1]:
@@ -175,6 +161,7 @@ class IndicoQuerySelectMultipleCheckboxField(IndicoQuerySelectMultipleField):
 
 
 class IndicoField(Field):
+    # DEPRECATED/TO BE REMOVED - DO NOT USE
     def __init__(self, *args, **kw):
         self.parameter_name = kw.pop('parameter_name', None)
         super(IndicoField, self).__init__(*args, **kw)
@@ -227,6 +214,7 @@ class IndicoField(Field):
 
 
 class DateTimeIndicoField(IndicoField, DateTimeField):
+    # DEPRECATED/TO BE REMOVED - DO NOT USE
     def process_formdata(self, raw_data):
         if raw_data:
             try:
@@ -254,6 +242,7 @@ class DateTimeIndicoField(IndicoField, DateTimeField):
 
 
 class MultipleCheckboxIndicoField(IndicoField):
+    # DEPRECATED/TO BE REMOVED - DO NOT USE
     def __init__(self, prefix, *args, **kw):
         self.prefix = prefix
         super(MultipleCheckboxIndicoField, self).__init__(*args, **kw)
@@ -281,6 +270,7 @@ class JSONField(HiddenField):
         return json.dumps(self.data)
 
     def populate_obj(self, obj, name):
+        # We don't want to populate an object with this
         pass
 
 

@@ -22,15 +22,11 @@ Small functions and classes widely used in Room Booking Module.
 """
 
 import json
-import re
-import string
-import struct
-import time
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
+from functools import wraps
+
 from dateutil.relativedelta import MO, TU, WE, TH, FR, SA, SU
 from dateutil.rrule import rrule, DAILY
-from functools import wraps
-from random import randrange
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import class_mapper
 from sqlalchemy.sql import over, func
@@ -41,7 +37,6 @@ from MaKaC.plugins.base import PluginsHolder
 from MaKaC.user import Avatar
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
-from indico.util.date_time import iterdays
 from indico.util.i18n import _
 
 
@@ -104,7 +99,7 @@ def accessChecked(func):
                 else:
                     raise RuntimeError('Unexpected entity type')
 
-            authorized_list = PluginsHolder().getPluginType('RoomBooking').getOption('AuthorisedUsersGroups').getValue()
+            authorized_list = getRoomBookingOption('AuthorisedUsersGroups')
             if authorized_list:
                 return any(map(isAuthorized, authorized_list))
             else:
@@ -223,7 +218,7 @@ def next_work_day(dtstart=None, neglect_time=True):
                       dtstart=dtstart))[0]
 
 
-def single_occurrence_to_reservation(f):
+def proxy_to_reservation_if_single_occurrence(f):
     """Forwards a method call to `self.reservation` if there is only one occurrence."""
     @wraps(f)
     def wrapper(self, *args, **kwargs):

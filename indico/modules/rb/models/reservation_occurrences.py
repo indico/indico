@@ -25,7 +25,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.errors import IndicoError
-from indico.modules.rb.models.utils import single_occurrence_to_reservation, Serializer
+from indico.modules.rb.models.utils import proxy_to_reservation_if_single_occurrence, Serializer
 from indico.util import date_time
 from indico.util.date_time import iterdays
 from indico.util.string import return_ascii
@@ -221,12 +221,12 @@ class ReservationOccurrence(db.Model, Serializer):
             return None, None
         return date_time.get_overlap((self.start, self.end), (occurrence.start, occurrence.end))
 
-    @single_occurrence_to_reservation
+    @proxy_to_reservation_if_single_occurrence
     def cancel(self, reason):
         self.is_cancelled = True
         self.rejection_reason = reason
 
-    @single_occurrence_to_reservation
+    @proxy_to_reservation_if_single_occurrence
     def reject(self, reason):
         # TODO: is_rejected
         print 'REJECT', self, reason
