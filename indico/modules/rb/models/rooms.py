@@ -27,6 +27,7 @@ from dateutil.relativedelta import relativedelta
 from sqlalchemy import and_, func, exists, extract, or_, type_coerce
 from sqlalchemy.dialects.postgresql.base import ARRAY as sa_array
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import cast, literal
 from sqlalchemy.types import Date as sa_date, Time as sa_time
 
@@ -777,14 +778,14 @@ class Room(db.Model, Serializer):
 
     # blocked rooms
 
-    def getBlockedRoom(self, d):
-        return self.blocked_rooms \
-                   .join(BlockedRoom.blocking) \
-                   .filter(
-                       Blocking.is_active_at(d),
-                       BlockedRoom.state == BlockedRoom.State.accepted
-                   ) \
-                   .first()
+    def get_blocked_rooms(self, *dates, **kwargs):
+        states = kwargs.get('states', (BlockedRoom.State.accepted,))
+        return (self.blocked_rooms
+                .options(joinedload(BlockedRoom.blocking))
+                .join(BlockedRoom.blocking)
+                .filter(or_(Blocking.is_active_at(d) for d in dates),
+                        BlockedRoom.state.in_(states))
+                .all())
 
     # attributes
 

@@ -138,7 +138,7 @@ class DBTest(TestCase):
                     ])
 
                     # reservation occurrences
-                    reservation.create_occurrences(True)
+                    reservation.create_occurrences(True, None)
 
                     room.reservations.append(reservation)
             db.session.add(location)

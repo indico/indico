@@ -452,29 +452,43 @@ class Reservation(Serializer, db.Model):
                     conflicts[occurrence][key].append(colliding)
         return conflicts
 
-    def create_occurrences(self, skip_conflicts, check_nonbookable_dates=True):
+    def create_occurrences(self, skip_conflicts, user):
         ReservationOccurrence.create_series_for_reservation(self)
 
         # Check for conflicts with nonbookable periods
-        if check_nonbookable_dates:
+        if not user.isRBAdmin():
             nonbookable_dates = self.room.nonbookable_dates.filter(NonBookableDate.end_date > self.start_date)
             for occurrence in self.occurrences:
                 for nbd in nonbookable_dates:
                     if nbd.overlaps(occurrence.start, occurrence.end):
                         if not skip_conflicts:
                             raise ConflictingOccurrences()
-                        occurrence.cancel(u'Skipped due to nonbookable date')
+                        occurrence.cancel(u'Skipped due to nonbookable date', propagate=False)
                         break
+
+        # Check for conflicts with blockings
+        blocked_rooms = self.room.get_blocked_rooms(*(occurrence.start for occurrence in self.occurrences))
+        for br in blocked_rooms:
+            blocking = br.blocking
+            if blocking.can_be_overridden(user, self.room):
+                continue
+            for occurrence in self.occurrences:
+                if occurrence.is_valid and blocking.is_active_at(occurrence.start.date()):
+                    # Cancel OUR occurrence
+                    msg = u'Skipped due to collision with a blocking ({})'
+                    occurrence.cancel(msg.format(blocking.reason), propagate=False)
 
         # Check for conflicts with other occurrences
         conflicting_occurrences = self.get_conflicting_occurrences()
         for occurrence, conflicts in conflicting_occurrences.iteritems():
+            if not occurrence.is_valid:
+                continue
             if conflicts['confirmed']:
                 if not skip_conflicts:
                     raise ConflictingOccurrences()
                 # Cancel OUR occurrence
                 msg = u'Skipped due to collision with {} reservation(s)'
-                occurrence.cancel(msg.format(len(conflicts['confirmed'])))
+                occurrence.cancel(msg.format(len(conflicts['confirmed'])), propagate=False)
             elif conflicts['pending'] and self.is_confirmed:
                 # Reject OTHER occurrences
                 for conflict in conflicts['pending']:
@@ -524,7 +538,7 @@ class Reservation(Serializer, db.Model):
         reservation.booked_for_name = reservation.booked_for_user.getFullName()
         reservation.is_confirmed = not prebook
         reservation.created_by_user = user
-        reservation.create_occurrences(data.get('skip_conflicts', False), check_nonbookable_dates=not user.isRBAdmin())
+        reservation.create_occurrences(data.get('skip_conflicts', False), user)
         if not any(occ.is_valid for occ in reservation.occurrences):
             raise IndicoError('Reservation has no valid occurrences')
         return reservation

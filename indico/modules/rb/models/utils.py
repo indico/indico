@@ -227,6 +227,8 @@ def single_occurrence_to_reservation(f):
     """Forwards a method call to `self.reservation` if there is only one occurrence."""
     @wraps(f)
     def wrapper(self, *args, **kwargs):
+        if not kwargs.pop('propagate', True):
+            return f(self, *args, **kwargs)
         resv_func = getattr(self.reservation, f.__name__)
         if not self.reservation.is_repeating:
             return resv_func(*args, **kwargs)

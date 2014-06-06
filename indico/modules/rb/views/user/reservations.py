@@ -131,36 +131,45 @@ class RoomBookingCalendarWidget(object):
     def build_days_attrs(self):
         days_data = {}
 
+        if self.specific_room:
+            states = (BlockedRoom.State.accepted, BlockedRoom.State.pending)
+            blocked_rooms = self.specific_room.get_blocked_rooms(*self.iter_days(), states=states)
+        else:
+            blocked_rooms = []
+
         for day in self.iter_days():
             attrs = {'tooltip': '', 'className': ''}
 
-            # TODO waiting for blockings
-            # blocking = self._room.getBlockedDay(day)
-            blocking = False
+            # Lookup the blocking for the day
+            for blocked_room in blocked_rooms:
+                if blocked_room.blocking.is_active_at(day):
+                    break
+            else:
+                blocked_room = None
 
-            if blocking:
-                block = blocking.block
-
-                if block.canOverride(session.user, explicitOnly=True):
+            if blocked_room:
+                blocking = blocked_room.blocking
+                if blocking.can_be_overridden(session.user, explicit_only=True):
                     attrs['className'] = 'blocked_permitted'
-                    attrs['tooltip'] = _(
-                        'Blocked by {0}:\n{1}\n\n<b>You are permitted to '
-                        'override the blocking.</b>'.format(block.createdByUser.getFullName(), block.message))
-                elif blocking.active is True:
-                    if block.canOverride(session.user, self._room):
+                    attrs['tooltip'] = _('Blocked by {0}:\n{1}\n\n<b>You are permitted to override the blocking.</b>') \
+                        .format(blocking.created_by_user.getFullName(), blocking.reason)
+                elif blocked_room.state == BlockedRoom.State.accepted:
+                    if blocking.can_be_overridden(session.user, room=self.specific_room):
                         attrs['className'] = 'blocked_override'
                         attrs['tooltip'] = _(
                             'Blocked by {0}:\n{1}\n\n<b>You own this room or are an administrator '
                             'and are thus permitted to override the blocking. Please use this '
-                            'privilege with care!</b>'.format(block.createdByUser.getFullName(), block.message))
+                            'privilege with care!</b>').format(blocking.created_by_user.getFullName(), blocking.reason)
                     else:
                         attrs['className'] = 'blocked'
-                        attrs['tooltip'] = _('Blocked by {0}:\n{1}'.format(block.createdByUser.getFullName(), block.message))
-                elif blocking.active is None:
+                        attrs['tooltip'] = _('Blocked by {0}:\n{1}').format(blocking.created_by_user.getFullName(),
+                                                                            blocking.reason)
+                elif blocked_room.state == BlockedRoom.State.pending:
                     attrs['className'] = 'preblocked'
                     attrs['tooltip'] = _(
                         'Blocking requested by {0}:\n{1}\n\n'
-                        '<b>If this blocking is approved, any colliding bookings will be rejected!</b>'.format(block.createdByUser.getFullName(), block.message))
+                        '<b>If this blocking is approved, any colliding bookings will be rejected!</b>') \
+                        .format(blocking.created_by_user.getFullName(), blocking.reason)
             days_data[str(day)] = attrs
 
         return days_data
