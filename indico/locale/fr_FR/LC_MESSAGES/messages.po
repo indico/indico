@@ -19867,7 +19867,7 @@ msgid ""
 "Thank you for completing the registration form which has been sent to the"
 " organisers for their attention."
 msgstr ""
-"Merci d'avoir complêter votre formulaire d'inscription qui a été envoyé à"
+"Merci d'avoir complété votre formulaire d'inscription qui a été envoyé à"
 " l'attention des organisateurs."
 
 #: MaKaC/webinterface/tpls/ConfRegistrationFormCreationDone.tpl:32
