@@ -87,8 +87,7 @@
             <div class="info-message-box">
                 <div class="message-text">
                     <h4>${ _('Let us know that you exist!') }</h4>
-                    ${ _('Be part of the ever growing Indico community and choose to receive updated news on latest releases (2-3 times per year) as well as important security warnings.') }<br>
-                    <br>
+                    ${ _('By enabling this service you will receive updated news on latest releases as well as important security warnings.') }<br>
                     ${ _('The following data will be sent back to us:') }
                     <ul>
                         <li>${ _('Contact person') }</li>
@@ -96,14 +95,12 @@
                         <li>${ _('Server URL') }</li>
                         <li>${ _('Name of the organisation') }</li>
                     </ul>
-                    ${ _('Please note that <strong>no private information</strong> will ever be sent to the Indico Project and that you can disable it anytime.') }<br>
-                    <br>
                     ${ _('Alongside the previous data, the following public information will be periodically collected by us:') }
                     <ul>
                         <li>${ _('Server default language') }</li>
                         <li>${ _('Indico version installed') }</li>
                         <li>${ _('Python version used') }</li>
-                        <li>${ _('Statistics data (number of events, contributions, etc...)') }</li>
+                        <li>${ _('Statistical data (number of events, contributions, etc...)') }</li>
                     </ul>
                 </div>
             </div>
