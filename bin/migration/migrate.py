@@ -60,6 +60,7 @@ from indico.util import console, i18n
 from indico.modules.scheduler.tasks import AlarmTask
 from indico.modules.scheduler.tasks.periodic import FoundationSyncTask, CategoryStatisticsUpdaterTask
 from indico.modules.scheduler.tasks.suggestions import CategorySuggestionTask
+from indico.modules.rb.tasks import OccurrenceNotifications
 from indico.modules import ModuleHolder
 from indico.util.redis import avatar_links
 from indico.util.redis import client as redis_client
@@ -967,6 +968,36 @@ def fixIndexesEncoding(dbi, withRBDB, prevVersion):
             words[newKey] = values
         idx.setIndex(words)
         dbi.commit()
+
+
+@since('1.9')
+def addOccurrenceNotificationsTask(dbi, withRBDB, prevVersion):
+    """
+    Add OccurrenceNotificationsTask to scheduler and remove old RoomReservationTask
+    """
+    scheduler_client = Client()
+    scheduler_module = scheduler_client._schedMod
+    old_tasks = []
+
+    for _, task in scheduler_module.getWaitingQueue():
+        if isinstance(task, RoomReservationTask):
+            old_tasks.append(task)
+    for task in scheduler_module._runningList:
+        if isinstance(task, RoomReservationTask):
+            old_tasks.append(task)
+    for finished_task in scheduler_module._finishedIndex.values():
+        task = failed_task._task if hasattr(failed_task, '_task') else failed_task
+        if isinstance(task, RoomReservationTask):
+            scheduler_module._failedIndex.unindex_obj(finished_task)
+    for failed_task in scheduler_module._failedIndex.values():
+        task = failed_task._task if hasattr(failed_task, '_task') else failed_task
+        if isinstance(task, OccurrenceNotifications):
+            scheduler_module._failedIndex.unindex_obj(failed_task)
+    for task in old_tasks:
+        scheduler_client.dequeue(task)
+
+    scheduler_client.enqueue(OccurrenceNotifications(rrule.HOURLY, byminute=0, bysecond=0))
+    dbi.commit()
 
 
 def runMigration(withRBDB=False, prevVersion=parse_version(__version__),

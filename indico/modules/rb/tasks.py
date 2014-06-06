@@ -6,6 +6,7 @@ from sqlalchemy import Date
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.utils import getRoomBookingOption
 from indico.modules.rb.notifications.reservation_occurrences import upcoming_occurrence
 from indico.modules.scheduler.tasks.periodic import PeriodicUniqueTask
 from MaKaC.common.mail import GenericMailer
@@ -14,8 +15,10 @@ from MaKaC.webinterface.mail import GenericNotification
 
 class OccurrenceNotifications(PeriodicUniqueTask):
     def run(self):
-        today = cast(func.now(), Date)
+        if getRoomBookingOption('notificationHour') != datetime.now().hour:
+            return
 
+        today = cast(func.now(), Date)
         occurrences = ReservationOccurrence.find(
             Reservation.is_confirmed,
             ~ReservationOccurrence.is_sent,
