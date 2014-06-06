@@ -65,7 +65,6 @@ class UserEventHook(HTTPAPIHook):
 
     def _getParams(self):
         super(UserEventHook, self)._getParams()
-        self._what = self._pathParams['what']
         self._avatar = None
         # User-specified avatar
         userId = get_query_parameter(self._queryParams, ['uid', 'userid'])
@@ -75,7 +74,7 @@ class UserEventHook(HTTPAPIHook):
                 raise HTTPAPIError('Avatar does not exist')
 
     def _getMethodName(self):
-        return self.PREFIX + '_' + self._what
+        return self.PREFIX + '_' + self._pathParams['what']
 
     def _checkProtection(self, aw):
         if not self._avatar:
