@@ -188,34 +188,9 @@ type ("RoomMap", ["IWidget"],
             var addr = $("<span/>").addClass('mapRoomAddress').text(address);
 
             // "Book" link
-            var bookingUrl = room.booking_url;
-            if($("#isAvailable:checked")) {
-                bookingUrl += '&ignoreSession=on';
-                var domMapping = {
-                    sDay: 'day',
-                    sMonth: 'month',
-                    sYear: 'year',
-                    eDay: 'dayEnd',
-                    eMonth: 'monthEnd',
-                    eYear: 'yearEnd',
-                    repeatability: 'repeatability'
-                }
-                _.each(_.keys(domMapping), function(key) {
-                    bookingUrl += '&' + domMapping[key] + '=' + encodeURIComponent($("#" + key).val());
-                });
-
-                var sTime = $('#sTime').val().split(':');
-                var eTime = $('#eTime').val().split(':');
-                if(sTime.length == 2 && eTime.length == 2) {
-                    bookingUrl += '&hour=' + parseInt(sTime[0], 10);
-                    bookingUrl += '&minute=' + parseInt(sTime[1], 10);
-                    bookingUrl += '&hourEnd=' + parseInt(eTime[0], 10);
-                    bookingUrl += '&minuteEnd=' + parseInt(eTime[1], 10);
-                }
-            }
             var book = $('<a/>')
                         .addClass('mapBookRoomLink')
-                        .attr('href', bookingUrl)
+                        .attr('href', room.booking_url)
                         .attr('target', '_blank')
                         .text($T('Book'));
 
