@@ -139,7 +139,8 @@ class BlockedRoom(db.Model):
                 continue
             reservation.reject(reason)
             log_msg = 'Booking rejected: {}'.format(reason)
-            reservation.add_edit_log(ReservationEditLog(avatar_id=self.blocking.created_by, info=log_msg))
+            reservation.add_edit_log(ReservationEditLog(user_name=self.blocking.created_by_user.getFullName(),
+                                                        info=log_msg))
             emails += reservation.notify_rejection(reason)
 
         for occurrence in occurrences:
@@ -148,7 +149,8 @@ class BlockedRoom(db.Model):
                 continue
             occurrence.reject(reason)
             log_msg = 'Booking occurrence on {} rejected: {}'.format(format_date(occurrence.date), reason)
-            reservation.add_edit_log(ReservationEditLog(avatar_id=self.blocking.created_by, info=log_msg))
+            reservation.add_edit_log(ReservationEditLog(user_name=self.blocking.created_by_user.getFullName(),
+                                                        info=log_msg))
             emails += occurrence.notify_rejection(reason)
 
         if notify_blocker:
