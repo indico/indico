@@ -99,7 +99,6 @@ ${ form.repeat_step(type='hidden') }
             }
 
             if ($(this).val() == '1') {
-                $('#flexibleDatesDiv').hide();
                 $("#flexibleDates input:radio").prop("disabled", true);
             } else {
                 $("#flexibleDates input:radio").prop("disabled", false);

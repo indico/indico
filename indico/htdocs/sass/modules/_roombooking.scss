@@ -321,8 +321,6 @@ a.weekday {
     }
 }
 
-
-
 .bookDateDiv {
     display: inline-block;
     margin-right: 35px;
@@ -332,10 +330,6 @@ a.weekday {
     span {
         color: #777;
     }
-}
-
-#flexibleDatesDiv {
-    margin-top: 20px;
 }
 
 .bookingTitle {
@@ -366,6 +360,10 @@ a.weekday {
         @include border-radius();
         width: 370px;
     }
+}
+
+#vc-options {
+    list-style: none;
 }
 
 .datepicker-info {

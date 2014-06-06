@@ -416,13 +416,11 @@ class NewBookingConfirmForm(NewBookingPeriodForm):
     contact_email = StringField(_('Email'), [InputRequired(), IndicoEmail(multi=True)])
     contact_phone = StringField(_('Telephone'))
     booking_reason = TextAreaField(_('Reason'), [DataRequired()])
-    uses_video_conference = BooleanField(_('I will use Video Conference equipment.'))
+    uses_video_conference = BooleanField(_('I will use videoconference equipment'))
     equipments = IndicoQuerySelectMultipleCheckboxField(_('VC equipment'), get_label=lambda x: x.name)
     needs_video_conference_setup = BooleanField(_('Request assistance for the startup of the videoconference session. '
                                                   'This support is usually performed remotely.'))
-    needs_general_assistance = BooleanField(_('Request assistance for the startup of your meeting. A technician will '
-                                              'be physically present 10 to 15 minutes before the event to help you '
-                                              'start up the room equipment (microphone, projector, etc.).'))
+    needs_general_assistance = BooleanField(_('Request personal assistance for meeting startup'))
     submit_book = SubmitField(_('Create booking'))
     submit_prebook = SubmitField(_('Create pre-booking'))
 
