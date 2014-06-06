@@ -69,7 +69,7 @@ ${ form.repeat_step(type='hidden') }
         $('#sDatePlace, #eDatePlace').datepicker({
             dateformat: 'dd/mm/yy',
             minDate: 0,
-            maxDate: ${ room.max_advance_days if room and room.max_advance_days else 'null' },
+            maxDate: ${ room.max_advance_days - 1 if room and room.max_advance_days else 'null' },
             showButtonPanel: true,
             changeMonth: true,
             changeYear: true,
