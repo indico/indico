@@ -482,16 +482,19 @@ class Reservation(Serializer, db.Model):
                     conflict.reject(u'Rejected due to collision with a confirmed reservation')
 
     @classmethod
-    def create_from_form(cls, room, form, user, prebook=None):
-        """Creates a new reservation based on a NewbookingConfirmForm.
+    def create_from_data(cls, room, data, user, prebook=None):
+        """Creates a new reservation.
 
         :param room: The Room that's being booked.
-        :param form: A :class:`NewBookingConfirmForm` instance containing the
-                     data for the booking.
+        :param data: A dict containing the booking data, usually from a :class:`NewBookingConfirmForm` instance
         :param user: The :class:`Avatar` who creates the booking.
         :param prebook: Instead of determining the booking type from the user's
                         permissions, always use the given mode.
         """
+
+        populate_fields = ('start_date', 'end_date', 'repeat_unit', 'repeat_step', 'room_id', 'booked_for_id',
+                           'contact_email', 'contact_phone', 'booking_reason', 'equipments',
+                           'needs_general_assistance', 'uses_video_conference', 'needs_video_conference_setup')
 
         if prebook is None:
             prebook = not room.can_be_booked(user)
@@ -500,7 +503,7 @@ class Reservation(Serializer, db.Model):
 
         if not user.isRBAdmin() and not room.isOwnedBy(user):
             if room.max_advance_days != 0:
-                advance_days = form.end_date.data.date() - datetime.today().date()
+                advance_days = data['end_date'].data.date() - datetime.today().date()
                 if advance_days.days >= room.max_advance_days:
                     msg = 'You cannot book this room more than {} days in advance'
                     raise IndicoError(msg.format(room.max_advance_days))
@@ -509,20 +512,20 @@ class Reservation(Serializer, db.Model):
             bookable_times = room.bookable_times.all()
             if bookable_times:
                 for bt in room.bookable_times:
-                    if bt.fits_period(form.start_date.data.time(), form.end_date.data.time()):
+                    if bt.fits_period(data['start_date'].data.time(), data['end_date'].data.time()):
                         break
                 else:
                     raise IndicoError('Room cannot be booked at this time')
 
         reservation = cls()
-        form.populate_obj(reservation, skip={'start_date', 'end_date', 'booked_for_name'}, existing_only=True)
+        for field in populate_fields:
+            if field in data:
+                setattr(reservation, field, data[field])
         reservation.room = room
         reservation.booked_for_name = reservation.booked_for_user.getFullName()
         reservation.is_confirmed = not prebook
         reservation.created_by_user = user
-        reservation.start_date = form.start_date.data
-        reservation.end_date = form.end_date.data
-        reservation.create_occurrences(form.skip_conflicts.data, check_nonbookable_dates=not user.isRBAdmin())
+        reservation.create_occurrences(data.get('skip_conflicts', False), check_nonbookable_dates=not user.isRBAdmin())
         if not any(occ.is_valid for occ in reservation.occurrences):
             raise IndicoError('Reservation has no valid occurrences')
         return reservation

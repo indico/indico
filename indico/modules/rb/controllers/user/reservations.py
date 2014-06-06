@@ -245,7 +245,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         else:
             # Otherwise the existence of the book submit button means the user can book
             prebook = 'submit_book' not in form
-        reservation = Reservation.create_from_form(room, form, session.user, prebook)
+        reservation = Reservation.create_from_data(room, form.data, session.user, prebook)
         db.session.add(reservation)
         db.session.flush()
         return reservation

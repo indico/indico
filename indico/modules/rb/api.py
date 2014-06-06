@@ -30,7 +30,6 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.modules.rb.controllers import rb_check_user_access
-from indico.modules.rb.controllers.forms import NewBookingSimpleForm
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping, RepeatUnit, ConflictingOccurrences
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
@@ -172,6 +171,10 @@ class BookRoomHook(HTTPAPIHook):
         self._toDT = utc_to_server(self._toDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._toDT else None
         if not self._fromDT or not self._toDT or self._fromDT.date() != self._toDT.date():
             raise HTTPAPIError('from/to must be on the same day')
+        elif self._fromDT >= self._toDT:
+            raise HTTPAPIError('to must be after from')
+        elif self._fromDT < datetime.now():
+            raise HTTPAPIError('You cannot make bookings in the past')
 
         username = get_query_parameter(self._queryParams, 'username')
         avatars = username and filter(None, AuthenticatorMgr().getAvatarByLogin(username).itervalues())
@@ -205,24 +208,19 @@ class BookRoomHook(HTTPAPIHook):
         return False
 
     def api_roomBooking(self, aw):
-        formdata = MultiDict({
-            'start_date': self._params['from'].strftime('%d/%m/%Y %H:%M'),
-            'end_date': self._params['to'].strftime('%d/%m/%Y %H:%M'),
-            'repeat_unit': str(RepeatUnit.NEVER),
-            'repeat_step': '0',
-            'room_id': str(self._room.id),
+        data = MultiDict({
+            'start_date': self._params['from'],
+            'end_date': self._params['to'],
+            'repeat_unit': RepeatUnit.NEVER,
+            'repeat_step': 0,
+            'room_id': self._room.id,
             'booked_for_id': self._params['booked_for'].getId(),
             'contact_email': self._params['booked_for'].getEmail(),
             'contact_phone': self._params['booked_for'].getTelephone(),
-            'booking_reason': self._params['reason'],
-            'submit_book': True
+            'booking_reason': self._params['reason']
         })
-        form = NewBookingSimpleForm(formdata=formdata)
-        form.equipments.query = self._room.find_available_video_conference()
-        if not form.validate():
-            raise HTTPAPIError('Failed to create the booking: {}'.format('  '.join(form.error_list)))
         try:
-            reservation = Reservation.create_from_form(self._room, form, aw.getUser())
+            reservation = Reservation.create_from_data(self._room, data, aw.getUser())
         except ConflictingOccurrences:
             raise HTTPAPIError('Failed to create the booking due to conflicts with other bookings')
         except IndicoError as e:
