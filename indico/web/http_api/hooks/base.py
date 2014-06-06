@@ -220,11 +220,11 @@ class HTTPAPIHook(object):
                         except ClientDisconnected:
                             transaction.abort()
                             time.sleep(i * 5)
-            except Exception as e:
+                else:
+                    raise HTTPAPIError('An unresolvable database conflict has occured', 500)
+            except Exception:
                 transaction.abort()
-                if isinstance(e, HTTPAPIError):
-                    raise
-                raise HTTPAPIError(str(e))
+                raise
 
         return resultList, extra, complete, self.SERIALIZER_TYPE_MAP
 
