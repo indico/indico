@@ -611,10 +611,15 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
                  return false;
              });
 
-
+         var startDate = parseInt(this.eventData.startDate.time.substring(0,2))*60 + parseInt(this.eventData.startDate.time.substring(3,5));
+         var endDate = parseInt(this.eventData.endDate.time.substring(0,2))*60 + parseInt(this.eventData.endDate.time.substring(3,5));
+         var shifted = "";
+         if ((endDate - startDate) < 20){
+            shifted = " ttentryArrowsShifted";
+         }
          this.arrows = Html.div({},
-                             Html.div({className: "ttentryArrowsBackground"}),
-                             Html.div({className: "ttentryArrows"}, arrowUp, arrowDown));
+                             Html.div({className: "ttentryArrowsBackground" + shifted}),
+                             Html.div({className: "ttentryArrows" + shifted}, arrowUp, arrowDown));
          this.DragAndDropBlockMixin();
      });
 

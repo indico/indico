@@ -5785,6 +5785,10 @@ div.cloneElements {
     width: 450px;
 }
 
+.ttentryArrowsBackground.ttentryArrowsShifted, .ttentryArrows.ttentryArrowsShifted {
+    margin-right: 25px;
+}
+
 .ttentryArrowsBackground {
     padding: 3px;
     position: absolute;
