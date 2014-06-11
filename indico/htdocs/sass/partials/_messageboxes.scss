@@ -22,6 +22,7 @@
 %message-box {
     @include border-radius();
 
+    color: #777;
     padding: 0 0.5em;
     margin-bottom: 18px;
 
@@ -33,12 +34,22 @@
         padding-top: 0.3em;
     }
 
-    & .message-text {
-        color: #777;
+    .message-text {
         font-size: 1.2em;
         padding-left: 2em;
         padding-top: 1px;
         margin: 0.5em 0;
+
+        p:first-child {
+            margin-top: 0;
+        }
+    }
+
+    .message-box-footer {
+        @include single-box-shadow($light-gray, 0, 5px, 5px, -5px, inset);
+        display: block;
+        margin: 0 -0.5em;
+        padding: 0.5em 0.5em;
     }
 }
 
@@ -105,6 +116,10 @@
 
     background-color: #FAFAFA;
     border: 1px solid #DDD;
+
+    .message-box-footer {
+        background: darken(#FAFAFA, 5%);
+    }
 }
 
 .success-message-box {
@@ -116,6 +131,10 @@
 
     &:before {
         color: #CDC;
+    }
+
+    .message-box-footer {
+        background: darken(#EEFAEE, 5%);
     }
 }
 
@@ -129,6 +148,10 @@
     &:before {
         color: #BE9056;
     }
+
+    .message-box-footer {
+        background: darken(#FFF3E2, 5%);
+    }
 }
 
 .error-message-box {
@@ -140,6 +163,10 @@
 
     &:before {
         color: $dark-red;
+    }
+
+    .message-box-footer {
+        background: darken($light-red, 5%);
     }
 }
 
