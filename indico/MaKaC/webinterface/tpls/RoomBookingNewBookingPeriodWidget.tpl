@@ -92,7 +92,13 @@ ${ form.repeat_step(type='hidden') }
         $('#eDatePlace').datepicker('setDate', "${ format_date(form.end_date.data, format='short') }");
 
         $("#repeatability input:radio[name=repeat_unit]").change(function() {
-            if ($(this).val() === '0') {
+            checkFrequency();
+        });
+
+        function checkFrequency() {
+            var frequency = $("#repeatability input:radio[name=repeat_unit]:checked").val();
+
+            if (frequency === '0') {
                 $('#sDatePlaceTitle').text("${ _('Booking date') }");
                 $('#eDatePlaceDiv').hide();
             } else {
@@ -100,18 +106,18 @@ ${ form.repeat_step(type='hidden') }
                 $('#eDatePlaceDiv').show();
             }
 
-            if ($(this).val() == '1') {
+            if (frequency == '1') {
                 $("#flexibleDates input:radio").prop("disabled", true);
             } else {
                 $("#flexibleDates input:radio").prop("disabled", false);
             }
 
-            if ($(this).val() === '0') {
+            if (frequency === '0') {
                 $('#repeat_step').val(0);
             } else {
                 $('#repeat_step').val(1);
             }
-        });
+        }
 
         function combineDatetime() {
             var start_date = moment($('#sDatePlace').datepicker('getDate')).format('D/MM/YYYY');
@@ -145,6 +151,7 @@ ${ form.repeat_step(type='hidden') }
             });
         }
 
+        checkFrequency();
         checkHolidays();
     });
 </script>
