@@ -168,28 +168,6 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         form.equipments.query = room.find_available_video_conference()
         return form
 
-    def _show_confirm(self, room, form, step=None, defaults=None):
-        # form can be PeriodForm or Confirmform depending on the step we come from
-        if step == 2:
-            confirm_form = self._make_confirm_form(room, step, defaults)
-        else:
-            # Step3 => Step3 due to an error in the form
-            confirm_form = form
-
-        conflicts, pre_conflicts = self._get_all_conflicts(room, form)
-        repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
-        can_override = room.can_be_overriden(session.user)
-        return WPRoomBookingNewBookingConfirm(self, form=confirm_form, room=room,
-                                              start_dt=form.start_date.data,
-                                              end_dt=form.end_date.data,
-                                              repeat_unit=form.repeat_unit.data,
-                                              repeat_step=form.repeat_step.data,
-                                              repeat_msg=repeat_msg,
-                                              conflicts=conflicts,
-                                              pre_conflicts=pre_conflicts,
-                                              can_override=can_override,
-                                              errors=confirm_form.error_list).display()
-
     def _get_all_conflicts(self, room, form):
         conflicts = defaultdict(list)
         pre_conflicts = defaultdict(list)
@@ -330,6 +308,26 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
             return NewBookingPeriodForm(formdata=MultiDict(), obj=defaults)
         else:
             return NewBookingPeriodForm()
+
+    def _show_confirm(self, room, form, step=None, defaults=None):
+        # form can be PeriodForm or Confirmform depending on the step we come from
+        if step == 2:
+            confirm_form = self._make_confirm_form(room, step, defaults)
+        else:
+            # Step3 => Step3 due to an error in the form
+            confirm_form = form
+
+        conflicts, pre_conflicts = self._get_all_conflicts(room, form)
+        repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
+        return WPRoomBookingNewBookingConfirm(self, form=confirm_form, room=room,
+                                              start_dt=form.start_date.data,
+                                              end_dt=form.end_date.data,
+                                              repeat_unit=form.repeat_unit.data,
+                                              repeat_step=form.repeat_step.data,
+                                              repeat_msg=repeat_msg,
+                                              conflicts=conflicts,
+                                              pre_conflicts=pre_conflicts,
+                                              errors=confirm_form.error_list).display()
 
     def _process_select_room(self):
         # Step 1: Room(s), dates, repetition selection
