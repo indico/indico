@@ -20,7 +20,7 @@
 import itertools
 import json
 from collections import defaultdict
-from datetime import datetime, time, timedelta
+from datetime import datetime, date, time, timedelta
 from functools import partial
 
 from flask import session
@@ -368,7 +368,7 @@ class NewBookingFormBase(IndicoForm):
             raise ValidationError('Invalid repeat step')
 
     def validate_start_date(self, field):
-        if field.data < datetime.now() and not session.user.isAdmin():
+        if field.data.date() < date.today() and not session.user.isAdmin():
             raise ValidationError(_('The start time cannot be in the past.'))
 
     def validate_end_date(self, field):
