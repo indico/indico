@@ -94,9 +94,11 @@
     }
 
     &.accept {
-        color: #FDFDFD !important;
-        background: $green;
-        border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
+        &:not(.disabled):not(:disabled) {
+            color: #FDFDFD !important;
+            background: $green;
+            border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
+        }
 
         &:hover:not(.disabled):not(:disabled) {
             @include gradient(#0DA500, #0B8D00);
@@ -107,9 +109,11 @@
     }
 
     &.danger {
-        background: $red;
-        border-color: $dark-red;
-        color: #FDFDFD !important;
+        &:not(.disabled):not(:disabled) {
+            background: $red;
+            border-color: $dark-red;
+            color: #FDFDFD !important;
+        }
 
         &:hover:not(.disabled):not(:disabled) {
             @include gradient($red, darken($red, $color-variation));
@@ -126,9 +130,11 @@
     }
 
     &.highlight {
-        background: $blue;
-        border-color: $dark-blue;
-        color: #FDFDFD !important;
+        &:not(.disabled):not(:disabled) {
+            background: $blue;
+            border-color: $dark-blue;
+            color: #FDFDFD !important;
+        }
 
         &:hover:not(.disabled):not(:disabled) {
             @include gradient($blue, darken($blue, $color-variation));
@@ -145,10 +151,12 @@
     }
 
     &.warning {
-        background: $yellow;
-        border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
-        color: #EFEFEF !important;
-        font-weight: normal !important;
+        &:not(.disabled):not(:disabled) {
+            background: $yellow;
+            border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
+            color: #EFEFEF !important;
+            font-weight: normal !important;
+        }
 
         &:hover:not(.disabled):not(:disabled) {
             @include gradient(#F3BB08, #E99E18);
