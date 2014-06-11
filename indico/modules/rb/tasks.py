@@ -4,7 +4,7 @@ from sqlalchemy.sql import func, cast
 from sqlalchemy import Date
 
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.models.reservations import Reservation, RepeatUnit
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.utils import getRoomBookingOption
 from indico.modules.rb.notifications.reservation_occurrences import upcoming_occurrence
@@ -29,4 +29,7 @@ class OccurrenceNotifications(PeriodicUniqueTask):
 
         for occ in occurrences:
             occ.is_sent = True
+            if occ.reservation.repeat_unit == RepeatUnit.DAY:
+                occ.reservation.occurrences.update({'is_sent': True})
+
             GenericMailer.send(GenericNotification(upcoming_occurrence(occ)))
