@@ -22,7 +22,7 @@
 %message-box {
     @include border-radius();
 
-    padding: 0 14px;
+    padding: 0 0.5em;
     margin-bottom: 18px;
 
     &:before {
@@ -30,7 +30,7 @@
         display: block;
         float: left;
         font-size: 1.5em;
-        padding-top: 0.25em;
+        padding-top: 0.3em;
     }
 
     & .message-text {
@@ -113,6 +113,10 @@
 
     background-color: #EEFAEE;
     border: 1px solid #CDC;
+
+    &:before {
+        color: #CDC;
+    }
 }
 
 .warning-message-box {
@@ -121,6 +125,10 @@
 
     background-color: #FFF3E2;
     border: 1px solid #BE9056;
+
+    &:before {
+        color: #BE9056;
+    }
 }
 
 .error-message-box {
@@ -129,6 +137,10 @@
 
     background-color: $light-red;
     border: 1px solid $dark-red;
+
+    &:before {
+        color: $dark-red;
+    }
 }
 
 .error-message-tag {
