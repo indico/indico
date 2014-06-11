@@ -68,7 +68,7 @@ class AccessControlError(IndicoError):
         super(AccessControlError, self).__init__(**kw)
 
     def __str__(self):
-        return _('you are not authorised to access this {0}').format(self.objType)
+        return _('you are not authorised to access this {0}').format(self._object_type)
 
 
 class ConferenceClosedError(IndicoError):
@@ -104,7 +104,7 @@ class ModificationError(AccessControlError):
     """
 
     def __str__(self):
-        return _('you are not authorised to modify this {0}').format(self.objType)
+        return _('you are not authorised to modify this {0}').format(self._object_type)
 
 
 class AdminError(AccessControlError):
@@ -112,7 +112,7 @@ class AdminError(AccessControlError):
     """
 
     def __str__(self):
-        return _('only administrators can access this {0}').format(self.objType)
+        return _('only administrators can access this {0}').format(self._object_type)
 
 
 class WebcastAdminError(AccessControlError):
@@ -120,7 +120,7 @@ class WebcastAdminError(AccessControlError):
     """
 
     def __str__(self):
-        return _('only webcast administrators can access this {0}').format(self.objType)
+        return _('only webcast administrators can access this {0}').format(self._object_type)
 
 
 class TimingError(IndicoError):
