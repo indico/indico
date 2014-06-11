@@ -126,6 +126,20 @@
         return valid;
     }
 
+    function validate_conflict() {
+        var conflictWarnings = $('#conflict-warning, #preconflict-warning');
+        var understood = _.every(conflictWarnings, function(e) {
+            return $(e).prop('checked');
+        });
+    
+        if (understood) {
+            $('#submit_book, #submit_prebook').prop('disabled', false);
+        } else {
+            $('#submit_book, #submit_prebook').prop('disabled', true);
+        }
+    
+        return understood;
+    }
 
     $(function() {
         $('#searchForm').on('submit', function(e) {
@@ -158,5 +172,11 @@
         $('#bookingForm :input').on('input change', function() {
             validateForm();
         });
+
+        $('#conflict-warning, #preconflict-warning').on('change', function() {
+            validate_conflict();
+        });
+
+        validate_conflict();
     });
 })();

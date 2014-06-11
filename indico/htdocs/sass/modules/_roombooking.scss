@@ -25,11 +25,8 @@
 @import "partials/_jquery.indico.clearableinput";
 @import "roombooking/bars";
 @import "roombooking/breadcrumbs";
+@import "roombooking/calendar";
 @import "roombooking/roomselector";
-
-#roomBookingCal {
-    width: 820px;
-}
 
 #searchBookings {
     width: 570px;
@@ -72,6 +69,99 @@
     }
 }
 
+#roomBookingTable {
+    sub, sup {
+        top: -0.2em;
+        right: -0.1em;
+    }
+
+    sub {
+        top: 0.2em;
+        right: 0.1em;
+    }
+
+    td.ui-datepicker-week-end {
+        a, span {
+            background: lighten($gray, $color-variation);
+
+            &.ui-state-hover,
+            &.ui-state-active {
+                background: $blue;
+            }
+        }
+    }
+}
+
+#mapOfRoomAvailabilityForm {
+
+    .subFieldWidth {
+        width: 60px;
+    }
+
+    #repeatability {
+        width: 115px;
+    }
+
+    .dateField input {
+        width: 137px;
+    }
+}
+
+#datePeriod {
+    .datepicker {
+        display: inline-block;
+        margin-right: 35px;
+
+        .datepicker-title {
+            @include border-radius();
+            background: $light-blue;
+            font-size: 1.1em;
+            font-weight: bold;
+            height: 2em;
+            line-height: 2em;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+    }
+
+    .datepicker-info {
+        display: inline-block;
+        vertical-align: top;
+        width: 300px;
+
+        margin-top: 36px;
+    }
+}
+
+#bookedForInfo {
+    .group {
+        position: relative;
+
+        i.info-helper {
+            position: absolute;
+            right: -18px;
+            top: 6px;
+        }
+    }
+
+    .i-button.label {
+        width: 130px;
+    }
+
+    input[type=text] {
+        width: 240px;
+    }
+
+    textarea {
+        @include border-radius();
+        width: 370px;
+    }
+}
+
+#videoconferenceOptions {
+    list-style: none;
+}
+
 .tip {
     border:solid 1px #888888;
     color:#222222;
@@ -92,75 +182,6 @@
 .tip-no-borders {
     @extend .tip;
     border: none;
-}
-
-.dayDiv {
-    position: relative;
-    height: 10px;
-    font-size:0px;
-    margin-top: 6px;
-}
-
-.dayCalendarDiv {
-    position: relative;
-    height: 20px;
-    font-size:0px;
-    display: inline-block;
-    vertical-align: middle;
-
-    & .time-bar {
-        background: image-url('../images/rb_timebar_bg.png');
-        width: 675px;
-        height: 20px;
-    }
-}
-
-.dayCalendarDivHeader {
-    height: 20px;
-    font-size:0px;
-    margin-top: 6px;
-    margin-left: 120px;
-    position: relative;
-}
-
-div.calHour {
-    margin-top: 2px;
-    position: absolute;
-    font-size: 8px;
-    height: 20px;
-    color: #666;
-}
-
-.room-row {
-    min-height: 20px;
-    width: 100%;
-    margin-bottom: 5px;
-    clear: both;
-
-    & .link {
-        line-height: 20px;
-        width: 120px;
-        padding-left: 5px;
-        display: inline-block;
-        vertical-align: middle;
-    }
-}
-
-.wholeDayCalendarDiv {
-    clear: both;
-    float: left;
-    width: 800px;
-    padding-bottom: 20px;
-    margin-bottom: 10px;
-    overflow: hidden;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.wholeDayCalendarDayHighlight {
-    background-color: #D9EDF7;
-    padding: 5px 0px 0px 5px;
 }
 
 /* Form fields: field description width. */
@@ -267,107 +288,11 @@ a.weekday {
     background-color: white;
 }
 
-#roomBookingTable {
-    sub, sup {
-        top: -0.2em;
-        right: -0.1em;
-    }
-
-    sub {
-        top: 0.2em;
-        right: 0.1em;
-    }
-
-    td.ui-datepicker-week-end {
-        a, span {
-            background: lighten($gray, $color-variation);
-
-            &.ui-state-hover,
-            &.ui-state-active {
-                background: $blue;
-            }
-        }
-    }
-}
-
-#mapOfRoomAvailabilityForm {
-
-    .subFieldWidth {
-        width: 60px;
-    }
-
-    #repeatability {
-        width: 115px;
-    }
-
-    .dateField input {
-        width: 137px;
-    }
-}
-
-#eTime,
-#sTime {
-    width: 5em;
-}
-
-#sDatePlaceDiv,
-#eDatePlaceDiv {
-
-    #sDatePlaceTitle,
-    #eDatePlaceTitle {
-        font-size: 1.1em;
-        padding-bottom: 10px;
-        text-align: center;
-    }
-}
-
-.bookDateDiv {
-    display: inline-block;
-    margin-right: 35px;
-    padding: 10px;
-    background-color: #FAFAFA;
-
-    span {
-        color: #777;
-    }
-}
-
 .bookingTitle {
    border-bottom: 1px solid #eaeaea;
-   padding-top: 15px;
+   padding-top: 2.6em;
 }
 
-#bookedForInfo {
-    .group {
-        position: relative;
-
-        i.info-helper {
-            position: absolute;
-            right: -18px;
-            top: 6px;
-        }
-    }
-
-    .i-button.label {
-        width: 130px;
-    }
-
-    input[type=text] {
-        width: 240px;
-    }
-
-    textarea {
-        @include border-radius();
-        width: 370px;
-    }
-}
-
-#vc-options {
-    list-style: none;
-}
-
-.datepicker-info {
-    display: inline-block;
-    vertical-align: top;
-    width: 300px;
+.new-booking-message-box {
+    width: 820px;
 }

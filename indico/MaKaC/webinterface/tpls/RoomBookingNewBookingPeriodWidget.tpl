@@ -25,13 +25,13 @@
 </div>
 
 <!-- Datepicker -->
-<div>
-    <div id="sDatePlaceDiv" class="bookDateDiv" style="clear: both;">
-        <div id="sDatePlaceTitle" class="label">${ _('Booking date') }</div>
+<div id="datePeriod">
+    <div id="sDatePlaceDiv" class="datepicker" style="clear: both;">
+        <div id="sDatePlaceTitle" class="datepicker-title">${ _('Booking date') }</div>
         <div id="sDatePlace"></div>
     </div>
-    <div id="eDatePlaceDiv" class="bookDateDiv" style="display:none;">
-        <div id='eDatePlaceTitle' class='label'>${ _('End date') }</div>
+    <div id="eDatePlaceDiv" class="datepicker" style="display:none;">
+        <div id='eDatePlaceTitle' class='datepicker-title'>${ _('End date') }</div>
         <div id="eDatePlace"></div>
     </div>
     <div class="datepicker-info">

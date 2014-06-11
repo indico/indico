@@ -74,8 +74,13 @@
 </table>
 
 % if room.needs_video_conference_setup:
-    <div class="warningMessage" style="text-align: left; max-width: 600px; margin: 3em 1em 1em 1em;">
-        ${ _("The conference room you have chosen is equipped for video-conferencing and video-projection. If you need this equipment, <strong>do not forget</strong> to select it. If you don't need any of this equipment please <strong>choose another room</strong>, if a suitable one is free on a suitable location for your meeting. Thank you for your understanding.") }
+    <div class="warning-message-box new-booking-message-box" style="margin-top: 2em;">
+        <div class="message-text ">
+            <p>
+                ${ _("The conference room you have chosen is equipped for video-conferencing and video-projection.") }
+            </p>
+            ${ _("If you need this equipment, <strong>do not forget</strong> to select it. If you don't need any of this equipment please <strong>choose another room</strong> unless there is no suitable one available for your meeting.") }
+        </div>
     </div>
 % endif
 

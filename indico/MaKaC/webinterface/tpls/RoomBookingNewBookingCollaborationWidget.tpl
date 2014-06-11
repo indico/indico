@@ -14,7 +14,7 @@
         ${ form.uses_video_conference.label(style='font-weight: normal;') }
         <i class="info-helper" title="${ _('Check ONLY if you are actually going to use it') }"></i>
     </div>
-    <ul id="vc-options" class="weak-hidden">
+    <ul id="videoconferenceOptions" class="weak-hidden">
         % for subfield in [form.needs_video_conference_setup] + eq_list:
             <li class="js-vc-row">
                 ${ subfield() }
@@ -27,9 +27,9 @@
 <script>
     $('#uses_video_conference').on('change', function() {
         if (this.checked) {
-            $('#vc-options').slideDown();
+            $('#videoconferenceOptions').slideDown();
         } else {
-            $('#vc-options').slideUp();
+            $('#videoconferenceOptions').slideUp();
         }
 
         $('.js-vc-row input:checkbox').prop('disabled', !this.checked);

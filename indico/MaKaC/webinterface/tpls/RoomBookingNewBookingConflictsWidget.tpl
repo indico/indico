@@ -1,7 +1,7 @@
 <%page args="form=None"/>
 
 % if conflicts:
-    <div class="warning-message-box">
+    <div class="warning-message-box new-booking-message-box">
         <div class="message-text">
             ${ _('Some of your days will not be booked as they overlap with other existing bookings.') }
             <ul>
@@ -25,11 +25,15 @@
                 % endfor
             </ul>
         </div>
+        <div class="message-box-footer">
+            <input type="checkbox" id="conflict-warning" name="conflict-warning">
+            <label for="conflict-warning">${ _('I understand') }</label>
+        </div>
     </div>
 % endif
 
 % if pre_conflicts and form.submit_prebook:
-    <div class="info-message-box">
+    <div class="info-message-box new-booking-message-box">
         <div class="message-text">
             % if form.submit_book:
                 <div>
@@ -61,6 +65,10 @@
                 </li>
                 % endfor
             </ul>
+        </div>
+        <div class="message-box-footer">
+            <input type="checkbox" id="preconflict-warning" name="preconflict-warning">
+            <label for="preconflict-warning">${ _('I understand') }</label>
         </div>
     </div>
 % endif
