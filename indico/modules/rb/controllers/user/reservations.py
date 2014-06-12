@@ -21,6 +21,7 @@ from ast import literal_eval
 from datetime import datetime, time, timedelta, date
 from collections import defaultdict
 
+import dateutil
 from flask import request, session
 from werkzeug.datastructures import MultiDict
 
@@ -67,6 +68,83 @@ class RHRoomBookingBookingDetails(RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _process(self):
         is_new_booking = request.values.get('new_booking', type=bool, default=False)
         return reservation_views.WPRoomBookingBookingDetails(self, is_new_booking=is_new_booking).display()
+
+
+class RHRoomBookingAcceptBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
+    def _checkProtection(self):
+        RHRoomBookingBase._checkProtection(self)
+        if not self._reservation.can_be_accepted(session.user):
+            raise IndicoError("You are not authorized to perform this action")
+
+    def _process(self):
+        if self._reservation.find_overlapping().filter(Reservation.is_confirmed).count():
+            raise IndicoError("This reservation couldn't be accepted due to conflicts with other reservations")
+        self._reservation.accept(session.user)
+        # TODO add flash message
+        self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
+
+
+class RHRoomBookingCancelBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
+    def _checkProtection(self):
+        RHRoomBookingBase._checkProtection(self)
+        if not self._reservation.can_be_cancelled(session.user):
+            raise IndicoError("You are not authorized to perform this action")
+
+    def _process(self):
+        self._reservation.cancel(session.user)
+        # TODO add flash message
+        self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
+
+
+class RHRoomBookingRejectBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
+    def _checkParams(self):
+        RHRoomBookingBookingMixin._checkParams(self)
+        self._reason = request.form.get('reason', u'')
+
+    def _checkProtection(self):
+        RHRoomBookingBase._checkProtection(self)
+        if not self._reservation.can_be_rejected(session.user):
+            raise IndicoError("You are not authorized to perform this action")
+
+    def _process(self):
+        self._reservation.reject(session.user, self._reason)
+        # TODO add flash message
+        self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
+
+
+class RHRoomBookingCancelBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBookingBase):
+    def _checkParams(self):
+        RHRoomBookingBookingMixin._checkParams(self)
+        date = dateutil.parser.parse(request.view_args.get('date'), yearfirst=True).date()
+        self._occurrence = self._reservation.occurrences.filter(ReservationOccurrence.date == date).one()
+
+    def _checkProtection(self):
+        RHRoomBookingBase._checkProtection(self)
+        if not self._reservation.can_be_cancelled(session.user):
+            raise IndicoError("You are not authorized to perform this action")
+
+    def _process(self):
+        self._occurrence.cancel(session.user)
+        # TODO add flash message
+        self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
+
+
+class RHRoomBookingRejectBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBookingBase):
+    def _checkParams(self):
+        RHRoomBookingBookingMixin._checkParams(self)
+        date = dateutil.parser.parse(request.view_args.get('date'), yearfirst=True).date()
+        self._reason = request.form.get('reason', u'')
+        self._occurrence = self._reservation.occurrences.filter(ReservationOccurrence.date == date).one()
+
+    def _checkProtection(self):
+        RHRoomBookingBase._checkProtection(self)
+        if not self._reservation.can_be_rejected(session.user):
+            raise IndicoError("You are not authorized to perform this action")
+
+    def _process(self):
+        self._occurrence.reject(session.user, self._reason)
+        # TODO add flash message
+        self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
 
 
 class RHRoomBookingSearchBookings(RHRoomBookingBase):
@@ -597,222 +675,6 @@ class RHRoomBookingStatement(RHRoomBookingBase):
 
     def _process(self):
         return reservation_views.WPRoomBookingStatement(self).display()
-
-
-class RHRoomBookingAcceptBooking(RHRoomBookingBase):
-    def _checkParams(self):
-        resvID = int(params.get("resvID"))
-        roomLocation = params.get("roomLocation")
-        self._resv = CrossLocationQueries.getReservations(resvID=resvID, location=roomLocation)
-        self._target = self._resv
-
-    def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
-
-        # only do the remaining checks the rest if the basic ones were successful
-        # (i.e. user is logged in)
-        if self._doProcess:
-            user = self._getUser()
-            # Only responsible and admin can ACCEPT
-            if not self._resv.room.isOwnedBy(user) and not self._getUser().isRBAdmin():
-                raise MaKaCError("You are not authorized to take this action.")
-
-    def _process(self):
-        emailsToBeSent = []
-        if len(self._resv.getCollisions(sansID=self._resv.id)) == 0:
-            # No conflicts
-            self._resv.isConfirmed = True
-            self._resv.update()
-            emailsToBeSent += self._resv.notifyAboutConfirmation()
-
-            # Add entry to the booking history
-            info = []
-            info.append("Booking accepted")
-            histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
-            self._resv.getResvHistory().addHistoryEntry(histEntry)
-
-            session['rbActionSucceeded'] = True
-            session['rbTitle'] = _("Booking has been accepted.")
-            session['rbDescription'] = _("NOTE: confirmation e-mail has been sent to the user.")
-            url = urlHandlers.UHRoomBookingBookingDetails.getURL(self._resv)
-            self._redirect(url)  # Redirect to booking details
-        else:
-            errors = ["PRE-Booking conflicts with other (confirmed) bookings."]
-            session['rbActionSucceeded'] = False
-            session['rbCandDataInSession'] = True
-            session['rbErrors'] = errors
-            session['rbShowErrors'] = True
-            session['rbThereAreConflicts'] = True
-
-            session['rbTitle'] = _("PRE-Booking conflicts with other (confirmed) bookings.")
-            session['rbDescription'] = ""
-
-            self._formMode = FormMode.MODIF
-            self._saveResvCandidateToSession(self._resv)
-            url = urlHandlers.UHRoomBookingBookingForm.getURL(self._resv.room)
-            self._redirect(url)  # Redirect to booking details
-
-        for notification in emailsToBeSent:
-            GenericMailer.send(notification)
-
-
-class RHRoomBookingCancelBooking(RHRoomBookingBase):
-    def _checkParams(self, params):
-        resvID = int(params.get("resvID"))
-        roomLocation = params.get("roomLocation")
-        self._resv = CrossLocationQueries.getReservations(resvID=resvID, location=roomLocation)
-        self._target = self._resv
-
-    def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
-        user = self._getUser()
-        # Only owner (the one who created), the requestor(booked for) and admin can CANCEL
-        # (Responsible can not cancel a booking!)
-        if not self._resv.canCancel(user):
-            raise MaKaCError("You are not authorized to take this action.")
-
-    def _process(self):
-        # Booking deletion is always possible - just delete
-        self._resv.cancel()  # Just sets isCancel = True
-        self._resv.update()
-        emailsToBeSent = self._resv.notifyAboutCancellation()
-
-        # Add entry to the booking history
-        info = []
-        info.append("Booking cancelled")
-        histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
-        self._resv.getResvHistory().addHistoryEntry(histEntry)
-
-        for notification in emailsToBeSent:
-            GenericMailer.send(notification)
-
-        session['rbActionSucceeded'] = True
-        session['rbTitle'] = _("Booking has been cancelled.")
-        session['rbDescription'] = _("You have successfully cancelled the booking.")
-        url = urlHandlers.UHRoomBookingBookingDetails.getURL(self._resv)
-        self._redirect(url)  # Redirect to booking details
-
-
-class RHRoomBookingRejectBooking(RHRoomBookingBase):
-    def _checkParams(self, params):
-        resvID = int(params.get("resvID"))
-        roomLocation = params.get("roomLocation")
-        reason = params.get("reason")
-
-        self._resv = CrossLocationQueries.getReservations(resvID=resvID, location=roomLocation)
-        self._resv.rejectionReason = reason
-        self._target = self._resv
-
-    def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
-        user = self._getUser()
-        # Only responsible and admin can REJECT
-        # (Owner can not reject his own booking, he should cancel instead)
-        if not self._resv.room.isOwnedBy(user) and not self._getUser().isRBAdmin():
-            raise MaKaCError("You are not authorized to take this action.")
-
-    def _process(self):
-        self._resv.reject()  # Just sets isRejected = True
-        self._resv.update()
-        emailsToBeSent = self._resv.notifyAboutRejection()
-
-        # Add entry to the booking history
-        info = []
-        info.append("Booking rejected")
-        info.append("Reason : '%s'" % self._resv.rejectionReason)
-        histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
-        self._resv.getResvHistory().addHistoryEntry(histEntry)
-
-        for notification in emailsToBeSent:
-            GenericMailer.send(notification)
-
-        session['rbActionSucceeded'] = True
-        session['rbTitle'] = _("Booking has been rejected.")
-        session['rbDescription'] = _(
-            "NOTE: rejection e-mail has been sent to the user. However, it's advisable to <strong>inform</strong> the user directly. Note that users often don't read e-mails.")
-        url = urlHandlers.UHRoomBookingBookingDetails.getURL(self._resv)
-        self._redirect(url)  # Redirect to booking details
-
-
-class RHRoomBookingCancelBookingOccurrence(RHRoomBookingBase):
-    def _checkParams(self, params):
-        resvID = int(params.get("resvID"))
-        roomLocation = params.get("roomLocation")
-        date = params.get("date")
-
-        self._resv = CrossLocationQueries.getReservations(resvID=resvID, location=roomLocation)
-        self._date = parse_date(date)
-        self._target = self._resv
-
-    def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
-        user = self._getUser()
-        # Only owner (the one who created), the requestor(booked for) and admin can CANCEL
-        # (Owner can not reject his own booking, he should cancel instead)
-        if not self._resv.canCancel(user):
-            raise MaKaCError("You are not authorized to take this action.")
-
-    def _process(self):
-        self._resv.excludeDay(self._date, unindex=True)
-        self._resv.update()
-        emailsToBeSent = self._resv.notifyAboutCancellation(date=self._date)
-
-        # Add entry to the booking history
-        info = []
-        info.append("Booking occurence of the %s cancelled" % self._date.strftime("%d %b %Y"))
-        histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
-        self._resv.getResvHistory().addHistoryEntry(histEntry)
-
-        for notification in emailsToBeSent:
-            GenericMailer.send(notification)
-
-        session['rbActionSucceeded'] = True
-        session['rbTitle'] = _("Selected occurrence has been cancelled.")
-        session['rbDescription'] = _("You have successfully cancelled an occurrence of this booking.")
-        url = urlHandlers.UHRoomBookingBookingDetails.getURL(self._resv)
-        self._redirect(url)  # Redirect to booking details
-
-
-class RHRoomBookingRejectBookingOccurrence(RHRoomBookingBase):
-    def _checkParams(self, params):
-        resvID = int(params.get("resvID"))
-        roomLocation = params.get("roomLocation")
-        reason = params.get("reason")
-        date = params.get("date")
-
-        self._resv = CrossLocationQueries.getReservations(resvID=resvID, location=roomLocation)
-        self._rejectionReason = reason
-        self._date = parse_date(date)
-        self._target = self._resv
-
-    def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
-        user = self._getUser()
-        # Only responsible and admin can REJECT
-        # (Owner can not reject his own booking, he should cancel instead)
-        if not self._resv.room.isOwnedBy(user) and not self._getUser().isRBAdmin():
-            raise MaKaCError("You are not authorized to take this action.")
-
-    def _process(self):
-        self._resv.excludeDay(self._date, unindex=True)
-        self._resv.update()
-        emailsToBeSent = self._resv.notifyAboutRejection(date=self._date, reason=self._rejectionReason)
-
-        # Add entry to the booking history
-        info = []
-        info.append("Booking occurence of the %s rejected" % self._date.strftime("%d %b %Y"))
-        info.append("Reason : '%s'" % self._rejectionReason)
-        histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
-        self._resv.getResvHistory().addHistoryEntry(histEntry)
-
-        for notification in emailsToBeSent:
-            GenericMailer.send(notification)
-
-        session['rbActionSucceeded'] = True
-        session['rbTitle'] = _("Selected occurrence of this booking has been rejected.")
-        session['rbDescription'] = _("NOTE: rejection e-mail has been sent to the user.")
-        url = urlHandlers.UHRoomBookingBookingDetails.getURL(self._resv)
-        self._redirect(url)  # Redirect to booking details
 
 
 class RHRoomBookingRejectAllConflicting(RHRoomBookingBase):

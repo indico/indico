@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-from flask import request
+from flask import request, url_for
 from indico.core.db import db
 
 from indico.core.errors import IndicoError
@@ -38,6 +38,4 @@ class RHRoomBookingDeleteBooking(RHRoomBookingAdminBase):
         # TODO: flash message, redirect to <somewhere>
         # session['rbTitle'] = _("Booking has been deleted.")
         # session['rbDescription'] = _("You have successfully deleted the booking.")
-        # url = urlHandlers.UHRoomBookingStatement.getURL()
-        # self._redirect(url)  # Redirect to deletion confirmation
-        return 'Deleted.'
+        self._redirect(url_for('rooms.roomBooking-search4Bookings'))

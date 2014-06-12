@@ -191,9 +191,7 @@ class Reservation(Serializer, db.Model):
         default=''
     )
     rejection_reason = db.Column(
-        db.String,
-        nullable=False,
-        default=''
+        db.String
     )
     # extras
     uses_video_conference = db.Column(
@@ -401,18 +399,30 @@ class Reservation(Serializer, db.Model):
             return notification_list.value.split(',')
         return []
 
-    def cancel(self, reason=None):
-        self.is_cancelled = True
-        self.rejection_reason = reason
-        self.occurrences.filter_by(is_valid=True).update({'is_cancelled': True, 'rejection_reason': reason},
-                                                         synchronize_session='fetch')
+    def accept(self, user):
+        self.is_confirmed = True
+        self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=['Reservation accepted']))
 
-    def reject(self, reason):
+        valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
+        pre_occurrences = ReservationOccurrence.find_overlapping_with(self.room, valid_occurrences, self.id).all()
+        for occurrence in pre_occurrences:
+            if not occurrence.is_valid:
+                continue
+            occurrence.reject(u'Rejected due to collision with a confirmed reservation')
+
+    def cancel(self, user):
+        self.is_cancelled = True
+        self.occurrences.filter_by(is_valid=True).update({'is_cancelled': True}, synchronize_session='fetch')
+        self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=['Reservation cancelled']))
+
+    def reject(self, user, reason):
         self.is_rejected = True
         self.rejection_reason = reason
         # TODO: use is_rejected once we have it for occurrences
         self.occurrences.filter_by(is_valid=True).update({'is_cancelled': True, 'rejection_reason': reason},
                                                          synchronize_session='fetch')
+        log_msg = 'Reservation rejected: {}'.format(reason)
+        self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
 
     def notify_rejection(self, reason, occurrence_date=None):
         return self.notifyAboutRejection(occurrence_date, reason)
@@ -439,10 +449,11 @@ class Reservation(Serializer, db.Model):
                                 _join=ReservationOccurrence)
 
     def find_overlapping(self):
-        return Reservation.find_overlapping_with(self.room, self.occurrencies, self.id)
+        occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
+        return Reservation.find_overlapping_with(self.room, occurrences, self.id)
 
     def get_conflicting_occurrences(self):
-        valid_occurrences = [occ for occ in self.occurrences if occ.is_valid]
+        valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
         colliding_occurrences = ReservationOccurrence.find_overlapping_with(self.room, valid_occurrences, self.id).all()
         conflicts = defaultdict(lambda: dict(confirmed=[], pending=[]))
         for occurrence in valid_occurrences:
@@ -986,6 +997,9 @@ class Reservation(Serializer, db.Model):
         The one must be logged in to do anything in RB module.
         """
         return True
+
+    def can_be_accepted(self, user):
+        return user and (user.isRBAdmin() or self.room.isOwnedBy(user))
 
     def can_be_modified(self, user):
         if not user:

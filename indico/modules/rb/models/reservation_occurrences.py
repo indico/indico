@@ -20,14 +20,16 @@
 from datetime import datetime
 
 from dateutil import rrule
-from sqlalchemy import or_
+from sqlalchemy import Date, or_
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.sql import cast
 
 from indico.core.db import db
 from indico.core.errors import IndicoError
+from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.utils import proxy_to_reservation_if_single_occurrence, Serializer
 from indico.util import date_time
-from indico.util.date_time import iterdays
+from indico.util.date_time import iterdays, format_date
 from indico.util.string import return_ascii
 
 
@@ -64,6 +66,26 @@ class ReservationOccurrence(db.Model, Serializer):
         db.String
     )
 
+    @hybrid_property
+    def date(self):
+        return self.start.date()
+
+    @date.expression
+    def date(self):
+        return cast(self.start, Date)
+
+    @hybrid_property
+    def is_rejected(self):
+        return self.is_cancelled
+
+    @hybrid_property
+    def is_valid(self):
+        return not self.is_rejected and not self.is_cancelled
+
+    @is_valid.expression
+    def is_valid(self):
+        return ~self.is_rejected & ~self.is_cancelled
+
     @return_ascii
     def __repr__(self):
         return u'<ReservationOccurrence({0}, {1}, {2}, {3}, {4})>'.format(
@@ -73,10 +95,6 @@ class ReservationOccurrence(db.Model, Serializer):
             self.is_cancelled,
             self.is_sent
         )
-
-    @property
-    def date(self):
-        return self.start.date()
 
     @classmethod
     def create_series_for_reservation(cls, reservation):
@@ -222,27 +240,19 @@ class ReservationOccurrence(db.Model, Serializer):
         return date_time.get_overlap((self.start, self.end), (occurrence.start, occurrence.end))
 
     @proxy_to_reservation_if_single_occurrence
-    def cancel(self, reason):
+    def cancel(self, user):
         self.is_cancelled = True
-        self.rejection_reason = reason
+        log_msg = 'Day cancelled: {}'.format(format_date(self.date))
+        self.reservation.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
 
     @proxy_to_reservation_if_single_occurrence
-    def reject(self, reason):
+    def reject(self, user, reason):
         # TODO: is_rejected
-        print 'REJECT', self, reason
-        self.cancel(reason)
-
-    @hybrid_property
-    def is_rejected(self):
-        return self.is_cancelled
-
-    @hybrid_property
-    def is_valid(self):
-        return not self.is_rejected and not self.is_cancelled
-
-    @is_valid.expression
-    def is_valid(self):
-        return ~self.is_rejected & ~self.is_cancelled
+        self.is_cancelled = True
+        self.rejection_reason = reason
+        log = ['Day rejected: {}'.format(format_date(self.date)),
+               'Reason: {}'.format(reason)]
+        self.reservation.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=log))
 
     def notify_cancellation(self):
         return self.reservation.notify_cancellation(self.date)

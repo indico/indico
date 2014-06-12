@@ -29,6 +29,7 @@
         contentDiv = createContentDiv($T("Are you sure you want to <strong>cancel the whole booking</strong>?"), occurs);
         new ConfirmPopup($T("Cancel booking"), contentDiv, function(confirmed) {
             if(confirmed) {
+                $("#reason").val('');
                 $("#submits").attr("action", "${ urlHandlers.UHRoomBookingCancelBooking.getURL(reservation)}");
                 $("#submits").submit();
             }
@@ -37,6 +38,7 @@
     function submit_accept() {
         new ConfirmPopup($T("Accept booking"), $T("Are you sure you want to <strong>accept</strong> this booking?"), function(confirmed) {
             if(confirmed) {
+                $("#reason").val('');
                 $("#submits").attr("action", "${ urlHandlers.UHRoomBookingAcceptBooking.getURL(reservation)}");
                 $("#submits").submit();
             }
@@ -47,7 +49,8 @@
         new ConfirmPopupWithReason($T("Reject booking"), contentDiv, function(confirmed) {
             if(confirmed) {
                 var reason = this.reason.get();
-                $("#submits").attr("action", build_url("${ urlHandlers.UHRoomBookingRejectBooking.getURL(reservation)}", {reason: reason}));
+                $("#reason").val(reason);
+                $("#submits").attr("action", build_url("${ urlHandlers.UHRoomBookingRejectBooking.getURL(reservation)}"));
                 $("#submits").submit();
             }
         }, $T("Yes"), $T("No")).open();
@@ -58,7 +61,8 @@
         new ConfirmPopupWithReason($T("Reject occurrence"), contentDiv, function(confirmed) {
             if(confirmed) {
                 var reason = this.reason.get();
-                $("#submits").attr("action", build_url(action, {reason: reason}));
+                $("#reason").val(reason);
+                $("#submits").attr("action", build_url(action));
                 $("#submits").submit();
             }
         }, $T("Yes"), $T("No")).open();
@@ -67,6 +71,7 @@
         contentDiv = createContentDiv($T("Are you sure you want to <strong>cancel</strong> the booking for the selected date") + " (" + date + ")?");
         new ConfirmPopup($T("Cancel ocurrence"), contentDiv, function(confirmed) {
             if(confirmed) {
+                $("#reason").val('');
                 $("#submits").attr("action", action);
                 $("#submits").submit();
             }
@@ -376,6 +381,7 @@
                     </td>
                     <td>
                     <form id="submits" name="submits" action="" method="post">
+                      <input type="hidden" id="reason" name="reason">
                       <div style="float:left; padding-top: 15px;">
                         % if not reservation.is_cancelled and not reservation.is_rejected:
                           % if can_be_cancelled:
