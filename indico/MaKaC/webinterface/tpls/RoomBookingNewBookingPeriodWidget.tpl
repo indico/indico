@@ -90,6 +90,7 @@ ${ form.repeat_step(type='hidden') }
 
         $('#sDatePlace').datepicker('setDate', "${ format_date(form.start_date.data, format='short') }");
         $('#eDatePlace').datepicker('setDate', "${ format_date(form.end_date.data, format='short') }");
+        $('#eDatePlace').datepicker('option', 'minDate', $('#sDatePlace').datepicker('getDate'));
 
         $("#repeatability input:radio[name=repeat_unit]").change(function() {
             checkFrequency();
