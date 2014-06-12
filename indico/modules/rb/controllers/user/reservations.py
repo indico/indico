@@ -179,10 +179,10 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
 
         candidates = ReservationOccurrence.create_series(form.start_date.data, form.end_date.data,
                                                          (form.repeat_step.data, form.repeat_step.data))
-        occurences = ReservationOccurrence.find_overlapping_with(room, candidates, reservation_id).all()
+        occurrences = ReservationOccurrence.find_overlapping_with(room, candidates, reservation_id).all()
 
         for cand in candidates:
-            for occ in occurences:
+            for occ in occurrences:
                 if cand.overlaps(occ):
                     if occ.reservation.is_confirmed:
                         conflicts[cand].append(occ)

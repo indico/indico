@@ -368,7 +368,7 @@ class WPRoomBookingSearchBookingsResults(WPRoomBookingBase):
             only_pending_bookings = only_confirmed_bookings = False
 
         return self.mapping.get((only_my_rooms, only_pending_bookings, only_confirmed_bookings, only_my_bookings),
-                                _('{} occurences found').format(len(params['occurrences'])))
+                                _('{} occurrences found').format(len(params['occurrences'])))
 
     def _getBody(self, params):
         params['summary'] = self._get_criteria_summary(params)
