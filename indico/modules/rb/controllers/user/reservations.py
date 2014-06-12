@@ -62,7 +62,7 @@ class RHRoomBookingBookingDetails(RHRoomBookingBase):
         self._is_new_booking = request.values.get('new_booking', type=bool, default=False)
 
     def _process(self):
-        return reservation_views.WPRoomBookingBookingDetails(self, self._is_new_booking).display()
+        return reservation_views.WPRoomBookingBookingDetails(self, is_new_booking=self._is_new_booking).display()
 
 
 class RHRoomBookingSearchBookings(RHRoomBookingBase):
