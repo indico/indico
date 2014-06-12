@@ -289,6 +289,15 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
                                              can_override=can_override).display()
 
 
+class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBookingSimple):
+    def _checkParams(self):
+        RHRoomBookingBookingMixin._checkParams(self)
+        self._room = self._reservation.room
+
+    def _make_form(self):
+        return self._make_confirm_form(self._room, defaults=self._reservation, form_class=NewBookingSimpleForm)
+
+
 class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
     def _checkParams(self):
         try:
@@ -723,31 +732,6 @@ class RHRoomBookingRejectBooking(RHRoomBookingBase):
             "NOTE: rejection e-mail has been sent to the user. However, it's advisable to <strong>inform</strong> the user directly. Note that users often don't read e-mails.")
         url = urlHandlers.UHRoomBookingBookingDetails.getURL(self._resv)
         self._redirect(url)  # Redirect to booking details
-
-
-class RHRoomBookingCloneBooking(RHRoomBookingBase):
-    """
-    Performs open a new booking form with the data of an already existing booking.
-    """
-
-    def _checkParams(self, params):
-        # DATA FROM
-        session['rbCandDataInSession'] = True
-
-        self._formMode = FormMode.NEW
-
-        # Reservation ID
-        resvID = int(params.get("resvID"))
-
-        # CREATE CANDIDATE OBJECT
-        candResv = CrossLocationQueries.getReservations(resvID=resvID)
-        if type(candResv) == list:
-            candResv = candResv[0]
-        self._saveResvCandidateToSession(candResv)
-        self._room = candResv.room
-
-    def _process(self):
-        self._redirect(urlHandlers.UHRoomBookingBookingForm.getURL(self._room))
 
 
 class RHRoomBookingCancelBookingOccurrence(RHRoomBookingBase):

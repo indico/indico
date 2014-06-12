@@ -81,10 +81,6 @@
             }
         }, $T("Yes"), $T("No")).open();
     }
-    function submit_clone() {
-        $("#submits").attr("action", "${cloneURL}");
-        $("#submits").submit();
-    }
 </script>
 
 <!-- CONTEXT HELP DIVS -->
@@ -398,7 +394,7 @@
                         % if reservation.can_be_deleted(user):
                           <a class="i-button" href="#" onclick="submit_delete(); return false;">${ _('Delete') }</a>
                         % endif
-                        <a class="i-button" href="#" onclick="submit_clone(); return false;">${ _('Clone') }</a>
+                        <a class="i-button" href="${ cloneURL }">${ _('Clone') }</a>
                       </div>
                     </form>
                   </td>

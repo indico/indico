@@ -118,7 +118,7 @@ rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/delete',
 rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/clone',
                    'roomBooking-cloneBooking',
                    reservation_handlers.RHRoomBookingCloneBooking,
-                   methods=('POST',))
+                   methods=('GET', 'POST'))
 
 rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/<date>/cancel',
                    'roomBooking-cancelBookingOccurrence',
