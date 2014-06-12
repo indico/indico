@@ -1,10 +1,4 @@
 <script type="text/javascript">
-  function submit_stats() {
-      var frm = document.forms['submits'];
-      frm.action = '${ stats_url }';
-      frm.submit();
-  }
-
   function submit_delete() {
     if (confirm(
           "${ _('THIS ACTION IS IRREVERSIBLE. Please note that all archived BOOKINGS WILL BE DELETED with the room. Are you sure you want to DELETE the room?') }"
@@ -343,33 +337,20 @@
                         </td>
                         <td colspan="2">
                           <form id="submits" name="submits" action="#" method="post">
-                            <ul id="button-menu" class="ui-list-menu ui-list-menu-level ui-list-menu-level-0" style="float:left;">
+                            <div style="float:left; padding-top: 15px;">
                               % if room.can_be_booked(user):
-                                <li class="button" style="margin-left: 10px">
-                                  <a href="${ url_for('rooms.room_book', room) }">${ _('Book') }</a>
-                                </li>
+                                <a class="i-button" href="${ url_for('rooms.room_book', room) }">${ _('Book') }</a>
                               % elif room.can_be_prebooked(user):
-                                <li class="button" style="margin-left: 10px">
-                                  <a href="${ url_for('rooms.room_book', room) }">${ _('PRE-Book')}</a>
-                                </li>
+                                <a class="i-button" href="${ url_for('rooms.room_book', room) }">${ _('PRE-Book') }</a>
                               % endif
                               % if room.canBeModifiedBy(user):
-                                <li class="button" style="margin-left: 10px">
-                                  <a href="${ modify_room_url }">${ _('Modify')}</a>
-                                </li>
-                                <li style="display: none"></li>
+                                <a class="i-button" href="${ modify_room_url }">${ _('Modify') }</a>
                               % endif
                               % if room.canBeDeletedBy(user):
-                                <li class="button" style="margin-left: 10px" onclick="submit_delete(); return false;">
-                                  <a href="#" onClick="return false;">${ _('Delete') }</a>
-                                </li>
-                                <li style="display: none"></li>
+                                <a class="i-button" href="#" onclick="submit_delete(); return false;">${ _('Delete') }</a>
                               % endif
-                              <li class="button" style="margin-left: 10px" onclick="submit_stats(); return false;">
-                                <a href="#" onClick="return false;">${ _('Stats')}</a>
-                              </li>
-                              <li style="display: none"></li>
-                            </ul>
+                              <a class="i-button" href="${ stats_url }">${ _('Stats') }</a>
+                            </div>
                           </form>
                         </td>
                       </tr>
