@@ -59,9 +59,10 @@ class RHRoomBookingBookingDetails(RHRoomBookingBase):
         self._reservation = Reservation.get(request.view_args['resvID'])
         if not self._reservation:
             raise IndicoError('No booking with id: {}'.format(resv_id))
+        self._is_new_booking = request.values.get('new_booking', type=bool, default=False)
 
     def _process(self):
-        return reservation_views.WPRoomBookingBookingDetails(self).display()
+        return reservation_views.WPRoomBookingBookingDetails(self, self._is_new_booking).display()
 
 
 class RHRoomBookingSearchBookings(RHRoomBookingBase):
@@ -267,7 +268,7 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
 
         if form.validate_on_submit() and not form.submit_check.data:
             booking = self._create_booking(form, room)
-            self._redirect(url_for('rooms.roomBooking-bookingDetails', booking))
+            self._redirect(url_for('rooms.roomBooking-bookingDetails', booking, new_booking=True))
             return
 
         can_override = room.can_be_overriden(session.user)
@@ -383,8 +384,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
             raise IndicoError('You cannot book this room')
         if form.validate_on_submit():
             booking = self._create_booking(form, room)
-            url = url_for('rooms.roomBooking-bookingDetails', booking)
-            self._redirect(url)
+            self._redirect(url_for('rooms.roomBooking-bookingDetails', booking, new_booking=True))
             return
         # There was an error in the form
         return self._show_confirm(room, form)

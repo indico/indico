@@ -262,19 +262,27 @@ class WRoomBookingBookRoom(WTemplated):
 
 
 class WPRoomBookingBookingDetails(WPRoomBookingBase):
+
+    def __init__(self, rh, _is_new_booking=False):
+        WPRoomBookingBase.__init__(self, rh)
+        self._is_new_booking = _is_new_booking
+
+
     def _setCurrentMenuItem(self):
         self._bookRoomNewOpt.setActive(True)
 
     def _getBody(self, params):
-        return WRoomBookingDetails(self._rh).getHTML(params)
+        return WRoomBookingDetails(self._rh, _is_new_booking=self._is_new_booking).getHTML(params)
 
 
 class WRoomBookingDetails(WTemplated):
-    def __init__(self, rh, conference=None):
+
+    def __init__(self, rh, conference=None, _is_new_booking=False):
         self._rh = rh
         self._reservation = rh._reservation
         self._conf = conference
         self._standalone = (conference is None)
+        self._is_new_booking = _is_new_booking
 
     def getVars(self):
         wvars = WTemplated.getVars(self)
@@ -306,6 +314,7 @@ class WRoomBookingDetails(WTemplated):
         wvars['assistence_emails'] = getRoomBookingOption('assistanceNotificationEmails')
         wvars['edit_logs'] = self._reservation.edit_logs.order_by(ReservationEditLog.timestamp.asc()).all()
         wvars['excluded_days'] = self._reservation.find_excluded_days().all()
+        wvars['_is_new_booking'] = self._is_new_booking
 
         return wvars
 

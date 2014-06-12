@@ -600,3 +600,12 @@
   </tr>
 </table>
 <br />
+
+% if _is_new_booking:
+<script>
+$(document).ready(function() {
+  var userId = "rb-user-${ user.getId() if _session.user else 'not-logged' }";
+  $.jStorage.set(userId, {});
+});
+</script>
+% endif
