@@ -306,7 +306,7 @@ class WRoomBookingDetails(WTemplated):
         wvars['repetition'] = RepeatMapping.getMessage(self._reservation.repeat_unit, self._reservation.repeat_step)
         wvars['vc_equipment'] = ', '.join(eq.name for eq in self._reservation.get_vc_equipment())
         wvars['assistence_emails'] = getRoomBookingOption('assistanceNotificationEmails')
-        wvars['edit_logs'] = self._reservation.edit_logs.order_by(ReservationEditLog.timestamp.asc()).all()
+        wvars['edit_logs'] = self._reservation.edit_logs.order_by(ReservationEditLog.timestamp.desc()).all()
         wvars['excluded_days'] = self._reservation.find_excluded_days().all()
         return wvars
 

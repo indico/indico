@@ -174,7 +174,7 @@
             <table width="90%" align="left" border="0">
               <!-- ROOM -->
               <tr>
-                <td class="bookingDisplayTitleCell">
+                <td class="bookingDisplayTitleCell" style="vertical-align: top;">
                   <span class="titleCellFormat">${ _('Room') }</span>
                 </td>
                 <td>
@@ -223,7 +223,7 @@
               <tr><td>&nbsp;</td></tr>
               <!-- WHEN -->
               <tr>
-                <td class="bookingDisplayTitleCell">
+                <td class="bookingDisplayTitleCell" style="vertical-align: top;">
                   <span class="titleCellFormat">${ _('When') }</span>
                 </td>
                 <td>
@@ -257,7 +257,7 @@
                 <tr><td>&nbsp;</td></tr>
                 <!-- BOOKED FOR -->
                 <tr>
-                  <td class="bookingDisplayTitleCell">
+                  <td class="bookingDisplayTitleCell" style="vertical-align: top;">
                     <span class="titleCellFormat"> ${ _('Booked for') }</span>
                   </td>
                   <td>
@@ -293,7 +293,7 @@
                 <tr><td>&nbsp;</td></tr>
                 <!-- CREATED -->
                 <tr>
-                  <td class="bookingDisplayTitleCell">
+                  <td class="bookingDisplayTitleCell" style="vertical-align: top;">
                     <span class="titleCellFormat"> ${ _('Created') }</span>
                   </td>
                   <td>
@@ -379,7 +379,7 @@
                   </tr>
                   <!-- ACTIONS -->
                   <tr>
-                    <td class="bookingDisplayTitleCell">
+                    <td class="bookingDisplayTitleCell" style="vertical-align: top;">
                       <span class="titleCellFormat">${ _('Actions') }</span>
                     </td>
                     <td>
@@ -396,7 +396,7 @@
                             <a class="i-button" href="#" onclick="submit_reject(); return false;">${ _('Reject') }</a>
                           % endif
                           % if reservation.can_be_modified(user):
-                            <a class="i-button" href="#" onclick="submit_modify(); return false;">${ _('Modify') }</a>
+                            <a class="i-button" href="${ modifyBookingUH.getURL(reservation)}">${ _('Modify') }</a>
                           % endif
                         % endif
                         % if reservation.can_be_deleted(user):
@@ -407,118 +407,61 @@
                     </form>
                   </td>
                 </tr>
-                <!-- TODO: history methods -->
-                % if edit_logs and (reservation.created_by_user == user or reservation.room.isOwnedBy(user) or user.isAdmin()):
+                % if edit_logs and (reservation.created_by_user == user or reservation.room.isOwnedBy(user) or user.isRBAdmin()):
                   <tr><td>&nbsp;</td></tr>
                   <!-- BOOKING HISTORY -->
-                  <script type="text/javascript">
-                    function performSlideOnEntry(entryNum, state) {
-                      if (state) {
-                        IndicoUI.Effect.slide('bookingEntryLine' + entryNum, eval('height' + entryNum));
-                        $E('bookingEntryMoreInfo' + entryNum).set('More Info');
-                        // TODO: fakeLink
-                        $E('bookingEntryMoreInfo' + entryNum).dom.className = "fakeLink bookingDisplayEntryMoreInfo";
-                         } else {
-                             IndicoUI.Effect.slide('bookingEntryLine' + entryNum,  eval('height' + entryNum));
-                             $E('bookingEntryMoreInfo' + entryNum).set('Hide Info');
-                             $E('bookingEntryMoreInfo' + entryNum).dom.className = "fakeLink bookingDisplayEntryHideInfo";
-                         }
-                         return !state
-                    }
-                  </script>
-                <tr>
-                  <td class="bookingDisplayTitleCell">
-                    <span class="titleCellFormat">${ _('Booking History') }</span>
-                  </td>
-                  <td>
-                    <% count = 0 %>
-                    % for entry in edit_logs:
-                      <% info = entry.info.split('```') %>
-                      % if count == 1:
-                        <!-- Construct the divs needed by the sliding effect -->
-                        <div id="bookingHistoryLine" style="visibility: hidden; overflow: hidden;">
-                        <div class="bookingDisplayBookingHistoryLine">
-                      % endif
-                      <div class="bookingHistoryEntry">
-                        <span class="bookingDisplayHistoryTimestamp">
-                          ${ formatDateTime(entry.timestamp) }
-                        </span>
-                        <span class="bookingDisplayHistoryInfo">${ info[0] } ${ _('by') } ${ entry.user_name }
-                        % if len(info) > 1:
-                            <span class='fakeLink bookingDisplayEntryMoreInfo' id='bookingEntryMoreInfo${ count }'>
-                              ${ _('More Info') }
-                            </span>
-                          </span>
-                          <div id="bookingEntryLine${ count }"  style="visibility: hidden; overflow: hidden;">
-                            <div class="bookingDisplayEntryLine">
-                              <ul>
-                                % for elem in info[1:]:
-                                  <li>${ elem }</li>
-                                % endfor
-                              </ul>
-                            </div>
-                          </div>
-                          <script type="text/javascript">
-                            $E('bookingEntryMoreInfo${ count }').dom.onmouseover = function(event) {
-                                IndicoUI.Widgets.Generic.tooltip(
-                                    $E('bookingEntryMoreInfo${ count }').dom, event,
-                                    '<div class="bookingHistoryTooltip">Click here to show / hide detailed information.</div>'
-                                );
-                            };
-                            var showEntryMoreState${ count } = false;
-                            var height${ count } = IndicoUI.Effect.prepareForSlide('bookingEntryLine${ count }', true);
-                            $E('bookingEntryMoreInfo${ count }').observeClick(function () {
-                                showEntryMoreState${ count } = performSlideOnEntry(
-                                    ${ count }, showEntryMoreState${ count }
-                                );
-                            });
+                  <tr>
+                      <td class="bookingDisplayTitleCell" style="vertical-align: top;">
+                        <span class="titleCellFormat">${ _('Booking History') }</span>
+                      </td>
+                      <td>
+                          <dl class="booking-history">
+                              % for i, entry in enumerate(edit_logs):
+                                  % if i == 1:
+                                      </dl>
+                                      <dl class="booking-history old" style="display: none;">
+                                  % endif
+                                  <% info = entry.info.split('```') %>
+                                  <dt>${ formatDateTime(entry.timestamp) }</dt>
+                                  <dd>
+                                      <strong>${ info[0] }</strong> ${ _('by') } ${ entry.user_name }
+                                      % if len(info) > 1:
+                                          (<a class="js-history-show-details" href="#" data-other-text="${ _('Hide Details') }">${ _('Show Details') }</a>)
+                                      % endif
+                                  </dd>
+                                  % for detail in info[1:]:
+                                      <dd style="display: none;">
+                                          ${ detail }
+                                      </dd>
+                                  % endfor
+                              % endfor
+                          </dl>
+                          <a href="#" class="js-history-show-old" data-other-text="${ _('Hide older history') }">${ _('Show older history') }</a>
+                          <script>
+                              $('.js-history-show-details').on('click', function(e) {
+                                  e.preventDefault();
+                                  var $this = $(this);
+                                  var otherText = $this.data('otherText');
+                                  $this.data('otherText', $this.text()).text(otherText);
+                                  $(this).closest('dd').nextUntil(':not(dd)').slideToggle();
+                              });
+
+                              $('.js-history-show-old').on('click', function(e) {
+                                  e.preventDefault();
+                                  var $this = $(this);
+                                  var otherText = $this.data('otherText');
+                                  $this.data('otherText', $this.text()).text(otherText);
+                                  $('.booking-history.old').slideToggle();
+                              });
                           </script>
-                        % else :
-                          </span>
-                        % endif
-                        <% count += 1 %>
-                      </div>
-                    % endfor
-                    % if count > 1:
-                      </div>
-                      </div>
-                      <div class="bookingShowHideHistory">
-                        <span class="fakeLink bookingDisplayShowHistory" id="bookingShowHistory">
-                          ${ _('Show All History') }&nbsp;...
-                        </span>
-                      </div>
-                      <script type="text/javascript">
-                        $E('bookingShowHistory').dom.onmouseover = function(event) {
-                          IndicoUI.Widgets.Generic.tooltip($E('bookingShowHistory').dom, event,
-                            '<div class="bookingHistoryTooltip">Click here to show / hide detailed information.</div>'
-                          );
-                        };
-                        var height = IndicoUI.Effect.prepareForSlide('bookingHistoryLine', true);
-                        var showHistoryState = false;
-                        $E('bookingShowHistory').observeClick(function() {
-                          if (showHistoryState) {
-                            height = IndicoUI.Effect.prepareForSlide('bookingHistoryLine', false);
-                            $E('bookingShowHistory').dom.className = "fakeLink bookingDisplayShowHistory";
-                            IndicoUI.Effect.slide('bookingHistoryLine', height);
-                            $E('bookingShowHistory').set('Show All History ...');
-                          }
-                          else {
-                            $E('bookingShowHistory').dom.className = "fakeLink bookingDisplayHideHistory";
-                            IndicoUI.Effect.slide('bookingHistoryLine', height);
-                            $E('bookingShowHistory').set('Hide All History');
-                          }
-                          showHistoryState = !showHistoryState
-                        });
-                      </script>
-                    % endif
-                  </td>
-                </tr>
-              % endif
+                      </td>
+                  </tr>
+                % endif
               % if reservation.repeat_unit and excluded_days:
                 <tr><td>&nbsp;</td></tr>
                 <!-- Excluded dates -->
                 <tr>
-                  <td class="bookingDisplayTitleCell">
+                  <td class="bookingDisplayTitleCell" style="vertical-align: top;">
                     <span class="titleCellFormat"> ${ _('Excluded days') }</span>
                   </td>
                   <td>
@@ -541,7 +484,7 @@
                 <tr><td>&nbsp;</td></tr>
                 <!-- Occurrences -->
                 <tr>
-                  <td class="bookingDisplayTitleCell">
+                  <td class="bookingDisplayTitleCell" style="vertical-align: top;">
                     <span class="titleCellFormat">${ _('Occurrences') }</span>
                   </td>
                   <td>
@@ -575,7 +518,7 @@
                 <tr><td>&nbsp;</td></tr>
                 <!-- Occurrences -->
                 <tr>
-                  <td class="bookingDisplayTitleCell">
+                  <td class="bookingDisplayTitleCell" style="vertical-align: top;">
                     <span class="titleCellFormat"> ${ _('Conflicts at the same time') }</span>
                   </td>
                   <td>

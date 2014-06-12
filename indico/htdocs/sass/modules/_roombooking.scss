@@ -260,32 +260,19 @@ a.weekday {
     width: 25%;
 }
 
-.bookingShowHideHistory {
-    margin-top: 9px;
-}
+.booking-history {
+    clear: left;
+    margin: 0;
 
-.bookingDisplayEntryMoreInfo, .bookingDisplayEntryHideInfo {
-    white-space: nowrap;
-    padding-left: 7px;
-}
+    dt {
+        float: left;
+        color: #999;
+    }
 
-.bookingDisplayHistoryTimestamp {
-    color: #999;
-    font-size: 11px;
-    display: table-cell;
-    white-space: pre;
-    padding-right: 10px;
-}
-
-.bookingDisplayHistoryInfo {
-    display: table-cell;
-    /* For GChrome and Safari*/
-    width: 1000px;
-}
-
-.bookingHistoryTooltip {
-    padding: 3px;
-    background-color: white;
+    dd {
+        margin-left: 135px;
+        display: block;
+    }
 }
 
 .bookingTitle {
