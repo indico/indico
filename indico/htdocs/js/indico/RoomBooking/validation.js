@@ -124,22 +124,16 @@
         }
 
         return valid;
-    };
+    }
 
     function validate_conflict() {
-        var conflictWarnings = $('#conflict-warning, #preconflict-warning');
-        var understood = _.every(conflictWarnings, function(e) {
-            return $(e).prop('checked');
+        var understood = _.every($('.js-confirm-warning'), function(e) {
+            return e.checked;
         });
 
-        if (understood) {
-            $('#submit_book, #submit_prebook').prop('disabled', false);
-        } else {
-            $('#submit_book, #submit_prebook').prop('disabled', true);
-        }
-
+        $('.js-submit-booking').prop('disabled', !understood);
         return understood;
-    };
+    }
 
     $(function() {
         $('#searchForm').on('submit', function(e) {
@@ -173,7 +167,7 @@
             validateForm();
         });
 
-        $('#conflict-warning, #preconflict-warning').on('change', function() {
+        $('.js-confirm-warning').on('change', function() {
             validate_conflict();
         });
 

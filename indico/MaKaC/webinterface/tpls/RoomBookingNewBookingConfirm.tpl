@@ -98,10 +98,10 @@
 
     <div>
         % if form.submit_prebook:
-            ${ form.submit_prebook(class_='i-button highlight') }
+            ${ form.submit_prebook(class_='i-button highlight js-submit-booking') }
         % endif
         % if form.submit_book:
-            ${ form.submit_book(class_='i-button highlight') }
+            ${ form.submit_book(class_='i-button highlight js-submit-booking') }
         % endif
         % if not form.submit_book and not form.submit_prebook:
             <div class="info-message-box">

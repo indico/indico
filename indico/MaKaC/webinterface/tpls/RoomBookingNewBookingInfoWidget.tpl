@@ -43,7 +43,7 @@
                     $('#booked_for_name').val(users[0].name);
                     $('#booked_for_id').val(users[0].id);
                     $('#contact_email').val(users[0].email);
-                    $('#telephone').val(users[0].phone);
+                    $('#contact_phone').val(users[0].phone);
                 }
             ).execute();
         });

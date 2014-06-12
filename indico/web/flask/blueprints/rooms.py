@@ -92,7 +92,7 @@ rooms.add_url_rule('/show-message',
 
 rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/modify',
                    'roomBooking-modifyBookingForm',
-                   reservation_handlers.RHRoomBookingBookingForm,
+                   reservation_handlers.RHRoomBookingModifyBooking,
                    methods=('GET', 'POST'))
 
 rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/cancel',

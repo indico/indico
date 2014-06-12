@@ -25,13 +25,14 @@ from flask import request, session
 from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
-from indico.core.errors import IndicoError
+from indico.core.errors import IndicoError, AccessError
 from indico.util.date_time import get_datetime_from_request
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.forms import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
-                                                 FormDefaults, NewBookingConfirmForm, NewBookingSimpleForm)
+                                                 FormDefaults, NewBookingConfirmForm, NewBookingSimpleForm,
+                                                 ModifyBookingForm)
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
@@ -41,8 +42,17 @@ from indico.modules.rb.views.user.reservations import (WPRoomBookingSearchBookin
                                                        WPRoomBookingCalendar, WPRoomBookingNewBookingSelectRoom,
                                                        WPRoomBookingNewBookingSelectPeriod,
                                                        WPRoomBookingNewBookingConfirm,
-                                                       WPRoomBookingNewBookingSimple)
+                                                       WPRoomBookingNewBookingSimple, WPRoomBookingModifyBooking)
 from indico.web.flask.util import url_for
+
+
+class RHRoomBookingBookingMixin:
+    """Mixin that retrieves the booking or fails if there is none."""
+    def _checkParams(self):
+        resv_id = request.view_args.get('resvID')
+        self._reservation = Reservation.get(request.view_args['resvID'])
+        if not self._reservation:
+            raise IndicoError('No booking with id: {}'.format(resv_id))
 
 
 class RHRoomBookingBookRoom(RHRoomBookingBase):
@@ -53,16 +63,10 @@ class RHRoomBookingBookRoom(RHRoomBookingBase):
         return reservation_views.WPRoomBookingBookRoom(self).display()
 
 
-class RHRoomBookingBookingDetails(RHRoomBookingBase):
-    def _checkParams(self):
-        resv_id = request.view_args.get('resvID')
-        self._reservation = Reservation.get(request.view_args['resvID'])
-        if not self._reservation:
-            raise IndicoError('No booking with id: {}'.format(resv_id))
-        self._is_new_booking = request.values.get('new_booking', type=bool, default=False)
-
+class RHRoomBookingBookingDetails(RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _process(self):
-        return reservation_views.WPRoomBookingBookingDetails(self, is_new_booking=self._is_new_booking).display()
+        is_new_booking = request.values.get('new_booking', type=bool, default=False)
+        return reservation_views.WPRoomBookingBookingDetails(self, is_new_booking=is_new_booking).display()
 
 
 class RHRoomBookingSearchBookings(RHRoomBookingBase):
@@ -169,13 +173,13 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         form.equipments.query = room.find_available_video_conference()
         return form
 
-    def _get_all_conflicts(self, room, form):
+    def _get_all_conflicts(self, room, form, reservation_id=None):
         conflicts = defaultdict(list)
         pre_conflicts = defaultdict(list)
 
         candidates = ReservationOccurrence.create_series(form.start_date.data, form.end_date.data,
                                                          (form.repeat_step.data, form.repeat_step.data))
-        occurences = ReservationOccurrence.find_overlapping_with(room, candidates).all()
+        occurences = ReservationOccurrence.find_overlapping_with(room, candidates, reservation_id).all()
 
         for cand in candidates:
             for occ in occurences:
@@ -187,7 +191,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
 
         return conflicts, pre_conflicts
 
-    def _get_all_occurrences(self, room_ids, form, flexible_days=0):
+    def _get_all_occurrences(self, room_ids, form, flexible_days=0, reservation_id=None):
         start_dt = form.start_date.data
         end_dt = form.end_date.data
         repeat_unit = form.repeat_unit.data
@@ -202,6 +206,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
 
         occurrences = ReservationOccurrence.find_all(
             Reservation.room_id.in_(room_ids),
+            Reservation.id != reservation_id,
             ReservationOccurrence.start >= flexible_start_dt,
             ReservationOccurrence.end <= flexible_end_dt,
             ReservationOccurrence.is_valid,
@@ -398,6 +403,40 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
             return self._process_confirm()
         else:
             self._redirect(url_for('rooms.book'))
+
+
+class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBookingBase):
+    def _checkProtection(self):
+        if not self._reservation.can_be_modified(session.user):
+            raise AccessError
+
+    def _process(self):
+        room = self._reservation.room
+        form = ModifyBookingForm(obj=self._reservation, old_start_date=self._reservation.start_date.date())
+        form.equipments.query = room.find_available_video_conference()
+
+        if form.is_submitted() and not form.validate():
+            occurrences = {}
+            candidates = {}
+            conflicts = {}
+            pre_conflicts = {}
+        else:
+            occurrences, candidates = self._get_all_occurrences([room.id], form, reservation_id=self._reservation.id)
+            conflicts, pre_conflicts = self._get_all_conflicts(room, form, self._reservation.id)
+
+        if form.validate_on_submit() and not form.submit_check.data:
+            if self._reservation.modify(form.data, session.user):
+                # TODO: flash success message
+                pass
+            self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
+
+        return WPRoomBookingModifyBooking(self, form=form, room=room, rooms=Room.find_all(), occurrences=occurrences,
+                                          candidates=candidates, conflicts=conflicts, pre_conflicts=pre_conflicts,
+                                          start_dt=form.start_date.data, end_dt=form.end_date.data,
+                                          repeat_unit=form.repeat_unit.data,
+                                          repeat_step=form.repeat_step.data,
+                                          reservation=self._reservation,
+                                          can_override=room.can_be_overriden(session.user)).display()
 
 
 class RHRoomBookingBookingForm(RHRoomBookingBase):

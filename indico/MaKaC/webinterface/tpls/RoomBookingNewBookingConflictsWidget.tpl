@@ -1,4 +1,4 @@
-<%page args="form=None"/>
+<%page args="form=None, reservation=None"/>
 
 % if conflicts:
     <div class="warning-message-box new-booking-message-box">
@@ -26,23 +26,31 @@
             </ul>
         </div>
         <div class="message-box-footer">
-            <input type="checkbox" id="conflict-warning" name="conflict-warning">
+            <input type="checkbox" id="conflict-warning" name="conflict-warning" class="js-confirm-warning">
             <label for="conflict-warning">${ _('I understand') }</label>
         </div>
     </div>
 % endif
 
-% if pre_conflicts and form.submit_prebook:
+% if pre_conflicts:
     <div class="info-message-box new-booking-message-box">
         <div class="message-text">
             % if form.submit_book:
                 <div>
                     ${ _('If you book, overlapping days of the following pre-bookings will automatically be rejected.') }
                 </div>
+            % elif reservation and reservation.is_confirmed:
+                <div>
+                    ${ _('If you update this booking, overlapping days of the following pre-bookings will automatically be rejected.') }
+                </div>
             % endif
             % if form.submit_prebook:
                 <div>
                     ${ _('If you pre-book, some of your days may get rejected as they overlap with other existing pre-bookings.') }
+                </div>
+            % elif reservation and not reservation.is_confirmed:
+                <div>
+                    ${ _('If you update this pre-booking, some of your days may get rejected as they overlap with other existing pre-bookings.') }
                 </div>
             % endif
             <ul>
@@ -67,7 +75,7 @@
             </ul>
         </div>
         <div class="message-box-footer">
-            <input type="checkbox" id="preconflict-warning" name="preconflict-warning">
+            <input type="checkbox" id="preconflict-warning" name="preconflict-warning" class="js-confirm-warning">
             <label for="preconflict-warning">${ _('I understand') }</label>
         </div>
     </div>

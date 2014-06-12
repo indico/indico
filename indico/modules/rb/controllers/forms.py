@@ -431,6 +431,21 @@ class NewBookingSimpleForm(NewBookingConfirmForm):
                                                  DataRequired()])
 
 
+class ModifyBookingForm(NewBookingSimpleForm):
+    submit_update = SubmitField(_('Update booking'))
+
+    def __init__(self, *args, **kwargs):
+        self._old_start_date = kwargs.pop('old_start_date')
+        super(ModifyBookingForm, self).__init__(*args, **kwargs)
+        del self.room_id
+        del self.submit_book
+        del self.submit_prebook
+
+    def validate_start_date(self, field):
+        if field.data.date() < self._old_start_date and not session.user.isAdmin():
+            raise ValidationError(_('The start time cannot be moved into the paste.'))
+
+
 class RoomListForm(IndicoForm):
     location_id = IntegerField(validators=[DataRequired(), NumberRange(min=1)])
     free_search = StringField()

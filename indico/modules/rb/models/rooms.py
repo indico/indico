@@ -39,6 +39,7 @@ from MaKaC.errors import MaKaCError
 from MaKaC.user import Avatar, AvatarHolder, GroupHolder
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import greatest, least, static_array
+from indico.core.errors import IndicoError
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
@@ -1118,3 +1119,29 @@ class Room(db.Model, Serializer):
                        ReservationOccurrence.is_cancelled == is_cancelled
                    ) \
                    .all()
+
+    def check_advance_days(self, end_date, user=None, quiet=False):
+        if not self.max_advance_days:
+            return
+        if user and (user.isRBAdmin() or self.isOwnedBy(user)):
+            return
+        advance_days = (end_date - date.today()).days
+        ok = advance_days < self.max_advance_days
+        if quiet:
+            return ok
+        elif not ok:
+            msg = _('You cannot book this room more than {} days in advance')
+            raise IndicoError(msg.format(self.max_advance_days))
+
+    def check_bookable_times(self, start_time, end_time, user=None, quiet=False):
+        if user and (user.isRBAdmin() or self.isOwnedBy(user)):
+            return True
+        bookable_times = self.bookable_times.all()
+        if not bookable_times:
+            return True
+        for bt in bookable_times:
+            if bt.fits_period(start_time, end_time):
+                return True
+        if quiet:
+            return False
+        raise IndicoError('Room cannot be booked at this time')

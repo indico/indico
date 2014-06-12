@@ -716,7 +716,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
             drawReservation: function(bar){
                 // Conflict, prebooking conflict and concurrent prebooking bars don't represent bookings.
                 // They're added to the calendar to highlight some events.
-                if(!(bar.type == 'barPreC' || bar.type == 'barConf' || bar.type == 'barPreConc')) {
+                if(!(bar.type == 'barPreC' || bar.type == 'barConf' || bar.type == 'barPreConc' || bar.type == 'barCand')) {
                     var showBookingLink = Html.p({className:"fakeLink"}, $T("Show"));
                     showBookingLink.observeClick(function(){
                         window.open(bar.url);

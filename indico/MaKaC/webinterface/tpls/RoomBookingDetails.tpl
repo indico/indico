@@ -72,10 +72,6 @@
             }
         }, $T("Yes"), $T("No")).open();
     }
-    function submit_modify() {
-        $("#submits").attr("action", "${ modifyBookingUH.getURL(reservation)}");
-        $("#submits").submit();
-    }
     function submit_delete() {
         contentDiv = createContentDiv($T("This action is irreversible. Are you sure you want to <strong>delete</strong> the booking?"));
         new ConfirmPopup($T("Delete booking"), contentDiv, function(confirmed) {

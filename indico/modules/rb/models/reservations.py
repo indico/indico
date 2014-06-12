@@ -21,7 +21,6 @@
 Schema of a reservation
 """
 from collections import defaultdict, OrderedDict
-from copy import deepcopy
 from datetime import datetime, timedelta
 from operator import attrgetter
 
@@ -36,12 +35,13 @@ from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.errors import IndicoError
 from indico.modules.rb.models import utils
+from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.modules.rb.models.room_equipments import (ReservationEquipmentAssociation, RoomEquipment,
                                                       RoomEquipmentAssociation)
-from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.utils import limit_groups, unimplemented, Serializer
-from indico.util.date_time import now_utc, format_date, format_datetime, overlaps
+from indico.util.date_time import now_utc, format_date, format_datetime, format_time
 from indico.util.i18n import _, N_
 from indico.util.string import return_ascii
 from indico.web.flask.util import url_for
@@ -454,11 +454,14 @@ class Reservation(Serializer, db.Model):
 
     def create_occurrences(self, skip_conflicts, user):
         ReservationOccurrence.create_series_for_reservation(self)
+        db.session.flush()
 
         # Check for conflicts with nonbookable periods
         if not user.isRBAdmin():
             nonbookable_dates = self.room.nonbookable_dates.filter(NonBookableDate.end_date > self.start_date)
             for occurrence in self.occurrences:
+                if not occurrence.is_valid:
+                    continue
                 for nbd in nonbookable_dates:
                     if nbd.overlaps(occurrence.start, occurrence.end):
                         if not skip_conflicts:
@@ -514,21 +517,8 @@ class Reservation(Serializer, db.Model):
             if prebook and not room.can_be_prebooked(user):
                 raise IndicoError('You cannot book this room')
 
-        if not user.isRBAdmin() and not room.isOwnedBy(user):
-            if room.max_advance_days != 0:
-                advance_days = data['end_date'].date() - datetime.today().date()
-                if advance_days.days >= room.max_advance_days:
-                    msg = 'You cannot book this room more than {} days in advance'
-                    raise IndicoError(msg.format(room.max_advance_days))
-
-        if not user.isRBAdmin():
-            bookable_times = room.bookable_times.all()
-            if bookable_times:
-                for bt in room.bookable_times:
-                    if bt.fits_period(data['start_date'].time(), data['end_date'].time()):
-                        break
-                else:
-                    raise IndicoError('Room cannot be booked at this time')
+        room.check_advance_days(data['end_date'].date(), user)
+        room.check_bookable_times(data['start_date'].time(), data['end_date'].time(), user)
 
         reservation = cls()
         for field in populate_fields:
@@ -542,6 +532,121 @@ class Reservation(Serializer, db.Model):
         if not any(occ.is_valid for occ in reservation.occurrences):
             raise IndicoError('Reservation has no valid occurrences')
         return reservation
+
+    def modify(self, data, user):
+        """Modifies an existing reservation.
+
+        :param data: A dict containing the booking data, usually from a :class:`ModifyBookingForm` instance
+        :param user: The :class:`Avatar` who modifies the booking.
+        """
+
+        populate_fields = ('start_date', 'end_date', 'repeat_unit', 'repeat_step', 'booked_for_id',
+                           'contact_email', 'contact_phone', 'booking_reason', 'equipments',
+                           'needs_general_assistance', 'uses_video_conference', 'needs_video_conference_setup')
+        # fields affecting occurrences
+        occurrence_fields = {'start_date', 'end_date', 'repeat_unit', 'repeat_step'}
+        # fields where date and time are compared separately
+        date_time_fields = {'start_date', 'end_date'}
+        # fields for the repetition
+        repetition_fields = {'repeat_unit', 'repeat_step'}
+        # pretty names for logging
+        field_names = {
+            'start_date/date': "start date",
+            'end_date/date': "end date",
+            'start_date/time': "start time",
+            'end_date/time': "end time",
+            'repetition': "booking type",
+            'booked_for_id': "'Booked for' user",
+            'contact_email': "contact email",
+            'contact_phone': "contact phone number",
+            'booking_reason': "booking reason",
+            'equipments': "list of equipment",
+            'needs_general_assistance': "option 'General Assistance'",
+            'uses_video_conference': "option 'Uses Video Conference'",
+            'needs_video_conference_setup': "option 'Video Conference Setup Assistance'"
+        }
+
+        self.room.check_advance_days(data['end_date'].date(), user)
+        self.room.check_bookable_times(data['start_date'].time(), data['end_date'].time(), user)
+
+        changes = {}
+        update_occurrences = False
+        old_repetition = self.repeat_unit, self.repeat_step
+
+        for field in populate_fields:
+            old = getattr(self, field)
+            new = data[field]
+            converter = unicode
+            if field == 'equipments':
+                # Dynamic relationship
+                old = sorted(old.all())
+                converter = lambda x: ', '.join(x.name for x in x)
+            if old != new:
+                # Apply the change
+                setattr(self, field, data[field])
+                # Booked for id updates also update the (redundant) name
+                if field == 'booked_for_id':
+                    old = self.booked_for_name
+                    new = self.booked_for_name = self.booked_for_user.getFullName()
+                # If any occurrence-related field changed we need to recreate the occurrences
+                if field in occurrence_fields:
+                    update_occurrences = True
+                # Record change for history entry
+                if field in date_time_fields:
+                    # The date/time fields create separate entries for the date and time parts
+                    if old.date() != new.date():
+                        changes[field + '/date'] = {'old': old.date(), 'new': new.date(), 'converter': format_date}
+                    if old.time() != new.time():
+                        changes[field + '/time'] = {'old': old.time(), 'new': new.time(), 'converter': format_time}
+                elif field in repetition_fields:
+                    # Repetition needs special handling since it consists of two fields but they are tied together
+                    # We simply update it whenever we encounter such a change; after the last change we end up with
+                    # the correct change data
+                    changes['repetition'] = {'old': old_repetition, 'new': (self.repeat_unit, self.repeat_step),
+                                             'converter': lambda x: RepeatMapping.getMessage(*x)}
+                else:
+                    changes[field] = {'old': old, 'new': new, 'converter': converter}
+
+        if not changes:
+            return False
+
+        # Create a verbose log entry for the modification
+        log = ['Booking modified']
+        for field, change in changes.iteritems():
+            field_title = field_names.get(field, field)
+            converter = change['converter']
+            old = converter(change['old'])
+            new = converter(change['new'])
+            if not old:
+                log.append("The {} was set to '{}'".format(field_title, new))
+            elif not new:
+                log.append("The {} was cleared".format(field_title))
+            else:
+                log.append("The {} was changed from '{}' to '{}'".format(field_title, old, new))
+
+        self.edit_logs.append(ReservationEditLog(user_name=user.getFullName(), info='```'.join(log)))
+
+        # Recreate all occurrence if necessary
+        if update_occurrences:
+            cols = [col.name for col in ReservationOccurrence.__table__.columns
+                    if not col.primary_key and col.name not in {'start', 'end'}]
+
+            old_occurrences = {occ.start: occ for occ in self.occurrences}
+            self.occurrences.delete(synchronize_session='fetch')
+            self.create_occurrences(True, user)
+            db.session.flush()
+            # Restore rejection data etc. for recreated occurrences
+            for occurrence in self.occurrences:
+                old_occurrence = old_occurrences.get(occurrence.start)
+                if old_occurrence:
+                    for col in cols:
+                        setattr(occurrence, col, getattr(old_occurrence, col))
+
+        # Sanity check so we don't end up with an "empty" booking
+        if not any(occ.is_valid for occ in self.occurrences):
+            raise IndicoError('Reservation has no valid occurrences')
+
+        return True
 
     def getSoonestOccurrence(self, d):
         return self.occurrences.filter(ReservationOccurrence.start >= d).first()
@@ -882,15 +987,10 @@ class Reservation(Serializer, db.Model):
         """
         return True
 
-    def canBeViewed(self, accessWrapper):
-        """
-        Reservation details are public - anyone who is
-        authenticated can view.
-        """
-        return True
-
     def can_be_modified(self, user):
         if not user:
+            return False
+        if self.is_rejected or self.is_cancelled:
             return False
         return user.isRBAdmin() or self.created_by_user == user or self.room.isOwnedBy(user) or self.isBookedFor(user)
 
@@ -991,59 +1091,5 @@ class Reservation(Serializer, db.Model):
     def isDayExcluded(self, d):
         return self.ed.filter_by(excluded_day=d).exists()
 
-    def getSnapShot(self):
-        """
-        Creates dynamically a dictionary of the attributes of the object.
-        This dictionary will be mainly used to compare the reservation
-        before and after a modification
-        """
-        return deepcopy(self.__dict__)
-
-    def getSnapShotDiff(self, old):
-        # TODO: dictdiffer
-        return list(diff(self.getSnapShot(), old))
-
     def getLocationName(self):
         return self.location_name
-
-    def getReservationModificationInformation(self, old):
-        changes, info = self.getSnapShotDiff(old), []
-        if changes:
-            info.append(_('Booking modified'))
-            for change in changes:
-                pass
-                # TODO process messages
-                # try:
-                #     attrName = self._attrNamesMap[attr]
-                # except KeyError:
-                #     attrName = attr
-                # try:
-                #     prevValue = self._attrFormatMap[attr](attrDiff[attr]["prev"])
-                # except KeyError, AttributeError:
-                #     prevValue = str(attrDiff[attr]["prev"])
-                # try:
-                #     newValue = self._attrFormatMap[attr](attrDiff[attr]["new"])
-                # except KeyError, AttributeError:
-                #     newValue = str(attrDiff[attr]["new"])
-
-                # if prevValue == "" :
-                #     info.append("The %s was set to '%s'" %(attrName, newValue))
-                # elif newValue == "" :
-                #     info.append("The %s was cleared" %attrName)
-                # else :
-                #     info.append("The %s was changed from '%s' to '%s'" %(attrName, prevValue, newValue))
-        return info
-
-
-class Collision(object):
-
-    def __init__(self, period, resv):
-        self.start_date, self.end_date = period
-        self.collides_with = resv
-
-    def __repr__(self):
-        return '<Collision({0}, {1}, {2})>'.format(
-            self.start_date,
-            self.end_date,
-            self.collides_with.id,
-        )

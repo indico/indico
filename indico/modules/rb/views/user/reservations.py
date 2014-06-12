@@ -413,7 +413,16 @@ class WPRoomBookingNewBookingSimple(WPRoomBookingNewBookingBase):
             params['calendar'] = calendar.render(show_navbar=False)
         else:
             params['calendar'] = ''
-        return WTemplated('RoomBookingNewBookingSimple').getHTML(params)
+        return WTemplated('RoomBookingBookingForm').getHTML(params)
+
+
+class WPRoomBookingModifyBooking(WPRoomBookingBase):
+    def _getBody(self, params):
+        calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
+                                             candidates=params['candidates'], specific_room=params['room'],
+                                             repeat_unit=params['repeat_unit'], repeat_step=params['repeat_step'])
+        params['calendar'] = calendar.render(show_navbar=False)
+        return WTemplated('RoomBookingBookingForm').getHTML(params)
 
 
 class WPRoomBookingBookingForm(WPRoomBookingBase):

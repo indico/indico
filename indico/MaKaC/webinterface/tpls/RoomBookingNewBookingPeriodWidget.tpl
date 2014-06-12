@@ -1,4 +1,4 @@
-<%page args="form=None, flexibility=False"/>
+<%page args="form=None, flexibility=False, can_override=False, min_date=None"/>
 
 <!-- Slider -->
 <div id="timerange"></div>
@@ -69,7 +69,7 @@ ${ form.repeat_step(type='hidden') }
         $('#sDatePlace, #eDatePlace').datepicker({
             dateformat: 'dd/mm/yy',
             % if not can_override:
-                minDate: 0,
+                minDate: ${ "'{}'".format(min_date.strftime('%d/%m/%Y')) if min_date else 0 },
                 maxDate: ${ room.max_advance_days - 1 if room and room.max_advance_days else 'null' },
             % endif
             showButtonPanel: true,
