@@ -417,15 +417,14 @@
                                       </dl>
                                       <dl class="booking-history old" style="display: none;">
                                   % endif
-                                  <% info = entry.info.split('```') %>
                                   <dt>${ formatDateTime(entry.timestamp) }</dt>
                                   <dd>
-                                      <strong>${ info[0] }</strong> ${ _('by') } ${ entry.user_name }
-                                      % if len(info) > 1:
+                                      <strong>${ entry.info[0] }</strong> ${ _('by') } ${ entry.user_name }
+                                      % if len(entry.info) > 1:
                                           (<a class="js-history-show-details" href="#" data-other-text="${ _('Hide Details') }">${ _('Show Details') }</a>)
                                       % endif
                                   </dd>
-                                  % for detail in info[1:]:
+                                  % for detail in entry.info[1:]:
                                       <dd style="display: none;">
                                           ${ detail }
                                       </dd>

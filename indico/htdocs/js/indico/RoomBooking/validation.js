@@ -148,7 +148,7 @@
             }
         });
 
-        $('#submit_check, #submit_prebook, #submit_book').on('click', function(e) {
+        $('.js-submit-booking, #submit_check').on('click', function(e) {
             if ($(this).data('validation') == 'check') {
                 validatingConflicts = true;
                 validatingBooking = false;

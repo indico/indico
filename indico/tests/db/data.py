@@ -91,12 +91,12 @@ RESERVATION_EDIT_LOGS = [
     {
         'timestamp': _create_utc_dt(2013, 12, 2, 11, 33, 57),
         'user_name': 'johhny',
-        'info': 'name updated```flag is cleared'
+        'info': ['name updated', 'flag is cleared']
     },
     {
         'timestamp': _create_utc_dt(2013, 12, 2, 11, 34, 17),
         'user_name': 'admin',
-        'info': 'removed bad words from reason```some value changed```set flag'
+        'info': ['removed bad words from reason', 'some value changed', 'set flag']
     }
 ]
 

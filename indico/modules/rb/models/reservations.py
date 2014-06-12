@@ -618,13 +618,13 @@ class Reservation(Serializer, db.Model):
             old = converter(change['old'])
             new = converter(change['new'])
             if not old:
-                log.append("The {} was set to '{}'".format(field_title, new))
+                log.append(u"The {} was set to '{}'".format(field_title, new))
             elif not new:
-                log.append("The {} was cleared".format(field_title))
+                log.append(u"The {} was cleared".format(field_title))
             else:
-                log.append("The {} was changed from '{}' to '{}'".format(field_title, old, new))
+                log.append(u"The {} was changed from '{}' to '{}'".format(field_title, old, new))
 
-        self.edit_logs.append(ReservationEditLog(user_name=user.getFullName(), info='```'.join(log)))
+        self.edit_logs.append(ReservationEditLog(user_name=user.getFullName(), info=log))
 
         # Recreate all occurrence if necessary
         if update_occurrences:

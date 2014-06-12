@@ -8,3 +8,5 @@ For the moment, we are focusing on _PostgreSQL_. These are some of the specific 
 * `array_agg()`, since MySQL doesn't have ARRAY type. You can find occurrences of them within:
     - _indico/modules/rb/models/locations.py_
     - _indico/modules/rb/models/rooms.py_
+
+* ReservationEditLog uses a PostgreSQL ARRAY to store the changes for a single log entry

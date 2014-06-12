@@ -406,7 +406,7 @@ def migrate_reservations(rb_root):
                 el = ReservationEditLog(
                     timestamp=ts,
                     user_name=h._responsibleUser,
-                    info=convert_to_unicode('```'.join(h._info))  # TODO: store this properly!
+                    info=map(convert_to_unicode, h._info)
                 )
                 r.edit_logs.append(el)
 
