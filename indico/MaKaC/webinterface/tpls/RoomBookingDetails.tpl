@@ -433,7 +433,9 @@
                                   % endfor
                               % endfor
                           </dl>
-                          <a href="#" class="js-history-show-old" data-other-text="${ _('Hide older history') }">${ _('Show older history') }</a>
+                          % if len(edit_logs) > 1:
+                              <a href="#" class="js-history-show-old" data-other-text="${ _('Hide older history') }">${ _('Show older history') }</a>
+                          % endif
                           <script>
                               $('.js-history-show-details').on('click', function(e) {
                                   e.preventDefault();
