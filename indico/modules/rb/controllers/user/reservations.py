@@ -50,8 +50,8 @@ from indico.web.flask.util import url_for
 class RHRoomBookingBookingMixin:
     """Mixin that retrieves the booking or fails if there is none."""
     def _checkParams(self):
-        resv_id = request.view_args.get('resvID')
-        self._reservation = Reservation.get(request.view_args['resvID'])
+        resv_id = request.view_args['resvID']
+        self._reservation = Reservation.get(resv_id)
         if not self._reservation:
             raise IndicoError('No booking with id: {}'.format(resv_id))
 
@@ -115,8 +115,8 @@ class RHRoomBookingRejectBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
 class RHRoomBookingCancelBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _checkParams(self):
         RHRoomBookingBookingMixin._checkParams(self)
-        date = dateutil.parser.parse(request.view_args.get('date'), yearfirst=True).date()
-        self._occurrence = self._reservation.occurrences.filter(ReservationOccurrence.date == date).one()
+        occ_date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()
+        self._occurrence = self._reservation.occurrences.filter(ReservationOccurrence.date == occ_date).one()
 
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
@@ -132,9 +132,9 @@ class RHRoomBookingCancelBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBook
 class RHRoomBookingRejectBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _checkParams(self):
         RHRoomBookingBookingMixin._checkParams(self)
-        date = dateutil.parser.parse(request.view_args.get('date'), yearfirst=True).date()
+        occ_date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()
         self._reason = request.form.get('reason', u'')
-        self._occurrence = self._reservation.occurrences.filter(ReservationOccurrence.date == date).one()
+        self._occurrence = self._reservation.occurrences.filter(ReservationOccurrence.date == occ_date).one()
 
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)

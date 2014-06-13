@@ -31,7 +31,7 @@
         ${ _("Whether bookings must be accepted by person responsible.") }
     </div>
     <div id="notification_for_startCH" class="tip">
-        ${ _("Send the start notification X days before an occurence (leave empty to use default)")  }
+        ${ _("Send the start notification X days before an occurrence (leave empty to use default)")  }
     </div>
     <div id="notification_for_endCH" class="tip">
         ${ _("Whether to trigger notifications when a booking for the room ends.") }

@@ -13,7 +13,7 @@
                     textAlign: 'left'
                 }
             });
-            occursdiv.append($T("This applies to all the following ocurrences ({0} in total):".format(occurs.length)));
+            occursdiv.append($T("This applies to all the following occurrences ({0} in total):".format(occurs.length)));
             occursdiv.addClass("warningMessage");
             var occurslist = $("<ul/>")
             for(var i=0; i<occurs.length; i++) {
@@ -69,7 +69,7 @@
     }
     function submit_cancel_occurrence(action, date) {
         contentDiv = createContentDiv($T("Are you sure you want to <strong>cancel</strong> the booking for the selected date") + " (" + date + ")?");
-        new ConfirmPopup($T("Cancel ocurrence"), contentDiv, function(confirmed) {
+        new ConfirmPopup($T("Cancel occurrence"), contentDiv, function(confirmed) {
             if(confirmed) {
                 $("#reason").val('');
                 $("#submits").attr("action", action);
