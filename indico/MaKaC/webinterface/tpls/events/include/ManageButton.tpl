@@ -62,7 +62,7 @@
                         m.close();
 
                     };
-                    (new ConfirmPopup($T('Delete minutes'),$T('Are you sure you want to delete this minutes?'),popupHandler, $T("Yes"), $T("No"))).open();
+                    (new ConfirmPopup($T('Delete minutes'),$T('Are you sure you want to delete these minutes?'),popupHandler, $T("Yes"), $T("No"))).open();
                     return false;}, display: $T('Delete minutes')};
             % endif
 
