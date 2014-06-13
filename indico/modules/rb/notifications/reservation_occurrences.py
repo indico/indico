@@ -3,6 +3,7 @@ from datetime import date
 from flask import render_template
 
 from indico.core.config import Config
+from indico.modules.rb.models.reservations import RepeatUnit
 
 
 def upcoming_occurrence(occurrence):
@@ -18,7 +19,8 @@ def upcoming_occurrence(occurrence):
     subject = 'Reservation reminder'
     text = render_template('rb/upcoming_occurrence.txt',
                            occurrence=occurrence,
-                           owner=owner)
+                           owner=owner,
+                           RepeatUnit=RepeatUnit)
 
     return {
         'fromAddr': from_addr,
