@@ -17,7 +17,7 @@
 
 <div class="collaborationAdvancedTabCheckboxDiv" style="margin-bottom:10px">
     <input type="checkbox" id="displayPhoneNumbers" class="centeredCheckBox" name="displayPhoneNumbers" value="yes" checked="checked" />
-    <label for="displayPhoneNumbers" class="normal">${ _("Display VidyoVoice phone numbers in event page") }</label>
+    <label for="displayPhoneNumbers" class="normal">${ _("Display phone access numbers in event page") }</label>
 </div>
 
 <div class="collaborationAdvancedTabTitleLine">

@@ -145,7 +145,7 @@ class XMLGenerator(object):
 
         if booking.getBookingParamByName("displayPhoneNumbers") and getVidyoOptionValue("phoneNumbers"):
             out.openTag("section")
-            out.writeTag("title", _('VidyoVoice phone numbers:'))
+            out.writeTag("title", _('Phone access:'))
             out.writeTag("line", ', '.join(getVidyoOptionValue("phoneNumbers")))
             out.closeTag("section")
 
@@ -206,7 +206,7 @@ class ServiceInformation(object):
 
         if booking.getBookingParamByName("displayPhoneNumbers") and getVidyoOptionValue("phoneNumbers"):
             sections.append({
-                "title": _('VidyoVoice phone numbers'),
+                "title": _('Phone access numbers'),
                 'lines': [', '.join(getVidyoOptionValue("phoneNumbers"))],
             })
         sections.append({
