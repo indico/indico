@@ -42,4 +42,9 @@ class IndicoSQLAlchemy(SQLAlchemy):
         return logger
 
 
+def on_models_committed(sender, changes):
+    for obj, change in changes:
+        obj.__committed__(change)
+
+
 db = IndicoSQLAlchemy(session_options={'extension': ZopeTransactionExtension()})

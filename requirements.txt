@@ -63,3 +63,4 @@ Whoosh==2.6.0
 redis==2.9.1
 hiredis==0.1.3
 enum34==1.0
+blinker==1.3

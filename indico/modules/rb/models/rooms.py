@@ -49,10 +49,10 @@ from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttribut
 from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_equipments import RoomEquipment, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
+from indico.modules.rb.models.utils import Serializer, cached, versioned_cache
 from indico.util.i18n import _
 from indico.util.string import return_ascii, natural_sort_key
 from indico.web.flask.util import url_for
-from .utils import Serializer
 
 
 _cache = GenericCache('Rooms')
@@ -62,7 +62,7 @@ class RoomKind(object):
     BASIC, MODERATED, PRIVATE = 'basicRoom', 'moderatedRoom', 'privateRoom'
 
 
-class Room(db.Model, Serializer):
+class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     __tablename__ = 'rooms'
     __public__ = [
         'id', 'name', 'location_name', 'floor', 'number', 'building',
@@ -316,6 +316,7 @@ class Room(db.Model, Serializer):
         return self.photo_id is not None
 
     @hybrid_property
+    @cached(_cache)
     def is_public(self):
         return self.is_reservable and not self.has_booking_groups
 
@@ -352,18 +353,22 @@ class Room(db.Model, Serializer):
         return self.equipments.filter_by(name=equipment_name).count() > 0
 
     @property
+    @cached(_cache)
     def needs_video_conference_setup(self):
         return self.has_equipment('video conference')
 
     @property
+    @cached(_cache)
     def has_webcast_recording(self):
         return self.has_equipment('webcast/recording')
 
     @property
+    @cached(_cache)
     def has_projector(self):
         return self.has_equipment('computer projector')
 
     @property
+    @cached(_cache)
     def available_video_conference(self):
         return self.find_available_video_conference().all()
 
@@ -385,6 +390,7 @@ class Room(db.Model, Serializer):
         return self.getAttributeByName(attribute_name) is not None
 
     @property
+    @cached(_cache)
     def has_booking_groups(self):
         return self.has_attribute('allowed-booking-group')
 

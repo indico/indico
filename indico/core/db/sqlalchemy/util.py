@@ -57,6 +57,15 @@ class IndicoModel(Model):
     def get(cls, oid):
         return cls.query.get(oid)
 
+    def __committed__(self, change):
+        """Called after a commit for this object.
+
+        ALWAYS call super if you override this method!
+
+        :param change: The operation that has been committed (delete/change/update)
+        """
+        pass
+
 
 def update_session_options(db, session_options=None):
     """Replaces the Flask-SQLAlchemy session a new one using the given options.

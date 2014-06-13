@@ -22,6 +22,7 @@ Small functions and classes widely used in Room Booking Module.
 """
 
 import json
+import random
 from datetime import date, datetime
 from functools import wraps
 
@@ -37,6 +38,7 @@ from MaKaC.plugins.base import PluginsHolder
 from MaKaC.user import Avatar
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
+from indico.util.decorators import cached_writable_property
 from indico.util.i18n import _
 
 
@@ -71,6 +73,78 @@ def unimplemented(exceptions=(Exception,), message='Unimplemented'):
         return _wrapper
 
     return _unimplemented
+
+
+def versioned_cache(cache, primary_key_attr='id'):
+    """Mixin to add a cache version number, bumped on each commit.
+
+    This class MUST come before db.Model in the superclass list::
+
+        class SomeModel(versioned_cache(my_cache), db.Model, ...):
+            pass
+
+    :param cache: A :class:`GenericCache` instance
+    :param primary_key_attr: The attribute containing the an unique identifier for the object
+    """
+    def _get_key(obj):
+        return 'version:{}[{}]'.format(type(obj).__name__, getattr(obj, primary_key_attr))
+
+    class _CacheVersionMixin(object):
+        def __committed__(self, change):
+            super(_CacheVersionMixin, self).__committed__(change)
+            if change == 'delete':
+                cache.delete(_get_key())
+            else:
+                self.cache_version += 1
+
+        @cached_writable_property('_cache_version')
+        def cache_version(self):
+            return cache.get(_get_key(self), 0)
+
+        @cache_version.setter
+        def cache_version(self, value):
+            cache.set(_get_key(self), value)
+
+    return _CacheVersionMixin
+
+
+def cached(cache, primary_key_attr='id', base_ttl=86400*31):
+    """Caches the decorated function's result in redis.
+
+    This decorator is meant to be be used for properties::
+
+        @property
+        @cached(my_cache)
+        def expensive_function(self):
+            return self.do_expensive_stuff()
+
+    It is usually a good idea to expunge cache entries when the object is modified.
+    To do so, make the model inherit from the mixin created by :func:`versioned_cache`.
+
+    :param cache: A :class:`GenericCache` instance
+    :param primary_key_attr: The attribute containing the an unique identifier for the object
+    :param base_ttl: The time after which a cached property expires
+    """
+    def decorator(f):
+        @wraps(f)
+        def wrapper(self, *args, **kawrgs):
+            primary_key = getattr(self, primary_key_attr)
+            if hasattr(self, 'cache_version'):
+                key = '{}[{}.{}].{}'.format(type(self).__name__, primary_key, self.cache_version, f.__name__)
+            else:
+                key = '{}[{}].{}'.format(type(self).__name__, primary_key, f.__name__)
+
+            result = cache.get(key)
+            if result is None:
+                result = f(self, *args, **kawrgs)
+                # Cache the value with a somewhat random expiry so we don't end up with all keys
+                # expiring at the same time if there hasn't been an update for some time
+                cache.set(key, result, base_ttl + 300 * random.randint(0, 200))
+            return result
+
+        return wrapper
+
+    return decorator
 
 
 def getRoomBookingOption(opt):

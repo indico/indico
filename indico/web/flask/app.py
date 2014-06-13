@@ -24,6 +24,7 @@ import re
 
 from flask import send_from_directory, request, _app_ctx_stack
 from flask import current_app as app
+from flask.ext.sqlalchemy import models_committed
 from sqlalchemy.orm import configure_mappers
 from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
@@ -39,6 +40,7 @@ from MaKaC.webinterface.pages.error import WErrorWSGI
 
 from indico.core.db import DBMgr
 from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util import delete_all_tables
 from indico.web.assets import core_env, register_all_css, register_all_js
@@ -175,6 +177,7 @@ def configure_db(app):
     db.init_app(app)
     apply_db_loggers(app.debug)
     configure_mappers()  # Make sure all backrefs are set
+    models_committed.connect(on_models_committed, app)
     if cfg.getCreateTables():
         with app.app_context():
             delete_all_tables(db)  # favorable to `drop_all` under foreign keys
