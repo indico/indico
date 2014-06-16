@@ -125,7 +125,7 @@ class BlockedRoom(db.Model):
         occurrences = ReservationOccurrence.find_all(
             ReservationOccurrence.start >= start_dt,
             ReservationOccurrence.end <= end_dt,
-            ~ReservationOccurrence.is_cancelled,
+            ReservationOccurrence.is_valid,
             ~ReservationOccurrence.reservation_id.in_(map(attrgetter('id'), reservations)),
             *reservation_criteria,
             _join=Reservation

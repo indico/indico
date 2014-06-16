@@ -62,6 +62,11 @@ class ReservationOccurrence(db.Model, Serializer):
         nullable=False,
         default=False
     )
+    is_rejected = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     rejection_reason = db.Column(
         db.String
     )
@@ -75,10 +80,6 @@ class ReservationOccurrence(db.Model, Serializer):
         return cast(self.start, Date)
 
     @hybrid_property
-    def is_rejected(self):
-        return self.is_cancelled
-
-    @hybrid_property
     def is_valid(self):
         return not self.is_rejected and not self.is_cancelled
 
@@ -88,11 +89,12 @@ class ReservationOccurrence(db.Model, Serializer):
 
     @return_ascii
     def __repr__(self):
-        return u'<ReservationOccurrence({0}, {1}, {2}, {3}, {4})>'.format(
+        return u'<ReservationOccurrence({0}, {1}, {2}, {3}, {4}, {5})>'.format(
             self.reservation_id,
             self.start,
             self.end,
             self.is_cancelled,
+            self.is_rejected,
             self.is_sent
         )
 
@@ -247,8 +249,7 @@ class ReservationOccurrence(db.Model, Serializer):
 
     @proxy_to_reservation_if_single_occurrence
     def reject(self, user, reason):
-        # TODO: is_rejected
-        self.is_cancelled = True
+        self.is_rejected = True
         self.rejection_reason = reason
         log = ['Day rejected: {}'.format(format_date(self.date)),
                'Reason: {}'.format(reason)]

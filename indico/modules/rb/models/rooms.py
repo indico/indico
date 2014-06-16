@@ -980,7 +980,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                     # Reservation.is_rejected == False,
                     ReservationOccurrence.start >= start_date,
                     ReservationOccurrence.end <= end_date,
-                    ReservationOccurrence.is_cancelled == False
+                    ReservationOccurrence.is_valid
                 )
                 .scalar()
         ) or 0
@@ -1103,7 +1103,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                    .filter(
                        exists().where(
                            ~((ReservationOccurrence.start >= end) | (ReservationOccurrence.end <= start)),
-                           ReservationOccurrence.is_cancelled == False
+                           ReservationOccurrence.is_valid
                        )
                    ) \
                    .scalar()
@@ -1113,7 +1113,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                    .join(ReservationOccurrence) \
                    .filter(
                        ~((ReservationOccurrence.start >= end) | (ReservationOccurrence.end <= start)),
-                       ReservationOccurrence.is_cancelled == False
+                       ReservationOccurrence.is_valid
                    ) \
                    .all()
 
@@ -1122,7 +1122,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                    .join(ReservationOccurrence) \
                    .filter(
                        ~((ReservationOccurrence.start >= end) | (ReservationOccurrence.end <= start)),
-                       ReservationOccurrence.is_cancelled == is_cancelled
+                       ReservationOccurrence.is_valid == (not is_cancelled)
                    ) \
                    .all()
 

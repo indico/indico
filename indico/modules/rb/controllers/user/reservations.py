@@ -652,7 +652,7 @@ class RHRoomBookingCalendar(RHRoomBookingBase):
                 Reservation.room_id.in_(room.id for room in rooms),
                 ReservationOccurrence.start >= self.start_dt,
                 ReservationOccurrence.end <= self.end_dt,
-                ~ReservationOccurrence.is_cancelled,
+                ReservationOccurrence.is_valid,
                 _join=Reservation,
                 _eager=ReservationOccurrence.reservation
             )

@@ -418,8 +418,7 @@ class Reservation(Serializer, db.Model):
     def reject(self, user, reason):
         self.is_rejected = True
         self.rejection_reason = reason
-        # TODO: use is_rejected once we have it for occurrences
-        self.occurrences.filter_by(is_valid=True).update({'is_cancelled': True, 'rejection_reason': reason},
+        self.occurrences.filter_by(is_valid=True).update({'is_rejected': True, 'rejection_reason': reason},
                                                          synchronize_session='fetch')
         log_msg = 'Reservation rejected: {}'.format(reason)
         self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
@@ -438,7 +437,7 @@ class Reservation(Serializer, db.Model):
     # ================================================
 
     def find_excluded_days(self):
-        return self.occurrences.filter(ReservationOccurrence.is_cancelled | ReservationOccurrence.is_rejected)
+        return self.occurrences.filter(~ReservationOccurrence.is_valid)
 
     @staticmethod
     def find_overlapping_with(room, occurrences, reservation_id=None):
