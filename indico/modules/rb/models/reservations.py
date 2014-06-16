@@ -410,18 +410,21 @@ class Reservation(Serializer, db.Model):
                 continue
             occurrence.reject(u'Rejected due to collision with a confirmed reservation')
 
-    def cancel(self, user):
+    def cancel(self, user, reason=None, log=True):
         self.is_cancelled = True
+        self.rejection_reason = reason
         self.occurrences.filter_by(is_valid=True).update({'is_cancelled': True}, synchronize_session='fetch')
-        self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=['Reservation cancelled']))
+        if log:
+            self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=['Reservation cancelled']))
 
-    def reject(self, user, reason):
+    def reject(self, user, reason, log=True):
         self.is_rejected = True
         self.rejection_reason = reason
         self.occurrences.filter_by(is_valid=True).update({'is_rejected': True, 'rejection_reason': reason},
                                                          synchronize_session='fetch')
-        log_msg = 'Reservation rejected: {}'.format(reason)
-        self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
+        if log:
+            log_msg = 'Reservation rejected: {}'.format(reason)
+            self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
 
     def notify_rejection(self, reason, occurrence_date=None):
         return self.notifyAboutRejection(occurrence_date, reason)
@@ -476,7 +479,7 @@ class Reservation(Serializer, db.Model):
                     if nbd.overlaps(occurrence.start, occurrence.end):
                         if not skip_conflicts:
                             raise ConflictingOccurrences()
-                        occurrence.cancel(u'Skipped due to nonbookable date', propagate=False)
+                        occurrence.cancel(user, u'Skipped due to nonbookable date', log=False, propagate=False)
                         break
 
         # Check for conflicts with blockings
@@ -489,7 +492,7 @@ class Reservation(Serializer, db.Model):
                 if occurrence.is_valid and blocking.is_active_at(occurrence.start.date()):
                     # Cancel OUR occurrence
                     msg = u'Skipped due to collision with a blocking ({})'
-                    occurrence.cancel(msg.format(blocking.reason), propagate=False)
+                    occurrence.cancel(user, msg.format(blocking.reason), log=False, propagate=False)
 
         # Check for conflicts with other occurrences
         conflicting_occurrences = self.get_conflicting_occurrences()
@@ -501,11 +504,11 @@ class Reservation(Serializer, db.Model):
                     raise ConflictingOccurrences()
                 # Cancel OUR occurrence
                 msg = u'Skipped due to collision with {} reservation(s)'
-                occurrence.cancel(msg.format(len(conflicts['confirmed'])), propagate=False)
+                occurrence.cancel(user, msg.format(len(conflicts['confirmed'])), log=False, propagate=False)
             elif conflicts['pending'] and self.is_confirmed:
                 # Reject OTHER occurrences
                 for conflict in conflicts['pending']:
-                    conflict.reject(u'Rejected due to collision with a confirmed reservation')
+                    conflict.reject(user, u'Rejected due to collision with a confirmed reservation')
 
     @classmethod
     def create_from_data(cls, room, data, user, prebook=None):

@@ -242,18 +242,21 @@ class ReservationOccurrence(db.Model, Serializer):
         return date_time.get_overlap((self.start, self.end), (occurrence.start, occurrence.end))
 
     @proxy_to_reservation_if_single_occurrence
-    def cancel(self, user):
+    def cancel(self, user, reason=None, log=True):
         self.is_cancelled = True
-        log_msg = 'Day cancelled: {}'.format(format_date(self.date))
-        self.reservation.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
+        self.rejection_reason = reason
+        if log:
+            log_msg = 'Day cancelled: {}'.format(format_date(self.date))
+            self.reservation.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
 
     @proxy_to_reservation_if_single_occurrence
-    def reject(self, user, reason):
+    def reject(self, user, reason, log=True):
         self.is_rejected = True
         self.rejection_reason = reason
-        log = ['Day rejected: {}'.format(format_date(self.date)),
-               'Reason: {}'.format(reason)]
-        self.reservation.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=log))
+        if log:
+            log = ['Day rejected: {}'.format(format_date(self.date)),
+                   'Reason: {}'.format(reason)]
+            self.reservation.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=log))
 
     def notify_cancellation(self):
         return self.reservation.notify_cancellation(self.date)
