@@ -15,7 +15,6 @@
     ${ period_form.repeat_step(type='hidden') }
     ${ period_form.start_date(type='hidden') }
     ${ period_form.end_date(type='hidden') }
-    ${ period_form.skip_conflicts(type='hidden') }
     ${ period_form.room_id() }
 </form>
 

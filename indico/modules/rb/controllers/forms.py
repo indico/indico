@@ -397,7 +397,6 @@ class NewBookingCriteriaForm(NewBookingFormBase):
 
 class NewBookingPeriodForm(NewBookingFormBase):
     room_id = IntegerField('Room', [DataRequired()], widget=HiddenInput())
-    skip_conflicts = BooleanField('Skip conflicts')
 
 
 class NewBookingConfirmForm(NewBookingPeriodForm):

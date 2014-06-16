@@ -110,6 +110,5 @@
                 </div>
             </div>
         % endif
-        ${ form.skip_conflicts() } ${ form.skip_conflicts.label() }
     </div>
 </form>

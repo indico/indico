@@ -384,11 +384,10 @@ type ("RoomBookingCalendarDrawer", [],
                 });
             },
 
-            _proceedToBooking: function(bar, skipConflicting) {
+            _proceedToBooking: function(bar) {
                 $('#start_date').val(Util.formatDateTime(bar.resvStartDT));
                 $('#end_date').val(Util.formatDateTime(bar.resvEndDT));
                 $('#room_id').val(bar.room.id);
-                $('#skip_conflicts').val(Boolean(skipConflicting).toString());
                 $('#periodForm').submit();
             },
 
@@ -420,7 +419,7 @@ type ("RoomBookingCalendarDrawer", [],
                         $('#booking-dialog').dialog({
                             buttons: {
                                 "Skip conflicting days": function() {
-                                    self._proceedToBooking(bar, true);
+                                    self._proceedToBooking(bar);
                                 },
                                 Close: function() {
                                     $(this).dialog('close');

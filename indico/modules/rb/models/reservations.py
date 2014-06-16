@@ -538,7 +538,7 @@ class Reservation(Serializer, db.Model):
         reservation.booked_for_name = reservation.booked_for_user.getFullName()
         reservation.is_confirmed = not prebook
         reservation.created_by_user = user
-        reservation.create_occurrences(data.get('skip_conflicts', False), user)
+        reservation.create_occurrences(True, user)
         if not any(occ.is_valid for occ in reservation.occurrences):
             raise IndicoError('Reservation has no valid occurrences')
         return reservation
