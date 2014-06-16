@@ -637,7 +637,7 @@ class Reservation(Serializer, db.Model):
 
         self.edit_logs.append(ReservationEditLog(user_name=user.getFullName(), info=log))
 
-        # Recreate all occurrence if necessary
+        # Recreate all occurrences if necessary
         if update_occurrences:
             cols = [col.name for col in ReservationOccurrence.__table__.columns
                     if not col.primary_key and col.name not in {'start', 'end'}]
@@ -652,6 +652,10 @@ class Reservation(Serializer, db.Model):
                 if old_occurrence:
                     for col in cols:
                         setattr(occurrence, col, getattr(old_occurrence, col))
+            # Don't cause new notifications for the entire booking in case of daily repetition
+            if self.repeat_unit == RepeatUnit.DAY and all(occ.is_sent for occ in old_occurrences.itervalues()):
+                for occurrence in self.occurrences:
+                    occurrence.is_sent = True
 
         # Sanity check so we don't end up with an "empty" booking
         if not any(occ.is_valid for occ in self.occurrences):
