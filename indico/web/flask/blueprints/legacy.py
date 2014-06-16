@@ -230,7 +230,7 @@ legacy_endpoints = set([
     'roomBooking-cancelBookingOccurrence', 'roomBooking-cloneBooking',
     'roomBooking-deleteBooking', 'roomBooking-deleteCustomAttribute', 'roomBooking-deleteEquipment',
     'roomBooking-deleteLocation', 'roomBooking-mapOfRooms', 'roomBooking-mapOfRoomsWidget',
-    'roomBooking-rejectAllConflicting', 'roomBooking-rejectBooking', 'roomBooking-rejectBookingOccurrence',
+    'roomBooking-rejectBooking', 'roomBooking-rejectBookingOccurrence',
     'roomBooking-roomDetails', 'roomBooking-roomList', 'roomBooking-roomStats',
     'roomBooking-saveBooking', 'roomBooking-saveCustomAttributes', 'roomBooking-saveEquipment',
     'roomBooking-saveLocation', 'roomBooking-search4Bookings', 'roomBooking-search4Rooms',

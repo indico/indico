@@ -232,35 +232,6 @@ class RoomBookingCalendarWidget(object):
                              if blocking.start_date <= day <= blocking.end_date)
 
 
-class WPRoomBookingBookRoom(WPRoomBookingBase):
-    def __init__(self, rh):
-        WPRoomBookingBase.__init__(self, rh)
-        self._rh = rh
-
-    def _getTitle(self):
-        return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Book a Room'))
-
-    def _setCurrentMenuItem(self):
-        self._bookRoomNewOpt.setActive(True)
-
-    def _getBody(self, params):
-        return WRoomBookingBookRoom(self._rh).getHTML(params)
-
-
-class WRoomBookingBookRoom(WTemplated):
-    def __init__(self, rh):
-        self._rh = rh
-
-    def getVars(self):
-        wvars = WTemplated.getVars(self)
-        wvars['today'] = datetime.now()
-        wvars['rooms'] = [r['room'].to_serializable('__public_exhaustive__') for r in self._rh._rooms]
-        wvars['maxRoomCapacity'] = self._rh._max_capacity
-        wvars['roomBookingBookingListURL'] = UH.UHRoomBookingBookingListForBooking.getURL()
-        wvars['formerBookingInterfaceURL'] = UH.UHRoomBookingSearch4Rooms.getURL(is_new_booking=True)
-        return wvars
-
-
 class WPRoomBookingBookingDetails(WPRoomBookingBase):
 
     def _setCurrentMenuItem(self):

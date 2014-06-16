@@ -49,11 +49,3 @@ def rb_check_user_access(user):
                     (isinstance(entity, user_mod.Avatar) and entity == user):
                 return True
     return False
-
-
-# TODO: remove
-class FormMode(object):
-    """
-    Used to distinguish between insert and edit mode for the form.
-    """
-    NEW, MODIF = range(2)

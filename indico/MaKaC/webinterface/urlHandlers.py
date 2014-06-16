@@ -436,10 +436,6 @@ class UHRoomBookingBookingList(BooleanMixin, URLHandler):
         return url
 
 
-class UHRoomBookingBookingListForBooking(UHRoomBookingBookingList):
-    _endpoint = 'rooms.roomBooking-bookingListForBooking'
-
-
 class UHRoomBookingRoomDetails(BooleanTrueMixin, URLHandler):
     _endpoint = 'rooms.roomBooking-roomDetails'
 
@@ -488,10 +484,6 @@ class UHRoomBookingAcceptBooking(URLHandler):
 
 class UHRoomBookingRejectBooking(URLHandler):
     _endpoint = 'rooms.roomBooking-rejectBooking'
-
-
-class UHRoomBookingRejectAllConflicting(URLHandler):
-    _endpoint = 'rooms.roomBooking-rejectAllConflicting'
 
 
 class UHRoomBookingCancelBookingOccurrence(URLHandler):

@@ -17,7 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-from ast import literal_eval
 from datetime import datetime, time, timedelta, date
 from collections import defaultdict
 
@@ -28,7 +27,6 @@ from werkzeug.datastructures import MultiDict
 from indico.core.db import db
 from indico.core.errors import IndicoError, AccessError
 from indico.util.date_time import get_datetime_from_request
-from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.forms import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
@@ -37,13 +35,12 @@ from indico.modules.rb.controllers.forms import (BookingSearchForm, NewBookingCr
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.models.utils import getRoomBookingOption
-from indico.modules.rb.views.user import reservations as reservation_views
 from indico.modules.rb.views.user.reservations import (WPRoomBookingSearchBookings, WPRoomBookingSearchBookingsResults,
                                                        WPRoomBookingCalendar, WPRoomBookingNewBookingSelectRoom,
                                                        WPRoomBookingNewBookingSelectPeriod,
                                                        WPRoomBookingNewBookingConfirm,
-                                                       WPRoomBookingNewBookingSimple, WPRoomBookingModifyBooking)
+                                                       WPRoomBookingNewBookingSimple, WPRoomBookingModifyBooking,
+                                                       WPRoomBookingBookingDetails, WPRoomBookingStatement)
 from indico.web.flask.util import url_for
 
 
@@ -56,18 +53,10 @@ class RHRoomBookingBookingMixin:
             raise IndicoError('No booking with id: {}'.format(resv_id))
 
 
-class RHRoomBookingBookRoom(RHRoomBookingBase):
-    def _process(self):
-        self._rooms = sorted(Room.getRoomsWithData('equipment'),
-                             key=lambda x: natural_sort_key(x['room'].getFullName()))
-        self._max_capacity = Room.getMaxCapacity()
-        return reservation_views.WPRoomBookingBookRoom(self).display()
-
-
 class RHRoomBookingBookingDetails(RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _process(self):
         is_new_booking = request.values.get('new_booking', type=bool, default=False)
-        return reservation_views.WPRoomBookingBookingDetails(self, is_new_booking=is_new_booking).display()
+        return WPRoomBookingBookingDetails(self, is_new_booking=is_new_booking).display()
 
 
 class RHRoomBookingAcceptBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
@@ -526,112 +515,6 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
                                           can_override=room.can_be_overriden(session.user)).display()
 
 
-class RHRoomBookingBookingForm(RHRoomBookingBase):
-    # This class is unused and should be removed soon!
-    def _checkParams(self):
-        self._form = ReservationForm(prefix='reservation')
-        self._room = Room.get(int(request.values.get('roomID')))
-        self._infoBookingMode = 'infoBookingMode' in request.values
-        self._isAssistenceEmailSetup = getRoomBookingOption('assistanceNotificationEmails')
-        self._requireRealUsers = getRoomBookingOption('bookingsForRealUsers')
-        self._skipConflicting = request.values.get('skipConflicting') == 'on'
-        self._isModif = False
-
-        if not self._form.is_submitted():
-            self.__populate_form(request)
-        else:
-            if 'resvID' in request.view_args:  # modification
-                self._isModif = True
-                if self._form.validate_on_submit():
-                    self._reservation = Reservation()
-                    self._form.populate_obj(self._reservation)
-
-        self._thereAreConflicts = session.get('rbThereAreConflicts')
-        self._showErrors = session.get('rbShowErrors')
-        self._errors = session.get('rbErrors') if self._showErrors else None
-
-    def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
-
-        # only do the remaining checks the rest if the basic ones were successful
-        # if self._doProcess:
-        #     if not self._candResv.room.isActive and not self._getUser().isRBAdmin():
-        #         raise FormValuesError('You are not authorized to book this room.')
-
-        #     if not self._candResv.room.canBook(self._getUser()) and not self._candResv.room.canPrebook(self._getUser()):
-        #         raise NoReportError('You are not authorized to book this room.')
-
-        #     if self._formMode == FormMode.MODIF:
-        #         if not self._candResv.canModify(self.getAW()):
-        #             raise IndicoError('You are not authorized to take this action.')
-
-    def _process(self):
-        self._rooms = Room.find_all()
-
-        start_dt = self._form.start_date.data
-        end_dt = self._form.end_date.data
-
-        day_start_dt = datetime.combine(self._form.start_date.data.date(), time())
-        day_end_dt = datetime.combine(self._form.end_date.data.date(), time(23, 59))
-
-        occurrences = ReservationOccurrence.find_all(
-            Reservation.room_id == self._room.id,
-            ReservationOccurrence.start >= day_start_dt,
-            ReservationOccurrence.end <= day_end_dt,
-            ~ReservationOccurrence.is_cancelled,
-            _join=Reservation,
-            _eager=ReservationOccurrence.reservation
-        )
-
-        candidates = ReservationOccurrence.create_series(
-            start_dt, end_dt,
-            (self._form.repeat_unit.data, self._form.repeat_step.data)
-        )
-
-        return reservation_views.WPRoomBookingBookingForm(self, occurrences=occurrences,
-                                                          candidates=candidates).display()
-
-    def __populate_form(self, request):
-        sDT = {
-            'day': request.values.get('day', datetime.now().day),
-            'month': request.values.get('month', datetime.now().month),
-            'year': request.values.get('year', datetime.now().year)}
-        eDT = {
-            'day': request.values.get('dayEnd', datetime.now().day),
-            'month': request.values.get('monthEnd', datetime.now().month),
-            'year': request.values.get('yearEnd', datetime.now().year)}
-        sTime = {
-            'hour': request.values.get('hour', 8),
-            'minute': request.values.get('minute', 30)}
-        eTime = {
-            'hour': request.values.get('hourEnd', 17),
-            'minute': request.values.get('minuteEnd', 30)}
-        repeatability = request.values.get('repeatability')
-
-        self._form.booked_for_id.data = session.user.getId()
-        self._form.booked_for_name.data = session.user.getFullName().decode('utf-8')
-        self._form.contact_email.data = session.user.getEmail().decode('utf-8')
-        self._form.contact_phone.data = session.user.getPhone().decode('utf-8')
-
-        for data in [sDT, sTime, eDT, eTime]:
-            for k, v in data.iteritems():
-                data[k] = int(v) if v is not None else v
-
-        self._form.start_date.data = datetime(sDT['year'], sDT['month'], sDT['day'], sTime['hour'], sTime['minute'])
-        self._form.end_date.data = datetime(eDT['year'], eDT['month'], eDT['day'], eTime['hour'], eTime['minute'])
-
-        try:
-            repeatability = literal_eval(repeatability)
-            if len(repeatability) == 2:
-                self._form.repeat_unit.data = int(repeatability[0])
-                self._form.repeat_step.data = int(repeatability[1])
-            else:
-                raise ValueError('Wrong repeatition, expecting (interval, frequency)')
-        except ValueError:
-            self._form.repeat_unit.data = 0
-            self._form.repeat_step.data = 0
-
-
 class RHRoomBookingCalendar(RHRoomBookingBase):
     MAX_DAYS = 365 * 2
 
@@ -661,70 +544,24 @@ class RHRoomBookingCalendar(RHRoomBookingBase):
                                      end_dt=self.end_dt, overload=self._overload, max_days=self.MAX_DAYS).display()
 
 
-# TODO remove with legacy MaKaC code
+# TODO: remove with legacy MaKaC code
+class RHRoomBookingBookingForm(RHRoomBookingBase):
+    def __init__(self):
+        raise NotImplementedError
+
+
+# TODO: remove with legacy MaKaC code
 class RHRoomBookingSaveBooking(RHRoomBookingBase):
 
     def __init__(self):
         raise NotImplementedError
 
 
+# TODO: remove once we use flash messages
 class RHRoomBookingStatement(RHRoomBookingBase):
     def _checkParams(self):
         self._title = session.pop('rbTitle', None)
         self._description = session.pop('rbDescription', None)
 
     def _process(self):
-        return reservation_views.WPRoomBookingStatement(self).display()
-
-
-class RHRoomBookingRejectAllConflicting(RHRoomBookingBase):
-    def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
-        user = self._getUser()
-        # Only responsible and admin can REJECT
-        # (Owner can not reject his own booking, he should cancel instead)
-        if not user.getRooms() and not self._getUser().isRBAdmin():
-            raise MaKaCError("You are not authorized to take this action.")
-
-    def _process(self):
-        userRooms = self._getUser().getRooms()
-        emailsToBeSent = []
-
-        resvEx = ReservationBase()
-        resvEx.isConfirmed = False
-        resvEx.isRejected = False
-        resvEx.isCancelled = False
-
-        resvs = CrossLocationQueries.getReservations(resvExample=resvEx, rooms=userRooms)
-
-        counter = 0
-        for resv in resvs:
-            # There's a big difference between 'isConfirmed' being None and False. This value needs to be
-            # changed to None and after the search reverted to the previous value. For further information,
-            # please take a look at the comment in rb_reservation.py::ReservationBase.getCollisions method
-            tmpConfirmed = resv.isConfirmed
-            resv.isConfirmed = None
-            if resv.getCollisions(sansID=resv.id, boolResult=True):
-                resv.rejectionReason = "Your PRE-booking conflicted with exiting booking. (Please note it IS possible even if you were the first one to PRE-book the room)."
-                resv.reject()  # Just sets isRejected = True
-                resv.update()
-                emailsToBeSent += resv.notifyAboutRejection()
-                counter += 1
-                # Add entry to the history of the rejected reservation
-                info = []
-                info.append("Booking rejected due to conflict with existing booking")
-                histEntry = ResvHistoryEntry(self._getUser(), info, emailsToBeSent)
-                resv.getResvHistory().addHistoryEntry(histEntry)
-            resv.isConfirmed = tmpConfirmed
-        session['rbPrebookingsRejected'] = True
-        if counter > 0:
-            session['rbTitle'] = _("%d conflicting PRE-bookings have been rejected.") % counter
-            session['rbDescription'] = _(
-                "Rejection e-mails have been sent to the users, with explanation that their PRE-bookings conflicted with the present confirmed bookings.")
-        else:
-            session['rbTitle'] = _("There are no conflicting PRE-bookings for your rooms.")
-            session['rbDescription'] = ""
-        for notification in emailsToBeSent:
-            GenericMailer.send(notification)
-        url = urlHandlers.UHRoomBookingBookingList.getURL(ofMyRooms=True, onlyPrebookings=True, autoCriteria=True)
-        self._redirect(url)  # Redirect to booking details
+        return WPRoomBookingStatement(self).display()
