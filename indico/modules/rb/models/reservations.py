@@ -644,13 +644,13 @@ class Reservation(Serializer, db.Model):
             cols = [col.name for col in ReservationOccurrence.__table__.columns
                     if not col.primary_key and col.name not in {'start', 'end'}]
 
-            old_occurrences = {occ.start: occ for occ in self.occurrences}
+            old_occurrences = {occ.date: occ for occ in self.occurrences}
             self.occurrences.delete(synchronize_session='fetch')
             self.create_occurrences(True, user)
             db.session.flush()
             # Restore rejection data etc. for recreated occurrences
             for occurrence in self.occurrences:
-                old_occurrence = old_occurrences.get(occurrence.start)
+                old_occurrence = old_occurrences.get(occurrence.date)
                 if old_occurrence:
                     for col in cols:
                         setattr(occurrence, col, getattr(old_occurrence, col))
