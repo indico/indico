@@ -3,11 +3,14 @@
 </h2>
 
 <ul id="breadcrumbs" style="margin: 0px 0px 0px -15px; padding: 0; list-style: none;">
-    <li><span>${ _('Specify Search Criteria') }</span></li>
-    <li><span>${ _('Select Available Period') }</span></li>
+    <li><span><a href="${ url_for('rooms.book') }">${ _('Specify Search Criteria') }</a></span></li>
+    <li><span><a href="#" id="js-back-to-period">${ _('Select Available Period') }</a></span></li>
     <li><span class="current">${ _('Confirm Reservation') }</span></li>
 </ul>
 
+<script>
+    var userId = "rb-user-${ user.getId() }";
+</script>
 
 % if errors:
     <div class="error-message-box">

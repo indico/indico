@@ -62,9 +62,42 @@ function saveFormData() {
         "selectedRooms": selectedRooms,
         "finishDate": $('#finishDate').val(),
         "flexibleDatesRange": $("#flexibleDates input[name=flexible_dates_range]:checked").val(),
-        "repeatUnit": $('input[name=repeat_unit]:checked').val()
+        repeatUnit: $('input[name=repeat_unit]:checked').val(),
+        repeatStep: $('#repeat_step').val(),
+        roomIds: $('#room_ids').val()
     };
 
     $.jStorage.set(userId, rbDict);
     $.jStorage.setTTL(userId, 7200000); // 2 hours
 }
+
+$(document).ready(function() {
+    var backLink = $('#js-back-to-period');
+    if (backLink.length) {
+        var data = $.jStorage.get(userId);
+        if (!data || !data.startDate) {
+            backLink.contents().unwrap();
+        }
+        else {
+            backLink.on('click', function(e) {
+                e.preventDefault();
+                var form = $('<form>', {
+                    method: 'POST',
+                    action: ''
+                });
+                form.append([
+                    $('<input>', {type: 'hidden', name: 'step', value: 1}),
+                    $('<input>', {type: 'hidden', name: 'start_date', value: moment(data.startDate).format('D/MM/YYYY') + ' ' + data.startTime}),
+                    $('<input>', {type: 'hidden', name: 'end_date', value: moment(data.endDate).format('D/MM/YYYY') + ' ' + data.endTime}),
+                    $('<input>', {type: 'hidden', name: 'repeat_unit', value: data.repeatUnit}),
+                    $('<input>', {type: 'hidden', name: 'repeat_step', value: data.repeatStep}),
+                    $('<input>', {type: 'hidden', name: 'flexible_dates_range', value: data.flexibleDatesRange})
+                ]);
+                form.append($.map(data.roomIds, function(value) {
+                    return $('<input>', {type: 'hidden', name: 'room_ids', value: value});
+                }));
+                form.appendTo(document.body).submit();
+            });
+        }
+    }
+});
