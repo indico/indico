@@ -137,7 +137,7 @@
                     $('#eDatePlaceDiv').hide();
                 }
                 refreshDates();
-                forms_are_valid()
+                forms_are_valid();
             });
 
             // Calendars init

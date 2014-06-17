@@ -62,22 +62,19 @@
         }
 
         function restoreUserData() {
-            if (rbUserData.sDay) {
-                $("#sDatePlace").datepicker('setDate', new Date(rbUserData.sYear + "/" + rbUserData.sMonth + "/" + rbUserData.sDay));
-                $("#eDatePlace").datepicker('setDate', new Date(rbUserData.eYear + "/" + rbUserData.eMonth + "/" + rbUserData.eDay));
+            if (rbUserData.startDate) {
+                $("#sDatePlace").datepicker('setDate', moment(rbUserData.startDate).toDate());
+            }
+            if (rbUserData.endDate) {
+                $("#eDatePlace").datepicker('setDate', moment(rbUserData.endDate).toDate());
             }
 
             $("#finishDate").val(rbUserData.finishDate);
-            $("#repeatability input[name=repeatability][value=" + rbUserData.repeatability + "]")
-                    .prop('checked', true)
-                    .change();
-            $("#flexibleDates input[name=flexible_dates_range][value=" + rbUserData.flexible_dates_range + "]")
-                    .prop('checked', true);
+            $("input[name=repeat_unit][value=" + rbUserData.repeatUnit + "]").prop('checked', true).change();
+            $("#flexibleDates input[name=flexible_dates_range][value=" + rbUserData.flexibleDatesRange + "]").prop('checked', true);
 
-            if (rbUserData.sTime) {
-                $('#timerange')
-                        .timerange('setStartTime', rbUserData.sTime)
-                        .timerange('setEndTime', rbUserData.eTime)
+            if (rbUserData.startTime && rbUserData.endTime) {
+                $('#timerange').timerange('setStartTime', rbUserData.startTime).timerange('setEndTime', rbUserData.endTime);
             }
         }
     });

@@ -36,36 +36,10 @@ function set_repeatition_comment() {
 
 //Refresh datapicker's dates
 function refreshDates(){
-    if ($("#sDatePlace").datepicker('getDate') > $("#eDatePlace").datepicker('getDate')) {
-        $("#eDatePlace").datepicker('setDate', $("#sDatePlace").datepicker('getDate'));
-    }
-    $("#sDay").val($("#sDatePlace").datepicker('getDate').getDate());
-    $("#sMonth").val(parseInt($("#sDatePlace").datepicker('getDate').getMonth() + 1));
-    $("#sYear").val($("#sDatePlace").datepicker('getDate').getFullYear());
-    if ($('#finishDate').val() == 'true') {
-        $("#eDay").val($("#eDatePlace").datepicker('getDate').getDate());
-        $("#eMonth").val(parseInt($("#eDatePlace").datepicker('getDate').getMonth() + 1));
-        $("#eYear").val($("#eDatePlace").datepicker('getDate').getFullYear()); }
-    else {
-        $("#eDay").val($("#sDatePlace").datepicker('getDate').getDate());
-        $("#eMonth").val(parseInt($("#sDatePlace").datepicker('getDate').getMonth() + 1));
-        $("#eYear").val($("#sDatePlace").datepicker('getDate').getFullYear());
-    }
-}
-
-//Save calendar data
-function saveCalendarData(finishDate) {
-    $("#sDay").val($("#sDatePlace").datepicker('getDate').getDate());
-    $("#sMonth").val(parseInt($("#sDatePlace").datepicker('getDate').getMonth() + 1));
-    $("#sYear").val($("#sDatePlace").datepicker('getDate').getFullYear());
-    if (finishDate == 'true') {
-        $("#eDay").val($("#eDatePlace").datepicker('getDate').getDate());
-        $("#eMonth").val(parseInt($("#eDatePlace").datepicker('getDate').getMonth() + 1));
-        $("#eYear").val($("#eDatePlace").datepicker('getDate').getFullYear());
-    } else {
-        $("#eDay").val($("#sDatePlace").datepicker('getDate').getDate());
-        $("#eMonth").val(parseInt($("#sDatePlace").datepicker('getDate').getMonth() + 1));
-        $("#eYear").val($("#sDatePlace").datepicker('getDate').getFullYear());
+    var startDate = $("#sDatePlace").datepicker('getDate');
+    var endDate = $("#eDatePlace").datepicker('getDate');
+    if (startDate > endDate) {
+        $("#eDatePlace").datepicker('setDate', startDate);
     }
 }
 
@@ -73,27 +47,22 @@ function saveCalendarData(finishDate) {
 function saveFormData() {
     var selectedRooms = $("#roomselector").roomselector("selection");
     var filterData = $("#roomselector").roomselector("userdata");
-    saveCalendarData($('#finishDate').val());
 
     var rbDict = {
-        "sDay": $("#sDay").val(),
-        "sMonth": $("#sMonth").val(),
-        "sYear": $("#sYear").val(),
-        "eDay": $("#eDay").val(),
-        "eMonth": $("#eMonth").val(),
-        "eYear": $("#eYear").val(),
-        "sTime": $('#timerange').timerange('getStartTime'),
-        "eTime": $('#timerange').timerange('getEndTime'),
+        startDate: $('#sDatePlace').datepicker('getDate'),
+        endDate: $('#eDatePlace').datepicker('getDate'),
+        startTime: $('#timerange').timerange('getStartTime'),
+        endTime: $('#timerange').timerange('getEndTime'),
         "capacity": filterData.capacity,
         "videoconference": filterData.videoconference,
         "webcast": filterData.webcast,
         "projector": filterData.projector,
         "publicroom": filterData.publicroom,
-        "filter":  filterData.search,
-        "selectedRooms":  selectedRooms,
+        "filter": filterData.search,
+        "selectedRooms": selectedRooms,
         "finishDate": $('#finishDate').val(),
         "flexibleDatesRange": $("#flexibleDates input[name=flexible_dates_range]:checked").val(),
-        "repeatability": $('#repeatability input[name=repeatability]:checked').val()
+        "repeatUnit": $('input[name=repeat_unit]:checked').val()
     };
 
     $.jStorage.set(userId, rbDict);
