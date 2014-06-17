@@ -475,7 +475,6 @@ class Config:
         'DBUserName'                : '',
         'DBPassword'                : '',
         'DBRealm'                   : '',
-        'CreateTables'              : False,
         'IsRoomBookingActive'       : True,
         'SQLAlchemyDatabaseURI'     : None,
         'SQLAlchemyEcho'            : False,

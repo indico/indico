@@ -178,10 +178,6 @@ def configure_db(app):
     apply_db_loggers(app.debug)
     configure_mappers()  # Make sure all backrefs are set
     models_committed.connect(on_models_committed, app)
-    if cfg.getCreateTables():
-        with app.app_context():
-            delete_all_tables(db)  # favorable to `drop_all` under foreign keys
-            db.create_all()
 
 
 def extend_url_map(app):
