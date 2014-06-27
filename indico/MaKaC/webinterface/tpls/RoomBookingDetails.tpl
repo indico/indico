@@ -405,7 +405,7 @@
                     </form>
                   </td>
                 </tr>
-                % if edit_logs and (reservation.created_by_user == user or reservation.room.isOwnedBy(user) or user.isRBAdmin()):
+                % if edit_logs and (reservation.created_by_user == user or reservation.room.is_owned_by(user) or user.isRBAdmin()):
                   <tr><td>&nbsp;</td></tr>
                   <!-- BOOKING HISTORY -->
                   <tr>
@@ -517,7 +517,7 @@
                   </td>
                 </tr>
               % endif
-              % if ((reservation.room.isOwnedBy(user) or user.isRBAdmin()) and not reservation.is_confirmed and collisions):
+              % if ((reservation.room.is_owned_by(user) or user.isRBAdmin()) and not reservation.is_confirmed and collisions):
                 <tr><td>&nbsp;</td></tr>
                 <!-- Occurrences -->
                 <tr>

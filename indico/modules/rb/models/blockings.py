@@ -115,7 +115,7 @@ class Blocking(db.Model):
         if not explicit_only:
             if user.isAdmin():
                 return True
-            elif room and room.isOwnedBy(user):
+            elif room and room.is_owned_by(user):
                 return True
         for principal in self.allowed:
             if principal.entity.containsUser(user):

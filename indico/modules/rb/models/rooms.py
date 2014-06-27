@@ -896,7 +896,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def can_be_deleted(self, accessWrapper):
         return self.can_be_modified(accessWrapper)
 
-    def isOwnedBy(self, avatar):
+    def is_owned_by(self, avatar):
         """
         Returns True if user is responsible for this room. False otherwise.
         """

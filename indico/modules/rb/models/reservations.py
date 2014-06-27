@@ -1005,20 +1005,20 @@ class Reservation(Serializer, db.Model):
         return True
 
     def can_be_accepted(self, user):
-        return user and (user.isRBAdmin() or self.room.isOwnedBy(user))
+        return user and (user.isRBAdmin() or self.room.is_owned_by(user))
 
     def can_be_modified(self, user):
         if not user:
             return False
         if self.is_rejected or self.is_cancelled:
             return False
-        return user.isRBAdmin() or self.created_by_user == user or self.room.isOwnedBy(user) or self.isBookedFor(user)
+        return user.isRBAdmin() or self.created_by_user == user or self.room.is_owned_by(user) or self.isBookedFor(user)
 
     def can_be_cancelled(self, user):
         return user and (self.isOwnedBy(user) or user.isRBAdmin() or self.isBookedFor(user))
 
     def can_be_rejected(self, user):
-        return user and (user.isRBAdmin() or self.room.isOwnedBy(user))
+        return user and (user.isRBAdmin() or self.room.is_owned_by(user))
 
     def can_be_deleted(self, user):
         return user and user.isRBAdmin()

@@ -28,7 +28,7 @@ class RoomBookingBlockingProcessBase(ServiceBase):
 
     def _checkProtection(self):
         user = self._aw.getUser()
-        if not user or (not user.isAdmin() and not self.blocked_room.room.isOwnedBy(user)):
+        if not user or (not user.isAdmin() and not self.blocked_room.room.is_owned_by(user)):
             raise ServiceError(_('You are not permitted to modify this blocking'))
 
 
