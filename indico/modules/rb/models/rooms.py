@@ -853,7 +853,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if not avatar:
             return False
 
-        if (not ignore_admin and avatar.isRBAdmin()) or (self.isOwnedBy(avatar) and self.is_active):
+        if (not ignore_admin and avatar.isRBAdmin()) or (self.is_owned_by(avatar) and self.is_active):
             return True
 
         if self.is_active and self.is_reservable and (prebook or not self.reservations_need_confirmation):
@@ -871,7 +871,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return self._can_be_booked(avatar, ignore_admin=ignore_admin)
 
     def can_be_overriden(self, avatar):
-        return avatar.isRBAdmin() or self.isOwnedBy(avatar)
+        return avatar.isRBAdmin() or self.is_owned_by(avatar)
 
     def can_be_prebooked(self, avatar, ignore_admin=False):
         """
@@ -1128,7 +1128,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def check_advance_days(self, end_date, user=None, quiet=False):
         if not self.max_advance_days:
             return
-        if user and (user.isRBAdmin() or self.isOwnedBy(user)):
+        if user and (user.isRBAdmin() or self.is_owned_by(user)):
             return
         advance_days = (end_date - date.today()).days
         ok = advance_days < self.max_advance_days
@@ -1139,7 +1139,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             raise IndicoError(msg.format(self.max_advance_days))
 
     def check_bookable_times(self, start_time, end_time, user=None, quiet=False):
-        if user and (user.isRBAdmin() or self.isOwnedBy(user)):
+        if user and (user.isRBAdmin() or self.is_owned_by(user)):
             return True
         bookable_times = self.bookable_times.all()
         if not bookable_times:
