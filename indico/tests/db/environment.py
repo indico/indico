@@ -19,12 +19,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from flask.ext.testing import TestCase
 import transaction
+
+from flask.ext.testing import TestCase
+from flask.ext.sqlalchemy import models_committed
+from sqlalchemy.orm import configure_mappers
 
 from indico.core.db import db
 from indico.modules.rb.models import *
 from indico.web.flask.app import make_app
+from indico.core.db.sqlalchemy.core import on_models_committed
 
 from .data import *
 
@@ -32,12 +36,15 @@ from .data import *
 class DBTest(TestCase):
 
     # SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-    SQLALCHEMY_DATABASE_URI = 'postgresql://127.0.0.1/testing'
+    SQLALCHEMY_DATABASE_URI = 'postgresql:///testing'
     TESTING = True
 
     def create_app(self):
         app = make_app(db_setup=False)
+        app.config['SQLALCHEMY_DATABASE_URI'] = self.SQLALCHEMY_DATABASE_URI
         db.init_app(app)
+        configure_mappers()
+        models_committed.connect(on_models_committed, app)
         return app
 
     def setUp(self):
