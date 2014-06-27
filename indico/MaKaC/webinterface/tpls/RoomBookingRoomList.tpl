@@ -30,7 +30,7 @@
                             </tr>
                             % for room in rooms:
                               <% details_url = detailsUH.getURL(room) %>
-                              <% booking_url = bookingUH.getURL(room) %>
+                              <% booking_url = url_for('rooms.room_book', room) %>
                               <% modification_url = url_for('rooms_admin.modify_room', room) %>
                               <% on_click_details_url = 'onclick="window.location=\'{}\'"'.format(details_url) %>
                               % if mapAvailable:
@@ -54,12 +54,12 @@
                                 </td>
                                 <td>
                                   <a href="${ details_url }">${ _('view') }</a><br/>
-                                  % if room.canBeBookedBy(user):
+                                  % if room.can_be_booked(user):
                                     <a href="${ booking_url }">${ _('book') }</a><br/>
-                                  % elif room.canBePrebookedBy(user) and not room.canBeBookedBy(user):
+                                  % elif room.can_be_prebooked(user):
                                     <a href="${ booking_url }">${ _('PRE-book') }</a><br/>
                                   % endif
-                                  % if room.canBeModifiedBy(user):
+                                  % if room.can_be_modified(user):
                                     <a href="${ modification_url }"> ${ _('modify') }</a><br/>
                                   % endif
                                   % if mapAvailable:

@@ -343,10 +343,10 @@
                               % elif room.can_be_prebooked(user):
                                 <a class="i-button" href="${ url_for('rooms.room_book', room) }">${ _('PRE-Book') }</a>
                               % endif
-                              % if room.canBeModifiedBy(user):
+                              % if room.can_be_modified(user):
                                 <a class="i-button" href="${ modify_room_url }">${ _('Modify') }</a>
                               % endif
-                              % if room.canBeDeletedBy(user):
+                              % if room.can_be_deleted(user):
                                 <a class="i-button" href="#" onclick="submit_delete(); return false;">${ _('Delete') }</a>
                               % endif
                               <a class="i-button" href="${ stats_url }">${ _('Stats') }</a>

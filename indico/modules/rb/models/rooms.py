@@ -880,7 +880,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         """
         return self._can_be_booked(avatar, prebook=True, ignore_admin=ignore_admin)
 
-    def canBeModifiedBy(self, accessWrapper):
+    def can_be_modified(self, accessWrapper):
         """Only admin can modify rooms."""
         if not accessWrapper:
             return False
@@ -893,9 +893,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
         raise MaKaCError(_('canModify requires either AccessWrapper or Avatar object'))
 
-    def canBeDeletedBy(self, accessWrapper):
-        """Entity can modify is also capable of deletion"""
-        return self.canBeModifiedBy(accessWrapper)
+    def can_be_deleted(self, accessWrapper):
+        return self.can_be_modified(accessWrapper)
 
     def isOwnedBy(self, avatar):
         """
