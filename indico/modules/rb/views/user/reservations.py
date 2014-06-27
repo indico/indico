@@ -142,7 +142,7 @@ class WPRoomBookingSearchBookingsResults(WPRoomBookingBase):
     def _getBody(self, params):
         params['summary'] = self._get_criteria_summary(params)
         calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
-                                             rooms=params['rooms'])
+                                             rooms=params['rooms'], show_blockings=params['show_blockings'])
         params['calendar'] = calendar.render(form_data=params['form_data'])
         return WTemplated('RoomBookingSearchBookingsResults').getHTML(params)
 

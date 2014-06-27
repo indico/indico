@@ -138,6 +138,7 @@ class RHRoomBookingRejectBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBook
 
 class RHRoomBookingSearchBookings(RHRoomBookingBase):
     menu_item = 'bookingListSearch'
+    show_blockings = True
 
     def _get_form_data(self):
         return request.form
@@ -157,6 +158,7 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
             occurrences = ReservationOccurrence.find_with_filters(form.data, session.user).all()
             rooms = [r for r in self._rooms if r.id in set(form.room_ids.data)]
             return WPRoomBookingSearchBookingsResults(self, rooms=rooms, occurrences=occurrences,
+                                                      show_blockings=self.show_blockings,
                                                       start_dt=form.start_dt.data, end_dt=form.end_dt.data,
                                                       form=form, form_data=self._form_data,
                                                       menu_item=self.menu_item).display()
@@ -168,6 +170,7 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
 class RHRoomBookingSearchBookingsShortcutBase(RHRoomBookingSearchBookings):
     """Base class for searches with predefined criteria"""
     search_criteria = {}
+    show_blockings = False
 
     def _is_submitted(self):
         return True
