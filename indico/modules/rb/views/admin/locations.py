@@ -42,7 +42,7 @@ class WRoomBookingAdmin(WTemplated):
 
     def getVars(self):
         wvars = WTemplated.getVars(self)
-        wvars['locations'] = Location.getLocations()
+        wvars['locations'] = Location.find_all()
         defaultLocation = Location.getDefaultLocation()
         wvars['defaultLocationName'] = defaultLocation.name if defaultLocation else ''
         return wvars

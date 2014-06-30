@@ -116,13 +116,5 @@ class RoomEquipment(db.Model):
     # getters
 
     @staticmethod
-    def getEquipmentById(eid):
-        return RoomEquipment.query.get(eid)
-
-    @staticmethod
-    def getEquipments():
-        return RoomEquipment.query.all()
-
-    @staticmethod
     def getEquipmentNames():
         return RoomEquipment.query.with_entities(RoomEquipment.name).all()

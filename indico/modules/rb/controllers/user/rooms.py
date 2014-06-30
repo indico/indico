@@ -18,6 +18,7 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime, timedelta
+
 from flask import request, session
 
 from MaKaC.common.cache import GenericCache
@@ -25,13 +26,16 @@ from MaKaC.webinterface.locators import WebLocator
 from indico.util.i18n import _
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.decorators import requires_location, requires_room
-from indico.modules.rb.controllers.forms import RoomListForm
+from indico.modules.rb.controllers.forms import SearchRoomsForm, FormDefaults
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import RepeatUnit
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.modules.rb.models.utils import next_work_day
-from indico.modules.rb.views.user import rooms as room_views
+from indico.modules.rb.views.user.rooms import (WPRoomBookingSearchRooms, WPRoomBookingMapOfRooms,
+                                                WPRoomBookingMapOfRoomsWidget, WPRoomBookingRoomList,
+                                                WPRoomBookingRoomDetails, WPRoomBookingRoomStats,
+                                                WPRoomBookingSearchRoomsResults)
 
 
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):
@@ -40,7 +44,7 @@ class RHRoomBookingMapOfRooms(RHRoomBookingBase):
         self._room_id = request.args.get('roomID')
 
     def _process(self):
-        return room_views.WPRoomBookingMapOfRooms(self, roomID=self._room_id).display()
+        return WPRoomBookingMapOfRooms(self, roomID=self._room_id).display()
 
 
 class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
@@ -67,7 +71,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         html = self._cache.get(key)
         if not html:
             self._businessLogic()
-            page = room_views.WPRoomBookingMapOfRoomsWidget(
+            page = WPRoomBookingMapOfRoomsWidget(
                 self,
                 self._aspects,
                 self._buildings,
@@ -80,7 +84,26 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         return html
 
 
+class RHRoomBookingSearchRooms(RHRoomBookingBase):
+    def _checkParams(self):
+        defaults = FormDefaults(location=Location.getDefaultLocation())
+        self._form = SearchRoomsForm(obj=defaults)
+        if not session.user.has_rooms:
+            del self._form.is_only_my_rooms
+
+    def _process(self):
+        form = self._form
+        if form.validate_on_submit():
+            rooms = Room.getRoomsForRoomList(form, session.user)
+            return WPRoomBookingSearchRoomsResults(self, rooms=rooms).display()
+        equipment_locations = {eq.id: eq.location_id for eq in RoomEquipment.find()}
+        return WPRoomBookingSearchRooms(self, form=form, errors=form.error_list, rooms=Room.find_all(),
+                                        equipment_locations=equipment_locations).display()
+
+
 class RHRoomBookingRoomList(RHRoomBookingBase):
+    # TODO: This will only be needed for "my rooms" and should be done similar to
+    # how RHRoomBookingSearchBookingsShortcutBase is done and get a similar kind of URL!
     def _checkParams(self):
         self._form = RoomListForm(request.values)
 
@@ -89,21 +112,12 @@ class RHRoomBookingRoomList(RHRoomBookingBase):
         room_count = len(self._rooms)
         self._title = _('1 room found') if room_count == 1 else _('{} rooms found').format(room_count)
         self._mapAvailable = Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable()
-        return room_views.WPRoomBookingRoomList(self).display()
+        return WPRoomBookingRoomList(self).display()
 
 
+# TODO: remove with legacy makac code. still referenced in book-room-for-event code
 class RHRoomBookingSearch4Rooms(RHRoomBookingBase):
-    def _checkParams(self):
-        self._is_new_booking = request.values.get('is_new_booking', type=bool, default=False)
-
-    def _process(self):
-        # TODO: make this only one query
-        self._rooms = Room.find_all()
-        self._locations = Location.getLocations()
-        self._equipments = RoomEquipment.getEquipments()
-        self._is_user_responsible_for_rooms = Room.isAvatarResponsibleForRooms(self.getAW().getUser())
-        self._event_room_name = None
-        return room_views.WPRoomBookingSearch4Rooms(self, self._is_new_booking).display()
+    pass
 
 
 class RHRoomBookingRoomDetails(RHRoomBookingBase):
@@ -140,7 +154,7 @@ class RHRoomBookingRoomDetails(RHRoomBookingBase):
         # self._clearSessionState()
 
     def _process(self):
-        return room_views.WPRoomBookingRoomDetails(self).display()
+        return WPRoomBookingRoomDetails(self).display()
 
 
 # TODO
@@ -165,4 +179,4 @@ class RHRoomBookingRoomStats(RHRoomBookingBase):
 
     def _process(self):
         self._businessLogic()
-        return room_views.WPRoomBookingRoomStats(self).display()
+        return WPRoomBookingRoomStats(self).display()

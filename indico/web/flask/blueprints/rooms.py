@@ -73,7 +73,7 @@ rooms.add_url_rule('/rooms',
 
 rooms.add_url_rule('/search/rooms',
                    'roomBooking-search4Rooms',
-                   room_handlers.RHRoomBookingSearch4Rooms,
+                   room_handlers.RHRoomBookingSearchRooms,
                    methods=('GET', 'POST'))
 
 

@@ -101,7 +101,7 @@ def teardown():
     pass
 
 
-def convert_reservation_repeatibility(old):
+def convert_reservation_repeatability(old):
     return RepeatMapping.getNewMapping(old)
 
 
@@ -361,7 +361,7 @@ def migrate_reservations(rb_root):
             print cformat('  %{red!}skipping resv for dead room {0.room.id}: {0.id} ({0._utcCreatedDT})').format(v)
             continue
 
-        repeat_unit, repeat_step = convert_reservation_repeatibility(v.repeatability)
+        repeat_unit, repeat_step = convert_reservation_repeatability(v.repeatability)
 
         r = Reservation(
             id=v.id,

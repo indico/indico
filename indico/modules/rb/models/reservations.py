@@ -89,7 +89,7 @@ class RepeatMapping(object):
     @unimplemented(exceptions=(KeyError,), message=_('Unknown old repeatability'))
     def getNewMapping(cls, repeat):
         if repeat is None or repeat < 5:
-            for k, (_, v) in cls._mapping.iteritems():
+            for k, (_, v, _) in cls._mapping.iteritems():
                 if v == repeat:
                     return k
         else:
@@ -134,7 +134,7 @@ class Reservation(Serializer, db.Model):
         db.DateTime,
         nullable=False
     )
-    # repeatibility
+    # repeatability
     repeat_unit = db.Column(
         db.SmallInteger,
         nullable=False,

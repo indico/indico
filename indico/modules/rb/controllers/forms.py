@@ -20,33 +20,30 @@
 import itertools
 import json
 from collections import defaultdict
-from datetime import datetime, date, time, timedelta
-from functools import partial
+from datetime import datetime, date, timedelta
 
 from flask import session
 from flask.ext.wtf import Form
 from flask.ext.wtf.file import FileField
-from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
-from wtforms.fields.core import (Field, BooleanField, FloatField, IntegerField, StringField, FieldList, FormField,
-                                 RadioField, SelectMultipleField)
+from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField, QuerySelectField
+from wtforms.fields.core import (BooleanField, FloatField, IntegerField, StringField, FieldList, FormField, RadioField,
+                                 SelectMultipleField)
 from wtforms.fields.simple import HiddenField, TextAreaField, SubmitField
-from wtforms.validators import (AnyOf, Optional, NumberRange, DataRequired, ValidationError, StopValidation,
+from wtforms.validators import (Optional, NumberRange, DataRequired, ValidationError, StopValidation,
                                 InputRequired)
 from wtforms.ext.dateutil.fields import DateTimeField, DateField
-from wtforms.widgets import CheckboxInput, HiddenInput
+from wtforms.widgets import CheckboxInput, HiddenInput, HTMLString
 from wtforms_components import TimeField
 
-from indico.core.errors import IndicoError
 from indico.util.i18n import _
 from indico.util.string import is_valid_mail
-from indico.modules.rb.models.reservations import RepeatUnit, RepeatMapping
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.reservations import RepeatUnit, RepeatMapping
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.room_equipments import RoomEquipment
 from MaKaC.user import GroupHolder, AvatarHolder
-
-
-AVAILABILITY_VALUES = ['Available', 'Booked', "Don't care"]
 
 
 def auto_datetime(diff=None):
@@ -57,11 +54,26 @@ def auto_date(specified_time):
     return datetime.combine(auto_datetime(), specified_time)
 
 
-def repeatibility_check(form, field):
-    if form.availability.validate(form):
-        if form.availability.data == AVAILABILITY_VALUES[1]:
-            if field.data >= 5:
-                raise ValidationError('Unrecognized repeatability')
+def _get_equipment_label(eq):
+    parents = []
+    parent = eq.parent
+    while parent:
+        parents.append(parent.name)
+        parent = parent.parent
+    return ': '.join(itertools.chain(reversed(parents), [eq.name]))
+
+
+def _group_equipment(objects, _tree=None, _child_of=None):
+    """Groups the equipment list so children follow their their parents"""
+    if _tree is None:
+        _tree = defaultdict(list)
+        for obj in objects:
+            _tree[obj[1].parent_id].append(obj)
+
+    for obj in _tree[_child_of]:
+        yield obj
+        for child in _group_equipment(objects, _tree, obj[1].id):
+            yield child
 
 
 class DataWrapper(object):
@@ -111,6 +123,22 @@ class IndicoForm(Form):
         return data
 
 
+class ConcatWidget(object):
+    """Renders a list of fields as a simple string joined by an optional separator."""
+    def __init__(self, separator='', prefix_label=True):
+        self.separator = separator
+        self.prefix_label = prefix_label
+
+    def __call__(self, field, label_args=None, field_args=None):
+        label_args = label_args or {}
+        field_args = field_args or {}
+        html = []
+        for subfield in field:
+            fmt = '{0} {1}' if self.prefix_label else '{1} {0}'
+            html.append(fmt.format(subfield.label(**label_args), subfield(**field_args)))
+        return HTMLString(self.separator.join(html))
+
+
 class UsedIf(object):
     """Makes a WTF field "used" if a given condition evaluates to True.
 
@@ -158,107 +186,6 @@ class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
 
 class IndicoQuerySelectMultipleCheckboxField(IndicoQuerySelectMultipleField):
     option_widget = CheckboxInput()
-
-
-class IndicoField(Field):
-    # DEPRECATED/TO BE REMOVED - DO NOT USE
-    def __init__(self, *args, **kw):
-        self.parameter_name = kw.pop('parameter_name', None)
-        super(IndicoField, self).__init__(*args, **kw)
-        if not self.parameter_name:
-            self.parameter_name = self.underscore_to_camel_case(self.name)
-
-    def underscore_to_camel_case(self, s):
-        ls = s.split('_')
-        return ''.join(ls[:1] + [e.capitalize() for e in ls[1:]])
-
-    def process_default(self, formdata, data):
-        self.process_errors = []
-        if data is None:
-            try:
-                data = self.default()
-            except TypeError:
-                data = self.default
-
-        self.object_data = data
-
-        try:
-            self.process_data(data)
-        except ValueError as e:
-            self.process_errors.append(e.args[0])
-
-    def process_filters(self):
-        for filter in self.filters:
-            try:
-                self.data = filter(self.data)
-            except ValueError as e:
-                self.process_errors.append(e.args[0])
-
-    def _process(self, formdata, data):
-        if formdata:
-            try:
-                if self.parameter_name in formdata:
-                    self.raw_data = formdata.getlist(self.parameter_name)
-                elif self.name in formdata:
-                    self.raw_data = formdata.getlist(self.name)
-                else:
-                    self.raw_data = []
-                self.process_formdata(self.raw_data)
-            except ValueError as e:
-                self.process_errors.append(e.args[0])
-
-    def process(self, formdata, data=None):
-        self.process_default(formdata, data)
-        self._process(formdata, data)
-        self.process_filters()
-
-
-class DateTimeIndicoField(IndicoField, DateTimeField):
-    # DEPRECATED/TO BE REMOVED - DO NOT USE
-    def process_formdata(self, raw_data):
-        if raw_data:
-            try:
-                self.data = datetime.combine(datetime(*map(int, raw_data[:-1])),
-                                             datetime.strptime(raw_data[-1], '%H:%M'))
-            except:
-                self.data = datetime(*map(int, raw_data))
-
-    def _process(self, formdata, data=None):
-        if formdata:
-            try:
-                try:
-                    self.raw_data = [formdata.getlist(p)[0] for p in self.parameter_name if formdata.getlist(p)]
-                except KeyError:
-                    camel_name = self.underscore_to_camel_case(self.name) in formdata
-                    if camel_name in formdata:
-                        self.raw_data = formdata.getlist(self.name)
-                    elif self.name in formdata:
-                        self.raw_data = formdata.getlist(self.name)
-                    else:
-                        self.raw_data = []
-                self.process_formdata(self.raw_data)
-            except ValueError as e:
-                self.process_errors.append(e.args[0])
-
-
-class MultipleCheckboxIndicoField(IndicoField):
-    # DEPRECATED/TO BE REMOVED - DO NOT USE
-    def __init__(self, prefix, *args, **kw):
-        self.prefix = prefix
-        super(MultipleCheckboxIndicoField, self).__init__(*args, **kw)
-
-    def _process(self, formdata, data=None):
-        if formdata:
-            try:
-                if self.prefix:
-                    self.raw_data = [int(k.replace(self.prefix, '', 1))
-                                     for k, _ in formdata.iteritems()
-                                     if k.startswith(self.prefix)]
-                else:
-                    self.raw_data = []
-                self.data = self.raw_data
-            except ValueError as e:
-                self.process_errors.append(e.args[0])
 
 
 class JSONField(HiddenField):
@@ -445,35 +372,29 @@ class ModifyBookingForm(NewBookingSimpleForm):
             raise ValidationError(_('The start time cannot be moved into the paste.'))
 
 
-class RoomListForm(IndicoForm):
-    location_id = IntegerField(validators=[DataRequired(), NumberRange(min=1)])
-    free_search = StringField()
-    capacity = IntegerField(validators=[NumberRange(min=0)])
-    equipments = MultipleCheckboxIndicoField('equipments_')
-
-    availability = StringField(validators=[DataRequired(), AnyOf(values=AVAILABILITY_VALUES)],
-                               default='Don\'t care')
-    repeatibility = IntegerField(validators=[repeatibility_check])
-
-    includes_pending_blockings = BooleanField(validators=[DataRequired()], default=False)
-    includes_pre_bookings = BooleanField(validators=[DataRequired()], default=False)
-
-    is_public = BooleanField(default=True)
-    is_only_my_rooms = BooleanField(default=False)
-    is_auto_confirm = BooleanField(default=True)
-    is_active = BooleanField(default=True)
-
-    start_date = DateTimeIndicoField(validators=[Optional()],
-                                     parameter_name=('sYear', 'sMonth', 'sDay', 'sTime'),
-                                     default=partial(auto_date, time(8, 30)))
-    end_date = DateTimeIndicoField(validators=[Optional()],
-                                   parameter_name=('eYear', 'eMonth', 'eDay', 'eTime'),
-                                   default=partial(auto_date, time(17, 30)))
-
-    def __getattr__(self, attr):
-        if attr == 'repeat':
-            RepeatMapping.getNewMapping(self.repeatibility.data)
-        raise IndicoError('{} has no attribute: {}'.format(self.__class__.__name__, attr))
+class SearchRoomsForm(IndicoForm):
+    location = QuerySelectField(_('Location'), get_label=lambda x: x.name, query_factory=Location.find)
+    details = StringField()
+    available = RadioField(_('Availability'), coerce=int, default=-1, validators=[InputRequired()],
+                           choices=[(1, _('Available')), (0, _('Booked')), (-1, _("Don't care"))],
+                           widget=ConcatWidget(prefix_label=False))
+    capacity = IntegerField(_('Capacity'), validators=[NumberRange(min=0)], default=0)
+    equipments = IndicoQuerySelectMultipleCheckboxField(_('Equipment'), get_label=_get_equipment_label,
+                                                        modify_object_list=_group_equipment,
+                                                        query_factory=lambda: RoomEquipment.find().order_by(
+                                                            RoomEquipment.name))
+    is_only_public = BooleanField(_('Only public rooms'), default=True)
+    is_auto_confirm = BooleanField(_('Only rooms not requiring confirmation'), default=True)
+    is_only_active = BooleanField(_('Only active rooms'), default=True)
+    is_only_my_rooms = BooleanField(_('Only my rooms'))
+    # Period details when searching for (un-)availability
+    start_date = DateTimeField(_('Start date'), validators=[Optional()], parse_kwargs={'dayfirst': True},
+                               display_format='%d/%m/%Y %H:%M', widget=HiddenInput())
+    end_date = DateTimeField(_('End date'), validators=[Optional()], parse_kwargs={'dayfirst': True},
+                             display_format='%d/%m/%Y %H:%M', widget=HiddenInput())
+    repeatability = StringField()  # TODO: use repeat_unit/step with new UI
+    include_pending_blockings = BooleanField(_('Check conflicts against pending blockings'), default=True)
+    include_pre_bookings = BooleanField(_('Check conflicts against pre-bookings'), default=True)
 
 
 class BlockingForm(IndicoForm):
@@ -536,28 +457,6 @@ class CreateBlockingForm(BlockingForm):
             raise ValidationError('Blocking may not end before it starts!')
 
     validate_end_date = validate_start_date
-
-
-def _get_equipment_label(eq):
-    parents = []
-    parent = eq.parent
-    while parent:
-        parents.append(parent.name)
-        parent = parent.parent
-    return ': '.join(itertools.chain(reversed(parents), [eq.name]))
-
-
-def _group_equipment(objects, _tree=None, _child_of=None):
-    """Groups the equipment list so children follow their their parents"""
-    if _tree is None:
-        _tree = defaultdict(list)
-        for obj in objects:
-            _tree[obj[1].parent_id].append(obj)
-
-    for obj in _tree[_child_of]:
-        yield obj
-        for child in _group_equipment(objects, _tree, obj[1].id):
-            yield child
 
 
 class _TimePair(IndicoForm):

@@ -169,12 +169,7 @@ class WRoomBookingRoomList(WTemplated):
         return wvars
 
 
-class WPRoomBookingSearch4Rooms(WPRoomBookingBase):
-    def __init__(self, rh, is_new_booking=False):
-        WPRoomBookingBase.__init__(self, rh)
-        self._rh = rh
-        self._is_new_booking = is_new_booking
-
+class WPRoomBookingSearchRooms(WPRoomBookingBase):
     def getJSFiles(self):
         return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
@@ -182,13 +177,26 @@ class WPRoomBookingSearch4Rooms(WPRoomBookingBase):
         return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Search for rooms'))
 
     def _setCurrentMenuItem(self):
-        if self._is_new_booking:
-            self._bookARoomOpt.setActive(True)
-        else:
-            self._roomSearchOpt.setActive(True)
+        self._roomSearchOpt.setActive(True)
 
     def _getBody(self, params):
-        return WRoomBookingSearch4Rooms(self._rh, standalone=True).getHTML(params)
+        today = next_work_day()
+        params['startDT'] = datetime.combine(today.date(), time(8, 30))
+        params['endDT'] = datetime.combine(today.date(), time(17, 30))
+        params['startT'] = params['startDT'].strftime('%H:%M')
+        params['endT'] = params['endDT'].strftime('%H:%M')
+        return WTemplated('RoomBookingSearchRooms').getHTML(params)
+
+
+class WPRoomBookingSearchRoomsResults(WPRoomBookingBase):
+    def _getTitle(self):
+        return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Search results'))
+
+    def _setCurrentMenuItem(self):
+        self._roomSearchOpt.setActive(True)
+
+    def _getBody(self, params):
+        return WTemplated('RoomBookingSearchRoomsResults').getHTML(params)
 
 
 class WRoomBookingSearch4Rooms(WTemplated):

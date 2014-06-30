@@ -69,43 +69,47 @@
     ${ _('Search rooms') }
 </h2>
 
-<form id="chooseForm" method="post">
-    <h2 class="group-title">
-        <i class="icon-location"></i>
-        ${ _('Check a room') }
-    </h2>
-    <select name="roomName" id="roomName">
-        % for room in rooms:
-        <option value="${ bookingFormUH.getURL(room) if forNewBooking else detailsUH.getURL(room) }"
-            ${ (room.name == eventRoomName) * 'selected' } class="${ room.kind }">
-                ${ room.location.name + ": &nbsp; " + room.getFullName() }
+% if form.error_list:
+    <div class="error-message-box">
+        <div class="message-text">
+            ${ _('There are some errors in the data you submitted') }:
+            <ul>
+                % for error in form.error_list:
+                    <li>${ error }</li>
+                % endfor
+            </ul>
+        </div>
+    </div>
+% endif
+
+<!-- Choose a room -->
+<h2 class="group-title">
+    <i class="icon-location"></i>
+    ${ _('Check a room') }
+</h2>
+<select name="roomName" id="roomName">
+    % for room in rooms:
+        <option value="${ url_for('rooms.roomBooking-roomDetails', room) }" class="${ room.kind }">
+            ${ '{}: &nbsp; {}'.format(room.location.name, room.full_name) }
         </option>
     % endfor
-  </select>
+</select>
 
-  % if forNewBooking:
-    <span id="bookButtonWrapper">
-      <input id="bookButton" class="i-button highlight" type="button"
-        value="${ _('Book') }" onclick="isBookable();" />
-    </span>
-  % else:
-    <input class="i-button highlight" type="button" value="${ _('Go to room') }"
-      onclick="document.location = $('#roomName').val(); return false;"/>
-  % endif
+<input class="i-button highlight" type="button" value="${ _('Go to room') }" onclick="location.href = $('#roomName').val(); return false;"/>
+${ contextHelp('chooseButtonHelp') }
 
-  <!-- Help -->
-  ${ contextHelp('chooseButtonHelp') }
-</form>
-
+<!-- Search for rooms -->
 <div id="searchRooms">
-    <form id="searchForm" method="post" action="${ roomBookingRoomListURL }">
+    <form id="searchRoomsForm" method="post" action="">
+        ${ form.start_date() }
+        ${ form.end_date() }
         <h2 class="group-title">
             <i class="icon-search"></i>
             ${ _('Search for a room') }
         </h2>
 
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
-            <!-- LOCATION (PLUGIN) -->
+            <!-- LOCATION -->
             <tr>
                 <td class="titleCellTD" style="width: 125px;">
                     <span class="titleCellFormat">${ _('Location') }</span>
@@ -114,13 +118,7 @@
                     <table width="100%" cellspacing="4px">
                         <tr>
                             <td align="left" class="blacktext">
-                                <select name="roomLocation" id="roomLocation">
-                                % for location in locations:
-                                    <option value="${ location.id }" ${ location.is_default * 'selected' }>
-                                        ${ location.name }
-                                    </option>
-                                % endfor
-                                </select>
+                                ${ form.location() }
                             </td>
                         </tr>
                     </table>
@@ -136,7 +134,7 @@
                     <table width="100%" cellspacing="4px">
                         <tr>
                             <td align="left" class="blacktext">
-                                <input id="freeSearch" size="30" type="text" name="freeSearch" />
+                                ${ form.details(size=30) }
                                 ${ contextHelp('freeSearchHelp') }
                             </td>
                         </tr>
@@ -153,24 +151,18 @@
                     <table width="100%" cellspacing="4px">
                         <tr>
                             <td align="left" class="blacktext">
-                                <input name="availability" type="radio" value="Available" data-show-availability="true" ${ forNewBooking * 'checked' } />
-                                    ${ _('Available') }
-                                <input name="availability" type="radio" value="Booked" data-show-availability="true" />
-                                    ${ _('Booked') }
-                                <input name="availability" type="radio" value="Don't care" data-show-availability="false" ${ (not forNewBooking) * 'checked' } />
-                                    ${ _('Don\'t care') }
+                                ${ form.available(label_args={'style': 'font-weight: normal;'}) }
                                 ${ contextHelp('availabilityHelp') }
                             </td>
                         </tr>
-
-                        <%include file="RoomBookingPeriodFormOld.tpl" args="form = 1, unavailableDates = [], availableDayPeriods = [] "/>
+                        <%include file="RoomBookingPeriodFormOld.tpl"/>
                         <tr id='includePrebookingsTR'>
                             <td class="subFieldWidth" align="right" >
                                 <small> ${ _('PRE-Bookings') }</small>
                             </td>
                             <td align="left" class="blacktext">
-                                <input id="includePrebookings" name="includePrebookings" type="checkbox" checked/>
-                                ${ _('Check conflicts against pre-bookings') }
+                                ${ form.include_pre_bookings() }
+                                ${ form.include_pre_bookings.label(style='font-weight: normal;') }
                                 ${ inlineContextHelp(_('Check if you want to avoid conflicts with PRE-bookings. By default conflicts are checked only against confirmed bookings.')) }
                             </td>
                         </tr>
@@ -179,8 +171,8 @@
                                 <small>${ _('Blockings') }</small>
                             </td>
                             <td align="left" class="blacktext">
-                                <input id="includePendingBlockings" name="includePendingBlockings" type="checkbox" checked />
-                                ${ _('Check conflicts against pending blockings') }
+                                ${ form.include_pending_blockings() }
+                                ${ form.include_pending_blockings.label(style='font-weight: normal;') }
                                 ${ inlineContextHelp(_('Check if you want to avoid conflicts with pending blockings. By default conflicts are checked only against confirmed blockings.')) }
                             </td>
                         </tr>
@@ -191,13 +183,13 @@
             <!-- CAPACITY -->
             <tr>
                 <td class="titleCellTD" style="width: 125px;">
-                    <span class="titleCellFormat">${ _('Capacity') }</span>
+                    <span class="titleCellFormat">${ form.capacity.label(style='font-weight: normal;') }</span>
                 </td>
                 <td align="right">
                     <table width="100%" cellspacing="4px">
                         <tr>
                             <td align="left" class="blacktext">
-                                <input size="3" type="text" id="capacity" name="capacity"/>
+                                ${ form.capacity(size=3) }
                                 ${ _('seats') }
                                 ${ contextHelp('capacityHelp') }
                             </td>
@@ -209,17 +201,17 @@
             <!-- REQUIRED EQUIPMENT -->
             <tr>
                 <td nowrap class="titleCellTD" style="width: 125px;">
-                    <span class="titleCellFormat">${ _("Required equipment") }
+                    <span class="titleCellFormat">${ _("Required equipment") }</span>
                 </td>
                 <td align="right">
                     <table width="100%" cellspacing="4px">
                         <tr>
-                            <td align="left" class="blacktext" >
-                                % for eq in possibleEquipment:
-                                    <input id="${ eq.id }" name="equipments_${ eq.id }" type="checkbox">
-                                        ${ eq.name }
-                                    </input>
-                                    <br />
+                            <td align="left" class="blacktext">
+                                % for eq in form.equipments:
+                                    <div class="${ 'js-location js-location-{}'.format(equipment_locations[int(eq.data)]) }">
+                                        ${ eq() }
+                                        ${ eq.label(style='font-weight: normal;') }
+                                    </div>
                                 % endfor
                             </td>
                         </tr>
@@ -228,51 +220,34 @@
             </tr>
 
             <tr>
-                <td nowrap class="titleCellTD" style="width: 125px;"><span class="titleCellFormat">
-                    ${ _('Special attributes') }
+                <td nowrap class="titleCellTD" style="width: 125px;">
+                    <span class="titleCellFormat">${ _('Special attributes') }</span>
                 </td>
                 <td align="right">
                     <table width="100%" cellspacing="4px">
                         <tr>
                             <td align="left" class="blacktext">
-                                <input id="isReservable" name="isReservable" type="checkbox" checked/>
-                                ${ _('Is public') }
+                                ${ form.is_only_public() }
+                                ${ form.is_only_public.label(style='font-weight: normal;') }
                                 ${ inlineContextHelp(_('Include only publically reservable rooms.')) }
-                                <br />
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="left" class="blacktext">
-                                <input id="isAutoConfirmed" name="isAutoConfirmed" type="checkbox"/>
-                                ${ _('Auto confirm') }
+                                <br>
+                                ${ form.is_auto_confirm() }
+                                ${ form.is_auto_confirm.label(style='font-weight: normal;') }
                                 ${ inlineContextHelp(_('Include only rooms, where bookings are automatically confirmed. This is the case for most rooms.')) }
-                                <br />
+                                % if form.is_only_my_rooms:
+                                    <br>
+                                    ${ form.is_only_my_rooms() }
+                                    ${ form.is_only_my_rooms.label(style='font-weight: normal;') }
+                                    ${ inlineContextHelp(_('Include only rooms you are responsible for.')) }
+                                % endif
+                                % if form.is_only_active:
+                                    <br>
+                                    ${ form.is_only_active() }
+                                    ${ form.is_only_active.label(style='font-weight: normal;') }
+                                    ${ inlineContextHelp(_('Include only active rooms. <b>This should be checked.</b> Please note that inactive rooms are considered deleted.')) }
+                                % endif
                             </td>
                         </tr>
-
-                        % if isResponsibleForRooms:
-                        <tr>
-                            <td class="subFieldWidth" align="right" valign="top">
-                                ${ _('Only mine') }&nbsp;&nbsp;
-                            </td>
-                            <td align="left" class="blacktext">
-                                <input id="onlyMy" name="onlyMy" type="checkbox" />
-                                ${ inlineContextHelp(_('Include only rooms you are responsible for.')) }
-                                <br />
-                            </td>
-                        </tr>
-                        % endif
-
-                        % if user.isAdmin():
-                        <tr>
-                            <td align="left" class="blacktext">
-                                <input id="isActive" name="isActive" type="checkbox" checked/>
-                                ${ _('Active?') }
-                                ${ inlineContextHelp(_('Include only active rooms. <b>This should be checked.</b> Please note that inactive rooms are considered deleted.')) }
-                                <br />
-                            </td>
-                        </tr>
-                        % endif
                     </table>
                 </td>
             </tr>
@@ -303,15 +278,16 @@
         }
 
         // Clean up - make all textboxes white again
-        var searchForm = $('#searchForm');
+        var searchForm = $('#searchRoomsForm');
         $(':input', searchForm).removeClass('invalid');
         // Init
         var isValid = true;
 
         // Simple search -------------------------------------
         // Availability
-        if (!$('input[name="availability"]', searchForm).is(':checked')) { // only if NOT "Don't care"
-            isValid = validate_period();
+        if ($('input[name="available"]:checked', searchForm).val() != '-1') { // only if NOT "Don't care"
+            // validate_period is not defined, wth, apparently the old if condition was never net
+            // isValid = validate_period();
         }
         // capacity
         if ($('#capacity').val().length > 0 && parseInt($('#capacity').val(), 10).toString() == 'NaN') {
@@ -386,26 +362,29 @@
     }
 
     $(window).on('load', function() {
-        $('#searchForm').delegate(':input', 'keyup change', function() {
+        $('#searchRoomsForm').on('keyup change', ':input', function() {
             forms_are_valid();
-        }).submit(function(e) {
+        }).on('submit', function(e) {
             if (!forms_are_valid(true)) {
                 e.preventDefault();
                 new AlertPopup($T("Error"), $T("There are errors in the form. Please correct fields with red background.")).open();
-            };
+            }
         });
 
         if (forms_are_valid()) {
             set_repeatition_comment();
         }
-        if ($('#searchForm input[name="availability"]').is(':checked')) { // if "Don't care" about availability
-            display_availability(false);
-        }
-        $('#searchForm input[name="availability"]').change(function() {
-            display_availability($(this).data('showAvailability'));
+        $('#searchRoomsForm input[name="available"]').change(function() {
+            display_availability(this.value != '-1');
         });
-        display_availability($('input[name=availability]:checked').data('showAvailability'));
+        display_availability($('input[name="available"]:checked').val() != '-1');
         $('#freeSearch').focus();
     });
+
+    $('#location').on('change', function() {
+        var locationId = $(this).val();
+        $('.js-location').hide().find('input:checkbox').prop('checked', false);
+        $('.js-location-' + locationId).show();
+    }).trigger('change');
 
 </script>

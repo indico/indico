@@ -68,7 +68,7 @@ def unimplemented(exceptions=(Exception,), message='Unimplemented'):
             try:
                 return func(*args, **kw)
             except exceptions:
-                raise IndicoError(message)
+                raise IndicoError(str(message))
 
         return _wrapper
 

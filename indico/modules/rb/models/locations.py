@@ -239,10 +239,6 @@ class Location(db.Model):
         return Location.query.filter_by(name=name).first()
 
     @staticmethod
-    def getLocations():
-        return Location.query.all()
-
-    @staticmethod
     def getNumberOfLocations():
         return Location.query.count()
 

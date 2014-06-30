@@ -9,7 +9,7 @@
       <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
         <tr>
           <td class="maincell">
-            <h2 class="page-title">${ title }</h2>
+            <h2 class="page-title">${ _(' Found rooms ') }</h2>
             % if rooms:
               <table width="100%" class="filesTab">
                 <tr>
@@ -29,12 +29,12 @@
                               <td class="titleCellTD" colspan="10" style="height: 0px">&nbsp;</td>
                             </tr>
                             % for room in rooms:
-                              <% details_url = detailsUH.getURL(room) %>
+                              <% details_url = url_for('rooms.roomBooking-roomDetails', room) %>
                               <% booking_url = url_for('rooms.room_book', room) %>
                               <% modification_url = url_for('rooms_admin.modify_room', room) %>
                               <% on_click_details_url = 'onclick="window.location=\'{}\'"'.format(details_url) %>
                               % if mapAvailable:
-                                <% show_on_map = mapUH.getURL(roomID=room.id) %>
+                                <% show_on_map = url_for('rooms.roomBooking-mapOfRooms', roomID=room.id) %>
                               % endif
                               <tr style="height: 60px" id="${ room.id }" class="resvHover">
                                 <td ${ on_click_details_url }>
@@ -83,7 +83,7 @@
                 </tr>
               </table>
             % else:
-              <span class="actionFailed">${ noResultsMsg }</span>
+              <span class="actionFailed">${ _('There are no rooms with this search criteria') }</span>
             % endif
           </td>
         </tr>
