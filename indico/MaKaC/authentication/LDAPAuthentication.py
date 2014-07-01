@@ -468,8 +468,6 @@ class LDAPConnector(object):
         """
 
         d = {}
-        self.login()
-
         res = self.l.search_s(self.ldapPeopleDN, ldap.SCOPE_SUBTREE, ufilter)
         for dn, data in res:
             if dn:
