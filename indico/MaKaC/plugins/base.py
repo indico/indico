@@ -1427,4 +1427,3 @@ class ActionBase(object):
         """ To be implemented by inheriting classes
         """
         raise PluginError("Action of class " + str(self.__class__.__name__) + " has not implemented the method call()")
-
