@@ -395,8 +395,8 @@ class PluginsHolder (ObjectHolder):
 
             # if there are dependencies missing, set as not usable
             if missingDeps:
-                ptype.setUsable(False, reason="Dependencies missing: {0}".format(missingDeps))
-                if disable_if_broken:
+                ptype.setUsable(False, reason="Dependencies missing: {0}".format(', '.join(missingDeps)))
+                if disable_if_broken and ptype.isActive():
                     ptype.setActive(False)
             else:
                 ptype.setUsable(True)
