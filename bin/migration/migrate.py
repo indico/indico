@@ -72,6 +72,11 @@ MIGRATION_TASKS = []
 
 i18n.setLocale('en_GB')
 
+
+class ControlledExit(Exception):
+    pass
+
+
 def since(version, always=False, never=False):
     def _since(f):
         if not f.__doc__:
@@ -361,15 +366,19 @@ def catalogMigration(dbi, withRBDB, prevVersion):
     Initializing/updating index catalog
     """
     PluginsHolder().reloadAllPlugins(disable_if_broken=False)
-    skipped = False
+    skip = False
 
     for plugin in (p for p in PluginsHolder().getList() if isinstance(p, Plugin) or isinstance(p, PluginType)):
         if plugin.isActive() and not plugin.isUsable():
-            print console.colored('\r  Plugin {0} is missing dependencies'.format(plugin.getName()), 'red')
-            skipped = True
+            print console.colored(
+                "\r  Plugin '{0}' is going to be disabled: {1}".format(
+                    plugin.getName(),
+                    plugin.getNotUsableReason()
+                ), 'yellow')
+            skip = True
 
-    if skipped and not console.yesno('\r  Do you want to continue the migration anyway?'):
-        sys.exit(1)
+    if skip and not console.yesno('\r  Do you want to continue the migration anyway?'):
+        raise ControlledExit()
 
     Catalog.updateDB(dbi=dbi)
 
@@ -1075,10 +1084,13 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
                                     specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))),
                                     run_from=args.run_from,
                                     dry_run=args.dry_run)
+        except ControlledExit:
+            return 1
         except (Exception, SystemExit, KeyboardInterrupt):
             print console.colored("\nMigration failed! DB may be in "
                                   " an inconsistent state:", 'red', attrs=['bold'])
             print console.colored(traceback.format_exc(), 'red')
+            return -1
     else:
         return 1
 
