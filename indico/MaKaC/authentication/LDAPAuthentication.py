@@ -68,6 +68,7 @@ from zope.interface import implements
 # indico imports
 from indico.core.extpoint import Component
 from indico.core.extpoint.rh import IServerRequestListener
+from indico.util.contextManager import ContextManager
 
 # legacy indico imports
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, SSOHandler
@@ -324,8 +325,6 @@ class LDAPConnector(object):
     of users which seems to be the standard LDAP setup
     """
 
-    _instance = None
-
     def __init__(self):
         conf = Configuration.Config.getInstance()
         ldapConfig = conf.getAuthenticatorConfigById("LDAP")
@@ -344,21 +343,19 @@ class LDAPConnector(object):
 
     @classmethod
     def getInstance(cls):
-        if cls._instance is None:
-            cls._instance = LDAPConnector()
-            cls._instance.open()
-            cls._instance.login()
-        return cls._instance
-
-    @classmethod
-    def init(cls):
-        cls.getInstance()
+        connector = ContextManager.get('ldap.connector', default=None)
+        if not connector:
+            connector = cls()
+            connector.open()
+            connector.login()
+        return connector
 
     @classmethod
     def destroy(cls):
-        if cls._instance:
-            cls._instance.close()
-            cls._instance = None
+        connector = ContextManager.get('ldap.connector', default=None)
+        if connector:
+            connector.close()
+            ContextManager.delete('ldap.connector', silent=True)
 
     def login(self):
         try:
@@ -720,6 +717,3 @@ class RequestListener(Component):
     # IServerRequestListener
     def requestFinished(self, obj):
         LDAPConnector.destroy()
-
-    def requestStarted(self, obj):
-        LDAPConnector.init()

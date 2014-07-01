@@ -182,7 +182,6 @@ class BaseTask(TimedEvent):
     def start(self, delay):
         self._executionDelay = delay
         try:
-            LDAPConnector.init()
             self.run()
             self.endedOn = self._getCurrentDateTime()
         finally:

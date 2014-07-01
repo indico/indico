@@ -150,7 +150,6 @@ def handler(prefix, path):
 
     dbi = DBMgr.getInstance()
     dbi.startRequest()
-    LDAPConnector.init()
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
     if minfo.getRoomBookingModuleActive():
         Factory.getDALManager().connect()
