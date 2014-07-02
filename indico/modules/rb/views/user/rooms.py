@@ -159,9 +159,6 @@ class WPRoomBookingRoomDetails(WPRoomBookingBase):
     def _getTitle(self):
         return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Room Details'))
 
-    def _setCurrentMenuItem(self):
-        self._roomSearchOpt.setActive(True)
-
     def getJSFiles(self):
         return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
