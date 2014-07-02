@@ -15,16 +15,16 @@
             if ( IndicoUtil.parseDate(startDate.get()) > IndicoUtil.parseDate(endDate.get()) ) {
                 endDate.set(startDate.get());
                 set_repeatition_comment();
-                updateFields();
             }
+            updateFields();
         });
 
         endDate.observe(function(value) {
             if ( IndicoUtil.parseDate(startDate.get()) > IndicoUtil.parseDate(endDate.get()) ) {
                 startDate.set(endDate.get());
                 set_repeatition_comment();
-                updateFields();
             }
+            updateFields();
         });
 
         $('#sTime, #eTime').on('change', function() {
