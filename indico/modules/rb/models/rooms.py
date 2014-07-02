@@ -22,6 +22,7 @@ Schema of a room
 """
 
 import ast
+import json
 from datetime import date, datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
@@ -46,7 +47,7 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
-from indico.modules.rb.models.room_attributes import RoomAttribute
+from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_equipments import RoomEquipment, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
@@ -601,12 +602,19 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             elif form.available.data == 1:  # available
                 q = q.filter(~occurrences_filter, ~blocking_filter)
 
-
         free_search_columns = (
             'name', 'site', 'division', 'building', 'floor', 'number', 'telephone', 'key_location', 'comments'
         )
         if form.details.data:
-            q = q.filter(or_(*[getattr(Room, c).ilike(u'%{}%'.format(form.details.data)) for c in free_search_columns]))
+            # Attributes are stored JSON-encoded, so we need to JSON-encode the provided string and remove the quotes
+            # afterwards since PostgreSQL currently does not expose a function to decode a JSON string:
+            # http://www.postgresql.org/message-id/51FBF787.5000408@dunslane.net
+            details = form.details.data.lower()
+            details_str = u'%{}%'.format(details)
+            details_json = u'%{}%'.format(json.dumps(details)[1:-1])
+            free_search_criteria = [getattr(Room, c).ilike(details_str) for c in free_search_columns]
+            free_search_criteria.append(Room.attributes.any(RoomAttributeAssociation.raw_data.ilike(details_json)))
+            q = q.filter(or_(*free_search_criteria))
 
         q = q.order_by(Room.capacity)
         rooms = q.all()
