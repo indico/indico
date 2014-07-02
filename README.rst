@@ -30,7 +30,7 @@ The project web site is http://indico-software.org and the developers can be
 reached via IRC in `#indico on Freenode`_.
 
 
-.. |build-status| image:: https://travis-ci.org/indico/indico.png
+.. |build-status| image:: https://travis-ci.org/indico/indico.svg?branch=master
                    :alt: Travis Build Status
 .. _build-status: https://travis-ci.org/indico/indico
 .. _#indico on Freenode: https://webchat.freenode.net/?channels=indico
