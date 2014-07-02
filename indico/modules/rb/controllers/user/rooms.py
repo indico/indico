@@ -24,19 +24,18 @@ from werkzeug.datastructures import MultiDict
 
 from MaKaC.common.cache import GenericCache
 from MaKaC.webinterface.locators import WebLocator
-from indico.util.i18n import _
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.decorators import requires_location, requires_room
-from indico.modules.rb.controllers.forms import SearchRoomsForm, FormDefaults
+from indico.modules.rb.forms.base import FormDefaults
+from indico.modules.rb.forms.rooms import SearchRoomsForm
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import RepeatUnit
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.modules.rb.models.utils import next_work_day
 from indico.modules.rb.views.user.rooms import (WPRoomBookingSearchRooms, WPRoomBookingMapOfRooms,
-                                                WPRoomBookingMapOfRoomsWidget, WPRoomBookingRoomList,
-                                                WPRoomBookingRoomDetails, WPRoomBookingRoomStats,
-                                                WPRoomBookingSearchRoomsResults)
+                                                WPRoomBookingMapOfRoomsWidget, WPRoomBookingRoomDetails,
+                                                WPRoomBookingRoomStats, WPRoomBookingSearchRoomsResults)
 
 
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):

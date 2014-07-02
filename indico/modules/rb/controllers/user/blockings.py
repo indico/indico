@@ -22,9 +22,9 @@ from datetime import date
 
 from flask import request, session
 
-from indico.modules.rb.controllers.forms import FormDefaults, BlockingForm, CreateBlockingForm
+from indico.modules.rb.forms.base import FormDefaults
+from indico.modules.rb.forms.blockings import CreateBlockingForm, BlockingForm
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
-from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.notifications.blockings import request_confirmation
 from indico.util.i18n import _
 from indico.core.db import db

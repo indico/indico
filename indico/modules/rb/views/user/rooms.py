@@ -117,57 +117,6 @@ class WRoomBookingMapOfRoomsWidget(WTemplated):
         return wvars
 
 
-class WPRoomBookingRoomList(WPRoomBookingBase):
-    def __init__(self, rh):
-        WPRoomBookingBase.__init__(self, rh)
-        self._rh = rh
-
-    def _getTitle(self):
-        return '{} - {}'.format(
-            WPRoomBookingBase._getTitle(self),
-            _('My Rooms') if self._rh._form.is_only_my_rooms.data else _('Found rooms')
-        )
-
-    def _setCurrentMenuItem(self):
-        if self._rh._form.is_only_my_rooms.data:
-            self._myRoomListOpt.setActive(True)
-        else:
-            self._roomSearchOpt.setActive(True)
-
-    def _getBody(self, params):
-        return WRoomBookingRoomList(self._rh, standalone=True).getHTML(params)
-
-
-class WRoomBookingRoomList(WTemplated):
-    def __init__(self, rh, standalone=False):
-        self._rh = rh
-        self._standalone = standalone
-
-    def getVars(self):
-        wvars = WTemplated.getVars(self)
-        f = self._rh._form
-
-        wvars['rooms'] = self._rh._rooms
-        wvars['mapAvailable'] = self._rh._mapAvailable
-        wvars['standalone'] = self._standalone
-        wvars['title'] = self._rh._title
-        if f.is_only_my_rooms.data:
-            wvars['noResultsMsg'] = _('You are not the owner of any room')
-        else:
-            wvars['noResultsMsg'] = _('There are no rooms with this search criteria')
-
-        if self._standalone:
-            wvars['detailsUH'] = UH.UHRoomBookingRoomDetails
-            wvars['bookingUH'] = UH.UHRoomBookingBookingForm
-        else:
-            wvars['conference'] = self._rh._conf
-            wvars['detailsUH'] = UH.UHConfModifRoomBookingRoomDetails
-            wvars['bookingUH'] = UH.UHConfModifRoomBookingBookingForm
-        wvars['mapUH'] = UH.UHRoomBookingMapOfRooms
-
-        return wvars
-
-
 class WPRoomBookingSearchRooms(WPRoomBookingBase):
     def getJSFiles(self):
         return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')

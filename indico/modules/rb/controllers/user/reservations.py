@@ -26,12 +26,12 @@ from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
 from indico.core.errors import IndicoError, AccessError
+from indico.modules.rb.forms.base import FormDefaults
 from indico.util.date_time import get_datetime_from_request
 from indico.util.string import natural_sort_key
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.controllers.forms import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
-                                                 FormDefaults, NewBookingConfirmForm, NewBookingSimpleForm,
-                                                 ModifyBookingForm)
+from indico.modules.rb.forms.reservations import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
+                                                  NewBookingConfirmForm, NewBookingSimpleForm, ModifyBookingForm)
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room

@@ -22,8 +22,10 @@ from wtforms import TextField
 from wtforms.validators import DataRequired
 from MaKaC.common.cache import GenericCache
 from MaKaC.user import AvatarHolder
+from indico.modules.rb.forms.base import FormDefaults
+from indico.modules.rb.forms.rooms import RoomForm
+from indico.modules.rb.forms.validators import IndicoEmail
 from indico.modules.rb.models.room_equipments import RoomEquipment
-from indico.modules.rb.controllers.forms import RoomForm, FormDefaults, IndicoEmail
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation, RoomAttribute
 
 from MaKaC.webinterface import urlHandlers as UH
