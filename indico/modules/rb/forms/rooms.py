@@ -64,7 +64,7 @@ class SearchRoomsForm(IndicoForm):
     details = StringField()
     available = RadioField(_('Availability'), coerce=int, default=-1, widget=ConcatWidget(prefix_label=False),
                            choices=[(1, _('Available')), (0, _('Booked')), (-1, _("Don't care"))])
-    capacity = IntegerField(_('Capacity'), validators=[NumberRange(min=0)], default=0)
+    capacity = IntegerField(_('Capacity'), validators=[Optional(), NumberRange(min=0)])
     equipments = IndicoQuerySelectMultipleCheckboxField(_('Equipment'), get_label=_get_equipment_label,
                                                         modify_object_list=_group_equipment,
                                                         query_factory=lambda: RoomEquipment.find().order_by(
