@@ -1,0 +1,5 @@
+{% extends 'rb/base_email_to_manager.txt' %}
+
+{% block body -%}
+The date {{ reservation.start_date | format_date }} from a booking that concerns one of your rooms has been CANCELLED by the user.
+{%- endblock %}

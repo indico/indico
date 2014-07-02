@@ -44,6 +44,9 @@ from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.modules.rb.models.room_equipments import (ReservationEquipmentAssociation, RoomEquipment,
                                                       RoomEquipmentAssociation)
 from indico.modules.rb.models.utils import limit_groups, unimplemented, Serializer
+from indico.modules.rb.notifications.reservations import (notify_confirmation, notify_cancellation,
+                                                          notify_creation, notify_modification,
+                                                          notify_rejection)
 from indico.util.date_time import now_utc, format_date, format_datetime, format_time
 from indico.util.i18n import _, N_
 from indico.util.string import return_ascii
@@ -415,6 +418,7 @@ class Reservation(Serializer, db.Model):
     def accept(self, user):
         self.is_confirmed = True
         self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=['Reservation accepted']))
+        notify_confirmation(self)
 
         valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
         pre_occurrences = ReservationOccurrence.find_overlapping_with(self.room, valid_occurrences, self.id).all()
@@ -423,27 +427,23 @@ class Reservation(Serializer, db.Model):
                 continue
             occurrence.reject(u'Rejected due to collision with a confirmed reservation')
 
-    def cancel(self, user, reason=None, log=True):
+    def cancel(self, user, reason=None, silent=False):
         self.is_cancelled = True
         self.rejection_reason = reason
         self.occurrences.filter_by(is_valid=True).update({'is_cancelled': True}, synchronize_session='fetch')
-        if log:
+        if not silent:
+            notify_cancellation(self)
             self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=['Reservation cancelled']))
 
-    def reject(self, user, reason, log=True):
+    def reject(self, user, reason, silent=False):
         self.is_rejected = True
         self.rejection_reason = reason
         self.occurrences.filter_by(is_valid=True).update({'is_rejected': True, 'rejection_reason': reason},
                                                          synchronize_session='fetch')
-        if log:
+        if not silent:
+            notify_rejection(self)
             log_msg = 'Reservation rejected: {}'.format(reason)
             self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
-
-    def notify_rejection(self, reason, occurrence_date=None):
-        return self.notifyAboutRejection(occurrence_date, reason)
-
-    def notify_cancellation(self):
-        return self.notifyAboutCancellation()
 
     # edit logs
 
@@ -492,7 +492,7 @@ class Reservation(Serializer, db.Model):
                     if nbd.overlaps(occurrence.start, occurrence.end):
                         if not skip_conflicts:
                             raise ConflictingOccurrences()
-                        occurrence.cancel(user, u'Skipped due to nonbookable date', log=False, propagate=False)
+                        occurrence.cancel(user, u'Skipped due to nonbookable date', silent=True, propagate=False)
                         break
 
         # Check for conflicts with blockings
@@ -505,7 +505,7 @@ class Reservation(Serializer, db.Model):
                 if occurrence.is_valid and blocking.is_active_at(occurrence.start.date()):
                     # Cancel OUR occurrence
                     msg = u'Skipped due to collision with a blocking ({})'
-                    occurrence.cancel(user, msg.format(blocking.reason), log=False, propagate=False)
+                    occurrence.cancel(user, msg.format(blocking.reason), silent=True, propagate=False)
 
         # Check for conflicts with other occurrences
         conflicting_occurrences = self.get_conflicting_occurrences()
@@ -517,7 +517,7 @@ class Reservation(Serializer, db.Model):
                     raise ConflictingOccurrences()
                 # Cancel OUR occurrence
                 msg = u'Skipped due to collision with {} reservation(s)'
-                occurrence.cancel(user, msg.format(len(conflicts['confirmed'])), log=False, propagate=False)
+                occurrence.cancel(user, msg.format(len(conflicts['confirmed'])), silent=True, propagate=False)
             elif conflicts['pending'] and self.is_confirmed:
                 # Reject OTHER occurrences
                 for conflict in conflicts['pending']:
@@ -560,6 +560,7 @@ class Reservation(Serializer, db.Model):
         reservation.create_occurrences(True, user)
         if not any(occ.is_valid for occ in reservation.occurrences):
             raise IndicoError('Reservation has no valid occurrences')
+        notify_creation(reservation)
         return reservation
 
     def modify(self, data, user):
@@ -679,6 +680,7 @@ class Reservation(Serializer, db.Model):
         if not any(occ.is_valid for occ in self.occurrences):
             raise IndicoError('Reservation has no valid occurrences')
 
+        notify_modification(self, changes)
         return True
 
     def getSoonestOccurrence(self, d):
@@ -713,286 +715,6 @@ class Reservation(Serializer, db.Model):
     #                 .first())
     #     if aval:
     #         return aval[0]
-
-    # =========================================================
-
-    # notification emails
-
-    def _getEmailDateAndOccurrenceText(self, date=None):
-        if date:
-            occurrence_text = '(SINGLE OCCURRENCE)'
-            formatted_start_date = format_date(date)
-        else:
-            occurrence_text = ''
-            try:
-                formatted_start_date = format_datetime(self.start_date)
-            except Exception:  # XXX: why would this ever fail?!
-                formatted_start_date = ''
-        return formatted_start_date, occurrence_text
-
-    def _getEmailSubject(self, **mail_params):
-        return '{pre}[{room}] {sub} {fsd} {occ}'.format(
-            room=self.room.getFullName(),
-            pre=mail_params.get('pre_subject_message', ''),
-            sub=mail_params.get('subject_message', ''),
-            fsd=mail_params.get('formatted_start_date',
-                                self._getEmailDateAndOccurrenceText()[0]),
-            occ=mail_params.get('occurrence_text', '')
-        ).strip()
-
-    def _getCreatorAndContactEmail(self, **mail_params):
-        creator = self.getCreator()
-        if creator:
-            to = creator.getEmail()
-            to2 = self.getContactEmailList()
-
-            subject = self._getEmailSubject()
-
-            body = WTemplated(mail_params.get('template_name')).getHTML(
-                dict(mail_params, **{
-                    'reservation': self,
-                    'firstName': creator.getFirstName()
-                })
-            )
-
-            return {
-                'fromAddr': Config.getInstance().getNoReplyEmail(),
-                'toList': set((to and [to] or []) + to2),
-                'subject': subject,
-                'body': body
-            }
-
-    def _getResponsibleEmail(self, **mail_params):
-        subject = self._getEmailSubject(**mail_params)
-
-        body = WTemplated(mail_params.get('template_name')).getHTML(
-            dict(mail_params, **{
-                'reservation': self,
-            })
-        )
-        return {
-            'fromAddr': Config.getInstance().getNoReplyEmail(),
-            'toList': set(
-                [self.room.getResponsible().getEmail()] +
-                self.getNotificationEmailList()
-            ),
-            'subject': subject,
-            'body': body
-        }
-
-    # TODO: naming
-    def _getAVCSupportEmail(self, **mail_params):
-        if self.is_confirmed and self.getAttributeByName('usesAVC'):
-            to = self.room.location.getSupportEmails()
-            if to:
-                subject = self._getEmailSubject(**mail_params)
-                body = WTemplated(mail_params.get('template_name')).getHTML(
-                    dict(mail_params, **{
-                        'reservation': self
-                    })
-                )
-                return {
-                    'fromAddr': Config.getInstance().getNoReplyEmail(),
-                    'toList': to,
-                    'subject': subject,
-                    'body': body
-                }
-
-    def _getAssistanceEmail(self, **mail_params):
-        to = utils.getRoomBookingOption('assistanceNotificationEmails')
-        if (to and self.room.notification_for_assistance and (self.getAttributeByName('needsAssistance') or
-                                                              mail_params.get('old_needs_assistance', False))):
-            rh = ContextManager.get('currentRH', None)
-            user = rh._getUser() if rh else None
-            subject = self._getEmailSubject(**mail_params)
-
-            body = WTemplated(mail_params.get('template_name')).getHTML(
-                dict(mail_params, **{
-                    'reservation': self,
-                    'currentUser': user
-                })
-            )
-            return {
-                'fromAddr': Config.getInstance().getNoReplyEmail(),
-                'toList': to,
-                'subject': subject,
-                'body': body
-            }
-
-    def notifyAboutNewReservation(self):
-        """
-        Notifies (e-mails) user and responsible
-        about creation of a new reservation.
-        Called after insert().
-        """
-
-        return filter(None, [
-            self._getCreatorAndContactEmail(
-                subject_message=(
-                    'PRE-Booking waiting Acceptance'
-                    'New Booking on',
-                )[self.is_confirmed],
-                template_name=(
-                    'RoomBookingEmail_2UserAfterPreBookingInsertion'
-                    'RoomBookingEmail_2UserAfterBookingInsertion'
-                )[self.is_confirmed]
-            ),
-            self._getResponsibleEmail(
-                subject_message=(
-                    'New PRE-Booking on',
-                    'New Booking on'
-                )[self.is_confirmed],
-                booking_message=(
-                    'Book',
-                    'PRE-book'
-                )[self.is_confirmed],
-                template_name='RoomBookingEmail_2ResponsibleAfterBookingInsertion'
-            ),
-            self._getAVCSupportEmail(
-                subject_message='New Booking on',
-                template_name='RoomBookingEmail_2AVCSupportAfterBookingInsertion'
-            ),
-            self._getAssistanceEmail(
-                pre_subject_message='[Support Request]',
-                subject_message='New Booking on',
-                template_name='RoomBookingEmail_AssistanceAfterBookingInsertion'
-            )
-        ])
-
-    def notifyAboutCancellation(self, date=None):
-        """
-        Notifies (e-mails) user and responsible about
-        reservation cancellation.
-        Called after cancel().
-        """
-
-        formatted_start_date, occurrence_text = self._getEmailDateAndOccurrenceText(date=date)
-
-        return filter(None, [
-            self._getCreatorAndContactEmail(
-                formatted_start_date=formatted_start_date,
-                subject_message='Cancellation Confirmation on',
-                occurrence_text=occurrence_text,
-                date=date,
-                template_name='RoomBookingEmail_2UserAfterBookingCancellation'
-            ),
-            self._getResponsibleEmail(
-                formatted_start_date=formatted_start_date,
-                subject_message='Cancelled Booking on',
-                occurrence_text=occurrence_text,
-                date=date,
-                template_name='RoomBookingEmail_2ResponsibleAfterBookingCancellation'
-            ),
-            self._getAVCSupportEmail(
-                formatted_start_date=formatted_start_date,
-                subject_message='Booking Cancelled on',
-                template_name='RoomBookingEmail_2AVCSupportAfterBookingCancellation'
-            ),
-            self._getAssistanceEmail(
-                formatted_start_date=formatted_start_date,
-                pre_subject_message='[Support Request Cancellation]',
-                subject_message='Request Cancelled for',
-                template_name='RoomBookingEmail_AssistanceAfterBookingCancellation'
-            )
-        ])
-
-    def notifyAboutRejection(self, date=None, reason=None):
-        """
-        Notifies (e-mails) user and responsible about
-        reservation rejection.
-        Called after reject().
-        """
-
-        formatted_start_date, occurrence_text = self._getEmailDateAndOccurrenceText(date=date)
-
-        return filter(None, [
-            self._getCreatorAndContactEmail(
-                formatted_start_date=formatted_start_date,
-                subject_message='REJECTED Booking on',
-                occurrence_text=occurrence_text,
-                template_name='RoomBookingEmail_2UserAfterBookingRejection',
-                date=date,
-                reason=reason
-            ),
-            self._getResponsibleEmail(
-                formatted_start_date=formatted_start_date,
-                subject_message='Rejected Booking on',
-                occurrence_text=occurrence_text,
-                template_name='RoomBookingEmail_2ResponsibleAfterBookingRejection',
-                date=date,
-                reason=reason
-            ),
-            self._getAssistanceEmail(
-                formatted_start_date=formatted_start_date,
-                pre_subject_message='[Support Request Cancellation]',
-                subject_message='Request Cancelled for',
-                template_name='RoomBookingEmail_AssistanceAfterBookingRejection',
-                date=date,
-                reason=reason
-            )
-        ])
-
-    def notifyAboutConfirmation(self):
-        """
-        Notifies (e-mails) user about reservation acceptance.
-        Called after reject().
-        """
-
-        return filter(None, [
-            self._getCreatorAndContactEmail(
-                subject_message='Confirmed Booking on',
-                template_name='RoomBookingEmail_2UserAfterBookingConfirmation'
-            ),
-            self._getResponsibleEmail(
-                subject_message='Confirmed Booking on',
-                template_name='RoomBookingEmail_2ResponsibleAfterBookingConfirmation'
-            ),
-            self._getAVCSupportEmail(
-                subject_message='New Booking on',
-                template_name='RoomBookingEmail_2AVCSupportAfterBookingInsertion'
-            ),
-            self._getAssistanceEmail(
-                pre_subject_message='[Support Request]',
-                subject_message='New Support on',
-                template_name='RoomBookingEmail_AssistanceAfterBookingInsertion'
-            )
-        ])
-
-    def notifyAboutUpdate(self, attrsBefore):
-        """
-        Notifies (e-mails) user and responsible about
-        reservation update.
-        Called after update().
-        """
-
-        is_cancelled = (attrsBefore.get('needsAssistance', False) and
-                        not self.getAttributeByName('needsAssistance'))
-
-        return filter(None, [
-            self._getCreatorAndContactEmail(
-                subject_message='Booking Modified on',
-                template_name='RoomBookingEmail_2UserAfterBookingModification'
-            ),
-            self._getResponsibleEmail(
-                subject_message='Booking Modified on',
-                template_name='RoomBookingEmail_2ResponsibleAfterBookingModification'
-            ),
-            self._getAVCSupportEmail(
-                subject_message='Modified booking on',
-                template_name='RoomBookingEmail_2AVCSupportAfterBookingModification'
-            ),
-            self._getAssistanceEmail(
-                pre_subject_message='[Support Request {}]'.format(
-                    ('Modification', 'Cancelled')[is_cancelled]
-                ),
-                subject_message='Modified request for',
-                template_name='RoomBookingEmail_AssistanceAfterBookingModification',
-                old_needs_assistance=attrsBefore.get('needsAssistance', False),
-                hasCancelled=is_cancelled
-            )
-        ])
-
-    # ===============================================================
 
     @staticmethod
     def getClosestReservation(resvs=[], after=None):

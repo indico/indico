@@ -142,7 +142,6 @@ class BlockedRoom(db.Model):
             log_msg = 'Booking rejected: {}'.format(reason)
             reservation.add_edit_log(ReservationEditLog(user_name=self.blocking.created_by_user.getFullName(),
                                                         info=log_msg))
-            emails += reservation.notify_rejection(reason)
 
         for occurrence in occurrences:
             reservation = occurrence.reservation
@@ -152,15 +151,14 @@ class BlockedRoom(db.Model):
             log_msg = 'Booking occurrence on {} rejected: {}'.format(format_date(occurrence.date), reason)
             reservation.add_edit_log(ReservationEditLog(user_name=self.blocking.created_by_user.getFullName(),
                                                         info=log_msg))
-            emails += occurrence.notify_rejection(reason)
 
         if notify_blocker:
             # We only need to notify the blocking creator if the blocked room wasn't approved yet.
             # This is the case if it's a new blocking for a room managed by the creator
             emails.append(blocking_processed(self))
+            for notification in map(GenericNotification, emails):
+                GenericMailer.send(notification)
 
-        for notification in map(GenericNotification, emails):
-            GenericMailer.send(notification)
 
     @return_ascii
     def __repr__(self):

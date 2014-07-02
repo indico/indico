@@ -1,0 +1,10 @@
+Dear AVC Support,
+
+
+{% block body %}{% endblock %}
+
+{% include 'rb/booking_info.txt' %}
+
+You can check the details of the booking here:
+{{ url_for('rooms.roomBooking-bookingDetails', roomLocation=reservation.location_name, resvID=reservation.id, _external=True) }}
+{% include 'rb/email_footer.txt' %}

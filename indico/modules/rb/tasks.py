@@ -7,10 +7,8 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation, RepeatUnit
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.utils import getRoomBookingOption
-from indico.modules.rb.notifications.reservation_occurrences import upcoming_occurrence
+from indico.modules.rb.notifications.reservation_occurrences import notify_upcoming_occurrence
 from indico.modules.scheduler.tasks.periodic import PeriodicUniqueTask
-from MaKaC.common.mail import GenericMailer
-from MaKaC.webinterface.mail import GenericNotification
 
 
 class OccurrenceNotifications(PeriodicUniqueTask):
@@ -31,5 +29,4 @@ class OccurrenceNotifications(PeriodicUniqueTask):
             occ.is_sent = True
             if occ.reservation.repeat_unit == RepeatUnit.DAY:
                 occ.reservation.occurrences.update({'is_sent': True})
-
-            GenericMailer.send(GenericNotification(upcoming_occurrence(occ)))
+            notify_upcoming_occurrence(occ)

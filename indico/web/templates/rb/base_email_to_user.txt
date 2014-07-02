@@ -1,0 +1,11 @@
+Dear {{ reservation.created_by_user.getFirstName() }},
+
+
+{% block body %}{% endblock %}
+
+Booking details:
+{{ url_for('rooms.roomBooking-bookingDetails', roomLocation=reservation.location_name, resvID=reservation.id, _external=True) }}
+
+Remember you can always check your bookings here:
+{{ url_for('rooms.my_bookings', _external=True) }}
+{% include 'rb/email_footer.txt' %}

@@ -1,0 +1,5 @@
+{% extends 'rb/base_email_to_assistance.txt' %}
+
+{% block body -%}
+{{ session.user.getStraightFullName() }} {{ 'has cancelled' if assistance_cancelled else 'requested' }} ASSISTANCE for the meeting startup.
+{%- endblock %}
