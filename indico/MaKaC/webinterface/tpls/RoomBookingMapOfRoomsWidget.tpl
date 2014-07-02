@@ -21,7 +21,7 @@
     </tr>
 </table>
 
-<form id="mapOfRoomAvailabilityForm" method="post"  style="width:150px;" action="${ roomBookingRoomListURL }">
+<form id="mapOfRoomAvailabilityForm" method="post" style="width:150px;" action="#">
     <p>
         <span>
             <span>

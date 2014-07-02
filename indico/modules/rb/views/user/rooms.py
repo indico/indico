@@ -106,7 +106,6 @@ class WRoomBookingMapOfRoomsWidget(WTemplated):
         wvars['forVideoConference'] = self._forVideoConference
         wvars['roomID'] = self._roomID
 
-        wvars['roomBookingRoomListURL'] = UH.UHRoomBookingRoomList.getURL(None)
         wvars['startDT'] = session.get('_rb_default_start')
         wvars['endDT'] = session.get('_rb_default_end')
         wvars['startT'] = session.get('_rb_default_start').time().strftime('%H:%M')
@@ -189,51 +188,18 @@ class WPRoomBookingSearchRooms(WPRoomBookingBase):
 
 
 class WPRoomBookingSearchRoomsResults(WPRoomBookingBase):
+    def __init__(self, rh, menu_item, **kwargs):
+        self._menu_item = menu_item
+        WPRoomBookingBase.__init__(self, rh, **kwargs)
+
+    def _setCurrentMenuItem(self):
+        getattr(self, '_{}Opt'.format(self._menu_item)).setActive(True)
+
     def _getTitle(self):
         return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Search results'))
 
-    def _setCurrentMenuItem(self):
-        self._roomSearchOpt.setActive(True)
-
     def _getBody(self, params):
         return WTemplated('RoomBookingSearchRoomsResults').getHTML(params)
-
-
-class WRoomBookingSearch4Rooms(WTemplated):
-    def __init__(self, rh, standalone=False):
-        self._standalone = standalone
-        self._rh = rh
-
-    def getVars(self):
-        wvars = WTemplated.getVars(self)
-
-        wvars['standalone'] = self._standalone
-        wvars['forNewBooking'] = self._rh._is_new_booking
-        wvars['eventRoomName'] = self._rh._event_room_name
-
-        wvars['locations'] = self._rh._locations
-        wvars['rooms'] = self._rh._rooms
-        wvars['possibleEquipment'] = self._rh._equipments
-        wvars['isResponsibleForRooms'] = Room.isAvatarResponsibleForRooms(self._rh.getAW().getUser())
-
-        today = next_work_day()
-        wvars['startDT'] = datetime.combine(today.date(), time(8, 30))
-        wvars['endDT'] = datetime.combine(today.date(), time(17, 30))
-        wvars['startT'] = wvars['startDT'].time().strftime("%H:%M")
-        wvars['endT'] = wvars['endDT'].strftime("%H:%M")
-        wvars['repeatability'] = RepeatMapping.getOldMapping(RepeatUnit.NEVER, 0)
-
-        if self._standalone:
-            # URLs for standalone room booking
-            wvars['roomBookingRoomListURL'] = UH.UHRoomBookingRoomList.getURL(None)
-            wvars['detailsUH'] = UH.UHRoomBookingRoomDetails
-            wvars['bookingFormUH'] = UH.UHRoomBookingBookingForm
-        else:
-            # URLs for room booking in the event context
-            wvars['roomBookingRoomListURL'] = UH.UHConfModifRoomBookingRoomList.getURL(self._rh._conf)
-            wvars['detailsUH'] = UH.UHConfModifRoomBookingRoomDetails
-            wvars['bookingFormUH'] = UH.UHConfModifRoomBookingBookingForm
-        return wvars
 
 
 class WPRoomBookingRoomDetails(WPRoomBookingBase):

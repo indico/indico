@@ -412,17 +412,8 @@ class UHRoomBookingWelcome(URLHandler):
     _endpoint = 'rooms.roomBooking'
 
 
-class UHRoomBookingSearch4Rooms(BooleanMixin, URLHandler):
-    _endpoint = 'rooms.roomBooking-search4Rooms'
-    _defaultParams = dict(is_new_booking=False)
-
-
 class UHRoomBookingSearch4Bookings(URLHandler):
     _endpoint = 'rooms.roomBooking-search4Bookings'
-
-
-class UHRoomBookingRoomList(BooleanMixin, URLHandler):
-    _endpoint = 'rooms.roomBooking-roomList'
 
 
 class UHRoomBookingBookingList(BooleanMixin, URLHandler):

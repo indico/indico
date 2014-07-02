@@ -375,9 +375,8 @@ class ModifyBookingForm(NewBookingSimpleForm):
 class SearchRoomsForm(IndicoForm):
     location = QuerySelectField(_('Location'), get_label=lambda x: x.name, query_factory=Location.find)
     details = StringField()
-    available = RadioField(_('Availability'), coerce=int, default=-1, validators=[InputRequired()],
-                           choices=[(1, _('Available')), (0, _('Booked')), (-1, _("Don't care"))],
-                           widget=ConcatWidget(prefix_label=False))
+    available = RadioField(_('Availability'), coerce=int, default=-1, widget=ConcatWidget(prefix_label=False),
+                           choices=[(1, _('Available')), (0, _('Booked')), (-1, _("Don't care"))])
     capacity = IntegerField(_('Capacity'), validators=[NumberRange(min=0)], default=0)
     equipments = IndicoQuerySelectMultipleCheckboxField(_('Equipment'), get_label=_get_equipment_label,
                                                         modify_object_list=_group_equipment,

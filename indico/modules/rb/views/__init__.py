@@ -97,13 +97,6 @@ class WPRoomBookingBase(WPMainBase):
             urlHandlers.UHRoomBookingSearch4Bookings.getURL()
         )
 
-        self._bookARoomOpt = SideMenuItem(
-            _('Book a Room (Old)'),
-            urlHandlers.UHRoomBookingSearch4Rooms.getURL(is_new_booking=True),
-            enabled=True
-        )
-        self._bookARoomOpt.setVisible(False)
-
         self._myBookingListOpt = SideMenuItem(
             _('My bookings'),
             url_for('rooms.my_bookings'),
@@ -142,20 +135,17 @@ class WPRoomBookingBase(WPMainBase):
             enabled=self._showResponsible
         )
 
-        self._roomsOpt = SideMenuSection(
-            _('View Rooms'),
-            urlHandlers.UHRoomBookingSearch4Rooms.getURL()
-        )
+        self._roomsOpt = SideMenuSection(_('View Rooms'))
 
         self._roomSearchOpt = SideMenuItem(
             _('Search rooms'),
-            urlHandlers.UHRoomBookingSearch4Rooms.getURL(),
+            url_for('rooms.search_rooms'),
             enabled=True
         )
 
         self._myRoomListOpt = SideMenuItem(
             _('My rooms'),
-            urlHandlers.UHRoomBookingRoomList.getURL(is_only_mine=True),
+            url_for('rooms.search_my_rooms'),
             enabled=self._showResponsible
         )
 
@@ -188,7 +178,6 @@ class WPRoomBookingBase(WPMainBase):
         self._roomsBookingOpt.addItem(self._bookingListCalendarOpt)
 
         self._leftMenu.addSection(self._bookingsOpt)
-        self._bookingsOpt.addItem(self._bookARoomOpt)
         self._bookingsOpt.addItem(self._myBookingListOpt)
         self._bookingsOpt.addItem(self._myPendingBookingListOpt)
         self._bookingsOpt.addItem(self._usersBookingsOpt)

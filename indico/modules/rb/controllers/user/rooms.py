@@ -20,6 +20,7 @@
 from datetime import datetime, timedelta
 
 from flask import request, session
+from werkzeug.datastructures import MultiDict
 
 from MaKaC.common.cache import GenericCache
 from MaKaC.webinterface.locators import WebLocator
@@ -85,34 +86,51 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 
 
 class RHRoomBookingSearchRooms(RHRoomBookingBase):
+    menu_item = 'roomSearch'
+
+    def _get_form_data(self):
+        return request.form
+
     def _checkParams(self):
         defaults = FormDefaults(location=Location.getDefaultLocation())
-        self._form = SearchRoomsForm(obj=defaults)
+        self._form = SearchRoomsForm(self._get_form_data(), obj=defaults)
         if not session.user.has_rooms:
             del self._form.is_only_my_rooms
 
+    def _is_submitted(self):
+        return self._form.is_submitted()
+
     def _process(self):
         form = self._form
-        if form.validate_on_submit():
+        if self._is_submitted() and form.validate():
             rooms = Room.getRoomsForRoomList(form, session.user)
-            return WPRoomBookingSearchRoomsResults(self, rooms=rooms).display()
+            return WPRoomBookingSearchRoomsResults(self, self.menu_item, rooms=rooms).display()
         equipment_locations = {eq.id: eq.location_id for eq in RoomEquipment.find()}
         return WPRoomBookingSearchRooms(self, form=form, errors=form.error_list, rooms=Room.find_all(),
                                         equipment_locations=equipment_locations).display()
 
 
-class RHRoomBookingRoomList(RHRoomBookingBase):
-    # TODO: This will only be needed for "my rooms" and should be done similar to
-    # how RHRoomBookingSearchBookingsShortcutBase is done and get a similar kind of URL!
-    def _checkParams(self):
-        self._form = RoomListForm(request.values)
+class RHRoomBookingSearchRoomsShortcutBase(RHRoomBookingSearchRooms):
+    """Base class for searches with predefined criteria"""
+    search_criteria = {}
 
-    def _process(self):
-        self._rooms = Room.getRoomsForRoomList(self._form, self._getUser())
-        room_count = len(self._rooms)
-        self._title = _('1 room found') if room_count == 1 else _('{} rooms found').format(room_count)
-        self._mapAvailable = Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable()
-        return WPRoomBookingRoomList(self).display()
+    def _is_submitted(self):
+        return True
+
+    def _get_form_data(self):
+        return MultiDict(self.search_criteria)
+
+
+class RHRoomBookingSearchMyRooms(RHRoomBookingSearchRoomsShortcutBase):
+    menu_item = 'myRoomList'
+    search_criteria = {
+        'is_only_my_rooms': True
+    }
+
+
+# TODO: remove with legacy makac code. still referenced in book-room-for-event code
+class RHRoomBookingRoomList(RHRoomBookingBase):
+    pass
 
 
 # TODO: remove with legacy makac code. still referenced in book-room-for-event code
