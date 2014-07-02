@@ -46,7 +46,7 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
-from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
+from indico.modules.rb.models.room_attributes import RoomAttribute
 from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_equipments import RoomEquipment, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
@@ -576,16 +576,31 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         )
 
         if form.available.data != -1:
+            # Check for occurrences during the given period
             repeat_unit, repeat_step = RepeatMapping.getNewMapping(ast.literal_eval(form.repeatability.data))
             occurrences = ReservationOccurrence.create_series(form.start_date.data, form.end_date.data,
                                                               (repeat_unit, repeat_step))
             overlap_criteria = ReservationOccurrence.build_overlap_criteria(occurrences)
-            criterion = Reservation.occurrences.any((Reservation.room_id == Room.id) & or_(*overlap_criteria))
-            # TODO: prebookings, blockings
-            if form.available.data == 0:  # booked
-                q = q.filter(criterion)
+            reservation_criteria = [Reservation.room_id == Room.id, or_(*overlap_criteria)]
+            if not form.include_pre_bookings.data:
+                reservation_criteria.append(Reservation.is_confirmed)
+            occurrences_filter = Reservation.occurrences.any(and_(*reservation_criteria))
+            # Check for blockings during the given period
+            if form.include_pending_blockings.data:
+                valid_states = (BlockedRoom.State.accepted, BlockedRoom.State.pending)
+            else:
+                valid_states = (BlockedRoom.State.accepted,)
+            blocking_criteria = [Blocking.id == BlockedRoom.blocking_id,
+                                 Blocking.start_date <= form.end_date.data,
+                                 Blocking.end_date >= form.start_date.data,
+                                 BlockedRoom.state.in_(valid_states)]
+            blocking_filter = Room.blocked_rooms.any(and_(*blocking_criteria))
+            # Filter the search results
+            if form.available.data == 0:  # booked/unavailable
+                q = q.filter(occurrences_filter | blocking_filter)
             elif form.available.data == 1:  # available
-                q = q.filter(~criterion)
+                q = q.filter(~occurrences_filter, ~blocking_filter)
+
 
         free_search_columns = (
             'name', 'site', 'division', 'building', 'floor', 'number', 'telephone', 'key_location', 'comments'
