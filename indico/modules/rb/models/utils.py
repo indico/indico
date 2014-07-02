@@ -301,7 +301,7 @@ def proxy_to_reservation_if_single_occurrence(f):
         resv_func = getattr(self.reservation, f.__name__)
         if not self.reservation.is_repeating:
             return resv_func(*args, **kwargs)
-        valid_occurrences = self.reservation.occurrences.filter_by(is_valid=True).all()
+        valid_occurrences = self.reservation.occurrences.filter_by(is_valid=True).limit(2).all()
         if len(valid_occurrences) == 1 and valid_occurrences[0] == self:
             # If we ever use this outside ReservationOccurrence we can probably get rid of the ==self check
             return resv_func(*args, **kwargs)
