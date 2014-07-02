@@ -19,8 +19,8 @@
 
 from datetime import datetime
 from flask import request
+from hashlib import md5
 from pytz import timezone
-
 
 import string
 from indico.util.json import dumps
@@ -110,7 +110,7 @@ class outputGenerator(Observable):
         else:
             return "INDICOSEARCH.PUBLIC"
 
-    def getOutput(self, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeSubContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
+    def getOutput(self, conf, stylesheet, vars=None, includeSession=1, includeContribution=1, includeSubContribution=1, includeMaterial=1, showSession="all", showDate="all", showContribution="all"):
         # get xml conference
         xml = self._getBasicXML(conf, vars, includeSession,includeContribution,includeSubContribution,includeMaterial,showSession,showDate,showContribution)
         if not os.path.exists(stylesheet):
@@ -142,24 +142,29 @@ class outputGenerator(Observable):
             html = html.replace(escapeHTMLForJS(baseURL), escapeHTMLForJS(baseSecureURL))
         return html
 
-    def _getBasicXML(self, conf, vars,includeSession,includeContribution,includeSubContribution,includeMaterial,showSession="all",showDate="all",showContribution="all", showSubContribution="all", out=None):
-        if not out:
-            out = self._XMLGen
+    def _getBasicXML(self, conf, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession="all", showDate="all", showContribution="all", showSubContribution="all", out=None):
         """
         conf: conference object
         """
+        if not out:
+            out = self._XMLGen
         #out.initXml()
         out.openTag("iconf")
-        self._confToXML(conf,vars,includeSession,includeContribution,includeSubContribution,includeMaterial,showSession,showDate, showContribution,out=out)
+        self._confToXML(conf, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession, showDate, showContribution, out=out)
         out.closeTag("iconf")
         return out.getXml()
 
-    def _userToXML(self, user, out):
+    def _userToXML(self, obj, user, out):
         out.openTag("user")
-        out.writeTag("title",user.getTitle())
-        out.writeTag("name","",[["first",user.getFirstName()],["middle",""],["last",user.getFamilyName()]])
-        out.writeTag("organization",user.getAffiliation())
-        out.writeTag("email",user.getEmail())
+        out.writeTag("title", user.getTitle())
+        out.writeTag("name", "", [["first", user.getFirstName()], ["middle", ""], ["last", user.getFamilyName()]])
+        out.writeTag("organization", user.getAffiliation())
+
+        if obj.canModify(self.__aw):
+            out.writeTag("email", user.getEmail())
+
+        out.writeTag("emailHash", md5(user.getEmail()).hexdigest())
+
         try:
             out.writeTag("userid",user.id)
         except:
@@ -282,30 +287,30 @@ class outputGenerator(Observable):
         else:
             modificons = 1
 
-        out.writeTag("ID",conf.getId())
+        out.writeTag("ID", conf.getId())
 
         if conf.getOwnerList():
-            out.writeTag("category",conf.getOwnerList()[0].getName())
+            out.writeTag("category", conf.getOwnerList()[0].getName())
         else:
-            out.writeTag("category","")
+            out.writeTag("category", "")
 
         out.writeTag("parentProtection", dumps(conf.getAccessController().isProtected()))
         out.writeTag("materialList", dumps(self._generateMaterialList(conf)))
 
         self._notify('addXMLMetadata', {'out': out, 'obj': conf, 'type':"conference", 'recordingManagerTags':recordingManagerTags})
 
+        if conf.canModify(self.__aw) and vars and modificons:
+            out.writeTag("modifyLink", vars["modifyURL"])
         if conf.canModify( self.__aw ) and vars and modificons:
-            out.writeTag("modifyLink",vars["modifyURL"])
-        if conf.canModify( self.__aw ) and vars and modificons:
-            out.writeTag("minutesLink",True)
+            out.writeTag("minutesLink", True)
         if conf.canModify( self.__aw ) and vars and modificons:
             out.writeTag("materialLink", True)
         if conf.canModify( self.__aw ) and vars and vars.has_key("cloneURL") and modificons:
-            out.writeTag("cloneLink",vars["cloneURL"])
+            out.writeTag("cloneLink", vars["cloneURL"])
         if  vars and vars.has_key("iCalURL"):
-            out.writeTag("iCalLink",vars["iCalURL"])
+            out.writeTag("iCalLink", vars["iCalURL"])
         if  vars and vars.has_key("webcastAdminURL"):
-            out.writeTag("webcastAdminLink",vars["webcastAdminURL"])
+            out.writeTag("webcastAdminLink", vars["webcastAdminURL"])
 
         if conf.getOrgText() != "":
             out.writeTag("organiser", conf.getOrgText())
@@ -313,7 +318,7 @@ class outputGenerator(Observable):
         out.openTag("announcer")
         chair = conf.getCreator()
         if chair != None:
-            self._userToXML(chair, out)
+            self._userToXML(conf, chair, out)
         out.closeTag("announcer")
 
         sinfo = conf.getSupportInfo()
@@ -384,7 +389,7 @@ class outputGenerator(Observable):
         if len(uList) > 0 or conf.getChairmanText() != "":
             out.openTag("chair")
             for chair in uList:
-                self._userToXML(chair, out)
+                self._userToXML(conf, chair, out)
             if conf.getChairmanText() != "":
                 out.writeTag("UnformatedUser",conf.getChairmanText())
             out.closeTag("chair")
@@ -557,7 +562,7 @@ class outputGenerator(Observable):
         if len(cList) != 0:
             out.openTag("convener")
             for conv in cList:
-                self._userToXML(conv, out)
+                self._userToXML(session, conv, out)
             if session.getConvenerText() != "":
                 out.writeTag("UnformatedUser",session.getConvenerText())
             out.closeTag("convener")
@@ -615,8 +620,6 @@ class outputGenerator(Observable):
         self._notify('addXMLMetadata', {'out': out, 'obj': session, 'type':"session", 'recordingManagerTags':recordingManagerTags})
         out.closeTag("session")
 
-
-
     def _slotToXML(self,slot,vars,includeContribution,includeMaterial, showWithdrawed=True, out=None, recordingManagerTags=None):
         if not out:
             out = self._XMLGen
@@ -656,7 +659,7 @@ class outputGenerator(Observable):
         if len(cList) != 0:
             out.openTag("convener")
             for conv in cList:
-                self._userToXML(conv, out)
+                self._userToXML(slot, conv, out)
             if session.getConvenerText() != "":
                 out.writeTag("UnformatedUser",session.getConvenerText())
             out.closeTag("convener")
@@ -700,8 +703,6 @@ class outputGenerator(Observable):
         for mat in mList:
             self._materialToXML(mat, vars, out=out)
         out.closeTag("session")
-
-
 
     def _contribToXML(self,
                       contribution,
@@ -760,7 +761,7 @@ class outputGenerator(Observable):
         if len(sList) != 0:
             out.openTag("speakers")
             for sp in sList:
-                self._userToXML(sp, out)
+                self._userToXML(contribution, sp, out)
             if contribution.getSpeakerText() != "":
                 out.writeTag("UnformatedUser",contribution.getSpeakerText())
             out.closeTag("speakers")
@@ -768,13 +769,13 @@ class outputGenerator(Observable):
         if len(primaryAuthorList) != 0:
             out.openTag("primaryAuthors")
             for sp in primaryAuthorList:
-                self._userToXML(sp, out)
+                self._userToXML(contribution, sp, out)
             out.closeTag("primaryAuthors")
         coAuthorList = contribution.getCoAuthorList()
         if len(coAuthorList) != 0:
             out.openTag("coAuthors")
             for sp in coAuthorList:
-                self._userToXML(sp, out)
+                self._userToXML(contribution, sp, out)
             out.closeTag("coAuthors")
         l = contribution.getLocation()
         if l != None or contribution.getRoom():
@@ -815,7 +816,7 @@ class outputGenerator(Observable):
         for subC in contribution.getSubContributionList():
             if includeSubContribution:
                 if showSubContribution == 'all' or str(showSubContribution) == str(subC.getId()):
-                    self._subContributionToXML(subC,vars,includeMaterial, out=out, recordingManagerTags=recordingManagerTags)
+                    self._subContributionToXML(subC, vars, includeMaterial, out=out, recordingManagerTags=recordingManagerTags)
 
         self._notify('addXMLMetadata', {'out': out, 'obj': contribution, 'type':"contribution", 'recordingManagerTags':recordingManagerTags})
         out.closeTag("contribution")
@@ -859,7 +860,7 @@ class outputGenerator(Observable):
         if len(sList) > 0 or subCont.getSpeakerText() != "":
             out.openTag("speakers")
         for sp in sList:
-            self._userToXML(sp, out)
+            self._userToXML(subCont, sp, out)
         if subCont.getSpeakerText() != "":
             out.writeTag("UnformatedUser",subCont.getSpeakerText())
         if len(sList) > 0 or subCont.getSpeakerText() != "":

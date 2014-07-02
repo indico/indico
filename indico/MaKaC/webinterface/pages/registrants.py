@@ -1412,7 +1412,7 @@ class WConfModifRegistrantSessions2PrioritiesModify(WConfModifRegistrantSessions
                         <option value="nosession" %s>--_("None selected")--</option>""")%(selectName, selected)]
         for ses in self._sessionForm.getSessionList(True):
             selected = ""
-            if ses == sessionValue:
+            if (ses and sessionValue) and ses.getId() == sessionValue.getId():
                 selected = "selected"
             html.append("""
                     <option value="%s" %s>%s</option>

@@ -527,151 +527,169 @@ extend(IndicoUI.Dialogs,
 
            },
 
-           writeMinutes: function(confId, sessId, contId, subContId, compile) {
+          writeMinutes: function(confId, sessId, contId, subContId, compile) {
+            var changedText = new WatchValue(false),
+              should_reload = false,
+              compileMinutes = exists(compile) ? compile : false,
+              killProgress = null,
+              saveAndClose = false,
+              rtWidget = null,
+              useragent = navigator.userAgent.toLowerCase();
 
-               var changedText = new WatchValue(false);
-               var wasChanged = false;
-               var compileMinutes = exists(compile)?compile:false;
-               var killProgress = null;
-               var saveAndClose = false;
-               var rtWidget = null;
-               var useragent = navigator.userAgent;
-               useragent = useragent.toLowerCase();
+            if (useragent.indexOf('iphone') != -1 || useragent.indexOf('symbianos') != -1 || useragent.indexOf('ipad') != -1 || useragent.indexOf('ipod') != -1 || useragent.indexOf('android') != -1 || useragent.indexOf('blackberry') != -1 || useragent.indexOf('samsung') != -1 || useragent.indexOf('nokia') != -1 || useragent.indexOf('windows ce') != -1 || useragent.indexOf('sonyericsson') != -1 || useragent.indexOf('webos') != -1 || useragent.indexOf('wap') != -1 || useragent.indexOf('motor') != -1 || useragent.indexOf('symbian') != -1 ) {
+              rtWidget = new ParsedRichTextWidget(700, 400, '', 'plain', true);
+            }
+            else {
+              rtWidget = new ParsedRichTextEditor(700, 400);
+            }
 
-               if (useragent.indexOf('iphone') != -1 || useragent.indexOf('symbianos') != -1 || useragent.indexOf('ipad') != -1 || useragent.indexOf('ipod') != -1 || useragent.indexOf('android') != -1 || useragent.indexOf('blackberry') != -1 || useragent.indexOf('samsung') != -1 || useragent.indexOf('nokia') != -1 || useragent.indexOf('windows ce') != -1 || useragent.indexOf('sonyericsson') != -1 || useragent.indexOf('webos') != -1 || useragent.indexOf('wap') != -1 || useragent.indexOf('motor') != -1 || useragent.indexOf('symbian') != -1 ) {
-                   rtWidget = new ParsedRichTextWidget(700, 400,'','plain','IndicoMinimal',true);
-               }
-               else {
-                   rtWidget = new ParsedRichTextEditor(700, 400,'IndicoFull');
-               }
+            var saveButton;
+            var intToStr = function(id) {
+              if (IndicoUtil.isInteger(id)) {
+                return id + '';
+              } else {
+                return null;
+              }
+            };
 
-               var saveButton;
-               var intToStr = function(id) {
-                   if (IndicoUtil.isInteger(id)) {
-                       return id+'';
-                   } else {
-                       return null;
-                   }
-               };
+            var popup = new ExclusivePopupWithButtons(
+              $T('My minutes'),
+              function() {
+                popup.closeMinutesPopup();
+              }, true, false, true);
 
-               var popup = new ExclusivePopupWithButtons(
-                       $T('My minutes'),
-                       function() {
-                           popup.closeMinutesPopup();
-                       }, true, false, true);
+            var closeMinutes = function(){
+              popup.close();
+              rtWidget.destroy();
 
-               var closeMinutes = function(){
-                   popup.close();
-                   rtWidget.destroy();
+              if (should_reload) {
+                window.location.reload(true);
+              }
+            };
 
-                   if (wasChanged) {
-                       window.location.reload(true);
-                   }
+            var req = indicoSource('minutes.edit', {
+              'confId': intToStr(confId),
+              'sessionId': intToStr(sessId),
+              'contribId': intToStr(contId),
+              'subContId': intToStr(subContId),
+              'compile': compileMinutes
+            }, {}, true);
 
-               };
+            req.state.observe(function(state){
+              if (state == SourceState.Error) {
+                  if(killProgress) {
+                    killProgress();
+                  }
+                  IndicoUtil.errorReport(req.error.get());
+              } else if (state == SourceState.Loaded) {
 
-               var req = indicoSource('minutes.edit',
-                   {
-                       'confId': intToStr(confId),
-                       'sessionId': intToStr(sessId),
-                       'contribId': intToStr(contId),
-                       'subContId': intToStr(subContId),
-                       'compile': compileMinutes
-                   });
+                if (rtWidget.get() != req.get()) {
+                  rtWidget.set(req.get(), !req.get());
+                }
 
-               req.state.observe(function(state){
-                   if (state == SourceState.Error) {
-                       if(killProgress) {
-                           killProgress();
-                       }
-                       IndicoUtil.errorReport(req.error.get());
-                   } else if (state == SourceState.Loaded) {
+                changedText.set(false);
 
-                       rtWidget.set(req.get(), !req.get());
+                if (killProgress) {
+                  killProgress();
+                  if (saveAndClose) {
+                    closeMinutes();
+                  }
+                }
+              }
+            });
 
-                       _.defer(function(){
-                               rtWidget.onChange(function(ev){
-                                   changedText.set(true);
-                               });
-                       });
-                       if (killProgress) {
-                           killProgress();
-                           changedText.set(false);
-                           wasChanged = true;
-                           saveButton.button('disable');
-                           if (saveAndClose) {
-                               closeMinutes();
-                           }
-                       }
-                   }
-               });
+            changedText.observe(
+              function(value) {
+                saveButton.button(value ? 'enable' : 'disable');
+            });
 
-               changedText.observe(
-                   function(value) {
-                       if (value) {
-                           saveButton.button('enable');
-                       }
-                   });
+            popup.commitChanges = function() {
+              killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
+              if(rtWidget.clean()) {
+                changedText.set(false);
+                should_reload = true;
+                req.set(rtWidget.get());
+              }
+              killProgress();
+            };
 
-               popup.commitChanges = function() {
-                       killProgress = IndicoUI.Dialogs.Util.progress($T('Saving...'));
-                       if(rtWidget.clean()){
-                           changedText.set(false);
-                           wasChanged = true;
-                       saveButton.button('disable');
-                           req.set(rtWidget.get());
-                       }
-                       killProgress();
-               };
+            popup.commitChangesAndClose = function() {
+              saveAndClose = true;
+              this.commitChanges();
+            };
 
-               popup.commitChangesAndClose = function() {
-                       saveAndClose = true;
-                   this.commitChanges();
-                   };
+            popup.closeMinutesPopup = function() {
+              var self = this;
+              var confirmation = function(confirmed){
+                if (confirmed == 1) {
+                  self.commitChangesAndClose();
+                }
+                else if (confirmed == 2) {
+                  closeMinutes();
+                }
+              };
 
-               popup.closeMinutesPopup = function(){
-                   var self = this;
-                       var confirmation = function(confirmed){
-                           if (confirmed == 1){
-                           self.commitChangesAndClose();
-                           }
-                           else if (confirmed == 2){
-                               closeMinutes();
-                           }
-                       };
+              if (changedText.get()){
+                var popupConfirm = new SaveConfirmPopup($T("Confirm"), Html.div({}, Html.div({style:{paddingBottom: pixels(16)}},
+                                                        $T("You have modified your text since you last saved.")),
+                                                        Html.div({}, $T("Do you want to save your changes?"))), confirmation);
+                popupConfirm.open();
+              } else {
+                closeMinutes();
+              }
+            };
 
-                       if (changedText.get()){
-                       var popupConfirm = new SaveConfirmPopup($T("Confirm"), Html.div({}, Html.div({style:{paddingBottom: pixels(16)}},
-                                                                    $T("You have modified your text since you last saved.")),
-                                                                    Html.div({}, $T("Do you want to save your changes?"))), confirmation);
-                           popupConfirm.open();
-                       } else {
-                           closeMinutes();
-                       }
-                   };
+            popup.draw = function() {
+               var content = Html.div({}, rtWidget.draw());
+               return this.ExclusivePopupWithButtons.prototype.draw.call(this, content);
+            };
 
-               popup.draw = function() {
-                   var content = Html.div({}, rtWidget.draw());
-                   return this.ExclusivePopupWithButtons.prototype.draw.call(this, content);
-               };
+            popup.postDraw = function() {
+              var first_run = true;
 
-               popup._getButtons = function() {
-                   return [
-                       [$T('Save'), function() {
-                           popup.commitChanges();
-                       }],
-                       [$T('Close'), function() {
-                           popup.closeMinutesPopup();
-                       }]
-                   ];
-               };
+              CKEDITOR.once('instanceReady', function() {
+                rtWidget.onChange(function(ev) {
+                  // ignore the first run, since it will correspond to the update
+                  // with the data coming from the server
+                  if (!first_run) {
+                    changedText.set(true);
+                  } else {
+                    first_run = false;
+                  }
+                });
 
-               popup.open();
-               saveButton = popup.buttons.eq(0);
-               if(!compileMinutes) {
-                   saveButton.button('disable');
-               }
-           },
+                // the editor is ready, so let's ask for data from the server
+                killProgress = IndicoUI.Dialogs.Util.progress();
+                req.refresh();
+
+              });
+            };
+
+            popup._getButtons = function() {
+              return [
+                [$T('Save'), function() {
+                   popup.commitChanges();
+                }],
+                [$T('Close'), function() {
+                   popup.closeMinutesPopup();
+                }]
+              ];
+            };
+
+            popup._onClose = function(e) {
+              // Destroy CKEDITOR instance
+              rtWidget.getEditor().destroy();
+              this.ExclusivePopupWithButtons.prototype._onClose.call(this, e);
+            }
+
+            popup.open();
+            saveButton = popup.buttons.eq(0);
+
+            if(!compileMinutes) {
+               saveButton.button('disable');
+            }
+
+          },
            __addSessionSlot: function(slotId, sessionId, confId){
                var slot = undefined;
 

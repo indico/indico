@@ -314,7 +314,7 @@ class WConfModifRegFormStatusModif(wcomponents.WTemplated):
         html = ["""<table>"""]
         for v in self._tempStatus.getStatusValuesList(True):
             default = ""
-            if self._tempStatus.getDefaultValue() is not None and self._tempStatus.getDefaultValue().getId() == v.getId():
+            if self._tempStatus.getDefaultValue() is not None and self._tempStatus.getDefaultValue() == v.getId():
                 default = """<i><b> (default)</b></i>"""
             html.append("""<tr>
                                 <td align="left" style="padding-left:10px"><input type="checkbox" name="valuesIds" value="%s">%s%s</td>

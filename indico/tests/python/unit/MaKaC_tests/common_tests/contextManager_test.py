@@ -53,6 +53,35 @@ class TestInitializedContextManager(IndicoTestCase):
         ContextManager.set('test2', 66)
         self.assertEquals(ContextManager.get('test2'), 66)
 
+    def testDelete(self):
+        """
+        Delete works OK
+        """
+        ContextManager.set('test', 123)
+        ContextManager.delete('test')
+        self.assertEqual(ContextManager.get('test', default=None), None)
+
+    def testDeleteWithDel(self):
+        """
+        Delete works OK
+        """
+        ContextManager.set('test', 123)
+        del ContextManager.get()['test']
+        self.assertEqual(ContextManager.get('test', default=None), None)
+
+    def testDeleteNonExisting(self):
+        """
+        Deleting non-existing key raises KeyError
+        """
+        self.assertRaises(KeyError, ContextManager.delete, 'test')
+
+    def testDeleteNonExistingSilent(self):
+        """
+        Deleting non-existing key doesn't raise KeyError if silent=True
+        """
+        ContextManager.delete('test', silent=True)
+        self.assertEqual(ContextManager.get('test', default=None), None)
+
     def thread1(self):
         ContextManager.set('samevariable', 'a')
         time.sleep(2)

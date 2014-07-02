@@ -349,7 +349,7 @@ class PluginsHolder (ObjectHolder):
         PluginLoader.loadPlugins()
         self.updateAllPluginInfo()
 
-    def reloadAllPlugins(self):
+    def reloadAllPlugins(self, disable_if_broken=True):
         """ Reloads all plugins and updates their information
         """
 
@@ -357,7 +357,7 @@ class PluginsHolder (ObjectHolder):
         self.getById("ajaxMethodMap").cleanAJAXDict()
         self.getById("RHMap").cleanRHDict()
         PluginLoader.reloadPlugins()
-        self.updateAllPluginInfo()
+        self.updateAllPluginInfo(disable_if_broken)
         self.getComponentsManager().registerAllComponents()
 
     def reloadPluginType(self, pluginTypeName):
@@ -370,7 +370,7 @@ class PluginsHolder (ObjectHolder):
         else:
             raise PluginError("Error while trying to reload plugins of the type: " + pluginTypeName + ". Plugins of the type " + pluginTypeName + "do not exist")
 
-    def updateAllPluginInfo(self):
+    def updateAllPluginInfo(self, disable_if_broken=True):
         """ Updates the info about plugins in the DB
             We must keep if plugins are active or not even between reloads
             and even if plugins are removed from the file system (they may
@@ -394,15 +394,14 @@ class PluginsHolder (ObjectHolder):
             missingDeps = ptype.getModule().__missing_deps__
 
             # if there are dependencies missing, set as not usable
-            if len(missingDeps) > 0:
-                ptype.setUsable(False, reason = "Dependencies missing: %s " % \
-                                missingDeps)
-                if ptype.isActive():
+            if missingDeps:
+                ptype.setUsable(False, reason="Dependencies missing: {0}".format(', '.join(missingDeps)))
+                if disable_if_broken and ptype.isActive():
                     ptype.setActive(False)
             else:
                 ptype.setUsable(True)
 
-            ptype.updateInfo()
+            ptype.updateInfo(disable_if_broken)
 
     def clearPluginInfo(self):
         """ Removes all the plugin information from the DB
@@ -781,7 +780,7 @@ class PluginType (PluginBase):
     def configureFromMetadata(self, metadata):
         self.__name = metadata['name']
 
-    def _updatePluginInfo(self, pid, pluginModule, metadata):
+    def _updatePluginInfo(self, pid, pluginModule, metadata, disable_if_broken=True):
 
         if self.hasPlugin(pid):
             p = self.getPlugin(pid)
@@ -801,12 +800,10 @@ class PluginType (PluginBase):
 
         missingDeps = p.getModule().__missing_deps__
 
-        if len(missingDeps) > 0:
-            p.setUsable(False, reason = "Dependencies missing: %s " % missingDeps)
-
-            if p.isActive():
+        if missingDeps:
+            p.setUsable(False, reason="Dependencies missing: {0}".format(missingDeps))
+            if disable_if_broken:
                 p.setActive(False)
-
         else:
             p.setUsable(True)
 
@@ -826,7 +823,7 @@ class PluginType (PluginBase):
         self._updateHandlerInfo(p, pluginModule)
         self._updateRHMapInfo(p, pluginModule)
 
-    def updateInfo(self):
+    def updateInfo(self, disable_if_broken=True):
         """
         Will update the information in the DB about this plugin type.
         """
@@ -847,9 +844,7 @@ class PluginType (PluginBase):
             if metadata['ignore']:
                 continue
             else:
-                self._updatePluginInfo(pluginModule.__plugin_id__,
-                                       pluginModule,
-                                       metadata)
+                self._updatePluginInfo(pluginModule.__plugin_id__, pluginModule, metadata, disable_if_broken=disable_if_broken)
 
         ptypeModule = self.getModule()
         ptypeMetadata = processPluginMetadata(ptypeModule)
@@ -1432,4 +1427,3 @@ class ActionBase(object):
         """ To be implemented by inheriting classes
         """
         raise PluginError("Action of class " + str(self.__class__.__name__) + " has not implemented the method call()")
-

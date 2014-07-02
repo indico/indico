@@ -122,7 +122,7 @@ type("NewsItem", ["ServiceWidget"],
 
             this.chooser = new Chooser(new Lookup({
                 edit: function() {
-                   var content = new ParsedRichTextEditor(600,400,'IndicoMinimal');
+                   var content = new ParsedRichTextEditor(600,400);
                    self.content = content;
 
                    if (self.id) {

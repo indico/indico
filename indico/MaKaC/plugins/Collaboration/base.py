@@ -345,7 +345,9 @@ class CSBookingManager(Persistent, Observer):
         """
         if CollaborationTools.hasOption(bookingType, "searchAllow") \
                 and CollaborationTools.getOptionValue(bookingType, "searchAllow"):
-            return CollaborationTools.getCSBookingClass(bookingType)._search(user, query, offset, limit)
+            res = CollaborationTools.getCSBookingClass(bookingType)._search(user, query, offset, limit)
+            return {'results': res[0],
+                    'offset': res[1]}
         else:
             raise CollaborationException("Plugin type " + str(bookingType) + " does not allow search.")
 

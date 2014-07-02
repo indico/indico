@@ -147,7 +147,7 @@
         verifyLectureDates();
 
 
-    var editor = new ParsedRichTextWidget(500, 200,"", "rich", "IndicoMinimal");
+    var editor = new ParsedRichTextWidget(600, 200, "", "rich");
     $E('descriptionBox').set(editor.draw());
 
 

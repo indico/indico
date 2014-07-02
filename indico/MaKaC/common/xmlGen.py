@@ -43,19 +43,19 @@ class XMLGen:
         tmp = encodeUnicode(text, self._sourceEncoding)
         return saxutils.escape( tmp )
 
-    def openTag(self,name,listAttrib=[],single=False):
+    def openTag(self, name, listAttrib=[], single=False):
         #open an XML tag
         #listAttrib is the list of the attribute. each attribute must be set in a 2 elements list like [name,value]
         #the single parameter, when false, place a '\n\r' after the tag
         LAtt = ""
         for att in listAttrib:
             LAtt= LAtt + ' ' + att[0] + '=' + saxutils.quoteattr(self.escapeString(att[1]))
-        for i in range(0,self.indent):
+        for i in range(0, self.indent):
             self.xml.append(" ")
-        self.xml.append( "<" + name + LAtt + ">" )
+        self.xml.append("<" + name + LAtt + ">")
         if not single:
-            self.xml.append( self.escapeString("\r\n") )
-        self.indent = self.indent+1
+            self.xml.append(self.escapeString("\r\n"))
+        self.indent = self.indent + 1
 
     def closeTag(self,name,single=False):
         #close an XML tag
@@ -68,17 +68,17 @@ class XMLGen:
     def writeText(self,text, single=False):
         #add text to the response
         #the single parameter, when false, place a '\n\r' after the text
-        if text!="":
+        if text != "":
             text = self.cleanText(text)
-            self.xml.append( self.escapeString(text))
+            self.xml.append(self.escapeString(text))
         if not single:
             self.xml.append( self.escapeString("\r\n"))
 
-    def writeTag(self,name,value,ListAttrib=[]):
+    def writeTag(self, name, value, ListAttrib=[]):
         #add a full tag
-        self.openTag(name,ListAttrib,True)
-        self.writeText(value,True)
-        self.closeTag(name,True)
+        self.openTag(name, ListAttrib, True)
+        self.writeText(value, True)
+        self.closeTag(name, True)
 
     def writeComment(self, commentText):
         self.xml.append("<!-- ")

@@ -41,8 +41,7 @@ type("RichTextEditor", ["IWidget", "Accessor"],
                      self.text ,
                      self.callbacks,
                      self.width,
-                     self.height,
-                     self.toolbarSet);
+                     self.height);
              },5);
              return this.div;
          },
@@ -91,12 +90,11 @@ type("RichTextEditor", ["IWidget", "Accessor"],
          }
 
      },
-     function(width, height, toolbarSet) {
+     function(width, height) {
          this.onLoadList = new WatchList();
          this.callbacks = new WatchList();
          this.width = width;
          this.height = height;
-         this.toolbarSet = toolbarSet?toolbarSet:'IndicoMinimal';
 
          this.divId = Html.generateId();
      });
@@ -112,8 +110,8 @@ type("ParsedRichTextEditor", ["RichTextEditor"],
             }
         },
 
-        function(width, height, toolbarSet, sanitizationLevel) {
-            this.RichTextEditor(width, height, toolbarSet);
+        function(width, height, sanitizationLevel) {
+            this.RichTextEditor(width, height);
             this.sanitizationLevel = sanitizationLevel?sanitizationLevel:2;
         });
 
@@ -195,14 +193,14 @@ type("RichTextWidget", ["IWidget", "Accessor"],
              }
          }
      },
-     function(width, height, initialText, mode, toolbarSet, hideSwitchLink) {
+     function(width, height, initialText, mode, hideSwitchLink) {
 
          var textAreaParams = { style: {} };
          textAreaParams.style.width = pixels(width);
          textAreaParams.style.height = pixels(height);
 
          this.plain = new RealtimeTextArea(textAreaParams);
-         this.rich = new RichTextEditor(width, height, toolbarSet);
+         this.rich = new RichTextEditor(width, height);
          this.richDiv = Html.div({});
          this.currentText = any(initialText, '');
          this.loaded = false;
@@ -269,9 +267,9 @@ type("ParsedRichTextWidget",['RichTextWidget'],
                  return cleanText(this.plain.get(),this.plain);
          }
         },
-        function(width, height, initialText, mode, toolbarSet, hideSwitchLink) {
-            this.RichTextWidget(width, height, initialText, mode, toolbarSet, hideSwitchLink);
-            this.rich = new ParsedRichTextEditor(width, height, toolbarSet);
+        function(width, height, initialText, mode, hideSwitchLink) {
+            this.RichTextWidget(width, height, initialText, mode, hideSwitchLink);
+            this.rich = new ParsedRichTextEditor(width, height);
 
             var self = this;
 
@@ -296,9 +294,7 @@ type("RichTextInlineEditWidget", ["InlineEditWidget"],
         {
             _handleEditMode: function(value) {
 
-                this.description = new RichTextWidget(600, 400,
-                                                      '','rich',
-                                                      'IndicoMinimal');
+                this.description = new RichTextWidget(600, 400, '','rich');
                 this.description.set(value);
                 return this.description.draw();
             },
@@ -355,7 +351,7 @@ type("ParsedRichTextInlineEditWidget", ["RichTextInlineEditWidget"],
         {
             _handleEditMode: function(value) {
 
-                this.description = new ParsedRichTextWidget(600, 400,'','rich','IndicoMinimal');
+                this.description = new ParsedRichTextWidget(600, 400, '', 'rich');
                 this.description.set(value);
                 return this.description.draw();
             },
@@ -387,12 +383,12 @@ type("ParsedRichTextInlineEditWidget", ["RichTextInlineEditWidget"],
         });
 
 
-function initializeEditor( wrapper, editorId, text, callbacks, width, height, toolbarSet ){
+function initializeEditor( wrapper, editorId, text, callbacks, width, height ){
     // "wrapper" is the actual Indico API object that represents an editor
 
     try {
 
-        CKEDITOR.replace(editorId, {language : userLanguage, width : width, height : height - 75, 'toolbar': toolbarSet});
+        CKEDITOR.replace(editorId, {language : userLanguage, width : width, height : height - 75});
         var cki = CKEDITOR.instances[editorId];
 
         cki.setData(text);
