@@ -8,19 +8,7 @@
     <li><span>${ _('Confirm Reservation') }</span></li>
 </ul>
 
-
-% if errors:
-    <div class="error-message-box">
-        <div class="message-text">
-            ${ _("There are some errors in the search criteria:") }
-            <ul>
-                % for error in errors:
-                    <li>${ error }</li>
-                % endfor
-            </ul>
-        </div>
-    </div>
-% endif
+<%include file="ErrorList.tpl" args='errors=errors, msg=_("There are some errors in the search criteria:")'/>
 
 <form id="searchForm" method="POST" action="">
     <input type="hidden" name="step" value="1">

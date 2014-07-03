@@ -2,18 +2,7 @@
     ${ _('Search bookings') }
 </h2>
 
-% if errors:
-    <div class="error-message-box">
-        <div class="message-text">
-            ${ _("There are some errors in the search criteria:") }
-            <ul>
-                % for error in errors:
-                    <li>${ error }</li>
-                % endfor
-            </ul>
-        </div>
-    </div>
-% endif
+<%include file="ErrorList.tpl" args='errors=errors, msg=_("There are some errors in the search criteria:")'/>
 
 <form method="post" action="" id="searchBookings">
     <h2 class="group-title">

@@ -12,19 +12,7 @@
     var userId = "rb-user-${ user.getId() }";
 </script>
 
-% if errors:
-    <div class="error-message-box">
-        <div class="message-text">
-            ${ _("There are some errors:") }
-            <ul>
-                % for error in errors:
-                    <li>${ error }</li>
-                % endfor
-            </ul>
-        </div>
-    </div>
-% endif
-
+<%include file="ErrorList.tpl" args='errors=errors, msg=_("There are some errors:")'/>
 
 <h2 class="group-title">
     <i class="icon-location"></i>

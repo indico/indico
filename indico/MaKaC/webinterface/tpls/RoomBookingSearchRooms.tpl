@@ -69,18 +69,7 @@
     ${ _('Search rooms') }
 </h2>
 
-% if form.error_list:
-    <div class="error-message-box">
-        <div class="message-text">
-            ${ _('There are some errors in the data you submitted') }:
-            <ul>
-                % for error in form.error_list:
-                    <li>${ error }</li>
-                % endfor
-            </ul>
-        </div>
-    </div>
-% endif
+<%include file="ErrorList.tpl" args='errors=form.error_list, msg=_("There are some errors in the data you submitted")'/>
 
 <!-- Choose a room -->
 <h2 class="group-title">
