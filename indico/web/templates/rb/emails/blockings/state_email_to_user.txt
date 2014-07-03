@@ -1,0 +1,13 @@
+Dear {{ blocking.created_by_user.getFirstName() }},
+
+Your room blocking request has been {{ verb }} by a room manager.
+
+Room: {{ blocked_room.room.full_name }}
+Action: {{ verb }}
+{%- if not blocked_room.state == blocked_room.State.rejected %}
+Reason: {{ blocked_room.rejection_reason or '(none)' }}
+{%- endif %}
+
+You can view the details of your blocking here:
+{{ url_for('rooms.blocking_details', blocking_id=blocking.id, _external=true) }}
+{% include 'rb/emails/email_footer.txt' %}

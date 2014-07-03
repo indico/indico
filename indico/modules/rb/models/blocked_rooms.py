@@ -30,7 +30,7 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
-from indico.modules.rb.notifications.blockings import blocking_processed
+from indico.modules.rb.notifications.blockings import notify_request_response
 from indico.util.date_time import format_date
 from indico.util.string import return_ascii
 from indico.util.struct.enum import TitledIntEnum
@@ -99,7 +99,7 @@ class BlockedRoom(db.Model):
             self.rejection_reason = reason
         if user:
             self.rejected_by = user.getFullName()
-        GenericMailer.send(GenericNotification(blocking_processed(self)))
+        notify_request_response(self)
 
     def approve(self, notify_blocker=True):
         """Approve the room blocking, rejecting all colliding reservations/occurrences."""
@@ -155,9 +155,7 @@ class BlockedRoom(db.Model):
         if notify_blocker:
             # We only need to notify the blocking creator if the blocked room wasn't approved yet.
             # This is the case if it's a new blocking for a room managed by the creator
-            emails.append(blocking_processed(self))
-            for notification in map(GenericNotification, emails):
-                GenericMailer.send(notification)
+            notify_request_response(self)
 
 
     @return_ascii

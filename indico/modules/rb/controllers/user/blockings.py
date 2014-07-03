@@ -25,7 +25,7 @@ from flask import request, session
 from indico.modules.rb.forms.base import FormDefaults
 from indico.modules.rb.forms.blockings import CreateBlockingForm, BlockingForm
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
-from indico.modules.rb.notifications.blockings import request_confirmation
+from indico.modules.rb.notifications.blockings import notify_request
 from indico.util.i18n import _
 from indico.core.db import db
 from indico.core.errors import IndicoError
@@ -68,7 +68,7 @@ class RHRoomBookingCreateModifyBlockingBase(RHRoomBookingBase):
                 rooms_by_owner[owner].append(blocked_room)
 
         for owner, rooms in rooms_by_owner.iteritems():
-            GenericMailer.send(GenericNotification(request_confirmation(owner, self._blocking, rooms)))
+            notify_request(owner, self._blocking, rooms)
 
 
 class RHRoomBookingCreateBlocking(RHRoomBookingCreateModifyBlockingBase):

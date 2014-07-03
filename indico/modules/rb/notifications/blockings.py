@@ -1,47 +1,43 @@
+from flask import render_template
+
 from indico.core.config import Config
-from MaKaC.webinterface.wcomponents import WTemplated
+from indico.modules.rb.notifications.util import email_sender
 
 
-def request_confirmation(owner, blocking, blocked_rooms):
+@email_sender
+def notify_request(owner, blocking, blocked_rooms):
     """
     Notifies (e-mails) room owner about blockings he has to approve.
     Expects only blockings for rooms owned by the specified owner
     """
+    from_addr = Config.getInstance().getNoReplyEmail()
     to = owner.getEmail()
     subject = 'Confirm room blockings'
-    wc = WTemplated('RoomBookingEmail_2ResponsibleConfirmBlocking')
-    text = wc.getHTML({
-        'owner': owner,
-        'blocking': blocking,
-        'blocked_rooms': blocked_rooms
-    })
-    from_addr = Config.getInstance().getNoReplyEmail()
+    body = render_template('rb/emails/blockings/awaiting_confirmation_email_to_manager.txt',
+                           owner=owner, blocking=blocking, blocked_rooms=blocked_rooms)
     return {
         'fromAddr': from_addr,
         'toList': [to],
         'subject': subject,
-        'body': text
+        'body': body
     }
 
 
-def blocking_processed(blocked_room):
+@email_sender
+def notify_request_response(blocked_room):
     """
     Notifies (e-mails) blocking creator about approval/rejection of his
     blocking request for a room
     """
+    from_addr = Config.getInstance().getSupportEmail()
     to = blocked_room.blocking.created_by_user.getEmail()
     verb = blocked_room.State(blocked_room.state).title.upper()
     subject = 'Room blocking {}'.format(verb)
-    wc = WTemplated('RoomBookingEmail_2BlockingCreatorRequestProcessed')
-    text = wc.getHTML({
-        'blocking': blocked_room.blocking,
-        'blocked_room': blocked_room,
-        'verb': verb
-    })
-    from_addr = Config.getInstance().getSupportEmail()
+    body = render_template('rb/emails/blockings/state_email_to_user.txt',
+                           blocking=blocked_room.blocking, blocked_room=blocked_room, verb=verb)
     return {
         'fromAddr': from_addr,
         'toList': [to],
         'subject': subject,
-        'body': text
+        'body': body
     }
