@@ -83,7 +83,7 @@ type ("RoomBookingRoom", [],
             this.number = roomData.number;
             this.floor = roomData.floor;
             this.building = roomData.building;
-            this.location_name = roomData.location_data;
+            this.location_name = roomData.location_name;
             this.name = roomData.name;
             this.type = roomData.kind;
             this.details_url = roomData.details_url;
