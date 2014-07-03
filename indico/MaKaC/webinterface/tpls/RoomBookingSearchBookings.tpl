@@ -218,15 +218,6 @@
         e.datepicker('setDate', '+7');
     }
 
-    function confirm_search() {
-        if ($('#is_only_mine').is(':checked') || $('#roomIDList').val() !== null) {
-            return true;
-        }
-        try { if ($('#is_only_my_rooms').is(':checked')) { return true; } } catch (err) {}
-        new AlertPopup($T('Select room'), $T('Please select a room (or several rooms).')).open();
-        return false;
-    }
-
     // Reads out the invalid textboxes and returns false if something is invalid.
     // Returns true if form may be submited.
     function forms_are_valid(onSubmit) {
@@ -267,7 +258,8 @@
                 new AlertPopup($T('Error'), $T('There are errors in the form. Please correct fields with red background.')).open();
                 e.preventDefault();
             }
-            else if(!confirm_search()) {
+            else if(!$('#roomselector').roomselector('validate')) {
+                new AlertPopup($T('Select room'), $T('Please select a room (or several rooms).')).open();
                 e.preventDefault();
             }
         });
