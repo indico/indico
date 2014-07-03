@@ -29,7 +29,7 @@ from MaKaC.webinterface.wcomponents import WTemplated
 from indico.modules.rb.models.reservations import RepeatMapping
 from indico.modules.rb.models.utils import next_work_day
 from indico.modules.rb.views import WPRoomBookingBase
-from indico.modules.rb.views.user.reservations import RoomBookingCalendarWidget
+from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
