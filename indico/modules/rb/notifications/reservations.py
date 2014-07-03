@@ -11,12 +11,12 @@ class ReservationNotification(object):
         self.start_date = format_datetime(reservation.start_date)
 
     def _get_email_subject(self, **mail_params):
-        return '{prefix}[{room}] {subject} {date} {sufix}'.format(
+        return '{prefix}[{room}] {subject} {date} {suffix}'.format(
             prefix=mail_params.get('subject_prefix', ''),
             room=self.reservation.room.getFullName(),
             subject=mail_params.get('subject', ''),
             date=self.start_date,
-            sufix=mail_params.get('subject_sufix', '')
+            suffix=mail_params.get('subject_suffix', '')
         ).strip()
 
     def _make_body(self, mail_params, **body_params):
@@ -99,11 +99,11 @@ def notify_confirmation(reservation):
     notification = ReservationNotification(reservation)
     return filter(None, [
         notification.compose_email_to_creator_and_contact(
-            subject='Confirmed Booking on',
+            subject='Booking confirmed on',
             template_name='confirmation_email_to_user'
         ),
         notification.compose_email_to_owner(
-            subject='Confirmed Booking on',
+            subject='Booking confirmed on',
             template_name='confirmation_email_to_manager'
         ),
         notification.compose_email_to_avc_support(

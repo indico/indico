@@ -16,7 +16,7 @@ class ReservationOccurrenceNotification(ReservationNotification):
         self.start_date = format_datetime(occurrence.start)
 
     def _get_email_subject(self, **mail_params):
-        mail_params = dict(mail_params, **{'subject_sufix': '(SINGLE OCCURRENCE)'})
+        mail_params = dict(mail_params, **{'subject_suffix': '(SINGLE OCCURRENCE)'})
         return super(ReservationOccurrenceNotification, self)._get_email_subject(**mail_params)
 
     def _make_body(self, mail_params, **body_params):
@@ -31,20 +31,20 @@ def notify_cancellation(occurrence):
     notification = ReservationOccurrenceNotification(occurrence)
     return filter(None, [
         notification.compose_email_to_creator_and_contact(
-            subject='Cancellation Confirmation on',
+            subject='Booking cancelled on',
             template_name='occurrence_cancellation_email_to_user'
         ),
         notification.compose_email_to_owner(
-            subject='Cancelled Booking on',
+            subject='Booking cancelled on',
             template_name='occurrence_cancellation_email_to_manager'
         ),
         notification.compose_email_to_avc_support(
-            subject='Booking Cancelled on',
+            subject='Booking cancelled on',
             template_name='occurrence_cancellation_email_to_avc_support'
         ),
         notification.compose_email_to_assistance(
             subject_prefix='[Support Request Cancellation]',
-            subject='Request Cancelled for',
+            subject='Request cancelled for',
             template_name='occurrence_cancellation_email_to_assistance'
         )
     ])
@@ -57,16 +57,16 @@ def notify_rejection(occurrence):
     notification = ReservationOccurrenceNotification(occurrence)
     return filter(None, [
         notification.compose_email_to_creator_and_contact(
-            subject='REJECTED Booking on',
+            subject='Booking rejected on',
             template_name='occurrence_rejection_email_to_user'
         ),
         notification.compose_email_to_owner(
-            subject='Rejected Booking on',
+            subject='Booking rejected on',
             template_name='occurrence_rejection_email_to_manager'
         ),
         notification.compose_email_to_assistance(
             subject_prefix='[Support Request Cancellation]',
-            subject='Request Cancelled for',
+            subject='Request cancelled for',
             template_name='occurrence_rejection_email_to_assistance'
         )
     ])
