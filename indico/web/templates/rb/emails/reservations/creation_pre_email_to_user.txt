@@ -1,6 +1,7 @@
-{% extends 'rb/emails/creation_email_to_user.txt' %}
+{% extends 'rb/emails/reservations/creation_email_to_user.txt' %}
 
-{% block prebooking_warning -%}
+{% block prebooking_warning %}
+
 Note:
 Your pre-booking is NOT YET ACCEPTED by a room manager.
 Please be aware that pre-bookings are subject to acceptance

@@ -1,6 +1,8 @@
-Dear {{ owner.getFirstName() }},
+{% extends 'rb/emails/base_email.txt' %}
+{% block recipient %}{{ owner.getFirstName() }}{% endblock %}
 
-{{ blocking.created_by_user.getFullName() }} has created a blocking for {{ "some rooms" if blocked_rooms | length > 1 else "a room" }} you are responsible for.
+{% block email_body -%}
+{{ blocking.created_by_user.getFullName() }} has created a blocking for {{ "some rooms" if blocked_rooms | length > 1 else "a room" }} you manage.
 
 {% if blocked_rooms | length == 1 -%}
 Room: {{ blocked_rooms[0].room.full_name }}
@@ -15,4 +17,4 @@ Dates: {{ blocking.start_date | format_date }} - {{ blocking.end_date | format_d
 
 You can approve or reject this blocking request here:
 {{ url_for('rooms.blocking_my_rooms', state='pending', _external=true) }}
-{% include 'rb/emails/email_footer.txt' %}
+{%- endblock %}

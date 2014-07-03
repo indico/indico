@@ -1,7 +1,0 @@
-{% extends 'rb/emails/base_email_to_manager.txt' %}
-
-{% block body -%}
-There is a new {% block prebooking_prefix %}{% endblock %}booking for your room.
-
-{% include 'rb/emails/booking_info.txt' %}
-{%- endblock %}

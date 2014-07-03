@@ -1,4 +1,4 @@
-{% extends 'rb/emails/base_email_to_user.txt' %}
+{% extends 'rb/emails/reservations/base_email_to_user.txt' %}
 {% set excluded_days = reservation.find_excluded_days().count() %}
 
 {% block body -%}
@@ -19,9 +19,9 @@ for this room may reject your booking. Should that happen you will
 be instantly notified by e-mail.
 {%- endblock %}
 
-{%- include 'rb/emails/booking_key_info.txt' %}
+{%- include 'rb/emails/reservations/reservation_key_info.txt' %}
 
-{% block prebooking_warning %}{% endblock %}
+{%- block prebooking_warning %}{% endblock %}
 
 {%- if reservation.uses_video_conference %}
 
@@ -30,5 +30,5 @@ you intend to use them. After your meeting, you will be able to give IT
 service managers feedback about your video/phone conference by accessing this URL:
 http://cern.ch/go/MQ8Q
 Thanks in advance for your feedback
-{% endif %}
+{%- endif %}
 {%- endblock %}

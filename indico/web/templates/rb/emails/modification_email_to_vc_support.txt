@@ -1,6 +1,0 @@
-{% extends 'rb/emails/base_email_to_vc_support.txt' %}
-
-{% block body -%}
-A booking on {{ reservation.room.full_name }} was modified.
-{% include 'rb/emails/booking_vc_info.txt' %}
-{%- endblock %}

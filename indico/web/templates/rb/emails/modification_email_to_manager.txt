@@ -1,5 +1,0 @@
-{% extends 'rb/emails/base_email_to_manager.txt' %}
-
-{% block body -%}
-A booking on your room has been MODIFIED.
-{%- endblock %}

@@ -1,0 +1,5 @@
+{% extends 'rb/emails/reservations/base_email_to_vc_support.txt' %}
+
+{% block body -%}
+A booking has been CANCELLED.
+{%- endblock %}
