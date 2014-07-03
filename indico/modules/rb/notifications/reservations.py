@@ -13,7 +13,7 @@ class ReservationNotification(object):
     def _get_email_subject(self, **mail_params):
         return '{prefix}[{room}] {subject} {date} {suffix}'.format(
             prefix=mail_params.get('subject_prefix', ''),
-            room=self.reservation.room.getFullName(),
+            room=self.reservation.room.full_name,
             subject=mail_params.get('subject', ''),
             date=self.start_date,
             suffix=mail_params.get('subject_suffix', '')
@@ -119,12 +119,11 @@ def notify_creation(reservation):
     notification = ReservationNotification(reservation)
     return filter(None, [
         notification.compose_email_to_creator_and_contact(
-            subject=('Pre-Booking awaiting acceptance', 'New Booking on')[reservation.is_confirmed],
-            template_name=('creation_pre_email_to_user', 'creation_email_to_user')[reservation.is_confirmed]
+            subject='New Booking on' if reservation.is_confirmed else 'Pre-Booking awaiting acceptance',
+            template_name='creation_email_to_user' if reservation.is_confirmed else 'creation_pre_email_to_user'
         ),
         notification.compose_email_to_owner(
-            subject=('New Pre-Booking on', 'New Booking on')[reservation.is_confirmed],
-            booking_message=('Book', 'Pre-book')[reservation.is_confirmed],
+            subject='New booking on' if reservation.is_confirmed else 'New Pre-Booking on',
             template_name='creation_email_to_manager'
         ),
         notification.compose_email_to_avc_support(
@@ -180,7 +179,7 @@ def notify_modification(reservation, changes):
             template_name='modification_email_to_avc_support'
         ),
         notification.compose_email_to_assistance(
-            subject_prefix='[Support Request {}]'.format(('Modification', 'Cancelled')[assistance_cancelled]),
+            subject_prefix='[Support Request {}]'.format('Cancelled' if assistance_cancelled else 'Modification'),
             subject='Modified request on',
             template_name='modification_email_to_assistance',
             assistance_cancelled=assistance_cancelled
