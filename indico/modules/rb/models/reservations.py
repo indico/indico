@@ -525,6 +525,9 @@ class Reservation(Serializer, db.Model):
                            'contact_email', 'contact_phone', 'booking_reason', 'equipments',
                            'needs_general_assistance', 'uses_video_conference', 'needs_video_conference_setup')
 
+        if data['repeat_unit'] == RepeatUnit.NEVER and data['start_date'].date() != data['end_date'].date():
+            raise ValueError('end_date != start_date for non-repeating booking')
+
         if prebook is None:
             prebook = not room.can_be_booked(user)
             if prebook and not room.can_be_prebooked(user):
