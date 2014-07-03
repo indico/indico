@@ -1,0 +1,6 @@
+{% extends 'rb/emails/base_email_to_vc_support.txt' %}
+
+{% block body -%}
+There is a new booking on {{ reservation.room.full_name }}.
+{% include 'rb/emails/booking_vc_info.txt' %}
+{%- endblock %}

@@ -4,8 +4,8 @@ Dear {{ reservation.created_by_user.getFirstName() }},
 {% block body %}{% endblock %}
 
 Booking details:
-{{ url_for('rooms.roomBooking-bookingDetails', roomLocation=reservation.location_name, resvID=reservation.id, _external=True) }}
+{{ url_for('rooms.roomBooking-bookingDetails', roomLocation=reservation.location_name, resvID=reservation.id, _external=true) }}
 
 Remember you can always check your bookings here:
-{{ url_for('rooms.my_bookings', _external=True) }}
+{{ url_for('rooms.my_bookings', _external=true) }}
 {% include 'rb/emails/email_footer.txt' %}

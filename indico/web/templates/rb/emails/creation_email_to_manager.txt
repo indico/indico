@@ -1,14 +1,7 @@
-Dear ${ reservation.room.getResponsible().getFirstName() },
+{% extends 'rb/emails/base_email_to_manager.txt' %}
 
+{% block body -%}
+There is a new {% block prebooking_prefix %}{% endblock %}booking for your room.
 
-There is a new ${ bookingMessage }ing for your room.
-
-Room: ${ reservation.room.getFullName() }
-For:  ${ reservation.bookedForName }
-Reason: ${ reservation.reason }
-Dates: ${ formatDate(reservation.startDT.date()) } -- ${ formatDate(reservation.endDT.date()) }
-Hours: ${ reservation.startDT.strftime("%H:%M") } -- ${ reservation.endDT.strftime("%H:%M") }
-
- You can check details here:
-${ urlHandlers.UHRoomBookingBookingDetails.getURL( reservation ) }
-<%include file="RoomBookingEmail_Footer.tpl"/>
+{% include 'rb/emails/booking_info.txt' %}
+{%- endblock %}

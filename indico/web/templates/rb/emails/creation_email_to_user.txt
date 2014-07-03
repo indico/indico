@@ -1,14 +1,14 @@
 {% extends 'rb/emails/base_email_to_user.txt' %}
+{% set excluded_days = reservation.find_excluded_days().count() %}
 
 {% block body -%}
-{% block prebooking_warning %}{% endblock -%}
-The conference room {{ reservation.room.getFullName() }}
+The conference room {{ reservation.room.full_name }}
 has been {% block prebooked_prefix %}{% endblock %}booked for {{ reservation.booked_for_name }}
 reason: {{ reservation.booking_reason }}
 from {{ reservation.start_date | format_date }} to {{ reservation.end_date | format_date }} between {{ reservation.start_date | format_time }} and {{ reservation.end_date | format_time }}
 {%- block confirmed_booking -%}
-{%- if reservation.find_excluded_days().count() %}
-    (Note that there are {{ reservation.find_excluded_days().count() }} excluded days. For further info, check your reservation)
+{%- if excluded_days %}
+    (Note that there are {{ excluded_days }} excluded days. For further info, check your reservation)
 {%- endif %}
 
 If you end up not needing this room, please cancel the booking from the
@@ -21,12 +21,14 @@ be instantly notified by e-mail.
 
 {%- include 'rb/emails/booking_key_info.txt' %}
 
+{% block prebooking_warning %}{% endblock %}
+
 {%- if reservation.uses_video_conference %}
 
 This room is equipped with remote collaboration features and you marked that
 you intend to use them. After your meeting, you will be able to give IT
 service managers feedback about your video/phone conference by accessing this URL:
-https://espace.cern.ch/AVC-workspace/videoconference/Lists User%20Satisfaction%20in%20CERN%20Videoconference%20Rooms/NewForm.aspx
+https://espace.cern.ch/AVC-workspace/videoconference/Lists/User%20Satisfaction%20in%20CERN%20Videoconference%20Rooms/NewForm.aspx
 Thanks in advance for your feedback
 {% endif %}
 {%- endblock %}

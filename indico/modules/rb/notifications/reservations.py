@@ -1,4 +1,4 @@
-from flask import render_template, session
+from flask import render_template
 
 from indico.core.config import Config
 from indico.modules.rb.notifications.util import email_sender
@@ -30,20 +30,20 @@ class ReservationNotification(object):
             'body': body
         }
 
-    def compose_email_to_creator_and_contact(self, **mail_params):
+    def compose_email_to_user(self, **mail_params):
         creator = self.reservation.created_by_user
         to_list = set([creator.getEmail()] + self.reservation.getContactEmailList())
         subject = self._get_email_subject(**mail_params)
         body = self._make_body(mail_params, reservation=self.reservation)
         return self._make_email(to_list, subject, body)
 
-    def compose_email_to_owner(self, **mail_params):
+    def compose_email_to_manager(self, **mail_params):
         to_list = set([self.reservation.room.getResponsible().getEmail()] + self.reservation.getNotificationEmailList())
         subject = self._get_email_subject(**mail_params)
         body = self._make_body(mail_params, reservation=self.reservation)
         return self._make_email(to_list, subject, body)
 
-    def compose_email_to_avc_support(self, **mail_params):
+    def compose_email_to_vc_support(self, **mail_params):
         if self.reservation.is_confirmed and self.reservation.uses_video_conference:
             to_list = self.reservation.room.location.getSupportEmails()
             if to_list:
@@ -68,17 +68,17 @@ def notify_cancellation(reservation):
         raise ValueError('Reservation is not cancelled')
     notification = ReservationNotification(reservation)
     return filter(None, [
-        notification.compose_email_to_creator_and_contact(
+        notification.compose_email_to_user(
             subject='Booking cancelled on',
             template_name='cancellation_email_to_user'
         ),
-        notification.compose_email_to_owner(
+        notification.compose_email_to_manager(
             subject='Booking cancelled on',
             template_name='cancellation_email_to_manager'
         ),
-        notification.compose_email_to_avc_support(
+        notification.compose_email_to_vc_support(
             subject='Booking cancelled on',
-            template_name='cancellation_email_to_avc_support'
+            template_name='cancellation_email_to_vc_support'
         ),
         notification.compose_email_to_assistance(
             subject_prefix='[Support Request Cancellation]',
@@ -94,17 +94,17 @@ def notify_confirmation(reservation):
         raise ValueError('Reservation is not confirmed')
     notification = ReservationNotification(reservation)
     return filter(None, [
-        notification.compose_email_to_creator_and_contact(
+        notification.compose_email_to_user(
             subject='Booking confirmed on',
             template_name='confirmation_email_to_user'
         ),
-        notification.compose_email_to_owner(
+        notification.compose_email_to_manager(
             subject='Booking confirmed on',
             template_name='confirmation_email_to_manager'
         ),
-        notification.compose_email_to_avc_support(
+        notification.compose_email_to_vc_support(
             subject='New Booking on',
-            template_name='creation_email_to_avc_support'
+            template_name='creation_email_to_vc_support'
         ),
         notification.compose_email_to_assistance(
             subject_prefix='[Support Request]',
@@ -118,17 +118,17 @@ def notify_confirmation(reservation):
 def notify_creation(reservation):
     notification = ReservationNotification(reservation)
     return filter(None, [
-        notification.compose_email_to_creator_and_contact(
+        notification.compose_email_to_user(
             subject='New Booking on' if reservation.is_confirmed else 'Pre-Booking awaiting acceptance',
             template_name='creation_email_to_user' if reservation.is_confirmed else 'creation_pre_email_to_user'
         ),
-        notification.compose_email_to_owner(
+        notification.compose_email_to_manager(
             subject='New booking on' if reservation.is_confirmed else 'New Pre-Booking on',
-            template_name='creation_email_to_manager'
+            template_name='creation_email_to_manager' if reservation.is_confirmed else 'creation_pre_email_to_manager'
         ),
-        notification.compose_email_to_avc_support(
+        notification.compose_email_to_vc_support(
             subject='New Booking on',
-            template_name='creation_email_to_avc_support'
+            template_name='creation_email_to_vc_support'
         ),
         notification.compose_email_to_assistance(
             subject_prefix='[Support Request]',
@@ -144,11 +144,11 @@ def notify_rejection(reservation):
         raise ValueError('Reservation is not rejected')
     notification = ReservationNotification(reservation)
     return filter(None, [
-        notification.compose_email_to_creator_and_contact(
+        notification.compose_email_to_user(
             subject='Booking rejected on',
             template_name='rejection_email_to_user',
         ),
-        notification.compose_email_to_owner(
+        notification.compose_email_to_manager(
             subject='Booking rejected on',
             template_name='rejection_email_to_manager',
         ),
@@ -166,17 +166,17 @@ def notify_modification(reservation, changes):
     assistance_cancelled = assistance_change and assistance_change['old'] and not assistance_change['new']
     notification = ReservationNotification(reservation)
     return filter(None, [
-        notification.compose_email_to_creator_and_contact(
+        notification.compose_email_to_user(
             subject='Booking modified on',
             template_name='modification_email_to_user'
         ),
-        notification.compose_email_to_owner(
+        notification.compose_email_to_manager(
             subject='Booking modified on',
             template_name='modification_email_to_manager'
         ),
-        notification.compose_email_to_avc_support(
+        notification.compose_email_to_vc_support(
             subject='Booking modified on',
-            template_name='modification_email_to_avc_support'
+            template_name='modification_email_to_vc_support'
         ),
         notification.compose_email_to_assistance(
             subject_prefix='[Support Request {}]'.format('Cancelled' if assistance_cancelled else 'Modification'),
