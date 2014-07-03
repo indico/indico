@@ -356,7 +356,9 @@
                       </tr>
                       <tr>
                         <td colspan="3">
-                          <div id="roomBookingCal"></div>
+                          <div id="roomBookingCal">
+                              ${ calendar }
+                          </div>
                     </td>
                   </tr>
                 </table>
@@ -365,11 +367,3 @@
           </td>
         </tr>
 </table>
-
-<script type="text/javascript">
-    var roomBookingCalendar = new RoomBookingCalendar(
-        ${ jsonEncode(barsFossil) },
-        ${ jsonEncode(dayAttrs) }
-    );
-    $E('roomBookingCal').set(roomBookingCalendar.draw());
-</script>
