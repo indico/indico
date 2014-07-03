@@ -1,4 +1,4 @@
-{% extends 'rb/base_email_to_avc_support.txt' %}
+{% extends 'rb/emails/base_email_to_avc_support.txt' %}
 
 {% block body -%}
 A booking has been CANCELLED.

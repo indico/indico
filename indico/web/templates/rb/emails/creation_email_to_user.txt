@@ -1,4 +1,4 @@
-{% extends 'rb/base_email_to_user.txt' %}
+{% extends 'rb/emails/base_email_to_user.txt' %}
 
 {% block body -%}
 {% block prebooking_warning %}{% endblock -%}
@@ -19,7 +19,7 @@ for this room may reject your booking. Should that happen you will
 be instantly notified by e-mail.
 {%- endblock %}
 
-{%- include 'rb/booking_key_info.txt' %}
+{%- include 'rb/emails/booking_key_info.txt' %}
 
 {%- if reservation.uses_video_conference %}
 

@@ -8,4 +8,4 @@ Booking details:
 
 Remember you can always check your bookings here:
 {{ url_for('rooms.my_bookings', _external=True) }}
-{% include 'rb/email_footer.txt' %}
+{% include 'rb/emails/email_footer.txt' %}

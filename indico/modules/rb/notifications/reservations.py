@@ -20,7 +20,7 @@ class ReservationNotification(object):
         ).strip()
 
     def _make_body(self, mail_params, **body_params):
-        return render_template('rb/{}.txt'.format(mail_params['template_name']), **dict(mail_params, **body_params))
+        return render_template('rb/emails/{}.txt'.format(mail_params['template_name']), **dict(mail_params, **body_params))
 
     def _make_email(self, to_list, subject=None, body=None):
         return {

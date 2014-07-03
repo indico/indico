@@ -1,4 +1,4 @@
-{% extends 'rb/base_email_to_assistance.txt' %}
+{% extends 'rb/emails/base_email_to_assistance.txt' %}
 
 {% block body -%}
 {{ session.user.getStraightFullName() }} has cancelled the occurrence on {{ occurrence.start | format_date }} of the following meeting. Support is NOT needed anymore.

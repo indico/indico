@@ -1,4 +1,4 @@
-{% extends 'rb/base_email_to_assistance.txt' %}
+{% extends 'rb/emails/base_email_to_assistance.txt' %}
 
 {% block body -%}
 A booking has been REJECTED by the manager of the room '{{ reservation.room.full_name }}'.

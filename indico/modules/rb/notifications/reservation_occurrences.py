@@ -84,7 +84,7 @@ def notify_upcoming_occurrence(occurrence):
     from_addr = Config.getInstance().getNoReplyEmail()
     to = owner.getEmail()
     subject = 'Reservation reminder'
-    text = render_template('rb/upcoming_occurrence_email.txt',
+    text = render_template('rb/emails/upcoming_occurrence_email.txt',
                            occurrence=occurrence,
                            owner=owner,
                            RepeatUnit=RepeatUnit)

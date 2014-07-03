@@ -5,4 +5,4 @@ Dear {{ reservation.room.getResponsible().getFirstName() }},
 
 You can check the booking details here:
 {{ url_for('rooms.roomBooking-bookingDetails', roomLocation=reservation.location_name, resvID=reservation.id, _external=True) }}
-{% include 'rb/email_footer.txt' %}
+{% include 'rb/emails/email_footer.txt' %}

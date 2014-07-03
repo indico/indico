@@ -1,7 +1,7 @@
-{% extends 'rb/base_email_to_user.txt' %}
+{% extends 'rb/emails/base_email_to_user.txt' %}
 
 {% block body -%}
 You have CANCELLED an occurrence of your booking on {{ occurrence.start | format_date }}.
 
-{% include 'rb/booking_info.txt' %}
+{% include 'rb/emails/booking_info.txt' %}
 {%- endblock %}

@@ -1,4 +1,4 @@
-{% extends 'rb/creation_email_to_user.txt' %}
+{% extends 'rb/emails/creation_email_to_user.txt' %}
 
 {% block prebooking_warning -%}
 Note:
