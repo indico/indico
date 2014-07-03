@@ -624,7 +624,7 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
                     var detailsUrl = build_url(this.room.details_url, {preview_months: 3});
                     var singleDayHeader = Html.div({
                         className:"bookingTitle",
-                        style:{marginBottom: pixels(20), marginTop: pixels(18)}
+                        style:{marginBottom: pixels(20), marginTop: pixels(18), padding: 0}
                     }, Html.a({href:detailsUrl, style:{paddingLeft: pixels(5), fontSize:"x-small"}}, $T("( show 3 months preview )" )));
                 return Html.div({}, singleDayHeader, this.RoomBookingCalendarDrawer.prototype.drawHeader.call(this));
             },

@@ -356,7 +356,7 @@
                       </tr>
                       <tr>
                         <td colspan="3">
-                          <div id="roomBookingCal">
+                          <div id="roomBookingCal" style="margin-top: 40px;">
                               ${ calendar }
                           </div>
                     </td>
