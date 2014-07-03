@@ -44,19 +44,15 @@ class ReservationNotification(object):
         return self._make_email(to_list, subject, body)
 
     def compose_email_to_avc_support(self, **mail_params):
-        # DEBUG: remove or True
-        if self.reservation.is_confirmed and self.reservation.uses_video_conference or True:
+        if self.reservation.is_confirmed and self.reservation.uses_video_conference:
             to_list = self.reservation.room.location.getSupportEmails()
-            # DEBUG: remove this line
-            to_list = ['avc_support@test.test']
             if to_list:
                 subject = self._get_email_subject(**mail_params)
                 body = self._make_body(mail_params, reservation=self.reservation)
                 return self._make_email(to_list, subject, body)
 
     def compose_email_to_assistance(self, **mail_params):
-        # DEBUG: remove or True
-        if self.reservation.room.notification_for_assistance or True:
+        if self.reservation.room.notification_for_assistance:
             if self.reservation.needs_general_assistance or mail_params.get('assistance_cancelled'):
                 from indico.modules.rb.controllers.utils import getRoomBookingOption
                 to_list = getRoomBookingOption('assistanceNotificationEmails')
