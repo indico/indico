@@ -25,8 +25,11 @@ from datetime import datetime, timedelta
 from operator import attrgetter
 
 from dateutil.relativedelta import relativedelta
+from sqlalchemy import Date, Time
+from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql import cast
 from werkzeug.datastructures import OrderedMultiDict
 
 from indico.core.config import Config
@@ -114,6 +117,13 @@ class Reservation(Serializer, db.Model):
         'is_rejected', ('location_name', 'location')
     ]
 
+    @declared_attr
+    def __table_args__(cls):
+        return (db.Index('ix_reservations_start_date_date', cast(cls.start_date, Date)),
+                db.Index('ix_reservations_end_date_date', cast(cls.end_date, Date)),
+                db.Index('ix_reservations_start_date_time', cast(cls.start_date, Time)),
+                db.Index('ix_reservations_end_date_time', cast(cls.end_date, Time)))
+
     # columns
 
     id = db.Column(
@@ -128,11 +138,13 @@ class Reservation(Serializer, db.Model):
     )
     start_date = db.Column(
         db.DateTime,
-        nullable=False
+        nullable=False,
+        index=True
     )
     end_date = db.Column(
         db.DateTime,
-        nullable=False
+        nullable=False,
+        index=True
     )
     # repeatability
     repeat_unit = db.Column(
@@ -162,7 +174,8 @@ class Reservation(Serializer, db.Model):
     room_id = db.Column(
         db.Integer,
         db.ForeignKey('rooms.id'),
-        nullable=False
+        nullable=False,
+        index=True
     )
     # reservation specific
     contact_email = db.Column(

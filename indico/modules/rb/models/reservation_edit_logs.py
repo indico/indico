@@ -52,7 +52,8 @@ class ReservationEditLog(db.Model):
     reservation_id = db.Column(
         db.Integer,
         db.ForeignKey('reservations.id'),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     @return_ascii

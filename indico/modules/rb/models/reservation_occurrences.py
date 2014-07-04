@@ -46,11 +46,13 @@ class ReservationOccurrence(db.Model, Serializer):
     start = db.Column(
         db.DateTime,
         nullable=False,
-        primary_key=True
+        primary_key=True,
+        index=True
     )
     end = db.Column(
         db.DateTime,
-        nullable=False
+        nullable=False,
+        index=True
     )
     is_sent = db.Column(
         db.Boolean,

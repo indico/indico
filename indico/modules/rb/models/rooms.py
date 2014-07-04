@@ -191,7 +191,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     is_active = db.Column(
         db.Boolean,
         nullable=False,
-        default=True
+        default=True,
+        index=True
     )
     is_reservable = db.Column(
         db.Boolean,

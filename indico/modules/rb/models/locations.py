@@ -34,7 +34,6 @@ from indico.util.string import return_ascii, natural_sort_key
 from . import utils
 from .aspects import Aspect
 from .reservations import Reservation
-from .room_attributes import RoomAttribute
 from .room_equipments import RoomEquipment
 from .rooms import Room
 from MaKaC.common.Locators import Locator

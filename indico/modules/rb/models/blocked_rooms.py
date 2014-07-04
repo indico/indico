@@ -72,7 +72,8 @@ class BlockedRoom(db.Model):
     room_id = db.Column(
         db.Integer,
         db.ForeignKey('rooms.id'),
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     @property

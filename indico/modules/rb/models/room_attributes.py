@@ -23,8 +23,7 @@ Attribute keys for rooms and reservations
 
 from indico.core.db import db
 from indico.util.string import return_ascii
-
-from .utils import JSONStringBridgeMixin
+from indico.modules.rb.models.utils import JSONStringBridgeMixin
 
 
 class RoomAttributeAssociation(JSONStringBridgeMixin, db.Model):

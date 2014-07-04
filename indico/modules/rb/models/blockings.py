@@ -51,11 +51,13 @@ class Blocking(db.Model):
     )
     start_date = db.Column(
         db.Date,
-        nullable=False
+        nullable=False,
+        index=True
     )
     end_date = db.Column(
         db.Date,
-        nullable=False
+        nullable=False,
+        index=True
     )
     reason = db.Column(
         db.Text,

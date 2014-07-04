@@ -24,8 +24,6 @@ Equipments for rooms
 from indico.core.db import db
 from indico.util.string import return_ascii
 
-from . import utils
-
 
 RoomEquipmentAssociation = db.Table(
     'rooms_equipments',
