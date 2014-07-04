@@ -138,19 +138,13 @@ class BlockedRoom(db.Model):
         for reservation in reservations:
             if self.blocking.can_be_overridden(reservation.created_by_user, reservation.room):
                 continue
-            reservation.reject(reason)
-            log_msg = 'Booking rejected: {}'.format(reason)
-            reservation.add_edit_log(ReservationEditLog(user_name=self.blocking.created_by_user.getFullName(),
-                                                        info=log_msg))
+            reservation.reject(self.blocking.created_by_user, reason)
 
         for occurrence in occurrences:
             reservation = occurrence.reservation
             if self.blocking.can_be_overridden(reservation.created_by_user, reservation.room):
                 continue
-            occurrence.reject(reason)
-            log_msg = 'Booking occurrence on {} rejected: {}'.format(format_date(occurrence.date), reason)
-            reservation.add_edit_log(ReservationEditLog(user_name=self.blocking.created_by_user.getFullName(),
-                                                        info=log_msg))
+            occurrence.reject(self.blocking.created_by_user, reason)
 
         if notify_blocker:
             # We only need to notify the blocking creator if the blocked room wasn't approved yet.
