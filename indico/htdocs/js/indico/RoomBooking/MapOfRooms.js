@@ -667,13 +667,15 @@ type ("RoomMap", ["IWidget"],
                 customWidget.getFilters(filtersCallback);
             });
 
-            setTimeout(function() {
+            function waitResponses() {
                 if (counter == total) {
                     filterCallback();
                 } else {
                     setTimeout(waitResponses, 50);
                 }
-            }, 50);
+            };
+
+            setTimeout(waitResponses, 50);
         },
 
         addStartupFiltersToCriteria: function(buildingCriteria, roomCriteria) {
