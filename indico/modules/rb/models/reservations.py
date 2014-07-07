@@ -32,7 +32,6 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import cast
 from werkzeug.datastructures import OrderedMultiDict
 
-from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
@@ -47,14 +46,13 @@ from indico.modules.rb.models.utils import limit_groups, unimplemented, Serializ
 from indico.modules.rb.notifications.reservations import (notify_confirmation, notify_cancellation,
                                                           notify_creation, notify_modification,
                                                           notify_rejection)
-from indico.util.date_time import now_utc, format_date, format_datetime, format_time
+from indico.util.date_time import now_utc, format_date, format_time
 from indico.util.i18n import _, N_
 from indico.util.string import return_ascii
 from indico.web.flask.util import url_for
 from MaKaC.common.Locators import Locator
 from MaKaC.errors import MaKaCError
 from MaKaC.user import AvatarHolder
-from MaKaC.webinterface.wcomponents import WTemplated
 
 
 class ConflictingOccurrences(Exception):
@@ -807,26 +805,6 @@ class Reservation(Serializer, db.Model):
     @property
     def is_valid(self):
         return self.is_confirmed and not (self.is_rejected or self.is_cancelled)
-
-    def is_heavy(self):
-        """
-        Defines when reservation is considered "heavy".
-
-        Conditions of heavines - the booking:
-        1. Is for room which is publically reservable AND
-        2. Is repeating AND
-        3. Lasts longer than one month AND
-        4. Takes more than x hours monthly
-        """
-        if (not self.room.isReservable or self.room.hasBookingACL() or not self.is_repeating
-                or (self.end_date - self.start_date).days < 30):
-            return False
-
-        # TODO: put it into config
-        HOURS_MONTHLY_TO_CONSIDER_HEAVY = 15
-        totalHours = sum(lambda p: (p.endDT - p.startDT).seconds / 3600.0, self.splitToPeriods())
-        hoursPerMonth = totalHours / (self.endDT - self.startDT).days * 30
-        return hoursPerMonth >= HOURS_MONTHLY_TO_CONSIDER_HEAVY
 
     def getNotifications(self):
         return self.notifications.all()
