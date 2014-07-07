@@ -28,7 +28,7 @@ be instantly notified by e-mail.
 This room is equipped with remote collaboration features and you marked that
 you intend to use them. After your meeting, you will be able to give IT
 service managers feedback about your video/phone conference by accessing this URL:
-http://cern.ch/go/MQ8Q
+https://cern.ch/go/MQ8Q
 Thanks in advance for your feedback
 {%- endif %}
 {%- endblock %}
