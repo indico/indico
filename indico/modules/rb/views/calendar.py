@@ -39,7 +39,7 @@ from MaKaC.webinterface.wcomponents import WTemplated
 
 class RoomBookingCalendarWidget(object):
     def __init__(self, occurrences, start_dt, end_dt, candidates=None, rooms=None, specific_room=None,
-                 repeat_unit=None, repeat_step=None, flexible_days=0):
+                 repeat_unit=None, repeat_step=None, flexible_days=0, show_blockings=True):
         self.occurrences = occurrences
         self.start_dt = start_dt
         self.end_dt = end_dt
@@ -49,6 +49,7 @@ class RoomBookingCalendarWidget(object):
         self.repeat_unit = repeat_unit
         self.repeat_step = repeat_step
         self.flexible_days = flexible_days
+        self.show_blockings = show_blockings
 
         self.conflicts = 0
         self.bars = []
@@ -62,10 +63,13 @@ class RoomBookingCalendarWidget(object):
             self.rooms = Room.find_all(is_active=True)
         self.rooms = sorted(self.rooms, key=lambda x: natural_sort_key(x.getFullName()))
 
-        self.blocked_rooms = BlockedRoom.find_with_filters({'room_ids': [r.id for r in self.rooms],
-                                                            'state': BlockedRoom.State.accepted,
-                                                            'start_date': self.start_dt.date(),
-                                                            'end_date': self.end_dt.date()})
+        if self.show_blockings:
+            self.blocked_rooms = BlockedRoom.find_with_filters({'room_ids': [r.id for r in self.rooms],
+                                                                'state': BlockedRoom.State.accepted,
+                                                                'start_date': self.start_dt.date(),
+                                                                'end_date': self.end_dt.date()})
+        else:
+            self.blocked_rooms = []
 
         self._produce_bars()
 
@@ -126,7 +130,7 @@ class RoomBookingCalendarWidget(object):
     def build_days_attrs(self):
         days_data = {}
 
-        if self.specific_room:
+        if self.specific_room and self.show_blockings:
             states = (BlockedRoom.State.accepted, BlockedRoom.State.pending)
             blocked_rooms = self.specific_room.get_blocked_rooms(*self.iter_days(), states=states)
         else:
@@ -175,7 +179,8 @@ class RoomBookingCalendarWidget(object):
         if self.candidates is not None:
             self._produce_candidate_bars()
             self._produce_conflict_bars()
-        self._produce_blocking_bars()
+        if self.show_blockings:
+            self._produce_blocking_bars()
 
     def _produce_reservation_bars(self):
         self.bars += map(Bar.from_occurrence, self.occurrences)
