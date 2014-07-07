@@ -6,7 +6,7 @@ Your room blocking request has been {{ verb }} by a room manager.
 
 Room: {{ blocked_room.room.full_name }}
 Action: {{ verb }}
-{%- if not blocked_room.state == blocked_room.State.rejected %}
+{%- if blocked_room.state == blocked_room.State.rejected %}
 Reason: {{ blocked_room.rejection_reason or '(none)' }}
 {%- endif %}
 
