@@ -1,7 +1,7 @@
 <% from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry %>
 <% from MaKaC.common import Config %>
 <% from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr %>
-<% from MaKaC.rb_location import Location %>
+<% from indico.modules.rb.models.locations import Location %>
 <% from indico.util import json %>
 <% import MaKaC.webinterface.common.tools as securityTools %>
 <% from MaKaC.export import fileConverter %>
@@ -10,21 +10,7 @@ config = Config.getInstance()
 authenticators = filter(lambda x: x.id != 'Local', AuthenticatorMgr().getList())
 extAuths = list((auth.id, auth.name) for auth in authenticators)
 
-rbActive = config.getIsRoomBookingActive()
-if rbActive:
-    locationList = {}
-    locationNames = map(lambda l: l.friendlyName, Location.allLocations)
-
-    for name in locationNames:
-        locationList[name] = name;
-
-    if Location.getDefaultLocation():
-        defaultLocation = Location.getDefaultLocation().friendlyName
-    else:
-        defaultLocation = ""
-else:
-    locationList = None
-    defaultLocation = ""
+locations = Location.find_all() if config.getIsRoomBookingActive() else []
 %>
 
 var Indico = {
@@ -140,8 +126,8 @@ var Indico = {
         conference: ${ json.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['conference'])) },
         category: ${ json.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['category'])) }},
         WeekDays: ${ [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] },
-        DefaultLocation: '${ str(defaultLocation) }',
-        Locations: ${ jsonEncode(locationList) }
+        DefaultLocation: ${ next((loc.name for loc in locations if loc.is_default), None) | j,n },
+        Locations: ${ {loc.name: loc.name for loc in locations} | j,n }
     },
 
     Security:{
