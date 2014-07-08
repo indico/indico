@@ -633,7 +633,7 @@ def upload_ssh(build_dir=None, server_host=None, server_port=None,
 @task
 def package_release(py_versions=None, build_dir=None, system_node=False,
                     indico_version=None, upstream=None, tag_name=None,
-                    git_auth=None, overwrite=None, ssh_server_host=None,
+                    github_auth=None, overwrite=None, ssh_server_host=None,
                     ssh_server_port=None, ssh_user=None, ssh_key=None,
                     ssh_dest_dir=None, no_clean=False, force_clean=False,
                     upload_to=None):
@@ -689,7 +689,7 @@ def package_release(py_versions=None, build_dir=None, system_node=False,
 
             for u in upload_to:
                 if u == 'github':
-                    upload_github(build_dir, indico_version, tag_name, git_auth, overwrite)
+                    upload_github(build_dir, tag_name, github_auth, overwrite, indico_version)
                 elif u == 'ssh':
                     upload_ssh(build_dir, ssh_server_host, ssh_server_port, ssh_user, ssh_key, ssh_dest_dir)
 
