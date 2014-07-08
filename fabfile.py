@@ -632,7 +632,7 @@ def upload_ssh(build_dir=None, server_host=None, server_port=None,
 
 @task
 def package_release(py_versions=None, build_dir=None, system_node=False,
-                    indico_versions=None, upstream=None, tag_name=None,
+                    indico_version=None, upstream=None, tag_name=None,
                     git_auth=None, overwrite=None, ssh_server_host=None,
                     ssh_server_port=None, ssh_user=None, ssh_key=None,
                     ssh_dest_dir=None, no_clean=False, force_clean=False,
@@ -656,7 +656,7 @@ def package_release(py_versions=None, build_dir=None, system_node=False,
     ssh_key = ssh_key or env.ssh['key']
     ssh_dest_dir = ssh_dest_dir or env.ssh['dest_dir']
 
-    indico_versions = indico_versions or env.indico_versions
+    indico_version = indico_version or 'master'
 
     local('mkdir -p {0}'.format(build_dir))
 
@@ -675,23 +675,22 @@ def package_release(py_versions=None, build_dir=None, system_node=False,
         else:
             local('git clone {0}'.format(upstream))
         with lcd('indico'):
-            for indico_version in indico_versions:
-                print green("Checking out branch \'{0}\'".format(indico_version))
-                local('git checkout origin/{0}'.format(indico_version))
+            print green("Checking out branch \'{0}\'".format(indico_version))
+            local('git checkout origin/{0}'.format(indico_version))
 
-                # Build source tarball
-                with settings(system_node=system_node):
-                    print green('Generating '), cyan('tarball')
-                    tarball(os.path.join(build_dir, 'indico'))
+            # Build source tarball
+            with settings(system_node=system_node):
+                print green('Generating '), cyan('tarball')
+                tarball(os.path.join(build_dir, 'indico'))
 
-                # Build binaries (EGG)
-                print green('Generating '), cyan('eggs')
-                egg(py_versions)
+            # Build binaries (EGG)
+            print green('Generating '), cyan('eggs')
+            egg(py_versions)
 
-                for u in upload_to:
-                    if u == 'github':
-                        upload_github(build_dir, indico_version, tag_name, git_auth, overwrite)
-                    elif u == 'ssh':
-                        upload_ssh(build_dir, ssh_server_host, ssh_server_port, ssh_user, ssh_key, ssh_dest_dir)
+            for u in upload_to:
+                if u == 'github':
+                    upload_github(build_dir, indico_version, tag_name, git_auth, overwrite)
+                elif u == 'ssh':
+                    upload_ssh(build_dir, ssh_server_host, ssh_server_port, ssh_user, ssh_key, ssh_dest_dir)
 
     cleanup(build_dir, force=True)
