@@ -54,7 +54,6 @@ from MaKaC.common.fossilize import fossilize, clearCache
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.cache import GenericCache
-from MaKaC.plugins.RoomBooking.default.factory import Factory
 
 
 # Remove the extension at the end or before the querystring
@@ -150,8 +149,6 @@ def handler(prefix, path):
     dbi = DBMgr.getInstance()
     dbi.startRequest()
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-    if minfo.getRoomBookingModuleActive():
-        Factory.getDALManager().connect()
 
     apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)
     cookieAuth = get_query_parameter(queryParams, ['ca', 'cookieauth'], 'no') == 'yes'
@@ -264,13 +261,9 @@ def handler(prefix, path):
             # Commit only if there was an API key and no error
             for _retry in xrange(10):
                 dbi.sync()
-                if minfo.getRoomBookingModuleActive():
-                    Factory.getDALManager().sync()
                 normPath, normQuery = normalizeQuery(path, query, remove=('signature', 'timestamp'), separate=True)
                 ak.used(request.remote_addr, normPath, normQuery, not onlyPublic)
                 try:
-                    if minfo.getRoomBookingModuleActive():
-                        Factory.getDALManager().disconnect()
                     dbi.endRequest(True)
                 except ConflictError:
                     pass  # retry
@@ -279,9 +272,6 @@ def handler(prefix, path):
         else:
             # No need to commit stuff if we didn't use an API key
             # (nothing was written)
-            if minfo.getRoomBookingModuleActive():
-                Factory.getDALManager().rollback()
-                Factory.getDALManager().disconnect()
             dbi.endRequest(False)
 
         # Log successful POST api requests

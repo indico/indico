@@ -22,15 +22,13 @@ from flask import current_app as app
 import pkg_resources
 import os.path
 import re
-import posixpath, re
-from indico.core.db import DBMgr
+import posixpath
 from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime, formatDate, formatTime
 from MaKaC.user import Avatar
 from mako.lookup import TemplateLookup
 import mako.exceptions as exceptions
 import MaKaC
-import MaKaC.common.info as info
 from MaKaC.plugins.base import PluginsHolder
 import xml.sax.saxutils
 
@@ -397,9 +395,7 @@ def registerHelpers(objDict):
         from MaKaC.services.interface.rpc.offline import roomInfo
         objDict['roomInfo'] = roomInfo
     if not 'roomBookingActive' in objDict:
-        if DBMgr.getInstance().isConnected():
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            objDict['roomBookingActive'] = minfo.getRoomBookingModuleActive()
+        objDict['roomBookingActive'] = Config.getInstance().getIsRoomBookingActive()
     if not 'user' in objDict:
         if not '__rh__' in objDict or not objDict['__rh__']:
             objDict['user'] = "ERROR: Assign self._rh = rh in your WTemplated.__init__( self, rh ) method."

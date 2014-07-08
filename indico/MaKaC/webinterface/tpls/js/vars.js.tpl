@@ -1,7 +1,6 @@
 <% from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry %>
 <% from MaKaC.common import Config %>
 <% from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr %>
-<% import MaKaC.common.info as info %>
 <% from MaKaC.rb_location import Location %>
 <% from indico.util import json %>
 <% import MaKaC.webinterface.common.tools as securityTools %>
@@ -11,7 +10,7 @@ config = Config.getInstance()
 authenticators = filter(lambda x: x.id != 'Local', AuthenticatorMgr().getList())
 extAuths = list((auth.id, auth.name) for auth in authenticators)
 
-rbActive = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
+rbActive = config.getIsRoomBookingActive()
 if rbActive:
     locationList = {}
     locationNames = map(lambda l: l.friendlyName, Location.allLocations)

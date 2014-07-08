@@ -17,13 +17,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.wcomponents import WTemplated
-
+from indico.core.config import Config
+from indico.modules.rb.views.admin import WPRoomBookingPluginAdminBase
 from indico.util.i18n import _
-
-from . import WPRoomBookingPluginAdminBase
+from MaKaC.webinterface.wcomponents import WTemplated
 
 
 class WPRoomBookingPluginAdmin(WPRoomBookingPluginAdminBase):
@@ -46,11 +43,8 @@ class WRoomBookingPluginAdmin(WTemplated):
     def getVars(self):
         wvars = WTemplated.getVars(self)
 
-        if HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive():
+        if Config.getInstance().getIsRoomBookingActive():
             wvars['activationStatusText'] = _('Room Booking is currently active')
-            wvars['activationText'] = _('Deactivate')
         else:
             wvars['activationStatusText'] = _('Room Booking is currently not active')
-            wvars['activationText'] = _('Activate')
-        wvars['toggleURL'] = urlHandlers.UHRoomBookingModuleActive.getURL()
         return wvars

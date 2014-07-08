@@ -19,37 +19,10 @@
 
 from flask import request
 
-from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.plugins.base import PluginsHolder
-from MaKaC.webinterface import urlHandlers
+from indico.modules.rb.views.admin.index import WPRoomBookingPluginAdmin
 from MaKaC.webinterface.rh.admins import RHAdminBase
-from indico.modules.rb.views.admin import index as index_views
 
 
-class RHRoomBookingPluginAdminBase(RHAdminBase):
-    pass
-
-
-class RHRoomBookingPluginAdmin(RHRoomBookingPluginAdminBase):
-    def _checkParams(self):
-        RHRoomBookingPluginAdminBase._checkParams(self, request.args)
-
+class RHRoomBookingPluginAdmin(RHAdminBase):
     def _process(self):
-        return index_views.WPRoomBookingPluginAdmin(self, request.args).display()
-
-
-class RHSwitchRoomBookingModuleActive(RHRoomBookingPluginAdminBase):
-    def _checkParams(self):
-        RHRoomBookingPluginAdminBase._checkParams(self, request.args)
-
-    def _process(self):
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-
-        active = minfo.getRoomBookingModuleActive()
-        if not active:
-            PluginsHolder().reloadAllPlugins()
-            if not PluginsHolder().getPluginType('RoomBooking').isActive():
-                PluginsHolder().getPluginType('RoomBooking').setActive(True)
-
-        minfo.setRoomBookingModuleActive(not active)
-        self._redirect(urlHandlers.UHRoomBookingPluginAdmin.getURL())
+        return WPRoomBookingPluginAdmin(self, request.args).display()

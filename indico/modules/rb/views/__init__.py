@@ -19,13 +19,13 @@
 
 import os
 
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.wcomponents import BasicSideMenu, SideMenuItem, SideMenuSection
-from indico.util.i18n import _
+from indico.core.config import Config
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
 
@@ -60,13 +60,10 @@ class WPRoomBookingBase(WPMainBase):
         """ % (baseurl, os.stat(__file__).st_mtime)
 
     def _getSideMenu(self):
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-
         self._leftMenu = BasicSideMenu(self._getAW().getUser() is not None)
-
         self._showResponsible = False
 
-        if minfo.getRoomBookingModuleActive():
+        if Config.getInstance().getIsRoomBookingActive():
             self._showResponsible = ((self._getAW().getUser() is not None)
                                      and (Room.isAvatarResponsibleForRooms(self._getAW().getUser())
                                           or self._getAW().getUser().isAdmin()

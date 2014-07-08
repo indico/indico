@@ -235,7 +235,7 @@ legacy_endpoints = set([
     'roomBooking-saveBooking', 'roomBooking-saveCustomAttributes', 'roomBooking-saveEquipment',
     'roomBooking-saveLocation', 'roomBooking-search4Bookings', 'roomBooking-search4Rooms',
     'roomBooking-setDefaultLocation', 'roomBooking-statement', 'roomBookingPluginAdmin',
-    'roomBookingPluginAdmin-switchRoomBookingModuleActive', 'roomBookingPluginAdmin-zodbSave', 'roomMapper',
+    'roomBookingPluginAdmin-zodbSave', 'roomMapper',
     'roomMapper-creation', 'roomMapper-details', 'roomMapper-modify', 'roomMapper-performCreation',
     'roomMapper-performModify', 'sessionDisplay', 'sessionDisplay-ical', 'sessionModifAC',
     'sessionModifAC-setVisibility', 'sessionModifComm', 'sessionModifComm-edit', 'sessionModification',

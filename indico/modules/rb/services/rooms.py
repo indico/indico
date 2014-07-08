@@ -70,16 +70,14 @@ class RoomBookingAvailabilitySearchRooms(ServiceBase, RoomBookingAvailabilityPar
 # TODO:
 class RoomBookingListLocationsAndRooms(ServiceBase):
     def _getAnswer(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            result = {}
-            locationNames = map(lambda l: l.friendlyName, Location.allLocations)
-            for loc in locationNames:
-                for room in CrossLocationQueries.getRooms(location=loc):
-                    result[loc + ":" + room.name] = loc + ":" + room.name
-            return sorted(result)
-        else:
+        if not Config.getInstance().getIsRoomBookingActive():
             return []
+        result = {}
+        locationNames = map(lambda l: l.friendlyName, Location.allLocations)
+        for loc in locationNames:
+            for room in CrossLocationQueries.getRooms(location=loc):
+                result[loc + ":" + room.name] = loc + ":" + room.name
+        return sorted(result)
 
 
 class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):

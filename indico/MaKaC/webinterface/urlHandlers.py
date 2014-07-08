@@ -490,10 +490,6 @@ class UHRoomBookingPluginAdmin(URLHandler):
     _endpoint = 'rooms_admin.roomBookingPluginAdmin'
 
 
-class UHRoomBookingModuleActive(URLHandler):
-    _endpoint = 'rooms_admin.roomBookingPluginAdmin-switchRoomBookingModuleActive'
-
-
 class UHRoomBookingPlugAdminZODBSave(URLHandler):
     _endpoint = 'rooms_admin.roomBookingPluginAdmin-zodbSave'
 

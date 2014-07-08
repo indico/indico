@@ -57,9 +57,6 @@ class MaKaCInfo(Persistent):
         self._moderateAccountCreation = False
         self._moderators = []
 
-        # Room booking related
-        self._roomBookingModuleActive = False
-
         # Global poster/badge templates
         self._defaultConference = None
 
@@ -249,66 +246,8 @@ class MaKaCInfo(Persistent):
         return emails
 
     # === ROOM BOOKING RELATED ===============================================
-
-    def getRoomBookingModuleActive( self ):
-        try:
-            return self._roomBookingModuleActive
-        except:
-            self.setRoomBookingModuleActive()
-            return self._roomBookingModuleActive
-
-    def setRoomBookingModuleActive( self, active = False ):
-        self._roomBookingModuleActive = active
-        from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
-        RHGetVarsJs.removeTmpVarsFile()
-
-    # Only for default Indico/ZODB plugin
-    def getRoomBookingDBConnectionParams( self ):
-        #self._roomBookingStorageParams = ('indicodev.cern.ch', 9676)
-        try:
-            return self._roomBookingStorageParams
-        except:
-            self.setRoomBookingDBConnectionParams()
-            return self._roomBookingStorageParams
-
-    def setRoomBookingDBConnectionParams( self, hostPortTuple = ('localhost', 9676) ):
-        self._roomBookingStorageParams = hostPortTuple
-
-    # Only for default Indico/ZODB plugin
-    def getRoomBookingDBUserName( self ):
-        try:
-            return self._roomBookingDBUserName
-        except:
-            self._roomBookingDBUserName = ""
-            return self._roomBookingDBUserName
-
-    # Only for default Indico/ZODB plugin
-    def setRoomBookingDBUserName( self, user = "" ):
-        self._roomBookingDBUserName = user
-
-    # Only for default Indico/ZODB plugin
-    def getRoomBookingDBPassword( self ):
-        try:
-            return self._roomBookingDBPassword
-        except:
-            self._roomBookingDBPassword = ""
-            return self._roomBookingDBPassword
-
-    # Only for default Indico/ZODB plugin
-    def setRoomBookingDBPassword( self, password = "" ):
-        self._roomBookingDBPassword = password
-
-    # Only for default Indico/ZODB plugin
-    def getRoomBookingDBRealm( self ):
-        try:
-            return self._roomBookingDBRealm
-        except:
-            self._roomBookingDBRealm = ""
-            return self._roomBookingDBRealm
-
-    # Only for default Indico/ZODB plugin
-    def setRoomBookingDBRealm( self, realm = "" ):
-        self._roomBookingDBRealm = realm
+    def getRoomBookingModuleActive(self):
+        return Config.getInstance().getIsRoomBookingActive()
 
     def getDefaultConference( self ):
         try:

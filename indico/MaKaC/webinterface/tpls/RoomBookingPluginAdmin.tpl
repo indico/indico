@@ -21,11 +21,6 @@
           ${ activationStatusText }
         </p>
       </td>
-      <td>
-        <a class="i-button i-button-fit" href="${ toggleURL }" rel="no-follow">
-            ${ activationText }
-        </a>
-      </td>
     </tr>
     </table>
   </td>

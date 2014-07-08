@@ -167,13 +167,6 @@ def configure_db(app):
     app.config['SQLALCHEMY_MAX_OVERFLOW'] = cfg.getSQLAlchemyMaxOverflow()
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = False
 
-    with DBMgr.getInstance().global_connection(commit=True):
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        if cfg.getIsRoomBookingActive():
-            minfo.setRoomBookingModuleActive(True)
-        else:
-            minfo.setRoomBookingModuleActive()
-
     db.init_app(app)
     apply_db_loggers(app.debug)
     configure_mappers()  # Make sure all backrefs are set

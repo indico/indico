@@ -17,12 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common.info import HelperMaKaCInfo
+from indico.core.config import Config
+from indico.modules.rb.views.admin import WPRoomsBase
 from MaKaC.roomMapping import RoomMapperHolder
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.wcomponents import WTemplated
-
-from . import WPRoomsBase
 
 
 class WPRoomMapperBase(WPRoomsBase):
@@ -109,7 +108,7 @@ class WRoomMapperEdit(WTemplated):
         wvars = WTemplated.getVars(self)
         wvars['name'] = wvars['description'] = wvars['url'] = \
             wvars['placeName'] = wvars['regexps'] = wvars['locator'] = ''
-        wvars['is_rb_active'] = HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
+        wvars['is_rb_active'] = Config.getInstance().getIsRoomBookingActive()
         if self._roomMapper:
             wvars['name'] = self._roomMapper.getName()
             wvars['description'] = self._roomMapper.getDescription()

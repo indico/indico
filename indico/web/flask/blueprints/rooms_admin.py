@@ -34,10 +34,6 @@ rooms_admin.add_url_rule('/config/',
                          'roomBookingPluginAdmin',
                          index_handler.RHRoomBookingPluginAdmin)
 
-rooms_admin.add_url_rule('/config/toggle',
-                         'roomBookingPluginAdmin-switchRoomBookingModuleActive',
-                         index_handler.RHSwitchRoomBookingModuleActive)
-
 
 # Locations
 rooms_admin.add_url_rule('/locations/',
