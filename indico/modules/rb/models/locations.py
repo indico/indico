@@ -372,7 +372,7 @@ class Location(db.Model):
             'title': _('Building {}').format(building),
             'longitude': lo,
             'latitude': la,
-            'rooms': [rooms[rid].to_serializable() for rid in room_ids]
+            'rooms': [rooms[rid].to_serializable(attr='__public_exhaustive__') for rid in room_ids]
         } for building, room_ids, lo, la in results if la and lo]
 
         return res

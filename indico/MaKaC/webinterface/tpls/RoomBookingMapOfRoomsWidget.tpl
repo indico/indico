@@ -203,7 +203,7 @@ var filters = [
         filterType: "room",
         inputType: "boolean",
         defaultValue: false,
-        property: "needs_video_conference_setup_assistance",
+        property: "needs_video_conference_setup",
         optional: true
     },
     {
