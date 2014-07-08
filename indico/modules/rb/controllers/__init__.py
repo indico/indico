@@ -19,7 +19,6 @@
 
 from indico.core.config import Config
 from indico.core.errors import AccessError
-from indico.modules.rb.controllers.mixins import RoomBookingAvailabilityParamsMixin
 from indico.modules.rb.controllers.utils import rb_check_user_access
 from MaKaC.webinterface.rh.base import RHProtected
 
@@ -38,6 +37,6 @@ class RHRoomBookingProtected(RHProtected):
             self._doProcess = False
 
 
-class RHRoomBookingBase(RoomBookingAvailabilityParamsMixin, RHRoomBookingProtected):
+class RHRoomBookingBase(RHRoomBookingProtected):
     """Base class for room booking RHs"""
     pass

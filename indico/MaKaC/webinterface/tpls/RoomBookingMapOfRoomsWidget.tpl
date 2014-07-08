@@ -38,11 +38,8 @@
             <td class="subFieldWidth" align="right">
                 <small>${ _('From') }&nbsp;</small>
             </td>
-            <td class="blacktext">
-                <span id="sDatePlace"></span>
-                <input type="hidden" value="${ startDT.day }" name="sDay" id="sDay"/>
-                <input type="hidden" value="${ startDT.month }" name="sMonth" id="sMonth"/>
-                <input type="hidden" value="${ startDT.year }" name="sYear" id="sYear"/>
+            <td>
+                <input type="text" name="start_date" id="start_date">
             </td>
         </tr>
         <tr id="edatesTR" >
@@ -50,10 +47,7 @@
                 <small>${ _('To') }&nbsp;</small>
             </td>
             <td>
-                <span id="eDatePlace"></span>
-                <input type="hidden" value="${ endDT.day }" name="eDay" id="eDay"/>
-                <input type="hidden" value="${ endDT.month }" name="eMonth" id="eMonth"/>
-                <input type="hidden" value="${ endDT.year }" name="eYear" id="eYear"/>
+                <input type="text" name="end_date" id="end_date">
             </td>
         </tr>
         <tr id="hoursTR" >
@@ -61,8 +55,9 @@
                 <small>${ _('Hours') }&nbsp;</small>
             </td>
             <td align="left" class="blacktext">
-                <input name="sTime" id="sTime" maxlength="5" size="4" type="text" value="${ startT }" onchange="" /> &nbsp;&mdash;&nbsp;
-                <input name="eTime" id="eTime" maxlength="5" size="4" type="text" value="${ endT }" onchange="" />
+                <input name="start_time" id="start_time" maxlength="5" size="4" type="text" value="${ formatTime(default_start_dt, format='HH:mm') }"/>
+                &nbsp;&mdash;&nbsp;
+                <input name="end_time" id="end_time" maxlength="5" size="4" type="text" value="${ formatTime(default_end_dt, format='HH:mm') }"/>
                 <span id="holidays-warning" style="color: Red; font-weight:bold;"></span>
             </td>
         </tr>
@@ -81,21 +76,9 @@
             </td>
         </tr>
     </table>
-
-    <input type="hidden" name="location" value="${ defaultLocation }" />
 </form>
 
-<div style="display:none">
-</div>
-
-<script type="text/javascript">
-
-function fieldValues(ids) {
-    return _.reduce(ids, function(mem, key) {
-        mem[key] = $E(key).dom.value;
-        return mem;
-    }, {})
-}
+<script>
 
 function distance(location1, location2) {
     if (!location1 || !location2) {
@@ -268,45 +251,48 @@ var filters = [
 ];
 
 function initializeAvailabilityFields() {
-
-    // In case the date changes, we need to check
-    // whether the start date is greater than the end date,
-    // and if it's so we need to change it
-    startDate = IndicoUI.Widgets.Generic.dateField_sdate(false, null, ['sDay', 'sMonth', 'sYear']);
-    startDate.observe(function(value) {
-        if (IndicoUtil.parseDate(startDate.get()) > IndicoUtil.parseDate(endDate.get())) {
-            endDate.set(startDate.get());
-            endDate.dom.onchange();
+    $('#start_date, #end_date').datepicker({
+        onSelect: function() {
+            s = $('#start_date');
+            e = $('#end_date');
+            if (s.datepicker('getDate') > e.datepicker('getDate')) {
+                e.datepicker('setDate', s.datepicker('getDate'));
+            }
+            e.datepicker('option', 'minDate', s.datepicker('getDate'));
         }
     });
-    $E('sDatePlace').set(startDate);
+    $('#start_date, #end_date').datepicker('setDate','${ formatDate(default_start_dt) }');
+    $('#end_date').datepicker('option', 'minDate', $('#start_date').datepicker('getDate'));
 
-    endDate = IndicoUI.Widgets.Generic.dateField_edate(false, null, ['eDay', 'eMonth', 'eYear']);
-    endDate.observe(function(value) {
-        if (IndicoUtil.parseDate(startDate.get()) > IndicoUtil.parseDate(endDate.get())) {
-            startDate.set(endDate.get());
-            startDate.dom.onchange();
+    $('#isAvailable').on('change', function() {
+        var checked = !$(this).prop('checked');
+        $('#start_date').prop('disabled', checked);
+        $('#end_date').prop('disabled', checked);
+        $('#start_time').prop('disabled', checked);
+        $('#end_time').prop('disabled', checked);
+        $('#repeatability')
+            .prop('disabled', checked)
+            .trigger('change');
+    });
+
+    $('#repeatability').on('change', function() {
+        var single_day = $(this).val() == '(0, 0)'
+        $('#end_date').prop('disabled', single_day);
+        if (single_day) {
+            $('#end_date').datepicker('setDate', $('#start_date').datepicker('getDate'));
         }
     });
-    $E('eDatePlace').set(endDate);
-
-    isAvailable = $E('isAvailable');
-    function onIsAvailableChange() {
-        var isEnabled = isAvailable.dom.checked;
-        $E('sdate').dom.disabled = !isEnabled;
-        $E('edate').dom.disabled = !isEnabled;
-        $E('sTime').dom.disabled = !isEnabled;
-        $E('eTime').dom.disabled = !isEnabled;
-        $E('repeatability').dom.disabled = !isEnabled;
-    }
-    isAvailable.observeChange(onIsAvailableChange);
-    isAvailable.observeClick(onIsAvailableChange);
-
 }
 
 function availabilityFilterFunction(filtersCallback) {
-    if(isAvailable.dom.checked) {
-        function indicoCallback(ids, error) {
+    if($('#isAvailable').prop('checked')) {
+        indicoRequest('roomBooking.rooms.availabilitySearch', {
+            start_date: moment($('#start_date').datepicker('getDate')).format('YYYY-MM-DD'),
+            end_date: moment($('#end_date').datepicker('getDate')).format('YYYY-MM-DD'),
+            start_time: $('#start_time').val(),
+            end_time: $('#end_time').val(),
+            repeatability: $('#repeatability').val()
+        }, function (ids, error) {
             if (!error) {
                 function roomIdFilter(room) {
                     return contains(ids, room.id);
@@ -316,48 +302,25 @@ function availabilityFilterFunction(filtersCallback) {
                 IndicoUtil.errorReport(error);
                 filtersCallback([], []);
             }
-        }
-
-        params = fieldValues(
-            ['sDay', 'eDay', 'sMonth', 'eMonth', 'sYear', 'eYear', 'sTime', 'eTime', 'repeatability']
-        );
-        params['location'] = '${ defaultLocation }';
-        indicoRequest('roomBooking.rooms.availabilitySearch', params, indicoCallback);
+        });
     } else {
         filtersCallback([], []);
     }
 }
 
 function setDefaultAvailabilityValues() {
-    isAvailable.dom.checked = false;
-    isAvailable.dispatchEvent('change');
-
-    % if startDT.day:
-        startDate.set('${ startDT.day }/${ startDT.month }/${ startDT.year }');
-    % endif
-
-    % if endDT.day:
-        endDate.set('${ endDT.day }/${ endDT.month }/${ endDT.year }');
-    % endif
+    $('#start_date, #end_date').datepicker('setDate', '${ formatDate(default_start_dt) }');
+    $('#start_time').val("${ formatTime(default_start_dt, format='HH:mm') }");
+    $('#end_time').val("${ formatTime(default_end_dt, format='HH:mm') }");
+    $('#isAvailable')
+        .prop('checked', false)
+        .trigger('change');
+    $('#repeatability')
+        .val(${ default_repeat })
+        .trigger('change');
 }
 
-function overrideCalendar() {
-    var width = 182;
-    var extraSpace = 7;
-    var availableWidth = document.body.clientWidth;
-    Calendar.prototype.originalShowAt = Calendar.prototype.showAt;
-    Calendar.prototype.showAt = function (x, y) {
-        if (isAvailable.dom.checked) {
-            if (x + width + extraSpace > availableWidth) {
-                x = availableWidth - width - extraSpace;
-            }
-            this.originalShowAt(x, y);
-        }
-    };
-}
-
-IndicoUI.executeOnLoad(function() {
-    overrideCalendar();
+$(function() {
     initializeAvailabilityFields();
 
     var mapCanvas = $E('map_canvas').dom;
@@ -381,5 +344,4 @@ IndicoUI.executeOnLoad(function() {
         startupBuildingFilters
     );
 });
-
 </script>

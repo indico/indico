@@ -26,7 +26,6 @@ from MaKaC.roomMapping import RoomMapperHolder
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
-from indico.modules.rb.models.reservations import RepeatMapping
 from indico.modules.rb.models.utils import next_work_day
 from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
@@ -62,14 +61,6 @@ class WRoomBookingMapOfRooms(WTemplated):
 
 
 class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
-    def __init__(self, rh, aspects, buildings, defaultLocation, forVideoConference, roomID):
-        WPNotDecorated.__init__(self, rh)
-        self._aspects = aspects
-        self._buildings = buildings
-        self._defaultLocation = defaultLocation
-        self._forVideoConference = forVideoConference
-        self._roomID = roomID
-
     def getCSSFiles(self):
         return WPNotDecorated.getCSSFiles(self) + ['css/mapofrooms.css']
 
@@ -83,39 +74,7 @@ class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
         self._roomMapOpt.setActive(True)
 
     def _getBody(self, params):
-        return WRoomBookingMapOfRoomsWidget(self._aspects,
-                                            self._buildings,
-                                            self._defaultLocation,
-                                            self._forVideoConference,
-                                            self._roomID).getHTML(params)
-
-
-class WRoomBookingMapOfRoomsWidget(WTemplated):
-    def __init__(self, aspects, buildings, defaultLocationName, forVideoConference, roomID):
-        self._aspects = aspects
-        self._buildings = buildings
-        self._default_location_name = defaultLocationName
-        self._forVideoConference = forVideoConference
-        self._roomID = roomID
-
-    def getVars(self):
-        wvars = WTemplated.getVars(self)
-
-        wvars['aspects'] = self._aspects
-        wvars['buildings'] = self._buildings
-        wvars['defaultLocation'] = self._default_location_name
-        wvars['forVideoConference'] = self._forVideoConference
-        wvars['roomID'] = self._roomID
-
-        wvars['startDT'] = session.get('_rb_default_start')
-        wvars['endDT'] = session.get('_rb_default_end')
-        wvars['startT'] = session.get('_rb_default_start').time().strftime('%H:%M')
-        wvars['endT'] = session.get('_rb_default_end').time().strftime('%H:%M')
-
-        wvars['repeat_mapping'] = RepeatMapping.getMapping()
-        wvars['default_repeat'] = session.get('_rb_default_repeatability')
-
-        return wvars
+        return WTemplated('RoomBookingMapOfRoomsWidget').getHTML(params)
 
 
 class WPRoomBookingSearchRooms(WPRoomBookingBase):

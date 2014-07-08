@@ -36,8 +36,6 @@ from MaKaC.errors import NoReportError
 import MaKaC.webinterface.linking as linking
 from MaKaC.rb_factory import Factory
 
-from indico.modules.rb.controllers.mixins import RoomBookingAvailabilityParamsMixin
-
 
 class RoomBookingListLocations(ServiceBase):
 
@@ -75,27 +73,6 @@ class RoomBookingListRooms(ServiceBase):
                 for room in CrossLocationQueries.getRooms(location=self._location):
                     res[room.name] = room.name
         return sorted(res)
-
-
-class RoomBookingAvailabilitySearchRooms(ServiceBase, RoomBookingAvailabilityParamsMixin):
-
-    def _checkParams(self):
-        try:
-            self._location = self._params["location"]
-        except:
-            raise ServiceError("ERR-RB0", "Invalid location.")
-
-        self._checkParamsRepeatingPeriod(self._params)
-
-    def _getAnswer(self):
-        p = ReservationBase()
-        p.startDT = self._startDT
-        p.endDT = self._endDT
-        p.repeatability = self._repeatability
-
-        rooms = CrossLocationQueries.getRooms(location=self._location, resvExample=p, available=True)
-
-        return [room.id for room in rooms]
 
 
 class RoomBookingFullNameListRooms(RoomBookingListRooms):

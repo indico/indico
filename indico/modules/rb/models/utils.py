@@ -274,10 +274,6 @@ def strip_if_unicode(e):
     return e.strip() if e and isinstance(e, unicode) else e
 
 
-def get_checked_param_dict(f, params, converter=unicode):
-    return dict((k, strip_if_unicode(f.get(k, type=converter))) for k in params)
-
-
 def is_weekend(d):
     assert isinstance(d, date) or isinstance(d, datetime)
     return d.weekday() in [e.weekday for e in [SA, SU]]

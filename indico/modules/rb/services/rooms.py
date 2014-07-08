@@ -17,14 +17,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import ast
+
 from flask import session
 from sqlalchemy.orm.exc import NoResultFound
 
 from indico.core.config import Config
-from indico.modules.rb.controllers.mixins import RoomBookingAvailabilityParamsMixin
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
+from indico.util.date_time import get_datetime_from_request
 from indico.util.string import natural_sort_key
 from MaKaC.services.implementation.base import LoggedOnlyService, ServiceBase
 from MaKaC.services.interface.rpc.common import ServiceError
@@ -47,24 +49,14 @@ class RoomBookingFullNameListRooms(RoomBookingListRooms):
         return [(room.name, room.full_name) for room in self._rooms]
 
 
-# TODO
-class RoomBookingAvailabilitySearchRooms(ServiceBase, RoomBookingAvailabilityParamsMixin):
+class RoomBookingAvailabilitySearchRooms(ServiceBase):
     def _checkParams(self):
-        try:
-            self._location = self._params["location"]
-        except:
-            raise ServiceError("ERR-RB0", "Invalid location.")
-
-        self._checkParamsRepeatingPeriod(self._params)
+        self._start_dt = get_datetime_from_request(prefix='start_', source=self._params)
+        self._end_dt = get_datetime_from_request(prefix='end_', source=self._params)
+        self._repetition = ast.literal_eval(self._params['repeatability'])
 
     def _getAnswer(self):
-        p = ReservationBase()
-        p.startDT = self._startDT
-        p.endDT = self._endDT
-        p.repeatability = self._repeatability
-
-        rooms = CrossLocationQueries.getRooms(location=self._location, resvExample=p, available=True)
-
+        rooms = Room.find_all(Room.is_available(self._start_dt, self._end_dt, self._repetition))
         return [room.id for room in rooms]
 
 

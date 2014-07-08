@@ -30,7 +30,7 @@ from indico.modules.rb.forms.base import FormDefaults
 from indico.modules.rb.forms.rooms import SearchRoomsForm
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import RepeatUnit, Reservation
+from indico.modules.rb.models.reservations import RepeatMapping, RepeatUnit, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.modules.rb.models.utils import next_work_day
@@ -54,8 +54,6 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         self._cache = GenericCache('MapOfRooms')
 
     def _checkParams(self):
-        session['_rb_default_start'] = session['_rb_default_end'] = next_work_day()
-        session['_rb_default_repeatability'] = (RepeatUnit.NEVER, 0)
         RHRoomBookingBase._checkParams(self, request.args)
         self._room_id = request.args.get('roomID')
 
@@ -72,15 +70,15 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         html = self._cache.get(key)
         if not html:
             self._businessLogic()
-            page = WPRoomBookingMapOfRoomsWidget(
-                self,
-                self._aspects,
-                self._buildings,
-                self._default_location_name,
-                self._for_video_conference,
-                self._room_id
-            )
-            html = page.display()
+            html = WPRoomBookingMapOfRoomsWidget(self,
+                                                 aspects=self._aspects,
+                                                 buildings=self._buildings,
+                                                 for_video_conference=self._for_video_conference,
+                                                 room_id=self._room_id,
+                                                 default_repeat=(RepeatUnit.NEVER, 0),
+                                                 default_start_dt=datetime.combine(next_work_day(), time(8)),
+                                                 default_end_dt=datetime.combine(next_work_day(), time(17)),
+                                                 repeat_mapping=RepeatMapping.getMapping()).display()
             self._cache.set(key, html, 3600)
         return html
 
