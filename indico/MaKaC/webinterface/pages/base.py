@@ -89,7 +89,7 @@ class WPBase(OldObservable):
         but depends on user data (can't be in vars.js.tpl)
         """
 
-        user = self._getAW().getUser();
+        user = self._getAW().getUser()
 
         from MaKaC.webinterface.asyndico import UserDataFactory
 
@@ -254,7 +254,8 @@ class WPDecorated(WPBase):
         self._notify("includeMainJSFiles", pluginJSFiles)
         return WPBase.getJSFiles(self) + pluginJSFiles['paths']
 
-class WPNotDecorated( WPBase ):
+
+class WPNotDecorated(WPBase):
 
     def getLoginURL(self):
         return urlHandlers.UHSignIn.getURL(request.url)
@@ -262,12 +263,11 @@ class WPNotDecorated( WPBase ):
     def getLogoutURL(self):
         return urlHandlers.UHSignOut.getURL(request.url)
 
-    def _display( self, params ):
-        return self._getBody( params )
+    def _display(self, params):
+        params = dict(params, **self._kwargs)
+        return self._getBody(params)
 
-    def _getBody( self, params ):
-        """
-        """
+    def _getBody(self, params):
         pass
 
     def _getNavigationDrawer(self):
