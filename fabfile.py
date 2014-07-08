@@ -559,7 +559,12 @@ def upload_github(build_dir=None, tag_name=None, auth_token=None,
     # Create a new release
     tag_name = tag_name or indico_version
     url = "https://api.github.com/repos/{0}/{1}/releases".format(env.github['org'], env.github['repo'])
-    payload = {'tag_name': tag_name}
+    payload = {
+        'tag_name': tag_name,
+        'target_commitish': indico_version,
+        'name': 'Indico {0}'.format(tag_name),
+        'draft': True
+    }
 
     (exists, rel_id) = _release_exists(tag_name, auth_token)
     if exists:
