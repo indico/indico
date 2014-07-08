@@ -452,7 +452,7 @@ class RoomFetcher(RoomBookingFetcher):
         rooms = CrossLocationQueries.getRooms(location=location)
 
         def _search_rooms(name):
-            return (room for room in rooms if name in room.getFullName())
+            return (room for room in rooms if name.lower() in room.getFullName().lower())
 
         for obj in self._process(_search_rooms(name)):
             yield obj
