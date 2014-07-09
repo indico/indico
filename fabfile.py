@@ -676,7 +676,8 @@ def package_release(py_versions=None, build_dir=None, system_node=False,
             with lcd('indico'):
                 local('git fetch {0}'.format(upstream))
                 local('git reset --hard FETCH_HEAD')
-                local('git clean -df')
+                if not no_clean:
+                    local('git clean -df')
         else:
             local('git clone {0}'.format(upstream))
         with lcd('indico'):
@@ -698,4 +699,5 @@ def package_release(py_versions=None, build_dir=None, system_node=False,
                 elif u == 'ssh':
                     upload_ssh(build_dir, ssh_server_host, ssh_server_port, ssh_user, ssh_key, ssh_dest_dir)
 
-    cleanup(build_dir, force=True)
+    if force_clean:
+        cleanup(build_dir, force=True)
