@@ -667,9 +667,6 @@ def package_release(py_versions=None, build_dir=None, system_node=False,
 
     _check_pyenv(py_versions)
 
-    with pyenv_env(py_versions[-1]):
-        local('pip -q install {0}'.format(' '.join(DEVELOP_REQUIRES + ['babel'])))
-
     with lcd(build_dir):
         if os.path.exists(os.path.join(build_dir, 'indico')):
             print yellow("Repository seems to already exist.")
