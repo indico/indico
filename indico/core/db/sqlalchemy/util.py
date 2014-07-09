@@ -54,6 +54,10 @@ class IndicoModel(Model):
         return cls.find(*args, **kwargs).first()
 
     @classmethod
+    def find_one(cls, *args, **kwargs):
+        return cls.find(*args, **kwargs).one()
+
+    @classmethod
     def get(cls, oid):
         return cls.query.get(oid)
 

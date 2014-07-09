@@ -141,7 +141,7 @@ var Indico = {
 
     Settings: {
         ExtAuthenticators: ${ jsonEncode(extAuths) },
-        RoomBookingModuleActive: ${ jsBoolean(rbActive) }
+        RoomBookingModuleActive: ${ config.getIsRoomBookingActive() | j,n }
     },
 
     FileRestrictions: {

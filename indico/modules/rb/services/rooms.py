@@ -18,12 +18,14 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from flask import session
+from sqlalchemy.orm.exc import NoResultFound
 
 from indico.core.config import Config
 from indico.modules.rb.controllers.mixins import RoomBookingAvailabilityParamsMixin
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
+from indico.util.string import natural_sort_key
 from MaKaC.services.implementation.base import LoggedOnlyService, ServiceBase
 from MaKaC.services.interface.rpc.common import ServiceError
 
@@ -31,17 +33,18 @@ from MaKaC.services.interface.rpc.common import ServiceError
 class RoomBookingListRooms(ServiceBase):
     def _checkParams(self):
         try:
-            self._location = Location.getLocationByName(self._params['location'])
-        except:
+            location = Location.find_one(name=self._params['location'])
+        except NoResultFound:
             raise ServiceError('ERR-RB0', 'Invalid location name: {0}.'.format(self._params['location']))
+        self._rooms = sorted(location.rooms, key=lambda r: natural_sort_key(r.full_name))
 
     def _getAnswer(self):
-        return {room.name: room.name for room in self._location.rooms}
+        return [(room.name, room.name) for room in self._rooms]
 
 
 class RoomBookingFullNameListRooms(RoomBookingListRooms):
     def _getAnswer(self):
-        return {room.name: room.full_name for room in self._location.rooms}
+        return [(room.name, room.full_name) for room in self._rooms]
 
 
 # TODO

@@ -41,7 +41,9 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
-from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
+from MaKaC.rb_location import CrossLocationDB
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.locations import Location
 from indico.util.i18n import L_
 from indico.util.string import safe_upper, safe_slice
 from MaKaC.review import AbstractFieldContent
@@ -1569,8 +1571,8 @@ class CustomRoom(Persistent):
     def retrieveFullName(self, location):
         if not location:
             return
-        room = CrossLocationQueries.getRooms(roomName=self.name, location=location)
-        self.fullName = room.getFullName() if room else None
+        room = Room.find_first(Room.name == self.name, Location.name == location, _join=Room.location)
+        self.fullName = room.full_name if room else None
 
     def setFullName(self, newFullName):
         self.fullName = newFullName
