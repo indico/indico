@@ -19,6 +19,7 @@
 
 from functools import wraps
 from flask import request
+from sqlalchemy.orm.exc import NoResultFound
 
 from indico.core.errors import IndicoError, NotFoundError
 from indico.util.i18n import _
@@ -65,11 +66,11 @@ def requires_room(f, parameter_name='roomID', attribute_name='_room', location_a
             raise IndicoError(_('Wrong usage of room decorator'))
 
         room_id = getattr(request, request_attribute).get(parameter_name, None)
-        room = location.getRoomById(room_id)
-        if room:
-            setattr(args[0], attribute_name, room)
-        else:
+        try:
+            room = location.rooms.filter_by(id=room_id).one()
+        except NoResultFound:
             raise NotFoundError(_("There is no room at '{1}' with id: {0}").format(room_id, location.name))
+        setattr(args[0], attribute_name, room)
         return f(*args, **kw)
 
     return wrapper

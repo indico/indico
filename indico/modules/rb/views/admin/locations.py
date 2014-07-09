@@ -22,6 +22,7 @@ from MaKaC.webinterface.wcomponents import WTemplated
 from . import WPRoomBookingPluginAdminBase
 from indico.modules.rb.models.room_attributes import RoomAttribute
 from indico.modules.rb.models.locations import Location
+from indico.util.string import natural_sort_key
 
 
 class WPRoomBookingAdmin(WPRoomBookingPluginAdminBase):
@@ -79,7 +80,7 @@ class WRoomBookingAdminLocation(WTemplated):
         wvars['keys'] = RoomAttribute
 
         # Rooms
-        wvars['rooms'] = self._location.getRoomsOrderedByNames()
+        wvars['rooms'] = sorted(self._location.rooms, key=lambda r: natural_sort_key(r.full_name))
 
         rh = self._rh
         wvars['withKPI'] = rh._withKPI

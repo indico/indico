@@ -420,14 +420,14 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return self.name != self.generateName()
 
     def getFullName(self):
+        return self.full_name
+
+    @property
+    def full_name(self):
         if self.has_special_name:
             return u'{} - {}'.format(self.generateName(), self.name)
         else:
             return u'{}'.format(self.generateName())
-
-    @property
-    def full_name(self):
-        return self.getFullName()
 
     def updateName(self):
         if not self.name and self.building and self.floor and self.number:

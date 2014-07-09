@@ -1068,50 +1068,6 @@ class Avatar(Persistent, Fossilizable):
         from indico.modules.rb.models.rooms import Room  # avoid circular import
         return Room.find_all(is_active=True, owner_id=self.getId())
 
-    def getReservations(self):
-        """
-        Returns list of ALL reservations (ReservationBase
-        derived objects) this user has ever made.
-        """
-#        self._ensureRoomAndResv()
-#        resvs = [guid.getReservation() for guid in self.resvGuids]
-#        return resvs
-
-        from MaKaC.rb_location import CrossLocationQueries
-        from MaKaC.rb_reservation import ReservationBase
-
-        resvEx = ReservationBase()
-        resvEx.createdBy = str(self.id)
-        resvEx.isCancelled = None
-        resvEx.isRejected = None
-        resvEx.isArchival = None
-
-        myResvs = CrossLocationQueries.getReservations(resvExample = resvEx)
-        return myResvs
-
-    def getReservationsOfMyRooms(self):
-        """
-        Returns list of ALL reservations (ReservationBase
-        derived objects) this user has ever made.
-        """
-#        self._ensureRoomAndResv()
-#        resvs = [guid.getReservation() for guid in self.resvGuids]
-#        return resvs
-
-        from MaKaC.rb_location import CrossLocationQueries
-        from MaKaC.rb_reservation import ReservationBase
-
-        myRooms = self.getRooms() # Just to speed up
-
-        resvEx = ReservationBase()
-        resvEx.isCancelled = None
-        resvEx.isRejected = None
-        resvEx.isArchival = None
-
-        myResvs = CrossLocationQueries.getReservations(resvExample = resvEx, rooms = myRooms)
-        return myResvs
-
-
     def getPersonalInfo(self):
         try:
             return self.personalInfo

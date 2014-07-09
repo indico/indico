@@ -35,8 +35,6 @@ from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.views.user.blockings import (WPRoomBookingBlockingList, WPRoomBookingBlockingDetails,
                                                     WPRoomBookingBlockingsForMyRooms, WPRoomBookingBlockingForm)
-from MaKaC.common.mail import GenericMailer
-from MaKaC.webinterface.mail import GenericNotification
 
 
 class RHRoomBookingBlockingDetails(RHRoomBookingBase):
@@ -180,7 +178,7 @@ class RHRoomBookingBlockingsForMyRooms(RHRoomBookingBase):
     def _process(self):
         state = BlockedRoom.State.get(self.state)
         my_blocks = defaultdict(list)
-        for room in self._getUser().getRooms():
+        for room in session.user.getRooms():
             roomBlocks = room.blocked_rooms.filter(True if state is None else BlockedRoom.state == state).all()
             if roomBlocks:
                 my_blocks[room] += roomBlocks

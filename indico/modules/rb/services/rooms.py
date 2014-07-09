@@ -36,14 +36,12 @@ class RoomBookingListRooms(ServiceBase):
             raise ServiceError('ERR-RB0', 'Invalid location name: {0}.'.format(self._params['location']))
 
     def _getAnswer(self):
-        return dict((room.name, room.name)
-                    for room in self._location.getRoomsOrderedByNames())
+        return {room.name: room.name for room in self._location.rooms}
 
 
 class RoomBookingFullNameListRooms(RoomBookingListRooms):
     def _getAnswer(self):
-        return dict((room.name, room.getFullName())
-                    for room in self._location.getRoomsOrderedByNames())
+        return {room.name: room.full_name for room in self._location.rooms}
 
 
 # TODO

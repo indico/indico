@@ -202,18 +202,6 @@ class Location(db.Model):
     def isMapAvailable(self):
         return self.aspects.count() > 0
 
-    # room management
-
-    def getRooms(self):
-        return self.rooms.all()
-
-    def getRoomById(self, rid):
-        return self.rooms.filter_by(id=rid).first()
-
-    def getRoomsOrderedByNames(self):
-        # Needs to be sorted locally for natural order
-        return sorted(self.rooms.all(), key=lambda x: natural_sort_key(x.getFullName()))
-
     # default location management
 
     @staticmethod
@@ -222,28 +210,20 @@ class Location(db.Model):
 
     @staticmethod
     def setDefaultLocation(location_name):
-            Location.query \
-                    .filter(Location.is_default | (Location.name == location_name)) \
-                    .update({'is_default': func.not_(Location.is_default)},
-                            synchronize_session='fetch')
+        Location.query \
+                .filter(Location.is_default | (Location.name == location_name)) \
+                .update({'is_default': func.not_(Location.is_default)},
+                        synchronize_session='fetch')
 
     # generic location management
-
-    @staticmethod
-    def getLocationById(lid):
-        return Location.query.get(lid)
 
     @staticmethod
     def getLocationByName(name):
         return Location.query.filter_by(name=name).first()
 
     @staticmethod
-    def getNumberOfLocations():
-        return Location.query.count()
-
-    @staticmethod
     def addLocationByName(name):
-        is_default = Location.getNumberOfLocations() == 0
+        is_default = Location.find().count() == 0
         db.session.add(Location(name=name, is_default=is_default))
 
     @staticmethod
