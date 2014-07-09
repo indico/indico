@@ -444,7 +444,7 @@ type("SelectableDynamicListWidgetBase", ["SelectableListWidget"],
         },
 
         _updateOffset: function() {
-            self.offset += self.getInterval();
+            self.offset += this.getInterval();
         },
 
         /**
