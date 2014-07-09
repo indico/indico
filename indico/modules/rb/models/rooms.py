@@ -354,17 +354,17 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     @property
     @cached(_cache)
     def needs_video_conference_setup(self):
-        return self.has_equipment('video conference')
+        return self.has_equipment('Video conference')
 
     @property
     @cached(_cache)
     def has_webcast_recording(self):
-        return self.has_equipment('webcast/recording')
+        return self.has_equipment('Webcast/Recording')
 
     @property
     @cached(_cache)
     def has_projector(self):
-        return self.has_equipment('computer projector')
+        return self.has_equipment('Computer Projector')
 
     @property
     @cached(_cache)
@@ -375,7 +375,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         vc_equipment = self.equipments \
                            .correlate(Room) \
                            .with_entities(RoomEquipment.id) \
-                           .filter_by(name='video conference') \
+                           .filter_by(name='Video conference') \
                            .as_scalar()
         return self.equipments.filter(RoomEquipment.parent_id == vc_equipment)
 
@@ -481,7 +481,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if 'vc_equipment' in args or 'non_vc_equipment' in args:
             vc_id_subquery = db.session.query(RoomEquipment.id) \
                                        .correlate(Room) \
-                                       .filter_by(name='video conference') \
+                                       .filter_by(name='Video conference') \
                                        .join(RoomEquipmentAssociation) \
                                        .filter(RoomEquipmentAssociation.c.room_id == Room.id) \
                                        .as_scalar()

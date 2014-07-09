@@ -311,7 +311,7 @@ class Reservation(Serializer, db.Model):
         vc_equipment = self.room.equipments \
                            .correlate(ReservationOccurrence) \
                            .with_entities(RoomEquipment.id) \
-                           .filter_by(name='video conference') \
+                           .filter_by(name='Video conference') \
                            .as_scalar()
         return self.equipments.filter(RoomEquipment.parent_id == vc_equipment)
 
@@ -344,7 +344,7 @@ class Reservation(Serializer, db.Model):
         if 'vc_equipment' in args:
             vc_id_subquery = db.session.query(RoomEquipment.id) \
                 .correlate(Reservation) \
-                .filter_by(name='video conference') \
+                .filter_by(name='Video conference') \
                 .join(RoomEquipmentAssociation) \
                 .filter(RoomEquipmentAssociation.c.room_id == Reservation.room_id) \
                 .as_scalar()

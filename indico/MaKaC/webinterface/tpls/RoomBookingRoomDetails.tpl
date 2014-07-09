@@ -323,7 +323,7 @@
                               </td>
                               <td align="left" class="blacktext">
                                 <!-- TODO: Show nested equipment nicely, e.g. VC children. Needs a helper function! -->
-                                ${ ', '.join(eq.name.title() for eq in room.equipments) }
+                                ${ ', '.join(eq.name for eq in room.equipments) }
                               </td>
                             </tr>
                           </table>
