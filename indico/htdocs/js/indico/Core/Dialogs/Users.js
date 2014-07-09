@@ -1380,11 +1380,11 @@ type("UserListField", ["IWidget"], {
     },
 
     privilegesOn: function() {
-        return $('#grant-manager').attr("checked") || $('#presenter-grant-submission').attr("checked");
+        return $('#grant-manager').prop("checked") || $('#presenter-grant-submission').prop("checked");
     },
 
     bothPrivilegesOn: function() {
-        return $('#grant-manager').attr("checked") && $('#presenter-grant-submission').attr("checked");
+        return $('#grant-manager').prop("checked") && $('#presenter-grant-submission').prop("checked");
     },
 
     setUpParameters: function() {
