@@ -230,6 +230,9 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         else:
             form = form_class(obj=defaults)
 
+        if not room.notification_for_assistance:
+            del form.needs_general_assistance
+
         can_book = room.can_be_booked(session.user)
         can_prebook = room.can_be_prebooked(session.user)
         if not can_prebook or (can_book and room.can_be_booked(session.user, True)):

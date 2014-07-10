@@ -38,11 +38,13 @@
         </h2>
         <%include file="RoomBookingNewBookingInfoWidget.tpl" args="form=form"/>
 
-        <h2 class="group-title">
-            <i class="icon-projector"></i>
-            ${ _('Collaboration & assistance') }
-        </h2>
-        <%include file="RoomBookingNewBookingCollaborationWidget.tpl" args="form=form"/>
+        % if list(form.equipments) or form.needs_general_assistance:
+            <h2 class="group-title">
+                <i class="icon-projector"></i>
+                ${ _('Collaboration & assistance') }
+            </h2>
+            <%include file="RoomBookingNewBookingCollaborationWidget.tpl" args="form=form"/>
+        % endif
     % endif
 
     <h2 class="group-title"></h2>

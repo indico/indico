@@ -1,12 +1,14 @@
 <%page args="form=None"/>
 <% eq_list = list(form.equipments) %>
 
-<div>
-    ${ form.needs_general_assistance() }
-    ${ form.needs_general_assistance.label(style='font-weight: normal;') }
-    <i class="info-helper"
-       title="${ _('A technician will arrive about 10 minutes before the event to help you start up the room equipment (microphone, projector, etc.)') }"></i>
-</div>
+% if form.needs_general_assistance:
+    <div>
+        ${ form.needs_general_assistance() }
+        ${ form.needs_general_assistance.label(style='font-weight: normal;') }
+        <i class="info-helper"
+           title="${ _('A technician will arrive about 10 minutes before the event to help you start up the room equipment (microphone, projector, etc.)') }"></i>
+    </div>
+% endif
 
 % if eq_list:
     <div>
