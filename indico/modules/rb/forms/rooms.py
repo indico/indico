@@ -121,7 +121,7 @@ class RoomForm(IndicoForm):
     capacity = IntegerField(_('Capacity'), [DataRequired(), NumberRange(min=1)])
     division = StringField(_('Department'))
     surface_area = IntegerField(_('Surface area'), [NumberRange(min=0)])
-    max_advance_days = IntegerField(_('Maximum advance time for bookings'), [NumberRange(min=1)])
+    max_advance_days = IntegerField(_('Maximum advance time for bookings'), [Optional(), NumberRange(min=1)])
     comments = TextAreaField(_('Comments'))
     delete_photos = BooleanField(_('Delete photos'))
     large_photo = FileField(_('Large photo'))

@@ -200,9 +200,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         default=True
     )
     max_advance_days = db.Column(
-        db.Integer,
-        nullable=False,
-        default=30
+        db.Integer
     )
 
     # relationships

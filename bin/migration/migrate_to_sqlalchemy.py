@@ -97,20 +97,12 @@ def setup(main_zodb_uri, rb_zodb_uri, sqlalchemy_uri):
     return main_root, rb_root, app
 
 
-def teardown():
-    pass
-
-
 def convert_reservation_repeatability(old):
     return RepeatMapping.getNewMapping(old)
 
 
 def convert_room_notification_for_start(flag, before):
     return before if flag else 0
-
-
-def convert_room_max_advance_days(old):
-    return int(old) if old else 30
 
 
 def generate_name(old_room):
@@ -280,7 +272,7 @@ def migrate_rooms(rb_root, photo_path):
 
             is_active=old_room.isActive,
             is_reservable=old_room.isReservable,
-            max_advance_days=convert_room_max_advance_days(old_room.maxAdvanceDays)
+            max_advance_days=int(old_room.maxAdvanceDays) if old_room.maxAdvanceDays else None
         )
 
         print cformat('- [%{cyan}{}%{reset}] %{grey!}{:4}%{reset}  %{green!}{}%{reset}').format(l.name, r.id, r.name)

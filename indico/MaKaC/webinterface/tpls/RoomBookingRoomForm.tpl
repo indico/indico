@@ -59,6 +59,9 @@
     <div id="surface_areaCH" class="tip">
         <b> ${ _('Required.')}</b>  ${ _('Surface in square meters. Must be a positive number.') }
     </div>
+    <div id="max_advance_daysCH" class="tip">
+        <b> ${ _('Maximum number of days the room can be booked in advance. Must be a positive number (or empty for no restriction).') }</b>
+    </div>
     <div id="commentsCH" class="tip">
         ${ _('Any other comments - recommended.') }
     </div>

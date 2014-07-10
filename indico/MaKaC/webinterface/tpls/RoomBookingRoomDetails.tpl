@@ -254,7 +254,7 @@
                             ${ _('Maximum advance time') }&nbsp;&nbsp;
                           </td>
                           <td align="left" class="blacktext">
-                            ${ _('{0} days').format(room.max_advance_days) }
+                            ${ _('{0} days').format(room.max_advance_days) if room.max_advance_days else _('Not set') }
                           </td>
                         </tr>
                         <tr>
