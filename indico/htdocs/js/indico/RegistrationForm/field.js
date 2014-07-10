@@ -211,9 +211,9 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         userdata = userdata || {};
 
         if (validation !== undefined) {
-            return ($scope.isBillable(item) && userdata.payed) || validation(userdata);
+            return ($scope.isBillable(item) && userdata.paid) || validation(userdata);
         } else {
-            return $scope.isBillable(item) && userdata.payed;
+            return $scope.isBillable(item) && userdata.paid;
         }
     };
 
@@ -407,7 +407,7 @@ ndRegForm.directive('ndRadioField', function(url) {
             };
 
             scope.anyBillableItemPayed = function(userdata) {
-                if (userdata.payed) {
+                if (userdata.paid) {
                     var item = _.find(scope.field.values.radioitems, function(item) {
                         return item.caption == userdata[scope.getName(scope.field.input)];
                     }) || {};

@@ -269,7 +269,7 @@ ndRegForm.directive("ndAccommodationSection", function($rootScope) {
             scope.billableOptionPayed = function(userdata) {
                 if (userdata.accommodation !== undefined) {
                     var accommodation = userdata.accommodation.accommodationType || {};
-                    return accommodation.billable === true && userdata.payed === true;
+                    return accommodation.billable === true && userdata.paid === true;
                 }
 
                 return false;
@@ -434,7 +434,7 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
             };
 
             $scope.anyBillableSessionPayed = function(userdata) {
-                if (userdata.payed) {
+                if (userdata.paid) {
                     return _.any(userdata.sessionList, function(item) {
                         var session = _.find($scope.section.items, function(session) {
                             return session.id == item.id;
@@ -602,7 +602,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
             };
 
             scope.anyBillableEventPayed = function(userdata) {
-                if (userdata.payed) {
+                if (userdata.paid) {
                     return _.any(userdata.socialEvents, function(item) {
                         return item.price !== 0;
                     });
