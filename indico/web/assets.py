@@ -231,7 +231,6 @@ jquery = Bundle(*filter(None, [
                'jquery.form.js',
                'jquery.custom.js',
                'jquery.daterange.js',
-               'jquery.form.js',
                'jquery.dttbutton.js',
                'jquery.colorbox.js',
                'jquery.menu.js',
