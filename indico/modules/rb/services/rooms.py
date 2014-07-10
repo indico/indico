@@ -56,7 +56,7 @@ class RoomBookingAvailabilitySearchRooms(ServiceBase):
         self._repetition = ast.literal_eval(self._params['repeatability'])
 
     def _getAnswer(self):
-        rooms = Room.find_all(Room.is_available(self._start_dt, self._end_dt, self._repetition))
+        rooms = Room.find_all(Room.filter_available(self._start_dt, self._end_dt, self._repetition))
         return [room.id for room in rooms]
 
 

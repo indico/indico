@@ -57,23 +57,17 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         RHRoomBookingBase._checkParams(self, request.args)
         self._room_id = request.args.get('roomID')
 
-    def _businessLogic(self):
-        defaultLocation = Location.getDefaultLocation()
-        self._default_location_name = defaultLocation.name
-        self._aspects = defaultLocation.getAspectsAsDictionary()
-        self._for_video_conference = request.args.get('avc') == 'y' and \
-                                     defaultLocation.hasEquipment('Video conference')
-        self._buildings = defaultLocation.getBuildings(not self._for_video_conference)
-
     def _process(self):
         key = str(sorted(dict(request.args, lang=session.lang, user=session.user.getId()).items()))
         html = self._cache.get(key)
         if not html:
-            self._businessLogic()
+            default_location = Location.getDefaultLocation()
+            aspects = default_location.getAspectsAsDictionary()
+            for_video_conference = request.args.get('avc') == 'y' and default_location.hasEquipment('Video conference')
+            buildings = default_location.getBuildings(with_rooms=not for_video_conference)
             html = WPRoomBookingMapOfRoomsWidget(self,
-                                                 aspects=self._aspects,
-                                                 buildings=self._buildings,
-                                                 for_video_conference=self._for_video_conference,
+                                                 aspects=aspects,
+                                                 buildings=buildings,
                                                  room_id=self._room_id,
                                                  default_repeat=(RepeatUnit.NEVER, 0),
                                                  default_start_dt=datetime.combine(next_work_day(), time(8)),

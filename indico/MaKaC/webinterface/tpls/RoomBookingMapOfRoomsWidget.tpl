@@ -253,26 +253,20 @@ var filters = [
 function initializeAvailabilityFields() {
     $('#start_date, #end_date').datepicker({
         onSelect: function() {
-            s = $('#start_date');
-            e = $('#end_date');
+            var s = $('#start_date');
+            var e = $('#end_date');
             if (s.datepicker('getDate') > e.datepicker('getDate')) {
                 e.datepicker('setDate', s.datepicker('getDate'));
             }
             e.datepicker('option', 'minDate', s.datepicker('getDate'));
         }
     });
-    $('#start_date, #end_date').datepicker('setDate','${ formatDate(default_start_dt) }');
+    $('#start_date, #end_date').datepicker('setDate', ${ formatDate(default_start_dt) | n, j});
     $('#end_date').datepicker('option', 'minDate', $('#start_date').datepicker('getDate'));
 
     $('#isAvailable').on('change', function() {
-        var checked = !$(this).prop('checked');
-        $('#start_date').prop('disabled', checked);
-        $('#end_date').prop('disabled', checked);
-        $('#start_time').prop('disabled', checked);
-        $('#end_time').prop('disabled', checked);
-        $('#repeatability')
-            .prop('disabled', checked)
-            .trigger('change');
+        $('#start_date, #end_date, #start_time, #end_time, #repeatability').prop('disabled', !this.checked);
+        $('#repeatability').trigger('change');
     });
 
     $('#repeatability').on('change', function() {
@@ -309,9 +303,9 @@ function availabilityFilterFunction(filtersCallback) {
 }
 
 function setDefaultAvailabilityValues() {
-    $('#start_date, #end_date').datepicker('setDate', '${ formatDate(default_start_dt) }');
-    $('#start_time').val("${ formatTime(default_start_dt, format='HH:mm') }");
-    $('#end_time').val("${ formatTime(default_end_dt, format='HH:mm') }");
+    $('#start_date, #end_date').datepicker('setDate', ${ formatDate(default_start_dt) | n, j });
+    $('#start_time').val(${ formatTime(default_start_dt, format='HH:mm') | n, j });
+    $('#end_time').val(${ formatTime(default_end_dt, format='HH:mm') | n, j });
     $('#isAvailable')
         .prop('checked', false)
         .trigger('change');

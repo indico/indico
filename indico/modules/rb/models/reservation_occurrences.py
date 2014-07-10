@@ -145,7 +145,7 @@ class ReservationOccurrence(db.Model, Serializer):
         raise IndicoError('Unexpected frequency')
 
     @staticmethod
-    def build_overlap_criteria(occurrences):
+    def filter_overlap(occurrences):
         criteria = []
         for occurrence in occurrences:
             criteria += [
@@ -163,7 +163,7 @@ class ReservationOccurrence(db.Model, Serializer):
         return ReservationOccurrence.find(Reservation.room == room,
                                           Reservation.id != reservation_id,
                                           ReservationOccurrence.is_valid,
-                                          ReservationOccurrence.build_overlap_criteria(occurrences),
+                                          ReservationOccurrence.filter_overlap(occurrences),
                                           _eager=ReservationOccurrence.reservation,
                                           _join=Reservation)
 

@@ -549,10 +549,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return Room.query.filter_by(name=name).first()
 
     @staticmethod
-    def is_available(start_dt, end_dt, repetition, include_pre_bookings=True, include_pending_blockings=True):
+    def filter_available(start_dt, end_dt, repetition, include_pre_bookings=True, include_pending_blockings=True):
+        """Returns a SQLAlchemy filter criterion ensuring that the room is available during the given time."""
         # Check availability against reservation occurrences
         dummy_occurrences = ReservationOccurrence.create_series(start_dt, end_dt, repetition)
-        overlap_criteria = ReservationOccurrence.build_overlap_criteria(dummy_occurrences)
+        overlap_criteria = ReservationOccurrence.filter_overlap(dummy_occurrences)
         reservation_criteria = [Reservation.room_id == Room.id,
                                 ReservationOccurrence.is_valid,
                                 or_(*overlap_criteria)]
@@ -602,9 +603,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
         if form.available.data != -1:
             repetition = RepeatMapping.getNewMapping(ast.literal_eval(form.repeatability.data))
-            is_available = Room.is_available(form.start_date.data, form.end_date.data, repetition,
-                                             include_pre_bookings=form.include_pre_bookings.data,
-                                             include_pending_blockings=form.include_pending_blockings.data)
+            is_available = Room.filter_available(form.start_date.data, form.end_date.data, repetition,
+                                                 include_pre_bookings=form.include_pre_bookings.data,
+                                                 include_pending_blockings=form.include_pending_blockings.data)
             # Filter the search results
             if form.available.data == 0:  # booked/unavailable
                 q = q.filter(~is_available)
