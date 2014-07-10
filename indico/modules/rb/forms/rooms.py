@@ -89,8 +89,10 @@ class _TimePair(IndicoForm):
 
 
 class _DateTimePair(IndicoForm):
-    start = DateTimeField(_('from'), [UsedIf(lambda form, field: form.end.data)], display_format='%d/%m/%Y %H:%M')
-    end = DateTimeField(_('to'), [UsedIf(lambda form, field: form.start.data)], display_format='%d/%m/%Y %H:%M')
+    start = DateTimeField(_('from'), [UsedIf(lambda form, field: form.end.data)], display_format='%d/%m/%Y %H:%M',
+                          parse_kwargs={'dayfirst': True})
+    end = DateTimeField(_('to'), [UsedIf(lambda form, field: form.start.data)], display_format='%d/%m/%Y %H:%M',
+                        parse_kwargs={'dayfirst': True})
 
     def validate_start(self, field):
         if self.start.data and self.end.data and self.start.data >= self.end.data:
