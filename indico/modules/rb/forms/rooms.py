@@ -19,6 +19,7 @@
 
 import itertools
 from collections import defaultdict
+from operator import itemgetter
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.ext.dateutil.fields import DateTimeField
@@ -35,6 +36,7 @@ from indico.modules.rb.forms.widgets import ConcatWidget
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.util.i18n import _
+from indico.util.struct.iterables import group_nested
 
 
 def _get_equipment_label(eq):
@@ -46,17 +48,9 @@ def _get_equipment_label(eq):
     return ': '.join(itertools.chain(reversed(parents), [eq.name]))
 
 
-def _group_equipment(objects, _tree=None, _child_of=None):
+def _group_equipment(objects):
     """Groups the equipment list so children follow their their parents"""
-    if _tree is None:
-        _tree = defaultdict(list)
-        for obj in objects:
-            _tree[obj[1].parent_id].append(obj)
-
-    for obj in _tree[_child_of]:
-        yield obj
-        for child in _group_equipment(objects, _tree, obj[1].id):
-            yield child
+    return group_nested(objects, itemgetter(1))
 
 
 class SearchRoomsForm(IndicoForm):

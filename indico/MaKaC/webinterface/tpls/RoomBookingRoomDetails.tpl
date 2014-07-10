@@ -322,8 +322,10 @@
                                 ${ _('Room has') }:&nbsp;&nbsp;
                               </td>
                               <td align="left" class="blacktext">
-                                <!-- TODO: Show nested equipment nicely, e.g. VC children. Needs a helper function! -->
-                                ${ ', '.join(eq.name for eq in room.equipments) }
+                                <%
+                                from indico.util.struct.iterables import render_nested
+                                %>
+                                ${ render_nested(sorted(room.equipments, key=lambda x: x.name)) }
                               </td>
                             </tr>
                           </table>
