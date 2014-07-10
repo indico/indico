@@ -21,7 +21,8 @@ from datetime import datetime, time, timedelta, date
 from collections import defaultdict
 
 import dateutil
-from flask import request, session
+import transaction
+from flask import request, session, jsonify
 from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
@@ -360,7 +361,17 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
             conflicts, pre_conflicts = self._get_all_conflicts(self._room, form)
 
         if form.validate_on_submit() and not form.submit_check.data:
-            booking = self._create_booking(form, room)
+            try:
+                booking = self._create_booking(form, room)
+            except IndicoError as e:
+                transaction.abort()
+                if not request.is_xhr:
+                    raise
+                return jsonify(success=False, msg=unicode(e))
+
+            if request.is_xhr:
+                return jsonify(success=True, url=url_for('rooms.roomBooking-bookingDetails', booking))
+
             self._redirect(url_for('rooms.roomBooking-bookingDetails', booking, new_booking=True))
             return
 

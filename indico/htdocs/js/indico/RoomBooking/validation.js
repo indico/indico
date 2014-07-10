@@ -166,6 +166,26 @@
         $('#bookingForm :input').on('input change', function() {
             validateForm();
         });
+        $('#bookingForm').on('submit', function(e) {
+            if (validatingConflicts) {
+                return;
+            }
+            e.preventDefault();
+            $(this).ajaxSubmit({
+                dataType: 'json',
+                success: function(data) {
+                    if (data.success) {
+                        location.href = data.url;
+                        var userId = $('body').data('userId');
+                        $.jStorage.set('rb-user-{0}'.format(userId), {});
+                    } else {
+                        var error_box = $('.js-booking-creation-error-box').clone().show()
+                        error_box.find('.js-booking-creation-error-message').text(data.msg)
+                        new AlertPopup($T("Booking creation error"), error_box[0]).open();
+                    }
+                }
+            });
+        });
 
         $('.js-confirm-warning').on('change', function() {
             validate_conflict();
