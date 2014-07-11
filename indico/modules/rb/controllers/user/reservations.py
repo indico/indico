@@ -26,7 +26,7 @@ from flask import request, session, jsonify
 from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
-from indico.core.errors import IndicoError, AccessError
+from indico.core.errors import IndicoError, AccessError, NoReportError
 from indico.modules.rb.forms.base import FormDefaults
 from indico.util.date_time import get_datetime_from_request
 from indico.util.string import natural_sort_key
@@ -329,7 +329,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         """Creates the booking and returns a JSON response."""
         try:
             booking = self._create_booking(form, room)
-        except IndicoError as e:
+        except NoReportError as e:
             transaction.abort()
             return jsonify(success=False, msg=unicode(e))
         return jsonify(success=True, url=url_for('rooms.roomBooking-bookingDetails', booking))

@@ -35,7 +35,7 @@ from werkzeug.datastructures import OrderedMultiDict
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
-from indico.core.errors import IndicoError
+from indico.core.errors import NoReportError
 from indico.modules.rb.models import utils
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
@@ -542,7 +542,7 @@ class Reservation(Serializer, db.Model):
         if prebook is None:
             prebook = not room.can_be_booked(user)
             if prebook and not room.can_be_prebooked(user):
-                raise IndicoError('You cannot book this room')
+                raise NoReportError('You cannot book this room')
 
         room.check_advance_days(data['end_date'].date(), user)
         room.check_bookable_times(data['start_date'].time(), data['end_date'].time(), user)
@@ -557,7 +557,7 @@ class Reservation(Serializer, db.Model):
         reservation.created_by_user = user
         reservation.create_occurrences(True, user)
         if not any(occ.is_valid for occ in reservation.occurrences):
-            raise IndicoError('Reservation has no valid occurrences')
+            raise NoReportError(_('Reservation has no valid occurrences'))
         notify_creation(reservation)
         return reservation
 
@@ -676,7 +676,7 @@ class Reservation(Serializer, db.Model):
 
         # Sanity check so we don't end up with an "empty" booking
         if not any(occ.is_valid for occ in self.occurrences):
-            raise IndicoError('Reservation has no valid occurrences')
+            raise NoReportError(_('Reservation has no valid occurrences'))
 
         notify_modification(self, changes)
         return True
