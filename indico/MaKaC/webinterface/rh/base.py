@@ -324,7 +324,7 @@ class RH(RequestHandlerBase):
             return
         raise BadRefererError('This operation is not allowed from an external referer.')
 
-    @jsonify_error
+    @jsonify_error(logging_level='exception')
     def _processGeneralError(self, e):
         """Treats general errors occured during the process of a RH."""
 
@@ -332,7 +332,7 @@ class RH(RequestHandlerBase):
             raise
         return errors.WPGenericError(self).display()
 
-    @jsonify_error
+    @jsonify_error(logging_level='exception')
     def _processUnexpectedError(self, e):
         """Unexpected errors"""
 

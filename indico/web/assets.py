@@ -175,6 +175,7 @@ indico_jquery = Bundle(
     *namespace('js/indico/jquery',
                'defaults.js',
                'global.js',
+               'errors.js',
                'clearableinput.js',
                'actioninput.js',
                'fieldarea.js',

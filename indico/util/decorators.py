@@ -93,7 +93,7 @@ def jsonify_error(function=None, logger_name=None, logger_message=None, logging_
                     request, exception.__class__.__name__, exception
                 ))
 
-            if request.headers.get('Content-Type') == 'application/json':
+            if request.is_xhr or request.headers.get('Content-Type') == 'application/json':
                 return create_json_error_answer(exception)
             else:
                 return f(*args, **kw)
@@ -101,13 +101,3 @@ def jsonify_error(function=None, logger_name=None, logger_message=None, logging_
     if function:
         return _jsonify_error(function)
     return _jsonify_error
-
-
-def rename(new_name):
-    def _rename(f):
-        @wraps(f)
-        def wrapper(*args, **kw):
-            f.__name__ = new_name
-            return f(*args, **kw)
-        return wrapper
-    return _rename

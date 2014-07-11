@@ -22,8 +22,8 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.errors import MaKaCError
 
 from indico.core.config import Config
-from MaKaC.common.info import HelperMaKaCInfo
 from indico.core.logger import Logger
+
 
 class SendErrorReport(ServiceBase):
     """
@@ -47,19 +47,27 @@ class SendErrorReport(ServiceBase):
         subject = "[Indico@%s] Error report"%cfg.getBaseURL()
 
         # build the message body
-        body = ["-"*20, "Error details\n", self._code, self._message, "Inner error: " + str(self._inner), str(self._requestInfo), "-"*20 ]
-        maildata = { "fromAddr": fromAddr, "toList": [toAddr], "subject": subject, "body": "\n".join( body ) }
+        body = [
+            "-" * 20,
+            "Error details\n",
+            self._code,
+            self._message,
+            "Inner error: " + str(self._inner),
+            str(self._requestInfo) if self._requestInfo else '',
+            "-" * 20
+        ]
+        maildata = {"fromAddr": fromAddr, "toList": [toAddr], "subject": subject, "body": "\n".join(body)}
 
         # send it
         GenericMailer.send(GenericNotification(maildata))
-
 
     def _checkParams(self):
         pManager = ParameterManager(self._params)
         self._userMail = pManager.extract("userMail", pType=str, allowEmpty=True)
         self._code = pManager.extract("code", pType=str, allowEmpty=True)
         self._message = pManager.extract("message", pType=str, allowEmpty=True)
-        self._inner = pManager.extract("inner", pType=str, allowEmpty=True)
+        inner = self._params.get('inner', '')
+        self._inner = '\n'.join(inner) if isinstance(inner, list) else inner
         self._requestInfo = pManager.extract("requestInfo", pType=dict)
 
     def _getAnswer(self):

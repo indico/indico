@@ -21,7 +21,9 @@
 Module containing the Indico exception class hierarchy
 """
 
-from ..util.i18n import _
+import traceback
+
+from indico.util.i18n import _
 
 
 class IndicoError(Exception):
@@ -54,8 +56,11 @@ class IndicoError(Exception):
     def toDict(self):
         return {
             'code': self.code,
+            'type': 'noReport' if isinstance(self, NoReportError) else 'unknown',
             'message': self.getMessage(),
-            'data': self.__dict__
+            'data': self.__dict__,
+            'requestInfo': {},
+            'inner': traceback.format_exc()
         }
 
 

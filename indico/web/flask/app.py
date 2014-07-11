@@ -31,18 +31,15 @@ from werkzeug.urls import url_parse
 
 import indico.util.date_time as date_time_util
 from indico.core.config import Config
-from MaKaC.common.info import HelperMaKaCInfo
 from indico.util.i18n import gettext, ngettext
 from indico.core.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
 
-from indico.core.db import DBMgr
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
-from indico.core.db.sqlalchemy.util import delete_all_tables
 from indico.web.assets import core_env, register_all_css, register_all_js
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,

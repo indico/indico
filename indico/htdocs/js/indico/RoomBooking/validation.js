@@ -175,6 +175,9 @@
             $(this).ajaxSubmit({
                 dataType: 'json',
                 success: function(data) {
+                    if (handleAjaxError(data)) {
+                        return;
+                    }
                     if (data.success) {
                         var userId = $('body').data('userId');
                         $.jStorage.set('rb-user-{0}'.format(userId), {});
