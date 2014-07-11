@@ -143,6 +143,9 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
     def _get_form_data(self):
         return request.form
 
+    def _filter_displayed_rooms(self, rooms, occurrences):
+        return rooms
+
     def _checkParams(self):
         self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.getFullName()))
         self._form_data = self._get_form_data()
@@ -156,7 +159,8 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
         form = self._form
         if self._is_submitted() and form.validate():
             occurrences = ReservationOccurrence.find_with_filters(form.data, session.user).all()
-            rooms = [r for r in self._rooms if r.id in set(form.room_ids.data)]
+            rooms = self._filter_displayed_rooms([r for r in self._rooms if r.id in set(form.room_ids.data)],
+                                                 occurrences)
             return WPRoomBookingSearchBookingsResults(self, rooms=rooms, occurrences=occurrences,
                                                       show_blockings=self.show_blockings,
                                                       start_dt=form.start_dt.data, end_dt=form.end_dt.data,
@@ -190,14 +194,25 @@ class RHRoomBookingSearchBookingsShortcutBase(RHRoomBookingSearchBookings):
         return data
 
 
-class RHRoomBookingSearchMyBookings(RHRoomBookingSearchBookingsShortcutBase):
+class _RoomsWithBookingsMixin:
+    def _filter_displayed_rooms(self, rooms, occurrences):
+        booked_rooms = {occ.reservation.room_id for occ in occurrences}
+        return [r for r in rooms if r.id in booked_rooms]
+
+
+class _MyRoomsMixin:
+    def _filter_displayed_rooms(self, rooms, occurrences):
+        return [r for r in rooms if r.owner_id == session.user.id]
+
+
+class RHRoomBookingSearchMyBookings(_RoomsWithBookingsMixin, RHRoomBookingSearchBookingsShortcutBase):
     menu_item = 'myBookingList'
     search_criteria = {
         'is_only_mine': True
     }
 
 
-class RHRoomBookingSearchMyPendingBookings(RHRoomBookingSearchBookingsShortcutBase):
+class RHRoomBookingSearchMyPendingBookings(_RoomsWithBookingsMixin, RHRoomBookingSearchBookingsShortcutBase):
     menu_item = 'myPendingBookingList'
     search_criteria = {
         'is_only_mine': True,
@@ -205,14 +220,14 @@ class RHRoomBookingSearchMyPendingBookings(RHRoomBookingSearchBookingsShortcutBa
     }
 
 
-class RHRoomBookingSearchBookingsMyRooms(RHRoomBookingSearchBookingsShortcutBase):
+class RHRoomBookingSearchBookingsMyRooms(_MyRoomsMixin, RHRoomBookingSearchBookingsShortcutBase):
     menu_item = 'usersBookings'
     search_criteria = {
         'is_only_my_rooms': True
     }
 
 
-class RHRoomBookingSearchPendingBookingsMyRooms(RHRoomBookingSearchBookingsShortcutBase):
+class RHRoomBookingSearchPendingBookingsMyRooms(_MyRoomsMixin, RHRoomBookingSearchBookingsShortcutBase):
     menu_item = 'usersPendingBookings'
     search_criteria = {
         'is_only_my_rooms': True,
