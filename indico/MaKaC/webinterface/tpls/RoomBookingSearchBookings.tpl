@@ -83,26 +83,6 @@
             </div>
         </div>
 
-        % if user_has_rooms:
-        <div class="toolbar thin table">
-            <div class="group i-selection">
-                <span class="i-button label">
-                    ${ _('Rooms') }
-                </span>
-                <input type="radio" id="any_room" name="is_only_my_rooms" value="false" checked/>
-                <label for="any_room" class="i-button"
-                    title="${ _('Shows all the rooms') }">
-                    ${ _('Any room') }
-                </label>
-                <input type="radio" id="only_my_rooms" name="is_only_my_rooms" value="true"/>
-                <label for="only_my_rooms" class="i-button"
-                    title="${ _('Filter by bookings of rooms you are taking care of') }">
-                    ${ _('My rooms') }
-                </label>
-            </div>
-        </div>
-        % endif
-
         <div class="toolbar thin table">
             <div class="group i-selection">
                 <span class="i-button label">

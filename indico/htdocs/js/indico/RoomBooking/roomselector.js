@@ -41,7 +41,6 @@
         },
 
         selection: function() {
-            var self = this;
             var selection = [];
 
             $('.ui-multiselect-checkboxes :checkbox').each(function(index) {
@@ -68,13 +67,7 @@
         },
 
         validate: function() {
-            var self = this;
-
-            if (!self.options.allowEmpty && self.select.val() === null) {
-                return false;
-            }
-
-            return true;
+            return this.select.val() !== null || this.options.allowEmpty;
         },
 
         _initData: function() {
@@ -218,10 +211,34 @@
             var checknone = header.find(".ui-helper-reset .ui-multiselect-none").each(function() {
                 $(this).html($(this).find("span:last-child").text());
             });
+            var checkmine = $('<a>', {
+                'class': 'i-button',
+                href: '#',
+                text: $T('Mine'),
+                click: function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if ($(this).hasClass('disabled')) {
+                        return;
+                    }
+                    self.select.multiselect('uncheckAll');
+                    self.parts.list.find(":checkbox").each(function() {
+                        var $this = $(this);
+                        if (!this.checked && $this.data('myRoom') && $this.is(':visible')) {
+                            $this.click();
+                        }
+                    });
+                }
+            });
+            var userId = $('body').data('userId');
+            checkmine.toggleClass('disabled', !_.any(self.options.rooms, function(room) {
+                return room.owner_id == userId;
+            }));
             self.selecttools = $("<div/>").addClass("group")
                 .append($("<span class='i-button label'/>").text($T("Select")))
                 .append(checkall.addClass("i-button"))
-                .append(checknone.addClass("i-button"));
+                .append(checknone.addClass("i-button"))
+                .append(checkmine);
             header.find(".ui-helper-reset").replaceWith(function() {
                 return self.selecttools;
             });
@@ -308,9 +325,11 @@
                                   $T('Projector not available'),
                                   $T("Private room")];
 
+            var userId = $('body').data('userId');
             self.select.find("option").each(function(index) {
                 var labelparts = $(this).attr('label').split(":");
                 var item = self.parts.list.find('input[value="' + $(this).val() +'"]').parent();
+                item.find(':checkbox').data('myRoom', rooms[index].owner_id == userId);
                 item.children("span").addClass("roomid")
                     .children(":first-child").addClass("roomname")
                     .next().addClass("roomlocation");
@@ -422,7 +441,7 @@
             self.parts.header.find(".ui-slider").slider('value', capacity.val());
         },
 
-        _updateSelectionCounter: function() {
+        _updateSelectionCounter: _.debounce(function() {
             var self = this;
             var opt = self.select.multiselect("option");
 
@@ -433,7 +452,7 @@
             counter
                 .text(str)
                 .effect("pulsate", {times: 1});
-        },
+        }, 50),
 
         _updateFilter: function() {
             var self = this;

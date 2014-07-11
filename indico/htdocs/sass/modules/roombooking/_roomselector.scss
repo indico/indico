@@ -25,7 +25,7 @@
     @include border-all();
     @include border-radius();
     @include single-box-shadow($hoff: 2px, $voff: 2px);
-    width: 910px;
+    width: 960px;
 
     .ui-multiselect-menu {
         top: 0 !important;
