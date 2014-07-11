@@ -179,8 +179,8 @@
                         var userId = $('body').data('userId');
                         $.jStorage.set('rb-user-{0}'.format(userId), {});
                     } else {
-                        var error_box = $('.js-booking-creation-error-box').clone().show()
-                        error_box.find('.js-booking-creation-error-message').text(data.msg)
+                        var error_box = $('.js-booking-creation-error-box').clone().show();
+                        error_box.find('.js-booking-creation-error-message').text(data.msg);
                         new AlertPopup($T("Booking creation error"), error_box[0]).open();
                     }
                 }

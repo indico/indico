@@ -81,9 +81,9 @@
     </div>
 % endif
 
-<div class="error-message-box js-booking-creation-error-box" style="display: none">
+<div class="error-message-box js-booking-creation-error-box" style="display: none;">
     <div class="message-text">
-        <p>${ _("Your reservation can't be created:") }</p>
+        <p>${ _("Your reservation could not be created:") }</p>
         <ul>
             <li class="js-booking-creation-error-message"></li>
         </ul>
