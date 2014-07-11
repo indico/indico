@@ -666,7 +666,9 @@ class Reservation(Serializer, db.Model):
             # Restore rejection data etc. for recreated occurrences
             for occurrence in self.occurrences:
                 old_occurrence = old_occurrences.get(occurrence.date)
-                if old_occurrence:
+                # Copy data from old occurrence UNLESS the new one is invalid (e.g. because of collisions)
+                # Otherwise we'd end up with valid occurrences ignoring collisions!
+                if old_occurrence and occurrence.is_valid:
                     for col in cols:
                         setattr(occurrence, col, getattr(old_occurrence, col))
             # Don't cause new notifications for the entire booking in case of daily repetition
