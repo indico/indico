@@ -171,18 +171,22 @@
                 return;
             }
             e.preventDefault();
+            var killProgress = IndicoUI.Dialogs.Util.progress();
             $(this).ajaxSubmit({
                 dataType: 'json',
                 success: function(data) {
                     if (data.success) {
-                        location.href = data.url;
                         var userId = $('body').data('userId');
                         $.jStorage.set('rb-user-{0}'.format(userId), {});
+                        location.href = data.url;
                     } else {
                         var error_box = $('.js-booking-creation-error-box').clone().show();
                         error_box.find('.js-booking-creation-error-message').text(data.msg);
                         new AlertPopup($T("Booking creation error"), error_box[0]).open();
                     }
+                },
+                complete: function() {
+                    killProgress();
                 }
             });
         });
