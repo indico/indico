@@ -527,10 +527,13 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
             conflicts, pre_conflicts = self._get_all_conflicts(room, form, self._reservation.id)
 
         if form.validate_on_submit() and not form.submit_check.data:
-            if self._reservation.modify(form.data, session.user):
+            try:
+                self._reservation.modify(form.data, session.user)
                 # TODO: flash success message
-                pass
-            self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
+            except NoReportError as e:
+                transaction.abort()
+                return jsonify(success=False, msg=unicode(e))
+            return jsonify(success=True, url=url_for('rooms.roomBooking-bookingDetails', self._reservation))
 
         return WPRoomBookingModifyBooking(self, form=form, room=room, rooms=Room.find_all(), occurrences=occurrences,
                                           candidates=candidates, conflicts=conflicts, pre_conflicts=pre_conflicts,
