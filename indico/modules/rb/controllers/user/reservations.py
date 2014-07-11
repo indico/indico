@@ -56,8 +56,7 @@ class RHRoomBookingBookingMixin:
 
 class RHRoomBookingBookingDetails(RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _process(self):
-        is_new_booking = request.values.get('new_booking', type=bool, default=False)
-        return WPRoomBookingBookingDetails(self, is_new_booking=is_new_booking).display()
+        return WPRoomBookingBookingDetails(self).display()
 
 
 class RHRoomBookingAcceptBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
@@ -326,6 +325,15 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         db.session.flush()
         return reservation
 
+    def _create_booking_response(self, form, room):
+        """Creates the booking and returns a JSON response."""
+        try:
+            booking = self._create_booking(form, room)
+        except IndicoError as e:
+            transaction.abort()
+            return jsonify(success=False, msg=unicode(e))
+        return jsonify(success=True, url=url_for('rooms.roomBooking-bookingDetails', booking))
+
 
 class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
     def _checkParams(self):
@@ -361,19 +369,7 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
             conflicts, pre_conflicts = self._get_all_conflicts(self._room, form)
 
         if form.validate_on_submit() and not form.submit_check.data:
-            try:
-                booking = self._create_booking(form, room)
-            except IndicoError as e:
-                transaction.abort()
-                if not request.is_xhr:
-                    raise
-                return jsonify(success=False, msg=unicode(e))
-
-            if request.is_xhr:
-                return jsonify(success=True, url=url_for('rooms.roomBooking-bookingDetails', booking))
-
-            self._redirect(url_for('rooms.roomBooking-bookingDetails', booking, new_booking=True))
-            return
+            return self._create_booking_response(form, room)
 
         can_override = room.can_be_overriden(session.user)
         return WPRoomBookingNewBookingSimple(self, form=form, room=room, rooms=rooms,
@@ -496,9 +492,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
         if not room.can_be_booked(session.user) and not room.can_be_prebooked(session.user):
             raise IndicoError('You cannot book this room')
         if form.validate_on_submit():
-            booking = self._create_booking(form, room)
-            self._redirect(url_for('rooms.roomBooking-bookingDetails', booking, new_booking=True))
-            return
+            return self._create_booking_response(form, room)
         # There was an error in the form
         return self._show_confirm(room, form)
 
