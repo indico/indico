@@ -375,9 +375,7 @@ def _get_reservation_state_filter(params):
         filters.append(Reservation.is_rejected == _yesno(rejected))
     if confirmed is not None:
         if confirmed == 'pending':
-            filters.append(~Reservation.is_confirmed)
-            filters.append(~Reservation.is_rejected)
-            filters.append(~Reservation.is_cancelled)
+            filters.append(Reservation.is_pending)
         elif _yesno(confirmed):
             filters.append(Reservation.is_confirmed)
         else:

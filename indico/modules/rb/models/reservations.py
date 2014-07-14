@@ -273,6 +273,10 @@ class Reservation(Serializer, db.Model):
     def is_repeating(self):
         return self.repeat_unit != RepeatUnit.NEVER
 
+    @hybrid_property
+    def is_pending(self):
+        return ~Reservation.is_confirmed & ~Reservation.is_rejected & ~Reservation.is_cancelled
+
     @property
     def location_name(self):
         return self.room.location.name
