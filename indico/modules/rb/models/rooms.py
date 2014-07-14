@@ -651,7 +651,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     def doesHaveLiveReservations(self):
         return self.reservations.filter_by(
-            is_live=True,
+            is_archived=False,
             is_cancelled=False,
             is_rejected=False
         ).count() > 0
@@ -659,7 +659,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def getLiveReservations(self):
         return Reservation.find_all(
             Reservation.room == self,
-            Reservation.is_live,
+            ~Reservation.is_archived,
             ~Reservation.is_cancelled,
             ~Reservation.is_rejected
         )

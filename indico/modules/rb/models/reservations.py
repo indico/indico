@@ -258,10 +258,6 @@ class Reservation(Serializer, db.Model):
         return self.end_date < datetime.now()
 
     @hybrid_property
-    def is_live(self):
-        return self.end_date >= datetime.now()
-
-    @hybrid_property
     def is_repeating(self):
         return self.repeat_unit != RepeatUnit.NEVER
 
@@ -742,7 +738,7 @@ class Reservation(Serializer, db.Model):
             if resvs:
                 return resvs[0]
         # TODO order_by limit 1
-        return Reservation.getReservations(is_live=True)[0]
+        return Reservation.getReservations(is_archived=False)[0]
 
     def getLocator(self):
         locator = Locator()
