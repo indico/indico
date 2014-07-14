@@ -275,7 +275,11 @@ class Reservation(Serializer, db.Model):
 
     @hybrid_property
     def is_pending(self):
-        return ~Reservation.is_confirmed & ~Reservation.is_rejected & ~Reservation.is_cancelled
+        return not (self.is_confirmed or self.is_rejected or self.is_cancelled)
+
+    @is_pending.expression
+    def is_pending(self):
+        return ~(Reservation.is_confirmed | Reservation.is_rejected | Reservation.is_cancelled)
 
     @property
     def location_name(self):
