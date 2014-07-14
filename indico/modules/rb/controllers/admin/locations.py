@@ -25,6 +25,7 @@ from indico.core.errors import IndicoError, FormValuesError
 from indico.core.db import db
 from indico.util.i18n import _
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.utils import get_reservation_stats
 from indico.modules.rb.views.admin import locations as location_views
 from . import RHRoomBookingAdminBase
 
@@ -87,7 +88,7 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
             self._kpiReservableSurface = self._location.getTotalReservableSurface()
 
             # Bookings
-            st = self._location.getReservationStats()
+            st = get_reservation_stats(self._location.rooms.all())
             self._booking_stats = st
             self._totalBookings = sum(map(lambda k, v: v, st.iteritems()))
 

@@ -186,42 +186,17 @@ def accessChecked(func):
     return check_access
 
 
-def stats_to_dict(results):
-    """ Creates dictionary from stat rows of reservations
-
-        results = [
-            is_live(bool),
-            is_cancelled(bool),
-            is_rejected(bool),
-            count(int)
-        ]
-    """
-
-    stats = {
-        'liveValid': 0,
-        'liveCancelled': 0,
-        'liveRejected': 0,
-        'archivedValid': 0,
-        'archivedCancelled': 0,
-        'archivedRejected': 0
+def get_reservation_stats(rooms):
+    from indico.modules.rb.models.reservations import Reservation
+    reservations = Reservation.find(Reservation.room_id.in_([r.id for r in rooms]))
+    return {
+        'liveValid': reservations.filter(Reservation.is_valid, ~Reservation.is_archived).count(),
+        'liveCancelled': reservations.filter(Reservation.is_cancelled, ~Reservation.is_archived).count(),
+        'liveRejected': reservations.filter(Reservation.is_rejected, ~Reservation.is_archived).count(),
+        'archivedValid': reservations.filter(Reservation.is_valid, Reservation.is_archived).count(),
+        'archivedCancelled': reservations.filter(Reservation.is_cancelled, Reservation.is_archived).count(),
+        'archivedRejected': reservations.filter(Reservation.is_rejected, Reservation.is_archived).count()
     }
-    for is_live, is_cancelled, is_rejected, c in results:
-        assert not (is_cancelled and is_rejected)
-        if is_live:
-            if is_cancelled:
-                stats['liveCancelled'] = c
-            elif is_rejected:
-                stats['liveRejected'] = c
-            else:
-                stats['liveValid'] = c
-        else:
-            if is_cancelled:
-                stats['oldCancelled'] = c
-            elif is_rejected:
-                stats['oldRejected'] = c
-            else:
-                stats['oldValid'] = c
-    return stats
 
 
 class JSONStringBridgeMixin:

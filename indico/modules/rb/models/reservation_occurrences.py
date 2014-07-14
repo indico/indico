@@ -244,7 +244,6 @@ class ReservationOccurrence(db.Model, Serializer):
                 from indico.modules.rb.notifications.reservation_occurrences import notify_cancellation
                 notify_cancellation(self)
 
-
     @proxy_to_reservation_if_single_occurrence
     def reject(self, user, reason, silent=False):
         self.is_rejected = True

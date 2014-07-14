@@ -30,8 +30,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from indico.core.db import db
 from indico.util.i18n import _
-from indico.util.string import return_ascii, natural_sort_key
-from . import utils
+from indico.util.string import return_ascii
 from .aspects import Aspect
 from .reservations import Reservation
 from .room_equipments import RoomEquipment
@@ -304,24 +303,6 @@ class Location(db.Model):
                    .with_entities(func.sum(Room.capacity)) \
                    .filter_by(is_reservable=True) \
                    .scalar()
-
-    def getReservationStats(self):
-        return utils.stats_to_dict(
-            self.rooms
-                .join(Room.reservations)
-                .with_entities(
-                    Reservation.is_live,
-                    Reservation.is_cancelled,
-                    Reservation.is_rejected,
-                    func.count(Reservation.id)
-                )
-                .group_by(
-                    Reservation.is_live,
-                    Reservation.is_cancelled,
-                    Reservation.is_rejected
-                )
-                .all()
-        )
 
     def getBuildings(self, with_rooms=True):
         def get_subquery(column):

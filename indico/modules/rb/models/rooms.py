@@ -1099,23 +1099,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         booked = self.getTotalBookedTime(start, end)
         return booked / float(bookable) if bookable else 0
 
-    def getReservationStats(self):
-        return utils.stats_to_dict(
-            self.reservations
-                .with_entities(
-                    Reservation.is_live,
-                    Reservation.is_cancelled,
-                    Reservation.is_rejected,
-                    func.count(Reservation.id)
-                )
-                .group_by(
-                    Reservation.is_live,
-                    Reservation.is_cancelled,
-                    Reservation.is_rejected
-                )
-                .all()
-        )
-
     @staticmethod
     def getBuildingCoordinatesByRoomIds(rids):
         return Room.query \
