@@ -56,7 +56,7 @@
                 ${ _('Room key') }
             </td>
             <td align="left" class="blacktext">
-                ${ room.key_location }${ contextHelp('whereIsKeyHelp') }
+                ${ room.key_location }${ inlineContextHelp(_('How to obtain a key. Typically a phone number.')) }
             </td>
         </tr>
     % endif
