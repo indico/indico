@@ -68,8 +68,9 @@ class RHRoomBookingAcceptBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _process(self):
         if self._reservation.find_overlapping().filter(Reservation.is_confirmed).count():
             raise IndicoError("This reservation couldn't be accepted due to conflicts with other reservations")
-        self._reservation.accept(session.user)
-        # TODO add flash message
+        if self._reservation.is_pending:
+            self._reservation.accept(session.user)
+            # TODO add flash message
         self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
 
 
@@ -80,8 +81,9 @@ class RHRoomBookingCancelBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
             raise IndicoError("You are not authorized to perform this action")
 
     def _process(self):
-        self._reservation.cancel(session.user)
-        # TODO add flash message
+        if not self._reservation.is_cancelled and not self._reservation.is_rejected:
+            self._reservation.cancel(session.user)
+            # TODO add flash message
         self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
 
 
@@ -96,8 +98,9 @@ class RHRoomBookingRejectBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
             raise IndicoError("You are not authorized to perform this action")
 
     def _process(self):
-        self._reservation.reject(session.user, self._reason)
-        # TODO add flash message
+        if not self._reservation.is_cancelled and not self._reservation.is_rejected:
+            self._reservation.reject(session.user, self._reason)
+            # TODO add flash message
         self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
 
 
@@ -113,8 +116,9 @@ class RHRoomBookingCancelBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBook
             raise IndicoError("You are not authorized to perform this action")
 
     def _process(self):
-        self._occurrence.cancel(session.user)
-        # TODO add flash message
+        if self._occurrence.is_valid:
+            self._occurrence.cancel(session.user)
+            # TODO add flash message
         self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
 
 
@@ -131,8 +135,9 @@ class RHRoomBookingRejectBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBook
             raise IndicoError("You are not authorized to perform this action")
 
     def _process(self):
-        self._occurrence.reject(session.user, self._reason)
-        # TODO add flash message
+        if self._occurrence.is_valid:
+            self._occurrence.reject(session.user, self._reason)
+            # TODO add flash message
         self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
 
 
