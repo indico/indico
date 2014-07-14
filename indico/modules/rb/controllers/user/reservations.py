@@ -26,7 +26,7 @@ from flask import request, session, jsonify
 from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
-from indico.core.errors import IndicoError, AccessError, NoReportError
+from indico.core.errors import IndicoError, AccessError, NoReportError, NotFoundError
 from indico.modules.rb.forms.base import FormDefaults
 from indico.util.date_time import get_datetime_from_request
 from indico.util.string import natural_sort_key
@@ -338,6 +338,8 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
 class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
     def _checkParams(self):
         self._room = Room.get(int(request.view_args['roomID']))
+        if self._room is None:
+            raise NotFoundError('This room does not exist')
 
     def _make_form(self):
         if 'start_date' in request.args:
