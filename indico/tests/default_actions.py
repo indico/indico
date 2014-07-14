@@ -21,7 +21,7 @@ import os
 
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.conference import CategoryManager, DefaultConference
-from MaKaC.user import Avatar, AvatarHolder, LoginInfo
+from MaKaC.user import Avatar, AvatarHolder, LoginInfo, Group, GroupHolder
 from MaKaC.authentication import AuthenticatorMgr
 from indico.core.config import Config
 from indico.util.fs import delete_recursively
@@ -49,20 +49,28 @@ def initialize_new_db(root):
 
 
 def create_user(name, login, authManager, set_password=False):
-        avatar = Avatar()
-        avatar.setName(name)
-        avatar.setSurName(name)
-        avatar.setOrganisation("fake")
-        avatar.setLang("en_GB")
-        avatar.setEmail("%s@fake.fake" % name)
+    avatar = Avatar()
+    avatar.setName(name)
+    avatar.setSurName(name)
+    avatar.setOrganisation("fake")
+    avatar.setLang("en_GB")
+    avatar.setEmail("%s@fake.fake" % name)
 
-        # setting up the login info
-        li = LoginInfo(login, login if set_password else None)
-        userid = authManager.createIdentity(li, avatar, "Local")
-        authManager.add(userid)
-        # activate the account
-        avatar.activateAccount()
-        return avatar
+    # setting up the login info
+    li = LoginInfo(login, login if set_password else None)
+    userid = authManager.createIdentity(li, avatar, "Local")
+    authManager.add(userid)
+    # activate the account
+    avatar.activateAccount()
+    return avatar
+
+
+def create_group(name, description, email):
+    group = Group()
+    group.setName(name)
+    group.setDescription(description)
+    group.setEmail(email)
+    return group
 
 
 def create_dummy_users(dummyuser_has_password=False):
@@ -90,3 +98,13 @@ def create_dummy_users(dummyuser_has_password=False):
 
     HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(DefaultConference())
     return avatars
+
+
+def create_dummy_group():
+    """
+    Creates a dummy group for testing purposes.
+    """
+    gh = GroupHolder()
+    dummy_group = create_group("fake_group", "fake", "fake@fk.com")
+    gh.add(dummy_group)
+    return dummy_group

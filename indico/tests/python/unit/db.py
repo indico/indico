@@ -125,3 +125,23 @@ class DummyUser_Feature(IndicoTestFeature):
             for i in xrange(1, 5):
                 setattr(obj, '_avatar%d' % i, obj._avatars[i])
             setattr(obj, '_dummy', obj._avatars[0])
+
+
+class DummyGroup_Feature(IndicoTestFeature):
+
+    """
+    Creates a dummy group - needs database
+    """
+
+    _requires = ['db.Database']
+
+    def start(self, obj):
+        super(DummyGroup_Feature, self).start(obj)
+
+        with obj._context('database', sync=True):
+            obj._group_with_users = default_actions.create_dummy_group()
+            for usr in obj._avatars:
+                obj._group_with_users.addMember(usr)
+            obj._empty_group = default_actions.create_dummy_group()
+            setattr(obj, '_dummy_group_with_users', obj._group_with_users)
+            setattr(obj, '_dummy_empty_group', obj._empty_group)
