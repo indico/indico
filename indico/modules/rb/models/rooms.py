@@ -990,19 +990,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     # statistics
 
-    @staticmethod
-    def getNumberOfRooms():
-        return Room.query.count()
-
-    @staticmethod
-    def getNumberOfActiveRooms():
-        return Room.query.filter_by(is_active=True).count()
-
-    @staticmethod
-    def getNumberOfReservableRooms():
-        return Room.query.filter_by(is_reservable=True).count()
-
-    def getTotalBookedTime(self, start_date=None, end_date=None):
+    def get_booked_time(self, start_date=None, end_date=None):
         if not end_date:
             end_date = date.today()
         if not start_date:
@@ -1028,7 +1016,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 .scalar()
         ) or 0
 
-    def getTotalBookableTime(self, start_date=None, end_date=None):
+    def get_bookable_time(self, start_date=None, end_date=None):
         if not end_date:
             end_date = datetime.utcnow()
         if not start_date:
@@ -1094,9 +1082,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
         return ((end_date-start_date).days + 1 - nonbookable_count) * daily_time
 
-    def getAverageOccupation(self, start, end):
-        bookable = self.getTotalBookableTime(start, end)
-        booked = self.getTotalBookedTime(start, end)
+    def get_occupancy(self, start, end):
+        bookable = self.get_bookable_time(start, end)
+        booked = self.get_booked_time(start, end)
         return booked / float(bookable) if bookable else 0
 
     @staticmethod

@@ -256,19 +256,19 @@ class Location(db.Model):
 
     # location helpers
 
-    def getAverageOccupation(self):
+    def get_occupancy(self):
         today = date.today()
         end_date = datetime.combine(today, time(17, 30))
         start_date = end_date - timedelta(days=30, hours=9)
 
         booked_time = self.getTotalBookedTimeInLastMonth(start_date, end_date)
-        bookable_time = self.getTotalBookableTime(start_date, end_date)
+        bookable_time = self.get_bookable_time(start_date, end_date)
 
         if bookable_time:
             return float(booked_time) / bookable_time
         return 0
 
-    def getTotalBookedTime(self, *dates):
+    def get_booked_time(self, *dates):
         return self.query \
                    .with_entities(func.sum()) \
                    .join(Location.rooms) \
@@ -277,28 +277,16 @@ class Location(db.Model):
                    .filter(Reservation.start_date.in_(dates) | Reservation.end_date.in_(dates))
         # TODO
 
-    def getTotalBookableTime(self):
+    def get_bookable_time(self):
         pass
 
-    def getNumberOfRooms(self):
-        return self.rooms.count()
-
-    def getNumberOfActiveRooms(self):
-        return self.rooms.filter_by(is_active=True).count()
-
-    def getNumberOfReservableRooms(self):
-        return self.rooms.filter_by(is_reservable=True).count()
-
-    def getReservableRooms(self):
-        return self.rooms.filter_by(is_reservable=True).all()
-
-    def getTotalReservableSurfaceArea(self):
+    def get_reservable_surface_area(self):
         return self.rooms \
                    .with_entities(func.sum(Room.surface_area)) \
                    .filter_by(is_reservable=True) \
                    .scalar()
 
-    def getTotalReservableCapacity(self):
+    def get_reservable_capacity(self):
         return self.rooms \
                    .with_entities(func.sum(Room.capacity)) \
                    .filter_by(is_reservable=True) \

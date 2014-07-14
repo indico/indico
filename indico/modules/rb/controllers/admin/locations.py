@@ -80,10 +80,10 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
     def _process(self):
         # TODO
         if self._withKPI:
-            self._kpiAverageOccupation = self._location.getAverageOccupation()
-            self._kpiTotalRooms = self._location.getNumberOfRooms()
-            self._kpiActiveRooms = self._location.getNumberOfActiveRooms()
-            self._kpiReservableRooms = self._location.getNumberOfReservableRooms()
+            self._kpiAverageOccupation = self._location.get_occupancy()
+            self._kpiTotalRooms = self._location.rooms.count()
+            self._kpiActiveRooms = self._location.rooms.filter_by(is_active=True).count()
+            self._kpiReservableRooms = self._location.rooms.filter_by(is_reservable=True).count()
             self._kpiReservableCapacity = self._location.getTotalReservableCapacity()
             self._kpiReservableSurface = self._location.getTotalReservableSurface()
 
