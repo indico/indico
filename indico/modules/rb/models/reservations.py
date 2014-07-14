@@ -253,6 +253,26 @@ class Reservation(Serializer, db.Model):
         lazy='dynamic'
     )
 
+    @hybrid_property
+    def is_archived(self):
+        return self.end_date < datetime.now()
+
+    @hybrid_property
+    def is_live(self):
+        return self.end_date >= datetime.now()
+
+    @hybrid_property
+    def is_repeating(self):
+        return self.repeat_unit != RepeatUnit.NEVER
+
+    @hybrid_property
+    def is_valid(self):
+        return self.is_confirmed and not (self.is_rejected or self.is_cancelled)
+
+    @is_valid.expression
+    def is_valid(self):
+        return self.is_confirmed & ~(self.is_rejected | self.is_cancelled)
+
     # core
 
     @return_ascii
@@ -264,14 +284,6 @@ class Reservation(Serializer, db.Model):
             self.start_date,
             self.end_date
         )
-
-    @hybrid_property
-    def is_live(self):
-        return self.end_date >= datetime.now()
-
-    @hybrid_property
-    def is_repeating(self):
-        return self.repeat_unit != RepeatUnit.NEVER
 
     @hybrid_property
     def is_pending(self):
@@ -292,10 +304,6 @@ class Reservation(Serializer, db.Model):
     @property
     def details_url(self):
         return url_for('rooms.roomBooking-bookingDetails', self, _external=True)
-
-    @hybrid_property
-    def is_archived(self):
-        return self.end_date < datetime.now()
 
     @property
     def status_string(self):
@@ -811,7 +819,3 @@ class Reservation(Serializer, db.Model):
                 return periods
             start_date = period.start_date
             periods.append(period)
-
-    @property
-    def is_valid(self):
-        return self.is_confirmed and not (self.is_rejected or self.is_cancelled)
