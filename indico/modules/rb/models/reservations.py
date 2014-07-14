@@ -815,27 +815,3 @@ class Reservation(Serializer, db.Model):
     @property
     def is_valid(self):
         return self.is_confirmed and not (self.is_rejected or self.is_cancelled)
-
-    def getNotifications(self):
-        return self.notifications.all()
-
-    # reservations
-
-    def getExcludedDays(self):
-        return self.excluded_days.all()
-
-    def setExcludedDays(self, excluded_days):
-        self.excluded_days.delete()
-        self.excluded_days.extend(excluded_days)
-
-    def addExcludedDay(self, d):
-        self.excluded_days.append(d)
-
-    def removeExcludedDay(self, d):
-        self.ed.filter_by(excluded_day=d).delete()
-
-    def isDayExcluded(self, d):
-        return self.ed.filter_by(excluded_day=d).exists()
-
-    def getLocationName(self):
-        return self.location_name
