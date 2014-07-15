@@ -51,7 +51,7 @@ from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttribut
 from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_equipments import RoomEquipment, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
-from indico.modules.rb.models.utils import Serializer, cached, versioned_cache
+from indico.modules.rb.models.utils import Serializer, cached, versioned_cache, db_dates_overlap
 from indico.util.i18n import _
 from indico.util.string import return_ascii, natural_sort_key
 from indico.web.flask.util import url_for
@@ -272,8 +272,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     @property
     def bookable_time_per_day(self):
-        bookable_time = self.bookable_times.with_entities(
-            func.sum(BookableTime.end_time - BookableTime.start_time)).scalar()
+        bookable_time = (self.bookable_times
+                             .with_entities(func.sum(BookableTime.end_time - BookableTime.start_time))
+                             .group_by(BookableTime.start_time)).scalar()
         return bookable_time.seconds if bookable_time else 3600 * 24  # seconds in a day
 
     @property
@@ -991,105 +992,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         """
         pass
 
-    # statistics
-
-    def get_booked_time(self, start_date=None, end_date=None):
-        if not end_date:
-            end_date = date.today()
-        if not start_date:
-            start_date = end_date + relativedelta(months=-1)
-
-        return (
-            self.reservations
-                .join(ReservationOccurrence)
-                .with_entities(
-                    func.sum(
-                        func.abs(
-                            extract('epoch', ReservationOccurrence.start) - extract('epoch', ReservationOccurrence.end)
-                        )
-                    )
-                )
-                .filter(
-                    # Reservation.is_cancelled == False,
-                    # Reservation.is_rejected == False,
-                    ReservationOccurrence.start >= start_date,
-                    ReservationOccurrence.end <= end_date,
-                    ReservationOccurrence.is_valid
-                )
-                .scalar()
-        ) or 0
-
-    def get_bookable_time(self, start_date=None, end_date=None):
-        if not end_date:
-            end_date = datetime.utcnow()
-        if not start_date:
-            start_date = end_date + relativedelta(months=-1)
-
-        # print (self.nonbookable_dates
-        #         .with_entities(
-        #             func.sum(
-        #                 func.abs(
-        #                     greatest(NonBookableDate.start_date, start_date) - least(NonBookableDate.end_date, end_date)
-        #                 ) + 1
-        #             )
-        #         )
-        #         .filter(
-        #             or_(
-        #                 and_(NonBookableDate.start_date >= start_date, NonBookableDate.start_date <= end_date),
-        #                 and_(NonBookableDate.end_date >= start_date, NonBookableDate.end_date <= end_date)
-        #             )
-        #         )
-        #     )
-
-        # TODO: DB must calculate this
-        nonbookable_count = (
-            self.nonbookable_dates
-                .with_entities(
-                    func.sum(
-                        func.abs(
-                            greatest(NonBookableDate.start_date, start_date) - least(NonBookableDate.end_date, end_date)
-                        ) + 1
-                    )
-                )
-                .filter(
-                    or_(
-                        (NonBookableDate.start_date >= start_date) & (NonBookableDate.start_date <= end_date),
-                        (NonBookableDate.end_date >= start_date) & (NonBookableDate.end_date <= end_date)
-                    )
-                )
-                .scalar()
-            ) or 0
-
-        # nonbookable_count = 0
-        # for d in nonbookable_dates_in_interval:
-        #     s = max(d.start_date, start_date)
-        #     e = min(d.end_date, end_date)
-        #     nonbookable_count += (e-s).days + 1
-
-        # TODO: default bookable time should go into config
-        daily_time = (
-            self.bookable_times
-                .with_entities(
-                    func.sum(
-                        func.abs(
-                            # extract(
-                            #     'epoch',
-                            #     BookableTime.start_time-BookableTime.end_time
-                            # )
-                            extract('epoch', BookableTime.start_time) - extract('epoch', BookableTime.end_time)
-                        )
-                    )
-                )
-                .scalar()
-        ) or 3600 * 9
-
-        return ((end_date-start_date).days + 1 - nonbookable_count) * daily_time
-
-    def get_occupancy(self, start, end):
-        bookable = self.get_bookable_time(start, end)
-        booked = self.get_booked_time(start, end)
-        return booked / float(bookable) if bookable else 0
-
     @staticmethod
     def getBuildingCoordinatesByRoomIds(rids):
         return Room.query \
@@ -1168,3 +1070,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if quiet:
             return False
         raise IndicoError('Room cannot be booked at this time')
+
+    def get_nonbookable_days(self, start_date, end_date):
+        earliest_day = greatest(NonBookableDate.start_date, start_date)
+        latest_day = least(NonBookableDate.end_date, end_date)
+        query = (self.nonbookable_dates.with_entities(func.sum(latest_day - earliest_day) + timedelta(1))
+                 .filter(db_dates_overlap(NonBookableDate, 'start_date', start_date, 'end_date', end_date))
+                 .group_by(NonBookableDate.end_date))
+        return (query.scalar() or timedelta()).days

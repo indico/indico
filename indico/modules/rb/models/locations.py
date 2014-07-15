@@ -275,10 +275,6 @@ class Location(db.Model):
                    .join(Room.reservations) \
                    .filter(Room.is_active, Room.is_reservable) \
                    .filter(Reservation.start_date.in_(dates) | Reservation.end_date.in_(dates))
-        # TODO
-
-    def get_bookable_time(self):
-        pass
 
     def get_reservable_surface_area(self):
         return self.rooms \

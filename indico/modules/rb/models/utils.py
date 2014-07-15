@@ -29,7 +29,7 @@ from functools import wraps
 from dateutil.relativedelta import MO, TU, WE, TH, FR, SA, SU
 from dateutil.rrule import rrule, DAILY
 from sqlalchemy.orm import class_mapper
-from sqlalchemy.sql import over, func, or_
+from sqlalchemy.sql import over, func
 
 from MaKaC import user as user_mod
 from MaKaC.accessControl import AdminList
@@ -184,19 +184,6 @@ def accessChecked(func):
         return func(*args, **kwargs)
 
     return check_access
-
-
-def get_reservation_stats(rooms):
-    from indico.modules.rb.models.reservations import Reservation
-    reservations = Reservation.find(Reservation.room_id.in_([r.id for r in rooms]))
-    return {
-        'liveValid': reservations.filter(Reservation.is_valid, ~Reservation.is_archived).count(),
-        'liveCancelled': reservations.filter(Reservation.is_cancelled, ~Reservation.is_archived).count(),
-        'liveRejected': reservations.filter(Reservation.is_rejected, ~Reservation.is_archived).count(),
-        'archivedValid': reservations.filter(Reservation.is_valid, Reservation.is_archived).count(),
-        'archivedCancelled': reservations.filter(Reservation.is_cancelled, Reservation.is_archived).count(),
-        'archivedRejected': reservations.filter(Reservation.is_rejected, Reservation.is_archived).count()
-    }
 
 
 class JSONStringBridgeMixin:
