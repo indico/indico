@@ -696,9 +696,9 @@ class WElectronicAgreement(wcomponents.WTemplated):
         [[spkId, spkName, spkStatus, contId], [spkId, spkName, spkStatus, contId], ...]
         '''
         manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
-        list = []
+        lst = []
 
-        sortMap = {'speaker':1, 'status':2, 'cont':3, 'reqType':4}
+        sortMap = {'speaker': 1, 'status': 2, 'cont': 3, 'reqType': 4}
         reverse = False if self.order == 'down' else True
 
         for cont in dict:
@@ -710,11 +710,12 @@ class WElectronicAgreement(wcomponents.WTemplated):
                 if sw:
                     status = STATUS_STRING[sw.getStatus()]
                     reqType = sw.getRequestType()
-                    enabled = sw.getStatus() not in [SpeakerStatusEnum.SIGNED, SpeakerStatusEnum.FROMFILE, SpeakerStatusEnum.NOEMAIL]
+                    enabled = sw.getStatus() not in [SpeakerStatusEnum.SIGNED, SpeakerStatusEnum.FROMFILE,
+                                                     SpeakerStatusEnum.NOEMAIL]
 
-                list.append([id.getId(), id.getFullNameNoTitle(), status, cont, reqType, enabled])
+                lst.append([id.getId(), id.getFullNameNoTitle(), status, cont, reqType, enabled])
 
-        return sorted(list, key=lambda list: list[sortMap[self.sortCriteria]], reverse=reverse)
+        return sorted(lst, key=lambda list: lst[sortMap[self.sortCriteria]], reverse=reverse)
 
     def getTableContent(self):
 
@@ -722,7 +723,8 @@ class WElectronicAgreement(wcomponents.WTemplated):
         # Here we check the rights again, and chose what contributions we should show
         requestType = CollaborationTools.getRequestTypeUserCanManage(self._conf, self._user)
 
-        self._fromList = [{"name": self._user.getStraightFullName() , "email": email} for email in self._user.getEmails()]
+        self._fromList = [{"name": self._user.getStraightFullName(), "email": email}
+                          for email in self._user.getEmails()]
 
         contributions = manager.getContributionSpeakerByType(requestType)
 
