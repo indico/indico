@@ -778,9 +778,6 @@ class WElectronicAgreement(wcomponents.WTemplated):
 
         vars["conf"] = self._conf
         vars["contributions"] = self.getTableContent()
-
-        self._fromList.append({"name": "Indico Mailer",
-                               "email": Config.getInstance().getNoReplyEmail()})
         vars['fromList'] = self._fromList
         manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         vars['manager'] = manager
