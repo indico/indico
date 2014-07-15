@@ -257,11 +257,118 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         lazy='dynamic'
     )
 
+    @hybrid_property
+    def is_auto_confirm(self):
+        return not self.reservations_need_confirmation
+
+    @is_auto_confirm.expression
+    def is_auto_confirm(self):
+        return ~self.reservations_need_confirmation
+
+    @property
+    @cached(_cache)
+    def available_video_conference(self):
+        return self.find_available_video_conference().all()
+
     @property
     def bookable_time_per_day(self):
         bookable_time = self.bookable_times.with_entities(
             func.sum(BookableTime.end_time - BookableTime.start_time)).scalar()
         return bookable_time.seconds if bookable_time else 3600 * 24  # seconds in a day
+
+    @property
+    def booking_url(self):
+        if self.id is None:
+            return None
+        return url_for('rooms.room_book', self)
+
+    @property
+    def details_url(self):
+        if self.id is None:
+            return None
+        return str(UH.UHRoomBookingRoomDetails.getURL(target=self))
+
+    @property
+    def full_name(self):
+        if self.has_special_name:
+            return u'{} - {}'.format(self.generateName(), self.name)
+        else:
+            return u'{}'.format(self.generateName())
+
+    @property
+    @cached(_cache)
+    def has_booking_groups(self):
+        return self.has_attribute('allowed-booking-group')
+
+    @property
+    @cached(_cache)
+    def has_projector(self):
+        return self.has_equipment('Computer Projector')
+
+    @property
+    def has_special_name(self):
+        return self.name != self.generateName()
+
+    @property
+    @cached(_cache)
+    def has_webcast_recording(self):
+        return self.has_equipment('Webcast/Recording')
+
+    @property
+    @cached(_cache)
+    def is_public(self):
+        return self.is_reservable and not self.has_booking_groups
+
+    @property
+    def kind(self):
+        if not self.is_reservable or self.has_booking_groups:
+            return 'privateRoom'
+        elif self.is_reservable and self.reservations_need_confirmation:
+            return 'moderatedRoom'
+        elif self.is_reservable:
+            return 'basicRoom'
+
+    @property
+    def location_name(self):
+        return self.location.name
+
+    @property
+    def marker_description(self):
+        infos = []
+
+        infos.append('{capacity} {label}'.format(
+            capacity=self.capacity,
+            label=(_('person'), _('people'))[self.capacity > 1 or self.capacity == 0]
+        ))
+        infos.append((_('private'),
+                      _('public'))[self.is_public])
+        infos.append((_('needs confirmation'),
+                      _('auto-confirmation'))[self.is_auto_confirm])
+        if self.needs_video_conference_setup:
+            infos.append(_('video conference'))
+
+        return ', '.join(map(unicode, infos))
+
+    @property
+    @cached(_cache)
+    def needs_video_conference_setup(self):
+        return self.has_equipment('Video conference')
+
+    @property
+    def large_photo_url(self):
+        if self.id is None:
+            return None
+        return url_for('rooms.photo', self, size='large')
+
+    @property
+    def small_photo_url(self):
+        if self.id is None:
+            return None
+        return url_for('rooms.photo', self, size='small')
+
+    @property
+    def has_photo(self):
+        return self.photo_id is not None
 
     # core
 
@@ -287,90 +394,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             self.name
         )
 
-    @property
-    def location_name(self):
-        return self.location.name
-
-    @property
-    def booking_url(self):
-        if self.id is None:
-            return None
-        return url_for('rooms.room_book', self)
-
-    @property
-    def details_url(self):
-        if self.id is None:
-            return None
-        return str(UH.UHRoomBookingRoomDetails.getURL(target=self))
-
-    @property
-    def large_photo_url(self):
-        if self.id is None:
-            return None
-        return url_for('rooms.photo', self, size='large')
-
-    @property
-    def small_photo_url(self):
-        if self.id is None:
-            return None
-        return url_for('rooms.photo', self, size='small')
-
-    @property
-    def has_photo(self):
-        return self.photo_id is not None
-
-    @property
-    @cached(_cache)
-    def is_public(self):
-        return self.is_reservable and not self.has_booking_groups
-
-    @hybrid_property
-    def is_auto_confirm(self):
-        return not self.reservations_need_confirmation
-
-    @is_auto_confirm.expression
-    def is_auto_confirm(self):
-        return ~self.reservations_need_confirmation
-
-    @property
-    def marker_description(self):
-        infos = []
-
-        infos.append('{capacity} {label}'.format(
-            capacity=self.capacity,
-            label=(_('person'), _('people'))[self.capacity > 1 or self.capacity == 0]
-        ))
-        infos.append((_('private'),
-                      _('public'))[self.is_public])
-        infos.append((_('needs confirmation'),
-                      _('auto-confirmation'))[self.is_auto_confirm])
-        if self.needs_video_conference_setup:
-            infos.append(_('video conference'))
-
-        return ', '.join(map(unicode, infos))
-
     def has_equipment(self, equipment_name):
         return self.equipments.filter_by(name=equipment_name).count() > 0
-
-    @property
-    @cached(_cache)
-    def needs_video_conference_setup(self):
-        return self.has_equipment('Video conference')
-
-    @property
-    @cached(_cache)
-    def has_webcast_recording(self):
-        return self.has_equipment('Webcast/Recording')
-
-    @property
-    @cached(_cache)
-    def has_projector(self):
-        return self.has_equipment('Computer Projector')
-
-    @property
-    @cached(_cache)
-    def available_video_conference(self):
-        return self.find_available_video_conference().all()
 
     def find_available_video_conference(self):
         vc_equipment = self.equipments \
@@ -389,20 +414,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def has_attribute(self, attribute_name):
         return self.getAttributeByName(attribute_name) is not None
 
-    @property
-    @cached(_cache)
-    def has_booking_groups(self):
-        return self.has_attribute('allowed-booking-group')
-
-    @property
-    def kind(self):
-        if not self.is_reservable or self.has_booking_groups:
-            return 'privateRoom'
-        elif self.is_reservable and self.reservations_need_confirmation:
-            return 'moderatedRoom'
-        elif self.is_reservable:
-            return 'basicRoom'
-
     def getLocator(self):
         locator = Locator()
         locator['roomLocation'] = self.location.name
@@ -416,19 +427,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             self.number
         )
 
-    @property
-    def has_special_name(self):
-        return self.name != self.generateName()
-
     def getFullName(self):
         return self.full_name
-
-    @property
-    def full_name(self):
-        if self.has_special_name:
-            return u'{} - {}'.format(self.generateName(), self.name)
-        else:
-            return u'{}'.format(self.generateName())
 
     def updateName(self):
         if not self.name and self.building and self.floor and self.number:
