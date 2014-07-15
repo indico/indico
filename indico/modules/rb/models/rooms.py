@@ -257,8 +257,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         lazy='dynamic'
     )
 
-    # many to many deleter
-    # @event.listens_for(scoped_session, 'after_flush')
+    @property
+    def bookable_time_per_day(self):
+        bookable_time = self.bookable_times.with_entities(
+            func.sum(BookableTime.end_time - BookableTime.start_time)).scalar()
+        return bookable_time.seconds if bookable_time else 3600 * 24  # seconds in a day
 
     # core
 
