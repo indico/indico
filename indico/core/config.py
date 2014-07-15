@@ -521,7 +521,8 @@ class Config:
         'CustomCountries'           : {},
         'PDFLatexProgram'           : 'pdflatex',
         'StrictLatex'               : True,
-        'WorkerName'                : socket.getfqdn()
+        'WorkerName'                : socket.getfqdn(),
+        'CategoryCleanup'           : {}
     }
 
     if sys.platform == 'win32':

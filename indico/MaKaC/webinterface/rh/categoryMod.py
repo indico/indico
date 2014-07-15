@@ -586,8 +586,7 @@ class RHCategoryDeletion( RoomBookingDBMixin, RHCategModifBase ):
         elif self._confirmation:
             owner = self._target.getOwner()
             self._perform()
-            self._redirect( urlHandlers.UHCategoryModification.getURL( owner ) )
+            self._redirect(urlHandlers.UHCategoryModification.getURL(owner))
         else:
-            p = category.WPCategoryDeletion( self, self._target )
+            p = category.WPCategoryDeletion(self, self._target)
             return p.display()
-
