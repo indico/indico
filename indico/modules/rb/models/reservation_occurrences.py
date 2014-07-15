@@ -27,7 +27,7 @@ from sqlalchemy.sql import cast
 from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
-from indico.modules.rb.models.utils import proxy_to_reservation_if_single_occurrence, Serializer
+from indico.modules.rb.models.utils import proxy_to_reservation_if_single_occurrence, Serializer, db_dates_overlap
 from indico.util import date_time
 from indico.util.date_time import iterdays, format_date
 from indico.util.string import return_ascii
@@ -146,15 +146,7 @@ class ReservationOccurrence(db.Model, Serializer):
 
     @staticmethod
     def filter_overlap(occurrences):
-        criteria = []
-        for occurrence in occurrences:
-            criteria += [
-                # other starts after or at our start time         & other starts before our end time
-                (ReservationOccurrence.start >= occurrence.start) & (ReservationOccurrence.start < occurrence.end),
-                # other ends after our start time              & other ends before or when we end
-                (ReservationOccurrence.end > occurrence.start) & (ReservationOccurrence.end <= occurrence.end)
-            ]
-        return or_(*criteria)
+        return or_(db_dates_overlap(ReservationOccurrence, 'start', occ.start, 'end', occ.end) for occ in occurrences)
 
     @staticmethod
     def find_overlapping_with(room, occurrences, reservation_id=None):
@@ -183,10 +175,7 @@ class ReservationOccurrence(db.Model, Serializer):
             for day_start_dt in iterdays(start_dt, end_dt):
                 # Same date, but the end time
                 day_end_dt = datetime.combine(day_start_dt.date(), end_dt.time())
-                criteria += [
-                    (ReservationOccurrence.start >= day_start_dt) & (ReservationOccurrence.start < day_end_dt),
-                    (ReservationOccurrence.end > day_start_dt) & (ReservationOccurrence.end <= day_end_dt)
-                ]
+                criteria.append(db_dates_overlap(ReservationOccurrence, 'start', day_start_dt, 'end', day_end_dt))
             q = q.filter(or_(*criteria))
 
         if filters.get('is_only_my_rooms') and avatar:

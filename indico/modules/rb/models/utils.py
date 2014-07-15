@@ -29,7 +29,7 @@ from functools import wraps
 from dateutil.relativedelta import MO, TU, WE, TH, FR, SA, SU
 from dateutil.rrule import rrule, DAILY
 from sqlalchemy.orm import class_mapper
-from sqlalchemy.sql import over, func
+from sqlalchemy.sql import over, func, or_
 
 from MaKaC import user as user_mod
 from MaKaC.accessControl import AdminList
@@ -366,3 +366,12 @@ class Serializer(object):
                     .format(k, self.__class__.__name__.lower())
                 )
         return j
+
+
+def db_dates_overlap(entity, start_column, start, end_column, end, inclusive=False):
+    element_start = getattr(entity, start_column)
+    element_end = getattr(entity, end_column)
+    if inclusive:
+        return (element_start <= end) & (start <= element_end)
+    else:
+        return (element_start < end) & (start < element_end)
