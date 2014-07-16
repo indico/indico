@@ -241,7 +241,7 @@ def migrate_rooms(rb_root, photo_path):
         l = Location.getLocationByName(old_room._locationName)
         r = Room(
             id=old_room_id,
-            name=convert_to_unicode(old_room._name or generate_name(old_room)),
+            name=convert_to_unicode((old_room._name or '').strip() or generate_name(old_room)),
             site=convert_to_unicode(old_room.site),
             division=convert_to_unicode(old_room.site),
             building=convert_to_unicode(old_room.building),
