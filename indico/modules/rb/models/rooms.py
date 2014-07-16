@@ -275,7 +275,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         bookable_time = (self.bookable_times
                              .with_entities(func.sum(BookableTime.end_time - BookableTime.start_time))
                              .group_by(BookableTime.start_time)).scalar()
-        return bookable_time.seconds if bookable_time else 3600 * 24  # seconds in a day
+        return bookable_time.total_seconds() if bookable_time else 3600 * 24  # seconds in a day
 
     @property
     def booking_url(self):

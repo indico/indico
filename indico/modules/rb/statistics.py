@@ -24,18 +24,18 @@ def calculate_rooms_bookable_time(rooms, start_date=None, end_date=None):
 
 
 def calculate_rooms_booked_time(rooms, start_date=None, end_date=None):
-    if not end_date:
+    if end_date is None:
         end_date = date.today()
-    if not start_date:
+    if start_date is None:
         start_date = end_date + relativedelta(months=-1)
 
-    reservations = Reservation.find(Reservation.room_id.in_([r.id for r in rooms]))
+    reservations = Reservation.find(Reservation.room_id.in_(r.id for r in rooms))
     query = (reservations.join(ReservationOccurrence)
              .with_entities(func.sum(ReservationOccurrence.end - ReservationOccurrence.start))
              .filter(ReservationOccurrence.start >= start_date,
                      ReservationOccurrence.end <= end_date,
                      ReservationOccurrence.is_valid))
-    return (query.scalar() or timedelta()).seconds
+    return (query.scalar() or timedelta()).total_seconds()
 
 
 def calculate_rooms_occupancy(rooms, start=None, end=None):
@@ -45,7 +45,7 @@ def calculate_rooms_occupancy(rooms, start=None, end=None):
 
 
 def compose_rooms_stats(rooms):
-    reservations = Reservation.find(Reservation.room_id.in_([r.id for r in rooms]))
+    reservations = Reservation.find(Reservation.room_id.in_(r.id for r in rooms))
     return {
         'active': {
             'valid': reservations.filter(Reservation.is_valid, ~Reservation.is_archived).count(),
