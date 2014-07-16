@@ -343,7 +343,7 @@ def migrate_rooms(rb_root, photo_path):
     db.session.commit()
 
 
-def migrate_reservations(rb_root):
+def migrate_reservations(main_root, rb_root):
     print cformat('%{white!}migrating reservations')
     i = 1
     for rid, v in rb_root['Reservations'].iteritems():
@@ -416,6 +416,20 @@ def migrate_reservations(rb_root):
                                   if d in occurrence_rejection_reasons else None)
             )
             r.occurrences.append(occ)
+
+        event_id = getattr(v, '_ReservationBase__owner', None)
+        if hasattr(event_id, 'getObject'):  # Impersistant object
+            event_id = event_id.getObject()
+        if event_id is not None:
+            event = main_root['conferences'].get(event_id)
+            if event:
+                # For some stupid reason there are bookings in the database which have a completely unrelated parent
+                # TODO: Maybe use a separate migration step which iterates over all events? Would be slower but safer!
+                guids = getattr(event, '_Conference__roomBookingGuids', [])
+                if any(int(x.id) == v.id for x in guids if x.id is not None):
+                    r.event_id = int(event_id)
+                else:
+                    print cformat('  %{red}event {} does not contain booking {}').format(event_id, v.id)
 
         print cformat('- [%{cyan}{}%{reset}/%{green!}{}%{reset}]  %{grey!}{}%{reset}  {}').format(l.name, room.name,
                                                                                                   r.id,
@@ -492,7 +506,7 @@ def migrate(main_root, rb_root, photo_path):
     migrate_locations(main_root, rb_root)
     migrate_rooms(rb_root, photo_path)
     migrate_blockings(rb_root)
-    migrate_reservations(rb_root)
+    migrate_reservations(main_root, rb_root)
     fix_sequences()
 
 

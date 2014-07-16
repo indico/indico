@@ -223,6 +223,10 @@ class Reservation(Serializer, db.Model):
         nullable=False,
         default=False
     )
+    event_id = db.Column(
+        db.Integer,
+        index=True
+    )
 
     # relationships
 
@@ -310,6 +314,16 @@ class Reservation(Serializer, db.Model):
         else:
             parts.append(_("Live"))
         return ', '.join(parts)
+
+    @property
+    def event(self):
+        from MaKaC.conference import ConferenceHolder
+
+        return ConferenceHolder().getById(str(self.event_id))
+
+    @event.setter
+    def event(self, event):
+        self.event_id = int(event.getId())
 
     def get_vc_equipment(self):
         vc_equipment = self.room.equipments \
