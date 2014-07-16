@@ -7,7 +7,7 @@
     </a>
   </td>
 </tr>
-% if actionSucceeded:
+% if action_succeeded:
 <tr>
   <td>
     <div class="successfulAction">
@@ -353,13 +353,12 @@ indicoRequest(
         ${ _('Key Performance Indicators') }
       </td>
     </tr>
-    % if not withKPI:
+    % if not kpi:
     <tr>
       <td colspan="2" style="padding-left: 30px; padding-top: 30px;">
         <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location, withKPI=True) }">
           ${ _('Show Key Performance Indicators') }
-        </a><br />
-        ${ _('Computations may take <strong>several minutes</strong>') }.
+        </a>
       </td>
       <br /><br />
     </tr>
@@ -371,9 +370,12 @@ indicoRequest(
       <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
         <table>
           <tr>
-            <td style="text-align: right;">${ _('Average occupation') }:</td>
+            <td style="text-align: right;">${ _('Average occupancy') }:</td>
             <td>
-              <span style="background-color: #C9FFC9; font-weight: bold;">${ kpiAverageOccupation }</span> ${inlineContextHelp('Average room occupation in last 30 days during working hours (8H30-17H30, Monday-Friday including holidays). Only active, publically reservable rooms are taken into account.' )}
+              <span style="background-color: #C9FFC9; font-weight: bold;">
+                ${ kpi['occupancy'] }
+              </span>
+              ${inlineContextHelp('Average room occupancy in last 30 days during working hours (8H30-17H30, Monday-Friday including holidays). Only active, publically reservable rooms are taken into account.' )}
             </td>
           </tr>
           <tr><td>&nbsp;</td></tr>
@@ -382,7 +384,8 @@ indicoRequest(
               ${ _('Total') }:
             </td>
             <td>
-              ${ kpiTotalRooms } ${ inlineContextHelp('Total number of rooms (including deactivated).') }
+              ${ kpi['total_rooms'] }
+              ${ inlineContextHelp('Total number of rooms (including deactivated).') }
             </td>
           </tr>
           <tr>
@@ -390,7 +393,8 @@ indicoRequest(
               ${ _('Active') }:
             </td>
             <td>
-              ${ kpiActiveRooms } ${ inlineContextHelp('Total number of active rooms.') }
+              ${ kpi['active_rooms'] }
+              ${ inlineContextHelp('Total number of active rooms.') }
             </td>
           </tr>
           <tr>
@@ -398,7 +402,8 @@ indicoRequest(
               ${ _('Reservable') }:
             </td>
             <td>
-              ${ kpiReservableRooms } ${ inlineContextHelp('Total number of rooms that are <b>publically</b> reservable. The rest are reservable only by people responsible.') }
+              ${ kpi['reservable_rooms'] }
+              ${ inlineContextHelp('Total number of rooms that are <b>publically</b> reservable. The rest are reservable only by people responsible.') }
             </td>
           </tr>
           <tr><td>&nbsp;</td></tr>
@@ -407,7 +412,8 @@ indicoRequest(
               ${ _('Reservable capacity') }:
             </td>
             <td>
-              ${ kpiReservableCapacity } ${ inlineContextHelp('Total capacity of rooms that are <b>publically</b> reservable.') }
+              ${ kpi['reservable_capacity'] }
+              ${ inlineContextHelp('Total capacity of rooms that are <b>publically</b> reservable.') }
             </td>
           </tr>
           <tr>
@@ -415,7 +421,8 @@ indicoRequest(
               ${ _('Reservable surface') }:
             </td>
             <td>
-              ${ kpiReservableSurface } &sup2; ${ inlineContextHelp('Total surface of rooms that are <b>publically</b> reservable.') }
+              ${ kpi['reservable_surface'] } &sup2;
+              ${ inlineContextHelp('Total surface of rooms that are <b>publically</b> reservable.') }
             </td>
           </tr>
         </table>
@@ -430,7 +437,10 @@ indicoRequest(
         <table>
           <tr>
             <td>${ _('Total') }:</td>
-            <td>${ kbiTotalBookings } ${ inlineContextHelp('Total number of bookings including archival, cancelled and rejected.' ) }</td>
+            <td>
+                ${ kpi['booking_count'] }
+                ${ inlineContextHelp('Total number of bookings including archival, cancelled and rejected.' ) }
+            </td>
           </tr>
         </table>
         <br />
@@ -442,26 +452,26 @@ indicoRequest(
             <td style="width: 70px;">${ _('Rejected') }</td>
           </tr>
           <tr>
-            <td>${ _('Live') }</td>
+            <td>${ _('Active') }</td>
             <td>
               <span style="background-color: #C9FFC9; font-weight: bold;">
-                ${ stats['liveValid'] }
+                ${ kpi['booking_stats']['active']['valid'] }
               </span>
             </td>
-            <td>${ stats['liveCancelled'] }</td>
-            <td>${ stats['liveRejected'] }</td>
+            <td>${ kpi['booking_stats']['active']['cancelled'] }</td>
+            <td>${ kpi['booking_stats']['active']['rejected'] }</td>
           </tr>
           <tr>
-            <td>${ _('Archival') }</td>
-            <td>${ stats['archivalValid'] }</td>
-            <td>${ stats['archivalCancelled'] }</td>
-            <td>${ stats['archivalRejected'] }</td>
+            <td>${ _('Archived') }</td>
+            <td>${ kpi['booking_stats']['archived']['valid'] }</td>
+            <td>${ kpi['booking_stats']['archived']['cancelled'] }</td>
+            <td>${ kpi['booking_stats']['archived']['rejected'] }</td>
           </tr>
           <tr>
             <td>${ _('Total') }</td>
-            <td>${ stats['liveValid'] + stats['archivalValid'] }</td>
-            <td>${ stats['liveCancelled'] + stats['archivalCancelled'] }</td>
-            <td>${ stats['liveRejected'] + stats['archivalRejected'] }</td>
+            <td>${ kpi['booking_stats']['active']['valid'] + kpi['booking_stats']['archived']['valid'] }</td>
+            <td>${ kpi['booking_stats']['active']['cancelled'] + kpi['booking_stats']['archived']['cancelled'] }</td>
+            <td>${ kpi['booking_stats']['active']['rejected'] + kpi['booking_stats']['archived']['rejected'] }</td>
           </tr>
         </table>
       </td>

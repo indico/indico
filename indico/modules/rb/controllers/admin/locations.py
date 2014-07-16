@@ -18,21 +18,25 @@
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 from flask import request
-from indico.modules.rb.models.room_attributes import RoomAttribute
+from sqlalchemy import func
 
 from MaKaC.webinterface import urlHandlers
 from indico.core.errors import IndicoError, FormValuesError
 from indico.core.db import db
 from indico.util.i18n import _
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb.statistics import compose_rooms_stats
-from indico.modules.rb.views.admin import locations as location_views
+from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.room_attributes import RoomAttribute
+from indico.modules.rb.statistics import calculate_rooms_occupancy, compose_rooms_stats
+from indico.modules.rb.views.admin.locations import WPRoomBookingAdmin, WPRoomBookingAdminLocation
+from indico.util.string import natural_sort_key
 from . import RHRoomBookingAdminBase
 
 
 class RHRoomBookingAdmin(RHRoomBookingAdminBase):
     def _process(self):
-        return location_views.WPRoomBookingAdmin(self).display()
+        return WPRoomBookingAdmin(self).display()
 
 
 class RHRoomBookingDeleteLocation(RHRoomBookingAdminBase):
@@ -70,30 +74,34 @@ class RHRoomBookingSetDefaultLocation(RHRoomBookingAdminBase):
 
 class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
     def _checkParams(self):
-        self._withKPI = request.args.get('withKPI', type=bool)
+        self._with_kpi = request.args.get('withKPI', type=bool)
         self._actionSucceeded = request.args.get('actionSucceeded', default=False, type=bool)
-        name = request.view_args.get('locationId')
-        self._location = Location.getLocationByName(name)
+        location_name = request.view_args.get('locationId')
+        self._location = Location.getLocationByName(location_name)
         if not self._location:
-            raise IndicoError(_('Unknown Location: {0}').format(name))
+            raise IndicoError('Unknown Location: {0}'.format(location_name))
 
     def _process(self):
-        # TODO
-        if self._withKPI:
-            self._kpiAverageOccupation = self._location.get_occupancy()
-            self._kpiTotalRooms = self._location.rooms.count()
-            self._kpiActiveRooms = self._location.rooms.filter_by(is_active=True).count()
-            self._kpiReservableRooms = self._location.rooms.filter_by(is_reservable=True).count()
-            self._kpiReservableCapacity = self._location.getTotalReservableCapacity()
-            self._kpiReservableSurface = self._location.getTotalReservableSurface()
-
-            # Bookings
-            st = compose_rooms_stats(self._location.rooms.all())
-            self._booking_stats = st
-            self._totalBookings = sum(map(lambda k, v: v, st.iteritems()))
-
-        return location_views.WPRoomBookingAdminLocation(self, self._location,
-                                                         actionSucceeded=self._actionSucceeded).display()
+        rooms = sorted(self._location.rooms, key=lambda r: natural_sort_key(r.full_name))
+        kpi = {}
+        if self._with_kpi:
+            kpi['occupancy'] = calculate_rooms_occupancy(self._location.rooms)
+            kpi['total_rooms'] = self._location.rooms.count()
+            kpi['active_rooms'] = self._location.rooms.filter_by(is_active=True).count()
+            kpi['reservable_rooms'] = self._location.rooms.filter_by(is_reservable=True).count()
+            kpi['reservable_capacity'] = (self._location.rooms.with_entities(func.sum(Room.capacity))
+                                                              .filter_by(is_reservable=True).scalar())
+            kpi['reservable_surface'] = (self._location.rooms.with_entities(func.sum(Room.surface_area))
+                                                             .filter_by(is_reservable=True).scalar())
+            kpi['booking_stats'] = compose_rooms_stats(self._location.rooms.all())
+            kpi['booking_count'] = Reservation.find(Reservation.room_id.in_(r.id for r in self._location.rooms)).count()
+        return WPRoomBookingAdminLocation(self,
+                                          location=self._location,
+                                          rooms=rooms,
+                                          action_succeeded=self._actionSucceeded,
+                                          possibleEquipments=self._location.getEquipmentNames(),
+                                          attributes=self._location.attributes.all(),
+                                          kpi=kpi).display()
 
 
 class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):

@@ -21,8 +21,6 @@
 Holder of rooms in a place and its map view related data
 """
 
-from datetime import datetime, timedelta, date, time
-
 from sqlalchemy import func, or_, and_
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import select
@@ -32,7 +30,6 @@ from indico.core.db import db
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from .aspects import Aspect
-from .reservations import Reservation
 from .room_equipments import RoomEquipment
 from .rooms import Room
 from MaKaC.common.Locators import Locator
@@ -253,40 +250,6 @@ class Location(db.Model):
 
     def hasEquipment(self, name):
         return self.equipment_objects.filter_by(name=name).count() > 0
-
-    # location helpers
-
-    def get_occupancy(self):
-        today = date.today()
-        end_date = datetime.combine(today, time(17, 30))
-        start_date = end_date - timedelta(days=30, hours=9)
-
-        booked_time = self.getTotalBookedTimeInLastMonth(start_date, end_date)
-        bookable_time = self.get_bookable_time(start_date, end_date)
-
-        if bookable_time:
-            return float(booked_time) / bookable_time
-        return 0
-
-    def get_booked_time(self, *dates):
-        return self.query \
-                   .with_entities(func.sum()) \
-                   .join(Location.rooms) \
-                   .join(Room.reservations) \
-                   .filter(Room.is_active, Room.is_reservable) \
-                   .filter(Reservation.start_date.in_(dates) | Reservation.end_date.in_(dates))
-
-    def get_reservable_surface_area(self):
-        return self.rooms \
-                   .with_entities(func.sum(Room.surface_area)) \
-                   .filter_by(is_reservable=True) \
-                   .scalar()
-
-    def get_reservable_capacity(self):
-        return self.rooms \
-                   .with_entities(func.sum(Room.capacity)) \
-                   .filter_by(is_reservable=True) \
-                   .scalar()
 
     def getBuildings(self, with_rooms=True):
         def get_subquery(column):
