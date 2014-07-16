@@ -18,6 +18,7 @@
 (function() {
     var validatingBooking = false;
     var validatingConflicts = false;
+    var clickedButton = null;
 
     window.validateForm = function validateForm() {
         var isValid = true;
@@ -149,6 +150,7 @@
         });
 
         $('.js-submit-booking, #submit_check').on('click', function(e) {
+            clickedButton = $(this).attr('name');
             if ($(this).data('validation') == 'check') {
                 validatingConflicts = true;
                 validatingBooking = false;
@@ -171,9 +173,12 @@
                 return;
             }
             e.preventDefault();
+            var extraData = {};
+            extraData[clickedButton] = '1';
             var killProgress = IndicoUI.Dialogs.Util.progress();
             $(this).ajaxSubmit({
                 dataType: 'json',
+                data: extraData,
                 success: function(data) {
                     if (handleAjaxError(data)) {
                         return;
