@@ -20,7 +20,6 @@
 from datetime import datetime, time
 
 from dateutil.relativedelta import relativedelta
-from flask import session
 
 from MaKaC.roomMapping import RoomMapperHolder
 from MaKaC.webinterface import urlHandlers as UH
@@ -161,8 +160,6 @@ class WRoomBookingRoomDetails(WTemplated):
             wvars['delete_room_url'] = url_for('rooms_admin.delete_room', room)
             wvars['modify_room_url'] = url_for('rooms_admin.modify_room', room)
 
-
-
         room_mapper = RoomMapperHolder().match({'placeName': self._rh._location.name}, exact=True)
         if room_mapper:
             wvars['show_on_map'] = room_mapper[0].getMapURL(self._rh._room.name)
@@ -173,31 +170,8 @@ class WRoomBookingRoomDetails(WTemplated):
 
 
 class WPRoomBookingRoomStats(WPRoomBookingBase):
-    def __init__(self, rh):
-        self._rh = rh
-        super(WPRoomBookingRoomStats, self).__init__(rh)
-
     def _setCurrentMenuItem(self):
         self._roomSearchOpt.setActive(True)
 
     def _getBody(self, params):
-        return WRoomBookingRoomStats(self._rh, standalone=True).getHTML(params)
-
-
-class WRoomBookingRoomStats(WTemplated):
-    def __init__(self, rh, standalone=False):
-        self._rh = rh
-        self._standalone = standalone
-
-    def getVars(self):
-        wvars = super(WRoomBookingRoomStats, self).getVars()
-        wvars['room'] = self._rh._room
-        wvars["standalone"] = self._standalone
-        wvars["period"] = self._rh._period
-        wvars["kpiAverageOccupation"] = '{0:.02f}%'.format(self._rh._kpiAverageOccupation * 100)
-        # Bookings
-        wvars["kbiTotalBookings"] = self._rh._totalBookings
-        # Next 9 KPIs
-        wvars["stats"] = self._rh._booking_stats
-        wvars["statsURL"] = UH.UHRoomBookingRoomStats.getURL(self._rh._room)
-        return wvars
+        return WTemplated('RoomBookingRoomStats').getHTML(params)

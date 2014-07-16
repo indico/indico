@@ -17,13 +17,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, timedelta, time
+from datetime import date, datetime, timedelta, time
 
+from dateutil.relativedelta import relativedelta
 from flask import request, session
 from werkzeug.datastructures import MultiDict
 
 from MaKaC.common.cache import GenericCache
-from MaKaC.webinterface.locators import WebLocator
+from indico.core.errors import IndicoError
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.decorators import requires_location, requires_room
 from indico.modules.rb.forms.base import FormDefaults
@@ -34,6 +35,7 @@ from indico.modules.rb.models.reservations import RepeatMapping, RepeatUnit, Res
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.modules.rb.models.utils import next_work_day
+from indico.modules.rb.statistics import calculate_rooms_occupancy, compose_rooms_stats
 from indico.modules.rb.views.user.rooms import (WPRoomBookingSearchRooms, WPRoomBookingMapOfRooms,
                                                 WPRoomBookingMapOfRoomsWidget, WPRoomBookingRoomDetails,
                                                 WPRoomBookingRoomStats, WPRoomBookingSearchRoomsResults)
@@ -162,26 +164,21 @@ class RHRoomBookingRoomDetails(RHRoomBookingBase):
                                         occurrences=occurrences).display()
 
 
-# TODO
 class RHRoomBookingRoomStats(RHRoomBookingBase):
     def _checkParams(self):
-        params = request.args if request.method == 'GET' else request.form
-        locator = WebLocator()
-        locator.setRoom(params)
-        self._period = params.get('period', default='pastmonth')
-        self._room = self._target = locator.getObject()
-
-    def _businessLogic(self):
-        pass
-        # self._kpiAverageOccupation = self._room.getMyAverageOccupation(self._period)
-        # self._kpiActiveRooms = RoomBase.getNumberOfActiveRooms()
-        # self._kpiReservableRooms = RoomBase.getNumberOfReservableRooms()
-        # self._kpiReservableCapacity, self._kpiReservableSurface = RoomBase.getTotalSurfaceAndCapacity()
-        # # Bookings
-        # st = ReservationBase.getRoomReservationStats(self._room)
-        # self._booking_stats = st
-        # self._totalBookings = st['liveValid'] + st['liveCancelled'] + st['liveRejected'] + st['archivalValid'] + st['archivalCancelled'] + st['archivalRejected']
+        self._room = Room.get(request.view_args['roomID'])
+        self._occupancy_period = request.args.get('period', 'pastmonth')
+        self._end = date.today()
+        if self._occupancy_period == 'pastmonth':
+            self._start = self._end - relativedelta(months=1)
+        elif self._occupancy_period == 'thisyear':
+            self._start = date(self._end.year, 1, 1)
+        else:
+            raise IndicoError('Invalid period specified')
 
     def _process(self):
-        self._businessLogic()
-        return WPRoomBookingRoomStats(self).display()
+        return WPRoomBookingRoomStats(self,
+                                      room=self._room,
+                                      period=self._occupancy_period,
+                                      occupancy=calculate_rooms_occupancy([self._room], self._start, self._end),
+                                      stats=compose_rooms_stats([self._room])).display()

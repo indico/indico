@@ -1,9 +1,4 @@
     <table cellpadding="0" cellspacing="0" border="0" width="80%">
-        % if standalone:
-            <tr>
-            <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
-            </tr>
-        % endif
         <tr>
             <td class="bottomvtab" width="100%">
                 <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
@@ -19,7 +14,7 @@
                                     <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small>Location&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ room.locationName }</td>
+                                            <td align="left" class="blacktext">${ room.location.name }</td>
                                         </tr>
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small>Name&nbsp;&nbsp;</small></td>
@@ -39,14 +34,14 @@
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small>Room&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ room.roomNr }</td>
+                                            <td align="left" class="blacktext">${ room.number }</td>
                                         </tr>
                                  </table>
                                 </td>
                                 <td width="20%" align="right" class="thumbnail">
-                                % if room.photoId != None:
-                                    <a href="${ room.getPhotoURL() }" nofollow="lightbox" title="${ room.photoId }">
-                                        <img border="1px" height="100" src="${ room.getPhotoURL() }" alt="${ str( room.photoId ) }"/>
+                                % if room.has_photo:
+                                    <a href="${ room.large_photo_url }" nofollow="lightbox" title="${ room.photo_id }">
+                                        <img border="1px" height="100" src="${ room.small_photo_url }" alt="${ str( room.photo_id ) }"/>
                                     </a>
                                 % endif
                                 </td>
@@ -67,7 +62,7 @@
           <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
             <table>
             <tr>
-          <form action=${ statsURL }>
+          <form action="${ url_for('rooms.roomBooking-roomStats', roomLocation=room.location.name, roomID=room.id) }">
           <td bgcolor="white" valign="top" style="padding-left: 12px;">
             <select name="period" onChange="this.form.submit();">
             % if period=="pastmonth":
@@ -83,7 +78,12 @@
           </form>
             </tr>
             <tr>
-                <td><span style="background-color: #C9FFC9; font-weight: bold;">${ kpiAverageOccupation }</span> ${inlineContextHelp('Average room occupancy over the selected period during working hours (8H30-17H30, Monday-Friday including holidays).' )}</td>
+                <td>
+                    <span style="background-color: #C9FFC9; font-weight: bold;">
+                        ${ '{0:.02f}%'.format(occupancy) }
+                    </span>
+                    ${inlineContextHelp('Average room occupancy over the selected period during working hours (8H30-17H30, Monday-Friday including holidays).' )}
+                </td>
             </tr>
             </table>
           </td>
@@ -95,7 +95,10 @@
             <table>
             <tr>
                 <td>Total:</td>
-                <td>${kbiTotalBookings} ${inlineContextHelp('Total number of bookings including archival, cancelled and rejected.' )}</td>
+                <td>
+                    ${ room.reservations.count() }
+                    ${inlineContextHelp('Total number of bookings including archival, cancelled and rejected.' )}
+                </td>
             </tr>
             </table>
             <br />
@@ -107,22 +110,22 @@
                     <td style="width: 70px;">Rejected</td>
                 </tr>
                 <tr>
-                    <td>Live</td>
-                    <td><span style="background-color: #C9FFC9; font-weight: bold;">${ stats['liveValid'] }</span></td>
-                    <td>${ stats['liveCancelled'] }</td>
-                    <td>${ stats['liveRejected'] }</td>
+                    <td>${ _('Active') }</td>
+                    <td><span style="background-color: #C9FFC9; font-weight: bold;">${ stats['active']['valid'] }</span></td>
+                    <td>${ stats['active']['cancelled'] }</td>
+                    <td>${ stats['active']['rejected'] }</td>
                 </tr>
                 <tr>
-                    <td>Archival</td>
-                    <td>${ stats['archivalValid'] }</td>
-                    <td>${ stats['archivalCancelled'] }</td>
-                    <td>${ stats['archivalRejected'] }</td>
+                    <td>${ _('Archived') }</td>
+                    <td>${ stats['archived']['valid'] }</td>
+                    <td>${ stats['archived']['cancelled'] }</td>
+                    <td>${ stats['archived']['rejected'] }</td>
                 </tr>
                 <tr>
-                    <td>Total</td>
-                    <td>${ stats['liveValid'] + stats['archivalValid'] }</td>
-                    <td>${ stats['liveCancelled'] + stats['archivalCancelled'] }</td>
-                    <td>${ stats['liveRejected'] + stats['archivalRejected'] }</td>
+                    <td>${ _('Total') }</td>
+                    <td>${ stats['active']['valid'] + stats['archived']['valid'] }</td>
+                    <td>${ stats['active']['cancelled'] + stats['archived']['cancelled'] }</td>
+                    <td>${ stats['active']['rejected'] + stats['archived']['rejected'] }</td>
                 </tr>
             </table>
           </td>
