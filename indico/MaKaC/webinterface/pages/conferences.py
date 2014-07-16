@@ -1390,8 +1390,8 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
 
     _userData = ['favorite-user-ids']
 
-    def __init__( self, rh, conference ):
-        main.WPMainBase.__init__( self, rh )
+    def __init__(self, rh, conference, **kwargs):
+        main.WPMainBase.__init__(self, rh, **kwargs)
         self._navigationTarget = self._conf = conference
 
     def getJSFiles(self):

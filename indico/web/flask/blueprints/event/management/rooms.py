@@ -18,11 +18,12 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceModif
+from indico.modules.rb.controllers.user.event_reservations import RHRoomBookingEventBookingList
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Booking and event assignment list
-event_mgmt.add_url_rule('/rooms/', 'conferenceModification-roomBookingList', conferenceModif.RHConfModifRoomBookingList)
+event_mgmt.add_url_rule('/rooms/', 'conferenceModification-roomBookingList', RHRoomBookingEventBookingList)
 event_mgmt.add_url_rule('/rooms/book/select-event', 'conferenceModification-roomBookingChooseEvent',
                         conferenceModif.RHConfModifRoomBookingChooseEvent)
 
