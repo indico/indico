@@ -448,25 +448,25 @@ class RHCategoryActionSubCategs( RHCategModifBase ):
                 #remove, reallocate
                 self._action.perform()
             else:
-                return self._action.askConfirmation( self._getRequestParams() )
-        self._redirect( urlHandlers.UHCategoryModification.getURL( self._target ) )
+                return self._action.askConfirmation(self._getRequestParams())
+        self._redirect(urlHandlers.UHCategoryModification.getURL(self._target))
+
 
 class _ActionConferenceDeletion:
 
-    def __init__( self, rh,target, selConfs,):
+    def __init__(self, rh, target, selConfs):
         self._rh = rh
         self._target = target
         self._confs = selConfs
 
-    def perform( self,confs ):
+    def perform(self, confs):
         for event in confs:
-            for manager in event.getManagerList():
-                event.revokeModification(manager)
             event.delete()
 
-    def askConfirmation( self, params ):
-        p = category.WPConferenceDeletion( self._rh, self._target )
-        return p.display( events=self._confs )
+    def askConfirmation(self, params):
+        p = category.WPConferenceDeletion(self._rh, self._target)
+        return p.display(events=self._confs)
+
 
 class _ActionConferenceReallocation:
 
@@ -586,8 +586,7 @@ class RHCategoryDeletion( RoomBookingDBMixin, RHCategModifBase ):
         elif self._confirmation:
             owner = self._target.getOwner()
             self._perform()
-            self._redirect( urlHandlers.UHCategoryModification.getURL( owner ) )
+            self._redirect(urlHandlers.UHCategoryModification.getURL(owner))
         else:
-            p = category.WPCategoryDeletion( self, self._target )
+            p = category.WPCategoryDeletion(self, self._target)
             return p.display()
-

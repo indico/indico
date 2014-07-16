@@ -151,12 +151,12 @@ $(function() {
             var uniqueIdList = $('.speakerLine input:checked').map(function(){return this.id;}).toArray();
             var defaultText = "Dear {name},<br />" +
                             "<br />" +
-                            "The organiser asked to record the following event: <strong>" + ${conf.getTitle()| n,j} +"</strong><br />" +
-                            "In order to allow us to publish the video recording of your talk <strong>{talkTitle}</strong>, please sign the agreement form at this page:" +
+                            'I have requested that your talk "<strong>{talkTitle}</strong>" during the event "<strong>' + ${conf.getTitle()| n,j} +'</strong>" be recorded and published.<br />' +
+                            'In order to allow the recording team to publish the video recording, we would need you to sign the speaker release form at this page:' +
                             "<br/><br/> {url} <br/>"+
                             "<br/>" +
                             "Best Regards,<br/><br />" +
-                            "Cern Recording Team";
+                            ${user.getStraightFullName(upper=False) | n,j};
             var legends = {'url':$T('field containing the url of the electronic agreement. (This field is mandatory)'),
                     'talkTitle':$T('field containing the talk title. (This field is mandatory)'),
                     'name':$T('field containing the full name of the speaker.')};

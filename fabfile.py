@@ -447,9 +447,6 @@ def egg(py_versions=None):
 
     for py_version in py_versions:
         cmd_dir = os.path.join(env.pyenv_dir, 'versions', 'indico-build-{0}'.format(py_version), 'bin')
-        local('{0} -q install {1} --allow-all-external -r requirements.txt'
-              .format(os.path.join(cmd_dir, 'pip'),
-                      ' '.join("--allow-unverified {0}".format(pkg) for pkg in env.unverified)))
         local('{0} setup.py -q bdist_egg'.format(os.path.join(cmd_dir, 'python')))
     print green(local('ls -lah dist/', capture=True))
 
@@ -636,12 +633,24 @@ def upload_ssh(build_dir=None, server_host=None, server_port=None,
 
 
 @task
+def _package_release(build_dir, py_versions, system_node):
+    # Build source tarball
+    with settings(system_node=system_node):
+        print green('Generating '), cyan('tarball')
+        tarball(build_dir)
+
+    # Build binaries (EGG)
+    print green('Generating '), cyan('eggs')
+    egg(py_versions)
+
+
+@task
 def package_release(py_versions=None, build_dir=None, system_node=False,
                     indico_version=None, upstream=None, tag_name=None,
                     github_auth=None, overwrite=None, ssh_server_host=None,
                     ssh_server_port=None, ssh_user=None, ssh_key=None,
                     ssh_dest_dir=None, no_clean=False, force_clean=False,
-                    upload_to=None):
+                    upload_to=None, build_here=False):
     """
     Create an Indico release - source and binary distributions
     """
@@ -667,35 +676,30 @@ def package_release(py_versions=None, build_dir=None, system_node=False,
 
     _check_pyenv(py_versions)
 
-    with pyenv_env(py_versions[-1]):
-        local('pip -q install {0}'.format(' '.join(DEVELOP_REQUIRES + ['babel'])))
-
-    with lcd(build_dir):
-        if os.path.exists(os.path.join(build_dir, 'indico')):
-            print yellow("Repository seems to already exist.")
+    if build_here:
+        _package_release(os.path.dirname(__file__), py_versions, system_node)
+    else:
+        with lcd(build_dir):
+            if os.path.exists(os.path.join(build_dir, 'indico')):
+                print yellow("Repository seems to already exist.")
+                with lcd('indico'):
+                    local('git fetch {0}'.format(upstream))
+                    local('git reset --hard FETCH_HEAD')
+                    if not no_clean:
+                        local('git clean -df')
+            else:
+                local('git clone {0}'.format(upstream))
             with lcd('indico'):
-                local('git fetch {0}'.format(upstream))
-                local('git reset --hard FETCH_HEAD')
-                local('git clean -df')
-        else:
-            local('git clone {0}'.format(upstream))
-        with lcd('indico'):
-            print green("Checking out branch \'{0}\'".format(indico_version))
-            local('git checkout origin/{0}'.format(indico_version))
+                print green("Checking out branch \'{0}\'".format(indico_version))
+                local('git checkout origin/{0}'.format(indico_version))
 
-            # Build source tarball
-            with settings(system_node=system_node):
-                print green('Generating '), cyan('tarball')
-                tarball(os.path.join(build_dir, 'indico'))
+                _package_release(os.path.join(build_dir, 'indico'), py_versions, system_node)
 
-            # Build binaries (EGG)
-            print green('Generating '), cyan('eggs')
-            egg(py_versions)
+    for u in upload_to:
+        if u == 'github':
+            upload_github(build_dir, tag_name, github_auth, overwrite, indico_version)
+        elif u == 'ssh':
+            upload_ssh(build_dir, ssh_server_host, ssh_server_port, ssh_user, ssh_key, ssh_dest_dir)
 
-            for u in upload_to:
-                if u == 'github':
-                    upload_github(build_dir, tag_name, github_auth, overwrite, indico_version)
-                elif u == 'ssh':
-                    upload_ssh(build_dir, ssh_server_host, ssh_server_port, ssh_user, ssh_key, ssh_dest_dir)
-
-    cleanup(build_dir, force=True)
+    if force_clean:
+        cleanup(build_dir, force=True)

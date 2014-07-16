@@ -527,7 +527,8 @@ class Config:
         'StrictLatex'               : True,
         'WorkerName'                : socket.getfqdn(),
         'Loggers'                   : ['files'],
-        'SentryDSN'                 : None
+        'SentryDSN'                 : None,
+        'CategoryCleanup'           : {}
     }
 
     if sys.platform == 'win32':

@@ -156,6 +156,7 @@ MaxUploadFilesTotalSize = 0
 
 MaxUploadFileSize = 0
 
+
 #------------------------------------------------------------------------------
 # FILE CONVERSION
 #------------------------------------------------------------------------------
@@ -167,6 +168,17 @@ MaxUploadFileSize = 0
 #   indico-team@cern.ch
 #
 # FileConverter        = {"conversion_server": "localhost", "response_url": "http://localhost/conversion-finished"}
+
+
+#------------------------------------------------------------------------------
+# CATEGORY CLEANUP
+#------------------------------------------------------------------------------
+# Indico can automatically delete events older than a specified number of days.
+# This is set on a per-category basis:
+#
+# CategoryCleanup = {
+#   '2': 30  # delete events in category '2' that have been created more than 30 days ago
+# }
 
 
 #------------------------------------------------------------------------------

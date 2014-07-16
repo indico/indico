@@ -1,0 +1,6 @@
+pojson>=0.4
+termcolor
+nodeenv
+fabric
+sphinx
+repoze.sphinx.autointerface
