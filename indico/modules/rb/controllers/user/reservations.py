@@ -255,7 +255,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
 
         can_book = room.can_be_booked(session.user)
         can_prebook = room.can_be_prebooked(session.user)
-        if not can_prebook or (can_book and room.can_be_booked(session.user, True)):
+        if room.is_auto_confirm or (not can_prebook or (can_book and room.can_be_booked(session.user, True))):
             # The user has actually the permission to book (not just because he's an admin)
             # Or he simply can't even prebook the room
             del form.submit_prebook
