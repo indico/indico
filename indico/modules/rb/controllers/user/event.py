@@ -20,9 +20,9 @@
 from indico.core.errors import NoReportError
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.user.reservations import (RHRoomBookingBookingDetails, RHRoomBookingModifyBooking,
-                                                             RHRoomBookingCloneBooking)
+                                                             RHRoomBookingCloneBooking, RHRoomBookingNewBookingSimple)
 from indico.modules.rb.controllers.user.rooms import RHRoomBookingRoomDetails
-from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.models.reservations import Reservation, RepeatUnit
 from indico.modules.rb.views.user.event import (WPRoomBookingEventRoomDetails, WPRoomBookingEventBookingList,
                                                 WPRoomBookingEventBookingDetails, WPRoomBookingEventModifyBooking,
                                                 WPRoomBookingEventNewBookingSimple)
@@ -124,3 +124,37 @@ class RHRoomBookingEventBookingCloneBooking(RHRoomBookingEventBase, RHRoomBookin
 
     def _process(self):
         return RHRoomBookingCloneBooking._process(self)
+
+
+class RHRoomBookingEventNewBookingSimple(RHRoomBookingEventBase, RHRoomBookingNewBookingSimple):
+    def __init__(self):
+        RHRoomBookingNewBookingSimple.__init__(self)
+        RHRoomBookingEventBase.__init__(self)
+
+    def _checkParams(self, params):
+        RHRoomBookingEventBase._checkParams(self, params)
+        RHRoomBookingNewBookingSimple._checkParams(self)
+
+    def _get_view(self, **kwargs):
+        return WPRoomBookingEventNewBookingSimple(self, self.event, **kwargs)
+
+    def _make_confirm_form(self, *args, **kwargs):
+        defaults = kwargs['defaults']
+        defaults.start_date = self.event.getAdjustedStartDate().replace(tzinfo=None)
+        defaults.end_date = self.event.getAdjustedEndDate().replace(tzinfo=None)
+        if defaults.end_date.date() != defaults.start_date.date():
+            defaults.repeat_unit = RepeatUnit.DAY
+            defaults.repeat_step = 1
+        defaults.booking_reason = "{} '{}'".format(self.event.getVerboseType(), self.event.getTitle())
+        return RHRoomBookingNewBookingSimple._make_confirm_form(self, *args, **kwargs)
+
+    def _get_success_url(self, booking):
+        return url_for('event_mgmt.rooms_booking_details', self.event, booking)
+
+    def _create_booking(self, form, room):
+        booking = RHRoomBookingNewBookingSimple._create_booking(self, form, room)
+        booking.event_id = self.event_id
+        return booking
+
+    def _process(self):
+        return RHRoomBookingNewBookingSimple._process(self)

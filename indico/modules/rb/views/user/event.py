@@ -64,7 +64,7 @@ class WPRoomBookingEventBase(WPConferenceModifBase):
 
 class WPRoomBookingEventRoomDetails(WPRoomBookingEventBase, WPRoomBookingRoomDetails):
     endpoints = {
-        'room_book': 'rooms.room_book'
+        'room_book': 'event_mgmt.rooms_room_book'
     }
 
     def _setActiveTab(self):
