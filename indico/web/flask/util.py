@@ -81,10 +81,16 @@ def make_view_func(obj):
                 return _send_file(path)
         elif hasattr(obj, 'process'):
             # Indico RH
+            # TODO: check if we can get rid of the unused req arg of RHs?
+            if len(inspect.getargspec(obj.__init__).args) < 2:
+                make_instance = lambda: obj()
+            else:
+                make_instance = lambda: obj(None)
+
             def wrapper(**kwargs):
                 params = create_flat_args()
                 params.update(kwargs)
-                return obj(None).process(params)
+                return make_instance().process(params)
         else:
             # Some class we didn't expect.
             raise ValueError('Unexpected view func class: %r' % obj)
@@ -175,7 +181,7 @@ def endpoint_for_url(url):
         return None
 
 
-def url_for(endpoint, target=None, **values):
+def url_for(endpoint, *targets, **values):
     """Wrapper for Flask's url_for() function.
 
     Instead of an endpoint you can also pass an URLHandler - in this case **only** its _endpoint will be used.
@@ -205,8 +211,10 @@ def url_for(endpoint, target=None, **values):
         elif not secure:
             values['_scheme'] = 'http'
 
-    if target is not None:
-        locator = target.getLocator()
+    if targets:
+        locator = {}
+        for target in targets:
+            locator.update(target.getLocator())
         intersection = set(locator.iterkeys()) & set(values.iterkeys())
         if intersection:
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
