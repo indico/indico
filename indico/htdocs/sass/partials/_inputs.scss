@@ -111,6 +111,10 @@ span[contenteditable] {
             color: white !important;
         }
 
+        &:first-child + label {
+            @include border-left-radius();
+        }
+
         &:disabled + label.i-button {
             @extend %button-disabled;
         }
