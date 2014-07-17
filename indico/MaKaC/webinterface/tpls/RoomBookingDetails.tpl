@@ -181,7 +181,7 @@
                         ${ _('Name') }&nbsp;&nbsp;
                       </td>
                       <td align="left" class="blacktext">
-                        <a href="${ roomDetailsUH.getURL(reservation.room) }">
+                        <a href="${ url_for(endpoints['room_details'], reservation.room) }">
                           ${ reservation.room.name }
                         </a>
                       </td>
@@ -394,13 +394,13 @@
                             <a class="i-button" href="#" onclick="submit_reject(); return false;">${ _('Reject') }</a>
                           % endif
                           % if reservation.can_be_modified(user):
-                            <a class="i-button" href="${ modifyBookingUH.getURL(reservation)}">${ _('Modify') }</a>
+                            <a class="i-button" href="${ url_for(endpoints['booking_modify'], event, reservation)}">${ _('Modify') }</a>
                           % endif
                         % endif
                         % if reservation.can_be_deleted(user):
                           <a class="i-button" href="#" onclick="submit_delete(); return false;">${ _('Delete') }</a>
                         % endif
-                        <a class="i-button" href="${ cloneURL }">${ _('Clone') }</a>
+                        <a class="i-button" href="${ url_for(endpoints['booking_clone'], reservation) }">${ _('Clone') }</a>
                       </div>
                     </form>
                   </td>

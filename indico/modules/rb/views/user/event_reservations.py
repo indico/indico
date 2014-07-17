@@ -19,7 +19,7 @@
 
 import os
 
-from indico.modules.rb.views.user.reservations import WPRoomBookingBookingDetails
+from indico.modules.rb.views.user.reservations import (WPRoomBookingBookingDetails, WPRoomBookingModifyBooking)
 from indico.web.flask.util import url_for
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
@@ -69,8 +69,22 @@ class WPRoomBookingEventBookingList(WPRoomBookingEventBase):
 
 
 class WPRoomBookingEventBookingDetails(WPRoomBookingEventBase, WPRoomBookingBookingDetails):
+    endpoints = {
+        'room_details': 'rooms.roomBooking-roomDetails',
+        'booking_modify': 'event_mgmt.rooms_booking_modify',
+        'booking_clone': 'rooms.roomBooking-cloneBooking'
+    }
+
     def _setActiveTab(self):
         self._tabExistBookings.setActive()
 
     def _getTabContent(self, params):
         return WPRoomBookingBookingDetails._getBody(self, params)
+
+
+class WPRoomBookingEventModifyBooking(WPRoomBookingEventBase, WPRoomBookingModifyBooking):
+    def _setActiveTab(self):
+        self._tabExistBookings.setActive()
+
+    def _getTabContent(self, params):
+        return WPRoomBookingModifyBooking._getBody(self, params)

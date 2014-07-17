@@ -55,11 +55,11 @@ class RHRoomBookingBookingMixin:
 
 
 class RHRoomBookingBookingDetails(RHRoomBookingBookingMixin, RHRoomBookingBase):
-    def _get_WP(self):
+    def _get_view(self):
         return WPRoomBookingBookingDetails(self)
 
     def _process(self):
-        return self._get_WP().display()
+        return self._get_view().display()
 
 
 class RHRoomBookingAcceptBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
@@ -522,6 +522,12 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
         if not self._reservation.can_be_modified(session.user):
             raise AccessError
 
+    def _get_view(self, **kwargs):
+        return WPRoomBookingModifyBooking(self, **kwargs)
+
+    def _get_success_url(self):
+        return url_for('rooms.roomBooking-bookingDetails', self._reservation)
+
     def _process(self):
         room = self._reservation.room
         form = ModifyBookingForm(obj=self._reservation, old_start_date=self._reservation.start_date.date())
@@ -543,15 +549,13 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
             except NoReportError as e:
                 transaction.abort()
                 return jsonify(success=False, msg=unicode(e))
-            return jsonify(success=True, url=url_for('rooms.roomBooking-bookingDetails', self._reservation))
+            return jsonify(success=True, url=self._get_success_url())
 
-        return WPRoomBookingModifyBooking(self, form=form, room=room, rooms=Room.find_all(), occurrences=occurrences,
-                                          candidates=candidates, conflicts=conflicts, pre_conflicts=pre_conflicts,
-                                          start_dt=form.start_date.data, end_dt=form.end_date.data,
-                                          repeat_unit=form.repeat_unit.data,
-                                          repeat_step=form.repeat_step.data,
-                                          reservation=self._reservation,
-                                          can_override=room.can_be_overriden(session.user)).display()
+        return self._get_view(form=form, room=room, rooms=Room.find_all(), occurrences=occurrences,
+                              candidates=candidates, conflicts=conflicts, pre_conflicts=pre_conflicts,
+                              start_dt=form.start_date.data, end_dt=form.end_date.data,
+                              repeat_unit=form.repeat_unit.data, repeat_step=form.repeat_step.data,
+                              reservation=self._reservation, can_override=room.can_be_overriden(session.user)).display()
 
 
 class RHRoomBookingCalendar(RHRoomBookingBase):

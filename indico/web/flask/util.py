@@ -214,7 +214,8 @@ def url_for(endpoint, *targets, **values):
     if targets:
         locator = {}
         for target in targets:
-            locator.update(target.getLocator())
+            if target:  # don't fail on None or mako's Undefined
+                locator.update(target.getLocator())
         intersection = set(locator.iterkeys()) & set(values.iterkeys())
         if intersection:
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))

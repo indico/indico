@@ -26,16 +26,21 @@ from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
 from indico.util.i18n import _
 from MaKaC.common import Config
-from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.wcomponents import WTemplated
 
 
 class WPRoomBookingBookingDetails(WPRoomBookingBase):
+    endpoints = {
+        'room_details': 'rooms.roomBooking-roomDetails',
+        'booking_modify': 'rooms.roomBooking-modifyBookingForm',
+        'booking_clone': 'rooms.roomBooking-cloneBooking'
+    }
 
     def _setCurrentMenuItem(self):
         self._bookRoomNewOpt.setActive(True)
 
     def _getBody(self, params):
+        params['endpoints'] = self.endpoints
         return WRoomBookingDetails(self._rh).getHTML(params)
 
 
@@ -51,21 +56,11 @@ class WRoomBookingDetails(WTemplated):
         wvars = WTemplated.getVars(self)
         wvars['standalone'] = self._standalone
         wvars['reservation'] = self._reservation
-        #wvars['collisions'] = self._rh._collisions
         wvars['config'] = Config.getInstance()
         # wvars['actionSucceeded'] = self._rh._afterActionSucceeded
         # if self._rh._afterActionSucceeded:
         #     wvars['title'] = self._rh._title
         #     wvars['description'] = self._rh._description
-
-        if self._standalone:
-            wvars['roomDetailsUH'] = UH.UHRoomBookingRoomDetails
-            wvars['modifyBookingUH'] = UH.UHRoomBookingModifyBookingForm
-            wvars['cloneURL'] = UH.UHRoomBookingCloneBooking.getURL(self._reservation)
-        else:
-            wvars['roomDetailsUH'] = UH.UHConfModifRoomBookingRoomDetails
-            wvars['modifyBookingUH'] = UH.UHConfModifRoomBookingModifyBookingForm
-            wvars['cloneURL'] = UH.UHConfModifRoomBookingCloneBooking.getURL(self._reservation)
 
         wvars['isPreBooking'] = not self._reservation.is_confirmed
         wvars['bookMessage'] = _('PRE-Booking') if wvars['isPreBooking'] else _('Booking')

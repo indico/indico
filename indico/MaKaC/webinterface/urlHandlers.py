@@ -563,10 +563,6 @@ class UHConfModifRoomBookingBookingForm(UHConfModifRoomBookingBase):
     _endpoint = 'event_mgmt.conferenceModification-roomBookingBookingForm'
 
 
-class UHConfModifRoomBookingModifyBookingForm(UHConfModifRoomBookingBase):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingModifyBookingForm'
-
-
 class UHConfModifRoomBookingCloneBooking(UHConfModifRoomBookingBase):
     _endpoint = 'event_mgmt.conferenceModification-roomBookingCloneBooking'
 
