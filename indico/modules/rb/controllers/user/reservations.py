@@ -407,6 +407,9 @@ class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBooki
         RHRoomBookingBookingMixin._checkParams(self)
         self._room = self._reservation.room
 
+    def _get_view(self, **kwargs):
+        return RHRoomBookingNewBookingSimple._get_view(self, cloning=True, **kwargs)
+
     def _make_form(self):
         return self._make_confirm_form(self._room, defaults=self._reservation, form_class=NewBookingSimpleForm)
 

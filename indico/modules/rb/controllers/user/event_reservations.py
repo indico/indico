@@ -96,7 +96,7 @@ class RHRoomBookingEventBookingCloneBooking(RHRoomBookingEventBase, RHRoomBookin
         RHRoomBookingCloneBooking._checkParams(self)
 
     def _get_view(self, **kwargs):
-        return WPRoomBookingEventNewBookingSimple(self, self.event, **kwargs)
+        return WPRoomBookingEventNewBookingSimple(self, self.event, cloning=True, **kwargs)
 
     def _get_success_url(self, booking):
         return url_for('event_mgmt.rooms_booking_details', self.event, booking)
