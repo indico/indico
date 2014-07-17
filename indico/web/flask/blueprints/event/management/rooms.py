@@ -18,10 +18,9 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceModif
-from indico.modules.rb.controllers.user.event_reservations import (RHRoomBookingEventBookingList,
-                                                                   RHRoomBookingEventBookingDetails,
-                                                                   RHRoomBookingEventBookingModifyBooking,
-                                                                   RHRoomBookingEventBookingCloneBooking)
+from indico.modules.rb.controllers.user.event import (RHRoomBookingEventBookingList, RHRoomBookingEventBookingDetails,
+                                                      RHRoomBookingEventBookingModifyBooking,
+                                                      RHRoomBookingEventBookingCloneBooking)
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 

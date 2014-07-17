@@ -22,10 +22,8 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.user.reservations import (RHRoomBookingBookingDetails, RHRoomBookingModifyBooking,
                                                              RHRoomBookingCloneBooking)
 from indico.modules.rb.models.reservations import Reservation
-from indico.modules.rb.views.user.event_reservations import (WPRoomBookingEventBookingList,
-                                                             WPRoomBookingEventBookingDetails,
-                                                             WPRoomBookingEventModifyBooking,
-                                                             WPRoomBookingEventNewBookingSimple)
+from indico.modules.rb.views.user.event import (WPRoomBookingEventBookingList, WPRoomBookingEventBookingDetails,
+                                                WPRoomBookingEventModifyBooking, WPRoomBookingEventNewBookingSimple)
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
