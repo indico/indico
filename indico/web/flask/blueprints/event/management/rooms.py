@@ -18,7 +18,8 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import conferenceModif
-from indico.modules.rb.controllers.user.event_reservations import RHRoomBookingEventBookingList
+from indico.modules.rb.controllers.user.event_reservations import (RHRoomBookingEventBookingList,
+                                                                   RHRoomBookingEventBookingDetails)
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
@@ -28,12 +29,12 @@ event_mgmt.add_url_rule('/rooms/book/select-event', 'conferenceModification-room
                         conferenceModif.RHConfModifRoomBookingChooseEvent)
 
 # View/modify booking
-event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/', 'conferenceModification-roomBookingDetails',
-                        conferenceModif.RHConfModifRoomBookingDetails)
-event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/modify',
+event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/', 'conferenceModification-roomBookingDetails',
+                        RHRoomBookingEventBookingDetails)
+event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/modify',
                         'conferenceModification-roomBookingModifyBookingForm',
                         conferenceModif.RHConfModifRoomBookingBookingForm, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<resvID>/clone',
+event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/clone',
                         'conferenceModification-roomBookingCloneBooking',
                         conferenceModif.RHConfModifRoomBookingCloneBooking, methods=('GET', 'POST'))
 
@@ -48,5 +49,5 @@ event_mgmt.add_url_rule('/rooms/book/save', 'conferenceModification-roomBookingS
                         conferenceModif.RHConfModifRoomBookingSaveBooking, methods=('GET', 'POST'))
 
 # Room details
-event_mgmt.add_url_rule('/rooms/room/<roomLocation>/<roomID>/', 'conferenceModification-roomBookingRoomDetails',
+event_mgmt.add_url_rule('/rooms/room/<roomLocation>/<int:roomID>/', 'conferenceModification-roomBookingRoomDetails',
                         conferenceModif.RHConfModifRoomBookingRoomDetails, methods=('GET', 'POST'))

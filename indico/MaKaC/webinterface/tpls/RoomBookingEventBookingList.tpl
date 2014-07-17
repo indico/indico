@@ -24,7 +24,7 @@
 
                             % for reservation in reservations:
                                 <%
-                                    details_url = url_for('rooms.roomBooking-bookingDetails', reservation)
+                                    details_url = url_for('event_mgmt.conferenceModification-roomBookingDetails', event, reservation)
                                     onclick = 'onclick="window.location=\'{}\'"'.format(details_url)
                                     style = 'text-decoration: line-through;' if reservation.is_rejected or reservation.is_cancelled else ''
                                 %>

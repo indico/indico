@@ -55,8 +55,11 @@ class RHRoomBookingBookingMixin:
 
 
 class RHRoomBookingBookingDetails(RHRoomBookingBookingMixin, RHRoomBookingBase):
+    def _get_WP(self):
+        return WPRoomBookingBookingDetails(self)
+
     def _process(self):
-        return WPRoomBookingBookingDetails(self).display()
+        return self._get_WP().display()
 
 
 class RHRoomBookingAcceptBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):

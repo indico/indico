@@ -19,6 +19,7 @@
 
 import os
 
+from indico.modules.rb.views.user.reservations import WPRoomBookingBookingDetails
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 from MaKaC.webinterface.wcomponents import TabControl, WTabControl, WTemplated
@@ -51,6 +52,7 @@ class WPRoomBookingEventBase(WPConferenceModifBase):
 
     def _getPageContent(self, params):
         self._createTabCtrl()
+        params['event'] = self._conf
         return WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
 
     def _getTabContent(self, params):
@@ -63,3 +65,11 @@ class WPRoomBookingEventBookingList(WPRoomBookingEventBase):
 
     def _getTabContent(self, params):
         return WTemplated('RoomBookingEventBookingList').getHTML(params)
+
+
+class WPRoomBookingEventBookingDetails(WPRoomBookingEventBase, WPRoomBookingBookingDetails):
+    def _setActiveTab(self):
+        self._tabExistBookings.setActive()
+
+    def _getTabContent(self, params):
+        return WPRoomBookingBookingDetails._getBody(self, params)

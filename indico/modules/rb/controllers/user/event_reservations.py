@@ -19,8 +19,10 @@
 
 from indico.core.errors import NoReportError
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.controllers.user.reservations import RHRoomBookingBookingDetails
 from indico.modules.rb.models.reservations import Reservation
-from indico.modules.rb.views.user.event_reservations import WPRoomBookingEventBookingList
+from indico.modules.rb.views.user.event_reservations import (WPRoomBookingEventBookingList,
+                                                             WPRoomBookingEventBookingDetails)
 from indico.util.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -42,3 +44,19 @@ class RHRoomBookingEventBookingList(RHRoomBookingEventBase):
     def _process(self):
         reservations = Reservation.find_all(event_id=self.event_id)
         return WPRoomBookingEventBookingList(self, self._conf, reservations=reservations).display()
+
+
+class RHRoomBookingEventBookingDetails(RHRoomBookingEventBase, RHRoomBookingBookingDetails):
+    def __init__(self):
+        RHRoomBookingBookingDetails.__init__(self)
+        RHRoomBookingEventBase.__init__(self)
+
+    def _checkParams(self, params):
+        RHRoomBookingEventBase._checkParams(self, params)
+        RHRoomBookingBookingDetails._checkParams(self)
+
+    def _get_WP(self):
+        return WPRoomBookingEventBookingDetails(self, self._conf)
+
+    def _process(self):
+        return RHRoomBookingBookingDetails._process(self)

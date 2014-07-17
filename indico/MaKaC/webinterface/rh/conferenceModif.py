@@ -4110,26 +4110,6 @@ class RHConfModifRoomBookingRoomList( RHConferenceModifRoomBookingBase, RHRoomBo
         p = conferences.WPConfModifRoomBookingRoomList( self )
         return p.display()
 
-class RHConfModifRoomBookingList(RHConferenceModifRoomBookingBase):
-    _uh = urlHandlers.UHConfModifRoomBookingList
-
-    def _checkParams( self, params ):
-        RHRoomBookingBookingList._checkParams(self, params)
-        RHConferenceModifRoomBookingBase._checkParams(self, params)
-
-    def _process( self ):
-        if self._target.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
-
-        self._resvs = self._target.getRoomBookingList()
-        for r in self._resvs:
-            if r.getOwner() == None:
-                r.setOwner( self._conf )
-
-        p = conferences.WPConfModifRoomBookingList( self )
-        return p.display()
-
 # 3. Details of...
 
 class RHConfModifRoomBookingRoomDetails( RHConferenceModifRoomBookingBase, RHRoomBookingRoomDetails ):
@@ -4142,20 +4122,6 @@ class RHConfModifRoomBookingRoomDetails( RHConferenceModifRoomBookingBase, RHRoo
     def _process( self ):
         self._businessLogic()
         p = conferences.WPConfModifRoomBookingRoomDetails( self )
-        return p.display()
-
-class RHConfModifRoomBookingDetails( RHConferenceModifRoomBookingBase, RHRoomBookingBookingDetails ):
-    _uh = urlHandlers.UHConfModifRoomBookingDetails
-
-    def _checkParams( self, params ):
-        RHRoomBookingBookingDetails._checkParams( self, params )
-        RHConferenceModifRoomBookingBase._checkParams(self, params)
-
-    def _process( self ):
-        self._businessLogic()
-        self._resv.setOwner( self._conf )
-
-        p = conferences.WPConfModifRoomBookingDetails( self )
         return p.display()
 
 # 4. New ...
