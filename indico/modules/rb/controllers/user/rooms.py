@@ -137,8 +137,6 @@ class RHRoomBookingRoomDetails(RHRoomBookingBase):
     @requires_location
     @requires_room
     def _checkParams(self):
-        self._target = self._room
-
         # TODO: flash() messages instead!!!
         self._afterActionSucceeded = session.get('rbActionSucceeded')
         self._afterDeletionFailed = session.get('rbDeletionFailed')
@@ -151,6 +149,9 @@ class RHRoomBookingRoomDetails(RHRoomBookingBase):
             preview_months = 0
         self._calendar_end += timedelta(days=31 * preview_months)
 
+    def _get_view(self, **kwargs):
+        return WPRoomBookingRoomDetails(self, **kwargs)
+
     def _process(self):
         occurrences = ReservationOccurrence.find_all(
             Reservation.room_id == self._room.id,
@@ -161,8 +162,8 @@ class RHRoomBookingRoomDetails(RHRoomBookingBase):
             _eager=ReservationOccurrence.reservation
         )
 
-        return WPRoomBookingRoomDetails(self, room=self._room, start_dt=self._calendar_start, end_dt=self._calendar_end,
-                                        occurrences=occurrences).display()
+        return self._get_view(room=self._room, start_dt=self._calendar_start, end_dt=self._calendar_end,
+                              occurrences=occurrences).display()
 
 
 class RHRoomBookingRoomStats(RHRoomBookingBase):

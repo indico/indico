@@ -21,6 +21,7 @@ import os
 
 from indico.modules.rb.views.user.reservations import (WPRoomBookingBookingDetails, WPRoomBookingModifyBooking,
                                                        WPRoomBookingNewBookingSimple)
+from indico.modules.rb.views.user.rooms import WPRoomBookingRoomDetails
 from indico.web.flask.util import url_for
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
@@ -61,6 +62,18 @@ class WPRoomBookingEventBase(WPConferenceModifBase):
         raise NotImplementedError
 
 
+class WPRoomBookingEventRoomDetails(WPRoomBookingEventBase, WPRoomBookingRoomDetails):
+    endpoints = {
+        'room_book': 'rooms.room_book'
+    }
+
+    def _setActiveTab(self):
+        self._tabNewBooking.setActive()
+
+    def _getTabContent(self, params):
+        return WPRoomBookingRoomDetails._getBody(self, params)
+
+
 class WPRoomBookingEventBookingList(WPRoomBookingEventBase):
     def _setActiveTab(self):
         self._tabExistBookings.setActive()
@@ -71,7 +84,7 @@ class WPRoomBookingEventBookingList(WPRoomBookingEventBase):
 
 class WPRoomBookingEventBookingDetails(WPRoomBookingEventBase, WPRoomBookingBookingDetails):
     endpoints = {
-        'room_details': 'rooms.roomBooking-roomDetails',
+        'room_details': 'event_mgmt.rooms_room_details',
         'booking_modify': 'event_mgmt.rooms_booking_modify',
         'booking_clone': 'event_mgmt.rooms_booking_clone'
     }

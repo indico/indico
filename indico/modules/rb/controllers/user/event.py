@@ -21,9 +21,11 @@ from indico.core.errors import NoReportError
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.user.reservations import (RHRoomBookingBookingDetails, RHRoomBookingModifyBooking,
                                                              RHRoomBookingCloneBooking)
+from indico.modules.rb.controllers.user.rooms import RHRoomBookingRoomDetails
 from indico.modules.rb.models.reservations import Reservation
-from indico.modules.rb.views.user.event import (WPRoomBookingEventBookingList, WPRoomBookingEventBookingDetails,
-                                                WPRoomBookingEventModifyBooking, WPRoomBookingEventNewBookingSimple)
+from indico.modules.rb.views.user.event import (WPRoomBookingEventRoomDetails, WPRoomBookingEventBookingList,
+                                                WPRoomBookingEventBookingDetails, WPRoomBookingEventModifyBooking,
+                                                WPRoomBookingEventNewBookingSimple)
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -41,6 +43,22 @@ class RHRoomBookingEventBase(RHConferenceModifBase, RHRoomBookingBase):
             self.event_id = int(self.event.getId())
         except ValueError:
             raise NoReportError(_('Room booking tools are not available for legacy events.'))
+
+
+class RHRoomBookingEventRoomDetails(RHRoomBookingEventBase, RHRoomBookingRoomDetails):
+    def __init__(self):
+        RHRoomBookingRoomDetails.__init__(self)
+        RHRoomBookingEventBase.__init__(self)
+
+    def _checkParams(self, params):
+        RHRoomBookingEventBase._checkParams(self, params)
+        RHRoomBookingRoomDetails._checkParams(self)
+
+    def _get_view(self, **kwargs):
+        return WPRoomBookingEventRoomDetails(self, self.event, **kwargs)
+
+    def _process(self):
+        return RHRoomBookingRoomDetails._process(self)
 
 
 class RHRoomBookingEventBookingList(RHRoomBookingEventBase):

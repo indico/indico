@@ -20,7 +20,8 @@
 from MaKaC.webinterface.rh import conferenceModif
 from indico.modules.rb.controllers.user.event import (RHRoomBookingEventBookingList, RHRoomBookingEventBookingDetails,
                                                       RHRoomBookingEventBookingModifyBooking,
-                                                      RHRoomBookingEventBookingCloneBooking)
+                                                      RHRoomBookingEventBookingCloneBooking,
+                                                      RHRoomBookingEventRoomDetails)
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
@@ -48,5 +49,5 @@ event_mgmt.add_url_rule('/rooms/book/save', 'conferenceModification-roomBookingS
                         conferenceModif.RHConfModifRoomBookingSaveBooking, methods=('GET', 'POST'))
 
 # Room details
-event_mgmt.add_url_rule('/rooms/room/<roomLocation>/<int:roomID>/', 'conferenceModification-roomBookingRoomDetails',
-                        conferenceModif.RHConfModifRoomBookingRoomDetails, methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/rooms/room/<roomLocation>/<int:roomID>/', 'rooms_room_details', RHRoomBookingEventRoomDetails,
+                        methods=('GET', 'POST'))

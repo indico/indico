@@ -4110,20 +4110,6 @@ class RHConfModifRoomBookingRoomList( RHConferenceModifRoomBookingBase, RHRoomBo
         p = conferences.WPConfModifRoomBookingRoomList( self )
         return p.display()
 
-# 3. Details of...
-
-class RHConfModifRoomBookingRoomDetails( RHConferenceModifRoomBookingBase, RHRoomBookingRoomDetails ):
-    _uh = urlHandlers.UHConfModifRoomBookingRoomDetails
-
-    def _checkParams( self, params ):
-        RHRoomBookingRoomDetails._checkParams(self, params)
-        RHConferenceModifRoomBookingBase._checkParams(self, params)
-
-    def _process( self ):
-        self._businessLogic()
-        p = conferences.WPConfModifRoomBookingRoomDetails( self )
-        return p.display()
-
 # 4. New ...
 
 class RHConfModifRoomBookingBookingForm( RHConferenceModifRoomBookingBase, RHRoomBookingBookingForm ):

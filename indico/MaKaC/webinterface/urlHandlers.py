@@ -555,10 +555,6 @@ class UHConfModifRoomBookingRoomList(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-roomBookingRoomList'
 
 
-class UHConfModifRoomBookingRoomDetails(UHConfModifRoomBookingBase):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingRoomDetails'
-
-
 class UHConfModifRoomBookingBookingForm(UHConfModifRoomBookingBase):
     _endpoint = 'event_mgmt.conferenceModification-roomBookingBookingForm'
 

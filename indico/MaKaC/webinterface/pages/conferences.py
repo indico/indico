@@ -7687,23 +7687,6 @@ class WPConfModifRoomBookingRoomList( WPConfModifRoomBookingBase ):
         wc = wcomponents.WRoomBookingRoomList( self._rh )
         return wc.getHTML( params )
 
-
-
-# 3. Details of...
-
-class WPConfModifRoomBookingRoomDetails( WPConfModifRoomBookingBase ):
-
-    def __init__( self, rh ):
-        self._rh = rh
-        WPConfModifRoomBookingBase.__init__( self, rh, rh._conf )
-
-    def _setActiveTab( self ):
-        self._tabNewBooking.setActive()
-
-    def _getTabContent( self, params ):
-        wc = wcomponents.WRoomBookingRoomDetails( self._rh )
-        return wc.getHTML( params )
-
 # 4. New booking
 
 class WPConfModifRoomBookingBookingForm( WPConfModifRoomBookingBase ):

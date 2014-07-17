@@ -111,6 +111,10 @@ class WPRoomBookingSearchRoomsResults(WPRoomBookingBase):
 
 
 class WPRoomBookingRoomDetails(WPRoomBookingBase):
+    endpoints = {
+        'room_book': 'rooms.room_book'
+    }
+
     def _getTitle(self):
         return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Room Details'))
 
@@ -118,6 +122,7 @@ class WPRoomBookingRoomDetails(WPRoomBookingBase):
         return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
     def _getBody(self, params):
+        params['endpoints'] = self.endpoints
         calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
                                              specific_room=params['room'])
         params['calendar'] = calendar.render(show_navbar=False, can_navigate=False)

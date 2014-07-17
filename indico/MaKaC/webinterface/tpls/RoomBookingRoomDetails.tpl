@@ -341,9 +341,9 @@
                           <form id="submits" name="submits" action="#" method="post">
                             <div style="float:left; padding-top: 15px;">
                               % if room.can_be_booked(user):
-                                <a class="i-button" href="${ url_for('rooms.room_book', room) }">${ _('Book') }</a>
+                                <a class="i-button" href="${ url_for(endpoints['room_book'], event, room) }">${ _('Book') }</a>
                               % elif room.can_be_prebooked(user):
-                                <a class="i-button" href="${ url_for('rooms.room_book', room) }">${ _('PRE-Book') }</a>
+                                <a class="i-button" href="${ url_for(endpoints['room_book'], event, room) }">${ _('PRE-Book') }</a>
                               % endif
                               % if room.can_be_modified(user):
                                 <a class="i-button" href="${ modify_room_url }">${ _('Modify') }</a>
