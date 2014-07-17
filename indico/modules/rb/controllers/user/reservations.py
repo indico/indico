@@ -484,7 +484,8 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
 
         # GET or form errors => show step 1 page
         return WPRoomBookingNewBookingSelectRoom(self, errors=form.error_list, rooms=self._rooms, form=form,
-                                                 max_room_capacity=Room.getMaxCapacity()).display()
+                                                 max_room_capacity=Room.getMaxCapacity(),
+                                                 can_override=session.user.isRBAdmin()).display()
 
     def _process_select_period(self):
         form = self._make_select_period_form()
