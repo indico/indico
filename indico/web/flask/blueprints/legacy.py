@@ -131,7 +131,6 @@ legacy_endpoints = set([
     'conferenceModification-materialsShow', 'conferenceModification-modifKey', 'conferenceModification-open',
     'conferenceModification-removeContribType', 'conferenceModification-roomBookingBookingForm',
     'conferenceModification-roomBookingChooseEvent', 'conferenceModification-roomBookingCloneBooking',
-    'conferenceModification-roomBookingDetails', 'conferenceModification-roomBookingList',
     'conferenceModification-roomBookingRoomDetails', 'conferenceModification-roomBookingRoomList',
     'conferenceModification-roomBookingSaveBooking', 'conferenceModification-roomBookingSearch4Rooms',
     'conferenceModification-screenDates', 'conferenceOtherViews', 'conferenceProgram', 'conferenceProgram-pdf',

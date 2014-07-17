@@ -148,17 +148,10 @@ class WRoomBookingRoomDetails(WTemplated):
 
         # URLs
         wvars['stats_url'] = UH.UHRoomBookingRoomStats.getURL(room)
-        if self._standalone:
-            wvars['booking_details_url'] = UH.UHRoomBookingBookingDetails.getURL()
-            wvars['booking_form_url'] = UH.UHRoomBookingBookingForm.getURL()
-            wvars['delete_room_url'] = url_for('rooms_admin.delete_room', room)
-            wvars['modify_room_url'] = url_for('rooms_admin.modify_room', room)
-        else:
-            wvars['booking_form_url'] = UH.UHConfModifRoomBookingBookingForm.getURL()
-            wvars['booking_details_url'] = UH.UHConfModifRoomBookingDetails.getURL()
+        wvars['delete_room_url'] = url_for('rooms_admin.delete_room', room)
+        wvars['modify_room_url'] = url_for('rooms_admin.modify_room', room)
+        if not self._standalone:
             wvars['conference'] = self._rh._conf
-            wvars['delete_room_url'] = url_for('rooms_admin.delete_room', room)
-            wvars['modify_room_url'] = url_for('rooms_admin.modify_room', room)
 
         room_mapper = RoomMapperHolder().match({'placeName': self._rh._location.name}, exact=True)
         if room_mapper:

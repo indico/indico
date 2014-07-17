@@ -24,12 +24,12 @@ from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Booking and event assignment list
-event_mgmt.add_url_rule('/rooms/', 'conferenceModification-roomBookingList', RHRoomBookingEventBookingList)
+event_mgmt.add_url_rule('/rooms/', 'rooms_booking_list', RHRoomBookingEventBookingList)
 event_mgmt.add_url_rule('/rooms/book/select-event', 'conferenceModification-roomBookingChooseEvent',
                         conferenceModif.RHConfModifRoomBookingChooseEvent)
 
 # View/modify booking
-event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/', 'conferenceModification-roomBookingDetails',
+event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/', 'rooms_booking_details',
                         RHRoomBookingEventBookingDetails)
 event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/modify',
                         'conferenceModification-roomBookingModifyBookingForm',

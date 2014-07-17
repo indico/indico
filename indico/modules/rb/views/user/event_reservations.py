@@ -20,6 +20,7 @@
 import os
 
 from indico.modules.rb.views.user.reservations import WPRoomBookingBookingDetails
+from indico.web.flask.util import url_for
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 from MaKaC.webinterface.wcomponents import TabControl, WTabControl, WTemplated
@@ -45,7 +46,7 @@ class WPRoomBookingEventBase(WPConferenceModifBase):
     def _createTabCtrl(self):
         self._tabCtrl = TabControl()
         self._tabExistBookings = self._tabCtrl.newTab('existing', 'Existing Bookings',
-                                                      urlHandlers.UHConfModifRoomBookingList.getURL(self._conf))
+                                                      url_for('event_mgmt.rooms_booking_list', self._conf))
         self._tabNewBooking = self._tabCtrl.newTab('new', 'New Booking',
                                                    urlHandlers.UHConfModifRoomBookingChooseEvent.getURL(self._conf))
         self._setActiveTab()

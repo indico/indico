@@ -84,6 +84,7 @@ from MaKaC.webinterface.general import WebFactory
 from MaKaC.common.TemplateExec import render
 
 from indico.modules.rb.views.user.index import WRoomBookingChooseEvent
+from indico.web.flask.util import url_for
 
 
 def stringToDate(str):
@@ -1433,7 +1434,7 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         self._generalSection.addItem( self._materialMenuItem)
 
         self._roomBookingMenuItem = wcomponents.SideMenuItem(_("Room booking"),
-            urlHandlers.UHConfModifRoomBookingList.getURL( self._conf ))
+                                                             url_for('event_mgmt.rooms_booking_list', self._conf))
         self._generalSection.addItem( self._roomBookingMenuItem)
 
         self._programMenuItem = wcomponents.SideMenuItem(_("Programme"),
