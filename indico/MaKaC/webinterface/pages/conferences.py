@@ -83,7 +83,6 @@ from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.common.TemplateExec import render
 
-from indico.modules.rb.views.user.index import WRoomBookingChooseEvent
 from indico.web.flask.util import url_for
 
 
@@ -7639,21 +7638,6 @@ class WPConfModifRoomBookingBase( WPConferenceModifBase ):
 
     def _getTabContent(self, params):
         return "nothing"
-
-
-# 0. Choosing an "event" (conference / session / contribution)...
-
-class WPConfModifRoomBookingChooseEvent(WPConfModifRoomBookingBase):
-
-    def __init__(self, rh):
-        self._rh = rh
-        super(WPConfModifRoomBookingChooseEvent, self).__init__(rh, rh._conf)
-
-    def _getTabContent(self, params):
-        return WRoomBookingChooseEvent(self._rh).getHTML(params)
-
-    def _setActiveTab(self):
-        self._tabNewBooking.setActive()
 
 
 # 1. Searching...

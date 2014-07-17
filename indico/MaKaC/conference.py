@@ -5358,6 +5358,9 @@ class Session(CommonObjectBase, Locatable):
             return cmp(self.getId(), other.getId())
         return cmp(self.getConference(), other.getConference())
 
+    def getVerboseType(self):
+        return 'Session'
+
     def getTimezone( self ):
         return self.getConference().getTimezone()
 
@@ -7775,6 +7778,9 @@ class Contribution(CommonObjectBase, Locatable):
         else:
             parentId = None
         return "<Contribution %s:%s@%s>" % (parentId, self.getId(), hex(id(self)))
+
+    def getVerboseType(self):
+        return 'Contribution'
 
     def getTimezone(self):
         return self.getConference().getTimezone()

@@ -51,7 +51,7 @@ class RHRoomBookingBookingMixin:
         resv_id = request.view_args['resvID']
         self._reservation = Reservation.get(resv_id)
         if not self._reservation:
-            raise IndicoError('No booking with id: {}'.format(resv_id))
+            raise NoReportError('No booking with id: {}'.format(resv_id))
 
 
 class RHRoomBookingBookingDetails(RHRoomBookingBookingMixin, RHRoomBookingBase):
@@ -245,6 +245,7 @@ class RHRoomBookingSearchPendingBookingsMyRooms(_MyRoomsMixin, RHRoomBookingSear
 
 class RHRoomBookingNewBookingBase(RHRoomBookingBase):
     def _make_confirm_form(self, room, step=None, defaults=None, form_class=NewBookingConfirmForm):
+        # Note: ALWAYS pass defaults as a kwargs! For-Event room booking depends on it!
         # Step 3
         # If we come from a successful step 2 we take default values from that step once again
         if step == 2:
@@ -421,14 +422,21 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
         except ValueError:
             self._step = 1
 
+    def _get_view(self, view, **kwargs):
+        views = {'select_room': WPRoomBookingNewBookingSelectRoom,
+                 'select_period': WPRoomBookingNewBookingSelectPeriod,
+                 'confirm': WPRoomBookingNewBookingConfirm}
+        return views[view](self, **kwargs)
+
+    def _get_select_room_form_defaults(self):
+        return FormDefaults(start_date=datetime.combine(date.today(), time(8, 30)),
+                            end_date=datetime.combine(date.today(), time(17, 30)))
+
     def _make_select_room_form(self):
         # Step 1
         self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.getFullName()))
 
-        defaults = FormDefaults(start_date=datetime.combine(date.today(), time(8, 30)),
-                                end_date=datetime.combine(date.today(), time(17, 30)))
-
-        form = NewBookingCriteriaForm(obj=defaults)
+        form = NewBookingCriteriaForm(obj=self._get_select_room_form_defaults())
         form.room_ids.choices = [(r.id, None) for r in self._rooms]
         return form
 
@@ -443,22 +451,17 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
     def _show_confirm(self, room, form, step=None, defaults=None):
         # form can be PeriodForm or Confirmform depending on the step we come from
         if step == 2:
-            confirm_form = self._make_confirm_form(room, step, defaults)
+            confirm_form = self._make_confirm_form(room, step, defaults=defaults)
         else:
             # Step3 => Step3 due to an error in the form
             confirm_form = form
 
         conflicts, pre_conflicts = self._get_all_conflicts(room, form)
         repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
-        return WPRoomBookingNewBookingConfirm(self, form=confirm_form, room=room,
-                                              start_dt=form.start_date.data,
-                                              end_dt=form.end_date.data,
-                                              repeat_unit=form.repeat_unit.data,
-                                              repeat_step=form.repeat_step.data,
-                                              repeat_msg=repeat_msg,
-                                              conflicts=conflicts,
-                                              pre_conflicts=pre_conflicts,
-                                              errors=confirm_form.error_list).display()
+        return self._get_view('confirm', form=confirm_form, room=room, start_dt=form.start_date.data,
+                              end_dt=form.end_date.data, repeat_unit=form.repeat_unit.data,
+                              repeat_step=form.repeat_step.data, repeat_msg=repeat_msg, conflicts=conflicts,
+                              pre_conflicts=pre_conflicts, errors=confirm_form.error_list).display()
 
     def _process_select_room(self):
         # Step 1: Room(s), dates, repetition selection
@@ -475,17 +478,14 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
             period_form = self._make_select_period_form(period_form_defaults)
 
             # Show step 2 page
-            return WPRoomBookingNewBookingSelectPeriod(self, rooms=selected_rooms, occurrences=occurrences,
-                                                       candidates=candidates, start_dt=day_start_dt,
-                                                       end_dt=day_end_dt, period_form=period_form, form=form,
-                                                       repeat_unit=form.repeat_unit.data,
-                                                       repeat_step=form.repeat_step.data,
-                                                       flexible_days=flexible_days).display()
+            return self._get_view('select_period', rooms=selected_rooms, occurrences=occurrences, candidates=candidates,
+                                  start_dt=day_start_dt, end_dt=day_end_dt, period_form=period_form, form=form,
+                                  repeat_unit=form.repeat_unit.data, repeat_step=form.repeat_step.data,
+                                  flexible_days=flexible_days).display()
 
         # GET or form errors => show step 1 page
-        return WPRoomBookingNewBookingSelectRoom(self, errors=form.error_list, rooms=self._rooms, form=form,
-                                                 max_room_capacity=Room.getMaxCapacity(),
-                                                 can_override=session.user.isRBAdmin()).display()
+        return self._get_view('select_room', errors=form.error_list, rooms=self._rooms, form=form,
+                              max_room_capacity=Room.getMaxCapacity(), can_override=session.user.isRBAdmin()).display()
 
     def _process_select_period(self):
         form = self._make_select_period_form()

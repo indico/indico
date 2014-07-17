@@ -17,18 +17,49 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+from flask import request
+
 from indico.core.errors import NoReportError
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.user.reservations import (RHRoomBookingBookingDetails, RHRoomBookingModifyBooking,
-                                                             RHRoomBookingCloneBooking, RHRoomBookingNewBookingSimple)
+                                                             RHRoomBookingCloneBooking, RHRoomBookingNewBookingSimple,
+                                                             RHRoomBookingNewBooking)
 from indico.modules.rb.controllers.user.rooms import RHRoomBookingRoomDetails
 from indico.modules.rb.models.reservations import Reservation, RepeatUnit
 from indico.modules.rb.views.user.event import (WPRoomBookingEventRoomDetails, WPRoomBookingEventBookingList,
                                                 WPRoomBookingEventBookingDetails, WPRoomBookingEventModifyBooking,
-                                                WPRoomBookingEventNewBookingSimple)
+                                                WPRoomBookingEventNewBookingSimple, WPRoomBookingEventChooseEvent,
+                                                WPRoomBookingEventNewBookingSelectRoom,
+                                                WPRoomBookingEventNewBookingSelectPeriod,
+                                                WPRoomBookingEventNewBookingConfirm)
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from MaKaC.conference import CustomRoom, CustomLocation, Session
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+
+
+def _get_defaults_from_object(obj):
+    defaults = {'start_date': obj.getAdjustedStartDate().replace(tzinfo=None),
+                'end_date': obj.getAdjustedEndDate().replace(tzinfo=None),
+                'booking_reason': "{} '{}'".format(obj.getVerboseType(), obj.getTitle())}
+    if defaults['end_date'].date() != defaults['start_date'].date():
+        defaults['repeat_unit'] = RepeatUnit.DAY
+        defaults['repeat_step'] = 1
+    return defaults
+
+
+def _assign_room(obj, room):
+    if isinstance(obj, Session):
+        for slot in obj.getSlotList():
+            _assign_room(slot, room)
+        return
+    custom_location = CustomLocation()
+    custom_location.setName(room.location_name)
+    custom_room = CustomRoom()
+    custom_room.setName(room.name)
+    custom_room.setFullName(room.full_name)
+    obj.setRoom(custom_room)
+    obj.setLocation(custom_location)
 
 
 class RHRoomBookingEventBase(RHConferenceModifBase, RHRoomBookingBase):
@@ -45,6 +76,17 @@ class RHRoomBookingEventBase(RHConferenceModifBase, RHRoomBookingBase):
             raise NoReportError(_('Room booking tools are not available for legacy events.'))
 
 
+class RHRoomBookingEventBookingList(RHRoomBookingEventBase):
+    def _process(self):
+        reservations = Reservation.find_all(event_id=self.event_id)
+        return WPRoomBookingEventBookingList(self, self.event, reservations=reservations).display()
+
+
+class RHRoomBookingEventChooseEvent(RHRoomBookingEventBase):
+    def _process(self):
+        return WPRoomBookingEventChooseEvent(self, self.event).display()
+
+
 class RHRoomBookingEventRoomDetails(RHRoomBookingEventBase, RHRoomBookingRoomDetails):
     def __init__(self):
         RHRoomBookingRoomDetails.__init__(self)
@@ -59,12 +101,6 @@ class RHRoomBookingEventRoomDetails(RHRoomBookingEventBase, RHRoomBookingRoomDet
 
     def _process(self):
         return RHRoomBookingRoomDetails._process(self)
-
-
-class RHRoomBookingEventBookingList(RHRoomBookingEventBase):
-    def _process(self):
-        reservations = Reservation.find_all(event_id=self.event_id)
-        return WPRoomBookingEventBookingList(self, self.event, reservations=reservations).display()
 
 
 class RHRoomBookingEventBookingDetails(RHRoomBookingEventBase, RHRoomBookingBookingDetails):
@@ -140,12 +176,8 @@ class RHRoomBookingEventNewBookingSimple(RHRoomBookingEventBase, RHRoomBookingNe
 
     def _make_confirm_form(self, *args, **kwargs):
         defaults = kwargs['defaults']
-        defaults.start_date = self.event.getAdjustedStartDate().replace(tzinfo=None)
-        defaults.end_date = self.event.getAdjustedEndDate().replace(tzinfo=None)
-        if defaults.end_date.date() != defaults.start_date.date():
-            defaults.repeat_unit = RepeatUnit.DAY
-            defaults.repeat_step = 1
-        defaults.booking_reason = "{} '{}'".format(self.event.getVerboseType(), self.event.getTitle())
+        for key, value in _get_defaults_from_object(self.event).iteritems():
+            defaults[key] = value
         return RHRoomBookingNewBookingSimple._make_confirm_form(self, *args, **kwargs)
 
     def _get_success_url(self, booking):
@@ -158,3 +190,60 @@ class RHRoomBookingEventNewBookingSimple(RHRoomBookingEventBase, RHRoomBookingNe
 
     def _process(self):
         return RHRoomBookingNewBookingSimple._process(self)
+
+
+class RHRoomBookingEventNewBooking(RHRoomBookingEventBase, RHRoomBookingNewBooking):
+    def __init__(self):
+        RHRoomBookingNewBooking.__init__(self)
+        RHRoomBookingEventBase.__init__(self)
+
+    def _checkParams(self, params):
+        RHRoomBookingEventBase._checkParams(self, params)
+        RHRoomBookingNewBooking._checkParams(self)
+        assign = request.args.get('assign')
+        if not assign or assign == 'nothing':
+            self._assign_to = None
+        elif assign == 'event':
+            self._assign_to = self.event
+        else:
+            element, _, element_id = assign.partition('-')
+            if element == 'session':
+                self._assign_to = self.event.getSessionById(element_id)
+            elif element == 'contribution':
+                self._assign_to = self.event.getContributionById(element_id)
+            else:
+                raise NoReportError('Invalid assignment')
+            if not self._assign_to:
+                raise NoReportError('Invalid assignment')
+
+    def _get_view(self, view, **kwargs):
+        views = {'select_room': WPRoomBookingEventNewBookingSelectRoom,
+                 'select_period': WPRoomBookingEventNewBookingSelectPeriod,
+                 'confirm': WPRoomBookingEventNewBookingConfirm}
+        return views[view](self, self.event, **kwargs)
+
+    def _get_select_room_form_defaults(self):
+        defaults = RHRoomBookingNewBooking._get_select_room_form_defaults(self)
+        for key, value in _get_defaults_from_object(self._assign_to or self.event).iteritems():
+            defaults[key] = value
+        return defaults
+
+    def _make_confirm_form(self, *args, **kwargs):
+        if 'defaults' in kwargs:
+            obj = self._assign_to or self.event
+            kwargs['defaults'].booking_reason = _get_defaults_from_object(obj)['booking_reason']
+        return RHRoomBookingNewBooking._make_confirm_form(self, *args, **kwargs)
+
+    def _get_success_url(self, booking):
+        return url_for('event_mgmt.rooms_booking_details', self.event, booking)
+
+    def _create_booking(self, form, room):
+        booking = RHRoomBookingNewBooking._create_booking(self, form, room)
+        booking.event_id = self.event_id
+        if self._assign_to:
+            _assign_room(self._assign_to, room)
+
+        return booking
+
+    def _process(self):
+        return RHRoomBookingNewBooking._process(self)

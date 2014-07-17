@@ -21,14 +21,14 @@ from MaKaC.webinterface.rh import conferenceModif
 from indico.modules.rb.controllers.user.event import (RHRoomBookingEventBookingList, RHRoomBookingEventBookingDetails,
                                                       RHRoomBookingEventBookingModifyBooking,
                                                       RHRoomBookingEventBookingCloneBooking,
-                                                      RHRoomBookingEventRoomDetails, RHRoomBookingEventNewBookingSimple)
+                                                      RHRoomBookingEventRoomDetails, RHRoomBookingEventNewBookingSimple,
+                                                      RHRoomBookingEventChooseEvent, RHRoomBookingEventNewBooking)
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Booking and event assignment list
 event_mgmt.add_url_rule('/rooms/', 'rooms_booking_list', RHRoomBookingEventBookingList)
-event_mgmt.add_url_rule('/rooms/book/select-event', 'conferenceModification-roomBookingChooseEvent',
-                        conferenceModif.RHConfModifRoomBookingChooseEvent)
+event_mgmt.add_url_rule('/rooms/choose-event', 'rooms_choose_event', RHRoomBookingEventChooseEvent)
 
 # View/modify booking
 event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/', 'rooms_booking_details',
@@ -51,6 +51,7 @@ event_mgmt.add_url_rule('/rooms/book/save', 'conferenceModification-roomBookingS
 # Book room
 event_mgmt.add_url_rule('/rooms/room/<roomLocation>/<int:roomID>/book', 'rooms_room_book',
                         RHRoomBookingEventNewBookingSimple, methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/rooms/book', 'rooms_book', RHRoomBookingEventNewBooking, methods=('GET', 'POST'))
 
 # Room details
 event_mgmt.add_url_rule('/rooms/room/<roomLocation>/<int:roomID>/', 'rooms_room_details', RHRoomBookingEventRoomDetails,

@@ -543,10 +543,6 @@ class UHConfModifRoomBookingBase(URLHandler):
         return url
 
 
-class UHConfModifRoomBookingChooseEvent(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingChooseEvent'
-
-
 class UHConfModifRoomBookingSearch4Rooms(BooleanTrueMixin, URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-roomBookingSearch4Rooms'
 

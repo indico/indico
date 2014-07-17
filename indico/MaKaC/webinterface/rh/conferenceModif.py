@@ -3985,18 +3985,6 @@ class RHConferenceModifRoomBookingBase(RHConferenceModifBase, RHRoomBookingProte
         RHConferenceModifBase._checkProtection(self)
         RHRoomBookingProtected._checkSessionUser(self)
 
-class RHConfModifRoomBookingChooseEvent( RHConferenceModifRoomBookingBase, RHRoomBookingSearch4Rooms ):
-    _uh = urlHandlers.UHConfModifRoomBookingChooseEvent
-
-    def _checkParams( self, params ):
-        RHConferenceModifRoomBookingBase._checkParams( self, params )
-
-        self._forNewBooking = True
-
-    def _process( self ):
-
-        p = conferences.WPConfModifRoomBookingChooseEvent( self )
-        return p.display()
 
 # 1. Searching
 
