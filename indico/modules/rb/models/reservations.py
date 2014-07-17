@@ -226,6 +226,7 @@ class Reservation(Serializer, db.Model):
 
     # relationships
 
+    # XXX: is this needed anymore?
     # attributes = db.relationship(
     #     'ReservationAttribute',
     #     backref='reservation',
@@ -241,6 +242,7 @@ class Reservation(Serializer, db.Model):
     occurrences = db.relationship(
         'ReservationOccurrence',
         backref='reservation',
+        # XXX: does this still happen?
         # This breaks update() with synchronize_session
         # order_by='ReservationOccurrence.start',
         cascade='all, delete-orphan',

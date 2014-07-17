@@ -173,6 +173,8 @@ class RHRoomBookingRoomStats(RHRoomBookingBase):
             self._start = self._end - relativedelta(months=1)
         elif self._occupancy_period == 'thisyear':
             self._start = date(self._end.year, 1, 1)
+        elif self._occupancy_period == 'sinceever':
+            self._start = Reservation.find().first().start_date.date()
         else:
             raise IndicoError('Invalid period specified')
 

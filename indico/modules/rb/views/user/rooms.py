@@ -174,4 +174,9 @@ class WPRoomBookingRoomStats(WPRoomBookingBase):
         self._roomSearchOpt.setActive(True)
 
     def _getBody(self, params):
+        params['period_options'] = [
+            ('pastmonth', _('Past month')),
+            ('thisyear', _('This year')),
+            ('sinceever', _('Since ever'))
+        ]
         return WTemplated('RoomBookingRoomStats').getHTML(params)

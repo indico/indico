@@ -287,3 +287,48 @@ a.weekday {
 .nested-1 {
     color: $dark-gray;
 }
+
+table.booking-stats {
+    td {
+        padding: 5px;
+    }
+
+    td:not(:first-child) {
+        text-align: right;
+    }
+
+    td:first-child,
+    tr:first-child td,
+    tr:last-child td:last-child {
+        font-weight: bold;
+    }
+
+    tr:last-child td {
+        border-top: 1px solid $gray;
+    }
+
+    td:last-child {
+        border-left: 1px solid $gray;
+    }
+
+    .active-valid {
+        color: $green;
+        font-weight: bold;
+    }
+}
+
+table.occupancy-stats {
+    width: 100%;
+
+    td.occupancy-period {
+        font-size: 1.1em;
+    }
+
+    td.occupancy-value {
+        color: $dark-gray;
+        font-size: 3em;
+        font-weight: bold;
+        padding-left: 25px;
+        text-align: right;
+    }
+}
