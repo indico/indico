@@ -1,4 +1,4 @@
-<%page args="room=None, booking_mode=False"/>
+<%page args="room=None, endpoints=None, event=None, booking_mode=False"/>
 <table>
     <tr>
         <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
@@ -6,7 +6,7 @@
         </td>
         <td align="left" class="blacktext">
             % if booking_mode:
-                <a href="${ room.details_url }">
+                <a href="${ url_for(endpoints['room_details'], event, room) }">
                     ${ room.getFullName() }
                 </a>
             % else:
@@ -21,7 +21,7 @@
                         </option>
                     % endfor
                 </select>
-                <a target="_blank" href="${ room.details_url }">${ _('Full details') }</a>
+                <a target="_blank" href="${ url_for(endpoints['room_details'], event, room) }">${ _('Full details') }</a>
             % endif
         </td>
     </tr>

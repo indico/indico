@@ -105,6 +105,10 @@ class WPRoomBookingEventModifyBooking(WPRoomBookingEventBase, WPRoomBookingModif
 
 
 class WPRoomBookingEventNewBookingSimple(WPRoomBookingEventBase, WPRoomBookingNewBookingSimple):
+    endpoints = {
+        'room_details': 'event_mgmt.rooms_room_details'
+    }
+
     def _setActiveTab(self):
         self._tabNewBooking.setActive()
 

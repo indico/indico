@@ -163,12 +163,22 @@ class WPRoomBookingNewBookingSelectPeriod(WPRoomBookingNewBookingBase):
 
 
 class WPRoomBookingNewBookingConfirm(WPRoomBookingNewBookingBase):
+    endpoints = {
+        'room_details': 'rooms.roomBooking-roomDetails'
+    }
+
     def _getBody(self, params):
+        params['endpoints'] = self.endpoints
         return WTemplated('RoomBookingNewBookingConfirm').getHTML(params)
 
 
 class WPRoomBookingNewBookingSimple(WPRoomBookingNewBookingBase):
+    endpoints = {
+        'room_details': 'rooms.roomBooking-roomDetails'
+    }
+
     def _getBody(self, params):
+        params['endpoints'] = self.endpoints
         if params['start_dt'] and params['end_dt']:
             calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
                                                  candidates=params['candidates'],

@@ -13,7 +13,7 @@
     <i class="icon-location"></i>
         ${ _('Room details') }
     </h2>
-    <%include file="RoomBookingRoomMiniDetails.tpl" args="room=room,booking_mode=bool(reservation) or cloning"/>
+    <%include file="RoomBookingRoomMiniDetails.tpl" args="room=room,event=event,endpoints=endpoints,booking_mode=bool(reservation) or cloning"/>
 
     % if reservation or form.submit_book or form.submit_prebook:
         <h2 class="group-title">
