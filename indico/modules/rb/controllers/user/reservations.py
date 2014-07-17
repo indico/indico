@@ -333,6 +333,9 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         db.session.flush()
         return reservation
 
+    def _get_success_url(self, booking):
+        return url_for('rooms.roomBooking-bookingDetails', booking)
+
     def _create_booking_response(self, form, room):
         """Creates the booking and returns a JSON response."""
         try:
@@ -340,7 +343,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         except NoReportError as e:
             transaction.abort()
             return jsonify(success=False, msg=unicode(e))
-        return jsonify(success=True, url=url_for('rooms.roomBooking-bookingDetails', booking))
+        return jsonify(success=True, url=self._get_success_url(booking))
 
 
 class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
@@ -364,6 +367,9 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
 
         return self._make_confirm_form(self._room, defaults=defaults, form_class=NewBookingSimpleForm)
 
+    def _get_view(self, **kwargs):
+        return WPRoomBookingNewBookingSimple(self, **kwargs)
+
     def _process(self):
         room = self._room
         rooms = Room.find_all()
@@ -382,16 +388,18 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
             return self._create_booking_response(form, room)
 
         can_override = room.can_be_overriden(session.user)
-        return WPRoomBookingNewBookingSimple(self, form=form, room=room, rooms=rooms,
-                                             occurrences=occurrences,
-                                             candidates=candidates,
-                                             conflicts=conflicts,
-                                             pre_conflicts=pre_conflicts,
-                                             start_dt=form.start_date.data,
-                                             end_dt=form.end_date.data,
-                                             repeat_unit=form.repeat_unit.data,
-                                             repeat_step=form.repeat_step.data,
-                                             can_override=can_override).display()
+        return self._get_view(form=form,
+                              room=room,
+                              rooms=rooms,
+                              occurrences=occurrences,
+                              candidates=candidates,
+                              conflicts=conflicts,
+                              pre_conflicts=pre_conflicts,
+                              start_dt=form.start_date.data,
+                              end_dt=form.end_date.data,
+                              repeat_unit=form.repeat_unit.data,
+                              repeat_step=form.repeat_step.data,
+                              can_override=can_override).display()
 
 
 class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBookingSimple):

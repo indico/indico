@@ -181,7 +181,7 @@
                         ${ _('Name') }&nbsp;&nbsp;
                       </td>
                       <td align="left" class="blacktext">
-                        <a href="${ url_for(endpoints['room_details'], reservation.room) }">
+                        <a href="${ url_for(endpoints['room_details'], event, reservation.room) }">
                           ${ reservation.room.name }
                         </a>
                       </td>
@@ -400,7 +400,7 @@
                         % if reservation.can_be_deleted(user):
                           <a class="i-button" href="#" onclick="submit_delete(); return false;">${ _('Delete') }</a>
                         % endif
-                        <a class="i-button" href="${ url_for(endpoints['booking_clone'], reservation) }">${ _('Clone') }</a>
+                        <a class="i-button" href="${ url_for(endpoints['booking_clone'], event, reservation) }">${ _('Clone') }</a>
                       </div>
                     </form>
                   </td>

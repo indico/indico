@@ -563,17 +563,6 @@ class UHConfModifRoomBookingBookingForm(UHConfModifRoomBookingBase):
     _endpoint = 'event_mgmt.conferenceModification-roomBookingBookingForm'
 
 
-class UHConfModifRoomBookingCloneBooking(UHConfModifRoomBookingBase):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingCloneBooking'
-
-    @classmethod
-    def getURL(cls, target=None, conf=None, **params):
-        url = cls._getURL(**cls._getParams(target, params))
-        if conf is not None:
-            url.addParams(conf.getLocator())
-        return url
-
-
 class UHConfModifRoomBookingSaveBooking(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-roomBookingSaveBooking'
 

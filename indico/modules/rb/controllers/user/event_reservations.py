@@ -19,11 +19,13 @@
 
 from indico.core.errors import NoReportError
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.controllers.user.reservations import (RHRoomBookingBookingDetails, RHRoomBookingModifyBooking)
+from indico.modules.rb.controllers.user.reservations import (RHRoomBookingBookingDetails, RHRoomBookingModifyBooking,
+                                                             RHRoomBookingCloneBooking)
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.views.user.event_reservations import (WPRoomBookingEventBookingList,
                                                              WPRoomBookingEventBookingDetails,
-                                                             WPRoomBookingEventModifyBooking)
+                                                             WPRoomBookingEventModifyBooking,
+                                                             WPRoomBookingEventNewBookingSimple)
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -82,3 +84,27 @@ class RHRoomBookingEventBookingModifyBooking(RHRoomBookingEventBase, RHRoomBooki
 
     def _process(self):
         return RHRoomBookingModifyBooking._process(self)
+
+
+class RHRoomBookingEventBookingCloneBooking(RHRoomBookingEventBase, RHRoomBookingCloneBooking):
+    def __init__(self):
+        RHRoomBookingCloneBooking.__init__(self)
+        RHRoomBookingEventBase.__init__(self)
+
+    def _checkParams(self, params):
+        RHRoomBookingEventBase._checkParams(self, params)
+        RHRoomBookingCloneBooking._checkParams(self)
+
+    def _get_view(self, **kwargs):
+        return WPRoomBookingEventNewBookingSimple(self, self.event, **kwargs)
+
+    def _get_success_url(self, booking):
+        return url_for('event_mgmt.rooms_booking_details', self.event, booking)
+
+    def _create_booking(self, form, room):
+        booking = RHRoomBookingCloneBooking._create_booking(self, form, room)
+        booking.event_id = self.event_id
+        return booking
+
+    def _process(self):
+        return RHRoomBookingCloneBooking._process(self)
