@@ -46,7 +46,7 @@
                                     </td>
                                     <td ${onclick} style="padding: 0 10px 6px 0; cursor: pointer; vertical-align: top; ${ style }">
                                         ${ formatDate(reservation.start_date) }
-                                        % if reservation.is_repeating or True:
+                                        % if reservation.is_repeating:
                                             (recurring)
                                         % endif
                                     </td>
