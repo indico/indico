@@ -114,10 +114,12 @@
             </table>
         </div>
     </div>
-    <div class="i-box titled" style="width:500px">
+    <div class="i-box titled occupancy-stats">
         <div class="i-box-header">
-            <div class="i-box-title">
-                ${ _('Occupancy') }
+            <div class="i-box-header-text">
+                <div class="i-box-title">
+                    ${ _('Occupancy') }
+                </div>
             </div>
             <div class="i-box-buttons toolbar thin">
                 <div class="group i-selection">
@@ -130,7 +132,7 @@
             </div>
         </div>
         <div class="i-box-content">
-            <table class="occupancy-stats" cellspacing="0">
+            <table cellspacing="0">
                 <tr>
                     <td class="occupancy-period">
                         ${ _('Average room occupancy in weekdays from 8:30 to 17:30') }

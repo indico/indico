@@ -317,18 +317,22 @@ table.booking-stats {
     }
 }
 
-table.occupancy-stats {
-    width: 100%;
+.occupancy-stats {
+    width: 500px;
 
-    td.occupancy-period {
-        font-size: 1.1em;
-    }
+    table {
+        width: 100%;
 
-    td.occupancy-value {
-        color: $dark-gray;
-        font-size: 3em;
-        font-weight: bold;
-        padding-left: 25px;
-        text-align: right;
+        td.occupancy-period {
+            font-size: 1.1em;
+        }
+
+        td.occupancy-value {
+            color: $dark-gray;
+            font-size: 3em;
+            font-weight: bold;
+            padding-left: 25px;
+            text-align: right;
+        }
     }
 }
