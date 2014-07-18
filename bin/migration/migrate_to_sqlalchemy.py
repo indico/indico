@@ -30,8 +30,10 @@ from time import clock
 import pytz
 from babel import dates
 from flask import Flask
+from persistent import Persistent
 from sqlalchemy.sql import func, select
 from ZODB import DB, FileStorage
+from ZODB.broken import find_global
 from ZEO.ClientStorage import ClientStorage
 
 from indico.core.db.sqlalchemy import db
@@ -64,6 +66,14 @@ attribute_map = {
 }
 
 
+class UnbreakingDB(DB):
+    class NotBroken(Persistent):
+        pass
+
+    def classFactory(self, connection, modulename, globalname):
+        return find_global(modulename, globalname, Broken=self.NotBroken)
+
+
 def get_storage(zodb_uri):
     uri_parts = urlparse(zodb_uri)
 
@@ -92,7 +102,7 @@ def setup(main_zodb_uri, rb_zodb_uri, sqlalchemy_uri):
     db.init_app(app)
 
     main_root = MigratedDB(get_storage(main_zodb_uri)).open().root()
-    rb_root = DB(get_storage(rb_zodb_uri)).open().root()
+    rb_root = UnbreakingDB(get_storage(rb_zodb_uri)).open().root()
 
     return main_root, rb_root, app
 
