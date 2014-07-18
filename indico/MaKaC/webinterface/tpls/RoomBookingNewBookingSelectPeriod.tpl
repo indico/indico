@@ -3,7 +3,8 @@
 </h2>
 
 <ul id="breadcrumbs" style="margin: 0px 0px 0px -15px; padding: 0; list-style: none;">
-    <li><span><a href="${ url_for('rooms.book') }">${ _('Specify Search Criteria') }</a></span></li>
+    <!-- the href of the following link is intentionally left empty since we just want to switch to GET -->
+    <li><span><a href="">${ _('Specify Search Criteria') }</a></span></li>
     <li><span class="current">${ _('Select Available Period') }</span></li>
     <li><span>${ _('Confirm Reservation') }</span></li>
 </ul>

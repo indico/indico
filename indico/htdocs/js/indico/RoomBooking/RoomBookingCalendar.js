@@ -407,7 +407,8 @@ type ("RoomBookingCalendarDrawer", [],
                         $('#booking-dialog').dialog({
                             buttons: {
                                 "Search again": function() {
-                                    window.location = build_url(Indico.Urls.RoomBookingBook);
+                                    // Reload current page via GET (i.e. back to step 1); remove anchor if there's one
+                                    location.href = location.href.replace(/#.*$/, '');
                                 },
                                 Close: function() {
                                     $(this).dialog('close');
