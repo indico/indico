@@ -21,18 +21,18 @@ import argparse
 import importlib
 import os
 
-try:
-    from flask import Flask
-    from sqlalchemy_schemadisplay import create_schema_graph, create_uml_graph
-    from sqlalchemy import MetaData
-    from sqlalchemy.orm import class_mapper
-except ImportError:
-    print ('You should install flask, sqlalchemy and sqlalchemy-schemadisplay'
-           ' to create graphs')
-    import sys
-    sys.exit(0)
+from flask import Flask
+from sqlalchemy import MetaData
+from sqlalchemy.orm import class_mapper
 
 from indico.core.db import db
+
+try:
+    from sqlalchemy_schemadisplay import create_schema_graph, create_uml_graph
+except ImportError:
+    print 'You need to install sqlalchemy-schemadisplay to create graphs'
+    import sys
+    sys.exit(1)
 
 
 def load_all_modules(pkg_name):
