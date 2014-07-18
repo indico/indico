@@ -75,9 +75,20 @@
 // ============================================================================
 
 .i-box-group {
-    $margin: 5px;
+    $margin: 15px;
+
+    & + & {
+        margin-top: $margin;
+    }
 
     &.horz {
+        overflow: hidden;
+        padding-bottom: $margin;
+
+        .i-box {
+            float: left;
+        }
+
         .i-box + .i-box {
             margin-left: $margin;
         }
