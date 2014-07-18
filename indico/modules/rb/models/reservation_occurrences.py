@@ -237,8 +237,10 @@ class ReservationOccurrence(db.Model, Serializer):
         self.is_cancelled = True
         self.rejection_reason = reason
         if not silent:
-            log_msg = 'Day cancelled: {}'.format(format_date(self.date))
-            self.reservation.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
+            log = ['Day cancelled: {}'.format(format_date(self.date))]
+            if reason:
+                log.append('Reason: {}'.format(reason))
+            self.reservation.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=log))
             # Notification sent only when the reservation is still valid
             if self.reservation.occurrences.filter_by(is_valid=True).count():
                 from indico.modules.rb.notifications.reservation_occurrences import notify_cancellation
