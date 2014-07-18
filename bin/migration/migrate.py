@@ -986,9 +986,9 @@ def addOccurrenceNotificationsTask(dbi, withRBDB, prevVersion):
         if isinstance(task, RoomReservationTask):
             old_tasks.append(task)
     for finished_task in scheduler_module._finishedIndex.values():
-        task = failed_task._task if hasattr(failed_task, '_task') else failed_task
+        task = finished_task._task if hasattr(finished_task, '_task') else finished_task
         if isinstance(task, RoomReservationTask):
-            scheduler_module._failedIndex.unindex_obj(finished_task)
+            scheduler_module._finishedIndex.unindex_obj(finished_task)
     for failed_task in scheduler_module._failedIndex.values():
         task = failed_task._task if hasattr(failed_task, '_task') else failed_task
         if isinstance(task, OccurrenceNotifications):
