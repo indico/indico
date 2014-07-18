@@ -14,7 +14,8 @@
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+## along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 """
 Migration script
 
@@ -22,56 +23,41 @@ NOTE: Methods should be specified in order of execution, since @since adds them 
 the task list in the order it is called.
 """
 
+import argparse
+import sys
+import traceback
 
-import sys, traceback, argparse
-import bcrypt
-from BTrees.OOBTree import OOTreeSet, OOBTree
-from BTrees.IOBTree import IOBTree
 from dateutil import rrule
 from pkg_resources import parse_version
-from collections import defaultdict
 
-from MaKaC import __version__
-from MaKaC.common.indexes import IndexesHolder, CategoryDayIndex, CalendarDayIndex
-from indico.core.db import DBMgr
-from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.common.Counter import Counter
 from indico.core.config import Config
-from MaKaC.conference import ConferenceHolder, CategoryManager, Conference, CustomLocation, CustomRoom
-from MaKaC.common.timerExec import HelperTaskList
-from MaKaC.plugins.base import PluginType, PluginsHolder
-from MaKaC.registration import RegistrantSession, RegistrationSession
-from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
-from MaKaC.plugins.RoomBooking.default.room import Room
+from indico.core.db import DBMgr
+from indico.core.index import Catalog
+from indico.modules.rb.tasks import OccurrenceNotifications
+from indico.modules.scheduler.tasks import AlarmTask
+from indico.modules.scheduler.tasks.suggestions import CategorySuggestionTask
+from indico.modules.scheduler import Client
+from indico.util import console, i18n
+from indico.util.redis import avatar_links
+from indico.util.redis import client as redis_client
+from indico.util.string import fix_broken_string
+from MaKaC import __version__
+from MaKaC.common.indexes import IndexesHolder
+from MaKaC.conference import ConferenceHolder, CategoryManager
+from MaKaC.plugins.base import PluginsHolder
 from MaKaC.plugins.RoomBooking.tasks import RoomReservationTask
-from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools
 from MaKaC.plugins.Collaboration import urlHandlers
 from MaKaC.webinterface import displayMgr
 from MaKaC.authentication.LocalAuthentication import LocalAuthenticator, LocalIdentity
 from MaKaC.authentication.LDAPAuthentication import LDAPIdentity, LDAPAuthenticator
 from MaKaC.user import AvatarHolder
-from MaKaC.rb_location import CrossLocationQueries
 from MaKaC.review import AbstractField
-
-from indico.core.index import Catalog
-from indico.core.db.event import SupportInfo
-from indico.ext import livesync
-from indico.util import console, i18n
-from indico.modules.scheduler.tasks import AlarmTask
-from indico.modules.scheduler.tasks.periodic import FoundationSyncTask, CategoryStatisticsUpdaterTask
-from indico.modules.scheduler.tasks.suggestions import CategorySuggestionTask
-from indico.modules.rb.tasks import OccurrenceNotifications
-from indico.modules import ModuleHolder
-from indico.util.redis import avatar_links
-from indico.util.redis import client as redis_client
-from indico.util.string import fix_broken_string
-
-from indico.modules.scheduler import Client
 
 
 MIGRATION_TASKS = []
 
 i18n.setLocale('en_GB')
+
 
 def since(version, always=False, never=False):
     def _since(f):
@@ -137,600 +123,25 @@ def _fixDefaultStyle(conf, cdmr):
         confDM.setDefaultStyle('standard')
 
 
-@since('0.98b2')
-def pluginMigration(dbi, withRBDB, prevVersion):
-    """
-    Adding new plugins and adapting existing ones to new name policies
-    """
-
-    PLUGIN_REMAP = {
-        'PayPal': 'payPal',
-        'WorldPay': 'worldPay',
-        'YellowPay': 'yellowPay',
-        "Dummyimporter": "dummy",
-        "CDSInvenio": "invenio",
-        "CERNSearchPOST": "cern_search",
-        "InvenioBatchUploader": "invenio"
-    }
-
-    root = dbi.getDBConnection().root()
-    if 'plugins' in root:
-        ptl = []
-        ps = root['plugins']
-        for k, v in ps.iteritems():
-            if isinstance(v, PluginType):
-                ptl.append(v)
-        for pt in ptl:
-            pt.setUsable(True)
-            for p in pt.getPluginList(includeNonPresent=True,
-                                      includeTestPlugins=True,
-                                      includeNonActive=True):
-                if hasattr(p, '_Plugin__id'):
-                    pid = p.getId()
-                else:
-                    pid = p.getName()
-
-                if pid in PLUGIN_REMAP:
-                    pid = PLUGIN_REMAP[pid]
-
-                p.setId(pid)
-                p.setUsable(True)
-
-    dbi.commit()
-    if withRBDB:
-        DALManager.commit()
-
-    # load new plugins, so that we can update them after
-    PluginsHolder().reloadAllPlugins()
-    dbi.commit()
-    if withRBDB:
-        DALManager.commit()
-
-    if prevVersion < parse_version("0.98b1"):
-        # update db for specific plugins
-        livesync.db.updateDBStructures(root)
-        dbi.commit()
-        if withRBDB:
-            DALManager.commit()
-
-
-@since('0.97', always=True)
-def pluginReload(dbi, withRBDB, prevVersion):
+@since('0.0', always=True)
+def pluginReload(dbi, prevVersion):
     """
     Reloading all plugins
     """
     PluginsHolder().reloadAllPlugins()
     dbi.commit()
-    if withRBDB:
-        DALManager.commit()
 
 
-@since('0.98b')
-def categoryACMigration(dbi, withRBDB, prevVersion):
-    """
-    Fixing AccessController for categories
-    """
-    for categ in CategoryManager()._getIdx().itervalues():
-        _fixAccessController(categ)
-        dbi.commit()
-
-
-@since('0.98b2')
-def conferenceMigration(dbi, withRBDB, prevVersion):
-    """
-    Adding missing attributes to conference objects and children
-    """
-
-    cdmr = displayMgr.ConfDisplayMgrRegistery()
-    ch = ConferenceHolder()
-    i = 0
-
-    from97 = prevVersion < parse_version("0.98b1")
-
-    # migrating from <=0.97.1 requires smaller granularity
-    for (level, obj) in console.conferenceHolderIterator(ch, deepness='subcontrib' if from97 else 'event'):
-        # only for conferences
-        if level == 'event':
-
-            if from97:
-                # handle sessions, that our iterator ignores
-                for session in obj.getSessionList():
-                    _fixAccessController(session)
-
-                if hasattr(obj, '_Conference__alarmCounter'):
-                    raise Exception("Conference Object %s (%s) seems to have been "
-                                    "already converted" % (obj, obj.id))
-
-                existingKeys = obj.alarmList.keys()
-                existingKeys.sort()
-                nstart = int(existingKeys[-1]) + 1 if existingKeys else 0
-                obj._Conference__alarmCounter = Counter(nstart)
-
-                # For each conference, take the existing tasks and
-                # convert them to the new object classes.
-                _convertAlarms(obj)
-
-            # convert registration form's "Personal Data" section to new format
-            obj.getRegistrationForm()._convertPersonalData()
-
-            # For each conference, fix the default style
-            _fixDefaultStyle(obj, cdmr)
-
-        if from97:
-            _fixAccessController(obj,
-                                 fixSelf=(level != 'subcontrib'))
-
-            # Convert RegistrationSessions to RegistrantSessions
-            if isinstance(obj, Conference):
-                for reg in obj.getRegistrants().itervalues():
-                    if reg._sessions and \
-                           isinstance(reg._sessions[0], RegistrationSession):
-                        reg._sessions = [RegistrantSession(ses, reg) \
-                                         for ses in reg._sessions]
-
-        if i % 1000 == 999:
-            dbi.commit()
-            if withRBDB and from97:
-                DALManager.commit()
-
-        i += 1
-
-    dbi.commit()
-    if withRBDB and from97:
-        DALManager.commit()
-
-
-@since('0.98b')
-def taskMigration(dbi, withRBDB, prevVersion):
-    """
-    Migrating database tasks from the old format to the new one
-    """
-
-    c = Client()
-
-    for t in HelperTaskList().getTaskListInstance().getTasks():
-        for obj in t.listObj.values():
-            print console.colored("   * %s" % obj.__class__.__name__, 'blue')
-            if obj.__class__.__name__ == 'OfflineWebsiteCreator':
-                continue
-            if obj.__class__.__name__ == 'FoundationSync':
-                c.enqueue(
-                    FoundationSyncTask(rrule.DAILY, byhour=0, byminute=0))
-            elif obj.__class__.__name__ == 'StatisticsUpdater':
-                c.enqueue(CategoryStatisticsUpdaterTask(
-                    CategoryManager().getById('0'),
-                    rrule.DAILY,
-                    byhour=0, byminute=0))
-            elif obj.__class__.__name__ == 'sendMail':
-                # they have to be somewhere in the conference
-                alarm = t.conf.alarmList[t.id]
-                c.enqueue(alarm)
-            else:
-                print console.colored("WARNING: Unknown task type!", 'yellow')
-
-    if withRBDB:
-        DALManager.commit()
-    dbi.commit()
-
-
-@since('0.98b')
-def categoryConfDictToTreeSet(dbi, withRBDB, prevVersion):
-    """
-    Replacing the conference dictionary in the Category objects by a OOTreeSet.
-    """
-    for categ in CategoryManager()._getIdx().itervalues():
-        categ.conferencesBackup = categ.conferences.values()
-        categ.conferences = OOTreeSet(categ.conferences.itervalues())
-        if len(categ.conferences) != len(categ.conferencesBackup):
-            print "Problem migrating conf dict to tree set: %s" % categ.getId()
-
-
-@since('0.98b')
-def categoryDateIndexMigration(dbi, withRBDB, prevVersion):
-    """
-    Replacing category date indexes.
-    """
-    if "backupCategoryDate" not in IndexesHolder()._getIdx():
-        categoryDate = IndexesHolder().getIndex("categoryDate")
-        IndexesHolder()._getIdx()["backupCategoryDate"] = categoryDate
-        newIdx = CategoryDayIndex()
-        newIdx.buildIndex(dbi)
-        IndexesHolder()._getIdx()["categoryDate"] = newIdx
-    else:
-        print """categoryDateIndexMigration: new categoryDate index has """ \
-        """NOT been generated because the index backup already exists.
-
-If you still want to regenerate it, please, do it manually using """ \
-        """bin/migration/CategoryDate.py"""
-
-
-@since('0.98.1')
-def categoryDateIndexWithoutVisibility(dbi, withRBDB, prevVersion):
-    """
-    Create category date index without visibility.
-    """
-    IndexesHolder()._getIdx()['categoryDate']._useVisibility = True
-    if 'categoryDateAll' not in IndexesHolder()._getIdx():
-        newIdx = CategoryDayIndex(visibility=False)
-        IndexesHolder()._getIdx()['categoryDateAll'] = newIdx
-        newIdx.buildIndex(dbi)
-
-
-@since('0.98b', always=True)
-def catalogMigration(dbi, withRBDB, prevVersion):
+@since('0.0', always=True)
+def catalogMigration(dbi, prevVersion):
     """
     Initializing/updating index catalog
     """
     Catalog.updateDB(dbi=dbi)
 
 
-@since('0.98b2')
-def roomBlockingInit(dbi, withRBDB, prevVersion):
-    """
-    Initializing room blocking indexes.
-    """
-    if not withRBDB:
-        return
-
-    root = DALManager().getRoot()
-    if not root.has_key( 'RoomBlocking' ):
-        root['RoomBlocking'] = OOBTree()
-        root['RoomBlocking']['Blockings'] = IOBTree()
-        root['RoomBlocking']['Indexes'] = OOBTree()
-        root['RoomBlocking']['Indexes']['OwnerBlockings'] = OOBTree()
-        root['RoomBlocking']['Indexes']['DayBlockings'] = CalendarDayIndex()
-        root['RoomBlocking']['Indexes']['RoomBlockings'] = OOBTree()
-
-@since('0.98.1')
-def runRoomDayIndexInit(dbi, withRBDB, prevVersion):
-    """
-    Initializing room+day => reservation index.
-    """
-    if not withRBDB:
-        return
-
-    root = DALManager().getRoot()
-    if not root.has_key('RoomDayReservationsIndex'):
-        root['RoomDayReservationsIndex'] = OOBTree()
-        for i, resv in enumerate(CrossLocationQueries.getReservations()):
-            resv._addToRoomDayReservationsIndex()
-            if i % 1000 == 0:
-                DALManager.commit()
-        DALManager.commit()
-
-@since('0.98-rc2')
-def runReservationNotificationMigration(dbi, withRBDB, prevVersion):
-    """
-    Migrate the reservation notification system.
-    """
-    if not withRBDB:
-        return
-
-    # Delete old start end notification data
-    for i, resv in enumerate(CrossLocationQueries.getReservations()):
-        if hasattr(resv, '_startEndNotification'):
-            resv._startEndNotification = None
-        if i % 1000 == 0:
-            DALManager.commit()
-    # Create start notification task
-    Client().enqueue(RoomReservationTask(rrule.HOURLY, byminute=0, bysecond=0))
-    DALManager.commit()
-
-
-@since('0.98b2')
-def langToGB(dbi, withRBDB, prevVersion):
-    """
-    Replacing en_US with en_GB.
-    """
-    avatars = AvatarHolder().getList()
-    for av in avatars:
-        if av.getLang() == "en_US":
-            av.setLang("en_GB")
-
-
-@since('0.98b2')
-def makoMigration(dbi, withRBDB, prevVersion):
-    """
-    Installing new TPLs for meeting/lecture styles
-    """
-    info = HelperMaKaCInfo().getMaKaCInfoInstance()
-    sm = info.getStyleManager()
-    try:
-        del sm._stylesheets
-    except:
-        pass
-    for lid in ['meeting', 'simple_event', 'conference']:
-        l = sm._eventStylesheets[lid]
-        if 'it' in l:
-            l.remove('it')
-        if 'administrative3' in l:
-            l.remove('administrative3')
-        sm._eventStylesheets[lid] = l
-    styles = sm.getStyles()
-    styles['xml'] = ('xml','XML.xsl',None)
-    sm.setStyles(styles)
-
-
-@since('0.98b2')
-def pluginOptionsRoomGUIDs(dbi, withRBDB, prevVersion):
-    """
-    Modifying Room GUIDs
-    """
-    if not withRBDB:
-        return
-
-    ph = PluginsHolder()
-    for pluginName, roomsOpt in [('WebcastRequest', 'webcastCapableRooms'),
-                                 ('RecordingRequest', 'recordingCapableRooms')]:
-        opt = ph.getPluginType('Collaboration').getPlugin(pluginName).getOption(roomsOpt)
-        newValue = []
-        for name in opt.getValue():
-            loc, name = name.split(':')
-            room = CrossLocationQueries.getRooms(location=loc, roomName=name)
-            if room:
-                newValue.append(str(room.guid))
-        opt.setValue(newValue)
-
-
-@since('0.98.1')
-def slotLocationMigration(dbi, withRBDB, prevVersion):
-    """
-    Add missing location info to slots of a session that contains location or room
-    """
-
-    ch = ConferenceHolder()
-    i = 0
-
-    for (level, obj) in console.conferenceHolderIterator(ch, deepness='event'):
-        for session in obj.getSessionList():
-            for slot in session.getSlotList():
-                sessionLoc = session.getOwnLocation()
-                sessionRoom = session.getOwnRoom()
-                if (sessionRoom is not None or sessionLoc is not None) and \
-                    (slot.getOwnRoom() is None and slot.getOwnLocation() is None):
-                    if sessionLoc:
-                        loc = CustomLocation()
-                        slot.setLocation(loc)
-                        loc.setName(sessionLoc.getName())
-                        loc.setAddress(sessionLoc.getAddress())
-                    if sessionRoom:
-                        r = CustomRoom()
-                        slot.setRoom(r)
-                        r.setName(sessionRoom.getName())
-                        if sessionLoc and withRBDB:
-                            r.retrieveFullName(sessionLoc.getName())
-        if i%1000 == 999:
-            dbi.commit()
-        i+=1
-    dbi.commit()
-
-
-@since('0.98.3')
-def collaborationRequestIndexCreate(dbi, withRBDB, prevVersion):
-    """
-    Creating new "All Requests" index
-    """
-    ci = IndexesHolder().getById('collaboration')
-    ci.indexAll(index_names=['All Requests'], dbi=dbi)
-    dbi.commit()
-
-
-@since('0.99')
-def chatroomIndexMigration(dbi, withRBDB, prevVersion):
-    """
-    Migrating Chat Room index to new structure
-    """
-
-    # The structure of the indexes is such that for each one self._data
-    #    is a BTree and each node is referenced by the IndexBy___ designation,
-    #    where ___ is the ID in question. Each node is then a TreeSet of
-    #    ChatRoom or XMPPChatRoom objects originally orderded by ID, we need
-    #    this to be ordered by title for effective searching / querying.
-    #   The __cmp__ method has been altered to accommodate this new format,
-    #    take each subnode, iterate through saving the current objects, clear the
-    #    index and reinsert them - they will now be in the correct order.
-
-    from MaKaC.plugins.InstantMessaging.indexes import IndexByUser, IndexByConf, IndexByCRName, IndexByID
-
-    im_plugin = PluginsHolder().getPluginType('InstantMessaging')
-
-    if not im_plugin.isUsable():
-        print console.colored('  IM plugin not usable - jumping task', 'yellow')
-        return
-
-    try:
-        for idx in [IndexByUser(), IndexByConf(), IndexByCRName()]:
-            tmp_idx = defaultdict(list)
-            print console.colored("  * Index: " + str(idx), 'blue')
-
-            for key, node in idx._data.iteritems():
-                for leaf in node:
-                    tmp_idx[key].append(leaf)
-
-            # reset index
-            idx._data.clear()
-
-            for accum, rooms in tmp_idx.iteritems():
-                for room in rooms:
-                    # Specific handling as IndexByUser & IndexByConf have different
-                    # arguements for tree insertion.
-                    if isinstance(idx, IndexByUser) or isinstance(idx, IndexByConf):
-                        idx.index(str(accum), room)
-                    else:
-                        idx.index(room)
-
-        print console.colored("\tAll indexes have now been re-indexed and committed to the DB.", 'green')
-    except:
-        dbi.abort()
-        print console.colored("Process failed, ended abruptly, changes not committed.", 'red')
-        raise
-
-
-@since('0.99')
-def timedLinkedEventListRemoval(dbi, withRBDB, prevVersion):
-    """
-    Removing TimedLinkedEvents
-    """
-    i = 0
-    for uid, user in AvatarHolder()._getIdx().iteritems():
-        if hasattr(user, 'timedLinkedEvents'):
-            del user.timedLinkedEvents
-        i += 1
-        if i % 100 == 0:
-            dbi.commit()
-
-@since('1.0')
-def ip_based_acl(dbi, withRBDB, prevVersion):
-    """
-    Moving from OAI Private Harvesting to a more general IP-based ACL.
-    """
-    from MaKaC.common.info import IPBasedACLMgr
-    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-    ip_set = set(minfo._oaiPrivateHarvesterList)
-    ip_acl_mgr = minfo._ip_based_acl_mgr = IPBasedACLMgr()
-    ip_acl_mgr._full_access_acl = ip_set
-    dbi.commit()
-
-@since('1.0')
-def removeOldCSSTemplates(dbi, withRBDB, prevVersion):
-    """
-    Removing old CSS Templates from events
-    """
-
-    mod = ModuleHolder().getById('cssTpls')
-
-    try:
-        del mod._cssTpls['template1.css']
-    except KeyError, e:
-        print 'info: %s'%e
-    try:
-        del mod._cssTpls['template2.css']
-    except KeyError, e:
-        print 'info: %s'%e
-    try:
-        del mod._cssTpls['top_menu.css']
-    except KeyError, e:
-        print 'info: %s'%e
-
-    mod._p_changed = 1
-    dbi.commit()
-
-@since('1.0')
-def conferenceMigration1_0(dbi, withRBDB, prevVersion):
-    """
-    Tasks: 1. Moving support info fields from conference to a dedicated class
-           2. Update non inherited children list
-           3. Update Vidyo indexes
-    """
-
-    def _updateMaterial(obj):
-        for material in obj.getAllMaterialList(sort=False):
-            material.getAccessController().setNonInheritingChildren(set())
-            if material.getAccessController().getAccessProtectionLevel() != 0:
-                material.notify_protection_to_owner(material)
-            for resource in material.getResourceList(sort=False):
-                if resource.getAccessController().getAccessProtectionLevel() != 0:
-                    resource.notify_protection_to_owner()
-
-    def updateSupport(conf):
-        #################################################################
-        #Moving support info fields from conference to a dedicated class:
-        #################################################################
-
-        dMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf)
-        caption = email = telephone = ""
-
-        if hasattr(dMgr, "_supportEmailCaption"):
-            caption = dMgr._supportEmailCaption
-            del dMgr._supportEmailCaption
-        if hasattr(conf, "_supportEmail"):
-            email = conf._supportEmail
-            del conf._supportEmail
-
-        supportInfo = SupportInfo(conf, caption, email, telephone)
-        conf.setSupportInfo(supportInfo)
-
-    def updateNonInheritedChildren (conf):
-        ####################################
-        #Update non inherited children list:
-        ####################################
-
-        conf.getAccessController().setNonInheritingChildren(set())
-        _updateMaterial(conf)
-
-        for session in conf.getSessionList():
-            session.getAccessController().setNonInheritingChildren(set())
-            if session.getAccessController().getAccessProtectionLevel() != 0:
-                session.notify_protection_to_owner(session)
-            _updateMaterial(session)
-        for contrib in conf.getContributionList():
-            contrib.getAccessController().setNonInheritingChildren(set())
-            if contrib.getAccessController().getAccessProtectionLevel() != 0:
-                contrib.notify_protection_to_owner(contrib)
-            _updateMaterial(contrib)
-            for subContrib in contrib.getSubContributionList():
-                _updateMaterial(subContrib)
-
-    def updateVidyoIndex(conf, endDateIndex, vidyoRoomIndex):
-        ####################################
-        #Update vidyo indexes:
-        ####################################
-        csbm = getattr(conf, "_CSBookingManager", None)
-        if csbm is None:
-            return
-        for booking in csbm.getBookingList():
-            if booking.getType() == "Vidyo" and booking.isCreated():
-                endDateIndex.indexBooking(booking)
-                vidyoRoomIndex.indexBooking(booking)
-
-    ph = PluginsHolder()
-    collaboration_pt = ph.getPluginType("Collaboration")
-    vidyoPluginActive = collaboration_pt.isActive() and collaboration_pt.getPlugin("Vidyo").isActive()
-    if vidyoPluginActive:
-        endDateIndex = VidyoTools.getEventEndDateIndex()
-        vidyoRoomIndex = VidyoTools.getIndexByVidyoRoom()
-        endDateIndex.clear()
-        vidyoRoomIndex.clear()
-
-    ch = ConferenceHolder()
-    i = 0
-
-    for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
-
-        updateSupport(conf)
-        updateNonInheritedChildren(conf)
-        if vidyoPluginActive:
-            updateVidyoIndex(conf, endDateIndex, vidyoRoomIndex)
-
-        if i % 10000 == 9999:
-            dbi.commit()
-        i += 1
-    dbi.commit()
-
-
-@since('1.0')
-def changeVidyoRoomNames(dbi, withRBDB, prevVersion):
-    """
-    Changing Vidyo Room Names
-    """
-    ph = PluginsHolder()
-    collaboration_pt = ph.getPluginType("Collaboration")
-    if not collaboration_pt.isActive() or not collaboration_pt.getPlugin("Vidyo").isActive():
-        return
-    i = 0
-    for booking in VidyoTools.getIndexByVidyoRoom().itervalues():
-        if hasattr(booking, '_originalConferenceId'):
-            roomName = booking.getBookingParamByName("roomName") + '_indico_' + booking._originalConferenceId
-            booking._bookingParams["roomName"] = roomName
-            del booking._originalConferenceId
-        i += 1
-        if i % 10000 == 0:
-            dbi.commit()
-    dbi.commit()
-
-
 @since('1.1')
-def convertLinkedTo(dbi, withRBDB, prevVersion):
+def convertLinkedTo(dbi, prevVersion):
     """Convert Avatar.linkedTo structure to use OOTreeSets
        and import linkedTo information into Redis (if enabled)"""
     print 'Note: Some links might point to broken objects which will be skipped automatically.'
@@ -772,7 +183,7 @@ def convertLinkedTo(dbi, withRBDB, prevVersion):
 
 
 @since('1.1')
-def redisLinkedTo(dbi, withRBDB, prevVersion):
+def redisLinkedTo(dbi, prevVersion):
     """Import linkedTo information into Redis"""
     if not Config.getInstance().getRedisConnectionURL():
         print console.colored("  Redis not configured, skipping", 'yellow')
@@ -791,7 +202,7 @@ def redisLinkedTo(dbi, withRBDB, prevVersion):
 
 
 @since('1.2')
-def addSuggestionsTask(dbi, withRBDB, prevVersion):
+def addSuggestionsTask(dbi, prevVersion):
     """Add Category Suggestion Task to scheduler (Redis needed)"""
     if not Config.getInstance().getRedisConnectionURL():
         print console.colored("  Redis not configured, skipping", 'yellow')
@@ -801,8 +212,9 @@ def addSuggestionsTask(dbi, withRBDB, prevVersion):
     client.enqueue(task)
     dbi.commit()
 
+
 @since('1.2')
-def conferenceMigration1_2(dbi, withRBDB, prevVersion):
+def conferenceMigration1_2(dbi, prevVersion):
     """
     Tasks: 1. Removing Video Services from core
            2. Migrates old AbstractField to new AbstractField subclasses
@@ -867,7 +279,7 @@ def conferenceMigration1_2(dbi, withRBDB, prevVersion):
 
 
 @since('1.2')
-def localIdentityMigration(dbi, withRBDB, prevVersion):
+def localIdentityMigration(dbi, prevVersion):
     """Generate the new password with a salt"""
 
     auth = LocalAuthenticator()
@@ -883,7 +295,7 @@ def localIdentityMigration(dbi, withRBDB, prevVersion):
 
 
 @since('1.2')
-def removeNiceIdentities(dbi, withRBDB, prevVersion):
+def removeNiceIdentities(dbi, prevVersion):
     """
     Remove the NiceIdentities from the avatars
     """
@@ -898,7 +310,7 @@ def removeNiceIdentities(dbi, withRBDB, prevVersion):
 
 
 @since('1.2')
-def lowercaseLDAPIdentities(dbi, withRBDB, prevVersion):
+def lowercaseLDAPIdentities(dbi, prevVersion):
     """Convert all LDAP identities to lowercase"""
     auth = LDAPAuthenticator()
     total = len(auth.getList())
@@ -918,7 +330,7 @@ def lowercaseLDAPIdentities(dbi, withRBDB, prevVersion):
 
 
 @since('1.2')
-def reindexCategoryNameAndConferenceTitle(dbi, withRBDB, prevVersion):
+def reindexCategoryNameAndConferenceTitle(dbi, prevVersion):
     """
     Indexing Conference Title with new WhooshTextIndex
     """
@@ -936,7 +348,7 @@ def reindexCategoryNameAndConferenceTitle(dbi, withRBDB, prevVersion):
 
 
 @since('1.2')
-def updateAvatarEmails(dbi, withRBDB, prevVersion):
+def updateAvatarEmails(dbi, prevVersion):
     """
     Makes sure that all the secondary emails are lower case (otherwise it would be difficult to use indexes)
     """
@@ -950,7 +362,7 @@ def updateAvatarEmails(dbi, withRBDB, prevVersion):
 
 
 @since('1.2')
-def fixIndexesEncoding(dbi, withRBDB, prevVersion):
+def fixIndexesEncoding(dbi, prevVersion):
     """
     Fix indexes encoding. They may be in unicode and they have to be encoded in utf-8
     """
@@ -971,7 +383,7 @@ def fixIndexesEncoding(dbi, withRBDB, prevVersion):
 
 
 @since('1.9')
-def addOccurrenceNotificationsTask(dbi, withRBDB, prevVersion):
+def addOccurrenceNotificationsTask(dbi, prevVersion):
     """
     Add OccurrenceNotificationsTask to scheduler and remove old RoomReservationTask
     """
@@ -1000,8 +412,7 @@ def addOccurrenceNotificationsTask(dbi, withRBDB, prevVersion):
     dbi.commit()
 
 
-def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
-                 specified=[], dry_run=False, run_from=None):
+def runMigration(prevVersion=parse_version(__version__), specified=[], dry_run=False, run_from=None):
 
     global MIGRATION_TASKS
 
@@ -1039,13 +450,9 @@ def runMigration(withRBDB=False, prevVersion=parse_version(__version__),
             if dry_run:
                 continue
             dbi.startRequest()
-            if withRBDB:
-                DALManager.connect()
 
-            task(dbi, withRBDB, prevVersion)
+            task(dbi, prevVersion)
 
-            if withRBDB:
-                DALManager.commit()
             dbi.endRequest()
 
             print console.colored("  DONE\n", 'green', attrs=['bold'])
@@ -1067,8 +474,6 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
     parser = argparse.ArgumentParser(description='Execute migration')
     parser.add_argument('--dry-run', '-n', dest='dry_run', action='store_true',
                         help='Only show which migration tasks would be executed')
-    parser.add_argument('--with-rb', dest='useRBDB', action='store_true',
-                        help='Use the Room Booking DB')
     parser.add_argument('--run-only', dest='specified', default='',
                         help='Specify which step(s) to run (comma-separated)')
     parser.add_argument('--run-from', dest='run_from', default='',
@@ -1084,7 +489,7 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
                 import profile, random, os
                 proffilename = os.path.join(Config.getInstance().getTempDir(), "migration%s.prof" % str(random.random()))
                 result = None
-                profile.runctx("""result=runMigration(withRBDB=args.useRBDB,
+                profile.runctx("""result=runMigration(
                                   prevVersion=parse_version(args.prevVersion),
                                   specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))),
                                   run_from=args.run_from,
@@ -1092,8 +497,7 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
                                   globals(), locals(), proffilename)
                 return result
             else:
-                return runMigration(withRBDB=args.useRBDB,
-                                    prevVersion=parse_version(args.prevVersion),
+                return runMigration(prevVersion=parse_version(args.prevVersion),
                                     specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))),
                                     run_from=args.run_from,
                                     dry_run=args.dry_run)
