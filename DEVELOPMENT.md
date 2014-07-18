@@ -11,6 +11,8 @@ For the moment, we are focusing on _PostgreSQL_. These are some of the specific 
 
 * ReservationEditLog uses a PostgreSQL ARRAY to store the changes for a single log entry
 
+* calculate_rooms_booked_time uses `extract('dow')` PostgreSQL specific for day of the week.
+
 In some cases you have properties in your models which trigger additional queries or are expensive for some other reason.
 Sometimes you can simply write tricky queries to retrieve all data at once, but in other cases that's not feasible,
 either because of what the property does or because you need it for serializing and thus only have the object itself

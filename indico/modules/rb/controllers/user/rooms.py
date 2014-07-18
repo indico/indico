@@ -21,6 +21,7 @@ from datetime import date, datetime, timedelta, time
 
 from dateutil.relativedelta import relativedelta
 from flask import request, session
+from sqlalchemy import func
 from werkzeug.datastructures import MultiDict
 
 from MaKaC.common.cache import GenericCache
@@ -174,7 +175,7 @@ class RHRoomBookingRoomStats(RHRoomBookingBase):
         elif self._occupancy_period == 'thisyear':
             self._start = date(self._end.year, 1, 1)
         elif self._occupancy_period == 'sinceever':
-            self._start = Reservation.find().first().start_date.date()
+            self._start = Reservation.query.with_entities(func.min(Reservation.start_date)).one()[0].date()
         else:
             raise IndicoError('Invalid period specified')
 

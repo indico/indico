@@ -143,7 +143,7 @@
                         % endif
                     </td>
                     <td class="occupancy-value">
-                        ${ '{0:.02f}'.format(occupancy) }<small>%</small>
+                        ${ '{0:.02f}'.format(occupancy * 100) }<small>%</small>
                     </td>
                 </tr>
             </table>

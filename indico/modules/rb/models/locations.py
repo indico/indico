@@ -21,6 +21,8 @@
 Holder of rooms in a place and its map view related data
 """
 
+from datetime import time
+
 from sqlalchemy import func, or_, and_
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import select
@@ -37,6 +39,9 @@ from MaKaC.common.Locators import Locator
 
 class Location(db.Model):
     __tablename__ = 'locations'
+
+    working_time_start = time(8)
+    working_time_end = time(17, 30)
 
     # columns
 

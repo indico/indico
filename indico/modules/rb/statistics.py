@@ -3,8 +3,11 @@ from __future__ import division
 from datetime import date, datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
-from sqlalchemy import func
+from sqlalchemy import func, extract, cast, TIME
 
+from indico.core.db.sqlalchemy.custom import greatest, least
+from indico.util.date_time import days_between
+from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 
@@ -13,29 +16,31 @@ def calculate_rooms_bookable_time(rooms, start_date=None, end_date=None):
     if end_date is None:
         end_date = datetime.utcnow()
     if start_date is None:
-        start_date = end_date + relativedelta(months=-1)
-
-    total_days = (end_date - start_date).days + 1
-    bookable_time = 0
-    for room in rooms:
-        bookable_time += (total_days - room.get_nonbookable_days(start_date, end_date)) * room.bookable_time_per_day
-
-    return bookable_time
+        start_date = end_date - relativedelta(months=1)
+    working_time_start = datetime.combine(date.today(), Location.working_time_start)
+    working_time_end = datetime.combine(date.today(), Location.working_time_end)
+    working_time_per_day = (working_time_end - working_time_start).seconds
+    working_days = days_between(start_date, end_date, include_weekends=False, inclusive=True)
+    return working_days * working_time_per_day * len(rooms)
 
 
 def calculate_rooms_booked_time(rooms, start_date=None, end_date=None):
     if end_date is None:
         end_date = date.today()
     if start_date is None:
-        start_date = end_date + relativedelta(months=-1)
-
-    reservations = Reservation.find(Reservation.room_id.in_(r.id for r in rooms))
-    query = (reservations.join(ReservationOccurrence)
-             .with_entities(func.sum(ReservationOccurrence.end - ReservationOccurrence.start))
-             .filter(ReservationOccurrence.start >= start_date,
-                     ReservationOccurrence.end <= end_date,
-                     ReservationOccurrence.is_valid))
-    return (query.scalar() or timedelta()).total_seconds()
+        start_date = end_date - relativedelta(months=1)
+    # Reservations on working days
+    reservations = Reservation.find(Reservation.room_id.in_(r.id for r in rooms),
+                                    extract('dow', ReservationOccurrence.start) < 5,
+                                    ReservationOccurrence.start >= start_date,
+                                    ReservationOccurrence.end <= end_date,
+                                    ReservationOccurrence.is_valid,
+                                    _join=ReservationOccurrence)
+    # Take into account only working hours
+    earliest_time = greatest(cast(ReservationOccurrence.start, TIME), Location.working_time_start)
+    latest_time = least(cast(ReservationOccurrence.end, TIME), Location.working_time_end)
+    booked_time = reservations.with_entities(func.sum(latest_time - earliest_time)).scalar()
+    return (booked_time or timedelta()).total_seconds()
 
 
 def calculate_rooms_occupancy(rooms, start=None, end=None):

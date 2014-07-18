@@ -85,7 +85,7 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
         rooms = sorted(self._location.rooms, key=lambda r: natural_sort_key(r.full_name))
         kpi = {}
         if self._with_kpi:
-            kpi['occupancy'] = calculate_rooms_occupancy(self._location.rooms)
+            kpi['occupancy'] = calculate_rooms_occupancy(self._location.rooms.all())
             kpi['total_rooms'] = self._location.rooms.count()
             kpi['active_rooms'] = self._location.rooms.filter_by(is_active=True).count()
             kpi['reservable_rooms'] = self._location.rooms.filter_by(is_reservable=True).count()

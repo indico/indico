@@ -23,10 +23,9 @@ Schema of a room
 
 import ast
 import json
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
-from dateutil.relativedelta import relativedelta
-from sqlalchemy import and_, func, exists, extract, or_, type_coerce
+from sqlalchemy import and_, func, exists, or_, type_coerce
 from sqlalchemy.dialects.postgresql.base import ARRAY as sa_array
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import joinedload
