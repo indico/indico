@@ -19,6 +19,7 @@
 
 import os
 
+from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.views.user.reservations import (WPRoomBookingBookingDetails, WPRoomBookingModifyBooking,
                                                        WPRoomBookingNewBookingSimple, WPRoomBookingNewBookingSelectRoom,
                                                        WPRoomBookingNewBookingSelectPeriod,
@@ -52,6 +53,8 @@ class WPRoomBookingEventBase(WPConferenceModifBase):
                                                       url_for('event_mgmt.rooms_booking_list', self._conf))
         self._tabNewBooking = self._tabCtrl.newTab('new', 'New Booking',
                                                    url_for('event_mgmt.rooms_choose_event', self._conf))
+        if not Reservation.find(event_id=self._conf.getId()).count():
+            self._tabExistBookings.setEnabled(False)
         self._setActiveTab()
 
     def _getPageContent(self, params):
