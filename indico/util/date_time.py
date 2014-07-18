@@ -222,3 +222,13 @@ def get_datetime_from_request(prefix='', default=None, source=None):
         parsed_time = default.time()
 
     return datetime.combine(parsed_date, parsed_time)
+
+
+def days_between(start_date, end_date, include_weekends=True, inclusive=False):
+    if inclusive:
+        daterange = (end_date - start_date).days + 1
+        daygenerator = (start_date + timedelta(delta) for delta in xrange(daterange))
+    else:
+        daterange = (end_date - start_date).days - 1
+        daygenerator = (start_date + timedelta(delta + 1) for delta in xrange(daterange))
+    return daterange if include_weekends else sum(day.weekday() < 5 for day in daygenerator)
