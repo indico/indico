@@ -467,24 +467,6 @@ class ConferenceStartEndDateTimeModification(ConferenceModifBase):
             return self._params.get('value')
 
 
-class ConferenceListUsedRooms(ConferenceDisplayBase):
-    """
-    Get rooms that are used in the context of the conference:
-     * Booked in CRBS
-     * Already chosen in sessions
-    """
-    def _getAnswer(self):
-        """
-        Calls _handle() on the derived classes, in order to make it happen. Provides
-        them with self._value.
-        """
-        roomList = []
-        roomList.extend(self._target.getRoomList())
-        roomList.extend(map(lambda x: x._getName(), self._target.getBookedRooms()))
-
-        return roomList
-
-
 class ConferenceDateTimeEndModification(ConferenceDateTimeModificationBase):
     """ Conference end date/time modification
         When changing the end date / time, the _setParam method will be called by DateTimeModificationBase's _handleSet method.
@@ -1718,7 +1700,6 @@ methodMap = {
     "main.sendEmailData": ConferenceSendEmailData,
     "main.changeSubmissionRights": ConferenceChangeSubmissionRights,
     "program.changeDescription": ConferenceProgramDescriptionModification,
-    "rooms.list" : ConferenceListUsedRooms,
     "contributions.list" : ConferenceListContributionsReview,
     "contributions.listAll" : ConferenceListContributions,
     "contributions.delete": ConferenceDeleteContributions,
