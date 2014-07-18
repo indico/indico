@@ -29,7 +29,7 @@ from babel.dates import format_date as _format_date
 from babel.dates import format_timedelta as _format_timedelta
 from babel.dates import get_timezone
 from babel.numbers import format_number as _format_number
-from dateutil.rrule import rrule, DAILY
+from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR
 
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
@@ -196,8 +196,9 @@ def get_overlap(range1, range2):
     return latest_start, earliest_end
 
 
-def iterdays(start, end):
-    return rrule(DAILY, dtstart=start, until=end)
+def iterdays(start, end, skip_weekends=False):
+    weekdays = (MO, TU, WE, TH, FR) if skip_weekends else None
+    return rrule(DAILY, dtstart=start, until=end, byweekday=weekdays)
 
 
 def get_datetime_from_request(prefix='', default=None, source=None):
@@ -222,13 +223,3 @@ def get_datetime_from_request(prefix='', default=None, source=None):
         parsed_time = default.time()
 
     return datetime.combine(parsed_date, parsed_time)
-
-
-def days_between(start_date, end_date, include_weekends=True, inclusive=False):
-    if inclusive:
-        daterange = (end_date - start_date).days + 1
-        daygenerator = (start_date + timedelta(delta) for delta in xrange(daterange))
-    else:
-        daterange = (end_date - start_date).days - 1
-        daygenerator = (start_date + timedelta(delta + 1) for delta in xrange(daterange))
-    return daterange if include_weekends else sum(day.weekday() < 5 for day in daygenerator)
