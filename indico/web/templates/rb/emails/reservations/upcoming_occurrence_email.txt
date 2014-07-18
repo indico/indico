@@ -1,5 +1,7 @@
-Dear {{ owner.getName() }},
+{% extends 'rb/emails/base_email.txt' %}
+{% block recipient %}{{ owner.getName() }}{% endblock %}
 
+{% block email_body -%}
 This is a reminder about a booking you have made:
 
 Room: {{ occurrence.reservation.room.name }}
@@ -10,4 +12,7 @@ Date: {{ occurrence.start | format_date }}
 {%- endif %}
 Time: {{ occurrence.start | format_time }} - {{ occurrence.end | format_time }}
 
-If you don't need to use the room, please cancel your ocurrence in the following link {{ occurrence.reservation.details_url }}.
+
+If you don't need to use the room, please cancel your occurrence in the following link:
+{{ occurrence.reservation.details_url }}
+{%- endblock %}
