@@ -416,17 +416,6 @@ class UHRoomBookingSearch4Bookings(URLHandler):
     _endpoint = 'rooms.roomBooking-search4Bookings'
 
 
-class UHRoomBookingBookingList(BooleanMixin, URLHandler):
-    _endpoint = 'rooms.roomBooking-bookingList'
-
-    @classmethod
-    def getURL(cls, **kw):
-        return '#'
-        url = cls._getURL()
-        url.setParams(kw)
-        return url
-
-
 class UHRoomBookingRoomDetails(BooleanTrueMixin, URLHandler):
     _endpoint = 'rooms.roomBooking-roomDetails'
 
@@ -445,16 +434,8 @@ class UHRoomBookingBookingDetails(URLHandler):
         return params
 
 
-class UHRoomBookingBookingForm(URLHandler):
-    _endpoint = 'rooms.roomBooking-bookingForm'
-
-
 class UHRoomBookingModifyBookingForm(URLHandler):
     _endpoint = 'rooms.roomBooking-modifyBookingForm'
-
-
-class UHRoomBookingSaveBooking(URLHandler):
-    _endpoint = 'rooms.roomBooking-saveBooking'
 
 
 class UHRoomBookingDeleteBooking(URLHandler):
@@ -488,10 +469,6 @@ class UHRoomBookingStatement(URLHandler):
 # RB Administration
 class UHRoomBookingPluginAdmin(URLHandler):
     _endpoint = 'rooms_admin.roomBookingPluginAdmin'
-
-
-class UHRoomBookingPlugAdminZODBSave(URLHandler):
-    _endpoint = 'rooms_admin.roomBookingPluginAdmin-zodbSave'
 
 
 class UHRoomBookingAdmin(URLHandler):
@@ -528,35 +505,6 @@ class UHRoomBookingSaveCustomAttributes(URLHandler):
 
 class UHRoomBookingDeleteCustomAttribute(URLHandler):
     _endpoint = 'rooms_admin.roomBooking-deleteCustomAttribute'
-
-
-# For the event ==============================================================
-class UHConfModifRoomBookingBase(URLHandler):
-    @classmethod
-    def _getURL(cls, target=None, **params):
-        url = super(UHConfModifRoomBookingBase, cls)._getURL(**params)
-        if target:
-            url.setParams(target.getLocator())
-        conf = ContextManager.get("currentConference", None)
-        if conf:
-            url.addParams(conf.getLocator())
-        return url
-
-
-class UHConfModifRoomBookingSearch4Rooms(BooleanTrueMixin, URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingSearch4Rooms'
-
-
-class UHConfModifRoomBookingRoomList(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingRoomList'
-
-
-class UHConfModifRoomBookingBookingForm(UHConfModifRoomBookingBase):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingBookingForm'
-
-
-class UHConfModifRoomBookingSaveBooking(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingSaveBooking'
 
 
 class UHConferenceClose(URLHandler):

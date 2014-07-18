@@ -74,7 +74,10 @@ legacy.add_url_rule('/xmlGateway.py/webcastOnAir',
 
 
 # Legacy endpoints defined in htdocs/*.py files (which need compatibility routes)
-legacy_endpoints = set([
+# Note: When removing/renaming endpoints, feel free to remove them in here, too, but
+# it's not absolutely necessary - if there's no non-legacy endpoint with that name
+# the entry in here simply does nothing.
+legacy_endpoints = {
     'about', 'abstractDisplay', 'abstractDisplay-getAttachedFile', 'abstractDisplay-pdf', 'abstractManagment',
     'abstractManagment-abstractToPDF', 'abstractManagment-accept', 'abstractManagment-acceptMultiple',
     'abstractManagment-backToSubmitted', 'abstractManagment-changeTrack', 'abstractManagment-comments',
@@ -129,10 +132,7 @@ legacy_endpoints = set([
     'conferenceModification-dataPerform', 'conferenceModification-editContribType',
     'conferenceModification-managementAccess', 'conferenceModification-materialsAdd',
     'conferenceModification-materialsShow', 'conferenceModification-modifKey', 'conferenceModification-open',
-    'conferenceModification-removeContribType', 'conferenceModification-roomBookingBookingForm',
-    'conferenceModification-roomBookingChooseEvent', 'conferenceModification-roomBookingCloneBooking',
-    'conferenceModification-roomBookingRoomDetails', 'conferenceModification-roomBookingRoomList',
-    'conferenceModification-roomBookingSaveBooking', 'conferenceModification-roomBookingSearch4Rooms',
+    'conferenceModification-removeContribType',
     'conferenceModification-screenDates', 'conferenceOtherViews', 'conferenceProgram', 'conferenceProgram-pdf',
     'conferenceTimeTable', 'conferenceTimeTable-customizePdf', 'conferenceTimeTable-pdf', 'confListContribToJudge',
     'confListContribToJudge-asEditor', 'confListContribToJudge-asReviewer', 'confLogin', 'confLogin-active',
@@ -264,4 +264,4 @@ legacy_endpoints = set([
     'wcalendar', 'wcalendar-select', 'xmlGateway', 'xmlGateway-getCategoryInfo', 'xmlGateway-getStatsIndico',
     'xmlGateway-getStatsRoomBooking', 'xmlGateway-loginStatus', 'xmlGateway-signIn', 'xmlGateway-signOut',
     'xmlGateway-webcastForthcomingEvents', 'xmlGateway-webcastOnAir'
-])
+}
