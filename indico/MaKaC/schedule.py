@@ -29,7 +29,7 @@ from MaKaC.common import utils
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.i18n import _
 from pytz import timezone
-from MaKaC.common.utils import daysBetween
+from indico.util.date_time import iterdays
 from MaKaC.common.Conversion import Conversion
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.fossilize import Fossilizable, fossilizes
@@ -1595,7 +1595,7 @@ class ScheduleToJson(object):
             fullTT = False # This flag is used to indicate that we must save the general cache (not entries). When
             if not days:   # asking only one day, we don't need to cache (it can generate issues)
                 fullTT = True
-                days = daysBetween(schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz))
+                days = iterdays(schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz))
 
             dates = [d.strftime("%Y%m%d") for d in days]
 

@@ -35,7 +35,6 @@ from MaKaC.plugins import Collaboration, Plugin
 
 from MaKaC.user import Group, Avatar
 from indico.core.logger import Logger
-from MaKaC.common.utils import daysBetween
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.webinterface.rh.admins import RCAdmin
 from MaKaC.webinterface import wcomponents
@@ -48,6 +47,7 @@ from indico.core.extpoint.events import IObjectLifeCycleListener, ITimeActionLis
 from indico.core.extpoint.plugins import IPluginSettingsContributor, IPluginRightsContributor, IPluginDocumentationContributor
 from indico.core.extpoint.location import ILocationActionListener
 from indico.core.extpoint.index import ICatalogIndexProvider, IIndexHolderProvider
+from indico.util.date_time import iterdays
 
 
 class CSBookingInstanceIndexCatalog(Index):
@@ -102,7 +102,7 @@ class CSBookingInstanceIndex(OOIndex):
                     self.index_obj(CSBookingInstanceWrapper(bk, conf.getContributionById(contrib_id)))
         # We need to check if it is a lecture with a correct room
         elif CollaborationTools.isAbleToBeWebcastOrRecorded(conf, bk.getType()) or conf.getType() !="simple_event":
-            for day in daysBetween(conf.getStartDate(), conf.getEndDate()):
+            for day in iterdays(conf.getStartDate(), conf.getEndDate()):
                 bkw = CSBookingInstanceWrapper(bk, conf,
                                                day.replace(hour=0, minute=0, second=0),
                                                day.replace(hour=23, minute=59, second=59))

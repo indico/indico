@@ -402,20 +402,6 @@ def unicodeSlice(s, start, end, encoding = 'utf-8'):
     """
     return s.decode(encoding, 'replace')[start:end]
 
-def daysBetween(dtStart, dtEnd):
-    d = dtEnd - dtStart
-    days = [ dtStart + timedelta(n) for n in range(0, d.days + 1)]
-    if days[-1].date() != dtEnd.date():
-        # handles special case, when d.days is the
-        # actual span minus 2
-        # |----|----|----|----|
-        # (4 days)
-        #    |----|----|---
-        # (2 days and some hours)
-        days.append(dtEnd)
-
-    return days
-
 
 def formatDateTime(dateTime, showWeek=False, format=None, locale=None, server_tz=False):
     week = "EEEE" if showWeek else ""
