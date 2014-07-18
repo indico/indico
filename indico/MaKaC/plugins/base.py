@@ -1235,15 +1235,10 @@ class PluginOption(Persistent):
         return self.__value
 
     def getRooms(self):
-        from MaKaC.rb_location import RoomGUID
+        from indico.modules.rb.models.rooms import Room
         if self.getType() != 'rooms':
             raise PluginError('getRooms() called on non-rooms option')
-        rooms = []
-        for guid in self.getValue():
-            room = RoomGUID.parse(guid).getRoom()
-            if room:
-                rooms.append(room)
-        return rooms
+        return Room.find_all(Room.id.in_(self.getValue()))
 
     def setName(self, value):
         self.__name = value

@@ -135,12 +135,14 @@ class CSBookingManager(Persistent, Observer):
             self._bookingsByType = {}
 
         if filterByType is not None:
-            if type(filterByType) == str:
+            if isinstance(filterByType, basestring):
                 keys = self._bookingsByType.get(filterByType, [])
-            if type(filterByType) == list:
+            elif isinstance(filterByType, list):
                 keys = []
                 for pluginName in filterByType:
                     keys.extend(self._bookingsByType.get(pluginName, []))
+            else:
+                raise ValueError('Unexpected filterByType type: {}'.format(type(filterByType)))
         else:
             keys = self._bookings.keys()
 
@@ -1746,7 +1748,7 @@ class CSBookingBase(Persistent, Fossilizable):
 
         invalidFields = []
         for k, v in params.iteritems():
-            if type(v) == str and hasTags(v):
+            if isinstance(v, basestring) and hasTags(v):
                 invalidFields.append(k)
 
         if invalidFields:

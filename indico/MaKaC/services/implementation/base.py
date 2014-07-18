@@ -134,7 +134,7 @@ class ParameterManager(object):
                 # in the future
                 try:
                     # both strings and objects are accepted
-                    if type(value) == str:
+                    if isinstance(value, basestring):
                         naiveDate = datetime.strptime(value, '%Y/%m/%d %H:%M')
                     elif value:
                         naiveDate = datetime.strptime(value['date']+' '+value['time'][:5], '%Y/%m/%d %H:%M')

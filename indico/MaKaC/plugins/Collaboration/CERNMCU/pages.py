@@ -16,6 +16,8 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.rooms import Room
 from indico.core.config import Config
 
 from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase,\
@@ -24,9 +26,6 @@ from MaKaC.common.utils import formatDateTime, validIP
 from MaKaC.webinterface.common.tools import strip_ml_tags, unescape_html
 from MaKaC.plugins.Collaboration.CERNMCU.common import getCERNMCUOptionValueByName,\
     RoomWithH323, getMinStartDate, getMaxEndDate
-from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
-from MaKaC.errors import MaKaCError
-from indico.core.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.plugins.Collaboration.pages import WAdvancedTabBase
 from datetime import timedelta
@@ -77,70 +76,27 @@ class WMain (WJSBase):
             else:
                 vars["InitialRoomInstitution"] = ""
 
-            # TODO: get IP of room from a plugin option instead of querying RB DB every time
-            try:
-                if Config.getInstance().getIsRoomBookingActive():
-                    Logger.get("CERNMCU").info("Connecting with Room Booking DB to get a room's H323 IP")
-                    CrossLocationDB.connect()
-                    Logger.get("CERNMCU").info("Connection successful")
-
-                    attName = getCERNMCUOptionValueByName("H323_IP_att_name")
-
-                    try:
-                        returnedRooms = CrossLocationQueries.getRooms( location = locationName, roomName = roomName )
-
-                        if isinstance(returnedRooms, list):
-                            if len(returnedRooms) == 0:
-                                returnedRoom = None
-                            else:
-                                returnedRoom = returnedRooms[0]
-                        else:
-                            returnedRoom = returnedRooms
-
-                        if returnedRoom != None:
-                            vars["InitialRoomName"] = returnedRoom.getFullName()
-                            if attName in returnedRoom.customAtts:
-                                initialRoomIp = returnedRoom.customAtts[attName]
-                                if (initialRoomIp.strip() == ""):
-                                    initialRoomIp = "Please enter IP."
-                                    vars["IPRetrievalResult"] = 1
-                                elif not validIP(initialRoomIp):
-                                    vars["IPRetrievalResult"] = 2
-                                else:
-                                    vars["IPRetrievalResult"] = 0
-
-                            else:
-                                initialRoomIp = "IP not defined for this room."
-                                vars["IPRetrievalResult"] = 1
-
-                        else:
-                            initialRoomIp = "Please enter IP."
-                            vars["IPRetrievalResult"] = 1
-
-                    except AttributeError:
-                        #CrossLocationQueries.getRooms fails because it does not handle location names that are not in the DB
-                        initialRoomIp = "Please enter IP"
-                        vars["IPRetrievalResult"] = 1
-                    except Exception, e:
-                        initialRoomIp = "IP not found."
-                        vars["IPRetrievalResult"] = 4
-                        Logger.get("CERNMCU").warning("Location: " + locationName + "Problem with CrossLocationQueries when retrieving the list of all rooms with a H323 IP: " + str(e))
+            if not Config.getInstance().getIsRoomBookingActive():
+                room_ip = "Please enter IP"
+                vars["IPRetrievalResult"] = 3
+            else:
+                rb_room = Room.find_first(Location.name == locationName, Room.name == roomName, _join=Room.location)
+                if rb_room is None:
+                    room_ip = "Please enter IP."
+                    vars["IPRetrievalResult"] = 1
                 else:
-                    initialRoomIp = "Please enter IP"
-                    vars["IPRetrievalResult"] = 3
-                    Logger.get("CERNMCU").info("Tried to retrieve a room's H323 IP, but Room Booking module was not active.")
+                    vars["InitialRoomName"] = rb_room.full_name
+                    attr_name = getCERNMCUOptionValueByName('H323_IP_att_name')
+                    room_ip = rb_room.get_attribute_value(attr_name, '').strip()
+                    if not room_ip:
+                        room_ip = "Please enter IP."
+                        vars["IPRetrievalResult"] = 1
+                    elif not validIP(room_ip):
+                        vars["IPRetrievalResult"] = 2
+                    else:
+                        vars["IPRetrievalResult"] = 0
 
-            except MaKaCError, e:
-                initialRoomIp = "IP not found."
-                vars["IPRetrievalResult"] = 4
-                Logger.get("CERNMCU").warning("Location: " + locationName + "MaKaCError when retrieving a room's H.323 IP: " + e.getMessage())
-            except Exception, e:
-                initialRoomIp = "IP not found."
-                vars["IPRetrievalResult"] = 4
-                Logger.get("CERNMCU").warning("Location: " + locationName + "Exception when retrieving a room's H.323 IP: " + str(e))
-
-
-            vars["InitialRoomIP"] = initialRoomIp
+            vars["InitialRoomIP"] = room_ip
 
         else:
             vars["IncludeInitialRoom"] = False
@@ -176,42 +132,15 @@ class WExtra (WJSBase):
             if location and location.getName():
                 locationName = location.getName()
 
-                # TODO: get list of room from a plugin option instead of querying the RB DB everytime
-                try:
-                    if Config.getInstance().getIsRoomBookingActive():
-                        Logger.get("CERNMCU").info("Connecting with Room Booking DB to get the list of all rooms with a H323 IP")
-                        CrossLocationDB.connect()
-                        Logger.get("CERNMCU").info("Connection successful")
-
-                        attName = getCERNMCUOptionValueByName("H323_IP_att_name")
-
-                        try:
-                            returnedRooms = CrossLocationQueries.getRooms( location = locationName,
-                                                                           customAtts = [{"name":attName, "allowEmpty":False,
-                                                                                          "filter": (lambda ip: validIP(ip))}] )
-                            if not isinstance(returnedRooms, list):
-                                if returnedRooms:
-                                    returnedRooms = [returnedRooms]
-                                else:
-                                    returnedRooms = []
-
-                            for room in returnedRooms:
-                                roomsWithH323IP.append(RoomWithH323(locationName, room.getFullName(), room.customAtts[attName]))
-
-                        except AttributeError:
-                            #CrossLocationQueries.getRooms fails because it does not handle location names that are not in the DB
-                            pass
-                        except Exception, e:
-                            Logger.get("CERNMCU").warning("Location: " + locationName + "Problem with CrossLocationQueries when retrieving the list of all rooms with a H323 IP: " + str(e))
-
-                except MaKaCError, e:
-                    Logger.get("CERNMCU").warning("Location: " + locationName + "MaKaCError when retrieving the list of all rooms with a H323 IP: " + e.getMessage())
-                except Exception, e:
-                    Logger.get("CERNMCU").warning("Location: " + locationName + "Exception when retrieving the list of all rooms with a H323 IP: " + str(e))
+                if Config.getInstance().getIsRoomBookingActive():
+                    attr_name = getCERNMCUOptionValueByName('H323_IP_att_name')
+                    for room, ip in Room.find_with_attribute(attr_name):
+                        if validIP(ip):
+                            roomsWithH323IP.append(RoomWithH323(locationName, room.full_name, ip))
         else:
             vars["ConferenceId"] = ""
 
-        roomsWithH323IP.sort(key = lambda room: room.getLocation()+':'+room.getName())
+        roomsWithH323IP.sort(key=lambda r: (r.getLocation(), r.getName()))
         vars["RoomsWithH323IP"] = roomsWithH323IP
         return vars
 

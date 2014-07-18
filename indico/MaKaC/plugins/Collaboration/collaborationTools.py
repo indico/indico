@@ -434,8 +434,8 @@ class CollaborationTools(object):
         #list of "locationName:roomName" strings
         capableRooms = CollaborationTools.getOptionValueRooms(plugin_name, plugin_option)
 
-        roomFullNames = [r.locationName + ':' + r.getFullName() for r in capableRooms]
-        roomNames = [r.locationName + ':' + r.name for r in capableRooms]
+        roomFullNames = [r.location_name + ':' + r.full_name for r in capableRooms]
+        roomNames = [r.location_name + ':' + r.name for r in capableRooms]
 
         #a webcast-able talk is defined as a talk talking place in a webcast-able room
         ableTalks = []
@@ -454,7 +454,7 @@ class CollaborationTools(object):
     def isAbleToBeWebcastOrRecorded(cls, obj, plugin_name):
         plugin_option ='recordingCapableRooms' if plugin_name == 'RecordingRequest' else 'webcastCapableRooms'
         capableRooms = CollaborationTools.getOptionValueRooms(plugin_name, plugin_option)
-        roomNames = [r.locationName + ':' + r.name for r in capableRooms]
+        roomNames = [r.location_name + ':' + r.name for r in capableRooms]
         location = obj.getLocation()
         room = obj.getRoom()
         isAble = location is not None and room is not None and (location.getName() + ":" + room.getName() in roomNames)

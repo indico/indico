@@ -99,9 +99,9 @@ class CSBooking(CSBookingBase):
         return self._created
 
     def isLinkedToEquippedRoom(self):
-        return self._created and (VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="H323 IP") != "" or
+        return self._created and (VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="h323-ip") != "" or
                                   VidyoTools.getLinkRoomAttribute(self.getLinkObject(),
-                                                                  attName="VidyoPanorama ID") != "")
+                                                                  attName="vidyopanorama-id") != "")
 
     def __conform__(self, proto):
         if proto == IIndexableByVidyoRoom:
@@ -259,9 +259,9 @@ class CSBooking(CSBookingBase):
 
     def connectionStatus(self):
         return VidyoOperations.isRoomConnected(self, VidyoTools.getLinkRoomAttribute(self.getLinkObject(),
-                                                                                     attName="H323 IP"),
+                                                                                     attName="h323-ip"),
                                                VidyoTools.getLinkRoomAttribute(self.getLinkObject(),
-                                                                               attName="VidyoPanorama ID"))
+                                                                               attName="vidyopanorama-id"))
 
     def getBookingInformation(self):
         """ For retreiving the ServiceInformation sections dict built for the
@@ -492,8 +492,8 @@ class CSBooking(CSBookingBase):
         if isinstance(connectionStatus, VidyoError):
             return connectionStatus
 
-        confRoomIp = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="H323 IP")
-        confRoomPanoramaUser = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="VidyoPanorama ID")
+        confRoomIp = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="h323-ip")
+        confRoomPanoramaUser = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="vidyopanorama-id")
         if confRoomIp == "" and confRoomPanoramaUser == "":
             return VidyoError("noValidConferenceRoom", "connect")
 
@@ -539,8 +539,8 @@ class CSBooking(CSBookingBase):
 
     def _disconnect(self):
         self._checkStatus()
-        confRoomIp = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="H323 IP")
-        confRoomPanoramaUser = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="VidyoPanorama ID")
+        confRoomIp = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="h323-ip")
+        confRoomPanoramaUser = VidyoTools.getLinkRoomAttribute(self.getLinkObject(), attName="vidyopanorama-id")
         if confRoomIp == "" and confRoomPanoramaUser == "":
             return VidyoError("noValidConferenceRoom", "disconnect")
         connectionStatus = self.connectionStatus()

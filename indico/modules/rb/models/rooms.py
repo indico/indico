@@ -463,6 +463,15 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         rooms.sort(key=lambda x: natural_sort_key(x.location.name + x.getFullName()))
         return rooms
 
+    @classmethod
+    def find_with_attribute(cls, attribute):
+        """Search rooms which have a specific attribute"""
+        query = (Room.query
+                 .with_entities(Room, RoomAttributeAssociation.raw_data)
+                 .join(Room.attributes, RoomAttributeAssociation.attribute)
+                 .filter(RoomAttribute.name == attribute))
+        return [(room, json.loads(attr)) for room, attr in query]
+
     @staticmethod
     def getRoomsWithData(*args, **kwargs):
         from .locations import Location
@@ -843,10 +852,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     #                      .first())
     #     return attribute
 
-    def get_attribute_value(self, name):
+    def get_attribute_value(self, name, default=None):
         attr = self.getAttributeByName(name)
-        if attr:
-            return attr.value
+        return attr.value if attr else default
 
     def containsText(self, text):
         for attr in dir(self):

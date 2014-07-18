@@ -424,7 +424,7 @@
                             addNew = true;
                         % endif
                         <%
-                        roomList = dict((str(r.guid), '%s: %s' % (r.locationName, r.getFullName())) for r in option.getRooms())
+                        roomList = dict((str(r.id), '{}: {}'.format(r.location_name, r.full_name)) for r in option.getRooms())
                         %>
                         var rlf = new RoomListField('PeopleListDiv', 'PeopleList', ${ fossilize(roomList) }, addNew, addRoomHandler, removeRoomHandler);
 

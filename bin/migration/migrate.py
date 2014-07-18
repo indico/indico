@@ -29,10 +29,12 @@ import traceback
 
 from dateutil import rrule
 from pkg_resources import parse_version
+from indico.web.flask.app import make_app
 
 from indico.core.config import Config
 from indico.core.db import DBMgr
 from indico.core.index import Catalog
+from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.tasks import OccurrenceNotifications
 from indico.modules.scheduler.tasks import AlarmTask
 from indico.modules.scheduler.tasks.suggestions import CategorySuggestionTask
@@ -412,6 +414,29 @@ def addOccurrenceNotificationsTask(dbi, prevVersion):
     dbi.commit()
 
 
+@since('1.9')
+def updatePluginSettingsNewRB(dbi, prevVersion):
+    """Migrate plugin settings to be compatible with the new RB module"""
+    ph = PluginsHolder()
+    # Custom attributes are now loercase-with-dashes internally
+    opt = ph.getPluginType('Collaboration').getPlugin('CERNMCU').getOption('H323_IP_att_name')
+    if opt.getValue() == 'H323 IP':
+        opt.setValue('h323-ip')
+    # Replace room GUIDs with plain room IDs
+    for plugin_name, rooms_opt in [('WebcastRequest', 'webcastCapableRooms'),
+                                   ('RecordingRequest', 'recordingCapableRooms')]:
+        opt = ph.getPluginType('Collaboration').getPlugin(plugin_name).getOption(rooms_opt)
+        room_ids = []
+        for room_id in opt.getValue():
+            if isinstance(room_id, basestring):
+                room_id = int(room_id.split('|')[1].strip())
+            if Room.get(room_id):
+                room_ids.append(room_id)
+        opt.setValue(room_ids)
+
+    dbi.commit()
+
+
 def runMigration(prevVersion=parse_version(__version__), specified=[], dry_run=False, run_from=None):
 
     global MIGRATION_TASKS
@@ -497,10 +522,11 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
                                   globals(), locals(), proffilename)
                 return result
             else:
-                return runMigration(prevVersion=parse_version(args.prevVersion),
-                                    specified=filter(lambda x: x, map(lambda x: x.strip(), args.specified.split(','))),
-                                    run_from=args.run_from,
-                                    dry_run=args.dry_run)
+                with make_app().app_context():
+                    return runMigration(prevVersion=parse_version(args.prevVersion),
+                                        specified=filter(None, map(str.strip, args.specified.split(','))),
+                                        run_from=args.run_from,
+                                        dry_run=args.dry_run)
         except:
             print console.colored("\nMigration failed! DB may be in "
                                   " an inconsistent state:", 'red', attrs=['bold'])

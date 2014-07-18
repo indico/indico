@@ -86,7 +86,6 @@ class PluginOptionsRemoveUser ( PluginOptionsBase, UserModificationBase ):
         return True
 
 
-# TODO: DB mixin
 class PluginOptionsAddRooms(PluginOptionsBase):
 
     def _checkParams(self):
@@ -95,7 +94,7 @@ class PluginOptionsAddRooms(PluginOptionsBase):
     def _getAnswer(self):
         if self._targetOption.getType() == 'rooms':
             optionValue = self._targetOption.getValue()
-            roomToAdd = self._params.get("room")
+            roomToAdd = int(self._params.get("room"))
             if roomToAdd not in optionValue:
                 optionValue.append(roomToAdd)
             self._targetOption._notifyModification()
@@ -112,7 +111,7 @@ class PluginOptionsRemoveRooms ( PluginOptionsBase ):
 
     def _getAnswer(self):
         if self._targetOption.getType() == 'rooms':
-            roomToRemove=self._params.get("room")
+            roomToRemove = int(self._params.get("room"))
             self._targetOption.getValue().remove(roomToRemove)
             self._targetOption._notifyModification()
         else:
