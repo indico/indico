@@ -61,10 +61,8 @@ from MaKaC.common.TemplateExec import escapeHTMLForJS
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface import displayMgr
 from MaKaC.common.ContextHelp import ContextHelp
-from MaKaC.rb_tools import FormMode, overlap
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 from MaKaC.common.TemplateExec import truncateTitle
-from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
@@ -339,9 +337,8 @@ class WHeader(WTemplated):
         vars["categId"] = self.__currentCategory.getId() if self.__currentCategory else 0
         extension_point("fillCategoryHeader", vars)
 
-        # Check if room booking module is active
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        vars['roomBooking'] = minfo.getRoomBookingModuleActive()
+        vars['roomBooking'] = Config.getInstance().getIsRoomBookingActive()
         vars['protectionDisclaimerProtected'] = minfo.getProtectionDisclaimerProtected()
         vars['protectionDisclaimerRestricted'] = minfo.getProtectionDisclaimerRestricted()
         #Build a list of items for the administration menu
@@ -3443,8 +3440,7 @@ class WSessionModEditData(WTemplated):
         vars = WTemplated.getVars(self)
         vars["conference"] = self._conf
         vars["eventId"] = "s" + vars["sessionId"]
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
+        vars["useRoomBookingModule"] = Config.getInstance().getIsRoomBookingActive()
         vars["pageTitle"] = self.htmlText(self._title)
         vars["postURL"] = quoteattr(str(vars["postURL"]))
         vars["title"] = quoteattr(str(vars.get("title", "")))

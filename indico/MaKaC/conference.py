@@ -22,7 +22,7 @@ from itertools import ifilter
 # fossil classes
 from indico.modules.rb.models.reservations import Reservation
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
-from MaKaC.plugins import PluginsHolder, Observable
+from MaKaC.plugins import Observable
 from MaKaC.common.utils import formatDateTime
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
     ISubContribParticipationFullFossil, ISubContributionFossil, ISubContributionWithSpeakersFossil
@@ -42,7 +42,6 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
-from MaKaC.rb_location import CrossLocationDB
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
 from indico.util.i18n import L_
@@ -54,7 +53,7 @@ import re, os
 import tempfile
 import copy
 import stat
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta
 from flask import session
 
 from MaKaC.contributionReviewing import ReviewManager
@@ -65,15 +64,14 @@ from pytz import timezone
 from pytz import all_timezones
 
 from persistent import Persistent
-from BTrees.OOBTree import OOBTree, OOTreeSet, OOSet
+from BTrees.OOBTree import OOBTree, OOTreeSet
 from BTrees.OIBTree import OIBTree,OISet,union
 import MaKaC
 import MaKaC.common.indexes as indexes
 from MaKaC.common.timezoneUtils import nowutc, maxDatetime
 import MaKaC.fileRepository as fileRepository
-from MaKaC.schedule import ConferenceSchedule, SessionSchedule,SlotSchedule,\
-     PosterSlotSchedule, SlotSchTypeFactory, ContribSchEntry, \
-     LinkedTimeSchEntry, BreakTimeSchEntry
+from MaKaC.schedule import (ConferenceSchedule, SessionSchedule, SlotSchTypeFactory, ContribSchEntry,
+                            LinkedTimeSchEntry, BreakTimeSchEntry)
 import MaKaC.review as review
 from MaKaC.common import utils
 from MaKaC.common.Counter import Counter
@@ -89,14 +87,11 @@ from MaKaC.common import pendingQueues
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.participant import Participation
 from MaKaC.common.log import LogHandler
-import MaKaC.common.info as info
 from MaKaC.badge import BadgeTemplateManager
 from MaKaC.poster import PosterTemplateManager
 from MaKaC.common import mail
-from MaKaC.common.utils import getHierarchicalId
 from MaKaC.i18n import _
 from MaKaC.common.PickleJar import Updates
-from MaKaC.common.PickleJar import if_else
 from MaKaC.schedule import ScheduleToJson
 from MaKaC.webinterface import urlHandlers
 

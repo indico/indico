@@ -38,7 +38,7 @@ import MaKaC.schedule as schedule
 import MaKaC.conference as conference
 import MaKaC.webinterface.materialFactories as materialFactories
 import MaKaC.common.filters as filters
-from MaKaC.common.utils import isStringHTML, formatDateTime, formatDate
+from MaKaC.common.utils import isStringHTML
 import MaKaC.common.utils
 import MaKaC.review as review
 from MaKaC.review import AbstractTextField
@@ -46,7 +46,6 @@ from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.pages.signIn import WPResetPasswordBase
 from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
 from MaKaC.webinterface.materialFactories import ConfMFRegistry,PaperFactory,SlidesFactory,PosterFactory
-from indico.core.config import Config
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.common.output import outputGenerator
@@ -66,14 +65,12 @@ from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
 from indico.util.string import safe_upper
 import MaKaC.webcast as webcast
-from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
 from indico.core.logger import Logger
 from MaKaC.plugins.base import OldObservable
 from MaKaC.plugins.base import extension_point
-from indico.core import config as Configuration
 from indico.modules import ModuleHolder
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
 from MaKaC.conference import Session, Contribution, LocalFile
@@ -1172,7 +1169,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         customRoom = item.getRoom()
         if not customRoom:
             roomName = ''
-        elif fullName and location and minfo.getRoomBookingModuleActive():
+        elif fullName and location and Config.getInstance().getIsRoomBookingActive():
             # if we want the full name and we have a RB DB to search in
             roomName = customRoom.getFullName()
             if not roomName:
@@ -1521,7 +1518,7 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
             self._logMenuItem.setVisible(False)
             self._evaluationMenuItem.setVisible(False)
 
-        if not (info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive() and canModify):
+        if not (Config.getInstance().getIsRoomBookingActive() and canModify):
             self._roomBookingMenuItem.setVisible(False)
 
         #if not (self._conf.hasEnabledSection("cfa") and (canModify or isAM)):
@@ -1724,7 +1721,7 @@ class WConfModifMainData(wcomponents.WTemplated):
             sedate += i18nformat(""" <i> _("(normal)")</i>""")
         else:
             sedate += i18nformat(""" <font color='red'> _("(modified)")</font>""")
-        vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
+        vars['rbActive'] = Config.getInstance().getIsRoomBookingActive()
         vars["screenDates"] = "%s -> %s" % (ssdate, sedate)
         vars["timezoneList"] = TimezoneRegistry.getList()
         vars["chairpersons"] = self._getChairPersonsList()
@@ -1878,7 +1875,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
                 selected = ""
             styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId,selected,styleMgr.getStyleName(styleId))
         vars["conference"] = self._conf
-        vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
+        vars["useRoomBookingModule"] = Config.getInstance().getIsRoomBookingActive()
         vars["styleOptions"] = styleoptions
         import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
         wr = webFactoryRegistry.WebFactoryRegistry()
@@ -4708,8 +4705,8 @@ class WConfModifContribList(wcomponents.WTemplated):
         hours = (totaldur.seconds)/3600
         dayhours = (days * 24)+hours
         mins = ((totaldur.seconds)/60)-(hours*60)
-        vars["totaldur" ]="""%sh%sm"""%(dayhours,mins)
-        vars['rbActive'] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
+        vars["totaldur"] = """%sh%sm""" % (dayhours, mins)
+        vars['rbActive'] = Config.getInstance().getIsRoomBookingActive()
         vars["bookings"] = Conversion.reservationsList(self._conf.getRoomBookingList())
         vars["filterMenu"] = self._getFilterMenu()
         vars["sortingOptions"]="""<input type="hidden" name="sortBy" value="%s">
