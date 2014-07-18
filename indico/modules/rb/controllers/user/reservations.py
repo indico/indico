@@ -599,19 +599,6 @@ class RHRoomBookingCalendar(RHRoomBookingBase):
                                      end_dt=self.end_dt, overload=self._overload, max_days=self.MAX_DAYS).display()
 
 
-# TODO: remove with legacy MaKaC code
-class RHRoomBookingBookingForm(RHRoomBookingBase):
-    def __init__(self):
-        raise NotImplementedError
-
-
-# TODO: remove with legacy MaKaC code
-class RHRoomBookingSaveBooking(RHRoomBookingBase):
-
-    def __init__(self):
-        raise NotImplementedError
-
-
 # TODO: remove once we use flash messages
 class RHRoomBookingStatement(RHRoomBookingBase):
     def _checkParams(self):
