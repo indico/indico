@@ -17,7 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceModif
 from indico.modules.rb.controllers.user.event import (RHRoomBookingEventBookingList, RHRoomBookingEventBookingDetails,
                                                       RHRoomBookingEventBookingModifyBooking,
                                                       RHRoomBookingEventBookingCloneBooking,
@@ -37,16 +36,6 @@ event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/modify', 'ro
                         RHRoomBookingEventBookingModifyBooking, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/clone', 'rooms_booking_clone',
                         RHRoomBookingEventBookingCloneBooking, methods=('GET', 'POST'))
-
-# Book room
-event_mgmt.add_url_rule('/rooms/book/search', 'conferenceModification-roomBookingSearch4Rooms',
-                        conferenceModif.RHConfModifRoomBookingSearch4Rooms, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/rooms/book/search/results', 'conferenceModification-roomBookingRoomList',
-                        conferenceModif.RHConfModifRoomBookingRoomList, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/rooms/book/confirm', 'conferenceModification-roomBookingBookingForm',
-                        conferenceModif.RHConfModifRoomBookingBookingForm, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/rooms/book/save', 'conferenceModification-roomBookingSaveBooking',
-                        conferenceModif.RHConfModifRoomBookingSaveBooking, methods=('GET', 'POST'))
 
 # Book room
 event_mgmt.add_url_rule('/rooms/room/<roomLocation>/<int:roomID>/book', 'rooms_room_book',

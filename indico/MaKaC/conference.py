@@ -20,6 +20,7 @@
 from itertools import ifilter
 
 # fossil classes
+from indico.modules.rb.models.reservations import Reservation
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.plugins import PluginsHolder, Observable
 from MaKaC.common.utils import formatDateTime
@@ -2217,70 +2218,12 @@ class Conference(CommonObjectBase, Locatable):
 
     # Room booking related ===================================================
 
-    def getRoomBookingList( self ):
-        """
-        Returns list of bookings for this conference.
-        """
-        from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
-
-        if not DALManager.isConnected():
+    def getRoomBookingList(self):
+        """Returns list of bookings for this conference."""
+        # In case anyone wonders why this method is still here: Various fossils expect/use it.
+        if not self.getId().isdigit():
             return []
-
-        resvs = []
-        for resvGuid in self.getRoomBookingGuids():
-            r = resvGuid.getReservation()
-            if r == None:
-                self.removeRoomBookingGuid( resvGuid )
-            elif r.isValid:
-                resvs.append( r )
-        return resvs
-
-    def getBookedRooms( self ):
-        """
-        Returns list of rooms booked for this conference.
-        Returns [] if room booking module is off.
-        """
-        rooms = []
-
-        for r in self.getRoomBookingList():
-            if not r.room in rooms:
-                rooms.append( r.room )
-        return rooms
-
-    def getRoomBookingGuids( self ):
-        try:
-            self.__roomBookingGuids
-        except AttributeError:
-            self.__roomBookingGuids = []
-        return self.__roomBookingGuids
-
-    def setRoomBookingGuids( self, guids ):
-        self.__roomBookingGuids = guids
-
-    def addRoomBookingGuid( self, guid ):
-        self.getRoomBookingGuids().append( guid )
-        self._p_changed = True
-
-    def removeRoomBookingGuid( self, guid ):
-        self.getRoomBookingGuids().remove( guid )
-        self._p_changed = True
-
-    def __TMP_PopulateRoomBookings( self ):
-        # TEMPORARY GENERATION OF RESERVATIONS FOR CONFERENCE
-        from MaKaC.rb_reservation import ReservationBase
-        from MaKaC.rb_location import ReservationGUID, Location
-        resvs = []
-        resvs.append( ReservationBase.getReservations( resvID = 395887 ) )
-        resvs.append( ReservationBase.getReservations( resvID = 381406 ) )
-        resvs.append( ReservationBase.getReservations( resvID = 387688 ) )
-        resvs.append( ReservationBase.getReservations( resvID = 383459 ) )
-
-        resvGuids = []
-        for resv in resvs:
-            resvGuids.append( ReservationGUID( Location.getDefaultLocation(), resv.id ) )
-
-        self.__roomBookingGuids = resvGuids
-
+        return Reservation.find_all(event_id=int(self.getId()))
 
     # ========================================================================
 
@@ -2728,11 +2671,14 @@ class Conference(CommonObjectBase, Locatable):
             if not alarm.getEndedOn():
                 self.removeAlarm(alarm)
 
-        #Delete the RoomBooking associated reservations
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive() and CrossLocationDB.isConnected():
-            for resv in self.getRoomBookingList():
-                resv.remove()
+        # Cancel the associated room bookings
+        if Config.getInstance().getIsRoomBookingActive() and self.getId().isdigit():
+            reservations = Reservation.find(Reservation.event_id == int(self.getId()),
+                                            ~Reservation.is_cancelled,
+                                            ~Reservation.is_rejected)
+            for resv in reservations:
+                resv.event_id = None
+                resv.cancel(session.user, u'Associated event was deleted')
 
         #For each conference we have a list of managers. If we delete the conference but we don't delete
         #the link in every manager to the conference then, when the manager goes to his "My profile" he

@@ -21,8 +21,12 @@
 Conversion functions for fossils
 """
 
+from collections import defaultdict
+
 import pytz
+
 from MaKaC.user import Avatar
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 
 
 class Conversion(object):
@@ -176,11 +180,12 @@ class Conversion(object):
 
     @classmethod
     def reservationsList(cls, resvs):
-        res = {}
+        res = defaultdict(list)
         for resv in resvs:
-            if not res.has_key(resv.room.getFullName()):
-                res[resv.room.getFullName()] = []
-            res[resv.room.getFullName()].extend([{'startDateTime': cls.datetime(period.startDT), 'endDateTime':  cls.datetime(period.endDT)} for period in resv.splitToPeriods()])
+            occurrences = resv.occurrences.filter(ReservationOccurrence.is_valid)
+            res[resv.room.full_name] += [{'startDateTime': cls.datetime(occ.start),
+                                          'endDateTime': cls.datetime(occ.end)}
+                                         for occ in occurrences]
         return res
 
     @classmethod
