@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from indico.core.config import Config
 
 from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase,\
     WCSCSSBase
@@ -26,7 +27,6 @@ from MaKaC.plugins.Collaboration.CERNMCU.common import getCERNMCUOptionValueByNa
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from MaKaC.errors import MaKaCError
 from indico.core.logger import Logger
-from MaKaC.common import info
 from MaKaC.i18n import _
 from MaKaC.plugins.Collaboration.pages import WAdvancedTabBase
 from datetime import timedelta
@@ -79,8 +79,7 @@ class WMain (WJSBase):
 
             # TODO: get IP of room from a plugin option instead of querying RB DB every time
             try:
-                minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-                if minfo.getRoomBookingModuleActive():
+                if Config.getInstance().getIsRoomBookingActive():
                     Logger.get("CERNMCU").info("Connecting with Room Booking DB to get a room's H323 IP")
                     CrossLocationDB.connect()
                     Logger.get("CERNMCU").info("Connection successful")
@@ -179,8 +178,7 @@ class WExtra (WJSBase):
 
                 # TODO: get list of room from a plugin option instead of querying the RB DB everytime
                 try:
-                    minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-                    if minfo.getRoomBookingModuleActive():
+                    if Config.getInstance().getIsRoomBookingActive():
                         Logger.get("CERNMCU").info("Connecting with Room Booking DB to get the list of all rooms with a H323 IP")
                         CrossLocationDB.connect()
                         Logger.get("CERNMCU").info("Connection successful")

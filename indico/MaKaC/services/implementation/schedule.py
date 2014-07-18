@@ -49,7 +49,6 @@ from MaKaC.fossils.schedule import ILinkedTimeSchEntryMgmtFossil, IBreakTimeSchE
 from MaKaC.fossils.contribution import IContributionParticipationTTMgmtFossil, IContributionFossil
 from MaKaC.fossils.conference import IConferenceParticipationFossil,\
     ISessionFossil
-from MaKaC.common import timezoneUtils
 from MaKaC.common.Conversion import Conversion
 from MaKaC.schedule import BreakTimeSchEntry
 from MaKaC.conference import SessionSlot, Material, Link
@@ -57,7 +56,10 @@ from MaKaC.webinterface.pages.sessions import WSessionICalExport
 from MaKaC.webinterface.pages.contributions import WContributionICalExport
 from indico.web.http_api.util import generate_public_auth_request
 
-import time, datetime, pytz, copy
+import datetime
+import pytz
+import copy
+from indico.core.config import Config
 
 def translateAutoOps(autoOps):
 
@@ -105,8 +107,7 @@ class LocationSetter:
                 r = conference.CustomRoom()
             target.setRoom(r)
             r.setName(room)
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            if minfo.getRoomBookingModuleActive():
+            if Config.getInstance().getIsRoomBookingActive():
                 r.retrieveFullName(location)
             else:
                 # invalidate full name, as we have no way to know it

@@ -542,14 +542,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return max_capacity
 
     @staticmethod
-    def getRoomsByName(name):
-        return Room.find_all(name=name)
-
-    @staticmethod
-    def getRoomByName(name):
-        return Room.query.filter_by(name=name).first()
-
-    @staticmethod
     def filter_available(start_dt, end_dt, repetition, include_pre_bookings=True, include_pending_blockings=True):
         """Returns a SQLAlchemy filter criterion ensuring that the room is available during the given time."""
         # Check availability against reservation occurrences

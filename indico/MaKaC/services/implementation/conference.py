@@ -64,7 +64,6 @@ from indico.modules import ModuleHolder
 from indico.modules.offlineEvents import OfflineEventItem
 from indico.modules.scheduler.tasks.offlineEventGenerator import OfflineEventGeneratorTask
 from indico.modules.scheduler import tasks, Client
-from indico.util.i18n import i18nformat
 from indico.web.http_api.util import generate_public_auth_request
 from indico.core.config import Config
 
@@ -224,8 +223,7 @@ class ConferenceBookingModification(ConferenceTextModificationBase):
         if room.getName() != newRoom:
             room.setName(newRoom)
 
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            if minfo.getRoomBookingModuleActive():
+            if Config.getInstance().getIsRoomBookingActive():
                 room.retrieveFullName(newLocation)
             else:
                 # invalidate full name, as we have no way to know it

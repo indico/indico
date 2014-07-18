@@ -21,57 +21,36 @@ import datetime
 import os
 import re
 from cgi import escape
-from collections import OrderedDict
 
-from flask import current_app
 from pytz import timezone
 
 # MaKaC
+from indico.core.config import Config
 import MaKaC.common.indexes as indexes
 import MaKaC.common.info as info
 import MaKaC.webcast as webcast
-from indico.core.config import Config
 import MaKaC.conference as conference
 import MaKaC.user as user
-from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.authentication.LDAPAuthentication import LDAPGroup
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.personalization as personalization
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC import (
-    domain,
-    roomMapping
-)
+from MaKaC import domain
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common import (
     timezoneUtils,
     utils
 )
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
-from MaKaC.common.Configuration import Config
 from MaKaC.common.fossilize import fossilize
-from MaKaC.common.pendingQueues import (
-    PendingCoordinatorReminder,
-    PendingManagerReminder,
-    PendingSubmitterReminder,
-)
-from MaKaC.conference import ConferenceHolder
-from MaKaC.errors import MaKaCError
 from MaKaC.fossils.modules import INewsItemFossil
 from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.i18n import _
-from MaKaC.plugins import (
-    PluginLoader,
-    PluginsHolder
-)
+from MaKaC.plugins import PluginsHolder
 from MaKaC.services.implementation.user import UserComparator
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
-from MaKaC.webinterface.common.timezones import (
-    DisplayTimezoneRegistry,
-    TimezoneRegistry
-)
-from MaKaC.webinterface.locators import CategoryWebLocator
+from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.pages.base import WPDecorated
@@ -410,8 +389,8 @@ class WAdminPlugins (wcomponents.WTemplated):
         vars["PluginType"] = PluginsHolder().getPluginType(self._pluginType)
         vars["InitialPlugin"] = self._initialPlugin
         vars["Favorites"] = fossilize(self._user.getPersonalInfo().getBasket().getUsers().values(), IAvatarFossil)
-        vars["rbActive"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
-        vars["baseURL"]=Config.getInstance().getBaseURL()
+        vars["rbActive"] = Config.getInstance().getIsRoomBookingActive()
+        vars["baseURL"] = Config.getInstance().getBaseURL()
 
         return vars
 

@@ -15,7 +15,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-
+from indico.core.config import Config
 
 from MaKaC.plugins.Collaboration.base import CollaborationException, CSErrorBase
 from persistent import Persistent
@@ -31,7 +31,6 @@ from MaKaC.common.timezoneUtils import nowutc
 from datetime import timedelta
 from indico.core.logger import Logger
 from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
-from MaKaC.common import info
 from indico.core.index import Catalog
 
 
@@ -196,8 +195,7 @@ class VidyoTools(object):
         room = linkVideo.getRoom()
         roomAttribute = ""
         if location and room and location.getName() and room.getName() and location.getName().strip() and room.getName().strip():
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            if minfo.getRoomBookingModuleActive():
+            if Config.getInstance().getIsRoomBookingActive():
                 CrossLocationDB.connect()
                 try:
                     roomInfo = CrossLocationQueries.getRooms(location=location.getName(), roomName=room.getName())

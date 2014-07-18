@@ -245,10 +245,6 @@ class MaKaCInfo(Persistent):
             emails.append(admin.getEmail())
         return emails
 
-    # === ROOM BOOKING RELATED ===============================================
-    def getRoomBookingModuleActive(self):
-        return Config.getInstance().getIsRoomBookingActive()
-
     def getDefaultConference( self ):
         try:
             self._defaultConference

@@ -18,6 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import re
+from indico.core.config import Config
 from MaKaC.common import filters, info
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
@@ -120,10 +121,9 @@ class RoomMapper(Persistent):
         groupdict = self.applyRegularExpressions(roomName)
         if groupdict:
             return self.getBaseMapURL().format(**groupdict)
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
+        if Config.getInstance().getIsRoomBookingActive():
             from indico.modules.rb.models.rooms import Room
-            room = Room.getRoomByName(roomName)
+            room = Room.find_first(name=roomName)
             if room:
                 if all(field in self.getBaseMapURL() for field in ['{building}','{floor}','{roomNr}']):
                     return self.getBaseMapURL().format(**{'building': str(room.building),

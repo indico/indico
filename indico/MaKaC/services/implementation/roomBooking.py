@@ -21,6 +21,7 @@
 """
 Asynchronous request handlers for room booking
 """
+from indico.core.config import Config
 from MaKaC.services.interface.rpc.common import ServiceError
 
 import time
@@ -67,8 +68,7 @@ class RoomBookingListRooms(ServiceBase):
     def _getAnswer(self):
 
         res = {}
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
+        if Config.getInstance().getIsRoomBookingActive():
             if Location.parse(self._location):
                 for room in CrossLocationQueries.getRooms(location=self._location):
                     res[room.name] = room.name
@@ -80,8 +80,7 @@ class RoomBookingFullNameListRooms(RoomBookingListRooms):
     def _getAnswer(self):
 
         res = []
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
+        if Config.getInstance().getIsRoomBookingActive():
             if Location.parse(self._location):
                 for room in CrossLocationQueries.getRooms(location=self._location, allFast=True):
                         res.append((room.name, room.getFullName()))
@@ -91,8 +90,7 @@ class RoomBookingFullNameListRooms(RoomBookingListRooms):
 class RoomBookingListLocationsAndRooms(ServiceBase):
 
     def _getAnswer(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
+        if Config.getInstance().getIsRoomBookingActive():
             result = {}
             locationNames = map(lambda l: l.friendlyName, Location.allLocations)
             for loc in locationNames:
@@ -109,9 +107,8 @@ class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):
         self._isActive = self._params.get('isActive', None)
 
     def _getAnswer(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         result = {}
-        if minfo.getRoomBookingModuleActive():
+        if Config.getInstance().getIsRoomBookingActive():
             locationNames = map(lambda l: l.friendlyName, Location.allLocations)
             for loc in locationNames:
                 roomEx = Factory.newRoom()

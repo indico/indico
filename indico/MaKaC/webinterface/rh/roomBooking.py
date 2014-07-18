@@ -164,7 +164,7 @@ class RoomBookingAvailabilityParamsMixin:
             self._startDT = datetime.today().replace(hour=0,minute=0,second=0)
             self._endDT = self._startDT.replace(hour=23,minute=59,second=59)
 
-class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin, RHRoomBookingProtected ):
+class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RHRoomBookingProtected ):
     """
     All room booking related hanlders are derived from this class.
     This gives them:

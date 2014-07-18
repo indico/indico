@@ -313,7 +313,6 @@ class Avatar(Persistent, Fossilizable):
     @cached_classproperty
     @classmethod
     def linkedToMap(cls):
-        from MaKaC.common.timerExec import Alarm
         import MaKaC.conference
         import MaKaC.registration
         import MaKaC.evaluation
@@ -341,9 +340,7 @@ class Avatar(Persistent, Fossilizable):
             'group': {'cls': MaKaC.user.Group,
                       'roles': set(['member'])},
             'evaluation': {'cls': MaKaC.evaluation.Submission,
-                           'roles': set(['submitter'])},
-            'alarm': {'cls': Alarm,
-                      'roles': set(['to'])}
+                           'roles': set(['submitter'])}
         }
 
     def __init__(self, userData=None):
@@ -1425,13 +1422,6 @@ class AvatarHolder(ObjectHolder):
                         for reg in set(links[objType][role]):
                             reg.setAvatar(prin)
                             prin.addRegistrant(reg)
-
-            if objType == "alarm":
-                for role in links[objType].keys():
-                    if role == "to":
-                        for alarm in set(links[objType][role]):
-                            alarm.removeToUser(merged)
-                            alarm.addToUser(prin)
 
             if objType == "group":
                 for role in links[objType].keys():
