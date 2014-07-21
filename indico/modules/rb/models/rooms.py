@@ -336,14 +336,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def marker_description(self):
         infos = []
 
-        infos.append('{capacity} {label}'.format(
-            capacity=self.capacity,
-            label=(_('person'), _('people'))[self.capacity > 1 or self.capacity == 0]
-        ))
-        infos.append((_('private'),
-                      _('public'))[self.is_public])
-        infos.append((_('needs confirmation'),
-                      _('auto-confirmation'))[self.is_auto_confirm])
+        infos.append('{capacity} {label}'.format(capacity=self.capacity,
+                                                 label=_('person') if self.capacity == 1 else _('people')))
+        infos.append(_('public') if self.is_public else _('private'))
+        infos.append(_('auto-confirmation') if self.is_auto_confirm else _('needs confirmation'))
         if self.needs_video_conference_setup:
             infos.append(_('video conference'))
 
@@ -651,187 +647,22 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if r:
             return r.getFullName()
 
-    # reservations
-
-    def doesHaveLiveReservations(self):
+    def has_live_reservations(self):
         return self.reservations.filter_by(
             is_archived=False,
             is_cancelled=False,
             is_rejected=False
         ).count() > 0
 
-    def getLiveReservations(self):
-        return Reservation.find_all(
-            Reservation.room == self,
-            ~Reservation.is_archived,
-            ~Reservation.is_cancelled,
-            ~Reservation.is_rejected
-        )
-
-    def removeReservations(self):
-        del self.reservations[:]
-
     @staticmethod
     def isAvatarResponsibleForRooms(avatar):
         return Room.query.filter_by(owner_id=avatar.id).count() > 0
 
-    def getLocationName(self):
-        return self.location.name
-
-    @staticmethod
-    def getReservationsForAvailability(start_date, end_date, room_id_list):
-        from .locations import Location
-
-        date_query = db.session.query(
-            cast(func.generate_series(start_date.date(), end_date.date(), timedelta(1)),
-                 sa_date).label('available_date')
-        ).subquery()
-
-        # def get_exclude_null_query(attr, kind):
-        #     # return db.session\
-        #     #          .query(func.array_agg('x'))\
-        #     #          .select_from(func.unnest(func.array_agg(attr).alias('x')))\
-        #     #          .correlate(Reservation)\
-        #     #          .filter('x != null')\
-        #     #          .subquery()
-        #     print kind, '==================='
-        #     return select([type_coerce(
-        #         func.array_agg('x'),
-        #         sa_array(kind, as_tuple=True))])\
-        #     .select_from(
-        #         func.unnest(func.array_agg(attr)).alias('x')
-        #     )\
-        #     .where('x != None')\
-        #     .as_scalar()
-
-        def coerce_as_tuple(attr, kind=None):
-            return type_coerce(
-                func.array_agg(attr),
-                sa_array(kind or attr.type, as_tuple=True)
-            )
-
-        return db.session \
-                 .query() \
-                 .select_from(date_query) \
-                 .with_entities(
-                     date_query.c.available_date,
-                     Room,
-                     func.min(Location.name),
-                     func.min(Blocking.id),
-                     func.min(Blocking.reason),
-                     func.min(Blocking.created_by),
-                     coerce_as_tuple(Reservation.id),
-                     # coerce_as_tuple(Reservation.booking_reason),
-                     coerce_as_tuple(Reservation.booked_for_name),
-                     coerce_as_tuple(Reservation.booked_for_name),
-                     coerce_as_tuple(Reservation.is_confirmed),
-                     coerce_as_tuple(cast(ReservationOccurrence.start, sa_time)),
-                     coerce_as_tuple(cast(ReservationOccurrence.end, sa_time))
-                 ) \
-                 .outerjoin(
-                     Location,
-                     literal(1) == 1  # cartesian product
-                 ) \
-                 .outerjoin(
-                     Room,
-                     Location.rooms
-                 ) \
-                 .outerjoin(
-                     Reservation,
-                     Room.reservations
-                 ) \
-                 .outerjoin(
-                     ReservationOccurrence,
-                     and_(
-                         Reservation.occurrences,
-                         date_query.c.available_date == cast(ReservationOccurrence.start, sa_date)
-                     )
-                 ) \
-                 .outerjoin(
-                     BlockedRoom,
-                     BlockedRoom.room_id == Room.id
-                 ) \
-                 .outerjoin(
-                     Blocking,
-                     Blocking.id == BlockedRoom.blocking_id
-                 ) \
-                 .correlate(date_query) \
-                 .filter(
-                     Room.id.in_(room_id_list),
-                 ) \
-                 .group_by(date_query.c.available_date, Room.id) \
-                 .order_by(date_query.c.available_date, Room.name) \
-                 .all()
-
-    @staticmethod
-    def getReservationsForAvailability2(start_date, end_date, room_id_list):
-        date_query = db.session.query(
-            cast(func.generate_series(start_date.date(), end_date.date(), timedelta(1)),
-                 sa_date).label('available_date')
-        ).subquery()
-
-        return db.session \
-                 .query(date_query.c.available_date) \
-                 .select_from(date_query) \
-                 .correlate(date_query) \
-                 .filter(date_query.c.available_date != date(2014, 2, 18)) \
-                 .all()
-
-    # equipments
-
     def getEquipmentNames(self):
         return self.equipment_names
 
-    def getEquipmentIds(self):
-        return self.equipments.with_entities(RoomEquipment.id).all()
-
-    def removeEquipments(self, equipment_names):
-        del self.equipments[:]
-
     def removeEquipment(self, equipment_name):
         self.equipments.filter_by(name=equipment_name).delete()
-
-    # def hasEquipment(self, eq):
-    #     return self.equipments.get(eq.id) is not None
-
-    def hasEquipment(self, name):
-        return any(eq.name == name for eq in self.equipments)
-
-    def clearEquipments(self):
-        for eq in self.equipments.all():
-            self.equipments.remove(eq)
-
-    def setEquipments(self, eqs):
-        if self.id:
-            self.clearEquipments()
-        self.equipments.extend(eqs)
-
-    def hasEquipments(self, names):
-        def has(name):
-            return any(map(lambda e: e.lower.find(name) != -1, self.equipment_names))
-        return all(map(has, names))
-
-    def needsVideoConferenceSetup(self):
-        return self.hasEquipment('Video Conference')
-
-    def hasWebcastRecording(self):
-        return self.hasEquipment('Webcast/Recording')
-
-    def getVerboseEquipment(self):
-        return self.equipments \
-                   .with_entities(func.array_to_string(func.array_agg(RoomEquipment.name), ', ')) \
-                   .scalar()
-        # return (self.equipments
-        #         .with_entities(func.group_concat(RoomEquipment.name))
-        #         .scalar())
-
-    def isCloseToBuilding(self):
-        raise NotImplementedError('todo')
-
-    def belongsTo(self, avatar):
-        raise NotImplementedError('todo')
-
-    # blocked rooms
 
     def get_blocked_rooms(self, *dates, **kwargs):
         states = kwargs.get('states', (BlockedRoom.State.accepted,))
@@ -842,58 +673,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                         BlockedRoom.state.in_(states))
                 .all())
 
-    # attributes
-
-    # def getAttributeByName(self, name):
-    #     attribute = (self.attributes
-    #                      .with_entities(RoomAttribute)
-    #                      .join(RoomAttribute.key)
-    #                      .filter(AttributeKey.name == name)
-    #                      .first())
-    #     return attribute
-
     def get_attribute_value(self, name, default=None):
         attr = self.getAttributeByName(name)
         return attr.value if attr else default
-
-    def containsText(self, text):
-        for attr in dir(self):
-            if not attr.startswith('_') and isinstance(getattr(self, attr), str):
-                if getattr(self, attr).lower().find(text) != -1:
-                    return True
-
-        avatar = self.getResponsible()
-        if text in avatar.getFullName().lower() or text in avatar.getEmail.lower():
-            return True
-
-        like_query_param = '%{}%'.format(text)
-        return self.equipments \
-                   .join(Room.attributes) \
-                   .filter(
-                       exists().where(
-                           or_(
-                               RoomEquipment.name.ilike(like_query_param),
-                               RoomAttribute.raw_data.ilike(like_query_param)
-                           )
-                       )
-                   ) \
-                   .scalar()
-
-    # TODO: 20% should go to config
-    def isGoodCapacity(self, capacity):
-        if not self.capacity or self.capacity == 0:
-            return False
-        return abs(self.capacity - capacity) / float(self.capacity) <= 0.2
-
-    # access checks
-
-    def hasAllowedBookingGroups(self):
-        return False
-        # return self.getAttributeByName('allowed-booking-group') is not None
-
-    def canBeViewedBy(self, accessWrapper):
-        """Room details are public - anyone can view."""
-        return True
 
     @utils.accessChecked
     def _can_be_booked(self, avatar, prebook=False, ignore_admin=False):
@@ -971,78 +753,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if groups and len(groups) == 1:
             managers |= set(groups[0].getMemberList())
         return managers
-
-    def checkManagerGroupExistence(self):
-        attribute = self.getAttributeByName('manager-group')
-        if attribute:
-            for group_name in attribute.value.get('is_equipped', []):
-                if not self.getGroups(group_name):
-                    attribute.value['is_equipped'] = ['Error: unknown mailing list']
-                    break
-
-    def hasManagerGroup(self):
-        attribute = self.getAttributeByName('manager-group')
-        return attribute and attribute.value.get('is_equipped', [])
-
-    def notifyAboutResponsibility(self):
-        """
-        Notifies (e-mails) previous and new responsible about
-        responsibility change. Called after creating/updating the room.
-        """
-        pass
-
-    @staticmethod
-    def getBuildingCoordinatesByRoomIds(rids):
-        return Room.query \
-                   .with_entities(
-                       Room.latitude,
-                       Room.longitude
-                   ) \
-                   .filter(
-                       Room.latitude != None,
-                       Room.longitude != None,
-                       Room.id.in_(rids)
-                   ) \
-                   .first()
-
-    @staticmethod
-    def getRoomsRequireVideoConferenceSetupByIds(rids):
-        return Room.query \
-                   .join(Room.equipments) \
-                   .filter(
-                       RoomEquipment.name == 'Video Conference',
-                       Room.id.in_(rids)
-                   ) \
-                   .all()
-
-    def collides(self, start, end):
-        return self.reservations \
-                   .join(ReservationOccurrence) \
-                   .filter(
-                       exists().where(
-                           ~((ReservationOccurrence.start >= end) | (ReservationOccurrence.end <= start)),
-                           ReservationOccurrence.is_valid
-                       )
-                   ) \
-                   .scalar()
-
-    def getCollisions(self, start, end):
-        return self.reservations \
-                   .join(ReservationOccurrence) \
-                   .filter(
-                       ~((ReservationOccurrence.start >= end) | (ReservationOccurrence.end <= start)),
-                       ReservationOccurrence.is_valid
-                   ) \
-                   .all()
-
-    def getOccurrences(self, start, end, is_cancelled=False):
-        return self.reservations \
-                   .join(ReservationOccurrence) \
-                   .filter(
-                       ~((ReservationOccurrence.start >= end) | (ReservationOccurrence.end <= start)),
-                       ReservationOccurrence.is_valid == (not is_cancelled)
-                   ) \
-                   .all()
 
     def check_advance_days(self, end_date, user=None, quiet=False):
         if not self.max_advance_days:

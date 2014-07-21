@@ -50,7 +50,7 @@ class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
 
     def _process(self):
         # Check whether deletion is possible
-        if self._room.doesHaveLiveReservations():
+        if self._room.has_live_reservations():
             # Impossible
             session['rbDeletionFailed'] = True
             self._redirect(UH.UHRoomBookingRoomDetails.getURL(self._room))  # room details
