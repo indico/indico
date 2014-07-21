@@ -228,13 +228,13 @@ def quoteattr(s):
 
 
 def roomClass(room):
-    if not room.is_reservable or room.hasAllowedBookingGroups():
-        roomCls = 'privateRoom'
+    if not room.is_reservable or room.has_booking_groups:
+        return 'privateRoom'
     elif room.is_reservable and room.reservations_need_confirmation:
-        roomCls = 'moderatedRoom'
+        return 'moderatedRoom'
     elif room.is_reservable:
-        roomCls = 'basicRoom'
-    return roomCls
+        return 'basicRoom'
+    return ''
 
 
 def dequote(s):

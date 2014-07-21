@@ -19,7 +19,6 @@
 
 import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
 
-from indico.modules.rb.controllers.xml import RHStatsRoomBooking
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -40,11 +39,6 @@ legacy.add_url_rule('/xmlGateway.py/getCategoryInfo',
 legacy.add_url_rule('/xmlGateway.py/getStatsIndico',
                     'xmlGateway-getStatsIndico',
                     mod_rh_xmlGateway.RHStatsIndico,
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/getStatsRoomBooking',
-                    'xmlGateway-getStatsRoomBooking',
-                    RHStatsRoomBooking,
                     methods=('GET', 'POST'))
 
 legacy.add_url_rule('/xmlGateway.py/loginStatus',

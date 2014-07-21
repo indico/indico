@@ -428,8 +428,8 @@ def migrate_reservations(main_root, rb_root):
             r.occurrences.append(occ)
 
         event_id = getattr(v, '_ReservationBase__owner', None)
-        if hasattr(event_id, 'getObject'):  # Impersistant object
-            event_id = event_id.getObject()
+        if hasattr(event_id, '_Impersistant__obj'):  # Impersistant object
+            event_id = event_id._Impersistant__obj
         if event_id is not None:
             event = main_root['conferences'].get(event_id)
             if event:
