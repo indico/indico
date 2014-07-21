@@ -312,43 +312,7 @@ ${ contextHelp('chooseButtonHelp') }
 
         return isValid;
     }
-    // Check whether a room can be booked (or pre-booked) by the user
-    // If not, pop up a dialog
-    function isBookable() {
-        // Get the selected option in the SELECT
-        var selectedURL = $('#roomName').val();
-        var roomLocationPattern = /roomLocation=([a-zA-Z0-9\-\+]*)(?:&|$)/;
-        var roomIDPattern = /roomID=([a-zA-Z0-9\-]*)(?:&|$)/;
 
-        // Get the room location and id from the url
-        var roomLocation = selectedURL.match(roomLocationPattern);
-        var roomID = selectedURL.match(roomIDPattern);
-
-        var bookButton = $E("bookButton");
-        var bookButtonWrapper = $E("bookButtonWrapper");
-        bookButtonWrapper.set(progressIndicator(true, false));
-
-        // Send an asynchronous request to the server
-        // Depending of result, either redirect to the
-        // Room Booking form or pop up a dialog
-        indicoRequest('user.canBook',
-            {roomLocation: roomLocation[1], roomID: roomID[1]},
-            function(result, error) {
-                if(!error) {
-                    if (result) {
-                        document.location = selectedURL;
-                    } else {
-                        bookButtonWrapper.set(bookButton);
-                        var popup = new AlertPopup('Booking Not Allowed',
-                                "You're not allowed to book this room");
-                        popup.open();
-                    }
-                } else {
-                    bookButtonWrapper.set(bookButton);
-                    IndicoUtil.errorReport(error);
-                }
-            });
-    }
 
     $(window).on('load', function() {
         $('#searchRoomsForm').on('keyup change', ':input', function() {

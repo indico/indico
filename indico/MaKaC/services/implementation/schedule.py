@@ -37,7 +37,6 @@ from MaKaC.services.interface.rpc.common import ServiceError, TimingNoReportErro
 
 from MaKaC.services.implementation import conference as conferenceServices
 from MaKaC.services.implementation import base
-from MaKaC.services.implementation import roomBooking
 from MaKaC.services.implementation import session as sessionServices
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common.utils import getHierarchicalId, formatTime, formatDateTime, parseDate
@@ -823,10 +822,6 @@ class SessionSlotGetFossil(sessionServices.SessionSlotDisplayBase):
     def _getAnswer(self):
         return fossilize(self._slot)
 
-class SessionSlotGetBooking(ScheduleOperation, sessionServices.SessionSlotDisplayBase, roomBooking.GetBookingBase):
-    def _performOperation(self):
-        return self._getRoomInfo(self._target)
-
 class SessionScheduleGetDayEndDate(ScheduleOperation, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
 
     def _checkParams(self):
@@ -1068,11 +1063,6 @@ class BreakDisplayBase(base.ProtectedDisplayService, BreakBase):
     def _checkParams(self):
         BreakBase._checkParams(self)
         base.ProtectedDisplayService._checkParams(self)
-
-
-class BreakGetBooking(BreakDisplayBase, roomBooking.GetBookingBase):
-    def _getAnswer(self):
-        return self._getRoomInfo(self._break)
 
 
 class GetUnscheduledContributions(ScheduleOperation):
@@ -1491,7 +1481,6 @@ methodMap = {
     "slot.deleteContribution": SessionSlotScheduleDeleteContribution,
     "slot.deleteBreak": SessionSlotScheduleDeleteBreak,
     "slot.getDayEndDate": SessionSlotScheduleGetDayEndDate,
-    "slot.getBooking": SessionSlotGetBooking,
     "slot.getFossil": SessionSlotGetFossil,
     "slot.modifyStartEndDate": SessionSlotScheduleModifyStartEndDate,
     "slot.moveEntry": MoveEntryFromSessionBlock,
@@ -1507,8 +1496,6 @@ methodMap = {
 
     "session.getUnscheduledContributions": SessionGetUnscheduledContributions,
     "slot.scheduleContributions": SessionSlotScheduleContributions,
-
-    "break.getBooking": BreakGetBooking,
 
     "setSessionSlots": ConferenceSetSessionSlots,
     "setScheduleSessions": ConferenceSetScheduleSessions,

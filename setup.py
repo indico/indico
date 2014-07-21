@@ -536,9 +536,6 @@ if __name__ == '__main__':
             Collaboration.RecordingRequest = MaKaC.plugins.Collaboration.RecordingRequest
             Collaboration.WebcastRequest = MaKaC.plugins.Collaboration.WebcastRequest
 
-            RoomBooking.CERN = MaKaC.plugins.RoomBooking.CERN
-            RoomBooking.default = MaKaC.plugins.RoomBooking.default
-
             EPayment.payPal = MaKaC.plugins.EPayment.payPal
             EPayment.worldPay = MaKaC.plugins.EPayment.worldPay
             EPayment.yellowPay = MaKaC.plugins.EPayment.yellowPay

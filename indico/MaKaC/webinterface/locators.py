@@ -95,7 +95,6 @@ class WebLocator:
         self.__contribTypeId = None
         self.__slotId = None
         self.__notifTplId = None
-        self.__resvID = None
         self.__location = None
         self.__roomID = None
         self.__registrantId = None
@@ -286,33 +285,9 @@ class WebLocator:
             self.setMaterial( params, 1 )
             self.__resId = params["resId"]
 
-    def setRoomBooking( self, params ):
-        if not params.has_key( 'resvID' ):
-            raise errors.MaKaCError( _("resvID not set"))
-        if not params.has_key( 'roomLocation' ):
-            raise errors.MaKaCError( _("roomLocation not set"))
-        self.__resvID = int( params['resvID'] )
-        self.__location = params['roomLocation']
-
-    def setRoom( self, params ):
-        if not params.has_key( 'roomID' ):
-            raise errors.MaKaCError( _("roomID not set"))
-        if not params.has_key( 'roomLocation' ):
-            raise errors.MaKaCError( _("roomLocation not set"))
-        self.__roomID = int( params['roomID'] )
-        self.__location = params['roomLocation']
-
     def getObject( self ):
         """
         """
-        if self.__resvID:
-            from MaKaC.rb_location import CrossLocationQueries, Location
-            obj = CrossLocationQueries.getReservations( resvID = self.__resvID, location = self.__location )
-            return obj
-        if self.__roomID:
-            from MaKaC.rb_location import CrossLocationQueries, Location
-            obj = CrossLocationQueries.getRooms( roomID = self.__roomID, location = self.__location )
-            return obj
         if self.__categId:
             if not conference.CategoryManager().hasKey(self.__categId):
                 raise errors.NoReportError(_("There is no category with id '%s', or it has been deleted") % self.__categId)
@@ -325,7 +300,7 @@ class WebLocator:
         if not self.__confId:
             return None
         obj = conference.ConferenceHolder().getById( self.__confId )
-        if obj == None:
+        if obj is None:
             raise errors.NoReportError("The event you are trying to access does not exist or has been deleted")
         fr = materialFactories.ConfMFRegistry
         if self.__notifTplId:

@@ -31,8 +31,6 @@ from indico.core.config import Config
 from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 
-from MaKaC.rb_location import CrossLocationQueries
-
 from indico.util.i18n import getLocaleDisplayNames, availableLocales
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.services.implementation.base import ParameterManager
@@ -256,23 +254,6 @@ class UserGetSessionLanguage(ServiceBase):
             minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
             return minfo.getLang()
 
-class UserCanBook(LoggedOnlyService):
-
-    def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-        self._user = self.getAW().getUser()
-        self._roomID = int(self._params.get("roomID", ""))
-        self._roomLocation = self._params.get("roomLocation", "").replace("+"," ")
-        self._room = CrossLocationQueries.getRooms(roomID = self._roomID, location = self._roomLocation)
-
-    def _getAnswer( self):
-        if self._user and self._room:
-            if not self._room.isActive and not self._user.isAdmin():
-                return False
-            if not self._room.canBook( self._user ) and not self._room.canPrebook( self._user ):
-                return False
-            return True
-        return False
 
 class UserShowPastEvents(UserModifyBase):
 
@@ -569,7 +550,6 @@ methodMap = {
     "timezone.get": UserGetTimezone,
     "session.timezone.get": UserGetSessionTimezone,
     "session.language.get": UserGetSessionLanguage,
-    "canBook": UserCanBook,
     "showPastEvents": UserShowPastEvents,
     "hidePastEvents": UserHidePastEvents,
     "getLanguages": UserGetLanguages,

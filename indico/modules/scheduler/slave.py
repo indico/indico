@@ -29,10 +29,7 @@ from ZODB.POSException import ConflictError
 
 from indico.core.db import DBMgr
 from MaKaC.common.mail import GenericMailer
-from MaKaC.plugins.RoomBooking.default.dalManager import DBConnection, DALManager
-from MaKaC.common.info import HelperMaKaCInfo
-from indico.modules.scheduler import SchedulerModule, base, TaskDelayed
-from indico.modules.scheduler.base import TimeSource
+from indico.modules.scheduler import SchedulerModule, TaskDelayed
 from indico.util import fossilize
 
 class _Worker(object):

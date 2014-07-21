@@ -20,7 +20,6 @@
 from MaKaC.services.implementation.base import ProtectedModificationService
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.services.implementation.roomBooking import GetBookingBase
 
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
 
@@ -179,9 +178,6 @@ class ContributionDeleteSubContribution(ContributionModifBase):
 
     def _getAnswer(self):
         self._subContribution.getOwner().removeSubContribution(self._subContribution)
-
-class ContributionGetBooking(ContributionDisplayBase, GetBookingBase):
-    pass
 
 
 class ContributionProtectionUserList(ContributionModifBase):
@@ -915,7 +911,6 @@ class ContributionProtectionToggleDomains(ContributionModifBase):
 methodMap = {
     "addSubContribution": ContributionAddSubContribution,
     "deleteSubContribution": ContributionDeleteSubContribution,
-    "getBooking": ContributionGetBooking,
     "protection.getAllowedUsersList": ContributionProtectionUserList,
     "protection.addAllowedUsers": ContributionProtectionAddUsers,
     "protection.removeAllowedUser": ContributionProtectionRemoveUser,
