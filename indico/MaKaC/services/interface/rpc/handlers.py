@@ -54,7 +54,6 @@ methodMap = {
     'roomBooking.rooms.list': rb_room_services.RoomBookingListRooms,
     'roomBooking.rooms.availabilitySearch': rb_room_services.RoomBookingAvailabilitySearchRooms,
     'roomBooking.rooms.fullNameList': rb_room_services.RoomBookingFullNameListRooms,
-    'roomBooking.locationsAndRooms.list': rb_room_services.RoomBookingListLocationsAndRooms,
     'roomBooking.locationsAndRooms.listWithGuids': rb_room_services.RoomBookingListLocationsAndRoomsWithGuids,
     'roomBooking.locationsAndRooms.getLink': rb_room_services.RoomBookingLocationsAndRoomsGetLink,
     'roomBooking.room.bookingPermission': rb_room_services.BookingPermission,

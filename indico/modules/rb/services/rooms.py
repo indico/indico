@@ -30,6 +30,7 @@ from indico.util.date_time import get_datetime_from_request
 from indico.util.string import natural_sort_key
 from MaKaC.services.implementation.base import LoggedOnlyService, ServiceBase
 from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.webinterface.linking import RoomLinker
 
 
 class RoomBookingListRooms(ServiceBase):
@@ -60,19 +61,6 @@ class RoomBookingAvailabilitySearchRooms(ServiceBase):
         return [room.id for room in rooms]
 
 
-# TODO:
-class RoomBookingListLocationsAndRooms(ServiceBase):
-    def _getAnswer(self):
-        if not Config.getInstance().getIsRoomBookingActive():
-            return []
-        result = {}
-        locationNames = map(lambda l: l.friendlyName, Location.allLocations)
-        for loc in locationNames:
-            for room in CrossLocationQueries.getRooms(location=loc):
-                result[loc + ":" + room.name] = loc + ":" + room.name
-        return sorted(result)
-
-
 class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):
     def _checkParams(self):
         self._isActive = self._params.get('isActive', None)
@@ -87,44 +75,13 @@ class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):
         return {room.id: '{}: {}'.format(room.location_name, room.getFullName()) for room in rooms}
 
 
-# Refactored from GetBookingBase
-# TODO:
-class RoomBookingLocationRoomAddress(object):
-    def _getRoomInfo(self, target):
-        location = target.getOwnLocation()
-
-        if location:
-            locName = location.getName()
-            locAddress = location.getAddress()
-        else:
-            locName = None
-            locAddress = None
-
-        room = target.getOwnRoom()
-
-        if room:
-            roomName = room.getName()
-        else:
-            roomName = None
-
-        return {
-            'location': locName,
-            'room': roomName,
-            'address': locAddress
-        }
-
-    def _getAnswer(self):
-        return self._getRoomInfo(self._target)
-
-
-# TODO
 class RoomBookingLocationsAndRoomsGetLink(ServiceBase):
     def _checkParams(self):
-        self._location = self._params["location"]
-        self._room = self._params["room"]
+        self._location = self._params['location']
+        self._room = self._params['room']
 
     def _getAnswer(self):
-        return linking.RoomLinker().getURLByName(self._room, self._location)
+        return RoomLinker().getURLByName(self._room, self._location)
 
 
 class BookingPermission(LoggedOnlyService):
