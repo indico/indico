@@ -17,9 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-
 from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.views import WPRoomBookingHeadContentMixin
 from indico.modules.rb.views.user.reservations import (WPRoomBookingBookingDetails, WPRoomBookingModifyBooking,
                                                        WPRoomBookingNewBookingSimple, WPRoomBookingNewBookingSelectRoom,
                                                        WPRoomBookingNewBookingSelectPeriod,
@@ -30,19 +29,12 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 from MaKaC.webinterface.wcomponents import TabControl, WTabControl, WTemplated
 
 
-class WPRoomBookingEventBase(WPConferenceModifBase):
+class WPRoomBookingEventBase(WPRoomBookingHeadContentMixin, WPConferenceModifBase):
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['roombooking_sass'].urls()
-
-    def _getHeadContent(self):
-        return """
-        <!-- Our libs -->
-        <script type="text/javascript" src="%s/js/indico/Legacy/validation.js?%d"></script>
-
-        """ % (self._getBaseURL(), os.stat(__file__).st_mtime)
 
     def _setActiveSideMenuItem(self):
         self._roomBookingMenuItem.setActive()

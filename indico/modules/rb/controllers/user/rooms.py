@@ -89,7 +89,8 @@ class RHRoomBookingSearchRooms(RHRoomBookingBase):
     def _checkParams(self):
         defaults = FormDefaults(location=Location.getDefaultLocation())
         self._form = SearchRoomsForm(self._get_form_data(), obj=defaults)
-        if not session.user.has_rooms:
+        if not session.user.has_rooms and not hasattr(self, 'search_criteria'):
+            # Remove the form element if the user has no rooms and we are not using a shortcut
             del self._form.is_only_my_rooms
 
     def _is_submitted(self):

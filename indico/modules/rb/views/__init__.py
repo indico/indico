@@ -19,17 +19,27 @@
 
 import os
 
+from flask import session
+
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.wcomponents import BasicSideMenu, SideMenuItem, SideMenuSection
 from indico.core.config import Config
-from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
 
-class WPRoomBookingBase(WPMainBase):
+class WPRoomBookingHeadContentMixin:
+    def _getHeadContent(self):
+        # This should be in sync with WPRoomBookingEventBase._getHeadContent!
+        return """
+        <!-- Our libs -->
+        <script type="text/javascript" src="%s/js/indico/Legacy/validation.js?%d"></script>
+        """ % (self._getBaseURL(), os.stat(__file__).st_mtime)
+
+
+class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
     def _getTitle(self):
         return '{} - {}'.format(WPMainBase._getTitle(self), _('Room Booking'))
 
@@ -39,35 +49,10 @@ class WPRoomBookingBase(WPMainBase):
     def getCSSFiles(self):
         return WPMainBase.getCSSFiles(self) + self._asset_env['roombooking_sass'].urls()
 
-    def _getHeadContent(self):
-        """
-        !!!! WARNING
-        If you update the following, you will need to do
-        the same update in:
-        roomBooking.py / WPRoomBookingBase0  AND
-        conferences.py / WPConfModifRoomBookingBase
-
-        For complex reasons, these two inheritance chains
-        should not have common root, so this duplication is
-        necessary evil. (In general, one chain is for standalone
-        room booking and second is for conference-context room
-        booking.)
-        """
-        baseurl = self._getBaseURL()
-        return """
-        <!-- Our libs -->
-        <script type="text/javascript" src="%s/js/indico/Legacy/validation.js?%d"></script>
-        """ % (baseurl, os.stat(__file__).st_mtime)
-
     def _getSideMenu(self):
-        self._leftMenu = BasicSideMenu(self._getAW().getUser() is not None)
-        self._showResponsible = False
-
-        if Config.getInstance().getIsRoomBookingActive():
-            self._showResponsible = ((self._getAW().getUser() is not None)
-                                     and (Room.isAvatarResponsibleForRooms(self._getAW().getUser())
-                                          or self._getAW().getUser().isAdmin()
-                                          or self._getAW().getUser().isRBAdmin()))
+        self._leftMenu = BasicSideMenu(session.user is not None)
+        user_has_rooms = session.user is not None and session.user.has_rooms
+        user_is_admin = session.user is not None and session.user.isRBAdmin()
 
         self._roomsBookingOpt = SideMenuSection(currentPage=url_for('rooms.book'))
 
@@ -109,13 +94,13 @@ class WPRoomBookingBase(WPMainBase):
         self._usersBookingsOpt = SideMenuItem(
             _('Bookings in my rooms'),
             url_for('rooms.bookings_my_rooms'),
-            enabled=self._showResponsible
+            enabled=user_has_rooms
         )
 
         self._usersPendingBookingsOpt = SideMenuItem(
             _('Pre-bookings in my rooms'),
             url_for('rooms.pending_bookings_my_rooms'),
-            enabled=self._showResponsible
+            enabled=user_has_rooms
         )
 
         self._bookingListSearchOpt = SideMenuItem(
@@ -129,7 +114,7 @@ class WPRoomBookingBase(WPMainBase):
         self._usersBlockingsOpt = SideMenuItem(
             _('Blockings for my rooms'),
             url_for('rooms.blocking_my_rooms', state='pending'),
-            enabled=self._showResponsible
+            enabled=user_has_rooms
         )
 
         self._roomsOpt = SideMenuSection(_('View Rooms'))
@@ -143,7 +128,7 @@ class WPRoomBookingBase(WPMainBase):
         self._myRoomListOpt = SideMenuItem(
             _('My rooms'),
             url_for('rooms.search_my_rooms'),
-            enabled=self._showResponsible
+            enabled=user_has_rooms
         )
 
         self._blockingListOpt = SideMenuItem(
@@ -157,7 +142,7 @@ class WPRoomBookingBase(WPMainBase):
             url_for('rooms.create_blocking')
         )
 
-        if self._rh._getUser().isRBAdmin():
+        if user_is_admin:
             self._adminSect = SideMenuSection(
                 _('Administration'),
                 urlHandlers.UHRoomBookingAdmin.getURL()
@@ -187,7 +172,7 @@ class WPRoomBookingBase(WPMainBase):
         self._leftMenu.addSection(self._roomsOpt)
         self._roomsOpt.addItem(self._roomSearchOpt)
         self._roomsOpt.addItem(self._myRoomListOpt)
-        if self._rh._getUser().isRBAdmin():
+        if user_is_admin:
             self._leftMenu.addSection(self._adminSect)
             self._adminSect.addItem(self._adminOpt)
         return self._leftMenu
