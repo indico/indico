@@ -131,9 +131,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     )
     # notifications
     notification_for_start = db.Column(
-        db.Integer,
-        nullable=False,
-        default=0
+        db.Integer
     )
     notification_for_end = db.Column(
         db.Boolean,

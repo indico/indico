@@ -17,11 +17,12 @@ class OccurrenceNotifications(PeriodicUniqueTask):
             return
 
         today = cast(func.now(), Date)
+        days_before = func.coalesce(Room.notification_for_start, getRoomBookingOption('notificationBefore'))
         occurrences = ReservationOccurrence.find(
             Reservation.is_confirmed,
             ~ReservationOccurrence.is_sent,
             ReservationOccurrence.is_valid,
-            cast(ReservationOccurrence.start, Date) - Room.notification_for_start * timedelta(days=1) == today,
+            cast(ReservationOccurrence.start, Date) - days_before * timedelta(days=1) == today,
             _join=[Reservation, Room]
         )
 

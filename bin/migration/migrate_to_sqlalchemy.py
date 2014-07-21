@@ -260,8 +260,9 @@ def migrate_rooms(rb_root, photo_path):
             floor=convert_to_unicode(old_room.floor),
             number=convert_to_unicode(old_room.roomNr),
 
-            notification_for_start=old_room.resvStartNotificationBefore if getattr(old_room, 'resvStartNotification',
-                                                                                   False) else 0,
+            notification_for_start=((old_room.resvStartNotificationBefore or None)
+                                    if getattr(old_room, 'resvStartNotification', False)
+                                    else None),
             notification_for_end=getattr(old_room, 'resvEndNotification', False),
             notification_for_responsible=getattr(old_room, 'resvNotificationToResponsible', False),
             notification_for_assistance=getattr(old_room, 'resvNotificationAssistance', False),
