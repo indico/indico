@@ -702,51 +702,6 @@ class Reservation(Serializer, db.Model):
         notify_modification(self, changes)
         return True
 
-    def getSoonestOccurrence(self, d):
-        return self.occurrences.filter(ReservationOccurrence.start >= d).first()
-
-    def getNextRepeatingWithUtil(self, current):
-        if self.repeat_unit == RepeatUnit.NEVER:
-            return timedelta.max
-        elif self.repeat_unit == RepeatUnit.DAY:
-            return current + relativedelta(days=self.repeat_step)
-        elif self.repeat_unit == RepeatUnit.WEEK:
-            return current + relativedelta(weeks=self.repeat_step)
-        elif self.repeat_unit == RepeatUnit.MONTH:
-            return current + relativedelta(months=self.srepeat_step)
-        elif self.repeat_unit == RepeatUnit.YEAR:
-            return current + relativedelta(years=self.repeat_step)
-        raise MaKaCError(_('Unexpected repeat unit: ') + self.repeat_unit)
-
-    @staticmethod
-    def getOverlappingPeriods(start_date, end_date):
-        return Reservation.getReservations(**locals())
-
-    # def getAttributeByName(self, name):
-    #     aval = (self.attributes
-    #                 .with_entities(ReservationAttribute.value)
-    #                 .outerjoin(ReservationAttribute.key)
-    #                 .filter(
-    #                     self.id == ReservationAttribute.reservation_id,
-    #                     ReservationAttribute.key_id == ReservationAttributeKey.id,
-    #                     ReservationAttributeKey.name == name
-    #                 )
-    #                 .first())
-    #     if aval:
-    #         return aval[0]
-
-    @staticmethod
-    def getClosestReservation(resvs=[], after=None):
-        if not after:
-            after = datetime.now()
-        if not resvs:
-            resvs = sorted(filter(lambda r: r.start_date >= after, resvs),
-                           key=attrgetter('start_date'))
-            if resvs:
-                return resvs[0]
-        # TODO order_by limit 1
-        return Reservation.getReservations(is_archived=False)[0]
-
     def getLocator(self):
         locator = Locator()
         locator['roomLocation'] = self.room.location_name
@@ -798,27 +753,3 @@ class Reservation(Serializer, db.Model):
 
     def getAccessKey(self):
         return ''
-
-    def createdByUser(self):
-        return self.created_by_user
-
-    def splitToPeriods(self, end_date=None, start_date=None):
-        """
-        Returns the list of Periods that represent this reservation.
-
-        For non-repeating reservations it is just the reservation period.
-        For repeating ones, the list will include all repeatings.
-        """
-        if start_date is None:
-            start_date = self.start_date - timedelta(1)
-        # One day before the beginning
-        start_date -= timedelta(1)
-
-        periods = []
-
-        while True:
-            period = self.getNextRepeating(start_date)
-            if period is None or (end_date is not None and period.start_date > end_date):
-                return periods
-            start_date = period.start_date
-            periods.append(period)

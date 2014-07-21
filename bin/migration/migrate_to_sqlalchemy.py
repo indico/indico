@@ -19,26 +19,24 @@
 
 import os
 import re
+import time
 from argparse import ArgumentParser
 from urlparse import urlparse
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from operator import itemgetter
 from itertools import ifilter
-from time import clock
 
 import pytz
 from babel import dates
 from flask import Flask
-from persistent import Persistent
 from sqlalchemy.sql import func, select
 from ZODB import DB, FileStorage
-from ZODB.broken import find_global
+from ZODB.broken import find_global, Broken
 from ZEO.ClientStorage import ClientStorage
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.util import delete_all_tables, update_session_options
-from indico.core.db.migration import MigratedDB
 from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
@@ -66,12 +64,15 @@ attribute_map = {
 }
 
 
-class UnbreakingDB(DB):
-    class NotBroken(Persistent):
-        pass
+class NotBroken(Broken):
+    """Like Broken, but it makes the attributes available"""
+    def __setstate__(self, state):
+        self.__dict__.update(state)
 
+
+class UnbreakingDB(DB):
     def classFactory(self, connection, modulename, globalname):
-        return find_global(modulename, globalname, Broken=self.NotBroken)
+        return find_global(modulename, globalname, Broken=NotBroken)
 
 
 def get_storage(zodb_uri):
@@ -101,7 +102,7 @@ def setup(main_zodb_uri, rb_zodb_uri, sqlalchemy_uri):
     app.config['SQLALCHEMY_DATABASE_URI'] = sqlalchemy_uri
     db.init_app(app)
 
-    main_root = MigratedDB(get_storage(main_zodb_uri)).open().root()
+    main_root = UnbreakingDB(get_storage(main_zodb_uri)).open().root()
     rb_root = UnbreakingDB(get_storage(rb_zodb_uri)).open().root()
 
     return main_root, rb_root, app
@@ -109,10 +110,6 @@ def setup(main_zodb_uri, rb_zodb_uri, sqlalchemy_uri):
 
 def convert_reservation_repeatability(old):
     return RepeatMapping.getNewMapping(old)
-
-
-def convert_room_notification_for_start(flag, before):
-    return before if flag else 0
 
 
 def generate_name(old_room):
@@ -162,6 +159,11 @@ def convert_to_unicode(val):
     raise RuntimeError('Unexpected type is found for unicode conversion')
 
 
+def utc_to_local(dt):
+    assert dt.tzinfo is None
+    return dt - timedelta(seconds=time.altzone)
+
+
 def migrate_locations(main_root, rb_root):
     print cformat('%{white!}migrating locations')
     default_location_name = main_root['DefaultRoomBookingLocation']
@@ -178,7 +180,7 @@ def migrate_locations(main_root, rb_root):
         print cformat('- %{cyan}{}').format(l.name)
 
         # add aspects
-        for old_aspect in old_location.aspects.values():
+        for old_aspect in old_location._aspects.values():
             a = Aspect(
                 name=convert_to_unicode(old_aspect.name),
                 center_latitude=old_aspect.centerLatitude,
@@ -258,13 +260,11 @@ def migrate_rooms(rb_root, photo_path):
             floor=convert_to_unicode(old_room.floor),
             number=convert_to_unicode(old_room.roomNr),
 
-            notification_for_start=convert_room_notification_for_start(
-                old_room.resvStartNotification,
-                old_room.resvStartNotificationBefore
-            ),
-            notification_for_end=old_room.resvEndNotification,
-            notification_for_responsible=old_room.resvNotificationToResponsible,
-            notification_for_assistance=old_room.resvNotificationAssistance,
+            notification_for_start=old_room.resvStartNotificationBefore if getattr(old_room, 'resvStartNotification',
+                                                                                   False) else 0,
+            notification_for_end=getattr(old_room, 'resvEndNotification', False),
+            notification_for_responsible=getattr(old_room, 'resvNotificationToResponsible', False),
+            notification_for_assistance=getattr(old_room, 'resvNotificationAssistance', False),
 
             reservations_need_confirmation=old_room.resvsNeedConfirmation,
 
@@ -272,9 +272,9 @@ def migrate_rooms(rb_root, photo_path):
             key_location=convert_to_unicode(old_room.whereIsKey),
 
             capacity=old_room.capacity,
-            surface_area=old_room.surfaceArea,
-            latitude=old_room.latitude,
-            longitude=old_room.longitude,
+            surface_area=getattr(old_room, 'surfaceArea', None),
+            latitude=getattr(old_room, 'latitude', None),
+            longitude=getattr(old_room, 'longitude', None),
 
             comments=convert_to_unicode(old_room.comments),
 
@@ -282,12 +282,12 @@ def migrate_rooms(rb_root, photo_path):
 
             is_active=old_room.isActive,
             is_reservable=old_room.isReservable,
-            max_advance_days=int(old_room.maxAdvanceDays) if old_room.maxAdvanceDays else None
+            max_advance_days=int(old_room.maxAdvanceDays) if getattr(old_room, 'maxAdvanceDays', None) else None
         )
 
         print cformat('- [%{cyan}{}%{reset}] %{grey!}{:4}%{reset}  %{green!}{}%{reset}').format(l.name, r.id, r.name)
 
-        for old_bookable_time in old_room.getDailyBookablePeriods():
+        for old_bookable_time in getattr(old_room, '_dailyBookablePeriods', []):
             r.bookable_times.append(
                 BookableTime(
                     start_time=old_bookable_time._startTime,
@@ -296,7 +296,7 @@ def migrate_rooms(rb_root, photo_path):
             )
             print cformat('  %{blue!}Bookable:%{reset} {}').format(r.bookable_times[-1])
 
-        for old_nonbookable_date in old_room.getNonBookableDates():
+        for old_nonbookable_date in getattr(old_room, '_nonBookableDates', []):
             r.nonbookable_dates.append(
                 NonBookableDate(
                     start_date=old_nonbookable_date._startDate,
@@ -357,7 +357,6 @@ def migrate_reservations(main_root, rb_root):
     print cformat('%{white!}migrating reservations')
     i = 1
     for rid, v in rb_root['Reservations'].iteritems():
-        l = Location.getLocationByName(v.locationName)
         room = Room.get(v.room.id)
         if room is None:
             print cformat('  %{red!}skipping resv for dead room {0.room.id}: {0.id} ({0._utcCreatedDT})').format(v)
@@ -368,27 +367,27 @@ def migrate_reservations(main_root, rb_root):
         r = Reservation(
             id=v.id,
             created_at=as_utc(v._utcCreatedDT),
-            start_date=v.startDT,
-            end_date=v.endDT,
-            booked_for_id=convert_to_unicode(v.bookedForId) or None,
+            start_date=utc_to_local(v._utcStartDT),
+            end_date=utc_to_local(v._utcEndDT),
+            booked_for_id=convert_to_unicode(getattr(v, 'bookedForId', None)) or None,
             booked_for_name=convert_to_unicode(v.bookedForName),
             contact_email=convert_to_unicode(v.contactEmail),
-            contact_phone=convert_to_unicode(v.contactPhone),
+            contact_phone=convert_to_unicode(getattr(v, 'contactPhone', None)),
             created_by=convert_to_unicode(v.createdBy) or None,
             is_cancelled=v.isCancelled,
             is_confirmed=v.isConfirmed,
             is_rejected=v.isRejected,
             booking_reason=convert_to_unicode(v.reason),
-            rejection_reason=convert_to_unicode(v.rejectionReason),
+            rejection_reason=convert_to_unicode(getattr(v, 'rejectionReason', None)),
             repeat_unit=repeat_unit,
             repeat_step=repeat_step,
-            uses_video_conference=v.usesAVC,
-            needs_video_conference_setup=v.needsAVCSupport,
-            needs_general_assistance=v.needsAssistance
+            uses_video_conference=getattr(v, 'usesAVC', False),
+            needs_video_conference_setup=getattr(v, 'needsAVCSupport', False),
+            needs_general_assistance=getattr(v, 'needsAssistance', False)
         )
 
         for eq_name in getattr(v, 'useVC', []):
-            eq = l.getEquipmentByName(eq_name)
+            eq = room.location.getEquipmentByName(eq_name)
             if eq:
                 r.equipments.append(eq)
 
@@ -414,18 +413,13 @@ def migrate_reservations(main_root, rb_root):
 
         notifications = getattr(v, 'startEndNotification', []) or []
         excluded_days = getattr(v, '_excludedDays', []) or []
-        for period in v.splitToPeriods():
-            d = period.startDT.date()
-            occ = ReservationOccurrence(
-                start=period.startDT,
-                end=period.endDT,
-                is_sent=d in notifications,
-                is_rejected=r.is_rejected,
-                is_cancelled=r.is_cancelled or d in excluded_days,
-                rejection_reason=(convert_to_unicode(occurrence_rejection_reasons[d])
-                                  if d in occurrence_rejection_reasons else None)
-            )
-            r.occurrences.append(occ)
+        ReservationOccurrence.create_series_for_reservation(r)
+        for occ in r.occurrences:
+            occ.is_sent = occ.date in notifications
+            occ.is_rejected = r.is_rejected
+            occ.is_cancelled = r.is_cancelled or occ.date in excluded_days
+            occ.rejection_reason = (convert_to_unicode(occurrence_rejection_reasons[occ.date])
+                                    if occ.date in occurrence_rejection_reasons else None)
 
         event_id = getattr(v, '_ReservationBase__owner', None)
         if hasattr(event_id, '_Impersistant__obj'):  # Impersistant object
@@ -441,7 +435,8 @@ def migrate_reservations(main_root, rb_root):
                 else:
                     print cformat('  %{red}event {} does not contain booking {}').format(event_id, v.id)
 
-        print cformat('- [%{cyan}{}%{reset}/%{green!}{}%{reset}]  %{grey!}{}%{reset}  {}').format(l.name, room.name,
+        print cformat('- [%{cyan}{}%{reset}/%{green!}{}%{reset}]  %{grey!}{}%{reset}  {}').format(room.location_name,
+                                                                                                  room.name,
                                                                                                   r.id,
                                                                                                   r.created_at.date())
 
@@ -529,13 +524,13 @@ def main(main_uri, rb_uri, sqla_uri, photo_path, drop):
     except KeyError:
         tz = pytz.utc
 
-    start = clock()
+    start = time.clock()
     with app.app_context():
         if drop:
             delete_all_tables(db)
         db.create_all()
         migrate(main_root, rb_root, photo_path)
-    print (clock() - start), 'seconds'
+    print (time.clock() - start), 'seconds'
 
 
 if __name__ == '__main__':
