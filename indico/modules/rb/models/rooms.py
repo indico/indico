@@ -599,7 +599,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 Room.is_reservable if form.is_only_public.data else True,
                 Room.is_auto_confirm if form.is_auto_confirm.data else True,
                 Room.is_active if form.is_only_active.data or not form.is_only_active else True,
-                Room.owner_id == avatar.getId() if form.is_only_my_rooms.data else True,
+                Room.owner_id == avatar.getId() if form.is_only_my_rooms and form.is_only_my_rooms.data else True,
                 (equipment_subquery == equipment_count) if equipment_count else True)
         )
 
