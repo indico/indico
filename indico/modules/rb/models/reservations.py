@@ -21,10 +21,8 @@
 Schema of a reservation
 """
 from collections import defaultdict, OrderedDict
-from datetime import datetime, timedelta
-from operator import attrgetter
+from datetime import datetime
 
-from dateutil.relativedelta import relativedelta
 from sqlalchemy import Date, Time
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -36,7 +34,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.errors import NoReportError
-from indico.modules.rb.models import utils
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
@@ -51,7 +48,6 @@ from indico.util.i18n import _, N_
 from indico.util.string import return_ascii
 from indico.web.flask.util import url_for
 from MaKaC.common.Locators import Locator
-from MaKaC.errors import MaKaCError
 from MaKaC.user import AvatarHolder
 
 
@@ -708,14 +704,6 @@ class Reservation(Serializer, db.Model):
         locator['resvID'] = self.id
         return locator
 
-    # access
-
-    def isProtected(self):
-        """
-        The one must be logged in to do anything in RB module.
-        """
-        return True
-
     def can_be_accepted(self, user):
         return user and (user.isRBAdmin() or self.room.is_owned_by(user))
 
@@ -724,10 +712,12 @@ class Reservation(Serializer, db.Model):
             return False
         if self.is_rejected or self.is_cancelled:
             return False
-        return user.isRBAdmin() or self.created_by_user == user or self.room.is_owned_by(user) or self.isBookedFor(user)
+        if user.isRBAdmin():
+            return True
+        return self.created_by_user == user or self.is_booked_for(user) or self.room.is_owned_by(user)
 
     def can_be_cancelled(self, user):
-        return user and (self.isOwnedBy(user) or user.isRBAdmin() or self.isBookedFor(user))
+        return user and (self.is_owned_by(user) or user.isRBAdmin() or self.is_booked_for(user))
 
     def can_be_rejected(self, user):
         return user and (user.isRBAdmin() or self.room.is_owned_by(user))
@@ -735,21 +725,8 @@ class Reservation(Serializer, db.Model):
     def can_be_deleted(self, user):
         return user and user.isRBAdmin()
 
-    def isOwnedBy(self, avatar):
-        """
-        Returns True if avatar is the one who inserted this
-        reservation. False otherwise.
-        """
+    def is_owned_by(self, avatar):
         return self.created_by == avatar.id
 
-    def isBookedFor(self, user):
-        """
-        Returns True if user is the one who is booked for the reservation.
-        False otherwise.
-        """
-        return user and (self.contact_email in user.getEmails() or
-                         (utils.getRoomBookingOption('bookingsForRealUsers') and
-                          self.booked_for_user == user))
-
-    def getAccessKey(self):
-        return ''
+    def is_booked_for(self, user):
+        return user and (self.booked_for_user == user or self.contact_email in user.getEmails())

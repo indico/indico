@@ -25,12 +25,9 @@ import ast
 import json
 from datetime import date, timedelta
 
-from sqlalchemy import and_, func, exists, or_, type_coerce
-from sqlalchemy.dialects.postgresql.base import ARRAY as sa_array
+from sqlalchemy import and_, func, or_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import joinedload
-from sqlalchemy.sql.expression import cast, literal
-from sqlalchemy.types import Date as sa_date, Time as sa_time
 
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.accessControl import AccessWrapper
