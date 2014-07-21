@@ -29,7 +29,6 @@ import traceback
 
 from dateutil import rrule
 from pkg_resources import parse_version
-from indico.web.flask.app import make_app
 
 from indico.core.config import Config
 from indico.core.db import DBMgr
@@ -43,11 +42,11 @@ from indico.util import console, i18n
 from indico.util.redis import avatar_links
 from indico.util.redis import client as redis_client
 from indico.util.string import fix_broken_string
+from indico.web.flask.app import make_app
 from MaKaC import __version__
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import ConferenceHolder, CategoryManager
 from MaKaC.plugins.base import PluginsHolder
-from MaKaC.plugins.RoomBooking.tasks import RoomReservationTask
 from MaKaC.plugins.Collaboration import urlHandlers
 from MaKaC.webinterface import displayMgr
 from MaKaC.authentication.LocalAuthentication import LocalAuthenticator, LocalIdentity
@@ -394,18 +393,18 @@ def addOccurrenceNotificationsTask(dbi, prevVersion):
     old_tasks = []
 
     for _, task in scheduler_module.getWaitingQueue():
-        if isinstance(task, RoomReservationTask):
+        if getattr(task, 'typeId', None) in {'RoomReservationTask', 'RoomReservationEndTask'}:
             old_tasks.append(task)
     for task in scheduler_module._runningList:
-        if isinstance(task, RoomReservationTask):
+        if getattr(task, 'typeId', None) in {'RoomReservationTask', 'RoomReservationEndTask'}:
             old_tasks.append(task)
     for finished_task in scheduler_module._finishedIndex.values():
         task = finished_task._task if hasattr(finished_task, '_task') else finished_task
-        if isinstance(task, RoomReservationTask):
+        if getattr(task, 'typeId', None) in {'RoomReservationTask', 'RoomReservationEndTask'}:
             scheduler_module._finishedIndex.unindex_obj(finished_task)
     for failed_task in scheduler_module._failedIndex.values():
         task = failed_task._task if hasattr(failed_task, '_task') else failed_task
-        if isinstance(task, OccurrenceNotifications):
+        if getattr(task, 'typeId', None) in {'RoomReservationTask', 'RoomReservationEndTask'}:
             scheduler_module._failedIndex.unindex_obj(failed_task)
     for task in old_tasks:
         scheduler_client.dequeue(task)

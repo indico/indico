@@ -41,7 +41,9 @@ globalname_dict = {
     "TaskOccurrence": ("indico.modules.scheduler.tasks.periodic", None),
     "CategoryStatisticsUpdaterTask": ("indico.modules.scheduler.tasks.periodic", None),
     "FoundationSyncTask": ("indico.modules.scheduler.tasks.periodic", None),
-    "SamplePeriodicTask": ("indico.modules.scheduler.tasks.periodic", None)
+    "SamplePeriodicTask": ("indico.modules.scheduler.tasks.periodic", None),
+    'RoomReservationTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
+    'RoomReservationEndTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
 }
 
 modulename_dict = {

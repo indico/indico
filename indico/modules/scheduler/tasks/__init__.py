@@ -497,3 +497,7 @@ class SampleOneShotTask(OneShotTask):
         self.getLogger().debug('Now i shall sleeeeeeeep!')
         base.TimeSource.get().sleep(1)
         self.getLogger().debug('%s executed' % self.__class__.__name__)
+
+
+class DeletedTask(BaseTask):
+    """ZODB migration class to avoid broken objects for deleted tasks"""
