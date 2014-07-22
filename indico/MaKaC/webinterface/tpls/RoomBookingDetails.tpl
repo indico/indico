@@ -342,7 +342,7 @@
                           </td>
                         </tr>
                       % endif
-                      % if assistence_emails and reservation.room.notification_for_assistance:
+                      % if assistance_emails and reservation.room.notification_for_assistance:
                         <tr>
                           <td class="subFieldWidth" align="right" valign="top" nowrap>
                             ${ _('Startup Assistance') }&nbsp;&nbsp;
