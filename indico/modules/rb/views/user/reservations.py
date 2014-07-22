@@ -191,7 +191,12 @@ class WPRoomBookingNewBookingSimple(WPRoomBookingNewBookingBase):
 
 
 class WPRoomBookingModifyBooking(WPRoomBookingBase):
+    endpoints = {
+        'room_details': 'rooms.roomBooking-roomDetails'
+    }
+
     def _getBody(self, params):
+        params['endpoints'] = self.endpoints
         calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
                                              candidates=params['candidates'], specific_room=params['room'],
                                              repeat_unit=params['repeat_unit'], repeat_step=params['repeat_step'])
