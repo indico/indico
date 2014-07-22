@@ -36,7 +36,7 @@ def rb_check_user_access(user):
 
     authorized = PluginsHolder().getPluginType('RoomBooking').getOption('AuthorisedUsersGroups').getValue()
 
-    if user.isAdmin():
+    if user.isRBAdmin():
         # user is admin
         return True
     elif not authorized:
@@ -45,7 +45,7 @@ def rb_check_user_access(user):
     else:
         # there is something in the authorization list
         for entity in authorized:
-            if (isinstance(entity, user_mod.Group) and entity.containsUser(user)) or \
-                    (isinstance(entity, user_mod.Avatar) and entity == user):
+            if ((isinstance(entity, user_mod.Group) and entity.containsUser(user)) or
+                    (isinstance(entity, user_mod.Avatar) and entity == user)):
                 return True
     return False
