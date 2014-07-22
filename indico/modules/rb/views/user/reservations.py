@@ -18,8 +18,8 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask import session
+from indico.modules.rb import settings
 
-from indico.modules.rb.controllers.utils import getRoomBookingOption
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservations import RepeatMapping
 from indico.modules.rb.views import WPRoomBookingBase
@@ -69,7 +69,7 @@ class WRoomBookingDetails(WTemplated):
         wvars['can_be_cancelled'] = self._reservation.can_be_cancelled(session.user)
         wvars['repetition'] = RepeatMapping.getMessage(self._reservation.repeat_unit, self._reservation.repeat_step)
         wvars['vc_equipment'] = ', '.join(eq.name for eq in self._reservation.get_vc_equipment())
-        wvars['assistence_emails'] = getRoomBookingOption('assistanceNotificationEmails')
+        wvars['assistence_emails'] = settings.get('assistance_emails', [])
         wvars['edit_logs'] = self._reservation.edit_logs.order_by(ReservationEditLog.timestamp.desc()).all()
         wvars['excluded_days'] = self._reservation.find_excluded_days().all()
         return wvars

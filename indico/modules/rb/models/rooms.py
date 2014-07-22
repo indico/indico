@@ -38,7 +38,7 @@ from MaKaC.user import Avatar, AvatarHolder, GroupHolder
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import greatest, least, static_array
 from indico.core.errors import IndicoError
-from indico.modules.rb.models import utils
+from indico.modules.rb.utils import rb_check_user_access
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
@@ -656,9 +656,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         attr = self.getAttributeByName(name)
         return attr.value if attr else default
 
-    @utils.accessChecked
     def _can_be_booked(self, avatar, prebook=False, ignore_admin=False):
-        if not avatar:
+        if not avatar or not rb_check_user_access(avatar):
             return False
 
         if (not ignore_admin and avatar.isRBAdmin()) or (self.is_owned_by(avatar) and self.is_active):

@@ -40,10 +40,10 @@ from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 
 from pytz import all_timezones
-from MaKaC.plugins.base import PluginsHolder
 
 from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
+from indico.util.misc import retrieve_principals
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import avatar_links, suggestions
 from indico.util.string import safe_upper, safe_slice
@@ -1042,13 +1042,12 @@ class Avatar(Persistent, Fossilizable):
         Convenience method for checking whether this user is an admin for the RB module.
         Returns bool.
         """
+        from indico.modules.rb import settings
+
         if self.isAdmin():
             return True
-        for entity in PluginsHolder().getPluginType('RoomBooking').getOption('Managers').getValue():
-            if (isinstance(entity, Group) and entity.containsUser(self)) or \
-                (isinstance(entity, Avatar) and entity == self):
-                return True
-        return False
+        principals = retrieve_principals(settings.get('admin_principals', []))
+        return any(principal.containsUser(self) for principal in principals)
 
     @property
     def has_rooms(self):

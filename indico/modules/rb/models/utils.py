@@ -31,10 +31,6 @@ from dateutil.rrule import rrule, DAILY
 from sqlalchemy.orm import class_mapper
 from sqlalchemy.sql import over, func
 
-from MaKaC import user as user_mod
-from MaKaC.accessControl import AdminList
-from MaKaC.plugins.base import PluginsHolder
-from MaKaC.user import Avatar
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.util.decorators import cached_writable_property
@@ -144,46 +140,6 @@ def cached(cache, primary_key_attr='id', base_ttl=86400*31):
         return wrapper
 
     return decorator
-
-
-def getRoomBookingOption(opt):
-    return PluginsHolder().getPluginType('RoomBooking').getOption(opt).getValue()
-
-
-def accessChecked(func):
-    """
-    Check if user should have access to RB module in general
-    """
-
-    def check_access_internal(*args, **kwargs):
-        try:
-            avatar = args[-1]
-        except IndexError:
-            raise IndicoError(_('accessChecked decorator expects an avatar as a positional argument'))
-
-        if AdminList.getInstance().isAdmin(avatar):
-            return True
-        else:
-            def isAuthorized(entity):
-                if isinstance(entity, user_mod.Group):
-                    return entity.containsUser(avatar)
-                elif isinstance(entity, Avatar):
-                    return entity == avatar
-                else:
-                    raise RuntimeError('Unexpected entity type')
-
-            authorized_list = getRoomBookingOption('AuthorisedUsersGroups')
-            if authorized_list:
-                return any(map(isAuthorized, authorized_list))
-            else:
-                return True
-
-    def check_access(*args, **kwargs):
-        if not check_access_internal(*args, **kwargs):
-            return False
-        return func(*args, **kwargs)
-
-    return check_access
 
 
 class JSONStringBridgeMixin:

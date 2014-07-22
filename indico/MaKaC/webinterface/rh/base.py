@@ -50,7 +50,6 @@ from MaKaC.errors import (
     ModificationError,
     NotLoggedError,
 )
-from MaKaC.plugins import PluginsHolder
 from MaKaC.plugins.base import OldObservable
 from MaKaC.webinterface.mail import GenericMailer
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -672,25 +671,6 @@ class RHProtected(RH):
 
     def _checkProtection(self):
         self._checkSessionUser()
-
-
-class RHRoomBookingProtected(RHProtected):
-
-    def _checkSessionUser(self):
-        user = self._getUser()
-        if user is None:
-            if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
-                raise NotLoggedError("You are currently not authenticated. Please log in again.")
-            else:
-                self._redirect(self._getLoginURL())
-                self._doProcess = False
-        else:
-            try:
-                if PluginsHolder().getPluginType("RoomBooking").isActive():
-                    if not rb_check_user_access(user):
-                        raise AccessError()
-            except KeyError:
-                pass
 
 
 class RHDisplayBaseProtected(RHProtected):

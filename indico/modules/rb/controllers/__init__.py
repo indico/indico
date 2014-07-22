@@ -17,18 +17,19 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
+
 from indico.core.config import Config
 from indico.core.errors import AccessError
-from indico.modules.rb.controllers.utils import rb_check_user_access
+from indico.modules.rb.utils import rb_check_user_access
 from MaKaC.webinterface.rh.base import RHProtected
 
 
 class RHRoomBookingProtected(RHProtected):
     def _checkSessionUser(self):
-        user = self._getUser()
-        if user:
+        if session.user:
             try:
-                if Config.getInstance().getIsRoomBookingActive() and not rb_check_user_access(user):
+                if Config.getInstance().getIsRoomBookingActive() and not rb_check_user_access(session.user):
                     raise AccessError()
             except KeyError:
                 pass
