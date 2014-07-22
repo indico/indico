@@ -26,8 +26,8 @@ from indico.util.i18n import _
 
 
 class SettingsForm(IndicoForm):
-    admin_principals = PrincipalField(_('Administrators'))
-    authorized_principals = PrincipalField(_('Authorized users/groups'))
+    admin_principals = PrincipalField(_('Administrators'), groups=True)
+    authorized_principals = PrincipalField(_('Authorized users/groups'), groups=True)
     assistance_emails = EmailListField(_('Assistance email addresses (one per line)'))
     notification_hour = IntegerField(_('Hour at which occurrence notifications should be sent'),
                                      [InputRequired(), NumberRange(0, 23)], default=6)

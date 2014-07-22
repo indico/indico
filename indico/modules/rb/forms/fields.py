@@ -90,6 +90,10 @@ class EmailListField(TextListField):
 class PrincipalField(HiddenField):
     widget = PrincipalWidget()
 
+    def __init__(self, *args, **kwargs):
+        self.groups = kwargs.pop('groups', False)
+        super(PrincipalField, self).__init__(*args, **kwargs)
+
     def _convert_principal(self, principal):
         if principal['_type'] == 'Avatar':
             return u'Avatar', principal['id']
@@ -100,6 +104,11 @@ class PrincipalField(HiddenField):
         if valuelist:
             data = json.loads(valuelist[0])
             self.data = map(self._convert_principal, data)
+
+    def pre_validate(self, form):
+        for principal in self.data:
+            if not self.groups and principal[0] == 'Group':
+                raise ValueError(u'You cannot select groups')
 
     def _value(self):
         return map(fossilize, retrieve_principals(self.data))
