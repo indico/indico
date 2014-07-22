@@ -37,6 +37,7 @@ from ZEO.ClientStorage import ClientStorage
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.util import delete_all_tables, update_session_options
+from indico.modules.rb import settings as rb_settings
 from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
@@ -53,6 +54,7 @@ from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.modules.rb.models.rooms import Room
 from indico.util.console import colored, cformat
 from indico.util.date_time import as_utc
+from indico.util.string import is_valid_mail
 
 
 month_names = [(str(i), name[:3].encode('utf-8').lower())
@@ -162,6 +164,30 @@ def convert_to_unicode(val):
 def utc_to_local(dt):
     assert dt.tzinfo is None
     return dt - timedelta(seconds=time.altzone)
+
+
+def migrate_settings(main_root):
+    print cformat('%{white!}migrating settings')
+    rb_settings.delete_all()
+    opts = main_root['plugins']['RoomBooking']._PluginBase__options
+
+    # Admins & authorized users/groups
+    for old_key, new_key in (('AuthorisedUsersGroups', 'authorized_principals'),
+                             ('Managers', 'admin_principals')):
+        principals = set()
+        for principal in opts[old_key].getValue():
+            if principal.__class__.__name__ == 'Avatar':
+                principals.add(('Avatar', principal.id))
+            else:
+                principals.add(('Group', principal.id))
+        rb_settings.set(new_key, list(principals))
+    # Assistance emails
+    emails = [email for email in opts['assistanceNotificationEmails'].getValue() if is_valid_mail(email, False)]
+    rb_settings.set('assistance_emails', emails)
+    # Simple settings
+    rb_settings.set('notification_hour', opts['notificationHour'].getValue())
+    rb_settings.set('notification_before_days', opts['notificationBefore'].getValue())
+    db.session.commit()
 
 
 def migrate_locations(main_root, rb_root):
@@ -509,6 +535,7 @@ def fix_sequences():
 
 
 def migrate(main_root, rb_root, photo_path):
+    migrate_settings(main_root)
     migrate_locations(main_root, rb_root)
     migrate_rooms(rb_root, photo_path)
     migrate_blockings(rb_root)
