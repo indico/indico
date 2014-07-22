@@ -142,20 +142,18 @@
 <!-- END OF CONTEXT HELP DIVS -->
 
 <table cellpadding="0" cellspacing="0" border="0" width="100%">
-  % if standalone:
-    <tr>
-      <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">
-        &nbsp;
-      </td> <!-- lastvtabtitle -->
-    </tr>
-  % endif
+  <tr>
+    <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">
+      &nbsp;
+    </td> <!-- lastvtabtitle -->
+  </tr>
   <tr>
     <td class="bottomvtab" width="100%">
       <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
         <tr>
           <td class="maincell">
             <span class="formTitle" style="border-bottom-width: 0px">
-              ${bookMessage} (${ reservation.room.name })
+              ${ _('PRE-Booking') if reservation.is_pending else _('Booking') } (${ reservation.room.name })
             </span><br /> <!-- PRE-Booking or Booking -->
             <!-- Action result message-->
             % if actionSucceeded:
@@ -163,7 +161,7 @@
             % endif
 
             <!-- Warning for pre-bookings -->
-            % if isPreBooking and not actionSucceeded:
+            % if reservation.is_pending:
               <p class="warningMessage">
                 ${ _('Please note that this is a <b>pre-booking</b>. This means that you shouldn\'t use the room unless you receive the confirmation that it has been accepted.') }
               </p>
@@ -384,13 +382,13 @@
                       <input type="hidden" id="reason" name="reason">
                       <div style="float:left; padding-top: 15px;">
                         % if not reservation.is_cancelled and not reservation.is_rejected:
-                          % if can_be_cancelled:
+                          % if reservation.can_be_cancelled(_session.user):
                             <a class="i-button" href="#" onclick="submit_cancel(); return false;">${ _('Cancel') }</a>
                           % endif
-                          % if can_be_rejected and not reservation.is_confirmed:
+                          % if reservation.can_be_rejected(_session.user) and not reservation.is_confirmed:
                             <a class="i-button" href="#" onclick="submit_accept(); return false;">${ _('Accept') }</a>
                           % endif
-                          % if can_be_rejected:
+                          % if reservation.can_be_rejected(_session.user):
                             <a class="i-button" href="#" onclick="submit_reject(); return false;">${ _('Reject') }</a>
                           % endif
                           % if reservation.can_be_modified(user):
@@ -499,12 +497,12 @@
                         <td align="left" class="blacktext">
                           % for occurrence in reservation.occurrences.filter_by(is_valid=True).all():
                           ${ formatDate(occurrence.start.date()) }
-                            % if can_be_rejected:
+                            % if reservation.can_be_rejected(_session.user):
                               <a class="roomBookingRejectOccurrence" href="#" onclick="submit_reject_occurrence('${ url_for('rooms.roomBooking-rejectBookingOccurrence', reservation, date=formatDate(occurrence.start.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start.date()) }'); return false;">
                                 ${ _('Reject') }
                               </a>
                             % endif
-                            % if can_be_cancelled:
+                            % if reservation.can_be_cancelled(_session.user):
                               <a class="roomBookingCancelOccurrence" href="#" onclick="submit_cancel_occurrence('${ url_for('rooms.roomBooking-cancelBookingOccurrence', reservation, date=formatDate(occurrence.start.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start.date()) }'); return false;">
                                 ${ _('Cancel') }
                               </a>

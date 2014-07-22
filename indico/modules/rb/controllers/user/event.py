@@ -115,8 +115,8 @@ class RHRoomBookingEventBookingDetails(RHRoomBookingEventBase, RHRoomBookingBook
         RHRoomBookingEventBase._checkParams(self, params)
         RHRoomBookingBookingDetails._checkParams(self)
 
-    def _get_view(self):
-        return WPRoomBookingEventBookingDetails(self, self.event)
+    def _get_view(self, **kwargs):
+        return WPRoomBookingEventBookingDetails(self, self.event, **kwargs)
 
     def _process(self):
         return RHRoomBookingBookingDetails._process(self)

@@ -17,7 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import session
 from indico.modules.rb import settings
 
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
@@ -25,7 +24,6 @@ from indico.modules.rb.models.reservations import RepeatMapping
 from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
 from indico.util.i18n import _
-from MaKaC.common import Config
 from MaKaC.webinterface.wcomponents import WTemplated
 
 
@@ -40,39 +38,14 @@ class WPRoomBookingBookingDetails(WPRoomBookingBase):
         self._bookRoomNewOpt.setActive(True)
 
     def _getBody(self, params):
+        reservation = params['reservation']
         params['endpoints'] = self.endpoints
-        return WRoomBookingDetails(self._rh).getHTML(params)
-
-
-class WRoomBookingDetails(WTemplated):
-
-    def __init__(self, rh, conference=None):
-        self._rh = rh
-        self._reservation = rh._reservation
-        self._conf = conference
-        self._standalone = conference is None
-
-    def getVars(self):
-        wvars = WTemplated.getVars(self)
-        wvars['standalone'] = self._standalone
-        wvars['reservation'] = self._reservation
-        wvars['config'] = Config.getInstance()
-        # wvars['actionSucceeded'] = self._rh._afterActionSucceeded
-        # if self._rh._afterActionSucceeded:
-        #     wvars['title'] = self._rh._title
-        #     wvars['description'] = self._rh._description
-
-        wvars['isPreBooking'] = not self._reservation.is_confirmed
-        wvars['bookMessage'] = _('PRE-Booking') if wvars['isPreBooking'] else _('Booking')
-
-        wvars['can_be_rejected'] = self._reservation.can_be_rejected(session.user)
-        wvars['can_be_cancelled'] = self._reservation.can_be_cancelled(session.user)
-        wvars['repetition'] = RepeatMapping.getMessage(self._reservation.repeat_unit, self._reservation.repeat_step)
-        wvars['vc_equipment'] = ', '.join(eq.name for eq in self._reservation.get_vc_equipment())
-        wvars['assistance_emails'] = settings.get('assistance_emails', [])
-        wvars['edit_logs'] = self._reservation.edit_logs.order_by(ReservationEditLog.timestamp.desc()).all()
-        wvars['excluded_days'] = self._reservation.find_excluded_days().all()
-        return wvars
+        params['assistance_emails'] = settings.get('assistance_emails', [])
+        params['vc_equipment'] = ', '.join(eq.name for eq in reservation.get_vc_equipment())
+        params['repetition'] = RepeatMapping.getMessage(*reservation.repetition)
+        params['edit_logs'] = reservation.edit_logs.order_by(ReservationEditLog.timestamp.desc()).all()
+        params['excluded_days'] = reservation.find_excluded_days().all()
+        return WTemplated('RoomBookingDetails').getHTML(params)
 
 
 class WPRoomBookingCalendar(WPRoomBookingBase):

@@ -55,11 +55,11 @@ class RHRoomBookingBookingMixin:
 
 
 class RHRoomBookingBookingDetails(RHRoomBookingBookingMixin, RHRoomBookingBase):
-    def _get_view(self):
-        return WPRoomBookingBookingDetails(self)
+    def _get_view(self, **kwargs):
+        return WPRoomBookingBookingDetails(self, **kwargs)
 
     def _process(self):
-        return self._get_view().display()
+        return self._get_view(reservation=self._reservation).display()
 
 
 class RHRoomBookingAcceptBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
