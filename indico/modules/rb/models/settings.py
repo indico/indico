@@ -44,6 +44,10 @@ class Setting(db.Model):
         return cls.find_first(module=module, name=name)
 
     @classmethod
+    def get_all_settings(cls, module):
+        return {s.name: s for s in cls.find(module=module)}
+
+    @classmethod
     def get_all(cls, module):
         return {s.name: s.value for s in cls.find(module=module)}
 
@@ -64,7 +68,7 @@ class Setting(db.Model):
 
     @classmethod
     def set_multi(cls, module, items):
-        existing = cls.get_all(module)
+        existing = cls.get_all_settings(module)
         for name in items.viewkeys() - existing.viewkeys():
             setting = cls(module=module, name=name, value=items[name])
             db.session.add(setting)

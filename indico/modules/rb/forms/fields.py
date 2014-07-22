@@ -20,8 +20,14 @@
 import json
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
-from wtforms.fields.simple import HiddenField
+from wtforms.fields.simple import HiddenField, TextAreaField
 from wtforms.widgets.core import CheckboxInput
+
+from indico.modules.rb.forms.widgets import PrincipalWidget
+from indico.util.fossilize import fossilize
+from indico.util.misc import retrieve_principals
+from indico.util.string import is_valid_mail
+from indico.util.i18n import _
 
 
 class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
@@ -55,3 +61,45 @@ class JSONField(HiddenField):
     def populate_obj(self, obj, name):
         # We don't want to populate an object with this
         pass
+
+
+class TextListField(TextAreaField):
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = [line.strip() for line in valuelist[0].split('\n') if line.strip()]
+        else:
+            self.data = []
+
+    def _validate_item(self, lie):
+        pass
+
+    def pre_validate(self, form):
+        for line in self.data:
+            self._validate_item(line)
+
+    def _value(self):
+        return u'\n'.join(self.data) if self.data else u''
+
+
+class EmailListField(TextListField):
+    def _validate_item(self, line):
+        if not is_valid_mail(line, False):
+            raise ValueError(_(u'Invalid email address: {}').format(line))
+
+
+class PrincipalField(HiddenField):
+    widget = PrincipalWidget()
+
+    def _convert_principal(self, principal):
+        if principal['_type'] == 'Avatar':
+            return u'Avatar', principal['id']
+        else:
+            return u'Group', principal['id']
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            data = json.loads(valuelist[0])
+            self.data = map(self._convert_principal, data)
+
+    def _value(self):
+        return map(fossilize, retrieve_principals(self.data))

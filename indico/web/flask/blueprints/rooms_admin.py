@@ -32,7 +32,8 @@ rooms_admin = IndicoBlueprint('rooms_admin', __name__, url_prefix='/admin/rooms'
 # Main settings
 rooms_admin.add_url_rule('/config/',
                          'roomBookingPluginAdmin',
-                         index_handler.RHRoomBookingPluginAdmin)
+                         index_handler.RHRoomBookingPluginAdmin,
+                         methods=('GET', 'POST'))
 
 
 # Locations

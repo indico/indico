@@ -17,12 +17,24 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-from flask import request
 
+from indico.core.config import Config
+from indico.modules.rb import settings
+from indico.modules.rb.forms.base import FormDefaults
+from indico.modules.rb.forms.settings import SettingsForm
 from indico.modules.rb.views.admin.index import WPRoomBookingPluginAdmin
+from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
 class RHRoomBookingPluginAdmin(RHAdminBase):
     def _process(self):
-        return WPRoomBookingPluginAdmin(self, request.args).display()
+        defaults = FormDefaults(**settings.get_all())
+        form = SettingsForm(obj=defaults)
+        if form.validate_on_submit():
+            settings.set_multi(form.data)
+            # TODO: flash message
+            self._redirect(url_for('rooms_admin.roomBookingPluginAdmin'))
+            return
+        rb_active = Config.getInstance().getIsRoomBookingActive()
+        return WPRoomBookingPluginAdmin(self, rb_active=rb_active, form=form).display()

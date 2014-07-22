@@ -1,0 +1,40 @@
+{% set value_json = field._value() | tojson %}
+<div id="userGroupList-{{ field.id }}" style="margin-bottom: 10px;"></div>
+<input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}">
+
+<script>
+    (function() {
+        var principals = {{ value_json }};
+        var field = $('#{{ field.id }}');
+
+        function addPrincipal(newPrincipals, setResult) {
+            // remove existing ones first to avoid duplicates
+            _.each(newPrincipals, function(principal) {
+                principals = _.without(principals, _.findWhere(principals, {
+                    _type: principal._type,
+                    id: principal.id
+                }));
+            });
+            principals = principals.concat(newPrincipals);
+            field.val(JSON.stringify(principals));
+            console.log(principals);
+            setResult(true);
+        }
+        function removePrincipal(principal, setResult) {
+            principals = _.without(principals, _.findWhere(principals, {
+                _type: principal.get('_type'),
+                id: principal.get('id')
+            }));
+            field.val(JSON.stringify(principals));
+            console.log(principals);
+            setResult(true);
+        }
+
+        var widget = new UserListField(
+            'PluginOptionPeopleListDiv', 'PeopleList', principals,
+            true, null, true, true, null, null, false, false, false, true,
+            addPrincipal, userListNothing, removePrincipal
+        );
+        $E('userGroupList-{{ field.id }}').set(widget.draw());
+    })();
+</script>

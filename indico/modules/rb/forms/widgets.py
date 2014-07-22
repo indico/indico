@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import render_template
 from wtforms.widgets.core import HTMLString
 
 
@@ -34,3 +35,9 @@ class ConcatWidget(object):
             fmt = '{0} {1}' if self.prefix_label else '{1} {0}'
             html.append(fmt.format(subfield.label(**label_args), subfield(**field_args)))
         return HTMLString(self.separator.join(html))
+
+
+class PrincipalWidget(object):
+    """Renders a user/group selector widget"""
+    def __call__(self, field):
+        return HTMLString(render_template('forms/principal_widget.html', field=field))

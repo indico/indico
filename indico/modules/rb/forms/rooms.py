@@ -18,7 +18,6 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import itertools
-from collections import defaultdict
 from operator import itemgetter
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField

@@ -19,6 +19,7 @@
 
 from flask.ext.wtf import Form
 from wtforms.fields.core import FieldList
+from wtforms.widgets.core import HiddenInput
 
 
 class DataWrapper(object):
@@ -45,6 +46,10 @@ class IndicoForm(Form):
             if existing_only and not hasattr(obj, name):
                 continue
             field.populate_obj(obj, name)
+
+    @property
+    def visible_fields(self):
+        return [field for field in self if not isinstance(field.widget, HiddenInput)]
 
     @property
     def error_list(self):

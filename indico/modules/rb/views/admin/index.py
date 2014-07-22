@@ -17,34 +17,19 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.config import Config
 from indico.modules.rb.views.admin import WPRoomBookingPluginAdminBase
-from indico.util.i18n import _
 from MaKaC.webinterface.wcomponents import WTemplated
 
 
 class WPRoomBookingPluginAdmin(WPRoomBookingPluginAdminBase):
-    def __init__(self, rh, params):
-        WPRoomBookingPluginAdminBase.__init__(self, rh)
-        self._params = params
-
     def _setActiveTab(self):
         WPRoomBookingPluginAdminBase._setActiveTab(self)
         self._subTabMain.setActive()
 
     def _getTabContent(self, params):
-        return WRoomBookingPluginAdmin(self._rh).getHTML(params)
-
-
-class WRoomBookingPluginAdmin(WTemplated):
-    def __init__(self, rh):
-        self._rh = rh
-
-    def getVars(self):
-        wvars = WTemplated.getVars(self)
-
-        if Config.getInstance().getIsRoomBookingActive():
-            wvars['activationStatusText'] = _('Room Booking is currently active')
-        else:
-            wvars['activationStatusText'] = _('Room Booking is currently not active')
-        return wvars
+        params['field_opts'] = {
+            'assistance_emails': {'rows': 3, 'cols': 40},
+            'notification_hour': {'size': 2},
+            'notification_before_days': {'size': 2}
+        }
+        return WTemplated('RoomBookingSettings').getHTML(params)

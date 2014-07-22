@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
+
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.wcomponents import TabControl, WSimpleNavigationDrawer, WTabControl
@@ -31,7 +33,7 @@ class WPRoomsBase(WPAdminsBase):
     def _createTabCtrl(self):
         self._tabCtrl = TabControl()
 
-        if self._rh._getUser().isAdmin():
+        if session.user.isAdmin():
             self._subTabRoomBooking = self._tabCtrl.newTab(
                 'booking',
                 _('Room Booking'),
@@ -39,8 +41,8 @@ class WPRoomsBase(WPAdminsBase):
             )
 
             self._subTabMain = self._subTabRoomBooking.newSubTab(
-                'main',
-                _('Main'),
+                'settings',
+                _('Settings'),
                 urlHandlers.UHRoomBookingPluginAdmin.getURL()
             )
         else:
@@ -51,8 +53,8 @@ class WPRoomsBase(WPAdminsBase):
             )
 
         self._subTabConfig = self._subTabRoomBooking.newSubTab(
-            'configuration',
-            _('Configuration'),
+            'management',
+            _('Management'),
             urlHandlers.UHRoomBookingAdmin.getURL()
         )
         self._subTabRoomMappers = self._tabCtrl.newTab(

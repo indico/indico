@@ -27,15 +27,14 @@ from MaKaC.webinterface.rh.base import RHProtected
 
 class RHRoomBookingProtected(RHProtected):
     def _checkSessionUser(self):
-        if session.user:
-            try:
-                if Config.getInstance().getIsRoomBookingActive() and not rb_check_user_access(session.user):
-                    raise AccessError()
-            except KeyError:
-                pass
-        else:
+        if not Config.getInstance().getIsRoomBookingActive():
+            raise AccessError()
+        if not session.user:
             self._redirect(self._getLoginURL())
             self._doProcess = False
+            return
+        if not rb_check_user_access(session.user):
+            raise AccessError()
 
 
 class RHRoomBookingBase(RHRoomBookingProtected):
