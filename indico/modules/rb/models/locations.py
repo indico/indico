@@ -133,14 +133,6 @@ class Location(db.Model):
             self.name
         )
 
-    def __cmp__(self, other):
-        if not self or not other:
-            return cmp(1 if self else None, 1 if other else None)
-        if self.id == other.id:
-            return 0
-        return cmp(self.name, other.name)
-
-    # TODO: get rid of locators, may use id field instead
     def getLocator(self):
         d = Locator()
         d['locationId'] = self.name

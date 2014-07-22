@@ -361,22 +361,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def has_photo(self):
         return self.photo_id is not None
 
-    # core
-
-    def __cmp__(self, other):
-        if not self or not other:
-            return cmp(1 if self else None, 1 if other else None)
-        if self.id == other.id:
-            return 0
-        return (cmp(self.location.name, other.location.name) or
-                cmp(self.building, other.building) or
-                cmp(self.floor, other.floor) or
-                cmp(self.number, other.number) or
-                cmp(self.name, other.name))
-
-    def __eq__(self, other):
-        return self.__cmp__(other) == 0
-
     @return_ascii
     def __repr__(self):
         return u'<Room({0}, {1}, {2})>'.format(
