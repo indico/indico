@@ -43,7 +43,7 @@ from pytz import all_timezones
 
 from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
-from indico.util.misc import retrieve_principals
+from indico.util.user import retrieve_principals
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import avatar_links, suggestions
 from indico.util.string import safe_upper, safe_slice

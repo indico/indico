@@ -25,7 +25,7 @@ from wtforms.widgets.core import CheckboxInput
 
 from indico.modules.rb.forms.widgets import PrincipalWidget
 from indico.util.fossilize import fossilize
-from indico.util.misc import retrieve_principals
+from indico.util.user import retrieve_principals
 from indico.util.string import is_valid_mail
 from indico.util.i18n import _
 

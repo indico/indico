@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.util.misc import retrieve_principals
+from indico.util.user import retrieve_principals
 
 
 def rb_check_user_access(user):
