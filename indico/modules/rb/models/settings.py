@@ -79,7 +79,7 @@ class Setting(db.Model):
     def delete(cls, module, *names):
         if not names:
             return
-        Setting.find(Setting.name.in_(names), Setting.module == module).delete()
+        Setting.find(Setting.name.in_(names), Setting.module == module).delete(synchronize_session='fetch')
 
     @classmethod
     def delete_all(cls, module):
