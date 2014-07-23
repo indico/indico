@@ -43,10 +43,15 @@ def _add_to_context(namespace, element, name=None, doc=None, color='green'):
         name = element.__name__
     namespace[name] = element
 
+    attrs = {}
+    if color[-1] == '!':
+        color = color[:-1]
+        attrs['attrs'] = ['bold']
+
     if doc:
-        print colored('+ {0} : {1}'.format(name, doc), color)
+        print colored('+ {0} : {1}'.format(name, doc), color, **attrs)
     else:
-        print colored('+ {0}'.format(name), color)
+        print colored('+ {0}'.format(name), color, **attrs)
 
 
 class IndicoShell(Shell):
@@ -63,9 +68,7 @@ class IndicoShell(Shell):
 
     def get_context(self):
         if self._context is None:
-            self._context = context = {'dbi': DBMgr.getInstance(),
-                                       'db': db,
-                                       'transaction': transaction}
+            self._context = context = {}
 
             for attr in ('date', 'time', 'datetime', 'timedelta'):
                 _add_to_context(context, getattr(datetime, attr), doc='stdlib datetime.{}'.format(attr), color='yellow')
@@ -85,5 +88,9 @@ class IndicoShell(Shell):
             for name, cls in sorted(db.Model._decl_class_registry.iteritems(), key=itemgetter(0)):
                 if hasattr(cls, '__table__'):
                     _add_to_context(context, cls, color='cyan')
+
+            _add_to_context(context, DBMgr.getInstance(), 'dbi', doc='zodb db interface', color='cyan!')
+            _add_to_context(context, db, 'db', doc='sqlalchemy db interface', color='cyan!')
+            _add_to_context(context, transaction, doc='transaction module', color='cyan!')
 
         return self._context
