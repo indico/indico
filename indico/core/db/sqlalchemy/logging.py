@@ -29,6 +29,8 @@ from flask import current_app
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listens_for
 
+from indico.core.db import db
+
 
 def _prettify_sql(statement):
     return '    ' + statement.replace('\n', '\n    ')
@@ -52,8 +54,9 @@ def _get_sql_line():
 
 
 def apply_db_loggers(debug=False):
-    if not debug:
+    if not debug or getattr(db, '_loggers_applied', False):
         return
+    db._loggers_applied = True
     from indico.core.logger import Logger
 
     logger = Logger.get('db')
