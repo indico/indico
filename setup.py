@@ -513,6 +513,7 @@ if __name__ == '__main__':
             indico_livesync = indico.ext.livesync.console:main
             indico_shell = indico.util.shell:main
             indico_admin = indico.util.admin:main
+            indico = indico.cli.manage:main
 
             [indico.ext_types]
 
