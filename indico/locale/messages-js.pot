@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 1.2-dev\n"
+"Project-Id-Version: indico 1.9\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-02-06 13:56+0100\n"
+"POT-Creation-Date: 2014-07-23 15:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.3\n"
 
-#: MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:224
-#: indico/MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:224
+#: MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:236
+#: indico/MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:236
 msgid "Hide list of webcastable rooms."
 msgstr ""
 
-#: MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:229
-#: indico/MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:229
+#: MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:241
+#: indico/MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:241
 msgid "See list of webcastable rooms."
 msgstr ""
 
-#: MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:243
-#: indico/MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:243
+#: MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:255
+#: indico/MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:255
 msgid "Contributions that can be Webcasted"
 msgstr ""
 
-#: MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:247
-#: indico/MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:247
+#: MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:259
+#: indico/MaKaC/plugins/Collaboration/WebcastRequest/tpls/NewBookingForm.tpl:259
 msgid "Contributions that can't be Webcasted"
 msgstr ""
 
@@ -79,8 +79,8 @@ msgstr ""
 #: indico/htdocs/js/indico/Management/AbstractReviewing.js:70
 #: indico/htdocs/js/indico/Management/AbstractReviewing.js:73
 #: indico/htdocs/js/indico/Management/AbstractReviewing.js:546
-#: indico/htdocs/js/indico/Management/CFA.js:657
-#: indico/htdocs/js/indico/Management/CFA.js:661
+#: indico/htdocs/js/indico/Management/CFA.js:655
+#: indico/htdocs/js/indico/Management/CFA.js:659
 #: indico/htdocs/js/indico/Management/NotificationTPL.js:48
 #: indico/htdocs/js/indico/Management/abstracts.js:24
 #: indico/htdocs/js/indico/Timetable/Management.js:134
@@ -100,6 +100,22 @@ msgstr ""
 #: MaKaC/plugins/InstantMessaging/tpls/EventDetailBanner.tpl:96
 #: indico/MaKaC/plugins/InstantMessaging/tpls/EventDetailBanner.tpl:96
 msgid "Using ${link['name']}"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/AbstractDataModification.tpl:253
+#: indico/MaKaC/webinterface/tpls/AbstractDataModification.tpl:253
+msgid "Submitting an abstract"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/AbstractDataModification.tpl:253
+#: indico/MaKaC/webinterface/tpls/AbstractDataModification.tpl:253
+msgid "You have to select at least one author as presenter."
+msgstr ""
+
+#: MaKaC/webinterface/tpls/AbstractDataModification.tpl:311
+#: indico/MaKaC/webinterface/tpls/AbstractDataModification.tpl:311
+#: indico/htdocs/js/indico/Legacy/Util.js:569
+msgid "At least one must be selected"
 msgstr ""
 
 #: MaKaC/webinterface/tpls/AbstractManagment.tpl:237
@@ -136,7 +152,7 @@ msgstr ""
 
 #: MaKaC/webinterface/tpls/AbstractManagment.tpl:245
 #: indico/MaKaC/webinterface/tpls/AbstractManagment.tpl:245
-#: indico/htdocs/js/indico/Legacy/Dialogs.js:644
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:633
 msgid "Confirm"
 msgstr ""
 
@@ -199,9 +215,9 @@ msgstr ""
 
 #: MaKaC/webinterface/tpls/AdminOAuthConsumers.tpl:64
 #: indico/MaKaC/webinterface/tpls/AdminOAuthConsumers.tpl:64
-#: indico/htdocs/js/indico/Core/Widgets/Base.js:1854
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:427
-#: indico/htdocs/js/indico/Legacy/Dialogs.js:617
+#: indico/htdocs/js/indico/Core/Widgets/Base.js:1862
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:423
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:607
 msgid "Saving..."
 msgstr ""
 
@@ -297,6 +313,25 @@ msgstr ""
 msgid "Creating new type of payment method..."
 msgstr ""
 
+#: MaKaC/webinterface/tpls/CategoryDisplay.tpl:193
+#: indico/MaKaC/webinterface/tpls/CategoryDisplay.tpl:193
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:668
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1067
+msgid "Name"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/CategoryDisplay.tpl:195
+#: indico/MaKaC/webinterface/tpls/CategoryDisplay.tpl:195
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:851
+msgid "File size"
+msgstr ""
+
+#: MaKaC/webinterface/tpls/CategoryDisplay.tpl:198
+#: indico/MaKaC/webinterface/tpls/CategoryDisplay.tpl:198
+#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:852
+msgid "File creation date"
+msgstr ""
+
 #: MaKaC/webinterface/tpls/ConfAccessControlFrame.tpl:24
 #: indico/MaKaC/webinterface/tpls/ConfAccessControlFrame.tpl:24
 msgid "Set access key"
@@ -358,7 +393,7 @@ msgstr ""
 #: indico/MaKaC/webinterface/tpls/UserDetails.tpl:135
 #: indico/htdocs/js/indico/Core/Dialogs/Base.js:128
 #: indico/htdocs/js/indico/Core/Dialogs/Base.js:134
-#: indico/htdocs/js/indico/Legacy/Dialogs.js:715
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:733
 msgid "Error"
 msgstr ""
 
@@ -663,7 +698,7 @@ msgstr ""
 
 #: MaKaC/webinterface/tpls/EventCreationJS.tpl:66
 #: indico/MaKaC/webinterface/tpls/EventCreationJS.tpl:66
-#: indico/htdocs/js/indico/Management/CFA.js:636
+#: indico/htdocs/js/indico/Management/CFA.js:634
 msgid "Remove"
 msgstr ""
 
@@ -734,7 +769,7 @@ msgstr ""
 #: MaKaC/webinterface/tpls/RoomBookingBookingForm.tpl:137
 #: indico/MaKaC/webinterface/tpls/RoomBookingBookingForm.tpl:137
 #: indico/htdocs/js/indico/Core/Dialogs/Popup.js:823
-#: indico/htdocs/js/indico/Legacy/Dialogs.js:663
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:673
 #: indico/htdocs/js/indico/Management/Timetable.js:237
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:1773
 msgid "Close"
@@ -1127,6 +1162,8 @@ msgid "State"
 msgstr ""
 
 #: indico/htdocs/js/indico/Admin/Scheduler.js:264
+#: indico/htdocs/js/indico/RegistrationForm/field.js:462
+#: indico/htdocs/js/indico/RegistrationForm/section.js:498
 msgid "Enabled"
 msgstr ""
 
@@ -1134,43 +1171,51 @@ msgstr ""
 msgid "Disabled"
 msgstr ""
 
-#: indico/htdocs/js/indico/Admin/Scheduler.js:267
-msgid "Spooled commands"
-msgstr ""
-
-#: indico/htdocs/js/indico/Admin/Scheduler.js:269
-msgid "Queued tasks"
+#: indico/htdocs/js/indico/Admin/Scheduler.js:268
+msgid "Hostname"
 msgstr ""
 
 #: indico/htdocs/js/indico/Admin/Scheduler.js:271
-msgid "Running tasks"
-msgstr ""
-
-#: indico/htdocs/js/indico/Admin/Scheduler.js:273
-msgid "Failed tasks"
+msgid "PID"
 msgstr ""
 
 #: indico/htdocs/js/indico/Admin/Scheduler.js:275
+msgid "Spooled commands"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:277
+msgid "Queued tasks"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:279
+msgid "Running tasks"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:281
+msgid "Failed tasks"
+msgstr ""
+
+#: indico/htdocs/js/indico/Admin/Scheduler.js:283
 msgid "Finished tasks"
 msgstr ""
 
-#: indico/htdocs/js/indico/Admin/Scheduler.js:359
+#: indico/htdocs/js/indico/Admin/Scheduler.js:366
 msgid "Summary"
 msgstr ""
 
-#: indico/htdocs/js/indico/Admin/Scheduler.js:360
+#: indico/htdocs/js/indico/Admin/Scheduler.js:367
 msgid "Running Tasks"
 msgstr ""
 
-#: indico/htdocs/js/indico/Admin/Scheduler.js:361
+#: indico/htdocs/js/indico/Admin/Scheduler.js:368
 msgid "Waiting queue"
 msgstr ""
 
-#: indico/htdocs/js/indico/Admin/Scheduler.js:362
+#: indico/htdocs/js/indico/Admin/Scheduler.js:369
 msgid "Failed Tasks"
 msgstr ""
 
-#: indico/htdocs/js/indico/Admin/Scheduler.js:363
+#: indico/htdocs/js/indico/Admin/Scheduler.js:370
 msgid "History"
 msgstr ""
 
@@ -1180,10 +1225,10 @@ msgstr ""
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:336
 #: indico/htdocs/js/indico/Legacy/Widgets.js:75
 #: indico/htdocs/js/indico/Legacy/Widgets.js:98
-#: indico/htdocs/js/indico/Management/CFA.js:846
+#: indico/htdocs/js/indico/Management/CFA.js:844
 #: indico/htdocs/js/indico/Management/Timetable.js:623
 #: indico/htdocs/js/indico/Management/Timetable.js:885
-#: indico/htdocs/js/indico/RegistrationForm/field.js:135
+#: indico/htdocs/js/indico/RegistrationForm/field.js:134
 msgid "Add"
 msgstr ""
 
@@ -1202,7 +1247,7 @@ msgstr ""
 #: indico/htdocs/js/indico/Legacy/Widgets.js:334
 #: indico/htdocs/js/indico/Legacy/Widgets.js:358
 #: indico/htdocs/js/indico/Legacy/Widgets.js:384
-#: indico/htdocs/js/indico/Management/CFA.js:850
+#: indico/htdocs/js/indico/Management/CFA.js:848
 #: indico/htdocs/js/indico/Management/RoomBookingMapOfRooms.js:76
 #: indico/htdocs/js/indico/Management/Timetable.js:655
 #: indico/htdocs/js/indico/Management/Timetable.js:908
@@ -1318,7 +1363,7 @@ msgstr ""
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1090
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1150
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:336
-#: indico/htdocs/js/indico/Legacy/Dialogs.js:660
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:670
 #: indico/htdocs/js/indico/Legacy/Widgets.js:334
 #: indico/htdocs/js/indico/Legacy/Widgets.js:358
 #: indico/htdocs/js/indico/Legacy/Widgets.js:384
@@ -1370,14 +1415,6 @@ msgstr ""
 msgid "File name"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:851
-msgid "File size"
-msgstr ""
-
-#: indico/htdocs/js/indico/Core/Dialogs/Popup.js:852
-msgid "File creation date"
-msgstr ""
-
 #: indico/htdocs/js/indico/Core/Dialogs/Popup.js:858
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:1714
 msgid "No paper uploaded"
@@ -1392,7 +1429,7 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Popup.js:991
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:670
-#: indico/htdocs/js/indico/RegistrationForm/field.js:325
+#: indico/htdocs/js/indico/RegistrationForm/field.js:328
 msgid "File"
 msgstr ""
 
@@ -1621,7 +1658,7 @@ msgstr ""
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1139
 #: indico/htdocs/js/indico/Display/Dialogs.js:52
 #: indico/htdocs/js/indico/Display/Dialogs.js:67
-#: indico/htdocs/js/indico/RegistrationForm/field.js:519
+#: indico/htdocs/js/indico/RegistrationForm/field.js:524
 msgid "Telephone"
 msgstr ""
 
@@ -1723,25 +1760,25 @@ msgid ""
 "variable and without initialState"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/Base.js:479
+#: indico/htdocs/js/indico/Core/Widgets/Base.js:483
 msgid "See  results more"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/Base.js:482
+#: indico/htdocs/js/indico/Core/Widgets/Base.js:486
 msgid "See all"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/Base.js:551
+#: indico/htdocs/js/indico/Core/Widgets/Base.js:555
 msgid "No more to load"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/Base.js:762
-#: indico/htdocs/js/indico/Core/Widgets/Base.js:766
+#: indico/htdocs/js/indico/Core/Widgets/Base.js:770
+#: indico/htdocs/js/indico/Core/Widgets/Base.js:774
 msgid "Previous tab"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/Base.js:775
-#: indico/htdocs/js/indico/Core/Widgets/Base.js:779
+#: indico/htdocs/js/indico/Core/Widgets/Base.js:783
+#: indico/htdocs/js/indico/Core/Widgets/Base.js:787
 msgid "Next tab"
 msgstr ""
 
@@ -1860,31 +1897,31 @@ msgstr ""
 msgid "Color"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:239
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:237
 msgid "switch to plain text"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:242
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:240
 msgid "switch to rich text"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:452
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:448
 msgid "here"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:463
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:478
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:459
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:474
 msgid "Warning!"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:464
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:460
 msgid ""
 "Your data contains some potentially harmful , which cannot be stored in the "
 "database. Use the automatic Indico cleaner or clean the text manually (see "
 "the list of forbidden elements that you are using "
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Widgets/RichText.js:478
+#: indico/htdocs/js/indico/Core/Widgets/RichText.js:474
 msgid "Format of your data is invalid. Please check the syntax."
 msgstr ""
 
@@ -1961,8 +1998,8 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:465
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:498
-#: indico/htdocs/js/indico/Management/CFA.js:311
-#: indico/htdocs/js/indico/Management/CFA.js:344
+#: indico/htdocs/js/indico/Management/CFA.js:309
+#: indico/htdocs/js/indico/Management/CFA.js:342
 msgid "The email address ("
 msgstr ""
 
@@ -1973,7 +2010,7 @@ msgid ""
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:499
-#: indico/htdocs/js/indico/Management/CFA.js:345
+#: indico/htdocs/js/indico/Management/CFA.js:343
 msgid ") is already used by another participant. Please modify email field value."
 msgstr ""
 
@@ -1986,12 +2023,12 @@ msgid "Edit"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:526
-#: indico/htdocs/js/indico/Management/CFA.js:385
+#: indico/htdocs/js/indico/Management/CFA.js:383
 msgid "The user you are trying to edit does not exist."
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/UserList.js:537
-#: indico/htdocs/js/indico/Management/CFA.js:405
+#: indico/htdocs/js/indico/Management/CFA.js:403
 msgid "The user you are trying to remove does not exist."
 msgstr ""
 
@@ -2074,7 +2111,7 @@ msgstr ""
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:494
 #: indico/htdocs/js/indico/Management/Timetable.js:434
 #: indico/htdocs/js/indico/Management/Timetable.js:1045
-#: indico/htdocs/js/indico/RegistrationForm/field.js:298
+#: indico/htdocs/js/indico/RegistrationForm/field.js:301
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:702
 msgid "Date"
 msgstr ""
@@ -2108,20 +2145,21 @@ msgid "Timezone"
 msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Dialogs.js:487
+#: indico/htdocs/js/indico/RegistrationForm/section.js:495
 #: indico/htdocs/js/indico/Timetable/Base.js:52
 #: indico/htdocs/js/indico/Timetable/Base.js:901
 msgid "Session"
 msgstr ""
 
-#: indico/htdocs/js/indico/Legacy/Dialogs.js:558
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:556
 msgid "My minutes"
 msgstr ""
 
-#: indico/htdocs/js/indico/Legacy/Dialogs.js:645
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:634
 msgid "You have modified your text since you last saved."
 msgstr ""
 
-#: indico/htdocs/js/indico/Legacy/Dialogs.js:646
+#: indico/htdocs/js/indico/Legacy/Dialogs.js:635
 msgid "Do you want to save your changes?"
 msgstr ""
 
@@ -2131,10 +2169,6 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Util.js:501
 msgid "The value must be at maximum "
-msgstr ""
-
-#: indico/htdocs/js/indico/Legacy/Util.js:569
-msgid "At least one must be selected"
 msgstr ""
 
 #: indico/htdocs/js/indico/Legacy/Util.js:574
@@ -2280,7 +2314,7 @@ msgid "Please answer all questions."
 msgstr ""
 
 #: indico/htdocs/js/indico/Management/CFA.js:25
-#: indico/htdocs/js/indico/Management/CFA.js:102
+#: indico/htdocs/js/indico/Management/CFA.js:101
 msgid "Over the limit"
 msgstr ""
 
@@ -2301,163 +2335,164 @@ msgstr ""
 msgid " words."
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:104
+#: indico/htdocs/js/indico/Management/CFA.js:103
 msgid " chars left"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:145
-#: indico/htdocs/js/indico/Management/CFA.js:147
+#: indico/htdocs/js/indico/Management/CFA.js:144
+#: indico/htdocs/js/indico/Management/CFA.js:146
 msgid "Maximum number of characters has been exceeded in "
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:145
+#: indico/htdocs/js/indico/Management/CFA.js:144
 msgid " character."
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:147
+#: indico/htdocs/js/indico/Management/CFA.js:146
 msgid " characters."
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:284
-#: indico/htdocs/js/indico/Management/CFA.js:310
-#: indico/htdocs/js/indico/Management/CFA.js:343
+#: indico/htdocs/js/indico/Management/CFA.js:282
+#: indico/htdocs/js/indico/Management/CFA.js:308
+#: indico/htdocs/js/indico/Management/CFA.js:341
 msgid "Add author"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:285
+#: indico/htdocs/js/indico/Management/CFA.js:283
 msgid "Search User"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:286
+#: indico/htdocs/js/indico/Management/CFA.js:284
 msgid "Define New"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:312
+#: indico/htdocs/js/indico/Management/CFA.js:310
 msgid ""
 ") of a user you are trying to add is already used by another author. An "
 "author can be added only once and only in one list."
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:325
+#: indico/htdocs/js/indico/Management/CFA.js:323
 msgid "New author"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:373
+#: indico/htdocs/js/indico/Management/CFA.js:371
 msgid "Edit author data"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:385
-#: indico/htdocs/js/indico/Management/CFA.js:456
+#: indico/htdocs/js/indico/Management/CFA.js:383
+#: indico/htdocs/js/indico/Management/CFA.js:454
 msgid "Edit author"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:405
-#: indico/htdocs/js/indico/Management/CFA.js:477
+#: indico/htdocs/js/indico/Management/CFA.js:403
+#: indico/htdocs/js/indico/Management/CFA.js:475
 msgid "Remove author"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:457
+#: indico/htdocs/js/indico/Management/CFA.js:455
 msgid "Edit this author"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:478
+#: indico/htdocs/js/indico/Management/CFA.js:476
 msgid "Remove this author from the list"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:519
+#: indico/htdocs/js/indico/Management/CFA.js:517
 msgid "This author will be also a "
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:519
+#: indico/htdocs/js/indico/Management/CFA.js:517
 #: indico/htdocs/js/indico/Management/Contributions.js:218
 msgid "presenter"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:623
+#: indico/htdocs/js/indico/Management/CFA.js:621
 msgid "Attach another file"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:657
+#: indico/htdocs/js/indico/Management/CFA.js:655
 msgid ""
 "You cannot attach this file because it exceeds the maximum size allowed per "
 "file. ("
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:661
+#: indico/htdocs/js/indico/Management/CFA.js:659
 msgid "The maximum size allowed in total ("
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:661
+#: indico/htdocs/js/indico/Management/CFA.js:659
 msgid "has been exceeded. Please remove some file before submitting the abstract."
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:686
+#: indico/htdocs/js/indico/Management/CFA.js:684
 msgid "Attach a file"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:732
+#: indico/htdocs/js/indico/Management/CFA.js:730
 msgid "Other files you want to attach"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:752
+#: indico/htdocs/js/indico/Management/CFA.js:750
 msgid "Remove material"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:753
+#: indico/htdocs/js/indico/Management/CFA.js:751
 msgid "Remove this attached material"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:826
+#: indico/htdocs/js/indico/Management/CFA.js:824
 msgid "Mandatory"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:840
+#: indico/htdocs/js/indico/Management/CFA.js:838
+#: indico/htdocs/js/indico/RegistrationForm/field.js:458
 msgid "Caption"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:846
-#: indico/htdocs/js/indico/RegistrationForm/field.js:135
+#: indico/htdocs/js/indico/Management/CFA.js:844
+#: indico/htdocs/js/indico/RegistrationForm/field.js:134
 msgid "Update"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:859
+#: indico/htdocs/js/indico/Management/CFA.js:857
 msgid "Loading field..."
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:889
+#: indico/htdocs/js/indico/Management/CFA.js:887
 msgid "Saving field..."
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:914
+#: indico/htdocs/js/indico/Management/CFA.js:912
 msgid "Edit Field: "
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:914
+#: indico/htdocs/js/indico/Management/CFA.js:912
 msgid "Add Field: "
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:939
+#: indico/htdocs/js/indico/Management/CFA.js:937
 msgid "Max length"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:967
-#: indico/htdocs/js/indico/RegistrationForm/field.js:533
+#: indico/htdocs/js/indico/Management/CFA.js:965
+#: indico/htdocs/js/indico/RegistrationForm/field.js:538
 msgid "Text"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:974
+#: indico/htdocs/js/indico/Management/CFA.js:972
 msgid "Input"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:983
+#: indico/htdocs/js/indico/Management/CFA.js:981
 msgid "option"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:986
+#: indico/htdocs/js/indico/Management/CFA.js:984
 msgid "Options"
 msgstr ""
 
-#: indico/htdocs/js/indico/Management/CFA.js:1000
+#: indico/htdocs/js/indico/Management/CFA.js:998
 msgid "Selection"
 msgstr ""
 
@@ -3225,11 +3260,6 @@ msgstr ""
 msgid "Uploading..."
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:668
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1067
-msgid "Name"
-msgstr ""
-
 #: indico/htdocs/js/indico/MaterialEditor/Editor.js:811
 msgid "Please select who will be able to access "
 msgstr ""
@@ -3326,29 +3356,29 @@ msgstr ""
 msgid "Upload paper"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1832
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1833
 msgid ""
 "Indico is currently performing the conversion to PDF of the "
 "file:<br>{fileName}<br>The conversion may take a few seconds."
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1881
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1882
 msgid "Edit Material"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1886
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1887
 msgid "Edit Resource"
 msgstr ""
 
-#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1891
+#: indico/htdocs/js/indico/MaterialEditor/Editor.js:1892
 msgid "Edit Materials"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:132
+#: indico/htdocs/js/indico/RegistrationForm/field.js:131
 msgid "New Field"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:132
+#: indico/htdocs/js/indico/RegistrationForm/field.js:131
 msgid "Edit Field"
 msgstr ""
 
@@ -3356,118 +3386,126 @@ msgstr ""
 msgid "Multiple choices/checkbox"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:284
+#: indico/htdocs/js/indico/RegistrationForm/field.js:287
 msgid "Country"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:341
+#: indico/htdocs/js/indico/RegistrationForm/field.js:344
 msgid "Free Text"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:360
+#: indico/htdocs/js/indico/RegistrationForm/field.js:362
 msgid "Number"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:395
+#: indico/htdocs/js/indico/RegistrationForm/field.js:394
 msgid "Multiple options/One choice"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:453
-#: indico/htdocs/js/indico/RegistrationForm/section.js:317
-#: indico/htdocs/js/indico/RegistrationForm/section.js:471
-#: indico/htdocs/js/indico/RegistrationForm/section.js:587
-#: indico/htdocs/js/indico/RegistrationForm/section.js:663
-msgid "caption"
+#: indico/htdocs/js/indico/RegistrationForm/field.js:459
+#: indico/htdocs/js/indico/RegistrationForm/section.js:340
+#: indico/htdocs/js/indico/RegistrationForm/section.js:496
+#: indico/htdocs/js/indico/RegistrationForm/section.js:640
+msgid "Billable"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:454
-#: indico/htdocs/js/indico/RegistrationForm/section.js:318
-#: indico/htdocs/js/indico/RegistrationForm/section.js:471
-msgid "billable"
+#: indico/htdocs/js/indico/RegistrationForm/field.js:460
+#: indico/htdocs/js/indico/RegistrationForm/section.js:341
+#: indico/htdocs/js/indico/RegistrationForm/section.js:497
+#: indico/htdocs/js/indico/RegistrationForm/section.js:641
+msgid "Price"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:455
-#: indico/htdocs/js/indico/RegistrationForm/section.js:319
-#: indico/htdocs/js/indico/RegistrationForm/section.js:471
-#: indico/htdocs/js/indico/RegistrationForm/section.js:589
-msgid "price"
+#: indico/htdocs/js/indico/RegistrationForm/field.js:461
+#: indico/htdocs/js/indico/RegistrationForm/section.js:342
+msgid "Places limit"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:456
-msgid "places limit"
-msgstr ""
-
-#: indico/htdocs/js/indico/RegistrationForm/field.js:457
-msgid "enable"
-msgstr ""
-
-#: indico/htdocs/js/indico/RegistrationForm/field.js:548
+#: indico/htdocs/js/indico/RegistrationForm/field.js:553
 msgid "Textarea"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/field.js:564
+#: indico/htdocs/js/indico/RegistrationForm/field.js:569
 msgid "Yes/No"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:310
-#: indico/htdocs/js/indico/RegistrationForm/section.js:465
-#: indico/htdocs/js/indico/RegistrationForm/section.js:578
+#: indico/htdocs/js/indico/RegistrationForm/section.js:332
+#: indico/htdocs/js/indico/RegistrationForm/section.js:487
+#: indico/htdocs/js/indico/RegistrationForm/section.js:630
 msgid "Configuration"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:311
+#: indico/htdocs/js/indico/RegistrationForm/section.js:333
 msgid "Edit accommodations"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:320
-msgid "place limit"
+#: indico/htdocs/js/indico/RegistrationForm/section.js:339
+msgid "Accommodation option"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:321
-msgid "cancelled"
+#: indico/htdocs/js/indico/RegistrationForm/section.js:343
+msgid "Cancelled"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:466
+#: indico/htdocs/js/indico/RegistrationForm/section.js:488
 msgid "Manage sessions"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:471
-msgid "enabled"
-msgstr ""
-
-#: indico/htdocs/js/indico/RegistrationForm/section.js:579
+#: indico/htdocs/js/indico/RegistrationForm/section.js:631
 msgid "Edit events"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:580
+#: indico/htdocs/js/indico/RegistrationForm/section.js:632
 msgid "Canceled events"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:588
-msgid "billabe"
+#: indico/htdocs/js/indico/RegistrationForm/section.js:639
+#: indico/htdocs/js/indico/RegistrationForm/section.js:727
+msgid "Event name"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:590
-msgid "price/place"
+#: indico/htdocs/js/indico/RegistrationForm/section.js:642
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:233
+msgid "Capacity"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:591
-msgid "Nb places"
+#: indico/htdocs/js/indico/RegistrationForm/section.js:644
+msgid "Accompanying"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:592
-msgid "Max./part."
+#: indico/htdocs/js/indico/RegistrationForm/section.js:645
+msgid "Must pay"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:597
+#: indico/htdocs/js/indico/RegistrationForm/section.js:650
+msgid "Uncheck to make the attendance free of charge without changing the price"
+msgstr ""
+
+#: indico/htdocs/js/indico/RegistrationForm/section.js:651
+msgid "Price for attending the event"
+msgstr ""
+
+#: indico/htdocs/js/indico/RegistrationForm/section.js:652
+msgid "Maximum amount of participants on the event"
+msgstr ""
+
+#: indico/htdocs/js/indico/RegistrationForm/section.js:654
+msgid "Limit of accompanying persons a participant can bring"
+msgstr ""
+
+#: indico/htdocs/js/indico/RegistrationForm/section.js:655
+msgid "Whether accompanying persons have to pay attendance or not"
+msgstr ""
+
+#: indico/htdocs/js/indico/RegistrationForm/section.js:660
 msgid "Cancel this event"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:663
+#: indico/htdocs/js/indico/RegistrationForm/section.js:727
 msgid "Reason for cancellation"
 msgstr ""
 
-#: indico/htdocs/js/indico/RegistrationForm/section.js:664
+#: indico/htdocs/js/indico/RegistrationForm/section.js:728
 msgid "Uncancel this event"
 msgstr ""
 
@@ -3678,60 +3716,68 @@ msgstr ""
 msgid "Hide empty rooms/days"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:119
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:121
 msgid "Filter rooms"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:201
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:204
 msgid "Select"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:210
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:213
 msgid "Require"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:213
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:216
 msgid "Videoconference"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:216
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:219
 msgid "Webcast"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:219
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:279
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:222
+msgid "Projector"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:225
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:286
 msgid "Public room"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:227
-msgid "Capacity"
-msgstr ""
-
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:277
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:283
 msgid "Video conference available"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:278
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:284
 msgid "Webcast/Recording available"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:280
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:285
+msgid "Projector available"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:287
 msgid "Maximum capacity"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:281
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:288
 msgid "Video conference not available"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:282
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:289
 msgid "Webcast/Recording not available"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:283
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:290
+msgid "Projector not available"
+msgstr ""
+
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:291
 msgid "Private room"
 msgstr ""
 
-#: indico/htdocs/js/indico/RoomBooking/roomselector.js:298
+#: indico/htdocs/js/indico/RoomBooking/roomselector.js:305
 msgid "Expand picture"
 msgstr ""
 
