@@ -281,7 +281,7 @@ def migrate_rooms(rb_root, photo_path):
             id=old_room_id,
             name=convert_to_unicode((old_room._name or '').strip() or generate_name(old_room)),
             site=convert_to_unicode(old_room.site),
-            division=convert_to_unicode(old_room.site),
+            division=convert_to_unicode(old_room.division),
             building=convert_to_unicode(old_room.building),
             floor=convert_to_unicode(old_room.floor),
             number=convert_to_unicode(old_room.roomNr),
