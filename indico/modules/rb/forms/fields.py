@@ -111,4 +111,4 @@ class PrincipalField(HiddenField):
                 raise ValueError(u'You cannot select groups')
 
     def _value(self):
-        return map(fossilize, retrieve_principals(self.data))
+        return map(fossilize, retrieve_principals(self.data or []))
