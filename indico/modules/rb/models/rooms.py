@@ -405,7 +405,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def getFullName(self):
         return self.full_name
 
-    def updateName(self):
+    def update_name(self):
         if not self.name and self.building and self.floor and self.number:
             self.name = self.generateName()
 
@@ -655,6 +655,22 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def get_attribute_value(self, name, default=None):
         attr = self.getAttributeByName(name)
         return attr.value if attr else default
+
+    def set_attribute_value(self, name, value):
+        attr = self.getAttributeByName(name)
+        if attr:
+            if value:
+                attr.value = value
+            else:
+                self.attributes.filter(RoomAttributeAssociation.attribute_id == attr.attribute_id).delete(synchronize_session='fetch')
+        elif value:
+            attr = self.location.getAttributeByName(name)
+            if not attr:
+                raise ValueError("Attribute {} not supported in location {}".format(name, self.location_name))
+            attr_assoc = RoomAttributeAssociation()
+            attr_assoc.value = value
+            attr_assoc.attribute = attr
+            self.attributes.append(attr_assoc)
 
     def _can_be_booked(self, avatar, prebook=False, ignore_admin=False):
         if not avatar or not rb_check_user_access(avatar):

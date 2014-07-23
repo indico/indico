@@ -62,6 +62,10 @@ class RoomAttributeAssociation(JSONStringBridgeMixin, db.Model):
         if value is not None:
             self.value = value
 
+    @return_ascii
+    def __repr__(self):
+        return u'<RoomAttributeAssociation({0}, {1}, {2})>'.format(self.room_id, self.attribute.name, self.value)
+
 
 class RoomAttribute(JSONStringBridgeMixin, db.Model):
     __tablename__ = 'room_attributes'
