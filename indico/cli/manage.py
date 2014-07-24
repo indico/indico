@@ -17,9 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask_migrate import MigrateCommand
 from flask_script import Manager
 
+from indico.cli.database import DatabaseManager
 from indico.cli.shell import IndicoShell
 from indico.core.db import db
 from indico.core.db.sqlalchemy.migration import migrate
@@ -34,7 +34,7 @@ def app_factory():
 
 manager = Manager(app_factory, with_default_commands=False)
 manager.add_command('shell', IndicoShell())
-manager.add_command('db', MigrateCommand)
+manager.add_command('db', DatabaseManager)
 
 
 def main():
