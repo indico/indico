@@ -254,7 +254,7 @@ class Logger:
         if cls.handlers:
             handler = cls.handlers.get(handlerName)
 
-            if handler:
+            if handler and handler in cls.handlers:
                 del cls.handlers[handlerName]
                 logging.root.handlers.remove(handler)
 
