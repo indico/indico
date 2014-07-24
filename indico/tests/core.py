@@ -37,7 +37,7 @@ import transaction
 # Indico
 import indico
 from indico.util.console import colored
-from indico.util.shell import WerkzeugServer
+from indico.cli.server import WerkzeugServer
 from indico.util.contextManager import ContextManager
 from indico.web.flask.app import make_app
 from indico.web.assets import core_env

@@ -511,7 +511,6 @@ if __name__ == '__main__':
             indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main
             indico_ctl = MaKaC.consoleScripts.indicoCtl:main
             indico_livesync = indico.ext.livesync.console:main
-            indico_shell = indico.util.shell:main
             indico_admin = indico.util.admin:main
             indico = indico.cli.manage:main
 

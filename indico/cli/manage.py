@@ -20,6 +20,7 @@
 from flask_script import Manager
 
 from indico.cli.database import DatabaseManager
+from indico.cli.server import IndicoDevServer
 from indico.cli.shell import IndicoShell
 from indico.core.db import db
 from indico.core.db.sqlalchemy.migration import migrate
@@ -35,6 +36,7 @@ def app_factory():
 manager = Manager(app_factory, with_default_commands=False)
 manager.add_command('shell', IndicoShell())
 manager.add_command('db', DatabaseManager)
+manager.add_command('runserver', IndicoDevServer())
 
 
 def main():

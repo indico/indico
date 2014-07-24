@@ -15,11 +15,10 @@
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import datetime
+
 import logging
-import argparse
 import errno
 import urlparse
 import os
@@ -27,66 +26,58 @@ import signal
 import socket
 import sys
 import werkzeug.serving
-from operator import itemgetter
 from SocketServer import TCPServer
+from flask_script import Command, Option
 from werkzeug.debug import DebuggedApplication
 from werkzeug.exceptions import NotFound
 from werkzeug.wsgi import DispatcherMiddleware
+
+from indico.core.config import Config
+from indico.core.logger import Logger
+from indico.util import console
+from indico.web.flask.app import make_app
+from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
+
 
 try:
     from OpenSSL import SSL
 except ImportError:
     SSL = None
 
-from indico.web.flask.app import make_app
-from indico.core.index import Catalog
-from indico.util import console
 
-## indico legacy imports
-import MaKaC
-from indico.core.config import Config
-from indico.core.db import DBMgr, db
-from MaKaC.conference import Conference, Category, ConferenceHolder, CategoryManager
-from MaKaC.user import AvatarHolder, GroupHolder
-from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.common.indexes import IndexesHolder
-from indico.core.logger import Logger
-from MaKaC.plugins.base import PluginsHolder
-from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
+class IndicoDevServer(Command):
+    """Runs the Flask development server"""
 
+    def get_options(self):
+        return (
+            Option('--logging', action='store',
+                   help='display logging messages for specified level'),
+            Option('--host',
+                   help='use a different host than the one in indico.conf'),
+            Option('--port', type=int,
+                   help='use a different port than the one in indico.conf'),
+            Option('--keep-base-url', action='store_true',
+                   help='do not update the base url with the given host/port'),
+            Option('--with-ssl', action='store_true',
+                   help='enable ssl support for web server'),
+            Option('--ssl-key', help='path to the ssl private key file'),
+            Option('--ssl-cert', help='path to the ssl certificate file'),
+            Option('--disable-reloader', action='store_true',
+                   help='restart the server whenever a file changes (does not work for legacy code)'),
+            Option('--enable-evalex', action='store_true',
+                   help="enable the werkzeug debugger's python shell in tracebacks and via /console)"),
+            Option('--evalex-from', action='append', metavar='IP',
+                   help="restricts the evalex shell to the given ips (can be used multiple times)")
+        )
 
-try:
-    HAS_IPYTHON = True
-    try:
-        # IPython >= 1.0
-        from IPython.terminal.embed import InteractiveShellEmbed
-    except ImportError:
-        # 0.12 <= IPython < 1.0
-        from IPython.frontend.terminal.embed import InteractiveShellEmbed
-    from IPython.config.loader import Config as IPConfig
-    OLD_IPYTHON = False
-except ImportError:
-    try:
-        # IPython < 0.12
-        from IPython.Shell import IPShellEmbed
-        OLD_IPYTHON = True
-    except ImportError:
-        import code
-        HAS_IPYTHON = False
+    def run(self, **args):
+        if args['logging']:
+            setup_logging(args['logging'])
 
-SHELL_BANNER = console.colored('\nindico {0}\n'.format(MaKaC.__version__), 'yellow')
-
-
-def add(namespace, element, name=None, doc=None, color='green'):
-
-    if not name:
-        name = element.__name__
-    namespace[name] = element
-
-    if doc:
-        print console.colored('+ {0} : {1}'.format(name, doc), color)
-    else:
-        print console.colored('+ {0}'.format(name), color)
+        start_web_server(host=args['host'], port=args['port'], keep_base_url=args['keep_base_url'],
+                         with_ssl=args['with_ssl'], ssl_cert=args['ssl_cert'], ssl_key=args['ssl_key'],
+                         enable_evalex=args['enable_evalex'], evalex_from=args['evalex_from'],
+                         reload_on_change=not args['disable_reloader'])
 
 
 def make_indico_dispatcher(wsgi_app):
@@ -127,7 +118,6 @@ class DebuggedIndico(DebuggedApplication):
 
 
 class WerkzeugServer(object):
-
     def __init__(self, app, host='localhost', port=8000, enable_ssl=False, ssl_key=None, ssl_cert=None,
                  reload_on_change=False, use_debugger=True, evalex_whitelist=None):
         """
@@ -234,37 +224,8 @@ class WerkzeugServer(object):
             except socket.error:
                 pass  # some platforms may raise ENOTCONN here
             self.close_request(request)
+
         TCPServer.shutdown_request = my_shutdown_request
-
-
-def setupNamespace(dbi):
-
-    namespace = {'dbi': dbi,
-                 'db': db}
-
-    for attr in ('date', 'time', 'datetime', 'timedelta'):
-        add(namespace, getattr(datetime, attr), doc='stdlib datetime.{}'.format(attr), color='yellow')
-
-    add(namespace, MaKaC, doc='MaKaC base package')
-    add(namespace, Conference)
-    add(namespace, Category)
-    add(namespace, ConferenceHolder)
-    add(namespace, CategoryManager)
-    add(namespace, AvatarHolder)
-    add(namespace, GroupHolder)
-    add(namespace, HelperMaKaCInfo)
-    add(namespace, PluginsHolder)
-    add(namespace, Catalog)
-    add(namespace, IndexesHolder)
-    add(namespace, Config)
-
-    add(namespace, HelperMaKaCInfo.getMaKaCInfoInstance(), 'minfo', 'MaKaCInfo instance')
-
-    for name, cls in sorted(db.Model._decl_class_registry.iteritems(), key=itemgetter(0)):
-        if hasattr(cls, '__table__'):
-            add(namespace, cls, color='cyan')
-
-    return namespace
 
 
 def _can_bind_port(port):
@@ -288,7 +249,7 @@ def _sigint(sig, frame):
 
 
 def setup_logging(level):
-    formatter = logging.Formatter("%(asctime)s %(name)-16s: %(levelname)-8s - %(message)s")
+    formatter = logging.Formatter('%(asctime)s %(name)-16s: %(levelname)-8s - %(message)s')
     logger = Logger.get()
     handler = logging.StreamHandler()
     handler.setLevel(getattr(logging, level))
@@ -298,10 +259,6 @@ def setup_logging(level):
 
 def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=True, ssl_cert=None, ssl_key=None,
                      reload_on_change=False, enable_evalex=False, evalex_from=None):
-    """
-    Sets up a Werkzeug-based web server based on the parameters provided
-    """
-
     config = Config.getInstance()
     # Let Indico know that we are using the embedded server. This causes it to re-raise exceptions so they
     # end up in the Werkzeug debugger.
@@ -317,7 +274,8 @@ def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=Tru
             port = 443
         console.warning(' * You should set {0}; retrieving host information from {1}'.format(
             'BaseSecureURL' if with_ssl else 'BaseURL',
-            base_url))
+            base_url)
+        )
     default_port = 443 if with_ssl else 80
     url_data = urlparse.urlparse(base_url)
 
@@ -328,7 +286,7 @@ def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=Tru
     # Don't let people bind on a port they cannot use.
     if used_port < 1024 and not _can_bind_port(used_port):
         used_port += 8000
-        console.warning(' * You cannot open a socket on port {0}, using {1} instead.'.format(requested_port, used_port))
+        console.warning(' * You cannot open a socket on port {}, using {} instead.'.format(requested_port, used_port))
 
     # By default we update the base URL with the actual host/port. The user has the option to
     # disable this though in case he wants different values, e.g. to use iptables to make his
@@ -380,75 +338,3 @@ def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=Tru
                             enable_ssl=with_ssl, ssl_cert=ssl_cert, ssl_key=ssl_key)
     signal.signal(signal.SIGINT, _sigint)
     server.run()
-
-
-def main():
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--logging', action='store',
-                        help='display logging messages for specified level')
-
-    parser.add_argument('--web-server', action='store_true',
-                        help='run a standalone WSGI web server with Indico')
-    parser.add_argument('--host',
-                        help='use a different host than the one in indico.conf')
-    parser.add_argument('--port', type=int,
-                        help='use a different port than the one in indico.conf')
-    parser.add_argument('--keep-base-url', action='store_true',
-                        help='do not update the base url with the given host/port')
-
-    parser.add_argument('--with-ssl', action='store_true',
-                        help='enable ssl support for web server')
-    parser.add_argument('--ssl-key', help='path to the ssl private key file')
-    parser.add_argument('--ssl-cert', help='path to the ssl certificate file')
-    parser.add_argument('--reload-on-change', action='store_true',
-                        help='restart the server whenever a file changes (does not work for legacy code)')
-    parser.add_argument('--enable-evalex', action='store_true',
-                        help="enable the werkzeug debugger's python shell in tracebacks and via /console)")
-    parser.add_argument('--evalex-from', action='append', metavar='IP',
-                        help="restricts the evalex shell to the given ips (can be used multiple times)")
-
-    args, remainingArgs = parser.parse_known_args()
-
-    if 'logging' in args and args.logging:
-        setup_logging(args.logging)
-
-    if 'web_server' in args and args.web_server:
-        start_web_server(host=args.host,
-                         port=args.port,
-                         with_ssl=args.with_ssl,
-                         keep_base_url=args.keep_base_url,
-                         ssl_cert=args.ssl_cert,
-                         ssl_key=args.ssl_key,
-                         reload_on_change=args.reload_on_change,
-                         enable_evalex=args.enable_evalex,
-                         evalex_from=args.evalex_from)
-    else:
-        dbi = DBMgr.getInstance()
-        dbi.startRequest()
-
-        namespace = setupNamespace(dbi)
-
-        if HAS_IPYTHON:
-            if OLD_IPYTHON:
-                ipshell = IPShellEmbed(remainingArgs,
-                                       banner=SHELL_BANNER,
-                                       exit_msg='Good luck',
-                                       user_ns=namespace)
-            else:
-                config = IPConfig()
-                config.TerminalInteractiveShell.confirm_exit = False
-                ipshell = InteractiveShellEmbed(config=config,
-                                                banner1=SHELL_BANNER,
-                                                exit_msg='Good luck',
-                                                user_ns=namespace)
-
-            with make_app(True).app_context():
-                ipshell()
-        else:
-            iconsole = code.InteractiveConsole(namespace)
-            with make_app(True).app_context():
-                iconsole.interact(SHELL_BANNER)
-
-        dbi.abort()
-        dbi.endRequest()
