@@ -225,7 +225,7 @@ class Location(db.Model):
     def getEquipmentNames(self):
         return list(self.equipments)
 
-    def getEquipmentByName(self, name):
+    def get_equipment_by_name(self, name):
         return self.equipment_objects.filter_by(name=name).first()
 
     def addEquipment(self, name):

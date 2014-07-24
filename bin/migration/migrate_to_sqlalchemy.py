@@ -264,7 +264,7 @@ def migrate_rooms(rb_root, photo_path):
     print cformat('%{white!}migrating vc equipment')
     for name, vcs in vc.iteritems():
         l = Location.getLocationByName(name)
-        pvc = l.getEquipmentByName('Video conference')
+        pvc = l.get_equipment_by_name('Video conference')
         for vc_name in vcs:
             req = RoomEquipment(name=vc_name)
             req.parent = pvc
@@ -353,7 +353,7 @@ def migrate_rooms(rb_root, photo_path):
 
         new_eq = []
         for old_equipment in ifilter(None, old_room._equipment.split('`') + old_room.avaibleVC):
-            room_eq = l.getEquipmentByName(old_equipment)
+            room_eq = l.get_equipment_by_name(old_equipment)
             new_eq.append(room_eq)
             r.equipments.append(room_eq)
         if new_eq:
@@ -414,7 +414,7 @@ def migrate_reservations(main_root, rb_root):
         )
 
         for eq_name in getattr(v, 'useVC', []):
-            eq = room.location.getEquipmentByName(eq_name)
+            eq = room.location.get_equipment_by_name(eq_name)
             if eq:
                 r.equipments.append(eq)
 

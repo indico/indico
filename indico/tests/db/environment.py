@@ -99,7 +99,7 @@ class DBTest(TestCase):
 
                 # room equipments
                 room.equipments.extend([
-                    location.getEquipmentByName(eq) for eq in r.get('equipments', [])
+                    location.get_equipment_by_name(eq) for eq in r.get('equipments', [])
                 ])
 
                 # room bookable times
