@@ -55,6 +55,7 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
             <td style="vertical-align: top; width:200px">${ sideMenu }</td>
             <td style="vertical-align: top">
                 <div class="body" style="padding:20px;">
+                    ${ render_template('flashed_messages.html') }
                     ${ body }
                 </div>
             </td>

@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-from flask import request
+from flask import request, flash
 
 from indico.core.errors import NoReportError
 from indico.modules.rb.controllers import RHRoomBookingBase
@@ -48,10 +48,13 @@ def _get_defaults_from_object(obj):
     return defaults
 
 
-def _assign_room(obj, room):
+def _assign_room(obj, room, flash_message=True):
+    if flash_message:
+        flash(_(u"Room of {0} '{1}' set to '{2}'").format(obj.getVerboseType().lower(), obj.getTitle().decode('utf-8'),
+                                                          room.full_name), 'info')
     if isinstance(obj, Session):
         for slot in obj.getSlotList():
-            _assign_room(slot, room)
+            _assign_room(slot, room, False)
         return
     custom_location = CustomLocation()
     custom_location.setName(room.location_name)
