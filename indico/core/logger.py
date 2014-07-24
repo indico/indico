@@ -61,15 +61,20 @@ class IndicoMailFormatter(logging.Formatter):
         try:
             info.append('Request: %s' % request.id)
             info.append('URL: %s' % request.url)
-            info.append('Endpoint: %s' % request.url_rule.endpoint)
+
+            if request.url_rule:
+                info.append('Endpoint: {0}'.format(request.url_rule.endpoint))
+
             info.append('Method: %s' % request.method)
             if rh:
                 info.append('Params: %s' % rh._getTruncatedParams())
-            try:
-                info.append('User: %r' % session.user)
-            except POSError:
-                # If the DB connection is closed getting the avatar may fail
-                info.append('User id: %s' % session.get('_avatarId'))
+
+            if session:
+                try:
+                    info.append('User: {0}'.format(session.user))
+                except POSError:
+                    # If the DB connection is closed getting the avatar may fail
+                    info.append('User id: {0}'.format(session.get('_avatarId')))
             info.append('IP: %s' % request.remote_addr)
             info.append('User Agent: %s' % request.user_agent)
             info.append('Referer: %s' % (request.referrer or 'n/a'))
