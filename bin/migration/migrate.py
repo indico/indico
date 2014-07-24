@@ -936,7 +936,7 @@ def lowercaseLDAPIdentities(dbi, withRBDB, prevVersion):
     dbi.commit()
 
 
-@since('1.2')
+@since('1.9')
 def reindexCategoryNameAndConferenceTitle(dbi, withRBDB, prevVersion):
     """
     Indexing Conference Title with new WhooshTextIndex
