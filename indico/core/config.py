@@ -538,6 +538,7 @@ class Config:
         'WorkerName'                : socket.getfqdn(),
         'Loggers'                   : ['files'],
         'SentryDSN'                 : None,
+        'SentryLoggingLevel'        : 'WARNING',
         'CategoryCleanup'           : {}
     }
 

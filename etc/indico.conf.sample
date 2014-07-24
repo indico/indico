@@ -332,6 +332,7 @@ AuthenticatorList    = [('Local', {})]
 #
 # Loggers              = ['sentry', 'files']
 # SentryDSN            = 'http://user:password@logger.example.com/n'
+# SentryLoggingLevel   = 'ERROR'  # default: 'WARNING'
 
 
 #------------------------------------------------------------------------------

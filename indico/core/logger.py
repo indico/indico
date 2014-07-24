@@ -233,10 +233,10 @@ class Logger:
 
         if 'sentry' in config.getLoggers() and has_app_context():
             from raven.contrib.flask import Sentry
-
             current_app.config['SENTRY_DSN'] = config.getSentryDSN()
-            # Plug both in to Flask and `logging`
-            Sentry(current_app, logging=True)
+
+            # Plug into both Flask and `logging`
+            Sentry(current_app, logging=True, level=getattr(logging, config.getSentryLoggingLevel()))
 
     @classmethod
     def reset(cls):
