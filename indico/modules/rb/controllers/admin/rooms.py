@@ -17,28 +17,29 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-from flask import request, session
+from flask import request, flash
 from wtforms import TextField
 from wtforms.validators import DataRequired
 from MaKaC.common.cache import GenericCache
 from MaKaC.user import AvatarHolder
+from MaKaC.webinterface import urlHandlers as UH
+
+from indico.core.db import db
+from indico.core.errors import NotFoundError
+from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
 from indico.modules.rb.forms.base import FormDefaults
 from indico.modules.rb.forms.rooms import RoomForm
 from indico.modules.rb.forms.validators import IndicoEmail
 from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation, RoomAttribute
-
-from MaKaC.webinterface import urlHandlers as UH
-from indico.core.db import db
-from indico.core.errors import NotFoundError
-from indico.util.i18n import _
 from indico.modules.rb.controllers.decorators import requires_location
 from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.views.admin import rooms as room_views
-from . import RHRoomBookingAdminBase
+from indico.util.i18n import _
+from indico.web.flask.util import url_for
 
 _cache = GenericCache('Rooms')
 
@@ -49,18 +50,13 @@ class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
         self._target = self._room
 
     def _process(self):
-        # Check whether deletion is possible
         if self._room.has_live_reservations():
-            # Impossible
-            session['rbDeletionFailed'] = True
-            self._redirect(UH.UHRoomBookingRoomDetails.getURL(self._room))  # room details
+            flash(_(u'Cannot delete room with live bookings'), 'error')
+            self._redirect(UH.UHRoomBookingRoomDetails.getURL(self._room))
         else:
-            # Possible - delete
             db.session.delete(self._room)
-            session['rbTitle'] = _('Room has been deleted.')
-            session['rbDescription'] = _(
-                'You have successfully deleted the room. All its bookings have also been deleted.')
-            self._redirect(UH.UHRoomBookingStatement.getURL())  # deletion confirmation
+            flash(_(u'Room deleted'), 'success')
+            self._redirect(url_for('rooms_admin.roomBooking-adminLocation', self._room.location))
 
 
 class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
@@ -159,6 +155,10 @@ class RHRoomBookingModifyRoom(RHRoomBookingCreateModifyRoomBase):
             raise NotFoundError('A Room with this ID does not exist.')
         self._form = self._make_form()
 
+    def _save(self):
+        RHRoomBookingCreateModifyRoomBase._save(self)
+        flash(_(u'Room updated'), 'success')
+
 
 class RHRoomBookingCreateRoom(RHRoomBookingCreateModifyRoomBase):
     @requires_location(parameter_name='roomLocation')
@@ -171,3 +171,4 @@ class RHRoomBookingCreateRoom(RHRoomBookingCreateModifyRoomBase):
         self._room.location = self._location
         db.session.add(self._room)
         db.session.flush()
+        flash(_(u'Room added'), 'success')

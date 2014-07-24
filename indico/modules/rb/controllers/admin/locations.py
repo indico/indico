@@ -17,11 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-from flask import request
+from flask import request, flash
 from sqlalchemy import func
 
 from MaKaC.webinterface import urlHandlers
-from indico.core.errors import IndicoError, FormValuesError
+from indico.core.errors import IndicoError, FormValuesError, NoReportError
 from indico.core.db import db
 from indico.util.i18n import _
 from indico.modules.rb.models.locations import Location
@@ -36,15 +36,21 @@ from . import RHRoomBookingAdminBase
 
 class RHRoomBookingAdmin(RHRoomBookingAdminBase):
     def _process(self):
-        return WPRoomBookingAdmin(self).display()
+        return WPRoomBookingAdmin(self, locations=Location.find_all()).display()
 
 
-class RHRoomBookingDeleteLocation(RHRoomBookingAdminBase):
+class RHRoomBookingLocationMixin:
+    """Mixin that retrieves the location  or fails if there is none."""
     def _checkParams(self):
-        self._locationName = request.form.get('removeLocationName')
+        self._location = Location.get(int(request.form['location_id']))
+        if not self._location:
+            raise NoReportError(u'No such location')
 
+
+class RHRoomBookingDeleteLocation(RHRoomBookingLocationMixin, RHRoomBookingAdminBase):
     def _process(self):
-        Location.removeLocationByName(self._locationName)
+        db.session.delete(self._location)
+        flash(_(u'Location deleted'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdmin.getURL())
 
 
@@ -59,16 +65,16 @@ class RHRoomBookingSaveLocation(RHRoomBookingAdminBase):
             raise FormValuesError(_('Location "{0}" already exists').format(self._locationName))
 
     def _process(self):
-        Location.addLocationByName(self._locationName)
+        is_default = Location.find().count() == 0
+        db.session.add(Location(name=self._locationName, is_default=is_default))
+        flash(_(u'Location added'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdmin.getURL())
 
 
-class RHRoomBookingSetDefaultLocation(RHRoomBookingAdminBase):
-    def _checkParams(self):
-        self._defaultLocation = request.form.get('defaultLocation')
-
+class RHRoomBookingSetDefaultLocation(RHRoomBookingLocationMixin, RHRoomBookingAdminBase):
     def _process(self):
-        Location.setDefaultLocation(self._defaultLocation)
+        self._location.set_default()
+        flash(_(u'Default location changed'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdmin.getURL())
 
 
@@ -115,6 +121,7 @@ class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
     def _process(self):
         self._location.attributes.filter_by(name=self._attr).delete()
         db.session.add(self._location)
+        flash(_(u'Custom attribute deleted'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
 
 
@@ -137,7 +144,6 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
                 'is_hidden': request.form.get('newCustomAttributeIsHidden') == 'on'
             }
 
-    # TODO: update logic should be in location model
     def _process(self):
         for attr in self._location.attributes:
             val = attr.value
@@ -150,8 +156,10 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
             attr = RoomAttribute(name=self._attrName, title=self._attrTitle)
             attr.value = self._value
             self._location.attributes.append(attr)
+            flash(_(u'Custom attribute added'), 'success')
 
         db.session.add(self._location)
+        flash(_(u'Custom attributes updated'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
 
 
@@ -171,6 +179,7 @@ class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
     def _process(self):
         self._location.removeEquipment(self._eq)
         db.session.add(self._location)
+        flash(_(u'Equipment deleted'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
 
 
@@ -182,4 +191,5 @@ class RHRoomBookingSaveEquipment(RHRoomBookingEquipmentBase):
         if self._eq:
             self._location.addEquipment(self._eq)
             db.session.add(self._location)
+            flash(_(u'Equipment added'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))

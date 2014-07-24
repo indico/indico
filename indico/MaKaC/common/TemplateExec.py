@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from flask import session, g, request
+from flask import session, g, request, render_template
 from flask import current_app as app
 import pkg_resources
 import os.path
@@ -434,3 +434,4 @@ def registerHelpers(objDict):
     # flask utils
     objDict['url_for'] = url_for
     objDict['url_rule_to_js'] = url_rule_to_js
+    objDict['render_template'] = render_template

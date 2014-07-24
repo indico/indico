@@ -18,33 +18,15 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.wcomponents import WTemplated
-
-from . import WPRoomBookingPluginAdminBase
-from indico.modules.rb.models.locations import Location
+from indico.modules.rb.views.admin import WPRoomBookingPluginAdminBase
 
 
 class WPRoomBookingAdmin(WPRoomBookingPluginAdminBase):
-    def __init__(self, rh):
-        self._rh = rh
-        WPRoomBookingPluginAdminBase.__init__(self, rh)
-
     def _setActiveTab(self):
         self._subTabConfig.setActive()
 
     def _getTabContent(self, params):
-        return WRoomBookingAdmin(self._rh).getHTML(params)
-
-
-class WRoomBookingAdmin(WTemplated):
-    def __init__(self, rh):
-        self._rh = rh
-
-    def getVars(self):
-        wvars = WTemplated.getVars(self)
-        wvars['locations'] = Location.find_all()
-        defaultLocation = Location.getDefaultLocation()
-        wvars['defaultLocationName'] = defaultLocation.name if defaultLocation else ''
-        return wvars
+        return WTemplated('RoomBookingAdmin').getHTML(params)
 
 
 class WPRoomBookingAdminLocation(WPRoomBookingPluginAdminBase):

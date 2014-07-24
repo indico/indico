@@ -19,6 +19,7 @@
                 % endif
                 <td style="vertical-align: top; width: 100%;">
                     <div class="body clearfix${" bodyWithSideMenu" if sideMenu else ""}${" bodyWithSideBar" if isFrontPage else ""}" style="margin-left:0px;">
+                        ${ render_template('flashed_messages.html') }
                         ${ body }
                     </div>
                 </td>

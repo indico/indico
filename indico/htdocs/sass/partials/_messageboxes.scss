@@ -110,7 +110,7 @@
     text-align: center;
 }
 
-.info-message-box {
+.info-message-box, .message-message-box {
     @extend %message-box;
     @include icon-before('icon-info');
 

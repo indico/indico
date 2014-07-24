@@ -24,7 +24,6 @@ from flask import session
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.wcomponents import BasicSideMenu, SideMenuItem, SideMenuSection
-from indico.core.config import Config
 from indico.modules.rb.models.locations import Location
 from indico.util.i18n import _
 from indico.web.flask.util import url_for

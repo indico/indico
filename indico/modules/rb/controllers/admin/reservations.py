@@ -17,12 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-from flask import request, url_for
-from indico.core.db import db
+from flask import request, url_for, flash
 
+from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
+from indico.util.i18n import _
 
 
 class RHRoomBookingDeleteBooking(RHRoomBookingAdminBase):
@@ -33,9 +34,6 @@ class RHRoomBookingDeleteBooking(RHRoomBookingAdminBase):
             raise IndicoError('No booking with id: {}'.format(resv_id))
 
     def _process(self):
-        # Booking deletion is always possible - just delete
         db.session.delete(self._reservation)
-        # TODO: flash message, redirect to <somewhere>
-        # session['rbTitle'] = _("Booking has been deleted.")
-        # session['rbDescription'] = _("You have successfully deleted the booking.")
+        flash(_(u'Booking deleted'), 'success')
         self._redirect(url_for('rooms.roomBooking-search4Bookings'))

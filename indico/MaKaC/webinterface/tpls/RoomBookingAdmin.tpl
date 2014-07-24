@@ -33,7 +33,7 @@
         <form action="${ urlHandlers.UHRoomBookingDeleteLocation.getURL() }" method="POST">
           <p>
             % for loc in locations:
-              <input type="radio" name="removeLocationName" id="removeLocationName" value="${ loc.name }">
+              <input type="radio" name="location_id" value="${ loc.id }">
               <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(loc) }">
                 ${ loc.name }
               </a><br>
@@ -57,9 +57,9 @@
       </td>
       <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
         <form action="${urlHandlers.UHRoomBookingSetDefaultLocation.getURL() }" method="POST">
-          <select name="defaultLocation" id="defaultLocation">
+          <select name="location_id" id="defaultLocation">
             % for loc in locations:
-              <option value="${ loc.name }" ${' selected="selected" ' if loc.name == defaultLocationName else ''} >${ loc.name }</option>
+              <option value="${ loc.id }" ${' selected' if loc.is_default else ''} >${ loc.name }</option>
             % endfor
           </select>
           <input type="submit" class="i-button" value="${ _('Change') }">

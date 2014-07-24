@@ -201,27 +201,18 @@ class Location(db.Model):
     def getDefaultLocation():
         return Location.query.filter_by(is_default=True).first()
 
-    @staticmethod
-    def setDefaultLocation(location_name):
-        Location.query \
-                .filter(Location.is_default | (Location.name == location_name)) \
-                .update({'is_default': func.not_(Location.is_default)},
-                        synchronize_session='fetch')
+    def set_default(self):
+        if self.is_default:
+            return
+        (Location.query
+         .filter(Location.is_default | (Location.id == self.id))
+         .update({'is_default': func.not_(Location.is_default)}, synchronize_session='fetch'))
 
     # generic location management
 
     @staticmethod
     def getLocationByName(name):
         return Location.query.filter_by(name=name).first()
-
-    @staticmethod
-    def addLocationByName(name):
-        is_default = Location.find().count() == 0
-        db.session.add(Location(name=name, is_default=is_default))
-
-    @staticmethod
-    def removeLocationByName(name):
-        Location.query.filter_by(name=name).delete()
 
     # attribute management
 
