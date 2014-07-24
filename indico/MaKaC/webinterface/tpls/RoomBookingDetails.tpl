@@ -1,11 +1,13 @@
+<% valid_occurrences = reservation.occurrences.filter_by(is_valid=True).all() %>
 <script type="text/javascript">
+    var occurrences = ${ [formatDate(occ.date) for occ in valid_occurrences] | n,j };
     function createContentDiv(title, occurs) {
         var content = $("<div/>", {css: {maxWidth: '400px', textAlign: 'left'}});
         content.append(title);
-        if (occurs) {
-            var occursdiv = $("<div/>", {
+        if (occurs && occurrences.length) {
+            var occursdiv = $("<div>", {
                 css: {
-                    maxHeight: '80px',
+                    maxHeight: '100px',
                     marginTop:'10px',
                     marginBottom: '10px',
                     overflow: 'auto',
@@ -13,24 +15,24 @@
                     textAlign: 'left'
                 }
             });
-            occursdiv.append($T("This applies to all the following occurrences ({0} in total):".format(occurs.length)));
+            occursdiv.append($T("This applies to all the following occurrences ({0} in total):".format(occurrences.length)));
             occursdiv.addClass("warningMessage");
-            var occurslist = $("<ul/>")
-            for(var i=0; i<occurs.length; i++) {
-                occurslist.append($('<li/>').text(occurs[i]));
+            var occurslist = $("<ul/>");
+            for(var i = 0; i < occurrences.length; i++) {
+                occurslist.append($('<li>').text(occurrences[i]));
             }
-            occursdiv.append(occurslist)
+            occursdiv.append(occurslist);
             content.append(occursdiv);
-            }
+        }
         return content.get(0);
     }
 
     function submit_cancel(occurs) {
-        contentDiv = createContentDiv($T("Are you sure you want to <strong>cancel the whole booking</strong>?"), occurs);
+        var contentDiv = createContentDiv($T("Are you sure you want to <strong>cancel the whole booking</strong>?"), true);
         new ConfirmPopup($T("Cancel booking"), contentDiv, function(confirmed) {
             if(confirmed) {
                 $("#reason").val('');
-                $("#submits").attr("action", "${ urlHandlers.UHRoomBookingCancelBooking.getURL(reservation)}");
+                $("#submits").attr("action", "${ url_for(endpoints['booking_cancel'], reservation, event) }");
                 $("#submits").submit();
             }
         }, $T("Yes"), $T("No")).open();
@@ -39,36 +41,36 @@
         new ConfirmPopup($T("Accept booking"), $T("Are you sure you want to <strong>accept</strong> this booking?"), function(confirmed) {
             if(confirmed) {
                 $("#reason").val('');
-                $("#submits").attr("action", "${ urlHandlers.UHRoomBookingAcceptBooking.getURL(reservation)}");
+                $("#submits").attr("action", "${ url_for(endpoints['booking_accept'], reservation, event) }");
                 $("#submits").submit();
             }
         }, $T("Yes"), $T("No")).open();
     }
-    function submit_reject(occurs) {
-        contentDiv = createContentDiv($T("Are you sure you want to <strong>reject the whole booking</strong>?"), occurs);
+    function submit_reject() {
+        var contentDiv = createContentDiv($T("Are you sure you want to <strong>reject the whole booking</strong>?"), true);
         new ConfirmPopupWithReason($T("Reject booking"), contentDiv, function(confirmed) {
             if(confirmed) {
                 var reason = this.reason.get();
                 $("#reason").val(reason);
-                $("#submits").attr("action", build_url("${ urlHandlers.UHRoomBookingRejectBooking.getURL(reservation)}"));
+                $("#submits").attr("action", "${ url_for(endpoints['booking_reject'], reservation, event) }");
                 $("#submits").submit();
             }
         }, $T("Yes"), $T("No")).open();
 
     }
     function submit_reject_occurrence(action, date) {
-        contentDiv = createContentDiv($T("Are you sure you want to <strong>reject</strong> the booking for the selected date") + " (" + date + ")?");
+        var contentDiv = createContentDiv($T("Are you sure you want to <strong>reject</strong> the booking for the selected date") + " (" + date + ")?");
         new ConfirmPopupWithReason($T("Reject occurrence"), contentDiv, function(confirmed) {
             if(confirmed) {
                 var reason = this.reason.get();
                 $("#reason").val(reason);
-                $("#submits").attr("action", build_url(action));
+                $("#submits").attr("action", action);
                 $("#submits").submit();
             }
         }, $T("Yes"), $T("No")).open();
     }
     function submit_cancel_occurrence(action, date) {
-        contentDiv = createContentDiv($T("Are you sure you want to <strong>cancel</strong> the booking for the selected date") + " (" + date + ")?");
+        var contentDiv = createContentDiv($T("Are you sure you want to <strong>cancel</strong> the booking for the selected date") + " (" + date + ")?");
         new ConfirmPopup($T("Cancel occurrence"), contentDiv, function(confirmed) {
             if(confirmed) {
                 $("#reason").val('');
@@ -78,7 +80,7 @@
         }, $T("Yes"), $T("No")).open();
     }
     function submit_delete() {
-        contentDiv = createContentDiv($T("This action is irreversible. Are you sure you want to <strong>delete</strong> the booking?"));
+        var contentDiv = createContentDiv($T("This action is irreversible. Are you sure you want to <strong>delete</strong> the booking?"));
         new ConfirmPopup($T("Delete booking"), contentDiv, function(confirmed) {
             if(confirmed) {
                 $("#submits").attr("action", '${ urlHandlers.UHRoomBookingDeleteBooking.getURL( reservation ) }');
@@ -495,15 +497,15 @@
                           ${ _('These days are booked.') }
                         </td>
                         <td align="left" class="blacktext">
-                          % for occurrence in reservation.occurrences.filter_by(is_valid=True).all():
+                          % for occurrence in valid_occurrences:
                           ${ formatDate(occurrence.start.date()) }
                             % if reservation.can_be_rejected(_session.user):
-                              <a class="roomBookingRejectOccurrence" href="#" onclick="submit_reject_occurrence('${ url_for('rooms.roomBooking-rejectBookingOccurrence', reservation, date=formatDate(occurrence.start.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start.date()) }'); return false;">
+                              <a class="roomBookingRejectOccurrence" href="#" onclick="submit_reject_occurrence('${ url_for(endpoints['booking_occurrence_reject'], event, reservation, date=formatDate(occurrence.start.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start.date()) }'); return false;">
                                 ${ _('Reject') }
                               </a>
                             % endif
                             % if reservation.can_be_cancelled(_session.user):
-                              <a class="roomBookingCancelOccurrence" href="#" onclick="submit_cancel_occurrence('${ url_for('rooms.roomBooking-cancelBookingOccurrence', reservation, date=formatDate(occurrence.start.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start.date()) }'); return false;">
+                              <a class="roomBookingCancelOccurrence" href="#" onclick="submit_cancel_occurrence('${ url_for(endpoints['booking_occurrence_cancel'], event, reservation, date=formatDate(occurrence.start.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start.date()) }'); return false;">
                                 ${ _('Cancel') }
                               </a>
                             % endif

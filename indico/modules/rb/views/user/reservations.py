@@ -31,7 +31,12 @@ class WPRoomBookingBookingDetails(WPRoomBookingBase):
     endpoints = {
         'room_details': 'rooms.roomBooking-roomDetails',
         'booking_modify': 'rooms.roomBooking-modifyBookingForm',
-        'booking_clone': 'rooms.roomBooking-cloneBooking'
+        'booking_clone': 'rooms.roomBooking-cloneBooking',
+        'booking_accept': 'rooms.roomBooking-acceptBooking',
+        'booking_cancel': 'rooms.roomBooking-cancelBooking',
+        'booking_reject': 'rooms.roomBooking-rejectBooking',
+        'booking_occurrence_cancel': 'rooms.roomBooking-cancelBookingOccurrence',
+        'booking_occurrence_reject': 'rooms.roomBooking-rejectBookingOccurrence'
     }
 
     def _setCurrentMenuItem(self):

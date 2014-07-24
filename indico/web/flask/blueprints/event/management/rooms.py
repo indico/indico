@@ -21,7 +21,11 @@ from indico.modules.rb.controllers.user.event import (RHRoomBookingEventBookingL
                                                       RHRoomBookingEventBookingModifyBooking,
                                                       RHRoomBookingEventBookingCloneBooking,
                                                       RHRoomBookingEventRoomDetails, RHRoomBookingEventNewBookingSimple,
-                                                      RHRoomBookingEventChooseEvent, RHRoomBookingEventNewBooking)
+                                                      RHRoomBookingEventChooseEvent, RHRoomBookingEventNewBooking,
+                                                      RHRoomBookingEventAcceptBooking, RHRoomBookingEventRejectBooking,
+                                                      RHRoomBookingEventCancelBooking,
+                                                      RHRoomBookingEventCancelBookingOccurrence,
+                                                      RHRoomBookingEventRejectBookingOccurrence)
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
@@ -36,6 +40,17 @@ event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/modify', 'ro
                         RHRoomBookingEventBookingModifyBooking, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/clone', 'rooms_booking_clone',
                         RHRoomBookingEventBookingCloneBooking, methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/accept', 'rooms_booking_accept',
+                        RHRoomBookingEventAcceptBooking, methods=('POST',))
+event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/cancel', 'rooms_booking_cancel',
+                        RHRoomBookingEventCancelBooking, methods=('POST',))
+event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/reject', 'rooms_booking_reject',
+                        RHRoomBookingEventRejectBooking, methods=('POST',))
+event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/<date>/cancel', 'rooms_booking_occurrence_cancel',
+                        RHRoomBookingEventCancelBookingOccurrence, methods=('POST',))
+event_mgmt.add_url_rule('/rooms/booking/<roomLocation>/<int:resvID>/<date>/reject', 'rooms_booking_occurrence_reject',
+                        RHRoomBookingEventRejectBookingOccurrence, methods=('POST',))
+
 
 # Book room
 event_mgmt.add_url_rule('/rooms/room/<roomLocation>/<int:roomID>/book', 'rooms_room_book',

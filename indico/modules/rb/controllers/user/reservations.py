@@ -63,7 +63,12 @@ class RHRoomBookingBookingDetails(RHRoomBookingBookingMixin, RHRoomBookingBase):
         return self._get_view(reservation=self._reservation).display()
 
 
-class RHRoomBookingAcceptBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
+class _SuccessUrlDetailsMixin:
+    def _get_success_url(self):
+        return url_for('rooms.roomBooking-bookingDetails', self._reservation)
+
+
+class RHRoomBookingAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
         if not self._reservation.can_be_accepted(session.user):
@@ -75,10 +80,10 @@ class RHRoomBookingAcceptBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
         if self._reservation.is_pending:
             self._reservation.accept(session.user)
             flash(_(u'Booking accepted'), 'success')
-        self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
+        self._redirect(self._get_success_url())
 
 
-class RHRoomBookingCancelBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
+class RHRoomBookingCancelBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
         if not self._reservation.can_be_cancelled(session.user):
@@ -88,10 +93,10 @@ class RHRoomBookingCancelBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
         if not self._reservation.is_cancelled and not self._reservation.is_rejected:
             self._reservation.cancel(session.user)
             flash(_(u'Booking cancelled'), 'success')
-        self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
+        self._redirect(self._get_success_url())
 
 
-class RHRoomBookingRejectBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
+class RHRoomBookingRejectBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _checkParams(self):
         RHRoomBookingBookingMixin._checkParams(self)
         self._reason = request.form.get('reason', u'')
@@ -105,10 +110,10 @@ class RHRoomBookingRejectBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
         if not self._reservation.is_cancelled and not self._reservation.is_rejected:
             self._reservation.reject(session.user, self._reason)
             flash(_(u'Booking rejected'), 'success')
-        self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
+        self._redirect(self._get_success_url())
 
 
-class RHRoomBookingCancelBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBookingBase):
+class RHRoomBookingCancelBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _checkParams(self):
         RHRoomBookingBookingMixin._checkParams(self)
         occ_date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()
@@ -123,10 +128,10 @@ class RHRoomBookingCancelBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBook
         if self._occurrence.is_valid:
             self._occurrence.cancel(session.user)
             flash(_(u'Booking occurrence cancelled'), 'success')
-        self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
+        self._redirect(self._get_success_url())
 
 
-class RHRoomBookingRejectBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBookingBase):
+class RHRoomBookingRejectBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _checkParams(self):
         RHRoomBookingBookingMixin._checkParams(self)
         occ_date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()
@@ -142,7 +147,7 @@ class RHRoomBookingRejectBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBook
         if self._occurrence.is_valid:
             self._occurrence.reject(session.user, self._reason)
             flash(_(u'Booking occurrence rejected'), 'success')
-        self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
+        self._redirect(self._get_success_url())
 
 
 class RHRoomBookingSearchBookings(RHRoomBookingBase):

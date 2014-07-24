@@ -23,7 +23,10 @@ from indico.core.errors import NoReportError
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.user.reservations import (RHRoomBookingBookingDetails, RHRoomBookingModifyBooking,
                                                              RHRoomBookingCloneBooking, RHRoomBookingNewBookingSimple,
-                                                             RHRoomBookingNewBooking)
+                                                             RHRoomBookingNewBooking, RHRoomBookingCancelBooking,
+                                                             RHRoomBookingRejectBooking, RHRoomBookingAcceptBooking,
+                                                             RHRoomBookingCancelBookingOccurrence,
+                                                             RHRoomBookingRejectBookingOccurrence)
 from indico.modules.rb.controllers.user.rooms import RHRoomBookingRoomDetails
 from indico.modules.rb.models.reservations import Reservation, RepeatUnit
 from indico.modules.rb.views.user.event import (WPRoomBookingEventRoomDetails, WPRoomBookingEventBookingList,
@@ -166,6 +169,78 @@ class RHRoomBookingEventBookingCloneBooking(RHRoomBookingEventBase, RHRoomBookin
 
     def _process(self):
         return RHRoomBookingCloneBooking._process(self)
+
+
+class _SuccessUrlDetailsMixin:
+    def _get_success_url(self):
+        return url_for('event_mgmt.rooms_booking_details', self.event, self._reservation)
+
+
+class RHRoomBookingEventAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingEventBase, RHRoomBookingAcceptBooking):
+    def __init__(self):
+        RHRoomBookingAcceptBooking.__init__(self)
+        RHRoomBookingEventBase.__init__(self)
+
+    def _checkParams(self, params):
+        RHRoomBookingEventBase._checkParams(self, params)
+        RHRoomBookingAcceptBooking._checkParams(self)
+
+    def _process(self):
+        return RHRoomBookingAcceptBooking._process(self)
+
+
+class RHRoomBookingEventCancelBooking(_SuccessUrlDetailsMixin, RHRoomBookingEventBase, RHRoomBookingCancelBooking):
+    def __init__(self):
+        RHRoomBookingCancelBooking.__init__(self)
+        RHRoomBookingEventBase.__init__(self)
+
+    def _checkParams(self, params):
+        RHRoomBookingEventBase._checkParams(self, params)
+        RHRoomBookingCancelBooking._checkParams(self)
+
+    def _process(self):
+        return RHRoomBookingCancelBooking._process(self)
+
+
+class RHRoomBookingEventRejectBooking(_SuccessUrlDetailsMixin, RHRoomBookingEventBase, RHRoomBookingRejectBooking):
+    def __init__(self):
+        RHRoomBookingRejectBooking.__init__(self)
+        RHRoomBookingEventBase.__init__(self)
+
+    def _checkParams(self, params):
+        RHRoomBookingEventBase._checkParams(self, params)
+        RHRoomBookingRejectBooking._checkParams(self)
+
+    def _process(self):
+        return RHRoomBookingRejectBooking._process(self)
+
+
+class RHRoomBookingEventCancelBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookingEventBase,
+                                                RHRoomBookingCancelBookingOccurrence):
+    def __init__(self):
+        RHRoomBookingCancelBookingOccurrence.__init__(self)
+        RHRoomBookingEventBase.__init__(self)
+
+    def _checkParams(self, params):
+        RHRoomBookingEventBase._checkParams(self, params)
+        RHRoomBookingCancelBookingOccurrence._checkParams(self)
+
+    def _process(self):
+        return RHRoomBookingCancelBookingOccurrence._process(self)
+
+
+class RHRoomBookingEventRejectBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookingEventBase,
+                                                RHRoomBookingRejectBookingOccurrence):
+    def __init__(self):
+        RHRoomBookingRejectBookingOccurrence.__init__(self)
+        RHRoomBookingEventBase.__init__(self)
+
+    def _checkParams(self, params):
+        RHRoomBookingEventBase._checkParams(self, params)
+        RHRoomBookingRejectBookingOccurrence._checkParams(self)
+
+    def _process(self):
+        return RHRoomBookingRejectBookingOccurrence._process(self)
 
 
 class RHRoomBookingEventNewBookingSimple(RHRoomBookingEventBase, RHRoomBookingNewBookingSimple):

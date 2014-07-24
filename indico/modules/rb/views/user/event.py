@@ -90,7 +90,12 @@ class WPRoomBookingEventBookingDetails(WPRoomBookingEventBase, WPRoomBookingBook
     endpoints = {
         'room_details': 'event_mgmt.rooms_room_details',
         'booking_modify': 'event_mgmt.rooms_booking_modify',
-        'booking_clone': 'event_mgmt.rooms_booking_clone'
+        'booking_clone': 'event_mgmt.rooms_booking_clone',
+        'booking_accept': 'event_mgmt.rooms_booking_accept',
+        'booking_cancel': 'event_mgmt.rooms_booking_cancel',
+        'booking_reject': 'event_mgmt.rooms_booking_reject',
+        'booking_occurrence_cancel': 'event_mgmt.rooms_booking_occurrence_cancel',
+        'booking_occurrence_reject': 'event_mgmt.rooms_booking_occurrence_reject'
     }
 
     def _setActiveTab(self):
