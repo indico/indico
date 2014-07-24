@@ -42,7 +42,7 @@ from indico.modules.rb.views.user.reservations import (WPRoomBookingSearchBookin
                                                        WPRoomBookingNewBookingSelectPeriod,
                                                        WPRoomBookingNewBookingConfirm,
                                                        WPRoomBookingNewBookingSimple, WPRoomBookingModifyBooking,
-                                                       WPRoomBookingBookingDetails, WPRoomBookingStatement)
+                                                       WPRoomBookingBookingDetails)
 from indico.web.flask.util import url_for
 
 
@@ -599,13 +599,3 @@ class RHRoomBookingCalendar(RHRoomBookingBase):
 
         return WPRoomBookingCalendar(self, rooms=rooms, occurrences=occurrences, start_dt=self.start_dt,
                                      end_dt=self.end_dt, overload=self._overload, max_days=self.MAX_DAYS).display()
-
-
-# TODO: remove once we use flash messages
-class RHRoomBookingStatement(RHRoomBookingBase):
-    def _checkParams(self):
-        self._title = session.pop('rbTitle', None)
-        self._description = session.pop('rbDescription', None)
-
-    def _process(self):
-        return WPRoomBookingStatement(self).display()

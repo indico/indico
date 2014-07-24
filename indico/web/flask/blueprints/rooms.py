@@ -80,10 +80,6 @@ rooms.add_url_rule('/room/<roomLocation>/<int:roomID>/book',
 
 
 # Modify a booking
-rooms.add_url_rule('/show-message',
-                   'roomBooking-statement',
-                   reservation_handlers.RHRoomBookingStatement)
-
 rooms.add_url_rule('/booking/<roomLocation>/<int:resvID>/modify',
                    'roomBooking-modifyBookingForm',
                    reservation_handlers.RHRoomBookingModifyBooking,

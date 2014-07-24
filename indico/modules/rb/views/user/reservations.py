@@ -175,19 +175,3 @@ class WPRoomBookingModifyBooking(WPRoomBookingBase):
                                              repeat_unit=params['repeat_unit'], repeat_step=params['repeat_step'])
         params['calendar'] = calendar.render(show_navbar=False)
         return WTemplated('RoomBookingBookingForm').getHTML(params)
-
-
-class WPRoomBookingStatement(WPRoomBookingBase):
-    def _getBody(self, params):
-        return WRoomBookingStatement(self._rh).getHTML(params)
-
-
-class WRoomBookingStatement(WTemplated):
-    def __init__(self, rh):
-        self._rh = rh
-
-    def getVars(self):
-        wvars = WTemplated.getVars(self)
-        wvars['title'] = self._rh._title
-        wvars['description'] = self._rh._description
-        return wvars
