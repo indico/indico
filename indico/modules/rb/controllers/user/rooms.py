@@ -124,24 +124,10 @@ class RHRoomBookingSearchMyRooms(RHRoomBookingSearchRoomsShortcutBase):
     }
 
 
-# TODO: remove with legacy makac code. still referenced in book-room-for-event code
-class RHRoomBookingRoomList(RHRoomBookingBase):
-    pass
-
-
-# TODO: remove with legacy makac code. still referenced in book-room-for-event code
-class RHRoomBookingSearch4Rooms(RHRoomBookingBase):
-    pass
-
-
 class RHRoomBookingRoomDetails(RHRoomBookingBase):
     @requires_location
     @requires_room
     def _checkParams(self):
-        # TODO: flash() messages instead!!!
-        self._afterActionSucceeded = session.get('rbActionSucceeded')
-        self._afterDeletionFailed = session.get('rbDeletionFailed')
-
         self._calendar_start = next_work_day()
         self._calendar_end = datetime.combine(self._calendar_start, time(23, 59))
         try:

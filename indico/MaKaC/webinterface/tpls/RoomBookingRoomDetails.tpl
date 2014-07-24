@@ -37,20 +37,6 @@
             <span class="formTitle" style="border-bottom-width: 0px">
               Room ${ room.name }
             </span><br />
-            % if actionSucceeded:
-              <br />
-              <span class="actionSucceeded">
-                ${ _('Action succeeded.')}</span> ${ _('Please review details below.') }<br />
-              <br />
-            % endif
-            % if deletionFailed:
-              <br />
-              <span class="actionFailed"> ${ _('Deletion failed.') }</span>
-              <p class="actionFailed">
-                ${ _('This room is booked in the future. Please remove all live bookings first. Please note that system never deletes live bookings automatically.')}
-              </p>
-              <br />
-            % endif
             <br />
             <table width="96%" align="left" border="0">
             <!-- LOCATION -->

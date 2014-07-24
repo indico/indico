@@ -143,9 +143,6 @@ class WRoomBookingRoomDetails(WTemplated):
 
         wvars['attrs'] = {attr.attribute.name: attr for attr in room.attributes}
 
-        wvars['actionSucceeded'] = self._rh._afterActionSucceeded
-        wvars['deletionFailed'] = self._rh._afterDeletionFailed
-
         wvars['owner_name'] = room.getResponsibleName()
 
         wvars['bookable_times'] = room.bookable_times.all()

@@ -22,13 +22,14 @@ from collections import defaultdict
 
 import dateutil
 import transaction
-from flask import request, session, jsonify
+from flask import request, session, jsonify, flash
 from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
 from indico.core.errors import IndicoError, AccessError, NoReportError, NotFoundError
 from indico.modules.rb.forms.base import FormDefaults
 from indico.util.date_time import get_datetime_from_request
+from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.forms.reservations import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
@@ -73,7 +74,7 @@ class RHRoomBookingAcceptBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
             raise IndicoError("This reservation couldn't be accepted due to conflicts with other reservations")
         if self._reservation.is_pending:
             self._reservation.accept(session.user)
-            # TODO add flash message
+            flash(_(u'Booking accepted'), 'success')
         self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
 
 
@@ -86,7 +87,7 @@ class RHRoomBookingCancelBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _process(self):
         if not self._reservation.is_cancelled and not self._reservation.is_rejected:
             self._reservation.cancel(session.user)
-            # TODO add flash message
+            flash(_(u'Booking cancelled'), 'success')
         self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
 
 
@@ -103,7 +104,7 @@ class RHRoomBookingRejectBooking(RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _process(self):
         if not self._reservation.is_cancelled and not self._reservation.is_rejected:
             self._reservation.reject(session.user, self._reason)
-            # TODO add flash message
+            flash(_(u'Booking rejected'), 'success')
         self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
 
 
@@ -121,7 +122,7 @@ class RHRoomBookingCancelBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBook
     def _process(self):
         if self._occurrence.is_valid:
             self._occurrence.cancel(session.user)
-            # TODO add flash message
+            flash(_(u'Booking occurrence cancelled'), 'success')
         self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
 
 
@@ -140,7 +141,7 @@ class RHRoomBookingRejectBookingOccurrence(RHRoomBookingBookingMixin, RHRoomBook
     def _process(self):
         if self._occurrence.is_valid:
             self._occurrence.reject(session.user, self._reason)
-            # TODO add flash message
+            flash(_(u'Booking occurrence rejected'), 'success')
         self._redirect(url_for('rooms.roomBooking-bookingDetails', self._reservation))
 
 
@@ -344,6 +345,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         except NoReportError as e:
             transaction.abort()
             return jsonify(success=False, msg=unicode(e))
+        flash(_(u'Pre-Booking created') if booking.is_pending else _(u'Booking created'), 'success')
         return jsonify(success=True, url=self._get_success_url(booking))
 
 
@@ -557,7 +559,7 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
         if form.validate_on_submit() and not form.submit_check.data:
             try:
                 self._reservation.modify(form.data, session.user)
-                # TODO: flash success message
+                flash(_(u'Booking updated'), 'success')
             except NoReportError as e:
                 transaction.abort()
                 return jsonify(success=False, msg=unicode(e))
