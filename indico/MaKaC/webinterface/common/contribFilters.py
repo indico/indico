@@ -19,6 +19,7 @@
 
 import MaKaC.common.filters as filters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
+from indico.util.string import natural_sort_key
 
 
 class TypeFilterField( filters.FilterField ):
@@ -310,7 +311,8 @@ class TitleSF(filters.SortingField):
             return +1
         if c2.getTitle() == None:
             return -1
-        return cmp( c1.getTitle().lower().strip(), c2.getTitle().lower().strip() )
+        return cmp(natural_sort_key(c1.getTitle().lower().strip()),
+                   natural_sort_key(c2.getTitle().lower().strip()))
 
 
 class NumberSF( filters.SortingField ):
@@ -351,7 +353,8 @@ class ContribTypeSF( filters.SortingField ):
             return +1
         elif c2.getType() == None:
             return -1
-        return cmp( c1.getType().getName().lower().strip(), c2.getType().getName().lower().strip() )
+        return cmp(natural_sort_key(c1.getType().getName().lower().strip()),
+                   natural_sort_key(c2.getType().getName().lower().strip()))
 
 
 class SessionSF( filters.SortingField ):
@@ -380,7 +383,8 @@ class SessionTitleSF( filters.SortingField ):
             return +1
         elif c2.getSession() == None:
             return -1
-        return cmp( c1.getSession().getTitle().lower().strip(), c2.getSession().getTitle().lower().strip() )
+        return cmp(natural_sort_key(c1.getSession().getTitle().lower().strip()),
+                   natural_sort_key(c2.getSession().getTitle().lower().strip()))
 
 class TrackSF(filters.SortingField):
     _id = "track"
