@@ -445,7 +445,7 @@ class Reservation(Serializer, db.Model):
         self.occurrences.filter_by(is_valid=True).update({'is_cancelled': True}, synchronize_session='fetch')
         if not silent:
             notify_cancellation(self)
-            log_msg = 'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
+            log_msg = u'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
             self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
 
     def reject(self, user, reason, silent=False):
@@ -455,7 +455,7 @@ class Reservation(Serializer, db.Model):
                                                          synchronize_session='fetch')
         if not silent:
             notify_rejection(self)
-            log_msg = 'Reservation rejected: {}'.format(reason)
+            log_msg = u'Reservation rejected: {}'.format(reason)
             self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
 
     # edit logs

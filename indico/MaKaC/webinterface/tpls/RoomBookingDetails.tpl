@@ -470,9 +470,9 @@
                         <td align="left" class="excluded" class="blacktext">
                           % for occurrence in excluded_days:
                             % if occurrence.is_rejected:
-                              ${ formatDate(occurrence.date) } (${ _('Rejected') }${ ': {}'.format(occurrence.rejection_reason) if occurrence.rejection_reason else '' })<br />
+                              ${ formatDate(occurrence.date) } (${ _('Rejected') }${ u': {}'.format(occurrence.rejection_reason) if occurrence.rejection_reason else '' })<br />
                             % elif occurrence.is_cancelled:
-                              ${ formatDate(occurrence.date) } (${ _('Cancelled') }${ ': {}'.format(occurrence.rejection_reason) if occurrence.rejection_reason else '' })<br />
+                              ${ formatDate(occurrence.date) } (${ _('Cancelled') }${ u': {}'.format(occurrence.rejection_reason) if occurrence.rejection_reason else '' })<br />
                             % endif
                           % endfor
                         </td>
