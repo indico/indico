@@ -132,7 +132,6 @@ class BlockedRoom(db.Model):
             _join=Reservation
         )
 
-        emails = []
         reason = 'Conflict with blocking {}: {}'.format(self.blocking.id, self.blocking.reason)
 
         for reservation in reservations:

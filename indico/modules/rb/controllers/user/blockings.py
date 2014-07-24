@@ -20,7 +20,7 @@
 from collections import defaultdict
 from datetime import date
 
-from flask import request, session
+from flask import flash, request, session
 
 from indico.modules.rb.forms.base import FormDefaults
 from indico.modules.rb.forms.blockings import CreateBlockingForm, BlockingForm
@@ -62,6 +62,8 @@ class RHRoomBookingCreateModifyBlockingBase(RHRoomBookingBase):
             owner = blocked_room.room.getResponsible()
             if owner == session.user:
                 blocked_room.approve(False)
+                flash(_(u"Blocking for your room '{0}' has been accepted automatically").format(
+                    blocked_room.room.full_name), 'info')
             else:
                 rooms_by_owner[owner].append(blocked_room)
 
@@ -90,6 +92,7 @@ class RHRoomBookingCreateBlocking(RHRoomBookingCreateModifyBlockingBase):
         blocking.blocked_rooms = [BlockedRoom(room_id=room_id) for room_id in self._form.blocked_rooms.data]
         db.session.add(blocking)
         db.session.flush()  # synchronizes relationships (e.g. BlockedRoom.room)
+        flash(_(u'Blocking created'), 'success')
         self._process_blocked_rooms(blocking.blocked_rooms)
 
 
@@ -131,6 +134,7 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
             blocking.blocked_rooms.append(blocked_room)
             added_blocked_rooms.append(blocked_room)
         db.session.flush()
+        flash(_(u'Blocking updated'), 'success')
         self._process_blocked_rooms(added_blocked_rooms)
 
 
@@ -147,6 +151,7 @@ class RHRoomBookingDeleteBlocking(RHRoomBookingBase):
 
     def _process(self):
         db.session.delete(self._block)
+        flash(_(u'Blocking deleted'), 'success')
         self._redirect(url_for('rooms.blocking_list', only_mine=True, timeframe='recent'))
 
 
