@@ -17,11 +17,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.db import DBMgr
-from indico.modules import ModuleHolder
-from MaKaC.common.timezoneUtils import nowutc
-from indico.modules.scheduler.tasks.periodic import PeriodicTask
 from datetime import timedelta
+
+from indico.core.db import DBMgr
+from indico.core.config import Config
+from indico.util.date_time import now_utc
+from indico.modules import ModuleHolder
+from indico.modules.scheduler.tasks.periodic import PeriodicTask
+
+from MaKaC.conference import CategoryManager
+from MaKaC.common.timezoneUtils import nowutc
 
 
 MAX_OFFLINE_WEBPAGE_LIFE = 30 * 24 * 3600
@@ -40,7 +45,39 @@ def delete_offline_events(dbi, logger):
                 logger.info("Deleted offline req {0}".format(req.id))
 
 
+def cleanup_categories(dbi, logger):
+    config = Config.getInstance()
+
+    logger.info("Checking whether any categories should be cleaned up")
+
+    for categ_id, days in config.getCategoryCleanup().items():
+        try:
+            category = CategoryManager().getById(categ_id)
+        except KeyError:
+            logger.warning("Category '{0}' does not exist!".format(categ_id))
+            continue
+
+        now = now_utc()
+
+        to_delete = [ev for ev in category.conferences if (now - ev._creationDS) > timedelta(days=days)]
+
+        if to_delete:
+            logger.info("Category '{0}': {1} events were created more than {2} days ago and will be deleted".format(
+                categ_id, len(to_delete), days
+            ))
+
+            for i, event in enumerate(to_delete, 1):
+                logger.info("Deleting {0}".format(repr(event)))
+                event.delete()
+                if i % 100 == 0:
+                    dbi.commit()
+            dbi.commit()
+
+
 class JanitorTask(PeriodicTask):
     def run(self):
         dbi = DBMgr.getInstance()
-        delete_offline_events(dbi, self.getLogger())
+        logger = self.getLogger()
+
+        delete_offline_events(dbi, logger)
+        cleanup_categories(dbi, logger)

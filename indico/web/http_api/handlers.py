@@ -54,6 +54,7 @@ from MaKaC.common.fossilize import fossilize, clearCache
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.cache import GenericCache
+from MaKaC.authentication.LDAPAuthentication import LDAPConnector
 
 
 # Remove the extension at the end or before the querystring
@@ -111,9 +112,9 @@ def checkAK(apiKey, signature, timestamp, path, query):
     onlyPublic = False
     if signature:
         validateSignature(ak, minfo, signature, timestamp, path, query)
-    elif apiMode in (API_MODE_SIGNED, API_MODE_ALL_SIGNED):
+    elif apiMode == API_MODE_ALL_SIGNED:
         raise HTTPAPIError('Signature missing', 403)
-    elif apiMode == API_MODE_ONLYKEY_SIGNED:
+    elif apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED):
         onlyPublic = True
     return ak, onlyPublic
 
@@ -273,6 +274,8 @@ def handler(prefix, path):
             # No need to commit stuff if we didn't use an API key
             # (nothing was written)
             dbi.endRequest(False)
+
+        LDAPConnector.destroy()
 
         # Log successful POST api requests
         if error is None and request.method == 'POST':

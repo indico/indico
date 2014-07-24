@@ -212,7 +212,7 @@ class _TmpStatus:
                 nsv=sv.clone(self)
                 nsv.setId(sv.getId())
                 self._values.append(nsv)
-            self._defaultValue=status.getDefaultValue()
+            self._defaultValue = status.getDefaultValue().getId() if status.getDefaultValue() else None
         else:
             self.map(params)
 
@@ -224,7 +224,7 @@ class _TmpStatus:
             d['values'].append({'id':v.getId(),'caption':v.getCaption()})
         d["defaultvalue"]=""
         if self._defaultValue is not None:
-            d["defaultvalue"]=self._defaultValue.getId()
+            d["defaultvalue"] = self._defaultValue
         return d
 
     def map(self, params):
@@ -248,8 +248,7 @@ class _TmpStatus:
             if type(vs)!=list:
                 vs=[vs]
             if len(vs) == 1:
-                v=self.getValueById(vs[0])
-                self._defaultValue=v
+                self._defaultValue = vs[0]
 
     def getValueById(self, id):
         for v in self._values:
@@ -261,8 +260,8 @@ class _TmpStatus:
         for v in self._values:
             if v.getId()==id:
                 self._values.remove(v)
-                if v == self._defaultValue:
-                    self._defaultValue=None
+                if v.getId() == self._defaultValue:
+                    self._defaultValue = None
                 return
 
     def getCaption(self):

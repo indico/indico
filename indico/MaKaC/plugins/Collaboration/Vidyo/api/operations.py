@@ -150,6 +150,11 @@ class VidyoOperations(object):
             return VidyoError("userHasNoAccounts", "attach")
         roomName = booking.getBookingParamByName("roomName")
         searchFilter = SOAPObjectFactory.createFilter('admin', roomName)
+
+        # TODO: Do several calls if needed
+        # Vidyo should have an exact match feature too
+        searchFilter.limit = 100
+
         answer = AdminApi.getRooms(searchFilter)
         createdRooms = answer.room
 
@@ -158,7 +163,7 @@ class VidyoOperations(object):
                 if str(room.name) == roomName and str(room.ownerName) == login:
                     return room
         else:
-            return  VidyoError("notValidRoom", "attach")
+            return VidyoError("notValidRoom", "attach")
 
     @classmethod
     def modifyRoom(cls, booking, oldBookingParams):
@@ -423,13 +428,21 @@ class VidyoOperations(object):
             return result
         except Exception:
             return VidyoError("roomCheckFailed", "roomConnected",
-                              _("There was a problem obtaining the room status from Vidyo. {0}").format(VidyoTools.getContactSupportText()))
+                              _("There was a problem obtaining the room status from Vidyo. {0}").format(
+                                    VidyoTools.getContactSupportText()))
 
     @classmethod
-    def searchRooms(cls, query):
+    def searchRooms(cls, query, offset=None, limit=None):
         try:
-            searchFilter = SOAPObjectFactory.createFilter('admin', "%%%s%%" % VidyoTools.replaceSpacesInName(query))
-            rooms = AdminApi.getRooms(searchFilter)
+            search_filter = SOAPObjectFactory.createFilter('admin', "%%%s%%" % VidyoTools.replaceSpacesInName(query))
+
+            if offset is not None:
+                search_filter.start = offset
+            if limit is not None:
+                search_filter.limit = limit
+
+            rooms = AdminApi.getRooms(search_filter)
+
             if rooms.total:
                 return rooms.room
             return []

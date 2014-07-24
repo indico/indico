@@ -402,9 +402,7 @@ class IteratedDataFetcher(DataFetcher):
             if iface is None:
                 raise HTTPAPIError('Invalid detail level: %s' % self._detail, 400)
         for obj in self._iterateOver(iterator, self._offset, self._limit, self._orderBy, self._descending, filter):
-            yield self._postprocess(obj,
-                                    self._makeFossil(obj, iface),
-                                    iface)
+            yield self._postprocess(obj, self._makeFossil(obj, iface), iface)
 
 
 Serializer.register('html', HTML4Serializer)

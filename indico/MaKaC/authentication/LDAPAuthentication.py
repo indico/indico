@@ -62,6 +62,14 @@ except:
 
 from urlparse import urlparse
 
+# dependency libs
+from zope.interface import implements
+
+# indico imports
+from indico.core.extpoint import Component
+from indico.core.extpoint.rh import IServerRequestListener
+from indico.util.contextManager import ContextManager
+
 # legacy indico imports
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, SSOHandler
 from MaKaC.authentication import AuthenticatorMgr
@@ -163,39 +171,31 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         return av
 
     def matchUser(self, criteria, exact=0):
-        criteria = dict((k, ldap.filter.escape_filter_chars(v)) \
+        criteria = dict((k, ldap.filter.escape_filter_chars(v))
                         for k, v in criteria.iteritems() if v.strip() != '')
-        lfilter = list((self._operations[k].format(v if exact else ("*%s*" % v))) \
+        lfilter = list((self._operations[k].format(v if exact else ("*%s*" % v)))
                        for k, v in criteria.iteritems())
 
-        if lfilter == []:
+        if not lfilter:
             return {}
-        ldapc = LDAPConnector()
-        ldapc.open()
+        ldapc = LDAPConnector.getInstance()
         fquery = "(&{0}{1})".format(ldapc.customUserFilter, ''.join(lfilter))
-
         d = ldapc.findUsers(fquery)
-        ldapc.close()
         return d
 
     def matchUserFirstLetter(self, index, letter):
         lfilter = self._operations[index].format("%s*" % letter)
         if lfilter == []:
             return {}
-        ldapc = LDAPConnector()
-        ldapc.open()
+        ldapc = LDAPConnector.getInstance()
         fquery = "(&%s)" % ''.join(lfilter)
         d = ldapc.findUsers(fquery)
-        ldapc.close()
         return d
 
     def searchUserById(self, id):
-        ldapc = LDAPConnector()
-        ldapc.open()
-        ldapc.login()
+        ldapc = LDAPConnector.getInstance()
         ret = ldapc.lookupUser(id)
-        ldapc.close()
-        if(ret == None):
+        if ret is None:
             return None
         av = LDAPTools.dictToAv(ret)
         av["id"] = id
@@ -230,11 +230,8 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             return None
 
     def matchGroup(self, criteria, exact=0):
-        ldapc = LDAPConnector()
-        ldapc.open()
-        ldapc.login()
+        ldapc = LDAPConnector.getInstance()
         ret = ldapc.findGroups(ldap.filter.escape_filter_chars(criteria), exact)
-        ldapc.close()
         groupList = []
         for grDict in ret:
             grName = grDict['cn']
@@ -246,11 +243,8 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         return groupList
 
     def matchGroupFirstLetter(self, letter):
-        ldapc = LDAPConnector()
-        ldapc.open()
-        ldapc.login()
+        ldapc = LDAPConnector.getInstance()
         ret = ldapc.findGroupsFirstLetter(ldap.filter.escape_filter_chars(letter))
-        ldapc.close()
         groupList = []
         for grDict in ret:
             grName = grDict['cn']
@@ -262,27 +256,18 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         return groupList
 
     def getGroupMemberList(self, group):
-        ldapc = LDAPConnector()
-        ldapc.open()
-        ldapc.login()
+        ldapc = LDAPConnector.getInstance()
         ret = ldapc.findGroupMemberUids(group)
-        ldapc.close()
         return ret
 
     def isUserInGroup(self, user, group):
-        ldapc = LDAPConnector()
-        ldapc.open()
-        ldapc.login()
+        ldapc = LDAPConnector.getInstance()
         ret = ldapc.userInGroup(user, group)
-        ldapc.close()
         return ret
 
     def groupExists(self, group):
-        ldapc = LDAPConnector()
-        ldapc.open()
-        ldapc.login()
+        ldapc = LDAPConnector.getInstance()
         ret = ldapc.groupExists(group)
-        ldapc.close()
         return ret
 
 
@@ -356,6 +341,22 @@ class LDAPConnector(object):
         self.groupStyle = ldapConfig.get('groupStyle')
         self.customUserFilter = ldapConfig.get('customUserFilter', '')
 
+    @classmethod
+    def getInstance(cls):
+        connector = ContextManager.get('ldap.connector', default=None)
+        if not connector:
+            connector = cls()
+            connector.open()
+            connector.login()
+        return connector
+
+    @classmethod
+    def destroy(cls):
+        connector = ContextManager.get('ldap.connector', default=None)
+        if connector:
+            connector.close()
+            ContextManager.delete('ldap.connector', silent=True)
+
     def login(self):
         try:
             self.l.bind_s(*self.ldapAccessCredentials)
@@ -386,6 +387,8 @@ class LDAPConnector(object):
         Opens an anonymous LDAP connection
         """
         self.l = ldap.initialize(self.ldapUri)
+        self.l.set_option(ldap.OPT_REFERRALS, 0)
+
         self.l.protocol_version = ldap.VERSION3
 
         if self.ldapUseTLS:
@@ -465,8 +468,6 @@ class LDAPConnector(object):
         """
 
         d = {}
-        self.login()
-
         res = self.l.search_s(self.ldapPeopleDN, ldap.SCOPE_SUBTREE, ufilter)
         for dn, data in res:
             if dn:
@@ -706,3 +707,11 @@ class LDAPTools:
         if m:
             return m.group(1)
         return None
+
+
+class RequestListener(Component):
+    implements(IServerRequestListener)
+
+    # IServerRequestListener
+    def requestFinished(self, obj):
+        LDAPConnector.destroy()

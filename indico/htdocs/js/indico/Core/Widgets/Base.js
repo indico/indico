@@ -443,6 +443,10 @@ type("SelectableDynamicListWidgetBase", ["SelectableListWidget"],
             return (self.ajaxPending !== null);
         },
 
+        _updateOffset: function() {
+            self.offset += this.getInterval();
+        },
+
         /**
          * Set the parent object's items based on this item buffer and draw
          * the result.
@@ -451,7 +455,7 @@ type("SelectableDynamicListWidgetBase", ["SelectableListWidget"],
             var self = this;
             self.tmpBuffer = null;
             self.ajaxPending = null;
-            self.offset += self.getInterval();
+            self._updateOffset();
             self._setItems(self.itemsBuffer);
             $(self.progress.dom).hide();
             $('#sdlw-load').show();
@@ -587,12 +591,16 @@ type("SelectableDynamicListWidget", ["SelectableDynamicListWidgetBase"],
             }
         },
 
+        _extractResult: function(result) {
+            return result;
+        },
+
         _performCall: function(args) {
             var self = this;
 
             indicoRequest(self.APIMethod, args, function(result, error) {
                 if (!error) {
-                    self.tmpBuffer = result;
+                    self.tmpBuffer = self._extractResult(result);
 
                     if (self.tmpBuffer.length < self.getInterval()) {
                         self._setComplete();

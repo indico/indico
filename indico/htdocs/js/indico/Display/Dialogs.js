@@ -113,7 +113,7 @@ type("BasicEmailPopup", ["ExclusivePopupWithButtons"],{
 
         var self = this;
         // Text editor with default message
-        self.rtWidget = new ParsedRichTextEditor(700, 400, 'IndicoMinimal');
+        self.rtWidget = new ParsedRichTextEditor(700, 400);
         self.rtWidget.set(self.defaultText);
     },
 

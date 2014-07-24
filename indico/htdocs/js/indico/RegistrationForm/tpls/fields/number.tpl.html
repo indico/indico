@@ -2,14 +2,12 @@
     <ng-form name="nestedForm">
         <input type="number"
             id="field-{{ section.id }}-{{ field.id }}"
-            ng-model="numberInput"
-            ng-init="numberInput = getValue(fieldName)"
+            ng-model="userdata[fieldName]"
             name="{{ fieldName }}"
             size="{{ field.values.length }}"
             min="{{ field.values.minValue }}"
             ng-required="field.mandatory"
             ng-disabled="paymentBlocked(field, userdata)"
-            ng-change="updateSubtotal(numberInput)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}"/>
     </ng-form>
     <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.mandatory" class="error-message-tag">
@@ -22,7 +20,7 @@
         <span class="regFormPrice">{{ field.price }}</span>
         <nd-currency currency="currency"></nd-currency>
         <span class="regFormSubtotal">{{ 'Total' | i18n }}:</span>
-        <span ng-init="updateSubtotal(numberInput)">{{ subtotal }}</span>
+        <span>{{ subtotal }}</span>
         <nd-currency currency="currency"></nd-currency>
     </span>
 </div>

@@ -129,9 +129,8 @@ class ChatSMContributor(Component, Observable):
         """
         #list of creators of the chat rooms
         if PluginsWrapper('InstantMessaging', 'XMPP').isActive():
-            list['cloneOptions'] += i18nformat(
-                '<li><input type="checkbox" name="cloneChatrooms'
-                ' id="cloneChatrooms" value="1" />_("Chat Rooms")</li>')
+            list['cloneOptions'] += '<li><input type="checkbox" name="cloneChatrooms"' \
+                ' id="cloneChatrooms" value="1" />{0}</li>'.format(_("Chat Rooms"))
 
     @classmethod
     def fillCloneDict(self, obj, params):

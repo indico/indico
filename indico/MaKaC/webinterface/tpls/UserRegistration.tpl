@@ -100,8 +100,6 @@ ${ locator }
   <td colspan="2">
     <center><font color="red">${ _("You must enter a valid email address. An email will be sent to you to confirm the registration.")}</font></center>
     <br><b>${ _("Account data")}</b>
-    <br>${ _("Please note that your password will be stored in clear text in our database which will allow us to send it back to you in case you lost it. Try avoid using the same password as accounts you may have in other systems.")}
-  </td>
 </tr>
 <tr>
   <td colspan="2" bgcolor="black"></td>

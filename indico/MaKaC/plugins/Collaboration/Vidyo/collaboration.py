@@ -557,27 +557,52 @@ class CSBooking(CSBookingBase):
 
     @classmethod
     def _search(cls, user, query, offset=0, limit=None):
-        if query == "":
-            return[]
-        result = VidyoOperations.searchRooms(query)
-        if isinstance(result, VidyoError):
-            return result
 
-        allowedRooms = []
-        for room in result:
-            av = VidyoTools.getAvatarByAccountName(room.ownerName)
-            for booking in VidyoTools.getIndexByVidyoRoom().getBookingList(room.roomID):
-                if av == user or booking.getConference() in user.getLinkTo("conference", "manager") \
-                        or user == booking.getConference().getCreator() \
-                        or RCVideoServicesManager.hasRights(user, booking.getConference(), ["Vidyo"]):
-                    bookingParams = booking.getBookingParams().copy()
-                    bookingParams["videoLinkType"] = "event"
-                    bookingParams["videoLinkSession"] = ""
-                    bookingParams["videoLinkContribution"] = ""
-                    allowedRooms.append(bookingParams)
+        if not query.strip():
+            return [], None
+
+        ask_for_more = True
+        allowed_rooms = []
+
+        while ask_for_more:
+            result = VidyoOperations.searchRooms(query, offset=offset, limit=limit)
+
+            if isinstance(result, VidyoError):
+                # query held no results? there's nothing left.
+                return result, offset
+
+            if not result:
+                # set offset to None, meaning that the bottom of the "search stream" has been reached
+                offset = None
+                break
+
+            for room in result:
+                av = VidyoTools.getAvatarByAccountName(room.ownerName)
+
+                # go through all bookings that use this room and check if this user has any privileges
+                # over them
+                for booking in VidyoTools.getIndexByVidyoRoom().getBookingList(room.roomID):
+                    if av == user or booking.getConference() in user.getLinkTo("conference", "manager") \
+                            or user == booking.getConference().getCreator() \
+                            or RCVideoServicesManager.hasRights(user, booking.getConference(), ["Vidyo"]) \
+                            or user.isAdmin():
+
+                        # if that's the case, add the booking to our list
+                        bookingParams = booking.getBookingParams().copy()
+                        bookingParams["videoLinkType"] = "event"
+                        bookingParams["videoLinkSession"] = ""
+                        bookingParams["videoLinkContribution"] = ""
+                        allowed_rooms.append(bookingParams)
+                        break
+
+                offset += 1
+
+                if limit is not None and len(allowed_rooms) >= limit:
+                    # reached limit? that's enough!
+                    ask_for_more = False
                     break
-        limit = limit if limit else (len(allowedRooms) - 1)
-        return allowedRooms[offset:offset+limit]
+
+        return (allowed_rooms, offset)
 
     def _checkStatus(self):
         """ Queries the data for the Vidyo Public room associated to this CSBooking

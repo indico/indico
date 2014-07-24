@@ -487,7 +487,7 @@ class WContribModifMain(wcomponents.WTemplated):
             isSubmitter = False
             av = AvatarHolder().match({"email": part.getEmail()}, searchInAuthenticators=False, exact=True)
             if not av:
-                if part.getEmail() in self._contrib.getSubmitterEmailList():
+                if part.getEmail().lower() in self._contrib.getSubmitterEmailList():
                     isSubmitter = True
             elif (av[0] in self._contrib.getSubmitterList() or self._contrib.getConference().getPendingQueuesMgr().isPendingSubmitter(part)):
                 isSubmitter = True

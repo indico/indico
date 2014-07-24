@@ -69,6 +69,9 @@ class Context(threading.local):
     def __setitem__(self, elem, value):
         self.__dict__[elem] = value
 
+    def __delitem__(self, elem):
+        del self.__dict__[elem]
+
     def clear(self):
         self.__dict__.clear()
 
@@ -100,7 +103,7 @@ class ContextManager(object):
         If no set has been done over the variable before,
         a dummy context will be returned.
         """
-        if elem == None:
+        if elem is None:
             return cls._context
         else:
             return cls._context.get(elem, default)
@@ -117,3 +120,11 @@ class ContextManager(object):
         a default value is *set* and *returned*
         """
         return cls._context.setdefault(name, default)
+
+    @classmethod
+    def delete(cls, name, silent=False):
+        try:
+            del cls._context[name]
+        except KeyError:
+            if not silent:
+                raise

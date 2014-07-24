@@ -269,7 +269,7 @@ ndRegForm.directive("ndAccommodationSection", function($rootScope) {
             scope.billableOptionPayed = function(userdata) {
                 if (userdata.accommodation !== undefined) {
                     var accommodation = userdata.accommodation.accommodationType || {};
-                    return accommodation.billable === true && userdata.payed === true;
+                    return accommodation.billable === true && userdata.paid === true;
                 }
 
                 return false;
@@ -434,7 +434,7 @@ ndRegForm.directive("ndSessionsSection", function($rootScope, regFormFactory) {
             };
 
             $scope.anyBillableSessionPayed = function(userdata) {
-                if (userdata.payed) {
+                if (userdata.paid) {
                     return _.any(userdata.sessionList, function(item) {
                         var session = _.find($scope.section.items, function(session) {
                             return session.id == item.id;
@@ -548,16 +548,38 @@ ndRegForm.directive("ndSocialEventSection", function() {
         link: function(scope) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
+            // keep track of the selected radio item
+            scope.selectedRadioInput = {};
+            // Keep track of the selected checkbox items (multiple)
+            scope.selectedInputs = _.object(_.map(_.filter(scope.section.items, function(item) {
+                    return item.cancelled != 'false';
+                }), function(item){
+                    return [item.id, false];
+                }));
+            // Keep track of the number of accompanying people
+            scope.selectedPlaces = _.object(_.map(_.filter(scope.section.items, function(item) {
+                    return item.cancelled != 'false';
+                }), function(item){
+                    return [item.id, 1];
+                }));
 
-            scope.isSelected = function(eventId) {
-                return _.any(scope.userdata.socialEvents, function(e) {
-                    return eventId == e.id;
+            scope.$watch('userdata.socialEvents', function() {
+                angular.forEach(scope.userdata.socialEvents, function(item){
+                    scope.selectedRadioInput['id'] = item.id;  // Used when radio buttons
+                    scope.selectedInputs[item.id] = true;  // Used when checkboxes
+                    scope.selectedPlaces[item.id] = scope.getNoPlaces(item);
                 });
+            });
+
+            scope.anySelected = function() {
+                return _.any(scope.selectedInputs, function(e) {
+                    return e;
+                });;
             };
 
             scope.getMaxRegistrations = function(item) {
                 if (item.placesLimit !== 0) {
-                    return Math.min(item.maxPlace + 1, item.noPlacesLeft + scope.getNoPlaces(item, scope.userdata));
+                    return Math.min(item.maxPlace + 1, item.noPlacesLeft + scope.getNoPlaces(item));
                 } else {
                     return item.maxPlace + 1;
                 }
@@ -580,7 +602,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
             };
 
             scope.anyBillableEventPayed = function(userdata) {
-                if (userdata.payed) {
+                if (userdata.paid) {
                     return _.any(userdata.socialEvents, function(item) {
                         return item.price !== 0;
                     });
@@ -589,8 +611,8 @@ ndRegForm.directive("ndSocialEventSection", function() {
                 return false;
             };
 
-            scope.getNoPlaces = function(item, userdata) {
-                var e = _.find(userdata.socialEvents, function(e) {
+            scope.getNoPlaces = function(item) {
+                var e = _.find(scope.userdata.socialEvents, function(e) {
                     return item.id == e.id;
                 });
 

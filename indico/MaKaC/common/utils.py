@@ -407,9 +407,9 @@ def formatDateTime(dateTime, showWeek=False, format=None, locale=None, server_tz
     week = "EEEE" if showWeek else ""
 
     if not format:
-        return format_datetime(dateTime, week+'d/M/yyyy H:mm', locale=locale, server_tz=server_tz).encode('utf-8')
+        return format_datetime(dateTime, week+'d/M/yyyy H:mm', locale=locale, server_tz=server_tz)
     else:
-        return format_datetime(dateTime, format, locale=locale, server_tz=server_tz).encode('utf-8')
+        return format_datetime(dateTime, format, locale=locale, server_tz=server_tz)
 
 
 def formatDate(date, showWeek=False, format=None, locale=None):
@@ -417,16 +417,16 @@ def formatDate(date, showWeek=False, format=None, locale=None):
     if showWeek:
         week = "EEE "
     if not format:
-        return format_date(date, week+'d/M/yyyy', locale=locale).encode('utf-8')
+        return format_date(date, week+'d/M/yyyy', locale=locale)
     else:
-        return format_date(date, format, locale=locale).encode('utf-8')
+        return format_date(date, format, locale=locale)
 
 
 def formatTime(tm, format=None, locale=None, server_tz=False):
     if not format:
-        return format_time(tm, 'H:mm', locale=locale, server_tz=server_tz).encode('utf-8')
+        return format_time(tm, 'H:mm', locale=locale, server_tz=server_tz)
     else:
-        return format_time(tm, format, locale=locale, server_tz=server_tz).encode('utf-8')
+        return format_time(tm, format, locale=locale, server_tz=server_tz)
 
 
 def parseDate(dateStr, format='%d/%m/%Y'):

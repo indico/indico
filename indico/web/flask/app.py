@@ -247,4 +247,9 @@ def make_app(set_path=False, db_setup=True):
     if app.config['INDICO_COMPAT_ROUTES']:
         add_compat_blueprints(app)
     add_plugin_blueprints(app)
+
+    with app.app_context():
+        # re-establish loggers
+        Logger.reset()
+
     return app

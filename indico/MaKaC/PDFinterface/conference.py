@@ -449,11 +449,11 @@ class ContributionBook(PDFLaTeXBase):
                         for slotentry in entry_owner.getSchedule().getEntries():
                             owner = slotentry.getOwner()
                             if isinstance(owner, conference.Contribution):
-                                contribs.append(owner)
+                                res.append(owner)
 
                 elif isinstance(entry, schedule.LinkedTimeSchEntry) and isinstance(entry_owner, conference.Contribution):
-                    contribs.append(entry_owner)
-            return contribs
+                    res.append(entry_owner)
+            return res
         else:
             fc = FilterCriteria(self._conf, {
                 "status": [ContribStatusList.getId(conference.ContribStatusSch),

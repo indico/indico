@@ -211,9 +211,9 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         userdata = userdata || {};
 
         if (validation !== undefined) {
-            return ($scope.isBillable(item) && userdata.payed) || validation(userdata);
+            return ($scope.isBillable(item) && userdata.paid) || validation(userdata);
         } else {
-            return $scope.isBillable(item) && userdata.payed;
+            return $scope.isBillable(item) && userdata.paid;
         }
     };
 
@@ -260,6 +260,7 @@ ndRegForm.directive('ndCheckboxField', function(url) {
         },
 
         link: function(scope) {
+            scope.checkboxValue = false;
             scope.settings.fieldName = $T("Multiple choices/checkbox");
             scope.settings.billable = true;
             scope.settings.singleColumn = true;
@@ -267,6 +268,10 @@ ndRegForm.directive('ndCheckboxField', function(url) {
             scope.settings.formData.push('billable');
             scope.settings.formData.push('price');
             scope.settings.formData.push('placesLimit');
+
+            scope.$watch('userdata[fieldName]', function() {
+                scope.checkboxValue = scope.userdata[scope.fieldName] === 'yes';
+            });
         }
     };
 });
@@ -362,21 +367,18 @@ ndRegForm.directive('ndNumberField', function(url) {
             scope.settings.formData.push(['values', 'minValue']);
             scope.settings.formData.push(['values', 'length']);
 
-            scope.getValue = function(fieldName) {
-                if (scope.userdata[fieldName] !== undefined) {
-                    if ((scope.userdata[fieldName] !== 0) || (scope.field.values.minValue === 0)) {
-                        return scope.userdata[fieldName];
-                    }
-                }
-            };
-
-            scope.updateSubtotal = function(value) {
+            scope.updateSubtotal = function() {
+                var value = scope.userdata[scope.fieldName];
                 if ((isNaN(parseInt(value, 10)) || parseInt(value, 10) < 0)) {
                     scope.subtotal = 0;
                 } else {
                     scope.subtotal = parseInt(value, 10) * parseInt(scope.field.price, 10);
                 }
             };
+
+            scope.$watch('userdata[fieldName]', function() {
+                scope.updateSubtotal();
+            });
         }
     };
 });
@@ -393,12 +395,19 @@ ndRegForm.directive('ndRadioField', function(url) {
             scope.settings.defaultValue = true;
             scope.settings.itemtable = true;
 
+            // keep track of the selected radio item
+            scope.radioValue = {};
+
+            scope.$watch('userdata[fieldName]', function(){
+                scope.radioValue['id'] = scope.getId(scope.getValue(scope.fieldName));
+            });
+
             scope.getInputTpl = function(inputType) {
                 return url.tpl('fields/{0}.tpl.html'.format(inputType));
             };
 
             scope.anyBillableItemPayed = function(userdata) {
-                if (userdata.payed) {
+                if (userdata.paid) {
                     var item = _.find(scope.field.values.radioitems, function(item) {
                         return item.caption == userdata[scope.getName(scope.field.input)];
                     }) || {};
@@ -426,10 +435,10 @@ ndRegForm.directive('ndRadioField', function(url) {
             };
 
             scope.getValue = function(fieldName) {
-                if (scope.userdata[fieldName] !== undefined) {
-                    return scope.userdata[fieldName];
-                } else {
+                if (!scope.userdata[fieldName] || scope.userdata[fieldName] === '') {
                     return scope.field.values.defaultItem;
+                } else {
+                    return scope.userdata[fieldName];
                 }
             };
 

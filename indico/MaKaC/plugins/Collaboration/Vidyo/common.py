@@ -297,7 +297,7 @@ class VidyoError(CSErrorBase):
                 return _("The user selected as owner has no login information")
 
             elif self._errorType == "notValidRoom" and self._operation == "attach":
-                return _("The room with that name does not exist or you are not the owner. Please select another one.")
+                return _("Either there is no room with this name or you are not its owner. Please select another one.")
 
             else:
                 return self._errorType

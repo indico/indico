@@ -1,4 +1,4 @@
-<div ng-switch="userdata[fieldName] !== undefined">
+<div ng-switch="userdata[fieldName] !== undefined && userdata[fieldName] !== null">
     <div ng-switch-default>
         <ng-form name="nestedForm">
             <input type="file" nd-valid-file

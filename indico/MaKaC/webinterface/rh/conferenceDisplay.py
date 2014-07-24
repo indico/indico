@@ -427,9 +427,11 @@ class RHRelativeEvent(RHConferenceBaseDisplay):
             return WPError404(self, urlHandlers.UHConferenceDisplay.getURL(self._conf)).display()
 
 
-class RHConferenceOtherViews(RHConferenceBaseDisplay ):
-    """this class is for the conference type objects only
-    it is an alternative to the standard TimeTable view"""
+class RHConferenceOtherViews(RHConferenceBaseDisplay):
+    """
+    this class is for the conference type objects only
+    it is an alternative to the standard TimeTable view
+    """
     _uh = urlHandlers.UHConferenceOtherViews
 
     def _process( self ):
@@ -455,15 +457,15 @@ class RHConferenceOtherViews(RHConferenceBaseDisplay ):
             view = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).getDefaultStyle()
             # if no default view was attributed, then get the configuration default
             if view == "":
-                view =styleMgr.getDefaultStyleForEventType( type )
-                displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).setDefaultStyle( view )
+                view =styleMgr.getDefaultStyleForEventType(type)
+                displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target).setDefaultStyle(view)
         # create the html factory
         if view in styleMgr.getXSLStyles() and isLibxml:
-            p = conferences.WPXSLConferenceDisplay( self, self._target, view, type, self._reqParams )
+            p = conferences.WPXSLConferenceDisplay(self, self._target, view, type, self._reqParams)
         elif view != "static":
-            p = conferences.WPTPLConferenceDisplay( self, self._target, view, type, self._reqParams )
+            p = conferences.WPTPLConferenceDisplay(self, self._target, view, type, self._reqParams)
         else:
-            p = conferences.WPMeetingTimeTable( self, self._target,"parallel","meeting",self._reqParams )
+            p = conferences.WPMeetingTimeTable(self, self._target, "parallel", "meeting", self._reqParams)
         # generate the html
         if view == "xml" and self._reqParams.get('fr') == 'no':
             self._responseUtil.content_type = 'text/xml'

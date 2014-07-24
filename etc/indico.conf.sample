@@ -182,6 +182,7 @@ MaxUploadFilesTotalSize = 0
 
 MaxUploadFileSize = 0
 
+
 #------------------------------------------------------------------------------
 # FILE CONVERSION
 #------------------------------------------------------------------------------
@@ -193,6 +194,17 @@ MaxUploadFileSize = 0
 #   indico-team@cern.ch
 #
 # FileConverter        = {"conversion_server": "localhost", "response_url": "http://localhost/conversion-finished"}
+
+
+#------------------------------------------------------------------------------
+# CATEGORY CLEANUP
+#------------------------------------------------------------------------------
+# Indico can automatically delete events older than a specified number of days.
+# This is set on a per-category basis:
+#
+# CategoryCleanup = {
+#   '2': 30  # delete events in category '2' that have been created more than 30 days ago
+# }
 
 
 #------------------------------------------------------------------------------
@@ -311,6 +323,18 @@ AuthenticatorList    = [('Local', {})]
 
 
 #------------------------------------------------------------------------------
+# LOGGING
+#------------------------------------------------------------------------------
+# Indico lets you log error messages using two methods:
+#
+#  * Simple log files (default)
+#  * Sentry (https://github.com/getsentry/sentry)
+#
+# Loggers              = ['sentry', 'files']
+# SentryDSN            = 'http://user:password@logger.example.com/n'
+
+
+#------------------------------------------------------------------------------
 # OFFLINE WEBSITE PACKAGES CREATION
 #------------------------------------------------------------------------------
 # Indico allows users to download their event so they can run it offline.
@@ -333,7 +357,6 @@ AuthenticatorList    = [('Local', {})]
 # you have old contributions that contain invalid LaTeX and you prefer possibly
 # weird-looking PDFs over an error and no PDF at all.
 # StrictLatex = True
-
 
 
 #------------------------------------------------------------------------------

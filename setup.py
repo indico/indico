@@ -51,8 +51,6 @@ except ImportError:
 
 DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras"]
 
-DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor', 'werkzeug', 'nodeenv', 'fabric', 'sphinx', 'repoze.sphinx.autointerface']
-
 if sys.platform == 'linux2':
     import pwd
     import grp
@@ -72,6 +70,11 @@ class vars(object):
 
 
 ###  Methods required by setup() ##############################################
+
+def read_requirements_file(fname):
+    with open(fname, 'r') as f:
+        return [dep.strip() for dep in f.readlines() if not (dep.startswith('-') or '://' in dep)]
+
 
 def _generateDataPaths(x):
 
@@ -123,8 +126,7 @@ def _getInstallRequires():
 
     These are the ones needed for runtime."""
 
-    with open(os.path.join(os.path.dirname(__file__), 'requirements.txt'), 'r') as f:
-        base = [dep.strip() for dep in f.readlines() if not (dep.startswith('-') or '://' in dep)]
+    base = read_requirements_file(os.path.join(os.path.dirname(__file__), 'requirements.txt'))
 
     return base
 
@@ -181,7 +183,7 @@ class develop_indico(develop.develop):
 
         # install dev dependencies
         env = pkg_resources.Environment()
-        easy_install.main(DEVELOP_REQUIRES)
+        easy_install.main(read_requirements_file(os.path.join(os.path.dirname(__file__), 'requirements.dev.txt')))
         env.scan()
 
 
@@ -496,7 +498,7 @@ if __name__ == '__main__':
           author="Indico Team",
           author_email="indico-team@cern.ch",
           url="http://indico-software.org",
-          download_url="http://indico-software.org/wiki/Releases/Indico1.1",
+          download_url="http://indico-software.org/wiki/Releases/Indico1.2",
           platforms=["any"],
           long_description="Indico allows you to schedule conferences, from single talks to complex meetings with "
                            "sessions and contributions. It also includes an advanced user delegation mechanism, "

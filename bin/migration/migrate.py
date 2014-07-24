@@ -46,7 +46,7 @@ from indico.web.flask.app import make_app
 from MaKaC import __version__
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import ConferenceHolder, CategoryManager
-from MaKaC.plugins.base import PluginsHolder
+from MaKaC.plugins.base import PluginsHolder, Plugin, PluginType
 from MaKaC.plugins.Collaboration import urlHandlers
 from MaKaC.webinterface import displayMgr
 from MaKaC.authentication.LocalAuthentication import LocalAuthenticator, LocalIdentity
@@ -58,6 +58,10 @@ from MaKaC.review import AbstractField
 MIGRATION_TASKS = []
 
 i18n.setLocale('en_GB')
+
+
+class ControlledExit(Exception):
+    pass
 
 
 def since(version, always=False, never=False):
@@ -138,6 +142,21 @@ def catalogMigration(dbi, prevVersion):
     """
     Initializing/updating index catalog
     """
+    PluginsHolder().reloadAllPlugins(disable_if_broken=False)
+    skip = False
+
+    for plugin in (p for p in PluginsHolder().getList() if isinstance(p, Plugin) or isinstance(p, PluginType)):
+        if plugin.isActive() and not plugin.isUsable():
+            print console.colored(
+                "\r  Plugin '{0}' is going to be disabled: {1}".format(
+                    plugin.getName(),
+                    plugin.getNotUsableReason()
+                ), 'yellow')
+            skip = True
+
+    if skip and not console.yesno('\r  Do you want to continue the migration anyway?'):
+        raise ControlledExit()
+
     Catalog.updateDB(dbi=dbi)
 
 
@@ -330,7 +349,7 @@ def lowercaseLDAPIdentities(dbi, prevVersion):
     dbi.commit()
 
 
-@since('1.2')
+@since('1.9')
 def reindexCategoryNameAndConferenceTitle(dbi, prevVersion):
     """
     Indexing Conference Title with new WhooshTextIndex
@@ -526,10 +545,12 @@ concurrency problems and DB conflicts.\n\n""", 'yellow')
                                         specified=filter(None, map(str.strip, args.specified.split(','))),
                                         run_from=args.run_from,
                                         dry_run=args.dry_run)
-        except:
-            print console.colored("\nMigration failed! DB may be in "
-                                  " an inconsistent state:", 'red', attrs=['bold'])
+        except ControlledExit:
+            return 1
+        except (Exception, SystemExit, KeyboardInterrupt):
+            print console.colored("\nMigration failed! DB may be in an inconsistent state:", 'red', attrs=['bold'])
             print console.colored(traceback.format_exc(), 'red')
+            return -1
     else:
         return 1
 

@@ -376,7 +376,7 @@
 
                     <div id="editor" style="margin-bottom: 10px"></div>
                     <script type="text/javascript">
-                        var editor = new RichTextEditor(600, 300, 'IndicoFull');
+                        var editor = new RichTextEditor(600, 300);
                             $E('editor').set(editor.draw());
                             editor.set('${ escapeHTMLForJS(option.getValue()) }');
                             var fillText = function(text){

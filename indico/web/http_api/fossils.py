@@ -21,7 +21,9 @@
 Basic fossils for data export
 """
 
-from indico.util.fossilize import IFossil, fossilize
+from hashlib import md5
+
+from indico.util.fossilize import IFossil
 from indico.util.fossilize.conversion import Conversion
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.linking import RoomLinker
@@ -80,6 +82,7 @@ class ICategoryMetadataFossil(IFossil):
     getLocator.convert = Conversion.url(urlHandlers.UHCategoryDisplay)
     getLocator.name = 'url'
 
+
 class ICategoryProtectedMetadataFossil(ICategoryMetadataFossil):
     def getName(self):
         pass
@@ -96,6 +99,11 @@ class IConferenceChairMetadataFossil(IFossil):
 
     def getEmail(self):
         pass
+    getEmail.onlyIf = 'canModify'
+
+    def getEmailHash(self):
+        pass
+    getEmailHash.produce = lambda s: md5(s.getEmail()).hexdigest()
 
     def getAffiliation(self):
         pass
@@ -111,6 +119,11 @@ class IContributionParticipationMetadataFossil(IFossil):
 
     def getEmail(self):
         pass
+    getEmail.onlyIf = 'canModify'
+
+    def getEmailHash(self):
+        pass
+    getEmailHash.produce = lambda s: md5(s.getEmail()).hexdigest()
 
     def getAffiliation(self):
         pass
@@ -120,6 +133,7 @@ class IResourceMetadataFossil(IFossil):
 
     def getName(self):
         pass
+
 
 class ILocalFileMetadataFossil(IResourceMetadataFossil):
 
@@ -140,6 +154,7 @@ class ILinkMetadataFossil(IResourceMetadataFossil):
     def getURL(self):
         pass
     getURL.name = 'url'
+
 
 class IMaterialMetadataFossil(IFossil):
 

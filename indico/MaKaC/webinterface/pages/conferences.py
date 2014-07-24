@@ -464,7 +464,8 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         adjusted_eDate = self._conf.getAdjustedScreenEndDate(tz)
 
         vars["timezone"] = tz
-        vars["confDateInterval"] = i18nformat("""_("from") %s _("to") %s (%s)""")%(format_date(adjusted_sDate, format='long'), format_date(adjusted_eDate, format='long'), tz)
+        vars["confDateInterval"] = i18nformat("""_("from") %s _("to") %s""") % (
+            format_date(adjusted_sDate, format='long'), format_date(adjusted_eDate, format='long'))
         if adjusted_sDate.strftime("%d%B%Y") == \
                 adjusted_eDate.strftime("%d%B%Y"):
             vars["confDateInterval"] = format_date(adjusted_sDate, format='long')
@@ -762,12 +763,13 @@ class WPEMail ( WPConferenceDefaultDisplayBase ):
         params["ccDisabled"] = True
         return wc.getHTML(params)
 
-class WPXSLConferenceDisplay( WPConferenceBase ):
+class WPXSLConferenceDisplay(WPConferenceBase):
+    """
+    Use this class just to transform to XML
+    """
 
-    """ Use this class just to transform to XML"""
-
-    def __init__( self, rh, conference, view, type, params ):
-        WPConferenceBase.__init__( self, rh, conference )
+    def __init__(self, rh, conference, view, type, params):
+        WPConferenceBase.__init__(self, rh, conference)
         self._params = params
         self._view = view
         self._conf = conference
@@ -780,20 +782,20 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         if wm.isManager(self._getAW().getUser()):
             self._webcastadd = True
 
-    def _getFooter( self ):
+    def _getFooter(self):
         """
         """
         return ""
 
-    def _getHTMLHeader( self ):
+    def _getHTMLHeader(self):
         return ""
 
-    def _applyDecoration( self, body ):
+    def _applyDecoration(self, body):
         """
         """
         return body
 
-    def _getHTMLFooter( self ):
+    def _getHTMLFooter(self):
         return ""
 
     def _getBodyVariables(self):
@@ -815,7 +817,7 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
             pars['webcastAdminURL'] = urladdwebcast
         return pars
 
-    def _getBody( self, params ):
+    def _getBody(self, params):
         body_vars = self._getBodyVariables()
         view = self._view
         outGen = outputGenerator(self._getAW())
@@ -832,17 +834,19 @@ class WPXSLConferenceDisplay( WPConferenceBase ):
         else:
             return _("Cannot find the %s stylesheet") % view
 
-    def _defineSectionMenu( self ):
+    def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._overviewOpt)
 
+
 class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
-    """Overrides XSL related functions in WPXSLConferenceDisplay
+    """
+    Overrides XSL related functions in WPXSLConferenceDisplay
     class and re-implements them using normal Indico templates.
     """
 
-    def __init__( self, rh, conference, view, type, params ):
-        WPXSLConferenceDisplay.__init__( self, rh, conference, view, type, params )
+    def __init__(self, rh, conference, view, type, params):
+        WPXSLConferenceDisplay.__init__(self, rh, conference, view, type, params)
         imagesBaseURL = Config.getInstance().getImagesBaseURL()
         self._types = {
             "pdf"   :{"mapsTo" : "pdf",   "imgURL" : os.path.join(imagesBaseURL, "pdf_small.png"),  "imgAlt" : "pdf file"},
@@ -863,34 +867,34 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         }
 
     def _getVariables(self, conf):
-        vars = {}
+        wvars = {}
         styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
-        vars['INCLUDE'] = '../include'
+        wvars['INCLUDE'] = '../include'
 
-        vars['accessWrapper'] = accessWrapper = self._rh._aw
-        vars['conf'] = conf
+        wvars['accessWrapper'] = accessWrapper = self._rh._aw
+        wvars['conf'] = conf
         if conf.getOwnerList():
-            vars['category'] = conf.getOwnerList()[0].getName()
+            wvars['category'] = conf.getOwnerList()[0].getName()
         else:
-            vars['category'] = ''
+            wvars['category'] = ''
 
         timezoneUtil = DisplayTZ(accessWrapper, conf)
         tz = timezoneUtil.getDisplayTZ()
-        vars['startDate'] = conf.getAdjustedStartDate(tz)
-        vars['endDate'] = conf.getAdjustedEndDate(tz)
-        vars['timezone'] = tz
+        wvars['startDate'] = conf.getAdjustedStartDate(tz)
+        wvars['endDate'] = conf.getAdjustedEndDate(tz)
+        wvars['timezone'] = tz
 
         if conf.getParticipation().displayParticipantList() :
-            vars['participants']  = conf.getParticipation().getPresentParticipantListText()
+            wvars['participants']  = conf.getParticipation().getPresentParticipantListText()
 
         wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        vars['webcastOnAirURL'] = wm.isOnAir(conf)
+        wvars['webcastOnAirURL'] = wm.isOnAir(conf)
         forthcomingWebcast = wm.getForthcomingWebcast(conf)
-        vars['forthcomingWebcast'] = forthcomingWebcast
+        wvars['forthcomingWebcast'] = forthcomingWebcast
         if forthcomingWebcast:
-            vars['forthcomingWebcastURL'] = wm.getWebcastServiceURL(forthcomingWebcast)
+            wvars['forthcomingWebcastURL'] = wm.getWebcastServiceURL(forthcomingWebcast)
 
-        vars['files'] = {}
+        wvars['files'] = {}
         lectureTitles = ['part%s' % nr for nr in xrange(1, 11)]
         materials, lectures, minutesText = [], [], []
         for material in conf.getAllMaterialList():
@@ -901,24 +905,24 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             elif material.getTitle() != "Internal Page Files":
                 materials.append(material)
 
-        vars['materials'] = materials
-        vars['minutesText'] = minutesText
+        wvars['materials'] = materials
+        wvars['minutesText'] = minutesText
         byTitleNumber = lambda x, y: int(x.getTitle()[4:]) - int(y.getTitle()[4:])
-        vars['lectures'] = sorted(lectures, cmp=byTitleNumber)
+        wvars['lectures'] = sorted(lectures, cmp=byTitleNumber)
 
         if (conf.getType() in ("meeting", "simple_event")
                 and conf.getParticipation().isAllowedForApplying()
                 and conf.getStartDate() > nowutc()
                 and not conf.getParticipation().isFull()):
-            vars['registrationOpen'] = True
+            wvars['registrationOpen'] = True
         evaluation = conf.getEvaluation()
         if evaluation.isVisible() and evaluation.inEvaluationPeriod() and evaluation.getNbOfQuestions() > 0:
-            vars['evaluationLink'] = urlHandlers.UHConfEvaluationDisplay.getURL(conf)
-        vars['supportEmailCaption'] = conf.getSupportInfo().getCaption()
+            wvars['evaluationLink'] = urlHandlers.UHConfEvaluationDisplay.getURL(conf)
+        wvars['supportEmailCaption'] = conf.getSupportInfo().getCaption()
 
-        vars['types'] = self._types
+        wvars['types'] = self._types
 
-        vars['entries'] = []
+        wvars['entries'] = []
         confSchedule = conf.getSchedule()
         showSession = self._params.get("showSession","all")
         detailLevel = self._params.get("detailLevel", "contribution")
@@ -942,19 +946,19 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                     newItem = entry
                 else:
                     newItem = entry.getOwner()
-                vars['entries'].append(newItem)
+                wvars['entries'].append(newItem)
 
-        vars["pluginDetails"] = "".join(self._notify('eventDetailBanner', self._conf))
+        wvars["pluginDetails"] = "".join(self._notify('eventDetailBanner', self._conf))
         pluginDetailsSessionContribs = {}
         self._notify('detailSessionContribs', self._conf, pluginDetailsSessionContribs)
-        vars["pluginDetailsSessionContribs"] = pluginDetailsSessionContribs
-        vars["daysPerRow"] = self._daysPerRow
-        vars["firstDay"] = self._firstDay
-        vars["lastDay"] = self._lastDay
-        vars["currentUser"] = self._rh._aw.getUser()
-        vars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
+        wvars["pluginDetailsSessionContribs"] = pluginDetailsSessionContribs
+        wvars["daysPerRow"] = self._daysPerRow
+        wvars["firstDay"] = self._firstDay
+        wvars["lastDay"] = self._lastDay
+        wvars["currentUser"] = self._rh._aw.getUser()
+        wvars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
 
-        return vars
+        return wvars
 
     def _getMaterialFiles(self, material):
         files = []
