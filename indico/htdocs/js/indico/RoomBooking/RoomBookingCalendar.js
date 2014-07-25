@@ -278,12 +278,16 @@ type ("RoomBookingCalendarDrawer", [],
                 });
 
                 if(bar.inDB) {
-                    barDiv.observeClick(function(){
-                        window.location = bar.url;
+                    $(barDiv.dom).on('click', function() {
+                        if (self.data.openDetailsInNewTab) {
+                            window.open(bar.url);
+                        }
+                        else {
+                            location.href = bar.url;
+                        }
                     });
                 }
-
-                if (bar.type == 'barCand' && showCandidateTip) {
+                else if (bar.type == 'barCand' && showCandidateTip) {
                     $(barDiv.dom).click(function(){
                         self._ajaxClick(bar, $(this));
                     });
@@ -717,11 +721,9 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                 // Conflict, prebooking conflict and concurrent prebooking bars don't represent bookings.
                 // They're added to the calendar to highlight some events.
                 if(!(bar.type == 'barPreC' || bar.type == 'barConf' || bar.type == 'barPreConc' || bar.type == 'barCand')) {
-                    var showBookingLink = Html.p({className:"fakeLink"}, $T("Show"));
-                    showBookingLink.observeClick(function(){
-                        window.open(bar.url);
-                    });
+                    var showBookingLink = Html.a({href:bar.url}, $T("Show"));
                     var rejectionLink;
+                    // XXX is this still used?
                     if (bar.canReject){
                         rejectionLink = Html.p({className:"fakeLink"},$T("Reject"));
                         rejectionLink.observeClick(function() {
@@ -740,7 +742,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
 
                     var attrs = {}, cursorStyle = '';
                     if(bar.inDB || bar.type == 'barCand') {
-                        attrs.onclick = "window.location='" + bar.url + "';";
+                        attrs.onclick = "window.open(" + JSON.stringify(bar.url) + ");";
                         cursorStyle = 'pointer';
                     }
                     return Html.div({ onmouseover : "this.style.backgroundColor='#f0f0f0';", onmouseout : "this.style.backgroundColor='#ffffff';", style:{clear:'both', overflow:'auto', cursor:cursorStyle}},
@@ -839,6 +841,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                     });
                     var content = Html.div({});
                     var rejectAllDiv = null;
+                    // XXX I'm pretty sure this it no used anymore
                     if (this.rejectAllLink) {
                         rejectAllDiv = Html.div({className:"fakeLink", style:{width:pixels(800), textAlign:"center", paddingBottom:pixels(10)}},
                                 $T("Reject ALL Conflicting PRE-Bookings"));
@@ -1062,6 +1065,7 @@ type ("RoomBookingCalendar", [],
                 finishDate: null,
                 flexibleDays: 0,
                 rejectAllLink: '',
+                openDetailsInNewTab: false, // open reservation details when clicking a bar in a new tab
                 showLegend: true,
                 showSummary: true, // "display booking summary" link on the bottom
                 showNavBar: true, // the "< date >" navbar and the filter button

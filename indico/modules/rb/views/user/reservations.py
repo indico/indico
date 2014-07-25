@@ -136,7 +136,7 @@ class WPRoomBookingNewBookingSelectPeriod(WPRoomBookingNewBookingBase):
                                              candidates=params['candidates'], rooms=params['rooms'],
                                              repeat_unit=params['repeat_unit'], repeat_step=params['repeat_step'],
                                              flexible_days=params['flexible_days'])
-        params['calendar'] = calendar.render(show_summary=False, can_navigate=False)
+        params['calendar'] = calendar.render(show_summary=False, can_navigate=False, details_in_new_tab=True)
         return WTemplated('RoomBookingNewBookingSelectPeriod').getHTML(params)
 
 
@@ -162,7 +162,7 @@ class WPRoomBookingNewBookingSimple(WPRoomBookingNewBookingBase):
                                                  candidates=params['candidates'],
                                                  specific_room=params['room'], repeat_unit=params['repeat_unit'],
                                                  repeat_step=params['repeat_step'])
-            params['calendar'] = calendar.render(show_navbar=False)
+            params['calendar'] = calendar.render(show_navbar=False, details_in_new_tab=True)
         else:
             params['calendar'] = ''
         return WTemplated('RoomBookingBookingForm').getHTML(params)
@@ -178,5 +178,5 @@ class WPRoomBookingModifyBooking(WPRoomBookingBase):
         calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
                                              candidates=params['candidates'], specific_room=params['room'],
                                              repeat_unit=params['repeat_unit'], repeat_step=params['repeat_step'])
-        params['calendar'] = calendar.render(show_navbar=False)
+        params['calendar'] = calendar.render(show_navbar=False, details_in_new_tab=True)
         return WTemplated('RoomBookingBookingForm').getHTML(params)

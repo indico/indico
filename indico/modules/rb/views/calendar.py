@@ -74,7 +74,7 @@ class RoomBookingCalendarWidget(object):
         self._produce_bars()
 
     def render(self, show_empty_rooms=True, show_empty_days=True, form_data=None, show_summary=True, show_navbar=True,
-               can_navigate=True):
+               can_navigate=True, details_in_new_tab=False):
         bars = self.build_bars_data(show_empty_rooms, show_empty_days)
         days = self.build_days_attrs() if self.specific_room and bars else {}
 
@@ -91,6 +91,7 @@ class RoomBookingCalendarWidget(object):
             'show_summary': show_summary,
             'show_navbar': show_navbar,
             'can_navigate': show_navbar and can_navigate,
+            'details_in_new_tab': details_in_new_tab,
             'repeat_unit': self.repeat_unit,
             'flexible_days': self.flexible_days
         })

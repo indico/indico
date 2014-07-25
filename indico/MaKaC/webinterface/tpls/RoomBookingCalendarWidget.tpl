@@ -26,6 +26,7 @@
         repeatUnit: ${ repeat_unit | n, j },
         flexibleDays: ${ flexible_days | n, j },
         rejectAllLink: '',
+        openDetailsInNewTab: ${ details_in_new_tab | n, j },
         showSummary: ${ show_summary | n, j },
         showNavBar: ${ show_navbar | n, j },
         canNavigate: ${ can_navigate | n, j }
