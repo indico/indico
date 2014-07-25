@@ -25,18 +25,6 @@ var DAY_WIDTH_PX = 35 * 12 * 2;
 // Room types, used for selecting proper CSS classes
 var barClasses = ['barBlocked', 'barPreB', 'barPreConc', 'barUnaval', 'barCand', 'barPreC', 'barConf'];
 
-
-// Compares two rooms. Mainly used for sorting.
-function compareRooms(elem1, elem2){
-    if (elem1.room.building != elem2.room.building)
-        return IndicoUtil.compare(elem1.room.building, elem2.room.building);
-    if (elem1.room.floor != elem2.room.floor)
-        return IndicoUtil.compare(elem1.room.floor, elem2.room.floor);
-    if (elem1.room.number != elem2.room.number)
-        return IndicoUtil.compare(elem1.room.number, elem2.room.number);
-    return 0;
-}
-
 var calendarLegend = Html.div({style:{clear: 'both', padding: pixels(5), marginBottom: pixels(10), border: "1px solid #eaeaea", borderRadius: pixels(2)}},
         Html.div( {className:'barLegend', style:{color: 'black'}}, $T('Legend:')),
         Html.div( {className:'barLegend barCand'}, $T('Available')),
@@ -46,6 +34,18 @@ var calendarLegend = Html.div({style:{clear: 'both', padding: pixels(5), marginB
         Html.div( {className:'barLegend barPreC', style:{color: 'white'}}, $T('Conflict with PRE-Booking')),
         Html.div( {className:'barLegend barPreConc', style:{color: 'white'}}, $T('Concurrent PRE-Bookings')),
         Html.div( {className:'barLegend barBlocked'}, $T('Blocked')));
+
+
+function compare_alphanum(elem1, elem2) {
+    var i_elem1 = parseInt(elem1),
+        i_elem2 = parseInt(elem2);
+
+    elem1 = isNaN(i_elem1) ? elem1.toLowerCase() : i_elem1;
+    elem2 = isNaN(i_elem2) ? elem2.toLowerCase() : i_elem2;
+
+    return elem1 == elem2 ? 0 : (elem1 < elem2 ? -1 : 1);
+}
+
 
 /**
  * Represents a single room in the roombooking
@@ -658,6 +658,7 @@ type ("RoomBookingSingleRoomCalendarDrawer", ["RoomBookingCalendarDrawer"],
             this.room = this.data.days.length > 0?this.data.days[0].rooms[0].room:null;
         });
 
+
 /**
  * Object used to draw roombooking summary out of reservation data.
  * @params {RoomBookingCalendarData} data reservations data
@@ -668,46 +669,44 @@ type ("RoomBookingCalendarSummaryDrawer", [],
              * Draws reservations list sorted by specified order
              * @param {string} sortBy sorting order
              */
-            drawBars: function( sortBy ) {
+
+            COMPARE_FUNCTIONS: {
+                room: function (elem1, elem2){
+                    if (elem1.room.building != elem2.room.building) {
+                        return compare_alphanum(elem1.room.building, elem2.room.building);
+                    } else if (elem1.room.floor != elem2.room.floor) {
+                        return compare_alphanum(elem1.room.floor, elem2.room.floor);
+                    } else if (elem1.room.number != elem2.room.number) {
+                        return compare_alphanum(elem1.room.number, elem2.room.number);
+                    }
+
+                    return 0;
+                },
+                date: function(elem1, elem2){
+                    return compare_alphanum(elem1.startDT.print("%y%m%d"), elem2.startDT.print("%y%m%d"));
+                },
+                time: function(elem1, elem2){
+                    return compare_alphanum(elem1.startDT.print("%H%M"), elem2.startDT.print("%H%M"));
+                },
+                owner: function(elem1, elem2) {
+                    return compare_alphanum(elem1.owner, elem2.owner);
+                },
+                reason: function(elem1, elem2) {
+                    return compare_alphanum(elem1.reason, elem2.reason);
+                },
+            },
+
+            drawBars: function(sortBy) {
                 var self = this;
-                var ascending = this.sortedBy == sortBy?-this.ascendingSort:1;
-                var sortFunc;
-                var barsDiv = [];
-                switch( sortBy ){
-                    case "reason":
-                        sortFunc = function(elem1, elem2){
-                            return ascending * IndicoUtil.compare(elem1.reason, elem2.reason);
-                        };
-                        break;
-                    case "owner":
-                        sortFunc = function(elem1, elem2){
-                            return ascending * IndicoUtil.compare(elem1.owner, elem2.owner);
-                        };
-                        break;
-                    case "date":
-                        sortFunc = function(elem1, elem2){
-                            return ascending * IndicoUtil.compare(elem1.startDT.print("%y%m%d"), elem2.startDT.print("%y%m%d"));
-                        };
-                        break;
-                    case "time":
-                        sortFunc = function(elem1, elem2){
-                            return ascending * IndicoUtil.compare(elem1.startDT.print("%H%M"), elem2.startDT.print("%H%M"));
-                        };
-                        break;
-                    case "name":
-                        sortFunc = function(elem1, elem2){
-                            return ascending * compareRooms(elem1, elem2);
-                        };
-                        break;
-                }
-                if(sortFunc)
-                    this.bars.sort(sortFunc);
-                    each(this.bars, function(bar) {
-                        barsDiv.push(self.drawReservation(bar));
-                    });
+
+                sortBy = sortBy || 'room';
+
+                this.bars.sort(function (elem1, elem2) {
+                    return self.ascendingSort * self.COMPARE_FUNCTIONS[sortBy](elem1, elem2);
+                });
+
                 this.sortedBy = sortBy;
-                this.ascendingSort = ascending;
-                return barsDiv;
+                return _.map(this.bars, this.drawReservation.bind(this));
             },
 
             /**
@@ -760,71 +759,53 @@ type ("RoomBookingCalendarSummaryDrawer", [],
              * Draws the header and the body of the summary
              */
             drawSummary: function(){
-                var self = this;
-                var arrows = {
-                    "name" : [Html.img({src:imageSrc("downArrow.png"), style:{display:"none"}}),
-                              Html.img({src:imageSrc("upArrow.png"), style:{display:"inline"}})],
-                    "owner" : [Html.img({src:imageSrc("downArrow.png"), style:{display:"none"}}),
-                              Html.img({src:imageSrc("upArrow.png"), style:{display:"none"}})],
-                    "reason" : [Html.img({src:imageSrc("downArrow.png"), style:{display:"none"}}),
-                              Html.img({src:imageSrc("upArrow.png"), style:{display:"none"}})],
-                    "date" : [Html.img({src:imageSrc("downArrow.png"), style:{display:"none"}}),
-                              Html.img({src:imageSrc("upArrow.png"), style:{display:"none"}})],
-                    "time" : [Html.img({src:imageSrc("downArrow.png"), style:{display:"none"}}),
-                              Html.img({src:imageSrc("upArrow.png"), style:{display:"none"}})]
-                };
-                var hideArrows = function(){
-                    each(arrows, function(arrowArray){
-                        arrowArray[0].dom.style.display = "none";
-                        arrowArray[1].dom.style.display = "none";
+
+                var self = this,
+                    sort_links = {},
+                    header = $('<div class="booking-list-header">');
+
+                function draw_sort_link(criterion, caption) {
+                    return $('<a href="#"/ class="sort-link sort-link-' + criterion + '">').append(
+                        caption,
+                        $('<img class="arrow arrow-up"/>').attr('src', imageSrc('upArrow.png')).hide(),
+                        $('<img class="arrow arrow-down"/>').attr('src', imageSrc('downArrow.png')).hide()
+                    ).click(function() {
+                        var $this = $(this);
+
+                        self.ascendingSort = self.sortedBy == criterion ? -self.ascendingSort : 1;
+
+                        // toggle arrow
+                        header.find('.arrow').hide();
+                        $this.find(self.ascendingSort == 1 ? '.arrow-up' : '.arrow-down').show();
+
+                        self.barsDiv.set(self.drawBars(criterion));
+
+                        return false;
                     });
-                };
+                }
 
-                var sortByRoomLink = Html.p({className:"fakeLink", style:{cssFloat:'left', width: pixels(175)}},$T("Room "), arrows["name"]);
-                sortByRoomLink.observeClick(function(){
-                    self.barsDiv.set(self.drawBars("name"));
-                    hideArrows();
-                    arrows["name"][self.ascendingSort == 1?1:0].dom.style.display = 'inline';
-                });
+                this.ascendingSort = 1;
 
-                var sortByOwnerLink = Html.span({className:"fakeLink"},$T("For whom "), arrows["owner"]);
-                sortByOwnerLink.observeClick(function(){
-                    self.barsDiv.set(self.drawBars("owner"));
-                    hideArrows();
-                    arrows["owner"][self.ascendingSort == 1?1:0].dom.style.display = 'inline';
-                });
+                [['room', $T('Room')],
+                   ['reason', $T('Reason')],
+                   ['owner', $T('Booked for')],
+                   ['date', $T('Date')],
+                   ['time', $T('Time')]].forEach(function(el) {
+                       sort_links[el[0]] = draw_sort_link(el[0], el[1]);
+                   });
 
-                var sortByReasonLink = Html.span({className:"fakeLink"},$T("Reason "), arrows["reason"]);
-                sortByReasonLink.observeClick(function(){
-                    self.barsDiv.set(self.drawBars("reason"));
-                    hideArrows();
-                    arrows["reason"][self.ascendingSort == 1?1:0].dom.style.display = 'inline';
-                });
+                sort_links.room.find('.arrow-up').show();
 
-                var sortByDateLink = Html.p({className:"fakeLink", style:{cssFloat:'left', width: pixels(90)}},$T("Date "), arrows["date"]);
-                sortByDateLink.observeClick(function(){
-                    self.barsDiv.set(self.drawBars("date"));
-                    hideArrows();
-                    arrows["date"][self.ascendingSort == 1?1:0].dom.style.display = 'inline';
-                });
+                header.append(sort_links.room,
+                              $('<span class="sort-link sort-link-reason-for"/>').append(
+                                  sort_links.reason, ' / ', sort_links.owner),
+                              sort_links.date,
+                              sort_links.time);
 
-                var sortByHourLink = Html.p({className:"fakeLink", style:{cssFloat:'left', width: pixels(75)}},$T("Hours "), arrows["time"]);
-                sortByHourLink.observeClick(function(){
-                    self.barsDiv.set(self.drawBars("time"));
-                    hideArrows();
-                    arrows["time"][self.ascendingSort == 1?1:0].dom.style.display = 'inline';
-                });
+                this.barsDiv = Html.div({}, this.drawBars("room"));
 
-                var header =  Html.div({ style:{clear:'both', overflow:'auto'}},
-                            sortByRoomLink,
-                            Html.p({style:{cssFloat:'left', width: pixels(350)}},sortByReasonLink, " / ", sortByOwnerLink),
-                            sortByDateLink,
-                            sortByHourLink
-                    );
+                return Html.div({}, new Html(header.get(0)), this.barsDiv);
 
-                this.barsDiv = Html.div({}, this.drawBars("name"));
-
-                return Html.div({}, header, this.barsDiv);
             },
 
             /**

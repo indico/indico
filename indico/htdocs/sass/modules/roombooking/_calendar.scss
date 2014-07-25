@@ -63,3 +63,38 @@
         vertical-align: middle;
     }
 }
+
+
+.booking-list-header {
+
+    margin-top: 2em;
+    padding-bottom: 0.2em;
+    clear: both;
+    overflow: auto;
+    border-bottom: 1px solid $gray;
+
+    .arrow {
+        margin-left: 0.2em;
+    }
+
+    .sort-link {
+        display: inline-block;
+    }
+
+    .sort-link-room {
+        width: 175px;
+    }
+
+    .sort-link-reason-for {
+        width: 350px;
+    }
+
+    .sort-link-date {
+        width: 90px;
+    }
+
+    .sort-link-time {
+        width: 75px;
+    }
+
+}
