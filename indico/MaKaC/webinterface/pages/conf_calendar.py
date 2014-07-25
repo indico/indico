@@ -32,7 +32,6 @@ from indico.core.config import Config
 from MaKaC import conference
 from copy import copy
 from MaKaC.common.Counter import Counter
-from MaKaC.common.utils import HolidaysHolder
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.errors import MaKaCError
 

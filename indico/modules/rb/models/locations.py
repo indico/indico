@@ -95,13 +95,6 @@ class Location(db.Model):
         lazy='dynamic'
     )
 
-    # attributes = db.relationship(
-    #     'LocationAttribute',
-    #     backref='location',
-    #     cascade='all, delete-orphan',
-    #     lazy='dynamic'
-    # )
-
     attributes = db.relationship(
         'RoomAttribute',
         backref='location',
@@ -119,6 +112,13 @@ class Location(db.Model):
         'equipment_objects',
         'name',
         creator=lambda name: RoomEquipment(name=name)
+    )
+
+    holidays = db.relationship(
+        'Holiday',
+        backref='location',
+        cascade='all, delete-orphan',
+        lazy='dynamic'
     )
 
     # core

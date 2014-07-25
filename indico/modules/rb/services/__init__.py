@@ -19,8 +19,8 @@
 
 from indico.util.date_time import get_datetime_from_request
 from indico.util.i18n import _
+from indico.modules.rb.models.holidays import Holiday
 from indico.modules.rb.models.utils import is_weekend
-from MaKaC.common.utils import HolidaysHolder
 from MaKaC.services.implementation.base import ServiceBase
 
 
@@ -32,8 +32,8 @@ class GetDateWarning(ServiceBase):
     def _getAnswer(self):
         if not self._start_dt or not self._end_dt:
             return ''
-        elif HolidaysHolder.isWorkingDay(self._start_dt) and HolidaysHolder.isWorkingDay(self._end_dt):
-            return ''
-        elif is_weekend(self._start_dt) or is_weekend(self._end_dt):
+        if Holiday.find(Holiday.date.in_([self._start_dt, self._end_dt])).count():
+            return _('Holidays chosen')
+        if is_weekend(self._start_dt) or is_weekend(self._end_dt):
             return _('Weekend chosen')
-        return _('Holidays chosen')
+        return ''

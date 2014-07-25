@@ -55,42 +55,6 @@ def isWeekend(d):
     return d.weekday() in [5, 6]
 
 
-# TODO: why don't we just use a set?
-HOLIDAYS_KEY = 'Holidays'
-class HolidaysHolder:
-
-    @classmethod
-    def isWorkingDay(cls, d):
-        if isinstance(d, datetime):
-            d = d.date()
-        if isWeekend(d):
-            return False
-        return not cls.__getBranch().has_key(d)
-
-    @classmethod
-    def getHolidays(cls):
-        """
-        Returns list of holidays
-        """
-        return cls.__getBranch().keys()
-
-    @classmethod
-    def insertHoliday(cls, d):
-        cls.__getBranch()[d] = None
-
-    @classmethod
-    def clearHolidays(cls):
-        root = DBMgr.getInstance().getDBConnection().root()
-        root[HOLIDAYS_KEY] = OOBTree()
-
-    @staticmethod
-    def __getBranch():
-        root = DBMgr.getInstance().getDBConnection().root()
-        if not root.has_key(HOLIDAYS_KEY):
-            root[HOLIDAYS_KEY] = OOBTree()
-        return root[HOLIDAYS_KEY]
-
-
 def stringToDate( str ):
     months = { "January":1, "February":2, "March":3, "April":4, "May":5, "June":6, "July":7, "August":8, "September":9, "October":10, "November":11, "December":12 }
     [ day, month, year ] = str.split("-")
