@@ -21,19 +21,17 @@
 Holder of rooms in a place and its map view related data
 """
 
+from collections import defaultdict
 from datetime import time
 
-from sqlalchemy import func, or_, and_
-from sqlalchemy.orm import aliased
-from sqlalchemy.sql.expression import select
+from sqlalchemy import func
 from sqlalchemy.ext.associationproxy import association_proxy
 
 from indico.core.db import db
+from indico.modules.rb.models.aspects import Aspect
+from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.util.i18n import _
 from indico.util.string import return_ascii
-from .aspects import Aspect
-from .room_equipments import RoomEquipment
-from .rooms import Room
 from MaKaC.common.Locators import Locator
 
 
@@ -80,7 +78,7 @@ class Location(db.Model):
         'Aspect',
         backref='location',
         cascade='all, delete-orphan',
-        primaryjoin=id == Aspect.location_id,
+        primaryjoin=(id == Aspect.location_id),
         lazy='dynamic',
     )
 
@@ -239,56 +237,19 @@ class Location(db.Model):
     def hasEquipment(self, name):
         return self.equipment_objects.filter_by(name=name).count() > 0
 
-    def getBuildings(self, with_rooms=True):
-        def get_subquery(column):
-            return select([column]).select_from(func.unnest(func.array_agg(getattr(Room, column))).alias(column)) \
-                                   .correlate(None)\
-                                   .where("{} != ''".format(column)) \
-                                   .limit(1) \
-                                   .as_scalar()
+    def get_buildings(self):
+        building_rooms = defaultdict(list)
+        for room in self.rooms.all():
+            building_rooms[room.building].append(room)
 
-        video_conference_equipment = self.equipment_objects \
-                                         .with_entities(RoomEquipment.id) \
-                                         .filter_by(name='Video conference') \
-                                         .as_scalar()
-
-        r = aliased(Room)
-        room_id_subquery = db.session.query(r) \
-                             .with_entities(r.id) \
-                             .correlate(Room) \
-                             .filter(
-                                 and_(
-                                     or_(
-                                         with_rooms,
-                                         r.equipments.any(video_conference_equipment)  # contains
-                                     ),
-                                     r.id.in_(
-                                         select(['e']).select_from(func.unnest(func.array_agg(Room.id)).alias('e'))
-                                                      .correlate(None)
-                                                      .as_scalar()
-                                     )
-                                 )
-                             ) \
-                             .as_scalar()
-
-        results = self.rooms \
-                      .with_entities(
-                          Room.building,
-                          func.array(room_id_subquery),
-                          get_subquery('longitude'),
-                          get_subquery('latitude')
-                      ) \
-                      .group_by(Room.building) \
-                      .all()
-
-        rooms = dict(self.rooms.with_entities(Room.id, Room).all())
-
-        res = [{
-            'number': building,
-            'title': _('Building {}').format(building),
-            'longitude': lo,
-            'latitude': la,
-            'rooms': [rooms[rid].to_serializable(attr='__public_exhaustive__') for rid in room_ids]
-        } for building, room_ids, lo, la in results if la and lo]
-
-        return res
+        buildings = []
+        for building_name, rooms in building_rooms.iteritems():
+            room_with_lat_lon = next((r for r in rooms if r.longitude and r.latitude), None)
+            if not room_with_lat_lon:
+                continue
+            buildings.append({'number': building_name,
+                              'title': _(u'Building {}'.format(building_name)),
+                              'longitude': room_with_lat_lon.longitude,
+                              'latitude': room_with_lat_lon.latitude,
+                              'rooms': [r.to_serializable('__public_exhaustive__') for r in rooms]})
+        return buildings

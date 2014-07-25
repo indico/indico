@@ -66,8 +66,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         if not html:
             default_location = Location.getDefaultLocation()
             aspects = default_location.getAspectsAsDictionary()
-            for_video_conference = request.args.get('avc') == 'y' and default_location.hasEquipment('Video conference')
-            buildings = default_location.getBuildings(with_rooms=not for_video_conference)
+            buildings = default_location.get_buildings()
             html = WPRoomBookingMapOfRoomsWidget(self,
                                                  aspects=aspects,
                                                  buildings=buildings,

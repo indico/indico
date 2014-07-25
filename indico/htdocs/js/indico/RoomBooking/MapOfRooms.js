@@ -141,6 +141,7 @@ type ("RoomMap", ["IWidget"],
                 this.map.setCenter(new google.maps.LatLng(aspect.center_latitude, aspect.center_longitude));
                 this.map.setZoom(aspect.zoom_level);
                 this.setSelectedAspectStyle(link);
+                return false;
             }, this);
         },
 

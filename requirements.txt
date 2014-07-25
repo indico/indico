@@ -46,7 +46,7 @@ bleach==1.4
 Flask-SQLAlchemy==1.0
 Flask-Testing==0.4
 Flask-WTF==0.9.4
-SQLAlchemy==0.9.3
+SQLAlchemy==0.9.7
 SQLAlchemy-Utils==0.26.6
 WTForms==1.0.5
 WTForms-Components==0.9.1
