@@ -421,7 +421,7 @@ class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBooki
             # otherwise default to reservation's
             self._room = self._reservation.room
         else:
-            self._room = Room.query.get(int(room_id))
+            self._room = Room.get(int(room_id))
 
         if self._room is None:
             raise NotFoundError('This room does not exist')
