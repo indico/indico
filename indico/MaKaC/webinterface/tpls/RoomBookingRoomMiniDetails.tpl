@@ -1,16 +1,16 @@
-<%page args="room=None, endpoints=None, event=None, booking_mode=False"/>
+<%page args="room=None, endpoints=None, event=None, allow_room_change=True, clone_booking=None"/>
 <table>
     <tr>
         <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
             ${ _('Name') }
         </td>
         <td align="left" class="blacktext">
-            % if booking_mode:
-                <a href="${ url_for(endpoints['room_details'], event, room) }">
-                    ${ room.getFullName() }
-                </a>
-            % else:
-                <select name="roomName" id="roomName" class="js-go-to-room" style="width:220px">
+            % if allow_room_change:
+                <select name="roomName" id="roomName" class="js-go-to-room" style="width:220px"
+                    % if clone_booking:
+                        data-clone-booking="${ clone_booking.id | n,j }"
+                    % endif
+                    >
                     % for roomItem in rooms:
                         <% selected = '' %>
                         % if room.name == roomItem.name:
@@ -22,6 +22,10 @@
                     % endfor
                 </select>
                 <a target="_blank" href="${ url_for(endpoints['room_details'], event, room) }">${ _('Full details') }</a>
+            % else:
+                <a href="${ url_for(endpoints['room_details'], event, room) }">
+                    ${ room.getFullName() }
+                </a>
             % endif
         </td>
     </tr>
@@ -90,7 +94,9 @@
             var option = $('#roomName option:selected');
             var roomLocation = option.data('location');
             var roomId = option.data('id');
-            go_to_room(roomLocation, roomId);
+
+            // cloneBooking will contain the booking id if we are in the 'clone' page
+            go_to_room(roomLocation, roomId, $('#roomName').data('cloneBooking'));
         });
     });
 </script>

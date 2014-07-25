@@ -413,13 +413,34 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
 class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBookingSimple):
     def _checkParams(self):
         RHRoomBookingBookingMixin._checkParams(self)
-        self._room = self._reservation.room
+
+        # use 'room' if passed through GET
+        room_id = request.args.get('room', None)
+
+        if room_id is None:
+            # otherwise default to reservation's
+            self._room = self._reservation.room
+        else:
+            self._room = Room.query.get(int(room_id))
+
+        if self._room is None:
+            raise NotFoundError('This room does not exist')
 
     def _get_view(self, **kwargs):
-        return RHRoomBookingNewBookingSimple._get_view(self, cloning=True, **kwargs)
+        return RHRoomBookingNewBookingSimple._get_view(self, clone_booking=self._reservation, **kwargs)
 
     def _make_form(self):
-        return self._make_confirm_form(self._room, defaults=self._reservation, form_class=NewBookingSimpleForm)
+        defaults = FormDefaults(
+            self._reservation,
+            skip_attrs={'room_id', 'booked_for_id', 'booked_for_name', 'contact_email', 'contact_phone'},
+            room_id=self._room.id,
+            booked_for_id=session.user.id,
+            booked_for_name=session.user.getStraightFullName().decode('utf-8'),
+            contact_email=session.user.getEmail().decode('utf-8'),
+            contact_phone=session.user.getPhone().decode('utf-8')
+        )
+
+        return self._make_confirm_form(self._room, defaults=defaults, form_class=NewBookingSimpleForm)
 
 
 class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):

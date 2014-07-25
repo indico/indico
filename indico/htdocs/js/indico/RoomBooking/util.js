@@ -15,10 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-function go_to_room(roomLocation, roomId) {
-    var url = build_url(Indico.Urls.RoomBookingBookRoom, {
+function go_to_room(roomLocation, roomId, clone_booking) {
+
+    var url = build_url(clone_booking ? Indico.Urls.RoomBookingCloneBooking : Indico.Urls.RoomBookingBookRoom, {
         roomLocation: roomLocation,
-        roomID: roomId
+        room: roomId,
+        resvID: clone_booking
     });
 
     indicoRequest('roomBooking.room.bookingPermission',

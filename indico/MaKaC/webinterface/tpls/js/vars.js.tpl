@@ -114,6 +114,7 @@ var Indico = {
         RoomBookingBookRoom: ${ url_rule_to_js('rooms.room_book') | j,n },
         RoomBookingBook: ${ url_rule_to_js('rooms.book') | j,n },
         RoomBookingDetails: ${ urlHandlers.UHRoomBookingRoomDetails.getURL(_ignore_static=True).js_router | j,n },
+        RoomBookingCloneBooking: ${ url_rule_to_js('rooms.roomBooking-cloneBooking')  | j,n },
         ConfModifSchedule: ${ urlHandlers.UHConfModifSchedule.getURL(_ignore_static=True).js_router | j,n },
         SubcontrModif: ${ urlHandlers.UHContribModifSubCont.getURL(_ignore_static=True).js_router | j,n },
         AuthorDisplay: ${ urlHandlers.UHContribAuthorDisplay.getURL(_ignore_static=True).js_router | j,n },
