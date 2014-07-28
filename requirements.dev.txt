@@ -1,3 +1,4 @@
+babel
 pojson>=0.4
 termcolor
 nodeenv

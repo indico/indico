@@ -146,6 +146,9 @@ def _check_pyenv(py_versions):
 
         local("echo \'y\' | pyenv virtualenv {0} indico-build-{0}".format(py_version))
 
+        with pyenv_env(py_version):
+            local("pip install -r requirements.dev.txt")
+
 
 def _check_present(executable, message="Please install it first."):
     """
