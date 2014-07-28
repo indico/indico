@@ -533,7 +533,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         overlap_criteria = ReservationOccurrence.filter_overlap(dummy_occurrences)
         reservation_criteria = [Reservation.room_id == Room.id,
                                 ReservationOccurrence.is_valid,
-                                or_(*overlap_criteria)]
+                                overlap_criteria]
         if not include_pre_bookings:
             reservation_criteria.append(Reservation.is_confirmed)
         occurrences_filter = Reservation.occurrences.any(and_(*reservation_criteria))
@@ -542,10 +542,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             valid_states = (BlockedRoom.State.accepted, BlockedRoom.State.pending)
         else:
             valid_states = (BlockedRoom.State.accepted,)
-        blocking_criteria = [Blocking.id == BlockedRoom.blocking_id,
-                             Blocking.start_date <= start_dt,
-                             Blocking.end_date >= end_dt,
-                             BlockedRoom.state.in_(valid_states)]
+        blocking_criteria = [BlockedRoom.blocking_id == Blocking.id,
+                             BlockedRoom.state.in_(valid_states),
+                             Blocking.start_date <= start_dt.date(),
+                             Blocking.end_date >= end_dt.date()]
         blockings_filter = Room.blocked_rooms.any(and_(*blocking_criteria))
         return ~occurrences_filter & ~blockings_filter
 
