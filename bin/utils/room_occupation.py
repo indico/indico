@@ -18,37 +18,39 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import argparse
-import itertools
+from datetime import date
 
-from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
-from MaKaC.plugins.RoomBooking.default.room import Room
-from indico.core.db import DBMgr
-from indico.util.string import natural_sort_key
+from dateutil.relativedelta import relativedelta
+
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.statistics import calculate_rooms_occupancy
+from indico.web.flask.app import make_app
 
 
 def _main(args):
+    today = date.today()
+    past_month = today - relativedelta(months=1)
+    past_year = today - relativedelta(years=1)
+
     if not args.locations:
         rooms = Room.find_all()
     else:
-        rooms = itertools.chain.from_iterable(Room.find_all(location=loc) for loc in args.locations)
+        rooms = Room.find_all(Location.name.in_(loc for loc in args.locations), _join=Location)
 
     print 'Month\tYear\tRoom'
     for room in rooms:
-        print '{1:.3f}\t{2:.3f}\t{0}'.format(room.getFullName(),
-                                             room.getMyAverageOccupation('pastmonth') * 100,
-                                             room.getMyAverageOccupation('pastyear') * 100)
+        print '{1:.3f}\t{2:.3f}\t{0}'.format(room.full_name,
+                                             calculate_rooms_occupancy([room], past_month, today) * 100,
+                                             calculate_rooms_occupancy([room], past_year, today) * 100)
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--location', '-l', action='append', dest='locations')
     args = parser.parse_args()
-    with DBMgr.getInstance().global_connection():
-        DALManager.connect()
-        try:
-            _main(args)
-        finally:
-            DALManager.disconnect()
+    with make_app().app_context():
+        _main(args)
 
 
 if __name__ == '__main__':
