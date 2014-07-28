@@ -24,14 +24,10 @@ from datetime import datetime, time
 from operator import attrgetter
 
 from indico.core.db import db
-from MaKaC.common.mail import GenericMailer
-from MaKaC.webinterface.mail import GenericNotification
 from indico.modules.rb.models.blockings import Blocking
-from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.notifications.blockings import notify_request_response
-from indico.util.date_time import format_date
 from indico.util.string import return_ascii
 from indico.util.struct.enum import TitledIntEnum
 
@@ -149,7 +145,6 @@ class BlockedRoom(db.Model):
             # We only need to notify the blocking creator if the blocked room wasn't approved yet.
             # This is the case if it's a new blocking for a room managed by the creator
             notify_request_response(self)
-
 
     @return_ascii
     def __repr__(self):
