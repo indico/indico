@@ -65,6 +65,12 @@ input[type=file] {
     }
 }
 
+input[type=checkbox].validate {
+    &:not(:checked) + label {
+        @extend .text-error;
+    }
+}
+
 textarea {
     @extend %text-input;
 }

@@ -75,8 +75,10 @@
             </ul>
         </div>
         <div class="message-box-footer">
-            <input type="checkbox" id="preconflict-warning" name="preconflict-warning" class="js-confirm-warning">
-            <label for="preconflict-warning">${ _('I understand') }</label>
+            <input type="checkbox" id="preconflict-warning" name="preconflict-warning" class="js-confirm-warning validate">
+            <label for="preconflict-warning">
+                ${ _('I understand') }
+            </label>
         </div>
     </div>
 % endif
