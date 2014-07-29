@@ -43,5 +43,17 @@
          background: #fff;
       }
    }
+}
 
+.qtip-disabled-wrapper {
+    display: inline-block;
+    position: relative;
+
+    .qtip-disabled-holder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+    }
 }
