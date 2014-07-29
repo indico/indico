@@ -331,14 +331,14 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def marker_description(self):
         infos = []
 
-        infos.append('{capacity} {label}'.format(capacity=self.capacity,
-                                                 label=_('person') if self.capacity == 1 else _('people')))
-        infos.append(_('public') if self.is_public else _('private'))
-        infos.append(_('auto-confirmation') if self.is_auto_confirm else _('needs confirmation'))
+        infos.append(u'{capacity} {label}'.format(capacity=self.capacity,
+                                                  label=_(u'person') if self.capacity == 1 else _(u'people')))
+        infos.append(_(u'public') if self.is_public else _(u'private'))
+        infos.append(_(u'auto-confirmation') if self.is_auto_confirm else _(u'needs confirmation'))
         if self.needs_video_conference_setup:
-            infos.append(_('video conference'))
+            infos.append(_(u'video conference'))
 
-        return ', '.join(map(unicode, infos))
+        return u', '.join(infos)
 
     @property
     @cached(_cache)

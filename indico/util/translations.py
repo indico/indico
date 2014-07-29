@@ -59,8 +59,7 @@ def _tr_eval(func, *args, **kwargs):
     else:
         # no? too bad, just don't translate anything
         tr = nullTranslations
-    res = getattr(tr, func)(*args, **kwargs).encode('utf-8')
-    return res
+    return getattr(tr, func)(*args, **kwargs)
 
 
 class LazyTranslations(Translations):
@@ -85,7 +84,7 @@ class LazyTranslations(Translations):
             return LazyProxy(_tr_eval, func, *args, **kwargs)
 
     def gettext(self, text):
-        return self._wrapper('gettext', text)
+        return self._wrapper('ugettext' if isinstance(text, unicode) else 'gettext', text)
 
     def ngettext(self, singular, plural, n):
         return self._wrapper('ngettext', singular, plural, n)

@@ -53,32 +53,32 @@ def _group_equipment(objects):
 
 
 class SearchRoomsForm(IndicoForm):
-    location = QuerySelectField(_('Location'), get_label=lambda x: x.name, query_factory=Location.find)
+    location = QuerySelectField(_(u'Location'), get_label=lambda x: x.name, query_factory=Location.find)
     details = StringField()
-    available = RadioField(_('Availability'), coerce=int, default=-1, widget=ConcatWidget(prefix_label=False),
-                           choices=[(1, _('Available')), (0, _('Booked')), (-1, _("Don't care"))])
-    capacity = IntegerField(_('Capacity'), validators=[Optional(), NumberRange(min=0)])
-    equipments = IndicoQuerySelectMultipleCheckboxField(_('Equipment'), get_label=_get_equipment_label,
+    available = RadioField(_(u'Availability'), coerce=int, default=-1, widget=ConcatWidget(prefix_label=False),
+                           choices=[(1, _(u'Available')), (0, _(u'Booked')), (-1, _(u"Don't care"))])
+    capacity = IntegerField(_(u'Capacity'), validators=[Optional(), NumberRange(min=0)])
+    equipments = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=_get_equipment_label,
                                                         modify_object_list=_group_equipment,
                                                         query_factory=lambda: RoomEquipment.find().order_by(
                                                             RoomEquipment.name))
-    is_only_public = BooleanField(_('Only public rooms'), default=True)
-    is_auto_confirm = BooleanField(_('Only rooms not requiring confirmation'), default=True)
-    is_only_active = BooleanField(_('Only active rooms'), default=True)
-    is_only_my_rooms = BooleanField(_('Only my rooms'))
+    is_only_public = BooleanField(_(u'Only public rooms'), default=True)
+    is_auto_confirm = BooleanField(_(u'Only rooms not requiring confirmation'), default=True)
+    is_only_active = BooleanField(_(u'Only active rooms'), default=True)
+    is_only_my_rooms = BooleanField(_(u'Only my rooms'))
     # Period details when searching for (un-)availability
-    start_date = DateTimeField(_('Start date'), validators=[Optional()], parse_kwargs={'dayfirst': True},
+    start_date = DateTimeField(_(u'Start date'), validators=[Optional()], parse_kwargs={'dayfirst': True},
                                display_format='%d/%m/%Y %H:%M', widget=HiddenInput())
-    end_date = DateTimeField(_('End date'), validators=[Optional()], parse_kwargs={'dayfirst': True},
+    end_date = DateTimeField(_(u'End date'), validators=[Optional()], parse_kwargs={'dayfirst': True},
                              display_format='%d/%m/%Y %H:%M', widget=HiddenInput())
     repeatability = StringField()  # TODO: use repeat_unit/step with new UI
-    include_pending_blockings = BooleanField(_('Check conflicts against pending blockings'), default=True)
-    include_pre_bookings = BooleanField(_('Check conflicts against pre-bookings'), default=True)
+    include_pending_blockings = BooleanField(_(u'Check conflicts against pending blockings'), default=True)
+    include_pre_bookings = BooleanField(_(u'Check conflicts against pre-bookings'), default=True)
 
 
 class _TimePair(IndicoForm):
-    start = TimeField(_('from'), [UsedIf(lambda form, field: form.end.data)])
-    end = TimeField(_('to'), [UsedIf(lambda form, field: form.start.data)])
+    start = TimeField(_(u'from'), [UsedIf(lambda form, field: form.end.data)])
+    end = TimeField(_(u'to'), [UsedIf(lambda form, field: form.start.data)])
 
     def validate_start(self, field):
         if self.start.data and self.end.data and self.start.data >= self.end.data:
@@ -88,9 +88,9 @@ class _TimePair(IndicoForm):
 
 
 class _DateTimePair(IndicoForm):
-    start = DateTimeField(_('from'), [UsedIf(lambda form, field: form.end.data)], display_format='%d/%m/%Y %H:%M',
+    start = DateTimeField(_(u'from'), [UsedIf(lambda form, field: form.end.data)], display_format='%d/%m/%Y %H:%M',
                           parse_kwargs={'dayfirst': True})
-    end = DateTimeField(_('to'), [UsedIf(lambda form, field: form.start.data)], display_format='%d/%m/%Y %H:%M',
+    end = DateTimeField(_(u'to'), [UsedIf(lambda form, field: form.start.data)], display_format='%d/%m/%Y %H:%M',
                         parse_kwargs={'dayfirst': True})
 
     def validate_start(self, field):
@@ -101,33 +101,33 @@ class _DateTimePair(IndicoForm):
 
 
 class RoomForm(IndicoForm):
-    name = StringField(_('Name'))
-    site = StringField(_('Site'))
-    building = StringField(_('Building'), [DataRequired()])
-    floor = StringField(_('Floor'), [DataRequired()])
-    number = StringField(_('Number'), [DataRequired()])
-    longitude = FloatField(_('Longitude'), [Optional(), NumberRange(min=0)])
-    latitude = FloatField(_('Latitude'), [Optional(), NumberRange(min=0)])
-    is_active = BooleanField(_('Active'))
-    is_reservable = BooleanField(_('Public'))
-    reservations_need_confirmation = BooleanField(_('Confirmations'))
-    notification_for_assistance = BooleanField(_('Assistance'))
-    notification_for_start = IntegerField(_('Notification on booking start - X days before'),
+    name = StringField(_(u'Name'))
+    site = StringField(_(u'Site'))
+    building = StringField(_(u'Building'), [DataRequired()])
+    floor = StringField(_(u'Floor'), [DataRequired()])
+    number = StringField(_(u'Number'), [DataRequired()])
+    longitude = FloatField(_(u'Longitude'), [Optional(), NumberRange(min=0)])
+    latitude = FloatField(_(u'Latitude'), [Optional(), NumberRange(min=0)])
+    is_active = BooleanField(_(u'Active'))
+    is_reservable = BooleanField(_(u'Public'))
+    reservations_need_confirmation = BooleanField(_(u'Confirmations'))
+    notification_for_assistance = BooleanField(_(u'Assistance'))
+    notification_for_start = IntegerField(_(u'Notification on booking start - X days before'),
                                           [Optional(), NumberRange(min=0, max=9)])
-    notification_for_end = BooleanField(_('Notification on booking end'))
-    notification_for_responsible = BooleanField(_('Notification to responsible, too'))
-    owner_id = HiddenField(_('Responsible user'), [DataRequired()])
-    key_location = StringField(_('Where is key?'))
-    telephone = StringField(_('Telephone'))
-    capacity = IntegerField(_('Capacity'), [DataRequired(), NumberRange(min=1)])
-    division = StringField(_('Department'))
-    surface_area = IntegerField(_('Surface area'), [NumberRange(min=0)])
-    max_advance_days = IntegerField(_('Maximum advance time for bookings'), [Optional(), NumberRange(min=1)])
-    comments = TextAreaField(_('Comments'))
-    delete_photos = BooleanField(_('Delete photos'))
-    large_photo = FileField(_('Large photo'))
-    small_photo = FileField(_('Small photo'))
-    equipments = IndicoQuerySelectMultipleCheckboxField(_('Equipment'), get_label=_get_equipment_label,
+    notification_for_end = BooleanField(_(u'Notification on booking end'))
+    notification_for_responsible = BooleanField(_(u'Notification to responsible, too'))
+    owner_id = HiddenField(_(u'Responsible user'), [DataRequired()])
+    key_location = StringField(_(u'Where is key?'))
+    telephone = StringField(_(u'Telephone'))
+    capacity = IntegerField(_(u'Capacity'), [DataRequired(), NumberRange(min=1)])
+    division = StringField(_(u'Department'))
+    surface_area = IntegerField(_(u'Surface area'), [NumberRange(min=0)])
+    max_advance_days = IntegerField(_(u'Maximum advance time for bookings'), [Optional(), NumberRange(min=1)])
+    comments = TextAreaField(_(u'Comments'))
+    delete_photos = BooleanField(_(u'Delete photos'))
+    large_photo = FileField(_(u'Large photo'))
+    small_photo = FileField(_(u'Small photo'))
+    equipments = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=_get_equipment_label,
                                                         modify_object_list=_group_equipment)
     # attribute_* - set at runtime
     bookable_times = FieldList(FormField(_TimePair), min_entries=1)
@@ -135,8 +135,8 @@ class RoomForm(IndicoForm):
 
     def validate_large_photo(self, field):
         if not field.data and self.small_photo.data:
-            raise ValidationError(_('When uploading a small photo you need to upload a large photo, too.'))
+            raise ValidationError(_(u'When uploading a small photo you need to upload a large photo, too.'))
 
     def validate_small_photo(self, field):
         if not field.data and self.large_photo.data:
-            raise ValidationError(_('When uploading a large photo you need to upload a small photo, too.'))
+            raise ValidationError(_(u'When uploading a large photo you need to upload a small photo, too.'))
