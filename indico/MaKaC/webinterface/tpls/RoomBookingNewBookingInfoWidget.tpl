@@ -15,7 +15,7 @@
     % for field in fields:
         <div class="toolbar thin">
             <div class="group">
-                % if not form[field].label.text == "Reason":
+                % if not form[field].short_name == 'booking_reason':
                     <span class="i-button label heavy">
                         ${ form[field].label.text }
                     </span>
