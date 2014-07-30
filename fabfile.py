@@ -704,5 +704,5 @@ def package_release(py_versions=None, build_dir=None, system_node=False,
         elif u == 'ssh':
             upload_ssh(build_dir, ssh_server_host, ssh_server_port, ssh_user, ssh_key, ssh_dest_dir)
 
-    if force_clean:
+    if not build_here and force_clean:
         cleanup(build_dir, force=True)
