@@ -163,12 +163,11 @@
             .roomid {
                 color: $black;
                 display: inline-block;
-
-                .roomname {
-                    max-width: 590px;
-                    overflow: hidden;
-                    white-space: nowrap;
-                }
+                max-width: 590px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                vertical-align: sub;
+                white-space: nowrap;
 
                 .roomlocation {
                     color: $gray;
@@ -253,6 +252,10 @@
 
         .capacity {
             display: none;
+        }
+
+        .roomid {
+            max-width: 400px;
         }
     }
 }
