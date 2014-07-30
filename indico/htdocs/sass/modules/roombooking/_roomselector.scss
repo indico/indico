@@ -161,13 +161,11 @@
             }
 
             .roomid {
+                @include ellipsis();
                 color: $black;
                 display: inline-block;
                 max-width: 590px;
-                overflow: hidden;
-                text-overflow: ellipsis;
                 vertical-align: sub;
-                white-space: nowrap;
 
                 .roomlocation {
                     color: $gray;
@@ -233,7 +231,7 @@
 }
 
 .roomselector.simple {
-    width: 550px;
+    width: 595px;
 
     .ui-multiselect-header {
         .requirements {

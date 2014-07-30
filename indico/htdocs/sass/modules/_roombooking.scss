@@ -29,23 +29,25 @@
 @import "roombooking/roomselector";
 
 #searchBookings {
-    width: 570px;
+    width: 615px;
+    $width: 595px;
 
     #timespan, #bookingDetails {
         .label {
-            width: 100px;
+            @include ellipsis();
+            width: 145px;
         }
     }
 
     #timespan {
         > .toolbar {
-            width: 550px;
+            width: $width;
         }
     }
 
     #bookingDetails {
         .toolbar.table {
-            width: 550px;
+            width: $width;
         }
 
         input[type=text] {
@@ -54,7 +56,7 @@
     }
 
     .submit-button-wrapper {
-        width: 550px;
+        width: $width;
 
         button {
             font-weight: bold;
