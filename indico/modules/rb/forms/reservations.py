@@ -75,7 +75,7 @@ class NewBookingFormBase(IndicoForm):
     end_date = DateTimeField('End date', validators=[InputRequired()], parse_kwargs={'dayfirst': True},
                              display_format='%d/%m/%Y %H:%M')
     repeat_unit = RadioField('Repeat unit', coerce=int, default=0, validators=[InputRequired()],
-                             choices=[(0, _('Once')), (1, _('Daily')), (2, _('Weekly')), (3, _('Monthly'))])
+                             choices=[(0, _(u'Once')), (1, _(u'Daily')), (2, _(u'Weekly')), (3, _(u'Monthly'))])
     repeat_step = IntegerField('Repeat step', validators=[NumberRange(0, 3)], default=0)
 
     def validate_repeat_step(self, field):
@@ -84,7 +84,7 @@ class NewBookingFormBase(IndicoForm):
 
     def validate_start_date(self, field):
         if field.data.date() < date.today() and not session.user.isAdmin():
-            raise ValidationError(_('The start time cannot be in the past.'))
+            raise ValidationError(_(u'The start time cannot be in the past.'))
 
     def validate_end_date(self, field):
         start_date = self.start_date.data
@@ -100,10 +100,10 @@ class NewBookingFormBase(IndicoForm):
 class NewBookingCriteriaForm(NewBookingFormBase):
     room_ids = SelectMultipleField('Rooms', [DataRequired()], coerce=int)
     flexible_dates_range = RadioField('Flexible days', coerce=int, default=0,
-                                      choices=[(0, _('Exact')),
-                                               (1, '&plusmn;{}'.format(_('1 day'))),
-                                               (2, '&plusmn;{}'.format(_('2 days'))),
-                                               (3, '&plusmn;{}'.format(_('3 days')))])
+                                      choices=[(0, _(u'Exact')),
+                                               (1, '&plusmn;{}'.format(_(u'1 day'))),
+                                               (2, '&plusmn;{}'.format(_(u'2 days'))),
+                                               (3, '&plusmn;{}'.format(_(u'3 days')))])
 
     def validate_flexible_dates_range(self, field):
         if self.repeat_unit.data == RepeatUnit.DAY:
@@ -115,18 +115,18 @@ class NewBookingPeriodForm(NewBookingFormBase):
 
 
 class NewBookingConfirmForm(NewBookingPeriodForm):
-    booked_for_id = HiddenField(_('User'), [InputRequired()])
+    booked_for_id = HiddenField(_(u'User'), [InputRequired()])
     booked_for_name = StringField()  # just for displaying
-    contact_email = StringField(_('Email'), [InputRequired(), IndicoEmail(multi=True)])
-    contact_phone = StringField(_('Telephone'))
-    booking_reason = TextAreaField(_('Reason'), [DataRequired()])
-    uses_video_conference = BooleanField(_('I will use videoconference equipment'))
-    equipments = IndicoQuerySelectMultipleCheckboxField(_('VC equipment'), get_label=lambda x: x.name)
-    needs_video_conference_setup = BooleanField(_('Request assistance for the startup of the videoconference session. '
+    contact_email = StringField(_(u'Email'), [InputRequired(), IndicoEmail(multi=True)])
+    contact_phone = StringField(_(u'Telephone'))
+    booking_reason = TextAreaField(_(u'Reason'), [DataRequired()])
+    uses_video_conference = BooleanField(_(u'I will use videoconference equipment'))
+    equipments = IndicoQuerySelectMultipleCheckboxField(_(u'VC equipment'), get_label=lambda x: x.name)
+    needs_video_conference_setup = BooleanField(_(u'Request assistance for the startup of the videoconference session. '
                                                   'This support is usually performed remotely.'))
-    needs_general_assistance = BooleanField(_('Request personal assistance for meeting startup'))
-    submit_book = SubmitField(_('Create booking'))
-    submit_prebook = SubmitField(_('Create pre-booking'))
+    needs_general_assistance = BooleanField(_(u'Request personal assistance for meeting startup'))
+    submit_book = SubmitField(_(u'Create booking'))
+    submit_prebook = SubmitField(_(u'Create pre-booking'))
 
     def validate_equipments(self, field):
         if field.data and not self.uses_video_conference.data:
@@ -140,13 +140,13 @@ class NewBookingConfirmForm(NewBookingPeriodForm):
 
 
 class NewBookingSimpleForm(NewBookingConfirmForm):
-    submit_check = SubmitField(_('Check conflicts'))
-    booking_reason = TextAreaField(_('Reason'), [UsedIf(lambda form, field: not form.submit_check.data),
+    submit_check = SubmitField(_(u'Check conflicts'))
+    booking_reason = TextAreaField(_(u'Reason'), [UsedIf(lambda form, field: not form.submit_check.data),
                                                  DataRequired()])
 
 
 class ModifyBookingForm(NewBookingSimpleForm):
-    submit_update = SubmitField(_('Update booking'))
+    submit_update = SubmitField(_(u'Update booking'))
 
     def __init__(self, *args, **kwargs):
         self._old_start_date = kwargs.pop('old_start_date')
@@ -157,4 +157,4 @@ class ModifyBookingForm(NewBookingSimpleForm):
 
     def validate_start_date(self, field):
         if field.data.date() < self._old_start_date and not session.user.isAdmin():
-            raise ValidationError(_('The start time cannot be moved into the paste.'))
+            raise ValidationError(_(u'The start time cannot be moved into the paste.'))

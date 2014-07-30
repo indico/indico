@@ -26,10 +26,10 @@ from indico.util.i18n import _
 
 
 class SettingsForm(IndicoForm):
-    admin_principals = PrincipalField(_('Administrators'), groups=True)
-    authorized_principals = PrincipalField(_('Authorized users/groups'), groups=True)
-    assistance_emails = EmailListField(_('Assistance email addresses (one per line)'))
-    notification_hour = IntegerField(_('Hour at which occurrence notifications should be sent'),
+    admin_principals = PrincipalField(_(u'Administrators'), groups=True)
+    authorized_principals = PrincipalField(_(u'Authorized users/groups'), groups=True)
+    assistance_emails = EmailListField(_(u'Assistance email addresses (one per line)'))
+    notification_hour = IntegerField(_(u'Hour at which occurrence notifications should be sent'),
                                      [InputRequired(), NumberRange(0, 23)], default=6)
-    notification_before_days = IntegerField(_('Send occurrence notifications X days before the occurrence'),
+    notification_before_days = IntegerField(_(u'Send occurrence notifications X days before the occurrence'),
                                             [InputRequired()], default=0)

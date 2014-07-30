@@ -48,5 +48,5 @@ class IndicoEmail(object):
 
     def __call__(self, form, field):
         if field.data and not is_valid_mail(field.data, self.multi):
-            msg = _('Invalid email address list') if self.multi else _('Invalid email address')
+            msg = _(u'Invalid email address list') if self.multi else _(u'Invalid email address')
             raise ValidationError(msg)

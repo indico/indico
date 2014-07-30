@@ -32,7 +32,7 @@ class ConcatWidget(object):
         field_args = field_args or {}
         html = []
         for subfield in field:
-            fmt = '{0} {1}' if self.prefix_label else '{1} {0}'
+            fmt = u'{0} {1}' if self.prefix_label else u'{1} {0}'
             html.append(fmt.format(subfield.label(**label_args), subfield(**field_args)))
         return HTMLString(self.separator.join(html))
 

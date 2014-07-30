@@ -32,7 +32,7 @@ from MaKaC.user import AvatarHolder, GroupHolder
 
 
 class BlockingForm(IndicoForm):
-    reason = TextAreaField(_('Reason'), [DataRequired()])
+    reason = TextAreaField(_(u'Reason'), [DataRequired()])
     principals = JSONField(default=[])
     blocked_rooms = JSONField(default=[])
 
@@ -83,8 +83,8 @@ class BlockingForm(IndicoForm):
 
 
 class CreateBlockingForm(BlockingForm):
-    start_date = DateField(_('Start date'), [DataRequired()], parse_kwargs={'dayfirst': True})
-    end_date = DateField(_('End date'), [DataRequired()], parse_kwargs={'dayfirst': True})
+    start_date = DateField(_(u'Start date'), [DataRequired()], parse_kwargs={'dayfirst': True})
+    end_date = DateField(_(u'End date'), [DataRequired()], parse_kwargs={'dayfirst': True})
 
     def validate_start_date(self, field):
         if self.start_date.data > self.end_date.data:
