@@ -34,11 +34,15 @@ try:
 except ImportError:
     translitcodec = None
 
+from indico.util.translations import LazyProxy
+
 
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small']
 
 
 def encode_if_unicode(s):
+    if isinstance(s, LazyProxy) and isinstance(s.value, unicode):
+        s = unicode(s)
     return s.encode('utf-8') if isinstance(s, unicode) else s
 
 
