@@ -143,7 +143,7 @@
             }
         } else {
             if (buttons.parent().hasClass('qtip-disabled-wrapper')) {
-                buttons.siblings().remove();
+                buttons.siblings('.qtip-disabled-holder').remove();
                 buttons.unwrap();
             }
         }

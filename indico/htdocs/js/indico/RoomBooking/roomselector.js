@@ -330,7 +330,7 @@
                 var labelparts = $(this).attr('label').split(":");
                 var item = self.parts.list.find('input[value="' + $(this).val() +'"]').parent();
                 item.find(':checkbox').data('myRoom', rooms[index].owner_id == userId);
-                item.children("span").addClass("roomid")
+                item.children("span").addClass("room-id")
                     .children(":first-child").addClass("roomname")
                     .next().addClass("roomlocation");
 

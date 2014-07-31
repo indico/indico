@@ -36,7 +36,7 @@ def _main(args):
     if not args.locations:
         rooms = Room.find_all()
     else:
-        rooms = Room.find_all(Location.name.in_(loc for loc in args.locations), _join=Location)
+        rooms = Room.find_all(Location.name.in_(args.locations), _join=Location)
 
     print 'Month\tYear\tRoom'
     for room in rooms:
