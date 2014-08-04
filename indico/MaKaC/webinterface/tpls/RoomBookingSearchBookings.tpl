@@ -195,7 +195,7 @@
             }
         });
         s.datepicker('setDate', '+0');
-        e.datepicker('setDate', '+7');
+        e.datepicker('setDate', '+6');
     }
 
     // Reads out the invalid textboxes and returns false if something is invalid.
