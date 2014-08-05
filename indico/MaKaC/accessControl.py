@@ -224,26 +224,17 @@ class AccessController( Persistent, Observable ):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         ipList = minfo.getIPBasedACLMgr().get_full_access_acl()
 
-        if ip in ipList:
-            # let Private OAI harvesters access protected (display) pages
+        return ip in ipList
+
+    def canIPAccess(self, ip):
+
+        # Domain protection
+        if not self.getRequiredDomainList():
             return True
-        else:
-            return False
+        return any(domain.belongsTo(ip) for domain in self.getRequiredDomainList())
 
-    def canIPAccess( self, ip ):
-        """
-        """
-
-        #Domain protection
-        if len(self.getRequiredDomainList())<=0:
-            return True
-        for domain in self.getRequiredDomainList():
-            if domain.belongsTo( ip ):
-                return True
-        return False
-
-    def isAdmin( self, av ):
-        if AdminList.getInstance().isAdmin( av ):
+    def isAdmin(self, av):
+        if AdminList.getInstance().isAdmin(av):
             return True
         else:
             return False
