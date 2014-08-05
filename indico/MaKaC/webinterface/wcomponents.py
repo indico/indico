@@ -1793,9 +1793,6 @@ class WDomainControlFrame(WTemplated):
 
     def getVars(self):
         tpl_vars = WTemplated.getVars(self)
-        doms = dict((dom, dom in self._target.getDomainList()) for dom in domain.DomainHolder().getList())
-
-
 
         if isinstance(self._target, conference.Conference):
             tpl_vars['method'] = 'event.protection.toggleDomains'
@@ -1809,7 +1806,14 @@ class WDomainControlFrame(WTemplated):
         else:
             tpl_vars['method'] = 'category.protection.toggleDomains'
             event = None
-        tpl_vars["domains"] = doms
+
+        ac = self._target.getAccessController()
+        inheriting = ac.getAccessProtectionLevel() == 0
+        domain_list = ac.getAnyDomainProtection() if inheriting else self._target.getDomainList()
+
+        tpl_vars["inheriting"] = inheriting
+        tpl_vars["domains"] = dict((dom, dom in domain_list)
+                                   for dom in domain.DomainHolder().getList())
         tpl_vars["locator"] = self._target.getLocator().getWebForm()
         tpl_vars["target"] = self._target
         tpl_vars["event"] = event
