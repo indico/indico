@@ -9,7 +9,8 @@
     <td class="itemTopAlign itemLeftAlign ">
         % if showOrder:
             % if not hideTime:
-                <span class="itemTime">${getTime(item.getAdjustedStartDate(timezone))}</span>&nbsp;&nbsp;${order}.
+                <span class="itemTime">${getTime(item.getAdjustedStartDate(timezone))}</span>
+                <span class="itemIndex">&nbsp;&nbsp;${ order }.</span>
             % else:
                 ${order}.
             % endif

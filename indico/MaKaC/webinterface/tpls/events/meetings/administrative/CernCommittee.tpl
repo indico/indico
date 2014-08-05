@@ -5,6 +5,7 @@
     hideTime = False
     materialSession = True
     showOrder = False
+    print_mode = True
 %>
 
 <%block name="header">

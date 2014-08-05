@@ -19,15 +19,24 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+@page {
+    margin: 25mm 25mm 25mm 25mm;
+}
+
 body {
     background: white;
 }
 
-p,br,dl,strong,em,h1,h2,h3,h4,h5,h6,blockquote,ol,ul,a {
-   font-family: verdana, arial, sans-serif;
+p, br, dl, strong, em, h1, h2, h3, h4, h5, h6, blockquote, ol, ul, a {
+   font-family: verdana, sans-serif;
    font-size: 12px;
    color: #000000;
 }
+
+hr {
+    display: none;
+}
+
 pre {
    font-family: helvetica, verdana, sans-serif;
    color: #000;
@@ -38,6 +47,7 @@ pre {
    word-wrap: break-word;       /* Internet Explorer 5.5+ */
    margin: 0px;
 }
+
 .tablepre {
    table-layout: fixed;
    margin: 0px;
@@ -45,7 +55,7 @@ pre {
    border: 0px;
 }
 
-td{
+td {
     font-family: Verdana;
     font-size: medium;
     color: #000;
@@ -59,47 +69,60 @@ td{
 }
 
 
-table.eventWrapper{
+table.eventWrapper {
     width: 750px;
     margin-top: 0px;
     margin-bottom: 0px;
 }
 
-table.eventHeader{
-    width: 100%;
+table.eventWrapper > tbody > tr > td > br {
+    display: none;
+}
+
+table.eventHeader {
+    border-spacing: 0px;
+    padding: 0px;
     text-align: center;
-    border-spacing:0px;
-    padding:0px;
+    width: 100%;
+}
+
+table.eventHeader img {
+    position: absolute;
 }
 
 table.dayList{
     width: 100%;
     border: 0;
-    border-spacing:5px;
+    border-spacing: 2px;
 }
 
 .textTitle{
-   font-family: helvetica, verdana, sans-serif;
-   font-size: 12px;
-   font-style: italic;
+   display: none;
 }
 .sessionTitle{
    font-weight: bold;
+   border: none;
 }
 
 .itemTime{
+   font-family: Verdana;
    font-size: medium;
+   font-style: italic;
+   padding-left: 2em;
 }
 .participantText{
-   font-family: helvetica, verdana, sans-serif;
+   font-family: verdana, sans-serif;
    font-size: 12px;
    text-align: left;
 }
 
+.participantText + br,
+.participantText ~ .materialDisplayName {
+    display: none;
+}
+
 .descriptionText{
-   font-family: helvetica, verdana, sans-serif;
-   font-size: 12px;
-   text-align: left;
+   display: none;
 }
 
 .subItemText{
@@ -131,30 +154,38 @@ td.itemRightAlign{
     text-align: right;
 }
 
-td.itemHeaderDate{
+td.itemHeaderDate {
     font-family: Verdana;
     font-size: medium;
     font-style: italic;
+    padding-top: 3em;
     text-align: left;
 }
 
+td.itemHeaderDate > span {
+    -webkit-print-color-adjust: exact;
+    background: #eaeaea;
+    display: block;
+    padding: 5px 2px;
+}
+
+td.itemHeaderDate > span ~ br {
+    display: none;
+}
+
 td.itemHeaderDocuments{
-    font-family: Verdana;
-    font-size: medium;
-    text-align: right;
-    text-decoration: underline;
+    display: none;
 }
 
 td.sessionInfo{
     font-family: Verdana;
-    font-size: large;
+    width: 100%;
 }
 
 td.breakInfo{
-    font-family: Verdana;
-    font-size: medium;
-    text-align: center;
+    display: none;
 }
+
 td.itemTopAlign{
     vertical-align: top;
 }
@@ -168,3 +199,27 @@ td.subItemOrder{
     font-size: 12px;
     font-family: Verdana;
 }
+
+.confModifIcon {
+    display: none;
+}
+
+.itemIndex {
+    display: none;
+}
+
+.locationInfo {
+    float: right;
+    font-size: 0.9em;
+    color: #555;
+    line-height: 24px;
+}
+
+.locationParenthesis {
+    display: none;
+}
+
+.sessionDescription {
+    border-bottom: 1px solid #aaa;
+}
+
