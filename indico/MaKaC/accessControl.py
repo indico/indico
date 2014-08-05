@@ -355,7 +355,7 @@ class AccessController( Persistent, Observable ):
 
         Returns the list of domains from which the item can be accessed.
         """
-        if self.isItselfProtected():
+        if self.getAccessProtectionLevel() != 0:
             return []
         elif self.isDomainProtected():
             return self.getRequiredDomainList()
