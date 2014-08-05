@@ -1399,7 +1399,7 @@ class Category(CommonObjectBase):
         if not self.hasAnyProtection():
             return True
         if not self.isProtected():
-            #domain checking only triggered if the category is PUBLIC
+            # domain checking only triggered if the category is PUBLIC
             return self.canIPAccess(aw.getIP()) or \
                 self.isAllowedToCreateConference(aw.getUser()) or \
                 self.isAllowedToAccess(aw.getUser())
