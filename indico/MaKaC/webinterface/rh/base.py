@@ -55,11 +55,11 @@ from MaKaC.webinterface.mail import GenericMailer
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.errors as errors
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
-
 from indico.core.config import Config
 from indico.core.db import DBMgr
 from indico.core.logger import Logger
 from indico.util import json
+from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _, availableLocales, setLocale
 from indico.util.redis import RedisError
@@ -458,6 +458,8 @@ class RH(RequestHandlerBase):
     def _process_retry_setup(self):
         # clear the fossile cache at the start of each request
         fossilize.clearCache()
+        # clear after-commit queue
+        flush_after_commit_queue(False)
         # delete all queued emails
         GenericMailer.flushQueue(False)
         # clear the existing redis pipeline
@@ -527,11 +529,11 @@ class RH(RequestHandlerBase):
         Logger.get('requestHandler').info('Request {} successful'.format(request))
         # request is succesfull, now, doing tasks that must be done only once
         try:
-            GenericMailer.flushQueue(True) # send emails
+            flush_after_commit_queue(True)
+            GenericMailer.flushQueue(True)  # send emails
             self._deleteTempFiles()
         except:
             Logger.get('mail').exception('Mail sending operation failed')
-            pass
         # execute redis pipeline if we have one
         if self._redisPipeline:
             try:

@@ -25,23 +25,22 @@ from flask import request, session
 from ZODB.POSException import ConflictError
 from ZEO.Exceptions import ClientDisconnected
 
+
 from MaKaC.plugins.base import Observable
 from MaKaC.errors import NoReportError
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.mail import GenericMailer
 from MaKaC.services.interface.rpc import handlers
-from MaKaC.services.interface.rpc.common import(
-    CausedError,
-    NoReportError as ServiceNoReportError,
-    CSRFError
-)
+from MaKaC.services.interface.rpc.common import (CausedError,
+                                                 CSRFError,
+                                                 NoReportError as ServiceNoReportError)
 from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
-
 from indico.core.config import Config
 from indico.core.db import DBMgr
 from indico.core.logger import Logger
 from indico.core.errors import NoReportError as NoReportIndicoError
+from indico.core.db.util import flush_after_commit_queue
 from indico.util.redis import RedisError
 from indico.util import fossilize
 
@@ -98,6 +97,8 @@ class ServiceRunner(Observable):
     def _invokeMethodRetryBefore(self):
         # clear/init fossil cache
         fossilize.clearCache()
+        # clear after-commit queue
+        flush_after_commit_queue(False)
         # delete all queued emails
         GenericMailer.flushQueue(False)
         DBMgr.getInstance().sync()
@@ -105,7 +106,8 @@ class ServiceRunner(Observable):
     def _invokeMethodSuccess(self):
         rh = ContextManager.get('currentRH')
 
-        GenericMailer.flushQueue(True) # send emails
+        flush_after_commit_queue(True)  # run after-commit functions
+        GenericMailer.flushQueue(True)  # send emails
         if rh._redisPipeline:
             try:
                 rh._redisPipeline.execute()

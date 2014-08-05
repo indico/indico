@@ -31,6 +31,8 @@ from indico.core.db import DBMgr
 from MaKaC.common.mail import GenericMailer
 from indico.modules.scheduler import SchedulerModule, TaskDelayed
 from indico.util import fossilize
+from indico.core.db.util import flush_after_commit_queue
+
 
 class _Worker(object):
 
@@ -69,6 +71,7 @@ class _Worker(object):
     def _prepare_retry(self):
         self._dbi.abort()
         self._dbi.sync()
+        flush_after_commit_queue(False)
         GenericMailer.flushQueue(False)
         self._task.plugLogger(self._logger)
 
@@ -106,6 +109,7 @@ class _Worker(object):
                         self._delayed = True
                         self._executionDelay = 0
                         time.sleep(e.delaySeconds)
+            flush_after_commit_queue(True)
             GenericMailer.flushQueue(True)
 
         except Exception as e:
