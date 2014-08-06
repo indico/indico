@@ -17,10 +17,18 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Multiple CLI utils
-"""
+from __future__ import division, absolute_import, print_function
+
+import fcntl
 import re
+import struct
+import sys
+import termios
+import time
+
+
+def strip_ansi(s, _re=re.compile(r'\x1b\[[;\d]*[A-Za-z]')):
+    return _re.sub('', s)
 
 
 def yesno(message):
@@ -32,6 +40,11 @@ def yesno(message):
         return True
     else:
         return False
+
+
+def terminal_size():
+    h, w, hp, wp = struct.unpack('HHHH', fcntl.ioctl(0, termios.TIOCGWINSZ, struct.pack('HHHH', 0, 0, 0, 0)))
+    return w, h
 
 
 def conferenceHolderIterator(ch, verbose=True, deepness='subcontrib'):
@@ -48,21 +61,31 @@ def conferenceHolderIterator(ch, verbose=True, deepness='subcontrib'):
                     yield ('subcontrib', scontrib)
 
     idx = ch._getIdx()
-
     total = len(idx.keys())
+    term_width = terminal_size()[0]
+    start_time = time.time()
+    fmt = cformat(
+        '[%{cyan!}{:6}%{reset}/%{cyan}{}%{reset}  %{yellow!}{:.3f}%{reset}%  %{green!}{}%{reset}]  {:>8}  %{grey!}{}'
+    )
 
-    i = 1
-    for id, conf in idx.iteritems():
-        if verbose and i % 10 == 9:
-            text = "[%d/%d %f%%] %s %s" % \
-                   (i, total, (float(i) / total * 100.0), id, conf.getTitle())
-            print text[:80].ljust(80), '\r',
-        i += 1
+    for i, (id_, conf) in enumerate(idx.iteritems(), 1):
+        if verbose and (i % 10 == 0 or i == total):
+            remaining_seconds = int((time.time() - start_time) / i * (total - i))
+            remaining = '{:02}:{:02}'.format(remaining_seconds // 60, remaining_seconds % 60)
+            title = conf.getTitle().replace('\n', ' ')
+            text = fmt.format(i, total, (i / total * 100.0), remaining, id_, title)
+            print('\r', ' ' * term_width, end='', sep='')
+            # terminal width + ansi control code length - trailing reset code (4)
+            print('\r', text[:term_width + len(text) - len(strip_ansi(text)) - 4], cformat('%{reset}'), end='', sep='')
+            sys.stdout.flush()
 
         yield ('event', conf)
         if deepness in ['contrib', 'subcontrib']:
             for contrib in _eventIterator(conf, 0):
                 yield contrib
+
+    if verbose:
+        print()
 
 
 # Coloring
@@ -103,25 +126,25 @@ def error(message):
     """
     Print a red error message
     """
-    print colored(message, 'red')
+    print(colored(message, 'red'))
 
 
 def warning(message):
     """
     Print a yellow warning message
     """
-    print colored(message, 'yellow')
+    print(colored(message, 'yellow'))
 
 
 def info(message):
     """
     Print a blue information message
     """
-    print colored(message, 'cyan', attrs=['bold'])
+    print(colored(message, 'cyan', attrs=['bold']))
 
 
 def success(message):
     """
     Print a green success message
     """
-    print colored(message, 'green')
+    print(colored(message, 'green'))
