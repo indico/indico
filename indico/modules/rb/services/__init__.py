@@ -32,8 +32,11 @@ class GetDateWarning(ServiceBase):
     def _getAnswer(self):
         if not self._start_dt or not self._end_dt:
             return None
-        if Holiday.find(Holiday.date.in_([self._start_dt, self._end_dt])).count():
-            return _('Holidays chosen')
-        if is_weekend(self._start_dt) or is_weekend(self._end_dt):
-            return _('Weekend chosen')
+        start_date = self._start_dt.date()
+        end_date = self._end_dt.date()
+        holidays = Holiday.find_all(Holiday.date.in_([start_date, end_date]))
+        if holidays:
+            return _(u'Holidays chosen: {0}'.format(', '.join(h.name for h in holidays)))
+        if is_weekend(start_date) or is_weekend(end_date):
+            return _(u'Weekend chosen')
         return None
