@@ -16,12 +16,20 @@
  */
 
 function go_to_room(roomLocation, roomId, clone_booking) {
-
-    var url = build_url(clone_booking ? Indico.Urls.RoomBookingCloneBooking : Indico.Urls.RoomBookingBookRoom, {
-        roomLocation: roomLocation,
-        room: roomId,
-        resvID: clone_booking
-    });
+    var url;
+    if (clone_booking) {
+        url = build_url(Indico.Urls.RoomBookingCloneBooking, {
+            roomLocation: roomLocation,
+            room: roomId,
+            resvID: clone_booking
+        });
+    }
+    else {
+        url = build_url(Indico.Urls.RoomBookingBookRoom, {
+            roomLocation: roomLocation,
+            roomID: roomId
+        });
+    }
 
     indicoRequest('roomBooking.room.bookingPermission',
         {room_id: roomId},
