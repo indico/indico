@@ -292,8 +292,9 @@ AuthenticatorList    = [('Local', {})]
 # DisplayLoginPage = True
 
 # Sessions are only stored for a certain time. You can modify the duration here. By setting
-# the lifetime to 0 the cookie will expire when the browser is closed.
-# SessionLifetime = 86400 * 31
+# the lifetime to 0 the cookie will expire when the browser is closed, and the session will
+# expire after a few days. The 'memcached' backend cannot use a lifetime of over 30 days.
+# SessionLifetime = 86400 * 30
 
 
 #------------------------------------------------------------------------------

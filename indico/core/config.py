@@ -520,7 +520,7 @@ class Config:
         'MobileURL'                 : '',
         'CheckinURL'                : 'http://indico-software.org/wiki/apps/check-in',
         'SCSSDebugInfo'             : True,
-        'SessionLifetime'           : 86400 * 31,
+        'SessionLifetime'           : 86400 * 30,
         'RouteOldUrls'              : False,
         'CustomCountries'           : {},
         'PDFLatexProgram'           : 'pdflatex',
@@ -661,6 +661,9 @@ class Config:
 
         if self.getStaticFileMethod() is not None and len(self.getStaticFileMethod()) != 2:
             raise MaKaCError('StaticFileMethod must be None, a string or a 2-tuple')
+
+        if self.getCacheBackend() == 'memcached' and self.getSessionLifetime() > 86400 * 30:
+            raise MaKaCError("Cache backend 'memcached' has a maximum session lifetime of 86400 * 30")
 
     def __getattr__(self, attr):
         """Dynamic finder for values defined in indico.conf
