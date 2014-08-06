@@ -109,7 +109,7 @@ class OfflineEventCreator(object):
         self._create_home()
 
         # Create main and static folders
-        self._mainPath = "OfflineWebsite-%s" % self._normalize_path(self._conf.getTitle())
+        self._mainPath = self._normalize_path(u'OfflineWebsite-{}'.format(self._conf.getTitle().decode('utf-8')))
         self._fileHandler.addDir(self._mainPath)
         self._staticPath = os.path.join(self._mainPath, "static")
         self._fileHandler.addDir(self._staticPath)
@@ -243,8 +243,6 @@ class OfflineEventCreator(object):
         pass
 
     def _normalize_path(self, path):
-        if not isinstance(path, unicode):
-            path = path.decode('utf-8')
         return secure_filename(remove_tags(path))
 
     def _getAllMaterial(self):
