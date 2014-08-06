@@ -234,19 +234,17 @@ class AccessController( Persistent, Observable ):
         return any(domain.belongsTo(ip) for domain in self.getRequiredDomainList())
 
     def isAdmin(self, av):
-        if AdminList.getInstance().isAdmin(av):
-            return True
-        else:
-            return False
+        return AdminList.getInstance().isAdmin(av)
 
-    def canUserAccess( self, av ):
-        if self.isAdmin( av ):
+    def canUserAccess(self, av):
+        if self.isAdmin(av):
             return True
         for principal in self.allowed:
-            if principal == None:
+            if principal is None:
                 self.revokeAccess(principal)
                 continue
-            if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.Group)) and principal.containsUser( av ):
+            if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.Group)) and \
+               principal.containsUser(av):
                 return True
         if isinstance(av, MaKaC.user.Avatar):
             for email in av.getEmails():
