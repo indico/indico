@@ -176,7 +176,7 @@
 
             if (!validateForm()) {
                 e.preventDefault();
-                new AlertPopup($T("Error"), $T('There are some errors in the form.')).open();
+                new AlertPopup($T("Error"), $T('Please fill in all the required fields (highlighted in red).')).open();
             }
         });
 
