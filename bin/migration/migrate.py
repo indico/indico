@@ -360,8 +360,9 @@ def reindexCategoryNameAndConferenceTitle(dbi, prevVersion):
     categNameIdx = IndexesHolder().getIndex('categoryName')
     dbi.commit()
 
+    iterator = (x[1] for x in console.conferenceHolderIterator(ConferenceHolder(), deepness='event'))
     confTitleIdx.clear()
-    confTitleIdx.initialize(dbi, ConferenceHolder().itervalues())
+    confTitleIdx.initialize(dbi, iterator)
 
     categNameIdx.clear()
     categNameIdx.initialize(dbi, CategoryManager().itervalues())
