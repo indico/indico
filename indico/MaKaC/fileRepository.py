@@ -76,7 +76,7 @@ class MaterialLocalRepository(Persistent):
         except KeyError:
             fr = cls()
             if not "local_repositories" in dbRoot:
-                dbRoot["local_repositories"] = OOBTree()
+                dbRoot["local_repositories"] = OOBTree.OOBTree()
             dbRoot["local_repositories"][cls._repo_name] = fr
         return fr
 
