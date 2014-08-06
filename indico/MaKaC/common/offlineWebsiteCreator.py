@@ -23,6 +23,7 @@ import re
 import requests
 import string
 from bs4 import BeautifulSoup
+from werkzeug.utils import secure_filename
 from MaKaC import conference
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface import displayMgr
@@ -42,6 +43,7 @@ from MaKaC.fileRepository import OfflineRepository
 from MaKaC.PDFinterface.conference import ProgrammeToPDF, TimeTablePlain, AbstractBook, ContribToPDF, \
     ContribsToPDF
 from indico.util.contextManager import ContextManager
+from indico.util.string import remove_tags
 from indico.web.assets import ie_compatibility
 
 
@@ -107,7 +109,7 @@ class OfflineEventCreator(object):
         self._create_home()
 
         # Create main and static folders
-        self._mainPath = "OfflineWebsite-%s" % self._normalize_path(self._conf.getTitle())
+        self._mainPath = self._normalize_path(u'OfflineWebsite-{}'.format(self._conf.getTitle().decode('utf-8')))
         self._fileHandler.addDir(self._mainPath)
         self._staticPath = os.path.join(self._mainPath, "static")
         self._fileHandler.addDir(self._staticPath)
@@ -241,8 +243,7 @@ class OfflineEventCreator(object):
         pass
 
     def _normalize_path(self, path):
-        return path.translate(string.maketrans(' /:()*?<>|"',
-                                               '___________'))
+        return secure_filename(remove_tags(path))
 
     def _getAllMaterial(self):
         self._addMaterialFrom(self._conf, "events/conference")
