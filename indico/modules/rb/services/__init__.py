@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from indico.util.date_time import get_datetime_from_request
+from indico.util.date_time import get_datetime_from_request, format_date
 from indico.util.i18n import _
 from indico.modules.rb.models.holidays import Holiday
 from indico.modules.rb.models.utils import is_weekend
@@ -36,7 +36,7 @@ class GetDateWarning(ServiceBase):
         end_date = self._end_dt.date()
         holidays = Holiday.find_all(Holiday.date.in_([start_date, end_date]))
         if holidays:
-            return _(u'Holidays chosen: {0}'.format(', '.join(h.name for h in holidays)))
+            return _(u'Holidays chosen: {0}'.format(', '.join(h.name or format_date(h.date) for h in holidays)))
         if is_weekend(start_date) or is_weekend(end_date):
             return _(u'Weekend chosen')
         return None
