@@ -57,9 +57,6 @@ rooms.add_url_rule('/bookings/search/', 'roomBooking-search4Bookings', reservati
 rooms.add_url_rule('/bookings/search/mine/', 'my_bookings', reservation_handlers.RHRoomBookingSearchMyBookings,
                    methods=('GET', 'POST'))
 
-rooms.add_url_rule('/bookings/search/mine/pending', 'my_pending_bookings',
-                   reservation_handlers.RHRoomBookingSearchMyPendingBookings, methods=('GET', 'POST'))
-
 rooms.add_url_rule('/bookings/search/my-rooms/', 'bookings_my_rooms',
                    reservation_handlers.RHRoomBookingSearchBookingsMyRooms, methods=('GET', 'POST'))
 

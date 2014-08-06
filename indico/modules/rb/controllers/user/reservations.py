@@ -226,14 +226,6 @@ class RHRoomBookingSearchMyBookings(_RoomsWithBookingsMixin, RHRoomBookingSearch
     }
 
 
-class RHRoomBookingSearchMyPendingBookings(_RoomsWithBookingsMixin, RHRoomBookingSearchBookingsShortcutBase):
-    menu_item = 'myPendingBookingList'
-    search_criteria = {
-        'is_only_mine': True,
-        'is_only_pending_bookings': True
-    }
-
-
 class RHRoomBookingSearchBookingsMyRooms(_MyRoomsMixin, RHRoomBookingSearchBookingsShortcutBase):
     menu_item = 'usersBookings'
     search_criteria = {

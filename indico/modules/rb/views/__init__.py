@@ -84,12 +84,6 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
             enabled=True
         )
 
-        self._myPendingBookingListOpt = SideMenuItem(
-            _('My Pre-bookings'),
-            url_for('rooms.my_pending_bookings'),
-            enabled=True
-        )
-
         self._usersBookingsOpt = SideMenuItem(
             _('Bookings in my rooms'),
             url_for('rooms.bookings_my_rooms'),
@@ -160,7 +154,6 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
 
         self._leftMenu.addSection(self._bookingsOpt)
         self._bookingsOpt.addItem(self._myBookingListOpt)
-        self._bookingsOpt.addItem(self._myPendingBookingListOpt)
         self._bookingsOpt.addItem(self._usersBookingsOpt)
         self._bookingsOpt.addItem(self._usersPendingBookingsOpt)
         self._bookingsOpt.addItem(self._bookingListSearchOpt)
