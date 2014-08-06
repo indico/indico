@@ -19,6 +19,7 @@
 
 import os
 import re
+import sys
 import time
 from argparse import ArgumentParser
 from urlparse import urlparse
@@ -554,10 +555,24 @@ def main(main_uri, rb_uri, sqla_uri, photo_path, drop):
     start = time.clock()
     with app.app_context():
         if drop:
+            print cformat('%{yellow!}*** DANGER')
+            print cformat('%{yellow!}***%{reset} '
+                          '%{red!}ALL DATA%{reset} in your database will be %{red!}PERMANENTLY ERASED%{reset}!')
+            if raw_input(cformat('%{yellow!}***%{reset} To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
+                print 'Aborting'
+                sys.exit(1)
             delete_all_tables(db)
         db.create_all()
+        if Location.find().count():
+            # Usually there's no good reason to migrate with data in the DB. However, during development one might
+            # comment out some migration tasks and run the migration anyway.
+            print cformat('%{yellow!}*** WARNING')
+            print cformat('%{yellow!}***%{reset} Your database is not empty, migration will most likely fail!')
+            if raw_input(cformat('%{yellow!}***%{reset} To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
+                print 'Aborting'
+                sys.exit(1)
         migrate(main_root, rb_root, photo_path)
-    print (time.clock() - start), 'seconds'
+    print 'migration took {} seconds'.format((time.clock() - start))
 
 
 if __name__ == '__main__':
