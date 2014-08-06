@@ -199,7 +199,6 @@ def migrate_locations(main_root, rb_root):
         # create location
         l = Location(
             name=convert_to_unicode(old_location.friendlyName),
-            support_emails=convert_to_unicode(','.join(old_location._avcSupportEmails)),
             is_default=(old_location.friendlyName == default_location_name)
         )
 
