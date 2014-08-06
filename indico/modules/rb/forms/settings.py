@@ -33,3 +33,4 @@ class SettingsForm(IndicoForm):
                                      [InputRequired(), NumberRange(0, 23)], default=6)
     notification_before_days = IntegerField(_(u'Send occurrence notifications X days before the occurrence'),
                                             [InputRequired()], default=0)
+    vc_support_emails = EmailListField(_(u'Videoconference support email addresses (one per line)'))

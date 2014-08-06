@@ -53,9 +53,6 @@ class Location(db.Model):
         unique=True,
         index=True
     )
-    support_emails = db.Column(
-        db.String
-    )
     is_default = db.Column(
         db.Boolean,
         nullable=False,
@@ -121,8 +118,6 @@ class Location(db.Model):
         lazy='dynamic'
     )
 
-    # core
-
     @return_ascii
     def __repr__(self):
         return u'<Location({0}, {1}, {2})>'.format(
@@ -135,36 +130,6 @@ class Location(db.Model):
         d = Locator()
         d['locationId'] = self.name
         return d
-
-    # support emails
-
-    def getSupportEmails(self, to_list=True):
-        if self.support_emails:
-            if to_list:
-                return self.support_emails.split(',')
-            else:
-                return self.support_emails
-        else:
-            return ('', [])[to_list]
-
-    def setSupportEmails(self, emails):
-        if isinstance(emails, list):
-            self.support_emails = ','.join(emails)
-        else:
-            self.support_emails = emails
-
-    def addSupportEmails(self, *emails):
-        new_support_emails = sorted(set(self.getSupportEmails() + list(emails)))
-        self.support_emails = ','.join(new_support_emails)
-
-    def deleteSupportEmails(self, *emails):
-        support_emails = self.getSupportEmails()
-        for email in emails:
-            if email in emails:
-                support_emails.remove(email)
-        self.setSupportEmails(support_emails)
-
-    # aspects
 
     def getAspects(self):
         return self.aspects.all()

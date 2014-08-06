@@ -30,6 +30,7 @@ class WPRoomBookingPluginAdmin(WPRoomBookingPluginAdminBase):
         params['field_opts'] = {
             'assistance_emails': {'rows': 3, 'cols': 40},
             'notification_hour': {'size': 2},
-            'notification_before_days': {'size': 2}
+            'notification_before_days': {'size': 2},
+            'vc_support_emails': {'rows': 3, 'cols': 40}
         }
         return WTemplated('RoomBookingSettings').getHTML(params)

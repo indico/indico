@@ -44,8 +44,10 @@ class ReservationNotification(object):
         return self._make_email(to_list, subject, body)
 
     def compose_email_to_vc_support(self, **mail_params):
+        from indico.modules.rb import settings
+
         if self.reservation.is_confirmed and self.reservation.uses_video_conference:
-            to_list = self.reservation.room.location.getSupportEmails()
+            to_list = settings.get('vc_support_emails')
             if to_list:
                 subject = self._get_email_subject(**mail_params)
                 body = self._make_body(mail_params, reservation=self.reservation)
