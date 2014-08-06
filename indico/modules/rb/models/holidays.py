@@ -31,6 +31,9 @@ class Holiday(db.Model):
         nullable=False,
         index=True
     )
+    name = db.Column(
+        db.String
+    )
     location_id = db.Column(
         db.Integer,
         db.ForeignKey('locations.id'),
@@ -39,4 +42,4 @@ class Holiday(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return u'<Holiday({}, {}, {})>'.format(self.id, self.date, self.location.name)
+        return u'<Holiday({}, {}, {}, {})>'.format(self.id, self.date, self.name or 'n/a', self.location.name)
