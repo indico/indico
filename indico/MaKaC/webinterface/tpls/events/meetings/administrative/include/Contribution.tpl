@@ -19,7 +19,7 @@
         % endif
 
     </td>
-    <td class="itemTopAlign itemLeftAlign">
+    <td class="itemTopAlign itemLeftAlign itemTitle">
         ${item.getTitle()}
         <br/>
         % if minutes:

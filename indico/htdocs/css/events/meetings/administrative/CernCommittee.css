@@ -109,7 +109,13 @@ table.dayList{
    font-size: medium;
    font-style: italic;
    padding-left: 2em;
+   padding-right: 1em;
 }
+
+.itemTitle {
+    width: 60%;
+}
+
 .participantText{
    font-family: verdana, sans-serif;
    font-size: 12px;
@@ -117,7 +123,7 @@ table.dayList{
 }
 
 .participantText + br,
-.participantText ~ .materialDisplayName {
+.materialDisplayName {
     display: none;
 }
 
