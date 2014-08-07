@@ -23,7 +23,7 @@ Schema of a room
 
 import ast
 import json
-from datetime import date, timedelta
+from datetime import date
 
 from sqlalchemy import and_, func, or_
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -36,7 +36,7 @@ from MaKaC.common.cache import GenericCache
 from MaKaC.errors import MaKaCError
 from MaKaC.user import Avatar, AvatarHolder, GroupHolder
 from indico.core.db.sqlalchemy import db
-from indico.core.db.sqlalchemy.custom import greatest, least, static_array
+from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.errors import IndicoError
 from indico.modules.rb.utils import rb_check_user_access
 from indico.modules.rb.models.blockings import Blocking
@@ -47,7 +47,7 @@ from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttribut
 from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_equipments import RoomEquipment, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
-from indico.modules.rb.models.utils import Serializer, cached, versioned_cache, db_dates_overlap
+from indico.modules.rb.models.utils import Serializer, cached, versioned_cache
 from indico.util.i18n import _
 from indico.util.string import return_ascii, natural_sort_key
 from indico.web.flask.util import url_for
@@ -306,6 +306,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             return 'moderatedRoom'
         elif self.is_reservable:
             return 'basicRoom'
+        return ''
 
     @property
     def location_name(self):

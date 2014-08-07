@@ -48,7 +48,7 @@
         <form>
           <select id="roomID">
             % for room in rooms:
-              <option value="${ room.id }" class="${ roomClass(room) }">
+              <option value="${ room.id }" class="${ room.kind }">
                 ${ room.getFullName() }
               </option>
             % endfor

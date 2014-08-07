@@ -227,16 +227,6 @@ def quoteattr(s):
     return xml.sax.saxutils.quoteattr(s)
 
 
-def roomClass(room):
-    if not room.is_reservable or room.has_booking_groups:
-        return 'privateRoom'
-    elif room.is_reservable and room.reservations_need_confirmation:
-        return 'moderatedRoom'
-    elif room.is_reservable:
-        return 'basicRoom'
-    return ''
-
-
 def dequote(s):
     """Remove surrounding quotes from a string (if there are any)."""
     if ((s.startswith('"') or s.startswith("'"))
@@ -403,8 +393,6 @@ def registerHelpers(objDict):
             objDict['user'] = objDict['__rh__']._getUser()  # The '__rh__' is set by framework
     if 'rh' not in objDict and '__rh__' in objDict:
         objDict['rh'] = objDict['__rh__']
-    if not roomClass in objDict:
-        objDict['roomClass'] = roomClass
     if not 'systemIcon' in objDict:
         objDict['systemIcon'] = systemIcon
     if not 'iconFileName' in objDict:

@@ -16,7 +16,7 @@
                         % if room.name == roomItem.name:
                             <% selected = 'selected' %>
                         % endif
-                        <option data-location="${ roomItem.location.name }" data-id="${ roomItem.id }" ${ selected } class="${ roomClass(roomItem) }">
+                        <option data-location="${ roomItem.location.name }" data-id="${ roomItem.id }" ${ selected } class="${ roomItem.kind }">
                             ${ roomItem.location.name + ": " + roomItem.getFullName() }
                         </option>
                     % endfor
