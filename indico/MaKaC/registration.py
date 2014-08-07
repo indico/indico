@@ -3716,9 +3716,9 @@ class AccommodationForm(BaseForm, Fossilizable):
         dates = []
         curDate = startDate = conf.getStartDate() + timedelta(days=offsets[0])
         endDate = conf.getEndDate() + timedelta(days=offsets[1])
-        if startDate > endDate:
+        if startDate.date() > endDate.date():
             endDate = startDate
-        while curDate <= endDate:
+        while curDate.date() <= endDate.date():
             dates.append(curDate)
             curDate += timedelta(days=1)
         return dates
