@@ -30,10 +30,21 @@ class Setting(db.Model):
                       db.CheckConstraint('module = lower(module)'),
                       db.CheckConstraint('name = lower(name)'))
 
-    id = db.Column(db.Integer, primary_key=True)
-    module = db.Column(db.String, index=True)
-    name = db.Column(db.String, index=True)
-    value = db.Column(JSON)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    module = db.Column(
+        db.String,
+        index=True
+    )
+    name = db.Column(
+        db.String,
+        index=True
+    )
+    value = db.Column(
+        JSON
+    )
 
     @return_ascii
     def __repr__(self):
