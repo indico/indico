@@ -110,7 +110,7 @@ class Reservation(Serializer, db.Model):
         'id', ('start_date', 'startDT'), ('end_date', 'endDT'), 'repeat_unit', 'repeat_step',
         ('booked_for_name', 'bookedForName'), ('details_url', 'bookingUrl'), ('booking_reason', 'reason'),
         ('uses_video_conference', 'usesAVC'), ('needs_video_conference_setup', 'needsAVCSupport'),
-        'needs_general_assistance', ('is_confirmed', 'isConfirmed'), ('is_valid', 'isValid'), 'is_cancelled',
+        'needs_general_assistance', ('is_accepted', 'isConfirmed'), ('is_valid', 'isValid'), 'is_cancelled',
         'is_rejected', ('location_name', 'location')
     ]
 
@@ -181,7 +181,7 @@ class Reservation(Serializer, db.Model):
     contact_phone = db.Column(
         db.String
     )
-    is_confirmed = db.Column(
+    is_accepted = db.Column(
         db.Boolean,
         nullable=False
     )
@@ -255,11 +255,11 @@ class Reservation(Serializer, db.Model):
 
     @hybrid_property
     def is_valid(self):
-        return self.is_confirmed and not (self.is_rejected or self.is_cancelled)
+        return self.is_accepted and not (self.is_rejected or self.is_cancelled)
 
     @is_valid.expression
     def is_valid(self):
-        return self.is_confirmed & ~(self.is_rejected | self.is_cancelled)
+        return self.is_accepted & ~(self.is_rejected | self.is_cancelled)
 
     # core
 
@@ -275,11 +275,11 @@ class Reservation(Serializer, db.Model):
 
     @hybrid_property
     def is_pending(self):
-        return not (self.is_confirmed or self.is_rejected or self.is_cancelled)
+        return not (self.is_accepted or self.is_rejected or self.is_cancelled)
 
     @is_pending.expression
     def is_pending(self):
-        return ~(Reservation.is_confirmed | Reservation.is_rejected | Reservation.is_cancelled)
+        return ~(Reservation.is_accepted | Reservation.is_rejected | Reservation.is_cancelled)
 
     @property
     def location_name(self):
@@ -303,7 +303,7 @@ class Reservation(Serializer, db.Model):
                 parts.append(_("Cancelled"))
             if self.is_rejected:
                 parts.append(_("Rejected"))
-            if not self.is_confirmed:
+            if not self.is_accepted:
                 parts.append(_("Not confirmed"))
         if self.is_archived:
             parts.append(_("Archived"))
@@ -428,7 +428,7 @@ class Reservation(Serializer, db.Model):
         return []
 
     def accept(self, user):
-        self.is_confirmed = True
+        self.is_accepted = True
         self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=['Reservation accepted']))
         notify_confirmation(self)
 
@@ -487,7 +487,7 @@ class Reservation(Serializer, db.Model):
         for occurrence in valid_occurrences:
             for colliding in colliding_occurrences:
                 if occurrence.overlaps(colliding):
-                    key = 'confirmed' if colliding.reservation.is_confirmed else 'pending'
+                    key = 'confirmed' if colliding.reservation.is_accepted else 'pending'
                     conflicts[occurrence][key].append(colliding)
         return conflicts
 
@@ -531,7 +531,7 @@ class Reservation(Serializer, db.Model):
                 # Cancel OUR occurrence
                 msg = u'Skipped due to collision with {} reservation(s)'
                 occurrence.cancel(user, msg.format(len(conflicts['confirmed'])), silent=True, propagate=False)
-            elif conflicts['pending'] and self.is_confirmed:
+            elif conflicts['pending'] and self.is_accepted:
                 # Reject OTHER occurrences
                 for conflict in conflicts['pending']:
                     conflict.reject(user, u'Rejected due to collision with a confirmed reservation')
@@ -568,7 +568,7 @@ class Reservation(Serializer, db.Model):
                 setattr(reservation, field, data[field])
         reservation.room = room
         reservation.booked_for_name = reservation.booked_for_user.getFullName()
-        reservation.is_confirmed = not prebook
+        reservation.is_accepted = not prebook
         reservation.created_by_user = user
         reservation.create_occurrences(True, user)
         if not any(occ.is_valid for occ in reservation.occurrences):

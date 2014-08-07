@@ -186,9 +186,9 @@ class ReservationOccurrence(db.Model, Serializer):
             q = q.filter(Room.id.in_(filters['room_ids']))
 
         if filters.get('is_only_confirmed_bookings') and not filters.get('is_only_pending_bookings'):
-            q = q.filter(Reservation.is_confirmed)
+            q = q.filter(Reservation.is_accepted)
         elif not filters.get('is_only_confirmed_bookings') and filters.get('is_only_pending_bookings'):
-            q = q.filter(~Reservation.is_confirmed)
+            q = q.filter(~Reservation.is_accepted)
 
         if filters.get('is_rejected'):
             q = q.filter(Reservation.is_rejected | ReservationOccurrence.is_rejected)

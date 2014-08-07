@@ -402,7 +402,7 @@ def migrate_reservations(main_root, rb_root):
             contact_phone=convert_to_unicode(getattr(v, 'contactPhone', None)),
             created_by=convert_to_unicode(v.createdBy) or None,
             is_cancelled=v.isCancelled,
-            is_confirmed=v.isConfirmed,
+            is_accepted=v.isConfirmed,
             is_rejected=v.isRejected,
             booking_reason=convert_to_unicode(v.reason),
             rejection_reason=convert_to_unicode(getattr(v, 'rejectionReason', None)),

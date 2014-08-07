@@ -535,7 +535,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                                 ReservationOccurrence.is_valid,
                                 overlap_criteria]
         if not include_pre_bookings:
-            reservation_criteria.append(Reservation.is_confirmed)
+            reservation_criteria.append(Reservation.is_accepted)
         occurrences_filter = Reservation.occurrences.any(and_(*reservation_criteria))
         # Check availability against blockings
         if include_pending_blockings:

@@ -206,7 +206,7 @@ class RoomBookingCalendarWidget(object):
                     self.bars.append(bar)
 
     def _produce_prereservation_overlap_bars(self):
-        for _, occurrences in groupby((o for o in self.occurrences if not o.reservation.is_confirmed),
+        for _, occurrences in groupby((o for o in self.occurrences if not o.reservation.is_accepted),
                                       key=lambda o: o.reservation.room_id):
             occurrences = list(occurrences)
             for idx, o1 in enumerate(occurrences):
@@ -222,7 +222,7 @@ class RoomBookingCalendarWidget(object):
                 for occurrence in self.occurrences:
                     if candidate.overlaps(occurrence, skip_self=True):
                         start, end = candidate.get_overlap(occurrence)
-                        self.conflicts += occurrence.reservation.is_confirmed
+                        self.conflicts += occurrence.reservation.is_accepted
                         self.bars.append(Bar(start, end, overlapping=True, reservation=occurrence.reservation))
 
     def _produce_blocking_bars(self):
@@ -265,9 +265,9 @@ class Bar(Serializer):
             self.room_id = reservation.room_id
             if kind is None:
                 if not overlapping:
-                    kind = Bar.UNAVAILABLE if reservation.is_confirmed else Bar.PREBOOKED
+                    kind = Bar.UNAVAILABLE if reservation.is_accepted else Bar.PREBOOKED
                 else:
-                    kind = Bar.CONFLICT if reservation.is_confirmed else Bar.PRECONFLICT
+                    kind = Bar.CONFLICT if reservation.is_accepted else Bar.PRECONFLICT
 
         if blocking is not None:
             self.blocking = blocking

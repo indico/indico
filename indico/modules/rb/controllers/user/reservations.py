@@ -75,7 +75,7 @@ class RHRoomBookingAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
             raise IndicoError("You are not authorized to perform this action")
 
     def _process(self):
-        if self._reservation.find_overlapping().filter(Reservation.is_confirmed).count():
+        if self._reservation.find_overlapping().filter(Reservation.is_accepted).count():
             raise IndicoError("This reservation couldn't be accepted due to conflicts with other reservations")
         if self._reservation.is_pending:
             self._reservation.accept(session.user)
@@ -279,7 +279,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         for cand in candidates:
             for occ in occurrences:
                 if cand.overlaps(occ):
-                    if occ.reservation.is_confirmed:
+                    if occ.reservation.is_accepted:
                         conflicts[cand].append(occ)
                     else:
                         pre_conflicts[cand].append(occ)

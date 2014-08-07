@@ -46,7 +46,7 @@ class ReservationNotification(object):
     def compose_email_to_vc_support(self, **mail_params):
         from indico.modules.rb import settings
 
-        if self.reservation.is_confirmed and self.reservation.uses_video_conference:
+        if self.reservation.is_accepted and self.reservation.uses_video_conference:
             to_list = settings.get('vc_support_emails')
             if to_list:
                 subject = self._get_email_subject(**mail_params)
@@ -93,7 +93,7 @@ def notify_cancellation(reservation):
 
 @email_sender
 def notify_confirmation(reservation):
-    if not reservation.is_confirmed:
+    if not reservation.is_accepted:
         raise ValueError('Reservation is not confirmed')
     notification = ReservationNotification(reservation)
     return filter(None, [
@@ -122,12 +122,12 @@ def notify_creation(reservation):
     notification = ReservationNotification(reservation)
     return filter(None, [
         notification.compose_email_to_user(
-            subject='New Booking on' if reservation.is_confirmed else 'Pre-Booking awaiting acceptance',
-            template_name='creation_email_to_user' if reservation.is_confirmed else 'creation_pre_email_to_user'
+            subject='New Booking on' if reservation.is_accepted else 'Pre-Booking awaiting acceptance',
+            template_name='creation_email_to_user' if reservation.is_accepted else 'creation_pre_email_to_user'
         ),
         notification.compose_email_to_manager(
-            subject='New booking on' if reservation.is_confirmed else 'New Pre-Booking on',
-            template_name='creation_email_to_manager' if reservation.is_confirmed else 'creation_pre_email_to_manager'
+            subject='New booking on' if reservation.is_accepted else 'New Pre-Booking on',
+            template_name='creation_email_to_manager' if reservation.is_accepted else 'creation_pre_email_to_manager'
         ),
         notification.compose_email_to_vc_support(
             subject='New Booking on',

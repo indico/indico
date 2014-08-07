@@ -377,9 +377,9 @@ def _get_reservation_state_filter(params):
         if confirmed == 'pending':
             filters.append(Reservation.is_pending)
         elif _yesno(confirmed):
-            filters.append(Reservation.is_confirmed)
+            filters.append(Reservation.is_accepted)
         else:
-            filters.append(~Reservation.is_confirmed)
+            filters.append(~Reservation.is_accepted)
             filters.append(Reservation.is_rejected | Reservation.is_cancelled)
     if archived is not None:
         filters.append(Reservation.is_archived == _yesno(archived))

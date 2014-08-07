@@ -387,7 +387,7 @@
                           % if reservation.can_be_cancelled(_session.user):
                             <a class="i-button" href="#" onclick="submit_cancel(); return false;">${ _('Cancel') }</a>
                           % endif
-                          % if reservation.can_be_rejected(_session.user) and not reservation.is_confirmed:
+                          % if reservation.can_be_rejected(_session.user) and not reservation.is_accepted:
                             <a class="i-button" href="#" onclick="submit_accept(); return false;">${ _('Accept') }</a>
                           % endif
                           % if reservation.can_be_rejected(_session.user):
@@ -517,7 +517,7 @@
                   </td>
                 </tr>
               % endif
-              % if ((reservation.room.is_owned_by(user) or user.isRBAdmin()) and not reservation.is_confirmed and collisions):
+              % if ((reservation.room.is_owned_by(user) or user.isRBAdmin()) and not reservation.is_accepted and collisions):
                 <tr><td>&nbsp;</td></tr>
                 <!-- Occurrences -->
                 <tr>
@@ -527,7 +527,7 @@
                   <td>
                     % for col in collisions:
                       <strong>
-                        ${ _('Booking') if col.withReservation.is_confirmed else _('PRE-Booking') }:
+                        ${ _('Booking') if col.withReservation.is_accepted else _('PRE-Booking') }:
                       </strong>
                       ${ col.withReservation.booked_for_name },
                       ${ verbose_dt(col.withReservation.start_date) } - ${ verbose_dt(col.withReservation.end_date) }
