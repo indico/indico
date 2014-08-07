@@ -176,10 +176,12 @@ class Reservation(Serializer, db.Model):
     )
     # reservation specific
     contact_email = db.Column(
-        db.String
+        db.String,
+        nullable=False
     )
     contact_phone = db.Column(
-        db.String
+        db.String,
+        nullable=False
     )
     is_accepted = db.Column(
         db.Boolean,
@@ -197,8 +199,7 @@ class Reservation(Serializer, db.Model):
     )
     booking_reason = db.Column(
         db.Text,
-        nullable=False,
-        default=''
+        nullable=False
     )
     rejection_reason = db.Column(
         db.String

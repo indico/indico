@@ -53,7 +53,7 @@ class RoomAttributeAssociation(JSONStringBridgeMixin, db.Model):
 
     attribute = db.relationship(
         'RoomAttribute',
-        backref='room_assocs'
+        backref='room_associations'
     )
 
     def __init__(self, *args, **kwargs):
