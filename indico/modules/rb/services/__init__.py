@@ -25,6 +25,8 @@ from MaKaC.services.implementation.base import ServiceBase
 
 
 class GetDateWarning(ServiceBase):
+    UNICODE_PARAMS = True
+
     def _checkParams(self):
         self._start_dt = get_datetime_from_request(prefix='start_', source=self._params)
         self._end_dt = get_datetime_from_request(prefix='end_', source=self._params)

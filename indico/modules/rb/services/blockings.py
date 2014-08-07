@@ -18,11 +18,14 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from indico.util.i18n import _
 from MaKaC.services.implementation.base import ServiceBase
 from MaKaC.services.interface.rpc.common import ServiceError
 
 
 class RoomBookingBlockingProcessBase(ServiceBase):
+    UNICODE_PARAMS = True
+
     def _checkParams(self):
         self.blocked_room = BlockedRoom.get(self._params['blocked_room_id'])
 

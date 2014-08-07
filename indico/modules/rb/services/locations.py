@@ -22,5 +22,7 @@ from MaKaC.services.implementation.base import ServiceBase
 
 
 class RoomBookingListLocations(ServiceBase):
+    UNICODE_PARAMS = True
+
     def _getAnswer(self):
         return dict((name, name) for name in Location.getLocationNames())

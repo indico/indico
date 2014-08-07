@@ -18,20 +18,20 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 
-from flask import request, session
 import distutils
-
-from MaKaC.conference import Category
-
-import sys, traceback, time, os
-
-from pytz import timezone
+import os
+import sys
+import traceback
 from datetime import datetime, date
 
+from flask import request, session
+from pytz import timezone
+
+
+from MaKaC.conference import Category
 from MaKaC import conference
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common import security
-from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.common.utils import parseDateTime
 
 from MaKaC.errors import MaKaCError, HtmlForbiddenTag, TimingError
@@ -39,7 +39,6 @@ from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
     ResultWithWarning
 
 from MaKaC.webinterface.rh.base import RequestHandlerBase
-from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from MaKaC.accessControl import AccessWrapper
 
@@ -48,10 +47,10 @@ from MaKaC.common.contextManager import ContextManager
 import MaKaC.common.info as info
 
 from indico.core.config import Config
+from indico.util.string import unicode_struct_to_utf8
 
-"""
-base module for asynchronous server requests
-"""
+# base module for asynchronous server requests
+
 
 class ExpectedParameterException(ServiceError):
     """
@@ -69,6 +68,7 @@ class EmptyParameterException(ServiceError):
     """
     def __init__(self, paramName=""):
         ServiceError.__init__(self, "ERR-P3","Expected parameter '%s' is empty"%paramName)
+
 
 class DateTimeParameterException(ServiceError):
     """
@@ -96,7 +96,7 @@ class ParameterManager(object):
         """
 
         # "global" policy applies if allowEmpty not set
-        if (allowEmpty is None):
+        if allowEmpty is None:
             allowEmpty = self._allowEmpty
 
         value = self._paramList.get(paramName)
@@ -162,8 +162,12 @@ class ServiceBase(RequestHandlerBase):
     The ServiceBase class is the basic class for services.
     """
 
+    UNICODE_PARAMS = False
+
     def __init__(self, params):
         RequestHandlerBase.__init__(self)
+        if not self.UNICODE_PARAMS:
+            params = unicode_struct_to_utf8(params)
         self._reqParams = self._params = params
         self._requestStarted = False
         # Fill in the aw instance with the current information

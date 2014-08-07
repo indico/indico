@@ -34,6 +34,8 @@ from MaKaC.webinterface.linking import RoomLinker
 
 
 class RoomBookingListRooms(ServiceBase):
+    UNICODE_PARAMS = True
+
     def _checkParams(self):
         try:
             location = Location.find_one(name=self._params['location'])
@@ -51,6 +53,8 @@ class RoomBookingFullNameListRooms(RoomBookingListRooms):
 
 
 class RoomBookingAvailabilitySearchRooms(ServiceBase):
+    UNICODE_PARAMS = True
+
     def _checkParams(self):
         self._start_dt = get_datetime_from_request(prefix='start_', source=self._params)
         self._end_dt = get_datetime_from_request(prefix='end_', source=self._params)
@@ -62,6 +66,8 @@ class RoomBookingAvailabilitySearchRooms(ServiceBase):
 
 
 class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):
+    UNICODE_PARAMS = True
+
     def _checkParams(self):
         self._isActive = self._params.get('isActive', None)
 
@@ -76,6 +82,8 @@ class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):
 
 
 class RoomBookingLocationsAndRoomsGetLink(ServiceBase):
+    UNICODE_PARAMS = True
+
     def _checkParams(self):
         self._location = self._params['location']
         self._room = self._params['room']
@@ -85,6 +93,8 @@ class RoomBookingLocationsAndRoomsGetLink(ServiceBase):
 
 
 class BookingPermission(LoggedOnlyService):
+    UNICODE_PARAMS = True
+
     def _checkParams(self):
         blocking_id = self._params.get('blocking_id')
         self._room = Room.get(self._params['room_id'])

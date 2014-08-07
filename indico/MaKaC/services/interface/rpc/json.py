@@ -35,7 +35,7 @@ from MaKaC.services.interface.rpc.process import ServiceRunner
 
 from indico.core.logger import Logger
 from indico.util.json import dumps, loads
-from indico.util.string import fix_broken_obj
+from indico.util.string import fix_broken_obj, unicode_struct_to_utf8
 
 
 def encode(obj):
@@ -43,28 +43,7 @@ def encode(obj):
 
 
 def decode(s):
-    return unicodeToUtf8(loads(s))
-
-
-def unicodeToUtf8(obj):
-    """ obj must be a unicode object, a list or a dictionary
-        This method will loop through the object and change unicode objects into str objects encoded in utf-8.
-        If a list or a dictionary is found during the loop, a recursive call is made.
-        However this method does not support objects that are not lists or dictionaries.
-        This method is useful to turn unicode objects from the output object given by loads(),
-        into str objects encoded in utf-8.
-        In case of a persistent object or an object inside a persistent object,
-        you will need to notify the database of changes in the object after calling this method.
-        Author: David Martin Clavo
-    """
-
-    if isinstance(obj, unicode):
-        return obj.encode('utf-8','replace')
-    if isinstance(obj, list):
-        obj = map(unicodeToUtf8, obj)
-    if isinstance(obj, dict):
-        obj = dict((unicodeToUtf8(k), unicodeToUtf8(v)) for k, v in obj.items())
-    return obj
+    return unicode_struct_to_utf8(loads(s))
 
 
 def process():

@@ -25,6 +25,8 @@ from MaKaC.services.interface.rpc.common import ServiceError
 
 
 class RoomBookingMapBase(ServiceBase):
+    UNICODE_PARAMS = True
+
     def _param(self, parameter_name):
         try:
             return self._params[parameter_name]
