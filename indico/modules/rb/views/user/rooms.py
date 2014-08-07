@@ -17,15 +17,15 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, time
+from datetime import datetime, time, date
 
 from dateutil.relativedelta import relativedelta
+from indico.modules.rb.models.locations import Location
 
 from MaKaC.roomMapping import RoomMapperHolder
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
-from indico.modules.rb.models.utils import next_work_day
 from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
 from indico.util.i18n import _
@@ -87,9 +87,8 @@ class WPRoomBookingSearchRooms(WPRoomBookingBase):
         self._roomSearchOpt.setActive(True)
 
     def _getBody(self, params):
-        today = next_work_day()
-        params['startDT'] = datetime.combine(today.date(), time(8, 30))
-        params['endDT'] = datetime.combine(today.date(), time(17, 30))
+        params['startDT'] = datetime.combine(date.today(), Location.working_time_start)
+        params['endDT'] = datetime.combine(date.today(), Location.working_time_end)
         params['startT'] = params['startDT'].strftime('%H:%M')
         params['endT'] = params['endDT'].strftime('%H:%M')
         return WTemplated('RoomBookingSearchRooms').getHTML(params)

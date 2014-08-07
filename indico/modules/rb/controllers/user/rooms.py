@@ -35,7 +35,6 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatMapping, RepeatUnit, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.room_equipments import RoomEquipment
-from indico.modules.rb.models.utils import next_work_day
 from indico.modules.rb.statistics import calculate_rooms_occupancy, compose_rooms_stats
 from indico.modules.rb.views.user.rooms import (WPRoomBookingSearchRooms, WPRoomBookingMapOfRooms,
                                                 WPRoomBookingMapOfRoomsWidget, WPRoomBookingRoomDetails,
@@ -72,8 +71,10 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
                                                  buildings=buildings,
                                                  room_id=self._room_id,
                                                  default_repeat=(RepeatUnit.NEVER, 0),
-                                                 default_start_dt=datetime.combine(next_work_day(), time(8)),
-                                                 default_end_dt=datetime.combine(next_work_day(), time(17)),
+                                                 default_start_dt=datetime.combine(date.today(),
+                                                                                   Location.working_time_start),
+                                                 default_end_dt=datetime.combine(date.today(),
+                                                                                 Location.working_time_end),
                                                  repeat_mapping=RepeatMapping.getMapping()).display()
             self._cache.set(key, html, 3600)
         return html
@@ -127,8 +128,8 @@ class RHRoomBookingRoomDetails(RHRoomBookingBase):
     @requires_location
     @requires_room
     def _checkParams(self):
-        self._calendar_start = next_work_day()
-        self._calendar_end = datetime.combine(self._calendar_start, time(23, 59))
+        self._calendar_start = datetime.combine(date.today(), time())
+        self._calendar_end = datetime.combine(date.today(), time(23, 59))
         try:
             preview_months = int(request.args.get('preview_months', '0'))
         except (TypeError, ValueError):

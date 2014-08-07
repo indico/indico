@@ -17,10 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from indico.util.date_time import get_datetime_from_request, format_date
+from indico.util.date_time import get_datetime_from_request, format_date, is_weekend
 from indico.util.i18n import _
 from indico.modules.rb.models.holidays import Holiday
-from indico.modules.rb.models.utils import is_weekend
 from MaKaC.services.implementation.base import ServiceBase
 
 

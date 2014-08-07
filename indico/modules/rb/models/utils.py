@@ -23,37 +23,17 @@ Small functions and classes widely used in Room Booking Module.
 
 import json
 import random
-from datetime import date, datetime
+from datetime import datetime
 from functools import wraps
 
-from dateutil.relativedelta import MO, TU, WE, TH, FR, SA, SU
+from dateutil.relativedelta import MO, TU, WE, TH, FR
 from dateutil.rrule import rrule, DAILY
-from sqlalchemy.orm import class_mapper
 from sqlalchemy.sql import over, func
 
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.util.decorators import cached_writable_property
 from indico.util.i18n import _
-
-
-def getDefaultValue(cls, attr):
-    for p in class_mapper(cls).iterate_properties:
-        if p.key == attr:
-            if len(p.columns) == 1:
-                if p.columns[0].default:
-                    return p.columns[0].default.arg
-                else:
-                    raise RuntimeError('This attribute doesn\'t have a default value')
-            else:
-                raise RuntimeError('Non or multiple column attribute')
-    raise RuntimeError('Attribute couldn\'t be found')
-
-
-def clone(cls, obj):
-    pks = set([c.key for c in class_mapper(cls).primary_key])
-    attrs = [p.key for p in class_mapper(cls).iterate_properties if p.key not in pks]
-    return cls(**dict((attr, getattr(obj, attr)) for attr in attrs))
 
 
 def unimplemented(exceptions=(Exception,), message='Unimplemented'):
@@ -178,30 +158,12 @@ class JSONStringBridgeMixin:
         return self.value.get('is_' + x, False)
 
 
-def is_none_valued_dict(d):
-    return filter(lambda e: e is None, d.values())
-
-
-def is_false_valued_dict(d):
-    return len(filter(None, d.values())) != len(d)
-
-
-def strip_if_unicode(e):
-    return e.strip() if e and isinstance(e, unicode) else e
-
-
-def is_weekend(d):
-    assert isinstance(d, date) or isinstance(d, datetime)
-    return d.weekday() in [e.weekday for e in [SA, SU]]
-
-
 def next_work_day(dtstart=None, neglect_time=True):
     if not dtstart:
         dtstart = datetime.utcnow()
     if neglect_time:
         dtstart = datetime.combine(dtstart.date(), datetime.min.time())
-    return list(rrule(DAILY, count=1, byweekday=(MO, TU, WE, TH, FR),
-                      dtstart=dtstart))[0]
+    return list(rrule(DAILY, count=1, byweekday=(MO, TU, WE, TH, FR), dtstart=dtstart))[0]
 
 
 def proxy_to_reservation_if_single_occurrence(f):

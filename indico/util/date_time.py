@@ -29,7 +29,7 @@ from babel.dates import format_date as _format_date
 from babel.dates import format_timedelta as _format_timedelta
 from babel.dates import get_timezone
 from babel.numbers import format_number as _format_number
-from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR
+from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
@@ -199,6 +199,10 @@ def get_overlap(range1, range2):
 def iterdays(start, end, skip_weekends=False):
     weekdays = (MO, TU, WE, TH, FR) if skip_weekends else None
     return rrule(DAILY, dtstart=start, until=end, byweekday=weekdays)
+
+
+def is_weekend(d):
+    return d.weekday() in [e.weekday for e in (SA, SU)]
 
 
 def get_datetime_from_request(prefix='', default=None, source=None):

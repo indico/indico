@@ -38,7 +38,7 @@ from MaKaC.common.Locators import Locator
 class Location(db.Model):
     __tablename__ = 'locations'
 
-    working_time_start = time(8)
+    working_time_start = time(8, 30)
     working_time_end = time(17, 30)
 
     # columns

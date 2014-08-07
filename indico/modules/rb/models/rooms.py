@@ -56,10 +56,6 @@ from indico.web.flask.util import url_for
 _cache = GenericCache('Rooms')
 
 
-class RoomKind(object):
-    BASIC, MODERATED, PRIVATE = 'basicRoom', 'moderatedRoom', 'privateRoom'
-
-
 class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     __tablename__ = 'rooms'
     __public__ = [
@@ -258,18 +254,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     @is_auto_confirm.expression
     def is_auto_confirm(self):
         return ~self.reservations_need_confirmation
-
-    @property
-    @cached(_cache)
-    def available_video_conference(self):
-        return self.find_available_video_conference().all()
-
-    @property
-    def bookable_time_per_day(self):
-        bookable_time = (self.bookable_times
-                             .with_entities(func.sum(BookableTime.end_time - BookableTime.start_time))
-                             .group_by(BookableTime.start_time)).scalar()
-        return bookable_time.total_seconds() if bookable_time else 3600 * 24  # seconds in a day
 
     @property
     def booking_url(self):
@@ -773,11 +757,3 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if quiet:
             return False
         raise IndicoError('Room cannot be booked at this time')
-
-    def get_nonbookable_days(self, start_date, end_date):
-        earliest_day = greatest(NonBookableDate.start_date, start_date)
-        latest_day = least(NonBookableDate.end_date, end_date)
-        query = (self.nonbookable_dates.with_entities(func.sum(latest_day - earliest_day) + timedelta(1))
-                 .filter(db_dates_overlap(NonBookableDate, 'start_date', start_date, 'end_date', end_date))
-                 .group_by(NonBookableDate.end_date))
-        return (query.scalar() or timedelta()).days
