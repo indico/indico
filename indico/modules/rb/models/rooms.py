@@ -17,10 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Schema of a room
-"""
-
 import ast
 import json
 from datetime import date
@@ -82,13 +78,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         'id', ('full_name', 'fullName')
     )
 
-    # columns
-
     id = db.Column(
         db.Integer,
         primary_key=True
     )
-    # location
     location_id = db.Column(
         db.Integer,
         db.ForeignKey('locations.id'),
@@ -98,12 +91,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         db.Integer,
         db.ForeignKey('photos.id')
     )
-    # user-facing identifier of the room
     name = db.Column(
         db.String,
         nullable=False
     )
-    # address
     site = db.Column(
         db.String,
         default=''
@@ -125,7 +116,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         default='',
         nullable=False
     )
-    # notifications
     notification_for_start = db.Column(
         db.Integer
     )
@@ -149,7 +139,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         nullable=False,
         default=False
     )
-    # extra info about room
     telephone = db.Column(
         db.String
     )
@@ -172,12 +161,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     comments = db.Column(
         db.String
     )
-    # just a pointer to avatar
     owner_id = db.Column(
         db.String,
         nullable=False
     )
-    # reservations
     is_active = db.Column(
         db.Boolean,
         nullable=False,
@@ -192,8 +179,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     max_advance_days = db.Column(
         db.Integer
     )
-
-    # relationships
 
     attributes = db.relationship(
         'RoomAttributeAssociation',
@@ -396,8 +381,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     def getAccessKey(self):
         return ''
-
-    # rooms
 
     @staticmethod
     def getRoomWithDefaults():

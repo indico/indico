@@ -17,10 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Equipments for rooms
-"""
-
 from indico.core.db import db
 from indico.util.string import return_ascii
 
@@ -76,8 +72,6 @@ class RoomEquipment(db.Model):
     __tablename__ = 'room_equipments'
     __table_args__ = (db.UniqueConstraint('name', 'location_id'),)
 
-    # columns
-
     id = db.Column(
         db.Integer,
         primary_key=True
@@ -105,13 +99,9 @@ class RoomEquipment(db.Model):
         )
     )
 
-    # core
-
     @return_ascii
     def __repr__(self):
         return u'<RoomEquipment({0}, {1}, {2})>'.format(self.id, self.name, self.location_id)
-
-    # getters
 
     @staticmethod
     def getEquipmentNames():

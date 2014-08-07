@@ -17,10 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Attribute keys for rooms and reservations
-"""
-
 from indico.core.db import db
 from indico.util.string import return_ascii
 from indico.modules.rb.models.utils import JSONStringBridgeMixin
@@ -28,8 +24,6 @@ from indico.modules.rb.models.utils import JSONStringBridgeMixin
 
 class RoomAttributeAssociation(JSONStringBridgeMixin, db.Model):
     __tablename__ = 'rooms_attributes_association'
-
-    # columns
 
     attribute_id = db.Column(
         db.Integer,
@@ -48,8 +42,6 @@ class RoomAttributeAssociation(JSONStringBridgeMixin, db.Model):
     raw_data = db.Column(
         db.String
     )
-
-    # relationships
 
     attribute = db.relationship(
         'RoomAttribute',
@@ -70,8 +62,6 @@ class RoomAttributeAssociation(JSONStringBridgeMixin, db.Model):
 class RoomAttribute(JSONStringBridgeMixin, db.Model):
     __tablename__ = 'room_attributes'
     __table_args__ = (db.UniqueConstraint('name', 'location_id'),)
-
-    # columns
 
     id = db.Column(
         db.Integer,
@@ -98,8 +88,6 @@ class RoomAttribute(JSONStringBridgeMixin, db.Model):
     raw_data = db.Column(
         db.String
     )
-
-    # relationships
 
     children = db.relationship(
         'RoomAttribute',

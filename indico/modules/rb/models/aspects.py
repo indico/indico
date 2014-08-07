@@ -17,18 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-A view of map of rooms in a specific location
-"""
-
 from indico.core.db import db
 from indico.util.string import return_ascii
 
 
 class Aspect(db.Model):
     __tablename__ = 'aspects'
-
-    # columns
 
     id = db.Column(
         db.Integer,
@@ -72,8 +66,6 @@ class Aspect(db.Model):
         nullable=False
     )
 
-    # core
-
     @return_ascii
     def __repr__(self):
         return u'<Aspect({0}, {1}, {2})>'.format(
@@ -81,8 +73,6 @@ class Aspect(db.Model):
             self.location_id,
             self.name
         )
-
-    # getters
 
     @staticmethod
     def getAspectById(aid):

@@ -17,10 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Nonbookable dates of rooms
-"""
-
 from indico.core.db import db
 from indico.util.string import return_ascii
 
@@ -28,9 +24,6 @@ from indico.util.string import return_ascii
 class NonBookableDate(db.Model):
     __tablename__ = 'room_nonbookable_dates'
 
-    # columns
-
-    # dates
     start_date = db.Column(
         db.DateTime,
         nullable=False,
@@ -41,7 +34,6 @@ class NonBookableDate(db.Model):
         nullable=False,
         primary_key=True
     )
-    # room
     room_id = db.Column(
         db.Integer,
         db.ForeignKey('rooms.id'),

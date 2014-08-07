@@ -17,9 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Schema of a blocked room (rejection and notification info about blocking)
-"""
 from datetime import datetime, time
 from operator import attrgetter
 
@@ -44,7 +41,6 @@ class BlockedRoom(db.Model):
 
     State = BlockedRoomState  # make it available here for convenience
 
-    # columns
     id = db.Column(
         db.Integer,
         primary_key=True

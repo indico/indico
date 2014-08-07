@@ -17,11 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Schema of a blocking (dates, related rooms and principals)
-"""
-
-
 from sqlalchemy.ext.hybrid import hybrid_method
 
 from indico.core.db import db
@@ -33,8 +28,6 @@ from MaKaC.user import AvatarHolder
 
 class Blocking(db.Model):
     __tablename__ = 'blockings'
-
-    # columns
 
     id = db.Column(
         db.Integer,
@@ -63,8 +56,6 @@ class Blocking(db.Model):
         db.Text,
         nullable=False
     )
-
-    # relationships
 
     allowed = db.relationship(
         'BlockingPrincipal',

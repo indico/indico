@@ -17,10 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Schema of a principal (user or group that isn't affected by blocking)
-"""
-
 from indico.core.db import db
 from indico.util.string import return_ascii
 from MaKaC.user import AvatarHolder, GroupHolder

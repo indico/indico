@@ -17,10 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Available times to book for rooms
-"""
-
 from indico.core.db import db
 from indico.util.string import return_ascii
 

@@ -17,10 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Schema of modifications done on a reservation
-"""
-
 from sqlalchemy.dialects.postgresql import ARRAY
 
 from indico.core.db import db

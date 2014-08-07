@@ -17,10 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Holder of rooms in a place and its map view related data
-"""
-
 from collections import defaultdict
 from datetime import time
 
@@ -40,8 +36,6 @@ class Location(db.Model):
 
     working_time_start = time(8, 30)
     working_time_end = time(17, 30)
-
-    # columns
 
     id = db.Column(
         db.Integer,
@@ -68,8 +62,6 @@ class Location(db.Model):
             ondelete='SET NULL'
         )
     )
-
-    # relationships
 
     aspects = db.relationship(
         'Aspect',
@@ -158,8 +150,6 @@ class Location(db.Model):
     def isMapAvailable(self):
         return self.aspects.count() > 0
 
-    # default location management
-
     @staticmethod
     def getDefaultLocation():
         return Location.query.filter_by(is_default=True).first()
@@ -171,18 +161,12 @@ class Location(db.Model):
          .filter(Location.is_default | (Location.id == self.id))
          .update({'is_default': func.not_(Location.is_default)}, synchronize_session='fetch'))
 
-    # generic location management
-
     @staticmethod
     def getLocationByName(name):
         return Location.query.filter_by(name=name).first()
 
-    # attribute management
-
     def getAttributeByName(self, name):
         return self.attributes.filter_by(name=name).first()
-
-    # equipment management
 
     def getEquipments(self):
         return self.equipment_objects.all()

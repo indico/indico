@@ -17,9 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Schema of a reservation
-"""
 from collections import defaultdict, OrderedDict
 from datetime import datetime
 
@@ -121,13 +118,10 @@ class Reservation(Serializer, db.Model):
                 db.Index('ix_reservations_start_date_time', cast(cls.start_date, Time)),
                 db.Index('ix_reservations_end_date_time', cast(cls.end_date, Time)))
 
-    # columns
-
     id = db.Column(
         db.Integer,
         primary_key=True
     )
-    # dates
     created_at = db.Column(
         UTCDateTime,
         nullable=False,
@@ -143,7 +137,6 @@ class Reservation(Serializer, db.Model):
         nullable=False,
         index=True
     )
-    # repeatability
     repeat_unit = db.Column(
         db.SmallInteger,
         nullable=False,
@@ -154,7 +147,6 @@ class Reservation(Serializer, db.Model):
         nullable=False,
         default=0
     )  # 1, 2, 3, etc.
-    # user
     booked_for_id = db.Column(
         db.String
         # Must be nullable for legacy data :(
@@ -167,14 +159,12 @@ class Reservation(Serializer, db.Model):
         db.String
         # Must be nullable for legacy data :(
     )
-    # room
     room_id = db.Column(
         db.Integer,
         db.ForeignKey('rooms.id'),
         nullable=False,
         index=True
     )
-    # reservation specific
     contact_email = db.Column(
         db.String,
         nullable=False
@@ -204,7 +194,6 @@ class Reservation(Serializer, db.Model):
     rejection_reason = db.Column(
         db.String
     )
-    # extras
     uses_video_conference = db.Column(
         db.Boolean,
         nullable=False,
@@ -224,8 +213,6 @@ class Reservation(Serializer, db.Model):
         db.Integer,
         index=True
     )
-
-    # relationships
 
     edit_logs = db.relationship(
         'ReservationEditLog',
@@ -261,8 +248,6 @@ class Reservation(Serializer, db.Model):
     @is_valid.expression
     def is_valid(self):
         return self.is_accepted & ~(self.is_rejected | self.is_cancelled)
-
-    # core
 
     @return_ascii
     def __repr__(self):
@@ -384,8 +369,6 @@ class Reservation(Serializer, db.Model):
 
         return result.values()
 
-    # reservations
-
     @staticmethod
     def getReservationByCreationTime(dt):
         return Reservation.query.filter_by(created_at=dt).first()
@@ -420,7 +403,6 @@ class Reservation(Serializer, db.Model):
         if email_list:
             return email_list.split(',')
 
-    # TODO: attribute names to the top
     def getNotificationEmailList(self):
         return []  # TODO: re-enable once getAttributeByName works
         notification_list = self.getAttributeByName('notification-email')
@@ -459,12 +441,8 @@ class Reservation(Serializer, db.Model):
             log_msg = u'Reservation rejected: {}'.format(reason)
             self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
 
-    # edit logs
-
     def add_edit_log(self, edit_log):
         self.edit_logs.append(edit_log)
-
-    # ================================================
 
     def find_excluded_days(self):
         return self.occurrences.filter(~ReservationOccurrence.is_valid)
