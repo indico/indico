@@ -26,8 +26,8 @@ from datetime import datetime
 
 from persistent.dict import PersistentDict
 
-from ..core.config import Config
-from .i18n import LazyProxy
+from indico.core.config import Config
+from indico.util.i18n import LazyProxy
 
 
 class _JSONEncoder(_json.JSONEncoder):

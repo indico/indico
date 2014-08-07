@@ -24,11 +24,12 @@ import logging
 import flask.ext.sqlalchemy
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.utils import cached_property
-
 from zope.sqlalchemy import ZopeTransactionExtension
-from .util import IndicoModel
+
+from indico.core.db.sqlalchemy.util import IndicoModel
 
 # Monkeypatching this since Flask-SQLAlchemy doesn't let us override the model class
+
 flask.ext.sqlalchemy.Model = IndicoModel
 
 

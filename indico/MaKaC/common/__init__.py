@@ -27,6 +27,6 @@ if not skip_imports:
 
     __all__ = ['HelperMaKaCInfo', 'URL', 'Config']
 
-    from .Configuration import Config
-    from .info import HelperMaKaCInfo
-    from .url import URL
+    from MaKaC.common.Configuration import Config
+    from MaKaC.common.info import HelperMaKaCInfo
+    from MaKaC.common.url import URL

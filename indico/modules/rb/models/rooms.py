@@ -433,7 +433,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     @staticmethod
     def getRoomsWithData(*args, **kwargs):
-        from .locations import Location
+        from indico.modules.rb.models.locations import Location
 
         only_active = kwargs.pop('only_active', True)
         filters = kwargs.pop('filters', None)
@@ -535,7 +535,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     @staticmethod
     def getRoomsForRoomList(form, avatar):
-        from .locations import Location
+        from indico.modules.rb.models.locations import Location
 
         equipment_count = len(form.equipments.data)
         equipment_subquery = (

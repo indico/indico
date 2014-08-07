@@ -117,7 +117,8 @@ class ReservationOccurrence(db.Model, Serializer):
 
     @staticmethod
     def iter_start_time(start, end, repetition):
-        from .reservations import RepeatUnit
+        from indico.modules.rb.models.reservations import RepeatUnit
+
         repeat_unit, repeat_step = repetition
 
         if repeat_unit == RepeatUnit.NEVER:

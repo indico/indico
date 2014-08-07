@@ -21,9 +21,9 @@ from functools import wraps
 
 from flask import request
 
-from ..core.errors import IndicoError
-from ..core.logger import Logger
-from .json import create_json_error_answer
+from indico.core.errors import IndicoError
+from indico.core.logger import Logger
+from indico.util.json import create_json_error_answer
 
 
 class classproperty(property):

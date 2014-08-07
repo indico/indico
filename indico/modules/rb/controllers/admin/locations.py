@@ -24,6 +24,7 @@ from MaKaC.webinterface import urlHandlers
 from indico.core.errors import IndicoError, FormValuesError, NoReportError
 from indico.core.db import db
 from indico.util.i18n import _
+from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
@@ -31,7 +32,6 @@ from indico.modules.rb.models.room_attributes import RoomAttribute
 from indico.modules.rb.statistics import calculate_rooms_occupancy, compose_rooms_stats
 from indico.modules.rb.views.admin.locations import WPRoomBookingAdmin, WPRoomBookingAdminLocation
 from indico.util.string import natural_sort_key
-from . import RHRoomBookingAdminBase
 
 
 class RHRoomBookingAdmin(RHRoomBookingAdminBase):
