@@ -255,9 +255,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     @property
     def full_name(self):
         if self.has_special_name:
-            return u'{} - {}'.format(self.generateName(), self.name)
+            return u'{} - {}'.format(self.generate_name(), self.name)
         else:
-            return u'{}'.format(self.generateName())
+            return u'{}'.format(self.generate_name())
 
     @property
     @cached(_cache)
@@ -271,7 +271,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     @property
     def has_special_name(self):
-        return self.name != self.generateName()
+        return self.name and self.name != self.generate_name()
 
     @property
     @cached(_cache)
@@ -365,7 +365,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         locator['roomID'] = self.id
         return locator
 
-    def generateName(self):
+    def generate_name(self):
         return u'{}-{}-{}'.format(
             self.building,
             self.floor,
@@ -376,25 +376,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return self.full_name
 
     def update_name(self):
-        if not self.name and self.building and self.floor and self.number:
-            self.name = self.generateName()
+        if not self.has_special_name and self.building and self.floor and self.number:
+            self.name = self.generate_name()
 
     def getAccessKey(self):
         return ''
-
-    @staticmethod
-    def getRoomWithDefaults():
-        return Room(
-            capacity=20,
-            is_active=True,
-            is_reservable=True,
-            reservations_need_confirmation=False,
-            notification_for_start=0,
-            notification_for_end=False,
-            notification_for_responsible=False,
-            notification_for_assistance=False,
-            max_advance_days=30
-        )
 
     @classmethod
     def find_all(cls, *args, **kwargs):

@@ -67,8 +67,10 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         form_class = type('RoomFormWithAttributes', (RoomForm,), {})
 
         # Default values
-        defaults = FormDefaults(room, skip_attrs={'nonbookable_dates', 'bookable_times'})
+        defaults = None
         if room.id is not None:
+            skip_name = set() if room.has_special_name else {'name'}
+            defaults = FormDefaults(room, skip_attrs={'nonbookable_dates', 'bookable_times'} | skip_name)
             for ra in room.attributes.all():
                 defaults['attribute_{}'.format(ra.attribute_id)] = ra.value
 
@@ -112,6 +114,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         form = self._form
         # Simple fields
         form.populate_obj(room, skip=('bookable_times', 'nonbookable_dates'), existing_only=True)
+        room.update_name()
         # Photos
         if form.small_photo.data and form.large_photo.data:
             _cache.delete_multi('photo-{}-{}'.format(room.id, size) for size in {'small', 'large'})
@@ -163,7 +166,7 @@ class RHRoomBookingModifyRoom(RHRoomBookingCreateModifyRoomBase):
 class RHRoomBookingCreateRoom(RHRoomBookingCreateModifyRoomBase):
     @requires_location(parameter_name='roomLocation')
     def _checkParams(self):
-        self._room = Room.getRoomWithDefaults()
+        self._room = Room()
         self._form = self._make_form()
 
     def _save(self):
