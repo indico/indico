@@ -17,15 +17,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, time, date
+from datetime import datetime, date
 
 from dateutil.relativedelta import relativedelta
-from indico.modules.rb.models.locations import Location
+from flask import session
 
 from MaKaC.roomMapping import RoomMapperHolder
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
+from indico.modules.rb.models.locations import Location
 from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
 from indico.util.i18n import _
@@ -140,7 +141,8 @@ class WRoomBookingRoomDetails(WTemplated):
         wvars['standalone'] = self._standalone
         room = wvars['room']
 
-        wvars['attrs'] = {attr.attribute.name: attr for attr in room.attributes}
+        wvars['attrs'] = {attr.attribute.name: attr for attr in room.attributes
+                          if not attr.attribute.is_hidden or session.user.isRBAdmin()}
 
         wvars['owner_name'] = room.getResponsibleName()
 

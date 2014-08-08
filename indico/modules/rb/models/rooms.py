@@ -21,7 +21,7 @@ import ast
 import json
 from datetime import date
 
-from sqlalchemy import and_, func, or_
+from sqlalchemy import and_, func, or_, cast
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import joinedload
 
@@ -395,11 +395,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     @classmethod
     def find_with_attribute(cls, attribute):
         """Search rooms which have a specific attribute"""
-        query = (Room.query
-                 .with_entities(Room, RoomAttributeAssociation.raw_data)
-                 .join(Room.attributes, RoomAttributeAssociation.attribute)
-                 .filter(RoomAttribute.name == attribute))
-        return [(room, json.loads(attr)) for room, attr in query]
+        return (Room.query
+                .with_entities(Room, RoomAttributeAssociation.value)
+                .join(Room.attributes, RoomAttributeAssociation.attribute)
+                .filter(RoomAttribute.name == attribute)
+                .all())
 
     @staticmethod
     def getRoomsWithData(*args, **kwargs):
@@ -554,7 +554,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             details_str = u'%{}%'.format(details)
             details_json = u'%{}%'.format(json.dumps(details)[1:-1])
             free_search_criteria = [getattr(Room, c).ilike(details_str) for c in free_search_columns]
-            free_search_criteria.append(Room.attributes.any(RoomAttributeAssociation.raw_data.ilike(details_json)))
+            free_search_criteria.append(Room.attributes.any(cast(RoomAttributeAssociation.value, db.String)
+                                                            .ilike(details_json)))
             q = q.filter(or_(*free_search_criteria))
 
         q = q.order_by(Room.capacity)

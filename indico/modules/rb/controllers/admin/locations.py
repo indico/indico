@@ -132,30 +132,23 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
         if not self._location:
             raise IndicoError(_('Unknown Location: {0}').format(name))
 
-        self._attrTitle = request.form.get('newCustomAttributeName', default='').strip()
-        self._attrName = self._attrTitle.replace(' ', '-').lower()
-        if self._attrName:
-            if self._location.getAttributeByName(self._attrName):
-                raise FormValuesError(_('There is already an attribute named: {0}').format(self._attrName))
+        self._new_attr = None
+        attr_title = request.form.get('newCustomAttributeName', default='').strip()
+        if attr_title:
+            attr_name = attr_title.replace(' ', '-').lower()
+            if self._location.getAttributeByName(attr_name):
+                raise FormValuesError(_('There is already an attribute named: {0}').format(attr_name))
 
-            self._value = {
-                'type': 'str',
-                'is_required': request.form.get('newCustomAttributeIsRequired') == 'on',
-                'is_hidden': request.form.get('newCustomAttributeIsHidden') == 'on'
-            }
+            self._new_attr = RoomAttribute(name=attr_name, title=attr_title, type='str',
+                                           is_required=request.form.get('newCustomAttributeIsRequired') == 'on',
+                                           is_hidden=request.form.get('newCustomAttributeIsHidden') == 'on')
 
     def _process(self):
         for attr in self._location.attributes:
-            val = attr.value
-            val.update({
-                'is_required': request.form.get('cattr_req_{0}'.format(attr.name), '') == 'on',
-                'is_hidden': request.form.get('cattr_hid_{0}'.format(attr.name), '') == 'on'
-            })
-            attr.value = val
-        if self._attrName:
-            attr = RoomAttribute(name=self._attrName, title=self._attrTitle)
-            attr.value = self._value
-            self._location.attributes.append(attr)
+            attr.is_required = request.form.get('cattr_req_{}'.format(attr.name), '') == 'on'
+            attr.is_hidden = request.form.get('cattr_hid_{}'.format(attr.name), '') == 'on'
+        if self._new_attr:
+            self._location.attributes.append(self._new_attr)
             flash(_(u'Custom attribute added'), 'success')
 
         db.session.add(self._location)

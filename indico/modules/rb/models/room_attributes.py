@@ -17,12 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from sqlalchemy.dialects.postgresql import JSON
+
 from indico.core.db import db
 from indico.util.string import return_ascii
-from indico.modules.rb.models.utils import JSONStringBridgeMixin
 
 
-class RoomAttributeAssociation(JSONStringBridgeMixin, db.Model):
+class RoomAttributeAssociation(db.Model):
     __tablename__ = 'rooms_attributes_association'
 
     attribute_id = db.Column(
@@ -39,8 +40,8 @@ class RoomAttributeAssociation(JSONStringBridgeMixin, db.Model):
         ),
         primary_key=True
     )
-    raw_data = db.Column(
-        db.String
+    value = db.Column(
+        JSON
     )
 
     attribute = db.relationship(
@@ -48,18 +49,12 @@ class RoomAttributeAssociation(JSONStringBridgeMixin, db.Model):
         backref='room_associations'
     )
 
-    def __init__(self, *args, **kwargs):
-        value = kwargs.pop('value', None)
-        super(RoomAttributeAssociation, self).__init__(*args, **kwargs)
-        if value is not None:
-            self.value = value
-
     @return_ascii
     def __repr__(self):
         return u'<RoomAttributeAssociation({0}, {1}, {2})>'.format(self.room_id, self.attribute.name, self.value)
 
 
-class RoomAttribute(JSONStringBridgeMixin, db.Model):
+class RoomAttribute(db.Model):
     __tablename__ = 'room_attributes'
     __table_args__ = (db.UniqueConstraint('name', 'location_id'),)
 
@@ -85,8 +80,17 @@ class RoomAttribute(JSONStringBridgeMixin, db.Model):
         db.ForeignKey('locations.id'),
         nullable=False
     )
-    raw_data = db.Column(
-        db.String
+    type = db.Column(
+        db.String,
+        nullable=False
+    )
+    is_required = db.Column(
+        db.Boolean,
+        nullable=False
+    )
+    is_hidden = db.Column(
+        db.Boolean,
+        nullable=False
     )
 
     children = db.relationship(
@@ -99,9 +103,4 @@ class RoomAttribute(JSONStringBridgeMixin, db.Model):
 
     @return_ascii
     def __repr__(self):
-        return u'<RoomAttribute({0}, {1}, {2}, {3})>'.format(
-            self.id,
-            self.name,
-            self.location_id,
-            self.raw_data
-        )
+        return u'<RoomAttribute({}, {}, {})>'.format(self.id, self.name, self.location.name)

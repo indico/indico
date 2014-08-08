@@ -150,10 +150,10 @@
                     <td>${ attr.title }</td>
                     <td>${ attr.name }</td>
                     <td>
-                      <input type="checkbox" name="${ 'cattr_req_' + attr.name }" ${ 'checked' if attr.is_value_required else '' }>
+                      <input type="checkbox" name="${ 'cattr_req_' + attr.name }" ${ 'checked' if attr.is_required else '' }>
                     </td>
                     <td>
-                      <input type="checkbox" name="${ 'cattr_hid_' + attr.name }" ${ 'checked' if attr.is_value_hidden else '' }>
+                      <input type="checkbox" name="${ 'cattr_hid_' + attr.name }" ${ 'checked' if attr.is_hidden else '' }>
                     </td>
                     <td>
                       <input type="button" class="i-button" value="Remove" onclick="document.location = '${ urlHandlers.UHRoomBookingDeleteCustomAttribute.getURL( location, removeCustomAttributeName=attr.name) }'; return false;" />
@@ -191,9 +191,6 @@
               </li>
               <li>
                 ${ _('Custom attributes are subject to free-text search. This means that they <b>will</b> work with "Room description must contain" box on a searching form.') }
-              </li>
-              <li>
-                ${ _('Custom attributes does not have type. They are kept as free text. It is impossible to add any kind of validation without coding.') }
               </li>
             </ul>
       </td>

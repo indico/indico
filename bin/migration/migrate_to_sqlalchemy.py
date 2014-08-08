@@ -229,12 +229,8 @@ def migrate_locations(main_root, rb_root):
             if ca['type'] != 'str':
                 raise RuntimeError('Non-str custom attributes are unsupported: {}'.format(ca))
             attr_name = attribute_map.get(ca['name'], ca['name'])
-            attr = RoomAttribute(name=attr_name.replace(' ', '-').lower(), title=attr_name)
-            attr.value = {
-                'is_required': ca['required'],
-                'is_hidden': ca['hidden'],
-                'type': ca['type']
-            }
+            attr = RoomAttribute(name=attr_name.replace(' ', '-').lower(), title=attr_name, type=ca['type'],
+                                 is_required=ca['required'], is_hidden=ca['hidden'])
             l.attributes.append(attr)
             print cformat('  %{blue!}Attribute:%{reset} {}').format(attr.title)
 

@@ -122,42 +122,6 @@ def cached(cache, primary_key_attr='id', base_ttl=86400*31):
     return decorator
 
 
-class JSONStringBridgeMixin:
-    """
-    A property to automatically encode/decode a string column to JSON and vice versa.
-
-    Assumes mapped column name is 'raw_data'
-    """
-
-    @property
-    def value(self):
-        return json.loads(self.raw_data)
-
-    @value.setter
-    def value(self, data):
-        self.raw_data = json.dumps(data)
-
-    @property
-    def is_value_required(self):
-        return self.value.get('is_required', False)
-
-    @property
-    def is_value_hidden(self):
-        return self.value.get('is_hidden', False)
-
-    @property
-    def is_value_used(self):
-        return self.value.get('is_used', False)
-
-    @property
-    def is_value_equipped(self):
-        return self.value.get('is_equipped', False)
-
-    @property
-    def is_value_x(self, x):
-        return self.value.get('is_' + x, False)
-
-
 def next_work_day(dtstart=None, neglect_time=True):
     if not dtstart:
         dtstart = datetime.utcnow()
