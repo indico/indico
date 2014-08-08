@@ -17,17 +17,21 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-try:
-    import simplejson as _json
-except ImportError:
-    import json as _json
+from __future__ import absolute_import
 
+import traceback
 from datetime import datetime
 
 from persistent.dict import PersistentDict
 
 from indico.core.config import Config
+from indico.core.errors import IndicoError
 from indico.util.i18n import LazyProxy
+
+try:
+    import simplejson as _json
+except ImportError:
+    import json as _json
 
 
 class _JSONEncoder(_json.JSONEncoder):
@@ -69,8 +73,20 @@ def loads(string):
 
 
 def create_json_error_answer(exception):
+    if isinstance(exception, IndicoError):
+        details = exception.toDict()
+    else:
+        details = {
+            'code': type(exception).__name__,
+            'type': 'unknown',
+            'message': exception.message,
+            'data': exception.__dict__,
+            'requestInfo': {},
+            'inner': traceback.format_exc()
+        }
+
     return dumps({
         'version': Config.getInstance().getVersion(),
         'result': None,
-        'error': exception.toDict()
+        'error': details
     })
