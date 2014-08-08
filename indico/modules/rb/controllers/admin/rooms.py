@@ -32,7 +32,7 @@ from indico.modules.rb.forms.rooms import RoomForm
 from indico.modules.rb.forms.validators import IndicoEmail
 from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation, RoomAttribute
-from indico.modules.rb.controllers.decorators import requires_location
+from indico.modules.rb.controllers.decorators import requires_location, requires_room
 from indico.modules.rb.models.room_bookable_times import BookableTime
 from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
 from indico.modules.rb.models.rooms import Room
@@ -152,10 +152,8 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
 
 class RHRoomBookingModifyRoom(RHRoomBookingCreateModifyRoomBase):
     @requires_location(parameter_name='roomLocation')
+    @requires_room
     def _checkParams(self):
-        self._room = Room.get(request.view_args['roomID'])
-        if self._room is None:
-            raise NotFoundError('A Room with this ID does not exist.')
         self._form = self._make_form()
 
     def _save(self):
