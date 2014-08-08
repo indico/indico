@@ -616,7 +616,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             if value:
                 attr.value = value
             else:
-                self.attributes.filter(RoomAttributeAssociation.attribute_id == attr.attribute_id).delete(synchronize_session='fetch')
+                self.attributes.filter(RoomAttributeAssociation.attribute_id == attr.attribute_id) \
+                    .delete(synchronize_session='fetch')
         elif value:
             attr = self.location.getAttributeByName(name)
             if not attr:
@@ -625,6 +626,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             attr_assoc.value = value
             attr_assoc.attribute = attr
             self.attributes.append(attr_assoc)
+
+    @property
+    def notification_emails(self):
+        return set(filter(None, map(unicode.strip, self.get_attribute_value(u'notification-email', u'').split(u','))))
 
     def _can_be_booked(self, avatar, prebook=False, ignore_admin=False):
         if not avatar or not rb_check_user_access(avatar):

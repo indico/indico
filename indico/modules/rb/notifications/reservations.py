@@ -32,13 +32,13 @@ class ReservationNotification(object):
 
     def compose_email_to_user(self, **mail_params):
         creator = self.reservation.created_by_user
-        to_list = set([creator.getEmail()] + self.reservation.getContactEmailList())
+        to_list = {creator.getEmail()} | self.reservation.contact_emails
         subject = self._get_email_subject(**mail_params)
         body = self._make_body(mail_params, reservation=self.reservation)
         return self._make_email(to_list, subject, body)
 
     def compose_email_to_manager(self, **mail_params):
-        to_list = set([self.reservation.room.getResponsible().getEmail()] + self.reservation.getNotificationEmailList())
+        to_list = {self.reservation.room.getResponsible().getEmail()} | self.reservation.room.notification_emails
         subject = self._get_email_subject(**mail_params)
         body = self._make_body(mail_params, reservation=self.reservation)
         return self._make_email(to_list, subject, body)

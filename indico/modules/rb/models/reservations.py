@@ -398,17 +398,9 @@ class Reservation(Serializer, db.Model):
     def setBookedForUser(self, avatar):
         self.booked_for_id = avatar and avatar.getId()
 
-    def getContactEmailList(self):
-        email_list = self.contact_email
-        if email_list:
-            return email_list.split(',')
-
-    def getNotificationEmailList(self):
-        return []  # TODO: re-enable once getAttributeByName works
-        notification_list = self.getAttributeByName('notification-email')
-        if notification_list:
-            return notification_list.value.split(',')
-        return []
+    @property
+    def contact_emails(self):
+        return set(filter(None, map(unicode.strip, self.contact_email.split(u','))))
 
     def accept(self, user):
         self.is_accepted = True
