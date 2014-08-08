@@ -1,4 +1,6 @@
-<%page args="contrib,affiliation_contribs"/>
+<%page args="contrib, affiliation_contribs"/>
+<% field_manager = contrib.getConference().getAbstractMgr().getAbstractFieldsMgr() %>
+
 \noindent
 \rmfamily
 % if contrib.getSession():
@@ -67,11 +69,34 @@
 
 \vspace{0.5em}
 
-%% Markdown content
-\rmfamily {
-    \allsectionsfont{\rmfamily}
-    \sectionfont{\normalsize\rmfamily}
-    \subsectionfont{\small\rmfamily}
-    \small
-    ${md_convert(str(contrib.getDescription()).decode('utf-8')).encode('utf-8')}
-}
+% if field_manager.hasActiveField('content'):
+    %% Markdown content
+    \setlength{\leftskip}{0.5cm}
+    \rmfamily {
+        \allsectionsfont{\rmfamily}
+        \sectionfont{\normalsize\rmfamily}
+        \subsectionfont{\small\rmfamily}
+        \small
+        ${ md_convert(str(contrib.getDescription()).decode('utf-8')).encode('utf-8') }
+    }
+
+    \vspace{1em}
+    \setlength{\leftskip}{0pt}
+% endif
+
+% for field_id, content in contrib.getFields(valueonly=True).iteritems():
+    % if field_id != 'content' and field_manager.hasActiveField(field_id):
+        \textbf{${ field_manager.getFieldById(field_id).getCaption() }}:
+
+        %% Markdown content
+        \rmfamily {
+            \allsectionsfont{\rmfamily}
+            \sectionfont{\normalsize\rmfamily}
+            \subsectionfont{\small\rmfamily}
+            \small
+            ${ md_convert(content).encode('utf-8') }
+        }
+
+        \vspace{0.5em}
+    % endif
+% endfor
