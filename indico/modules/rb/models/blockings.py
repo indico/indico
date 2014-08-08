@@ -33,11 +33,11 @@ class Blocking(db.Model):
         db.Integer,
         primary_key=True
     )
-    created_by = db.Column(
+    created_by_id = db.Column(
         db.String,
         nullable=False
     )
-    created_at = db.Column(
+    created_dt = db.Column(
         UTCDateTime,
         nullable=False,
         default=now_utc
@@ -74,11 +74,11 @@ class Blocking(db.Model):
 
     @property
     def created_by_user(self):
-        return AvatarHolder().getById(self.created_by)
+        return AvatarHolder().getById(self.created_by_id)
 
     @created_by_user.setter
     def created_by_user(self, user):
-        self.created_by = user.getId()
+        self.created_by_id = user.getId()
 
     def can_be_modified(self, user):
         """
@@ -119,7 +119,7 @@ class Blocking(db.Model):
     def __repr__(self):
         return u'<Blocking({0}, {1}, {2}, {3}, {4})>'.format(
             self.id,
-            self.created_by,
+            self.created_by_id,
             self.reason,
             self.start_date,
             self.end_date

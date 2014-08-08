@@ -90,8 +90,8 @@ ${ contextHelp('chooseButtonHelp') }
 <!-- Search for rooms -->
 <div id="searchRooms">
     <form id="searchRoomsForm" method="post" action="">
-        ${ form.start_date() }
-        ${ form.end_date() }
+        ${ form.start_dt() }
+        ${ form.end_dt() }
         <h2 class="group-title">
             <i class="icon-search"></i>
             ${ _('Search for a room') }

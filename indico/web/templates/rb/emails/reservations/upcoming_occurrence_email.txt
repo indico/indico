@@ -6,11 +6,11 @@ This is a reminder about a booking you have made:
 
 Room: {{ occurrence.reservation.room.name }}
 {% if occurrence.reservation.repeat_unit == RepeatUnit.DAY -%}
-Dates: {{ occurrence.reservation.start_date | format_date }} - {{ occurrence.reservation.end_date | format_date }}
+Dates: {{ occurrence.reservation.start_dt | format_date }} - {{ occurrence.reservation.end_dt | format_date }}
 {%- else -%}
-Date: {{ occurrence.start | format_date }}
+Date: {{ occurrence.start_dt | format_date }}
 {%- endif %}
-Time: {{ occurrence.start | format_time }} - {{ occurrence.end | format_time }}
+Time: {{ occurrence.start_dt | format_time }} - {{ occurrence.end_dt | format_time }}
 
 
 If you don't need to use the room, please cancel your occurrence on this page:

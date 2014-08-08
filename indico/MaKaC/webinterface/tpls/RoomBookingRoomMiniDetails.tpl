@@ -77,7 +77,7 @@
     % endif
 </table>
 
-% if room.needs_video_conference_setup:
+% if room.has_vc:
     <div class="warning-message-box new-booking-message-box" style="margin-top: 2em;">
         <div class="message-text ">
             <p>

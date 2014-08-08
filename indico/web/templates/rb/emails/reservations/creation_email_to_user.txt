@@ -5,7 +5,7 @@
 The conference room {{ reservation.room.full_name }}
 has been {% block prebooked_prefix %}{% endblock %}booked for {{ reservation.booked_for_name }}
 reason: {{ reservation.booking_reason }}
-from {{ reservation.start_date | format_date }} to {{ reservation.end_date | format_date }} between {{ reservation.start_date | format_time }} and {{ reservation.end_date | format_time }}
+from {{ reservation.start_dt | format_date }} to {{ reservation.end_dt | format_date }} between {{ reservation.start_dt | format_time }} and {{ reservation.end_dt | format_time }}
 {%- block confirmed_booking -%}
 {%- if excluded_days %}
     (Note that there are {{ excluded_days }} excluded days. For further info, check your reservation)
@@ -23,7 +23,7 @@ be instantly notified by e-mail.
 
 {%- block prebooking_warning %}{% endblock %}
 
-{%- if reservation.uses_video_conference %}
+{%- if reservation.uses_vc %}
 
 This room is equipped with remote collaboration features and you marked that
 you intend to use them. After your meeting, you will be able to give IT

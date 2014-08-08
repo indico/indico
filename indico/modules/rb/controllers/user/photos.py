@@ -46,7 +46,7 @@ def room_photo(roomID, size, **kw):
         if photo is None:
             _cache.set(cache_key, '*')
             return _redirect_no_photo(size)
-        photo_data = getattr(photo, '{}_content'.format(size))
+        photo_data = photo.thumbnail if size == 'small' else photo.data
         _cache.set(cache_key, photo_data)
 
     io = BytesIO(photo_data)

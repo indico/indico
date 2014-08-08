@@ -48,15 +48,15 @@
     </div>
 </div>
 
-${ form.start_date(type='hidden') }
-${ form.end_date(type='hidden') }
+${ form.start_dt(type='hidden') }
+${ form.end_dt(type='hidden') }
 ${ form.repeat_step(type='hidden') }
 
 <script>
     $(document).ready(function() {
         $('#timerange').timerange({
-            initStartTime: '${ format_time(form.start_date.data) }',
-            initEndTime: '${ format_time(form.end_date.data) }',
+            initStartTime: '${ format_time(form.start_dt.data) }',
+            initEndTime: '${ format_time(form.end_dt.data) }',
             startTimeName: 'sTime',
             endTimeName: 'eTime',
             sliderWidth: '512px',
@@ -88,8 +88,8 @@ ${ form.repeat_step(type='hidden') }
             }
         });
 
-        $('#sDatePlace').datepicker('setDate', "${ format_date(form.start_date.data, format='short') }");
-        $('#eDatePlace').datepicker('setDate', "${ format_date(form.end_date.data, format='short') }");
+        $('#sDatePlace').datepicker('setDate', "${ format_date(form.start_dt.data, format='short') }");
+        $('#eDatePlace').datepicker('setDate', "${ format_date(form.end_dt.data, format='short') }");
         $('#eDatePlace').datepicker('option', 'minDate', $('#sDatePlace').datepicker('getDate'));
 
         $("#repeatability input:radio[name=repeat_unit]").change(function() {
@@ -127,17 +127,17 @@ ${ form.repeat_step(type='hidden') }
             var end_time = $('#timerange').timerange('getEndTime');
 
 
-            $('#start_date').val('{0} {1}'.format(start_date, start_time));
-            $('#end_date').val('{0} {1}'.format(end_date, end_time));
+            $('#start_dt').val('{0} {1}'.format(start_date, start_time));
+            $('#end_dt').val('{0} {1}'.format(end_date, end_time));
         }
 
         function checkHolidays() {
             var data = {};
             var repeat_unit = $('input[name=repeat_unit]:checked').val();
 
-            data.start_date = moment($('#start_date').val(), 'D/MM/YYYY H:m').format('YYYY-MM-D');
+            data.start_date = moment($('#start_dt').val(), 'D/MM/YYYY H:m').format('YYYY-MM-D');
             if (repeat_unit !== '0') {
-                data.end_date = moment($('#end_date').val(), 'D/MM/YYYY H:m').format('YYYY-MM-D')
+                data.end_date = moment($('#end_dt').val(), 'D/MM/YYYY H:m').format('YYYY-MM-D')
             } else {
                 data.end_date = data.start_date;
             }

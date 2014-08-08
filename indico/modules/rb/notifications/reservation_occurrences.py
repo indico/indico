@@ -13,7 +13,7 @@ class ReservationOccurrenceNotification(ReservationNotification):
     def __init__(self, occurrence):
         super(ReservationOccurrenceNotification, self).__init__(occurrence.reservation)
         self.occurrence = occurrence
-        self.start_date = format_datetime(occurrence.start)
+        self.start_dt = format_datetime(occurrence.start_dt)
 
     def _get_email_subject(self, **mail_params):
         mail_params = dict(mail_params, **{'subject_suffix': '(SINGLE OCCURRENCE)'})
@@ -74,7 +74,7 @@ def notify_rejection(occurrence):
 
 @email_sender
 def notify_upcoming_occurrence(occurrence):
-    if occurrence.start.date() < date.today():
+    if occurrence.start_dt.date() < date.today():
         raise ValueError('This reservation occurrence started in the past')
 
     owner = occurrence.reservation.booked_for_user

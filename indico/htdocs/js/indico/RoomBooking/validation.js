@@ -50,10 +50,10 @@
         });
 
         // Collaboration validation
-        if ($('#uses_video_conference').length) {
-            var vcEnabled = $('#uses_video_conference').prop('checked');
-            var vcErrors = vcEnabled != !!$('.js-vc-row input:not(#needs_video_conference_setup):checked').length;
-            var vcLabel = $('label[for="uses_video_conference"]');
+        if ($('#uses_vc').length) {
+            var vcEnabled = $('#uses_vc').prop('checked');
+            var vcErrors = vcEnabled != !!$('.js-vc-row input:not(#needs_vc_assistance):checked').length;
+            var vcLabel = $('label[for="uses_vc"]');
             vcLabel.toggleClass('text-error', vcErrors);
             if (vcErrors) {
                 vcLabel.attr('title', 'You need to select at least one piece of Video Conference equipment');

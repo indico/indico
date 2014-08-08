@@ -202,8 +202,8 @@ class RHRoomBookingSearchBookingsShortcutBase(RHRoomBookingSearchBookings):
         data = MultiDict(self.search_criteria)
         data['start_time'] = '00:00'
         data['end_time'] = '23:59'
-        data['start_date'] = date.today().strftime('%d/%m/%Y')
-        data['end_date'] = (date.today() + timedelta(weeks=1)).strftime('%d/%m/%Y')
+        data['start_dt'] = date.today().strftime('%d/%m/%Y')
+        data['end_dt'] = (date.today() + timedelta(weeks=1)).strftime('%d/%m/%Y')
         data.setlist('room_ids', [r.id for r in self._rooms])
         return data
 
@@ -253,7 +253,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
             form = form_class(obj=defaults)
 
         if not room.notification_for_assistance:
-            del form.needs_general_assistance
+            del form.needs_assistance
 
         can_book = room.can_be_booked(session.user)
         can_prebook = room.can_be_prebooked(session.user)
@@ -272,7 +272,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         conflicts = defaultdict(list)
         pre_conflicts = defaultdict(list)
 
-        candidates = ReservationOccurrence.create_series(form.start_date.data, form.end_date.data,
+        candidates = ReservationOccurrence.create_series(form.start_dt.data, form.end_dt.data,
                                                          (form.repeat_step.data, form.repeat_step.data))
         occurrences = ReservationOccurrence.find_overlapping_with(room, candidates, reservation_id).all()
 
@@ -287,8 +287,8 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         return conflicts, pre_conflicts
 
     def _get_all_occurrences(self, room_ids, form, flexible_days=0, reservation_id=None):
-        start_dt = form.start_date.data
-        end_dt = form.end_date.data
+        start_dt = form.start_dt.data
+        end_dt = form.end_dt.data
         repeat_unit = form.repeat_unit.data
         repeat_step = form.repeat_step.data
         day_start_dt = datetime.combine(start_dt.date(), time())
@@ -302,8 +302,8 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         occurrences = ReservationOccurrence.find_all(
             Reservation.room_id.in_(room_ids),
             Reservation.id != reservation_id,
-            ReservationOccurrence.start >= flexible_start_dt,
-            ReservationOccurrence.end <= flexible_end_dt,
+            ReservationOccurrence.start_dt >= flexible_start_dt,
+            ReservationOccurrence.end_dt <= flexible_end_dt,
             ReservationOccurrence.is_valid,
             _join=Reservation,
             _eager=ReservationOccurrence.reservation
@@ -358,8 +358,8 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
         else:
             start_date = date.today()
         defaults = FormDefaults(room_id=self._room.id,
-                                start_date=datetime.combine(start_date, time(8, 30)),
-                                end_date=datetime.combine(start_date, time(17, 30)),
+                                start_dt=datetime.combine(start_date, time(8, 30)),
+                                end_dt=datetime.combine(start_date, time(17, 30)),
                                 booked_for_id=session.user.id,
                                 booked_for_name=session.user.getStraightFullName().decode('utf-8'),
                                 contact_email=session.user.getEmail().decode('utf-8'),
@@ -395,8 +395,8 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
                               candidates=candidates,
                               conflicts=conflicts,
                               pre_conflicts=pre_conflicts,
-                              start_dt=form.start_date.data,
-                              end_dt=form.end_date.data,
+                              start_dt=form.start_dt.data,
+                              end_dt=form.end_dt.data,
                               repeat_unit=form.repeat_unit.data,
                               repeat_step=form.repeat_step.data,
                               can_override=can_override).display()
@@ -449,8 +449,8 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
         return views[view](self, **kwargs)
 
     def _get_select_room_form_defaults(self):
-        return FormDefaults(start_date=datetime.combine(date.today(), time(8, 30)),
-                            end_date=datetime.combine(date.today(), time(17, 30)))
+        return FormDefaults(start_dt=datetime.combine(date.today(), time(8, 30)),
+                            end_dt=datetime.combine(date.today(), time(17, 30)))
 
     def _make_select_room_form(self):
         # Step 1
@@ -478,8 +478,8 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
 
         conflicts, pre_conflicts = self._get_all_conflicts(room, form)
         repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
-        return self._get_view('confirm', form=confirm_form, room=room, start_dt=form.start_date.data,
-                              end_dt=form.end_date.data, repeat_unit=form.repeat_unit.data,
+        return self._get_view('confirm', form=confirm_form, room=room, start_dt=form.start_dt.data,
+                              end_dt=form.end_dt.data, repeat_unit=form.repeat_unit.data,
                               repeat_step=form.repeat_step.data, repeat_msg=repeat_msg, conflicts=conflicts,
                               pre_conflicts=pre_conflicts, errors=confirm_form.error_list).display()
 
@@ -488,8 +488,8 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
         form = self._make_select_room_form()
         if form.validate_on_submit():
             flexible_days = form.flexible_dates_range.data
-            day_start_dt = datetime.combine(form.start_date.data.date(), time())
-            day_end_dt = datetime.combine(form.end_date.data.date(), time(23, 59))
+            day_start_dt = datetime.combine(form.start_dt.data.date(), time())
+            day_end_dt = datetime.combine(form.end_dt.data.date(), time(23, 59))
 
             selected_rooms = [r for r in self._rooms if r.id in form.room_ids.data]
             occurrences, candidates = self._get_all_occurrences(form.room_ids.data, form, flexible_days)
@@ -562,7 +562,7 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
 
     def _process(self):
         room = self._reservation.room
-        form = ModifyBookingForm(obj=self._reservation, old_start_date=self._reservation.start_date.date())
+        form = ModifyBookingForm(obj=self._reservation, old_start_date=self._reservation.start_dt.date())
         form.equipments.query = room.find_available_video_conference()
 
         if form.is_submitted() and not form.validate():
@@ -585,7 +585,7 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
 
         return self._get_view(form=form, room=room, rooms=Room.find_all(), occurrences=occurrences,
                               candidates=candidates, conflicts=conflicts, pre_conflicts=pre_conflicts,
-                              start_dt=form.start_date.data, end_dt=form.end_date.data,
+                              start_dt=form.start_dt.data, end_dt=form.end_dt.data,
                               repeat_unit=form.repeat_unit.data, repeat_step=form.repeat_step.data,
                               reservation=self._reservation, can_override=room.can_be_overriden(session.user)).display()
 
@@ -608,8 +608,8 @@ class RHRoomBookingCalendar(RHRoomBookingBase):
             rooms = Room.find_all(is_active=True)
             occurrences = ReservationOccurrence.find_all(
                 Reservation.room_id.in_(room.id for room in rooms),
-                ReservationOccurrence.start >= self.start_dt,
-                ReservationOccurrence.end <= self.end_dt,
+                ReservationOccurrence.start_dt >= self.start_dt,
+                ReservationOccurrence.end_dt <= self.end_dt,
                 ReservationOccurrence.is_valid,
                 _join=Reservation,
                 _eager=ReservationOccurrence.reservation

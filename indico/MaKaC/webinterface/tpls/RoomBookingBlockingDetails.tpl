@@ -32,7 +32,7 @@
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Date")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ formatDateTime(blocking.created_at) }</td>
+                                            <td align="left" class="blacktext">${ formatDateTime(blocking.created_dt) }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Reason")}&nbsp;&nbsp;</small></td>

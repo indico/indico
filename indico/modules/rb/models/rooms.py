@@ -62,7 +62,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     ]
 
     __public_exhaustive__ = __public__ + [
-        'has_webcast_recording', 'needs_video_conference_setup', 'has_projector', 'is_public', 'has_booking_groups'
+        'has_webcast_recording', 'has_vc', 'has_projector', 'is_public', 'has_booking_groups'
     ]
 
     __calendar_public__ = [
@@ -116,7 +116,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         default='',
         nullable=False
     )
-    notification_for_start = db.Column(
+    notification_before_days = db.Column(
         db.Integer
     )
     notification_for_end = db.Column(
@@ -212,7 +212,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     nonbookable_dates = db.relationship(
         'NonBookableDate',
         backref='room',
-        order_by=NonBookableDate.end_date.desc(),
+        order_by=NonBookableDate.end_dt.desc(),
         cascade='all, delete-orphan',
         lazy='dynamic'
     )
@@ -305,14 +305,14 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                                                   label=_(u'person') if self.capacity == 1 else _(u'people')))
         infos.append(_(u'public') if self.is_public else _(u'private'))
         infos.append(_(u'auto-confirmation') if self.is_auto_confirm else _(u'needs confirmation'))
-        if self.needs_video_conference_setup:
+        if self.has_vc:
             infos.append(_(u'video conference'))
 
         return u', '.join(infos)
 
     @property
     @cached(_cache)
-    def needs_video_conference_setup(self):
+    def has_vc(self):
         return self.has_equipment('Video conference')
 
     @property
@@ -534,7 +534,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
         if form.available.data != -1:
             repetition = RepeatMapping.getNewMapping(ast.literal_eval(form.repeatability.data))
-            is_available = Room.filter_available(form.start_date.data, form.end_date.data, repetition,
+            is_available = Room.filter_available(form.start_dt.data, form.end_dt.data, repetition,
                                                  include_pre_bookings=form.include_pre_bookings.data,
                                                  include_pending_blockings=form.include_pending_blockings.data)
             # Filter the search results

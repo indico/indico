@@ -142,8 +142,8 @@ class RHRoomBookingRoomDetails(RHRoomBookingBase):
     def _process(self):
         occurrences = ReservationOccurrence.find_all(
             Reservation.room_id == self._room.id,
-            ReservationOccurrence.start >= self._calendar_start,
-            ReservationOccurrence.end <= self._calendar_end,
+            ReservationOccurrence.start_dt >= self._calendar_start,
+            ReservationOccurrence.end_dt <= self._calendar_end,
             ReservationOccurrence.is_valid,
             _join=Reservation,
             _eager=ReservationOccurrence.reservation
@@ -163,7 +163,7 @@ class RHRoomBookingRoomStats(RHRoomBookingBase):
         elif self._occupancy_period == 'thisyear':
             self._start = date(self._end.year, 1, 1)
         elif self._occupancy_period == 'sinceever':
-            self._start = Reservation.query.with_entities(func.min(Reservation.start_date)).one()[0].date()
+            self._start = Reservation.query.with_entities(func.min(Reservation.start_dt)).one()[0].date()
         else:
             raise IndicoError('Invalid period specified')
 

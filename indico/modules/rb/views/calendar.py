@@ -260,8 +260,8 @@ class Bar(Serializer):
         self.blocking = None
 
         if reservation is not None:
-            self.reservation_start = reservation.start_date
-            self.reservation_end = reservation.end_date
+            self.reservation_start = reservation.start_dt
+            self.reservation_end = reservation.end_dt
             self.room_id = reservation.room_id
             if kind is None:
                 if not overlapping:
@@ -288,7 +288,7 @@ class Bar(Serializer):
 
     @classmethod
     def from_candidate(cls, candidate, room_id, resv_start, resv_end, blocking=None):
-        self = cls(candidate.start, candidate.end, cls.CANDIDATE, blocking=blocking)
+        self = cls(candidate.start_dt, candidate.end_dt, cls.CANDIDATE, blocking=blocking)
         self.room_id = room_id
         self.reservation_start = resv_start
         self.reservation_end = resv_end
@@ -296,7 +296,7 @@ class Bar(Serializer):
 
     @classmethod
     def from_occurrence(cls, occurrence):
-        return cls(occurrence.start, occurrence.end, reservation=occurrence.reservation)
+        return cls(occurrence.start_dt, occurrence.end_dt, reservation=occurrence.reservation)
 
     @classmethod
     def from_blocked_room(cls, blocked_room, day):

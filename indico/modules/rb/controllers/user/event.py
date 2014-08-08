@@ -42,10 +42,10 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 def _get_defaults_from_object(obj):
-    defaults = {'start_date': obj.getAdjustedStartDate().replace(tzinfo=None),
-                'end_date': obj.getAdjustedEndDate().replace(tzinfo=None),
+    defaults = {'start_dt': obj.getAdjustedStartDate().replace(tzinfo=None),
+                'end_dt': obj.getAdjustedEndDate().replace(tzinfo=None),
                 'booking_reason': "{} '{}'".format(obj.getVerboseType(), obj.getTitle())}
-    if defaults['end_date'].date() != defaults['start_date'].date():
+    if defaults['end_dt'].date() != defaults['start_dt'].date():
         defaults['repeat_unit'] = RepeatUnit.DAY
         defaults['repeat_step'] = 1
     return defaults

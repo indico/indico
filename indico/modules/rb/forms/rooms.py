@@ -67,10 +67,10 @@ class SearchRoomsForm(IndicoForm):
     is_only_active = BooleanField(_(u'Only active rooms'), default=True)
     is_only_my_rooms = BooleanField(_(u'Only my rooms'))
     # Period details when searching for (un-)availability
-    start_date = DateTimeField(_(u'Start date'), validators=[Optional()], parse_kwargs={'dayfirst': True},
-                               display_format='%d/%m/%Y %H:%M', widget=HiddenInput())
-    end_date = DateTimeField(_(u'End date'), validators=[Optional()], parse_kwargs={'dayfirst': True},
+    start_dt = DateTimeField(_(u'Start date'), validators=[Optional()], parse_kwargs={'dayfirst': True},
                              display_format='%d/%m/%Y %H:%M', widget=HiddenInput())
+    end_dt = DateTimeField(_(u'End date'), validators=[Optional()], parse_kwargs={'dayfirst': True},
+                           display_format='%d/%m/%Y %H:%M', widget=HiddenInput())
     repeatability = StringField()  # TODO: use repeat_unit/step with new UI
     include_pending_blockings = BooleanField(_(u'Check conflicts against pending blockings'), default=True)
     include_pre_bookings = BooleanField(_(u'Check conflicts against pre-bookings'), default=True)
@@ -112,8 +112,8 @@ class RoomForm(IndicoForm):
     is_reservable = BooleanField(_(u'Public'), default=True)
     reservations_need_confirmation = BooleanField(_(u'Confirmations'))
     notification_for_assistance = BooleanField(_(u'Assistance'))
-    notification_for_start = IntegerField(_(u'Notification on booking start - X days before'),
-                                          [Optional(), NumberRange(min=0, max=9)], default=0)
+    notification_before_days = IntegerField(_(u'Notification on booking start - X days before'),
+                                            [Optional(), NumberRange(min=0, max=9)], default=0)
     notification_for_end = BooleanField(_(u'Notification on booking end'))
     notification_for_responsible = BooleanField(_(u'Notification to responsible, too'))
     owner_id = HiddenField(_(u'Responsible user'), [DataRequired()])

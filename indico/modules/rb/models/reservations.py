@@ -104,35 +104,35 @@ class Reservation(Serializer, db.Model):
         'id', ('booked_for_name', 'bookedForName'), ('booking_reason', 'reason'), ('details_url', 'bookingUrl')
     ]
     __api_public__ = [
-        'id', ('start_date', 'startDT'), ('end_date', 'endDT'), 'repeat_unit', 'repeat_step',
+        'id', ('start_dt', 'startDT'), ('end_dt', 'endDT'), 'repeat_unit', 'repeat_step',
         ('booked_for_name', 'bookedForName'), ('details_url', 'bookingUrl'), ('booking_reason', 'reason'),
-        ('uses_video_conference', 'usesAVC'), ('needs_video_conference_setup', 'needsAVCSupport'),
-        'needs_general_assistance', ('is_accepted', 'isConfirmed'), ('is_valid', 'isValid'), 'is_cancelled',
+        ('uses_vc', 'usesAVC'), ('needs_vc_assistance', 'needsAVCSupport'),
+        'needs_assistance', ('is_accepted', 'isConfirmed'), ('is_valid', 'isValid'), 'is_cancelled',
         'is_rejected', ('location_name', 'location')
     ]
 
     @declared_attr
     def __table_args__(cls):
-        return (db.Index('ix_reservations_start_date_date', cast(cls.start_date, Date)),
-                db.Index('ix_reservations_end_date_date', cast(cls.end_date, Date)),
-                db.Index('ix_reservations_start_date_time', cast(cls.start_date, Time)),
-                db.Index('ix_reservations_end_date_time', cast(cls.end_date, Time)))
+        return (db.Index('ix_reservations_start_dt_date', cast(cls.start_dt, Date)),
+                db.Index('ix_reservations_end_dt_date', cast(cls.end_dt, Date)),
+                db.Index('ix_reservations_start_dt_time', cast(cls.start_dt, Time)),
+                db.Index('ix_reservations_end_dt_time', cast(cls.end_dt, Time)))
 
     id = db.Column(
         db.Integer,
         primary_key=True
     )
-    created_at = db.Column(
+    created_dt = db.Column(
         UTCDateTime,
         nullable=False,
         default=now_utc
     )
-    start_date = db.Column(
+    start_dt = db.Column(
         db.DateTime,
         nullable=False,
         index=True
     )
-    end_date = db.Column(
+    end_dt = db.Column(
         db.DateTime,
         nullable=False,
         index=True
@@ -155,7 +155,7 @@ class Reservation(Serializer, db.Model):
         db.String,
         nullable=False
     )
-    created_by = db.Column(
+    created_by_id = db.Column(
         db.String
         # Must be nullable for legacy data :(
     )
@@ -194,17 +194,17 @@ class Reservation(Serializer, db.Model):
     rejection_reason = db.Column(
         db.String
     )
-    uses_video_conference = db.Column(
+    uses_vc = db.Column(
         db.Boolean,
         nullable=False,
         default=False
     )
-    needs_video_conference_setup = db.Column(
+    needs_vc_assistance = db.Column(
         db.Boolean,
         nullable=False,
         default=False
     )
-    needs_general_assistance = db.Column(
+    needs_assistance = db.Column(
         db.Boolean,
         nullable=False,
         default=False
@@ -235,7 +235,7 @@ class Reservation(Serializer, db.Model):
 
     @hybrid_property
     def is_archived(self):
-        return self.end_date < datetime.now()
+        return self.end_dt < datetime.now()
 
     @hybrid_property
     def is_repeating(self):
@@ -255,8 +255,8 @@ class Reservation(Serializer, db.Model):
             self.id,
             self.room_id,
             self.booked_for_name,
-            self.start_date,
-            self.end_date
+            self.start_dt,
+            self.end_dt
         )
 
     @hybrid_property
@@ -320,7 +320,7 @@ class Reservation(Serializer, db.Model):
         filters = kwargs.pop('filters', None)
         limit = kwargs.pop('limit', None)
         offset = kwargs.pop('offset', 0)
-        order = kwargs.pop('order', Reservation.start_date)
+        order = kwargs.pop('order', Reservation.start_dt)
         limit_per_room = kwargs.pop('limit_per_room', False)
         if kwargs:
             raise ValueError('Unexpected kwargs: {}'.format(kwargs))
@@ -331,7 +331,7 @@ class Reservation(Serializer, db.Model):
         if limit_per_room and (limit or offset):
             query = limit_groups(query, Reservation, Reservation.room_id, order, limit, offset)
 
-        query = query.order_by(order, Reservation.created_at)
+        query = query.order_by(order, Reservation.created_dt)
 
         if not limit_per_room:
             if limit:
@@ -363,7 +363,7 @@ class Reservation(Serializer, db.Model):
             occurrence_data = OrderedMultiDict(db.session.query(ReservationOccurrence.reservation_id,
                                                                 ReservationOccurrence)
                                                .filter(ReservationOccurrence.reservation_id.in_(result.iterkeys()))
-                                               .order_by(ReservationOccurrence.start))
+                                               .order_by(ReservationOccurrence.start_dt))
             for id_, data in result.iteritems():
                 data['occurrences'] = occurrence_data.getlist(id_)
 
@@ -371,15 +371,15 @@ class Reservation(Serializer, db.Model):
 
     @staticmethod
     def getReservationByCreationTime(dt):
-        return Reservation.query.filter_by(created_at=dt).first()
+        return Reservation.query.filter_by(created_dt=dt).first()
 
     @property
     def created_by_user(self):
-        return AvatarHolder().getById(self.created_by) if self.created_by else None
+        return AvatarHolder().getById(self.created_by_id) if self.created_by_id else None
 
     @created_by_user.setter
     def created_by_user(self, user):
-        self.created_by = user.getId() if user else None
+        self.created_by_id = user.getId() if user else None
 
     @property
     def booked_for_user(self):
@@ -468,25 +468,25 @@ class Reservation(Serializer, db.Model):
 
         # Check for conflicts with nonbookable periods
         if not user.isRBAdmin():
-            nonbookable_dates = self.room.nonbookable_dates.filter(NonBookableDate.end_date > self.start_date)
+            nonbookable_dates = self.room.nonbookable_dates.filter(NonBookableDate.end_dt > self.start_dt)
             for occurrence in self.occurrences:
                 if not occurrence.is_valid:
                     continue
                 for nbd in nonbookable_dates:
-                    if nbd.overlaps(occurrence.start, occurrence.end):
+                    if nbd.overlaps(occurrence.start_dt, occurrence.end_dt):
                         if not skip_conflicts:
                             raise ConflictingOccurrences()
                         occurrence.cancel(user, u'Skipped due to nonbookable date', silent=True, propagate=False)
                         break
 
         # Check for conflicts with blockings
-        blocked_rooms = self.room.get_blocked_rooms(*(occurrence.start for occurrence in self.occurrences))
+        blocked_rooms = self.room.get_blocked_rooms(*(occurrence.start_dt for occurrence in self.occurrences))
         for br in blocked_rooms:
             blocking = br.blocking
             if blocking.can_be_overridden(user, self.room):
                 continue
             for occurrence in self.occurrences:
-                if occurrence.is_valid and blocking.is_active_at(occurrence.start.date()):
+                if occurrence.is_valid and blocking.is_active_at(occurrence.start_dt.date()):
                     # Cancel OUR occurrence
                     msg = u'Skipped due to collision with a blocking ({})'
                     occurrence.cancel(user, msg.format(blocking.reason), silent=True, propagate=False)
@@ -518,20 +518,20 @@ class Reservation(Serializer, db.Model):
                         permissions, always use the given mode.
         """
 
-        populate_fields = ('start_date', 'end_date', 'repeat_unit', 'repeat_step', 'room_id', 'booked_for_id',
+        populate_fields = ('start_dt', 'end_dt', 'repeat_unit', 'repeat_step', 'room_id', 'booked_for_id',
                            'contact_email', 'contact_phone', 'booking_reason', 'equipments',
-                           'needs_general_assistance', 'uses_video_conference', 'needs_video_conference_setup')
+                           'needs_assistance', 'uses_vc', 'needs_vc_assistance')
 
-        if data['repeat_unit'] == RepeatUnit.NEVER and data['start_date'].date() != data['end_date'].date():
-            raise ValueError('end_date != start_date for non-repeating booking')
+        if data['repeat_unit'] == RepeatUnit.NEVER and data['start_dt'].date() != data['end_dt'].date():
+            raise ValueError('end_dt != start_dt for non-repeating booking')
 
         if prebook is None:
             prebook = not room.can_be_booked(user)
             if prebook and not room.can_be_prebooked(user):
                 raise NoReportError('You cannot book this room')
 
-        room.check_advance_days(data['end_date'].date(), user)
-        room.check_bookable_times(data['start_date'].time(), data['end_date'].time(), user)
+        room.check_advance_days(data['end_dt'].date(), user)
+        room.check_bookable_times(data['start_dt'].time(), data['end_dt'].time(), user)
 
         reservation = cls()
         for field in populate_fields:
@@ -554,34 +554,34 @@ class Reservation(Serializer, db.Model):
         :param user: The :class:`Avatar` who modifies the booking.
         """
 
-        populate_fields = ('start_date', 'end_date', 'repeat_unit', 'repeat_step', 'booked_for_id',
+        populate_fields = ('start_dt', 'end_dt', 'repeat_unit', 'repeat_step', 'booked_for_id',
                            'contact_email', 'contact_phone', 'booking_reason', 'equipments',
-                           'needs_general_assistance', 'uses_video_conference', 'needs_video_conference_setup')
+                           'needs_assistance', 'uses_vc', 'needs_vc_assistance')
         # fields affecting occurrences
-        occurrence_fields = {'start_date', 'end_date', 'repeat_unit', 'repeat_step'}
+        occurrence_fields = {'start_dt', 'end_dt', 'repeat_unit', 'repeat_step'}
         # fields where date and time are compared separately
-        date_time_fields = {'start_date', 'end_date'}
+        date_time_fields = {'start_dt', 'end_dt'}
         # fields for the repetition
         repetition_fields = {'repeat_unit', 'repeat_step'}
         # pretty names for logging
         field_names = {
-            'start_date/date': "start date",
-            'end_date/date': "end date",
-            'start_date/time': "start time",
-            'end_date/time': "end time",
+            'start_dt/date': "start date",
+            'end_dt/date': "end date",
+            'start_dt/time': "start time",
+            'end_dt/time': "end time",
             'repetition': "booking type",
             'booked_for_id': "'Booked for' user",
             'contact_email': "contact email",
             'contact_phone': "contact phone number",
             'booking_reason': "booking reason",
             'equipments': "list of equipment",
-            'needs_general_assistance': "option 'General Assistance'",
-            'uses_video_conference': "option 'Uses Video Conference'",
-            'needs_video_conference_setup': "option 'Video Conference Setup Assistance'"
+            'needs_assistance': "option 'General Assistance'",
+            'uses_vc': "option 'Uses Video Conference'",
+            'needs_vc_assistance': "option 'Video Conference Setup Assistance'"
         }
 
-        self.room.check_advance_days(data['end_date'].date(), user)
-        self.room.check_bookable_times(data['start_date'].time(), data['end_date'].time(), user)
+        self.room.check_advance_days(data['end_dt'].date(), user)
+        self.room.check_bookable_times(data['start_dt'].time(), data['end_dt'].time(), user)
 
         changes = {}
         update_occurrences = False
@@ -643,7 +643,7 @@ class Reservation(Serializer, db.Model):
         # Recreate all occurrences if necessary
         if update_occurrences:
             cols = [col.name for col in ReservationOccurrence.__table__.columns
-                    if not col.primary_key and col.name not in {'start', 'end'}]
+                    if not col.primary_key and col.name not in {'start_dt', 'end_dt'}]
 
             old_occurrences = {occ.date: occ for occ in self.occurrences}
             self.occurrences.delete(synchronize_session='fetch')
@@ -658,9 +658,10 @@ class Reservation(Serializer, db.Model):
                     for col in cols:
                         setattr(occurrence, col, getattr(old_occurrence, col))
             # Don't cause new notifications for the entire booking in case of daily repetition
-            if self.repeat_unit == RepeatUnit.DAY and all(occ.is_sent for occ in old_occurrences.itervalues()):
+            if self.repeat_unit == RepeatUnit.DAY and all(occ.notification_sent
+                                                          for occ in old_occurrences.itervalues()):
                 for occurrence in self.occurrences:
-                    occurrence.is_sent = True
+                    occurrence.notification_sent = True
 
         # Sanity check so we don't end up with an "empty" booking
         if not any(occ.is_valid for occ in self.occurrences):
@@ -697,7 +698,7 @@ class Reservation(Serializer, db.Model):
         return user and user.isRBAdmin()
 
     def is_owned_by(self, avatar):
-        return self.created_by == avatar.id
+        return self.created_by_id == avatar.id
 
     def is_booked_for(self, user):
         return user and (self.booked_for_user == user or self.contact_email in user.getEmails())

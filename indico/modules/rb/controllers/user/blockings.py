@@ -165,7 +165,7 @@ class RHRoomBookingBlockingList(RHRoomBookingBase):
     def _process(self):
         criteria = []
         if self.only_mine:
-            criteria += [Blocking.created_by == self._getUser().getId()]
+            criteria += [Blocking.created_by_id == self._getUser().getId()]
         if self.timeframe == 'year':
             criteria += [Blocking.start_date <= date(date.today().year, 12, 31),
                          Blocking.end_date >= date(date.today().year, 1, 1)]

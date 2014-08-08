@@ -28,11 +28,11 @@ class Photo(db.Model):
         db.Integer,
         primary_key=True
     )
-    small_content = db.Column(
+    thumbnail = db.Column(
         db.LargeBinary,
         nullable=True
     )
-    large_content = db.Column(
+    data = db.Column(
         db.LargeBinary,
         nullable=True
     )

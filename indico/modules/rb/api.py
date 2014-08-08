@@ -209,8 +209,8 @@ class BookRoomHook(HTTPAPIHook):
 
     def api_roomBooking(self, aw):
         data = MultiDict({
-            'start_date': self._params['from'],
-            'end_date': self._params['to'],
+            'start_dt': self._params['from'],
+            'end_dt': self._params['to'],
             'repeat_unit': RepeatUnit.NEVER,
             'repeat_step': 0,
             'room_id': self._room.id,
@@ -239,24 +239,24 @@ def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None
     """
     filters = list(extra_filters) if extra_filters else []
     if hook._fromDT and hook._toDT:
-        filters.append(cast(Reservation.start_date, Date) <= hook._toDT.date())
-        filters.append(cast(Reservation.end_date, Date) >= hook._fromDT.date())
-        filters.append(cast(Reservation.start_date, Time) <= hook._toDT.time())
-        filters.append(cast(Reservation.end_date, Time) >= hook._fromDT.time())
+        filters.append(cast(Reservation.start_dt, Date) <= hook._toDT.date())
+        filters.append(cast(Reservation.end_dt, Date) >= hook._fromDT.date())
+        filters.append(cast(Reservation.start_dt, Time) <= hook._toDT.time())
+        filters.append(cast(Reservation.end_dt, Time) >= hook._fromDT.time())
     elif hook._toDT:
-        filters.append(cast(Reservation.end_date, Date) <= hook._toDT.date())
-        filters.append(cast(Reservation.end_date, Time) <= hook._toDT.time())
+        filters.append(cast(Reservation.end_dt, Date) <= hook._toDT.date())
+        filters.append(cast(Reservation.end_dt, Time) <= hook._toDT.time())
     elif hook._fromDT:
-        filters.append(cast(Reservation.start_date, Date) >= hook._fromDT.date())
-        filters.append(cast(Reservation.start_date, Time) >= hook._fromDT.time())
+        filters.append(cast(Reservation.start_dt, Date) >= hook._fromDT.date())
+        filters.append(cast(Reservation.start_dt, Time) >= hook._fromDT.time())
     filters += _get_reservation_state_filter(hook._queryParams)
     data = ['vc_equipment']
     if hook._occurrences:
         data.append('occurrences')
     order = {
-        'start': Reservation.start_date,
-        'end': Reservation.end_date
-    }.get(hook._orderBy, Reservation.start_date)
+        'start': Reservation.start_dt,
+        'end': Reservation.end_dt
+    }.get(hook._orderBy, Reservation.start_dt)
     if hook._descending:
         order = order.desc()
     reservations_data = Reservation.get_with_data(*data, filters=filters, limit=hook._limit, offset=hook._offset,
@@ -389,11 +389,11 @@ def _get_reservation_state_filter(params):
         else:
             filters.append(Reservation.repeat_unit == 0)
     if avc is not None:
-        filters.append(Reservation.uses_video_conference == _yesno(avc))
+        filters.append(Reservation.uses_vc == _yesno(avc))
     if avc_support is not None:
-        filters.append(Reservation.needs_video_conference_setup == _yesno(avc_support))
+        filters.append(Reservation.needs_vc_assistance == _yesno(avc_support))
     if startup_support is not None:
-        filters.append(Reservation.needs_general_assistance == _yesno(startup_support))
+        filters.append(Reservation.needs_assistance == _yesno(startup_support))
     if booked_for:
         like_str = '%{}%'.format(booked_for.replace('?', '_').replace('*', '%'))
         filters.append(Reservation.booked_for_name.ilike(like_str))

@@ -109,15 +109,15 @@ class BlockedRoom(db.Model):
 
         # Whole reservations to reject
         reservations = Reservation.find_all(
-            Reservation.start_date >= start_dt,
-            Reservation.end_date <= end_dt,
+            Reservation.start_dt >= start_dt,
+            Reservation.end_dt <= end_dt,
             *reservation_criteria
         )
 
         # Single occurrences to reject
         occurrences = ReservationOccurrence.find_all(
-            ReservationOccurrence.start >= start_dt,
-            ReservationOccurrence.end <= end_dt,
+            ReservationOccurrence.start_dt >= start_dt,
+            ReservationOccurrence.end_dt <= end_dt,
             ReservationOccurrence.is_valid,
             ~ReservationOccurrence.reservation_id.in_(map(attrgetter('id'), reservations)),
             *reservation_criteria,

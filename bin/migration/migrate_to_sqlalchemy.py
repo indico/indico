@@ -282,9 +282,9 @@ def migrate_rooms(rb_root, photo_path):
             floor=convert_to_unicode(old_room.floor),
             number=convert_to_unicode(old_room.roomNr),
 
-            notification_for_start=((old_room.resvStartNotificationBefore or None)
-                                    if getattr(old_room, 'resvStartNotification', False)
-                                    else None),
+            notification_before_days=((old_room.resvStartNotificationBefore or None)
+                                      if getattr(old_room, 'resvStartNotification', False)
+                                      else None),
             notification_for_end=getattr(old_room, 'resvEndNotification', False),
             notification_for_responsible=getattr(old_room, 'resvNotificationToResponsible', False),
             notification_for_assistance=getattr(old_room, 'resvNotificationAssistance', False),
@@ -322,8 +322,8 @@ def migrate_rooms(rb_root, photo_path):
         for old_nonbookable_date in getattr(old_room, '_nonBookableDates', []):
             r.nonbookable_dates.append(
                 NonBookableDate(
-                    start_date=old_nonbookable_date._startDate,
-                    end_date=old_nonbookable_date._endDate
+                    start_dt=old_nonbookable_date._startDate,
+                    end_dt=old_nonbookable_date._endDate
                 )
             )
             print cformat('  %{blue!}Nonbookable:%{reset} {}').format(r.nonbookable_dates[-1])
@@ -344,7 +344,7 @@ def migrate_rooms(rb_root, photo_path):
                 small_photo = None
 
             if large_photo and small_photo:
-                r.photo = Photo(large_content=large_photo, small_content=small_photo)
+                r.photo = Photo(data=large_photo, thumbnail=small_photo)
                 print cformat('  %{blue!}Photos')
 
         new_eq = []
@@ -389,14 +389,14 @@ def migrate_reservations(main_root, rb_root):
 
         r = Reservation(
             id=v.id,
-            created_at=as_utc(v._utcCreatedDT),
-            start_date=utc_to_local(v._utcStartDT),
-            end_date=utc_to_local(v._utcEndDT),
+            created_dt=as_utc(v._utcCreatedDT),
+            start_dt=utc_to_local(v._utcStartDT),
+            end_dt=utc_to_local(v._utcEndDT),
             booked_for_id=convert_to_unicode(getattr(v, 'bookedForId', None)) or None,
             booked_for_name=convert_to_unicode(v.bookedForName),
             contact_email=convert_to_unicode(v.contactEmail),
             contact_phone=convert_to_unicode(getattr(v, 'contactPhone', None)),
-            created_by=convert_to_unicode(v.createdBy) or None,
+            created_by_id=convert_to_unicode(v.createdBy) or None,
             is_cancelled=v.isCancelled,
             is_accepted=v.isConfirmed,
             is_rejected=v.isRejected,
@@ -404,9 +404,9 @@ def migrate_reservations(main_root, rb_root):
             rejection_reason=convert_to_unicode(getattr(v, 'rejectionReason', None)),
             repeat_unit=repeat_unit,
             repeat_step=repeat_step,
-            uses_video_conference=getattr(v, 'usesAVC', False),
-            needs_video_conference_setup=getattr(v, 'needsAVCSupport', False),
-            needs_general_assistance=getattr(v, 'needsAssistance', False)
+            uses_vc=getattr(v, 'usesAVC', False),
+            needs_vc_assistance=getattr(v, 'needsAVCSupport', False),
+            needs_assistance=getattr(v, 'needsAssistance', False)
         )
 
         for eq_name in getattr(v, 'useVC', []):
@@ -438,7 +438,7 @@ def migrate_reservations(main_root, rb_root):
         excluded_days = getattr(v, '_excludedDays', []) or []
         ReservationOccurrence.create_series_for_reservation(r)
         for occ in r.occurrences:
-            occ.is_sent = occ.date in notifications
+            occ.notification_sent = occ.date in notifications
             occ.is_rejected = r.is_rejected
             occ.is_cancelled = r.is_cancelled or occ.date in excluded_days
             occ.rejection_reason = (convert_to_unicode(occurrence_rejection_reasons[occ.date])
@@ -461,7 +461,7 @@ def migrate_reservations(main_root, rb_root):
         print cformat('- [%{cyan}{}%{reset}/%{green!}{}%{reset}]  %{grey!}{}%{reset}  {}').format(room.location_name,
                                                                                                   room.name,
                                                                                                   r.id,
-                                                                                                  r.created_at.date())
+                                                                                                  r.created_dt.date())
 
         room.reservations.append(r)
         db.session.add(room)
@@ -482,8 +482,8 @@ def migrate_blockings(rb_root):
     for old_blocking_id, old_blocking in rb_root['RoomBlocking']['Blockings'].iteritems():
         b = Blocking(
             id=old_blocking.id,
-            created_by=convert_to_unicode(old_blocking._createdBy),
-            created_at=as_utc(old_blocking._utcCreatedDT),
+            created_by_id=convert_to_unicode(old_blocking._createdBy),
+            created_dt=as_utc(old_blocking._utcCreatedDT),
             start_date=old_blocking.startDate,
             end_date=old_blocking.endDate,
             reason=convert_to_unicode(old_blocking.message)

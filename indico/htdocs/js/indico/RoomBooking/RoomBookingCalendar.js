@@ -389,8 +389,8 @@ type ("RoomBookingCalendarDrawer", [],
             },
 
             _proceedToBooking: function(bar) {
-                $('#start_date').val(Util.formatDateTime(bar.resvStartDT));
-                $('#end_date').val(Util.formatDateTime(bar.resvEndDT));
+                $('#start_dt').val(Util.formatDateTime(bar.resvStartDT));
+                $('#end_dt').val(Util.formatDateTime(bar.resvEndDT));
                 $('#room_id').val(bar.room.id);
                 $('#periodForm').submit();
             },

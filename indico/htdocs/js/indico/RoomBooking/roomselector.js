@@ -82,7 +82,7 @@
                 var roomName = roomLoc + (roomLoc == room.name ?  '' : ' - ' + room.name);
                 var option = $("<option/>")
                     .attr("label",
-                        room.needs_video_conference_setup + ":" +
+                        room.has_vc + ":" +
                         room.has_webcast_recording + ":" +
                         room.has_projector + ":" +
                         room.is_public + ":" +

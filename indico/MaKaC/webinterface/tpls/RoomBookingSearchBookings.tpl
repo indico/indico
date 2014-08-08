@@ -129,8 +129,8 @@
                 <span class="i-button label">
                     ${ _('Services') }
                 </span>
-                <input type="checkbox" id="uses_video_conference" name="uses_video_conference"/>
-                <label for="uses_video_conference" class="i-button"
+                <input type="checkbox" id="uses_vc" name="uses_vc"/>
+                <label for="uses_vc" class="i-button"
                     title="${ _('Filter by bookings which will use videoconference systems') }">
                     ${ _('Videoconference') }
                 </label>
@@ -142,13 +142,13 @@
                 <span class="i-button label">
                     ${ _('Assistance') }
                 </span>
-                <input type="checkbox" id="needs_video_conference_setup" name="needs_video_conference_setup"/>
-                <label for="needs_video_conference_setup" class="i-button"
+                <input type="checkbox" id="needs_vc_assistance" name="needs_vc_assistance"/>
+                <label for="needs_vc_assistance" class="i-button"
                     title="${ _('Filter by bookings which requested assistance for the startup of the videoconference session') }">
                     ${ _('Videoconference') }
                 </label>
-                <input type="checkbox" id="needs_general_assistance" name="needs_general_assistance"/>
-                <label for="needs_general_assistance" class="i-button"
+                <input type="checkbox" id="needs_assistance" name="needs_assistance"/>
+                <label for="needs_assistance" class="i-button"
                     title="${ _('Filter by bookings which requested assistance for the startup of the meeting') }">
                     ${ _('Startup') }
                 </label>

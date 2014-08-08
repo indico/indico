@@ -30,7 +30,7 @@
     <div id="reservations_need_confirmationCH" class="tip">
         ${ _("Whether bookings must be accepted by person responsible.") }
     </div>
-    <div id="notification_for_startCH" class="tip">
+    <div id="notification_before_daysCH" class="tip">
         ${ _("Send the start notification X days before an occurrence (leave empty to use default)")  }
     </div>
     <div id="notification_for_endCH" class="tip">
@@ -156,10 +156,10 @@
                             <table>
                                 <%
                                     fields = ['is_active', 'is_reservable', 'reservations_need_confirmation',
-                                              'notification_for_assistance', 'notification_for_start',
+                                              'notification_for_assistance', 'notification_before_days',
                                               'notification_for_end', 'notification_for_responsible']
                                     field_args = {
-                                        'notification_for_start': dict(style='width: 20px;', maxlength=1)
+                                        'notification_before_days': dict(style='width: 20px;', maxlength=1)
                                     }
                                 %>
                                 % for field in fields:

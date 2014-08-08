@@ -69,8 +69,8 @@
 
 <form method="POST" id="bookingForm">
     <input type="hidden" name="step" value="3">
-    ${ form.start_date(type='hidden') }
-    ${ form.end_date(type='hidden') }
+    ${ form.start_dt(type='hidden') }
+    ${ form.end_dt(type='hidden') }
     ${ form.repeat_unit(style='display: none') }
     ${ form.repeat_step(type='hidden') }
     ${ form.room_id(type='hidden') }
@@ -81,7 +81,7 @@
     </h2>
     <%include file="RoomBookingNewBookingInfoWidget.tpl" args="form=form"/>
 
-    % if list(form.equipments) or form.needs_general_assistance:
+    % if list(form.equipments) or form.needs_assistance:
         <h2 class="group-title">
             <i class="icon-projector"></i>
             ${ _('Collaboration & Assistance') }

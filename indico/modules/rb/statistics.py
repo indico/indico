@@ -31,14 +31,14 @@ def calculate_rooms_booked_time(rooms, start_date=None, end_date=None):
         start_date = end_date - relativedelta(months=1)
     # Reservations on working days
     reservations = Reservation.find(Reservation.room_id.in_(r.id for r in rooms),
-                                    extract('dow', ReservationOccurrence.start) < 5,
-                                    ReservationOccurrence.start >= start_date,
-                                    ReservationOccurrence.end <= end_date,
+                                    extract('dow', ReservationOccurrence.start_dt) < 5,
+                                    ReservationOccurrence.start_dt >= start_date,
+                                    ReservationOccurrence.end_dt <= end_date,
                                     ReservationOccurrence.is_valid,
                                     _join=ReservationOccurrence)
     # Take into account only working hours
-    earliest_time = greatest(cast(ReservationOccurrence.start, TIME), Location.working_time_start)
-    latest_time = least(cast(ReservationOccurrence.end, TIME), Location.working_time_end)
+    earliest_time = greatest(cast(ReservationOccurrence.start_dt, TIME), Location.working_time_start)
+    latest_time = least(cast(ReservationOccurrence.end_dt, TIME), Location.working_time_end)
     booked_time = reservations.with_entities(func.sum(latest_time - earliest_time)).scalar()
     return (booked_time or timedelta()).total_seconds()
 

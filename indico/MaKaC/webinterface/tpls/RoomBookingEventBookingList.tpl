@@ -45,15 +45,15 @@
                                         ${ reservation.booked_for_name }
                                     </td>
                                     <td ${onclick} style="padding: 0 10px 6px 0; cursor: pointer; vertical-align: top; ${ style }">
-                                        ${ formatDate(reservation.start_date) }
+                                        ${ formatDate(reservation.start_dt) }
                                         % if reservation.is_repeating:
                                             (recurring)
                                         % endif
                                     </td>
                                     <td ${onclick} style="padding: 0 10px 6px 0; cursor: pointer; vertical-align: top; white-space: nowrap; ${ style }">
-                                        ${ verbose_t(reservation.start_date) }
+                                        ${ verbose_t(reservation.start_dt) }
                                         -
-                                        ${ verbose_t(reservation.end_date) }
+                                        ${ verbose_t(reservation.end_dt) }
                                     </td>
                                     <td ${onclick} style="padding: 0 10px 6px 0; cursor: pointer; vertical-align: top;">
                                         <a href="${ details_url }">${ _('Details') }</a>

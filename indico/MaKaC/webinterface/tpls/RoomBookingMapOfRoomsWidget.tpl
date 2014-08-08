@@ -203,7 +203,7 @@ var filters = [
         filterType: "room",
         inputType: "boolean",
         defaultValue: false,
-        property: "needs_video_conference_setup",
+        property: "has_vc",
         optional: true
     },
     {
@@ -270,7 +270,7 @@ function initializeAvailabilityFields() {
     });
 
     $('#repeatability').on('change', function() {
-        var single_day = $(this).val() == '(0, 0)'
+        var single_day = $(this).val() == '(0, 0)';
         $('#end_date').prop('disabled', single_day);
         if (single_day) {
             $('#end_date').datepicker('setDate', $('#start_date').datepicker('getDate'));

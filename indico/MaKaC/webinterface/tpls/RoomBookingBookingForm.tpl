@@ -22,7 +22,7 @@
             ${ _('Booking time & date') }
         </h2>
         <%include file="RoomBookingNewBookingPeriodWidget.tpl"
-                  args="form=form, can_override=can_override, min_date=(reservation.start_date if reservation else None)
+                  args="form=form, can_override=can_override, min_date=(reservation.start_dt if reservation else None)
         "/>
 
         % if calendar:
@@ -39,7 +39,7 @@
         </h2>
         <%include file="RoomBookingNewBookingInfoWidget.tpl" args="form=form"/>
 
-        % if list(form.equipments) or form.needs_general_assistance:
+        % if list(form.equipments) or form.needs_assistance:
             <h2 class="group-title">
                 <i class="icon-projector"></i>
                 ${ _('Collaboration & assistance') }

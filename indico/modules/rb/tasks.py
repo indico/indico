@@ -17,17 +17,17 @@ class OccurrenceNotifications(PeriodicUniqueTask):
             return
 
         today = cast(func.now(), Date)
-        days_before = func.coalesce(Room.notification_for_start, settings.get('notification_before_days', 0))
+        days_before = func.coalesce(Room.notification_before_days, settings.get('notification_before_days', 0))
         occurrences = ReservationOccurrence.find(
             Reservation.is_accepted,
-            ~ReservationOccurrence.is_sent,
+            ~ReservationOccurrence.notification_sent,
             ReservationOccurrence.is_valid,
-            cast(ReservationOccurrence.start, Date) - days_before * timedelta(days=1) == today,
+            cast(ReservationOccurrence.start_dt, Date) - days_before * timedelta(days=1) == today,
             _join=[Reservation, Room]
         )
 
         for occ in occurrences:
-            occ.is_sent = True
+            occ.notification_sent = True
             if occ.reservation.repeat_unit == RepeatUnit.DAY:
-                occ.reservation.occurrences.update({'is_sent': True})
+                occ.reservation.occurrences.update({'notification_sent': True})
             notify_upcoming_occurrence(occ)

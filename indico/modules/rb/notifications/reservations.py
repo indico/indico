@@ -8,14 +8,14 @@ from indico.util.date_time import format_datetime
 class ReservationNotification(object):
     def __init__(self, reservation):
         self.reservation = reservation
-        self.start_date = format_datetime(reservation.start_date)
+        self.start_dt = format_datetime(reservation.start_dt)
 
     def _get_email_subject(self, **mail_params):
         return '{prefix}[{room}] {subject} {date} {suffix}'.format(
             prefix=mail_params.get('subject_prefix', ''),
             room=self.reservation.room.full_name,
             subject=mail_params.get('subject', ''),
-            date=self.start_date,
+            date=self.start_dt,
             suffix=mail_params.get('subject_suffix', '')
         ).strip()
 
@@ -46,7 +46,7 @@ class ReservationNotification(object):
     def compose_email_to_vc_support(self, **mail_params):
         from indico.modules.rb import settings
 
-        if self.reservation.is_accepted and self.reservation.uses_video_conference:
+        if self.reservation.is_accepted and self.reservation.uses_vc:
             to_list = settings.get('vc_support_emails')
             if to_list:
                 subject = self._get_email_subject(**mail_params)
@@ -57,7 +57,7 @@ class ReservationNotification(object):
         from indico.modules.rb import settings
 
         if self.reservation.room.notification_for_assistance:
-            if self.reservation.needs_general_assistance or mail_params.get('assistance_cancelled'):
+            if self.reservation.needs_assistance or mail_params.get('assistance_cancelled'):
                 to_list = settings.get('assistance_emails')
                 if to_list:
                     subject = self._get_email_subject(**mail_params)
@@ -165,7 +165,7 @@ def notify_rejection(reservation):
 
 @email_sender
 def notify_modification(reservation, changes):
-    assistance_change = changes.get('needs_general_assistance')
+    assistance_change = changes.get('needs_assistance')
     assistance_cancelled = assistance_change and assistance_change['old'] and not assistance_change['new']
     notification = ReservationNotification(reservation)
     return filter(None, [

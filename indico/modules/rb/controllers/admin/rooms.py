@@ -92,8 +92,8 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
             for i, nbd in enumerate(room.nonbookable_dates.all()):
                 if i >= len(form.nonbookable_dates.entries):
                     form.nonbookable_dates.append_entry()
-                form.nonbookable_dates[i].start.data = nbd.start_date
-                form.nonbookable_dates[i].end.data = nbd.end_date
+                form.nonbookable_dates[i].start.data = nbd.start_dt
+                form.nonbookable_dates[i].end.data = nbd.end_dt
 
             for i, bt in enumerate(room.bookable_times.all()):
                 if i >= len(form.bookable_times.entries):
@@ -118,8 +118,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         # Photos
         if form.small_photo.data and form.large_photo.data:
             _cache.delete_multi('photo-{}-{}'.format(room.id, size) for size in {'small', 'large'})
-            room.photo = Photo(small_content=form.small_photo.data.read(),
-                               large_content=form.large_photo.data.read())
+            room.photo = Photo(thumbnail=form.small_photo.data.read(), data=form.large_photo.data.read())
         elif form.delete_photos.data:
             _cache.delete_multi('photo-{}-{}'.format(room.id, size) for size in {'small', 'large'})
             room.photo = None
@@ -132,7 +131,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         room.bookable_times = [BookableTime(start_time=bt['start'], end_time=bt['end'])
                                for bt in form.bookable_times.data if all(bt.viewvalues())]
         # Nonbookable dates
-        room.nonbookable_dates = [NonBookableDate(start_date=nbd['start'], end_date=nbd['end'])
+        room.nonbookable_dates = [NonBookableDate(start_dt=nbd['start'], end_dt=nbd['end'])
                                   for nbd in form.nonbookable_dates.data if all(nbd.viewvalues())]
 
     def _process(self):

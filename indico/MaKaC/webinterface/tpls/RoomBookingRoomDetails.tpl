@@ -207,8 +207,8 @@
                               % for nbd in nonbookable_dates:
                                 <li>
                                     ${ _('from {} to {}').format(
-                                        nbd.start_date.strftime('%d/%m/%Y'),
-                                        nbd.end_date.strftime('%d/%m/%Y')
+                                        nbd.start_dt.strftime('%d/%m/%Y'),
+                                        nbd.end_dt.strftime('%d/%m/%Y')
                                     ) }
                                 </li>
                               % endfor

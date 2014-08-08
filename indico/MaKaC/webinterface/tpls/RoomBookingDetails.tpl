@@ -229,7 +229,7 @@
                       <td class="subFieldWidth" align="right" valign="top">
                         ${ _('Dates') }&nbsp;&nbsp;
                       </td>
-                      <td align="left" class="blacktext">${ formatDate(reservation.start_date.date()) } &mdash; ${ formatDate(reservation.end_date.date()) }
+                      <td align="left" class="blacktext">${ formatDate(reservation.start_dt.date()) } &mdash; ${ formatDate(reservation.end_dt.date()) }
                       </td>
                     </tr>
                     <tr>
@@ -237,7 +237,7 @@
                         ${ _('Hours') }&nbsp;&nbsp;
                       </td>
                       <td align="left" class="blacktext">
-                        ${ formatTime(reservation.start_date) } &mdash; ${ formatTime(reservation.end_date) }
+                        ${ formatTime(reservation.start_dt) } &mdash; ${ formatTime(reservation.end_dt) }
                       </td>
                     </tr>
                       <tr>
@@ -308,7 +308,7 @@
                           ${ _('Date') }&nbsp;&nbsp;
                         </td>
                         <td align="left" class="blacktext">
-                          ${ formatDateTime(reservation.created_at) } ${contextHelp('createdHelp') }
+                          ${ formatDateTime(reservation.created_dt) } ${contextHelp('createdHelp') }
                         </td>
                       </tr>
                       <tr>
@@ -319,13 +319,13 @@
                           ${ reservation.booking_reason }
                         </td>
                       </tr>
-                      % if reservation.room.needs_video_conference_setup:
+                      % if reservation.room.has_vc:
                         <tr>
                           <td class="subFieldWidth" align="right" valign="top">
                             ${ _('Video-conf.') }&nbsp;&nbsp;
                           </td>
                           <td align="left" class="blacktext">
-                            ${ _('yes') if reservation.uses_video_conference else _('no') }
+                            ${ _('yes') if reservation.uses_vc else _('no') }
                             % if vc_equipment:
                               <span style="color: grey;">(${ vc_equipment })</span>
                             % endif
@@ -337,7 +337,7 @@
                             ${ _('Video-conf Assistance') }&nbsp;&nbsp;
                           </td>
                           <td align="left" class="blacktext">
-                            ${ verbose(reservation.needs_video_conference_setup, 'no') }
+                            ${ verbose(reservation.needs_vc_assistance, 'no') }
                             ${ contextHelp('iNeedAVCSupport') }
                           </td>
                         </tr>
@@ -348,7 +348,7 @@
                             ${ _('Startup Assistance') }&nbsp;&nbsp;
                           </td>
                           <td align="left" class="blacktext">
-                            ${ verbose(reservation.needs_general_assistance, 'no') }
+                            ${ verbose(reservation.needs_assistance, 'no') }
                           </td>
                         </tr>
                       % endif
@@ -498,14 +498,14 @@
                         </td>
                         <td align="left" class="blacktext">
                           % for occurrence in valid_occurrences:
-                          ${ formatDate(occurrence.start.date()) }
+                          ${ formatDate(occurrence.start_dt.date()) }
                             % if reservation.can_be_rejected(_session.user):
-                              <a class="roomBookingRejectOccurrence" href="#" onclick="submit_reject_occurrence('${ url_for(endpoints['booking_occurrence_reject'], event, reservation, date=formatDate(occurrence.start.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start.date()) }'); return false;">
+                              <a class="roomBookingRejectOccurrence" href="#" onclick="submit_reject_occurrence('${ url_for(endpoints['booking_occurrence_reject'], event, reservation, date=formatDate(occurrence.start_dt.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start_dt.date()) }'); return false;">
                                 ${ _('Reject') }
                               </a>
                             % endif
                             % if reservation.can_be_cancelled(_session.user):
-                              <a class="roomBookingCancelOccurrence" href="#" onclick="submit_cancel_occurrence('${ url_for(endpoints['booking_occurrence_cancel'], event, reservation, date=formatDate(occurrence.start.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start.date()) }'); return false;">
+                              <a class="roomBookingCancelOccurrence" href="#" onclick="submit_cancel_occurrence('${ url_for(endpoints['booking_occurrence_cancel'], event, reservation, date=formatDate(occurrence.start_dt.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start_dt.date()) }'); return false;">
                                 ${ _('Cancel') }
                               </a>
                             % endif
@@ -530,7 +530,7 @@
                         ${ _('Booking') if col.withReservation.is_accepted else _('PRE-Booking') }:
                       </strong>
                       ${ col.withReservation.booked_for_name },
-                      ${ verbose_dt(col.withReservation.start_date) } - ${ verbose_dt(col.withReservation.end_date) }
+                      ${ verbose_dt(col.withReservation.start_dt) } - ${ verbose_dt(col.withReservation.end_dt) }
                       (<a href="${ urlHandlers.UHRoomBookingBookingDetails.getURL(col.withReservation) }" target="_blank">
                         ${ _('show this booking') }
                       </a>)<br/>

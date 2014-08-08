@@ -56,9 +56,9 @@ class BookingSearchForm(IndicoForm):
     is_cancelled = BooleanField('Is Cancelled')
     is_archived = BooleanField('Is Archived')
 
-    uses_video_conference = BooleanField('Uses Video Conference')
-    needs_video_conference_setup = BooleanField('Video Conference Setup Assistance')
-    needs_general_assistance = BooleanField('General Assistance')
+    uses_vc = BooleanField('Uses Video Conference')
+    needs_vc_assistance = BooleanField('Video Conference Setup Assistance')
+    needs_assistance = BooleanField('General Assistance')
 
     @property
     def start_dt(self):
@@ -70,10 +70,10 @@ class BookingSearchForm(IndicoForm):
 
 
 class NewBookingFormBase(IndicoForm):
-    start_date = DateTimeField('Start date', validators=[InputRequired()], parse_kwargs={'dayfirst': True},
-                               display_format='%d/%m/%Y %H:%M')
-    end_date = DateTimeField('End date', validators=[InputRequired()], parse_kwargs={'dayfirst': True},
+    start_dt = DateTimeField('Start date', validators=[InputRequired()], parse_kwargs={'dayfirst': True},
                              display_format='%d/%m/%Y %H:%M')
+    end_dt = DateTimeField('End date', validators=[InputRequired()], parse_kwargs={'dayfirst': True},
+                           display_format='%d/%m/%Y %H:%M')
     repeat_unit = RadioField('Repeat unit', coerce=int, default=0, validators=[InputRequired()],
                              choices=[(0, _(u'Once')), (1, _(u'Daily')), (2, _(u'Weekly')), (3, _(u'Monthly'))])
     repeat_step = IntegerField('Repeat step', validators=[NumberRange(0, 3)], default=0)
@@ -82,18 +82,18 @@ class NewBookingFormBase(IndicoForm):
         if (self.repeat_unit.data, self.repeat_step.data) not in RepeatMapping._mapping:
             raise ValidationError('Invalid repeat step')
 
-    def validate_start_date(self, field):
+    def validate_start_dt(self, field):
         if field.data.date() < date.today() and not session.user.isAdmin():
             raise ValidationError(_(u'The start time cannot be in the past.'))
 
-    def validate_end_date(self, field):
-        start_date = self.start_date.data
-        end_date = self.end_date.data
-        if start_date.time() >= end_date.time():
+    def validate_end_dt(self, field):
+        start_dt = self.start_dt.data
+        end_dt = self.end_dt.data
+        if start_dt.time() >= end_dt.time():
             raise ValidationError('Invalid times')
         if self.repeat_unit.data == RepeatUnit.NEVER:
-            field.data = datetime.combine(start_date.date(), field.data.time())
-        elif start_date.date() >= end_date.date():
+            field.data = datetime.combine(start_dt.date(), field.data.time())
+        elif start_dt.date() >= end_dt.date():
             raise ValidationError('Invalid period')
 
 
@@ -120,22 +120,22 @@ class NewBookingConfirmForm(NewBookingPeriodForm):
     contact_email = StringField(_(u'Email'), [InputRequired(), IndicoEmail(multi=True)])
     contact_phone = StringField(_(u'Telephone'))
     booking_reason = TextAreaField(_(u'Reason'), [DataRequired()])
-    uses_video_conference = BooleanField(_(u'I will use videoconference equipment'))
+    uses_vc = BooleanField(_(u'I will use videoconference equipment'))
     equipments = IndicoQuerySelectMultipleCheckboxField(_(u'VC equipment'), get_label=lambda x: x.name)
-    needs_video_conference_setup = BooleanField(_(u'Request assistance for the startup of the videoconference session. '
-                                                  'This support is usually performed remotely.'))
-    needs_general_assistance = BooleanField(_(u'Request personal assistance for meeting startup'))
+    needs_vc_assistance = BooleanField(_(u'Request assistance for the startup of the videoconference session. '
+                                         u'This support is usually performed remotely.'))
+    needs_assistance = BooleanField(_(u'Request personal assistance for meeting startup'))
     submit_book = SubmitField(_(u'Create booking'))
     submit_prebook = SubmitField(_(u'Create pre-booking'))
 
     def validate_equipments(self, field):
-        if field.data and not self.uses_video_conference.data:
+        if field.data and not self.uses_vc.data:
             raise ValidationError('Video Conference equipment is not used.')
-        elif not field.data and self.uses_video_conference.data:
+        elif not field.data and self.uses_vc.data:
             raise ValidationError('You need to select some Video Conference equipment')
 
-    def validate_needs_video_conference_setup(self, field):
-        if field.data and not self.uses_video_conference.data:
+    def validate_needs_vc_assistance(self, field):
+        if field.data and not self.uses_vc.data:
             raise ValidationError('Video Conference equipment is not used.')
 
 
@@ -155,6 +155,6 @@ class ModifyBookingForm(NewBookingSimpleForm):
         del self.submit_book
         del self.submit_prebook
 
-    def validate_start_date(self, field):
+    def validate_start_dt(self, field):
         if field.data.date() < self._old_start_date and not session.user.isAdmin():
             raise ValidationError(_(u'The start time cannot be moved into the paste.'))

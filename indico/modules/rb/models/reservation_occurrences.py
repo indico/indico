@@ -43,18 +43,18 @@ class ReservationOccurrence(db.Model, Serializer):
         nullable=False,
         primary_key=True
     )
-    start = db.Column(
+    start_dt = db.Column(
         db.DateTime,
         nullable=False,
         primary_key=True,
         index=True
     )
-    end = db.Column(
+    end_dt = db.Column(
         db.DateTime,
         nullable=False,
         index=True
     )
-    is_sent = db.Column(
+    notification_sent = db.Column(
         db.Boolean,
         nullable=False,
         default=False
@@ -75,11 +75,11 @@ class ReservationOccurrence(db.Model, Serializer):
 
     @hybrid_property
     def date(self):
-        return self.start.date()
+        return self.start_dt.date()
 
     @date.expression
     def date(self):
-        return cast(self.start, Date)
+        return cast(self.start_dt, Date)
 
     @hybrid_property
     def is_valid(self):
@@ -93,16 +93,16 @@ class ReservationOccurrence(db.Model, Serializer):
     def __repr__(self):
         return u'<ReservationOccurrence({0}, {1}, {2}, {3}, {4}, {5})>'.format(
             self.reservation_id,
-            self.start,
-            self.end,
+            self.start_dt,
+            self.end_dt,
             self.is_cancelled,
             self.is_rejected,
-            self.is_sent
+            self.notification_sent
         )
 
     @classmethod
     def create_series_for_reservation(cls, reservation):
-        for o in cls.iter_create_occurrences(reservation.start_date, reservation.end_date, reservation.repetition):
+        for o in cls.iter_create_occurrences(reservation.start_dt, reservation.end_dt, reservation.repetition):
             o.reservation = reservation
 
     @classmethod
@@ -113,7 +113,7 @@ class ReservationOccurrence(db.Model, Serializer):
     def iter_create_occurrences(cls, start, end, repetition):
         for start in cls.iter_start_time(start, end, repetition):
             end = datetime.combine(start.date(), end.time())
-            yield ReservationOccurrence(start=start, end=end)
+            yield ReservationOccurrence(start_dt=start, end_dt=end)
 
     @staticmethod
     def iter_start_time(start, end, repetition):
@@ -147,7 +147,8 @@ class ReservationOccurrence(db.Model, Serializer):
 
     @staticmethod
     def filter_overlap(occurrences):
-        return or_(db_dates_overlap(ReservationOccurrence, 'start', occ.start, 'end', occ.end) for occ in occurrences)
+        return or_(db_dates_overlap(ReservationOccurrence, 'start_dt', occ.start_dt, 'end_dt', occ.end_dt)
+                   for occ in occurrences)
 
     @staticmethod
     def find_overlapping_with(room, occurrences, reservation_id=None):
@@ -176,7 +177,7 @@ class ReservationOccurrence(db.Model, Serializer):
             for day_start_dt in iterdays(start_dt, end_dt):
                 # Same date, but the end time
                 day_end_dt = datetime.combine(day_start_dt.date(), end_dt.time())
-                criteria.append(db_dates_overlap(ReservationOccurrence, 'start', day_start_dt, 'end', day_end_dt))
+                criteria.append(db_dates_overlap(ReservationOccurrence, 'start_dt', day_start_dt, 'end_dt', day_end_dt))
             q = q.filter(or_(*criteria))
 
         if filters.get('is_only_my_rooms') and avatar:
@@ -202,12 +203,12 @@ class ReservationOccurrence(db.Model, Serializer):
         if filters.get('is_archived'):
             q = q.filter(Reservation.is_archived)
 
-        if filters.get('uses_video_conference'):
-            q = q.filter(Reservation.uses_video_conference)
-        if filters.get('needs_video_conference_setup'):
-            q = q.filter(Reservation.needs_video_conference_setup)
-        if filters.get('needs_general_assistance'):
-            q = q.filter(Reservation.needs_general_assistance)
+        if filters.get('uses_vc'):
+            q = q.filter(Reservation.uses_vc)
+        if filters.get('needs_vc_assistance'):
+            q = q.filter(Reservation.needs_vc_assistance)
+        if filters.get('needs_assistance'):
+            q = q.filter(Reservation.needs_assistance)
 
         if filters.get('booked_for_name'):
             qs = u'%{}%'.format(filters['booked_for_name'])
@@ -224,14 +225,14 @@ class ReservationOccurrence(db.Model, Serializer):
             raise ValueError('ReservationOccurrence objects of different rooms')
         if skip_self and self.reservation and occurrence.reservation and self.reservation == occurrence.reservation:
             return False
-        return date_time.overlaps((self.start, self.end), (occurrence.start, occurrence.end))
+        return date_time.overlaps((self.start_dt, self.end_dt), (occurrence.start_dt, occurrence.end_dt))
 
     def get_overlap(self, occurrence, skip_self=False):
         if self.reservation and occurrence.reservation and self.reservation.room_id != occurrence.reservation.room_id:
             raise ValueError('ReservationOccurrence objects of different rooms')
         if skip_self and self.reservation and occurrence.reservation and self.reservation == occurrence.reservation:
             return None, None
-        return date_time.get_overlap((self.start, self.end), (occurrence.start, occurrence.end))
+        return date_time.get_overlap((self.start_dt, self.end_dt), (occurrence.start_dt, occurrence.end_dt))
 
     @proxy_to_reservation_if_single_occurrence
     def cancel(self, user, reason=None, silent=False):

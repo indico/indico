@@ -7,13 +7,13 @@
             <ul>
                 % for occurrence, overlap in conflicts.iteritems():
                 <li>
-                    ${ format_date(occurrence.start, format='full') }:
+                    ${ format_date(occurrence.start_dt, format='full') }:
                     <ul>
                         % for occ in overlap:
                         <li>
                             <small>
-                                ${ format_time(occ.start) } -
-                                ${ format_time(occ.end) }
+                                ${ format_time(occ.start_dt) } -
+                                ${ format_time(occ.end_dt) }
                                 ${ _('by') }
                                 ${ occ.reservation.booked_for_name }
                                 (<a href="${ occ.reservation.details_url }">more info</a>)
@@ -56,13 +56,12 @@
             <ul>
                 % for occurrence, overlap in pre_conflicts.iteritems():
                 <li>
-                    ${ format_date(occurrence.start, format='full') }:
+                    ${ format_date(occurrence.start_dt, format='full') }:
                     <ul>
                         % for preocc in overlap:
                         <li>
                             <small>
-                                ${ format_time(preocc.start) } -
-                                ${ format_time(preocc.end) }
+                                ${ format_time(preocc.start_dt) } - ${ format_time(preocc.end_dt) }
                                 ${ _('by') }
                                 ${ preocc.reservation.booked_for_name }
                                 (<a href="${ preocc.reservation.details_url }">more info</a>)
