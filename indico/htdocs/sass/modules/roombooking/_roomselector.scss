@@ -31,6 +31,9 @@
         top: 0 !important;
         width: auto !important;
         z-index: auto;
+        padding: 0;
+        position: relative;
+        left: 0 !important;
     }
 
     .ui-multiselect-header {
