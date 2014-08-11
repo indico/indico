@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import os
+
 from flask_script import Manager
 
 from indico.cli.database import DatabaseManager
@@ -29,7 +31,7 @@ from indico.web.flask.app import make_app
 
 def app_factory():
     app = make_app()
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, os.path.join(app.root_path, '..', 'migrations'))
     return app
 
 
