@@ -26,6 +26,7 @@ class IndicoEnum(Enum):
     """Enhanced Enum
 
     You can use SomeEnum.get('some_name') like you could with a dict.
+    For SQLAlchemy compatitibility, the `str` of an enum member is its value.
     """
     @classmethod
     def get(cls, name, default=None):
@@ -33,6 +34,10 @@ class IndicoEnum(Enum):
             return cls[name]
         except KeyError:
             return default
+
+    def __str__(self):
+        # Otherwise SQLAlchemy gets e.g. '<State.accepted: 1>' which obviously breaks things
+        return str(self.value)
 
 
 class TitledEnum(IndicoEnum):
@@ -48,6 +53,4 @@ class TitledEnum(IndicoEnum):
 
 
 class TitledIntEnum(int, TitledEnum):
-    def __str__(self):
-        # Otherwise SQLAlchemy gets e.g. '<State.accepted: 1>' which obviously breaks things
-        return str(self.value)
+    pass

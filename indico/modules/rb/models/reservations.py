@@ -43,6 +43,7 @@ from indico.modules.rb.notifications.reservations import (notify_confirmation, n
 from indico.util.date_time import now_utc, format_date, format_time
 from indico.util.i18n import _, N_
 from indico.util.string import return_ascii
+from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
 from MaKaC.common.Locators import Locator
 from MaKaC.user import AvatarHolder
@@ -52,8 +53,12 @@ class ConflictingOccurrences(Exception):
     pass
 
 
-class RepeatFrequency(object):
-    NEVER, DAY, WEEK, MONTH, YEAR = xrange(5)
+class RepeatFrequency(int, IndicoEnum):
+    NEVER = 0
+    DAY = 1
+    WEEK = 2
+    MONTH = 3
+    YEAR = 4
 
 
 class RepeatMapping(object):

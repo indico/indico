@@ -74,9 +74,9 @@ class NewBookingFormBase(IndicoForm):
                              display_format='%d/%m/%Y %H:%M')
     end_dt = DateTimeField('End date', validators=[InputRequired()], parse_kwargs={'dayfirst': True},
                            display_format='%d/%m/%Y %H:%M')
-    repeat_frequency = RadioField('Repeat unit', coerce=int, default=0, validators=[InputRequired()],
-                             choices=[(0, _(u'Once')), (1, _(u'Daily')), (2, _(u'Weekly')), (3, _(u'Monthly'))])
-    repeat_interval = IntegerField('Repeat step', validators=[NumberRange(0, 3)], default=0)
+    repeat_frequency = RadioField('Repeat frequency', coerce=int, default=0, validators=[InputRequired()],
+                                  choices=[(0, _(u'Once')), (1, _(u'Daily')), (2, _(u'Weekly')), (3, _(u'Monthly'))])
+    repeat_interval = IntegerField('Repeat interval', validators=[NumberRange(0, 3)], default=0)
 
     def validate_repeat_interval(self, field):
         if (self.repeat_frequency.data, self.repeat_interval.data) not in RepeatMapping._mapping:
