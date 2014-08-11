@@ -519,9 +519,7 @@
                   </td>
                 </tr>
               % endif
-              % if (not reservation.is_accepted and \
-                    (user.isRBAdmin() or reservation.room.is_owned_by(user)) and \
-                    reservation.find_overlapping().count()):
+              % if (not reservation.is_accepted and (user.isRBAdmin() or reservation.room.is_owned_by(user)) and reservation.find_overlapping().count()):
                 <tr><td>&nbsp;</td></tr>
                 <!-- Occurrences -->
                 <tr>
