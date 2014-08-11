@@ -585,7 +585,7 @@ class Reservation(Serializer, db.Model):
 
         changes = {}
         update_occurrences = False
-        old_repetition = self.repeat_frequency, self.repeat_interval
+        old_repetition = self.repetition
 
         for field in populate_fields:
             old = getattr(self, field)
@@ -617,7 +617,7 @@ class Reservation(Serializer, db.Model):
                     # We simply update it whenever we encounter such a change; after the last change we end up with
                     # the correct change data
                     changes['repetition'] = {'old': old_repetition,
-                                             'new': (self.repeat_frequency, self.repeat_interval),
+                                             'new': self.repetition,
                                              'converter': lambda x: RepeatMapping.getMessage(*x)}
                 else:
                     changes[field] = {'old': old, 'new': new, 'converter': converter}

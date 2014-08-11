@@ -302,7 +302,7 @@ def _serializable_reservation(reservation_data, include_room=False):
     data['_type'] = 'Reservation'
     data['repeatability'] = None
     if reservation.repeat_frequency:
-        data['repeatability'] = RepeatMapping.get_short_name(reservation.repeat_frequency, reservation.repeat_interval)
+        data['repeatability'] = RepeatMapping.get_short_name(*reservation.repetition)
     data['vcList'] = reservation_data['vc_equipment']
     if include_room:
         data['room'] = _serializable_room_minimal(reservation_data['reservation'].room)
