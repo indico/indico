@@ -78,9 +78,6 @@ class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
 
 
 class WPRoomBookingSearchRooms(WPRoomBookingBase):
-    def getJSFiles(self):
-        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
-
     def _getTitle(self):
         return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Search for rooms'))
 
@@ -117,9 +114,6 @@ class WPRoomBookingRoomDetails(WPRoomBookingBase):
 
     def _getTitle(self):
         return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Room Details'))
-
-    def getJSFiles(self):
-        return WPRoomBookingBase.getJSFiles(self) + self._includeJSPackage('RoomBooking')
 
     def _getBody(self, params):
         params['endpoints'] = self.endpoints
