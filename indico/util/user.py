@@ -36,3 +36,18 @@ def retrieve_principals(iterable):
         if principal:
             principals.append(principal)
     return principals
+
+
+def principals_merge_users(iterable, new_id, old_id):
+    """Creates a new principal list with one user being replaced with another one
+
+    :param iterable: Iterable containing `(type, id)` tuples
+    :param new_id: Target user
+    :param old_id: Source user (being deleted in the merge)
+    """
+    principals = []
+    for type_, id_ in iterable:
+        if type_ == 'Avatar' and id_ == old_id:
+            id_ = new_id
+        principals.append((type_, id_))
+    return principals

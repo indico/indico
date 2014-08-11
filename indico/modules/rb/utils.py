@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.util.user import retrieve_principals
+from indico.util.user import retrieve_principals, principals_merge_users
 
 
 def rb_check_user_access(user):
@@ -30,3 +30,26 @@ def rb_check_user_access(user):
     if not principals:  # everyone has access
         return True
     return any(principal.containsUser(user) for principal in principals)
+
+
+def rb_merge_users(new_id, old_id):
+    """Updates RB data after an Avatar merge
+
+    :param new_id: Target user
+    :param old_id: Source user (being deleted in the merge)
+    """
+    from indico.modules.rb import settings
+    from indico.modules.rb.models.blocking_principals import BlockingPrincipal
+    from indico.modules.rb.models.blockings import Blocking
+    from indico.modules.rb.models.reservations import Reservation
+    from indico.modules.rb.models.rooms import Room
+
+    BlockingPrincipal.find(entity_type='Avatar', entity_id=old_id).update({'entity_id': new_id})
+    Blocking.find(created_by_id=old_id).update({'created_by_id': new_id})
+    Reservation.find(created_by_id=old_id).update({'created_by_id': new_id})
+    Reservation.find(booked_for_id=old_id).update({'booked_for_id': new_id})
+    Room.find(owner_id=old_id).update({'owner_id': new_id})
+    for key in ('authorized_principals', 'admin_principals'):
+        principals = settings.get(key, [])
+        principals = principals_merge_users(principals, new_id, old_id)
+        settings.set(key, principals)
