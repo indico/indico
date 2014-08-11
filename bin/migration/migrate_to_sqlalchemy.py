@@ -251,7 +251,7 @@ def migrate_rooms(rb_root, photo_path):
     print cformat('%{white!}migrating equipment')
     for name, eqs in eq.iteritems():
         l = Location.getLocationByName(name)
-        l.equipment_types.extend(eqs)
+        l.equipment_types.extend(EquipmentType(name=x) for x in eqs)
         print cformat('- [%{cyan}{}%{reset}] {}').format(name, eqs)
         db.session.add(l)
     db.session.commit()
