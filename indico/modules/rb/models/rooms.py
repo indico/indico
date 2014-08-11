@@ -119,11 +119,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     notification_before_days = db.Column(
         db.Integer
     )
-    notification_for_end = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
     notification_for_responsible = db.Column(
         db.Boolean,
         nullable=False,
