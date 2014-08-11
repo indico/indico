@@ -53,7 +53,6 @@ class WPRoomBookingBookingDetails(WPRoomBookingBase):
         params['repetition'] = RepeatMapping.getMessage(*reservation.repetition)
         params['edit_logs'] = reservation.edit_logs.order_by(ReservationEditLog.timestamp.desc()).all()
         params['excluded_days'] = reservation.find_excluded_days().all()
-        params['itertools'] = itertools
         return WTemplated('RoomBookingDetails').getHTML(params)
 
 

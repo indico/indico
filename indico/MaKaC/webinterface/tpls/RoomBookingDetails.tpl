@@ -1,4 +1,6 @@
 <% valid_occurrences = reservation.occurrences.filter_by(is_valid=True).all() %>
+<% import itertools %>
+
 <script type="text/javascript">
     var occurrences = ${ [formatDate(occ.date) for occ in valid_occurrences] | n,j };
     function createContentDiv(title, occurs) {
@@ -517,7 +519,9 @@
                   </td>
                 </tr>
               % endif
-              % if ((reservation.room.is_owned_by(user) or user.isRBAdmin()) and not reservation.is_accepted and reservation.find_overlapping().count()):
+              % if (not reservation.is_accepted and \
+                    (user.isRBAdmin() or reservation.room.is_owned_by(user)) and \
+                    reservation.find_overlapping().count()):
                 <tr><td>&nbsp;</td></tr>
                 <!-- Occurrences -->
                 <tr>
