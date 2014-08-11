@@ -2463,22 +2463,6 @@ img.clickableImage
 
 /* New CSS */
 
-
-/* HEADER */
-
-div.pageHeader {
-    position: relative;
-    width: 100%;
-}
-
-div.pageHeaderDark {
-    background-color: #424242;
-}
-
-div.pageHeaderMainPage {
-    background: white url("../images/indico_bg.gif") repeat 0 0;
-}
-
 div.pageOverHeader
 {
     background-color: #F6E8C3;
@@ -2566,65 +2550,6 @@ div.mobile-device-header > .text{
 
 div.mobile-device-header .i-button {
     font-size: 3em;
-}
-/* Styles for the main menu */
-
-div.globalMenu
-{
-    background: #0b63a5 url(../images/sprites.png) repeat-x scroll 0 0;
-    border-top: 1px solid #999999;
-    border-bottom: 1px solid #999999;
-    height: 30px;
-    width: 100%;
-}
-
-div.globalMenu ul {
-    margin: 0;
-    padding: 0;
-    display: inline;
-    list-style-type: none;
-}
-
-div.globalMenu li {
-    display: block;
-    float: left;
-    position: relative;
-    height: 30px;
-    cursor: pointer;
-}
-
-div.globalMenu li.mouseover {
-    background: #439ddc url(../images/sprites.png) repeat-x scroll 0 -30px;
-}
-
-div.globalMenu a
-{
-    font-weight: bold;
-    font-family: Verdana;
-    font-size: 11px;
-    color: white;
-    letter-spacing: 0.04em;
-    display: block;
-    padding: 8px 15px;
-}
-
-div.globalMenu span
-{
-    font-weight: bold;
-    font-family: Verdana;
-    font-size: 11px;
-    color: white;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-left: 15px;
-    margin-right: 15px;
-    letter-spacing: 0.04em;
-    display: block;
-}
-
-div.globalMenu .dropDownMenu {
-    padding-right: 20px;
-    background: transparent url(../images/menu_arrow_white.png) scroll no-repeat center right;
 }
 
 /* Styles for the session bar at the top right corner */
@@ -2797,22 +2722,6 @@ div.sessionBar .cornerRestricted {
     padding-left: 7px;
 }
 
-div.mainBreadcrumb {
-    background-color: #ECECEC;
-    padding: 4px 15px;
-    border-bottom: 1px solid #AAAAAA;
-}
-
-div.mainNoBreadcrumb {
-    background: transparent url(../images/sprites.png) scroll repeat-x 0 -120px;
-    height: 10px;
-}
-
-div.noBreadcrumb {
-    padding-top: 5px;
-    padding-bottom: 10px;
-}
-
 ul.horizontalMenu
 {
     margin: 0;
@@ -2829,14 +2738,6 @@ ul.horizontalMenu li{
     padding: 2px 6px;
     border-right: 1px solid #DDDDDD;
     line-height: 1.5;
-}
-
-img.headerLogo {
-
-    margin: 7px 10px;
-    border: none;
-    width: 196px;
-    height: 52px;
 }
 
 div.headerAboutIndico

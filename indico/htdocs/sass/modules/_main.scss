@@ -1,0 +1,257 @@
+/*
+ * This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import 'base';
+@import 'compass';
+@import 'partials/icons'
+
+/* Styles for the main menu */
+
+.toolbar.global-menu {
+    @extend %font-family-title-light;
+
+    height: 3em;
+    line-height: 3em;
+
+    padding: 0 0 0 20px;
+    background: $black;
+    border: none;
+    margin-bottom: 0;
+
+    border-color: darken($black, 10%);
+    border-style: solid;
+    border-width: 1px 0 1px 0;
+
+    > a {
+        @include transition-property(background-color);
+
+        display: inline-block;
+        height: 3em;
+        line-height: 3em;
+
+        color: white;
+        padding: 0 20px 0 20px;
+
+        &:first-child, &.arrow:last-of-type {
+            border-radius: 0;
+        }
+
+        &:hover, &.open {
+            background: $light-black !important;
+        }
+
+        &.arrow {
+            @include icon-after('icon-arrow-down');
+
+            &:after {
+                vertical-align: middle;
+            }
+        }
+    }
+}
+
+
+/* Header */
+
+div.page-header {
+    border-top: 1px solid lighten($dark-blue, 10%);
+    background-color: $dark-blue;
+    position: relative;
+    width: 100%;
+}
+
+div.page-header-dark {
+    background: #424242;
+}
+
+img.header-logo {
+    margin: 10px 0px 10px 40px;
+    border: none;
+    height: 60px;
+}
+
+/* Breadcrumbs */
+
+div.main-breadcrumb {
+    @extend %font-family-title;
+
+    background-color: darken($light-gray, 5%);
+    border-bottom: 1px solid $gray;
+    padding: 0.6em 0 0.6em 40px;
+
+    .path {
+        .sep {
+            color: $dark-gray;
+            padding: 0 0.5em;
+        }
+    }
+
+    a {
+        color: $light-black;
+
+        &:hover {
+            color: $dark-blue;
+        }
+    }
+}
+
+/* Styles for the session bar at the top right corner */
+
+
+div.sessionBar {
+    height:2em;
+    float: right;
+}
+
+div.sessionBar .links
+{
+    background: transparent url(../images/sprites.png) repeat-x scroll 0 -60px;
+    margin-left: 25px;
+    padding-top: 0px;
+    height: 25px;
+}
+
+div.sessionBar .icon-shield {
+    font-size: 1.2em;
+    vertical-align: middle;
+}
+
+.protectionBarRestricted .icon-shield {
+    color: #752020;
+}
+
+.protectionBarDomainProtected .icon-shield {
+    color: #ADA644;
+}
+
+.loginHighlighted {
+    background: transparent url(../images/sprites.png) repeat-x scroll 0 -150px;
+    height: 16px;
+}
+
+div.sessionBar .corner
+{
+    background: transparent url(../images/session_bar_corner.png) repeat-x scroll 0 0;
+    height: 25px;
+    width: 25px;
+    float: left;
+}
+
+
+div.sessionBar ul
+{
+    margin: 0;
+    padding: 0;
+    display: inline;
+    list-style-type: none;
+}
+
+div.sessionBar li {
+    display: inline;
+    margin: 0;
+    padding: 4px 17px;
+    float: left;
+    border-right: 1px solid #C7C7C7;
+}
+
+div.sessionBar span {
+    color: #444444;
+    font-size: 13px;
+}
+
+div.sessionBarDark .corner {
+    background-position: -25px 0;
+}
+
+div.sessionBarDark .links {
+    background-position: 0 -180px;
+}
+
+div.sessionBarDark span {
+    color: #BCBCBC
+}
+
+div.sessionBarDark .links a {
+    color: #DFDFDF;
+}
+
+div.sessionBarDark .links a:hover {
+    color: white;
+}
+
+div.sessionBarDark li {
+    border-color: #777;
+}
+
+div.sessionBarDark .dropDownMenu {
+    background: transparent url(../images/menu_arrow_white.png) scroll no-repeat center right;
+}
+
+div.sessionBar .protectionBar{
+    padding-right:10px;
+    padding-left:5px;
+    background: transparent url(../images/sprites.png) repeat-x scroll 0 0;
+    height: 17px;
+}
+
+div.sessionBar .protectionBar * {
+  vertical-align: middle;
+}
+
+div.sessionBar .protectionBarDomainProtected{
+    background-position: 0 -240px;
+}
+
+div.sessionBar .protectionBarRestricted {
+    background-position: 0 -270px;
+}
+
+div.sessionBar .protectionBarDomainProtected a{
+    color: #af9502 !important;
+}
+
+div.sessionBar .protectionBarDomainProtected a:hover{
+    text-decoration: underline;
+}
+
+div.sessionBar .protectionBarRestricted a{
+    color: #FFFFFF !important;
+    font-size: 12px;
+}
+
+div.sessionBar .protectionBarRestricted a:hover{
+    text-decoration: underline;
+}
+
+div.sessionBar .cornerDomainProtected{
+    background-position: -50px 0;
+}
+
+div.sessionBar .cornerRestricted {
+    background-position: -75px 0;
+}
+
+.protectionHighlightDomainProtected{
+    color: #AF9502;
+    font-weight: bold;
+}
+
+.protectionHighlightRestricted{
+    color: #C73C3C;
+    font-weight: bold;
+}

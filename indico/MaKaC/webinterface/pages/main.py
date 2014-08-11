@@ -152,17 +152,23 @@ class WPMainBase(base.WPDecorated):
 
         self._timezone = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ())
         params = dict(params, **self._kwargs)
-        body = WMainBase(self._getBody( params ), self._timezone, self._getNavigationDrawer(),
-                         isFrontPage=self._isFrontPage(), isRoomBooking=self._isRoomBooking(), sideMenu = sideMenu).getHTML({"subArea": self._getSiteArea()})
+        body = WMainBase(self._getBody(params), self._timezone, self._getNavigationDrawer(),
+                         isFrontPage=self._isFrontPage(),
+                         isRoomBooking=self._isRoomBooking(),
+                         sideMenu=sideMenu).getHTML({"subArea": self._getSiteArea()})
 
-        return self._applyDecoration( body )
+        return self._applyDecoration(body)
 
-    def _getBody( self, params ):
+    def _getBody(self, params):
         return _("nothing yet")
+
+    def getCSSFiles(self):
+        return base.WPDecorated.getCSSFiles(self) + self._asset_env['main_sass'].urls()
+
 
 class WMainBase(wcomponents.WTemplated):
 
-    def __init__(self, page, timezone, navigation=None, isFrontPage=False, isRoomBooking= False, sideMenu=None):
+    def __init__(self, page, timezone, navigation=None, isFrontPage=False, isRoomBooking=False, sideMenu=None):
         self._page = page
         self._navigation = navigation
         self._isFrontPage = isFrontPage
@@ -188,4 +194,3 @@ class WMainBase(wcomponents.WTemplated):
         vars["timezone"] = self._timezone
 
         return vars
-

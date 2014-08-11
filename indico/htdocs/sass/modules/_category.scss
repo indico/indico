@@ -176,6 +176,9 @@
 
 
 .main-page-list {
+    a {
+        color: $dark-blue;
+    }
     li {
         margin-bottom: 0.5em;
         list-style-type: none;
@@ -257,7 +260,7 @@ ul.category-list {
         a {
             @include single-transition(color);
             display: block;
-            color: #2C95E0;
+            color: lighten($dark-blue, 6%);
             padding: 0 0 0 1em;
             outline: none;
 
@@ -272,7 +275,7 @@ ul.category-list {
         &:hover {
             color: $light-black;
             a {
-                color: #0b63a5;
+                color: darken($dark-blue, 6%);
             }
             &:before {
                 color: $light-black;

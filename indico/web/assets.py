@@ -341,7 +341,7 @@ registrationform_sass = sass_module_bundle('registrationform')
 roombooking_sass = sass_module_bundle('roombooking')
 dashboard_sass = sass_module_bundle('dashboard')
 category_sass = sass_module_bundle('category')
-
+main_sass = sass_module_bundle('main')
 
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),
@@ -400,6 +400,7 @@ def register_all_css(env, main_css_file):
     env.register('contributions_sass', contributions_sass)
     env.register('dashboard_sass', dashboard_sass)
     env.register('category_sass', category_sass)
+    env.register('main_sass', main_sass)
     env.register('screen_sass', screen_sass)
 
 

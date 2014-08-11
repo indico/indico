@@ -4,47 +4,6 @@
 
 <%include file="Announcement.tpl"/>
 
-<div class="pageHeader pageHeaderMainPage clearfix">
-        <%include file="SessionBar.tpl" args="dark=False"/>
-
-        % if searchBox != '':
-            ${ searchBox }
-        % endif
-
-        <!--
-            set fixed height on anchor to assure that the height is
-            corrected if the image cannot be retrieved (i.e. https problems) -->
-        <a style="min-height: 66px;" href="${ urlHandlers.UHWelcome.getURL() }">
-            <img class="headerLogo" src="${ imgLogo }" />
-        </a>
-
-    <div class="globalMenu">
-        <ul>
-            <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHWelcome.getURL() }">${ _("Home") }</a></li>
-            <li id="createEventMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><span class="dropDownMenu">${ _("Create event") }</span></li>
-
-            % if roomBooking:
-                <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHRoomBookingWelcome.getURL() }">${ _("Room booking") }</a></li>
-            % endif
-
-            % if len(adminItemList) == 1:
-                <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ adminItemList[0]['url'] }">${ adminItemList[0]['text'] }</a></li>
-            % elif len(adminItemList) > 1:
-                <li id="administrationMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><span class="dropDownMenu">${ _("Administration") }</span></li>
-            % endif
-
-            % if currentUser:
-                <li onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHUserDashboard.getURL(currentUser) }">${ _("My profile") }</a></li>
-            % endif
-
-            <li id="helpMenu"  onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><span class="dropDownMenu">${ _("Help") }</span></li>
-            <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHContact.getURL() }">Contact</a></li>
-            <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHCategoryMap.getURL(categId=0) }">Site Map</a></li>
-            <li style="display: none;" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''"><a href="${ urlHandlers.UHAbout.getURL() }">About Indico</a></li>
-        </ul>
-    </div>
-</div>
-
 <%
 urlConference = urlHandlers.UHConferenceCreation.getURL(currentCategory)
 urlConference.addParam("event_type","conference")
@@ -56,70 +15,76 @@ urlMeeting = urlHandlers.UHConferenceCreation.getURL(currentCategory)
 urlMeeting.addParam("event_type","meeting")
 %>
 
+<div class="page-header clearfix">
+        <%include file="SessionBar.tpl" args="dark=False"/>
+
+        % if searchBox != '':
+            ${ searchBox }
+        % endif
+
+        <!--
+            set fixed height on anchor to assure that the height is
+            corrected if the image cannot be retrieved (i.e. https problems) -->
+        <a style="min-height: 66px;" href="${ urlHandlers.UHWelcome.getURL() }">
+            <img class="header-logo" src="${ imgLogo }" />
+        </a>
+
+    <div class="global-menu toolbar">
+        <a href="${ urlHandlers.UHWelcome.getURL() }">${ _("Home") }</a>
+        <a class="arrow" href="#" data-toggle="dropdown">${ _("Create event") }</a>
+        <ul class="dropdown">
+            <li><a id="create-lecture" href="${ urlLecture }">${ _("Create lecture") }</a></li>
+            <li><a id="create-meeting" href="${ urlMeeting }">${ _("Create meeting") }</a></li>
+            <li><a id="create-conference" href="${ urlConference }">${ _("Create conference") }</a></li>
+        </ul>
+
+        % if roomBooking:
+            <a href="${ urlHandlers.UHRoomBookingWelcome.getURL() }">${ _("Room booking") }</a>
+        % endif
+
+        % if len(adminItemList) == 1:
+            <a href="${ adminItemList[0]['url'] }">${ adminItemList[0]['text'] }</a>
+        % elif len(adminItemList) > 1:
+            <a class="arrow" href="#" data-toggle="dropdown">${ _("Administration") }</a>
+            <ul class="dropdown">
+                % for item in adminItemList:
+                    <li><a href="${ item['url'] }">${ item['text'] }</a></li>
+                % endfor
+            </ul>
+        % endif
+
+        % if currentUser:
+            <a href="${ urlHandlers.UHUserDashboard.getURL(currentUser) }">${ _("My profile") }</a>
+        % endif
+
+        <a class="arrow" href="#" data-toggle="dropdown">${ _("Help") }</a>
+        <ul class="dropdown">
+            <li><a href="${ urlHandlers.UHConferenceHelp.getURL() }">${ _("Indico help") }</a></li>
+            <li><a href="${ urlHandlers.UHAbout.getURL() }">${ _("About Indico") }</a></li>
+            <li><a href="${ urlHandlers.UHContact.getURL() }">${ _("Contact") }</a></li>
+        </ul>
+    </div>
+</div>
+
 <script type="text/javascript">
-var createEventMenu = $E('createEventMenu');
-var eventPopupMenu;
-createEventMenu.observeClick(function(e) {
-    var menuItems = {};
-    menuItems["createLecture"] = {action: "${ urlLecture }" , display: '${ _("Create lecture") }'};
-    menuItems["createMeeting"] = {action: "${ urlMeeting }", display: '${ _("Create meeting") }'};
-    menuItems["createConference"] = {action: "${ urlConference }" , display: '${ _("Create conference") }'};
+  var TIP_TEXT = {
+    lecture: ${ _("A <strong>lecture</strong> is a simple event to annouce a talk.<br/><strong>Features</strong>: poster creation, participants management,...") | n,j },
+    meeting: ${ _("A <strong>meeting</strong> is an event that defines an agenda with many talks.<br/><strong>Features</strong>: timetable, minutes, poster creation, participants management,...") | n,j},
+    conference: ${ _("A <strong>conference</strong> is a complex event with features to manage the whole life cycle of a conference.<br/><strong>Features</strong>: call for abstracts, registration, e-payment, timetable, badges creation, paper reviewing,...") | n,j}
+  }
 
-    //Create a new PopupMenu only if it has never been created before -> fix #679
-    if(!eventPopupMenu){
-        eventPopupMenu = new PopupMenu(menuItems, [createEventMenu], "globalMenuPopupList");
-    }
+  $(function() {
 
-    var pos = createEventMenu.getAbsolutePosition();
-    eventPopupMenu.open(pos.x, pos.y + 30);
-
-    var infoItems = {}; //List used to print additional help on the menu (MUST use the same keys as menuItems)
-    infoItems["createLecture"] = "${ _("A <strong>lecture</strong> is a simple event to annouce a talk.<br/><strong>Features</strong>: poster creation, participants management,...") }";
-    infoItems["createMeeting"] = "${ _("A <strong>meeting</strong> is an event that defines an agenda with many talks.<br/><strong>Features</strong>: timetable, minutes, poster creation, participants management,...") }";
-    infoItems["createConference"] = "${ _("A <strong>conference</strong> is a complex event with features to manage the whole life cycle of a conference.<br/><strong>Features</strong>: call for abstracts, registration, e-payment, timetable, badges creation, paper reviewing,...") }";
-    eventPopupMenu.drawInfoBubbles(infoItems);
-
-    return false;
-});
-
-% if len(adminItemList) > 1:
-
-    var administrationMenu = $E('administrationMenu');
-    var administrationPopupMenu;
-    administrationMenu.observeClick(function(e) {
-        var menuItems = {};
-
-        % for item in adminItemList:
-        menuItems["${ item['id']}"] = {action: "${ item['url'] }", display: "${ item['text'] }"};
-        % endfor
-        //Create a new PopupMenu only if it has never been created before -> fix #679
-        if(!administrationPopupMenu){
-            administrationPopupMenu = new PopupMenu(menuItems, [administrationMenu], "globalMenuPopupList");
+    ['lecture', 'meeting', 'conference'].forEach(function(evt_type) {
+      $('#create-' + evt_type).qtip({
+        content: TIP_TEXT[evt_type],
+        position: {
+          my: 'left center',
+          at: 'right center'
         }
-        var pos = administrationMenu.getAbsolutePosition();
-        administrationPopupMenu.open(pos.x, pos.y + 30);
-        return false;
+      })
     });
 
-% endif
-
-var helpMenu = $E('helpMenu');
-var helpPopupMenu;
-helpMenu.observeClick(function(e) {
-    var menuItems = {};
-
-    menuItems['indicoHelp'] = {action: "${ urlHandlers.UHConferenceHelp.getURL() }", display: '${ _("Indico help") }'};
-    menuItems['aboutIndico'] = {action: "${ urlHandlers.UHAbout.getURL() }", display: '${ _("About Indico") }'};
-    menuItems['contactIndico'] = {action: "${ urlHandlers.UHContact.getURL() }", display: '${ _("Contact") }'};
-
-    //Create a new PopupMenu only if it has never been created before-> fix #679
-    if(!helpPopupMenu){
-        helpPopupMenu = new PopupMenu(menuItems, [helpMenu], "globalMenuPopupList");
-    }
-    var pos = helpMenu.getAbsolutePosition();
-    helpPopupMenu.open(pos.x, pos.y + 30);
-    return false;
-});
-
+    $('.global-menu').dropdown({selector: 'a[data-toggle=dropdown]'});
+  })
 </script>
-
