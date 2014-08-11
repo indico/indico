@@ -136,7 +136,8 @@ class ReservationOccurrence(db.Model, Serializer):
         elif repeat_frequency == RepeatFrequency.MONTH:
             if repeat_interval == 1:
                 position = start.day // 7 + 1
-                return rrule.rrule(rrule.MONTHLY, dtstart=start, until=end, byweekday=start.weekday(), bysetpos=position)
+                return rrule.rrule(rrule.MONTHLY, dtstart=start, until=end, byweekday=start.weekday(),
+                                   bysetpos=position)
             else:
                 raise IndicoError('Unsupported interval')
 

@@ -665,7 +665,7 @@ class Reservation(Serializer, db.Model):
                         setattr(occurrence, col, getattr(old_occurrence, col))
             # Don't cause new notifications for the entire booking in case of daily repetition
             if self.repeat_frequency == RepeatFrequency.DAY and all(occ.notification_sent
-                                                          for occ in old_occurrences.itervalues()):
+                                                                    for occ in old_occurrences.itervalues()):
                 for occurrence in self.occurrences:
                     occurrence.notification_sent = True
 
