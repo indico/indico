@@ -68,7 +68,7 @@
             <td align="left" class="blacktext" >
                 <select name="repeatability" id="repeatability" style="width:144px; margin-right:6px;">
                     % for k, v in repeat_mapping.items():
-                        <option ${ 'selected' if k == default_repeat else '' } value="${ k }">
+                        <option ${ 'selected' if k == default_repeat else '' } value="${ k[0] }|${ k[1] }">
                             ${ v[0] }
                         </option>
                     % endfor
@@ -310,7 +310,7 @@ function setDefaultAvailabilityValues() {
         .prop('checked', false)
         .trigger('change');
     $('#repeatability')
-        .val(${ default_repeat })
+        .val('${ default_repeat }')
         .trigger('change');
 }
 

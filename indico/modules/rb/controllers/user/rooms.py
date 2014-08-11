@@ -70,7 +70,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
                                                  aspects=aspects,
                                                  buildings=buildings,
                                                  room_id=self._room_id,
-                                                 default_repeat=(RepeatFrequency.NEVER, 0),
+                                                 default_repeat='{}|0'.format(RepeatFrequency.NEVER),
                                                  default_start_dt=datetime.combine(date.today(),
                                                                                    Location.working_time_start),
                                                  default_end_dt=datetime.combine(date.today(),

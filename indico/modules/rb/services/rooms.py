@@ -17,14 +17,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import ast
-
 from flask import session
 from sqlalchemy.orm.exc import NoResultFound
 
 from indico.core.config import Config
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
 from indico.util.date_time import get_datetime_from_request
 from indico.util.string import natural_sort_key
@@ -58,7 +57,8 @@ class RoomBookingAvailabilitySearchRooms(ServiceBase):
     def _checkParams(self):
         self._start_dt = get_datetime_from_request(prefix='start_', source=self._params)
         self._end_dt = get_datetime_from_request(prefix='end_', source=self._params)
-        self._repetition = ast.literal_eval(self._params['repeatability'])
+        repetition = map(int, self._params['repeatability'].split('|'))
+        self._repetition = RepeatFrequency(repetition[0]), repetition[1]
 
     def _getAnswer(self):
         rooms = Room.find_all(Room.filter_available(self._start_dt, self._end_dt, self._repetition))
