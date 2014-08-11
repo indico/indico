@@ -39,15 +39,15 @@ from MaKaC.webinterface.wcomponents import WTemplated
 
 class RoomBookingCalendarWidget(object):
     def __init__(self, occurrences, start_dt, end_dt, candidates=None, rooms=None, specific_room=None,
-                 repeat_unit=None, repeat_step=None, flexible_days=0, show_blockings=True):
+                 repeat_frequency=None, repeat_interval=None, flexible_days=0, show_blockings=True):
         self.occurrences = occurrences
         self.start_dt = start_dt
         self.end_dt = end_dt
         self.candidates = candidates
         self.rooms = rooms
         self.specific_room = specific_room
-        self.repeat_unit = repeat_unit
-        self.repeat_step = repeat_step
+        self.repeat_frequency = repeat_frequency
+        self.repeat_interval = repeat_interval
         self.flexible_days = flexible_days
         self.show_blockings = show_blockings
 
@@ -92,17 +92,17 @@ class RoomBookingCalendarWidget(object):
             'show_navbar': show_navbar,
             'can_navigate': show_navbar and can_navigate,
             'details_in_new_tab': details_in_new_tab,
-            'repeat_unit': self.repeat_unit,
+            'repeat_frequency': self.repeat_frequency,
             'flexible_days': self.flexible_days
         })
 
     def iter_days(self):
-        if self.repeat_unit is None and self.repeat_step is None:
+        if self.repeat_frequency is None and self.repeat_interval is None:
             for dt in iterdays(self.start_dt, self.end_dt):
                 yield dt.date()
         else:
             for dt in ReservationOccurrence.iter_start_time(self.start_dt, self.end_dt,
-                                                            (self.repeat_unit, self.repeat_step)):
+                                                            (self.repeat_frequency, self.repeat_interval)):
                 for offset in xrange(-self.flexible_days, self.flexible_days + 1):
                     yield (dt + timedelta(days=offset)).date()
 

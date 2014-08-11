@@ -384,7 +384,7 @@ def migrate_reservations(main_root, rb_root):
             print cformat('  %{red!}skipping resv for dead room {0.room.id}: {0.id} ({0._utcCreatedDT})').format(v)
             continue
 
-        repeat_unit, repeat_step = convert_reservation_repeatability(v.repeatability)
+        repeat_frequency, repeat_interval = convert_reservation_repeatability(v.repeatability)
 
         r = Reservation(
             id=v.id,
@@ -401,8 +401,8 @@ def migrate_reservations(main_root, rb_root):
             is_rejected=v.isRejected,
             booking_reason=convert_to_unicode(v.reason),
             rejection_reason=convert_to_unicode(getattr(v, 'rejectionReason', None)),
-            repeat_unit=repeat_unit,
-            repeat_step=repeat_step,
+            repeat_frequency=repeat_frequency,
+            repeat_interval=repeat_interval,
             uses_vc=getattr(v, 'usesAVC', False),
             needs_vc_assistance=getattr(v, 'needsAVCSupport', False),
             needs_assistance=getattr(v, 'needsAssistance', False)

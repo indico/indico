@@ -117,30 +117,30 @@ class ReservationOccurrence(db.Model, Serializer):
 
     @staticmethod
     def iter_start_time(start, end, repetition):
-        from indico.modules.rb.models.reservations import RepeatUnit
+        from indico.modules.rb.models.reservations import RepeatFrequency
 
-        repeat_unit, repeat_step = repetition
+        repeat_frequency, repeat_interval = repetition
 
-        if repeat_unit == RepeatUnit.NEVER:
+        if repeat_frequency == RepeatFrequency.NEVER:
             return [start]
 
-        if repeat_unit == RepeatUnit.DAY:
+        if repeat_frequency == RepeatFrequency.DAY:
             return rrule.rrule(rrule.DAILY, dtstart=start, until=end)
 
-        elif repeat_unit == RepeatUnit.WEEK:
-            if 0 < repeat_step < 4:
-                return rrule.rrule(rrule.WEEKLY, dtstart=start, until=end, interval=repeat_step)
+        elif repeat_frequency == RepeatFrequency.WEEK:
+            if 0 < repeat_interval < 4:
+                return rrule.rrule(rrule.WEEKLY, dtstart=start, until=end, interval=repeat_interval)
             else:
                 raise IndicoError('Unsupported interval')
 
-        elif repeat_unit == RepeatUnit.MONTH:
-            if repeat_step == 1:
+        elif repeat_frequency == RepeatFrequency.MONTH:
+            if repeat_interval == 1:
                 position = start.day // 7 + 1
                 return rrule.rrule(rrule.MONTHLY, dtstart=start, until=end, byweekday=start.weekday(), bysetpos=position)
             else:
                 raise IndicoError('Unsupported interval')
 
-        elif repeat_unit == RepeatUnit.YEAR:
+        elif repeat_frequency == RepeatFrequency.YEAR:
             raise IndicoError('Unsupported frequency')
 
         raise IndicoError('Unexpected frequency')

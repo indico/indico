@@ -23,7 +23,7 @@
         firstDay: ${ start_dt.date().strftime('%Y-%m-%d') | n, j },
         lastDay: ${ end_dt.date().strftime('%Y-%m-%d') | n, j },
         specificRoom: ${ specific_room | n, j },
-        repeatUnit: ${ repeat_unit | n, j },
+        repeatFrequency: ${ repeat_frequency | n, j },
         flexibleDays: ${ flexible_days | n, j },
         rejectAllLink: '',
         openDetailsInNewTab: ${ details_in_new_tab | n, j },

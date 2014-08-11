@@ -62,8 +62,8 @@ function saveFormData() {
         "selectedRooms": selectedRooms,
         "finishDate": $('#finishDate').val(),
         "flexibleDatesRange": $("#flexibleDates input[name=flexible_dates_range]:checked").val(),
-        repeatUnit: $('input[name=repeat_unit]:checked').val(),
-        repeatStep: $('#repeat_step').val(),
+        repeatFrequency: $('input[name=repeat_frequency]:checked').val(),
+        repeatInterval: $('#repeat_interval').val(),
         roomIds: $('#room_ids').val()
     };
 
@@ -89,8 +89,8 @@ $(document).ready(function() {
                     $('<input>', {type: 'hidden', name: 'step', value: 1}),
                     $('<input>', {type: 'hidden', name: 'start_dt', value: moment(data.startDate).format('D/MM/YYYY') + ' ' + data.startTime}),
                     $('<input>', {type: 'hidden', name: 'end_dt', value: moment(data.endDate).format('D/MM/YYYY') + ' ' + data.endTime}),
-                    $('<input>', {type: 'hidden', name: 'repeat_unit', value: data.repeatUnit}),
-                    $('<input>', {type: 'hidden', name: 'repeat_step', value: data.repeatStep}),
+                    $('<input>', {type: 'hidden', name: 'repeat_frequency', value: data.repeatFrequency}),
+                    $('<input>', {type: 'hidden', name: 'repeat_interval', value: data.repeatInterval}),
                     $('<input>', {type: 'hidden', name: 'flexible_dates_range', value: data.flexibleDatesRange})
                 ]);
                 form.append($.map(data.roomIds, function(value) {

@@ -71,11 +71,11 @@
         var valid = true;
         var single_day = false;
 
-        var repeat_unit = $('input[name=repeat_unit]:checked').val();
+        var repeat_frequency = $('input[name=repeat_frequency]:checked').val();
         var repeatability;
         var message;
 
-        switch (repeat_unit) {
+        switch (repeat_frequency) {
             // Single Day
             case "0":
                 single_day = true;

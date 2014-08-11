@@ -30,7 +30,7 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.modules.rb.utils import rb_check_user_access
-from indico.modules.rb.models.reservations import Reservation, RepeatMapping, RepeatUnit, ConflictingOccurrences
+from indico.modules.rb.models.reservations import Reservation, RepeatMapping, RepeatFrequency, ConflictingOccurrences
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.util.date_time import utc_to_server
@@ -211,8 +211,8 @@ class BookRoomHook(HTTPAPIHook):
         data = MultiDict({
             'start_dt': self._params['from'],
             'end_dt': self._params['to'],
-            'repeat_unit': RepeatUnit.NEVER,
-            'repeat_step': 0,
+            'repeat_frequency': RepeatFrequency.NEVER,
+            'repeat_interval': 0,
             'room_id': self._room.id,
             'booked_for_id': self._params['booked_for'].getId(),
             'contact_email': self._params['booked_for'].getEmail(),
@@ -301,8 +301,8 @@ def _serializable_reservation(reservation_data, include_room=False):
     data = reservation.to_serializable('__api_public__', converters={datetime: _add_server_tz})
     data['_type'] = 'Reservation'
     data['repeatability'] = None
-    if reservation.repeat_unit:
-        data['repeatability'] = RepeatMapping.get_short_name(reservation.repeat_unit, reservation.repeat_step)
+    if reservation.repeat_frequency:
+        data['repeatability'] = RepeatMapping.get_short_name(reservation.repeat_frequency, reservation.repeat_interval)
     data['vcList'] = reservation_data['vc_equipment']
     if include_room:
         data['room'] = _serializable_room_minimal(reservation_data['reservation'].room)
@@ -318,12 +318,12 @@ def _ical_serialize_repeatability(data):
     WEEK_DAYS = 'MO TU WE TH FR SA SU'.split()
     recur = ical.vRecur()
     recur['until'] = end_dt_utc
-    if data['repeat_unit'] == RepeatUnit.DAY:
+    if data['repeat_frequency'] == RepeatFrequency.DAY:
         recur['freq'] = 'daily'
-    elif data['repeat_unit'] == RepeatUnit.WEEK:
+    elif data['repeat_frequency'] == RepeatFrequency.WEEK:
         recur['freq'] = 'weekly'
-        recur['interval'] = data['repeat_step']
-    elif data['repeat_unit'] == RepeatUnit.MONTH:
+        recur['interval'] = data['repeat_interval']
+    elif data['repeat_frequency'] == RepeatFrequency.MONTH:
         recur['freq'] = 'monthly'
         recur['byday'] = '{}{}'.format(start_dt_utc.day // 7, WEEK_DAYS[start_dt_utc.weekday()])
     return recur
@@ -342,7 +342,7 @@ def _ical_serialize_reservation(cal, data, now):
     event.set('summary', data['reason'])
     event.set('location', u'{}: {}'.format(data['location'], data['room']['fullName']))
     event.set('description', data['reason'].decode('utf-8') + '\n\n' + data['bookingUrl'])
-    if data['repeat_unit'] != RepeatUnit.NEVER:
+    if data['repeat_frequency'] != RepeatFrequency.NEVER:
         event.set('rrule', _ical_serialize_repeatability(data))
     cal.add_component(event)
 
@@ -385,9 +385,9 @@ def _get_reservation_state_filter(params):
         filters.append(Reservation.is_archived == _yesno(archived))
     if repeating is not None:
         if _yesno(repeating):
-            filters.append(Reservation.repeat_unit != 0)
+            filters.append(Reservation.repeat_frequency != 0)
         else:
-            filters.append(Reservation.repeat_unit == 0)
+            filters.append(Reservation.repeat_frequency == 0)
     if avc is not None:
         filters.append(Reservation.uses_vc == _yesno(avc))
     if avc_support is not None:

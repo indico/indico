@@ -3,7 +3,7 @@ from datetime import date
 from flask import render_template
 
 from indico.core.config import Config
-from indico.modules.rb.models.reservations import RepeatUnit
+from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.notifications.reservations import ReservationNotification
 from indico.modules.rb.notifications.util import email_sender
 from indico.util.date_time import format_datetime
@@ -87,7 +87,7 @@ def notify_upcoming_occurrence(occurrence):
     text = render_template('rb/emails/reservations/upcoming_occurrence_email.txt',
                            occurrence=occurrence,
                            owner=owner,
-                           RepeatUnit=RepeatUnit)
+                           RepeatFrequency=RepeatFrequency)
 
     return {
         'fromAddr': from_addr,

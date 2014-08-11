@@ -456,7 +456,7 @@
                       </td>
                   </tr>
                 % endif
-              % if reservation.repeat_unit and excluded_days:
+              % if reservation.repeat_frequency and excluded_days:
                 <tr><td>&nbsp;</td></tr>
                 <!-- Excluded dates -->
                 <tr>
@@ -483,7 +483,7 @@
                   </td>
                 </tr>
               % endif
-              % if reservation.repeat_unit:
+              % if reservation.repeat_frequency:
                 <tr><td>&nbsp;</td></tr>
                 <!-- Occurrences -->
                 <tr>

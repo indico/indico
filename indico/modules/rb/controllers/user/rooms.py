@@ -32,7 +32,7 @@ from indico.modules.rb.forms.base import FormDefaults
 from indico.modules.rb.forms.rooms import SearchRoomsForm
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import RepeatMapping, RepeatUnit, Reservation
+from indico.modules.rb.models.reservations import RepeatMapping, RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.statistics import calculate_rooms_occupancy, compose_rooms_stats
@@ -70,7 +70,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
                                                  aspects=aspects,
                                                  buildings=buildings,
                                                  room_id=self._room_id,
-                                                 default_repeat=(RepeatUnit.NEVER, 0),
+                                                 default_repeat=(RepeatFrequency.NEVER, 0),
                                                  default_start_dt=datetime.combine(date.today(),
                                                                                    Location.working_time_start),
                                                  default_end_dt=datetime.combine(date.today(),

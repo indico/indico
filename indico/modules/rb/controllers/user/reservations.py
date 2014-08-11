@@ -273,7 +273,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         pre_conflicts = defaultdict(list)
 
         candidates = ReservationOccurrence.create_series(form.start_dt.data, form.end_dt.data,
-                                                         (form.repeat_step.data, form.repeat_step.data))
+                                                         (form.repeat_interval.data, form.repeat_interval.data))
         occurrences = ReservationOccurrence.find_overlapping_with(room, candidates, reservation_id).all()
 
         for cand in candidates:
@@ -289,8 +289,8 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
     def _get_all_occurrences(self, room_ids, form, flexible_days=0, reservation_id=None):
         start_dt = form.start_dt.data
         end_dt = form.end_dt.data
-        repeat_unit = form.repeat_unit.data
-        repeat_step = form.repeat_step.data
+        repeat_frequency = form.repeat_frequency.data
+        repeat_interval = form.repeat_interval.data
         day_start_dt = datetime.combine(start_dt.date(), time())
         day_end_dt = datetime.combine(end_dt.date(), time(23, 59))
         today_start_dt = datetime.combine(date.today(), time())
@@ -317,7 +317,8 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
             if series_start < flexible_start_dt:
                     continue
             candidates[series_start, series_end] = ReservationOccurrence.create_series(series_start, series_end,
-                                                                                       (repeat_unit, repeat_step))
+                                                                                       (repeat_frequency,
+                                                                                        repeat_interval))
         return occurrences, candidates
 
     def _create_booking(self, form, room):
@@ -397,8 +398,8 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
                               pre_conflicts=pre_conflicts,
                               start_dt=form.start_dt.data,
                               end_dt=form.end_dt.data,
-                              repeat_unit=form.repeat_unit.data,
-                              repeat_step=form.repeat_step.data,
+                              repeat_frequency=form.repeat_frequency.data,
+                              repeat_interval=form.repeat_interval.data,
                               can_override=can_override).display()
 
 
@@ -477,10 +478,10 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
             confirm_form = form
 
         conflicts, pre_conflicts = self._get_all_conflicts(room, form)
-        repeat_msg = RepeatMapping.getMessage(form.repeat_unit.data, form.repeat_step.data)
+        repeat_msg = RepeatMapping.getMessage(form.repeat_frequency.data, form.repeat_interval.data)
         return self._get_view('confirm', form=confirm_form, room=room, start_dt=form.start_dt.data,
-                              end_dt=form.end_dt.data, repeat_unit=form.repeat_unit.data,
-                              repeat_step=form.repeat_step.data, repeat_msg=repeat_msg, conflicts=conflicts,
+                              end_dt=form.end_dt.data, repeat_frequency=form.repeat_frequency.data,
+                              repeat_interval=form.repeat_interval.data, repeat_msg=repeat_msg, conflicts=conflicts,
                               pre_conflicts=pre_conflicts, errors=confirm_form.error_list).display()
 
     def _process_select_room(self):
@@ -494,14 +495,15 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
             selected_rooms = [r for r in self._rooms if r.id in form.room_ids.data]
             occurrences, candidates = self._get_all_occurrences(form.room_ids.data, form, flexible_days)
 
-            period_form_defaults = FormDefaults(repeat_step=form.repeat_step.data, repeat_unit=form.repeat_unit.data)
+            period_form_defaults = FormDefaults(repeat_interval=form.repeat_interval.data,
+                                                repeat_frequency=form.repeat_frequency.data)
             period_form = self._make_select_period_form(period_form_defaults)
 
             # Show step 2 page
             return self._get_view('select_period', rooms=selected_rooms, occurrences=occurrences, candidates=candidates,
                                   start_dt=day_start_dt, end_dt=day_end_dt, period_form=period_form, form=form,
-                                  repeat_unit=form.repeat_unit.data, repeat_step=form.repeat_step.data,
-                                  flexible_days=flexible_days).display()
+                                  repeat_frequency=form.repeat_frequency.data,
+                                  repeat_interval=form.repeat_interval.data, flexible_days=flexible_days).display()
 
         # GET or form errors => show step 1 page
         return self._get_view('select_room', errors=form.error_list, rooms=self._rooms, form=form,
@@ -586,7 +588,7 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
         return self._get_view(form=form, room=room, rooms=Room.find_all(), occurrences=occurrences,
                               candidates=candidates, conflicts=conflicts, pre_conflicts=pre_conflicts,
                               start_dt=form.start_dt.data, end_dt=form.end_dt.data,
-                              repeat_unit=form.repeat_unit.data, repeat_step=form.repeat_step.data,
+                              repeat_frequency=form.repeat_frequency.data, repeat_interval=form.repeat_interval.data,
                               reservation=self._reservation, can_override=room.can_be_overriden(session.user)).display()
 
 

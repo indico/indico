@@ -551,7 +551,7 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                 var self = this;
                 var days = [];
                 $.each(this.data.days, function(index, day){
-                    var highlight = !self.data.repeatUnit
+                    var highlight = !self.data.repeatFrequency
                                     || (index == self.data.flexibleDays
                                     || (index - self.data.flexibleDays) % (2 * self.data.flexibleDays + 1) == 0);
                     days.push(self.drawDay(day, highlight));
@@ -1032,7 +1032,7 @@ type ("RoomBookingCalendar", [],
 
             addRepeatabilityBarsHovers: function(){
                 // Repeat daily booking hover support
-                var flexibleNumber = this.data.repeatUnit ? (2 * this.data.flexibleDays + 1) : 0;
+                var flexibleNumber = this.data.repeatFrequency ? (2 * this.data.flexibleDays + 1) : 0;
                 $('.wholeDayCalendarDiv').each(function(indexDiv) {
                     var flexibleIndex = flexibleNumber ? indexDiv % flexibleNumber : indexDiv;
                     $(this).find('.barCand').each(function(indexCand) {
@@ -1061,7 +1061,7 @@ type ("RoomBookingCalendar", [],
                 firstDay: null, // first day (for period selector)
                 lastDay: null, // last day (for period selector)
                 specificRoom: false,
-                repeatUnit: '0',
+                repeatFrequency: '0',
                 finishDate: null,
                 flexibleDays: 0,
                 rejectAllLink: '',

@@ -71,7 +71,7 @@ class SearchRoomsForm(IndicoForm):
                              display_format='%d/%m/%Y %H:%M', widget=HiddenInput())
     end_dt = DateTimeField(_(u'End date'), validators=[Optional()], parse_kwargs={'dayfirst': True},
                            display_format='%d/%m/%Y %H:%M', widget=HiddenInput())
-    repeatability = StringField()  # TODO: use repeat_unit/step with new UI
+    repeatability = StringField()  # TODO: use repeat_frequency/interval with new UI
     include_pending_blockings = BooleanField(_(u'Check conflicts against pending blockings'), default=True)
     include_pre_bookings = BooleanField(_(u'Check conflicts against pre-bookings'), default=True)
 

@@ -58,7 +58,7 @@
             }
 
             $("#finishDate").val(rbUserData.finishDate);
-            $("input[name=repeat_unit][value=" + rbUserData.repeatUnit + "]").prop('checked', true).change();
+            $("input[name=repeat_frequency][value=" + rbUserData.repeatFrequency + "]").prop('checked', true).change();
             $("#flexibleDates input[name=flexible_dates_range][value=" + rbUserData.flexibleDatesRange + "]").prop('checked', true);
 
             if (rbUserData.startTime && rbUserData.endTime) {

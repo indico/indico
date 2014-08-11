@@ -52,35 +52,35 @@ class ConflictingOccurrences(Exception):
     pass
 
 
-class RepeatUnit(object):
+class RepeatFrequency(object):
     NEVER, DAY, WEEK, MONTH, YEAR = xrange(5)
 
 
 class RepeatMapping(object):
     _mapping = {
-        (RepeatUnit.NEVER, 0): (N_('Single reservation'), None, 'none'),
-        (RepeatUnit.DAY, 1): (N_('Repeat daily'), 0, 'daily'),
-        (RepeatUnit.WEEK, 1): (N_('Repeat once a week'), 1, 'weekly'),
-        (RepeatUnit.WEEK, 2): (N_('Repeat once every two week'), 2, 'everyTwoWeeks'),
-        (RepeatUnit.WEEK, 3): (N_('Repeat once every three week'), 3, 'everyThreeWeeks'),
-        (RepeatUnit.MONTH, 1): (N_('Repeat every month'), 4, 'monthly')
+        (RepeatFrequency.NEVER, 0): (N_('Single reservation'), None, 'none'),
+        (RepeatFrequency.DAY, 1): (N_('Repeat daily'), 0, 'daily'),
+        (RepeatFrequency.WEEK, 1): (N_('Repeat once a week'), 1, 'weekly'),
+        (RepeatFrequency.WEEK, 2): (N_('Repeat once every two week'), 2, 'everyTwoWeeks'),
+        (RepeatFrequency.WEEK, 3): (N_('Repeat once every three week'), 3, 'everyThreeWeeks'),
+        (RepeatFrequency.MONTH, 1): (N_('Repeat every month'), 4, 'monthly')
     }
 
     @classmethod
     @unimplemented(exceptions=(KeyError,), message=_('Unimplemented repetition pair'))
-    def getMessage(cls, repeat_unit, repeat_step):
-        return cls._mapping[(repeat_unit, repeat_step)][0]
+    def getMessage(cls, repeat_frequency, repeat_interval):
+        return cls._mapping[(repeat_frequency, repeat_interval)][0]
 
     @classmethod
     @unimplemented(exceptions=(KeyError,), message=_('Unimplemented repetition pair'))
-    def getOldMapping(cls, repeat_unit, repeat_step):
-        return cls._mapping[(repeat_unit, repeat_step)][1]
+    def getOldMapping(cls, repeat_frequency, repeat_interval):
+        return cls._mapping[(repeat_frequency, repeat_interval)][1]
 
     @classmethod
     @unimplemented(exceptions=(KeyError,), message=_('Unimplemented repetition pair'))
-    def get_short_name(cls, repeat_unit, repeat_step):
+    def get_short_name(cls, repeat_frequency, repeat_interval):
         # for the API
-        return cls._mapping[(repeat_unit, repeat_step)][2]
+        return cls._mapping[(repeat_frequency, repeat_interval)][2]
 
     @classmethod
     @unimplemented(exceptions=(KeyError,), message=_('Unknown old repeatability'))
@@ -104,7 +104,7 @@ class Reservation(Serializer, db.Model):
         'id', ('booked_for_name', 'bookedForName'), ('booking_reason', 'reason'), ('details_url', 'bookingUrl')
     ]
     __api_public__ = [
-        'id', ('start_dt', 'startDT'), ('end_dt', 'endDT'), 'repeat_unit', 'repeat_step',
+        'id', ('start_dt', 'startDT'), ('end_dt', 'endDT'), 'repeat_frequency', 'repeat_interval',
         ('booked_for_name', 'bookedForName'), ('details_url', 'bookingUrl'), ('booking_reason', 'reason'),
         ('uses_vc', 'usesAVC'), ('needs_vc_assistance', 'needsAVCSupport'),
         'needs_assistance', ('is_accepted', 'isConfirmed'), ('is_valid', 'isValid'), 'is_cancelled',
@@ -137,12 +137,12 @@ class Reservation(Serializer, db.Model):
         nullable=False,
         index=True
     )
-    repeat_unit = db.Column(
+    repeat_frequency = db.Column(
         db.SmallInteger,
         nullable=False,
-        default=RepeatUnit.NEVER
+        default=RepeatFrequency.NEVER
     )  # week, month, year, etc.
-    repeat_step = db.Column(
+    repeat_interval = db.Column(
         db.SmallInteger,
         nullable=False,
         default=0
@@ -239,7 +239,7 @@ class Reservation(Serializer, db.Model):
 
     @hybrid_property
     def is_repeating(self):
-        return self.repeat_unit != RepeatUnit.NEVER
+        return self.repeat_frequency != RepeatFrequency.NEVER
 
     @hybrid_property
     def is_valid(self):
@@ -273,7 +273,7 @@ class Reservation(Serializer, db.Model):
 
     @property
     def repetition(self):
-        return self.repeat_unit, self.repeat_step
+        return self.repeat_frequency, self.repeat_interval
 
     @property
     def details_url(self):
@@ -518,11 +518,11 @@ class Reservation(Serializer, db.Model):
                         permissions, always use the given mode.
         """
 
-        populate_fields = ('start_dt', 'end_dt', 'repeat_unit', 'repeat_step', 'room_id', 'booked_for_id',
+        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booked_for_id',
                            'contact_email', 'contact_phone', 'booking_reason', 'used_equipment',
                            'needs_assistance', 'uses_vc', 'needs_vc_assistance')
 
-        if data['repeat_unit'] == RepeatUnit.NEVER and data['start_dt'].date() != data['end_dt'].date():
+        if data['repeat_frequency'] == RepeatFrequency.NEVER and data['start_dt'].date() != data['end_dt'].date():
             raise ValueError('end_dt != start_dt for non-repeating booking')
 
         if prebook is None:
@@ -554,15 +554,15 @@ class Reservation(Serializer, db.Model):
         :param user: The :class:`Avatar` who modifies the booking.
         """
 
-        populate_fields = ('start_dt', 'end_dt', 'repeat_unit', 'repeat_step', 'booked_for_id',
+        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'booked_for_id',
                            'contact_email', 'contact_phone', 'booking_reason', 'used_equipment',
                            'needs_assistance', 'uses_vc', 'needs_vc_assistance')
         # fields affecting occurrences
-        occurrence_fields = {'start_dt', 'end_dt', 'repeat_unit', 'repeat_step'}
+        occurrence_fields = {'start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval'}
         # fields where date and time are compared separately
         date_time_fields = {'start_dt', 'end_dt'}
         # fields for the repetition
-        repetition_fields = {'repeat_unit', 'repeat_step'}
+        repetition_fields = {'repeat_frequency', 'repeat_interval'}
         # pretty names for logging
         field_names = {
             'start_dt/date': "start date",
@@ -585,7 +585,7 @@ class Reservation(Serializer, db.Model):
 
         changes = {}
         update_occurrences = False
-        old_repetition = self.repeat_unit, self.repeat_step
+        old_repetition = self.repeat_frequency, self.repeat_interval
 
         for field in populate_fields:
             old = getattr(self, field)
@@ -616,7 +616,8 @@ class Reservation(Serializer, db.Model):
                     # Repetition needs special handling since it consists of two fields but they are tied together
                     # We simply update it whenever we encounter such a change; after the last change we end up with
                     # the correct change data
-                    changes['repetition'] = {'old': old_repetition, 'new': (self.repeat_unit, self.repeat_step),
+                    changes['repetition'] = {'old': old_repetition,
+                                             'new': (self.repeat_frequency, self.repeat_interval),
                                              'converter': lambda x: RepeatMapping.getMessage(*x)}
                 else:
                     changes[field] = {'old': old, 'new': new, 'converter': converter}
@@ -658,7 +659,7 @@ class Reservation(Serializer, db.Model):
                     for col in cols:
                         setattr(occurrence, col, getattr(old_occurrence, col))
             # Don't cause new notifications for the entire booking in case of daily repetition
-            if self.repeat_unit == RepeatUnit.DAY and all(occ.notification_sent
+            if self.repeat_frequency == RepeatFrequency.DAY and all(occ.notification_sent
                                                           for occ in old_occurrences.itervalues()):
                 for occurrence in self.occurrences:
                     occurrence.notification_sent = True

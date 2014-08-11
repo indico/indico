@@ -28,7 +28,7 @@ from indico.modules.rb.controllers.user.reservations import (RHRoomBookingBookin
                                                              RHRoomBookingCancelBookingOccurrence,
                                                              RHRoomBookingRejectBookingOccurrence)
 from indico.modules.rb.controllers.user.rooms import RHRoomBookingRoomDetails
-from indico.modules.rb.models.reservations import Reservation, RepeatUnit
+from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
 from indico.modules.rb.views.user.event import (WPRoomBookingEventRoomDetails, WPRoomBookingEventBookingList,
                                                 WPRoomBookingEventBookingDetails, WPRoomBookingEventModifyBooking,
                                                 WPRoomBookingEventNewBookingSimple, WPRoomBookingEventChooseEvent,
@@ -46,8 +46,8 @@ def _get_defaults_from_object(obj):
                 'end_dt': obj.getAdjustedEndDate().replace(tzinfo=None),
                 'booking_reason': "{} '{}'".format(obj.getVerboseType(), obj.getTitle())}
     if defaults['end_dt'].date() != defaults['start_dt'].date():
-        defaults['repeat_unit'] = RepeatUnit.DAY
-        defaults['repeat_step'] = 1
+        defaults['repeat_frequency'] = RepeatFrequency.DAY
+        defaults['repeat_interval'] = 1
     return defaults
 
 

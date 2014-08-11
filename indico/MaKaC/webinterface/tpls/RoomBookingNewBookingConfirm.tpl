@@ -71,8 +71,8 @@
     <input type="hidden" name="step" value="3">
     ${ form.start_dt(type='hidden') }
     ${ form.end_dt(type='hidden') }
-    ${ form.repeat_unit(style='display: none') }
-    ${ form.repeat_step(type='hidden') }
+    ${ form.repeat_frequency(style='display: none') }
+    ${ form.repeat_interval(type='hidden') }
     ${ form.room_id(type='hidden') }
 
     <h2 class="group-title">

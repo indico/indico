@@ -12,8 +12,8 @@
 
 <form id="periodForm" method="POST" action="">
     <input type="hidden" name="step" value="2">
-    ${ period_form.repeat_unit(style='display: none;') }
-    ${ period_form.repeat_step(type='hidden') }
+    ${ period_form.repeat_frequency(style='display: none;') }
+    ${ period_form.repeat_interval(type='hidden') }
     ${ period_form.start_dt(type='hidden') }
     ${ period_form.end_dt(type='hidden') }
     ${ period_form.room_id() }

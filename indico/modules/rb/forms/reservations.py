@@ -30,7 +30,7 @@ from wtforms.fields.simple import HiddenField, TextAreaField, SubmitField
 from indico.modules.rb.forms.base import IndicoForm, DataWrapper
 from indico.modules.rb.forms.fields import IndicoQuerySelectMultipleCheckboxField
 from indico.modules.rb.forms.validators import IndicoEmail, UsedIf
-from indico.modules.rb.models.reservations import RepeatMapping, RepeatUnit
+from indico.modules.rb.models.reservations import RepeatMapping, RepeatFrequency
 from indico.util.i18n import _
 
 
@@ -74,12 +74,12 @@ class NewBookingFormBase(IndicoForm):
                              display_format='%d/%m/%Y %H:%M')
     end_dt = DateTimeField('End date', validators=[InputRequired()], parse_kwargs={'dayfirst': True},
                            display_format='%d/%m/%Y %H:%M')
-    repeat_unit = RadioField('Repeat unit', coerce=int, default=0, validators=[InputRequired()],
+    repeat_frequency = RadioField('Repeat unit', coerce=int, default=0, validators=[InputRequired()],
                              choices=[(0, _(u'Once')), (1, _(u'Daily')), (2, _(u'Weekly')), (3, _(u'Monthly'))])
-    repeat_step = IntegerField('Repeat step', validators=[NumberRange(0, 3)], default=0)
+    repeat_interval = IntegerField('Repeat step', validators=[NumberRange(0, 3)], default=0)
 
-    def validate_repeat_step(self, field):
-        if (self.repeat_unit.data, self.repeat_step.data) not in RepeatMapping._mapping:
+    def validate_repeat_interval(self, field):
+        if (self.repeat_frequency.data, self.repeat_interval.data) not in RepeatMapping._mapping:
             raise ValidationError('Invalid repeat step')
 
     def validate_start_dt(self, field):
@@ -91,7 +91,7 @@ class NewBookingFormBase(IndicoForm):
         end_dt = self.end_dt.data
         if start_dt.time() >= end_dt.time():
             raise ValidationError('Invalid times')
-        if self.repeat_unit.data == RepeatUnit.NEVER:
+        if self.repeat_frequency.data == RepeatFrequency.NEVER:
             field.data = datetime.combine(start_dt.date(), field.data.time())
         elif start_dt.date() >= end_dt.date():
             raise ValidationError('Invalid period')
@@ -106,7 +106,7 @@ class NewBookingCriteriaForm(NewBookingFormBase):
                                                (3, '&plusmn;{}'.format(_(u'3 days')))])
 
     def validate_flexible_dates_range(self, field):
-        if self.repeat_unit.data == RepeatUnit.DAY:
+        if self.repeat_frequency.data == RepeatFrequency.DAY:
             field.data = 0
 
 

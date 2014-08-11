@@ -134,7 +134,8 @@ class WPRoomBookingNewBookingSelectPeriod(WPRoomBookingNewBookingBase):
     def _getBody(self, params):
         calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
                                              candidates=params['candidates'], rooms=params['rooms'],
-                                             repeat_unit=params['repeat_unit'], repeat_step=params['repeat_step'],
+                                             repeat_frequency=params['repeat_frequency'],
+                                             repeat_interval=params['repeat_interval'],
                                              flexible_days=params['flexible_days'])
         params['calendar'] = calendar.render(show_summary=False, can_navigate=False, details_in_new_tab=True)
         return WTemplated('RoomBookingNewBookingSelectPeriod').getHTML(params)
@@ -160,8 +161,9 @@ class WPRoomBookingNewBookingSimple(WPRoomBookingNewBookingBase):
         if params['start_dt'] and params['end_dt']:
             calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
                                                  candidates=params['candidates'],
-                                                 specific_room=params['room'], repeat_unit=params['repeat_unit'],
-                                                 repeat_step=params['repeat_step'])
+                                                 specific_room=params['room'],
+                                                 repeat_frequency=params['repeat_frequency'],
+                                                 repeat_interval=params['repeat_interval'])
             params['calendar'] = calendar.render(show_navbar=False, details_in_new_tab=True)
         else:
             params['calendar'] = ''
@@ -177,6 +179,7 @@ class WPRoomBookingModifyBooking(WPRoomBookingBase):
         params['endpoints'] = self.endpoints
         calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
                                              candidates=params['candidates'], specific_room=params['room'],
-                                             repeat_unit=params['repeat_unit'], repeat_step=params['repeat_step'])
+                                             repeat_frequency=params['repeat_frequency'],
+                                             repeat_interval=params['repeat_interval'])
         params['calendar'] = calendar.render(show_navbar=False, details_in_new_tab=True)
         return WTemplated('RoomBookingBookingForm').getHTML(params)
