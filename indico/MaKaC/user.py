@@ -41,7 +41,6 @@ from MaKaC.common.fossilize import Fossilizable, fossilizes
 
 from pytz import all_timezones
 
-from indico.modules.rb.utils import rb_merge_users
 from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
 from indico.util.user import retrieve_principals
@@ -1447,6 +1446,7 @@ class AvatarHolder(ObjectHolder):
             suggestions.merge_avatars(prin, merged)
 
         # Merge avatars in RB
+        from indico.modules.rb.utils import rb_merge_users
         rb_merge_users(prin.getId(), merged.getId())
 
         # Merge API keys
