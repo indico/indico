@@ -6,7 +6,7 @@ This is a reminder about a booking you have made:
 
 Room: {{ occurrence.reservation.room.name }}
 {% if occurrence.reservation.repeat_unit == RepeatUnit.DAY -%}
-Dates: {{ occurrence.reservation.start_dt | format_date }} - {{ occurrence.reservation.end_dt | format_date }}
+Daily: {{ occurrence.reservation.start_dt | format_date }} - {{ occurrence.reservation.end_dt | format_date }}
 {%- else -%}
 Date: {{ occurrence.start_dt | format_date }}
 {%- endif %}
