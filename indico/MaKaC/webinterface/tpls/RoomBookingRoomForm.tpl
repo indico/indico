@@ -379,10 +379,10 @@
                     <!-- EQUIPMENT -->
                     <tr>
                         <td class="titleUpCellTD" style="vertical-align: top;">
-                            <span class="titleCellFormat">${ _('Equipments') }</span>
+                            <span class="titleCellFormat">${ _('Equipment') }</span>
                         </td>
                         <td colspan="2">
-                            <% eq_list = list(form.equipments) %>
+                            <% eq_list = list(form.available_equipment) %>
                             % if eq_list:
                                 <table width="100%">
                                     <tr>
@@ -398,7 +398,7 @@
                                     </tr>
                                 </table>
                             % else:
-                                ${ _('There are no equipments to pick.') }
+                                ${ _('There is no equipment to pick.') }
                                 <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location) }">${ _('You may add some to location, {0}.').format(location.name) }</a>
                             % endif
                         </td>

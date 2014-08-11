@@ -1,5 +1,5 @@
 <%page args="form=None"/>
-<% eq_list = list(form.equipments) %>
+<% eq_list = list(form.used_equipment) %>
 
 % if form.needs_assistance:
     <div>

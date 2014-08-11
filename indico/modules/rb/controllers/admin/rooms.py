@@ -29,7 +29,7 @@ from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
 from indico.modules.rb.forms.base import FormDefaults
 from indico.modules.rb.forms.rooms import RoomForm
 from indico.modules.rb.forms.validators import IndicoEmail
-from indico.modules.rb.models.room_equipments import RoomEquipment
+from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation, RoomAttribute
 from indico.modules.rb.controllers.decorators import requires_location, requires_room
 from indico.modules.rb.models.room_bookable_hours import BookableHours
@@ -104,7 +104,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         form._attribute_fields = [field for name, field in form._fields.iteritems() if name.startswith('attribute_')]
 
         # Equipment
-        form.equipments.query = self._location.equipment_objects.order_by(RoomEquipment.name)
+        form.available_equipment.query = self._location.equipment_types.order_by(EquipmentType.name)
 
         return form
 

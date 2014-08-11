@@ -50,7 +50,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatMapping, Reservation
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation, RoomAttribute
 from indico.modules.rb.models.room_bookable_hours import BookableHours
-from indico.modules.rb.models.room_equipments import RoomEquipment
+from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.util.console import colored, cformat
@@ -251,7 +251,7 @@ def migrate_rooms(rb_root, photo_path):
     print cformat('%{white!}migrating equipment')
     for name, eqs in eq.iteritems():
         l = Location.getLocationByName(name)
-        l.equipments.extend(eqs)
+        l.equipment_types.extend(eqs)
         print cformat('- [%{cyan}{}%{reset}] {}').format(name, eqs)
         db.session.add(l)
     db.session.commit()
@@ -262,9 +262,9 @@ def migrate_rooms(rb_root, photo_path):
         l = Location.getLocationByName(name)
         pvc = l.get_equipment_by_name('Video conference')
         for vc_name in vcs:
-            req = RoomEquipment(name=vc_name)
+            req = EquipmentType(name=vc_name)
             req.parent = pvc
-            l.equipment_objects.append(req)
+            l.equipment_types.append(req)
             print cformat('- [%{cyan}{}%{reset}] {}').format(name, req.name)
         db.session.add(l)
     db.session.commit()
@@ -350,7 +350,7 @@ def migrate_rooms(rb_root, photo_path):
         for old_equipment in ifilter(None, old_room._equipment.split('`') + old_room.avaibleVC):
             room_eq = l.get_equipment_by_name(old_equipment)
             new_eq.append(room_eq)
-            r.equipments.append(room_eq)
+            r.available_equipment.append(room_eq)
         if new_eq:
             print cformat('  %{blue!}Equipment:%{reset} {}').format(', '.join(sorted(x.name for x in new_eq)))
 
@@ -411,7 +411,7 @@ def migrate_reservations(main_root, rb_root):
         for eq_name in getattr(v, 'useVC', []):
             eq = room.location.get_equipment_by_name(eq_name)
             if eq:
-                r.equipments.append(eq)
+                r.used_equipment.append(eq)
 
         occurrence_rejection_reasons = {}
         if getattr(v, 'resvHistory', None):

@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,7 +15,7 @@
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import ast
 import json
@@ -41,7 +41,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
-from indico.modules.rb.models.room_equipments import RoomEquipment, RoomEquipmentAssociation
+from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.utils import Serializer, cached, versioned_cache
 from indico.util.i18n import _
@@ -197,8 +197,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         lazy='dynamic'
     )
 
-    equipments = db.relationship(
-        'RoomEquipment',
+    available_equipment = db.relationship(
+        'EquipmentType',
         secondary=RoomEquipmentAssociation,
         backref='rooms',
         lazy='dynamic'
@@ -335,15 +335,15 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         )
 
     def has_equipment(self, equipment_name):
-        return self.equipments.filter_by(name=equipment_name).count() > 0
+        return self.available_equipment.filter_by(name=equipment_name).count() > 0
 
     def find_available_video_conference(self):
-        vc_equipment = self.equipments \
+        vc_equipment = self.available_equipment \
                            .correlate(Room) \
-                           .with_entities(RoomEquipment.id) \
+                           .with_entities(EquipmentType.id) \
                            .filter_by(name='Video conference') \
                            .as_scalar()
-        return self.equipments.filter(RoomEquipment.parent_id == vc_equipment)
+        return self.available_equipment.filter(EquipmentType.parent_id == vc_equipment)
 
     def getAttributeByName(self, attribute_name):
         return self.attributes \
@@ -410,10 +410,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         entities = [Room]
 
         if 'equipment' in args:
-            entities.append(static_array.array_agg(RoomEquipment.name))
-            query = query.outerjoin(RoomEquipmentAssociation).outerjoin(RoomEquipment)
+            entities.append(static_array.array_agg(EquipmentType.name))
+            query = query.outerjoin(RoomEquipmentAssociation).outerjoin(EquipmentType)
         if 'vc_equipment' in args or 'non_vc_equipment' in args:
-            vc_id_subquery = db.session.query(RoomEquipment.id) \
+            vc_id_subquery = db.session.query(EquipmentType.id) \
                                        .correlate(Room) \
                                        .filter_by(name='Video conference') \
                                        .join(RoomEquipmentAssociation) \
@@ -423,25 +423,25 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             if 'vc_equipment' in args:
                 # noinspection PyTypeChecker
                 entities.append(static_array.array(
-                    db.session.query(RoomEquipment.name)
+                    db.session.query(EquipmentType.name)
                     .join(RoomEquipmentAssociation)
                     .filter(
                         RoomEquipmentAssociation.c.room_id == Room.id,
-                        RoomEquipment.parent_id == vc_id_subquery
+                        EquipmentType.parent_id == vc_id_subquery
                     )
-                    .order_by(RoomEquipment.name)
+                    .order_by(EquipmentType.name)
                     .as_scalar()
                 ))
             if 'non_vc_equipment' in args:
                 # noinspection PyTypeChecker
                 entities.append(static_array.array(
-                    db.session.query(RoomEquipment.name)
+                    db.session.query(EquipmentType.name)
                     .join(RoomEquipmentAssociation)
                     .filter(
                         RoomEquipmentAssociation.c.room_id == Room.id,
-                        (RoomEquipment.parent_id == None) | (RoomEquipment.parent_id != vc_id_subquery)
+                        (EquipmentType.parent_id == None) | (EquipmentType.parent_id != vc_id_subquery)
                     )
-                    .order_by(RoomEquipment.name)
+                    .order_by(EquipmentType.name)
                     .as_scalar()
                 ))
 
@@ -502,13 +502,13 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def getRoomsForRoomList(form, avatar):
         from indico.modules.rb.models.locations import Location
 
-        equipment_count = len(form.equipments.data)
+        equipment_count = len(form.available_equipment.data)
         equipment_subquery = (
             db.session.query(RoomEquipmentAssociation)
             .with_entities(func.count(RoomEquipmentAssociation.c.room_id))
             .filter(
                 RoomEquipmentAssociation.c.room_id == Room.id,
-                RoomEquipmentAssociation.c.equipment_id.in_(eq.id for eq in form.equipments.data)
+                RoomEquipmentAssociation.c.equipment_id.in_(eq.id for eq in form.available_equipment.data)
             )
             .correlate(Room)
             .as_scalar()
@@ -586,12 +586,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     @staticmethod
     def isAvatarResponsibleForRooms(avatar):
         return Room.query.filter_by(owner_id=avatar.id).count() > 0
-
-    def getEquipmentNames(self):
-        return self.equipment_names
-
-    def removeEquipment(self, equipment_name):
-        self.equipments.filter_by(name=equipment_name).delete()
 
     def get_blocked_rooms(self, *dates, **kwargs):
         states = kwargs.get('states', (BlockedRoom.State.accepted,))

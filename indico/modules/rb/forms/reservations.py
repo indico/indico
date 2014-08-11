@@ -121,28 +121,28 @@ class NewBookingConfirmForm(NewBookingPeriodForm):
     contact_phone = StringField(_(u'Telephone'))
     booking_reason = TextAreaField(_(u'Reason'), [DataRequired()])
     uses_vc = BooleanField(_(u'I will use videoconference equipment'))
-    equipments = IndicoQuerySelectMultipleCheckboxField(_(u'VC equipment'), get_label=lambda x: x.name)
+    used_equipment = IndicoQuerySelectMultipleCheckboxField(_(u'VC equipment'), get_label=lambda x: x.name)
     needs_vc_assistance = BooleanField(_(u'Request assistance for the startup of the videoconference session. '
                                          u'This support is usually performed remotely.'))
     needs_assistance = BooleanField(_(u'Request personal assistance for meeting startup'))
     submit_book = SubmitField(_(u'Create booking'))
     submit_prebook = SubmitField(_(u'Create pre-booking'))
 
-    def validate_equipments(self, field):
+    def validate_used_equipment(self, field):
         if field.data and not self.uses_vc.data:
-            raise ValidationError('Video Conference equipment is not used.')
+            raise ValidationError(_(u'Video Conference equipment is not used.'))
         elif not field.data and self.uses_vc.data:
-            raise ValidationError('You need to select some Video Conference equipment')
+            raise ValidationError(_(u'You need to select some Video Conference equipment'))
 
     def validate_needs_vc_assistance(self, field):
         if field.data and not self.uses_vc.data:
-            raise ValidationError('Video Conference equipment is not used.')
+            raise ValidationError(_(u'Video Conference equipment is not used.'))
 
 
 class NewBookingSimpleForm(NewBookingConfirmForm):
     submit_check = SubmitField(_(u'Check conflicts'))
     booking_reason = TextAreaField(_(u'Reason'), [UsedIf(lambda form, field: not form.submit_check.data),
-                                                 DataRequired()])
+                                                  DataRequired()])
 
 
 class ModifyBookingForm(NewBookingSimpleForm):

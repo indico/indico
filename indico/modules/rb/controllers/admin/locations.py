@@ -29,6 +29,7 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.room_attributes import RoomAttribute
+from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.statistics import calculate_rooms_occupancy, compose_rooms_stats
 from indico.modules.rb.views.admin.locations import WPRoomBookingAdmin, WPRoomBookingAdminLocation
 from indico.util.string import natural_sort_key
@@ -105,7 +106,7 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
                                           location=self._location,
                                           rooms=rooms,
                                           action_succeeded=self._actionSucceeded,
-                                          possibleEquipments=self._location.getEquipmentNames(),
+                                          equipment_types=self._location.equipment_types.all(),
                                           attributes=self._location.attributes.all(),
                                           kpi=kpi).display()
 
@@ -120,7 +121,6 @@ class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
 
     def _process(self):
         self._location.attributes.filter_by(name=self._attr).delete()
-        db.session.add(self._location)
         flash(_(u'Custom attribute deleted'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
 
@@ -151,7 +151,6 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
             self._location.attributes.append(self._new_attr)
             flash(_(u'Custom attribute added'), 'success')
 
-        db.session.add(self._location)
         flash(_(u'Custom attributes updated'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
 
@@ -170,8 +169,7 @@ class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
         RHRoomBookingEquipmentBase._checkParams(self, 'removeEquipmentName')
 
     def _process(self):
-        self._location.removeEquipment(self._eq)
-        db.session.add(self._location)
+        self._location.equipment_types.filter_by(name=self._eq).delete()
         flash(_(u'Equipment deleted'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
 
@@ -182,7 +180,6 @@ class RHRoomBookingSaveEquipment(RHRoomBookingEquipmentBase):
 
     def _process(self):
         if self._eq:
-            self._location.addEquipment(self._eq)
-            db.session.add(self._location)
+            self._location.equipment_types.append(EquipmentType(self._eq))
             flash(_(u'Equipment added'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))

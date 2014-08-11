@@ -2,7 +2,7 @@
 ##
 ##
 ## This file is part of Indico.
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
 ## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,7 +15,7 @@
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict, OrderedDict
 from datetime import datetime
@@ -34,8 +34,8 @@ from indico.core.errors import NoReportError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
-from indico.modules.rb.models.room_equipments import (ReservationEquipmentAssociation, RoomEquipment,
-                                                      RoomEquipmentAssociation)
+from indico.modules.rb.models.equipment import (ReservationEquipmentAssociation, EquipmentType,
+                                                RoomEquipmentAssociation)
 from indico.modules.rb.models.utils import limit_groups, unimplemented, Serializer
 from indico.modules.rb.notifications.reservations import (notify_confirmation, notify_cancellation,
                                                           notify_creation, notify_modification,
@@ -226,8 +226,8 @@ class Reservation(Serializer, db.Model):
         cascade='all, delete-orphan',
         lazy='dynamic'
     )
-    equipments = db.relationship(
-        'RoomEquipment',
+    used_equipment = db.relationship(
+        'EquipmentType',
         secondary=ReservationEquipmentAssociation,
         backref='reservations',
         lazy='dynamic'
@@ -308,12 +308,12 @@ class Reservation(Serializer, db.Model):
         self.event_id = int(event.getId())
 
     def get_vc_equipment(self):
-        vc_equipment = self.room.equipments \
+        vc_equipment = self.room.available_equipment \
                            .correlate(ReservationOccurrence) \
-                           .with_entities(RoomEquipment.id) \
+                           .with_entities(EquipmentType.id) \
                            .filter_by(name='Video conference') \
                            .as_scalar()
-        return self.equipments.filter(RoomEquipment.parent_id == vc_equipment)
+        return self.used_equipment.filter(EquipmentType.parent_id == vc_equipment)
 
     @staticmethod
     def get_with_data(*args, **kwargs):
@@ -342,7 +342,7 @@ class Reservation(Serializer, db.Model):
         result = OrderedDict((r.id, {'reservation': r}) for r in query)
 
         if 'vc_equipment' in args:
-            vc_id_subquery = db.session.query(RoomEquipment.id) \
+            vc_id_subquery = db.session.query(EquipmentType.id) \
                 .correlate(Reservation) \
                 .filter_by(name='Video conference') \
                 .join(RoomEquipmentAssociation) \
@@ -350,10 +350,10 @@ class Reservation(Serializer, db.Model):
                 .as_scalar()
 
             # noinspection PyTypeChecker
-            vc_equipment_data = dict(db.session.query(Reservation.id, static_array.array_agg(RoomEquipment.name))
-                                     .join(ReservationEquipmentAssociation, RoomEquipment)
+            vc_equipment_data = dict(db.session.query(Reservation.id, static_array.array_agg(EquipmentType.name))
+                                     .join(ReservationEquipmentAssociation, EquipmentType)
                                      .filter(Reservation.id.in_(result.iterkeys()))
-                                     .filter(RoomEquipment.parent_id == vc_id_subquery)
+                                     .filter(EquipmentType.parent_id == vc_id_subquery)
                                      .group_by(Reservation.id))
 
             for id_, data in result.iteritems():
@@ -519,7 +519,7 @@ class Reservation(Serializer, db.Model):
         """
 
         populate_fields = ('start_dt', 'end_dt', 'repeat_unit', 'repeat_step', 'room_id', 'booked_for_id',
-                           'contact_email', 'contact_phone', 'booking_reason', 'equipments',
+                           'contact_email', 'contact_phone', 'booking_reason', 'used_equipment',
                            'needs_assistance', 'uses_vc', 'needs_vc_assistance')
 
         if data['repeat_unit'] == RepeatUnit.NEVER and data['start_dt'].date() != data['end_dt'].date():
@@ -555,7 +555,7 @@ class Reservation(Serializer, db.Model):
         """
 
         populate_fields = ('start_dt', 'end_dt', 'repeat_unit', 'repeat_step', 'booked_for_id',
-                           'contact_email', 'contact_phone', 'booking_reason', 'equipments',
+                           'contact_email', 'contact_phone', 'booking_reason', 'used_equipment',
                            'needs_assistance', 'uses_vc', 'needs_vc_assistance')
         # fields affecting occurrences
         occurrence_fields = {'start_dt', 'end_dt', 'repeat_unit', 'repeat_step'}
@@ -574,7 +574,7 @@ class Reservation(Serializer, db.Model):
             'contact_email': "contact email",
             'contact_phone': "contact phone number",
             'booking_reason': "booking reason",
-            'equipments': "list of equipment",
+            'used_equipment': "list of equipment",
             'needs_assistance': "option 'General Assistance'",
             'uses_vc': "option 'Uses Video Conference'",
             'needs_vc_assistance': "option 'Video Conference Setup Assistance'"
@@ -591,7 +591,7 @@ class Reservation(Serializer, db.Model):
             old = getattr(self, field)
             new = data[field]
             converter = unicode
-            if field == 'equipments':
+            if field == 'used_equipment':
                 # Dynamic relationship
                 old = sorted(old.all())
                 converter = lambda x: ', '.join(x.name for x in x)

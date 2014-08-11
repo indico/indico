@@ -21,11 +21,9 @@ from collections import defaultdict
 from datetime import time
 
 from sqlalchemy import func
-from sqlalchemy.ext.associationproxy import association_proxy
 
 from indico.core.db import db
 from indico.modules.rb.models.aspects import Aspect
-from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from MaKaC.common.Locators import Locator
@@ -91,16 +89,10 @@ class Location(db.Model):
         lazy='dynamic'
     )
 
-    equipment_objects = db.relationship(
-        'RoomEquipment',
+    equipment_types = db.relationship(
+        'EquipmentType',
         backref='location',
         lazy='dynamic'
-    )
-
-    equipments = association_proxy(
-        'equipment_objects',
-        'name',
-        creator=lambda name: RoomEquipment(name=name)
     )
 
     holidays = db.relationship(
@@ -168,23 +160,8 @@ class Location(db.Model):
     def getAttributeByName(self, name):
         return self.attributes.filter_by(name=name).first()
 
-    def getEquipments(self):
-        return self.equipment_objects.all()
-
-    def getEquipmentNames(self):
-        return list(self.equipments)
-
     def get_equipment_by_name(self, name):
-        return self.equipment_objects.filter_by(name=name).first()
-
-    def addEquipment(self, name):
-        self.equipments.append(name)
-
-    def removeEquipment(self, name):
-        self.equipment_objects.filter_by(name=name).delete()
-
-    def hasEquipment(self, name):
-        return self.equipment_objects.filter_by(name=name).count() > 0
+        return self.equipment_types.filter_by(name=name).first()
 
     def get_buildings(self):
         building_rooms = defaultdict(list)

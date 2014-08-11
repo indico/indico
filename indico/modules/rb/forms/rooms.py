@@ -33,7 +33,7 @@ from indico.modules.rb.forms.fields import IndicoQuerySelectMultipleCheckboxFiel
 from indico.modules.rb.forms.validators import UsedIf
 from indico.modules.rb.forms.widgets import ConcatWidget
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.room_equipments import RoomEquipment
+from indico.modules.rb.models.equipment import EquipmentType
 from indico.util.i18n import _
 from indico.util.struct.iterables import group_nested
 
@@ -58,10 +58,10 @@ class SearchRoomsForm(IndicoForm):
     available = RadioField(_(u'Availability'), coerce=int, default=-1, widget=ConcatWidget(prefix_label=False),
                            choices=[(1, _(u'Available')), (0, _(u'Booked')), (-1, _(u"Don't care"))])
     capacity = IntegerField(_(u'Capacity'), validators=[Optional(), NumberRange(min=0)])
-    equipments = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=_get_equipment_label,
-                                                        modify_object_list=_group_equipment,
-                                                        query_factory=lambda: RoomEquipment.find().order_by(
-                                                            RoomEquipment.name))
+    available_equipment = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=_get_equipment_label,
+                                                                 modify_object_list=_group_equipment,
+                                                                 query_factory=lambda: EquipmentType.find().order_by(
+                                                                     EquipmentType.name))
     is_only_public = BooleanField(_(u'Only public rooms'), default=True)
     is_auto_confirm = BooleanField(_(u'Only rooms not requiring confirmation'), default=True)
     is_only_active = BooleanField(_(u'Only active rooms'), default=True)
@@ -126,8 +126,8 @@ class RoomForm(IndicoForm):
     delete_photos = BooleanField(_(u'Delete photos'))
     large_photo = FileField(_(u'Large photo'))
     small_photo = FileField(_(u'Small photo'))
-    equipments = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=_get_equipment_label,
-                                                        modify_object_list=_group_equipment)
+    available_equipment = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=_get_equipment_label,
+                                                                 modify_object_list=_group_equipment)
     # attribute_* - set at runtime
     bookable_hours = FieldList(FormField(_TimePair), min_entries=1)
     nonbookable_periods = FieldList(FormField(_DateTimePair), min_entries=1)

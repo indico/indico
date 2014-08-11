@@ -247,7 +247,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         # Step 3
         # If we come from a successful step 2 we take default values from that step once again
         if step == 2:
-            defaults.equipments = []  # wtforms bug; avoid `foo in None` check
+            defaults.used_equipment = []  # wtforms bug; avoid `foo in None` check
             form = form_class(formdata=MultiDict(), obj=defaults)
         else:
             form = form_class(obj=defaults)
@@ -265,7 +265,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
             # User can only prebook
             del form.submit_book
 
-        form.equipments.query = room.find_available_video_conference()
+        form.used_equipment.query = room.find_available_video_conference()
         return form
 
     def _get_all_conflicts(self, room, form, reservation_id=None):
@@ -563,7 +563,7 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
     def _process(self):
         room = self._reservation.room
         form = ModifyBookingForm(obj=self._reservation, old_start_date=self._reservation.start_dt.date())
-        form.equipments.query = room.find_available_video_conference()
+        form.used_equipment.query = room.find_available_video_conference()
 
         if form.is_submitted() and not form.validate():
             occurrences = {}

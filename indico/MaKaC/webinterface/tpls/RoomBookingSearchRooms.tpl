@@ -196,7 +196,7 @@ ${ contextHelp('chooseButtonHelp') }
                     <table width="100%" cellspacing="4px">
                         <tr>
                             <td align="left" class="blacktext">
-                                % for eq in form.equipments:
+                                % for eq in form.available_equipment:
                                     <div class="${ 'js-location js-location-{}'.format(equipment_locations[int(eq.data)]) }">
                                         ${ eq() }
                                         ${ eq.label(style='font-weight: normal;') }

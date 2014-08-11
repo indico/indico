@@ -34,7 +34,7 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatMapping, RepeatUnit, Reservation
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.models.room_equipments import RoomEquipment
+from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.statistics import calculate_rooms_occupancy, compose_rooms_stats
 from indico.modules.rb.views.user.rooms import (WPRoomBookingSearchRooms, WPRoomBookingMapOfRooms,
                                                 WPRoomBookingMapOfRoomsWidget, WPRoomBookingRoomDetails,
@@ -101,7 +101,7 @@ class RHRoomBookingSearchRooms(RHRoomBookingBase):
         if self._is_submitted() and form.validate():
             rooms = Room.getRoomsForRoomList(form, session.user)
             return WPRoomBookingSearchRoomsResults(self, self.menu_item, rooms=rooms).display()
-        equipment_locations = {eq.id: eq.location_id for eq in RoomEquipment.find()}
+        equipment_locations = {eq.id: eq.location_id for eq in EquipmentType.find()}
         return WPRoomBookingSearchRooms(self, form=form, errors=form.error_list, rooms=Room.find_all(),
                                         equipment_locations=equipment_locations).display()
 

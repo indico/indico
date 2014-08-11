@@ -89,12 +89,12 @@
               <input type="submit" class="i-button" value="Add">
             </p>
           </form>
-          % if possibleEquipments:
+          % if equipment_types:
             <form action="${ urlHandlers.UHRoomBookingDeleteEquipment.getURL(location) }" method="POST">
               <p>
                 <select name="removeEquipmentName" id="removeEquipmentName">
-                  % for eq in possibleEquipments:
-                    <option value="${ eq }">${ eq }</option>
+                  % for eq in equipment_types:
+                    <option value="${ eq.name }">${ eq.name }</option>
                   % endfor
                 </select>
                 <input type="submit" class="i-button" value="Remove">

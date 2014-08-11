@@ -311,7 +311,7 @@
                                 <%
                                 from indico.util.struct.iterables import render_nested
                                 %>
-                                ${ render_nested(sorted(room.equipments, key=lambda x: x.name)) }
+                                ${ render_nested(sorted(room.available_equipment, key=lambda x: x.name)) }
                               </td>
                             </tr>
                           </table>

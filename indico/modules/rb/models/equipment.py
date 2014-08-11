@@ -22,13 +22,13 @@ from indico.util.string import return_ascii
 
 
 RoomEquipmentAssociation = db.Table(
-    'rooms_equipments',
+    'room_equipment',
     db.metadata,
     db.Column(
         'equipment_id',
         db.Integer,
         db.ForeignKey(
-            'room_equipments.id',
+            'equipment_types.id',
             ondelete='cascade'
         ),
         primary_key=True,
@@ -45,13 +45,13 @@ RoomEquipmentAssociation = db.Table(
 )
 
 ReservationEquipmentAssociation = db.Table(
-    'reservations_equipments',
+    'reservation_equipment',
     db.metadata,
     db.Column(
         'equipment_id',
         db.Integer,
         db.ForeignKey(
-            'room_equipments.id',
+            'equipment_types.id',
             ondelete='cascade'
         ),
         primary_key=True,
@@ -68,8 +68,8 @@ ReservationEquipmentAssociation = db.Table(
 )
 
 
-class RoomEquipment(db.Model):
-    __tablename__ = 'room_equipments'
+class EquipmentType(db.Model):
+    __tablename__ = 'equipment_types'
     __table_args__ = (db.UniqueConstraint('name', 'location_id'),)
 
     id = db.Column(
@@ -78,7 +78,7 @@ class RoomEquipment(db.Model):
     )
     parent_id = db.Column(
         db.Integer,
-        db.ForeignKey('room_equipments.id')
+        db.ForeignKey('equipment_types.id')
     )
     name = db.Column(
         db.String,
@@ -92,7 +92,7 @@ class RoomEquipment(db.Model):
     )
 
     children = db.relationship(
-        'RoomEquipment',
+        'EquipmentType',
         backref=db.backref(
             'parent',
             remote_side=[id]
@@ -101,8 +101,8 @@ class RoomEquipment(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return u'<RoomEquipment({0}, {1}, {2})>'.format(self.id, self.name, self.location_id)
+        return u'<EquipmentType({0}, {1}, {2})>'.format(self.id, self.name, self.location_id)
 
     @staticmethod
     def getEquipmentNames():
-        return RoomEquipment.query.with_entities(RoomEquipment.name).all()
+        return EquipmentType.query.with_entities(EquipmentType.name).all()
