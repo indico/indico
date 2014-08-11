@@ -32,8 +32,8 @@
         });
 
         function updateFields() {
-            $('#start_date').val('{0}/{1}/{2} {3}'.format($('#sDay').val(), $('#sMonth').val(), $('#sYear').val(), $('#sTime').val()));
-            $('#end_date').val('{0}/{1}/{2} {3}'.format($('#eDay').val(), $('#eMonth').val(), $('#eYear').val(), $('#eTime').val()));
+            $('#start_dt').val('{0}/{1}/{2} {3}'.format($('#sDay').val(), $('#sMonth').val(), $('#sYear').val(), $('#sTime').val()));
+            $('#end_dt').val('{0}/{1}/{2} {3}'.format($('#eDay').val(), $('#eMonth').val(), $('#eYear').val(), $('#eTime').val()));
         }
 
         % if startDT.day != '':
