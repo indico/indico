@@ -517,7 +517,7 @@
                   </td>
                 </tr>
               % endif
-              % if ((reservation.room.is_owned_by(user) or user.isRBAdmin()) and not reservation.is_accepted and collisions):
+              % if ((reservation.room.is_owned_by(user) or user.isRBAdmin()) and not reservation.is_accepted and reservation.find_overlapping().count()):
                 <tr><td>&nbsp;</td></tr>
                 <!-- Occurrences -->
                 <tr>
@@ -525,16 +525,18 @@
                     <span class="titleCellFormat"> ${ _('Conflicts at the same time') }</span>
                   </td>
                   <td>
-                    % for col in collisions:
+                  % for conflicts in reservation.get_conflicting_occurrences().itervalues():
+                    % for occ in itertools.chain(conflicts['confirmed'], conflicts['pending']):
                       <strong>
-                        ${ _('Booking') if col.withReservation.is_accepted else _('PRE-Booking') }:
+                        ${ _('Booking') if occ.reservation.is_accepted else _('Pre-Booking') }:
                       </strong>
-                      ${ col.withReservation.booked_for_name },
-                      ${ verbose_dt(col.withReservation.start_dt) } - ${ verbose_dt(col.withReservation.end_dt) }
-                      (<a href="${ urlHandlers.UHRoomBookingBookingDetails.getURL(col.withReservation) }" target="_blank">
+                      ${ occ.reservation.booked_for_name },
+                      ${ format_datetime(occ.reservation.start_dt) } - ${ format_datetime(occ.reservation.end_dt) }
+                      (<a href="${ url_for(endpoints['booking_details'], occ.reservation) }" target="_blank">
                         ${ _('show this booking') }
                       </a>)<br/>
                     % endfor
+                  % endfor
                   </td>
                 </tr>
               % endif

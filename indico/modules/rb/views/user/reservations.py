@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import itertools
+
 from indico.modules.rb import settings
 
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
@@ -30,6 +32,7 @@ from MaKaC.webinterface.wcomponents import WTemplated
 class WPRoomBookingBookingDetails(WPRoomBookingBase):
     endpoints = {
         'room_details': 'rooms.roomBooking-roomDetails',
+        'booking_details': 'rooms.roomBooking-bookingDetails',
         'booking_modify': 'rooms.roomBooking-modifyBookingForm',
         'booking_clone': 'rooms.roomBooking-cloneBooking',
         'booking_accept': 'rooms.roomBooking-acceptBooking',
@@ -50,6 +53,7 @@ class WPRoomBookingBookingDetails(WPRoomBookingBase):
         params['repetition'] = RepeatMapping.getMessage(*reservation.repetition)
         params['edit_logs'] = reservation.edit_logs.order_by(ReservationEditLog.timestamp.desc()).all()
         params['excluded_days'] = reservation.find_excluded_days().all()
+        params['itertools'] = itertools
         return WTemplated('RoomBookingDetails').getHTML(params)
 
 
