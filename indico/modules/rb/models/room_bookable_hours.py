@@ -21,16 +21,16 @@ from indico.core.db import db
 from indico.util.string import return_ascii
 
 
-class NonBookableDate(db.Model):
-    __tablename__ = 'room_nonbookable_dates'
+class BookableHours(db.Model):
+    __tablename__ = 'room_bookable_hours'
 
-    start_dt = db.Column(
-        db.DateTime,
+    start_time = db.Column(
+        db.Time,
         nullable=False,
         primary_key=True
     )
-    end_dt = db.Column(
-        db.DateTime,
+    end_time = db.Column(
+        db.Time,
         nullable=False,
         primary_key=True
     )
@@ -43,11 +43,11 @@ class NonBookableDate(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return u'<NonBookableDate({0}, {1}, {2})>'.format(
+        return u'<BookableHours({0}, {1}, {2})>'.format(
             self.room_id,
-            self.start_dt,
-            self.end_dt
+            self.start_time,
+            self.end_time
         )
 
-    def overlaps(self, st, et):
-        return self.start_dt < et and self.end_dt > st
+    def fits_period(self, st, et):
+        return self.start_time <= st and self.end_time >= et

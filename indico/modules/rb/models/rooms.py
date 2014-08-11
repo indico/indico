@@ -40,9 +40,9 @@ from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
-from indico.modules.rb.models.room_bookable_times import BookableTime
+from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_equipments import RoomEquipment, RoomEquipmentAssociation
-from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
+from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.utils import Serializer, cached, versioned_cache
 from indico.util.i18n import _
 from indico.util.string import return_ascii, natural_sort_key
@@ -194,10 +194,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         lazy='dynamic'
     )
 
-    bookable_times = db.relationship(
-        'BookableTime',
+    bookable_hours = db.relationship(
+        'BookableHours',
         backref='room',
-        order_by=BookableTime.start_time,
+        order_by=BookableHours.start_time,
         cascade='all, delete-orphan',
         lazy='dynamic'
     )
@@ -209,10 +209,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         lazy='dynamic'
     )
 
-    nonbookable_dates = db.relationship(
-        'NonBookableDate',
+    nonbookable_periods = db.relationship(
+        'NonBookablePeriod',
         backref='room',
-        order_by=NonBookableDate.end_dt.desc(),
+        order_by=NonBookablePeriod.end_dt.desc(),
         cascade='all, delete-orphan',
         lazy='dynamic'
     )
@@ -721,13 +721,13 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             msg = _('You cannot book this room more than {} days in advance')
             raise IndicoError(msg.format(self.max_advance_days))
 
-    def check_bookable_times(self, start_time, end_time, user=None, quiet=False):
+    def check_bookable_hours(self, start_time, end_time, user=None, quiet=False):
         if user and (user.isRBAdmin() or self.is_owned_by(user)):
             return True
-        bookable_times = self.bookable_times.all()
-        if not bookable_times:
+        bookable_hours = self.bookable_hours.all()
+        if not bookable_hours:
             return True
-        for bt in bookable_times:
+        for bt in bookable_hours:
             if bt.fits_period(start_time, end_time):
                 return True
         if quiet:

@@ -33,7 +33,7 @@ from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.errors import NoReportError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
+from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.room_equipments import (ReservationEquipmentAssociation, RoomEquipment,
                                                       RoomEquipmentAssociation)
 from indico.modules.rb.models.utils import limit_groups, unimplemented, Serializer
@@ -468,11 +468,11 @@ class Reservation(Serializer, db.Model):
 
         # Check for conflicts with nonbookable periods
         if not user.isRBAdmin():
-            nonbookable_dates = self.room.nonbookable_dates.filter(NonBookableDate.end_dt > self.start_dt)
+            nonbookable_periods = self.room.nonbookable_periods.filter(NonBookablePeriod.end_dt > self.start_dt)
             for occurrence in self.occurrences:
                 if not occurrence.is_valid:
                     continue
-                for nbd in nonbookable_dates:
+                for nbd in nonbookable_periods:
                     if nbd.overlaps(occurrence.start_dt, occurrence.end_dt):
                         if not skip_conflicts:
                             raise ConflictingOccurrences()
@@ -531,7 +531,7 @@ class Reservation(Serializer, db.Model):
                 raise NoReportError('You cannot book this room')
 
         room.check_advance_days(data['end_dt'].date(), user)
-        room.check_bookable_times(data['start_dt'].time(), data['end_dt'].time(), user)
+        room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user)
 
         reservation = cls()
         for field in populate_fields:
@@ -581,7 +581,7 @@ class Reservation(Serializer, db.Model):
         }
 
         self.room.check_advance_days(data['end_dt'].date(), user)
-        self.room.check_bookable_times(data['start_dt'].time(), data['end_dt'].time(), user)
+        self.room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user)
 
         changes = {}
         update_occurrences = False

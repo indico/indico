@@ -130,8 +130,8 @@ class RoomForm(IndicoForm):
     equipments = IndicoQuerySelectMultipleCheckboxField(_(u'Equipment'), get_label=_get_equipment_label,
                                                         modify_object_list=_group_equipment)
     # attribute_* - set at runtime
-    bookable_times = FieldList(FormField(_TimePair), min_entries=1)
-    nonbookable_dates = FieldList(FormField(_DateTimePair), min_entries=1)
+    bookable_hours = FieldList(FormField(_TimePair), min_entries=1)
+    nonbookable_periods = FieldList(FormField(_DateTimePair), min_entries=1)
 
     def validate_large_photo(self, field):
         if not field.data and self.small_photo.data:

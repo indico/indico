@@ -202,13 +202,13 @@
                         <tr>
                           <td class="subFieldWidth" align="right" valign="top"> ${ _("Unavailable periods")}&nbsp;&nbsp;</td>
                           <td align="left" class="blacktext">
-                          % if nonbookable_dates:
+                          % if nonbookable_periods:
                             <ul>
-                              % for nbd in nonbookable_dates:
+                              % for nbp in nonbookable_periods:
                                 <li>
                                     ${ _('from {} to {}').format(
-                                        nbd.start_dt.strftime('%d/%m/%Y'),
-                                        nbd.end_dt.strftime('%d/%m/%Y')
+                                        nbp.start_dt.strftime('%d/%m/%Y'),
+                                        nbp.end_dt.strftime('%d/%m/%Y')
                                     ) }
                                 </li>
                               % endfor
@@ -221,13 +221,13 @@
                             ${ _('Daily availability periods') }&nbsp;&nbsp;
                           </td>
                           <td align="left" class="blacktext">
-                            % if bookable_times:
+                            % if bookable_hours:
                               <ul>
-                                % for bt in bookable_times:
+                                % for bh in bookable_hours:
                                 <li>
                                   ${ _('from {0} to {1}').format(
-                                    bt.start_time.strftime('%H:%M'),
-                                    bt.end_time.strftime('%H:%M')
+                                    bh.start_time.strftime('%H:%M'),
+                                    bh.end_time.strftime('%H:%M')
                                   ) }
                                 </li>
                                 % endfor

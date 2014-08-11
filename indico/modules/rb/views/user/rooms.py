@@ -146,8 +146,8 @@ class WRoomBookingRoomDetails(WTemplated):
 
         wvars['owner_name'] = room.getResponsibleName()
 
-        wvars['bookable_times'] = room.bookable_times.all()
-        wvars['nonbookable_dates'] = room.nonbookable_dates.all()
+        wvars['bookable_hours'] = room.bookable_hours.all()
+        wvars['nonbookable_periods'] = room.nonbookable_periods.all()
 
         # URLs
         wvars['stats_url'] = UH.UHRoomBookingRoomStats.getURL(room)

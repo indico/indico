@@ -25,7 +25,6 @@ from MaKaC.user import AvatarHolder
 from MaKaC.webinterface import urlHandlers as UH
 
 from indico.core.db import db
-from indico.core.errors import NotFoundError
 from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
 from indico.modules.rb.forms.base import FormDefaults
 from indico.modules.rb.forms.rooms import RoomForm
@@ -33,8 +32,8 @@ from indico.modules.rb.forms.validators import IndicoEmail
 from indico.modules.rb.models.room_equipments import RoomEquipment
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation, RoomAttribute
 from indico.modules.rb.controllers.decorators import requires_location, requires_room
-from indico.modules.rb.models.room_bookable_times import BookableTime
-from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
+from indico.modules.rb.models.room_bookable_hours import BookableHours
+from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.views.admin import rooms as room_views
@@ -70,7 +69,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         defaults = None
         if room.id is not None:
             skip_name = set() if room.has_special_name else {'name'}
-            defaults = FormDefaults(room, skip_attrs={'nonbookable_dates', 'bookable_times'} | skip_name)
+            defaults = FormDefaults(room, skip_attrs={'nonbookable_periods', 'bookable_hours'} | skip_name)
             for ra in room.attributes.all():
                 defaults['attribute_{}'.format(ra.attribute_id)] = ra.value
 
@@ -89,17 +88,17 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         # Default values, part 2
         if not form.is_submitted() and room.id is not None:
             # This is ugly, but apparently FieldList+FormField does not work well with obj defaults
-            for i, nbd in enumerate(room.nonbookable_dates.all()):
-                if i >= len(form.nonbookable_dates.entries):
-                    form.nonbookable_dates.append_entry()
-                form.nonbookable_dates[i].start.data = nbd.start_dt
-                form.nonbookable_dates[i].end.data = nbd.end_dt
+            for i, nbd in enumerate(room.nonbookable_periods.all()):
+                if i >= len(form.nonbookable_periods.entries):
+                    form.nonbookable_periods.append_entry()
+                form.nonbookable_periods[i].start.data = nbd.start_dt
+                form.nonbookable_periods[i].end.data = nbd.end_dt
 
-            for i, bt in enumerate(room.bookable_times.all()):
-                if i >= len(form.bookable_times.entries):
-                    form.bookable_times.append_entry()
-                form.bookable_times[i].start.data = bt.start_time
-                form.bookable_times[i].end.data = bt.end_time
+            for i, bt in enumerate(room.bookable_hours.all()):
+                if i >= len(form.bookable_hours.entries):
+                    form.bookable_hours.append_entry()
+                form.bookable_hours[i].start.data = bt.start_time
+                form.bookable_hours[i].end.data = bt.end_time
 
         # Custom attributes, part 2
         form._attribute_fields = [field for name, field in form._fields.iteritems() if name.startswith('attribute_')]
@@ -113,7 +112,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         room = self._room
         form = self._form
         # Simple fields
-        form.populate_obj(room, skip=('bookable_times', 'nonbookable_dates'), existing_only=True)
+        form.populate_obj(room, skip=('bookable_hours', 'nonbookable_periods'), existing_only=True)
         room.update_name()
         # Photos
         if form.small_photo.data and form.large_photo.data:
@@ -128,11 +127,11 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
                            for attr in self._location.attributes.all()
                            if form['attribute_{}'.format(attr.id)].data]
         # Bookable times
-        room.bookable_times = [BookableTime(start_time=bt['start'], end_time=bt['end'])
-                               for bt in form.bookable_times.data if all(bt.viewvalues())]
+        room.bookable_hours = [BookableHours(start_time=bt['start'], end_time=bt['end'])
+                               for bt in form.bookable_hours.data if all(bt.viewvalues())]
         # Nonbookable dates
-        room.nonbookable_dates = [NonBookableDate(start_dt=nbd['start'], end_dt=nbd['end'])
-                                  for nbd in form.nonbookable_dates.data if all(nbd.viewvalues())]
+        room.nonbookable_periods = [NonBookablePeriod(start_dt=nbd['start'], end_dt=nbd['end'])
+                                    for nbd in form.nonbookable_periods.data if all(nbd.viewvalues())]
 
     def _process(self):
         room_owner = None

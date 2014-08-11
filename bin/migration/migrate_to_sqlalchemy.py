@@ -49,9 +49,9 @@ from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import RepeatMapping, Reservation
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation, RoomAttribute
-from indico.modules.rb.models.room_bookable_times import BookableTime
+from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_equipments import RoomEquipment
-from indico.modules.rb.models.room_nonbookable_dates import NonBookableDate
+from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.util.console import colored, cformat
 from indico.util.date_time import as_utc
@@ -311,22 +311,22 @@ def migrate_rooms(rb_root, photo_path):
         print cformat('- [%{cyan}{}%{reset}] %{grey!}{:4}%{reset}  %{green!}{}%{reset}').format(l.name, r.id, r.name)
 
         for old_bookable_time in getattr(old_room, '_dailyBookablePeriods', []):
-            r.bookable_times.append(
-                BookableTime(
+            r.bookable_hours.append(
+                BookableHours(
                     start_time=old_bookable_time._startTime,
                     end_time=old_bookable_time._endTime
                 )
             )
-            print cformat('  %{blue!}Bookable:%{reset} {}').format(r.bookable_times[-1])
+            print cformat('  %{blue!}Bookable:%{reset} {}').format(r.bookable_hours[-1])
 
         for old_nonbookable_date in getattr(old_room, '_nonBookableDates', []):
-            r.nonbookable_dates.append(
-                NonBookableDate(
+            r.nonbookable_periods.append(
+                NonBookablePeriod(
                     start_dt=old_nonbookable_date._startDate,
                     end_dt=old_nonbookable_date._endDate
                 )
             )
-            print cformat('  %{blue!}Nonbookable:%{reset} {}').format(r.nonbookable_dates[-1])
+            print cformat('  %{blue!}Nonbookable:%{reset} {}').format(r.nonbookable_periods[-1])
 
         if photo_path:
             try:

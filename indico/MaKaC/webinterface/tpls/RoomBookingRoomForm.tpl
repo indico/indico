@@ -291,7 +291,7 @@
                                     </td>
                                     <td align="left" class="blacktext">
                                         <table id="nonBookablePeriodsTable">
-                                            % for subform in form.nonbookable_dates:
+                                            % for subform in form.nonbookable_periods:
                                                 <% index = loop.index %>
                                                 <tr class="startEndDate">
                                                     % for field in ['start', 'end']:
@@ -316,7 +316,7 @@
                                     </td>
                                     <td align="left" class="blacktext">
                                         <table id="dailyBookablePeriodsTable">
-                                            % for subform in form.bookable_times:
+                                            % for subform in form.bookable_hours:
                                                 <tr class="startEndDate">
                                                     % for field in ['start', 'end']:
                                                         <td class="startEndDateEntry">${ subform[field].label.text }</td>
@@ -434,12 +434,12 @@
         var startDate = $('input', this).eq(0).val();
         var endDate = $('input', this).eq(1).val();
         var startDateField = IndicoUI.Widgets.Generic.dateField(true, {
-            id: 'nonbookable_dates-{0}-start'.format(i),
-            name: 'nonbookable_dates-{0}-start'.format(i)
+            id: 'nonbookable_periods-{0}-start'.format(i),
+            name: 'nonbookable_periods-{0}-start'.format(i)
         });
         var endDateField = IndicoUI.Widgets.Generic.dateField(true, {
-            id: 'nonbookable_dates-{0}-end'.format(i),
-            name: 'nonbookable_dates-{0}-end'.format(i)
+            id: 'nonbookable_periods-{0}-end'.format(i),
+            name: 'nonbookable_periods-{0}-end'.format(i)
         });
 
         $E('startDateNonBookablePeriod' + i).set(startDateField);
@@ -467,14 +467,14 @@
 
         $E('startDateNonBookablePeriod' + i).set(
             IndicoUI.Widgets.Generic.dateField(true, {
-                id: 'nonbookable_dates-{0}-start'.format(i),
-                name: 'nonbookable_dates-{0}-start'.format(i)
+                id: 'nonbookable_periods-{0}-start'.format(i),
+                name: 'nonbookable_periods-{0}-start'.format(i)
             })
         );
         $E('endDateNonBookablePeriod' + i).set(
             IndicoUI.Widgets.Generic.dateField(true, {
-                id: 'nonbookable_dates-{0}-end'.format(i),
-                name: 'nonbookable_dates-{0}-end'.format(i)
+                id: 'nonbookable_periods-{0}-end'.format(i),
+                name: 'nonbookable_periods-{0}-end'.format(i)
             })
         );
     }
@@ -483,9 +483,9 @@
         $('#dailyBookablePeriodsTable tbody').append(
             '<tr class="startEndDate"> \
                  <td class="startEndDateEntry">{0}</td> \
-                 <td><input id="bookable_times-{2}-start" name="bookable_times-{2}-start" style="width: 50px;" type="time"></td> \
+                 <td><input id="bookable_hours-{2}-start" name="bookable_hours-{2}-start" style="width: 50px;" type="time"></td> \
                  <td class="startEndDateEntry">{1}</td> \
-                 <td><input id="bookable_times-{2}-end" name="bookable_times-{2}-end" style="width: 50px;" type="time"></td> \
+                 <td><input id="bookable_hours-{2}-end" name="bookable_hours-{2}-end" style="width: 50px;" type="time"></td> \
             </tr>'.format(btStartLabel, btEndLabel, $('#dailyBookablePeriodsTable tr').length)
         );
     }
