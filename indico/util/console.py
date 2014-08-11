@@ -25,6 +25,7 @@ import struct
 import sys
 import termios
 import time
+from operator import itemgetter
 
 
 def strip_ansi(s, _re=re.compile(r'\x1b\[[;\d]*[A-Za-z]')):
@@ -47,6 +48,36 @@ def terminal_size():
     return w, h
 
 
+def verbose_iterator(iterable, total, get_id, get_title):
+    """Iterates large iterables verbosely
+
+    :param iterable: An iterable
+    :param total: The number of items in `iterable`
+    :param get_id: callable to retrieve the ID of an item
+    :param get_title: callable to retrieve the title of an item
+    """
+    term_width = terminal_size()[0]
+    start_time = time.time()
+    fmt = cformat(
+        '[%{cyan!}{:6}%{reset}/%{cyan}{}%{reset}  %{yellow!}{:.3f}%{reset}%  %{green!}{}%{reset}]  {:>8}  %{grey!}{}'
+    )
+
+    for i, item in enumerate(iterable, 1):
+        if i % 10 == 0 or i == total:
+            remaining_seconds = int((time.time() - start_time) / i * (total - i))
+            remaining = '{:02}:{:02}'.format(remaining_seconds // 60, remaining_seconds % 60)
+            title = get_title(item).replace('\n', ' ')
+            text = fmt.format(i, total, (i / total * 100.0), remaining, get_id(item), title)
+            print('\r', ' ' * term_width, end='', sep='')
+            # terminal width + ansi control code length - trailing reset code (4)
+            print('\r', text[:term_width + len(text) - len(strip_ansi(text)) - 4], cformat('%{reset}'), end='', sep='')
+            sys.stdout.flush()
+
+        yield item
+
+    print()
+
+
 def conferenceHolderIterator(ch, verbose=True, deepness='subcontrib'):
     """
     Goes over all conferences, printing a status message (ideal for scripts)
@@ -61,31 +92,15 @@ def conferenceHolderIterator(ch, verbose=True, deepness='subcontrib'):
                     yield ('subcontrib', scontrib)
 
     idx = ch._getIdx()
-    total = len(idx.keys())
-    term_width = terminal_size()[0]
-    start_time = time.time()
-    fmt = cformat(
-        '[%{cyan!}{:6}%{reset}/%{cyan}{}%{reset}  %{yellow!}{:.3f}%{reset}%  %{green!}{}%{reset}]  {:>8}  %{grey!}{}'
-    )
+    iterator = idx.iteritems()
+    if verbose:
+        iterator = verbose_iterator(iterator, len(idx.keys()), itemgetter(0), lambda x: x[1].getTitle())
 
-    for i, (id_, conf) in enumerate(idx.iteritems(), 1):
-        if verbose and (i % 10 == 0 or i == total):
-            remaining_seconds = int((time.time() - start_time) / i * (total - i))
-            remaining = '{:02}:{:02}'.format(remaining_seconds // 60, remaining_seconds % 60)
-            title = conf.getTitle().replace('\n', ' ')
-            text = fmt.format(i, total, (i / total * 100.0), remaining, id_, title)
-            print('\r', ' ' * term_width, end='', sep='')
-            # terminal width + ansi control code length - trailing reset code (4)
-            print('\r', text[:term_width + len(text) - len(strip_ansi(text)) - 4], cformat('%{reset}'), end='', sep='')
-            sys.stdout.flush()
-
-        yield ('event', conf)
-        if deepness in ['contrib', 'subcontrib']:
+    for id_, conf in iterator:
+        yield 'event', conf
+        if deepness in {'contrib', 'subcontrib'}:
             for contrib in _eventIterator(conf, 0):
                 yield contrib
-
-    if verbose:
-        print()
 
 
 # Coloring
