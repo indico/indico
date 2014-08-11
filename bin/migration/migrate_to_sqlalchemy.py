@@ -25,7 +25,7 @@ from argparse import ArgumentParser
 from urlparse import urlparse
 from collections import defaultdict
 from datetime import datetime, timedelta
-from operator import itemgetter
+from operator import itemgetter, attrgetter
 from itertools import ifilter
 
 import pytz
@@ -53,9 +53,9 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
-from indico.util.console import colored, cformat
+from indico.util.console import colored, cformat, verbose_iterator
 from indico.util.date_time import as_utc
-from indico.util.string import is_valid_mail
+from indico.util.string import is_valid_mail, safe_upper
 
 
 month_names = [(str(i), name[:3].encode('utf-8').lower())
@@ -241,7 +241,7 @@ def migrate_locations(main_root, rb_root):
     db.session.commit()
 
 
-def migrate_rooms(rb_root, photo_path):
+def migrate_rooms(rb_root, photo_path, avatar_id_map):
     eq = defaultdict(set)
     vc = defaultdict(set)
     for old_room_id, old_room in rb_root['Rooms'].iteritems():
@@ -300,7 +300,7 @@ def migrate_rooms(rb_root, photo_path):
 
             comments=convert_to_unicode(old_room.comments),
 
-            owner_id=old_room.responsibleId,
+            owner_id=avatar_id_map.get(old_room.responsibleId, old_room.responsibleId),
 
             is_active=old_room.isActive,
             is_reservable=old_room.isReservable,
@@ -375,7 +375,7 @@ def migrate_rooms(rb_root, photo_path):
     db.session.commit()
 
 
-def migrate_reservations(main_root, rb_root):
+def migrate_reservations(main_root, rb_root, avatar_id_map):
     print cformat('%{white!}migrating reservations')
     i = 1
     for rid, v in rb_root['Reservations'].iteritems():
@@ -385,17 +385,18 @@ def migrate_reservations(main_root, rb_root):
             continue
 
         repeat_frequency, repeat_interval = convert_reservation_repeatability(v.repeatability)
+        booked_for_id = getattr(v, 'bookedForId', None)
 
         r = Reservation(
             id=v.id,
             created_dt=as_utc(v._utcCreatedDT),
             start_dt=utc_to_local(v._utcStartDT),
             end_dt=utc_to_local(v._utcEndDT),
-            booked_for_id=convert_to_unicode(getattr(v, 'bookedForId', None)) or None,
+            booked_for_id=avatar_id_map.get(booked_for_id, booked_for_id) or None,
             booked_for_name=convert_to_unicode(v.bookedForName),
             contact_email=convert_to_unicode(v.contactEmail),
             contact_phone=convert_to_unicode(getattr(v, 'contactPhone', None)),
-            created_by_id=convert_to_unicode(v.createdBy) or None,
+            created_by_id=avatar_id_map.get(v.createdBy, v.createdBy) or None,
             is_cancelled=v.isCancelled,
             is_accepted=v.isConfirmed,
             is_rejected=v.isRejected,
@@ -470,7 +471,7 @@ def migrate_reservations(main_root, rb_root):
     db.session.commit()
 
 
-def migrate_blockings(rb_root):
+def migrate_blockings(rb_root, avatar_id_map):
     state_map = {
         None: BlockedRoom.State.pending,
         False: BlockedRoom.State.rejected,
@@ -481,7 +482,7 @@ def migrate_blockings(rb_root):
     for old_blocking_id, old_blocking in rb_root['RoomBlocking']['Blockings'].iteritems():
         b = Blocking(
             id=old_blocking.id,
-            created_by_id=convert_to_unicode(old_blocking._createdBy),
+            created_by_id=avatar_id_map.get(old_blocking._createdBy, old_blocking._createdBy),
             created_dt=as_utc(old_blocking._utcCreatedDT),
             start_date=old_blocking.startDate,
             end_date=old_blocking.endDate,
@@ -502,9 +503,12 @@ def migrate_blockings(rb_root):
                                                                      BlockedRoom.State(br.state).title)
 
         for old_principal in old_blocking.allowed:
+            principal_id = old_principal._id
+            if old_principal._type == 'Avatar':
+                principal_id = avatar_id_map.get(old_principal._id, old_principal._id)
             bp = BlockingPrincipal(
                 entity_type=old_principal._type,
-                entity_id=old_principal._id
+                entity_id=principal_id
             )
             b.allowed.append(bp)
             print cformat(u'  %{blue!}Allowed:%{reset} {}({})').format(bp.entity_type, bp.entity_id)
@@ -529,16 +533,27 @@ def fix_sequences():
     db.session.commit()
 
 
-def migrate(main_root, rb_root, photo_path):
+def find_merged_avatars(main_root):
+    print cformat('%{white!}checking for merged avatars')
+    avatar_id_map = {}
+    for avatar in verbose_iterator(main_root['avatars'].itervalues(), len(main_root['avatars']), attrgetter('id'),
+                                   lambda av: '{}, {}'.format(safe_upper(av.surName), av.name)):
+        for merged_avatar in getattr(avatar, '_mergeFrom', []):
+            avatar_id_map[merged_avatar.getId()] = avatar.getId()
+    return avatar_id_map
+
+
+def migrate(main_root, rb_root, photo_path, merged_avatars):
+    avatar_id_map = find_merged_avatars(main_root) if merged_avatars else {}
     migrate_settings(main_root)
     migrate_locations(main_root, rb_root)
-    migrate_rooms(rb_root, photo_path)
-    migrate_blockings(rb_root)
-    migrate_reservations(main_root, rb_root)
+    migrate_rooms(rb_root, photo_path, avatar_id_map)
+    migrate_blockings(rb_root, avatar_id_map)
+    migrate_reservations(main_root, rb_root, avatar_id_map)
     fix_sequences()
 
 
-def main(main_uri, rb_uri, sqla_uri, photo_path, drop):
+def main(main_uri, rb_uri, sqla_uri, photo_path, drop, merged_avatars):
     update_session_options(db)  # get rid of the zope transaction extension
     main_root, rb_root, app = setup(main_uri, rb_uri, sqla_uri)
     global tz
@@ -566,7 +581,7 @@ def main(main_uri, rb_uri, sqla_uri, photo_path, drop):
             if raw_input(cformat('%{yellow!}***%{reset} To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
                 print 'Aborting'
                 sys.exit(1)
-        migrate(main_root, rb_root, photo_path)
+        migrate(main_root, rb_root, photo_path, merged_avatars)
     print 'migration took {} seconds'.format((time.clock() - start))
 
 
@@ -576,7 +591,8 @@ if __name__ == '__main__':
     parser.add_argument('rb', help='Room Booking ZODB file storage URI (zeo:// or file://)', metavar="RB_ZODB_URI")
     parser.add_argument('uri', help='SQLAlchemy database uri', metavar="SQLALCHEMY_URI")
     parser.add_argument('-d', '--drop', help='drop any existing database', action='store_true')
+    parser.add_argument('-m', '--merged', help='take merged avatars into account', action='store_true')
     parser.add_argument('-p', '--photo', help='path to photos of rooms')
 
     args = parser.parse_args()
-    main(args.main, args.rb, args.uri, args.photo, args.drop)
+    main(args.main, args.rb, args.uri, args.photo, args.drop, args.merged)
