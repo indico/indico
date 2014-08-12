@@ -50,7 +50,7 @@ def _get_sql_line():
             return {'module': module_name,
                     'line': item[1],
                     'function': item[2],
-                    'items': stack[i:i+3]}
+                    'items': stack[i:i+5]}
 
 
 def apply_db_loggers(debug=False):
