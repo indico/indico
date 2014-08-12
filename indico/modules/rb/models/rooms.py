@@ -30,7 +30,7 @@ from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.Locators import Locator
 from MaKaC.common.cache import GenericCache
 from MaKaC.errors import MaKaCError
-from MaKaC.user import Avatar, AvatarHolder, GroupHolder
+from MaKaC.user import Avatar, AvatarHolder
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.errors import IndicoError
@@ -573,6 +573,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                         BlockedRoom.state.in_(states))
                 .all())
 
+    @cached(_cache)
     def get_attribute_value(self, name, default=None):
         attr = self.get_attribute_by_name(name)
         return attr.value if attr else default

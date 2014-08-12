@@ -24,6 +24,7 @@ from sqlalchemy import func
 
 from indico.core.db import db
 from indico.modules.rb.models.aspects import Aspect
+from indico.util.caching import memoize_request
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.string import return_ascii
@@ -117,11 +118,13 @@ class Location(db.Model):
         return d
 
     @property
+    @memoize_request
     def is_map_available(self):
         return self.aspects.count() > 0
 
     @classproperty
     @classmethod
+    @memoize_request
     def default_location(cls):
         return cls.query.filter_by(is_default=True).first()
 

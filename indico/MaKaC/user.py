@@ -41,6 +41,7 @@ from MaKaC.common.fossilize import Fossilizable, fossilizes
 
 from pytz import all_timezones
 
+from indico.util.caching import memoize_request
 from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
 from indico.util.user import retrieve_principals
@@ -1037,6 +1038,7 @@ class Avatar(Persistent, Fossilizable):
             return True
         return False
 
+    @memoize_request
     def isRBAdmin(self):
         """
         Convenience method for checking whether this user is an admin for the RB module.
@@ -1050,12 +1052,14 @@ class Avatar(Persistent, Fossilizable):
         return any(principal.containsUser(self) for principal in principals)
 
     @property
+    @memoize_request
     def has_rooms(self):
         """Checks if the user has any rooms"""
         from indico.modules.rb.models.rooms import Room  # avoid circular import
 
         return Room.find(owner_id=self.getId()).count() > 0
 
+    @memoize_request
     def get_rooms(self):
         """Returns the rooms this user is responsible for"""
         from indico.modules.rb.models.rooms import Room  # avoid circular import

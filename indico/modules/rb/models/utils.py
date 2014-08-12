@@ -21,7 +21,7 @@
 Small functions and classes widely used in Room Booking Module.
 """
 
-import json
+import cPickle
 import random
 from datetime import datetime
 from functools import wraps
@@ -32,6 +32,7 @@ from sqlalchemy.sql import over, func
 
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
+from indico.util.caching import make_hashable
 from indico.util.decorators import cached_writable_property
 from indico.util.i18n import _
 
@@ -102,19 +103,26 @@ def cached(cache, primary_key_attr='id', base_ttl=86400*31):
     """
     def decorator(f):
         @wraps(f)
-        def wrapper(self, *args, **kawrgs):
+        def wrapper(self, *args, **kwargs):
             primary_key = getattr(self, primary_key_attr)
             if hasattr(self, 'cache_version'):
-                key = '{}[{}.{}].{}'.format(type(self).__name__, primary_key, self.cache_version, f.__name__)
+                key = u'{}[{}.{}].{}'.format(type(self).__name__, primary_key, self.cache_version, f.__name__)
             else:
-                key = '{}[{}].{}'.format(type(self).__name__, primary_key, f.__name__)
+                key = u'{}[{}].{}'.format(type(self).__name__, primary_key, f.__name__)
+
+            args_key = u', '.join(map(make_hashable, args) +
+                                  [u'{}={}'.format(k, make_hashable(v)) for k, v in sorted(kwargs.viewitems())])
+            if args_key:
+                key = '{}({})'.format(key, args_key)
 
             result = cache.get(key)
-            if result is None:
-                result = f(self, *args, **kawrgs)
-                # Cache the value with a somewhat random expiry so we don't end up with all keys
-                # expiring at the same time if there hasn't been an update for some time
-                cache.set(key, result, base_ttl + 300 * random.randint(0, 200))
+            if result is not None:
+                return cPickle.loads(result)
+
+            result = f(self, *args, **kwargs)
+            # Cache the value with a somewhat random expiry so we don't end up with all keys
+            # expiring at the same time if there hasn't been an update for some time
+            cache.set(key, cPickle.dumps(result), base_ttl + 300 * random.randint(0, 200))
             return result
 
         return wrapper

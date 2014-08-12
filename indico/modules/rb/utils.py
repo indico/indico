@@ -17,9 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from indico.util.caching import memoize_request
 from indico.util.user import retrieve_principals, principals_merge_users
 
 
+@memoize_request
 def rb_check_user_access(user):
     """Checks if the user has access to the room booking system"""
     from indico.modules.rb import settings
