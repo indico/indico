@@ -488,16 +488,18 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         from indico.modules.rb.models.locations import Location
 
         equipment_count = len(filters['available_equipment'])
-        equipment_subquery = (
-            db.session.query(RoomEquipmentAssociation)
-            .with_entities(func.count(RoomEquipmentAssociation.c.room_id))
-            .filter(
-                RoomEquipmentAssociation.c.room_id == Room.id,
-                RoomEquipmentAssociation.c.equipment_id.in_(eq.id for eq in filters['available_equipment'])
+        equipment_subquery = None
+        if equipment_count:
+            equipment_subquery = (
+                db.session.query(RoomEquipmentAssociation)
+                .with_entities(func.count(RoomEquipmentAssociation.c.room_id))
+                .filter(
+                    RoomEquipmentAssociation.c.room_id == Room.id,
+                    RoomEquipmentAssociation.c.equipment_id.in_(eq.id for eq in filters['available_equipment'])
+                )
+                .correlate(Room)
+                .as_scalar()
             )
-            .correlate(Room)
-            .as_scalar()
-        )
 
         q = (
             Room.query
@@ -509,7 +511,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 Room.is_auto_confirm if filters['is_auto_confirm'] else True,
                 Room.is_active if filters.get('is_only_active', False) else True,
                 Room.owner_id == avatar.getId() if filters.get('is_only_my_rooms') else True,
-                (equipment_subquery == equipment_count) if equipment_count else True)
+                (equipment_subquery == equipment_count) if equipment_subquery else True)
         )
 
         if filters['available'] != -1:
@@ -659,7 +661,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         manager_group = self.get_attribute_value('manager-group')
         if not manager_group:
             return False
-        return avatar.is_member_of_group(manager_group)
+        return avatar.is_member_of_group(manager_group.encode('utf-8'))
 
     def check_advance_days(self, end_date, user=None, quiet=False):
         if not self.max_advance_days:
