@@ -24,6 +24,7 @@ Module containing the Indico exception class hierarchy
 import traceback
 
 from indico.util.i18n import _
+from indico.util.translations import ensure_str
 
 
 class IndicoError(Exception):
@@ -35,6 +36,7 @@ class IndicoError(Exception):
         self._area = area
         self._explanation = explanation
 
+    @ensure_str
     def __str__(self):
         if self._area:
             return '{} - {}'.format(self._area, self._message)
@@ -72,6 +74,7 @@ class AccessControlError(IndicoError):
         self._object_type = kw.pop('object_type', 'object')
         super(AccessControlError, self).__init__(**kw)
 
+    @ensure_str
     def __str__(self):
         return _('you are not authorised to access this {0}').format(self._object_type)
 
@@ -84,6 +87,7 @@ class ConferenceClosedError(IndicoError):
         self._conf = kw.pop('conf', None)
         super(ConferenceClosedError, self).__init__(**kw)
 
+    @ensure_str
     def __str__(self):
         return _('the event has been closed')
 
@@ -108,6 +112,7 @@ class ModificationError(AccessControlError):
     """
     """
 
+    @ensure_str
     def __str__(self):
         return _('you are not authorised to modify this {0}').format(self._object_type)
 
@@ -116,6 +121,7 @@ class AdminError(AccessControlError):
     """
     """
 
+    @ensure_str
     def __str__(self):
         return _('only administrators can access this {0}').format(self._object_type)
 
@@ -124,6 +130,7 @@ class WebcastAdminError(AccessControlError):
     """
     """
 
+    @ensure_str
     def __str__(self):
         return _('only webcast administrators can access this {0}').format(self._object_type)
 
@@ -148,6 +155,7 @@ class UserError(IndicoError):
     """
     """
 
+    @ensure_str
     def __str__(self):
         if self._message:
             return self._message
