@@ -18,6 +18,7 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sys
 
 from flask_script import Manager
 
@@ -36,10 +37,15 @@ def app_factory():
 
 
 manager = Manager(app_factory, with_default_commands=False)
-manager.add_command('shell', IndicoShell())
+manager.add_command('admin', IndicoAdminManager)
 manager.add_command('db', DatabaseManager)
 manager.add_command('runserver', IndicoDevServer())
+manager.add_command('shell', IndicoShell())
 
 
 def main():
-    manager.run()
+    try:
+        manager.run()
+    except KeyboardInterrupt:
+        print
+        sys.exit(1)
