@@ -162,9 +162,6 @@ class WPMainBase(base.WPDecorated):
     def _getBody(self, params):
         return _("nothing yet")
 
-    def getCSSFiles(self):
-        return base.WPDecorated.getCSSFiles(self) + self._asset_env['main_sass'].urls()
-
 
 class WMainBase(wcomponents.WTemplated):
 
