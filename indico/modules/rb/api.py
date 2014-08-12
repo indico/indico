@@ -80,8 +80,8 @@ class RoomHook(RoomBookingHookBase):
             return
 
         # Retrieve rooms
-        rooms_data = list(Room.getRoomsWithData('vc_equipment', 'non_vc_equipment',
-                                                filters=[Room.id.in_(self._ids), Room.location_id == loc.id]))
+        rooms_data = list(Room.get_with_data('vc_equipment', 'non_vc_equipment',
+                                             filters=[Room.id.in_(self._ids), Room.location_id == loc.id]))
 
         # Retrieve reservations
         reservations = None
@@ -121,8 +121,8 @@ class RoomNameHook(RoomBookingHookBase):
             return
 
         search_str = '%{}%'.format(self._room_name)
-        rooms_data = Room.getRoomsWithData('vc_equipment', 'non_vc_equipment',
-                                           filters=[Room.location_id == loc.id, Room.name.ilike(search_str)])
+        rooms_data = Room.get_with_data('vc_equipment', 'non_vc_equipment',
+                                        filters=[Room.location_id == loc.id, Room.name.ilike(search_str)])
         for result in rooms_data:
             yield _serializable_room(result)
 

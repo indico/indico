@@ -63,8 +63,8 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         key = str(sorted(dict(request.args, lang=session.lang, user=session.user.getId()).items()))
         html = self._cache.get(key)
         if not html:
-            default_location = Location.getDefaultLocation()
-            aspects = default_location.getAspectsAsDictionary()
+            default_location = Location.default_location
+            aspects = [a.to_serializable() for a in default_location.aspects]
             buildings = default_location.get_buildings()
             html = WPRoomBookingMapOfRoomsWidget(self,
                                                  aspects=aspects,
@@ -87,7 +87,7 @@ class RHRoomBookingSearchRooms(RHRoomBookingBase):
         return request.form
 
     def _checkParams(self):
-        defaults = FormDefaults(location=Location.getDefaultLocation())
+        defaults = FormDefaults(location=Location.default_location)
         self._form = SearchRoomsForm(self._get_form_data(), obj=defaults)
         if not session.user.has_rooms and not hasattr(self, 'search_criteria'):
             # Remove the form element if the user has no rooms and we are not using a shortcut
@@ -99,7 +99,7 @@ class RHRoomBookingSearchRooms(RHRoomBookingBase):
     def _process(self):
         form = self._form
         if self._is_submitted() and form.validate():
-            rooms = Room.getRoomsForRoomList(form, session.user)
+            rooms = Room.find_with_filters(form.data, session.user)
             return WPRoomBookingSearchRoomsResults(self, self.menu_item, rooms=rooms).display()
         equipment_locations = {eq.id: eq.location_id for eq in EquipmentType.find()}
         return WPRoomBookingSearchRooms(self, form=form, errors=form.error_list, rooms=Room.find_all(),
@@ -120,7 +120,8 @@ class RHRoomBookingSearchRoomsShortcutBase(RHRoomBookingSearchRooms):
 class RHRoomBookingSearchMyRooms(RHRoomBookingSearchRoomsShortcutBase):
     menu_item = 'myRoomList'
     search_criteria = {
-        'is_only_my_rooms': True
+        'is_only_my_rooms': True,
+        'location': None
     }
 
 

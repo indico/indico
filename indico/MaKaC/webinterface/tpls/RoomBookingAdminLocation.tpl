@@ -49,7 +49,7 @@
           <select id="roomID">
             % for room in rooms:
               <option value="${ room.id }" class="${ room.kind }">
-                ${ room.getFullName() }
+                ${ room.full_name }
               </option>
             % endfor
           </select>

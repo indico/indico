@@ -44,6 +44,7 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.utils import Serializer, cached, versioned_cache
+from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.string import return_ascii, natural_sort_key
 from indico.web.flask.util import url_for
@@ -337,7 +338,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def has_equipment(self, equipment_name):
         return self.available_equipment.filter_by(name=equipment_name).count() > 0
 
-    def find_available_video_conference(self):
+    def find_available_vc_equipment(self):
         vc_equipment = self.available_equipment \
                            .correlate(Room) \
                            .with_entities(EquipmentType.id) \
@@ -345,18 +346,18 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                            .as_scalar()
         return self.available_equipment.filter(EquipmentType.parent_id == vc_equipment)
 
-    def getAttributeByName(self, attribute_name):
-        return self.attributes \
-                   .join(RoomAttribute) \
-                   .filter(RoomAttribute.name == attribute_name) \
-                   .first()
+    def get_attribute_by_name(self, attribute_name):
+        return (self.attributes
+                .join(RoomAttribute)
+                .filter(RoomAttribute.name == attribute_name)
+                .first())
 
     def has_attribute(self, attribute_name):
-        return self.getAttributeByName(attribute_name) is not None
+        return self.get_attribute_by_name(attribute_name) is not None
 
     def getLocator(self):
         locator = Locator()
-        locator['roomLocation'] = self.location.name
+        locator['roomLocation'] = self.location_name
         locator['roomID'] = self.id
         return locator
 
@@ -367,24 +368,15 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             self.number
         )
 
-    def getFullName(self):
-        return self.full_name
-
     def update_name(self):
         if not self.has_special_name and self.building and self.floor and self.number:
             self.name = self.generate_name()
 
-    def getAccessKey(self):
-        return ''
-
     @classmethod
     def find_all(cls, *args, **kwargs):
-        """
-        Sorts by location and full name.
-        """
-        # TODO: not complete yet
+        """Retrieves rooms, sorted by location and full name"""
         rooms = super(Room, cls).find_all(*args, **kwargs)
-        rooms.sort(key=lambda x: natural_sort_key(x.location.name + x.getFullName()))
+        rooms.sort(key=lambda r: natural_sort_key(r.location_name + r.full_name))
         return rooms
 
     @classmethod
@@ -397,7 +389,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 .all())
 
     @staticmethod
-    def getRoomsWithData(*args, **kwargs):
+    def get_with_data(*args, **kwargs):
         from indico.modules.rb.models.locations import Location
 
         only_active = kwargs.pop('only_active', True)
@@ -462,17 +454,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         keys = ('room',) + tuple(args)
         return (dict(zip(keys, row if args else [row])) for row in query)
 
+    @classproperty
     @staticmethod
-    def getMaxCapacity():
-        key = 'maxcapacity'
-        max_capacity = _cache.get(key)
-        if max_capacity is None:
-            records = Room.query \
-                          .with_entities(func.max(Room.capacity).label('capacity')) \
-                          .all()
-            max_capacity = records[0].capacity
-            _cache.set(key, max_capacity, 300)
-        return max_capacity
+    def max_capacity():
+        return db.session.query(db.func.max(Room.capacity)).scalar() or 0
 
     @staticmethod
     def filter_available(start_dt, end_dt, repetition, include_pre_bookings=True, include_pending_blockings=True):
@@ -499,16 +484,16 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return ~occurrences_filter & ~blockings_filter
 
     @staticmethod
-    def getRoomsForRoomList(form, avatar):
+    def find_with_filters(filters, avatar):
         from indico.modules.rb.models.locations import Location
 
-        equipment_count = len(form.available_equipment.data)
+        equipment_count = len(filters['available_equipment'])
         equipment_subquery = (
             db.session.query(RoomEquipmentAssociation)
             .with_entities(func.count(RoomEquipmentAssociation.c.room_id))
             .filter(
                 RoomEquipmentAssociation.c.room_id == Room.id,
-                RoomEquipmentAssociation.c.equipment_id.in_(eq.id for eq in form.available_equipment.data)
+                RoomEquipmentAssociation.c.equipment_id.in_(eq.id for eq in filters['available_equipment'])
             )
             .correlate(Room)
             .as_scalar()
@@ -518,34 +503,34 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             Room.query
             .join(Location.rooms)
             .filter(
-                Location.id == form.location.data.id if form.location.data else True,
-                (Room.capacity >= (form.capacity.data * 0.8)) if form.capacity.data else True,
-                Room.is_reservable if form.is_only_public.data else True,
-                Room.is_auto_confirm if form.is_auto_confirm.data else True,
-                Room.is_active if form.is_only_active.data or not form.is_only_active else True,
-                Room.owner_id == avatar.getId() if form.is_only_my_rooms and form.is_only_my_rooms.data else True,
+                Location.id == filters['location'].id if filters['location'] else True,
+                (Room.capacity >= (filters['capacity'] * 0.8)) if filters['capacity'] else True,
+                Room.is_reservable if filters['is_only_public'] else True,
+                Room.is_auto_confirm if filters['is_auto_confirm'] else True,
+                Room.is_active if filters.get('is_only_active', False) else True,
+                Room.owner_id == avatar.getId() if filters.get('is_only_my_rooms') else True,
                 (equipment_subquery == equipment_count) if equipment_count else True)
         )
 
-        if form.available.data != -1:
-            repetition = RepeatMapping.getNewMapping(ast.literal_eval(form.repeatability.data))
-            is_available = Room.filter_available(form.start_dt.data, form.end_dt.data, repetition,
-                                                 include_pre_bookings=form.include_pre_bookings.data,
-                                                 include_pending_blockings=form.include_pending_blockings.data)
+        if filters['available'] != -1:
+            repetition = RepeatMapping.getNewMapping(ast.literal_eval(filters['repeatability']))
+            is_available = Room.filter_available(filters['start_dt'], filters['end_dt'], repetition,
+                                                 include_pre_bookings=filters['include_pre_bookings'],
+                                                 include_pending_blockings=filters['include_pending_blockings'])
             # Filter the search results
-            if form.available.data == 0:  # booked/unavailable
+            if filters['available'] == 0:  # booked/unavailable
                 q = q.filter(~is_available)
-            elif form.available.data == 1:  # available
+            elif filters['available'] == 1:  # available
                 q = q.filter(is_available)
 
         free_search_columns = (
             'name', 'site', 'division', 'building', 'floor', 'number', 'telephone', 'key_location', 'comments'
         )
-        if form.details.data:
+        if filters['details']:
             # Attributes are stored JSON-encoded, so we need to JSON-encode the provided string and remove the quotes
             # afterwards since PostgreSQL currently does not expose a function to decode a JSON string:
             # http://www.postgresql.org/message-id/51FBF787.5000408@dunslane.net
-            details = form.details.data.lower()
+            details = filters['details'].lower()
             details_str = u'%{}%'.format(details)
             details_json = u'%{}%'.format(json.dumps(details)[1:-1])
             free_search_criteria = [getattr(Room, c).ilike(details_str) for c in free_search_columns]
@@ -556,25 +541,21 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         q = q.order_by(Room.capacity)
         rooms = q.all()
         # Apply a bunch of filters which are *much* easier to do here than in SQL!
-        if form.is_only_public.data:
+        if filters['is_only_public']:
             # This may trigger additional SQL queries but is_public is cached and doing this check here is *much* easier
             rooms = [r for r in rooms if r.is_public]
-        if form.capacity.data:
+        if filters['capacity']:
             # Unless it would result in an empty resultset we don't want to show room which >20% more capacity
             # than requested. This cannot be done easily in SQL so we do that logic here after the SQL query already
             # weeded out rooms that are too small
-            matching_capacity_rooms = [r for r in rooms if r.capacity <= form.capacity.data * 1.2]
+            matching_capacity_rooms = [r for r in rooms if r.capacity <= filters['capacity'] * 1.2]
             if matching_capacity_rooms:
                 rooms = matching_capacity_rooms
         return rooms
 
-    def getResponsible(self):
+    @property
+    def owner(self):
         return AvatarHolder().getById(self.owner_id)
-
-    def getResponsibleName(self):
-        r = self.getResponsible()
-        if r:
-            return r.getFullName()
 
     def has_live_reservations(self):
         return self.reservations.filter_by(
@@ -582,10 +563,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             is_cancelled=False,
             is_rejected=False
         ).count() > 0
-
-    @staticmethod
-    def isAvatarResponsibleForRooms(avatar):
-        return Room.query.filter_by(owner_id=avatar.id).count() > 0
 
     def get_blocked_rooms(self, *dates, **kwargs):
         states = kwargs.get('states', (BlockedRoom.State.accepted,))
@@ -597,11 +574,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 .all())
 
     def get_attribute_value(self, name, default=None):
-        attr = self.getAttributeByName(name)
+        attr = self.get_attribute_by_name(name)
         return attr.value if attr else default
 
     def set_attribute_value(self, name, value):
-        attr = self.getAttributeByName(name)
+        attr = self.get_attribute_by_name(name)
         if attr:
             if value:
                 attr.value = value
@@ -609,7 +586,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 self.attributes.filter(RoomAttributeAssociation.attribute_id == attr.attribute_id) \
                     .delete(synchronize_session='fetch')
         elif value:
-            attr = self.location.getAttributeByName(name)
+            attr = self.location.get_attribute_by_name(name)
             if not attr:
                 raise ValueError("Attribute {} not supported in location {}".format(name, self.location_name))
             attr_assoc = RoomAttributeAssociation()
@@ -682,20 +659,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if not manager_group:
             return False
         return avatar.is_member_of_group(manager_group)
-
-    def getGroups(self, group_name):
-        groups = GroupHolder().match({'name': group_name}, exact=True, searchInAuthenticators=False)
-        if groups:
-            return groups
-        return GroupHolder().match({'name': group_name}, exact=True)
-
-    def getAllManagers(self):
-        managers = {self.owner_id}
-        manager_group = self.get_attribute_value('manager-group')
-        groups = self.getGroups(manager_group) if manager_group else None
-        if groups and len(groups) == 1:
-            managers |= set(groups[0].getMemberList())
-        return managers
 
     def check_advance_days(self, end_date, user=None, quiet=False):
         if not self.max_advance_days:

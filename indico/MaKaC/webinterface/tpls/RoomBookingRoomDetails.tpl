@@ -50,7 +50,7 @@
                             ${ _('Location') }&nbsp;&nbsp;
                           </td>
                           <td align="left" class="blacktext">
-                            ${ room.location.name }
+                            ${ room.location_name }
                           </td>
                         </tr>
                         <tr>

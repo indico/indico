@@ -250,7 +250,7 @@ def migrate_rooms(rb_root, photo_path, avatar_id_map):
 
     print cformat('%{white!}migrating equipment')
     for name, eqs in eq.iteritems():
-        l = Location.getLocationByName(name)
+        l = Location.find_first(name=name)
         l.equipment_types.extend(EquipmentType(name=x) for x in eqs)
         print cformat('- [%{cyan}{}%{reset}] {}').format(name, eqs)
         db.session.add(l)
@@ -259,7 +259,7 @@ def migrate_rooms(rb_root, photo_path, avatar_id_map):
 
     print cformat('%{white!}migrating vc equipment')
     for name, vcs in vc.iteritems():
-        l = Location.getLocationByName(name)
+        l = Location.find_first(name=name)
         pvc = l.get_equipment_by_name('Video conference')
         for vc_name in vcs:
             req = EquipmentType(name=vc_name)
@@ -272,7 +272,7 @@ def migrate_rooms(rb_root, photo_path, avatar_id_map):
 
     print cformat('%{white!}migrating rooms')
     for old_room_id, old_room in rb_root['Rooms'].iteritems():
-        l = Location.getLocationByName(old_room._locationName)
+        l = Location.find_first(name=old_room._locationName)
         r = Room(
             id=old_room_id,
             name=convert_to_unicode((old_room._name or '').strip() or generate_name(old_room)),
@@ -359,7 +359,7 @@ def migrate_rooms(rb_root, photo_path, avatar_id_map):
             if not value or ('Simba' in attr_name and value == u'Error: unknown mailing list'):
                 continue
             attr_name = attribute_map.get(attr_name, attr_name).replace(' ', '-').lower()
-            ca = l.getAttributeByName(attr_name)
+            ca = l.get_attribute_by_name(attr_name)
             if not ca:
                 print cformat('  %{blue!}Attribute:%{reset} {} %{red!}not found').format(attr_name)
                 continue
@@ -499,7 +499,7 @@ def migrate_blockings(rb_root, avatar_id_map):
             room = Room.get(get_room_id(old_blocked_room.roomGUID))
             room.blocked_rooms.append(br)
             b.blocked_rooms.append(br)
-            print cformat(u'  %{blue!}Room:%{reset} {} ({})').format(room.getFullName(),
+            print cformat(u'  %{blue!}Room:%{reset} {} ({})').format(room.full_name,
                                                                      BlockedRoom.State(br.state).title)
 
         for old_principal in old_blocking.allowed:

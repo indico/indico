@@ -1051,16 +1051,13 @@ class Avatar(Persistent, Fossilizable):
 
     @property
     def has_rooms(self):
-        """Does the user own any rooms?"""
+        """Checks if the user has any rooms"""
         from indico.modules.rb.models.rooms import Room  # avoid circular import
 
-        return Room.isAvatarResponsibleForRooms(self)
+        return Room.find(owner_id=self.getId()).count() > 0
 
-    def getRooms(self):
-        """
-        Returns list of rooms (RoomBase derived objects) this
-        user is responsible for.
-        """
+    def get_rooms(self):
+        """Returns the rooms this user is responsible for"""
         from indico.modules.rb.models.rooms import Room  # avoid circular import
         return Room.find_all(is_active=True, owner_id=self.getId())
 

@@ -148,7 +148,8 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
 
         self._leftMenu.addSection(self._roomsBookingOpt)
         self._roomsBookingOpt.addItem(self._bookRoomNewOpt)
-        if Location.getDefaultLocation() and Location.getDefaultLocation().isMapAvailable():
+        default_location = Location.default_location
+        if default_location and default_location.is_map_available:
             self._roomsBookingOpt.addItem(self._roomMapOpt)
         self._roomsBookingOpt.addItem(self._bookingListCalendarOpt)
 

@@ -102,7 +102,3 @@ class EquipmentType(db.Model):
     @return_ascii
     def __repr__(self):
         return u'<EquipmentType({0}, {1}, {2})>'.format(self.id, self.name, self.location_id)
-
-    @staticmethod
-    def getEquipmentNames():
-        return EquipmentType.query.with_entities(EquipmentType.name).all()

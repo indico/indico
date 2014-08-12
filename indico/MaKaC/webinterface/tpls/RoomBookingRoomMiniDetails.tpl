@@ -16,15 +16,15 @@
                         % if room.name == roomItem.name:
                             <% selected = 'selected' %>
                         % endif
-                        <option data-location="${ roomItem.location.name }" data-id="${ roomItem.id }" ${ selected } class="${ roomItem.kind }">
-                            ${ roomItem.location.name + ": " + roomItem.getFullName() }
+                        <option data-location="${ roomItem.location_name }" data-id="${ roomItem.id }" ${ selected } class="${ roomItem.kind }">
+                            ${ roomItem.location_name + ": " + roomItem.full_name }
                         </option>
                     % endfor
                 </select>
                 <a target="_blank" href="${ url_for(endpoints['room_details'], event, room) }">${ _('Full details') }</a>
             % else:
                 <a href="${ url_for(endpoints['room_details'], event, room) }">
-                    ${ room.getFullName() }
+                    ${ room.full_name }
                 </a>
             % endif
         </td>

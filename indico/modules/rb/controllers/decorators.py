@@ -45,11 +45,10 @@ def requires_location(f, parameter_name='roomLocation', attribute_name='_locatio
             raise IndicoError(_('Wrong usage of location decorator'))
 
         location_name = getattr(request, request_attribute).get(parameter_name, None)
-        location = Location.getLocationByName(location_name)
-        if location:
-            setattr(args[0], attribute_name, location)
-        else:
+        location = Location.find_first(name=location_name)
+        if not location:
             raise NotFoundError(_('There is no location named: {0}').format(location_name))
+        setattr(args[0], attribute_name, location)
         return f(*args, **kw)
 
     return wrapper

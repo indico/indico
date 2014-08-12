@@ -59,7 +59,7 @@ class RHRoomBookingCreateModifyBlockingBase(RHRoomBookingBase):
     def _process_blocked_rooms(self, blocked_rooms):
         rooms_by_owner = defaultdict(list)
         for blocked_room in blocked_rooms:
-            owner = blocked_room.room.getResponsible()
+            owner = blocked_room.room.owner
             if owner == session.user:
                 blocked_room.approve(False)
                 flash(_(u"Blocking for your room '{0}' has been accepted automatically").format(
@@ -183,7 +183,7 @@ class RHRoomBookingBlockingsForMyRooms(RHRoomBookingBase):
     def _process(self):
         state = BlockedRoom.State.get(self.state)
         my_blocks = defaultdict(list)
-        for room in session.user.getRooms():
+        for room in session.user.get_rooms():
             roomBlocks = room.blocked_rooms.filter(True if state is None else BlockedRoom.state == state).all()
             if roomBlocks:
                 my_blocks[room] += roomBlocks

@@ -78,7 +78,7 @@ class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):
         if self._isActive is not None:
             criteria['is_active'] = self._isActive
         rooms = Room.find_all(**criteria)
-        return {room.id: '{}: {}'.format(room.location_name, room.getFullName()) for room in rooms}
+        return {room.id: '{}: {}'.format(room.location_name, room.full_name) for room in rooms}
 
 
 class RoomBookingLocationsAndRoomsGetLink(ServiceBase):

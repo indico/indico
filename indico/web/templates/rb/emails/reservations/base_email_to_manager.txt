@@ -1,5 +1,5 @@
 {% extends 'rb/emails/base_email.txt' %}
-{% block recipient %}{{ reservation.room.getResponsible().getFirstName() }}{% endblock %}
+{% block recipient %}{{ reservation.room.owner.getFirstName() }}{% endblock %}
 
 {% block email_body -%}
 {% block body %}{% endblock %}

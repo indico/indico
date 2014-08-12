@@ -36,7 +36,7 @@
                 <tr class="blockingHover" data-id="${ rb.id }">
                     <td>
                         % if lastRoom is not room:
-                            <a href="${ urlHandlers.UHRoomBookingRoomDetails.getURL(room) }"><strong>${ room.getFullName() }</strong></a>
+                            <a href="${ urlHandlers.UHRoomBookingRoomDetails.getURL(room) }"><strong>${ room.full_name }</strong></a>
                         % endif
                     </td>
                     <td>${ formatDate(rb.blocking.start_date) }&nbsp;&mdash;&nbsp;${ formatDate(rb.blocking.end_date) }</td>

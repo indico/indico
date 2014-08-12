@@ -26,8 +26,8 @@ from indico.web.flask.util import url_for
 
 class RHRoomBookingWelcome(RHRoomBookingBase):
     def _process(self):
-        default_location = Location.getDefaultLocation()
-        if default_location and default_location.isMapAvailable():
+        default_location = Location.default_location
+        if default_location and default_location.is_map_available:
             self._redirect(UH.UHRoomBookingMapOfRooms.getURL())
         else:
             self._redirect(url_for('rooms.book'))

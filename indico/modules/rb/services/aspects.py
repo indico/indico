@@ -36,7 +36,7 @@ class RoomBookingMapBase(ServiceBase):
 
 class RoomBookingMapCreateAspect(RoomBookingMapBase):
     def _checkParams(self):
-        self._location = Location.getLocationByName(self._param('location'))
+        self._location = Location.find_first(name=self._param('location'))
         aspect_data = self._param('aspect')
         try:
             zoom_level = int(aspect_data.get('zoom_level', '0'))
@@ -55,49 +55,45 @@ class RoomBookingMapCreateAspect(RoomBookingMapBase):
         self._default_on_startup = aspect_data.get('DefaultOnStartup', False)
 
     def _getAnswer(self):
-        self._location.addAspect(self._aspect)
+        self._location.aspects.append(self._aspect)
         if self._default_on_startup:
             self._location.default_aspect = self._aspect
-        db.session.add(self._location)
         db.session.flush()
         return self._aspect.id
-        # return self._location.getAspectsAsDictionary()
 
 
 class RoomBookingMapUpdateAspect(RoomBookingMapBase):
     def _checkParams(self):
-        self._location = Location.getLocationByName(self._param('location'))
+        self._location = Location.find_first(name=self._param('location'))
         self._aspect = self._param('aspect')
 
     def _getAnswer(self):
-        aspect = self._location.getAspectById(self._aspect.pop('id'))
+        aspect = self._location.aspects.filter_by(id=self._aspect.pop('id')).first()
         if aspect:
             default_on_startup = self._aspect.pop('default_on_startup')
-            aspect.updateFromDictionary(self._aspect)
+            for k, v in self._aspect.iteritems():
+                setattr(aspect, k, v)
             if default_on_startup:
                 self._location.default_aspect = aspect
             elif self._location.default_aspect.id == aspect.id:
                 self._location.default_aspect = None
-            db.session.add(self._location)
             db.session.flush()
         return {}
-        # return self._location.getAspectsAsDictionary()
 
 
 class RoomBookingMapRemoveAspect(RoomBookingMapBase):
     def _checkParams(self):
-        self._location = Location.getLocationByName(self._param('location'))
+        self._location = Location.find_first(name=self._param('location'))
         self._aspectId = self._param('aspectId')
 
     def _getAnswer(self):
-        self._location.removeAspectById(self._aspectId)
-        db.session.add(self._location)
+        self._location.aspects.filter_by(id=self._aspectId).delete()
         return {}
 
 
 class RoomBookingMapListAspects(RoomBookingMapBase):
     def _checkParams(self):
-        self._location = Location.getLocationByName(self._param('location'))
+        self._location = Location.find_first(name=self._param('location'))
 
     def _getAnswer(self):
-        return self._location.getAspectsAsDictionary()
+        return [a.to_serializable() for a in self._location.aspects]

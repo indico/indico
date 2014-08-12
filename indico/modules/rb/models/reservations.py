@@ -274,7 +274,7 @@ class Reservation(Serializer, db.Model):
 
     @property
     def location_name(self):
-        return self.room.location.name
+        return self.room.location_name
 
     @property
     def repetition(self):
@@ -374,10 +374,6 @@ class Reservation(Serializer, db.Model):
 
         return result.values()
 
-    @staticmethod
-    def getReservationByCreationTime(dt):
-        return Reservation.query.filter_by(created_dt=dt).first()
-
     @property
     def created_by_user(self):
         return AvatarHolder().getById(self.created_by_id) if self.created_by_id else None
@@ -393,15 +389,6 @@ class Reservation(Serializer, db.Model):
     @booked_for_user.setter
     def booked_for_user(self, user):
         self.booked_for_id = user.getId() if user else None
-
-    def getCreator(self):
-        return self.created_by_user
-
-    def getBookedForUser(self):
-        return self.booked_for_user
-
-    def setBookedForUser(self, avatar):
-        self.booked_for_id = avatar and avatar.getId()
 
     @property
     def contact_emails(self):
@@ -678,12 +665,9 @@ class Reservation(Serializer, db.Model):
 
     def getLocator(self):
         locator = Locator()
-        locator['roomLocation'] = self.room.location_name
+        locator['roomLocation'] = self.location_name
         locator['resvID'] = self.id
         return locator
-
-    def can_be_accepted(self, user):
-        return user and (user.isRBAdmin() or self.room.is_owned_by(user))
 
     def can_be_modified(self, user):
         if not user:
@@ -696,6 +680,9 @@ class Reservation(Serializer, db.Model):
 
     def can_be_cancelled(self, user):
         return user and (self.is_owned_by(user) or user.isRBAdmin() or self.is_booked_for(user))
+
+    def can_be_accepted(self, user):
+        return user and (user.isRBAdmin() or self.room.is_owned_by(user))
 
     def can_be_rejected(self, user):
         return user and (user.isRBAdmin() or self.room.is_owned_by(user))

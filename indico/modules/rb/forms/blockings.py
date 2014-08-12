@@ -65,7 +65,7 @@ class BlockingForm(IndicoForm):
             _join=Blocking
         )
         if overlap:
-            msg = 'Your blocking for {} is overlapping with another blocking.'.format(overlap.room.getFullName())
+            msg = 'Your blocking for {} is overlapping with another blocking.'.format(overlap.room.full_name)
             raise ValidationError(msg)
 
     def validate_principals(self, field):

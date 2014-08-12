@@ -24,6 +24,7 @@ from sqlalchemy import func
 
 from indico.core.db import db
 from indico.modules.rb.models.aspects import Aspect
+from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from MaKaC.common.Locators import Locator
@@ -115,36 +116,14 @@ class Location(db.Model):
         d['locationId'] = self.name
         return d
 
-    def getAspects(self):
-        return self.aspects.all()
-
-    def getAspectsAsDictionary(self):
-        return [aspect.toDictionary() for aspect in self.getAspects()]
-
-    def getAspectById(self, aid):
-        return self.aspects.filter_by(id=aid).first()
-
-    def removeAspectById(self, aid):
-        return self.aspects.filter_by(id=aid).delete()
-
-    def addAspect(self, aspect):
-        self.aspects.append(aspect)
-
-    def deleteAspect(self, aspect):
-        self.aspects.remove(aspect)
-
-    def getDefaultAspect(self):
-        return self.default_aspect
-
-    def setDefaultAspect(self, aspect):
-        self.default_aspect = aspect
-
-    def isMapAvailable(self):
+    @property
+    def is_map_available(self):
         return self.aspects.count() > 0
 
-    @staticmethod
-    def getDefaultLocation():
-        return Location.query.filter_by(is_default=True).first()
+    @classproperty
+    @classmethod
+    def default_location(cls):
+        return cls.query.filter_by(is_default=True).first()
 
     def set_default(self):
         if self.is_default:
@@ -153,11 +132,7 @@ class Location(db.Model):
          .filter(Location.is_default | (Location.id == self.id))
          .update({'is_default': func.not_(Location.is_default)}, synchronize_session='fetch'))
 
-    @staticmethod
-    def getLocationByName(name):
-        return Location.query.filter_by(name=name).first()
-
-    def getAttributeByName(self, name):
+    def get_attribute_by_name(self, name):
         return self.attributes.filter_by(name=name).first()
 
     def get_equipment_by_name(self, name):

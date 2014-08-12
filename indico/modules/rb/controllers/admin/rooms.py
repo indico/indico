@@ -138,7 +138,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         if self._form.owner_id.data:
             room_owner = AvatarHolder().getById(self._form.owner_id.data)
         elif self._room.id is not None:
-            room_owner = self._room.getResponsible()
+            room_owner = self._room.owner
 
         if self._form.validate_on_submit():
             self._save()

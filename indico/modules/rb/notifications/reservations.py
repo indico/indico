@@ -39,7 +39,7 @@ class ReservationNotification(object):
         return self._make_email(to_list, subject, body)
 
     def compose_email_to_manager(self, **mail_params):
-        to_list = {self.reservation.room.getResponsible().getEmail()} | self.reservation.room.notification_emails
+        to_list = {self.reservation.room.owner.getEmail()} | self.reservation.room.notification_emails
         subject = self._get_email_subject(**mail_params)
         body = self._make_body(mail_params, reservation=self.reservation)
         return self._make_email(to_list, subject, body)

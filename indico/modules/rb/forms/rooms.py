@@ -53,7 +53,8 @@ def _group_equipment(objects):
 
 
 class SearchRoomsForm(IndicoForm):
-    location = QuerySelectField(_(u'Location'), get_label=lambda x: x.name, query_factory=Location.find)
+    location = QuerySelectField(_(u'Location'), get_label=lambda x: x.name, query_factory=Location.find,
+                                allow_blank=True)
     details = StringField()
     available = RadioField(_(u'Availability'), coerce=int, default=-1, widget=ConcatWidget(prefix_label=False),
                            choices=[(1, _(u'Available')), (0, _(u'Booked')), (-1, _(u"Don't care"))])

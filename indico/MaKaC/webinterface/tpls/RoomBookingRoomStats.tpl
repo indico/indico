@@ -18,7 +18,7 @@
                         ${ ('Location') }
                     </td>
                     <td align="left" class="blacktext">
-                        ${ room.location.name }
+                        ${ room.location_name }
                     </td>
                 </tr>
                 <tr>
@@ -158,7 +158,7 @@
         $('input[name=period]').on('change', function(e) {
             var url_template = ${ url_rule_to_js('rooms.roomBooking-roomStats') | n,j };
             location.href = build_url(url_template, {
-                roomLocation: ${ room.location.name | n, j},
+                roomLocation: ${ room.location_name | n, j},
                 roomID: ${ room.id | n, j },
                 period: this.value
             });

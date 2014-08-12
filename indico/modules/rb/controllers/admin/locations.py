@@ -62,7 +62,7 @@ class RHRoomBookingSaveLocation(RHRoomBookingAdminBase):
             raise FormValuesError(_('Location name may not be empty'))
         if '/' in self._locationName:
             raise FormValuesError(_('Location name may not contain slashes'))
-        if Location.getLocationByName(self._locationName):
+        if Location.find_first(name=self._locationName):
             raise FormValuesError(_('Location "{0}" already exists').format(self._locationName))
 
     def _process(self):
@@ -84,7 +84,7 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
         self._with_kpi = request.args.get('withKPI', type=bool)
         self._actionSucceeded = request.args.get('actionSucceeded', default=False, type=bool)
         location_name = request.view_args.get('locationId')
-        self._location = Location.getLocationByName(location_name)
+        self._location = Location.find_first(name=location_name)
         if not self._location:
             raise IndicoError('Unknown Location: {0}'.format(location_name))
 
@@ -114,7 +114,7 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
 class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
     def _checkParams(self):
         name = request.view_args.get('locationId')
-        self._location = Location.getLocationByName(name)
+        self._location = Location.find_first(name=name)
         if not self._location:
             raise IndicoError(_('Unknown Location: {0}').format(name))
         self._attr = request.args.get('removeCustomAttributeName', '')
@@ -128,7 +128,7 @@ class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
 class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
     def _checkParams(self):
         name = request.view_args.get('locationId')
-        self._location = Location.getLocationByName(name)
+        self._location = Location.find_first(name=name)
         if not self._location:
             raise IndicoError(_('Unknown Location: {0}').format(name))
 
@@ -136,7 +136,7 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
         attr_title = request.form.get('newCustomAttributeName', default='').strip()
         if attr_title:
             attr_name = attr_title.replace(' ', '-').lower()
-            if self._location.getAttributeByName(attr_name):
+            if self._location.get_attribute_by_name(attr_name):
                 raise FormValuesError(_('There is already an attribute named: {0}').format(attr_name))
 
             self._new_attr = RoomAttribute(name=attr_name, title=attr_title, type='str',
@@ -159,7 +159,7 @@ class RHRoomBookingEquipmentBase(RHRoomBookingAdminBase):
     def _checkParams(self, param):
         self._eq = request.form.get(param)
         name = request.view_args.get('locationId')
-        self._location = Location.getLocationByName(name)
+        self._location = Location.find_first(name=name)
         if not self._location:
             raise IndicoError(_('Unknown Location: {0}').format(name))
 
@@ -180,6 +180,6 @@ class RHRoomBookingSaveEquipment(RHRoomBookingEquipmentBase):
 
     def _process(self):
         if self._eq:
-            self._location.equipment_types.append(EquipmentType(self._eq))
+            self._location.equipment_types.append(EquipmentType(name=self._eq))
             flash(_(u'Equipment added'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))

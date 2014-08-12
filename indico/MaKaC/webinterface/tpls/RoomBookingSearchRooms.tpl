@@ -79,7 +79,7 @@
 <select name="roomName" id="roomName">
     % for room in rooms:
         <option value="${ url_for('rooms.roomBooking-roomDetails', room) }" class="${ room.kind }">
-            ${ '{}: &nbsp; {}'.format(room.location.name, room.full_name) }
+            ${ '{}: &nbsp; {}'.format(room.location_name, room.full_name) }
         </option>
     % endfor
 </select>
@@ -188,7 +188,7 @@ ${ contextHelp('chooseButtonHelp') }
             </tr>
 
             <!-- REQUIRED EQUIPMENT -->
-            <tr>
+            <tr id="equipment-search">
                 <td nowrap class="titleCellTD" style="width: 125px;">
                     <span class="titleCellFormat">${ _("Required equipment") }</span>
                 </td>
@@ -336,6 +336,7 @@ ${ contextHelp('chooseButtonHelp') }
 
     $('#location').on('change', function() {
         var locationId = $(this).val();
+        $('#equipment-search').toggle(locationId != '__None')
         $('.js-location').hide().find('input:checkbox').prop('checked', false);
         $('.js-location-' + locationId).show();
     }).trigger('change');

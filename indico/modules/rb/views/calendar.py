@@ -61,7 +61,7 @@ class RoomBookingCalendarWidget(object):
             self.rooms = [self.specific_room]
         elif self.rooms is None:
             self.rooms = Room.find_all(is_active=True)
-        self.rooms = sorted(self.rooms, key=lambda x: natural_sort_key(x.getFullName()))
+        self.rooms = sorted(self.rooms, key=lambda x: natural_sort_key(x.full_name))
 
         if self.show_blockings:
             self.blocked_rooms = BlockedRoom.find_with_filters({'room_ids': [r.id for r in self.rooms],

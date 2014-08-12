@@ -27,13 +27,11 @@ from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
 from indico.core.errors import IndicoError, AccessError, NoReportError, NotFoundError
-from indico.modules.rb.forms.base import FormDefaults
-from indico.util.date_time import get_datetime_from_request
-from indico.util.i18n import _
-from indico.util.string import natural_sort_key
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.forms.base import FormDefaults
 from indico.modules.rb.forms.reservations import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
                                                   NewBookingConfirmForm, NewBookingSimpleForm, ModifyBookingForm)
+from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
@@ -43,6 +41,9 @@ from indico.modules.rb.views.user.reservations import (WPRoomBookingSearchBookin
                                                        WPRoomBookingNewBookingConfirm,
                                                        WPRoomBookingNewBookingSimple, WPRoomBookingModifyBooking,
                                                        WPRoomBookingBookingDetails)
+from indico.util.date_time import get_datetime_from_request
+from indico.util.i18n import _
+from indico.util.string import natural_sort_key
 from indico.web.flask.util import url_for
 
 
@@ -161,7 +162,7 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
         return rooms
 
     def _checkParams(self):
-        self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.getFullName()))
+        self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.full_name))
         self._form_data = self._get_form_data()
         self._form = BookingSearchForm(self._form_data)
         self._form.room_ids.choices = [(r.id, None) for r in self._rooms]
@@ -265,7 +266,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
             # User can only prebook
             del form.submit_book
 
-        form.used_equipment.query = room.find_available_video_conference()
+        form.used_equipment.query = room.find_available_vc_equipment()
         return form
 
     def _get_all_conflicts(self, room, form, reservation_id=None):
@@ -359,8 +360,8 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
         else:
             start_date = date.today()
         defaults = FormDefaults(room_id=self._room.id,
-                                start_dt=datetime.combine(start_date, time(8, 30)),
-                                end_dt=datetime.combine(start_date, time(17, 30)),
+                                start_dt=datetime.combine(start_date, Location.working_time_start),
+                                end_dt=datetime.combine(start_date, Location.working_time_end),
                                 booked_for_id=session.user.id,
                                 booked_for_name=session.user.getStraightFullName().decode('utf-8'),
                                 contact_email=session.user.getEmail().decode('utf-8'),
@@ -450,12 +451,12 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
         return views[view](self, **kwargs)
 
     def _get_select_room_form_defaults(self):
-        return FormDefaults(start_dt=datetime.combine(date.today(), time(8, 30)),
-                            end_dt=datetime.combine(date.today(), time(17, 30)))
+        return FormDefaults(start_dt=datetime.combine(date.today(), Location.working_time_start),
+                            end_dt=datetime.combine(date.today(), Location.working_time_end))
 
     def _make_select_room_form(self):
         # Step 1
-        self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.getFullName()))
+        self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.full_name))
 
         form = NewBookingCriteriaForm(obj=self._get_select_room_form_defaults())
         form.room_ids.choices = [(r.id, None) for r in self._rooms]
@@ -507,7 +508,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
 
         # GET or form errors => show step 1 page
         return self._get_view('select_room', errors=form.error_list, rooms=self._rooms, form=form,
-                              max_room_capacity=Room.getMaxCapacity(), can_override=session.user.isRBAdmin()).display()
+                              max_room_capacity=Room.max_capacity, can_override=session.user.isRBAdmin()).display()
 
     def _process_select_period(self):
         form = self._make_select_period_form()
@@ -565,7 +566,7 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
     def _process(self):
         room = self._reservation.room
         form = ModifyBookingForm(obj=self._reservation, old_start_date=self._reservation.start_dt.date())
-        form.used_equipment.query = room.find_available_video_conference()
+        form.used_equipment.query = room.find_available_vc_equipment()
 
         if form.is_submitted() and not form.validate():
             occurrences = {}
