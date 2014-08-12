@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
@@ -22,6 +19,7 @@ import sys
 
 from flask_script import Manager
 
+from indico.cli.admin import IndicoAdminManager
 from indico.cli.database import DatabaseManager
 from indico.cli.server import IndicoDevServer
 from indico.cli.shell import IndicoShell
