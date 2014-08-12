@@ -46,33 +46,26 @@ def yesno(message):
         return False
 
 
-def prompt_email(prompt="Enter email: ", allow_empty=False):
+def prompt_email(prompt="Enter email: "):
     while True:
         try:
             email = unicode(raw_input(prompt.encode(sys.stderr.encoding)), sys.stdin.encoding).strip()
         except (EOFError, KeyboardInterrupt):  # ^D or ^C
             print
-            if allow_empty:
-                return None
-            else:
-                raise
+            return None
         if is_valid_mail(email):
             return email
         else:
             warning(u"Email format is invalid")
 
 
-def prompt_pass(prompt=u"Enter password: ", confirm_prompt=u"Confirm password: ",
-                min_length=8, confirm=True, allow_empty=False):
+def prompt_pass(prompt=u"Enter password: ", confirm_prompt=u"Confirm password: ", min_length=8, confirm=True):
     while True:
         try:
             password = unicode(getpass(prompt.encode(sys.stderr.encoding)), sys.stdin.encoding).strip()
         except (EOFError, KeyboardInterrupt):  # ^D or ^C
             print
-            if allow_empty:
-                return None
-            else:
-                raise
+            return None
         # Empty, just prompt again
         if not password:
             continue

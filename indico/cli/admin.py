@@ -41,7 +41,7 @@ def with_zodb(fn):
 
 
 @IndicoAdminManager.option('-a', '--admin', action='store_true', dest="grant_admin",
-                           help="Grants administration rights to new user")
+                           help="Grants administration rights")
 @with_zodb
 def user_create(grant_admin):
     """Creates new user"""
@@ -49,13 +49,17 @@ def user_create(grant_admin):
     user_type = 'user' if not grant_admin else 'admin'
 
     print()
-    name = prompt("New {} name".format(user_type))
-    surname = prompt("New {} surname".format(user_type))
-    organization = prompt("New {} organization".format(user_type))
+    name = prompt("First name")
+    surname = prompt("Last name")
+    organization = prompt("Affiliation")
     print()
     login = prompt("Enter username")
     email = prompt_email().encode('utf-8')
+    if email is None:
+        return
     password = prompt_pass().encode('utf-8')
+    if password is None:
+        return
 
     avatar.setName(name)
     avatar.setSurName(surname)
@@ -100,17 +104,17 @@ def user_grant(user_id):
         success("Administration rights granted successfully")
 
 
-@IndicoAdminManager.option('user_id', help="ID of user to be revoked admin rights")
+@IndicoAdminManager.option('user_id', help="ID of user to be revoked from admin rights")
 @with_zodb
 def user_revoke(user_id):
-    """Revokes administration rights to a given user"""
+    """Revokes administration rights from a given user"""
     avatar = AvatarHolder().getById(user_id)
     if avatar is None:
         error("The user does not exists")
         return
     print_user_info(avatar)
     if not avatar.isAdmin():
-        warning("This does not have administration rights")
+        warning("This user does not have administration rights")
         return
     if prompt_bool(cformat("%{yellow}Revoke administration rights from this user?")):
         admin_list = HelperMaKaCInfo.getMaKaCInfoInstance().getAdminList()
