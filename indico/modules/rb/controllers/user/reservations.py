@@ -203,8 +203,8 @@ class RHRoomBookingSearchBookingsShortcutBase(RHRoomBookingSearchBookings):
         data = MultiDict(self.search_criteria)
         data['start_time'] = '00:00'
         data['end_time'] = '23:59'
-        data['start_dt'] = date.today().strftime('%d/%m/%Y')
-        data['end_dt'] = (date.today() + timedelta(weeks=1)).strftime('%d/%m/%Y')
+        data['start_date'] = date.today().strftime('%d/%m/%Y')
+        data['end_date'] = (date.today() + timedelta(weeks=1)).strftime('%d/%m/%Y')
         data.setlist('room_ids', [r.id for r in self._rooms])
         return data
 
