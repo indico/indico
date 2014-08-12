@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
@@ -20,29 +17,30 @@
 
 from flask_migrate import MigrateCommand as DatabaseManager
 from flask_migrate import stamp
-from sqlalchemy.engine.reflection import Inspector
 
 from indico.core.db import db
-from indico.util.console import colored
+from indico.core.db.sqlalchemy.util import get_all_tables
+from indico.util.console import colored, cformat
 
 
 @DatabaseManager.command
 def prepare():
     """Initializes an empty database (creates tables, sets alembic rev to HEAD)"""
-    tables = Inspector.from_engine(db.engine).get_table_names()
-    if 'alembic_version' not in tables:
+    tables = get_all_tables(db)
+    if 'alembic_version' not in tables['public']:
         print colored('Setting the alembic version to HEAD', 'green')
         stamp()
         # Retrieve the table list again, that way we fail if the alembic version table was not created
-        tables = Inspector.from_engine(db.engine).get_table_names()
-    tables.remove('alembic_version')
-    if tables:
+        tables = get_all_tables(db)
+    tables['public'].remove('alembic_version')
+    if any(tables.viewvalues()):
         print colored('Your database is not empty!', 'red')
         print colored('If you just added a new table/model, create an alembic revision instead!', 'yellow')
         print
         print 'Tables in your database:'
-        for t in sorted(tables):
-            print '  * {}'.format(t)
+        for schema, schema_tables in sorted(tables.items()):
+            for t in schema_tables:
+                print cformat('  * %{cyan}{}%{reset}.%{cyan!}{}%{reset}').format(schema, t)
         return
     print colored('Creating tables', 'green')
     db.create_all()

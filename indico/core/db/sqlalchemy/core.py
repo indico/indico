@@ -21,16 +21,17 @@ from __future__ import absolute_import
 
 import logging
 
-import flask.ext.sqlalchemy
-from flask.ext.sqlalchemy import SQLAlchemy
+import flask_sqlalchemy
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.event import listen
+from sqlalchemy.sql.ddl import CreateSchema
 from werkzeug.utils import cached_property
 from zope.sqlalchemy import ZopeTransactionExtension
 
 from indico.core.db.sqlalchemy.util import IndicoModel
 
 # Monkeypatching this since Flask-SQLAlchemy doesn't let us override the model class
-
-flask.ext.sqlalchemy.Model = IndicoModel
+flask_sqlalchemy.Model = IndicoModel
 
 
 class IndicoSQLAlchemy(SQLAlchemy):
@@ -48,4 +49,18 @@ def on_models_committed(sender, changes):
         obj.__committed__(change)
 
 
+def _should_create_schema(ddl, target, connection, **kw):
+    sql = 'SELECT COUNT(*) FROM "information_schema"."schemata" WHERE "schema_name" = :name'
+    count = connection.execute(db.text(sql), name=ddl.element).scalar()
+    return not count
+
+
+def _before_create(target, connection, **kw):
+    # SQLAlchemy doesn't create schemas so we need to take care of it...
+    schemas = {table.schema for table in kw['tables']}
+    for schema in schemas:
+        CreateSchema(schema).execute_if(callable_=_should_create_schema).execute(connection)
+
+
 db = IndicoSQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
+listen(db.Model.metadata, 'before_create', _before_create)

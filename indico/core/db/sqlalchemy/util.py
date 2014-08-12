@@ -21,7 +21,7 @@ from flask.ext.sqlalchemy import Model, connection_stack
 from sqlalchemy import MetaData, ForeignKeyConstraint, Table
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.orm import joinedload, joinedload_all
-from sqlalchemy.sql.ddl import DropConstraint, DropTable
+from sqlalchemy.sql.ddl import DropConstraint, DropTable, DropSchema
 
 
 class IndicoModel(Model):
@@ -84,27 +84,35 @@ def update_session_options(db, session_options=None):
     db.session = db.create_scoped_session(session_options)
 
 
+def get_all_tables(db):
+    """Returns a dict containing all tables grouped by schema"""
+    inspector = Inspector.from_engine(db.engine)
+    schemas = sorted(set(inspector.get_schema_names()) - {'information_schema'})
+    return dict(zip(schemas, (inspector.get_table_names(schema=schema) for schema in schemas)))
+
+
 def delete_all_tables(db):
-    if db.engine.name == 'sqlite':
-        db.drop_all()
-    else:
-        conn = db.engine.connect()
-        transaction = conn.begin()
-        inspector = Inspector.from_engine(db.engine)
+    conn = db.engine.connect()
+    transaction = conn.begin()
+    inspector = Inspector.from_engine(db.engine)
+    metadata = MetaData()
 
-        metadata = MetaData()
-
-        tables = []
-        all_fkeys = []
-        for table_name in inspector.get_table_names():
+    all_schema_tables = get_all_tables(db)
+    tables = []
+    all_fkeys = []
+    for schema, schema_tables in all_schema_tables.iteritems():
+        for table_name in schema_tables:
             fkeys = [ForeignKeyConstraint((), (), name=fk['name'])
-                     for fk in inspector.get_foreign_keys(table_name)
+                     for fk in inspector.get_foreign_keys(table_name, schema=schema)
                      if fk['name']]
-            tables.append(Table(table_name, metadata, *fkeys))
+            tables.append(Table(table_name, metadata, *fkeys, schema=schema))
             all_fkeys.extend(fkeys)
 
-        for fkey in all_fkeys:
-            conn.execute(DropConstraint(fkey))
-        for table in tables:
-            conn.execute(DropTable(table))
-        transaction.commit()
+    for fkey in all_fkeys:
+        conn.execute(DropConstraint(fkey))
+    for table in tables:
+        conn.execute(DropTable(table))
+    for schema in all_schema_tables:
+        if schema != 'public':
+            conn.execute(DropSchema(schema))
+    transaction.commit()
