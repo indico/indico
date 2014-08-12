@@ -102,9 +102,7 @@ def memoize_request(f):
             g.memoize_cache = cache = {}
 
         key = (f.__name__, make_hashable(args), make_hashable(kwargs))
-        print key
         if key not in cache:
-            print 'generate'
             cache[key] = f(*args, **kwargs)
         return cache[key]
 
