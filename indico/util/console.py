@@ -26,6 +26,9 @@ import sys
 import termios
 import time
 from operator import itemgetter
+from getpass import getpass
+
+from indico.util.string import is_valid_mail
 
 
 def strip_ansi(s, _re=re.compile(r'\x1b\[[;\d]*[A-Za-z]')):
@@ -41,6 +44,53 @@ def yesno(message):
         return True
     else:
         return False
+
+
+def prompt_email(prompt="Enter email: ", allow_empty=False):
+    while True:
+        try:
+            email = unicode(raw_input(prompt.encode(sys.stderr.encoding)), sys.stdin.encoding).strip()
+        except (EOFError, KeyboardInterrupt):  # ^D or ^C
+            print
+            if allow_empty:
+                return None
+            else:
+                raise
+        if is_valid_mail(email):
+            return email
+        else:
+            warning(u"Email format is invalid")
+
+
+def prompt_pass(prompt=u"Enter password: ", confirm_prompt=u"Confirm password: ",
+                min_length=8, confirm=True, allow_empty=False):
+    while True:
+        try:
+            password = unicode(getpass(prompt.encode(sys.stderr.encoding)), sys.stdin.encoding).strip()
+        except (EOFError, KeyboardInterrupt):  # ^D or ^C
+            print
+            if allow_empty:
+                return None
+            else:
+                raise
+        # Empty, just prompt again
+        if not password:
+            continue
+        # Too short, tell the user about the fact
+        if min_length and len(password) < min_length:
+            warning(u"Password is too short (must be at least {} chars)".format(min_length))
+            continue
+        # Confirm password if requested
+        if not confirm:
+            return password
+        while True:
+            confirmation = prompt_pass(confirm_prompt, min_length=0, confirm=False)
+            if not confirmation:
+                return None
+            elif confirmation == password:
+                return password
+            else:
+                warning(u"Passwords don't match")
 
 
 def terminal_size():
