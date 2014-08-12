@@ -2,6 +2,7 @@ from __future__ import print_function
 
 from functools import wraps
 
+import transaction
 from flask_script import Manager, prompt, prompt_bool
 
 from indico.core.db import DBMgr
@@ -27,8 +28,15 @@ def print_user_info(avatar):
 def with_zodb(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        with DBMgr.getInstance().global_connection(commit=True):
-            return fn(*args, **kwargs)
+        with DBMgr.getInstance().global_connection():
+            try:
+                result = fn(*args, **kwargs)
+            except:
+                transaction.abort()
+                raise
+            else:
+                transaction.commit()
+            return result
     return wrapper
 
 
