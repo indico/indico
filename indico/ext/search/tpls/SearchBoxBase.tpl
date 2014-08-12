@@ -3,7 +3,7 @@
 <input type="hidden" name="sortOrder" value="d"/>
 <div id="UISearchBox">
     <div id="searchControls">
-        <div class="searchButton">
+        <div class="searchButton icon-search">
 
         </div>
         <div id="moreOptions" class="${ moreOptionsClass }" onclick="expandMenu(this);"></div>

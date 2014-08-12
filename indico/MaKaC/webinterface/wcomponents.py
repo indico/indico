@@ -302,10 +302,8 @@ class WHeader(WTemplated):
 
         vars["currentUser"] = self._currentuser
 
-        imgLogo=Configuration.Config.getInstance().getSystemIconURL( "logoIndico" )
-        imgLogin=Configuration.Config.getInstance().getSystemIconURL( "login" )
+        imgLogin = Configuration.Config.getInstance().getSystemIconURL("login")
 
-        vars["imgLogo"] = imgLogo
         vars["imgLogin"] = imgLogin
         vars["isFrontPage"] = self._isFrontPage
         vars["target"] = vars["currentCategory"] = self.__currentCategory

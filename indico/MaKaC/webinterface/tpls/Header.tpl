@@ -25,8 +25,8 @@ urlMeeting.addParam("event_type","meeting")
         <!--
             set fixed height on anchor to assure that the height is
             corrected if the image cannot be retrieved (i.e. https problems) -->
-        <a style="min-height: 66px;" href="${ urlHandlers.UHWelcome.getURL() }">
-            <img class="header-logo" src="${ imgLogo }" />
+        <a style="min-height: 60px;" href="${ urlHandlers.UHWelcome.getURL() }">
+            <img class="header-logo" src="${ systemIcon('logo_indico_bw.png') }" />
         </a>
 
     <div class="global-menu toolbar">
