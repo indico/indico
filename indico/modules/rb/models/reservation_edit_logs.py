@@ -27,6 +27,7 @@ from indico.util.string import return_ascii
 
 class ReservationEditLog(db.Model):
     __tablename__ = 'reservation_edit_logs'
+    __table_args__ = {'schema': 'roombooking'}
 
     id = db.Column(
         db.Integer,
@@ -47,7 +48,7 @@ class ReservationEditLog(db.Model):
     )
     reservation_id = db.Column(
         db.Integer,
-        db.ForeignKey('reservations.id'),
+        db.ForeignKey('roombooking.reservations.id'),
         nullable=False,
         index=True
     )

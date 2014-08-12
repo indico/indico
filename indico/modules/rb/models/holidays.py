@@ -20,7 +20,8 @@ from indico.util.string import return_ascii
 
 class Holiday(db.Model):
     __tablename__ = 'holidays'
-    __table_args__ = (db.UniqueConstraint('date', 'location_id'),)
+    __table_args__ = (db.UniqueConstraint('date', 'location_id'),
+                      {'schema': 'roombooking'})
 
     id = db.Column(
         db.Integer,
@@ -36,7 +37,7 @@ class Holiday(db.Model):
     )
     location_id = db.Column(
         db.Integer,
-        db.ForeignKey('locations.id'),
+        db.ForeignKey('roombooking.locations.id'),
         nullable=False
     )
 

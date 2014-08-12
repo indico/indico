@@ -121,7 +121,8 @@ class Reservation(Serializer, db.Model):
         return (db.Index('ix_reservations_start_dt_date', cast(cls.start_dt, Date)),
                 db.Index('ix_reservations_end_dt_date', cast(cls.end_dt, Date)),
                 db.Index('ix_reservations_start_dt_time', cast(cls.start_dt, Time)),
-                db.Index('ix_reservations_end_dt_time', cast(cls.end_dt, Time)))
+                db.Index('ix_reservations_end_dt_time', cast(cls.end_dt, Time)),
+                {'schema': 'roombooking'})
 
     id = db.Column(
         db.Integer,
@@ -166,7 +167,7 @@ class Reservation(Serializer, db.Model):
     )
     room_id = db.Column(
         db.Integer,
-        db.ForeignKey('rooms.id'),
+        db.ForeignKey('roombooking.rooms.id'),
         nullable=False,
         index=True
     )

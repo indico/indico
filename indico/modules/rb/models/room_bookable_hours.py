@@ -23,6 +23,7 @@ from indico.util.string import return_ascii
 
 class BookableHours(db.Model):
     __tablename__ = 'room_bookable_hours'
+    __table_args__ = {'schema': 'roombooking'}
 
     start_time = db.Column(
         db.Time,
@@ -36,7 +37,7 @@ class BookableHours(db.Model):
     )
     room_id = db.Column(
         db.Integer,
-        db.ForeignKey('rooms.id'),
+        db.ForeignKey('roombooking.rooms.id'),
         primary_key=True,
         nullable=False
     )

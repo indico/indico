@@ -24,6 +24,7 @@ from indico.util.string import return_ascii
 
 class Aspect(db.Model, Serializer):
     __tablename__ = 'aspects'
+    __table_args__ = {'schema': 'roombooking'}
     __public__ = ('id', 'name', 'center_latitude', 'center_longitude', 'zoom_level', 'top_left_latitude',
                   'top_left_longitude', 'bottom_right_latitude', 'bottom_right_longitude', 'default_on_startup')
 
@@ -65,7 +66,7 @@ class Aspect(db.Model, Serializer):
     )
     location_id = db.Column(
         db.Integer,
-        db.ForeignKey('locations.id'),
+        db.ForeignKey('roombooking.locations.id'),
         nullable=False
     )
 

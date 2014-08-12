@@ -33,6 +33,7 @@ from MaKaC.common.Locators import Locator
 
 class Location(db.Model):
     __tablename__ = 'locations'
+    __table_args__ = {'schema': 'roombooking'}
 
     working_time_start = time(8, 30)
     working_time_end = time(17, 30)
@@ -55,7 +56,7 @@ class Location(db.Model):
     default_aspect_id = db.Column(
         db.Integer,
         db.ForeignKey(
-            'aspects.id',
+            'roombooking.aspects.id',
             use_alter=True,
             name='fk_default_aspect_id',
             onupdate='CASCADE',

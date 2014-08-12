@@ -35,11 +35,12 @@ from indico.util.string import return_ascii
 
 class ReservationOccurrence(db.Model, Serializer):
     __tablename__ = 'reservation_occurrences'
+    __table_args__ = {'schema': 'roombooking'}
     __api_public__ = (('start', 'startDT'), ('end', 'endDT'), 'is_cancelled', 'is_rejected')
 
     reservation_id = db.Column(
         db.Integer,
-        db.ForeignKey('reservations.id'),
+        db.ForeignKey('roombooking.reservations.id'),
         nullable=False,
         primary_key=True
     )

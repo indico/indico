@@ -38,6 +38,7 @@ class BlockedRoomState(TitledIntEnum):
 
 class BlockedRoom(db.Model):
     __tablename__ = 'blocked_rooms'
+    __table_args__ = {'schema': 'roombooking'}
 
     State = BlockedRoomState  # make it available here for convenience
 
@@ -58,12 +59,12 @@ class BlockedRoom(db.Model):
     )
     blocking_id = db.Column(
         db.Integer,
-        db.ForeignKey('blockings.id'),
+        db.ForeignKey('roombooking.blockings.id'),
         nullable=False
     )
     room_id = db.Column(
         db.Integer,
-        db.ForeignKey('rooms.id'),
+        db.ForeignKey('roombooking.rooms.id'),
         nullable=False,
         index=True
     )

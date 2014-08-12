@@ -28,6 +28,7 @@ from MaKaC.user import AvatarHolder
 
 class Blocking(db.Model):
     __tablename__ = 'blockings'
+    __table_args__ = {'schema': 'roombooking'}
 
     id = db.Column(
         db.Integer,

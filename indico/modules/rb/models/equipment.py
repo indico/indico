@@ -28,7 +28,7 @@ RoomEquipmentAssociation = db.Table(
         'equipment_id',
         db.Integer,
         db.ForeignKey(
-            'equipment_types.id',
+            'roombooking.equipment_types.id',
             ondelete='cascade'
         ),
         primary_key=True,
@@ -37,11 +37,12 @@ RoomEquipmentAssociation = db.Table(
         'room_id',
         db.Integer,
         db.ForeignKey(
-            'rooms.id',
+            'roombooking.rooms.id',
             ondelete='cascade'
         ),
         primary_key=True
-    )
+    ),
+    schema='roombooking'
 )
 
 ReservationEquipmentAssociation = db.Table(
@@ -51,7 +52,7 @@ ReservationEquipmentAssociation = db.Table(
         'equipment_id',
         db.Integer,
         db.ForeignKey(
-            'equipment_types.id',
+            'roombooking.equipment_types.id',
             ondelete='cascade'
         ),
         primary_key=True,
@@ -60,17 +61,19 @@ ReservationEquipmentAssociation = db.Table(
         'reservation_id',
         db.Integer,
         db.ForeignKey(
-            'reservations.id',
+            'roombooking.reservations.id',
             ondelete='cascade'
         ),
         primary_key=True
-    )
+    ),
+    schema='roombooking'
 )
 
 
 class EquipmentType(db.Model):
     __tablename__ = 'equipment_types'
-    __table_args__ = (db.UniqueConstraint('name', 'location_id'),)
+    __table_args__ = (db.UniqueConstraint('name', 'location_id'),
+                      {'schema': 'roombooking'})
 
     id = db.Column(
         db.Integer,
@@ -78,7 +81,7 @@ class EquipmentType(db.Model):
     )
     parent_id = db.Column(
         db.Integer,
-        db.ForeignKey('equipment_types.id')
+        db.ForeignKey('roombooking.equipment_types.id')
     )
     name = db.Column(
         db.String,
@@ -87,7 +90,7 @@ class EquipmentType(db.Model):
     )
     location_id = db.Column(
         db.Integer,
-        db.ForeignKey('locations.id'),
+        db.ForeignKey('roombooking.locations.id'),
         nullable=False
     )
 

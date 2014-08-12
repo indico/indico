@@ -25,18 +25,19 @@ from indico.util.string import return_ascii
 
 class RoomAttributeAssociation(db.Model):
     __tablename__ = 'rooms_attributes_association'
+    __table_args__ = {'schema': 'roombooking'}
 
     attribute_id = db.Column(
         db.Integer,
         db.ForeignKey(
-            'room_attributes.id',
+            'roombooking.room_attributes.id',
         ),
         primary_key=True
     )
     room_id = db.Column(
         db.Integer,
         db.ForeignKey(
-            'rooms.id',
+            'roombooking.rooms.id',
         ),
         primary_key=True
     )
@@ -56,7 +57,8 @@ class RoomAttributeAssociation(db.Model):
 
 class RoomAttribute(db.Model):
     __tablename__ = 'room_attributes'
-    __table_args__ = (db.UniqueConstraint('name', 'location_id'),)
+    __table_args__ = (db.UniqueConstraint('name', 'location_id'),
+                      {'schema': 'roombooking'})
 
     id = db.Column(
         db.Integer,
@@ -64,7 +66,7 @@ class RoomAttribute(db.Model):
     )
     parent_id = db.Column(
         db.Integer,
-        db.ForeignKey('room_attributes.id')
+        db.ForeignKey('roombooking.room_attributes.id')
     )
     name = db.Column(
         db.String,
@@ -77,7 +79,7 @@ class RoomAttribute(db.Model):
     )
     location_id = db.Column(
         db.Integer,
-        db.ForeignKey('locations.id'),
+        db.ForeignKey('roombooking.locations.id'),
         nullable=False
     )
     type = db.Column(

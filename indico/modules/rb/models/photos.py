@@ -23,6 +23,7 @@ from indico.util.string import return_ascii
 
 class Photo(db.Model):
     __tablename__ = 'photos'
+    __table_args__ = {'schema': 'roombooking'}
 
     id = db.Column(
         db.Integer,

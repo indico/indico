@@ -55,6 +55,8 @@ _cache = GenericCache('Rooms')
 
 class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     __tablename__ = 'rooms'
+    __table_args__ = {'schema': 'roombooking'}
+
     __public__ = [
         'id', 'name', 'location_name', 'floor', 'number', 'building',
         'booking_url', 'capacity', 'comments', 'owner_id', 'details_url',
@@ -85,12 +87,12 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     )
     location_id = db.Column(
         db.Integer,
-        db.ForeignKey('locations.id'),
+        db.ForeignKey('roombooking.locations.id'),
         nullable=False
     )
     photo_id = db.Column(
         db.Integer,
-        db.ForeignKey('photos.id')
+        db.ForeignKey('roombooking.photos.id')
     )
     name = db.Column(
         db.String,

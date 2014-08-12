@@ -24,10 +24,11 @@ from MaKaC.user import AvatarHolder, GroupHolder
 
 class BlockingPrincipal(db.Model):
     __tablename__ = 'blocking_principals'
+    __table_args__ = {'schema': 'roombooking'}
 
     blocking_id = db.Column(
         db.Integer,
-        db.ForeignKey('blockings.id'),
+        db.ForeignKey('roombooking.blockings.id'),
         primary_key=True,
         nullable=False
     )

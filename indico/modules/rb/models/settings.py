@@ -28,7 +28,8 @@ class Setting(db.Model):
     __table_args__ = (db.Index('ix_settings_module_key', 'module', 'name'),
                       db.UniqueConstraint('module', 'name'),
                       db.CheckConstraint('module = lower(module)'),
-                      db.CheckConstraint('name = lower(name)'))
+                      db.CheckConstraint('name = lower(name)'),
+                      {'schema': 'indico'})
 
     id = db.Column(
         db.Integer,
