@@ -349,17 +349,24 @@ class AccessController( Persistent, Observable ):
     def getAnyDomainProtection(self):
         """
         Checks if the element is protected by domain at any level. It stops checking
-        when it finds some domain protection or a restricted owner.
+        when it finds an explicitly public or private parent.
 
         Returns the list of domains from which the item can be accessed.
         """
-        if self.getAccessProtectionLevel() != 0:
-            return []
-        elif self.isDomainProtected():
+
+        if self.getAccessProtectionLevel() == 0:
+            owner = self.getOwner().getOwner()
+
+            # inheriting  - get protection from parent
+            if owner:
+                return owner.getAccessController().getAnyDomainProtection()
+            else:
+                # strangely enough, the root category has 2 states
+                # 0 -> inheriting (public) and 1 -> restricted
+                # so, in this case, we really want the category's list
+                return self.getRequiredDomainList()
+        else:
             return self.getRequiredDomainList()
-        elif self.getOwner().getOwner():
-            return self.getOwner().getOwner().getAccessController().getAnyDomainProtection()
-        return []
 
     def isDomainProtected(self):
         if self.getRequiredDomainList():

@@ -1803,7 +1803,7 @@ class WDomainControlFrame(WTemplated):
             event = None
 
         ac = self._target.getAccessController()
-        inheriting = ac.getAccessProtectionLevel() == 0
+        inheriting = (ac.getAccessProtectionLevel() == 0) and (self._target.getOwner() is not None)
         domain_list = ac.getAnyDomainProtection() if inheriting else self._target.getDomainList()
 
         tpl_vars["inheriting"] = inheriting

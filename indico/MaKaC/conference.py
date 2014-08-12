@@ -283,6 +283,13 @@ class CommonObjectBase(CoreObject, Observable, Fossilizable):
         # return set containing whatever avatars/groups we may have collected
         return av_set
 
+    def canIPAccess(self, ip):
+        domains = self.getAccessController().getAnyDomainProtection()
+        if domains:
+            return any(domain.belongsTo(ip) for domain in domains)
+        else:
+            return True
+
 
 class CategoryManager(ObjectHolder):
     idxName = "categories"
@@ -1334,15 +1341,6 @@ class Category(CommonObjectBase):
     def canKeyAccess(self, aw):
         # Categories don't allow access keys
         return False
-
-    def canIPAccess(self, ip):
-        if not self.__ac.canIPAccess(ip):
-            return False
-
-        # if category is inheriting, check protection above
-        if self.getAccessProtectionLevel() == 0 and self.getOwner():
-            return self.getOwner().canIPAccess(ip)
-        return True
 
     def isProtected(self):
         return self.__ac.isProtected()
@@ -3614,15 +3612,15 @@ class Conference(CommonObjectBase, Locatable):
         """
         if self.isLastTrack(track):
             return
-        newPos=self.getTrackPos(track)+1
-        self.moveTrack(track,newPos)
+        newPos = self.getTrackPos(track) + 1
+        self.moveTrack(track, newPos)
 
-    def _cmpTracks( self, t1, t2 ):
+    def _cmpTracks(self, t1, t2):
         o1 = self.program.index(t1)
         o2 = self.program.index(t2)
-        return cmp( o1, o2 )
+        return cmp(o1, o2)
 
-    def sortTrackList( self, l ):
+    def sortTrackList(self, l):
         """Sorts out a list of tracks according to the current programme order.
         """
         if len(l) == 0:
@@ -3632,34 +3630,22 @@ class Conference(CommonObjectBase, Locatable):
         else:
             res = []
             for i in l:
-                res.append( i )
-            res.sort( self._cmpTracks )
+                res.append(i)
+            res.sort(self._cmpTracks)
             return res
 
-    def canIPAccess( self, ip ):
-        if not self.__ac.canIPAccess( ip ):
-            return False
-
-        # if event is inheriting, check IP protection above
-        if self.getAccessProtectionLevel() == 0:
-            for owner in self.getOwnerList():
-                if not owner.canIPAccess(ip):
-                    return False
-
-        return True
-
-    def requireDomain( self, dom ):
-        self.__ac.requireDomain( dom )
+    def requireDomain(self, dom):
+        self.__ac.requireDomain(dom)
         self._notify('accessDomainAdded', dom)
 
-    def freeDomain( self, dom ):
-        self.__ac.freeDomain( dom )
+    def freeDomain(self, dom):
+        self.__ac.freeDomain(dom)
         self._notify('accessDomainRemoved', dom)
 
-    def getDomainList( self ):
+    def getDomainList(self):
         return self.__ac.getRequiredDomainList()
 
-    def isProtected( self ):
+    def isProtected(self):
         """Tells whether a conference is protected for accessing or not
         """
         return self.__ac.isProtected()
@@ -6172,14 +6158,7 @@ class Session(CommonObjectBase, Locatable):
         else:
             return len(self.contributions)
 
-    def canIPAccess( self, ip ):
-        if not self.__ac.canIPAccess( ip ):
-            return False
-        if self.getOwner() != None:
-            return self.getOwner().canIPAccess(ip)
-        return True
-
-    def isProtected( self ):
+    def isProtected(self):
         # tells if a session is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
 
@@ -8898,13 +8877,6 @@ class Contribution(CommonObjectBase, Locatable):
     def appendSpeakerText(self, newText):
         self.setSpeakerText("%s, %s" % (self.getSpeakerText(), newText.strip()))
 
-    def canIPAccess(self, ip):
-        if not self.__ac.canIPAccess( ip ):
-            return False
-        if self.getOwner() != None:
-            return self.getOwner().canIPAccess(ip)
-        return True
-
     def isProtected(self):
         # tells if a contribution is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
@@ -10899,14 +10871,7 @@ class Material(CommonObjectBase):
     def recover(self):
         TrashCanManager().remove(self)
 
-    def canIPAccess( self, ip ):
-        if not self.__ac.canIPAccess( ip ):
-            return False
-        if self.getOwner() != None:
-            return self.getOwner().canIPAccess(ip)
-        return True
-
-    def isProtected( self ):
+    def isProtected(self):
         # tells if a material is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
 
@@ -11395,14 +11360,7 @@ class Resource(CommonObjectBase):
     def recover(self):
         TrashCanManager().remove(self)
 
-    def canIPAccess( self, ip ):
-        if not self.__ac.canIPAccess( ip ):
-            return False
-        if self.getOwner() != None:
-            return self.getOwner().canIPAccess(ip)
-        return True
-
-    def isProtected( self ):
+    def isProtected(self):
         # tells if a resource is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
 
