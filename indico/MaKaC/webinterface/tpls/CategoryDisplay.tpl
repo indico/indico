@@ -55,7 +55,7 @@ from MaKaC.webinterface.general import strfFileSize
             % endif
         </div>
 
-        <h1 class="category-title ${"sidebar-padding" if isRootCategory or materials or managers else ""}">
+        <h1 class="category-title ${"sidebar-padding" if isRootCategory or materials or managers or allowUserModif else ""}">
         % if isRootCategory and containsCategories:
             ${ _("Main categories") }
         % elif isRootCategory:
