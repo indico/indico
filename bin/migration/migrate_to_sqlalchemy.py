@@ -567,7 +567,8 @@ def main(main_uri, rb_uri, sqla_uri, photo_path, drop, merged_avatars):
         if drop:
             print cformat('%{yellow!}*** DANGER')
             print cformat('%{yellow!}***%{reset} '
-                          '%{red!}ALL DATA%{reset} in your database will be %{red!}PERMANENTLY ERASED%{reset}!')
+                          '%{red!}ALL DATA%{reset} in your database %{yellow!}{!r}%{reset} will be '
+                          '%{red!}PERMANENTLY ERASED%{reset}!').format(db.engine.url)
             if raw_input(cformat('%{yellow!}***%{reset} To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
                 print 'Aborting'
                 sys.exit(1)
