@@ -503,3 +503,9 @@ class SampleOneShotTask(OneShotTask):
 
 class DeletedTask(BaseTask):
     """ZODB migration class to avoid broken objects for deleted tasks"""
+
+    def getStartOn(self):
+        try:
+            return self._nextOccurrence
+        except AttributeError:
+            return self.startDateTime
