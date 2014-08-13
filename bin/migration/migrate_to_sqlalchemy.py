@@ -526,7 +526,7 @@ def fix_sequences():
         if len(candidates) != 1 or not isinstance(candidates[0].type, db.Integer):
             continue
         serial_col = candidates[0]
-        sequence_name = '{}_{}_seq'.format(cls.__tablename__, serial_col.name)
+        sequence_name = '{}.{}_{}_seq'.format(table.schema, cls.__tablename__, serial_col.name)
 
         query = select([func.setval(sequence_name, func.max(serial_col) + 1)], table)
         db.session.execute(query)
