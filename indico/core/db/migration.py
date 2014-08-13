@@ -35,6 +35,7 @@ We have two dictionaries
 globalname_dict = {
     "PersistentMapping": ("persistent.mapping", None),
     "PersistentList": ("persistent.list", None),
+    'SlotSchedule': ('MaKaC.schedule', 'SlotSchedule'),
     "CERNGroup": ("MaKaC.authentication.LDAPAuthentication", "LDAPGroup"),
     "PeriodicTask": ("indico.modules.scheduler.tasks.periodic", None),
     "PeriodicUniqueTask": ("indico.modules.scheduler.tasks.periodic", None),
@@ -43,7 +44,7 @@ globalname_dict = {
     "FoundationSyncTask": ("indico.modules.scheduler.tasks.periodic", None),
     "SamplePeriodicTask": ("indico.modules.scheduler.tasks.periodic", None),
     'RoomReservationTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
-    'RoomReservationEndTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
+    'RoomReservationEndTask': ('indico.modules.scheduler.tasks', 'DeletedTask')
 }
 
 modulename_dict = {
