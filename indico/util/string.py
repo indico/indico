@@ -21,19 +21,33 @@
 String manipulation functions
 """
 
+import functools
 import re
 import unicodedata
-from lxml import html, etree
 
 import markdown
 import bleach
+from lxml import html, etree
+
+try:
+    import translitcodec
+except ImportError:
+    translitcodec = None
+
+from indico.util.translations import LazyProxy
 
 
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small']
 
 
-def unicodeOrNone(string):
-    return None if string is None else string.decode('utf-8')
+def encode_if_unicode(s):
+    if isinstance(s, LazyProxy) and isinstance(s.value, unicode):
+        s = unicode(s)
+    return s.encode('utf-8') if isinstance(s, unicode) else s
+
+
+def unicodeOrNone(s):
+    return None if s is None else s.decode('utf-8')
 
 
 def safe_upper(string):
@@ -87,6 +101,37 @@ def fix_broken_obj(obj):
 
 def remove_non_alpha(text):
     return ''.join(c for c in text if c.isalnum())
+
+
+def unicode_to_ascii(text):
+    if not isinstance(text, unicode):
+        return text
+    elif translitcodec:
+        text = text.encode('translit/long')
+    else:
+        text = unicodedata.normalize('NFKD', text)
+    return text.encode('ascii', 'ignore')
+
+
+def unicode_struct_to_utf8(obj):
+    if isinstance(obj, unicode):
+        return obj.encode('utf-8', 'replace')
+    elif isinstance(obj, list):
+        return map(unicode_struct_to_utf8, obj)
+    elif isinstance(obj, dict):
+        return {unicode_struct_to_utf8(k): unicode_struct_to_utf8(v) for k, v in obj.iteritems()}
+    return obj
+
+
+def return_ascii(f):
+    """Decorator to normalize all unicode characters.
+
+    This is useful for __repr__ methods which **MUST** return a plain string to
+    avoid encoding to utf8 or ascii all the time."""
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        return unicode_to_ascii(f(*args, **kwargs))
+    return wrapper
 
 
 def html_line_breaks(text):
@@ -155,6 +200,36 @@ def sanitize_for_platypus(text):
     # Convert to XHTML
     doc = html.fromstring(res)
     return etree.tostring(doc)
+
+
+# TODO: reference implementation from MaKaC
+# but, it's not totally correct according to RFC, see test cases
+# However, this regex is pretty good in term of practicality
+# but it may be updated to cover all cases
+VALID_EMAIL_REGEX = re.compile(r"""[-a-zA-Z0-9!#$%&'*+/=?\^_`{|}~]+
+                                   (?:.[-a-zA-Z0-9!#$%&'*+/=?^_`{|}~]+)*
+                                   @
+                                   (?:[a-zA-Z0-9](?:[-a-zA-Z0-9]*[a-zA-Z0-9])?.)+
+                                   [a-zA-Z0-9](?:[-a-zA-Z0-9]*[a-zA-Z0-9])?""", re.X)
+
+
+def is_valid_mail(emails_string, multi=True):
+    """
+    Checks the validity of an email address or a series of email addresses
+
+    - emails_string: a string representing a single email address or several
+    email addresses separated by separators
+    - multi: flag if multiple email addresses are allowed
+
+    Returns True if emails are valid.
+    """
+
+    emails = re.split(r'[\s;,]+', emails_string)
+
+    if not multi and len(emails) > 1:
+        return False
+
+    return all(re.match(VALID_EMAIL_REGEX, email) for email in emails if email)
 
 
 def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):

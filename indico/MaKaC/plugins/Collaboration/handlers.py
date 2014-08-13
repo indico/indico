@@ -33,8 +33,7 @@ from indico.web.handlers import RHHtdocs
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.conference import LocalFile
-from MaKaC.common.logger import Logger
-from MaKaC.webinterface.rh.base import RoomBookingDBMixin
+from indico.core.logger import Logger
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
@@ -170,7 +169,7 @@ class RHConfModifCSBase(RHConferenceModifBase):
             self._tabs.append('Managers')
 
 
-class RHConfModifCSBookings(RoomBookingDBMixin, RHConfModifCSBase):
+class RHConfModifCSBookings(RHConfModifCSBase):
     _tohttps = True
 
     def _checkParams(self, params):

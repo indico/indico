@@ -21,7 +21,6 @@ from MaKaC.services.implementation.base import AdminService
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.plugins import PluginsHolder
 from MaKaC.webinterface.user import UserListModificationBase, UserModificationBase
-from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 
 
 class PluginOptionsBase (AdminService):
@@ -86,7 +85,8 @@ class PluginOptionsRemoveUser ( PluginOptionsBase, UserModificationBase ):
 
         return True
 
-class PluginOptionsAddRooms ( RoomBookingDBMixin, PluginOptionsBase ):
+
+class PluginOptionsAddRooms(PluginOptionsBase):
 
     def _checkParams(self):
         PluginOptionsBase._checkParams(self)
@@ -94,7 +94,7 @@ class PluginOptionsAddRooms ( RoomBookingDBMixin, PluginOptionsBase ):
     def _getAnswer(self):
         if self._targetOption.getType() == 'rooms':
             optionValue = self._targetOption.getValue()
-            roomToAdd = self._params.get("room")
+            roomToAdd = int(self._params.get("room"))
             if roomToAdd not in optionValue:
                 optionValue.append(roomToAdd)
             self._targetOption._notifyModification()
@@ -103,6 +103,7 @@ class PluginOptionsAddRooms ( RoomBookingDBMixin, PluginOptionsBase ):
 
         return True
 
+
 class PluginOptionsRemoveRooms ( PluginOptionsBase ):
 
     def _checkParams(self):
@@ -110,7 +111,7 @@ class PluginOptionsRemoveRooms ( PluginOptionsBase ):
 
     def _getAnswer(self):
         if self._targetOption.getType() == 'rooms':
-            roomToRemove=self._params.get("room")
+            roomToRemove = int(self._params.get("room"))
             self._targetOption.getValue().remove(roomToRemove)
             self._targetOption._notifyModification()
         else:

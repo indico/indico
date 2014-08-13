@@ -16,63 +16,54 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import request, session
-from urlparse import urljoin
-from werkzeug.exceptions import NotFound, BadRequest, MethodNotAllowed, BadRequestKeyError
-from indico.web.flask.util import ResponseUtil
-
-
 import copy
+import inspect
 import time
 import os
+import profile as profiler
+import pstats
 import sys
 import random
 import StringIO
 from datetime import datetime, timedelta
-
-from ZODB.POSException import ConflictError, POSKeyError
-from ZEO.Exceptions import ClientDisconnected
-import oauth2 as oauth
-
-from MaKaC.common import fossilize
-from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
-
-import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.pages.errors as errors
-
-from MaKaC.accessControl import AccessWrapper
-from indico.core.db import DBMgr
-from MaKaC.common import security
-from MaKaC.errors import MaKaCError, ModificationError, AccessError, KeyAccessError, TimingError, ParentTimingError,\
-    EntryTimingError, FormValuesError, NoReportError, NotFoundError, HtmlForbiddenTag, ConferenceClosedError,\
-    BadRefererError, NotLoggedError
-from MaKaC.PDFinterface.base import LaTeXRuntimeException
-from indico.modules.oauth.errors import OAuthError
-from MaKaC.webinterface.mail import GenericMailer
+from urlparse import urljoin
 from xml.sax.saxutils import escape
 
-from MaKaC.common.utils import truncate
-from MaKaC.common.logger import Logger
+import oauth2 as oauth
+import transaction
+from flask import request, session
+from werkzeug.exceptions import BadRequest, MethodNotAllowed
+from ZEO.Exceptions import ClientDisconnected
+from ZODB.POSException import ConflictError, POSKeyError
+
+from MaKaC.accessControl import AccessWrapper
+
+from MaKaC.common import fossilize, security
 from MaKaC.common.contextManager import ContextManager
-from indico.util.i18n import _, availableLocales
-from indico.util.json import create_json_error_answer
-
-from MaKaC.plugins import PluginsHolder
+from MaKaC.common.utils import truncate
+from MaKaC.errors import (
+    AccessError,
+    BadRefererError,
+    ConferenceClosedError,
+    KeyAccessError,
+    MaKaCError,
+    ModificationError,
+    NotLoggedError,
+)
 from MaKaC.plugins.base import OldObservable
-from MaKaC.plugins.RoomBooking.common import rb_check_user_access
-
-from indico.util.redis import RedisError
+from MaKaC.webinterface.mail import GenericMailer
+import MaKaC.webinterface.urlHandlers as urlHandlers
+import MaKaC.webinterface.pages.errors as errors
+from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from indico.core.config import Config
-
-def jsonify_error(func):
-    def decorator(*args, **keyargs):
-        e = args[1]
-        Logger.get('requestHandler').info('Request %s finished with %s: "%s"' % (request, e.__class__.__name__, e))
-        if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
-            return create_json_error_answer(e)
-        else:
-            return func(*args, **keyargs)
-    return decorator
+from indico.core.db import DBMgr
+from indico.core.logger import Logger
+from indico.util import json
+from indico.core.db.util import flush_after_commit_queue
+from indico.util.decorators import jsonify_error
+from indico.util.i18n import _, availableLocales, setLocale
+from indico.util.redis import RedisError
+from indico.web.flask.util import ResponseUtil
 
 
 class RequestHandlerBase(OldObservable):
@@ -96,13 +87,15 @@ class RequestHandlerBase(OldObservable):
         """
         Returns True if current user is a user or has either a modification key in their session.
         """
-        return bool(session.get('modifKeys')) or bool(self._getUser())
+        return session.get('modifKeys') or self._getUser()
 
-    def getAW( self ):
+    def getAW(self):
         """
         Returns the access wrapper related to this session/user
         """
         return self._aw
+
+    accessWrapper = property(getAW)
 
     def _getUser(self):
         """
@@ -110,11 +103,11 @@ class RequestHandlerBase(OldObservable):
         """
         return self._aw.getUser()
 
-    def _setUser(self, newUser=None):
+    def _setUser(self, new_user=None):
         """
         Sets the current user
         """
-        self._aw.setUser(newUser)
+        self._aw.setUser(new_user)
 
     def getRequestURL(self, secure=False):
         """
@@ -131,7 +124,7 @@ class RequestHandlerBase(OldObservable):
         """
         return self._tohttps and Config.getInstance().getBaseSecureURL()
 
-    def getRequestParams( self ):
+    def getRequestParams(self):
         return self._params
 
     def _setLang(self, params=None):
@@ -148,7 +141,6 @@ class RequestHandlerBase(OldObservable):
         Logger.get('i18n').debug("lang:%s" % lang)
         if lang is None:
             lang = "en_GB"
-        from indico.util.i18n import setLocale
         setLocale(lang)
 
     def _getTruncatedParams(self):
@@ -162,8 +154,6 @@ class RequestHandlerBase(OldObservable):
             else:
                 params[key] = value
         return params
-
-    accessWrapper = property(getAW)
 
 
 class RH(RequestHandlerBase):
@@ -198,9 +188,9 @@ class RH(RequestHandlerBase):
                  python data types. The key is the parameter name while the
                  value should be the received paramter value (or values).
     """
-    _tohttps = False # set this value to True for the RH that must be HTTPS when there is a BaseSecureURL
+    _tohttps = False  # set this value to True for the RH that must be HTTPS when there is a BaseSecureURL
     _doNotSanitizeFields = []
-    _isMobile = True # this value means that the generated web page can be mobile
+    _isMobile = True  # this value means that the generated web page can be mobile
 
     HTTP_VERBS = frozenset(('GET', 'POST', 'PUT', 'DELETE'))
 
@@ -214,18 +204,18 @@ class RH(RequestHandlerBase):
         RequestHandlerBase.__init__(self, req)
         self._responseUtil = ResponseUtil()
         self._requestStarted = False
-        self._aw = AccessWrapper()  #Fill in the aw instance with the current information
+        self._aw = AccessWrapper()  # Fill in the aw instance with the current information
         self._target = None
         self._reqParams = {}
         self._startTime = None
         self._endTime = None
         self._tempFilesToDelete = []
         self._redisPipeline = None
-        self._doProcess = True  #Flag which indicates whether the RH process
-                                #   must be carried out; this is useful for
-                                #   the checkProtection methods when they
-                                #   detect that an inmediate redirection is
-                                #   needed
+        self._doProcess = True  # Flag which indicates whether the RH process
+                                # must be carried out; this is useful for
+                                # the checkProtection methods when they
+                                # detect that an immediate redirection is
+                                # needed
 
     # Methods =============================================================
 
@@ -283,7 +273,7 @@ class RH(RequestHandlerBase):
             return [param]
         return param
 
-    def _processError(self, ex):
+    def _processError(self, e):
         raise
 
     def _checkParams(self, params):
@@ -333,27 +323,35 @@ class RH(RequestHandlerBase):
             return
         raise BadRefererError('This operation is not allowed from an external referer.')
 
-    @jsonify_error
+    @jsonify_error(logging_level='exception')
     def _processGeneralError(self, e):
-        """Treats general errors occured during the process of a RH. """
+        """Treats general errors occured during the process of a RH."""
 
         if Config.getInstance().getPropagateAllExceptions():
             raise
         return errors.WPGenericError(self).display()
 
-    @jsonify_error
+    @jsonify_error(logging_level='exception')
     def _processUnexpectedError(self, e):
         """Unexpected errors"""
 
+        self._responseUtil.redirect = None
+        self._responseUtil.status = 500
         if Config.getInstance().getEmbeddedWebserver() or Config.getInstance().getPropagateAllExceptions():
-            # Re-raise to get the nice werkzeug exception view
             raise
         return errors.WPUnexpectedError(self).display()
+
+    @jsonify_error
+    def _processHostnameResolveError(self, e):
+        """Unexpected errors"""
+
+        return errors.WPHostnameResolveError(self).display()
 
     @jsonify_error
     def _processAccessError(self, e):
         """Treats access errors occured during the process of a RH."""
 
+        self._responseUtil.status = 403
         return errors.WPAccessError(self).display()
 
     @jsonify_error
@@ -378,6 +376,21 @@ class RH(RequestHandlerBase):
         return errors.WPModificationError(self).display()
 
     @jsonify_error
+    def _processBadRequestKeyError(self, e):
+        """Request lacks a necessary key for processing"""
+        msg = _('Required argument missing: %s') % e.message
+        return errors.WPFormValuesError(self, msg).display()
+
+    # TODO: check this method to integrate with jsonify error
+    def _processOAuthError(self, e):
+        res = json.dumps(e.fossilize())
+        header = oauth.build_authenticate_header(realm=Config.getInstance().getBaseSecureURL())
+        self._responseUtil.headers.extend(header)
+        self._responseUtil.content_type = 'application/json'
+        self._responseUtil.status = e.code
+        return res
+
+    @jsonify_error
     def _processConferenceClosedError(self, e):
         """Treats access to modification pages for conferences when they are closed."""
 
@@ -399,6 +412,7 @@ class RH(RequestHandlerBase):
     def _processNotFoundError(self, e):
         """Process not found error; uses NoReportError template"""
 
+        self._responseUtil.status = 404
         return errors.WPNoReportError(self, e).display()
 
     @jsonify_error
@@ -430,17 +444,112 @@ class RH(RequestHandlerBase):
 
         return errors.WPRestrictedHTML(self, escape(str(e))).display()
 
+    @jsonify_error
+    def _processHtmlScriptError(self, e):
+        """ TODO """
+        return errors.WPHtmlScriptError(self, escape(str(e))).display()
+
+    @jsonify_error
+    def _processHtmlForbiddenTag(self, e):
+        """ TODO """
+
+        return errors.WPRestrictedHTML(self, escape(str(e))).display()
+
+    def _process_retry_setup(self):
+        # clear the fossile cache at the start of each request
+        fossilize.clearCache()
+        # clear after-commit queue
+        flush_after_commit_queue(False)
+        # delete all queued emails
+        GenericMailer.flushQueue(False)
+        # clear the existing redis pipeline
+        if self._redisPipeline:
+            self._redisPipeline.reset()
+
+    def _process_retry_auth_check(self, params):
+        # keep a link to the web session in the access wrapper
+        # this is used for checking access/modification key existence
+        # in the user session
+        self._aw.setIP(request.remote_addr)
+        self._setSessionUser()
+        self._setLang(params)
+        if self._getAuth():
+            if self._getUser():
+                Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (
+                    request, self._getUser().getFullName(), self._getUser().getId()))
+            if not self._tohttps and Config.getInstance().getAuthenticatedEnforceSecure():
+                self._tohttps = True
+                if self._checkHttpsRedirect():
+                    return self._responseUtil.make_redirect()
+
+        self._checkCSRF()
+        self._reqParams = copy.copy(params)
+
+
+    def _process_retry_do(self, profile):
+        profile_name, res = '', ''
+        # old code gets parameters from call
+        # new code utilizes of flask.request
+        if len(inspect.getargspec(self._checkParams).args) < 2:
+            self._checkParams()
+        else:
+            self._checkParams(self._reqParams)
+
+        func = getattr(self, '_checkParams_' + request.method, None)
+        if func:
+            func()
+
+        self._checkProtection()
+        func = getattr(self, '_checkProtection_' + request.method, None)
+        if func:
+            func()
+
+        security.Sanitization.sanitizationCheck(self._target,
+                                                self._reqParams,
+                                                self._aw,
+                                                self._doNotSanitizeFields)
+
+        if self._doProcess:
+            if profile:
+                profile_name = os.path.join(Config.getInstance().getTempDir(), 'stone{}.prof'.format(random.random()))
+                result = [None]
+                profiler.runctx('result[0] = self._process()', globals(), locals(), profile_name)
+                res = result[0]
+            else:
+                res = self._process()
+        return profile_name, res
+
+    def _process_retry(self, params, retry, profile, forced_conflicts):
+        self._process_retry_setup()
+        self._process_retry_auth_check(params)
+        DBMgr.getInstance().sync()
+        return self._process_retry_do(profile)
+
+    def _process_success(self):
+        Logger.get('requestHandler').info('Request {} successful'.format(request))
+        # request is succesfull, now, doing tasks that must be done only once
+        try:
+            flush_after_commit_queue(True)
+            GenericMailer.flushQueue(True)  # send emails
+            self._deleteTempFiles()
+        except:
+            Logger.get('mail').exception('Mail sending operation failed')
+        # execute redis pipeline if we have one
+        if self._redisPipeline:
+            try:
+                self._redisPipeline.execute()
+            except RedisError:
+                Logger.get('redis').exception('Could not execute pipeline')
+
     def process(self, params):
         if request.method not in self.HTTP_VERBS:
             # Just to be sure that we don't get some crappy http verb we don't expect
             raise BadRequest
 
-        profile = Config.getInstance().getProfile()
-        proffilename = ""
-        res = ""
-        MAX_RETRIES = 10
-        retry = MAX_RETRIES
-        textLog = []
+        cfg = Config.getInstance()
+        forced_conflicts, max_retries, profile = cfg.getForceConflicts(), cfg.getMaxRetries(), cfg.getProfile()
+        profile_name, res, textLog = '', '', []
+
         self._startTime = datetime.now()
 
         # clear the context
@@ -451,244 +560,94 @@ class RH(RequestHandlerBase):
         if self._checkHttpsRedirect():
             return self._responseUtil.make_redirect()
 
-
         DBMgr.getInstance().startRequest()
-        self._startRequestSpecific2RH()     # I.e. implemented by Room Booking request handlers
         textLog.append("%s : Database request started" % (datetime.now() - self._startTime))
         Logger.get('requestHandler').info('[pid=%s] Request %s started' % (
             os.getpid(), request))
+        self._notify('requestStarted')  # notify components about start
 
-        # notify components that the request has started
-        self._notify('requestStarted')
-
-        forcedConflicts = Config.getInstance().getForceConflicts()
         try:
-            while retry>0:
+            for i, retry in enumerate(transaction.attempts(max_retries)):
+                with retry:
+                    if i > 0:
+                        self._notify('requestRetry', i)  # notify components about retry
 
-                if retry < MAX_RETRIES:
-                    # notify components that the request is being retried
-                    self._notify('requestRetry', MAX_RETRIES - retry)
-
-                try:
-                    Logger.get('requestHandler').info('[pid=%s] from host %s' % (os.getpid(), request.remote_addr))
                     try:
-                        # clear the fossile cache at the start of each request
-                        fossilize.clearCache()
-                        # delete all queued emails
-                        GenericMailer.flushQueue(False)
-                        # clear the existing redis pipeline
-                        if self._redisPipeline:
-                            self._redisPipeline.reset()
-
-                        DBMgr.getInstance().sync()
-                        # keep a link to the web session in the access wrapper
-                        # this is used for checking access/modification key existence
-                        # in the user session
-                        self._aw.setIP(request.remote_addr)
-                        self._setSessionUser()
-                        self._setLang(params)
-                        if self._getAuth():
-                            if self._getUser():
-                                Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (
-                                    request, self._getUser().getFullName(), self._getUser().getId()))
-                            if not self._tohttps and Config.getInstance().getAuthenticatedEnforceSecure():
-                                self._tohttps = True
-                                if self._checkHttpsRedirect():
-                                    return self._responseUtil.make_redirect()
-
-                        self._checkCSRF()
-                        self._reqParams = copy.copy(params)
-                        self._checkParams(self._reqParams)
-                        func = getattr(self, '_checkParams_' + request.method, None)
-                        if func:
-                            func()
-
-                        self._checkProtection()
-                        func = getattr(self, '_checkProtection_' + request.method, None)
-                        if func:
-                            func()
-
-                        security.Sanitization.sanitizationCheck(self._target,
-                                               self._reqParams,
-                                               self._aw, self._doNotSanitizeFields)
-                        if self._doProcess:
-                            if profile:
-                                import profile, pstats
-                                proffilename = os.path.join(Config.getInstance().getTempDir(), "stone%s.prof" % str(random.random()))
-                                result = [None]
-                                profile.runctx("result[0] = self._process()", globals(), locals(), proffilename)
-                                res = result[0]
-                            else:
-                                res = self._process()
-
-                        # notify components that the request has finished
-                        self._notify('requestFinished')
-                        # Raise a conflict error if enabled. This allows detecting conflict-related issues easily.
-                        if retry > (MAX_RETRIES - forcedConflicts):
+                        Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), request.remote_addr))
+                        if i < forced_conflicts:  # raise conflict error if enabled to easily handle conflict error case
                             raise ConflictError
-                        self._endRequestSpecific2RH( True ) # I.e. implemented by Room Booking request handlers
-                        DBMgr.getInstance().endRequest( True )
-
-                        Logger.get('requestHandler').info('Request %s successful' % request)
-                        #request succesfull, now, doing tas that must be done only once
-                        try:
-                            GenericMailer.flushQueue(True) # send emails
-                            self._deleteTempFiles()
-                        except:
-                            Logger.get('mail').exception('Mail sending operation failed')
-                            pass
-                        # execute redis pipeline if we have one
-                        if self._redisPipeline:
-                            try:
-                                self._redisPipeline.execute()
-                            except RedisError:
-                                Logger.get('redis').exception('Could not execute pipeline')
+                        profile_name, res = self._process_retry(params, i, profile, forced_conflicts)
+                        transaction.commit()
                         break
-                    except MaKaCError, e:
-                        #DBMgr.getInstance().endRequest(False)
-                        res = self._processError(e)
-                except (ConflictError, POSKeyError):
-                    import traceback
-                    # only log conflict if it wasn't forced
-                    if retry <= (MAX_RETRIES - forcedConflicts):
-                        Logger.get('requestHandler').warning('Conflict in Database! (Request %s)\n%s' % (request, traceback.format_exc()))
-                    self._abortSpecific2RH()
-                    DBMgr.getInstance().abort()
-                    retry -= 1
-                    continue
-                except ClientDisconnected:
-                    Logger.get('requestHandler').warning('Client Disconnected! (Request %s)' % request)
-                    self._abortSpecific2RH()
-                    DBMgr.getInstance().abort()
-                    retry -= 1
-                    time.sleep(10-retry)
-                    continue
-        except KeyAccessError, e:
-            #Key Access error treatment
-            res = self._processKeyAccessError(e)
-            self._endRequestSpecific2RH(False)
-            DBMgr.getInstance().endRequest(False)
-        except AccessError, e:
-            #Access error treatment
-            res = self._processAccessError(e)
-            self._responseUtil.status = 403
-            self._endRequestSpecific2RH(False)
-            DBMgr.getInstance().endRequest(False)
-        except ModificationError, e:
-            #Modification error treatment
-            res = self._processModificationError(e)
-            self._endRequestSpecific2RH(False)
-            DBMgr.getInstance().endRequest(False)
-        except ParentTimingError, e:
-            #Modification error treatment
-            res = self._processParentTimingError(e)
-            self._endRequestSpecific2RH(False)
-            DBMgr.getInstance().endRequest(False)
-        except EntryTimingError, e:
-            #Modification error treatment
-            res = self._processEntryTimingError(e)
-            self._endRequestSpecific2RH(False)
-            DBMgr.getInstance().endRequest(False)
-        except TimingError, e:
-            #Modification error treatment
-            res = self._processTimingError(e)
-            self._endRequestSpecific2RH(False)
-            DBMgr.getInstance().endRequest(False)
-        except FormValuesError, e:
-            #Error filling the values of a form
-            res = self._processFormValuesError(e)
-            self._endRequestSpecific2RH(False)
-            DBMgr.getInstance().endRequest(False)
-        except BadRequestKeyError, e:
-            # The KeyError raised when accessing e.g. request.args['invalid']
-            msg = _('Required argument missing: %s') % e.message
-            res = errors.WPFormValuesError(self, msg).display()
-            self._endRequestSpecific2RH(False)
-            DBMgr.getInstance().endRequest(False)
-        except ConferenceClosedError, e:
-            #Modification error treatment
-            res = self._processConferenceClosedError(e)
-            self._endRequestSpecific2RH(False)
-            DBMgr.getInstance().endRequest(False)
-        except NoReportError, e:
-            #Error without report option
-            res = self._processNoReportError(e)
-            DBMgr.getInstance().endRequest(False)
-        except (NotFoundError, NotFound), e:
-            # File not found error
-            res = self._processNotFoundError(e)
-            self._responseUtil.status = 404
-            DBMgr.getInstance().endRequest(False)
-        except HtmlForbiddenTag, e:
-            res = self._processRestrictedHTML(e)
-            DBMgr.getInstance().endRequest(False)
-        except LaTeXRuntimeException, e:
-            res = self._processLaTeXError(e)
-            DBMgr.getInstance().endRequest(False)
-        except MaKaCError, e:
-            res = self._processGeneralError(e)
-            DBMgr.getInstance().endRequest(False)
-        except ValueError, e:
-            res = self._processGeneralError(e)
-            DBMgr.getInstance().endRequest(False)
-        except OAuthError, e:
-            from indico.util import json
-            res = json.dumps(e.fossilize())
-            header = oauth.build_authenticate_header(realm=Config.getInstance().getBaseSecureURL())
-            self._responseUtil.headers.extend(header)
-            self._responseUtil.content_type = 'application/json'
-            self._responseUtil.status = e.code
-            DBMgr.getInstance().endRequest(False)
-        except Exception, e:
-            res = self._processUnexpectedError(e)
-            self._endRequestSpecific2RH(False)
-            DBMgr.getInstance().endRequest(False)
-
-            #cancels any redirection
-            self._responseUtil.redirect = None
-            self._responseUtil.status = 500
+                    except (ConflictError, POSKeyError):
+                        transaction.abort()
+                        import traceback
+                        # only log conflict if it wasn't forced
+                        if i >= forced_conflicts:
+                            Logger.get('requestHandler').warning('Conflict in Database! (Request %s)\n%s' % (request, traceback.format_exc()))
+                        raise
+                    except ClientDisconnected:
+                        transaction.abort()
+                        Logger.get('requestHandler').warning('Client Disconnected! (Request {})'.format(request))
+                        time.sleep(i)
+            self._process_success()
+        except Exception as e:
+            transaction.abort()
+            res = self._getMethodByExceptionName(e)(e)
+        finally:
+            # notify components that the request has finished
+            self._notify('requestFinished')
+            DBMgr.getInstance().endRequest()
 
         totalTime = (datetime.now() - self._startTime)
-        textLog.append("%s : Request ended"%totalTime)
+        textLog.append('{} : Request ended'.format(totalTime))
 
         # log request timing
-        if profile and totalTime > timedelta(0, 1) and os.path.isfile(proffilename):
+        if profile and totalTime > timedelta(0, 1) and os.path.isfile(profile_name):
             rep = Config.getInstance().getTempDir()
-            stats = pstats.Stats(proffilename)
+            stats = pstats.Stats(profile_name)
             stats.strip_dirs()
             stats.sort_stats('cumulative', 'time', 'calls')
-            stats.dump_stats(os.path.join(rep, "IndicoRequestProfile.log"))
+            stats.dump_stats(os.path.join(rep, 'IndicoRequestProfile.log'))
             output = StringIO.StringIO()
             sys.stdout = output
             stats.print_stats(100)
             sys.stdout = sys.__stdout__
             s = output.getvalue()
-            f = file(os.path.join(rep, "IndicoRequest.log"), 'a+')
-            f.write("--------------------------------\n")
-            f.write("URL     : " + request.url + "\n")
-            f.write("%s : start request\n"%self._startTime)
-            f.write("params:%s"%params)
-            f.write("\n".join(textLog))
-            f.write("\n")
-            f.write("retried : %d\n"%(10-retry))
+            f = file(os.path.join(rep, 'IndicoRequest.log'), 'a+')
+            f.write('--------------------------------\n')
+            f.write('URL     : {}\n'.format(request.url))
+            f.write('{} : start request\n'.format(self._startTime))
+            f.write('params:{}'.format(params))
+            f.write('\n'.join(textLog))
+            f.write('\n')
+            f.write('retried : {}\n'.format(10-retry))
             f.write(s)
-            f.write("--------------------------------\n\n")
+            f.write('--------------------------------\n\n')
             f.close()
-        if profile and proffilename != "" and os.path.exists(proffilename):
-            os.remove(proffilename)
+        if profile and profile_name and os.path.exists(profile_name):
+            os.remove(profile_name)
 
         if self._responseUtil.call:
             return self._responseUtil.make_call()
 
-        if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
-            self._responseUtil.content_type = 'application/json'
-
-        # In case of no process needed, we should return empty string to avoid erroneous ouput
+        # In case of no process needed, we should return empty string to avoid erroneous output
         # specially with getVars breaking the JS files.
         if not self._doProcess or res is None:
             return self._responseUtil.make_empty()
 
         return self._responseUtil.make_response(res)
+
+    def _getMethodByExceptionName(self, e):
+        exception_name = {
+            'NotFound': 'NotFoundError',
+            'MaKaCError': 'GeneralError',
+            'IndicoError': 'GeneralError',
+            'ValueError': 'GeneralError',
+            'Exception': 'UnexpectedError'
+        }.get(type(e).__name__, type(e).__name__)
+        return getattr(self, '_process{}'.format(exception_name),
+                       getattr(self, '_processUnexpectedError'))
 
     def _deleteTempFiles(self):
         if len(self._tempFilesToDelete) > 0:
@@ -696,96 +655,7 @@ class RH(RequestHandlerBase):
                 if f is not None:
                     os.remove(f)
 
-    def _startRequestSpecific2RH(self):
-        """
-        Works like DBMgr.getInstance().startRequest() but is specific to
-        request handler. It is used to connect to other database only
-        in choosen request handlers.
-
-        I.e. all Room Booking request handlers override this
-        method to connect to Room Booking backend.
-        """
-        pass
-
-    def _endRequestSpecific2RH(self, commit):
-        """
-        Works like DBMgr.getInstance().endRequest() but is specific to
-        request handler. It is used to disconnect from other database only
-        in choosen request handlers.
-
-        I.e. all Room Booking request handlers override this
-        method to disconnect from Room Booking backend.
-        """
-        pass
-
-    def _syncSpecific2RH(self):
-        """
-        Works like DBMgr.getInstance().sync() but is specific to
-        request handler. It is used to connect to other database only
-        in choosen request handlers.
-
-        I.e. all Room Booking request handlers override this
-        method to sync backend.
-        """
-        pass
-
-    def _abortSpecific2RH(self):
-        """
-        Works like DBMgr.getInstance().abort() but is specific to
-        request handler. It is used to abort transactions of other database
-        only in choosen request handlers.
-
-        I.e. all Room Booking request handlers override this method.
-        """
-        pass
-
-    # Properties =============================================================
-
     relativeURL = None
-
-
-from MaKaC.rb_location import CrossLocationDB
-import MaKaC.common.info as info
-
-class RoomBookingDBMixin:     # It's _not_ RH
-    """
-    Goal:
-    Only _some_ Request Handlers should connect to
-    room booking database.
-
-    Mix in this class into all Request Handlers,
-    which must use Room Booking backend.
-
-    Usage:
-
-    class RHExample( RoomBookingDBMixin, RHProtected ):
-        pass
-
-    NOTE: it is important to put RoomBookingDBMixin as first
-    base class.
-    """
-
-    def _startRequestSpecific2RH(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            CrossLocationDB.connect()
-
-    def _endRequestSpecific2RH(self, commit=True):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            if commit: CrossLocationDB.commit()
-            else: CrossLocationDB.rollback()
-            CrossLocationDB.disconnect()
-
-    def _syncSpecific2RH(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            CrossLocationDB.sync()
-
-    def _abortSpecific2RH(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive():
-            CrossLocationDB.rollback()
 
 
 class RHProtected(RH):
@@ -803,25 +673,6 @@ class RHProtected(RH):
 
     def _checkProtection(self):
         self._checkSessionUser()
-
-
-class RHRoomBookingProtected(RHProtected):
-
-    def _checkSessionUser(self):
-        user = self._getUser()
-        if user is None:
-            if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
-                raise NotLoggedError("You are currently not authenticated. Please log in again.")
-            else:
-                self._redirect(self._getLoginURL())
-                self._doProcess = False
-        else:
-            try:
-                if PluginsHolder().getPluginType("RoomBooking").isActive():
-                    if not rb_check_user_access(user):
-                        raise AccessError()
-            except KeyError:
-                pass
 
 
 class RHDisplayBaseProtected(RHProtected):
@@ -861,4 +712,3 @@ class RHModificationBaseProtected(RHProtected):
         if hasattr(self._target, "getConference") and not self._allowClosed:
             if self._target.getConference().isClosed():
                 raise ConferenceClosedError(self._target.getConference())
-

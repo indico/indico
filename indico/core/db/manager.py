@@ -30,7 +30,6 @@ import transaction
 
 from indico.core.db.migration import MigratedDB
 
-from MaKaC.consoleScripts.installBase import getIndicoInstallMode
 
 class DBMgr:
     """This class provides the access point to the Shelf (every client will

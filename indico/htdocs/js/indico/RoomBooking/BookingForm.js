@@ -34,64 +34,12 @@ function set_repeatition_comment() {
     $('#repComment').html(s);
 }
 
-// Converting from time string to seconds
-function __getTime(time) {
-    var minutes = parseInt(time % 60);
-    var hours = parseInt(time / 60 % 24);
-    minutes = minutes + "";
-    if (minutes.length == 1) {
-        minutes = "0" + minutes;
-    }
-    return hours + ":" + minutes;
-}
-
-// Refresh time slider
-function updateTimeSlider(event, ui) {
-    if (event && event.type != "slidecreate" ) {
-        $("#sTime").val(__getTime(ui.values[0]));
-        $("#eTime").val(__getTime(ui.values[1]));
-    }
-    var sTime = parseInt($("#sTime").val().split(":")[0] * 60) + parseInt($("#sTime").val().split(":")[1]);
-    var eTime = parseInt($("#eTime").val().split(":")[0] * 60) + parseInt($("#eTime").val().split(":")[1]);
-    if (sTime && eTime || sTime == 0) {
-        $('#timeRange').slider('values', 0, sTime).slider('values', 1, eTime);
-    }
-    $('#sTimeBubble').text($("#sTime").val()).offset({left:$('#timeRange .ui-slider-handle:first').offset().left});
-    $('#eTimeBubble').text($("#eTime").val()).offset({left:$('#timeRange .ui-slider-handle:last').offset().left});
-}
-
 //Refresh datapicker's dates
 function refreshDates(){
-    if ($("#sDatePlace").datepicker('getDate') > $("#eDatePlace").datepicker('getDate')) {
-        $("#eDatePlace").datepicker('setDate', $("#sDatePlace").datepicker('getDate'));
-    }
-    $("#sDay").val($("#sDatePlace").datepicker('getDate').getDate());
-    $("#sMonth").val(parseInt($("#sDatePlace").datepicker('getDate').getMonth() + 1));
-    $("#sYear").val($("#sDatePlace").datepicker('getDate').getFullYear());
-    if ($('#finishDate').val() == 'true') {
-        $("#eDay").val($("#eDatePlace").datepicker('getDate').getDate());
-        $("#eMonth").val(parseInt($("#eDatePlace").datepicker('getDate').getMonth() + 1));
-        $("#eYear").val($("#eDatePlace").datepicker('getDate').getFullYear()); }
-    else {
-        $("#eDay").val($("#sDatePlace").datepicker('getDate').getDate());
-        $("#eMonth").val(parseInt($("#sDatePlace").datepicker('getDate').getMonth() + 1));
-        $("#eYear").val($("#sDatePlace").datepicker('getDate').getFullYear());
-    }
-}
-
-//Save calendar data
-function saveCalendarData(finishDate) {
-    $("#sDay").val($("#sDatePlace").datepicker('getDate').getDate());
-    $("#sMonth").val(parseInt($("#sDatePlace").datepicker('getDate').getMonth() + 1));
-    $("#sYear").val($("#sDatePlace").datepicker('getDate').getFullYear());
-    if (finishDate == 'true') {
-        $("#eDay").val($("#eDatePlace").datepicker('getDate').getDate());
-        $("#eMonth").val(parseInt($("#eDatePlace").datepicker('getDate').getMonth() + 1));
-        $("#eYear").val($("#eDatePlace").datepicker('getDate').getFullYear());
-    } else {
-        $("#eDay").val($("#sDatePlace").datepicker('getDate').getDate());
-        $("#eMonth").val(parseInt($("#sDatePlace").datepicker('getDate').getMonth() + 1));
-        $("#eYear").val($("#sDatePlace").datepicker('getDate').getFullYear());
+    var startDate = $("#sDatePlace").datepicker('getDate');
+    var endDate = $("#eDatePlace").datepicker('getDate');
+    if (startDate > endDate) {
+        $("#eDatePlace").datepicker('setDate', startDate);
     }
 }
 
@@ -99,27 +47,57 @@ function saveCalendarData(finishDate) {
 function saveFormData() {
     var selectedRooms = $("#roomselector").roomselector("selection");
     var filterData = $("#roomselector").roomselector("userdata");
-    saveCalendarData($('#finishDate').val());
 
-    var rbDict = {"sDay": $("#sDay").val(),
-                  "sMonth": $("#sMonth").val(),
-                  "sYear": $("#sYear").val(),
-                  "eDay": $("#eDay").val(),
-                  "eMonth": $("#eMonth").val(),
-                  "eYear": $("#eYear").val(),
-                  "sTime": $('#sTime').val(),
-                  "eTime": $('#eTime').val(),
-                  "capacity": filterData.capacity,
-                  "videoconference": filterData.videoconference,
-                  "webcast": filterData.webcast,
-                  'projector': filterData.projector,
-                  "publicroom": filterData.publicroom,
-                  "filter":  filterData.search,
-                  "selectedRooms":  selectedRooms,
-                  "finishDate": $('#finishDate').val(),
-                  "flexibleDatesRange": $("#flexibleDates input[name=flexibleDatesRange]:checked").val(),
-                  "repeatability": $('#repeatability input[name=repeatability]:checked').val()};
+    var rbDict = {
+        startDate: $('#sDatePlace').datepicker('getDate'),
+        endDate: $('#eDatePlace').datepicker('getDate'),
+        startTime: $('#timerange').timerange('getStartTime'),
+        endTime: $('#timerange').timerange('getEndTime'),
+        "capacity": filterData.capacity,
+        "videoconference": filterData.videoconference,
+        "webcast": filterData.webcast,
+        "projector": filterData.projector,
+        "publicroom": filterData.publicroom,
+        "filter": filterData.search,
+        "selectedRooms": selectedRooms,
+        "finishDate": $('#finishDate').val(),
+        "flexibleDatesRange": $("#flexibleDates input[name=flexible_dates_range]:checked").val(),
+        repeatFrequency: $('input[name=repeat_frequency]:checked').val(),
+        repeatInterval: $('#repeat_interval').val(),
+        roomIds: $('#room_ids').val()
+    };
 
     $.jStorage.set(userId, rbDict);
     $.jStorage.setTTL(userId, 7200000); // 2 hours
 }
+
+$(document).ready(function() {
+    var backLink = $('#js-back-to-period');
+    if (backLink.length) {
+        var data = $.jStorage.get(userId);
+        if (!data || !data.startDate) {
+            backLink.contents().unwrap();
+        }
+        else {
+            backLink.on('click', function(e) {
+                e.preventDefault();
+                var form = $('<form>', {
+                    method: 'POST',
+                    action: ''
+                });
+                form.append([
+                    $('<input>', {type: 'hidden', name: 'step', value: 1}),
+                    $('<input>', {type: 'hidden', name: 'start_dt', value: moment(data.startDate).format('D/MM/YYYY') + ' ' + data.startTime}),
+                    $('<input>', {type: 'hidden', name: 'end_dt', value: moment(data.endDate).format('D/MM/YYYY') + ' ' + data.endTime}),
+                    $('<input>', {type: 'hidden', name: 'repeat_frequency', value: data.repeatFrequency}),
+                    $('<input>', {type: 'hidden', name: 'repeat_interval', value: data.repeatInterval}),
+                    $('<input>', {type: 'hidden', name: 'flexible_dates_range', value: data.flexibleDatesRange})
+                ]);
+                form.append($.map(data.roomIds, function(value) {
+                    return $('<input>', {type: 'hidden', name: 'room_ids', value: value});
+                }));
+                form.appendTo(document.body).submit();
+            });
+        }
+    }
+});

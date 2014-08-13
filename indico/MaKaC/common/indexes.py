@@ -20,7 +20,12 @@
 """This file contains various indexes which will be used in the system in order
     to optimise some functionalities.
 """
+
+import itertools
 import os
+from datetime import datetime, timedelta
+
+import pytz
 from persistent import Persistent
 from BTrees.IOBTree import IOBTree
 from BTrees.OOBTree import OOBTree, OOSet
@@ -29,20 +34,18 @@ from whoosh.fields import Schema, ID, TEXT, DATETIME
 from whoosh.qparser import QueryParser
 from whoosh.sorting import FieldFacet
 from whoosh import writing
+from zope.index.text import textindex
+
+from indico.core.logger import Logger
+from indico.core.config import Config
+from indico.core.db.util import run_after_commit
+from indico.util.string import remove_accents
+from indico.util.redis.whoosh_storage import RedisStorage
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.timezoneUtils import date2utctimestamp, datetimeToUnixTime
 from MaKaC.errors import MaKaCError
-from datetime import datetime, timedelta
-from pytz import timezone
-from MaKaC.common.logger import Logger
-from indico.core.config import Config
 from MaKaC.plugins.base import extension_point
-from zope.index.text import textindex
-from indico.util.string import remove_accents
-import pytz
-import itertools
-import string
-from indico.util.redis.whoosh_storage import RedisStorage
+
 
 # BTrees are 32 bit by default
 # TODO: make this configurable
@@ -1311,11 +1314,13 @@ class WhooshTextIndex(object):
         with self._textIdx.writer() as writer:
             writer.add_document(id=obj.getId().decode('utf-8'), content=obj.getTitle().decode('utf-8'))
 
+    @run_after_commit
     def index(self, obj):
         if obj.getId() in self:
             raise KeyError(_("Key {0} already exists in index!").format(obj.getId()))
         self._index(obj)
 
+    @run_after_commit
     def unindex(self, obj):
         if obj.getId() in self:
             with self._textIdx.writer() as writer:
@@ -1324,12 +1329,10 @@ class WhooshTextIndex(object):
             Logger.get('indexes.text').error("No such entry {0}".format(obj.getId()))
 
     def search(self, text, limit=None):
-        results = []
         with self._textIdx.searcher() as searcher:
             qp = QueryParser("content", self._textIdx.schema)
             query = qp.parse(text)
-            results = [(record["id"], record["content"]) for record in searcher.search(query, limit=limit)]
-        return results
+            return [(record["id"], record["content"]) for record in searcher.search(query, limit=limit)]
 
     def clear(self):
         with self._textIdx.writer() as writer:

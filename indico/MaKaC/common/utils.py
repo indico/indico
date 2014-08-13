@@ -31,14 +31,13 @@ from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
     isTomorrow
 from MaKaC.common import info
 from MaKaC import errors
-from indico.core.db import DBMgr
-from MaKaC.webinterface.linking import RoomLinker
-from MaKaC.rb_location import CrossLocationQueries
-from indico.core.config import Config
 
 # indico imports
+from indico.core.config import Config
+from indico.core.db import DBMgr
 from indico.util.i18n import currentLocale
-
+# backward compatibility
+from indico.util.string import truncate
 
 # fcntl is only available for POSIX systems
 if os.name == 'posix':
@@ -49,52 +48,11 @@ _FAKENAME_SIZEMIN = 5
 _FAKENAME_SIZEMAX = 10
 
 
-### Backward-compatible utilities
-
-from indico.util.string import truncate
-
-
-
-def isWeekend( d ):
+def isWeekend(d):
     """
     Accepts date or datetime object.
     """
     return d.weekday() in [5, 6]
-
-
-HOLIDAYS_KEY = 'Holidays'
-class HolidaysHolder:
-
-    @classmethod
-    def isWorkingDay( cls, d ):
-        if isinstance( d, datetime ):
-            d = d.date()
-        if isWeekend( d ):
-            return False
-        return not cls.__getBranch().has_key( d )
-
-    @classmethod
-    def getHolidays( cls ):
-        """
-        Returns list of holidays
-        """
-        return cls.__getBranch().keys()
-
-    @classmethod
-    def insertHoliday( cls, d ):
-        cls.__getBranch()[d] = None
-
-    @classmethod
-    def clearHolidays( cls ):
-        root = DBMgr.getInstance().getDBConnection().root()
-        root[HOLIDAYS_KEY] = OOBTree()
-
-    @staticmethod
-    def __getBranch():
-        root = DBMgr.getInstance().getDBConnection().root()
-        if not root.has_key( HOLIDAYS_KEY ):
-            root[HOLIDAYS_KEY] = OOBTree()
-        return root[HOLIDAYS_KEY]
 
 
 def stringToDate( str ):
@@ -408,28 +366,14 @@ def unicodeSlice(s, start, end, encoding = 'utf-8'):
     """
     return s.decode(encoding, 'replace')[start:end]
 
-def daysBetween(dtStart, dtEnd):
-    d = dtEnd - dtStart
-    days = [ dtStart + timedelta(n) for n in range(0, d.days + 1)]
-    if days[-1].date() != dtEnd.date():
-        # handles special case, when d.days is the
-        # actual span minus 2
-        # |----|----|----|----|
-        # (4 days)
-        #    |----|----|---
-        # (2 days and some hours)
-        days.append(dtEnd)
 
-    return days
-
-
-def formatDateTime(dateTime, showWeek=False, format=None, locale=None):
+def formatDateTime(dateTime, showWeek=False, format=None, locale=None, server_tz=False):
     week = "EEEE" if showWeek else ""
 
     if not format:
-        return format_datetime(dateTime, week+'d/M/yyyy H:mm', locale=locale)
+        return format_datetime(dateTime, week+'d/M/yyyy H:mm', locale=locale, server_tz=server_tz)
     else:
-        return format_datetime(dateTime, format, locale=locale)
+        return format_datetime(dateTime, format, locale=locale, server_tz=server_tz)
 
 
 def formatDate(date, showWeek=False, format=None, locale=None):
@@ -442,11 +386,11 @@ def formatDate(date, showWeek=False, format=None, locale=None):
         return format_date(date, format, locale=locale)
 
 
-def formatTime(tm, format=None, locale=None):
+def formatTime(tm, format=None, locale=None, server_tz=False):
     if not format:
-        return format_time(tm, 'H:mm', locale=locale)
+        return format_time(tm, 'H:mm', locale=locale, server_tz=server_tz)
     else:
-        return format_time(tm, format, locale=locale)
+        return format_time(tm, format, locale=locale, server_tz=server_tz)
 
 
 def parseDate(dateStr, format='%d/%m/%Y'):
@@ -692,30 +636,6 @@ class OSSpecific(object):
             'LOCK_SH': None
             }
 
-def getLocationInfo(item, roomLink=True, fullName=False):
-    """Return a tuple (location, room, url) containing
-    information about the location of the item."""
-    minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-    location = item.getLocation().getName() if item.getLocation() else ""
-    customRoom = item.getRoom()
-    if not customRoom:
-        roomName = ''
-    elif fullName and location and minfo.getRoomBookingModuleActive():
-        # if we want the full name and we have a RB DB to search in
-        roomName = customRoom.getFullName()
-        if not roomName:
-            customRoom.retrieveFullName(location) # try to fetch the full name
-            roomName = customRoom.getFullName() or customRoom.getName()
-    else:
-        roomName = customRoom.getName()
-    # TODO check if the following if is required
-    if roomName in ['', '0--', 'Select:']:
-        roomName = ''
-    if roomLink:
-        url = RoomLinker().getURL(item.getRoom(), item.getLocation())
-    else:
-        url = ""
-    return (location, roomName, url)
 
 def getProtectionText(target):
     if target.hasAnyProtection():

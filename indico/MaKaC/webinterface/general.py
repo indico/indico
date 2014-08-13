@@ -32,10 +32,10 @@ def strfFileSize( sizeInBytes ):
     if sizeInGBs < 1024:
         return "%s GB"%sizeInGBs
 
-def normaliseListParam( param ):
-    if not isinstance(param, list):
-            return [ param ]
-    return param
+
+def normaliseListParam(param):
+    return [param] if not isinstance(param, list) else param
+
 
 class WebFactory:
     ##Don't remove this commentary. Its purpose is to be sure that those words/sentences are in the dictionary after extraction. It also prevents the developper to create an init for this class and update the 283 Webfactory occurences...

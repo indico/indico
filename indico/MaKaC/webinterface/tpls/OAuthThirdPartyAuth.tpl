@@ -1,10 +1,10 @@
-<div class="pageHeaderMainPage" style="text-align: center; margin-bottom: 20px;">
+<div class="page-header" style="text-align: center; margin-bottom: 20px;">
     <table style="margin: 0px auto; width: 630px;">
         <tbody>
             <tr>
                 <td>
                     <a href="${Config.getInstance().getBaseURL()}">
-                        <img alt="logo" style="float:left" class="headerLogo" src="${ Config.getInstance().getSystemIconURL("logoIndico") }" />
+                        <img alt="logo" style="float:left" class="header-logo" src="${ Config.getInstance().getSystemIconURL("logoIndico") }" />
                     </a>
                 </td>
                 <td style="vertical-align: bottom">

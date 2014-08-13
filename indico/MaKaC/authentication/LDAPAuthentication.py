@@ -73,9 +73,9 @@ from indico.util.contextManager import ContextManager
 # legacy indico imports
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, SSOHandler
 from MaKaC.authentication import AuthenticatorMgr
-from MaKaC.errors import MaKaCError, NotFoundError
-from MaKaC.common.logger import Logger
+from MaKaC.errors import MaKaCError
 from indico.core import config as Configuration
+from indico.core.logger import Logger
 from MaKaC.user import Group, PrincipalHolder
 
 

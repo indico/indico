@@ -19,6 +19,7 @@
 
     $.widget('ui.dropdown', {
         options: {
+            selector: '.i-button',
             effect_on: 'slideDown',
             effect_off: 'fadeOut',
             time_on: 200,
@@ -64,10 +65,10 @@
             });
         },
 
-        _menuize: function(elem) {
+        _menuize: function(elem, selector) {
             var self = this;
 
-            elem.find('.i-button').each(function() {
+            elem.find(this.options.selector).each(function() {
                 var $this = $(this);
                 if (!$this.attr('href') || $this.attr('href') == "#") {
                     $this.click(function(e) {

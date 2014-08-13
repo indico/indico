@@ -22,7 +22,8 @@
 %message-box {
     @include border-radius();
 
-    padding: 8px 14px 8px 14px;
+    color: #777;
+    padding: 0 0.5em;
     margin-bottom: 18px;
 
     &:before {
@@ -30,13 +31,25 @@
         display: block;
         float: left;
         font-size: 1.5em;
-        padding-top: 0.05em;
+        padding-top: 0.3em;
     }
 
-    & .message-text {
-        color: #777;
+    .message-text {
         font-size: 1.2em;
         padding-left: 2em;
+        padding-top: 1px;
+        margin: 0.5em 0;
+
+        p:first-child {
+            margin-top: 0;
+        }
+    }
+
+    .message-box-footer {
+        @include single-box-shadow($light-gray, 0, 5px, 5px, -5px, inset);
+        display: block;
+        margin: 0 -0.5em;
+        padding: 0.5em 0.5em;
     }
 }
 
@@ -97,12 +110,16 @@
     text-align: center;
 }
 
-.info-message-box {
+.info-message-box, .message-message-box {
     @extend %message-box;
     @include icon-before('icon-info');
 
     background-color: #FAFAFA;
     border: 1px solid #DDD;
+
+    .message-box-footer {
+        background: darken(#FAFAFA, 5%);
+    }
 }
 
 .success-message-box {
@@ -111,6 +128,14 @@
 
     background-color: #EEFAEE;
     border: 1px solid #CDC;
+
+    &:before {
+        color: #CDC;
+    }
+
+    .message-box-footer {
+        background: darken(#EEFAEE, 5%);
+    }
 }
 
 .warning-message-box {
@@ -119,6 +144,14 @@
 
     background-color: #FFF3E2;
     border: 1px solid #BE9056;
+
+    &:before {
+        color: #BE9056;
+    }
+
+    .message-box-footer {
+        background: darken(#FFF3E2, 5%);
+    }
 }
 
 .error-message-box {
@@ -127,6 +160,14 @@
 
     background-color: $light-red;
     border: 1px solid $dark-red;
+
+    &:before {
+        color: $dark-red;
+    }
+
+    .message-box-footer {
+        background: darken($light-red, 5%);
+    }
 }
 
 .error-message-tag {

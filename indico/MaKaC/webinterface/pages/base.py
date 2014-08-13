@@ -40,9 +40,10 @@ class WPBase(OldObservable):
     # required user-specific "data packages"
     _userData = []
 
-    def __init__( self, rh ):
+    def __init__(self, rh, **kwargs):
         config = Config.getInstance()
         self._rh = rh
+        self._kwargs = kwargs
         self._locTZ = ""
 
         self._dir = config.getTPLDir()
@@ -78,10 +79,9 @@ class WPBase(OldObservable):
         if not isinstance(pkg_names, list):
             pkg_names = [pkg_names]
 
-        urls = []
-        for pkg_name in pkg_names:
-            urls += self._asset_env['indico_' + pkg_name.lower()].urls()
-        return urls
+        return [url
+                for pkg_name in pkg_names
+                for url in self._asset_env['indico_' + pkg_name.lower()].urls()]
 
     def _getJavaScriptUserData(self):
         """
@@ -89,7 +89,7 @@ class WPBase(OldObservable):
         but depends on user data (can't be in vars.js.tpl)
         """
 
-        user = self._getAW().getUser();
+        user = self._getAW().getUser()
 
         from MaKaC.webinterface.asyndico import UserDataFactory
 
@@ -180,7 +180,7 @@ class WPBase(OldObservable):
         return text
 
 
-class WPDecorated( WPBase ):
+class WPDecorated(WPBase):
 
     def _getSiteArea(self):
         return "DisplayArea"
@@ -215,9 +215,9 @@ class WPDecorated( WPBase ):
         """
         return "<div class=\"wrapper\"><div class=\"main\">%s%s</div></div>%s"%( self._getHeader(), body, self._getFooter() )
 
-    def _display( self, params ):
-
-        return self._applyDecoration( self._getBody( params ) )
+    def _display(self, params):
+        params = dict(params, **self._kwargs)
+        return self._applyDecoration(self._getBody(params))
 
     def _getBody( self, params ):
         """
@@ -254,7 +254,8 @@ class WPDecorated( WPBase ):
         self._notify("includeMainJSFiles", pluginJSFiles)
         return WPBase.getJSFiles(self) + pluginJSFiles['paths']
 
-class WPNotDecorated( WPBase ):
+
+class WPNotDecorated(WPBase):
 
     def getLoginURL(self):
         return urlHandlers.UHSignIn.getURL(request.url)
@@ -262,12 +263,11 @@ class WPNotDecorated( WPBase ):
     def getLogoutURL(self):
         return urlHandlers.UHSignOut.getURL(request.url)
 
-    def _display( self, params ):
-        return self._getBody( params )
+    def _display(self, params):
+        params = dict(params, **self._kwargs)
+        return self._getBody(params)
 
-    def _getBody( self, params ):
-        """
-        """
+    def _getBody(self, params):
         pass
 
     def _getNavigationDrawer(self):

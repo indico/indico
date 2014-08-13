@@ -19,7 +19,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from requests.auth import HTTPDigestAuth
 import requests
 from urllib import urlencode

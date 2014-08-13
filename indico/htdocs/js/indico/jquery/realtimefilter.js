@@ -61,6 +61,12 @@
             });
         },
 
+        setValue: function(value) {
+            var self = this;
+
+            self.element.clearableinput('setValue', value)
+        },
+
         update: function(delayed) {
             var self = this;
 

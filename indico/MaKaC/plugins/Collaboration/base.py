@@ -31,7 +31,7 @@ from MaKaC.plugins import PluginsHolder
 from MaKaC.errors import MaKaCError, NoReportError
 from MaKaC.services.interface.rpc.common import ServiceError
 from MaKaC.common.timezoneUtils import nowutc
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools,\
     MailTools
@@ -135,12 +135,14 @@ class CSBookingManager(Persistent, Observer):
             self._bookingsByType = {}
 
         if filterByType is not None:
-            if type(filterByType) == str:
+            if isinstance(filterByType, basestring):
                 keys = self._bookingsByType.get(filterByType, [])
-            if type(filterByType) == list:
+            elif isinstance(filterByType, list):
                 keys = []
                 for pluginName in filterByType:
                     keys.extend(self._bookingsByType.get(pluginName, []))
+            else:
+                raise ValueError('Unexpected filterByType type: {}'.format(type(filterByType)))
         else:
             keys = self._bookings.keys()
 
@@ -1748,7 +1750,7 @@ class CSBookingBase(Persistent, Fossilizable):
 
         invalidFields = []
         for k, v in params.iteritems():
-            if type(v) == str and hasTags(v):
+            if isinstance(v, basestring) and hasTags(v):
                 invalidFields.append(k)
 
         if invalidFields:

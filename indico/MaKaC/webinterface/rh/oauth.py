@@ -29,7 +29,7 @@ from indico.modules.oauth.errors import OAuthError
 from indico.modules.oauth.components import OAuthUtils
 
 from MaKaC.common.timezoneUtils import nowutc
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from MaKaC.webinterface.rh import base
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.urlHandlers import UHOAuthThirdPartyAuth

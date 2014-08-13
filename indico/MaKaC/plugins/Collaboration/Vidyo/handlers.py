@@ -33,7 +33,7 @@ class ConnectVidyoBookingBase(CollaborationBookingModifBase):
 
     def _checkProtection(self):
         if self.getAW().getUser() and request.remote_addr == VidyoTools.getLinkRoomAttribute(self._booking.getLinkObject(),
-                                                                                             attName='IP'):
+                                                                                             attName='ip'):
             return
         elif not hasattr(self._booking, "getOwnerObject") or self._booking.getOwnerObject() != self.getAW().getUser():
             CollaborationBookingModifBase._checkProtection(self)

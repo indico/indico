@@ -27,7 +27,7 @@ else:
 % endif
 <%include file="Announcement.tpl"/>
 
-<div class="pageHeader ${"pageHeaderDark" if dark_ else ""}">
+<div class="page-header ${"page-header-dark" if dark_ else ""}">
 
     <%include file="SessionBar.tpl" args="dark=dark_"/>
 

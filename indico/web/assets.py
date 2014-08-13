@@ -121,10 +121,12 @@ indico_management = Bundle(
 indico_room_booking = Bundle(
     *namespace('js/indico/RoomBooking',
 
+               'util.js',
                'MapOfRooms.js',
                'BookingForm.js',
                'RoomBookingCalendar.js',
-               'roomselector.js'),
+               'roomselector.js',
+               'validation.js'),
     filters='rjsmin', output='js/indico_room_booking_%(version)s.min.js')
 
 indico_admin = Bundle(
@@ -173,12 +175,14 @@ indico_jquery = Bundle(
     *namespace('js/indico/jquery',
                'defaults.js',
                'global.js',
+               'errors.js',
                'clearableinput.js',
                'actioninput.js',
                'fieldarea.js',
                'multiselect.js',
                'realtimefilter.js',
-               'scrollblocker.js'),
+               'scrollblocker.js',
+               'timerange.js'),
     filters='rjsmin', output='js/indico_jquery_%(version)s.min.js')
 
 indico_jquery_authors = Bundle('js/indico/jquery/authors.js',
@@ -228,7 +232,6 @@ jquery = Bundle(*filter(None, [
                'jquery.form.js',
                'jquery.custom.js',
                'jquery.daterange.js',
-               'jquery.form.js',
                'jquery.dttbutton.js',
                'jquery.colorbox.js',
                'jquery.menu.js',
@@ -338,7 +341,6 @@ registrationform_sass = sass_module_bundle('registrationform')
 roombooking_sass = sass_module_bundle('roombooking')
 dashboard_sass = sass_module_bundle('dashboard')
 category_sass = sass_module_bundle('category')
-
 
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),

@@ -30,6 +30,7 @@ class Serializer(object):
         self.pretty = pretty
         self._fileName = None
         self._lastModified = None
+        self._extra_args = kwargs
 
     @classmethod
     def register(cls, tag, serializer):

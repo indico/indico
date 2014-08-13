@@ -34,17 +34,17 @@ import MaKaC.common.info as info
 from MaKaC.i18n import _
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
                             IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 
 from pytz import all_timezones
-from MaKaC.plugins.base import PluginsHolder
 
-from indico.util.caching import order_dict
+from indico.util.caching import memoize_request
 from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
+from indico.util.user import retrieve_principals
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import avatar_links, suggestions
 from indico.util.string import safe_upper, safe_slice
@@ -314,7 +314,6 @@ class Avatar(Persistent, Fossilizable):
     @cached_classproperty
     @classmethod
     def linkedToMap(cls):
-        from MaKaC.common.timerExec import Alarm
         import MaKaC.conference
         import MaKaC.registration
         import MaKaC.evaluation
@@ -342,9 +341,7 @@ class Avatar(Persistent, Fossilizable):
             'group': {'cls': MaKaC.user.Group,
                       'roles': set(['member'])},
             'evaluation': {'cls': MaKaC.evaluation.Submission,
-                           'roles': set(['submitter'])},
-            'alarm': {'cls': Alarm,
-                      'roles': set(['to'])}
+                           'roles': set(['submitter'])}
         }
 
     def __init__(self, userData=None):
@@ -1006,30 +1003,29 @@ class Avatar(Persistent, Fossilizable):
 
     # Room booking related
 
-    def isMemberOfSimbaList(self, simbaListName):
-
+    def is_member_of_group(self, group_name):
         # Try to get the result from the cache
         try:
-            if simbaListName in self._v_isMember.keys():
-                return self._v_isMember[simbaListName]
-        except:
+            if group_name in self._v_isMember.keys():
+                return self._v_isMember[group_name]
+        except Exception:
             self._v_isMember = {}
 
         groups = []
         try:
             # try to get the exact match first, which is what we expect since
             # there shouldn't be uppercase letters
-            groups.append(GroupHolder().getById(simbaListName))
+            groups.append(GroupHolder().getById(group_name))
         except KeyError:
-            groups = GroupHolder().match({ 'name': simbaListName }, searchInAuthenticators = False, exact=True)
+            groups = GroupHolder().match({'name': group_name}, searchInAuthenticators=False, exact=True)
             if not groups:
-                groups = GroupHolder().match({ 'name': simbaListName }, exact=True)
+                groups = GroupHolder().match({'name': group_name}, exact=True)
 
         if groups:
             result = groups[0].containsUser(self)
-            self._v_isMember[simbaListName] = result
+            self._v_isMember[group_name] = result
             return result
-        self._v_isMember[simbaListName] = False
+        self._v_isMember[group_name] = False
         return False
 
     def isAdmin(self):
@@ -1042,75 +1038,32 @@ class Avatar(Persistent, Fossilizable):
             return True
         return False
 
+    @memoize_request
     def isRBAdmin(self):
         """
         Convenience method for checking whether this user is an admin for the RB module.
         Returns bool.
         """
+        from indico.modules.rb import settings
+
         if self.isAdmin():
             return True
-        for entity in PluginsHolder().getPluginType('RoomBooking').getOption('Managers').getValue():
-            if (isinstance(entity, Group) and entity.containsUser(self)) or \
-                (isinstance(entity, Avatar) and entity == self):
-                return True
-        return False
+        principals = retrieve_principals(settings.get('admin_principals', []))
+        return any(principal.containsUser(self) for principal in principals)
 
-    def getRooms(self):
-        """
-        Returns list of rooms (RoomBase derived objects) this
-        user is responsible for.
-        """
-        from MaKaC.plugins.RoomBooking.default.room import Room
-        from MaKaC.rb_location import RoomGUID
+    @property
+    @memoize_request
+    def has_rooms(self):
+        """Checks if the user has any rooms"""
+        from indico.modules.rb.models.rooms import Room  # avoid circular import
 
-        rooms = Room.getUserRooms(self)
+        return Room.find(owner_id=self.getId()).count() > 0
 
-        roomList = [ RoomGUID.parse(str(rg)).getRoom() for rg in rooms ] if rooms else []
-        return [room for room in roomList if room and room.isActive]
-
-    def getReservations(self):
-        """
-        Returns list of ALL reservations (ReservationBase
-        derived objects) this user has ever made.
-        """
-#        self._ensureRoomAndResv()
-#        resvs = [guid.getReservation() for guid in self.resvGuids]
-#        return resvs
-
-        from MaKaC.rb_location import CrossLocationQueries
-        from MaKaC.rb_reservation import ReservationBase
-
-        resvEx = ReservationBase()
-        resvEx.createdBy = str(self.id)
-        resvEx.isCancelled = None
-        resvEx.isRejected = None
-        resvEx.isArchival = None
-
-        myResvs = CrossLocationQueries.getReservations(resvExample = resvEx)
-        return myResvs
-
-    def getReservationsOfMyRooms(self):
-        """
-        Returns list of ALL reservations (ReservationBase
-        derived objects) this user has ever made.
-        """
-#        self._ensureRoomAndResv()
-#        resvs = [guid.getReservation() for guid in self.resvGuids]
-#        return resvs
-
-        from MaKaC.rb_location import CrossLocationQueries
-        from MaKaC.rb_reservation import ReservationBase
-
-        myRooms = self.getRooms() # Just to speed up
-
-        resvEx = ReservationBase()
-        resvEx.isCancelled = None
-        resvEx.isRejected = None
-        resvEx.isArchival = None
-
-        myResvs = CrossLocationQueries.getReservations(resvExample = resvEx, rooms = myRooms)
-        return myResvs
-
+    @memoize_request
+    def get_rooms(self):
+        """Returns the rooms this user is responsible for"""
+        from indico.modules.rb.models.rooms import Room  # avoid circular import
+        return Room.find_all(is_active=True, owner_id=self.getId())
 
     def getPersonalInfo(self):
         try:
@@ -1470,13 +1423,6 @@ class AvatarHolder(ObjectHolder):
                             reg.setAvatar(prin)
                             prin.addRegistrant(reg)
 
-            if objType == "alarm":
-                for role in links[objType].keys():
-                    if role == "to":
-                        for alarm in set(links[objType][role]):
-                            alarm.removeToUser(merged)
-                            alarm.addToUser(prin)
-
             if objType == "group":
                 for role in links[objType].keys():
                     if role == "member":
@@ -1499,6 +1445,10 @@ class AvatarHolder(ObjectHolder):
         if redis_write_client:
             avatar_links.merge_avatars(prin, merged)
             suggestions.merge_avatars(prin, merged)
+
+        # Merge avatars in RB
+        from indico.modules.rb.utils import rb_merge_users
+        rb_merge_users(prin.getId(), merged.getId())
 
         # Merge API keys
         ak_prin = prin.getAPIKey()

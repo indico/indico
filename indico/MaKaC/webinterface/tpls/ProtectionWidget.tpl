@@ -19,10 +19,7 @@
     </div>
 </div>
 
-<li id="protectionBar" class="protectionBar protectionBar${protection[0]}">
-    <span class="icon-shield"></span>
-    <a id="protectionLink">${protection[1]}</a>
-</li>
+<a id="protectionLink" class="icon-shield arrow i-button protection-${protection[0].lower()}">${protection[1]}</a>
 
 
 <script type="text/javascript">

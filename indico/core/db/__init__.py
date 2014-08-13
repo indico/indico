@@ -17,7 +17,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import absolute_import
+
 __all__ = ['DBMgr', 'MigratedDB']
 
 from .manager import DBMgr
 from .migration import MigratedDB
+from .sqlalchemy import db

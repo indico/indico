@@ -475,6 +475,16 @@ class Config:
         'DBUserName'                : '',
         'DBPassword'                : '',
         'DBRealm'                   : '',
+        'IsRoomBookingActive'       : True,
+        'SQLAlchemyDatabaseURI'     : None,
+        'SQLAlchemyEcho'            : False,
+        'SQLAlchemyRecordQueries'   : False,
+        'SQLAlchemyPoolSize'        : 5,
+        'SQLAlchemyPoolTimeout'     : 10,
+        'SQLAlchemyPoolRecycle'     : 120,
+        'SQLAlchemyMaxOverflow'     : 3,
+        'EnableRoomBooking'         : True,
+        'MaxRetries'                : 10,
         'RedisConnectionURL'        : None,
         'SanitizationLevel'         : 1,
         'CSRFLevel'                 : 2,
@@ -528,6 +538,7 @@ class Config:
         'WorkerName'                : socket.getfqdn(),
         'Loggers'                   : ['files'],
         'SentryDSN'                 : None,
+        'SentryLoggingLevel'        : 'WARNING',
         'CategoryCleanup'           : {}
     }
 
@@ -541,7 +552,7 @@ class Config:
             "BinDir"               : "C:\\indico\\archive",
             "UploadedFilesTempDir" : "C:\\indico\\temp",
             "XMLCacheDir"          : "C:\\indico\\cache",
-                               })
+        })
 
     def __init__(self, filePath = None):
         self.filePath = filePath

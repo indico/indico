@@ -23,6 +23,7 @@ Module containing the MaKaC exception class hierarchy
 
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from indico.core.fossils.errors import IErrorReportFossil, IErrorNoReportFossil
+from indico.util.translations import ensure_str
 
 
 class MaKaCError(Exception, Fossilizable):
@@ -37,6 +38,7 @@ class MaKaCError(Exception, Fossilizable):
     def getMessage(self):
         return self._msg
 
+    @ensure_str
     def __str__(self):
         if self._area != "":
             return "%s - %s" % (self._area, self._msg)
@@ -64,6 +66,7 @@ class AccessControlError(MaKaCError):
         MaKaCError.__init__(self)
         self.objType = objectType
 
+    @ensure_str
     def __str__(self):
         return _("you are not authorised to access this %s") % self.objType
 
@@ -80,6 +83,7 @@ class ConferenceClosedError(MaKaCError):
         MaKaCError.__init__(self)
         self._conf = conf
 
+    @ensure_str
     def __str__(self):
         return _("the event has been closed")
 
@@ -100,6 +104,7 @@ class ModificationError(AccessControlError):
     """
     """
 
+    @ensure_str
     def __str__(self):
         return _("you are not authorised to modify this %s") % self.objType
 
@@ -108,6 +113,7 @@ class AdminError(AccessControlError):
     """
     """
 
+    @ensure_str
     def __str__(self):
         return _("only administrators can access this %s") % self.objType
 
@@ -116,6 +122,7 @@ class WebcastAdminError(AccessControlError):
     """
     """
 
+    @ensure_str
     def __str__(self):
         return _("only webcast administrators can access this %s") % self.objType
 
@@ -144,6 +151,7 @@ class UserError(MaKaCError):
     """
     """
 
+    @ensure_str
     def __str__(self):
         if self._msg:
             return self._msg

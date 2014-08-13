@@ -18,6 +18,9 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from functools import wraps
+
+from flask import has_request_context, g
+
 from indico.util.contextManager import ContextManager
 
 
@@ -63,11 +66,11 @@ def cached_property(f):
     return property(get)
 
 
-def _make_hashable(obj):
+def make_hashable(obj):
     if isinstance(obj, list):
         return tuple(obj)
     elif isinstance(obj, dict):
-        return frozenset((k, _make_hashable(v)) for k, v in obj.iteritems())
+        return frozenset((k, make_hashable(v)) for k, v in obj.iteritems())
     return obj
 
 
@@ -78,8 +81,29 @@ def memoize(obj):
 
     @wraps(obj)
     def memoizer(*args, **kwargs):
-        key = (_make_hashable(args), _make_hashable(kwargs))
+        key = (make_hashable(args), make_hashable(kwargs))
         if key not in cache:
             cache[key] = obj(*args, **kwargs)
         return cache[key]
+    return memoizer
+
+
+def memoize_request(f):
+    """Memoizes a function during the current request"""
+    @wraps(f)
+    def memoizer(*args, **kwargs):
+        if not has_request_context():
+            # No memoization outside request context
+            return f(*args, **kwargs)
+
+        try:
+            cache = g.memoize_cache
+        except AttributeError:
+            g.memoize_cache = cache = {}
+
+        key = (f.__name__, make_hashable(args), make_hashable(kwargs))
+        if key not in cache:
+            cache[key] = f(*args, **kwargs)
+        return cache[key]
+
     return memoizer

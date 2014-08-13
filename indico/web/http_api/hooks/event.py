@@ -23,10 +23,10 @@ import fnmatch
 import itertools
 import re
 import pytz
-from zope.index.text import parsetree
 from datetime import datetime
 
 # indico imports
+from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
 
 from indico.web.http_api.fossils import IConferenceMetadataWithContribsFossil, IConferenceMetadataFossil, \
@@ -40,12 +40,17 @@ from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 from MaKaC.conference import CategoryManager
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import ConferenceHolder
-from MaKaC.rb_tools import Period, datespan
 from MaKaC.schedule import ScheduleToJson
 
 utc = pytz.timezone('UTC')
 MAX_DATETIME = utc.localize(datetime(2099, 12, 31, 23, 59, 0))
 MIN_DATETIME = utc.localize(datetime(2000, 1, 1))
+
+
+class Period(object):
+    def __init__(self, startDT, endDT):
+        self.startDT = startDT
+        self.endDT = endDT
 
 
 @HTTPAPIHook.register
@@ -186,7 +191,7 @@ class CategoryEventFetcher(IteratedDataFetcher):
         Iterates over the daily times of an event
         """
         sched = conf.getSchedule()
-        for day in datespan(conf.getStartDate(), conf.getEndDate()):
+        for day in iterdays(conf.getStartDate(), conf.getEndDate()):
             # ignore days that have no occurrences
             if sched.getEntriesOnDay(day):
                 startDT = sched.calculateDayStartDate(day)

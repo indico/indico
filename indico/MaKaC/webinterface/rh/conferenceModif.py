@@ -18,7 +18,6 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import os
-import shutil
 from cStringIO import StringIO
 import tempfile
 import types
@@ -28,7 +27,6 @@ from datetime import datetime,timedelta
 from dateutil.relativedelta import relativedelta
 from pytz import timezone
 import MaKaC.common.timezoneUtils as timezoneUtils
-from MaKaC.common.contextManager import ContextManager
 from BTrees.OOBTree import OOBTree
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 import MaKaC.review as review
@@ -39,9 +37,8 @@ import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.conference as conference
-from MaKaC.webinterface.general import *
-from MaKaC.webinterface.rh.base import RHModificationBaseProtected, RoomBookingDBMixin
-from MaKaC.webinterface.rh.base import RH   # Strange conflict was here: this line vs nothing
+from MaKaC.webinterface.general import normaliseListParam
+from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.pages import admins
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHAlarmBase, RHSubmitMaterialBase
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
@@ -58,7 +55,6 @@ import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.common.contribPacker import ZIPFileHandler,AbstractPacker, ContribPacker,ConferencePacker, ProceedingsPacker
-from MaKaC.conference import CustomRoom
 from MaKaC.common import pendingQueues
 from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, ContributionsListToExcel
 from MaKaC.common import utils
@@ -68,14 +64,12 @@ from MaKaC.plugins.base import Observable
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept, AbstractStatusProposedToReject
 import MaKaC.webinterface.pages.abstracts as abstracts
-from MaKaC.rb_tools import FormMode
-from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from MaKaC.fossils.conference import ISessionBasicFossil
+
 from indico.modules.scheduler import Client
 from indico.util import json
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.flask.util import send_file
-from MaKaC.PDFinterface.base import LatexRunner
 
 
 class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
@@ -101,7 +95,7 @@ class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
         return self._displayDefaultPage()
 
 
-class RHConferenceModification( RoomBookingDBMixin, RHConferenceModifBase ):
+class RHConferenceModification(RHConferenceModifBase):
     _uh = urlHandlers.UHConferenceModification
 
     def _process( self ):
@@ -299,7 +293,7 @@ class RHConferenceOpen(RHConferenceModifBase):
         self._redirect(url)
 
 
-class RHConfDataModif(RoomBookingDBMixin, RHConferenceModifBase):
+class RHConfDataModif(RHConferenceModifBase):
     _uh = urlHandlers.UHConfDataModif
 
     def _displayCustomPage(self, wf):
@@ -314,7 +308,7 @@ class RHConfDataModif(RoomBookingDBMixin, RHConferenceModifBase):
         return p.display(**pars)
 
 
-class RHConfPerformDataModif( RoomBookingDBMixin, RHConferenceModifBase ):
+class RHConfPerformDataModif(RHConferenceModifBase):
     _uh = urlHandlers.UHConfPerformDataModif
 
     def _checkParams( self, params ):
@@ -331,7 +325,7 @@ class RHConfPerformDataModif( RoomBookingDBMixin, RHConferenceModifBase ):
 
 #----------------------------------------------------------------
 
-class RHConfModifSchedule( RoomBookingDBMixin, RHConferenceModifBase ):
+class RHConfModifSchedule(RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifSchedule
 
     def _checkParams( self, params ):
@@ -510,7 +504,8 @@ class RHConfModifTools( RHConferenceModifBase ):
         p = conferences.WPConfDisplayAlarm(self, self._target)
         return p.display()
 
-class RHConfDeletion( RoomBookingDBMixin, RHConferenceModifBase ):
+
+class RHConfDeletion(RHConferenceModifBase):
     _uh = urlHandlers.UHConfDeletion
 
     def _checkParams( self, params ):
@@ -791,7 +786,7 @@ class RHContribParticipantsSendEmail( RHConferenceModifBase  ):
 #######################################################################################
 
 
-class RHConfPerformCloning( RoomBookingDBMixin, RHConferenceModifBase, Observable ):
+class RHConfPerformCloning(RHConferenceModifBase, Observable):
     """
     New version of clone functionality -
     fully replace the old one, based on three different actions,
@@ -1077,7 +1072,8 @@ class RHConfAddAlarm( RHConferenceModifBase ):
         p = conferences.WPConfAddAlarm( self, self._conf )
         return p.display()
 
-class RHCreateAlarm( RoomBookingDBMixin, RHConferenceModifBase ):
+
+class RHCreateAlarm(RHConferenceModifBase):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
@@ -2524,7 +2520,8 @@ class RHConfRemoveCSS( RHConferenceModifBase ):
         sm.useLocalCSS()
         self._redirect( "%s#css"%urlHandlers.UHConfModifDisplayCustomization.getURL( self._conf ) )
 
-class RHConfModifPreviewCSS(RoomBookingDBMixin, RHConferenceModifBase):
+
+class RHConfModifPreviewCSS(RHConferenceModifBase):
 
     def _checkParams( self, params ):
         RHConferenceModifBase._checkParams( self, params )
@@ -2734,7 +2731,7 @@ class ContribFilterCrit(filters.FilterCriteria):
 
 
 class ContribSortingCrit(filters.SortingCriteria):
-    _availableFields={\
+    _availableFields = {
         contribFilters.NumberSF.getId():contribFilters.NumberSF,
         contribFilters.DateSF.getId():contribFilters.DateSF,
         contribFilters.ContribTypeSF.getId():contribFilters.ContribTypeSF,
@@ -2743,7 +2740,8 @@ class ContribSortingCrit(filters.SortingCriteria):
         contribFilters.BoardNumberSF.getId():contribFilters.BoardNumberSF,
         contribFilters.SessionSF.getId():contribFilters.SessionSF,
         contribFilters.TitleSF.getId():contribFilters.TitleSF
-        }
+    }
+
 
 class RHContributionListBase(RHConferenceModifBase):
 
@@ -2753,7 +2751,7 @@ class RHContributionListBase(RHConferenceModifBase):
             RHConferenceModifBase._checkProtection(self)
 
 
-class RHContributionList( RoomBookingDBMixin, RHContributionListBase ):
+class RHContributionList(RHContributionListBase):
     _uh = urlHandlers.UHConfModifContribList
 
     def _checkProtection(self):
@@ -3835,7 +3833,8 @@ class RHScheduleMoveEntryDown(RHConferenceModifBase):
         else:
             self._redirect("%s#%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf),date.strftime("%Y-%m-%d")))
 
-class RHReschedule(RoomBookingDBMixin, RHConferenceModifBase):
+
+class RHReschedule(RHConferenceModifBase):
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
@@ -3946,288 +3945,6 @@ class RHMaterialsShow(RHConferenceModifBase):
 
         p = conferences.WPConfModifExistingMaterials( self, self._target )
         return p.display()
-
-# ============================================================================
-# === Room booking related ===================================================
-# ============================================================================
-from MaKaC.webinterface.rh.conferenceBase import RHConferenceSite
-
-from MaKaC.rb_room import RoomBase
-from MaKaC.rb_reservation import ReservationBase, RepeatabilityEnum
-from MaKaC.rb_factory import Factory
-from MaKaC.rb_location import ReservationGUID, RoomGUID, Location
-
-# 0. Base Classes
-
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingSearch4Rooms, RHRoomBookingCloneBooking, RHRoomBookingProtected
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingRoomList
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingBookingList
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingRoomDetails
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingBookingDetails
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingBookingForm
-from MaKaC.webinterface.rh.roomBooking import RHRoomBookingSaveBooking
-
-# 0. RHConfModifRoomBookingChooseEvent
-
-class RHConferenceModifRoomBookingBase( RoomBookingDBMixin, RHConferenceModifBase, RHRoomBookingProtected):
-
-    def _checkProtection( self ):
-        self._checkSessionUser()
-        RHConferenceModifBase._checkProtection(self)
-        RHRoomBookingProtected._checkSessionUser(self)
-
-class RHConfModifRoomBookingChooseEvent( RHConferenceModifRoomBookingBase, RHRoomBookingSearch4Rooms ):
-    _uh = urlHandlers.UHConfModifRoomBookingChooseEvent
-
-    def _checkParams( self, params ):
-        RHConferenceModifRoomBookingBase._checkParams( self, params )
-
-        self._forNewBooking = True
-
-    def _process( self ):
-
-        p = conferences.WPConfModifRoomBookingChooseEvent( self )
-        return p.display()
-
-# 1. Searching
-
-class RHConfModifRoomBookingSearch4Rooms( RHConferenceModifRoomBookingBase, RHRoomBookingSearch4Rooms ):
-    _uh = urlHandlers.UHConfModifRoomBookingSearch4Rooms
-
-    def _setDefaultFormValues( self ):
-        """
-        Sets default values for HTML forms.
-        Uses event/session/contribution as an example.
-        """
-
-        # No example given? Fall back to general defaults
-        if self._dontAssign:
-            return
-
-        if self._conf != None and self._conf.getRoom() and self._conf.getRoom().getName():
-            self._eventRoomName = self._conf.getRoom().getName()
-
-        # Copy values from   Session
-        if self._conf is not None and self._assign2Session is not None:
-            confSession = self._assign2Session
-            session["rbDefaultStartDT"] = confSession.getAdjustedStartDate().replace(tzinfo=None)
-            session["rbDefaultEndDT"] = confSession.getAdjustedEndDate().replace(tzinfo=None)
-            if confSession.getStartDate().date() != confSession.getEndDate().date():
-                session["rbDefaultRepeatability"] = RepeatabilityEnum.daily
-            else:
-                session["rbDefaultRepeatability"] = None
-            session["rbDefaultBookedForName"] = self._getUser().getFullName() + " | " + confSession.getTitle()
-            session["rbDefaultReason"] = "Session '" + confSession.getTitle() + "'"
-            return
-
-        # Copy values from   Contribution
-        if self._conf is not None and self._assign2Contribution is not None:
-            contrib = self._assign2Contribution
-            session["rbDefaultStartDT"] = contrib.getAdjustedStartDate().replace(tzinfo=None)
-            session["rbDefaultEndDT"] = contrib.getAdjustedEndDate().replace(tzinfo=None)
-            if contrib.getStartDate().date() != contrib.getEndDate().date():
-                session["rbDefaultRepeatability"] = RepeatabilityEnum.daily
-            else:
-                session["rbDefaultRepeatability"] = None
-            session["rbDefaultBookedForName"] = self._getUser().getFullName() + " | " + contrib.getTitle()
-            session["rbDefaultReason"] = "Contribution '" + contrib.getTitle() + "'"
-            return
-
-        # Copy values from   Conference / Meeting / Lecture
-        if self._conf != None:
-            conf = self._conf
-            session["rbDefaultStartDT"] = conf.getAdjustedStartDate().replace(tzinfo=None)
-            session["rbDefaultEndDT"] = conf.getAdjustedEndDate().replace(tzinfo=None)
-            if conf.getStartDate().date() != conf.getEndDate().date():
-                session["rbDefaultRepeatability"] = RepeatabilityEnum.daily
-            else:
-                session["rbDefaultRepeatability"] = None
-            if self._getUser():
-                session["rbDefaultBookedForName"] = self._getUser().getFullName() + " | " + conf.getTitle()
-            else:
-                session["rbDefaultBookedForName"] = conf.getTitle()
-            session["rbDefaultReason"] = conf.getVerboseType() + " '" + conf.getTitle() + "'"
-            return
-
-    def _checkParams( self, params ):
-        locator = locators.WebLocator()
-        locator.setConference( params )
-        self._conf = locator.getConference()
-
-        RHRoomBookingSearch4Rooms._checkParams( self, params )
-        self._forNewBooking = True
-
-        if params.get('sessionId'):
-            self._assign2Session = self._conf.getSessionById(params['sessionId'])
-            session["rbAssign2Session"] = self._assign2Session.getLocator()
-        else:
-            self._assign2Session = None
-
-        if params.get('contribId'):
-            self._assign2Session = None
-            self._assign2Contribution = self._conf.getContributionById(params['contribId'])
-            session["rbAssign2Contribution"] = self._assign2Contribution.getLocator()
-        else:
-            self._assign2Contribution = None
-        self._dontAssign = params.get('rbDontAssign') == "True"
-        session["rbDontAssign"] = self._dontAssign
-
-        self._setDefaultFormValues()
-
-        RHConferenceModifRoomBookingBase._checkParams( self, params )
-
-    def _process( self ):
-        self._businessLogic()
-
-        p = conferences.WPConfModifRoomBookingSearch4Rooms( self )
-        return p.display()
-
-# 2. List of...
-
-class RHConfModifRoomBookingRoomList( RHConferenceModifRoomBookingBase, RHRoomBookingRoomList ):
-    _uh = urlHandlers.UHConfModifRoomBookingRoomList
-
-    def _checkParams( self, params ):
-        RHConferenceModifRoomBookingBase._checkParams(self, params)
-        RHRoomBookingRoomList._checkParams( self, params )
-
-    def _process( self ):
-        if self._target.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
-
-        self._businessLogic()
-
-        p = conferences.WPConfModifRoomBookingRoomList( self )
-        return p.display()
-
-class RHConfModifRoomBookingList( RHConferenceModifRoomBookingBase, RHRoomBookingBookingList ):
-    _uh = urlHandlers.UHConfModifRoomBookingList
-
-    def _checkParams( self, params ):
-        RHRoomBookingBookingList._checkParams(self, params)
-        RHConferenceModifRoomBookingBase._checkParams(self, params)
-
-    def _process( self ):
-        if self._target.isClosed():
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display()
-
-        self._resvs = self._target.getRoomBookingList()
-        for r in self._resvs:
-            if r.getOwner() == None:
-                r.setOwner( self._conf )
-
-        p = conferences.WPConfModifRoomBookingList( self )
-        return p.display()
-
-# 3. Details of...
-
-class RHConfModifRoomBookingRoomDetails( RHConferenceModifRoomBookingBase, RHRoomBookingRoomDetails ):
-    _uh = urlHandlers.UHConfModifRoomBookingRoomDetails
-
-    def _checkParams( self, params ):
-        RHRoomBookingRoomDetails._checkParams(self, params)
-        RHConferenceModifRoomBookingBase._checkParams(self, params)
-
-    def _process( self ):
-        self._businessLogic()
-        p = conferences.WPConfModifRoomBookingRoomDetails( self )
-        return p.display()
-
-class RHConfModifRoomBookingDetails( RHConferenceModifRoomBookingBase, RHRoomBookingBookingDetails ):
-    _uh = urlHandlers.UHConfModifRoomBookingDetails
-
-    def _checkParams( self, params ):
-        RHRoomBookingBookingDetails._checkParams( self, params )
-        RHConferenceModifRoomBookingBase._checkParams(self, params)
-
-    def _process( self ):
-        self._businessLogic()
-        self._resv.setOwner( self._conf )
-
-        p = conferences.WPConfModifRoomBookingDetails( self )
-        return p.display()
-
-# 4. New ...
-
-class RHConfModifRoomBookingBookingForm( RHConferenceModifRoomBookingBase, RHRoomBookingBookingForm ):
-    _uh = urlHandlers.UHConfModifRoomBookingBookingForm
-
-    def _checkParams( self, params ):
-        RHRoomBookingBookingForm._checkParams( self, params )
-        RHConferenceModifRoomBookingBase._checkParams(self, params)
-
-    def _process( self ):
-        self._businessLogic()
-        self._candResv.setOwner( self._conf )
-        p = conferences.WPConfModifRoomBookingBookingForm( self )
-        return p.display()
-
-class RHConfModifRoomBookingCloneBooking(RHConferenceModifRoomBookingBase, RHRoomBookingCloneBooking):
-    def _checkParams(self, params):
-        RHRoomBookingCloneBooking._checkParams(self, params)
-        RHConferenceModifBase._checkParams(self, params)
-
-    def _process( self ):
-        self._redirect(urlHandlers.UHConfModifRoomBookingBookingForm.getURL(self._room))
-
-class RHConfModifRoomBookingSaveBooking( RHConferenceModifRoomBookingBase, RHRoomBookingSaveBooking ):
-    _uh = urlHandlers.UHConfModifRoomBookingSaveBooking
-
-    def _checkParams( self, params ):
-        RHConferenceModifRoomBookingBase._checkParams(self, params)
-        RHRoomBookingSaveBooking._checkParams( self, params )
-
-        # Assign room to event / session / contribution?
-        self._assign2Session = None
-        self._assign2Contribution = None
-        if session.get('rbAssign2Session'):
-            locator = locators.WebLocator()
-            locator.setSession(session['rbAssign2Session'])
-            self._assign2Session = locator.getObject()
-        if session.get("rbAssign2Contribution"):
-            locator = locators.WebLocator()
-            locator.setContribution(session['rbAssign2Contribution'])
-            self._assign2Contribution = locator.getObject()
-        self._assign2Conference = None
-        if not self._assign2Session and not self._assign2Contribution:
-            if self._conf and not session.get("rbDontAssign"): # True or None
-                self._assign2Conference = self._conf
-
-    def _process( self ):
-        self._businessLogic()
-
-        if self._thereAreConflicts:
-            url = urlHandlers.UHConfModifRoomBookingBookingForm.getURL( self._candResv.room )
-            self._redirect( url )
-        elif self._confirmAdditionFirst:
-            p = conferences.WPConfModifRoomBookingConfirmBooking( self )
-            return p.display()
-        elif self._answer == 'No':
-            url = urlHandlers.UHConfModifRoomBookingBookingForm.getURL(self._candResv.room)
-            self._redirect(url)
-        else:
-            if self._formMode == FormMode.NEW:
-                # Add it to event reservations list
-                guid = ReservationGUID( Location.parse( self._candResv.locationName ), self._candResv.id )
-                self._conf.addRoomBookingGuid( guid )
-
-                # Set room for event / session / contribution (always only _one_ available)
-                assign2 = self._assign2Conference or self._assign2Contribution or self._assign2Session
-                if assign2:
-                    croom = CustomRoom()         # Boilerplate class, has only 'name' attribute
-                    croom.setName( self._candResv.room.name )
-                    croom.setFullName(self._candResv.room.getFullName())
-                    assign2.setRoom( croom )
-
-            # Redirect
-            self._candResv.setOwner( self._conf )
-            url = urlHandlers.UHConfModifRoomBookingDetails.getURL( self._candResv )
-            self._candResv.setOwner( None )
-            self._redirect( url )
-
-
 
 # ============================================================================
 # === Badges related =========================================================

@@ -25,6 +25,7 @@ from MaKaC.user import LoginInfo
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.conference import CategoryManager
 
+
 class RHXMLHandlerBase ( base.RH ):
 
     def _genStatus (self, statusValue, message, XG):
@@ -100,6 +101,7 @@ class RHSignOut( RHXMLHandlerBase ):
 
         return self._createResponse("OK", "Logged out")
 
+
 class RHWebcastOnAir( RHXMLHandlerBase ):
 
     def _printWebcast(self, wc, XG):
@@ -146,6 +148,7 @@ class RHWebcastOnAir( RHXMLHandlerBase ):
         self._responseUtil.content_type = 'text/xml'
         return XG.getXml()
 
+
 class RHWebcastForthcomingEvents( RHXMLHandlerBase ):
 
     def _printWebcast(self, wc, XG):
@@ -175,6 +178,7 @@ class RHWebcastForthcomingEvents( RHXMLHandlerBase ):
         XG.closeTag("response")
         self._responseUtil.content_type = 'text/xml'
         return XG.getXml()
+
 
 class RHCategInfo( RHXMLHandlerBase ):
 
@@ -220,62 +224,6 @@ class RHCategInfo( RHXMLHandlerBase ):
             message = "Category does not exist"
         if value != "OK":
             return self._createResponse(value, message)
-
-class RHStatsRoomBooking( base.RoomBookingDBMixin, RHXMLHandlerBase ):
-
-    def _createIndicator( self, XG, name, fullname, value ):
-        XG.openTag("indicator")
-        XG.writeTag("name", name)
-        XG.writeTag("fullname", fullname)
-        XG.writeTag("value", value)
-        XG.closeTag("indicator")
-
-    def _process( self ):
-        from MaKaC.rb_room import RoomBase
-        from datetime import datetime,timedelta
-        from MaKaC.rb_reservation import ReservationBase
-
-        startdt = enddt = datetime.now()
-        today = startdt.date()
-        startdt.replace( hour = 0, minute = 0)
-        enddt.replace( hour = 23, minute = 59)
-
-        self._responseUtil.content_type = 'text/xml'
-        XG = xmlGen.XMLGen()
-        XG.openTag("response")
-
-        rooms = RoomBase.getRooms()
-        nbRooms = len(rooms)
-        nbPublicRooms = nbPrivateRooms = nbSemiPrivateRooms = 0
-        for r in rooms:
-            if not r.isReservable:
-                nbPrivateRooms += 1
-            elif not r.resvsNeedConfirmation:
-                nbPublicRooms += 1
-            else:
-                nbSemiPrivateRooms += 1
-
-        self._createIndicator(XG, "total", "total number of managed rooms", nbRooms)
-        self._createIndicator(XG, "public", "number of public rooms", nbPublicRooms)
-        self._createIndicator(XG, "semiprivate", "number of semi-private rooms", nbSemiPrivateRooms)
-        self._createIndicator(XG, "private", "number of private rooms", nbPrivateRooms)
-
-        resvex = ReservationBase()
-        resvex.isConfirmed = True
-        resvex.isCancelled = False
-        nbResvs = len(ReservationBase.getReservations( resvExample = resvex, days = [ startdt.date() ] ))
-        resvex.usesAVC = True
-        nbAVResvs = len(ReservationBase.getReservations( resvExample = resvex, days = [ startdt.date() ] ))
-        resvex.needsAVCSupport = True
-        resvex.needsAssistance = False
-        nbAVResvsWithSupport = len(ReservationBase.getReservations( resvExample = resvex, days = [ startdt.date() ] ))
-
-        self._createIndicator(XG, "nbbookings", "total number of bookings for today", nbResvs)
-        self._createIndicator(XG, "nbvc", "number of remote collaboration bookings (video or phone conference)", nbAVResvs)
-        self._createIndicator(XG, "nbvcsupport", "number of remote collaboration bookings with planned IT support", nbAVResvsWithSupport)
-
-        XG.closeTag("response")
-        return XG.getXml()
 
 
 class RHStatsIndico( RHXMLHandlerBase ):

@@ -109,47 +109,50 @@ reservations
 Returns detailed data about the reservations and the most important
 information about the booked room.
 
-For example, https://indico.server/export/reservation/CERN.json?ak=00000000-0000-0000-0000-000000000000&detail=reservations&from=today&to=today&bookedfor=*MONNICH*&pretty=yes::
+For example, https://indico.server/export/reservation/CERN.json?ak=00000000-0000-0000-0000-000000000000&detail=reservation&from=today&to=today&pretty=yes::
 
     {
         "count": 1,
+        "additionalInfo": {},
         "_type": "HTTPAPIResult",
-        "complete": true,
-        "url": "https://indico.server/export/reservation/CERN.json?ak=00000000-0000-0000-0000-000000000000&detail=reservations&from=today&to=today&bookedfor=*MONNICH*&pretty=yes",
-        "ts": 1308923111,
+        "url": "/export/reservation/CERN.json?ak=00000000-0000-0000-0000-000000000000&detail=reservation&from=today&to=today&pretty=yes",
         "results": [
             {
+                "_type": "Reservation",
+                "repeat_unit": 1,
                 "endDT": {
-                    "date": "2011-06-25",
+                    "date": "2014-08-14",
                     "tz": "Europe/Zurich",
-                    "time": "17:30:00"
+                    "time": "12:30:00"
                 },
                 "room": {
-                    "_fossil": "minimalRoomMetadata",
-                    "_type": "RoomCERN",
-                    "fullName": "500-1-201 - Mezzanine",
-                    "id": 120
+                    "_type": "Room",
+                    "fullName": "500-1-001 - Main Auditorium",
+                    "id": 57
                 },
+                "needs_general_assistance": false,
                 "isConfirmed": true,
                 "isValid": true,
                 "usesAVC": false,
                 "repeatability": "daily",
-                "_type": "ReservationCERN",
+                "repeat_step": 1,
                 "vcList": [],
-                "reason": "Just testing",
-                "location": "CERN",
-                "_fossil": "reservationMetadata",
+                "reason": "Summer Student Lecture programme",
+                "bookedForName": "DOE, John",
+                "is_rejected": false,
+                "is_cancelled": false,
                 "needsAVCSupport": false,
                 "startDT": {
-                    "date": "2011-06-24",
+                    "date": "2014-07-02",
                     "tz": "Europe/Zurich",
                     "time": "08:30:00"
                 },
-                "id": 93094,
-                "bookingUrl": "http://indico.server/roomBooking.py/bookingDetails?roomLocation=CERN&resvID=93094",
-                "bookedForName": "MONNICH, Jerome"
+                "id": 63779,
+                "bookingUrl": "http://indico.server/rooms/booking/CERN/63779/",
+                "location": "CERN"
             }
-        ]
+        ],
+        "ts": 1406727843
     }
 
 
@@ -188,33 +191,50 @@ rooms
 
 Returns basic data about the rooms.
 
-For example, https://indico.server/export/room/CERN/120.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes::
+For example, https://indico.server/export/room/CERN/57.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes::
 
     {
         "count": 1,
+        "additionalInfo": {},
         "_type": "HTTPAPIResult",
-        "complete": true,
-        "url": "https://indico.server/export/room/CERN/120.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes",
-        "ts": 1308921960,
+        "url": "/export/room/CERN/57.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes",
         "results": [
             {
-                "building": 500,
-                "_type": "RoomCERN",
-                "name": "Mezzanine",
+                "building": "500",
+                "_type": "Room",
+                "name": "Main Auditorium",
                 "floor": "1",
-                "longitude": "6.05427049127",
-                "vcList": [],
-                "equipment": [],
-                "roomNr": "201",
+                "longitude": "6.0542704900999995",
+                "vcList": [
+                    "Audio Conference",
+                    "Built-in (MCU) Bridge",
+                    "CERN MCU",
+                    "ESnet MCU",
+                    "EVO",
+                    "H323 point2point",
+                    "Vidyo"
+                ],
+                "equipment": [
+                    "Blackboard",
+                    "Computer Projector",
+                    "Ethernet",
+                    "Microphone",
+                    "PC",
+                    "Telephone conference",
+                    "Video conference",
+                    "Webcast/Recording",
+                    "Wireless"
+                ],
+                "roomNr": "001",
                 "location": "CERN",
-                "_fossil": "roomMetadata",
-                "latitude": "46.2314139466",
-                "fullName": "500-1-201 - Mezzanine",
-                "id": 120,
-                "bookingUrl": "http://indico.server/roomBooking.py/bookingForm?roomLocation=CERN&roomID=120",
-                "avc": false
+                "latitude": "46.23141394580001",
+                "fullName": "500-1-001 - Main Auditorium",
+                "id": 57,
+                "bookingUrl": "/indico/rooms/room/CERN/57/book",
+                "avc": true
             }
-        ]
+        ],
+        "ts": 1406729635
     }
 
 
@@ -223,59 +243,81 @@ reservations
 
 Returns basic data about the rooms and their reservations in the given timeframe.
 
-Output for https://indico.server/export/room/CERN/120.json?ak=00000000-0000-0000-0000-000000000000&detail=reservations&from=today&to=today&pretty=yes::
+Output for https://indico.server/export/room/CERN/57.json?ak=00000000-0000-0000-0000-000000000000&detail=reservations&from=today&to=today&pretty=yes::
 
     {
         "count": 1,
+        "additionalInfo": {},
         "_type": "HTTPAPIResult",
-        "complete": true,
-        "url": "https://indico.server/export/room/CERN/120.json?ak=00000000-0000-0000-0000-000000000000&detail=reservations&from=today&to=today&pretty=yes",
-        "ts": 1308922107,
+        "url": "/export/room/CERN/57.json?ak=00000000-0000-0000-0000-000000000000&detail=reservations&from=today&to=today&pretty=yes",
         "results": [
             {
-                "building": 500,
-                "_type": "RoomCERN",
-                "name": "Mezzanine",
+                "building": "500",
+                "_type": "Room",
+                "name": "Main Auditorium",
                 "floor": "1",
-                "longitude": "6.05427049127",
                 "reservations": [
                     {
+                        "_type": "Reservation",
+                        "repeat_unit": 1,
                         "endDT": {
-                            "date": "2011-06-25",
+                            "date": "2014-08-14",
                             "tz": "Europe/Zurich",
-                            "time": "17:30:00"
+                            "time": "12:30:00"
                         },
+                        "needs_general_assistance": false,
                         "isConfirmed": true,
                         "isValid": true,
                         "usesAVC": false,
                         "repeatability": "daily",
-                        "_type": "ReservationCERN",
+                        "repeat_step": 1,
                         "vcList": [],
-                        "reason": "Just testing",
-                        "bookedForName": "MONNICH, Jerome",
-                        "_fossil": "roomReservationMetadata",
+                        "reason": "Summer Student Lecture programme",
+                        "bookedForName": "DOE, John",
+                        "is_rejected": false,
+                        "is_cancelled": false,
                         "needsAVCSupport": false,
                         "startDT": {
-                            "date": "2011-06-24",
+                            "date": "2014-07-02",
                             "tz": "Europe/Zurich",
                             "time": "08:30:00"
                         },
-                        "id": 93094,
-                        "bookingUrl": "http://indico.server/roomBooking.py/bookingDetails?roomLocation=CERN&resvID=93094"
+                        "id": 63779,
+                        "bookingUrl": "http://pcavc005.cern.ch:8000/indico/rooms/booking/CERN/63779/",
+                        "location": "CERN"
                     }
                 ],
-                "vcList": [],
-                "equipment": [],
-                "roomNr": "201",
+                "longitude": "6.0542704900999995",
+                "vcList": [
+                    "Audio Conference",
+                    "Built-in (MCU) Bridge",
+                    "CERN MCU",
+                    "ESnet MCU",
+                    "EVO",
+                    "H323 point2point",
+                    "Vidyo"
+                ],
+                "equipment": [
+                    "Blackboard",
+                    "Computer Projector",
+                    "Ethernet",
+                    "Microphone",
+                    "PC",
+                    "Telephone conference",
+                    "Video conference",
+                    "Webcast/Recording",
+                    "Wireless"
+                ],
+                "roomNr": "001",
                 "location": "CERN",
-                "_fossil": "roomMetadataWithReservations",
-                "latitude": "46.2314139466",
-                "fullName": "500-1-201 - Mezzanine",
-                "id": 120,
-                "bookingUrl": "http://indico.server/roomBooking.py/bookingForm?roomLocation=CERN&roomID=120",
-                "avc": false
+                "latitude": "46.23141394580001",
+                "fullName": "500-1-001 - Main Auditorium",
+                "id": 57,
+                "bookingUrl": "/indico/rooms/room/CERN/57/book",
+                "avc": true
             }
-        ]
+        ],
+        "ts": 1406731966
     }
 
 Get room by room name
@@ -305,32 +347,49 @@ Results
 
 Returns basic data about the rooms.
 
-For example, https://indico.server/export/roomName/CERN/Mezzanine.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes::
+For example, https://indico.server/export/roomName/CERN/Main Auditorium.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes::
 
     {
         "count": 1,
+        "additionalInfo": {},
         "_type": "HTTPAPIResult",
-        "complete": true,
-        "url": "https://indico.server/export/room/CERN/120.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes",
-        "ts": 1308921960,
+        "url": "/export/roomName/CERN/Main Auditorium.json?ak=00000000-0000-0000-0000-000000000000&pretty=yes",
         "results": [
             {
-                "building": 500,
-                "_type": "RoomCERN",
-                "name": "Mezzanine",
+                "building": "500",
+                "_type": "Room",
+                "name": "Main Auditorium",
                 "floor": "1",
-                "longitude": "6.05427049127",
-                "vcList": [],
-                "equipment": [],
-                "roomNr": "201",
+                "longitude": "6.0542704900999995",
+                "vcList": [
+                    "Audio Conference",
+                    "Built-in (MCU) Bridge",
+                    "CERN MCU",
+                    "ESnet MCU",
+                    "EVO",
+                    "H323 point2point",
+                    "Vidyo"
+                ],
+                "equipment": [
+                    "Blackboard",
+                    "Computer Projector",
+                    "Ethernet",
+                    "Microphone",
+                    "PC",
+                    "Telephone conference",
+                    "Video conference",
+                    "Webcast/Recording",
+                    "Wireless"
+                ],
+                "roomNr": "001",
                 "location": "CERN",
-                "_fossil": "roomMetadata",
-                "latitude": "46.2314139466",
-                "fullName": "500-1-201 - Mezzanine",
-                "id": 120,
-                "bookingUrl": "http://indico.server/roomBooking.py/bookingForm?roomLocation=CERN&roomID=120",
-                "avc": false
+                "latitude": "46.23141394580001",
+                "fullName": "500-1-001 - Main Auditorium",
+                "id": 57,
+                "bookingUrl": "/indico/rooms/room/CERN/57/book",
+                "avc": true
             }
-        ]
+        ],
+        "ts": 1406732578
     }
 

@@ -27,12 +27,17 @@ import pytz
 import re
 import urllib
 from datetime import datetime, timedelta, time
-from flask import request
 from types import GeneratorType
+
+import transaction
+from flask import request
+from ZEO.Exceptions import ClientDisconnected
 from ZODB.POSException import ConflictError
 
 # indico imports
+from MaKaC.common.mail import GenericMailer
 from indico.core.db import DBMgr
+from indico.core.db.util import flush_after_commit_queue
 from indico.util.date_time import nowutc
 from indico.util.fossilize import fossilize
 from indico.web.http_api.metadata import Serializer
@@ -153,6 +158,10 @@ class HTTPAPIHook(object):
     def _hasAccess(self, aw):
         return True
 
+    @property
+    def serializer_args(self):
+        return {}
+
     def _getMethodName(self):
         return self.PREFIX + '_' + self._type
 
@@ -170,41 +179,56 @@ class HTTPAPIHook(object):
             complete = (self._limit == self._userLimit)
         return resultList, complete
 
+    def _perform(self, aw, func, extra_func):
+        self._getParams()
+        if not self._hasAccess(aw):
+            raise HTTPAPIError('Access to this resource is restricted.', 403)
+        resultList, complete = self._performCall(func, aw)
+        extra = extra_func(aw, resultList) if extra_func else None
+        return resultList, complete, extra
+
     def __call__(self, aw):
         """Perform the actual exporting"""
         if self.HTTP_POST != (request.method == 'POST'):
             raise HTTPAPIError('This action requires %s' % ('POST' if self.HTTP_POST else 'GET'), 405)
-        self._getParams()
         if not self.GUEST_ALLOWED and not aw.getUser():
             raise HTTPAPIError('Guest access to this resource is forbidden.', 403)
-        if not self._hasAccess(aw):
-            raise HTTPAPIError('Access to this resource is restricted.', 403)
 
         method_name = self._getMethodName()
         func = getattr(self, method_name, None)
+        extra_func = getattr(self, method_name + '_extra', None)
         if not func:
             raise NotImplementedError(method_name)
 
         if not self.COMMIT:
-            # Just execute the function, we'll never have to repeat it
-            resultList, complete = self._performCall(func, aw)
+            resultList, complete, extra = self._perform(aw, func, extra_func)
         else:
-            # Try it a few times until commit succeeds
             dbi = DBMgr.getInstance()
-            for _retry in xrange(10):
-                dbi.sync()
-                resultList, complete = self._performCall(func, aw)
-                try:
-                    dbi.commit()
-                except ConflictError:
-                    pass  # retry
+            try:
+                for i, retry in enumerate(transaction.attempts(10)):
+                    with retry:
+                        if i > 0:
+                            dbi.abort()
+                        flush_after_commit_queue(False)
+                        GenericMailer.flushQueue(False)
+                        dbi.sync()
+                        try:
+                            resultList, complete, extra = self._perform(aw, func, extra_func)
+                            transaction.commit()
+                            flush_after_commit_queue(True)
+                            GenericMailer.flushQueue(True)
+                            break
+                        except ConflictError:
+                            transaction.abort()
+                        except ClientDisconnected:
+                            transaction.abort()
+                            time.sleep(i * 5)
                 else:
-                    break
-            else:
-                raise HTTPAPIError('An unresolvable database conflict has occured', 500)
+                    raise HTTPAPIError('An unresolvable database conflict has occured', 500)
+            except Exception:
+                transaction.abort()
+                raise
 
-        extraFunc = getattr(self, method_name + '_extra', None)
-        extra = extraFunc(aw, resultList) if extraFunc else None
         return resultList, extra, complete, self.SERIALIZER_TYPE_MAP
 
 

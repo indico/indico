@@ -21,23 +21,31 @@ from __future__ import absolute_import
 
 import os
 import re
+
 from flask import send_from_directory, request, _app_ctx_stack
 from flask import current_app as app
+from flask.ext.sqlalchemy import models_committed
+from sqlalchemy.orm import configure_mappers
 from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
 
 import indico.util.date_time as date_time_util
 from indico.core.config import Config
 from indico.util.i18n import gettext, ngettext
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
+
+from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy.core import on_models_committed
+from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.web.assets import core_env, register_all_css, register_all_js
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
                                    IndicoConfigWrapper)
 from indico.web.flask.wrappers import IndicoFlask
+
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.rooms import rooms
 from indico.web.flask.blueprints.api import api
@@ -85,6 +93,7 @@ def configure_app(app, set_path=False):
         app.config['SERVER_NAME'] = base.netloc
         if base.path:
             app.config['APPLICATION_ROOT'] = base.path
+    app.config['WTF_CSRF_ENABLED'] = False  # for forms of room booking
     static_file_method = cfg.getStaticFileMethod()
     if static_file_method:
         app.config['USE_X_SENDFILE'] = True
@@ -134,6 +143,31 @@ def setup_assets():
     ASSETS_REGISTERED = True
     register_all_js(core_env)
     register_all_css(core_env, Config.getInstance().getCssStylesheetName())
+
+
+def configure_db(app):
+    cfg = Config.getInstance()
+    db_uri = cfg.getSQLAlchemyDatabaseURI()
+
+    if db_uri is None:
+        raise Exception("No proper SQLAlchemy store has been configured."
+                        " Please edit your indico.conf")
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+
+    # DB options
+    app.config['SQLALCHEMY_ECHO'] = cfg.getSQLAlchemyEcho()
+    app.config['SQLALCHEMY_RECORD_QUERIES'] = cfg.getSQLAlchemyRecordQueries()
+    app.config['SQLALCHEMY_POOL_SIZE'] = cfg.getSQLAlchemyPoolSize()
+    app.config['SQLALCHEMY_POOL_TIMEOUT'] = cfg.getSQLAlchemyPoolTimeout()
+    app.config['SQLALCHEMY_POOL_RECYCLE'] = cfg.getSQLAlchemyPoolRecycle()
+    app.config['SQLALCHEMY_MAX_OVERFLOW'] = cfg.getSQLAlchemyMaxOverflow()
+    app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = False
+
+    db.init_app(app)
+    apply_db_loggers(app.debug)
+    configure_mappers()  # Make sure all backrefs are set
+    models_committed.connect(on_models_committed, app)
 
 
 def extend_url_map(app):
@@ -188,7 +222,7 @@ def handle_exception(exception):
     return WErrorWSGI(msg).getHTML(), 500
 
 
-def make_app(set_path=False):
+def make_app(set_path=False, db_setup=True):
     # If you are reading this code and wonder how to access the app:
     # >>> from flask import current_app as app
     # This only works while inside an application context but you really shouldn't have any
@@ -203,6 +237,10 @@ def make_app(set_path=False):
     configure_app(app, set_path)
     setup_jinja(app)
     setup_assets()
+
+    if db_setup:
+        configure_db(app)
+
     extend_url_map(app)
     add_handlers(app)
     add_blueprints(app)

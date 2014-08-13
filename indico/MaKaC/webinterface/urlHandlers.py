@@ -20,19 +20,21 @@ import re
 import os
 import string
 import urlparse
+
 from flask import request, session, url_for
 
-from MaKaC.common.url import URL, EndpointURL
-from indico.core.config import Config
 import MaKaC.user as user
+from MaKaC.common.url import URL, EndpointURL
 from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
 
+from indico.core.config import Config
 
-class BooleanOnMixin:
-    """Mixin to convert True to 'on' and remove False altogether."""
-    _true = 'on'
+
+class BooleanMixin:
+    """Mixin to convert True to 'y' and remove False altogether."""
+    _true = 'y'
 
     @classmethod
     def _translateParams(cls, params):
@@ -41,7 +43,7 @@ class BooleanOnMixin:
                     if value is not False)
 
 
-class BooleanTrueMixin(BooleanOnMixin):
+class BooleanTrueMixin(BooleanMixin):
     _true = 'True'
 
 
@@ -410,56 +412,8 @@ class UHRoomBookingWelcome(URLHandler):
     _endpoint = 'rooms.roomBooking'
 
 
-class UHRoomBookingSearch4Rooms(URLHandler):
-    _endpoint = 'rooms.roomBooking-search4Rooms'
-    _defaultParams = dict(forNewBooking=False)
-
-
 class UHRoomBookingSearch4Bookings(URLHandler):
     _endpoint = 'rooms.roomBooking-search4Bookings'
-
-
-class UHRoomBookingBookRoom(URLHandler):
-    _endpoint = 'rooms.roomBooking-bookRoom'
-
-
-class UHRoomBookingRoomList(BooleanOnMixin, URLHandler):
-    _endpoint = 'rooms.roomBooking-roomList'
-
-
-class UHRoomBookingBookingList(URLHandler):
-    _endpoint = 'rooms.roomBooking-bookingList'
-
-    @classmethod
-    def getURL(cls, onlyMy=False, newBooking=False, ofMyRooms=False, onlyPrebookings=False, autoCriteria=False,
-               newParams=None, today=False, allRooms=False):
-        """
-        onlyMy - only bookings of the current user
-        ofMyRooms - only bookings for rooms managed by the current user
-        autoCriteria - some reasonable constraints, like "only one month ahead"
-        """
-        url = cls._getURL()
-        if onlyMy:
-            url.addParam('onlyMy', 'on')
-        if newBooking:
-            url.addParam('newBooking', 'on')
-        if ofMyRooms:
-            url.addParam('ofMyRooms', 'on')
-        if onlyPrebookings:
-            url.addParam('onlyPrebookings', 'on')
-        if autoCriteria:
-            url.addParam('autoCriteria', 'True')
-        if today:
-            url.addParam('day', 'today')
-        if allRooms:
-            url.addParam('roomGUID', 'allRooms')
-        if newParams:
-            url.setParams(newParams)
-        return url
-
-
-class UHRoomBookingBookingListForBooking(UHRoomBookingBookingList):
-    _endpoint = 'rooms.roomBooking-bookingListForBooking'
 
 
 class UHRoomBookingRoomDetails(BooleanTrueMixin, URLHandler):
@@ -480,28 +434,8 @@ class UHRoomBookingBookingDetails(URLHandler):
         return params
 
 
-class UHRoomBookingRoomForm(URLHandler):
-    _endpoint = 'rooms_admin.roomBooking-roomForm'
-
-
-class UHRoomBookingSaveRoom(URLHandler):
-    _endpoint = 'rooms_admin.roomBooking-saveRoom'
-
-
-class UHRoomBookingDeleteRoom(URLHandler):
-    _endpoint = 'rooms_admin.roomBooking-deleteRoom'
-
-
-class UHRoomBookingBookingForm(URLHandler):
-    _endpoint = 'rooms.roomBooking-bookingForm'
-
-
 class UHRoomBookingModifyBookingForm(URLHandler):
     _endpoint = 'rooms.roomBooking-modifyBookingForm'
-
-
-class UHRoomBookingSaveBooking(URLHandler):
-    _endpoint = 'rooms.roomBooking-saveBooking'
 
 
 class UHRoomBookingDeleteBooking(URLHandler):
@@ -524,33 +458,13 @@ class UHRoomBookingRejectBooking(URLHandler):
     _endpoint = 'rooms.roomBooking-rejectBooking'
 
 
-class UHRoomBookingRejectAllConflicting(URLHandler):
-    _endpoint = 'rooms.roomBooking-rejectAllConflicting'
-
-
-class UHRoomBookingRejectBookingOccurrence(URLHandler):
-    _endpoint = 'rooms.roomBooking-rejectBookingOccurrence'
-
-
 class UHRoomBookingCancelBookingOccurrence(URLHandler):
     _endpoint = 'rooms.roomBooking-cancelBookingOccurrence'
-
-
-class UHRoomBookingStatement(URLHandler):
-    _endpoint = 'rooms.roomBooking-statement'
 
 
 # RB Administration
 class UHRoomBookingPluginAdmin(URLHandler):
     _endpoint = 'rooms_admin.roomBookingPluginAdmin'
-
-
-class UHRoomBookingModuleActive(URLHandler):
-    _endpoint = 'rooms_admin.roomBookingPluginAdmin-switchRoomBookingModuleActive'
-
-
-class UHRoomBookingPlugAdminZODBSave(URLHandler):
-    _endpoint = 'rooms_admin.roomBookingPluginAdmin-zodbSave'
 
 
 class UHRoomBookingAdmin(URLHandler):
@@ -587,103 +501,6 @@ class UHRoomBookingSaveCustomAttributes(URLHandler):
 
 class UHRoomBookingDeleteCustomAttribute(URLHandler):
     _endpoint = 'rooms_admin.roomBooking-deleteCustomAttribute'
-
-
-class UHRoomBookingBlockingsMyRooms(URLHandler):
-    _endpoint = 'rooms.roomBooking-blockingsForMyRooms'
-
-
-class UHRoomBookingBlockingsBlockingDetails(URLHandler):
-    _endpoint = 'rooms.roomBooking-blockingDetails'
-
-
-class UHRoomBookingBlockingList(BooleanOnMixin, URLHandler):
-    _endpoint = 'rooms.roomBooking-blockingList'
-    _defaultParams = dict(onlyThisYear=True)
-
-
-class UHRoomBookingBlockingForm(URLHandler):
-    _endpoint = 'rooms.roomBooking-blockingForm'
-
-
-class UHRoomBookingDeleteBlocking(URLHandler):
-    _endpoint = 'rooms.roomBooking-deleteBlocking'
-
-
-# For the event ==============================================================
-class UHConfModifRoomBookingBase(URLHandler):
-    @classmethod
-    def _getURL(cls, target=None, **params):
-        url = super(UHConfModifRoomBookingBase, cls)._getURL(**params)
-        if target:
-            url.setParams(target.getLocator())
-        conf = ContextManager.get("currentConference", None)
-        if conf:
-            url.addParams(conf.getLocator())
-        return url
-
-
-class UHConfModifRoomBookingChooseEvent(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingChooseEvent'
-
-
-class UHConfModifRoomBookingSearch4Rooms(BooleanTrueMixin, URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingSearch4Rooms'
-
-
-class UHConfModifRoomBookingList(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingList'
-
-
-class UHConfModifRoomBookingRoomList(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingRoomList'
-
-
-class UHConfModifRoomBookingDetails(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingDetails'
-
-
-class UHConfModifRoomBookingRoomDetails(UHConfModifRoomBookingBase):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingRoomDetails'
-
-
-class UHConfModifRoomBookingBookingForm(UHConfModifRoomBookingBase):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingBookingForm'
-
-
-class UHConfModifRoomBookingModifyBookingForm(UHConfModifRoomBookingBase):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingModifyBookingForm'
-
-
-class UHConfModifRoomBookingCloneBooking(UHConfModifRoomBookingBase):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingCloneBooking'
-
-    @classmethod
-    def getURL(cls, target=None, conf=None, **params):
-        url = cls._getURL(**cls._getParams(target, params))
-        if conf is not None:
-            url.addParams(conf.getLocator())
-        return url
-
-
-class UHConfModifRoomBookingSaveBooking(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-roomBookingSaveBooking'
-
-
-class UHRoomPhoto(URLHandler):
-    _endpoint = 'rooms.photo_large'
-
-    @classmethod
-    def getURL(cls, target=None, extension="jpg"):
-        return super(UHRoomPhoto, cls).getURL(room=target, ext=extension)
-
-
-class UHRoomPhotoSmall(URLHandler):
-    _endpoint = 'rooms.photo_small'
-
-    @classmethod
-    def getURL(cls, target=None, extension="jpg"):
-        return super(UHRoomPhotoSmall, cls).getURL(room=target, ext=extension)
 
 
 class UHConferenceClose(URLHandler):

@@ -25,7 +25,7 @@
 </table>
 <table>
     <tr>
-        <td class="group_title" style="display: block; padding:10px 0px 0px;" colspan="2">
+        <td class="group-title" style="display: block; padding:10px 0px 0px;" colspan="2">
             ${ _("Current bookings")}
             <div class="toolbar right">
               <div class="group" style="font-size:13px; padding:0">

@@ -19,7 +19,7 @@
 
 from Configuration import Config
 from MaKaC.errors import MaKaCError
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from MaKaC.common import timezoneUtils
 from MaKaC.common.utils import OSSpecific
 from MaKaC.common.contextManager import ContextManager
@@ -293,8 +293,21 @@ class MultiLevelCache(object):
         return '%s_%s' % (entry.getId(), version)
 
 
-class CacheClient(object):
+# To cache `None` we need to actually store something else since memcached
+# does not distinguish between a None value and a cache miss...
+class _NoneValue(object):
+    @classmethod
+    def replace(cls, value):
+        """Replaces `None` with a `_NoneValue`"""
+        return cls() if value is None else value
 
+    @classmethod
+    def restore(cls, value):
+        """Replaces `_NoneValue` with `None`"""
+        return None if isinstance(value, cls) else value
+
+
+class CacheClient(object):
     def set_multi(self, mapping, ttl=0):
         for key, val in mapping.iteritems():
             self.set(key, val, ttl)
@@ -313,9 +326,7 @@ class CacheClient(object):
 
 
 class NullCacheClient(CacheClient):
-    """
-    Does nothing
-    """
+    """Does nothing"""
 
     def set(self, key, val, ttl=0):
         pass
@@ -516,12 +527,12 @@ class GenericCache(object):
         self._connect()
         time = self._processTime(time)
         Logger.get('GenericCache/%s' % self._namespace).debug('SET %r (%d)' % (key, time))
-        self._client.set(self._makeKey(key), val, time)
+        self._client.set(self._makeKey(key), _NoneValue.replace(val), time)
 
     def set_multi(self, mapping, time=0):
         self._connect()
         time = self._processTime(time)
-        mapping = dict(((self._makeKey(key), val) for key, val in mapping.iteritems()))
+        mapping = dict(((self._makeKey(key), _NoneValue.replace(val)) for key, val in mapping.iteritems()))
         self._client.set_multi(mapping, time)
 
     def get(self, key, default=None):
@@ -530,7 +541,7 @@ class GenericCache(object):
         Logger.get('GenericCache/%s' % self._namespace).debug('GET %r -> %r' % (key, res is not None))
         if res is None:
             return default
-        return res
+        return _NoneValue.restore(res)
 
     def get_multi(self, keys, default=None, asdict=True):
         self._connect()
@@ -541,7 +552,7 @@ class GenericCache(object):
             if real_key not in data:
                 data[real_key] = default
         # Get data in the same order as our keys
-        sorted_data = (data[rk] for rk in real_keys)
+        sorted_data = (default if data[rk] is None else _NoneValue.restore(data[rk]) for rk in real_keys)
         if asdict:
             return dict(izip(keys, sorted_data))
         else:

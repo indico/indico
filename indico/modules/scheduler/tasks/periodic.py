@@ -193,8 +193,8 @@ class FoundationSyncTask(PeriodicUniqueTask):
         super(FoundationSyncTask, self).__init__(frequency, **kwargs)
 
     def run(self):
-        from MaKaC.common.FoundationSync.foundationSync import FoundationSync
-        FoundationSync(self.getLogger()).doAll(None)
+        from MaKaC.common.FoundationSync.foundation_sync import FoundationSync
+        FoundationSync(self.getLogger()).run_all()
 
 
 class SamplePeriodicTask(PeriodicTask):

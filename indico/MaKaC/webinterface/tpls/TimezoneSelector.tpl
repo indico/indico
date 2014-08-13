@@ -1,6 +1,4 @@
-<a id="timezoneSelectorLink" class="dropDownMenu fakeLink" style="display: inline-block;">
-    ${ ActiveTimezoneDisplay }
-</a>
+<a id="timezoneSelectorLink" href="#" class="i-button arrow icon-time">${ ActiveTimezoneDisplay }</a>
 
 <script type="text/javascript">
 var timezoneSelectorLink = $E('timezoneSelectorLink');
@@ -48,4 +46,3 @@ $("#timezoneSelectorLink").qtip({
 });
 
 </script>
-

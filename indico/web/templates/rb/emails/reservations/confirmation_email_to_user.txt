@@ -1,0 +1,11 @@
+{% extends 'rb/emails/reservations/base_email_to_user.txt' %}
+
+{% block body -%}
+{% block state -%}
+Your booking has been ACCEPTED.
+This is the final confirmation.
+{%- endblock %}
+
+{% include 'rb/emails/reservations/reservation_info.txt' %}
+{%- include 'rb/emails/reservations/reservation_key_info.txt' %}
+{%- endblock %}

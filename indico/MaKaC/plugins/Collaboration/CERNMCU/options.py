@@ -84,7 +84,7 @@ globalOptions = [
                               "visible": True}),
     ("H323_IP_att_name", {"description": "Name of the custom attribute for the H.323 IP of a room in the Room Booking database.",
                               "type": str,
-                              "defaultValue": "H323 IP",
+                              "defaultValue": "h323-ip",
                               "editable": True,
                               "visible": True}),
 

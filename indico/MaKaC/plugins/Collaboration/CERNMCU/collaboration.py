@@ -29,9 +29,8 @@ from MaKaC.i18n import _
 
 from xmlrpclib import Fault
 from datetime import timedelta
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from MaKaC.common.Counter import Counter
-from MaKaC.services.interface.rpc.json import unicodeToUtf8
 import socket
 import re
 from MaKaC.common.fossilize import fossilize
@@ -39,6 +38,7 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.plugins.Collaboration.CERNMCU.fossils import ICSBookingIndexingFossil
 from MaKaC.common.fossilize import fossilizes
 from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseConfModifFossil
+from indico.util.string import unicode_struct_to_utf8
 
 
 class CSBooking(CSBookingBase): #already Fossilizable
@@ -325,7 +325,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                                          description = unicodeSlice(self._bookingParams["description"], 0, 31),
                                         )
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.create with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-            answer = unicodeToUtf8(mcu.conference.create(params))
+            answer = unicode_struct_to_utf8(mcu.conference.create(params))
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.create. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
 
             for p in self._participants.itervalues():
@@ -376,7 +376,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                     "Evt: %s, booking: %s, calling conference.modify with params: %s" %
                     (self._conf.getId(), self.getId(), str(paramsForLog(params))))
 
-                answer = unicodeToUtf8(mcu.conference.modify(params))
+                answer = unicode_struct_to_utf8(mcu.conference.modify(params))
 
                 Logger.get('CERNMCU').debug(
                     "Evt: %s, booking: %s, calling conference.modify. Got answer: %s" %
@@ -484,7 +484,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                                    participantType = participant.getParticipantType(),
                                    participantProtocol = participant.getParticipantProtocol())
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.connect with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-                answer = unicodeToUtf8(mcu.participant.connect(params))
+                answer = unicode_struct_to_utf8(mcu.participant.connect(params))
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.connect. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
 
                 participant.setCallState("connected")
@@ -528,7 +528,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                                    participantProtocol = participant.getParticipantProtocol())
 
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.disconnect with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-                answer = unicodeToUtf8(mcu.participant.disconnect(params))
+                answer = unicode_struct_to_utf8(mcu.participant.disconnect(params))
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.disconnect. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
 
                 participant.setCallState("disconnected")
@@ -572,7 +572,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 mcu = MCU.getInstance()
                 params = MCUParams(conferenceName = name)
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.destroy with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-                answer = unicodeToUtf8(mcu.conference.destroy(params))
+                answer = unicode_struct_to_utf8(mcu.conference.destroy(params))
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling conference.destroy. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
 
                 self._created = False
@@ -603,7 +603,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                                                 participantProtocol = participant.getParticipantProtocol()
                                                 )
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.add with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-            answer = unicodeToUtf8(mcu.participant.add(params))
+            answer = unicode_struct_to_utf8(mcu.participant.add(params))
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.add. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
 
 
@@ -655,7 +655,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                 "Evt: %s, booking: %s, calling participant.modify with params: %s" %
                 (self._conf.getId(), self.getId(), str(paramsForLog(params))))
 
-            answer = unicodeToUtf8(mcu.participant.modify(params))
+            answer = unicode_struct_to_utf8(mcu.participant.modify(params))
 
             Logger.get('CERNMCU').info(
                 "Evt:%s, booking:%s, calling participant.modify. Got answer: %s" %
@@ -681,7 +681,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                                participantType = participantType,
                                participantProtocol = participantProtocol)
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.remove with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-            answer = unicodeToUtf8(mcu.participant.remove(params))
+            answer = unicode_struct_to_utf8(mcu.participant.remove(params))
             Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participant.remove. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
             return True
         except Fault, e:
@@ -834,7 +834,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                     "Evt:%s, booking:%s, calling conference.enumerate with params: %s"
                     % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
 
-                answer = unicodeToUtf8(mcu.conference.enumerate(params))
+                answer = unicode_struct_to_utf8(mcu.conference.enumerate(params))
                 #un-comment to print all the garbage about other conferences received
                 # Logger.get('CERNMCU').debug(
                 #    "Evt:%s, booking:%s, calling conference.enumerate. Got answer: %s" %
@@ -897,7 +897,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
                     params = MCUParams()
 
                 Logger.get('CERNMCU').info("""Evt:%s, booking:%s, calling participants.enumerate with params: %s""" % (self._conf.getId(), self.getId(), str(paramsForLog(params))))
-                answer = unicodeToUtf8(mcu.participant.enumerate(params))
+                answer = unicode_struct_to_utf8(mcu.participant.enumerate(params))
                 #un-comment to print all the garbage received about other participants
                 #Logger.get('CERNMCU').debug("""Evt:%s, booking:%s, calling participants.enumerate. Got answer: %s""" % (self._conf.getId(), self.getId(), str(answer)))
 

@@ -30,4 +30,3 @@ for conference in conferences:
     f.write(conference.getId() + " " + conference.getTitle() + " " + str(conference.isItselfProtected()) + " " + str(conference.isProtected())  + "\n")
 f.close()
 DBMgr.getInstance().endRequest()
-

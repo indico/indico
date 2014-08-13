@@ -43,4 +43,3 @@ logfile.write("cat %s: %s"%(cat.getId(), currentStyle))
 changeCatStyle(cat)
 
 dbm.endRequest()
-

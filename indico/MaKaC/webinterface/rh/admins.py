@@ -26,9 +26,10 @@ import MaKaC.user as user
 import MaKaC.common.info as info
 from MaKaC.errors import AdminError, MaKaCError, PluginError, FormValuesError
 from MaKaC.common import HelperMaKaCInfo
-from MaKaC.webinterface.rh.base import RHProtected, RoomBookingDBMixin
+from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.plugins import PluginsHolder
-from MaKaC.i18n import _
+from indico.util.i18n import _
+
 
 class RCAdmin(object):
     @staticmethod
@@ -259,8 +260,7 @@ class RHAdminLayoutSaveSocial(RHAdminBase):
         self._redirect( urlHandlers.UHAdminLayoutGeneral.getURL() )
 
 
-#Plugin admin start
-class RHAdminPluginsBase(RoomBookingDBMixin, RHAdminBase):
+class RHAdminPluginsBase(RHAdminBase):
     """ Base RH class for all plugin management requests.
         It will store 2 string parameters: pluginType and pluginId.
         Example: pluginType = "COllaboration" & pluginId = "EVO"
@@ -281,6 +281,7 @@ class RHAdminPluginsBase(RoomBookingDBMixin, RHAdminBase):
             raise PluginError("The plugin type " + self._pluginType + " does not exist or is not visible")
         elif self._pluginType and self._pluginId and not self._ph.getPluginType(self._pluginType).hasPlugin(self._pluginId):
             raise PluginError("The plugin " + self._pluginId + " does not exist")
+
 
 class RHAdminPlugins(RHAdminPluginsBase):
     """ Displays information about a given plugin type.

@@ -33,18 +33,15 @@
     % endif
 </div>
 
-<li id="userSettings">
-    <a class="userSettings dropDownMenu fakeLink">${currentUser.getStraightAbrName()}</a>
-</li>
-
+<a class="i-button icon icon-user arrow user-settings">${currentUser.getStraightAbrName()}</a>
 
 <script type="text/javascript">
 
 $("#settingsWidget a").click(function(){
-    $(".userSettings").qtip('hide');
+    $(".user-settings").qtip('hide');
 });
 
-$(".userSettings").qtip({
+$(".user-settings").qtip({
     style: {
         minWidth: '200px',
         classes: 'qtip-rounded qtip-shadow qtip-popup',

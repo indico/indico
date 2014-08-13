@@ -17,15 +17,21 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import absolute_import
+
+import traceback
+from datetime import datetime
+
+from persistent.dict import PersistentDict
+
+from indico.core.config import Config
+from indico.core.errors import IndicoError
+from indico.util.i18n import LazyProxy
+
 try:
     import simplejson as _json
 except ImportError:
     import json as _json
-
-from persistent.dict import PersistentDict
-from datetime import datetime
-from indico.util.i18n import LazyProxy
-from MaKaC.common.fossilize import fossilize, NonFossilizableException
 
 
 class _JSONEncoder(_json.JSONEncoder):
@@ -66,28 +72,21 @@ def loads(string):
     return _json.loads(string)
 
 
-def json_filter(obj):
-    """
-    Mako filter
-    """
-    return _json.dumps(obj)
+def create_json_error_answer(exception):
+    if isinstance(exception, IndicoError):
+        details = exception.toDict()
+    else:
+        details = {
+            'code': type(exception).__name__,
+            'type': 'unknown',
+            'message': exception.message,
+            'data': exception.__dict__,
+            'requestInfo': {},
+            'inner': traceback.format_exc()
+        }
 
-
-def create_json_error_answer(e):
-    responseBody = {
-        "version": "1.1",
-        "result": None,
-        "error": None
-    }
-
-    try:
-        responseBody["error"] = fossilize(e)
-    except NonFossilizableException:
-        from MaKaC.errors import MaKaCError
-        responseBody["error"] = fossilize(MaKaCError(e.message))
-    except Exception, e2:
-        responseBody["error"] = {'code': '', 'message': str(e2)}
-        from MaKaC.common.logger import Logger
-        Logger.get('dev').exception('Exception occurred while fossilizing: {0}'.format(str(e2)))
-
-    return dumps(responseBody)
+    return dumps({
+        'version': Config.getInstance().getVersion(),
+        'result': None,
+        'error': details
+    })

@@ -27,7 +27,7 @@ from MaKaC.common import info
 import MaKaC
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.plugins import Observable
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 
 def isFullyAccess(level):
     def wrap(func):
@@ -224,38 +224,27 @@ class AccessController( Persistent, Observable ):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         ipList = minfo.getIPBasedACLMgr().get_full_access_acl()
 
-        if ip in ipList:
-            # let Private OAI harvesters access protected (display) pages
+        return ip in ipList
+
+    def canIPAccess(self, ip):
+
+        # Domain protection
+        if not self.getRequiredDomainList():
             return True
-        else:
-            return False
+        return any(domain.belongsTo(ip) for domain in self.getRequiredDomainList())
 
-    def canIPAccess( self, ip ):
-        """
-        """
+    def isAdmin(self, av):
+        return AdminList.getInstance().isAdmin(av)
 
-        #Domain protection
-        if len(self.getRequiredDomainList())<=0:
-            return True
-        for domain in self.getRequiredDomainList():
-            if domain.belongsTo( ip ):
-                return True
-        return False
-
-    def isAdmin( self, av ):
-        if AdminList.getInstance().isAdmin( av ):
-            return True
-        else:
-            return False
-
-    def canUserAccess( self, av ):
-        if self.isAdmin( av ):
+    def canUserAccess(self, av):
+        if self.isAdmin(av):
             return True
         for principal in self.allowed:
-            if principal == None:
+            if principal is None:
                 self.revokeAccess(principal)
                 continue
-            if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.Group)) and principal.containsUser( av ):
+            if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.Group)) and \
+               principal.containsUser(av):
                 return True
         if isinstance(av, MaKaC.user.Avatar):
             for email in av.getEmails():
@@ -360,17 +349,24 @@ class AccessController( Persistent, Observable ):
     def getAnyDomainProtection(self):
         """
         Checks if the element is protected by domain at any level. It stops checking
-        when it finds some domain protection or a restricted owner.
+        when it finds an explicitly public or private parent.
 
         Returns the list of domains from which the item can be accessed.
         """
-        if self.isItselfProtected():
-            return []
-        elif self.isDomainProtected():
+
+        if self.getAccessProtectionLevel() == 0:
+            owner = self.getOwner().getOwner()
+
+            # inheriting  - get protection from parent
+            if owner:
+                return owner.getAccessController().getAnyDomainProtection()
+            else:
+                # strangely enough, the root category has 2 states
+                # 0 -> inheriting (public) and 1 -> restricted
+                # so, in this case, we really want the category's list
+                return self.getRequiredDomainList()
+        else:
             return self.getRequiredDomainList()
-        elif self.getOwner().getOwner():
-            return self.getOwner().getOwner().getAccessController().getAnyDomainProtection()
-        return []
 
     def isDomainProtected(self):
         if self.getRequiredDomainList():

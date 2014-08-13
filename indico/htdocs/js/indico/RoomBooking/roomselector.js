@@ -17,13 +17,13 @@
 
  (function($) {
     $.widget("indico.roomselector", {
-
         options: {
             allowEmpty: true,
             rooms: [],
             roomMaxCapacity: 0,
             userData: {},
-            selectName: "roomselection"
+            selectName: "roomselection",
+            simpleMode: false
         },
 
         _create: function() {
@@ -41,7 +41,6 @@
         },
 
         selection: function() {
-            var self = this;
             var selection = [];
 
             $('.ui-multiselect-checkboxes :checkbox').each(function(index) {
@@ -68,13 +67,7 @@
         },
 
         validate: function() {
-            var self = this;
-
-            if (!self.options.allowEmpty && self.select.val() === null) {
-                return false;
-            }
-
-            return true;
+            return this.select.val() !== null || this.options.allowEmpty;
         },
 
         _initData: function() {
@@ -82,21 +75,22 @@
             var name = self.options.selectName;
             var rooms = self.options.rooms;
 
-            self.select = $("<select name='" + name + "' multiple='multiple'/>").appendTo(self.element);
+            self.select = $("<select id='" + name + "' name='" + name + "' multiple='multiple'/>").appendTo(self.element);
 
             jQuery.map(rooms, function(room, i) {
-                var roomLoc = room.building + "-" + room.floor + "-" + room.roomNr;
-                var roomName = (roomLoc == room.name)? roomLoc : roomLoc + " - " + room.name;
-                option = $("<option/>")
+                var roomLoc = room.building + "-" + room.floor + "-" + room.number;
+                var roomName = roomLoc + (roomLoc == room.name ?  '' : ' - ' + room.name);
+                var option = $("<option/>")
                     .attr("label",
-                        room.needsAVCSetup + ":" +
-                        room.hasWebcastRecording + ":" +
-                        room.hasProjector + ':' +
-                        room.isPublic + ":" +
-                        (room.capacity || Number(0)))
-                    .attr("value", room.guid)
+                        room.has_vc + ":" +
+                        room.has_webcast_recording + ":" +
+                        room.has_projector + ":" +
+                        room.is_public + ":" +
+                        (room.capacity || '?')
+                    )
+                    .attr("value", room.id)
                     .append($("<span/>").text(roomName))
-                    .append($("<span/>").text(" (" + room.locationName + ")"))
+                    .append($("<span/>").text(" (" + room.location_name + ")"))
                     .appendTo(self.select);
             });
         },
@@ -121,11 +115,17 @@
                 placeholder: $T('Filter rooms')
             }).multiselectfilter('advancedFilter');
 
+            self.element.addClass('roomselector');
             self.element.find("button").css("display", "none");
             self.widget = self.select.multiselect("widget");
-            self.parts = {};
-            self.parts.list = self.widget.find(".ui-multiselect-checkboxes").scrollblocker();
-            self.parts.header = self.widget.find(".ui-widget-header");
+            self.parts = {
+                list: self.widget.find(".ui-multiselect-checkboxes").scrollblocker(),
+                header: self.widget.find(".ui-widget-header")
+            };
+
+            if (self.options.simpleMode) {
+                self.element.addClass('simple');
+            }
         },
 
         _draw: function() {
@@ -139,6 +139,9 @@
             });
 
             self.select.multiselect("refresh");
+            $('input[name=multiselect_{0}]'.format(self.options.selectName)).each(function(idx, elem) {
+                $(elem).prop('name', '');
+            });
             self._restoreData();
         },
 
@@ -186,7 +189,15 @@
             // Searchbox
             header.find(".ui-multiselect-filter").addClass("group").empty()
                 .append($("<span class='i-button label icon-search'/>"))
-                .append(filter.search);
+                .append(filter.search)
+                .on('click', 'a', function(e) {
+                    e.stopPropagation();
+                })
+                .on('keydown', 'input', function(e){
+                    if (e.which == K.ENTER) {
+                        e.preventDefault();
+                    }
+                });
             filter.search.realtimefilter({
                 callback: function() {
                     self._updateFilter();
@@ -200,16 +211,40 @@
             var checknone = header.find(".ui-helper-reset .ui-multiselect-none").each(function() {
                 $(this).html($(this).find("span:last-child").text());
             });
+            var checkmine = $('<a>', {
+                'class': 'i-button',
+                href: '#',
+                text: $T('Mine'),
+                click: function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if ($(this).hasClass('disabled')) {
+                        return;
+                    }
+                    self.select.multiselect('uncheckAll');
+                    self.parts.list.find(":checkbox").each(function() {
+                        var $this = $(this);
+                        if (!this.checked && $this.data('myRoom') && $this.is(':visible')) {
+                            $this.click();
+                        }
+                    });
+                }
+            });
+            var userId = $('body').data('userId');
+            checkmine.toggleClass('disabled', !_.any(self.options.rooms, function(room) {
+                return room.owner_id == userId;
+            }));
             self.selecttools = $("<div/>").addClass("group")
                 .append($("<span class='i-button label'/>").text($T("Select")))
                 .append(checkall.addClass("i-button"))
-                .append(checknone.addClass("i-button"));
+                .append(checknone.addClass("i-button"))
+                .append(checkmine);
             header.find(".ui-helper-reset").replaceWith(function() {
                 return self.selecttools;
             });
 
-            // Filtering tools
-            self.filtertools = $("<div class='group i-selection'/>")
+            // Filter tools
+            self.filtertools = $("<div class='group i-selection requirements'/>")
                    .append($("<span class='i-button label'/>").text($T("Require")))
                    .append(filter.videoconference)
                    .append($("<label for='videoconference' class='i-button icon-camera'/>")
@@ -229,9 +264,9 @@
                    .appendTo(header);
 
             // Capacity slider
-            self.slider = $("<div class='group'/>")
+            self.slider = $("<div class='group with-slider'/>")
                 .append($("<span class='i-button label'/>").text($T("Capacity")))
-                .append($("<span class='i-button label capacityslider'/>").css("width", "110px")
+                .append($("<span class='i-button label slider'/>")
                     .append($("<span/>").slider({
                         range: "min",
                         min: 0,
@@ -266,7 +301,7 @@
                 },
                 validation: function(e) {
                     var val = e.val();
-                    if (val !== '' && (val < 0 || val > maxRoomCapacity || parseInt(val, 10).toString() == 'NaN')) {
+                    if (val !== '' && (val < 0 || val > self.options.roomMaxCapacity || parseInt(val, 10).toString() == 'NaN')) {
                         return false;
                     } else {
                         return true;
@@ -290,21 +325,23 @@
                                   $T('Projector not available'),
                                   $T("Private room")];
 
+            var userId = $('body').data('userId');
             self.select.find("option").each(function(index) {
                 var labelparts = $(this).attr('label').split(":");
                 var item = self.parts.list.find('input[value="' + $(this).val() +'"]').parent();
-                item.children("span").addClass("roomid")
+                item.find(':checkbox').data('myRoom', rooms[index].owner_id == userId);
+                item.children("span").addClass("room-id")
                     .children(":first-child").addClass("roomname")
                     .next().addClass("roomlocation");
 
                 var pic = $("<a class='roompicture'/>")
-                    .append($("<img src='" + rooms[index].thumbnailPhotoURL + "'/>"))
+                    .append($("<img src='" + rooms[index].small_photo_url + "'/>"))
                     .prependTo(item);
-                if (rooms[index].hasPhoto) {
+                if (rooms[index].has_photo) {
                     pic.find("img")
                         .attr("title", $T("Expand picture"))
                         .addClass("active");
-                    pic.attr("href", rooms[index].tipPhotoURL);
+                    pic.attr("href", rooms[index].large_photo_url);
                     pic.attr("nofollow", "lightbox");
                 }
 
@@ -372,15 +409,23 @@
                         this.click();
                     }
                 });
+
+                self._updateSelectionCounter()
             }
 
             function restoreFilter(data) {
-                self.filter.search.val(data.filter).trigger("propertychange");
-                self.filter.videoconference.prop('checked', data.videoconference);
-                self.filter.webcast.prop('checked', data.webcast);
-                self.filter.projector.prop('checked', data.projector);
-                self.filter.publicroom.prop('checked', data.publicroom);
-                self.filter.capacity.val(data.capacity).trigger("focusout");
+                self.filter.search
+                    .realtimefilter('setValue', data.filter)
+                    .trigger("propertychange");
+
+                if (!self.options.simpleMode) {
+                    self.filter.videoconference.prop('checked', data.videoconference);
+                    self.filter.webcast.prop('checked', data.webcast);
+                    self.filter.projector.prop('checked', data.projector);
+                    self.filter.publicroom.prop('checked', data.publicroom);
+                    self.filter.capacity.val(data.capacity).trigger("focusout");
+                }
+
                 self._updateFilter();
             }
         },
@@ -396,7 +441,7 @@
             self.parts.header.find(".ui-slider").slider('value', capacity.val());
         },
 
-        _updateSelectionCounter: function() {
+        _updateSelectionCounter: _.debounce(function() {
             var self = this;
             var opt = self.select.multiselect("option");
 
@@ -407,7 +452,7 @@
             counter
                 .text(str)
                 .effect("pulsate", {times: 1});
-        },
+        }, 50),
 
         _updateFilter: function() {
             var self = this;

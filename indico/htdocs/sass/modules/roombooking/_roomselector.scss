@@ -21,11 +21,11 @@
 
 @import "partials/icons";
 
-#roomselector {
+.roomselector {
     @include border-all();
     @include border-radius();
     @include single-box-shadow($hoff: 2px, $voff: 2px);
-    width: 910px;
+    width: 960px;
 
     .ui-multiselect-menu {
         top: 0 !important;
@@ -59,16 +59,8 @@
             }
         }
 
-        .capacityslider {
-            padding-left: 1em !important;
-            padding-right: 1em !important;
-            width: 150px;
-
-            .ui-slider {
-                display: inline-block !important;
-                margin-top: 3px;
-                width: 100% !important;
-            }
+        .group.with-slider .slider {
+            width: 110px;
 
             & ~ input[type=text] {
                 width: 60px;
@@ -154,6 +146,7 @@
                     height: 2em;
                     vertical-align: middle;
                     opacity: 0.5;
+                    width: 45px;
 
                     &.active {
                         @include border-all();
@@ -167,15 +160,12 @@
                 }
             }
 
-            .roomid {
+            .room-id {
+                @include ellipsis();
                 color: $black;
                 display: inline-block;
-
-                .roomname {
-                    max-width: 590px;
-                    overflow: hidden;
-                    white-space: nowrap;
-                }
+                max-width: 590px;
+                vertical-align: sub;
 
                 .roomlocation {
                     color: $gray;
@@ -237,5 +227,33 @@
             float: right;
         }
 
+    }
+}
+
+.roomselector.simple {
+    width: 595px;
+
+    .ui-multiselect-header {
+        .requirements {
+            display: none;
+        }
+
+        .with-slider {
+            display: none;
+        }
+    }
+
+    .ui-multiselect-checkboxes {
+        .attributes {
+            display: none;
+        }
+
+        .capacity {
+            display: none;
+        }
+
+        .roomid {
+            max-width: 400px;
+        }
     }
 }

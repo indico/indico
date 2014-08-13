@@ -1,68 +1,102 @@
-<%page args="room=None"/>
-  <!-- ROOM -->
-  <tr>
-    <td>
-        <div class="groupTitle bookingTitle">${'Room Details'}</div>
-    </td>
-  </tr>
-  <tr>
-    <td>
-        <table>
-            <tr>
-                <td class="subFieldWidth" align="right" valign="top">${ _("Name")}&nbsp;&nbsp;</td>
-                <td align="left" class="blacktext">
-                % if infoBookingMode:
-                    <a href="${ roomDetailsUH.getURL( room ) }">${ room.building }-${ room.floor }-${ room.roomNr }
-                        % if room.name != str(room.building) + '-' + str(room.floor) + '-' + str(room.roomNr):
-                           (${ room.name })
-                        % endif
-                % else:
-                    <select name="roomName" id="roomName" onchange="isBookable()" style="width:220px">
+<%page args="room=None, endpoints=None, event=None, allow_room_change=True, clone_booking=None"/>
+<table>
+    <tr>
+        <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+            ${ _('Name') }
+        </td>
+        <td align="left" class="blacktext">
+            % if allow_room_change:
+                <select name="roomName" id="roomName" class="js-go-to-room" style="width:220px"
+                    % if clone_booking:
+                        data-clone-booking="${ clone_booking.id | n,j }"
+                    % endif
+                    >
                     % for roomItem in rooms:
-                      <% selected = "" %>
-                      % if room.name == roomItem.name:
-                        <% selected = 'selected="selected"' %>
-                      % endif
-                      <option data-location="${roomItem.locationName}" data-id="${roomItem.id}" ${ selected } class="${roomClass( roomItem )}">${ roomItem.locationName + ": &nbsp; " + roomItem.getFullName() }</option>
+                        <% selected = '' %>
+                        % if room.name == roomItem.name:
+                            <% selected = 'selected' %>
+                        % endif
+                        <option data-location="${ roomItem.location_name }" data-id="${ roomItem.id }" ${ selected } class="${ roomItem.kind }">
+                            ${ roomItem.location_name + ": " + roomItem.full_name }
+                        </option>
                     % endfor
-                    </select>
-                    <a target="_blank" href="${roomDetailsUH.getURL( room )}">${ _("Full details")}</a>
-                % endif
-                </td>
-            </tr>
-            % if room.photoId != None:
-            <tr>
-                <td class="subFieldWidth" align="right" valign="top"> ${ _("Interior")}&nbsp;&nbsp;</td>
-                <td align="left" class="thumbnail">
-                    <a href="${ room.getPhotoURL() }" nofollow="lightbox" title="${ room.photoId }">
-                        <img border="1px" src="${ room.getSmallPhotoURL() }" alt="${ str( room.photoId ) }"/>
-                    </a>
-                </td>
-            </tr>
+                </select>
+                <a target="_blank" href="${ url_for(endpoints['room_details'], event, room) }">${ _('Full details') }</a>
+            % else:
+                <a href="${ url_for(endpoints['room_details'], event, room) }">
+                    ${ room.full_name }
+                </a>
             % endif
-            % if room.capacity:
-            <tr>
-                <td class="subFieldWidth" align="right" valign="top"> ${ _("Capacity")}&nbsp;&nbsp;</td>
-                <td align="left" class="blacktext">${ room.capacity }&nbsp;${_("people")}</td>
-            </tr>
-            % endif
-            % if room.whereIsKey:
-            <tr>
-                <td class="subFieldWidth" align="right" valign="top"> ${ _("Room key")}&nbsp;&nbsp;</td>
-                <td align="left" class="blacktext">${ room.whereIsKey }${contextHelp('whereIsKeyHelp' )}</td>
-            </tr>
-            % endif
-            % if room.comments:
-            <tr>
-                <td class="subFieldWidth" align="right" valign="top"> ${ _("Comments")}&nbsp;&nbsp;</td>
-                <td align="left" class="blacktext">${ room.comments }</td>
-            </tr>
-            % endif
-        </table>
-        % if room.needsAVCSetup:
-            <div class="warningMessage" style="text-align: left; max-width: 600px; margin: 3em 1em 1em 1em;">
-                ${ _("The conference room you have chosen is equipped for video-conferencing and video-projection. If you need this equipment, <strong>do not forget</strong> to select it. If you don't need any of this equipment please <strong>choose another room</strong>, if a suitable one is free on a suitable location for your meeting. Thank you for your understanding.") }
-            </div>
-        % endif
-    </td>
-  </tr>
+        </td>
+    </tr>
+
+    % if room.photo_id is not None:
+        <tr>
+            <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                ${ _('Interior') }
+            </td>
+            <td align="left" class="thumbnail">
+                <a href="${ room.large_photo_url }" nofollow="lightbox">
+                    <img border="1" src="${ room.small_photo_url }" alt="${ _('Room picture') }"/>
+                </a>
+            </td>
+        </tr>
+    % endif
+
+    % if room.capacity:
+        <tr>
+            <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                ${ _('Capacity') }
+            </td>
+            <td align="left" class="blacktext">
+                ${ room.capacity }&nbsp;${ _('seats') }
+            </td>
+        </tr>
+    % endif
+
+    % if room.key_location:
+        <tr>
+            <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                ${ _('Room key') }
+            </td>
+            <td align="left" class="blacktext">
+                ${ room.key_location }${ inlineContextHelp(_('How to obtain a key. Typically a phone number.')) }
+            </td>
+        </tr>
+    % endif
+
+    % if room.comments:
+        <tr>
+            <td class="subFieldWidth" align="right" valign="top" style="padding-right: 5px;">
+                ${ _('Comments') }
+            </td>
+            <td align="left" class="blacktext">
+                ${ room.comments }
+            </td>
+        </tr>
+    % endif
+</table>
+
+% if room.has_vc:
+    <div class="warning-message-box new-booking-message-box" style="margin-top: 2em;">
+        <div class="message-text ">
+            <p>
+                ${ _("This room is equipped for video-conferencing.") }
+            </p>
+            ${ _("If you need this equipment, <strong>do not forget</strong> to select it. If you don't need any of this equipment please <strong>choose another room</strong> unless there is no suitable one available for your meeting.") }
+        </div>
+    </div>
+% endif
+
+<script>
+    $(function() {
+        $('select.js-go-to-room').on('change', function() {
+            var option = $('#roomName option:selected');
+            var roomLocation = option.data('location');
+            var roomId = option.data('id');
+
+            // cloneBooking will contain the booking id if we are in the 'clone' page
+            go_to_room(roomLocation, roomId, $('#roomName').data('cloneBooking'));
+        });
+    });
+</script>

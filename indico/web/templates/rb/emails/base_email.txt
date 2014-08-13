@@ -1,0 +1,5 @@
+Dear {% block recipient %}{% endblock %},
+
+
+{% block email_body %}{% endblock %}
+{% include 'rb/emails/email_footer.txt' %}

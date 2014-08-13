@@ -39,7 +39,7 @@ from MaKaC.common.utils import validMail, setValidEmailSeparators, formatDateTim
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 
 from MaKaC.errors import TimingError
 from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
@@ -64,7 +64,6 @@ from indico.modules import ModuleHolder
 from indico.modules.offlineEvents import OfflineEventItem
 from indico.modules.scheduler.tasks.offlineEventGenerator import OfflineEventGeneratorTask
 from indico.modules.scheduler import tasks, Client
-from indico.util.i18n import i18nformat
 from indico.web.http_api.util import generate_public_auth_request
 from indico.core.config import Config
 
@@ -224,8 +223,7 @@ class ConferenceBookingModification(ConferenceTextModificationBase):
         if room.getName() != newRoom:
             room.setName(newRoom)
 
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            if minfo.getRoomBookingModuleActive():
+            if Config.getInstance().getIsRoomBookingActive():
                 room.retrieveFullName(newLocation)
             else:
                 # invalidate full name, as we have no way to know it
@@ -465,24 +463,6 @@ class ConferenceStartEndDateTimeModification(ConferenceModifBase):
 
         else:
             return self._params.get('value')
-
-
-class ConferenceListUsedRooms(ConferenceDisplayBase):
-    """
-    Get rooms that are used in the context of the conference:
-     * Booked in CRBS
-     * Already chosen in sessions
-    """
-    def _getAnswer(self):
-        """
-        Calls _handle() on the derived classes, in order to make it happen. Provides
-        them with self._value.
-        """
-        roomList = []
-        roomList.extend(self._target.getRoomList())
-        roomList.extend(map(lambda x: x._getName(), self._target.getBookedRooms()))
-
-        return roomList
 
 
 class ConferenceDateTimeEndModification(ConferenceDateTimeModificationBase):
@@ -1718,7 +1698,6 @@ methodMap = {
     "main.sendEmailData": ConferenceSendEmailData,
     "main.changeSubmissionRights": ConferenceChangeSubmissionRights,
     "program.changeDescription": ConferenceProgramDescriptionModification,
-    "rooms.list" : ConferenceListUsedRooms,
     "contributions.list" : ConferenceListContributionsReview,
     "contributions.listAll" : ConferenceListContributions,
     "contributions.delete": ConferenceDeleteContributions,

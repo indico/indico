@@ -38,7 +38,6 @@ from indico.core.config import Config
 from indico.core.db import DBMgr
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
-from MaKaC.webinterface.rh.base import RoomBookingDBMixin
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.login import RHSignInBase, RHResetPasswordBase
 import MaKaC.common.filters as filters
@@ -54,6 +53,8 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 from reportlab.platypus.doctemplate import LayoutError
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+
+from indico.util.contextManager import ContextManager
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.hooks.event import CategoryEventHook
 from indico.web.flask.util import send_file
@@ -348,7 +349,7 @@ class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
             RHDisplayBaseProtected._checkProtection( self )
 
 
-class RHConferenceDisplay( RoomBookingDBMixin, RHConferenceBaseDisplay ):
+class RHConferenceDisplay(RHConferenceBaseDisplay):
     _uh = urlHandlers.UHConferenceDisplay
 
     def _process( self ):
@@ -425,7 +426,8 @@ class RHRelativeEvent(RHConferenceBaseDisplay):
         else:
             return WPError404(self, urlHandlers.UHConferenceDisplay.getURL(self._conf)).display()
 
-class RHConferenceOtherViews(RoomBookingDBMixin, RHConferenceBaseDisplay):
+
+class RHConferenceOtherViews(RHConferenceBaseDisplay):
     """
     this class is for the conference type objects only
     it is an alternative to the standard TimeTable view
@@ -594,7 +596,8 @@ class RHConferenceProgramPDF(RHConferenceBaseDisplay):
         pdf = ProgrammeToPDF(self._target, tz=tz)
         return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
-class RHConferenceTimeTable( RoomBookingDBMixin, RHConferenceBaseDisplay ):
+
+class RHConferenceTimeTable(RHConferenceBaseDisplay):
     _uh = urlHandlers.UHConferenceTimeTable
 
     def _process( self ):
@@ -986,7 +989,8 @@ class RHConfParticipantsInvitation(RHConferenceBaseDisplay):
         else:
             return conferences.WPConfModifParticipantsInvite( self, self._conf ).display(**params)
 
-class RHConferenceToiCal(RoomBookingDBMixin, RHConferenceBaseDisplay):
+
+class RHConferenceToiCal(RHConferenceBaseDisplay):
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )
@@ -1004,7 +1008,7 @@ class RHConferenceToiCal(RoomBookingDBMixin, RHConferenceBaseDisplay):
         return send_file(filename, StringIO(serializer(resultFossil)), 'ICAL')
 
 
-class RHConferenceToXML(RoomBookingDBMixin, RHConferenceBaseDisplay):
+class RHConferenceToXML(RHConferenceBaseDisplay):
 
     def _checkParams( self, params ):
         RHConferenceBaseDisplay._checkParams( self, params )

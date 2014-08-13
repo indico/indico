@@ -37,8 +37,7 @@ from indico.util import i18n
 
 
 import pkg_resources
-from setuptools.command import develop, install, sdist, bdist_egg, \
-    easy_install, test
+from setuptools.command import develop, install, sdist, bdist_egg, easy_install, test
 from setuptools import setup, find_packages, findall
 
 
@@ -50,10 +49,6 @@ except ImportError:
 
 
 DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras"]
-
-if sys.platform == 'linux2':
-    import pwd
-    import grp
 
 
 class vars(object):
@@ -95,55 +90,23 @@ def _generateDataPaths(x):
     return dataFiles
 
 
-def _getDataFiles(x):
-    """
-    Returns a fully populated data_files ready to be fed to setup()
-
-    WARNING: when creating a bdist_egg we need to include files inside bin,
-    doc, config & htdocs into the egg therefore we cannot fetch indico.conf
-    values directly because they will not refer to the proper place. We
-    include those files in the egg's root folder.
-    """
-
-    # setup expects a list like this (('foo/bar/baz', 'wiki.py'),
-    #                                 ('a/b/c', 'd.jpg'))
-    #
-    # What we do below is transform a list like this:
-    #                                (('foo', 'bar/baz/wiki.py'),
-    #                                 ('a', 'b/c/d.jpg'))
-    #
-    # first into a dict and then into a pallatable form for setuptools.
-
-    # This re will be used to filter out etc/*.conf files and therefore not overwritting them
-    dataFiles = _generateDataPaths((('bin', 'bin'),
-                                    ('doc', 'doc'),
-                                    ('etc', 'etc')))
-    return dataFiles
-
-
 def _getInstallRequires():
-    '''Returns external packages required by Indico
+    """Returns external packages required by Indico
 
-    These are the ones needed for runtime.'''
+    These are the ones needed for runtime."""
 
-    base = read_requirements_file(os.path.join(os.path.dirname(__file__), 'requirements.txt'))
-
-    #for Python older than 2.7
-    if sys.version_info[0] <= 2 and sys.version_info[1] < 7:
-        base += ['argparse', 'ordereddict']
-
-    return base
+    return read_requirements_file(os.path.join(os.path.dirname(__file__), 'requirements.txt'))
 
 
 def _versionInit():
-        '''Retrieves the version number from indico/MaKaC/__init__.py and returns it'''
+    """Retrieves the version number from indico/MaKaC/__init__.py and returns it"""
 
-        from indico.MaKaC import __version__
-        v = __version__
+    from indico.MaKaC import __version__
+    v = __version__
 
-        print('Indico %s' % v)
+    print 'Indico %s' % v
 
-        return v
+    return v
 
 
 ###  Commands ###########################################################
@@ -468,7 +431,7 @@ if __name__ == '__main__':
     x.configurationDir = 'etc'
     x.htdocsDir = 'htdocs'
 
-    dataFiles = _getDataFiles(x)
+    dataFiles = _generateDataPaths((('bin', 'bin'), ('doc', 'doc'), ('etc', 'etc'), ('migrations', 'migrations')))
 
     foundPackages = list('MaKaC.%s' % pkg for pkg in
                          find_packages(where='indico/MaKaC'))
@@ -515,15 +478,13 @@ if __name__ == '__main__':
             indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main
             indico_ctl = MaKaC.consoleScripts.indicoCtl:main
             indico_livesync = indico.ext.livesync.console:main
-            indico_shell = indico.util.shell:main
-            indico_admin = indico.util.admin:main
+            indico = indico.cli.manage:main
 
             [indico.ext_types]
 
             statistics = indico.ext.statistics
             Collaboration = MaKaC.plugins.Collaboration
             InstantMessaging = MaKaC.plugins.InstantMessaging
-            RoomBooking = MaKaC.plugins.RoomBooking
             EPayment = MaKaC.plugins.EPayment
             livesync = indico.ext.livesync
             importer = indico.ext.importer
@@ -541,9 +502,6 @@ if __name__ == '__main__':
             Collaboration.RecordingManager = MaKaC.plugins.Collaboration.RecordingManager
             Collaboration.RecordingRequest = MaKaC.plugins.Collaboration.RecordingRequest
             Collaboration.WebcastRequest = MaKaC.plugins.Collaboration.WebcastRequest
-
-            RoomBooking.CERN = MaKaC.plugins.RoomBooking.CERN
-            RoomBooking.default = MaKaC.plugins.RoomBooking.default
 
             EPayment.payPal = MaKaC.plugins.EPayment.payPal
             EPayment.worldPay = MaKaC.plugins.EPayment.worldPay

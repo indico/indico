@@ -17,24 +17,22 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from flask import session, g, request
+from flask import session, g, request, render_template
 from flask import current_app as app
 import pkg_resources
 import os.path
 import re
-import posixpath, re
-from indico.core.db import DBMgr
+import posixpath
 from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime, formatDate, formatTime
 from MaKaC.user import Avatar
 from mako.lookup import TemplateLookup
 import mako.exceptions as exceptions
 import MaKaC
-import MaKaC.common.info as info
 from MaKaC.plugins.base import PluginsHolder
 import xml.sax.saxutils
 
-from indico.util.date_time import format_number
+from indico.util.date_time import format_number, format_datetime, format_date, format_time
 from indico.util.i18n import ngettext
 from indico.util.contextManager import ContextManager
 from indico.util.mdx_latex import latex_escape
@@ -44,10 +42,13 @@ from indico.web.flask.util import url_for, url_rule_to_js
 
 # The main template directory
 TEMPLATE_DIR = Config.getInstance().getTPLDir()
-FILTER_IMPORTS = ['from indico.util.json import dumps as j',
-                  'from indico.util.string import html_line_breaks as html_breaks',
-                  'from indico.util.string import remove_tags',
-                  'from indico.util.string import render_markdown as m']
+FILTER_IMPORTS = [
+    'from indico.util.json import dumps as j',
+    'from indico.util.string import encode_if_unicode',
+    'from indico.util.string import html_line_breaks as html_breaks',
+    'from indico.util.string import remove_tags',
+    'from indico.util.string import render_markdown as m'
+]
 
 
 class IndicoTemplateLookup(TemplateLookup):
@@ -107,13 +108,19 @@ class IndicoTemplateLookup(TemplateLookup):
                         return self._load(srcfile, uri)
 
                 # We do not find anything, so we raise the Exception
-                raise exceptions.TopLevelLookupException(
-                                "Cant locate template for uri %r" % uri)
+                raise exceptions.TopLevelLookupException('Can\'t locate template for uri {0!r}'.format(uri))
+
 
 def _define_lookup():
+    # TODO: disable_unicode shouldn't be used
+    # since unicode is disabled, template waits for
+    # byte strings provided by default_filters
+    # i.e converting SQLAlchemy model unicode properties to byte strings
     return IndicoTemplateLookup(directories=[TEMPLATE_DIR],
                                 module_directory=os.path.join(Config.getInstance().getTempDir(), "mako_modules"),
                                 disable_unicode=True,
+                                input_encoding='utf-8',
+                                default_filters=['encode_if_unicode', 'str'],
                                 filesystem_checks=True,
                                 imports=FILTER_IMPORTS,
                                 cache_enabled=not ContextManager.get('offlineMode'))
@@ -131,7 +138,7 @@ def render(tplPath, params={}, module=None):
     # outside of the main tpls directory (e.g. plugins) wants
     # to include another template from the main directory.
     # Usage example: <%include file="${TPLS}/SomeTemplate.tpl"/>
-    params["TPLS"] = TEMPLATE_DIR
+    params['TPLS'] = TEMPLATE_DIR
 
     return template.render(**params)
 
@@ -220,16 +227,6 @@ def quoteattr(s):
     return xml.sax.saxutils.quoteattr(s)
 
 
-def roomClass(room):
-    if not room.isReservable or room.hasBookingACL():
-        roomCls = "privateRoom"
-    elif room.isReservable and room.resvsNeedConfirmation:
-        roomCls = "moderatedRoom"
-    elif room.isReservable:
-        roomCls = "basicRoom"
-    return roomCls
-
-
 def dequote(s):
     """Remove surrounding quotes from a string (if there are any)."""
     if ((s.startswith('"') or s.startswith("'"))
@@ -315,15 +312,17 @@ def escapeHTMLForJS(s):
         (carriage return) -> \r
         (backspace) -> \b
         (form feed) -> \f
-
-        TODO: try to optimize this (or check if it's optimum already).
-        translate() doesn't work, because we are replacing characters by couples of characters.
-        explore use of regular expressions, or maybe split the string and then join it manually, or just replace them by
-        looping through the string and using an if...elif... etc.
     """
-    res = s.replace("\\", "\\\\").replace("\'", "\\\'").replace("\"", "\\\"").replace("&", "\\&").replace("/", "\\/").\
-        replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r").replace("\b", "\\b").replace("\f", "\\f")
-    return res
+    return s.replace("\\", "\\\\")\
+            .replace("\'", "\\\'")\
+            .replace("\"", "\\\"")\
+            .replace("&", "\\&")\
+            .replace("/", "\\/")\
+            .replace("\n", "\\n")\
+            .replace("\t", "\\t")\
+            .replace("\r", "\\r")\
+            .replace("\b", "\\b")\
+            .replace("\f", "\\f")
 
 
 def registerHelpers(objDict):
@@ -353,6 +352,12 @@ def registerHelpers(objDict):
         objDict['formatTime'] = formatTime
     if not 'formatDate' in objDict:
         objDict['formatDate'] = formatDate
+    if not 'format_datetime' in objDict:
+        objDict['format_datetime'] = format_datetime
+    if not 'format_date' in objDict:
+        objDict['format_date'] = format_date
+    if not 'format_time' in objDict:
+        objDict['format_time'] = format_time
     if not 'systemIcon' in objDict:
         objDict['systemIcon'] = systemIcon
     if not 'formatDateTime' in objDict:
@@ -380,9 +385,7 @@ def registerHelpers(objDict):
         from MaKaC.services.interface.rpc.offline import roomInfo
         objDict['roomInfo'] = roomInfo
     if not 'roomBookingActive' in objDict:
-        if DBMgr.getInstance().isConnected():
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            objDict['roomBookingActive'] = minfo.getRoomBookingModuleActive()
+        objDict['roomBookingActive'] = Config.getInstance().getIsRoomBookingActive()
     if not 'user' in objDict:
         if not '__rh__' in objDict or not objDict['__rh__']:
             objDict['user'] = "ERROR: Assign self._rh = rh in your WTemplated.__init__( self, rh ) method."
@@ -390,8 +393,6 @@ def registerHelpers(objDict):
             objDict['user'] = objDict['__rh__']._getUser()  # The '__rh__' is set by framework
     if 'rh' not in objDict and '__rh__' in objDict:
         objDict['rh'] = objDict['__rh__']
-    if not roomClass in objDict:
-        objDict['roomClass'] = roomClass
     if not 'systemIcon' in objDict:
         objDict['systemIcon'] = systemIcon
     if not 'iconFileName' in objDict:
@@ -421,3 +422,4 @@ def registerHelpers(objDict):
     # flask utils
     objDict['url_for'] = url_for
     objDict['url_rule_to_js'] = url_rule_to_js
+    objDict['render_template'] = render_template

@@ -16,24 +16,24 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import re
+
+from persistent import Persistent
+
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.rooms import Room
+from indico.core.config import Config
 
 from MaKaC.plugins.Collaboration.base import CollaborationException, CSErrorBase
-from persistent import Persistent
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.fossilize import fossilizes, Fossilizable
-from MaKaC.plugins.Collaboration.Vidyo.fossils import IVidyoErrorFossil, \
-    IFakeAvatarOwnerFossil
+from MaKaC.plugins.Collaboration.Vidyo.fossils import IVidyoErrorFossil, IFakeAvatarOwnerFossil
 from MaKaC.i18n import _
-import re
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 from MaKaC.plugins.Collaboration.Vidyo.indexes import EventEndDateIndex, BOOKINGS_BY_VIDYO_ROOMS_INDEX
 from MaKaC.common.timezoneUtils import nowutc
 from datetime import timedelta
-from MaKaC.common.logger import Logger
-from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
-from MaKaC.common import info
 from indico.core.index import Catalog
-
 
 
 def getVidyoOptionValue(optionName):
@@ -189,22 +189,20 @@ class VidyoTools(object):
         return nowutc() - timedelta(days = getVidyoOptionValue("maxDaysBeforeClean"))
 
     @classmethod
-    def getLinkRoomAttribute(cls, linkVideo, attName="H323 IP"):
-        if linkVideo is None:
+    def getLinkRoomAttribute(cls, linkVideo, attName='h323-ip'):
+        if linkVideo is None or not Config.getInstance().getIsRoomBookingActive():
             return ""
         location = linkVideo.getLocation()
         room = linkVideo.getRoom()
-        roomAttribute = ""
-        if location and room and location.getName() and room.getName() and location.getName().strip() and room.getName().strip():
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            if minfo.getRoomBookingModuleActive():
-                CrossLocationDB.connect()
-                try:
-                    roomInfo = CrossLocationQueries.getRooms(location=location.getName(), roomName=room.getName())
-                    roomAttribute = roomInfo.customAtts[attName]
-                except Exception, e:
-                    Logger.get("Vidyo").warning("Location: '%s' - Problem with CrossLocationQueries: '%s'" % (location.getName(), str(e)))
-        return roomAttribute
+        if not location or not room:
+            return
+        location_name = location.getName()
+        room_name = room.getName()
+        if not location_name or not room_name:
+            return ''
+        rb_room = Room.find_first(Location.name == location_name.strip(), Room.name == room_name.strip(),
+                                  _join=Room.location)
+        return rb_room.get_attribute_value(attName, '') if rb_room else ''
 
     @classmethod
     def getContactSupportText(cls):

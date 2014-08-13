@@ -33,7 +33,7 @@ DEFAULT_PERSISTENT_USER_AGREEMENT = """In conjunction with a having a key associ
 DEFAULT_PROTECTION_DISCLAINER_RESTRICTED = 'Circulation to people other than the intended audience is not authorized. You are obliged to treat the information with the appropriate level of confidentiality.'
 DEFAULT_PROTECTION_DISCLAINER_PROTECTED = 'As such, this information is intended for an internal audience only. You are obliged to treat the information with the appropriate level of confidentiality.'
 
-#from MaKaC.common.logger import Logger
+#from indico.core.logger import Logger
 
 #the singleton pattern should be applied to this class to ensure that it is
 #   unique, but as Extended classes seem not to support classmethods it will
@@ -56,9 +56,6 @@ class MaKaCInfo(Persistent):
         self._notifyAccountCreation = False
         self._moderateAccountCreation = False
         self._moderators = []
-
-        # Room booking related
-        self._roomBookingModuleActive = False
 
         # Global poster/badge templates
         self._defaultConference = None
@@ -247,68 +244,6 @@ class MaKaCInfo(Persistent):
         for admin in self.getAdminList().getList():
             emails.append(admin.getEmail())
         return emails
-
-    # === ROOM BOOKING RELATED ===============================================
-
-    def getRoomBookingModuleActive( self ):
-        try:
-            return self._roomBookingModuleActive
-        except:
-            self.setRoomBookingModuleActive()
-            return self._roomBookingModuleActive
-
-    def setRoomBookingModuleActive( self, active = False ):
-        self._roomBookingModuleActive = active
-        from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
-        RHGetVarsJs.removeTmpVarsFile()
-
-    # Only for default Indico/ZODB plugin
-    def getRoomBookingDBConnectionParams( self ):
-        #self._roomBookingStorageParams = ('indicodev.cern.ch', 9676)
-        try:
-            return self._roomBookingStorageParams
-        except:
-            self.setRoomBookingDBConnectionParams()
-            return self._roomBookingStorageParams
-
-    def setRoomBookingDBConnectionParams( self, hostPortTuple = ('localhost', 9676) ):
-        self._roomBookingStorageParams = hostPortTuple
-
-    # Only for default Indico/ZODB plugin
-    def getRoomBookingDBUserName( self ):
-        try:
-            return self._roomBookingDBUserName
-        except:
-            self._roomBookingDBUserName = ""
-            return self._roomBookingDBUserName
-
-    # Only for default Indico/ZODB plugin
-    def setRoomBookingDBUserName( self, user = "" ):
-        self._roomBookingDBUserName = user
-
-    # Only for default Indico/ZODB plugin
-    def getRoomBookingDBPassword( self ):
-        try:
-            return self._roomBookingDBPassword
-        except:
-            self._roomBookingDBPassword = ""
-            return self._roomBookingDBPassword
-
-    # Only for default Indico/ZODB plugin
-    def setRoomBookingDBPassword( self, password = "" ):
-        self._roomBookingDBPassword = password
-
-    # Only for default Indico/ZODB plugin
-    def getRoomBookingDBRealm( self ):
-        try:
-            return self._roomBookingDBRealm
-        except:
-            self._roomBookingDBRealm = ""
-            return self._roomBookingDBRealm
-
-    # Only for default Indico/ZODB plugin
-    def setRoomBookingDBRealm( self, realm = "" ):
-        self._roomBookingDBRealm = realm
 
     def getDefaultConference( self ):
         try:
@@ -502,20 +437,17 @@ class HelperMaKaCInfo:
         ZODB4 is released and the Persistent classes are no longer Extension
         ones.
     """
-
+    @classmethod
     def getMaKaCInfoInstance(cls):
         dbmgr = db.DBMgr.getInstance()
         root = dbmgr.getDBConnection().root()
         try:
-            minfo = root["MaKaCInfo"]["main"]
-        except KeyError, e:
+            minfo = root['MaKaCInfo']['main']
+        except KeyError:
             minfo = MaKaCInfo()
-            root["MaKaCInfo"] = OOBTree.OOBTree()
-            root["MaKaCInfo"]["main"] = minfo
-
+            root['MaKaCInfo'] = OOBTree.OOBTree()
+            root['MaKaCInfo']['main'] = minfo
         return minfo
-
-    getMaKaCInfoInstance = classmethod( getMaKaCInfoInstance )
 
 
 class StyleManager(Persistent):

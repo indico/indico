@@ -18,6 +18,8 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 
+from functools import wraps
+
 from babel.support import Translations, LazyProxy as _LazyProxy
 from babel.core import Locale
 from gettext import NullTranslations
@@ -34,8 +36,7 @@ class LazyProxy(_LazyProxy):
     Stateless version of Babel's LazyProxy
     """
     def value(self):
-        # just return
-        return  self._func(*self._args, **self._kwargs)
+        return self._func(*self._args, **self._kwargs)
     value = property(value)
 
 
@@ -51,16 +52,11 @@ class IndicoLocale(Locale):
 
 
 def _tr_eval(func, *args, **kwargs):
-    # ok, eval time... is there a translation?
-
     if 'translation' in ContextManager.get():
-        # yes? good, let's do it
         tr = ContextManager.get('translation')
     else:
-        # no? too bad, just don't translate anything
         tr = nullTranslations
-    res = getattr(tr, func)(*args, **kwargs).encode('utf-8')
-    return res
+    return getattr(tr, func)(*args, **kwargs)
 
 
 class LazyTranslations(Translations):
@@ -85,10 +81,17 @@ class LazyTranslations(Translations):
             return LazyProxy(_tr_eval, func, *args, **kwargs)
 
     def gettext(self, text):
-        return self._wrapper('gettext', text)
+        return self._wrapper('ugettext' if isinstance(text, unicode) else 'gettext', text)
 
     def ngettext(self, singular, plural, n):
         return self._wrapper('ngettext', singular, plural, n)
+
+
+def ensure_str(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        return str(fn(*args, **kwargs))
+    return wrapper
 
 
 lazyTranslations = LazyTranslations()

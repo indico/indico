@@ -162,5 +162,3 @@ class PersistentWaitingQueue(Persistent):
                     yield tstamp, elem
             except StopIteration:
                 pass
-
-

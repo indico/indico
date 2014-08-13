@@ -1,0 +1,188 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of Indico.
+## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
+##
+## Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 3 of the
+## License, or (at your option) any later version.
+##
+## Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+import itertools
+
+from indico.modules.rb import settings
+
+from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
+from indico.modules.rb.models.reservations import RepeatMapping
+from indico.modules.rb.views import WPRoomBookingBase
+from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
+from indico.util.i18n import _
+from MaKaC.webinterface.wcomponents import WTemplated
+
+
+class WPRoomBookingBookingDetails(WPRoomBookingBase):
+    endpoints = {
+        'room_details': 'rooms.roomBooking-roomDetails',
+        'booking_details': 'rooms.roomBooking-bookingDetails',
+        'booking_modify': 'rooms.roomBooking-modifyBookingForm',
+        'booking_clone': 'rooms.roomBooking-cloneBooking',
+        'booking_accept': 'rooms.roomBooking-acceptBooking',
+        'booking_cancel': 'rooms.roomBooking-cancelBooking',
+        'booking_reject': 'rooms.roomBooking-rejectBooking',
+        'booking_occurrence_cancel': 'rooms.roomBooking-cancelBookingOccurrence',
+        'booking_occurrence_reject': 'rooms.roomBooking-rejectBookingOccurrence'
+    }
+
+    def _setCurrentMenuItem(self):
+        self._bookRoomNewOpt.setActive(True)
+
+    def _getBody(self, params):
+        reservation = params['reservation']
+        params['endpoints'] = self.endpoints
+        params['assistance_emails'] = settings.get('assistance_emails', [])
+        params['vc_equipment'] = ', '.join(eq.name for eq in reservation.get_vc_equipment())
+        params['repetition'] = RepeatMapping.getMessage(*reservation.repetition)
+        params['edit_logs'] = reservation.edit_logs.order_by(ReservationEditLog.timestamp.desc()).all()
+        params['excluded_days'] = reservation.find_excluded_days().all()
+        return WTemplated('RoomBookingDetails').getHTML(params)
+
+
+class WPRoomBookingCalendar(WPRoomBookingBase):
+    def _setCurrentMenuItem(self):
+        self._bookingListCalendarOpt.setActive(True)
+
+    def _getBody(self, params):
+        params['calendar'] = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
+                                                       rooms=params['rooms']).render()
+        return WTemplated('RoomBookingCalendar').getHTML(params)
+
+
+class WPRoomBookingSearchBookings(WPRoomBookingBase):
+    def _setCurrentMenuItem(self):
+        self._bookingListSearchOpt.setActive(True)
+
+    def _getBody(self, params):
+        return WTemplated('RoomBookingSearchBookings').getHTML(params)
+
+
+class WPRoomBookingSearchBookingsResults(WPRoomBookingBase):
+    mapping = {
+    #    x - only for my rooms
+    #    |  x - only pending bookings
+    #    |  |  x - only confirmed bookings
+    #    |  |  |  x - only created by myself
+    #    |  |  |  |
+        (0, 0, 0, 0): _('Bookings'),
+        (0, 1, 0, 0): _('Pending bookings'),
+        (0, 0, 1, 0): _('Confirmed bookings'),
+        (0, 0, 0, 1): _('My bookings'),
+        (0, 1, 0, 1): _('My pending bookings'),
+        (0, 0, 1, 1): _('My confirmed bookings'),
+        (1, 0, 0, 0): _('Bookings for my rooms'),
+        (1, 1, 0, 0): _('Pending bookings for my rooms'),
+        (1, 0, 1, 0): _('Confirmed bookings for my rooms'),
+        (1, 0, 0, 1): _('My bookings for my rooms'),
+        (1, 1, 0, 1): _('My pending bookings for my rooms'),
+        (1, 0, 1, 1): _('My confirmed bookings for my rooms'),
+    }
+
+    def __init__(self, rh, menu_item, **kwargs):
+        self._menu_item = menu_item
+        WPRoomBookingBase.__init__(self, rh, **kwargs)
+
+    def _setCurrentMenuItem(self):
+        getattr(self, '_{}Opt'.format(self._menu_item)).setActive(True)
+
+    def _get_criteria_summary(self, params):
+        form = params['form']
+        only_my_rooms = form.is_only_my_rooms.data
+        only_pending_bookings = form.is_only_pending_bookings.data
+        only_confirmed_bookings = form.is_only_confirmed_bookings.data
+        only_my_bookings = form.is_only_mine.data
+        if only_pending_bookings and only_confirmed_bookings:
+            # Both selected = show all
+            only_pending_bookings = only_confirmed_bookings = False
+
+        return self.mapping.get((only_my_rooms, only_pending_bookings, only_confirmed_bookings, only_my_bookings),
+                                _('{} occurrences found').format(len(params['occurrences'])))
+
+    def _getBody(self, params):
+        params['summary'] = self._get_criteria_summary(params)
+        calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
+                                             rooms=params['rooms'], show_blockings=params['show_blockings'])
+        params['calendar'] = calendar.render(form_data=params['form_data'])
+        return WTemplated('RoomBookingSearchBookingsResults').getHTML(params)
+
+
+class WPRoomBookingNewBookingBase(WPRoomBookingBase):
+    def _setCurrentMenuItem(self):
+        self._bookRoomNewOpt.setActive(True)
+
+
+class WPRoomBookingNewBookingSelectRoom(WPRoomBookingNewBookingBase):
+    def _getBody(self, params):
+        return WTemplated('RoomBookingNewBookingSelectRoom').getHTML(params)
+
+
+class WPRoomBookingNewBookingSelectPeriod(WPRoomBookingNewBookingBase):
+    def _getBody(self, params):
+        calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
+                                             candidates=params['candidates'], rooms=params['rooms'],
+                                             repeat_frequency=params['repeat_frequency'],
+                                             repeat_interval=params['repeat_interval'],
+                                             flexible_days=params['flexible_days'])
+        params['calendar'] = calendar.render(show_summary=False, can_navigate=False, details_in_new_tab=True)
+        return WTemplated('RoomBookingNewBookingSelectPeriod').getHTML(params)
+
+
+class WPRoomBookingNewBookingConfirm(WPRoomBookingNewBookingBase):
+    endpoints = {
+        'room_details': 'rooms.roomBooking-roomDetails'
+    }
+
+    def _getBody(self, params):
+        params['endpoints'] = self.endpoints
+        return WTemplated('RoomBookingNewBookingConfirm').getHTML(params)
+
+
+class WPRoomBookingNewBookingSimple(WPRoomBookingNewBookingBase):
+    endpoints = {
+        'room_details': 'rooms.roomBooking-roomDetails'
+    }
+
+    def _getBody(self, params):
+        params['endpoints'] = self.endpoints
+        if params['start_dt'] and params['end_dt']:
+            calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
+                                                 candidates=params['candidates'],
+                                                 specific_room=params['room'],
+                                                 repeat_frequency=params['repeat_frequency'],
+                                                 repeat_interval=params['repeat_interval'])
+            params['calendar'] = calendar.render(show_navbar=False, details_in_new_tab=True)
+        else:
+            params['calendar'] = ''
+        return WTemplated('RoomBookingBookingForm').getHTML(params)
+
+
+class WPRoomBookingModifyBooking(WPRoomBookingBase):
+    endpoints = {
+        'room_details': 'rooms.roomBooking-roomDetails'
+    }
+
+    def _getBody(self, params):
+        params['endpoints'] = self.endpoints
+        calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
+                                             candidates=params['candidates'], specific_room=params['room'],
+                                             repeat_frequency=params['repeat_frequency'],
+                                             repeat_interval=params['repeat_interval'])
+        params['calendar'] = calendar.render(show_navbar=False, details_in_new_tab=True)
+        return WTemplated('RoomBookingBookingForm').getHTML(params)

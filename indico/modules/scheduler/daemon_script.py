@@ -23,9 +23,14 @@ This script starts an Indico Scheduler instance, forking it off as a background
 process.
 """
 
+import argparse
 import ConfigParser
+import logging
+import multiprocessing
+import os
 import socket
-import time, sys, os, argparse, logging, cmd, multiprocessing
+import sys
+import time
 from logging.handlers import SMTPHandler
 
 from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
@@ -33,8 +38,6 @@ from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
 # legacy import
 from indico.core.config import Config
 from indico.core.db import DBMgr
-from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
 
 
 class SchedulerApp(object):
@@ -272,21 +275,12 @@ def _run(args):
     dbi = DBMgr.getInstance(max_disconnect_poll=40)
     dbi.startRequest()
 
-    info = HelperMaKaCInfo.getMaKaCInfoInstance()
-    useRBDB = info.getRoomBookingModuleActive()
-
-    if useRBDB:
-        DALManager.connect()
-
     sm = SchedulerModule.getDBInstance()
     t = sm.getTaskById(args.taskid)
 
     t.plugLogger(logging.getLogger('console.run/%s' % args.taskid))
     t.run()
 
-    if useRBDB:
-        DALManager.commit()
-        DALManager.disconnect()
     dbi.endRequest()
 
 

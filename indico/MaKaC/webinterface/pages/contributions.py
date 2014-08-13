@@ -31,7 +31,6 @@ from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceM
 from MaKaC.webinterface.pages.main import WPMainBase
 from indico.core.config import Config
 from MaKaC.common.utils import isStringHTML, formatDateTime
-from MaKaC.common import info
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.fossilize import fossilize
@@ -41,7 +40,6 @@ from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date
 
-from indico.util.string import render_markdown
 from MaKaC.common.TemplateExec import render
 
 
@@ -894,8 +892,7 @@ class WContributionDataModification(wcomponents.WTemplated):
             vars["Type"] = ""
             vars["Board"] = ""
 
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
+        vars["useRoomBookingModule"] = Config.getInstance().getIsRoomBookingActive()
         if self._contrib.getSession():
             vars["sessionType"] = self._contrib.getSession().getScheduleType()
         else:

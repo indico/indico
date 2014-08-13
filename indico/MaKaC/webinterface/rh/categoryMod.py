@@ -27,12 +27,13 @@ from MaKaC.webinterface.user import UserListModificationBase
 from indico.core.config import Config
 from MaKaC.common.utils import sortCategoryByTitle, validMail
 import MaKaC.user as user
-from MaKaC.webinterface.rh.base import RHModificationBaseProtected,\
-    RoomBookingDBMixin
+from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.errors import MaKaCError,NoReportError,FormValuesError
 import MaKaC.conference as conference
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
-from MaKaC.i18n import _
+
+from indico.util.i18n import _
+
 
 class RHCategModifBase( RHModificationBaseProtected ):
 
@@ -490,7 +491,7 @@ class _ActionConferenceReallocation:
             self._categ.moveConference(conf, self._target)
 
 
-class RHCategoryActionConferences( RoomBookingDBMixin, RHCategModifBase ):
+class RHCategoryActionConferences(RHCategModifBase):
     _uh = urlHandlers.UHCategoryActionConferences
 
     def _checkParams( self, params ):
@@ -567,7 +568,8 @@ class RHCategorySetNotifyCreation( RHCategModifBase ):
         self._target.setNotifyCreationList(self._emailList)
         self._redirect( urlHandlers.UHCategModifAC.getURL( self._target ) )
 
-class RHCategoryDeletion( RoomBookingDBMixin, RHCategModifBase ):
+
+class RHCategoryDeletion(RHCategModifBase):
     _uh = urlHandlers.UHCategoryDeletion
 
     def _checkParams( self, params ):

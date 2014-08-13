@@ -17,11 +17,11 @@
                         <a href="${withdrawURL}" class="i-button icon-remove" title="${_("Withdraw")}"></a>
                     % endif
                 % endif
-                <a href="${str(urlHandlers.UHAbstractDisplayPDF.getURL(abstract))}" 
+                <a href="${str(urlHandlers.UHAbstractDisplayPDF.getURL(abstract))}"
                    class="i-button icon-file-pdf" target="_blank" title="${_("Generate PDF")}"></a>
             </div>
         </div>
-        <h1 class="page_title">${"Abstract"}</h1>
+        <h1 class="page-title">${"Abstract"}</h1>
     </div>
     <div class="layout-wrapper clear">
         <div class="aside" title="${_("Submission details (date, time and user)")}">

@@ -42,8 +42,7 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
     },
 
     _dateFromString: function(dateStr) {
-        var matches = /^(\d+)\/(\d+)\/(\d+)$/.exec(dateStr);
-        return new Date(matches[3], matches[2] - 1, matches[1]);
+        return new Date(dateStr);
     },
 
     _verifyDates: function() {
@@ -91,8 +90,15 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
     this.allowEqual = allowEqual || false;
     this.dateRangeWidget = null;
 
-    this.startDate = startDate ? this._dateFromString(startDate) : new Date();
-    this.endDate = endDate ? this._dateFromString(endDate) : new Date();
+    if (startDate && typeof startDate == 'string') {
+        startDate = this._dateFromString(startDate);
+    }
+    if (endDate && typeof endDate == 'string') {
+        endDate = this._dateFromString(endDate);
+    }
+
+    this.startDate = startDate || new Date();
+    this.endDate = endDate || new Date();
 
     this.ExclusivePopupWithButtons(title || 'Choose date range', function() {
         self.close();

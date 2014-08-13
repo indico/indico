@@ -2,7 +2,7 @@
     <%block name="toolbar"></%block>
 </div>
 
-<h2 class="page_title">
+<h2 class="page-title">
     <%block name="title"></%block>
 </h2>
 

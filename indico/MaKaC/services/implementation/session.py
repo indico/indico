@@ -24,7 +24,6 @@ Session-related services
 from MaKaC.services.implementation.base import ProtectedModificationService
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.services.implementation.roomBooking import GetBookingBase
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
 from MaKaC.services.implementation import conference as conferenceServices
 import MaKaC.webinterface.locators as locators
@@ -173,9 +172,6 @@ class SessionSlotModifUnrestrictedContribMngCoordBase(SessionSlotModifBase, Sess
 
     def _checkProtection(self):
         SessionModifUnrestrictedContribMngCoordBase._checkProtection( self )
-
-class SessionGetBooking(SessionBase, GetBookingBase):
-    pass
 
 class SessionProtectionUserList(SessionModifBase):
     def _getAnswer(self):
@@ -369,7 +365,6 @@ class SessionGetChildrenPublic(SessionModifBase):
         return fossilize(self._session.getAccessController().getPublicChildren())
 
 methodMap = {
-    "getBooking": SessionGetBooking,
     "protection.getAllowedUsersList": SessionProtectionUserList,
     "protection.addAllowedUsers": SessionProtectionAddUsers,
     "protection.removeAllowedUser": SessionProtectionRemoveUser,

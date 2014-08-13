@@ -23,11 +23,10 @@
             a:hover {
                 color: #E25300;
             }
-            img.headerLogo {
+            img.header-logo {
                 border: medium none;
-                height: 52px;
+                height: 60px;
                 margin: 7px 10px;
-                width: 196px;
             }
             #errorBoxContainer h1 {
                 color: #777777;
@@ -61,9 +60,9 @@
     </head>
     <body>
         <div class="wrapper">
-            <div class="pageHeader" align="center">
+            <div class="page-header" align="center">
                 <a href="${ Config.getInstance().getBaseURL() }/">
-                    <img alt="logo" class="headerLogo" src="${ Config.getInstance().getSystemIconURL("logoIndico") }" />
+                    <img alt="logo" class="header-logo" src="${ Config.getInstance().getSystemIconURL("logoIndico") }" />
                 </a>
             </div>
             <div align="center">

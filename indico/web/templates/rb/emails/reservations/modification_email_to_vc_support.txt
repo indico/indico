@@ -1,0 +1,6 @@
+{% extends 'rb/emails/reservations/base_email_to_vc_support.txt' %}
+
+{% block body -%}
+A booking on {{ reservation.room.full_name }} was modified.
+{% include 'rb/emails/reservations/reservation_vc_info.txt' %}
+{%- endblock %}

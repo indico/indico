@@ -25,10 +25,143 @@
 @import "partials/_jquery.indico.clearableinput";
 @import "roombooking/bars";
 @import "roombooking/breadcrumbs";
+@import "roombooking/calendar";
 @import "roombooking/roomselector";
 
-#roomBookingCal {
-    width: 820px;
+#searchBookings {
+    width: 615px;
+    $width: 595px;
+
+    #timespan, #bookingDetails {
+        .label {
+            @include ellipsis();
+            width: 145px;
+        }
+    }
+
+    #timespan {
+        > .toolbar {
+            width: $width;
+        }
+    }
+
+    #bookingDetails {
+        .toolbar.table {
+            width: $width;
+        }
+
+        input[type=text] {
+            width: 450px;
+        }
+    }
+
+    .submit-button-wrapper {
+        width: $width;
+
+        button {
+            font-weight: bold;
+            float: right;
+        }
+    }
+}
+
+#searchRooms {
+    .titleCellTD {
+        padding-top: 0.5em;
+    }
+}
+
+#roomBookingTable {
+    sub, sup {
+        top: -0.2em;
+        right: -0.1em;
+    }
+
+    sub {
+        top: 0.2em;
+        right: 0.1em;
+    }
+
+    td.ui-datepicker-week-end {
+        a, span {
+            background: lighten($gray, $color-variation);
+
+            &.ui-state-hover,
+            &.ui-state-active {
+                background: $blue;
+            }
+        }
+    }
+}
+
+#mapOfRoomAvailabilityForm {
+
+    .subFieldWidth {
+        width: 60px;
+    }
+
+    #repeatability {
+        width: 115px;
+    }
+
+    .dateField input {
+        width: 137px;
+    }
+}
+
+#datePeriod {
+    .datepicker {
+        display: inline-block;
+        margin-right: 35px;
+
+        .datepicker-title {
+            @include border-radius();
+            background: $light-blue;
+            font-size: 1.1em;
+            font-weight: bold;
+            height: 2em;
+            line-height: 2em;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+    }
+
+    .datepicker-info {
+        display: inline-block;
+        vertical-align: top;
+        width: 300px;
+
+        margin-top: 36px;
+    }
+}
+
+#bookedForInfo {
+    .group {
+        position: relative;
+
+        i.info-helper {
+            position: absolute;
+            right: -18px;
+            top: 6px;
+        }
+    }
+
+    .i-button.label {
+        width: 130px;
+    }
+
+    input[type=text] {
+        width: 240px;
+    }
+
+    textarea {
+        @include border-radius();
+        width: 370px;
+    }
+}
+
+#videoconferenceOptions {
+    list-style: none;
 }
 
 .tip {
@@ -51,75 +184,6 @@
 .tip-no-borders {
     @extend .tip;
     border: none;
-}
-
-.dayDiv {
-    position: relative;
-    height: 10px;
-    font-size:0px;
-    margin-top: 6px;
-}
-
-.dayCalendarDiv {
-    position: relative;
-    height: 20px;
-    font-size:0px;
-    display: inline-block;
-    vertical-align: middle;
-
-    & .time-bar {
-        background: image-url('../images/rb_timebar_bg.png');
-        width: 675px;
-        height: 20px;
-    }
-}
-
-.dayCalendarDivHeader {
-    height: 20px;
-    font-size:0px;
-    margin-top: 6px;
-    margin-left: 120px;
-    position: relative;
-}
-
-div.calHour {
-    margin-top: 2px;
-    position: absolute;
-    font-size: 8px;
-    height: 20px;
-    color: #666;
-}
-
-.room-row {
-    min-height: 20px;
-    width: 100%;
-    margin-bottom: 5px;
-    clear: both;
-
-    & .link {
-        line-height: 20px;
-        width: 120px;
-        padding-left: 5px;
-        display: inline-block;
-        vertical-align: middle;
-    }
-}
-
-.wholeDayCalendarDiv {
-    clear: both;
-    float: left;
-    width: 800px;
-    padding-bottom: 20px;
-    margin-bottom: 10px;
-    overflow: hidden;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-}
-
-.wholeDayCalendarDayHighlight {
-    background-color: #D9EDF7;
-    padding: 5px 0px 0px 5px;
 }
 
 /* Form fields: field description width. */
@@ -198,102 +262,79 @@ a.weekday {
     width: 25%;
 }
 
-.bookingShowHideHistory {
-    margin-top: 9px;
-}
+.booking-history {
+    clear: left;
+    margin: 0;
 
-.bookingDisplayEntryMoreInfo, .bookingDisplayEntryHideInfo {
-    white-space: nowrap;
-    padding-left: 7px;
-}
-
-.bookingDisplayHistoryTimestamp {
-    color: #999;
-    font-size: 11px;
-    display: table-cell;
-    white-space: pre;
-    padding-right: 10px;
-}
-
-.bookingDisplayHistoryInfo {
-    display: table-cell;
-    /* For GChrome and Safari*/
-    width: 1000px;
-}
-
-.bookingHistoryTooltip {
-    padding: 3px;
-    background-color: white;
-}
-
-#roomBookingTable {
-    sub, sup {
-        top: -0.2em;
-        right: -0.1em;
+    dt {
+        float: left;
+        color: #999;
     }
 
-    sub {
-        top: 0.2em;
-        right: 0.1em;
+    dd {
+        margin-left: 135px;
+        display: block;
     }
-
-    .ui-datepicker-week-end,
-    .ui-datepicker-week-end .ui-state-default {
-        color: #881122 !important;
-    }
-}
-
-#mapOfRoomAvailabilityForm {
-
-    .subFieldWidth {
-        width: 60px;
-    }
-
-    #repeatability {
-        width: 115px;
-    }
-
-    .dateField input {
-        width: 137px;
-    }
-}
-
-#eTime,
-#sTime {
-    width: 4em;
-}
-
-#sDatePlaceDiv,
-#eDatePlaceDiv {
-
-    #sDatePlaceTitle,
-    #eDatePlaceTitle {
-        text-align: center;
-    }
-
-    .ui-datepicker-inline {
-        background-color: transparent;
-    }
-}
-
-
-
-.bookDateDiv {
-    float: left;
-    margin-right: 35px;
-    padding: 10px;
-    background-color: #FAFAFA;
-
-    span {
-        color: #777;
-    }
-}
-
-#flexibleDatesDiv {
-    margin-top: 20px;
 }
 
 .bookingTitle {
    border-bottom: 1px solid #eaeaea;
-   padding-top: 15px;
+   padding-top: 2.6em;
+}
+
+.new-booking-message-box {
+    width: 820px;
+}
+
+.nested-1 {
+    color: $dark-gray;
+}
+
+table.booking-stats {
+    td {
+        padding: 5px;
+    }
+
+    td:not(:first-child) {
+        text-align: right;
+    }
+
+    td:first-child,
+    tr:first-child td,
+    tr:last-child td:last-child {
+        font-weight: bold;
+    }
+
+    tr:last-child td {
+        border-top: 1px solid $gray;
+    }
+
+    td:last-child {
+        border-left: 1px solid $gray;
+    }
+
+    .active-valid {
+        color: $green;
+        font-weight: bold;
+    }
+}
+
+.occupancy-stats {
+    width: 500px;
+
+    table {
+        width: 100%;
+
+        td.occupancy-period {
+            font-size: 1.1em;
+        }
+
+        td.occupancy-value {
+            color: $dark-gray;
+            font-size: 3em;
+            font-weight: bold;
+            padding-left: 25px;
+            text-align: right;
+        }
+    }
 }

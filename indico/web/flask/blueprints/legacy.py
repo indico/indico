@@ -17,9 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
-from indico.web.flask.wrappers import IndicoBlueprint
-
 import MaKaC.webinterface.rh.xmlGateway as mod_rh_xmlGateway
+
+from indico.web.flask.wrappers import IndicoBlueprint
 
 
 legacy = IndicoBlueprint('legacy', __name__)
@@ -39,11 +39,6 @@ legacy.add_url_rule('/xmlGateway.py/getCategoryInfo',
 legacy.add_url_rule('/xmlGateway.py/getStatsIndico',
                     'xmlGateway-getStatsIndico',
                     mod_rh_xmlGateway.RHStatsIndico,
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/getStatsRoomBooking',
-                    'xmlGateway-getStatsRoomBooking',
-                    mod_rh_xmlGateway.RHStatsRoomBooking,
                     methods=('GET', 'POST'))
 
 legacy.add_url_rule('/xmlGateway.py/loginStatus',
@@ -73,7 +68,10 @@ legacy.add_url_rule('/xmlGateway.py/webcastOnAir',
 
 
 # Legacy endpoints defined in htdocs/*.py files (which need compatibility routes)
-legacy_endpoints = set([
+# Note: When removing/renaming endpoints, feel free to remove them in here, too, but
+# it's not absolutely necessary - if there's no non-legacy endpoint with that name
+# the entry in here simply does nothing.
+legacy_endpoints = {
     'about', 'abstractDisplay', 'abstractDisplay-getAttachedFile', 'abstractDisplay-pdf', 'abstractManagment',
     'abstractManagment-abstractToPDF', 'abstractManagment-accept', 'abstractManagment-acceptMultiple',
     'abstractManagment-backToSubmitted', 'abstractManagment-changeTrack', 'abstractManagment-comments',
@@ -128,11 +126,7 @@ legacy_endpoints = set([
     'conferenceModification-dataPerform', 'conferenceModification-editContribType',
     'conferenceModification-managementAccess', 'conferenceModification-materialsAdd',
     'conferenceModification-materialsShow', 'conferenceModification-modifKey', 'conferenceModification-open',
-    'conferenceModification-removeContribType', 'conferenceModification-roomBookingBookingForm',
-    'conferenceModification-roomBookingChooseEvent', 'conferenceModification-roomBookingCloneBooking',
-    'conferenceModification-roomBookingDetails', 'conferenceModification-roomBookingList',
-    'conferenceModification-roomBookingRoomDetails', 'conferenceModification-roomBookingRoomList',
-    'conferenceModification-roomBookingSaveBooking', 'conferenceModification-roomBookingSearch4Rooms',
+    'conferenceModification-removeContribType',
     'conferenceModification-screenDates', 'conferenceOtherViews', 'conferenceProgram', 'conferenceProgram-pdf',
     'conferenceTimeTable', 'conferenceTimeTable-customizePdf', 'conferenceTimeTable-pdf', 'confListContribToJudge',
     'confListContribToJudge-asEditor', 'confListContribToJudge-asReviewer', 'confLogin', 'confLogin-active',
@@ -224,18 +218,17 @@ legacy_endpoints = set([
     'oauth-userThirdPartyAuth', 'paperReviewingDisplay', 'paperReviewingDisplay-downloadTemplate',
     'paperReviewingDisplay-uploadPaper', 'payment', 'posterTemplates', 'posterTemplates-posterDesign',
     'posterTemplates-posterPrinting', 'resetSessionTZ', 'roomBooking', 'roomBooking-acceptBooking',
-    'roomBooking-admin', 'roomBooking-adminLocation', 'roomBooking-blockingDetails', 'roomBooking-blockingForm',
-    'roomBooking-blockingList', 'roomBooking-blockingsForMyRooms', 'roomBooking-bookingDetails',
+    'roomBooking-admin', 'roomBooking-adminLocation', 'roomBooking-bookingDetails',
     'roomBooking-bookingForm', 'roomBooking-bookingList', 'roomBooking-bookRoom', 'roomBooking-cancelBooking',
-    'roomBooking-cancelBookingOccurrence', 'roomBooking-cloneBooking', 'roomBooking-deleteBlocking',
+    'roomBooking-cancelBookingOccurrence', 'roomBooking-cloneBooking',
     'roomBooking-deleteBooking', 'roomBooking-deleteCustomAttribute', 'roomBooking-deleteEquipment',
-    'roomBooking-deleteLocation', 'roomBooking-deleteRoom', 'roomBooking-mapOfRooms', 'roomBooking-mapOfRoomsWidget',
-    'roomBooking-rejectAllConflicting', 'roomBooking-rejectBooking', 'roomBooking-rejectBookingOccurrence',
-    'roomBooking-roomDetails', 'roomBooking-roomForm', 'roomBooking-roomList', 'roomBooking-roomStats',
+    'roomBooking-deleteLocation', 'roomBooking-mapOfRooms', 'roomBooking-mapOfRoomsWidget',
+    'roomBooking-rejectBooking', 'roomBooking-rejectBookingOccurrence',
+    'roomBooking-roomDetails', 'roomBooking-roomList', 'roomBooking-roomStats',
     'roomBooking-saveBooking', 'roomBooking-saveCustomAttributes', 'roomBooking-saveEquipment',
-    'roomBooking-saveLocation', 'roomBooking-saveRoom', 'roomBooking-search4Bookings', 'roomBooking-search4Rooms',
+    'roomBooking-saveLocation', 'roomBooking-search4Bookings', 'roomBooking-search4Rooms',
     'roomBooking-setDefaultLocation', 'roomBooking-statement', 'roomBookingPluginAdmin',
-    'roomBookingPluginAdmin-switchRoomBookingModuleActive', 'roomBookingPluginAdmin-zodbSave', 'roomMapper',
+    'roomBookingPluginAdmin-zodbSave', 'roomMapper',
     'roomMapper-creation', 'roomMapper-details', 'roomMapper-modify', 'roomMapper-performCreation',
     'roomMapper-performModify', 'sessionDisplay', 'sessionDisplay-ical', 'sessionModifAC',
     'sessionModifAC-setVisibility', 'sessionModifComm', 'sessionModifComm-edit', 'sessionModification',
@@ -265,4 +258,4 @@ legacy_endpoints = set([
     'wcalendar', 'wcalendar-select', 'xmlGateway', 'xmlGateway-getCategoryInfo', 'xmlGateway-getStatsIndico',
     'xmlGateway-getStatsRoomBooking', 'xmlGateway-loginStatus', 'xmlGateway-signIn', 'xmlGateway-signOut',
     'xmlGateway-webcastForthcomingEvents', 'xmlGateway-webcastOnAir'
-])
+}

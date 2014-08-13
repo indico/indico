@@ -20,7 +20,6 @@
 from persistent import Persistent
 
 from indico.util.contextManager import ContextManager
-from indico.util.struct import iterators
 from MaKaC.common.timezoneUtils import nowutc
 
 class ModuleNames:
@@ -96,7 +95,7 @@ class LogItem(Persistent) :
         information to be shown.
         """
         info_list = []
-        for entry in iterators.SortedDictIterator(self._logInfo):
+        for entry in sorted(self._logInfo.items(), reverse=True):
             if (entry[0] != "subject"):
                 caption = entry[0]
                 value = entry[1]

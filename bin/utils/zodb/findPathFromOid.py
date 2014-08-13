@@ -234,9 +234,9 @@ def main():
 
     #If one only wants to see the shortest path
     if SHORTEST and len(paths):
-        paths = [sorted(paths, key=lambda(a): len(a), reverse=True)[-1]]
+        paths = [sorted(paths, key=len, reverse=True)[-1]]
 
-    for path in sorted(paths, key=lambda(a): len(a), reverse=True):
+    for path in sorted(paths, key=len, reverse=True):
         print "\n"
         for (oid, modKlass) in path[0:-1]:
             print "[0x"+(oid_repr(oid).strip())+ ":", modKlass +"]", "<-",

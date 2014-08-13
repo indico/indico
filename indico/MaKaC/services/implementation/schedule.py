@@ -37,7 +37,6 @@ from MaKaC.services.interface.rpc.common import ServiceError, TimingNoReportErro
 
 from MaKaC.services.implementation import conference as conferenceServices
 from MaKaC.services.implementation import base
-from MaKaC.services.implementation import roomBooking
 from MaKaC.services.implementation import session as sessionServices
 from MaKaC.common.timezoneUtils import setAdjustedDate
 from MaKaC.common.utils import getHierarchicalId, formatTime, formatDateTime, parseDate
@@ -49,7 +48,6 @@ from MaKaC.fossils.schedule import ILinkedTimeSchEntryMgmtFossil, IBreakTimeSchE
 from MaKaC.fossils.contribution import IContributionParticipationTTMgmtFossil, IContributionFossil
 from MaKaC.fossils.conference import IConferenceParticipationFossil,\
     ISessionFossil
-from MaKaC.common import timezoneUtils
 from MaKaC.common.Conversion import Conversion
 from MaKaC.schedule import BreakTimeSchEntry
 from MaKaC.conference import SessionSlot, Material, Link
@@ -57,7 +55,10 @@ from MaKaC.webinterface.pages.sessions import WSessionICalExport
 from MaKaC.webinterface.pages.contributions import WContributionICalExport
 from indico.web.http_api.util import generate_public_auth_request
 
-import time, datetime, pytz, copy
+import datetime
+import pytz
+import copy
+from indico.core.config import Config
 
 def translateAutoOps(autoOps):
 
@@ -105,8 +106,7 @@ class LocationSetter:
                 r = conference.CustomRoom()
             target.setRoom(r)
             r.setName(room)
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            if minfo.getRoomBookingModuleActive():
+            if Config.getInstance().getIsRoomBookingActive():
                 r.retrieveFullName(location)
             else:
                 # invalidate full name, as we have no way to know it
@@ -822,10 +822,6 @@ class SessionSlotGetFossil(sessionServices.SessionSlotDisplayBase):
     def _getAnswer(self):
         return fossilize(self._slot)
 
-class SessionSlotGetBooking(ScheduleOperation, sessionServices.SessionSlotDisplayBase, roomBooking.GetBookingBase):
-    def _performOperation(self):
-        return self._getRoomInfo(self._target)
-
 class SessionScheduleGetDayEndDate(ScheduleOperation, sessionServices.SessionModifUnrestrictedTTCoordinationBase):
 
     def _checkParams(self):
@@ -1067,11 +1063,6 @@ class BreakDisplayBase(base.ProtectedDisplayService, BreakBase):
     def _checkParams(self):
         BreakBase._checkParams(self)
         base.ProtectedDisplayService._checkParams(self)
-
-
-class BreakGetBooking(BreakDisplayBase, roomBooking.GetBookingBase):
-    def _getAnswer(self):
-        return self._getRoomInfo(self._break)
 
 
 class GetUnscheduledContributions(ScheduleOperation):
@@ -1490,7 +1481,6 @@ methodMap = {
     "slot.deleteContribution": SessionSlotScheduleDeleteContribution,
     "slot.deleteBreak": SessionSlotScheduleDeleteBreak,
     "slot.getDayEndDate": SessionSlotScheduleGetDayEndDate,
-    "slot.getBooking": SessionSlotGetBooking,
     "slot.getFossil": SessionSlotGetFossil,
     "slot.modifyStartEndDate": SessionSlotScheduleModifyStartEndDate,
     "slot.moveEntry": MoveEntryFromSessionBlock,
@@ -1506,8 +1496,6 @@ methodMap = {
 
     "session.getUnscheduledContributions": SessionGetUnscheduledContributions,
     "slot.scheduleContributions": SessionSlotScheduleContributions,
-
-    "break.getBooking": BreakGetBooking,
 
     "setSessionSlots": ConferenceSetSessionSlots,
     "setScheduleSessions": ConferenceSetScheduleSessions,

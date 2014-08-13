@@ -38,7 +38,6 @@ from MaKaC import schedule
 import MaKaC.common.info as info
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
-from indico.util.date_time import format_datetime
 
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.common.tools import escape_html
@@ -1128,7 +1127,7 @@ class WConferenceCreation( wcomponents.WTemplated ):
 
         vars["chairpersonDefined"] = vars.get("chairpersonDefined", [])
 
-        vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
+        vars["useRoomBookingModule"] = Config.getInstance().getIsRoomBookingActive()
 
         return vars
 

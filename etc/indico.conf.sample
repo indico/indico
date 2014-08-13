@@ -18,6 +18,32 @@ DBPassword           = ""
 DBRealm              = ""
 
 #------------------------------------------------------------------------------
+# SQLAlchemy DB
+#------------------------------------------------------------------------------
+
+SQLAlchemyDatabaseURI  = 'postgresql://localhost/indico'
+
+# Uncomment to echo requests
+# SQLAlchemyEcho = True
+
+# Uncomment if you wish to record queries
+# SQLAlchemyRecordQueries = True
+
+# Size of the connection pool (default = 5)
+# SQLAlchemyPoolSize = 5
+
+# Connection timeout
+# SQLAlchemyPoolTimeout = 10
+
+# Number of seconds after which a connection is automatically
+# recycled (default = 120)
+# SQLAlchemyPoolRecycle = 120
+
+# Number of connections that can be breated after pool is at maximum
+# size (default = 3)
+# SQLAlchemyMaxOverflow = 3
+
+#------------------------------------------------------------------------------
 # REDIS
 #------------------------------------------------------------------------------
 
@@ -306,6 +332,7 @@ AuthenticatorList    = [('Local', {})]
 #
 # Loggers              = ['sentry', 'files']
 # SentryDSN            = 'http://user:password@logger.example.com/n'
+# SentryLoggingLevel   = 'ERROR'  # default: 'WARNING'
 
 
 #------------------------------------------------------------------------------

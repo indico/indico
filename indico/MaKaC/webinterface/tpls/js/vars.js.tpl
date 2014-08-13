@@ -1,8 +1,7 @@
 <% from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry %>
 <% from MaKaC.common import Config %>
 <% from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr %>
-<% import MaKaC.common.info as info %>
-<% from MaKaC.rb_location import Location %>
+<% from indico.modules.rb.models.locations import Location %>
 <% from indico.util import json %>
 <% import MaKaC.webinterface.common.tools as securityTools %>
 <% from MaKaC.export import fileConverter %>
@@ -11,21 +10,7 @@ config = Config.getInstance()
 authenticators = filter(lambda x: x.id != 'Local', AuthenticatorMgr().getList())
 extAuths = list((auth.id, auth.name) for auth in authenticators)
 
-rbActive = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
-if rbActive:
-    locationList = {}
-    locationNames = map(lambda l: l.friendlyName, Location.allLocations)
-
-    for name in locationNames:
-        locationList[name] = name;
-
-    if Location.getDefaultLocation():
-        defaultLocation = Location.getDefaultLocation().friendlyName
-    else:
-        defaultLocation = ""
-else:
-    locationList = None
-    defaultLocation = ""
+locations = Location.find_all() if config.getIsRoomBookingActive() else []
 %>
 
 var Indico = {
@@ -126,9 +111,10 @@ var Indico = {
             category: ${ urlHandlers.UHCategoryAddMaterial.getURL(_ignore_static=True).js_router | j,n }
         },
 
-        RoomBookingBookRoom: ${ urlHandlers.UHRoomBookingBookRoom.getURL(_ignore_static=True).js_router | j,n },
-        RoomBookingForm: ${ urlHandlers.UHRoomBookingBookingForm.getURL(_ignore_static=True).js_router | j,n },
+        RoomBookingBookRoom: ${ url_rule_to_js('rooms.room_book') | j,n },
+        RoomBookingBook: ${ url_rule_to_js('rooms.book') | j,n },
         RoomBookingDetails: ${ urlHandlers.UHRoomBookingRoomDetails.getURL(_ignore_static=True).js_router | j,n },
+        RoomBookingCloneBooking: ${ url_rule_to_js('rooms.roomBooking-cloneBooking')  | j,n },
         ConfModifSchedule: ${ urlHandlers.UHConfModifSchedule.getURL(_ignore_static=True).js_router | j,n },
         SubcontrModif: ${ urlHandlers.UHContribModifSubCont.getURL(_ignore_static=True).js_router | j,n },
         AuthorDisplay: ${ urlHandlers.UHContribAuthorDisplay.getURL(_ignore_static=True).js_router | j,n },
@@ -141,8 +127,8 @@ var Indico = {
         conference: ${ json.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['conference'])) },
         category: ${ json.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['category'])) }},
         WeekDays: ${ [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] },
-        DefaultLocation: '${ str(defaultLocation) }',
-        Locations: ${ jsonEncode(locationList) }
+        DefaultLocation: ${ next((loc.name for loc in locations if loc.is_default), None) | j,n },
+        Locations: ${ {loc.name: loc.name for loc in locations} | j,n }
     },
 
     Security:{
@@ -156,7 +142,7 @@ var Indico = {
 
     Settings: {
         ExtAuthenticators: ${ jsonEncode(extAuths) },
-        RoomBookingModuleActive: ${ jsBoolean(rbActive) }
+        RoomBookingModuleActive: ${ config.getIsRoomBookingActive() | j,n }
     },
 
     FileRestrictions: {

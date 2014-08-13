@@ -20,8 +20,9 @@
 from itertools import ifilter
 
 # fossil classes
+from indico.modules.rb.models.reservations import Reservation
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
-from MaKaC.plugins import PluginsHolder, Observable
+from MaKaC.plugins import Observable
 from MaKaC.common.utils import formatDateTime
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
     ISubContribParticipationFullFossil, ISubContributionFossil, ISubContributionWithSpeakersFossil
@@ -41,7 +42,8 @@ from MaKaC.fossils.conference import IConferenceMinimalFossil, \
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
-from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.models.locations import Location
 from indico.util.i18n import L_
 from indico.util.string import safe_upper, safe_slice
 from MaKaC.review import AbstractFieldContent
@@ -51,7 +53,7 @@ import re, os
 import tempfile
 import copy
 import stat
-from datetime import datetime, timedelta, time
+from datetime import datetime, timedelta
 from flask import session
 
 from MaKaC.contributionReviewing import ReviewManager
@@ -62,15 +64,14 @@ from pytz import timezone
 from pytz import all_timezones
 
 from persistent import Persistent
-from BTrees.OOBTree import OOBTree, OOTreeSet, OOSet
+from BTrees.OOBTree import OOBTree, OOTreeSet
 from BTrees.OIBTree import OIBTree,OISet,union
 import MaKaC
 import MaKaC.common.indexes as indexes
 from MaKaC.common.timezoneUtils import nowutc, maxDatetime
 import MaKaC.fileRepository as fileRepository
-from MaKaC.schedule import ConferenceSchedule, SessionSchedule,SlotSchedule,\
-     PosterSlotSchedule, SlotSchTypeFactory, ContribSchEntry, \
-     LinkedTimeSchEntry, BreakTimeSchEntry
+from MaKaC.schedule import (ConferenceSchedule, SessionSchedule, SlotSchTypeFactory, ContribSchEntry,
+                            LinkedTimeSchEntry, BreakTimeSchEntry)
 import MaKaC.review as review
 from MaKaC.common import utils
 from MaKaC.common.Counter import Counter
@@ -86,18 +87,15 @@ from MaKaC.common import pendingQueues
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.participant import Participation
 from MaKaC.common.log import LogHandler
-import MaKaC.common.info as info
 from MaKaC.badge import BadgeTemplateManager
 from MaKaC.poster import PosterTemplateManager
 from MaKaC.common import mail
-from MaKaC.common.utils import getHierarchicalId
 from MaKaC.i18n import _
 from MaKaC.common.PickleJar import Updates
-from MaKaC.common.PickleJar import if_else
 from MaKaC.schedule import ScheduleToJson
 from MaKaC.webinterface import urlHandlers
 
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.webinterface.common.tools import escape_html
 import zope.interface
@@ -284,6 +282,13 @@ class CommonObjectBase(CoreObject, Observable, Fossilizable):
 
         # return set containing whatever avatars/groups we may have collected
         return av_set
+
+    def canIPAccess(self, ip):
+        domains = self.getAccessController().getAnyDomainProtection()
+        if domains:
+            return any(domain.belongsTo(ip) for domain in domains)
+        else:
+            return True
 
 
 class CategoryManager(ObjectHolder):
@@ -1337,15 +1342,6 @@ class Category(CommonObjectBase):
         # Categories don't allow access keys
         return False
 
-    def canIPAccess(self, ip):
-        if not self.__ac.canIPAccess(ip):
-            return False
-
-        # if category is inheriting, check protection above
-        if self.getAccessProtectionLevel() == 0 and self.getOwner():
-            return self.getOwner().canIPAccess(ip)
-        return True
-
     def isProtected(self):
         return self.__ac.isProtected()
 
@@ -1401,7 +1397,7 @@ class Category(CommonObjectBase):
         if not self.hasAnyProtection():
             return True
         if not self.isProtected():
-            #domain checking only triggered if the category is PUBLIC
+            # domain checking only triggered if the category is PUBLIC
             return self.canIPAccess(aw.getIP()) or \
                 self.isAllowedToCreateConference(aw.getUser()) or \
                 self.isAllowedToAccess(aw.getUser())
@@ -1569,8 +1565,8 @@ class CustomRoom(Persistent):
     def retrieveFullName(self, location):
         if not location:
             return
-        room = CrossLocationQueries.getRooms(roomName=self.name, location=location)
-        self.fullName = room.getFullName() if room else None
+        room = Room.find_first(Room.name == self.name, Location.name == location, _join=Room.location)
+        self.fullName = room.full_name if room else None
 
     def setFullName(self, newFullName):
         self.fullName = newFullName
@@ -2215,70 +2211,12 @@ class Conference(CommonObjectBase, Locatable):
 
     # Room booking related ===================================================
 
-    def getRoomBookingList( self ):
-        """
-        Returns list of bookings for this conference.
-        """
-        from MaKaC.plugins.RoomBooking.default.dalManager import DALManager
-
-        if not DALManager.isConnected():
+    def getRoomBookingList(self):
+        """Returns list of bookings for this conference."""
+        # In case anyone wonders why this method is still here: Various fossils expect/use it.
+        if not self.getId().isdigit():
             return []
-
-        resvs = []
-        for resvGuid in self.getRoomBookingGuids():
-            r = resvGuid.getReservation()
-            if r == None:
-                self.removeRoomBookingGuid( resvGuid )
-            elif r.isValid:
-                resvs.append( r )
-        return resvs
-
-    def getBookedRooms( self ):
-        """
-        Returns list of rooms booked for this conference.
-        Returns [] if room booking module is off.
-        """
-        rooms = []
-
-        for r in self.getRoomBookingList():
-            if not r.room in rooms:
-                rooms.append( r.room )
-        return rooms
-
-    def getRoomBookingGuids( self ):
-        try:
-            self.__roomBookingGuids
-        except AttributeError:
-            self.__roomBookingGuids = []
-        return self.__roomBookingGuids
-
-    def setRoomBookingGuids( self, guids ):
-        self.__roomBookingGuids = guids
-
-    def addRoomBookingGuid( self, guid ):
-        self.getRoomBookingGuids().append( guid )
-        self._p_changed = True
-
-    def removeRoomBookingGuid( self, guid ):
-        self.getRoomBookingGuids().remove( guid )
-        self._p_changed = True
-
-    def __TMP_PopulateRoomBookings( self ):
-        # TEMPORARY GENERATION OF RESERVATIONS FOR CONFERENCE
-        from MaKaC.rb_reservation import ReservationBase
-        from MaKaC.rb_location import ReservationGUID, Location
-        resvs = []
-        resvs.append( ReservationBase.getReservations( resvID = 395887 ) )
-        resvs.append( ReservationBase.getReservations( resvID = 381406 ) )
-        resvs.append( ReservationBase.getReservations( resvID = 387688 ) )
-        resvs.append( ReservationBase.getReservations( resvID = 383459 ) )
-
-        resvGuids = []
-        for resv in resvs:
-            resvGuids.append( ReservationGUID( Location.getDefaultLocation(), resv.id ) )
-
-        self.__roomBookingGuids = resvGuids
-
+        return Reservation.find_all(event_id=int(self.getId()))
 
     # ========================================================================
 
@@ -2726,11 +2664,14 @@ class Conference(CommonObjectBase, Locatable):
             if not alarm.getEndedOn():
                 self.removeAlarm(alarm)
 
-        #Delete the RoomBooking associated reservations
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.getRoomBookingModuleActive() and CrossLocationDB.isConnected():
-            for resv in self.getRoomBookingList():
-                resv.remove()
+        # Cancel the associated room bookings
+        if Config.getInstance().getIsRoomBookingActive() and self.getId().isdigit():
+            reservations = Reservation.find(Reservation.event_id == int(self.getId()),
+                                            ~Reservation.is_cancelled,
+                                            ~Reservation.is_rejected)
+            for resv in reservations:
+                resv.event_id = None
+                resv.cancel(session.user, u'Associated event was deleted')
 
         #For each conference we have a list of managers. If we delete the conference but we don't delete
         #the link in every manager to the conference then, when the manager goes to his "My profile" he
@@ -3671,15 +3612,15 @@ class Conference(CommonObjectBase, Locatable):
         """
         if self.isLastTrack(track):
             return
-        newPos=self.getTrackPos(track)+1
-        self.moveTrack(track,newPos)
+        newPos = self.getTrackPos(track) + 1
+        self.moveTrack(track, newPos)
 
-    def _cmpTracks( self, t1, t2 ):
+    def _cmpTracks(self, t1, t2):
         o1 = self.program.index(t1)
         o2 = self.program.index(t2)
-        return cmp( o1, o2 )
+        return cmp(o1, o2)
 
-    def sortTrackList( self, l ):
+    def sortTrackList(self, l):
         """Sorts out a list of tracks according to the current programme order.
         """
         if len(l) == 0:
@@ -3689,34 +3630,22 @@ class Conference(CommonObjectBase, Locatable):
         else:
             res = []
             for i in l:
-                res.append( i )
-            res.sort( self._cmpTracks )
+                res.append(i)
+            res.sort(self._cmpTracks)
             return res
 
-    def canIPAccess( self, ip ):
-        if not self.__ac.canIPAccess( ip ):
-            return False
-
-        # if event is inheriting, check IP protection above
-        if self.getAccessProtectionLevel() == 0:
-            for owner in self.getOwnerList():
-                if not owner.canIPAccess(ip):
-                    return False
-
-        return True
-
-    def requireDomain( self, dom ):
-        self.__ac.requireDomain( dom )
+    def requireDomain(self, dom):
+        self.__ac.requireDomain(dom)
         self._notify('accessDomainAdded', dom)
 
-    def freeDomain( self, dom ):
-        self.__ac.freeDomain( dom )
+    def freeDomain(self, dom):
+        self.__ac.freeDomain(dom)
         self._notify('accessDomainRemoved', dom)
 
-    def getDomainList( self ):
+    def getDomainList(self):
         return self.__ac.getRequiredDomainList()
 
-    def isProtected( self ):
+    def isProtected(self):
         """Tells whether a conference is protected for accessing or not
         """
         return self.__ac.isProtected()
@@ -5356,6 +5285,9 @@ class Session(CommonObjectBase, Locatable):
             return cmp(self.getId(), other.getId())
         return cmp(self.getConference(), other.getConference())
 
+    def getVerboseType(self):
+        return 'Session'
+
     def getTimezone( self ):
         return self.getConference().getTimezone()
 
@@ -6226,14 +6158,7 @@ class Session(CommonObjectBase, Locatable):
         else:
             return len(self.contributions)
 
-    def canIPAccess( self, ip ):
-        if not self.__ac.canIPAccess( ip ):
-            return False
-        if self.getOwner() != None:
-            return self.getOwner().canIPAccess(ip)
-        return True
-
-    def isProtected( self ):
+    def isProtected(self):
         # tells if a session is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
 
@@ -7774,6 +7699,9 @@ class Contribution(CommonObjectBase, Locatable):
             parentId = None
         return "<Contribution %s:%s@%s>" % (parentId, self.getId(), hex(id(self)))
 
+    def getVerboseType(self):
+        return 'Contribution'
+
     def getTimezone(self):
         return self.getConference().getTimezone()
 
@@ -8948,13 +8876,6 @@ class Contribution(CommonObjectBase, Locatable):
 
     def appendSpeakerText(self, newText):
         self.setSpeakerText("%s, %s" % (self.getSpeakerText(), newText.strip()))
-
-    def canIPAccess(self, ip):
-        if not self.__ac.canIPAccess( ip ):
-            return False
-        if self.getOwner() != None:
-            return self.getOwner().canIPAccess(ip)
-        return True
 
     def isProtected(self):
         # tells if a contribution is protected or not
@@ -10950,14 +10871,7 @@ class Material(CommonObjectBase):
     def recover(self):
         TrashCanManager().remove(self)
 
-    def canIPAccess( self, ip ):
-        if not self.__ac.canIPAccess( ip ):
-            return False
-        if self.getOwner() != None:
-            return self.getOwner().canIPAccess(ip)
-        return True
-
-    def isProtected( self ):
+    def isProtected(self):
         # tells if a material is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
 
@@ -11446,14 +11360,7 @@ class Resource(CommonObjectBase):
     def recover(self):
         TrashCanManager().remove(self)
 
-    def canIPAccess( self, ip ):
-        if not self.__ac.canIPAccess( ip ):
-            return False
-        if self.getOwner() != None:
-            return self.getOwner().canIPAccess(ip)
-        return True
-
-    def isProtected( self ):
+    def isProtected(self):
         # tells if a resource is protected or not
         return (self.hasProtectedOwner() + self.getAccessProtectionLevel()) > 0
 

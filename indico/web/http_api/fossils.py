@@ -52,8 +52,9 @@ class IHTTPAPIExportResultFossil(IHTTPAPIResultFossil):
     def getCount(self):
         pass
 
-    def getComplete(self):
-        pass
+    # New SQL-based hooks do not use it anymore, so we deprecate it for everything.
+    # def getComplete(self):
+    #     pass
 
     def getAdditionalInfo(self):
         pass

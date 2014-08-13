@@ -33,12 +33,23 @@
     @include border-all(darken($light-gray, $color-variation));
     background: $light-gray !important;
 
-    & .ui-slider-handle {
+    .ui-slider-handle {
+        @include single-box-shadow();
         outline: none;
         cursor: move;
+        z-index: 1;
+
+        &.ui-state-default {
+            background: $light-blue;
+        }
+
+        &:hover,
+        &.ui-state-focus {
+            background: white;
+        }
     }
 
-    & .ui-slider-range {
+    .ui-slider-range {
         background: $blue !important;
     }
 }

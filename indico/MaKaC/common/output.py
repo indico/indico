@@ -33,7 +33,6 @@ import MaKaC.schedule as schedule
 import MaKaC.webcast as webcast
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.linking import RoomLinker
-from Configuration import Config
 from xmlGen import XMLGen
 import os
 from math import ceil
@@ -41,11 +40,13 @@ from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
-from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
 from MaKaC.plugins.base import Observable
 from MaKaC.user import Avatar, Group
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 
+from indico.core.config import Config
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.rooms import Room
 from indico.util.event import uniqueId
 
 
@@ -172,22 +173,13 @@ class outputGenerator(Observable):
         out.closeTag("user")
 
     def _getRoom(self, room, location):
-        # get the name that is saved
-        roomName = room.getName()
-
-        # if there is a connection to the room booking DB
-        if CrossLocationDB.isConnected() and location:
-            # get the room info
-            roomFromDB = CrossLocationQueries.getRooms( roomName = roomName, location = location.getName() )
-            #roomFromDB can be a list or an object room
-            if isinstance(roomFromDB,list) and roomFromDB != []:
-                roomFromDB = roomFromDB[0]
-            # If there's a room with such name.
-            # Sometimes CrossLocationQueries.getRooms returns a list with None elements
-            if roomFromDB:
+        room_name = room.getName()
+        if location:
+            rb_room = Room.find_first(Room.name == room_name, Location.name == location.getName(), _join=Room.location)
+            if rb_room:
                 # use the full name instead
-                roomName = roomFromDB.getFullName()
-        return roomName
+                return rb_room.full_name
+        return room_name
 
     def _getExternalUserAccounts(self, user):
         accounts = []

@@ -1973,8 +1973,8 @@ ul.UIPeopleList li.UIError
 div#UISearchBox
 {
     position: absolute;
-    right: 30px;
-    top: 36px;
+    right: 0.5em;
+    top: 50px;
     border: none;
     font-size: 13px;
     z-index: 1;
@@ -1982,19 +1982,21 @@ div#UISearchBox
 
 div#UISearchBox .searchButton
 {
-    float:right;
-    border-left: 1px solid #888;
+    float: right;
+    border-left: 1px solid #003042;
     width: 28px;
     height: 21px;
-    background: #888 url('../images/search.png') 5px 3px no-repeat;
+    line-height: 21px;
     cursor: pointer;
+    background: #444;
+    text-align: center;
+    color: #fafafa;
 }
 
 div#UISearchBox #searchControls
 {
     width: auto;
-    border: 1px solid #888;
-    border-radius: 6px;
+    border: 1px solid #003042;
     height: 21px;
     overflow: hidden;
     background-color: white;
@@ -2102,9 +2104,6 @@ div#UISearch #searchControls input
 div.searchTag
 {
     max-width:112px;
-    border-radius: 4px 0 0 4px;
-    -webkit-border-radius:4px 0 0 4px;
-    -moz-border-radius:4px 0 0 4px;
     display:table-cell;
     line-height: 13px;
     height: 13px;
@@ -2463,22 +2462,6 @@ img.clickableImage
 
 /* New CSS */
 
-
-/* HEADER */
-
-div.pageHeader {
-    position: relative;
-    width: 100%;
-}
-
-div.pageHeaderDark {
-    background-color: #424242;
-}
-
-div.pageHeaderMainPage {
-    background: white url("../images/indico_bg.gif") repeat 0 0;
-}
-
 div.pageOverHeader
 {
     background-color: #F6E8C3;
@@ -2491,54 +2474,6 @@ div.pageOverHeader
     display: none;
 }
 
-div.icon-announcement {
-  float: right;
-  color: #9C793B;
-  font-size: 1.5em;
-  line-height: 1em;
-  cursor:pointer;
-}
-
-div.impersonation-header {
-    padding: 0.5em;
-    background-color: #CF996D;
-    border-bottom: 1px solid #A2905A;
-    color: #2f2506;
-    font-family: Verdana;
-    font-size: 12px;
-}
-
-div.impersonation-header .text {
-    display: inline-block;
-    float: left;
-}
-
-div.impersonation-header .text .logged-user-name {
-  font-weight: bold;
-  color: #555;
-  margin: 0.1em;
-  line-height: 1em;
-  max-width: 200px;
-}
-
-div.impersonation-header .text:before {
-  margin-right: 0.4em;
-  font-size: 1.5em;
-  line-height: 1em;
-  vertical-align: middle;
-}
-
-
-div.impersonation-header .undo-login-as {
-    float: right;
-    margin-right: 2px;
-    vertical-align: middle;
-    cursor: pointer;
-    font-size: 1.5em;
-    line-height: 1em;
-    font-family: 'icomoon-ultimate';
-    content: "\3b";
-}
 
 /* Mobile Header */
 
@@ -2567,211 +2502,7 @@ div.mobile-device-header > .text{
 div.mobile-device-header .i-button {
     font-size: 3em;
 }
-/* Styles for the main menu */
 
-div.globalMenu
-{
-    background: #0b63a5 url(../images/sprites.png) repeat-x scroll 0 0;
-    border-top: 1px solid #999999;
-    border-bottom: 1px solid #999999;
-    height: 30px;
-    width: 100%;
-}
-
-div.globalMenu ul {
-    margin: 0;
-    padding: 0;
-    display: inline;
-    list-style-type: none;
-}
-
-div.globalMenu li {
-    display: block;
-    float: left;
-    position: relative;
-    height: 30px;
-    cursor: pointer;
-}
-
-div.globalMenu li.mouseover {
-    background: #439ddc url(../images/sprites.png) repeat-x scroll 0 -30px;
-}
-
-div.globalMenu a
-{
-    font-weight: bold;
-    font-family: Verdana;
-    font-size: 11px;
-    color: white;
-    letter-spacing: 0.04em;
-    display: block;
-    padding: 8px 15px;
-}
-
-div.globalMenu span
-{
-    font-weight: bold;
-    font-family: Verdana;
-    font-size: 11px;
-    color: white;
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-left: 15px;
-    margin-right: 15px;
-    letter-spacing: 0.04em;
-    display: block;
-}
-
-div.globalMenu .dropDownMenu {
-    padding-right: 20px;
-    background: transparent url(../images/menu_arrow_white.png) scroll no-repeat center right;
-}
-
-/* Styles for the session bar at the top right corner */
-
-div.sessionBar {
-    height: 25px;
-    float: right;
-    font-size: 13px;
-}
-
-div.sessionBar .links
-{
-    background: transparent url(../images/sprites.png) repeat-x scroll 0 -60px;
-    margin-left: 25px;
-    padding-top: 0px;
-    height: 25px;
-}
-
-div.sessionBar .icon-shield {
-    font-size: 1.2em;
-    vertical-align: middle;
-}
-
-.protectionBarRestricted .icon-shield {
-    color: #752020;
-}
-
-.protectionBarDomainProtected .icon-shield {
-    color: #ADA644;
-}
-
-.loginHighlighted {
-    background: transparent url(../images/sprites.png) repeat-x scroll 0 -150px;
-    height: 16px;
-}
-
-div.sessionBar .corner
-{
-    background: transparent url(../images/session_bar_corner.png) repeat-x scroll 0 0;
-    height: 25px;
-    width: 25px;
-    float: left;
-}
-
-
-div.sessionBar ul
-{
-    margin: 0;
-    padding: 0;
-    display: inline;
-    list-style-type: none;
-}
-
-div.sessionBar li {
-    display: inline;
-    margin: 0;
-    padding: 4px 17px;
-    float: left;
-    border-right: 1px solid #C7C7C7;
-}
-
-div.sessionBar span {
-    color: #444444;
-    font-size: 13px;
-}
-
-div.sessionBarDark .corner {
-    background-position: -25px 0;
-}
-
-div.sessionBarDark .links {
-    background-position: 0 -180px;
-}
-
-div.sessionBarDark span {
-    color: #BCBCBC
-}
-
-div.sessionBarDark .links a {
-    color: #DFDFDF;
-}
-
-div.sessionBarDark .links a:hover {
-    color: white;
-}
-
-div.sessionBarDark li {
-    border-color: #777;
-}
-
-div.sessionBarDark .dropDownMenu {
-    background: transparent url(../images/menu_arrow_white.png) scroll no-repeat center right;
-}
-
-div.sessionBar .protectionBar{
-    padding-right:10px;
-    padding-left:5px;
-    background: transparent url(../images/sprites.png) repeat-x scroll 0 0;
-    height: 17px;
-}
-
-div.sessionBar .protectionBar * {
-  vertical-align: middle;
-}
-
-div.sessionBar .protectionBarDomainProtected{
-    background-position: 0 -240px;
-}
-
-div.sessionBar .protectionBarRestricted {
-    background-position: 0 -270px;
-}
-
-div.sessionBar .protectionBarDomainProtected a{
-    color: #af9502 !important;
-}
-
-div.sessionBar .protectionBarDomainProtected a:hover{
-    text-decoration: underline;
-}
-
-div.sessionBar .protectionBarRestricted a{
-    color: #FFFFFF !important;
-    font-size: 12px;
-}
-
-div.sessionBar .protectionBarRestricted a:hover{
-    text-decoration: underline;
-}
-
-div.sessionBar .cornerDomainProtected{
-    background-position: -50px 0;
-}
-
-div.sessionBar .cornerRestricted {
-    background-position: -75px 0;
-}
-
-.protectionHighlightDomainProtected{
-    color: #AF9502;
-    font-weight: bold;
-}
-
-.protectionHighlightRestricted{
-    color: #C73C3C;
-    font-weight: bold;
-}
 
 /* Breadcrumb styles */
 
@@ -2797,22 +2528,6 @@ div.sessionBar .cornerRestricted {
     padding-left: 7px;
 }
 
-div.mainBreadcrumb {
-    background-color: #ECECEC;
-    padding: 4px 15px;
-    border-bottom: 1px solid #AAAAAA;
-}
-
-div.mainNoBreadcrumb {
-    background: transparent url(../images/sprites.png) scroll repeat-x 0 -120px;
-    height: 10px;
-}
-
-div.noBreadcrumb {
-    padding-top: 5px;
-    padding-bottom: 10px;
-}
-
 ul.horizontalMenu
 {
     margin: 0;
@@ -2829,14 +2544,6 @@ ul.horizontalMenu li{
     padding: 2px 6px;
     border-right: 1px solid #DDDDDD;
     line-height: 1.5;
-}
-
-img.headerLogo {
-
-    margin: 7px 10px;
-    border: none;
-    width: 196px;
-    height: 52px;
 }
 
 div.headerAboutIndico
@@ -2949,12 +2656,6 @@ div.filterDiv
     margin: 30px 80px 30px 60px;
 }
 
-.sideBar {
-    float: right;
-    font-size: 14px;
-    width: 340px;
-}
-
 .smallSideBox {
     font-family: Georgia, Times, Times New Roman;
     padding: 15px 15px 10px 15px;
@@ -2965,73 +2666,15 @@ div.filterDiv
     font-family: 'Special Elite', arial, serif;
 }
 
-.sideMenu {
-    float: left;
-    width: 200px;
-    padding-right: 15px;
-    margin-left:30px;
-}
-
-.managementSideMenu {
-    margin-left:0px;
-}
-
-.sideMenu .separator {
-    font-weight: normal;
-    font-style: italic;
-    font-size: 12px;
-    color: #777;
-    padding: 7px 0;
-    border-bottom: 1px dotted #999;
-}
-
-.sideMenu .separatorNoText {
-    font-size: 1px;
-    height: 1px;
-    padding: 0;
-    margin-top: 0;
-    border-bottom: 1px dotted #999;
-}
-
-.sideBar .leftCorner {
-    width: 15px;
-    height: 15px;
-    float: left;
-    background: transparent url('../images/grey_corners.png') scroll no-repeat 0 0;
-}
-
-.sideBar .rightCorner {
-    width: 15px;
-    height: 15px;
-    float: right;
-    background: transparent url('../images/grey_corners.png') scroll no-repeat -15px 0;
-}
-
-.sideMenu .corner {
-    width: 15px;
-    height: 15px;
-    float: right;
-    background: transparent url('../images/grey_corners.png') scroll no-repeat -30px 0;
-}
-
-.sideBar .content {
-    background: #ECECEC url('../images/grey_gradient.png') scroll repeat-x bottom left;
-    padding: 20px 20px 50px 20px;
-}
-.sideMenu .content {
-    padding-top: 10px;
-}
-
-.managementSideMenu .content {
-    min-height: 200px;
-}
-
-.managementSideMenu .content {
-    margin-right: 15px;
-}
-
 .topBar {
     margin-bottom: 0px;
+}
+
+.topBar h1 {
+    margin: 0;
+    padding: 0;
+    color: #777;
+    font-size: 15px;
 }
 
 .topBar .content {
@@ -3045,48 +2688,6 @@ div.filterDiv
 .topBar .smaller {
     padding: 10px;
     margin-top: 10px;
-}
-
-.sideBar h1, .topBar h1 {
-    margin: 0;
-    padding: 0;
-    color: #777;
-    font-size: 15px;
-}
-
-.sideBar ul {
-    margin: 15px 0px 0px 0px;
-    padding: 0;
-    list-style-type: none;
-}
-
-.sideMenu li {
-    margin-bottom: 10px;
-}
-
-.sideBar a {
-    font-size: 12px;
-}
-
-.sideBar em {
-    color: #777;
-}
-
-.sideMenu a {
-    font-size: 14px;
-}
-
-.sideMenu .active {
-    font-weight: bold;
-}
-
-.sideMenu a.advanced {
-    font-style: italic;
-}
-
-.sideBar a.subLink {
-    font-style: italic;
-    font-size: 14px;
 }
 
 .leftMenu
@@ -6880,14 +6481,6 @@ ul.buttonMenuPopupList li a:hover {
     position: fixed;
     top: 0;
     z-index: 1;
-}
-
-#sessionBar.scrolling {
-    background-color: transparent;
-    box-shadow: none;
-    right: 0;
-    padding: 0 0 5px 5px;
-    z-index:999;
 }
 
 .ui-list-menu-level  {
