@@ -160,7 +160,7 @@
                 }
             }
 
-            .roomid {
+            .room-id {
                 @include ellipsis();
                 color: $black;
                 display: inline-block;
