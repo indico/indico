@@ -17,11 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""
-Small functions and classes widely used in Room Booking Module.
-"""
-
-import cPickle
 import random
 from datetime import datetime
 from functools import wraps
@@ -34,7 +29,6 @@ from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.util.caching import make_hashable
 from indico.util.decorators import cached_writable_property
-from indico.util.i18n import _
 
 
 def unimplemented(exceptions=(Exception,), message='Unimplemented'):
@@ -101,6 +95,8 @@ def cached(cache, primary_key_attr='id', base_ttl=86400*31):
     :param primary_key_attr: The attribute containing the an unique identifier for the object
     :param base_ttl: The time after which a cached property expires
     """
+    _not_cached = object()
+
     def decorator(f):
         @wraps(f)
         def wrapper(self, *args, **kwargs):
@@ -115,14 +111,12 @@ def cached(cache, primary_key_attr='id', base_ttl=86400*31):
             if args_key:
                 key = '{}({})'.format(key, args_key)
 
-            result = cache.get(key)
-            if result is not None:
-                return cPickle.loads(result)
-
-            result = f(self, *args, **kwargs)
-            # Cache the value with a somewhat random expiry so we don't end up with all keys
-            # expiring at the same time if there hasn't been an update for some time
-            cache.set(key, cPickle.dumps(result), base_ttl + 300 * random.randint(0, 200))
+            result = cache.get(key, _not_cached)
+            if result is _not_cached:
+                result = f(self, *args, **kwargs)
+                # Cache the value with a somewhat random expiry so we don't end up with all keys
+                # expiring at the same time if there hasn't been an update for some time
+                cache.set(key, result, base_ttl + 300 * random.randint(0, 200))
             return result
 
         return wrapper
