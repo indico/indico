@@ -1,6 +1,5 @@
 <%
     from indico.util.date_time import format_human_date, format_time
-    from indico.util.struct import iterators
     from MaKaC.common.timezoneUtils import nowutc
 %>
 
@@ -71,9 +70,7 @@
         ${_("All results hidden")}
     </h3>
 
-    % for day_entry in iterators.SortedDictIterator(log_dict, reverse=True):
-    <% key = day_entry[0] %>
-    <% value = day_entry[1] %>
+    % for key, value in sorted(log_dict.iteritems(), reverse=True):
 
     <h3 class="i-table searchable">${format_human_date(key).title()}</h3>
     <table id="log-table-${key}" class="i-table log-table">
