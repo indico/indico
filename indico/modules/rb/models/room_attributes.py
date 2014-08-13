@@ -24,7 +24,7 @@ from indico.util.string import return_ascii
 
 
 class RoomAttributeAssociation(db.Model):
-    __tablename__ = 'rooms_attributes_association'
+    __tablename__ = 'room_attribute_values'
     __table_args__ = {'schema': 'roombooking'}
 
     attribute_id = db.Column(
