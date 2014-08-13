@@ -569,7 +569,7 @@ class RHCategoryToAtom(RHCategDisplayBase):
         res = hook(self.getAW())
         resultFossil = {'results': res[0], 'url': str(self._uh.getURL(self._target))}
         serializer = Serializer.create('atom')
-        return send_file(filename, StringIO(serializer(resultFossil)), 'ATOM')
+        return send_file(filename, StringIO(serializer(resultFossil).encode('utf-8')), 'ATOM')
 
 
 def sortByStartDate(conf1,conf2):
