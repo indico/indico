@@ -195,7 +195,7 @@ class VidyoTools(object):
         location = linkVideo.getLocation()
         room = linkVideo.getRoom()
         if not location or not room:
-            return
+            return ""
         location_name = location.getName()
         room_name = room.getName()
         if not location_name or not room_name:
