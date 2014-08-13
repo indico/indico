@@ -67,9 +67,6 @@ class IndicoError(Exception):
 
 
 class AccessControlError(IndicoError):
-    """
-    """
-
     def __init__(self, **kw):
         self._object_type = kw.pop('object_type', 'object')
         super(AccessControlError, self).__init__(**kw)
@@ -80,9 +77,6 @@ class AccessControlError(IndicoError):
 
 
 class ConferenceClosedError(IndicoError):
-    """
-    """
-
     def __init__(self, conf, **kw):
         self._conf = kw.pop('conf', None)
         super(ConferenceClosedError, self).__init__(**kw)
@@ -93,13 +87,11 @@ class ConferenceClosedError(IndicoError):
 
 
 class AccessError(AccessControlError):
-    """
-    """
+    pass
 
 
 class KeyAccessError(AccessControlError):
-    """
-    """
+    pass
 
 
 class HostnameResolveError(IndicoError):
@@ -109,27 +101,18 @@ class HostnameResolveError(IndicoError):
 
 
 class ModificationError(AccessControlError):
-    """
-    """
-
     @ensure_str
     def __str__(self):
         return _('you are not authorised to modify this {0}').format(self._object_type)
 
 
 class AdminError(AccessControlError):
-    """
-    """
-
     @ensure_str
     def __str__(self):
         return _('only administrators can access this {0}').format(self._object_type)
 
 
 class WebcastAdminError(AccessControlError):
-    """
-    """
-
     @ensure_str
     def __str__(self):
         return _('only webcast administrators can access this {0}').format(self._object_type)
@@ -142,19 +125,14 @@ class TimingError(IndicoError):
 
 
 class ParentTimingError(TimingError):
-    """
-    """
+    pass
 
 
 class EntryTimingError(TimingError):
-    """
-    """
+    pass
 
 
 class UserError(IndicoError):
-    """
-    """
-
     @ensure_str
     def __str__(self):
         if self._message:
@@ -164,40 +142,32 @@ class UserError(IndicoError):
 
 
 class NotLoggedError(IndicoError):
-    """
-    """
+    pass
 
 
 class FormValuesError(IndicoError):
-    """
-    """
+    pass
 
 
 class NoReportError(IndicoError):
-    """
-    """
+    pass
 
 
 class NotFoundError(IndicoError):
-    """
-    """
+    pass
 
 
 class PluginError(IndicoError):
-    """
-    """
+    pass
 
 
 class HtmlScriptError(IndicoError):
-    """
-    """
+    pass
 
 
 class HtmlForbiddenTag(IndicoError):
-    """
-    """
+    pass
 
 
 class BadRefererError(IndicoError):
-    """
-    """
+    pass
