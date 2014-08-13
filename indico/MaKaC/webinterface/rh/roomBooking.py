@@ -255,7 +255,7 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
             errors.append("Longitude must be a number")
 
         try:
-            float(c.latitude):
+            float(c.latitude)
         except ValueError:
             errors.append("Latitude must be a number")
 
