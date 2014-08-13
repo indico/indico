@@ -31,12 +31,14 @@ from itertools import ifilter
 import pytz
 from babel import dates
 from flask import Flask
+from flask_migrate import stamp
 from sqlalchemy.sql import func, select
 from ZODB import DB, FileStorage
 from ZODB.broken import find_global, Broken
 from ZEO.ClientStorage import ClientStorage
 
 from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy.migration import migrate as alembic_migrate
 from indico.core.db.sqlalchemy.util import delete_all_tables, update_session_options
 from indico.modules.rb import settings as rb_settings
 from indico.modules.rb.models.aspects import Aspect
@@ -56,6 +58,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.util.console import colored, cformat, verbose_iterator
 from indico.util.date_time import as_utc
 from indico.util.string import is_valid_mail, safe_upper
+from indico.web.flask.app import fix_root_path
 
 
 month_names = [(str(i), name[:3].encode('utf-8').lower())
@@ -102,8 +105,10 @@ def get_storage(zodb_uri):
 
 def setup(main_zodb_uri, rb_zodb_uri, sqlalchemy_uri):
     app = Flask('migration')
+    fix_root_path(app)
     app.config['SQLALCHEMY_DATABASE_URI'] = sqlalchemy_uri
     db.init_app(app)
+    alembic_migrate.init_app(app, db, os.path.join(app.root_path, '..', 'migrations'))
 
     main_root = UnbreakingDB(get_storage(main_zodb_uri)).open().root()
     rb_root = UnbreakingDB(get_storage(rb_zodb_uri)).open().root()
@@ -573,6 +578,7 @@ def main(main_uri, rb_uri, sqla_uri, photo_path, drop, merged_avatars):
                 print 'Aborting'
                 sys.exit(1)
             delete_all_tables(db)
+        stamp()
         db.create_all()
         if Location.find().count():
             # Usually there's no good reason to migrate with data in the DB. However, during development one might

@@ -26,8 +26,7 @@ the `versioned_cache` mixin. For details, see the docstrings of these functions.
 Use `indico db prepare` to create your tables based on the SQLAlchemy models and set the migration status to the most
 recent alembic revision.
 
-If you want to import data from ZODB, run `bin/migration/migrate_to_sqlalchemy.py` with the appropriate arguments. If
-you use the `-d` switch to delete all tables, you need to run `indico db prepare` or `indico db stamp head` afterwards.
+If you want to import data from ZODB, run `bin/migration/migrate_to_sqlalchemy.py` with the appropriate arguments.
 
 
 ## SQL Database migrations
