@@ -2,7 +2,7 @@
     ${ _('Search bookings') }
 </h2>
 
-<%include file="ErrorList.tpl" args='errors=errors, msg=_("There are some errors in the search criteria:")'/>
+<%include file="ErrorList.tpl" args='errors=errors, msg=_("There are some errors in the search criteria")'/>
 
 <form method="post" action="" id="searchBookings">
     <h2 class="group-title">

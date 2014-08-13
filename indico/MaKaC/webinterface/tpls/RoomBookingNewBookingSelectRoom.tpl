@@ -8,7 +8,7 @@
     <li><span>${ _('Confirm Reservation') }</span></li>
 </ul>
 
-<%include file="ErrorList.tpl" args='errors=errors, msg=_("There are some errors in the search criteria:")'/>
+<%include file="ErrorList.tpl" args='errors=errors, msg=_("There are some errors in the search criteria")'/>
 
 <form id="searchForm" method="POST" action="">
     <input type="hidden" name="step" value="1">
