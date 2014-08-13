@@ -250,14 +250,12 @@ class RHRoomBookingBase( RoomBookingAvailabilityParamsMixin, RoomBookingDBMixin,
             errors.append( "Capacity must be a positive integer" )
 
         try:
-            if c.longitude and float(c.longitude) < 0:
-                errors.append("Longitude must be a positive number")
+            float(c.longitude)
         except ValueError:
             errors.append("Longitude must be a number")
 
         try:
-            if c.latitude and float(c.latitude) < 0:
-                errors.append("Latitude must be a positive number")
+            float(c.latitude):
         except ValueError:
             errors.append("Latitude must be a number")
 
