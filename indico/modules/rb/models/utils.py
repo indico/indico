@@ -185,7 +185,7 @@ class Serializer(object):
     __public__ = []
 
     def to_serializable(self, attr='__public__', converters=None):
-        j = {}
+        serializable = {}
         if converters is None:
             converters = {}
         for k in getattr(self, attr):
@@ -201,23 +201,18 @@ class Serializer(object):
                 if isinstance(v, Serializer):
                     v = v.to_serializable()
                 elif isinstance(v, list):
-                    v = map(lambda e: e.to_serializable(), v)
+                    v = [e.to_serializable() for e in v]
                 elif isinstance(v, dict):
                     v = dict((k, vv.to_serializable() if isinstance(vv, Serializer) else vv)
                              for k, vv in v.iteritems())
                 if type(v) in converters:
                     v = converters[type(v)](v)
-                j[name] = v
+                serializable[name] = v
             except Exception:
-                import traceback
-
-                Logger.get('Serializer{}'.format(self.__class__.__name__)) \
-                    .error(traceback.format_exc())
-                raise IndicoError(
-                    _('There was an error on the retrieval of {} of {}.')
-                    .format(k, self.__class__.__name__.lower())
-                )
-        return j
+                msg = 'Could not retrieve {}.{}.'.format(self.__class__.__name__, k)
+                Logger.get('Serializer{}'.format(self.__class__.__name__)).exception(msg)
+                raise IndicoError(msg)
+        return serializable
 
 
 def db_dates_overlap(entity, start_column, start, end_column, end, inclusive=False):
