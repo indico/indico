@@ -53,13 +53,11 @@ class WAuthorDisplay( wcomponents.WTemplated ):
         vars = wcomponents.WTemplated.getVars(self)
         authorObj = self._contrib.getAuthorById(self._authorId)
         if authorObj is None:
-            raise MaKaCError(_("Not found the author: %s") % self._authorId)
+            raise MaKaCError(_("Author not found: {}").format(self._authorId))
         authorList = self._conf.getAuthorIndex().getByAuthorObj(authorObj)
-        author = None
-        if authorList is not None:
-            author = authorList[0]
-        else:
-            raise MaKaCError(_("Not found the author: %s") % self._authorId)
+        if authorList is None:
+            raise MaKaCError(_("Author not found: {}").format(self._authorId))
+        author = authorList[0]
         contribList = []
         for auth in authorList:
             contrib = auth.getContribution()
