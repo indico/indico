@@ -44,7 +44,11 @@ class XMLSerializer(Serializer):
         elif type(value) in (int, float, bool):
             return str(value)
         else:
-            return value.decode('utf-8') if type(value) == str else value
+            value = value.decode('utf-8') if type(value) == str else value
+            if isinstance(value, basestring):
+                # Get rid of vertical tabs, the most common control char breaking XML conversion
+                value = value.replace('\x0b', '')
+            return value
 
     def _xmlForFossil(self, fossil, doc=None):
         attribs = {}
@@ -84,7 +88,7 @@ class XMLSerializer(Serializer):
                     txt = self._convert(v)
                     try:
                         elem.text = txt
-                    except Exception, e:
+                    except Exception:
                         Logger.get('xmlSerializer').exception('Setting XML text value failed (id: {}, value {!r})'
                                                               .format(id, txt))
 
