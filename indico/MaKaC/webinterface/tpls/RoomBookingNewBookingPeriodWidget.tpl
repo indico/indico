@@ -55,8 +55,8 @@ ${ form.repeat_interval(type='hidden') }
 <script>
     $(document).ready(function() {
         $('#timerange').timerange({
-            initStartTime: '${ format_time(form.start_dt.data) }',
-            initEndTime: '${ format_time(form.end_dt.data) }',
+            initStartTime: '${ form.start_dt.data.strftime("%H:%M") }',
+            initEndTime: '${ form.end_dt.data.strftime("%H:%M") }',
             startTimeName: 'sTime',
             endTimeName: 'eTime',
             sliderWidth: '512px',
