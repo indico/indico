@@ -149,7 +149,6 @@ def handler(prefix, path):
 
     dbi = DBMgr.getInstance()
     dbi.startRequest()
-    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
 
     apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)
     cookieAuth = get_query_parameter(queryParams, ['ca', 'cookieauth'], 'no') == 'yes'

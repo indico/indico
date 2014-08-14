@@ -35,6 +35,7 @@ from indico.util.fossilize import fossilize
 class SetPaidHook(EventBaseHook):
     PREFIX = "api"
     RE = r'(?P<event>[\w\s]+)/registrant/(?P<registrant_id>[\w\s]+)/pay'
+    METHOD_NAME = 'api_pay'
     NO_CACHE = True
     COMMIT = True
     HTTP_POST = True
@@ -46,7 +47,6 @@ class SetPaidHook(EventBaseHook):
         registrant_id = self._pathParams["registrant_id"]
         self._conf = ConferenceHolder().getById(self._pathParams['event'])
         self._registrant = self._conf.getRegistrantById(registrant_id)
-        self._type = "pay"
         if not self._conf.getModPay().isActivated():
             raise HTTPAPIError('E-payment is not enabled')
 
@@ -74,6 +74,7 @@ class SetPaidHook(EventBaseHook):
 class CheckInHook(EventBaseHook):
     PREFIX = "api"
     RE = r'(?P<event>[\w\s]+)/registrant/(?P<registrant_id>[\w\s]+)/checkin'
+    METHOD_NAME = 'api_checkin'
     NO_CACHE = True
     COMMIT = True
     HTTP_POST = True
@@ -85,7 +86,6 @@ class CheckInHook(EventBaseHook):
         registrant_id = self._pathParams["registrant_id"]
         self._conf = ConferenceHolder().getById(self._pathParams['event'])
         self._registrant = self._conf.getRegistrantById(registrant_id)
-        self._type = "checkin"
 
     def _hasAccess(self, aw):
         return (self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)) \
@@ -104,6 +104,7 @@ class CheckInHook(EventBaseHook):
 @HTTPAPIHook.register
 class RegistrantHook(EventBaseHook):
     RE = r'(?P<event>[\w\s]+)/registrant/(?P<registrant_id>[\w\s]+)'
+    METHOD_NAME = 'export_registrant'
     NO_CACHE = True
     DEFAULT_DETAIL = 'basic'
 
@@ -113,7 +114,6 @@ class RegistrantHook(EventBaseHook):
         self._conf = ConferenceHolder().getById(self._pathParams['event'])
         registrant_id = self._pathParams["registrant_id"]
         self._registrant = self._conf.getRegistrantById(registrant_id)
-        self._type = "registrant"
 
     def _hasAccess(self, aw):
         return self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)
@@ -153,12 +153,12 @@ class RegistrantFetcher(DataFetcher):
 @HTTPAPIHook.register
 class RegistrantsHook(EventBaseHook):
     RE = r'(?P<event>[\w\s]+)/registrants'
+    METHOD_NAME = 'export_registrants'
     NO_CACHE = True
 
     def _getParams(self):
         super(RegistrantsHook, self)._getParams()
         self._conf_id = self._pathParams['event']
-        self._type = "registrants"
         self._conf = ConferenceHolder().getById(self._conf_id)
 
     def _hasAccess(self, aw):

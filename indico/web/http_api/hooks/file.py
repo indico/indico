@@ -35,6 +35,7 @@ class FileHook(EventBaseHook):
     Example: /export/event/1/session/2/contrib/3/subcontrib/4/material/Slides/5.bin?ak=00000000-0000-0000-0000-000000000000
     """
     TYPES = ('file',)
+    METHOD_NAME = 'export_file'
     DEFAULT_DETAIL = 'bin'
     VALID_FORMATS = ('bin',)
     GUEST_ALLOWED = True
@@ -44,7 +45,6 @@ class FileHook(EventBaseHook):
     def _getParams(self):
         super(FileHook, self)._getParams()
 
-        self._type = 'file'
         self._event = self._pathParams['event']
         self._session = self._pathParams['session']
         self._contrib = self._pathParams['contrib']

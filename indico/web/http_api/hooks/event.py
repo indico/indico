@@ -278,7 +278,6 @@ class SessionContribHook(EventBaseHook):
 
 
 class SessionContribFetcher(IteratedDataFetcher):
-
     def __init__(self, aw, hook):
         super(SessionContribFetcher, self).__init__(aw, hook)
         self._eventId = hook._eventId
@@ -287,10 +286,7 @@ class SessionContribFetcher(IteratedDataFetcher):
 @HTTPAPIHook.register
 class SessionHook(SessionContribHook):
     RE = r'(?P<event>[\w\s]+)/session/(?P<idlist>\w+(?:-\w+)*)'
-
-    def _getParams(self):
-        super(SessionHook, self)._getParams()
-        self._type = 'session'
+    METHOD_NAME = 'export_session'
 
 
 class SessionFetcher(SessionContribFetcher):
@@ -316,10 +312,7 @@ class SessionFetcher(SessionContribFetcher):
 @HTTPAPIHook.register
 class ContributionHook(SessionContribHook):
     RE = r'(?P<event>[\w\s]+)/contribution/(?P<idlist>\w+(?:-\w+)*)'
-
-    def _getParams(self):
-        super(ContributionHook, self)._getParams()
-        self._type = 'contribution'
+    METHOD_NAME = 'export_contribution'
 
 
 class ContributionFetcher(SessionContribFetcher):
