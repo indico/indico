@@ -361,11 +361,11 @@ type ("RoomBookingCalendarDrawer", [],
                         if (!result.can_book) {
                             self._setDialog("search-again");
                             element.addClass("barProt");
-                            if (result.group) {
+                            if (result.is_reservable && result.group) {
                                 var protection = '<strong>' + result.group + '</strong>';
                                 $('#booking-dialog-content').html(format($T("Bookings of this room are limited to members of {0}."), [protection]));
                             } else {
-                                $('#booking-dialog-content').html($T("You are not authorized to book this room"));
+                                $('#booking-dialog-content').html($T("You are not authorized to book this room."));
                             }
                             $('#booking-dialog').dialog("open");
                         }
