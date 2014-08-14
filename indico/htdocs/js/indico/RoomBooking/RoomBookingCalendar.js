@@ -509,9 +509,12 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                             day_content.append(self.drawBar(bar, true).dom);
                         });
 
+                var roomHasBars = _.some(roomInfo.bars, function(bar) {
+                    return bar.type != 'barBlocked';
+                });
                 var container = $('<div class="room-row">')
                     .data('protected', roomInfo.room.type)
-                    .toggleClass('room-row-empty', !roomInfo.bars.length).append(
+                    .toggleClass('room-row-empty', !roomHasBars).append(
                         $('<div class="link">').append(roomLink.dom),
                         day_content);
 
@@ -530,8 +533,11 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                 each(day.rooms, function (room) {
                     var roomDiv = self.drawRoom(room);
                     if (roomDiv) {
+                        var roomHasBars = _.some(room.bars, function(bar) {
+                            return bar.type != 'barBlocked';
+                        });
                         rooms.push(roomDiv);
-                        if(room.bars.length) {
+                        if(roomHasBars) {
                             hasNonEmpty = true;
                         }
                     }
