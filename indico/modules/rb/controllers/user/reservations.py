@@ -174,7 +174,7 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
         form = self._form
         if self._is_submitted() and form.validate():
             if form.data.get('is_only_my_rooms'):
-                form.data['room_ids'] = [room.id for room in Room.find_all() if room.is_owned_by(session.user)]
+                form.room_ids.data = [room.id for room in Room.find_all() if room.is_owned_by(session.user)]
 
             occurrences = ReservationOccurrence.find_with_filters(form.data, session.user).all()
             rooms = self._filter_displayed_rooms([r for r in self._rooms if r.id in set(form.room_ids.data)],
@@ -220,7 +220,7 @@ class _RoomsWithBookingsMixin:
 
 class _MyRoomsMixin:
     def _filter_displayed_rooms(self, rooms, occurrences):
-        return [r for r in rooms if r.owner_id == session.user.id]
+        return [r for r in rooms if r.is_owned_by(session.user)]
 
 
 class RHRoomBookingSearchMyBookings(_RoomsWithBookingsMixin, RHRoomBookingSearchBookingsShortcutBase):

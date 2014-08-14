@@ -182,8 +182,6 @@ class ReservationOccurrence(db.Model, Serializer):
                 criteria.append(db_dates_overlap(ReservationOccurrence, 'start_dt', day_start_dt, 'end_dt', day_end_dt))
             q = q.filter(or_(*criteria))
 
-        if filters.get('is_only_my_rooms') and avatar:
-            q = q.filter(Room.owner_id == avatar.id)
         if filters.get('is_only_mine') and avatar:
             q = q.filter((Reservation.booked_for_id == avatar.id) | (Reservation.created_by_id == avatar.id))
         if filters.get('room_ids'):
