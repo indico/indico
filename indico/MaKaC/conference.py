@@ -7487,13 +7487,18 @@ class ContributionParticipation(Persistent, Fossilizable):
             return False
         return self.getContribution().getConference().getPendingQueuesMgr().isPendingSubmitter(self)
 
-    def _cmpFamilyName( cp1, cp2 ):
+    def isInAuthorList(self):
+        # Sometimes authors are not in the author index for an unknown reason.
+        # In this case we don't want to link to the author page since opening it would fail
+        return self.getConference().getAuthorIndex().getByAuthorObj(self) is not None
+
+    @staticmethod
+    def _cmpFamilyName(cp1, cp2):
         o1 = "%s %s"%(cp1.getFamilyName(), cp1.getFirstName())
         o2 = "%s %s"%(cp2.getFamilyName(), cp2.getFirstName())
         o1=o1.lower().strip()
         o2=o2.lower().strip()
         return cmp( o1, o2 )
-    _cmpFamilyName=staticmethod(_cmpFamilyName)
 
 
 class AuthorIndex(Persistent):
