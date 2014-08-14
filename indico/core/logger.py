@@ -52,6 +52,8 @@ class ExtraIndicoFilter(AddIDFilter):
 class IndicoMailFormatter(logging.Formatter):
     def format(self, record):
         s = logging.Formatter.format(self, record)
+        if isinstance(s, unicode):
+            s = s.encode('utf-8')
         return s + self._getRequestInfo()
 
     def _getRequestInfo(self):
