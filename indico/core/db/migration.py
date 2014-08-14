@@ -36,6 +36,7 @@ globalname_dict = {
     "PersistentMapping": ("persistent.mapping", None),
     "PersistentList": ("persistent.list", None),
     'SlotSchedule': ('MaKaC.schedule', 'SlotSchedule'),
+    'PosterSlotSchedule': ('MaKaC.schedule', 'PosterSlotSchedule'),
     "CERNGroup": ("MaKaC.authentication.LDAPAuthentication", "LDAPGroup"),
     "PeriodicTask": ("indico.modules.scheduler.tasks.periodic", None),
     "PeriodicUniqueTask": ("indico.modules.scheduler.tasks.periodic", None),
