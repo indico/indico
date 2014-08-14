@@ -2764,9 +2764,10 @@ class WCategoryStatisticsList(WTemplated):
         while year < last_year:
             nb = stats[year]
             # We hide holes >=10 years
-            if not nb and not any(stats[y] for y in xrange(year, year + 10)):
+            if not nb and not any(stats[y] for y in xrange(year, min(last_year, year + 10))):
                 end = next((y - 1 for y in xrange(year, last_year) if stats[y]), sys.maxint)
-                tmp.append(WCategoryStatisticsListRowEmpty(year, end).getHTML())
+                if end != sys.maxint:
+                    tmp.append(WCategoryStatisticsListRowEmpty(year, end).getHTML())
                 year = end + 1
                 continue
             percent = (nb * 100) / maximum
