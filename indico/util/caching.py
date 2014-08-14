@@ -71,6 +71,8 @@ def make_hashable(obj):
         return tuple(obj)
     elif isinstance(obj, dict):
         return frozenset((k, make_hashable(v)) for k, v in obj.iteritems())
+    elif hasattr(obj, 'getId'):
+        return obj.__class__.__name__, obj.getId()
     return obj
 
 

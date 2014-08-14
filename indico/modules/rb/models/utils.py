@@ -106,7 +106,7 @@ def cached(cache, primary_key_attr='id', base_ttl=86400*31):
             else:
                 key = u'{}[{}].{}'.format(type(self).__name__, primary_key, f.__name__)
 
-            args_key = u', '.join(map(make_hashable, args) +
+            args_key = u', '.join(map(repr, map(make_hashable, args)) +
                                   [u'{}={}'.format(k, make_hashable(v)) for k, v in sorted(kwargs.viewitems())])
             if args_key:
                 key = '{}({})'.format(key, args_key)
