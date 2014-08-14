@@ -306,7 +306,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if self.has_vc:
             infos.append(_(u'video conference'))
 
-        return u', '.join(infos)
+        return u', '.join(map(unicode, infos))
 
     @property
     @cached(_cache)
