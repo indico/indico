@@ -63,7 +63,15 @@ class WGenericError( WTemplated ):
             vars["userEmail"] = quoteattr( av.getEmail() )
         vars["reportURL"] = quoteattr( str( urlHandlers.UHErrorReporting.getURL() ) )
         details = ""
-        if Config.getInstance().getDebug():
+        show_details = Config.getInstance().getDebug()
+        if not show_details:
+            try:
+                show_details = session.user and session.user.isAdmin()
+            except Exception:
+                # We are handling some error so we cannot know if accessing the session user works
+                # If it fails we simply don't show details...
+                pass
+        if show_details:
             details = """
 <table class="errorDetailsBox">
     <tr>
