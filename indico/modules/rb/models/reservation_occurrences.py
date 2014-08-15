@@ -36,7 +36,7 @@ from indico.util.string import return_ascii
 class ReservationOccurrence(db.Model, Serializer):
     __tablename__ = 'reservation_occurrences'
     __table_args__ = {'schema': 'roombooking'}
-    __api_public__ = (('start', 'startDT'), ('end', 'endDT'), 'is_cancelled', 'is_rejected')
+    __api_public__ = (('start_dt', 'startDT'), ('end_dt', 'endDT'), 'is_cancelled', 'is_rejected')
 
     reservation_id = db.Column(
         db.Integer,
@@ -182,8 +182,6 @@ class ReservationOccurrence(db.Model, Serializer):
                 criteria.append(db_dates_overlap(ReservationOccurrence, 'start_dt', day_start_dt, 'end_dt', day_end_dt))
             q = q.filter(or_(*criteria))
 
-        if filters.get('is_only_my_rooms') and avatar:
-            q = q.filter(Room.owner_id == avatar.id)
         if filters.get('is_only_mine') and avatar:
             q = q.filter((Reservation.booked_for_id == avatar.id) | (Reservation.created_by_id == avatar.id))
         if filters.get('room_ids'):

@@ -456,7 +456,6 @@ def migrate_reservations(main_root, rb_root, avatar_id_map):
             event = main_root['conferences'].get(event_id)
             if event:
                 # For some stupid reason there are bookings in the database which have a completely unrelated parent
-                # TODO: Maybe use a separate migration step which iterates over all events? Would be slower but safer!
                 guids = getattr(event, '_Conference__roomBookingGuids', [])
                 if any(int(x.id) == v.id for x in guids if x.id is not None):
                     r.event_id = int(event_id)

@@ -1283,7 +1283,7 @@ class WhooshTextIndex(object):
 
     def __init__(self, index_name):
 
-        if Config.getInstance().getRedisConnectionURL():
+        if Config.getInstance().getWhooshBackend() == 'redis':
             storage = RedisStorage(Config.getInstance().getRedisConnectionURL(), index_name)
         else:
             indexDir = self._getRepositoryPath()

@@ -64,6 +64,7 @@ class HTTPAPIHook(object):
     TYPES = None  # abstract
     PREFIX = 'export'  # url prefix. must exist in indico.web.flask.blueprints.api, too! also used as function prefix
     RE = None  # abstract
+    METHOD_NAME = None  # overrides method name derived from prefix+type
     DEFAULT_DETAIL = None  # abstract
     MAX_RECORDS = {}
     SERIALIZER_TYPE_MAP = {}  # maps fossil type names to friendly names (useful for plugins e.g. RoomCERN --> Room)
@@ -163,6 +164,8 @@ class HTTPAPIHook(object):
         return {}
 
     def _getMethodName(self):
+        if self.METHOD_NAME:
+            return self.METHOD_NAME
         return self.PREFIX + '_' + self._type
 
     def _performCall(self, func, aw):

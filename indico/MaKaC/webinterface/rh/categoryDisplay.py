@@ -37,7 +37,7 @@ import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
 import MaKaC.webinterface.displayMgr as displayMgr
-from MaKaC.errors import MaKaCError,FormValuesError,NoReportError
+from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
 import MaKaC.conference as conference
 from MaKaC.conference import ConferenceChair
 import MaKaC.statistics as statistics
@@ -55,31 +55,33 @@ from indico.web.http_api.hooks.event import CategoryEventHook
 from indico.web.http_api.metadata.serializer import Serializer
 
 
-class RHCategDisplayBase( base.RHDisplayBaseProtected ):
+class RHCategDisplayBase(base.RHDisplayBaseProtected):
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         if not any(self._notify("isPluginTypeAdmin", {"user": self._getUser()}) +
                    self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"})):
-            base.RHDisplayBaseProtected._checkProtection( self )
+            base.RHDisplayBaseProtected._checkProtection(self)
 
-    def _checkParams( self, params, mustExist = 1 ):
+    def _checkParams(self, params, mustExist=True):
         if "categId" in params:
             params["categId"] = escape_html(str(params["categId"]))
-        l = locators.CategoryWebLocator( params, mustExist )
+        l = locators.CategoryWebLocator(params, mustExist)
         self._target = l.getObject()
 
         # throw an error if the category was not found
-        if mustExist and self._target == None:
-            raise NoReportError(_("The specified category with id \"%s\" does not exist or has been deleted")%params["categId"])
+        if mustExist and self._target is None:
+            raise NotFoundError(_("The category with id '{}' does not exist or has been deleted").format(
+                                "<strong>{}</strong>".format(params["categId"])),
+                                title=_("Category not found"))
 
 
-class RHCategoryDisplay( RHCategDisplayBase ):
+class RHCategoryDisplay(RHCategDisplayBase):
     _uh = urlHandlers.UHCategoryDisplay
 
-    def _process( self ):
+    def _process(self):
 
         wfReg = webFactoryRegistry.WebFactoryRegistry()
-        p = category.WPCategoryDisplay( self, self._target, wfReg )
+        p = category.WPCategoryDisplay(self, self._target, wfReg)
         return p.display()
 
 
@@ -569,7 +571,7 @@ class RHCategoryToAtom(RHCategDisplayBase):
         res = hook(self.getAW())
         resultFossil = {'results': res[0], 'url': str(self._uh.getURL(self._target))}
         serializer = Serializer.create('atom')
-        return send_file(filename, StringIO(serializer(resultFossil)), 'ATOM')
+        return send_file(filename, StringIO(serializer(resultFossil).encode('utf-8')), 'ATOM')
 
 
 def sortByStartDate(conf1,conf2):

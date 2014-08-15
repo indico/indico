@@ -101,7 +101,11 @@
         <ul>
         % for pa in Contribution.getPrimaryAuthorList():
             <li class="icon-user">
-                <a href="${getAuthorURL(pa)}">${pa.getDirectFullName()}</a> (${pa.getAffiliation()})
+                % if isWithdrawn or not pa.isInAuthorList():
+                    ${pa.getDirectFullName()} (${pa.getAffiliation()})
+                % else:
+                    <a href="${getAuthorURL(pa)}">${pa.getDirectFullName()}</a> (${pa.getAffiliation()})
+                % endif
             </li>
         % endfor
         </ul>
@@ -116,7 +120,11 @@
         <ul>
         % for ca in Contribution.getCoAuthorList():
             <li class="icon-user">
-                <a href="${getAuthorURL(ca)}">${ca.getDirectFullName()}</a> (${ca.getAffiliation()})
+                % if isWithdrawn or not ca.isInAuthorList():
+                    ${ca.getDirectFullName()} (${ca.getAffiliation()})
+                % else:
+                    <a href="${getAuthorURL(ca)}">${ca.getDirectFullName()}</a> (${ca.getAffiliation()})
+                % endif
             </li>
         % endfor
         </ul>

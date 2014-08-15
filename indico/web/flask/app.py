@@ -208,7 +208,7 @@ def handle_404(exception):
     except NotFound:
         if exception.description == NotFound.description:
             # The default reason is too long and not localized
-            msg = (_("Page not found"), _("The page you were looking for doesn't exist."))
+            msg = (_("Page not found"), _("The page you are looking for doesn't exist."))
         else:
             msg = (_("Page not found"), exception.description)
         return WErrorWSGI(msg).getHTML(), 404

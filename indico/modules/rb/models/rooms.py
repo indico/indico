@@ -306,7 +306,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if self.has_vc:
             infos.append(_(u'video conference'))
 
-        return u', '.join(infos)
+        return u', '.join(map(unicode, infos))
 
     @property
     @cached(_cache)
@@ -512,8 +512,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 Room.is_reservable if filters['is_only_public'] else True,
                 Room.is_auto_confirm if filters['is_auto_confirm'] else True,
                 Room.is_active if filters.get('is_only_active', False) else True,
-                Room.owner_id == avatar.getId() if filters.get('is_only_my_rooms') else True,
-                (equipment_subquery == equipment_count) if equipment_subquery else True)
+                (equipment_subquery == equipment_count) if equipment_subquery is not None else True)
         )
 
         if filters['available'] != -1:
@@ -548,6 +547,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if filters['is_only_public']:
             # This may trigger additional SQL queries but is_public is cached and doing this check here is *much* easier
             rooms = [r for r in rooms if r.is_public]
+        if filters.get('is_only_my_rooms'):
+            rooms = [r for r in rooms if r.is_owned_by(avatar)]
         if filters['capacity']:
             # Unless it would result in an empty resultset we don't want to show room which >20% more capacity
             # than requested. This cannot be done easily in SQL so we do that logic here after the SQL query already
@@ -650,6 +651,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def can_be_deleted(self, accessWrapper):
         return self.can_be_modified(accessWrapper)
 
+    @cached(_cache)
     def is_owned_by(self, avatar):
         """
         Returns True if user is responsible for this room. False otherwise.
@@ -664,6 +666,14 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if not manager_group:
             return False
         return avatar.is_member_of_group(manager_group.encode('utf-8'))
+
+    @classmethod
+    def get_owned_by(cls, user):
+        return [room for room in cls.find(is_active=True) if room.is_owned_by(user)]
+
+    @classmethod
+    def user_owns_rooms(cls, user):
+        return any(room for room in cls.find(is_active=True) if room.is_owned_by(user))
 
     def check_advance_days(self, end_date, user=None, quiet=False):
         if not self.max_advance_days:

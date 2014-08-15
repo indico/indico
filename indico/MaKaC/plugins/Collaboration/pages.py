@@ -712,7 +712,7 @@ class WElectronicAgreement(wcomponents.WTemplated):
 
                 lst.append([id.getId(), id.getFullNameNoTitle(), status, cont, reqType, enabled])
 
-        return sorted(lst, key=lambda list: lst[sortMap[self.sortCriteria]], reverse=reverse)
+        return sorted(lst, key=lambda x: x[sortMap[self.sortCriteria]], reverse=reverse)
 
     def getTableContent(self):
 

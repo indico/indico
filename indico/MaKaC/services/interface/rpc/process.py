@@ -27,7 +27,7 @@ from ZEO.Exceptions import ClientDisconnected
 
 
 from MaKaC.plugins.base import Observable
-from MaKaC.errors import NoReportError
+from MaKaC.errors import NoReportError, FormValuesError
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.mail import GenericMailer
 from MaKaC.services.interface.rpc import handlers
@@ -139,8 +139,8 @@ class ServiceRunner(Observable):
                             result = processRequest(method, copy.deepcopy(params))
                         except NoReportError as e:
                             raise ServiceNoReportError(e.getMsg())
-                        except NoReportIndicoError as e:
-                            raise ServiceNoReportError(e.getMessage())
+                        except (NoReportIndicoError, FormValuesError) as e:
+                            raise ServiceNoReportError(e.getMessage(), title=_("Error"))
 
                         transaction.commit()
                         break
@@ -154,7 +154,8 @@ class ServiceRunner(Observable):
             transaction.abort()
             if isinstance(e, CausedError):
                 raise
-            raise ProcessError('ERR-P0', 'Error processing method.')
+            else:
+                raise ProcessError('ERR-P0', 'Error processing method.')
         finally:
             # notify components that the request has ended
             self._notify('requestFinished')

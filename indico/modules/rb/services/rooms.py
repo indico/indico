@@ -104,6 +104,7 @@ class BookingPermission(LoggedOnlyService):
         user = session.user
         return {
             'blocked': not self._blocking.can_be_overridden(user, self._room) if self._blocking else False,
+            'is_reservable': self._room.is_reservable,
             'can_book': self._room.can_be_booked(user) or self._room.can_be_prebooked(user),
             'group': self._room.get_attribute_value('allowed-booking-group')
         }

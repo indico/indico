@@ -4075,7 +4075,6 @@ class WSystemLinkModif(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["linkName"] = self._link.getCaption()
-        vars["linkURL"] = self._link.getURL()
         vars["linkStatus"] = _("Disabled")
         vars["changeStatusTo"] = _("Activate")
         if self._link.isEnabled():
@@ -5178,20 +5177,20 @@ class WConfAuthorIndex(WConfDisplayBodyBase):
             if len(authors) == 0:
                 continue
             else:
-                auth = authors[0]
+                auth = next((x for x in authors if x.getContribution().getConference() is not None), None)
+                if auth is None:
+                    continue
 
-            authorURL = urlHandlers.UHContribAuthorDisplay.getURL(auth.getContribution(),
-                                                                  authorId=auth.getId())
+            authorURL = urlHandlers.UHContribAuthorDisplay.getURL(auth.getContribution(), authorId=auth.getId())
             contribs = []
             res.append({'fullName': auth.getFullNameNoTitle(),
                         'affiliation': auth.getAffiliation(),
                         'authorURL': authorURL,
-                        'contributions': contribs
-                        })
+                        'contributions': contribs})
 
             for auth in authors:
                 contrib = auth.getContribution()
-                if contrib is not None:
+                if contrib is not None and contrib.getConference() is not None:
                     contribs.append({
                         'title': contrib.getTitle(),
                         'url': str(urlHandlers.UHContributionDisplay.getURL(auth.getContribution())),

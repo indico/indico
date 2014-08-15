@@ -44,7 +44,11 @@ class XMLSerializer(Serializer):
         elif type(value) in (int, float, bool):
             return str(value)
         else:
-            return value.decode('utf-8') if type(value) == str else value
+            value = value.decode('utf-8') if type(value) == str else value
+            if isinstance(value, basestring):
+                # Get rid of vertical tabs, the most common control char breaking XML conversion
+                value = value.replace('\x0b', '')
+            return value
 
     def _xmlForFossil(self, fossil, doc=None):
         attribs = {}
@@ -66,7 +70,7 @@ class XMLSerializer(Serializer):
         for k, v in fossil.iteritems():
             if k not in ['_fossil', '_type', 'id']:
                 elem = etree.SubElement(felement, k)
-                if type(v) == list:
+                if isinstance(v, (list, tuple)):
                     onlyDicts = all(type(subv) == dict for subv in v)
                     if onlyDicts:
                         for subv in v:
@@ -78,14 +82,15 @@ class XMLSerializer(Serializer):
                             else:
                                 subelem = etree.SubElement(elem, 'item')
                                 subelem.text = self._convert(subv)
-                elif type(v) == dict:
+                elif isinstance(v, dict):
                     elem.append(self._xmlForFossil(v))
                 else:
                     txt = self._convert(v)
                     try:
                         elem.text = txt
-                    except Exception, e:
-                        Logger.get('xmlSerializer').error('Setting XML text value failed: %s (id: %s)' % (e, id))
+                    except Exception:
+                        Logger.get('xmlSerializer').exception('Setting XML text value failed (id: {}, value {!r})'
+                                                              .format(id, txt))
 
 
         return felement

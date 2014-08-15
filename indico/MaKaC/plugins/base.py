@@ -40,6 +40,7 @@ from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.plugins.util import processPluginMetadata
 
 from indico.core.extpoint import Component, IListener, IContributor
+from indico.util.caching import memoize_request
 from indico.util.importlib import import_module
 
 
@@ -1229,6 +1230,7 @@ class PluginOption(Persistent):
     def getValue(self):
         return self.__value
 
+    @memoize_request
     def getRooms(self):
         from indico.modules.rb.models.rooms import Room
         if self.getType() != 'rooms':

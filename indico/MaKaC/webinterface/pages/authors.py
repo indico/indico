@@ -16,14 +16,9 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import request
-
-from xml.sax.saxutils import quoteattr
-
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 from MaKaC.webinterface import wcomponents, navigation, urlHandlers
-from MaKaC.errors import MaKaCError
-from indico.core.config import Config
+from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.common.fossilize import fossilize
 from MaKaC.i18n import _
 from MaKaC.conference import Link
@@ -52,14 +47,17 @@ class WAuthorDisplay( wcomponents.WTemplated ):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         authorObj = self._contrib.getAuthorById(self._authorId)
+
+        not_found = NotFoundError(_("No author with id {} was found").format(
+                                  "<strong>{}</strong>".format(self._authorId)),
+                                  title=_("Author not found"))
+
         if authorObj is None:
-            raise MaKaCError(_("Not found the author: %s") % self._authorId)
+            raise not_found
         authorList = self._conf.getAuthorIndex().getByAuthorObj(authorObj)
-        author = None
-        if authorList is not None:
-            author = authorList[0]
-        else:
-            raise MaKaCError(_("Not found the author: %s") % self._authorId)
+        if authorList is None:
+            raise not_found
+        author = authorList[0]
         contribList = []
         for auth in authorList:
             contrib = auth.getContribution()

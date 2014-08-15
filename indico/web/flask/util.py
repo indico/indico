@@ -32,6 +32,7 @@ from werkzeug.datastructures import Headers, FileStorage
 from werkzeug.exceptions import NotFound, HTTPException
 from werkzeug.routing import BaseConverter, UnicodeConverter, RequestRedirect, BuildError
 from werkzeug.urls import url_parse
+from werkzeug.utils import secure_filename
 
 from indico.util.caching import memoize
 from indico.web.handlers import RHHtdocs
@@ -291,6 +292,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     the file only if it has been modified (based on mtime and size).
     """
 
+    name = secure_filename(name)
     if request.user_agent.platform == 'android':
         # Android is just full of fail when it comes to inline content-disposition...
         inline = False

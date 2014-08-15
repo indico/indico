@@ -1056,14 +1056,13 @@ class Avatar(Persistent, Fossilizable):
     def has_rooms(self):
         """Checks if the user has any rooms"""
         from indico.modules.rb.models.rooms import Room  # avoid circular import
-
-        return Room.find(owner_id=self.getId()).count() > 0
+        return Room.user_owns_rooms(self)
 
     @memoize_request
     def get_rooms(self):
         """Returns the rooms this user is responsible for"""
         from indico.modules.rb.models.rooms import Room  # avoid circular import
-        return Room.find_all(is_active=True, owner_id=self.getId())
+        return Room.get_owned_by(self)
 
     def getPersonalInfo(self):
         try:

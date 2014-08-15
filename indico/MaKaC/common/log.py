@@ -20,6 +20,7 @@
 from persistent import Persistent
 
 from indico.util.contextManager import ContextManager
+from indico.util.string import seems_html
 from MaKaC.common.timezoneUtils import nowutc
 
 class ModuleNames:
@@ -131,7 +132,7 @@ class EmailLogItem(LogItem):
         return self._logInfo.get("toList", "No receptors")
 
     def getLogContentType(self):
-        return self._logInfo.get("contentType", "text/html")
+        return self._logInfo.get("contentType", "text/html" if seems_html(self._logInfo['body']) else 'text/plain')
 
     def getLogInfoList(self):
         """

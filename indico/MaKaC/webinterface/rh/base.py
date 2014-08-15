@@ -32,7 +32,7 @@ from xml.sax.saxutils import escape
 import oauth2 as oauth
 import transaction
 from flask import request, session
-from werkzeug.exceptions import BadRequest, MethodNotAllowed
+from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound
 from ZEO.Exceptions import ClientDisconnected
 from ZODB.POSException import ConflictError, POSKeyError
 
@@ -54,6 +54,7 @@ from MaKaC.plugins.base import OldObservable
 from MaKaC.webinterface.mail import GenericMailer
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.errors as errors
+from MaKaC.webinterface.pages.error import WErrorWSGI
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from indico.core.config import Config
 from indico.core.db import DBMgr
@@ -323,7 +324,7 @@ class RH(RequestHandlerBase):
             return
         raise BadRefererError('This operation is not allowed from an external referer.')
 
-    @jsonify_error(logging_level='exception')
+    @jsonify_error
     def _processGeneralError(self, e):
         """Treats general errors occured during the process of a RH."""
 
@@ -410,10 +411,8 @@ class RH(RequestHandlerBase):
 
     @jsonify_error
     def _processNotFoundError(self, e):
-        """Process not found error; uses NoReportError template"""
-
         self._responseUtil.status = 404
-        return errors.WPNoReportError(self, e).display()
+        return WErrorWSGI((e.getMessage(), e.getExplanation())).getHTML()
 
     @jsonify_error
     def _processParentTimingError(self, e):
@@ -643,11 +642,11 @@ class RH(RequestHandlerBase):
             'NotFound': 'NotFoundError',
             'MaKaCError': 'GeneralError',
             'IndicoError': 'GeneralError',
-            'ValueError': 'GeneralError',
-            'Exception': 'UnexpectedError'
+            'ValueError': 'UnexpectedError',
+            'Exception': 'UnexpectedError',
+            'AccessControlError': 'AccessError'
         }.get(type(e).__name__, type(e).__name__)
-        return getattr(self, '_process{}'.format(exception_name),
-                       getattr(self, '_processUnexpectedError'))
+        return getattr(self, '_process{}'.format(exception_name), self._processUnexpectedError)
 
     def _deleteTempFiles(self):
         if len(self._tempFilesToDelete) > 0:

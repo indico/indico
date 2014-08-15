@@ -39,7 +39,7 @@
                 <div>
                     ${ _('If you book, overlapping days of the following pre-bookings will automatically be rejected.') }
                 </div>
-            % elif reservation and reservation.is_confirmed:
+            % elif reservation and reservation.is_accepted:
                 <div>
                     ${ _('If you update this booking, overlapping days of the following pre-bookings will automatically be rejected.') }
                 </div>
@@ -48,7 +48,7 @@
                 <div>
                     ${ _('If you pre-book, some of your days may get rejected as they overlap with other existing pre-bookings.') }
                 </div>
-            % elif reservation and not reservation.is_confirmed:
+            % elif reservation and not reservation.is_accepted:
                 <div>
                     ${ _('If you update this pre-booking, some of your days may get rejected as they overlap with other existing pre-bookings.') }
                 </div>
