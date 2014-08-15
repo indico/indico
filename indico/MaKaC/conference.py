@@ -4930,7 +4930,6 @@ class ConferenceHolder( ObjectHolder ):
                                 title=_("Event not found"))
 
 
-
 class Observer(object):
     """ Base class for Observer objects.
         Inheriting classes should overload the following boolean class attributes:
@@ -5943,8 +5942,8 @@ class Session(CommonObjectBase, Locatable):
         #    self.getSlotList()[0].duration = self.duration
         self.notifyModification()
 
-    def setDates(self,sDate,eDate,check=1,moveEntries=0):
-        if eDate<=sDate:
+    def setDates(self, sDate, eDate, check=1, moveEntries=0):
+        if eDate <= sDate:
             tz = timezone(self.getConference().getTimezone())
             raise FormValuesError(_("The end date ({}) cannot be prior to the start date ({})").format(
                 eDate.astimezone(tz).strftime('%Y-%m-%d %H:%M'), sDate.astimezone(tz).strftime('%Y-%m-%d %H:%M')),
@@ -5953,12 +5952,12 @@ class Session(CommonObjectBase, Locatable):
         self.setEndDate(eDate, check)
         self._checkInnerSchedule()
 
-    def getDuration( self ):
+    def getDuration(self):
         return self.duration
 
-    def setDuration(self,hours=0,minutes=15,dur=0):
-        if dur==0:
-            dur = timedelta(hours=int(hours),minutes=int(minutes))
+    def setDuration(self, hours=0, minutes=15, dur=0):
+        if dur == 0:
+            dur = timedelta(hours=int(hours), minutes=int(minutes))
             if dur.seconds <= 0:
                 raise FormValuesError(_("The duration cannot be less than zero"), _("Session"))
         self.duration = dur
@@ -6924,14 +6923,14 @@ class SessionSlot(Persistent, Observable, Fossilizable, Locatable):
     def getDescription(self):
         return self.getSession().getDescription()
 
-    def setDates(self,sDate,eDate,check=2,moveEntries=0):
+    def setDates(self, sDate, eDate, check=2, moveEntries=0):
         """check parameter:
             0: no check at all
             1: check and raise error in case of problem
             2: check and adapt the owner dates"""
 
-        if sDate>eDate:
-            raise FormValuesError(_("End date cannot be prior to Start date"),_("Slot"))
+        if sDate > eDate:
+            raise FormValuesError(_("End date cannot be prior to Start date"), _("Slot"))
 
         self.setStartDate(sDate, check, moveEntries, checkDuration=False)
         self.setDuration(0, 0, 0, eDate-sDate, check)

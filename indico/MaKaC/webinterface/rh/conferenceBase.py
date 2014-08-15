@@ -20,7 +20,6 @@ from flask import request
 
 import tempfile
 import os
-import shutil
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -28,9 +27,9 @@ from MaKaC.common import log
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.errors import MaKaCError, NotFoundError
 from indico.core.config import Config
-from MaKaC.conference import LocalFile,Link,Category
+from MaKaC.conference import LocalFile, Link, Category
 from MaKaC.export import fileConverter
-from MaKaC.conference import Conference,Session,Contribution,SubContribution
+from MaKaC.conference import Conference, Session, Contribution, SubContribution
 from MaKaC.i18n import _
 from MaKaC.user import AvatarHolder, GroupHolder
 
@@ -117,11 +116,11 @@ class RHSubContributionBase( RHConferenceSite ):
         self._conf = self._contrib.getConference()
 
 
-class RHMaterialBase( RHConferenceSite ):
+class RHMaterialBase(RHConferenceSite):
 
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         l = locators.WebLocator()
-        l.setMaterial( params )
+        l.setMaterial(params)
         self._material = self._target = l.getObject()
         if self._material is None:
             raise NotFoundError(_("The material you are trying to access does not exist or was removed").format(
@@ -129,20 +128,20 @@ class RHMaterialBase( RHConferenceSite ):
                                 title=_("Resource not found"))
 
         self._conf = self._material.getConference()
-        if self._conf == None:
-            self._categ=self._material.getCategory()
+        if self._conf is None:
+            self._categ = self._material.getCategory()
 
 
-class RHFileBase( RHConferenceSite ):
+class RHFileBase(RHConferenceSite):
 
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         l = locators.WebLocator()
-        l.setResource( params )
+        l.setResource(params)
         self._file = self._target = l.getObject()
 #        if not isinstance(self._file, LocalFile):
 #            raise MaKaCError("No file found, %s found instead"%type(self._file))
         self._conf = self._file.getConference()
-        if self._conf == None:
+        if self._conf is None:
             self._categ = self._file.getCategory()
 
 

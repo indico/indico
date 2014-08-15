@@ -45,8 +45,8 @@ class RHCategModifBase( RHModificationBaseProtected ):
             self._doProcess = False
             self._redirect(urlHandlers.UHCategoryDisplay.getURL(self._target))
 
-    def _checkParams( self, params ):
-        l = locators.CategoryWebLocator( params )
+    def _checkParams(self, params):
+        l = locators.CategoryWebLocator(params)
         self._target = l.getObject()
         if self._target is None:
             raise NotFoundError(_("The category with id '{}' does not exist or has been deleted").format(
@@ -54,12 +54,11 @@ class RHCategModifBase( RHModificationBaseProtected ):
                                 title=_("Category not found"))
 
 
-
-class RHCategoryModification( RHCategModifBase ):
+class RHCategoryModification(RHCategModifBase):
     _uh = urlHandlers.UHCategoryModification
 
-    def _process( self ):
-        p = category.WPCategoryModification( self, self._target )
+    def _process(self):
+        p = category.WPCategoryModification(self, self._target)
         return p.display()
 
 

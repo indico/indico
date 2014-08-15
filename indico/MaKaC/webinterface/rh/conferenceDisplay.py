@@ -1043,29 +1043,31 @@ class RHConferenceToMarcXML(RHConferenceBaseDisplay):
 
 
 class RHInternalPageDisplay(RHConferenceBaseDisplay):
-    _uh=urlHandlers.UHInternalPageDisplay
+    _uh = urlHandlers.UHInternalPageDisplay
 
-    def _checkParams(self,params):
+    def _checkParams(self, params):
         self._page = None
-        RHConferenceBaseDisplay._checkParams(self,params)
-        if params.has_key("pageId"):
-            pageId=params.get("pageId")
-            intPagesMgr=internalPagesMgr.InternalPagesMgrRegistery().getInternalPagesMgr(self._conf)
-            self._page=intPagesMgr.getPageById(pageId)
+        RHConferenceBaseDisplay._checkParams(self, params)
+
+        if 'pageId' in params:
+            pageId = params.get("pageId")
+            intPagesMgr = internalPagesMgr.InternalPagesMgrRegistery().getInternalPagesMgr(self._conf)
+            self._page = intPagesMgr.getPageById(pageId)
             self._target = self._conf
+
             if self._page is None:
                 raise NotFoundError(_("The web page you are trying to access does not exist"))
         else:
             raise NotFoundError(_("The web page you are trying to access does not exist"))
 
-    def _process( self ):
-        p=conferences.WPInternalPageDisplay(self,self._conf, self._page)
+    def _process(self):
+        p = conferences.WPInternalPageDisplay(self, self._conf, self._page)
         return p.display()
+
 
 class RHConferenceLatexPackage(RHConferenceBaseDisplay):
 
-    def _process( self ):
-        #return "nothing"
+    def _process(self):
         filename = "%s-BookOfAbstracts.zip" % self._target.getTitle()
         zipdata = StringIO()
         zip = zipfile.ZipFile(zipdata, "w")
