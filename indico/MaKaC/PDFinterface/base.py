@@ -647,29 +647,25 @@ class PDFWithTOC(PDFBase):
 
     """
 
-    def __init__(self, story=None, pagesize = 'A4', fontsize = 'normal', firstPageNumber = 1 ):
-
+    def __init__(self, story=None, pagesize='A4', fontsize='normal', firstPageNumber=1):
 
         self._fontsize = fontsize
-        #self._indexedFlowable = [] #indexedFlowable
-        #self._toc = TableOfContents()
-        self._story=story
+        self._story = story
         if story is None:
             self._story = []
-            self._story.append( Spacer(inch, 0*cm) ) #without this blank spacer first abstract isn't displayed. why?
+            # without this blank spacer first abstract isn't displayed. why?
+            self._story.append(Spacer(inch, 0*cm))
 
-        #self._toc = TableOfContents()
-        #self._processTOCPage()
         self._indexedFlowable = {}
         self._fileDummy = FileDummy()
 
-        self._doc = DocTemplateWithTOC(self._indexedFlowable, self._fileDummy, firstPageNumber = firstPageNumber, pagesize=PDFSizes().PDFpagesizes[pagesize])
+        self._doc = DocTemplateWithTOC(self._indexedFlowable, self._fileDummy, firstPageNumber=firstPageNumber,
+                                       pagesize=PDFSizes().PDFpagesizes[pagesize])
 
         self._PAGE_HEIGHT = PDFSizes().PDFpagesizes[pagesize][1]
         self._PAGE_WIDTH = PDFSizes().PDFpagesizes[pagesize][0]
 
         setTTFonts()
-
 
     def _processTOCPage(self):
         """ Generates page with table of contents.
@@ -681,7 +677,7 @@ class PDFWithTOC(PDFBase):
         style1.fontSize = modifiedFontSize(18, self._fontsize)
         style1.leading = modifiedFontSize(22, self._fontsize)
         style1.alignment = TA_CENTER
-        p = Paragraph( _("Table of contents"), style1)
+        p = Paragraph(_("Table of contents"), style1)
         self._story.append(Spacer(inch, 1*cm))
         self._story.append(p)
         self._story.append(Spacer(inch, 2*cm))
@@ -699,7 +695,7 @@ class PDFWithTOC(PDFBase):
 
     def getPDFBin(self):
         self.getBody()
-        self._doc.multiBuild( self._story, onFirstPage=self.firstPage, onLaterPages=self.laterPages)
+        self._doc.multiBuild(self._story, onFirstPage=self.firstPage, onLaterPages=self.laterPages)
         return self._fileDummy.getData()
 
 

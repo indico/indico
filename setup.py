@@ -21,15 +21,11 @@
 import ez_setup
 ez_setup.use_setuptools()
 
-import commands
-import getopt
 import os
 import getpass
 import re
 import shutil
-import string
 import sys
-import itertools
 from distutils.sysconfig import get_python_lib, get_python_version
 from distutils.cmd import Command
 from distutils.command import bdist
@@ -37,7 +33,7 @@ from indico.util import i18n
 
 
 import pkg_resources
-from setuptools.command import develop, install, sdist, bdist_egg, easy_install, test
+from setuptools.command import develop, sdist, bdist_egg, easy_install, test
 from setuptools import setup, find_packages, findall
 
 
