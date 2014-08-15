@@ -179,8 +179,15 @@ class NoReportError(MaKaCError):
 
 class NotFoundError(MaKaCError):
     """
+    MaKaC's own NotFound version (just for legacy support)
     """
     fossilizes(IErrorNoReportFossil)
+
+    def __init__(self, message, title=""):
+        if not title:
+            title = message
+            message = ''
+        super(NotFoundError, self).__init__(title, explanation=message)
 
 
 class PluginError(MaKaCError):
