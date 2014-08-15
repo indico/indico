@@ -17,6 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import traceback
 from functools import wraps
 
 from flask import request
@@ -87,11 +88,12 @@ def jsonify_error(function=None, logger_name=None, logger_message=None, logging_
             else:
                 raise IndicoError('Wrong usage of jsonify_error: No error found in params')
 
+            tb = traceback.format_exc() if logging_level != 'exception' else ''
             getattr(Logger.get(logger_name), logging_level)(
                 logger_message if logger_message else
-                'Request {0} finished with {1}: {2}'.format(
-                    request, exception.__class__.__name__, exception
-                ))
+                'Request {0} finished with {1}: {2}\n{3}'.format(
+                    request, exception.__class__.__name__, exception, tb
+                ).rstrip())
 
             if request.is_xhr or request.headers.get('Content-Type') == 'application/json':
                 return create_json_error_answer(exception)

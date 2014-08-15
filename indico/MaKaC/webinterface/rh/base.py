@@ -323,7 +323,7 @@ class RH(RequestHandlerBase):
             return
         raise BadRefererError('This operation is not allowed from an external referer.')
 
-    @jsonify_error(logging_level='exception')
+    @jsonify_error
     def _processGeneralError(self, e):
         """Treats general errors occured during the process of a RH."""
 
@@ -643,11 +643,11 @@ class RH(RequestHandlerBase):
             'NotFound': 'NotFoundError',
             'MaKaCError': 'GeneralError',
             'IndicoError': 'GeneralError',
-            'ValueError': 'GeneralError',
-            'Exception': 'UnexpectedError'
+            'ValueError': 'UnexpectedError',
+            'Exception': 'UnexpectedError',
+            'AccessControlError': 'AccessError'
         }.get(type(e).__name__, type(e).__name__)
-        return getattr(self, '_process{}'.format(exception_name),
-                       getattr(self, '_processUnexpectedError'))
+        return getattr(self, '_process{}'.format(exception_name), self._processUnexpectedError)
 
     def _deleteTempFiles(self):
         if len(self._tempFilesToDelete) > 0:
