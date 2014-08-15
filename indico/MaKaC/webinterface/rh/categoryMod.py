@@ -28,7 +28,7 @@ from indico.core.config import Config
 from MaKaC.common.utils import sortCategoryByTitle, validMail
 import MaKaC.user as user
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
-from MaKaC.errors import MaKaCError,NoReportError,FormValuesError
+from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
 import MaKaC.conference as conference
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 
@@ -48,8 +48,11 @@ class RHCategModifBase( RHModificationBaseProtected ):
     def _checkParams( self, params ):
         l = locators.CategoryWebLocator( params )
         self._target = l.getObject()
-        if self._target == None:
-            raise NoReportError(_("The specified category with id \"%s\" does not exist or has been deleted")%params["categId"])
+        if self._target is None:
+            raise NotFoundError(_("The category with id '{}' does not exist or has been deleted").format(
+                                "<strong>{}</strong>".format(params["categId"])),
+                                title=_("Category not found"))
+
 
 
 class RHCategoryModification( RHCategModifBase ):

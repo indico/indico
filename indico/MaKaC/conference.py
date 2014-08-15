@@ -78,7 +78,8 @@ from MaKaC.common.Counter import Counter
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
 from MaKaC.accessControl import AccessController, AdminList
-from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NoReportError
+from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NotFoundError, \
+    FormValuesError
 from MaKaC import registration, epayment
 from MaKaC.evaluation import Evaluation
 from MaKaC.trashCan import TrashCanManager
@@ -4924,7 +4925,10 @@ class ConferenceHolder( ObjectHolder ):
         elif quiet:
             return None
         else:
-            raise NoReportError( _("The specified event with id \"%s\" does not exist or has been deleted.") % escape_html(str(id)) )
+            raise NotFoundError(_("The event with id '{}' does not exist or has been deleted").format(
+                                "<strong>{}</strong>".format(id)),
+                                title=_("Event not found"))
+
 
 
 class Observer(object):
@@ -5942,9 +5946,11 @@ class Session(CommonObjectBase, Locatable):
     def setDates(self,sDate,eDate,check=1,moveEntries=0):
         if eDate<=sDate:
             tz = timezone(self.getConference().getTimezone())
-            raise MaKaCError(_("The end date (%s) cannot be prior to the start date (%s)") % (eDate.astimezone(tz).strftime('%Y-%m-%d %H:%M'),sDate.astimezone(tz).strftime('%Y-%m-%d %H:%M')),_("Session"))
-        self.setStartDate(sDate,check,moveEntries)
-        self.setEndDate(eDate,check)
+            raise FormValuesError(_("The end date ({}) cannot be prior to the start date ({})").format(
+                eDate.astimezone(tz).strftime('%Y-%m-%d %H:%M'), sDate.astimezone(tz).strftime('%Y-%m-%d %H:%M')),
+                _("Session"))
+        self.setStartDate(sDate, check, moveEntries)
+        self.setEndDate(eDate, check)
         self._checkInnerSchedule()
 
     def getDuration( self ):
@@ -5954,7 +5960,7 @@ class Session(CommonObjectBase, Locatable):
         if dur==0:
             dur = timedelta(hours=int(hours),minutes=int(minutes))
             if dur.seconds <= 0:
-                raise MaKaCError( _("The duration cannot be less than zero"), _("Session"))
+                raise FormValuesError(_("The duration cannot be less than zero"), _("Session"))
         self.duration = dur
         self.verifyEndDate(self.getEndDate())
         self.notifyModification()
@@ -6925,7 +6931,7 @@ class SessionSlot(Persistent, Observable, Fossilizable, Locatable):
             2: check and adapt the owner dates"""
 
         if sDate>eDate:
-            raise MaKaCError(_("End date cannot be prior to Start date"),_("Slot"))
+            raise FormValuesError(_("End date cannot be prior to Start date"),_("Slot"))
 
         self.setStartDate(sDate, check, moveEntries, checkDuration=False)
         self.setDuration(0, 0, 0, eDate-sDate, check)
@@ -7052,9 +7058,9 @@ class SessionSlot(Persistent, Observable, Fossilizable, Locatable):
 
         tz = timezone(self.getConference().getTimezone())
         if dur <= timedelta(0):
-            raise MaKaCError( _("The duration cannot be less than zero"), _("Slot"))
+            raise FormValuesError(_("The duration cannot be less than zero"), _("Slot"))
         if dur.days > 1:
-            raise MaKaCError( _("The duration cannot be more than one day"), _("Slot"))
+            raise FormValuesError(_("The duration cannot be more than one day"), _("Slot"))
         if self.startDate is not None:
             sessionStartDate = self.getSession().getStartDate()
             sessionEndDate = self.getSession().getEndDate()

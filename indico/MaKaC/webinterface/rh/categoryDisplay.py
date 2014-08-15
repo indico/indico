@@ -37,7 +37,7 @@ import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.category as category
 import MaKaC.webinterface.displayMgr as displayMgr
-from MaKaC.errors import MaKaCError,FormValuesError,NoReportError
+from MaKaC.errors import MaKaCError,FormValuesError,NotFoundError
 import MaKaC.conference as conference
 from MaKaC.conference import ConferenceChair
 import MaKaC.statistics as statistics
@@ -69,8 +69,10 @@ class RHCategDisplayBase( base.RHDisplayBaseProtected ):
         self._target = l.getObject()
 
         # throw an error if the category was not found
-        if mustExist and self._target == None:
-            raise NoReportError(_("The specified category with id \"%s\" does not exist or has been deleted")%params["categId"])
+        if mustExist and self._target is None:
+            raise NotFoundError(_("The category with id '{}' does not exist or has been deleted").format(
+                                "<strong>{}</strong>".format(params["categId"])),
+                                title=_("Category not found"))
 
 
 class RHCategoryDisplay( RHCategDisplayBase ):

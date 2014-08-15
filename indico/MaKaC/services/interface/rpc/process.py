@@ -27,7 +27,7 @@ from ZEO.Exceptions import ClientDisconnected
 
 
 from MaKaC.plugins.base import Observable
-from MaKaC.errors import NoReportError
+from MaKaC.errors import NoReportError, FormValuesError
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.mail import GenericMailer
 from MaKaC.services.interface.rpc import handlers

@@ -1054,9 +1054,9 @@ class RHInternalPageDisplay(RHConferenceBaseDisplay):
             self._page=intPagesMgr.getPageById(pageId)
             self._target = self._conf
             if self._page is None:
-                raise MaKaCError( _("The webpage, you are trying to access, does not exist"))
+                raise NotFoundError(_("The web page you are trying to access does not exist"))
         else:
-            raise MaKaCError( _("The webpage, you are trying to access, does not exist"))
+            raise NotFoundError(_("The web page you are trying to access does not exist"))
 
     def _process( self ):
         p=conferences.WPInternalPageDisplay(self,self._conf, self._page)

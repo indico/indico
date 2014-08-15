@@ -32,7 +32,7 @@ from xml.sax.saxutils import escape
 import oauth2 as oauth
 import transaction
 from flask import request, session
-from werkzeug.exceptions import BadRequest, MethodNotAllowed
+from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound
 from ZEO.Exceptions import ClientDisconnected
 from ZODB.POSException import ConflictError, POSKeyError
 
@@ -54,6 +54,7 @@ from MaKaC.plugins.base import OldObservable
 from MaKaC.webinterface.mail import GenericMailer
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.errors as errors
+from MaKaC.webinterface.pages.error import WErrorWSGI
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from indico.core.config import Config
 from indico.core.db import DBMgr
@@ -410,10 +411,8 @@ class RH(RequestHandlerBase):
 
     @jsonify_error
     def _processNotFoundError(self, e):
-        """Process not found error; uses NoReportError template"""
-
         self._responseUtil.status = 404
-        return errors.WPNoReportError(self, e).display()
+        return WErrorWSGI((e.getMessage(), e.getExplanation())).getHTML()
 
     @jsonify_error
     def _processParentTimingError(self, e):
