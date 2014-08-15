@@ -584,7 +584,6 @@ class RH(RequestHandlerBase):
                         # only log conflict if it wasn't forced
                         if i >= forced_conflicts:
                             Logger.get('requestHandler').warning('Conflict in Database! (Request %s)\n%s' % (request, traceback.format_exc()))
-                        raise
                     except ClientDisconnected:
                         transaction.abort()
                         Logger.get('requestHandler').warning('Client Disconnected! (Request {})'.format(request))
