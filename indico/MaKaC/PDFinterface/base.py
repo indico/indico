@@ -723,6 +723,10 @@ class PDFLaTeXBase(object):
 
 class LaTeXRuntimeException(Exception):
     def __init__(self, source_file, log_file, report_id, params):
+
+        super(LaTeXRuntimeException, self).__init__("{} -> {} ({}) [{}]".format(
+            source_file, log_file, report_id, params))
+
         self.report_id = report_id
         self.source_file = source_file
         self.log_file = log_file
