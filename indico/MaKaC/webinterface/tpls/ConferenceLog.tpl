@@ -12,17 +12,15 @@
 </%def>
 
 <%def name="render_info(item, log_entry)">
-    <% caption = item[0] %>
-    <% value = item[1] %>
-    <% mime = "" %>
+    <%
+        caption = item[0]
+        value = item[1]
+        mime = ""
 
-    % if log_entry.getLogType() == "emailLog":
-        % if caption == "Body":
-            % if log_entry.getLogContentType() == "text/plain" or log_entry.getLogContentType() == "text/html":
-                <% mime = "plain-text-email" %>
-            % endif
-        % endif
-    % endif
+        if log_entry.getLogType() == "emailLog" and caption == "Body" and log_entry.getLogContentType() == "text/plain":
+            mime = "plain-text-email"
+            value = escape(value)
+    %>
 
     <tr class="i-table content">
         <td class="i-table caption log-caption">${caption}</td>
