@@ -18,7 +18,7 @@
 
     % if log_entry.getLogType() == "emailLog":
         % if caption == "Body":
-            % if log_entry.getLogContentType() == "text/plain":
+            % if log_entry.getLogContentType() == "text/plain" or log_entry.getLogContentType() == "text/html":
                 <% mime = "plain-text-email" %>
             % endif
         % endif

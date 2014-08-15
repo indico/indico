@@ -148,6 +148,7 @@ tr.i-table.content {
 
     > td.i-table.value {
         border-bottom: 1px solid transparent;
+        color: $light-black;
 
         &.plain-text-email {
             white-space: pre-line;
