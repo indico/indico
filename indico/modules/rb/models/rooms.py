@@ -512,7 +512,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 Room.is_reservable if filters['is_only_public'] else True,
                 Room.is_auto_confirm if filters['is_auto_confirm'] else True,
                 Room.is_active if filters.get('is_only_active', False) else True,
-                (equipment_subquery == equipment_count) if equipment_subquery else True)
+                (equipment_subquery == equipment_count) if equipment_subquery is not None else True)
         )
 
         if filters['available'] != -1:
