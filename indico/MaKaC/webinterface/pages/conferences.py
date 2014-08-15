@@ -5178,20 +5178,20 @@ class WConfAuthorIndex(WConfDisplayBodyBase):
             if len(authors) == 0:
                 continue
             else:
-                auth = authors[0]
+                auth = next((x for x in authors if x.getContribution().getConference() is not None), None)
+                if auth is None:
+                    continue
 
-            authorURL = urlHandlers.UHContribAuthorDisplay.getURL(auth.getContribution(),
-                                                                  authorId=auth.getId())
+            authorURL = urlHandlers.UHContribAuthorDisplay.getURL(auth.getContribution(), authorId=auth.getId())
             contribs = []
             res.append({'fullName': auth.getFullNameNoTitle(),
                         'affiliation': auth.getAffiliation(),
                         'authorURL': authorURL,
-                        'contributions': contribs
-                        })
+                        'contributions': contribs})
 
             for auth in authors:
                 contrib = auth.getContribution()
-                if contrib is not None:
+                if contrib is not None and contrib.getConference() is not None:
                     contribs.append({
                         'title': contrib.getTitle(),
                         'url': str(urlHandlers.UHContributionDisplay.getURL(auth.getContribution())),
