@@ -4075,7 +4075,6 @@ class WSystemLinkModif(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["linkName"] = self._link.getCaption()
-        vars["linkURL"] = self._link.getURL()
         vars["linkStatus"] = _("Disabled")
         vars["changeStatusTo"] = _("Activate")
         if self._link.isEnabled():
