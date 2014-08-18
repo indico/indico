@@ -334,16 +334,16 @@ def _ical_serialize_reservation(cal, data, now):
     end_dt_utc = datetime.combine(data['startDT'].date(), data['endDT'].timetz()).astimezone(pytz.utc)
 
     event = icalendar.Event()
-    event.set('uid', 'indico-resv-%s@cern.ch' % data['id'])
-    event.set('dtstamp', now)
-    event.set('dtstart', start_dt_utc)
-    event.set('dtend', end_dt_utc)
-    event.set('url', data['bookingUrl'])
-    event.set('summary', data['reason'])
-    event.set('location', u'{}: {}'.format(data['location'], data['room']['fullName']))
-    event.set('description', data['reason'].decode('utf-8') + '\n\n' + data['bookingUrl'])
+    event.add('uid', 'indico-resv-%s@cern.ch' % data['id'])
+    event.add('dtstamp', now)
+    event.add('dtstart', start_dt_utc)
+    event.add('dtend', end_dt_utc)
+    event.add('url', data['bookingUrl'])
+    event.add('summary', data['reason'])
+    event.add('location', u'{}: {}'.format(data['location'], data['room']['fullName']))
+    event.add('description', data['reason'].decode('utf-8') + '\n\n' + data['bookingUrl'])
     if data['repeat_frequency'] != RepeatFrequency.NEVER:
-        event.set('rrule', _ical_serialize_repeatability(data))
+        event.add('rrule', _ical_serialize_repeatability(data))
     cal.add_component(event)
 
 

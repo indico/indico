@@ -42,11 +42,11 @@ globalHTTPAPIHooks = ['CollaborationAPIHook', 'CollaborationExportHook', 'VideoE
 def serialize_collaboration_alarm(fossil, now):
     alarm = ical.Alarm()
     trigger = timedelta(minutes=-int(fossil['alarm']))
-    alarm.set('trigger', trigger)
-    alarm.set('action', 'DISPLAY')
-    alarm.set('summary', VideoExportUtilities.getCondensedPrefix(fossil['type'],
+    alarm.add('trigger', trigger)
+    alarm.add('action', 'DISPLAY')
+    alarm.add('summary', VideoExportUtilities.getCondensedPrefix(fossil['type'],
                                                                  fossil['status']) + fossil['title'].decode('utf-8'))
-    alarm.set('description', str(fossil['url']))
+    alarm.add('description', str(fossil['url']))
 
     return alarm
 
@@ -54,25 +54,25 @@ def serialize_collaboration_alarm(fossil, now):
 def serialize_collaboration(cal, fossil, now):
     event = ical.Event()
     url = str(fossil['url'])
-    event.set('uid', 'indico-collaboration-%s@cern.ch' % fossil['uniqueId'])
-    event.set('dtstamp', now)
-    event.set('dtstart', getAdjustedDate(fossil['startDate'], None, "UTC"))
-    event.set('dtend', getAdjustedDate(fossil['endDate'], None, "UTC"))
-    event.set('url', url)
-    event.set('categories', "VideoService - " + fossil['type'])
-    event.set('summary', VideoExportUtilities.getCondensedPrefix(fossil['type'],
+    event.add('uid', 'indico-collaboration-%s@cern.ch' % fossil['uniqueId'])
+    event.add('dtstamp', now)
+    event.add('dtstart', getAdjustedDate(fossil['startDate'], None, "UTC"))
+    event.add('dtend', getAdjustedDate(fossil['endDate'], None, "UTC"))
+    event.add('url', url)
+    event.add('categories', "VideoService - " + fossil['type'])
+    event.add('summary', VideoExportUtilities.getCondensedPrefix(fossil['type'],
                                                                  fossil['status']) + fossil['title'].decode('utf-8'))
     loc = fossil.get('location', '')
     if loc:
         loc = loc.decode('utf-8')
     if fossil.get('room',''):
         loc += ': ' + fossil['room'].decode('utf-8')
-    event.set('location', loc)
+    event.add('location', loc)
     description = "Event URL: " + url
     audience = fossil.get("audience", None)
     if audience:
         description = "Audience: %s\n"% audience + description
-    event.set('description', description)
+    event.add('description', description)
 
     # If there is an alarm required, add a subcomponent to the Event
     if fossil.has_key('alarm'):
