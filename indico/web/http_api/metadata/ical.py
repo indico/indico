@@ -48,18 +48,18 @@ ical.cal.types_factory['recur'] = vRecur
 
 def serialize_event(cal, fossil, now, id_prefix="indico-event"):
     event = ical.Event()
-    event.set('uid', '%s-%s@cern.ch' % (id_prefix, fossil['id']))
-    event.set('dtstamp', now)
-    event.set('dtstart', getAdjustedDate(fossil['startDate'], None, "UTC"))
-    event.set('dtend', getAdjustedDate(fossil['endDate'], None, "UTC"))
-    event.set('url', fossil['url'])
-    event.set('summary', fossil['title'].decode('utf-8'))
+    event.add('uid', '%s-%s@cern.ch' % (id_prefix, fossil['id']))
+    event.add('dtstamp', now)
+    event.add('dtstart', getAdjustedDate(fossil['startDate'], None, "UTC"))
+    event.add('dtend', getAdjustedDate(fossil['endDate'], None, "UTC"))
+    event.add('url', fossil['url'])
+    event.add('summary', fossil['title'].decode('utf-8'))
     loc = fossil['location'] or ''
     if loc:
         loc = loc.decode('utf-8')
     if fossil['room']:
         loc += ' ' + fossil['room'].decode('utf-8')
-    event.set('location', loc)
+    event.add('location', loc)
     description = ""
     if fossil.get('speakers'):
         speakers = ('{} ({})'.format(speaker['fullName'], speaker['affiliation']) for speaker in fossil['speakers'])
@@ -73,7 +73,7 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
                                          fossil['url'])
     else:
         description += fossil['url']
-    event.set('description', description)
+    event.add('description', description)
     cal.add_component(event)
 
 
@@ -130,8 +130,8 @@ class ICalSerializer(Serializer):
             results = [results]
 
         cal = ical.Calendar()
-        cal.set('version', '2.0')
-        cal.set('prodid', '-//CERN//INDICO//EN')
+        cal.add('version', '2.0')
+        cal.add('prodid', '-//CERN//INDICO//EN')
         now = nowutc()
         for fossil in results:
             if '_fossil' in fossil:
