@@ -405,7 +405,7 @@ class Reservation(Serializer, db.Model):
         for occurrence in pre_occurrences:
             if not occurrence.is_valid:
                 continue
-            occurrence.reject(u'Rejected due to collision with a confirmed reservation')
+            occurrence.reject(user, u'Rejected due to collision with a confirmed reservation')
 
     def cancel(self, user, reason=None, silent=False):
         self.is_cancelled = True
