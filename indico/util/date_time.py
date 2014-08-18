@@ -198,6 +198,8 @@ def get_overlap(range1, range2):
 
 def iterdays(start, end, skip_weekends=False):
     weekdays = (MO, TU, WE, TH, FR) if skip_weekends else None
+    start = start.date() if isinstance(start, datetime) else start
+    end = end.date() if isinstance(end, datetime) else end
     return rrule(DAILY, dtstart=start, until=end, byweekday=weekdays)
 
 
