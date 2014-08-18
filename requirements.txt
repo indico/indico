@@ -7,7 +7,7 @@ ZODB3==3.10.5
 argparse==1.2.1
 cds-indico-extras==0.2
 cssmin==0.1.4
-icalendar==3.2
+icalendar==3.8.2
 jsmin==2.0.2
 lxml==2.3.4
 pojson==0.4
@@ -18,7 +18,7 @@ pyatom==1.2
 pycountry==1.2
 pytest==2.2.4
 python-dateutil==1.5
-pytz==2012c
+pytz==2014.4
 reportlab==2.5
 simplejson==2.6.2
 termcolor==1.1.0
