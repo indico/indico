@@ -113,7 +113,7 @@ class Reservation(Serializer, db.Model):
         ('booked_for_name', 'bookedForName'), ('details_url', 'bookingUrl'), ('booking_reason', 'reason'),
         ('uses_vc', 'usesAVC'), ('needs_vc_assistance', 'needsAVCSupport'),
         'needs_assistance', ('is_accepted', 'isConfirmed'), ('is_valid', 'isValid'), 'is_cancelled',
-        'is_rejected', ('location_name', 'location')
+        'is_rejected', ('location_name', 'location'), 'booked_for_user_email'
     ]
 
     @declared_attr
@@ -397,6 +397,11 @@ class Reservation(Serializer, db.Model):
     @booked_for_user.setter
     def booked_for_user(self, user):
         self.booked_for_id = user.getId() if user else None
+
+    @property
+    def booked_for_user_email(self):
+        user = self.booked_for_user
+        return self.booked_for_user.getEmail() if user else None
 
     @property
     def contact_emails(self):
