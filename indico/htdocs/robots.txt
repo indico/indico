@@ -8,4 +8,5 @@ Disallow: /category/overview
 Disallow: /category/calendar/
 Disallow: /search
 Disallow: /api
+Disallow: /admin/
 Crawl-delay: 10
