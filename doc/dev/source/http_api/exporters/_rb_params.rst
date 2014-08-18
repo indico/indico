@@ -16,4 +16,6 @@ avcsupport      avcs   yes, no           If specified only include bookings whic
 startupsupport  sts    yes, no           If specified only include bookings which (do not) need Startup Support.
 bookedfor       bf     text (wildcards)  Only include bookings where the *booked for* field matches the
                                          given wildcard string.
+occurs          `-`    yyyy-mm-dd        Only include bookings which have a valid occurrence on the given date.
+                                         Multiple dates can be separated by commas.
 ==============  =====  ================  =======================================================================

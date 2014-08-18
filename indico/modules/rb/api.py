@@ -250,6 +250,8 @@ def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None
         filters.append(cast(Reservation.start_dt, Date) >= hook._fromDT.date())
         filters.append(cast(Reservation.start_dt, Time) >= hook._fromDT.time())
     filters += _get_reservation_state_filter(hook._queryParams)
+    occurs = [datetime.strptime(x, '%Y-%m-%d').date()
+              for x in filter(None, get_query_parameter(hook._queryParams, ['occurs'], '').split(','))]
     data = ['vc_equipment']
     if hook._occurrences:
         data.append('occurrences')
@@ -260,7 +262,7 @@ def _export_reservations(hook, limit_per_room, include_rooms, extra_filters=None
     if hook._descending:
         order = order.desc()
     reservations_data = Reservation.get_with_data(*data, filters=filters, limit=hook._limit, offset=hook._offset,
-                                                  order=order, limit_per_room=limit_per_room)
+                                                  order=order, limit_per_room=limit_per_room, occurs_on=occurs)
     for result in reservations_data:
         yield result['reservation'].room_id, _serializable_reservation(result, include_rooms)
 

@@ -328,12 +328,19 @@ class Reservation(Serializer, db.Model):
         offset = kwargs.pop('offset', 0)
         order = kwargs.pop('order', Reservation.start_dt)
         limit_per_room = kwargs.pop('limit_per_room', False)
+        occurs_on = kwargs.pop('occurs_on')
         if kwargs:
             raise ValueError('Unexpected kwargs: {}'.format(kwargs))
 
         query = Reservation.query.options(joinedload(Reservation.room))
         if filters:
             query = query.filter(*filters)
+        if occurs_on:
+            query = query.filter(
+                Reservation.id.in_(db.session.query(ReservationOccurrence.reservation_id)
+                                   .filter(ReservationOccurrence.date.in_(occurs_on),
+                                           ReservationOccurrence.is_valid))
+            )
         if limit_per_room and (limit or offset):
             query = limit_groups(query, Reservation, Reservation.room_id, order, limit, offset)
 
