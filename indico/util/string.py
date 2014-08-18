@@ -75,7 +75,7 @@ def remove_accents(text, reencode=True):
         return result
 
 
-def fix_broken_string(text):
+def fix_broken_string(text, as_unicode=False):
     try:
         text = text.decode('utf-8')
     except UnicodeDecodeError:
@@ -83,7 +83,7 @@ def fix_broken_string(text):
             text = text.decode('latin1')
         except UnicodeDecodeError:
             text = unicode(text, 'utf-8', errors='replace')
-    return text.encode('utf-8')
+    return text if as_unicode else text.encode('utf-8')
 
 
 def fix_broken_obj(obj):

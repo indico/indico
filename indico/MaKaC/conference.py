@@ -45,7 +45,7 @@ from MaKaC.contributionReviewing import Review
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
 from indico.util.i18n import L_
-from indico.util.string import safe_upper, safe_slice
+from indico.util.string import safe_upper, safe_slice, fix_broken_string
 from MaKaC.review import AbstractFieldContent
 
 
@@ -1566,7 +1566,9 @@ class CustomRoom(Persistent):
     def retrieveFullName(self, location):
         if not location:
             return
-        room = Room.find_first(Room.name == self.name, Location.name == location, _join=Room.location)
+        room = Room.find_first(Room.name == fix_broken_string(self.name, True),
+                               Location.name == fix_broken_string(location, True),
+                               _join=Room.location)
         self.fullName = room.full_name if room else None
 
     def setFullName(self, newFullName):
