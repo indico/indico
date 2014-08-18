@@ -28,7 +28,9 @@ from indico.modules.rb.controllers.user.reservations import (RHRoomBookingBookin
                                                              RHRoomBookingCancelBookingOccurrence,
                                                              RHRoomBookingRejectBookingOccurrence)
 from indico.modules.rb.controllers.user.rooms import RHRoomBookingRoomDetails
+from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
+from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.views.user.event import (WPRoomBookingEventRoomDetails, WPRoomBookingEventBookingList,
                                                 WPRoomBookingEventBookingDetails, WPRoomBookingEventModifyBooking,
                                                 WPRoomBookingEventNewBookingSimple, WPRoomBookingEventChooseEvent,
@@ -48,6 +50,11 @@ def _get_defaults_from_object(obj):
     if defaults['end_dt'].date() != defaults['start_dt'].date():
         defaults['repeat_frequency'] = RepeatFrequency.DAY
         defaults['repeat_interval'] = 1
+    if obj.getLocation() and obj.getRoom():
+        room = Room.find_first(Room.name == obj.getRoom().getName(), Location.name == obj.getLocation().getName(),
+                               _join=Room.location)
+        if room:
+            defaults['room_ids'] = [room.id]
     return defaults
 
 
@@ -298,6 +305,8 @@ class RHRoomBookingEventNewBooking(RHRoomBookingEventBase, RHRoomBookingNewBooki
                 raise NoReportError('Invalid assignment')
 
     def _get_view(self, view, **kwargs):
+        if view == 'select_room':
+            kwargs['ignore_userdata'] = True
         views = {'select_room': WPRoomBookingEventNewBookingSelectRoom,
                  'select_period': WPRoomBookingEventNewBookingSelectPeriod,
                  'confirm': WPRoomBookingEventNewBookingConfirm}
