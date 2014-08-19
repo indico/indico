@@ -13,7 +13,7 @@ from indico.modules.scheduler.tasks.periodic import PeriodicUniqueTask
 
 def _build_notification_before_days_filter(notification_before_days):
     days_until_occurrence = cast(ReservationOccurrence.start_dt, Date) - cast(func.now(), Date)
-    notification_before_days = func.coalesce(Room.notification_for_start, notification_before_days)
+    notification_before_days = func.coalesce(Room.notification_before_days, notification_before_days)
     if datetime.now().hour >= settings.get('notification_hour', 6):
         # Notify of today and delayed occurrences (happening in N or less days)
         return days_until_occurrence <= notification_before_days
