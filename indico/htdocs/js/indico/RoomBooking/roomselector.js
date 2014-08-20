@@ -20,6 +20,7 @@
         options: {
             allowEmpty: true,
             rooms: [],
+            myRooms: [],
             roomMaxCapacity: 0,
             userData: {},
             selectName: "roomselection",
@@ -173,9 +174,24 @@
             });
         },
 
+        _applyShowMine: function(key, toggle) {
+            var filterIcon = this.parts.header.addClass("toolbar thin").find('.icon-filter');
+            var state = $.jStorage.get(key, false);
+
+            if (toggle) {
+                state = !state;
+            }
+
+            $.jStorage.set(key, state);
+            $('.room-not-mine').toggle(!state);
+
+            filterIcon.toggleClass('highlight', state);
+        },
+
         _drawHeader: function() {
             var self = this;
             var header = self.parts.header.addClass("toolbar thin");
+            var myRooms = self.options.myRooms;
 
             // Create filters
             var filter = (self.filter = {});
@@ -185,6 +201,37 @@
             self.filter.projector = $("<input type='checkbox' id='projector' name='advanced_options'/>");
             self.filter.publicroom = $("<input type='checkbox' id='publicroom' name='advanced_options'/>");
             self.filter.capacity = $("<input type='text' id='capacity' value='0'/>");
+
+            // Create filter button
+            var keyShowMine = 'rb-show-my-rooms-' + $('body').data('userId');
+
+            _.defer(function() {
+                self._applyShowMine(keyShowMine);
+            });
+
+            var filterButton = $('<a>', {
+                'href': '#',
+                'title': 'Filters',
+                'class': 'i-button icon-only arrow icon-filter'
+            });
+
+            // Enable the dropdown only if the user has some rooms
+            if (myRooms.length > 0) {
+                filterButton.data('toggle', 'dropdown');
+            } else {
+                filterButton.addClass('disabled');
+            }
+
+            var filterDropdown = $('<ul class="dropdown">');
+            $('<li>', {
+                'class': 'toggle',
+                'text': $T('Show only my rooms'),
+                'data': {
+                    'state': $.jStorage.get(keyShowMine, false)
+                }
+            }).on('menu_toggle', function(e) {
+                self._applyShowMine(keyShowMine, true);
+            }).appendTo(filterDropdown);
 
             // Searchbox
             header.find(".ui-multiselect-filter").addClass("group").empty()
@@ -197,7 +244,11 @@
                     if (e.which == K.ENTER) {
                         e.preventDefault();
                     }
-                });
+                })
+                .append(filterButton)
+                .append(filterDropdown)
+                .dropdown();
+
             filter.search.realtimefilter({
                 callback: function() {
                     self._updateFilter();
@@ -211,34 +262,11 @@
             var checknone = header.find(".ui-helper-reset .ui-multiselect-none").each(function() {
                 $(this).html($(this).find("span:last-child").text());
             });
-            var checkmine = $('<a>', {
-                'class': 'i-button',
-                href: '#',
-                text: $T('Mine'),
-                click: function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    if ($(this).hasClass('disabled')) {
-                        return;
-                    }
-                    self.select.multiselect('uncheckAll');
-                    self.parts.list.find(":checkbox").each(function() {
-                        var $this = $(this);
-                        if (!this.checked && $this.data('myRoom') && $this.is(':visible')) {
-                            $this.click();
-                        }
-                    });
-                }
-            });
             var userId = $('body').data('userId');
-            checkmine.toggleClass('disabled', !_.any(self.options.rooms, function(room) {
-                return room.owner_id == userId;
-            }));
             self.selecttools = $("<div/>").addClass("group")
                 .append($("<span class='i-button label'/>").text($T("Select")))
                 .append(checkall.addClass("i-button"))
-                .append(checknone.addClass("i-button"))
-                .append(checkmine);
+                .append(checknone.addClass("i-button"));
             header.find(".ui-helper-reset").replaceWith(function() {
                 return self.selecttools;
             });
@@ -313,6 +341,7 @@
         _drawRooms: function() {
             var self = this;
             var rooms = self.options.rooms;
+            var myRooms = self.options.myRooms;
 
             var icons = ["icon-camera", "icon-broadcast", 'icon-projector', "icon-unlocked", "icon-user"];
             var activetitles = [$T("Video conference available"),
@@ -328,8 +357,11 @@
             var userId = $('body').data('userId');
             self.select.find("option").each(function(index) {
                 var labelparts = $(this).attr('label').split(":");
-                var item = self.parts.list.find('input[value="' + $(this).val() +'"]').parent();
-                item.find(':checkbox').data('myRoom', rooms[index].owner_id == userId);
+                var roomId = Number($(this).val());
+                var item = self.parts.list.find('input[value="' + roomId +'"]').parent();
+                if(!_.contains(myRooms, roomId)) {
+                    item.addClass('room-not-mine');
+                }
                 item.children("span").addClass("room-id")
                     .children(":first-child").addClass("roomname")
                     .next().addClass("roomlocation");
@@ -405,12 +437,12 @@
 
             function restoreSelection(selectedRooms) {
                 self.parts.list.find(":checkbox").each(function(index) {
-                    if (jQuery.inArray(index, selectedRooms) != -1) {
+                    if (_.contains(selectedRooms, index)) {
                         this.click();
                     }
                 });
 
-                self._updateSelectionCounter()
+                self._updateSelectionCounter();
             }
 
             function restoreFilter(data) {

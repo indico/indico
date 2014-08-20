@@ -34,6 +34,7 @@
     var rbUserData = $.jStorage.get(userId, {});
     var maxRoomCapacity = ${ max_room_capacity };
     var rooms = ${ [r.to_serializable('__public_exhaustive__') for r in rooms] | j, n };
+    var myRooms = ${ [r.id for r in _session.user.get_rooms()] | j, n };
 
     $(document).ready(function() {
         initWidgets();
@@ -43,6 +44,7 @@
             $('#roomselector').roomselector({
                 allowEmpty: false,
                 rooms: rooms,
+                myRooms: myRooms,
                 roomMaxCapacity: maxRoomCapacity,
                 userData: rbUserData,
                 selectName: '${ form.room_ids.name }'

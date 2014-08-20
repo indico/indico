@@ -169,6 +169,7 @@
 
 <script>
     var rooms = ${ [r.to_serializable('__public_exhaustive__') for r in rooms] | j, n };
+    var myRooms = ${ [r.id for r in _session.user.get_rooms()] | j, n };
 
     function adjustDates(s, e) {
         if (s.datepicker('getDate') > e.datepicker('getDate'))
@@ -179,6 +180,7 @@
         $('#roomselector').roomselector({
             allowEmpty: false,
             rooms: rooms,
+            myRooms: myRooms,
             selectName: 'room_ids',
             simpleMode: true
         });

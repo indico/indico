@@ -232,7 +232,7 @@ $toolbar-thin-height: 1.9em;
     }
 
     > input[type=text]:not(:last-child),
-    > .clearableinput:not(:last-child) input[type=text] {
+    > .clearableinput:not(:last-child) {
         & + .i-button {
             border-left: none;
         }
