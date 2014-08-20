@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
@@ -17,7 +14,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-
 import logging
 import errno
 import urlparse
@@ -25,8 +21,10 @@ import os
 import signal
 import socket
 import sys
-import werkzeug.serving
 from SocketServer import TCPServer
+
+import werkzeug.serving
+from flask import current_app
 from flask_script import Command, Option
 from werkzeug.debug import DebuggedApplication
 from werkzeug.exceptions import NotFound
@@ -35,7 +33,6 @@ from werkzeug.wsgi import DispatcherMiddleware
 from indico.core.config import Config
 from indico.core.logger import Logger
 from indico.util import console
-from indico.web.flask.app import make_app
 from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
 
 
@@ -74,7 +71,8 @@ class IndicoDevServer(Command):
         if args['logging']:
             setup_logging(args['logging'])
 
-        start_web_server(host=args['host'], port=args['port'], keep_base_url=args['keep_base_url'],
+        app = current_app._get_current_object()
+        start_web_server(app, host=args['host'], port=args['port'], keep_base_url=args['keep_base_url'],
                          with_ssl=args['with_ssl'], ssl_cert=args['ssl_cert'], ssl_key=args['ssl_key'],
                          enable_evalex=args['enable_evalex'], evalex_from=args['evalex_from'],
                          reload_on_change=not args['disable_reloader'])
@@ -257,7 +255,7 @@ def setup_logging(level):
     logger.addHandler(handler)
 
 
-def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=True, ssl_cert=None, ssl_key=None,
+def start_web_server(app, host='localhost', port=0, with_ssl=False, keep_base_url=True, ssl_cert=None, ssl_key=None,
                      reload_on_change=False, enable_evalex=False, evalex_from=None):
     config = Config.getInstance()
     # Let Indico know that we are using the embedded server. This causes it to re-raise exceptions so they
@@ -333,7 +331,7 @@ def start_web_server(host='localhost', port=0, with_ssl=False, keep_base_url=Tru
         evalex_whitelist = True
 
     console.info(' * Using BaseURL {0}'.format(base_url))
-    app = make_indico_dispatcher(make_app())
+    app = make_indico_dispatcher(app)
     server = WerkzeugServer(app, host, used_port, reload_on_change=reload_on_change, evalex_whitelist=evalex_whitelist,
                             enable_ssl=with_ssl, ssl_cert=ssl_cert, ssl_key=ssl_key)
     signal.signal(signal.SIGINT, _sigint)
