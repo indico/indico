@@ -34,6 +34,7 @@ import time
 from logging.handlers import SMTPHandler
 
 from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
+from indico.web.flask.app import make_app
 
 # legacy import
 from indico.core.config import Config
@@ -279,7 +280,9 @@ def _run(args):
     t = sm.getTaskById(args.taskid)
 
     t.plugLogger(logging.getLogger('console.run/%s' % args.taskid))
-    t.run()
+
+    with make_app(True).app_context():
+        t.run()
 
     dbi.endRequest()
 
