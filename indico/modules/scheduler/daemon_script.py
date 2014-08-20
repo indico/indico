@@ -72,7 +72,7 @@ class SchedulerApp(object):
 
         logger = logging.getLogger('daemon')
         try:
-            Scheduler(multitask_mode = self.args.mode).run()
+            Scheduler(multitask_mode=self.args.mode).run()
             return_val = 0
         except base.SchedulerQuitException:
             logger.info("Daemon shut down successfully")
@@ -156,7 +156,7 @@ def _stop(args):
     dbi = DBMgr.getInstance()
     dbi.startRequest()
     c = Client()
-    c.shutdown(msg = "Daemon script")
+    c.shutdown(msg="Daemon script")
     dbi.commit()
 
     print "Waiting for death confirmation... "
@@ -197,7 +197,8 @@ def _check(args):
         os_running = _check_running(True)
 
         if not args.quiet:
-            print >>sys.stderr, 'Database status: running={1}, host={0[hostname]}, pid={0[pid]}'.format(status, db_running)
+            print >>sys.stderr, 'Database status: running={1}, host={0[hostname]}, pid={0[pid]}'.format(
+                status, db_running)
             print >>sys.stderr, 'Process status:  running={0}'.format(os_running)
 
         if db_running and os_running:
@@ -288,10 +289,8 @@ def _run(args):
 
 
 def main():
-    """
-    """
 
-    parser = argparse.ArgumentParser(description = sys.modules[__name__].__doc__)
+    parser = argparse.ArgumentParser(description=sys.modules[__name__].__doc__)
     subparsers = parser.add_subparsers(help="the action to be performed")
 
     parser_start = subparsers.add_parser('start', help="start the daemon")
@@ -303,52 +302,36 @@ def main():
     parser_run = subparsers.add_parser('run', help="run a task, from this process")
 
     parser.add_argument("-p", "--fork-processes", dest="mode",
-                        action = "store_const", const='processes',
-                        default = 'threads', required = False,
-                        help = "spawns processes instead of threads")
+                        action="store_const", const='processes',
+                        default='threads', required=False,
+                        help="spawns processes instead of threads")
     parser.add_argument("-f", "--force", dest="force",
-                        action = "store_const", const=True,
-                        default = False, required = False,
-                        help = "ignores the information in the DB about scheduler "
+                        action="store_const", const=True,
+                        default=False, required=False,
+                        help="ignores the information in the DB about scheduler "
                         "status")
 
     parser_start.add_argument("-s", "--standalone",
-                        action = "store_const", const=True,
-                        default = False, required = False,
-                        help = "forces standalone mode -  process doesn't "
-                        "go to background")
+                              action="store_const", const=True, default=False, required=False,
+                              help="forces standalone mode -  process doesn't go to background")
 
-    parser_start.add_argument("--log",
-                        type=str,
-                        default = "INFO", required = False,
-                        help = "set different logging mode")
+    parser_start.add_argument("--log", type=str, default="INFO", required=False, help="set different logging mode")
 
     parser_start.set_defaults(func=_start)
     parser_stop.set_defaults(func=_stop)
     parser_restart.set_defaults(func=_restart)
-    parser_check.set_defaults(func=_check)
 
+    parser_check.set_defaults(func=_check)
     parser_check.add_argument('-q', '--quiet', dest='quiet', action='store_true', help='Suppress console output')
 
-    parser_show.add_argument("field",
-                        choices=['status', 'spool'],
-                        type=str,
-                        help = "information to be shown")
+    parser_show.add_argument("field", choices=['status', 'spool'], type=str, help="information to be shown")
+    parser_show.set_defaults(func=_show)
 
-    parser_show.set_defaults(func = _show)
+    parser_cmd.add_argument("command", choices=['clear_spool'], type=str, help="command to be executed")
+    parser_cmd.set_defaults(func=_cmd)
 
-    parser_cmd.add_argument("command",
-                        choices=['clear_spool'],
-                        type=str,
-                        help = "command to be executed")
-
-    parser_cmd.set_defaults(func = _cmd)
-
-    parser_run.add_argument("taskid",
-                        type=int,
-                        help = "task to be executed (id)")
-    parser_run.set_defaults(func = _run)
-
+    parser_run.add_argument("taskid", type=int, help="task to be executed (id)")
+    parser_run.set_defaults(func=_run)
 
     args = parser.parse_args()
 
