@@ -20,6 +20,7 @@
 import calendar
 import time
 from datetime import timedelta, datetime
+from datetime import time as dt_time
 
 import pytz
 from flask import request
@@ -198,8 +199,8 @@ def get_overlap(range1, range2):
 
 def iterdays(start, end, skip_weekends=False):
     weekdays = (MO, TU, WE, TH, FR) if skip_weekends else None
-    start = start.date() if isinstance(start, datetime) else start
-    end = end.date() if isinstance(end, datetime) else end
+    start = get_day_start(start) if isinstance(start, datetime) else start
+    end = get_day_end(end) if isinstance(end, datetime) else end
     return rrule(DAILY, dtstart=start, until=end, byweekday=weekdays)
 
 
@@ -229,3 +230,19 @@ def get_datetime_from_request(prefix='', default=None, source=None):
         parsed_time = default.time()
 
     return datetime.combine(parsed_date, parsed_time)
+
+
+def get_day_start(day):
+    tzinfo = None
+    if isinstance(day, datetime):
+        tzinfo = day.tzinfo
+        day = day.date()
+    return datetime.combine(day, dt_time(0, tzinfo=tzinfo))
+
+
+def get_day_end(day):
+    tzinfo = None
+    if isinstance(day, datetime):
+        tzinfo = day.tzinfo
+        day = day.date()
+    return datetime.combine(day, dt_time(23, 59, tzinfo=tzinfo))
