@@ -2643,7 +2643,7 @@ class Conference(CommonObjectBase, Locatable):
     def delete(self, user=None):
         """deletes the conference from the system.
         """
-        #we notify the observers that the conference has been deleted
+        # we notify the observers that the conference has been deleted
         try:
             self._notify('deleted', self.getOwner())
         except Exception, e:
@@ -2655,11 +2655,11 @@ class Conference(CommonObjectBase, Locatable):
 
         self.notifyContributions()
 
-        #will have to remove it from all the owners (categories) and the
+        # will have to remove it from all the owners (categories) and the
         #   conference registry
-        ConferenceHolder().remove( self )
+        ConferenceHolder().remove(self)
         for owner in self.__owners:
-            owner.removeConference( self, notify=False )
+            owner.removeConference(self, notify=False)
 
         self.removeAllEvaluations()
 
@@ -2676,9 +2676,9 @@ class Conference(CommonObjectBase, Locatable):
                 resv.event_id = None
                 resv.cancel(user or session.user, u'Associated event was deleted')
 
-        #For each conference we have a list of managers. If we delete the conference but we don't delete
-        #the link in every manager to the conference then, when the manager goes to his "My profile" he
-        #will see a link to a conference that doesn't exist. Therefore, we need to delete that link as well
+        # For each conference we have a list of managers. If we delete the conference but we don't delete
+        # the link in every manager to the conference then, when the manager goes to his "My profile" he
+        # will see a link to a conference that doesn't exist. Therefore, we need to delete that link as well
         for manager in self.getManagerList():
             if isinstance(manager, MaKaC.user.Avatar):
                 manager.unlinkTo(self, "manager")
