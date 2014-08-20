@@ -23,7 +23,7 @@ import logging
 import logging.handlers
 import logging.config
 import ConfigParser
-from flask import request, session, current_app, has_app_context
+from flask import request, session
 from ZODB.POSException import POSError
 
 from indico.core.config import Config
@@ -238,12 +238,19 @@ class Logger:
 
             cls.handlers.update(LoggerUtils.configFromFile(logConfFilepath, defaultArgs, filters))
 
-        if 'sentry' in config.getLoggers() and has_app_context():
+    @classmethod
+    def init_app(cls, app):
+        """
+        Initialize Flask app logging (add Sentry if needed)
+        """
+        config = Config.getInstance()
+
+        if 'sentry' in config.getLoggers():
             from raven.contrib.flask import Sentry
-            current_app.config['SENTRY_DSN'] = config.getSentryDSN()
+            app.config['SENTRY_DSN'] = config.getSentryDSN()
 
             # Plug into both Flask and `logging`
-            Sentry(current_app, logging=True, level=getattr(logging, config.getSentryLoggingLevel()))
+            Sentry(app, logging=True, level=getattr(logging, config.getSentryLoggingLevel()))
 
     @classmethod
     def reset(cls):

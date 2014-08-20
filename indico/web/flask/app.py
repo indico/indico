@@ -251,8 +251,6 @@ def make_app(set_path=False, db_setup=True):
         add_compat_blueprints(app)
     add_plugin_blueprints(app)
 
-    with app.app_context():
-        # re-establish loggers
-        Logger.reset()
+    Logger.init_app(app)
 
     return app
