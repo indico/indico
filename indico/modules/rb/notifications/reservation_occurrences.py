@@ -77,21 +77,30 @@ def notify_upcoming_occurrence(occurrence):
     if occurrence.start_dt.date() < date.today():
         raise ValueError('This reservation occurrence started in the past')
 
-    owner = occurrence.reservation.booked_for_user
-    if owner is None:
+    to_list = []
+    reservation_user = occurrence.reservation.booked_for_user
+    if reservation_user is not None:
+        to_list.append(reservation_user.getEmail())
+
+    cc_list = []
+    room = occurrence.reservation.room
+    if room.notification_for_responsible:
+        cc_list.append(room.owner.getEmail())
+
+    if not to_list and not cc_list:
         return
 
     from_addr = Config.getInstance().getNoReplyEmail()
-    to = owner.getEmail()
     subject = 'Reservation reminder'
     text = render_template('rb/emails/reservations/upcoming_occurrence_email.txt',
                            occurrence=occurrence,
-                           owner=owner,
+                           owner=reservation_user,
                            RepeatFrequency=RepeatFrequency)
 
     return {
         'fromAddr': from_addr,
-        'toList': [to],
+        'toList': to_list,
+        'ccList': cc_list,
         'subject': subject,
         'body': text
     }

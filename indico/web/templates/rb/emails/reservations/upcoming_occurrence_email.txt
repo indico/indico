@@ -1,8 +1,8 @@
 {% extends 'rb/emails/base_email.txt' %}
-{% block recipient %}{{ owner.getName() }}{% endblock %}
+{% block recipient %}{{ owner.getName() if owner else 'user' }}{% endblock %}
 
 {% block email_body -%}
-This is a reminder about a booking you have made:
+This is a reminder about a booking at your name:
 
 Room: {{ occurrence.reservation.room.name }}
 {% if occurrence.reservation.repeat_frequency == RepeatFrequency.DAY -%}
