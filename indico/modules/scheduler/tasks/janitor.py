@@ -25,6 +25,7 @@ from indico.util.date_time import now_utc
 from indico.modules import ModuleHolder
 from indico.modules.scheduler.tasks.periodic import PeriodicTask
 
+from MaKaC.user import AvatarHolder
 from MaKaC.conference import CategoryManager
 from MaKaC.common.timezoneUtils import nowutc
 
@@ -47,6 +48,7 @@ def delete_offline_events(dbi, logger):
 
 def cleanup_categories(dbi, logger):
     config = Config.getInstance()
+    janitor_user = AvatarHolder().getById(config.getJanitorUserId())
 
     logger.info("Checking whether any categories should be cleaned up")
 
@@ -68,7 +70,7 @@ def cleanup_categories(dbi, logger):
 
             for i, event in enumerate(to_delete, 1):
                 logger.info("Deleting {0}".format(repr(event)))
-                event.delete()
+                event.delete(user=janitor_user)
                 if i % 100 == 0:
                     dbi.commit()
             dbi.commit()

@@ -2640,7 +2640,7 @@ class Conference(CommonObjectBase, Locatable):
 
             c._notify('deleted', self)
 
-    def delete( self ):
+    def delete(self, user=None):
         """deletes the conference from the system.
         """
         #we notify the observers that the conference has been deleted
@@ -2674,7 +2674,7 @@ class Conference(CommonObjectBase, Locatable):
                                             ~Reservation.is_rejected)
             for resv in reservations:
                 resv.event_id = None
-                resv.cancel(session.user, u'Associated event was deleted')
+                resv.cancel(user or session.user, u'Associated event was deleted')
 
         #For each conference we have a list of managers. If we delete the conference but we don't delete
         #the link in every manager to the conference then, when the manager goes to his "My profile" he

@@ -540,7 +540,8 @@ class Config:
         'Loggers'                   : ['files'],
         'SentryDSN'                 : None,
         'SentryLoggingLevel'        : 'WARNING',
-        'CategoryCleanup'           : {}
+        'CategoryCleanup'           : {},
+        'JanitorUserId'             : 0
     }
 
     if sys.platform == 'win32':
