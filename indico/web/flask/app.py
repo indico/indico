@@ -21,6 +21,7 @@ from __future__ import absolute_import
 
 import os
 import re
+import traceback
 
 from flask import send_from_directory, request, _app_ctx_stack
 from flask import current_app as app
@@ -229,8 +230,10 @@ def make_app(set_path=False, db_setup=True):
     # reason to access it outside this method without being inside an application context.
     # When set_path is enabled, SERVER_NAME and APPLICATION_ROOT are set according to BaseURL
     # so URLs can be generated without an app context, e.g. in the indico shell
+
     if _app_ctx_stack.top:
-        Logger.get('flask').warn('make_app({}) called within app context, using existing app'.format(set_path))
+        Logger.get('flask').warn('make_app({}) called within app context, using existing app:\n{}'.format(
+            set_path, '\n'.join(traceback.format_stack())))
         return _app_ctx_stack.top.app
     app = IndicoFlask('indico', static_folder=None, template_folder='web/templates')
     fix_root_path(app)
