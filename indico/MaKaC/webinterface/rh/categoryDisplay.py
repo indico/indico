@@ -262,8 +262,8 @@ class RHConferencePerformCreation(RHConferenceCreationBase):
     def _getPersons(self):
         cpAvatars, cpNewUsers, cpEditedAvatars , auAvatars, auNewUsers, auEditedAvatars = [], [], [] , [] , [] , []
         from MaKaC.services.interface.rpc import json
-        chairpersonDict = json.decode(self._params.get("chairperson", "")) or []
-        allowedUsersDict = json.decode(self._params.get("allowedUsers", "")) or []
+        chairpersonDict = json.decode(self._params.get("chairperson") or "[]") or []
+        allowedUsersDict = json.decode(self._params.get("allowedUsers") or "[]") or []
         if chairpersonDict:
             cpAvatars, cpNewUsers, cpEditedAvatars = UserListModificationBase.retrieveUsers({"userList":chairpersonDict})
         if allowedUsersDict :
