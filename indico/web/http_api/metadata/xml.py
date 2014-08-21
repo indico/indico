@@ -34,9 +34,9 @@ class XMLSerializer(Serializer):
 
     _mime = 'text/xml'
 
-    def __init__(self, pretty=False, **kwargs):
+    def __init__(self, query_params, pretty=False, **kwargs):
         self._typeMap = kwargs.pop('typeMap', {})
-        super(XMLSerializer, self).__init__(pretty, **kwargs)
+        super(XMLSerializer, self).__init__(query_params, pretty, **kwargs)
 
     def _convert(self, value):
         if type(value) == datetime:
