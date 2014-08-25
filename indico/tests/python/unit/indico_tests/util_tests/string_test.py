@@ -21,8 +21,10 @@
 Tests for `indico.util.string` module
 """
 
+from flask import render_template_string
+
 from MaKaC.common import utils
-from indico.tests.python.unit.util import IndicoTestCase
+from indico.tests.python.unit.util import IndicoTestCase, with_context
 from indico.util.string import permissive_format, remove_extra_spaces, remove_tags, fix_broken_string, is_valid_mail
 
 
@@ -176,3 +178,46 @@ class TestIsValidEmail(IndicoTestCase):
         for email in emails:
             self.assertEqual(utils.validMail(email, allowMultiple=False),
                              is_valid_mail(email, multi=False))
+
+
+class TestEnsureUnicodeExtension(IndicoTestCase):
+    _requires = ['util.RequestEnvironment']
+
+    def _render(self, template, raises=None):
+        val = u'm\xf6p'
+        utfval = val.encode('utf-8')
+        func = lambda x: x.encode('utf-8').decode('utf-8')
+        if raises:
+            self.assertRaises(raises, lambda: render_template_string(template, val=utfval, func=func))
+        else:
+            self.assertEqual(render_template_string(template, val=val, func=func),
+                             render_template_string(template, val=utfval, func=func))
+
+    @with_context('request')
+    def test_simple_vars(self):
+        """Test simple variables"""
+        self._render('{{ val }}')
+
+    @with_context('request')
+    def test_func_args(self):
+        """Test function arguments (no automated unicode conversion!)"""
+        self._render('{{ func(val | ensure_unicode) }}')
+        self._render('{{ func(val) }}', UnicodeDecodeError)
+
+    @with_context('request')
+    def test_filter_vars(self):
+        """Test variables with filters"""
+        self._render('{{ val | ensure_unicode }}')  # Redundant but needs to work nonetheless
+        self._render('{{ val | safe }}')
+
+    @with_context('request')
+    def test_inline_uf(self):
+        """Test variables with inline if"""
+        self._render('x {{ val if true else val }} x {{ val if false else val }} x')
+        self._render('x {{ val|safe if true else val|safe }} x {{ val|safe if false else val|safe }} x')
+
+    @with_context('request')
+    def test_trans(self):
+        """Test trans tag which need explicit unicode conversion"""
+        self._render('{% trans x=val | ensure_unicode %}{{ x }}}{% endtrans %}')
+        self._render('{% trans x=val %}{{ x }}}{% endtrans %}', UnicodeDecodeError)
