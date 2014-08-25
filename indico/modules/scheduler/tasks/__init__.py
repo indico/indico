@@ -31,6 +31,8 @@ from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.date_time import int_timestamp, format_datetime
 from indico.modules.scheduler.fossils import ITaskFossil
 from indico.modules.scheduler import base
+from indico.core.db import db
+from indico.core.db.sqlalchemy.util import update_session_options
 from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
 from indico.core.config import Config
 
@@ -64,6 +66,8 @@ class BaseTask(TimedEvent):
     `expiryDate` is the last point in time when the task can run. A task will
     refuse to run if current time is past `expiryDate`
     """
+
+    DISABLE_ZODB_HOOK = False
 
     fossilizes(ITaskFossil)
 
@@ -180,6 +184,8 @@ class BaseTask(TimedEvent):
         self.setStatus(base.TASK_STATUS_RUNNING)
 
     def start(self, delay):
+        if self.DISABLE_ZODB_HOOK:
+            update_session_options(db)
         self._executionDelay = delay
         try:
             self.run()

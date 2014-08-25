@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy.sql import func, cast
 from sqlalchemy import Date
 
+from indico.core.db import db
 from indico.modules.rb import settings
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
@@ -23,6 +24,8 @@ def _build_notification_before_days_filter(notification_before_days):
 
 
 class OccurrenceNotifications(PeriodicUniqueTask):
+    DISABLE_ZODB_HOOK = True
+
     def run(self):
         occurrences = ReservationOccurrence.find(
             Reservation.is_accepted,
@@ -33,8 +36,11 @@ class OccurrenceNotifications(PeriodicUniqueTask):
             _join=[Reservation, Room]
         )
 
-        for occ in occurrences:
-            occ.notification_sent = True
-            if occ.reservation.repeat_frequency == RepeatFrequency.DAY:
-                occ.reservation.occurrences.update({'notification_sent': True})
-            notify_upcoming_occurrence(occ)
+        try:
+            for occ in occurrences:
+                notify_upcoming_occurrence(occ)
+                occ.notification_sent = True
+                if occ.reservation.repeat_frequency == RepeatFrequency.DAY:
+                    occ.reservation.occurrences.update({'notification_sent': True})
+        finally:
+            db.session.commit()
