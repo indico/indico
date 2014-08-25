@@ -3650,7 +3650,7 @@ class WConfTickerTapeDrawer(WTemplated):
                                   isinstance(entry.getOwner(), conference.SessionSlot):
                 ss=entry.getOwner()
                 ssEntries=ss.getSchedule().getEntriesOnDate(n)
-                if isinstance(ss.getSchedule(), conference.PosterSlotSchedule):
+                if isinstance(ss.getSchedule(), schedule.PosterSlotSchedule):
                     ssEntries=ss.getSchedule().getEntries()
                 for ssEntry in ssEntries:
                     title=ssEntry.getTitle()
