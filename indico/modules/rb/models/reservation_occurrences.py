@@ -137,6 +137,9 @@ class ReservationOccurrence(db.Model, Serializer):
         elif repeat_frequency == RepeatFrequency.MONTH:
             if repeat_interval == 1:
                 position = start.day // 7 + 1
+                if position == 5:
+                    # The fifth weekday of the month will always be the last one
+                    position = -1
                 return rrule.rrule(rrule.MONTHLY, dtstart=start, until=end, byweekday=start.weekday(),
                                    bysetpos=position)
             else:
