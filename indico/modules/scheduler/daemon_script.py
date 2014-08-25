@@ -31,6 +31,7 @@ import os
 import socket
 import sys
 import time
+import warnings
 from logging.handlers import SMTPHandler
 
 from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
@@ -72,7 +73,7 @@ class SchedulerApp(object):
 
         logger = logging.getLogger('daemon')
         try:
-            Scheduler(multitask_mode=self.args.mode).run()
+            Scheduler().run()
             return_val = 0
         except base.SchedulerQuitException:
             logger.info("Daemon shut down successfully")
@@ -103,10 +104,9 @@ def _setup(args):
     root_logger.addHandler(handler)
     root_logger.setLevel(level)
 
-    if args.mode == 'processes':
-        mp_logger = multiprocessing.get_logger()
-        mp_logger.setLevel(level)
-        mp_logger.addHandler(handler)
+    mp_logger = multiprocessing.get_logger()
+    mp_logger.setLevel(level)
+    mp_logger.addHandler(handler)
 
 
 def _check_running(check_process=False):
@@ -301,15 +301,13 @@ def main():
     parser_cmd = subparsers.add_parser('cmd', help="execute a command")
     parser_run = subparsers.add_parser('run', help="run a task, from this process")
 
-    parser.add_argument("-p", "--fork-processes", dest="mode",
-                        action="store_const", const='processes',
-                        default='threads', required=False,
-                        help="spawns processes instead of threads")
+    parser.add_argument("-p", "--fork-processes", dest="fork_processes",
+                        action="store_true",  required=False,
+                        help="obsolete, the scheduler always uses processes")
     parser.add_argument("-f", "--force", dest="force",
                         action="store_const", const=True,
                         default=False, required=False,
-                        help="ignores the information in the DB about scheduler "
-                        "status")
+                        help="ignores the information in the DB about scheduler status")
 
     parser_start.add_argument("-s", "--standalone",
                               action="store_const", const=True, default=False, required=False,
@@ -334,11 +332,15 @@ def main():
     parser_run.set_defaults(func=_run)
 
     args = parser.parse_args()
+    if args.fork_processes:
+        warnings.warn('The scheduler always uses processes so -p/--fork-processes is not needed anymore',
+                      DeprecationWarning, 2)
 
     try:
         return args.func(args)
-    except Exception, e:
-        print e
+    except Exception:
+        import traceback
+        traceback.print_exc()
         return -1
 
 
