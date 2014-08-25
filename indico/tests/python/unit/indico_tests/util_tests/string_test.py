@@ -21,8 +21,9 @@
 Tests for `indico.util.string` module
 """
 
+from MaKaC.common import utils
 from indico.tests.python.unit.util import IndicoTestCase
-from indico.util.string import permissive_format, remove_extra_spaces, remove_tags, fix_broken_string
+from indico.util.string import permissive_format, remove_extra_spaces, remove_tags, fix_broken_string, is_valid_mail
 
 
 class TestPermissiveFormat(IndicoTestCase):
@@ -122,7 +123,6 @@ class TestIsValidEmail(IndicoTestCase):
         ]
 
         for email in emails:
-            # self.assertTrue(is_valid_mail(email))
             self.assertEqual(utils.validMail(email), is_valid_mail(email))
 
     def testOneInvalidEmail(self):
