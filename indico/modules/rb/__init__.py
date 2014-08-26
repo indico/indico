@@ -17,6 +17,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.rb.models.settings import SettingsProxy
+from indico.core.models.settings import SettingsProxy
 
 settings = SettingsProxy('roombooking')
