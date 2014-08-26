@@ -19,7 +19,7 @@ from flask_migrate import MigrateCommand as DatabaseManager
 from flask_migrate import stamp
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util import get_all_tables
+from indico.core.db.sqlalchemy.util.management import get_all_tables
 from indico.util.console import colored, cformat
 
 

@@ -32,7 +32,7 @@ from indico.util.date_time import int_timestamp, format_datetime
 from indico.modules.scheduler.fossils import ITaskFossil
 from indico.modules.scheduler import base
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util import update_session_options
+from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
 from indico.core.config import Config
 

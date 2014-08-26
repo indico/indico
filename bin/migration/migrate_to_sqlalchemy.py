@@ -39,7 +39,8 @@ from ZEO.ClientStorage import ClientStorage
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.migration import migrate as alembic_migrate
-from indico.core.db.sqlalchemy.util import delete_all_tables, update_session_options
+from indico.core.db.sqlalchemy.util.management import delete_all_tables
+from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.rb import settings as rb_settings
 from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.blocked_rooms import BlockedRoom

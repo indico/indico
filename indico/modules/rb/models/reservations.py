@@ -30,13 +30,14 @@ from werkzeug.datastructures import OrderedMultiDict
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
+from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.core.errors import NoReportError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.equipment import (ReservationEquipmentAssociation, EquipmentType,
                                                 RoomEquipmentAssociation)
-from indico.modules.rb.models.utils import limit_groups, unimplemented, Serializer
+from indico.modules.rb.models.utils import unimplemented, Serializer
 from indico.modules.rb.notifications.reservations import (notify_confirmation, notify_cancellation,
                                                           notify_creation, notify_modification,
                                                           notify_rejection)

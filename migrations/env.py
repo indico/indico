@@ -5,7 +5,7 @@ from flask import current_app
 from sqlalchemy import engine_from_config, pool
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util import update_session_options
+from indico.core.db.sqlalchemy.util.session import update_session_options
 
 
 # this is the Alembic Config object, which provides

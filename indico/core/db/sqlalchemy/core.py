@@ -28,9 +28,9 @@ from sqlalchemy.sql.ddl import CreateSchema
 from werkzeug.utils import cached_property
 from zope.sqlalchemy import ZopeTransactionExtension
 
-from indico.core.db.sqlalchemy.util import IndicoModel
-
 # Monkeypatching this since Flask-SQLAlchemy doesn't let us override the model class
+from indico.core.db.sqlalchemy.util.models import IndicoModel
+
 flask_sqlalchemy.Model = IndicoModel
 
 

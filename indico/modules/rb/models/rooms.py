@@ -33,6 +33,7 @@ from MaKaC.errors import MaKaCError
 from MaKaC.user import Avatar, AvatarHolder
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
+from indico.core.db.sqlalchemy.util.cache import versioned_cache, cached
 from indico.core.errors import IndicoError
 from indico.modules.rb.utils import rb_check_user_access
 from indico.modules.rb.models.blockings import Blocking
@@ -43,7 +44,7 @@ from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttribut
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
-from indico.modules.rb.models.utils import Serializer, cached, versioned_cache
+from indico.modules.rb.models.utils import Serializer
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.string import return_ascii, natural_sort_key

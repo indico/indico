@@ -25,9 +25,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.sql import cast
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
-from indico.modules.rb.models.utils import proxy_to_reservation_if_single_occurrence, Serializer, db_dates_overlap
+from indico.modules.rb.models.utils import proxy_to_reservation_if_single_occurrence, Serializer
 from indico.util import date_time
 from indico.util.date_time import iterdays, format_date
 from indico.util.string import return_ascii
