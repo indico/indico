@@ -39,11 +39,11 @@ class IndicoModel(Model):
         options = []
         options += [joinedload(rel) for rel in special_fields['eager']]
         options += [joinedload_all(rel) for rel in special_fields['eager_all']]
-        return cls.query \
-                  .filter_by(**kwargs) \
-                  .join(*special_fields['join']) \
-                  .filter(*args) \
-                  .options(*options)
+        return (cls.query
+                .filter_by(**kwargs)
+                .join(*special_fields['join'])
+                .filter(*args)
+                .options(*options))
 
     @classmethod
     def find_all(cls, *args, **kwargs):
@@ -92,6 +92,7 @@ def get_all_tables(db):
 
 
 def delete_all_tables(db):
+    """Drops all tables in the database"""
     conn = db.engine.connect()
     transaction = conn.begin()
     inspector = Inspector.from_engine(db.engine)
