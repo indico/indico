@@ -238,3 +238,7 @@ def natural_sort_key(s, _nsre=re.compile('([0-9]+)')):
 
 def seems_html(string):
     return re.search(r'<[a-z]+?>', string) is not None
+
+
+def strip_control_chars(string):
+    return re.sub(r'[\x0B-\x1F]', u'', string)
