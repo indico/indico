@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.db import db
-from indico.modules.rb.models.utils import Serializer
+from indico.util.serializer import Serializer
 from indico.util.string import return_ascii
 
 

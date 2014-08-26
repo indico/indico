@@ -25,12 +25,12 @@ from operator import attrgetter
 from flask import session
 from werkzeug.datastructures import MultiDict
 
-from indico.modules.rb.models.utils import Serializer
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
 from indico.util.date_time import iterdays, format_time
 from indico.util.i18n import _
+from indico.util.serializer import Serializer
 from indico.util.string import natural_sort_key
 from indico.util.struct.iterables import group_list
 from indico.web.flask.util import url_for

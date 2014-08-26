@@ -37,12 +37,13 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.equipment import (ReservationEquipmentAssociation, EquipmentType,
                                                 RoomEquipmentAssociation)
-from indico.modules.rb.models.utils import unimplemented, Serializer
+from indico.modules.rb.models.utils import unimplemented
 from indico.modules.rb.notifications.reservations import (notify_confirmation, notify_cancellation,
                                                           notify_creation, notify_modification,
                                                           notify_rejection)
 from indico.util.date_time import now_utc, format_date, format_time
 from indico.util.i18n import _, N_
+from indico.util.serializer import Serializer
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for

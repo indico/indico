@@ -44,9 +44,9 @@ from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttribut
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
-from indico.modules.rb.models.utils import Serializer
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
+from indico.util.serializer import Serializer
 from indico.util.string import return_ascii, natural_sort_key
 from indico.web.flask.util import url_for
 

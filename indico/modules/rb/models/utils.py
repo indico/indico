@@ -23,7 +23,6 @@ from dateutil.relativedelta import MO, TU, WE, TH, FR
 from dateutil.rrule import rrule, DAILY
 
 from indico.core.errors import IndicoError
-from indico.core.logger import Logger
 
 
 def unimplemented(exceptions=(Exception,), message='Unimplemented'):
@@ -64,37 +63,3 @@ def proxy_to_reservation_if_single_occurrence(f):
         return f(self, *args, **kwargs)
 
     return wrapper
-
-
-class Serializer(object):
-    __public__ = []
-
-    def to_serializable(self, attr='__public__', converters=None):
-        serializable = {}
-        if converters is None:
-            converters = {}
-        for k in getattr(self, attr):
-            try:
-                if isinstance(k, tuple):
-                    k, name = k
-                else:
-                    k, name = k, k
-
-                v = getattr(self, k)
-                if callable(v):  # to make it generic, we can get rid of it by properties
-                    v = v()
-                if isinstance(v, Serializer):
-                    v = v.to_serializable()
-                elif isinstance(v, list):
-                    v = [e.to_serializable() for e in v]
-                elif isinstance(v, dict):
-                    v = dict((k, vv.to_serializable() if isinstance(vv, Serializer) else vv)
-                             for k, vv in v.iteritems())
-                if type(v) in converters:
-                    v = converters[type(v)](v)
-                serializable[name] = v
-            except Exception:
-                msg = 'Could not retrieve {}.{}.'.format(self.__class__.__name__, k)
-                Logger.get('Serializer{}'.format(self.__class__.__name__)).exception(msg)
-                raise IndicoError(msg)
-        return serializable
