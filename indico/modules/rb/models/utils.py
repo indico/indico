@@ -17,10 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
 from functools import wraps
-from dateutil.relativedelta import MO, TU, WE, TH, FR
-from dateutil.rrule import rrule, DAILY
 
 from indico.core.errors import IndicoError
 
@@ -37,14 +34,6 @@ def unimplemented(exceptions=(Exception,), message='Unimplemented'):
         return _wrapper
 
     return _unimplemented
-
-
-def next_work_day(dtstart=None, neglect_time=True):
-    if not dtstart:
-        dtstart = datetime.utcnow()
-    if neglect_time:
-        dtstart = datetime.combine(dtstart.date(), datetime.min.time())
-    return list(rrule(DAILY, count=1, byweekday=(MO, TU, WE, TH, FR), dtstart=dtstart))[0]
 
 
 def proxy_to_reservation_if_single_occurrence(f):
