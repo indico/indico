@@ -84,6 +84,7 @@ class EnsureUnicodeExtension(Extension):
 
         variable_done = False
         in_trans = False
+        in_variable = False
         for token in stream:
             # Check if we are inside a trans block - we cannot use filters there!
             if token.type == 'block_begin':
@@ -92,19 +93,24 @@ class EnsureUnicodeExtension(Extension):
                     in_trans = True
                 elif block_name == 'endtrans':
                     in_trans = False
+            elif token.type == 'variable_begin':
+                in_variable = True
 
-            if not in_trans:
+            if not in_trans and in_variable:
                 if token.type == 'pipe':
                     # Inject our filter call before the first filter
                     yield Token(token.lineno, 'pipe', '|')
                     yield Token(token.lineno, 'name', 'ensure_unicode')
                     variable_done = True
-                elif token.type == 'variable_end':
+                elif token.type == 'variable_end' or (token.type == 'name' and token.value == 'if'):
                     if not variable_done:
                         # Inject our filter call if we haven't injected it right after the variable
                         yield Token(token.lineno, 'pipe', '|')
                         yield Token(token.lineno, 'name', 'ensure_unicode')
                     variable_done = False
+
+            if token.type == 'variable_end':
+                in_variable = False
 
             # Original token
             yield token

@@ -137,6 +137,9 @@ class ReservationOccurrence(db.Model, Serializer):
         elif repeat_frequency == RepeatFrequency.MONTH:
             if repeat_interval == 1:
                 position = start.day // 7 + 1
+                if position == 5:
+                    # The fifth weekday of the month will always be the last one
+                    position = -1
                 return rrule.rrule(rrule.MONTHLY, dtstart=start, until=end, byweekday=start.weekday(),
                                    bysetpos=position)
             else:
@@ -192,14 +195,19 @@ class ReservationOccurrence(db.Model, Serializer):
         elif not filters.get('is_only_confirmed_bookings') and filters.get('is_only_pending_bookings'):
             q = q.filter(~Reservation.is_accepted)
 
-        if filters.get('is_rejected'):
-            q = q.filter(Reservation.is_rejected | ReservationOccurrence.is_rejected)
+        if filters.get('is_rejected') and filters.get('is_cancelled'):
+            q = q.filter(Reservation.is_rejected | ReservationOccurrence.is_rejected
+                         | Reservation.is_cancelled | ReservationOccurrence.is_cancelled)
         else:
-            q = q.filter(~Reservation.is_rejected & ~ReservationOccurrence.is_rejected)
-        if filters.get('is_cancelled'):
-            q = q.filter(Reservation.is_cancelled | ReservationOccurrence.is_cancelled)
-        else:
-            q = q.filter(~Reservation.is_cancelled & ~ReservationOccurrence.is_cancelled)
+            if filters.get('is_rejected'):
+                q = q.filter(Reservation.is_rejected | ReservationOccurrence.is_rejected)
+            else:
+                q = q.filter(~Reservation.is_rejected & ~ReservationOccurrence.is_rejected)
+            if filters.get('is_cancelled'):
+                q = q.filter(Reservation.is_cancelled | ReservationOccurrence.is_cancelled)
+            else:
+                q = q.filter(~Reservation.is_cancelled & ~ReservationOccurrence.is_cancelled)
+
         if filters.get('is_archived'):
             q = q.filter(Reservation.is_archived)
 

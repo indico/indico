@@ -121,7 +121,7 @@ class CSBookingInstanceIndex(OOIndex):
                 if evt in added_whole_events:
                     continue
 
-                if not evt.getSchedule().getEntries():
+                if evt.getType() == 'simple_event' or not evt.getSchedule().getEntries():
                     yield dt, CSBookingInstanceWrapper(bkw.getOriginalBooking(),
                                                        evt)
                     # mark whole event as "added"

@@ -412,7 +412,13 @@ class RH(RequestHandlerBase):
     @jsonify_error
     def _processNotFoundError(self, e):
         self._responseUtil.status = 404
-        return WErrorWSGI((e.getMessage(), e.getExplanation())).getHTML()
+        if isinstance(e, NotFound):
+            message = str(e)
+            explanation = e.description
+        else:
+            message = e.getMessage()
+            explanation = e.getExplanation()
+        return WErrorWSGI((message, explanation)).getHTML()
 
     @jsonify_error
     def _processParentTimingError(self, e):
@@ -584,7 +590,6 @@ class RH(RequestHandlerBase):
                         # only log conflict if it wasn't forced
                         if i >= forced_conflicts:
                             Logger.get('requestHandler').warning('Conflict in Database! (Request %s)\n%s' % (request, traceback.format_exc()))
-                        raise
                     except ClientDisconnected:
                         transaction.abort()
                         Logger.get('requestHandler').warning('Client Disconnected! (Request {})'.format(request))

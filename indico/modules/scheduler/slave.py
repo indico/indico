@@ -135,19 +135,6 @@ class _Worker(object):
             self._dbi.endRequest()
 
 
-class ThreadWorker(_Worker, threading.Thread):
-
-    def __init__(self, tid, configData, delay):
-        super(ThreadWorker, self).__init__(tid, configData, delay)
-        self._result = 0
-
-    def _setResult(self, res):
-        self._result = res
-
-    def getResult(self):
-        return self._result
-
-
 class ProcessWorker(_Worker, multiprocessing.Process):
 
     def __init__(self, tid, configData, delay):

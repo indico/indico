@@ -113,7 +113,7 @@ class Reservation(Serializer, db.Model):
         ('booked_for_name', 'bookedForName'), ('details_url', 'bookingUrl'), ('booking_reason', 'reason'),
         ('uses_vc', 'usesAVC'), ('needs_vc_assistance', 'needsAVCSupport'),
         'needs_assistance', ('is_accepted', 'isConfirmed'), ('is_valid', 'isValid'), 'is_cancelled',
-        'is_rejected', ('location_name', 'location')
+        'is_rejected', ('location_name', 'location'), 'booked_for_user_email'
     ]
 
     @declared_attr
@@ -328,12 +328,19 @@ class Reservation(Serializer, db.Model):
         offset = kwargs.pop('offset', 0)
         order = kwargs.pop('order', Reservation.start_dt)
         limit_per_room = kwargs.pop('limit_per_room', False)
+        occurs_on = kwargs.pop('occurs_on')
         if kwargs:
             raise ValueError('Unexpected kwargs: {}'.format(kwargs))
 
         query = Reservation.query.options(joinedload(Reservation.room))
         if filters:
             query = query.filter(*filters)
+        if occurs_on:
+            query = query.filter(
+                Reservation.id.in_(db.session.query(ReservationOccurrence.reservation_id)
+                                   .filter(ReservationOccurrence.date.in_(occurs_on),
+                                           ReservationOccurrence.is_valid))
+            )
         if limit_per_room and (limit or offset):
             query = limit_groups(query, Reservation, Reservation.room_id, order, limit, offset)
 
@@ -392,6 +399,11 @@ class Reservation(Serializer, db.Model):
         self.booked_for_id = user.getId() if user else None
 
     @property
+    def booked_for_user_email(self):
+        user = self.booked_for_user
+        return self.booked_for_user.getEmail() if user else None
+
+    @property
     def contact_emails(self):
         return set(filter(None, map(unicode.strip, self.contact_email.split(u','))))
 
@@ -405,7 +417,7 @@ class Reservation(Serializer, db.Model):
         for occurrence in pre_occurrences:
             if not occurrence.is_valid:
                 continue
-            occurrence.reject(u'Rejected due to collision with a confirmed reservation')
+            occurrence.reject(user, u'Rejected due to collision with a confirmed reservation')
 
     def cancel(self, user, reason=None, silent=False):
         self.is_cancelled = True

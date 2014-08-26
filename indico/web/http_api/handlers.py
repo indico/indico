@@ -280,7 +280,7 @@ def handler(prefix, path):
         if error is None and request.method == 'POST':
             logger.info('API request: %s?%s' % (path, query))
 
-        serializer = Serializer.create(dformat, pretty=pretty, typeMap=typeMap,
+        serializer = Serializer.create(dformat, query_params=queryParams, pretty=pretty, typeMap=typeMap,
                                        **hook.serializer_args)
         if error:
             if not serializer.schemaless:

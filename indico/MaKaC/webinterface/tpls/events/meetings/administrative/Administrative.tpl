@@ -5,6 +5,7 @@
   hideTime = True
   materialSession = False
   minutes = False
+  print_mode = False
 %>
 <table class="eventWrapper">
     <tr>
@@ -74,18 +75,23 @@
                     % if (not previousItem or date != getDate(previousItem.getAdjustedStartDate(timezone))):
                         <tr></tr>
                         <tr>
-                            <td class="itemHeaderDate" colspan="2">
-                                ${prettyDate(item.getAdjustedStartDate(timezone))}<br />
+                            <td class="itemHeaderDate" colspan="${ 4 if self.attr.print_mode else 2}">
+                                <span>
+                                    ${prettyDate(item.getAdjustedStartDate(timezone))}
+                                </span>
+                                <br />
                                 <br />
                             </td>
-                            <td class="itemHeaderDocuments" colspan="2">
-                                Documents<br /><br />
-                            </td>
-                            <td></td>
+                            % if not self.attr.print_mode:
+                                <td class="itemHeaderDocuments" colspan="2">
+                                    Documents<br /><br />
+                                </td>
+                                <td></td>
+                            % endif
                         </tr>
                     % endif
                     % if getItemType(item) == "Session":
-                        <%include file="include/Session.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, showOrder=showOrder"/>
+                        <%include file="include/Session.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, showOrder=showOrder, print_mode=self.attr.print_mode"/>
                     % else:
                         <%include file="include/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order, showOrder=showOrder"/>
                     % endif

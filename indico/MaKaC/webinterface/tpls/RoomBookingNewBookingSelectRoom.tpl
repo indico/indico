@@ -37,15 +37,18 @@
 
     $(document).ready(function() {
         initWidgets();
-        restoreUserData();
+        % if not ignore_userdata:
+            restoreUserData();
+        % endif
 
         function initWidgets() {
             $('#roomselector').roomselector({
                 allowEmpty: false,
                 rooms: rooms,
                 roomMaxCapacity: maxRoomCapacity,
-                userData: rbUserData,
-                selectName: '${ form.room_ids.name }'
+                userData: ${ 'rbUserData' if not ignore_userdata else {}},
+                selectName: '${ form.room_ids.name }',
+                selectedRooms: ${ form.room_ids.data | j, n }
             });
         }
 

@@ -17,13 +17,15 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import pytz
 import requests
-from MaKaC.plugins import PluginsHolder
+from webassets.filter.cssrewrite import urlpath
+
 from indico.modules.scheduler import PeriodicTask
 from indico.ext.calendaring.storage import getAvatarConferenceStorage, isUserPluginEnabled
 from indico.util.date_time import format_datetime
-from webassets.filter.cssrewrite import urlpath
 from indico.core.db import DBMgr
+from MaKaC.plugins import PluginsHolder
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.webinterface import urlHandlers
 
@@ -80,8 +82,12 @@ class OutlookUpdateCalendarNotificationTask(PeriodicTask):
                            'location': conference.getRoom().getName() if conference.getRoom() else '',
                            'body': '<a href="%s">%s</a>' % (url, url) + '<br><br>' + conference.getDescription(),
                            'status': plugin.getOption('status').getValue(),
-                           'startDate': format_datetime(conference.getStartDate(), format=plugin.getOption('datetimeFormat').getValue()),
-                           'endDate': format_datetime(conference.getEndDate(), format=plugin.getOption('datetimeFormat').getValue()),
+                           'startDate': format_datetime(conference.getStartDate(),
+                                                        format=plugin.getOption('datetimeFormat').getValue(),
+                                                        timezone=pytz.utc),
+                           'endDate': format_datetime(conference.getEndDate(),
+                                                      format=plugin.getOption('datetimeFormat').getValue(),
+                                                      timezone=pytz.utc),
                            'isThereReminder': plugin.getOption('reminder').getValue(),
                            'reminderTimeInMinutes': plugin.getOption('reminder_minutes').getValue(),
                            }

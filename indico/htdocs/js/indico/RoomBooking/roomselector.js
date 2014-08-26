@@ -23,7 +23,8 @@
             roomMaxCapacity: 0,
             userData: {},
             selectName: "roomselection",
-            simpleMode: false
+            simpleMode: false,
+            selectedRooms: null
         },
 
         _create: function() {
@@ -68,6 +69,15 @@
 
         validate: function() {
             return this.select.val() !== null || this.options.allowEmpty;
+        },
+
+        scrollToFirstSelected: function() {
+            var element = this.parts.list.find(':checkbox:checked').first();
+            if (!element.length) {
+                return;
+            }
+            var parent = element.scrollParent();
+            parent.scrollTop(parent.scrollTop() + element.position().top - element.height());
         },
 
         _initData: function() {
@@ -399,9 +409,13 @@
             var self = this;
             var userdata = self.options.userData;
 
-            restoreSelection(userdata.selectedRooms);
+            restoreSelection(userdata.selectedRooms); // based on index, yuck!
+            if (self.options.selectedRooms) {
+                restoreSelectedRooms(); // based on room id
+            }
             restoreFilter(userdata);
             self._changeSelectedStyleAll();
+            self.scrollToFirstSelected();
 
             function restoreSelection(selectedRooms) {
                 self.parts.list.find(":checkbox").each(function(index) {
@@ -410,7 +424,17 @@
                     }
                 });
 
-                self._updateSelectionCounter()
+                self._updateSelectionCounter();
+            }
+
+            function restoreSelectedRooms() {
+                self.parts.list.find(':checkbox:not(:checked)').each(function() {
+                    if (_.contains(self.options.selectedRooms, +this.value)) {
+                        this.click();
+                    }
+                });
+
+                self._updateSelectionCounter();
             }
 
             function restoreFilter(data) {

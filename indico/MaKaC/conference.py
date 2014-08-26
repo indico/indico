@@ -45,7 +45,7 @@ from MaKaC.contributionReviewing import Review
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
 from indico.util.i18n import L_
-from indico.util.string import safe_upper, safe_slice
+from indico.util.string import safe_upper, safe_slice, fix_broken_string
 from MaKaC.review import AbstractFieldContent
 
 
@@ -1566,7 +1566,9 @@ class CustomRoom(Persistent):
     def retrieveFullName(self, location):
         if not location:
             return
-        room = Room.find_first(Room.name == self.name, Location.name == location, _join=Room.location)
+        room = Room.find_first(Room.name == fix_broken_string(self.name, True),
+                               Location.name == fix_broken_string(location, True),
+                               _join=Room.location)
         self.fullName = room.full_name if room else None
 
     def setFullName(self, newFullName):
@@ -2638,10 +2640,10 @@ class Conference(CommonObjectBase, Locatable):
 
             c._notify('deleted', self)
 
-    def delete( self ):
+    def delete(self, user=None):
         """deletes the conference from the system.
         """
-        #we notify the observers that the conference has been deleted
+        # we notify the observers that the conference has been deleted
         try:
             self._notify('deleted', self.getOwner())
         except Exception, e:
@@ -2653,11 +2655,11 @@ class Conference(CommonObjectBase, Locatable):
 
         self.notifyContributions()
 
-        #will have to remove it from all the owners (categories) and the
+        # will have to remove it from all the owners (categories) and the
         #   conference registry
-        ConferenceHolder().remove( self )
+        ConferenceHolder().remove(self)
         for owner in self.__owners:
-            owner.removeConference( self, notify=False )
+            owner.removeConference(self, notify=False)
 
         self.removeAllEvaluations()
 
@@ -2672,11 +2674,11 @@ class Conference(CommonObjectBase, Locatable):
                                             ~Reservation.is_rejected)
             for resv in reservations:
                 resv.event_id = None
-                resv.cancel(session.user, u'Associated event was deleted')
+                resv.cancel(user or session.user, u'Associated event was deleted')
 
-        #For each conference we have a list of managers. If we delete the conference but we don't delete
-        #the link in every manager to the conference then, when the manager goes to his "My profile" he
-        #will see a link to a conference that doesn't exist. Therefore, we need to delete that link as well
+        # For each conference we have a list of managers. If we delete the conference but we don't delete
+        # the link in every manager to the conference then, when the manager goes to his "My profile" he
+        # will see a link to a conference that doesn't exist. Therefore, we need to delete that link as well
         for manager in self.getManagerList():
             if isinstance(manager, MaKaC.user.Avatar):
                 manager.unlinkTo(self, "manager")

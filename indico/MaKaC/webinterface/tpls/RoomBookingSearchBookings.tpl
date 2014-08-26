@@ -200,11 +200,7 @@
 
     // Reads out the invalid textboxes and returns false if something is invalid.
     // Returns true if form may be submited.
-    function forms_are_valid(onSubmit) {
-        if (onSubmit != true) {
-            onSubmit = false;
-        }
-
+    function forms_are_valid() {
         // Clean up - make all textboxes white again
         var searchForm = $('#searchBookings');
         $(':input', searchForm).removeClass('hasError');

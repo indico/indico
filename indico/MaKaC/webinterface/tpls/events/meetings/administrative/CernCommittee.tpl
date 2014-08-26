@@ -5,6 +5,7 @@
     hideTime = False
     materialSession = True
     showOrder = False
+    print_mode = True
 %>
 
 <%block name="header">
@@ -15,9 +16,8 @@
                     <img src="${Config.getInstance().getBaseURL()}/images/smallcern.png"/>
                 </div>
                 <br/>
-                <div class="eventHeader">LHC Resources Review Boards</div>
+                <div class="eventHeader">${ category }</div>
             </td>
-
         </tr>
     </table>
 </%block>

@@ -144,13 +144,16 @@ class RequestEnvironment_Feature(IndicoTestFeature):
     """
 
     def _action_endRequest(self):
-        self._do._notify('requestFinished')
+        if hasattr(self, '_do'):
+            self._do._notify('requestFinished')
 
     def _action_startRequest(self):
-        self._do._notify('requestStarted')
+        if hasattr(self, '_do'):
+            self._do._notify('requestStarted')
 
     def _action_make_app_request_context(self, config):
-        app = make_app()
+        # XXX: Check if this breaks SA tests. If yes, use an argument for db_setup
+        app = make_app(db_setup=False)
         if config:
             for k, v in config.iteritems():
                 app.config[k] = v

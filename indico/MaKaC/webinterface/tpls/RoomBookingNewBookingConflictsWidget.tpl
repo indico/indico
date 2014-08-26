@@ -37,11 +37,11 @@
         <div class="message-text">
             % if form.submit_book:
                 <div>
-                    ${ _('If you book, overlapping days of the following pre-bookings will automatically be rejected.') }
+                    ${ _('If you create this booking, some overlapping days of existing pre-bookings will automatically be rejected.') }
                 </div>
             % elif reservation and reservation.is_accepted:
                 <div>
-                    ${ _('If you update this booking, overlapping days of the following pre-bookings will automatically be rejected.') }
+                    ${ _('If you update this booking, some overlapping days of existing pre-bookings will automatically be rejected.') }
                 </div>
             % endif
             % if form.submit_prebook:

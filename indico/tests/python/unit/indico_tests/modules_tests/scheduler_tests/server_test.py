@@ -96,15 +96,10 @@ class Worker(threading.Thread):
 
 class SchedulerThread(threading.Thread):
 
-    def __init__(self, mode):
-        super(SchedulerThread, self).__init__()
-        self._mode = mode
-
     def run(self):
 
         s = Scheduler(sleep_interval=1,
-                      task_max_tries=1,
-                      multitask_mode=self._mode)
+                      task_max_tries=1)
         self.result = s.run()
 
 
@@ -124,7 +119,7 @@ class _TestScheduler(IndicoTestCase):
         with self._context('database'):
             self._smodule = SchedulerModule.getDBInstance()
 
-        self._sched = SchedulerThread(self._mode)
+        self._sched = SchedulerThread()
         self._sched.start()
 
     def _checkWorkersFinished(self, timeout, value=1):
@@ -393,4 +388,4 @@ class _TestScheduler(IndicoTestCase):
 
 
 class TestProcessScheduler(_TestScheduler):
-    _mode = 'processes'
+    pass

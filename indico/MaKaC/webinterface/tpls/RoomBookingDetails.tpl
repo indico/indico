@@ -520,27 +520,28 @@
                 </tr>
               % endif
               % if (not reservation.is_accepted and (user.isRBAdmin() or reservation.room.is_owned_by(user)) and reservation.find_overlapping().count()):
-                <tr><td>&nbsp;</td></tr>
-                <!-- Occurrences -->
-                <tr>
-                  <td class="bookingDisplayTitleCell" style="vertical-align: top;">
-                    <span class="titleCellFormat"> ${ _('Conflicts at the same time') }</span>
-                  </td>
-                  <td>
-                  % for conflicts in reservation.get_conflicting_occurrences().itervalues():
-                    % for occ in itertools.chain(conflicts['confirmed'], conflicts['pending']):
-                      <strong>
-                        ${ _('Booking') if occ.reservation.is_accepted else _('Pre-Booking') }:
-                      </strong>
-                      ${ occ.reservation.booked_for_name },
-                      ${ format_datetime(occ.reservation.start_dt) } - ${ format_datetime(occ.reservation.end_dt) }
-                      (<a href="${ url_for(endpoints['booking_details'], occ.reservation) }" target="_blank">
-                        ${ _('show this booking') }
-                      </a>)<br/>
+                <% conflicting_occurrences = reservation.get_conflicting_occurrences() %>
+                % if conflicting_occurrences:
+                  <tr><td>&nbsp;</td></tr>
+                  <!-- Occurrences -->
+                  <tr>
+                    <td class="bookingDisplayTitleCell" style="vertical-align: top;">
+                      <span class="titleCellFormat"> ${ _('Conflicts at the same time') }</span>
+                    </td>
+                    <td>
+                    % for conflicts in conflicting_occurrences.itervalues():
+                      % for occ in itertools.chain(conflicts['confirmed'], conflicts['pending']):
+                        <strong>
+                          ${ _('Booking') if occ.reservation.is_accepted else _('Pre-Booking') }:
+                        </strong>
+                        ${ occ.reservation.booked_for_name },
+                        ${ format_datetime(occ.reservation.start_dt, 'short') } - ${ format_datetime(occ.reservation.end_dt, 'short') }
+                        (<a href="${ url_for(endpoints['booking_details'], occ.reservation) }" target="_blank">${ _('show this booking') }</a>)<br>
+                      % endfor
                     % endfor
-                  % endfor
-                  </td>
-                </tr>
+                    </td>
+                  </tr>
+                % endif
               % endif
             </table>
           </td>

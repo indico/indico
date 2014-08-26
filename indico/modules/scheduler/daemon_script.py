@@ -31,9 +31,11 @@ import os
 import socket
 import sys
 import time
+import warnings
 from logging.handlers import SMTPHandler
 
 from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
+from indico.web.flask.app import make_app
 
 # legacy import
 from indico.core.config import Config
@@ -71,7 +73,7 @@ class SchedulerApp(object):
 
         logger = logging.getLogger('daemon')
         try:
-            Scheduler(multitask_mode = self.args.mode).run()
+            Scheduler().run()
             return_val = 0
         except base.SchedulerQuitException:
             logger.info("Daemon shut down successfully")
@@ -102,10 +104,9 @@ def _setup(args):
     root_logger.addHandler(handler)
     root_logger.setLevel(level)
 
-    if args.mode == 'processes':
-        mp_logger = multiprocessing.get_logger()
-        mp_logger.setLevel(level)
-        mp_logger.addHandler(handler)
+    mp_logger = multiprocessing.get_logger()
+    mp_logger.setLevel(level)
+    mp_logger.addHandler(handler)
 
 
 def _check_running(check_process=False):
@@ -155,7 +156,7 @@ def _stop(args):
     dbi = DBMgr.getInstance()
     dbi.startRequest()
     c = Client()
-    c.shutdown(msg = "Daemon script")
+    c.shutdown(msg="Daemon script")
     dbi.commit()
 
     print "Waiting for death confirmation... "
@@ -196,7 +197,8 @@ def _check(args):
         os_running = _check_running(True)
 
         if not args.quiet:
-            print >>sys.stderr, 'Database status: running={1}, host={0[hostname]}, pid={0[pid]}'.format(status, db_running)
+            print >>sys.stderr, 'Database status: running={1}, host={0[hostname]}, pid={0[pid]}'.format(
+                status, db_running)
             print >>sys.stderr, 'Process status:  running={0}'.format(os_running)
 
         if db_running and os_running:
@@ -279,16 +281,16 @@ def _run(args):
     t = sm.getTaskById(args.taskid)
 
     t.plugLogger(logging.getLogger('console.run/%s' % args.taskid))
-    t.run()
+
+    with make_app(True).app_context():
+        t.run()
 
     dbi.endRequest()
 
 
 def main():
-    """
-    """
 
-    parser = argparse.ArgumentParser(description = sys.modules[__name__].__doc__)
+    parser = argparse.ArgumentParser(description=sys.modules[__name__].__doc__)
     subparsers = parser.add_subparsers(help="the action to be performed")
 
     parser_start = subparsers.add_parser('start', help="start the daemon")
@@ -299,60 +301,46 @@ def main():
     parser_cmd = subparsers.add_parser('cmd', help="execute a command")
     parser_run = subparsers.add_parser('run', help="run a task, from this process")
 
-    parser.add_argument("-p", "--fork-processes", dest="mode",
-                        action = "store_const", const='processes',
-                        default = 'threads', required = False,
-                        help = "spawns processes instead of threads")
+    parser.add_argument("-p", "--fork-processes", dest="fork_processes",
+                        action="store_true",  required=False,
+                        help="obsolete, the scheduler always uses processes")
     parser.add_argument("-f", "--force", dest="force",
-                        action = "store_const", const=True,
-                        default = False, required = False,
-                        help = "ignores the information in the DB about scheduler "
-                        "status")
+                        action="store_const", const=True,
+                        default=False, required=False,
+                        help="ignores the information in the DB about scheduler status")
 
     parser_start.add_argument("-s", "--standalone",
-                        action = "store_const", const=True,
-                        default = False, required = False,
-                        help = "forces standalone mode -  process doesn't "
-                        "go to background")
+                              action="store_const", const=True, default=False, required=False,
+                              help="forces standalone mode -  process doesn't go to background")
 
-    parser_start.add_argument("--log",
-                        type=str,
-                        default = "INFO", required = False,
-                        help = "set different logging mode")
+    parser_start.add_argument("--log", type=str, default="INFO", required=False, help="set different logging mode")
 
     parser_start.set_defaults(func=_start)
     parser_stop.set_defaults(func=_stop)
     parser_restart.set_defaults(func=_restart)
-    parser_check.set_defaults(func=_check)
 
+    parser_check.set_defaults(func=_check)
     parser_check.add_argument('-q', '--quiet', dest='quiet', action='store_true', help='Suppress console output')
 
-    parser_show.add_argument("field",
-                        choices=['status', 'spool'],
-                        type=str,
-                        help = "information to be shown")
+    parser_show.add_argument("field", choices=['status', 'spool'], type=str, help="information to be shown")
+    parser_show.set_defaults(func=_show)
 
-    parser_show.set_defaults(func = _show)
+    parser_cmd.add_argument("command", choices=['clear_spool'], type=str, help="command to be executed")
+    parser_cmd.set_defaults(func=_cmd)
 
-    parser_cmd.add_argument("command",
-                        choices=['clear_spool'],
-                        type=str,
-                        help = "command to be executed")
-
-    parser_cmd.set_defaults(func = _cmd)
-
-    parser_run.add_argument("taskid",
-                        type=int,
-                        help = "task to be executed (id)")
-    parser_run.set_defaults(func = _run)
-
+    parser_run.add_argument("taskid", type=int, help="task to be executed (id)")
+    parser_run.set_defaults(func=_run)
 
     args = parser.parse_args()
+    if args.fork_processes:
+        warnings.warn('The scheduler always uses processes so -p/--fork-processes is not needed anymore',
+                      DeprecationWarning, 2)
 
     try:
         return args.func(args)
-    except Exception, e:
-        print e
+    except Exception:
+        import traceback
+        traceback.print_exc()
         return -1
 
 

@@ -26,8 +26,9 @@ class Serializer(object):
 
     registry = {}
 
-    def __init__(self, pretty=False, **kwargs):
+    def __init__(self, query_params, pretty=False, **kwargs):
         self.pretty = pretty
+        self._query_params = query_params
         self._fileName = None
         self._lastModified = None
         self._extra_args = kwargs
@@ -41,15 +42,17 @@ class Serializer(object):
         return list(cls.registry)
 
     @classmethod
-    def create(cls, dformat, **kwargs):
+    def create(cls, dformat, query_params=None, **kwargs):
         """
         A serializer factory
         """
 
+        query_params = query_params or {}
+
         serializer = cls.registry.get(dformat)
 
         if serializer:
-            return serializer(**kwargs)
+            return serializer(query_params, **kwargs)
         else:
             raise Exception("Serializer for '%s' does not exist!" % dformat)
 
