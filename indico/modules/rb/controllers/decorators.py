@@ -22,22 +22,12 @@ from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
 from indico.core.errors import IndicoError, NotFoundError
+from indico.util.decorators import smart_decorator
 from indico.util.i18n import _
 from indico.modules.rb.models.locations import Location
 
 
-def double_wraps(f):
-    @wraps(f)
-    def wrapper(*args, **kw):
-        if len(args) == 1 and not kw and callable(args[0]):
-            return f(args[0])
-        else:
-            return lambda original: f(original, *args, **kw)
-
-    return wrapper
-
-
-@double_wraps
+@smart_decorator
 def requires_location(f, parameter_name='roomLocation', attribute_name='_location', request_attribute='view_args'):
     @wraps(f)
     def wrapper(*args, **kw):
@@ -54,7 +44,7 @@ def requires_location(f, parameter_name='roomLocation', attribute_name='_locatio
     return wrapper
 
 
-@double_wraps
+@smart_decorator
 def requires_room(f, parameter_name='roomID', attribute_name='_room', location_attribute_name='_location',
                   request_attribute='view_args'):
     @wraps(f)
