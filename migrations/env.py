@@ -6,7 +6,11 @@ from sqlalchemy import engine_from_config, pool
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import update_session_options
+from indico.core.db.sqlalchemy.util.models import import_all_models
 
+
+# Ensure all our models are imported
+import_all_models()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

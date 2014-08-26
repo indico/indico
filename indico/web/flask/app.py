@@ -41,6 +41,7 @@ from MaKaC.webinterface.pages.error import WErrorWSGI
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
+from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.web.assets import core_env, register_all_css, register_all_js
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
@@ -151,8 +152,7 @@ def configure_db(app):
     db_uri = cfg.getSQLAlchemyDatabaseURI()
 
     if db_uri is None:
-        raise Exception("No proper SQLAlchemy store has been configured."
-                        " Please edit your indico.conf")
+        raise Exception("No proper SQLAlchemy store has been configured. Please edit your indico.conf")
 
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
@@ -165,6 +165,7 @@ def configure_db(app):
     app.config['SQLALCHEMY_MAX_OVERFLOW'] = cfg.getSQLAlchemyMaxOverflow()
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = False
 
+    import_all_models()
     db.init_app(app)
     apply_db_loggers(app.debug)
     configure_mappers()  # Make sure all backrefs are set

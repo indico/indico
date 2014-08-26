@@ -16,12 +16,3 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-
-import importlib
-import os
-
-
-for f in os.listdir(os.path.dirname(__file__)):
-    if f.endswith('.py'):
-        module = importlib.import_module('indico.modules.rb.models.{}'.format(f[:-3]))
-        globals().update(module.__dict__)
