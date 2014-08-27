@@ -3,6 +3,7 @@
 .*.swp
 *.pyc
 *.pyo
+__pycache__/
 
 # makac symlink
 /MaKaC

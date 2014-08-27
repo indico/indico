@@ -148,26 +148,27 @@ def setup_assets():
 
 
 def configure_db(app):
-    cfg = Config.getInstance()
-    db_uri = cfg.getSQLAlchemyDatabaseURI()
+    if not app.config['TESTING']:
+        cfg = Config.getInstance()
+        db_uri = cfg.getSQLAlchemyDatabaseURI()
 
-    if db_uri is None:
-        raise Exception("No proper SQLAlchemy store has been configured. Please edit your indico.conf")
+        if db_uri is None:
+            raise Exception("No proper SQLAlchemy store has been configured. Please edit your indico.conf")
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+        app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
 
-    # DB options
-    app.config['SQLALCHEMY_ECHO'] = cfg.getSQLAlchemyEcho()
-    app.config['SQLALCHEMY_RECORD_QUERIES'] = cfg.getSQLAlchemyRecordQueries()
-    app.config['SQLALCHEMY_POOL_SIZE'] = cfg.getSQLAlchemyPoolSize()
-    app.config['SQLALCHEMY_POOL_TIMEOUT'] = cfg.getSQLAlchemyPoolTimeout()
-    app.config['SQLALCHEMY_POOL_RECYCLE'] = cfg.getSQLAlchemyPoolRecycle()
-    app.config['SQLALCHEMY_MAX_OVERFLOW'] = cfg.getSQLAlchemyMaxOverflow()
-    app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = False
+        # DB options
+        app.config['SQLALCHEMY_ECHO'] = cfg.getSQLAlchemyEcho()
+        app.config['SQLALCHEMY_RECORD_QUERIES'] = cfg.getSQLAlchemyRecordQueries()
+        app.config['SQLALCHEMY_POOL_SIZE'] = cfg.getSQLAlchemyPoolSize()
+        app.config['SQLALCHEMY_POOL_TIMEOUT'] = cfg.getSQLAlchemyPoolTimeout()
+        app.config['SQLALCHEMY_POOL_RECYCLE'] = cfg.getSQLAlchemyPoolRecycle()
+        app.config['SQLALCHEMY_MAX_OVERFLOW'] = cfg.getSQLAlchemyMaxOverflow()
 
     import_all_models()
     db.init_app(app)
-    apply_db_loggers(app.debug)
+    if not app.config['TESTING']:
+        apply_db_loggers(app.debug)
     configure_mappers()  # Make sure all backrefs are set
     models_committed.connect(on_models_committed, app)
 
@@ -224,7 +225,7 @@ def handle_exception(exception):
     return WErrorWSGI(msg).getHTML(), 500
 
 
-def make_app(set_path=False, db_setup=True):
+def make_app(set_path=False, db_setup=True, testing=False):
     # If you are reading this code and wonder how to access the app:
     # >>> from flask import current_app as app
     # This only works while inside an application context but you really shouldn't have any
@@ -237,6 +238,7 @@ def make_app(set_path=False, db_setup=True):
             set_path, '\n'.join(traceback.format_stack())))
         return _app_ctx_stack.top.app
     app = IndicoFlask('indico', static_folder=None, template_folder='web/templates')
+    app.config['TESTING'] = testing
     fix_root_path(app)
     configure_app(app, set_path)
     setup_jinja(app)
