@@ -24,10 +24,12 @@ from webassets.filter.cssrewrite import urlpath
 from indico.modules.scheduler import PeriodicTask
 from indico.ext.calendaring.storage import getAvatarConferenceStorage, isUserPluginEnabled
 from indico.util.date_time import format_datetime
+from indico.util.string import strip_control_chars
 from indico.core.db import DBMgr
 from MaKaC.plugins import PluginsHolder
 from MaKaC.common.externalOperationsManager import ExternalOperationsManager
 from MaKaC.webinterface import urlHandlers
+
 
 class OutlookUpdateCalendarNotificationTask(PeriodicTask):
     """
@@ -42,14 +44,21 @@ class OutlookUpdateCalendarNotificationTask(PeriodicTask):
         # Send the requests
         for key, eventList in storage.iteritems():
             for event in eventList:
-                logger.info("processing: %s:%s" % (key, event))
-                if not event.get('request_sent', False): # only the ones that are not already sent
-                    result = ExternalOperationsManager.execute(self, 'sendEventRequest' + key + event['eventType'], self._sendEventRequest, key, event['eventType'], event['avatar'], event['conference'])
-                    if result != 200:
-                        logger.debug("POST failed")
+                logger.info("Processing: {}:{}".format(key, event))
+                if not event.get('request_sent', False):  # only the ones that are not already sent
+                    result = ExternalOperationsManager.execute(self,
+                                                               'sendEventRequest{}{}'.format(key, event['eventType']),
+                                                               self._sendEventRequest, key, event['eventType'],
+                                                               event['avatar'], event['conference'])
+                    if result is None:
+                        logger.error("Request failed")
+                        break
+                    elif result.status_code != 200:
+                        logger.error('Request unsuccessful({})\nPayload: {}\nResponse: {}'
+                                     .format(result.status_code, self.payload, result.content))
                         break
                     else:
-                        logger.debug("processing successful")
+                        logger.debug("Processed successfully")
                         event['request_sent'] = True
             else:
                 keysToDelete.append(key)
@@ -58,7 +67,7 @@ class OutlookUpdateCalendarNotificationTask(PeriodicTask):
 
     def _clearAvatarConferenceStorage(self, keysToDelete):
         dbi = DBMgr.getInstance()
-        dbi.commit() # Ensure that the status 'request_sent' is kept and requests are not sent twice
+        dbi.commit()  # Ensure that the status 'request_sent' is kept and requests are not sent twice
         storage = getAvatarConferenceStorage()
         for i, key in enumerate(keysToDelete):
             del storage[key]
@@ -71,47 +80,47 @@ class OutlookUpdateCalendarNotificationTask(PeriodicTask):
             logger = self.getLogger()
             plugin = PluginsHolder().getPluginType('calendaring').getPlugin('outlook')
             if not isUserPluginEnabled(avatar.getId()):
-                logger.info("outlook plugin disabled for user: %s" % avatar.getId())
-                return 200
+                logger.info("Outlook plugin disabled for user: {}".format(avatar.getId()))
+                return {'status_code': 200}
             if eventType in ['added', 'updated']:
-                logger.debug("performing '%s' for: %s" % (eventType, avatar.getId()))
+                logger.debug("Performing '{}' for: {}".format(eventType, avatar.getId()))
                 url = urlHandlers.UHConferenceDisplay.getURL(conference)
-                payload = {'userEmail': avatar.getEmail(),
-                           'uniqueID': plugin.getOption('prefix').getValue() + key,
-                           'subject': conference.getTitle(),
-                           'location': conference.getRoom().getName() if conference.getRoom() else '',
-                           'body': '<a href="%s">%s</a>' % (url, url) + '<br><br>' + conference.getDescription(),
-                           'status': plugin.getOption('status').getValue(),
-                           'startDate': format_datetime(conference.getStartDate(),
-                                                        format=plugin.getOption('datetimeFormat').getValue(),
-                                                        timezone=pytz.utc),
-                           'endDate': format_datetime(conference.getEndDate(),
-                                                      format=plugin.getOption('datetimeFormat').getValue(),
-                                                      timezone=pytz.utc),
-                           'isThereReminder': plugin.getOption('reminder').getValue(),
-                           'reminderTimeInMinutes': plugin.getOption('reminder_minutes').getValue(),
-                           }
+                location = strip_control_chars(conference.getRoom().getName()) if conference.getRoom() else ''
+                description = strip_control_chars(conference.getDescription())
+                self.payload = {'userEmail': avatar.getEmail(),
+                                'uniqueID': plugin.getOption('prefix').getValue() + key,
+                                'subject': strip_control_chars(conference.getTitle()),
+                                'location': location,
+                                'body': '<a href="{}">{}</a><br><br>{}'.format(url, url, description),
+                                'status': plugin.getOption('status').getValue(),
+                                'startDate': format_datetime(conference.getStartDate(),
+                                                             format=plugin.getOption('datetimeFormat').getValue(),
+                                                             timezone=pytz.utc),
+                                'endDate': format_datetime(conference.getEndDate(),
+                                                           format=plugin.getOption('datetimeFormat').getValue(),
+                                                           timezone=pytz.utc),
+                                'isThereReminder': plugin.getOption('reminder').getValue(),
+                                'reminderTimeInMinutes': plugin.getOption('reminder_minutes').getValue()}
                 operation = plugin.getOption('addToCalendarOperationName').getValue() if eventType == 'added' else plugin.getOption('updateCalendarOperationName').getValue()
             elif eventType == 'removed':
-                logger.debug("removing calendar entry for: %s" % avatar.getId())
-                payload = {'userEmail': avatar.getEmail(),
-                           'uniqueID': plugin.getOption('prefix').getValue() + key,
-                           }
+                logger.debug("Removing calendar entry for: {}".format(avatar.getId()))
+                self.payload = {'userEmail': avatar.getEmail(),
+                                'uniqueID': plugin.getOption('prefix').getValue() + key}
                 operation = plugin.getOption('removeFromCalendarOperationName').getValue()
             else:
                 return None
             headers = {'content-type': 'application/x-www-form-urlencoded'}
-            r = requests.post(urlpath.tslash(plugin.getOption('url').getValue()) + operation,
-                              auth=(plugin.getOption('login').getValue(), plugin.getOption('password').getValue()),
-                              data=payload, headers=headers, timeout=plugin.getOption('timeout').getValue())
-            return r.status_code
+            return requests.post(urlpath.tslash(plugin.getOption('url').getValue()) + operation,
+                                 auth=(plugin.getOption('login').getValue(), plugin.getOption('password').getValue()),
+                                 data=self.payload, headers=headers, timeout=plugin.getOption('timeout').getValue())
         except requests.exceptions.Timeout:
             logger.exception('Timeout')
         except requests.exceptions.RequestException:
             logger.exception('RequestException: Connection problem')
         except Exception, e:
-            logger.exception('Outlook EventException: %s' % e)
+            logger.exception('Outlook EventException: {}'.format(e))
         return None
+
 
 class OutlookTaskRegistry(object):
 
