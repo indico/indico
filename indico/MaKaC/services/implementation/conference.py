@@ -1427,6 +1427,10 @@ class ConferenceRemoveChairPerson(ConferenceChairPersonBase):
 
     def _getAnswer(self):
         chair = self._conf.getChairById(self._chairId)
+
+        if chair is None:
+            raise NoReportError(_('Someone may have deleted this chairperson meanwhile. Please refresh the page.'))
+
         self._conf.removeChair(chair)
         self._conf.getAccessController().revokeSubmission(chair)
         return self._getChairPersonsList()
