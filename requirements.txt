@@ -54,7 +54,6 @@ dictdiffer==0.0.3
 psycopg2==2.5.2
 pyparsing==1.5.7
 zope.sqlalchemy==0.7.4
-Whoosh==2.6.0
 redis==2.9.1
 hiredis==0.1.3
 enum34==1.0

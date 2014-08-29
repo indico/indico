@@ -22,25 +22,21 @@
 """
 
 import itertools
-import os
 from datetime import datetime, timedelta
+from operator import itemgetter
 
 import pytz
 from persistent import Persistent
 from BTrees.IOBTree import IOBTree
 from BTrees.OOBTree import OOBTree, OOSet
-from whoosh.filedb.filestore import FileStorage
-from whoosh.fields import Schema, ID, TEXT, DATETIME
-from whoosh.qparser import QueryParser
-from whoosh.sorting import FieldFacet
-from whoosh import writing
 from zope.index.text import textindex
+from sqlalchemy import func
 
 from indico.core.logger import Logger
-from indico.core.config import Config
-from indico.core.db.util import run_after_commit
+from indico.core.db.sqlalchemy import db
 from indico.util.string import remove_accents
-from indico.util.redis.whoosh_storage import RedisStorage
+from indico.modules.events.models.events import IndexedEvent
+from indico.modules.categories.models.categories import IndexedCategory
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.timezoneUtils import date2utctimestamp, datetimeToUnixTime
 from MaKaC.errors import MaKaCError
@@ -1279,110 +1275,72 @@ class TextIndex(IntStringMappedIndex):
         return [(self.getString(record[0]), record[1]) for record in records]
 
 
-class WhooshTextIndex(object):
+class CategoryTitleIndex(object):
 
-    def __init__(self, index_name):
-
-        if Config.getInstance().getWhooshBackend() == 'redis':
-            storage = RedisStorage(Config.getInstance().getRedisConnectionURL(), index_name)
-        else:
-            indexDir = self._getRepositoryPath()
-            storage = FileStorage(indexDir)
-        schema = self._getSchema()
-        if storage.index_exists(index_name):
-            self._textIdx = storage.open_index(schema=schema, indexname=index_name)
-        else:
-            self._textIdx = storage.create_index(schema, indexname=index_name)
-
-    def _getRepositoryPath(self):
-        destPath = os.path.join(Config.getInstance().getArchiveDir(), 'whoosh')
-        if not os.access(destPath, os.F_OK):
-            os.makedirs(destPath)
-        return destPath
-
-    def _getSchema(self):
-        return Schema(id=ID(unique=True, stored=True), content=TEXT(stored=True))
-
-    def __contains__(self, key):
-        searcher = self._textIdx.searcher()
-        query = QueryParser("id", self._textIdx.schema).parse(key)
-        exist_key = len(searcher.search(query)) > 0
-        searcher.close()
-        return exist_key
-
-    def _index(self, obj):
-        with self._textIdx.writer() as writer:
-            writer.add_document(id=obj.getId().decode('utf-8'), content=obj.getTitle().decode('utf-8'))
-
-    @run_after_commit
     def index(self, obj):
-        if obj.getId() in self:
-            raise KeyError(_("Key {0} already exists in index!").format(obj.getId()))
-        self._index(obj)
+        self.unindex(obj)
+        category = IndexedCategory(id=obj.getId(), title=obj.getTitle())
+        db.session.add(category)
+        db.session.flush()
 
-    @run_after_commit
     def unindex(self, obj):
-        if obj.getId() in self:
-            with self._textIdx.writer() as writer:
-                writer.delete_by_term("id", obj.getId().decode('utf-8'))
-        else:
-            Logger.get('indexes.text').error("No such entry {0}".format(obj.getId()))
+        db.session.query(IndexedCategory).filter(IndexedCategory.id == obj.getId()).delete()
+        db.session.flush()
 
-    def search(self, text, limit=None):
-        with self._textIdx.searcher() as searcher:
-            qp = QueryParser("content", self._textIdx.schema)
-            query = qp.parse(text)
-            return [(record["id"], record["content"]) for record in searcher.search(query, limit=limit)]
+    def search(self, search_string, limit=None, offset=None):
+        query = (db.session.query(IndexedCategory.id)
+                 .filter(IndexedCategory.title_vector.op('@@')(func.plainto_tsquery('simple', search_string)))
+                 .limit(limit)
+                 .offset(offset))
+        return map(itemgetter(0), query)
+
+    def initialize(self, items):
+        for i, categ in enumerate(items, 1):
+            cat = IndexedCategory(id=categ.getId(), title=categ.getTitle())
+            db.session.add(cat)
+            if i % 1000 == 0:
+                db.session.commit()
+        db.session.commit()
 
     def clear(self):
-        with self._textIdx.writer() as writer:
-            writer.mergetype = writing.CLEAR
+        IndexedCategory.query.delete()
 
-    def initialize(self, dbi, list):
-        writer = self._textIdx.writer(limitmb=512)
-        i = 0
-        for obj in list:
-            writer.add_document(id=obj.getId().decode('utf-8'), content=obj.getTitle().decode('utf-8'))
+
+class ConferenceIndex(object):
+
+    def index(self, obj):
+        self.unindex(obj)
+        event = IndexedEvent(id=obj.getId(), title=obj.getTitle(), start_date=obj.getStartDate())
+        db.session.add(event)
+        db.session.flush()
+
+    def unindex(self, obj):
+        db.session.query(IndexedEvent).filter(IndexedEvent.id == obj.getId()).delete()
+        db.session.flush()
+
+    def search(self, search_string, order_by='start'):
+        order = IndexedEvent.start_date.desc()
+        if order_by == 'start':
+            order = IndexedEvent.start_date.desc()
+        elif order_by == 'id':
+            order = IndexedEvent.id
+        else:
+            order = None
+
+        return (db.session.query(IndexedEvent.id)
+                  .filter(IndexedEvent.title_vector.op('@@')(func.plainto_tsquery('simple', search_string)))
+                  .order_by(order))
+
+    def initialize(self, items):
+        for i, conf in enumerate(items, 1):
+            event = IndexedEvent(id=conf.getId(), title=conf.getTitle(), start_date=conf.getStartDate())
+            db.session.add(event)
             if i % 20000 == 19999:
-                writer.commit()
-                dbi.sync()
-                writer = self._textIdx.writer(limitmb=512)
-            i += 1
-        writer.commit(optimize=True)
+                db.session.commit()
+        db.session.commit()
 
-
-class WhooshConferenceIndex(WhooshTextIndex):
-
-    def _getSchema(self):
-        return Schema(id=ID(unique=True, stored=True), content=TEXT(stored=True), start_date=DATETIME(sortable=True))
-
-    def _index(self, obj):
-        with self._textIdx.writer() as writer:
-            writer.add_document(id=obj.getId().decode('utf-8'), content=obj.getTitle().decode('utf-8'),
-                                start_date=obj.getStartDate())
-
-    def search(self, text, limit=None):
-        results = []
-        with self._textIdx.searcher() as searcher:
-            qp = QueryParser("content", self._textIdx.schema)
-            query = qp.parse(text)
-            sort_by = FieldFacet("start_date", reverse=True)
-            results = [(record["id"], record["content"]) for record in searcher.search(query, limit=limit,
-                                                                                       sortedby=sort_by)]
-        return results
-
-    def initialize(self, dbi, list):
-        writer = self._textIdx.writer(limitmb=512)
-        i = 0
-        for obj in list:
-            writer.add_document(id=obj.getId().decode('utf-8'), content=obj.getTitle().decode('utf-8'),
-                                start_date=obj.getStartDate())
-            if i % 20000 == 19999:
-                writer.commit()
-                dbi.sync()
-                writer = self._textIdx.writer(limitmb=512)
-            i += 1
-        writer.commit(optimize=True)
+    def clear(self):
+        IndexedEvent.query.delete()
 
 
 class IndexesHolder(ObjectHolder):
@@ -1453,9 +1411,9 @@ class IndexesHolder(ObjectHolder):
             elif id=="pendingCoordinatorsTasks":
                 Idx[str(id)] = PendingManagersTasksIndex()
             elif id=="categoryName":
-                return WhooshTextIndex(str(id))
+                return CategoryTitleIndex()
             elif id=="conferenceTitle":
-                return WhooshConferenceIndex(str(id))
+                return ConferenceIndex()
             else:
                 extension_point("indexHolderProvider", Idx, id)
             return Idx[str(id)]

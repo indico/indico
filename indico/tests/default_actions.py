@@ -23,8 +23,6 @@ from MaKaC.common import HelperMaKaCInfo
 from MaKaC.conference import CategoryManager, DefaultConference
 from MaKaC.user import Avatar, AvatarHolder, LoginInfo
 from MaKaC.authentication import AuthenticatorMgr
-from indico.core.config import Config
-from indico.util.fs import delete_recursively
 
 
 def initialize_new_db(root):
@@ -35,11 +33,6 @@ def initialize_new_db(root):
     # Reset everything
     for e in root.keys():
         del root[e]
-
-    # Delete whoosh indexes
-    whoosh_dir = os.path.join(Config.getInstance().getArchiveDir(), 'whoosh')
-    if os.path.exists(whoosh_dir):
-        delete_recursively(whoosh_dir)
 
     # initialize db root
     cm = CategoryManager()

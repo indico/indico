@@ -31,7 +31,8 @@ from dateutil import rrule
 from pkg_resources import parse_version
 
 from indico.core.config import Config
-from indico.core.db import DBMgr
+from indico.core.db import DBMgr, db
+from indico.core.db.sqlalchemy.util import update_session_options
 from indico.core.index import Catalog
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.tasks import OccurrenceNotifications
@@ -352,7 +353,7 @@ def lowercaseLDAPIdentities(dbi, prevVersion):
 @since('1.9')
 def reindexCategoryNameAndConferenceTitle(dbi, prevVersion):
     """
-    Indexing Conference Title with new WhooshTextIndex
+    Indexing Conference Title and Category Name
     """
     IndexesHolder().removeById('conferenceTitle')
     IndexesHolder().removeById('categoryName')
@@ -362,10 +363,11 @@ def reindexCategoryNameAndConferenceTitle(dbi, prevVersion):
 
     iterator = (x[1] for x in console.conferenceHolderIterator(ConferenceHolder(), deepness='event'))
     confTitleIdx.clear()
-    confTitleIdx.initialize(dbi, iterator)
+    confTitleIdx.initialize(iterator)
 
     categNameIdx.clear()
-    categNameIdx.initialize(dbi, CategoryManager().itervalues())
+    db.session.commit()
+    categNameIdx.initialize(CategoryManager().itervalues())
 
 
 @since('1.2')
@@ -470,7 +472,7 @@ def runMigration(prevVersion=parse_version(__version__), specified=[], dry_run=F
         # probe DB connection
         dbi.startRequest()
         dbi.endRequest(False)
-
+        update_session_options(db)
         print "DONE!\n"
 
     if run_from:

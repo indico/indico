@@ -35,6 +35,9 @@ from indico.web.http_api.fossils import IConferenceMetadataWithContribsFossil, I
     ISessionMetadataWithSubContribsFossil, IContributionMetadataFossil, IContributionMetadataWithSubContribsFossil
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
+from indico.core.db.sqlalchemy import db
+from indico.modules.events.models.events import IndexedEvent
+from sqlalchemy import func
 
 # indico legacy imports
 from MaKaC.conference import CategoryManager
@@ -81,7 +84,7 @@ class EventSearchHook(HTTPAPIHook):
     def _getParams(self):
         super(EventSearchHook, self)._getParams()
         search = self._pathParams['search_term']
-        self._query = ' '.join(map(lambda y: "*%s*" % y, search.split()))
+        self._query = search
 
     def export_event(self, aw):
         expInt = EventSearchFetcher(aw, self)
@@ -343,15 +346,29 @@ class EventSearchFetcher(IteratedDataFetcher):
         ch = ConferenceHolder()
         index = IndexesHolder().getById("conferenceTitle")
 
-        def _iterate_objs(query):
-            results = index.search(query)
-            for id, _ in results:
-                event = ch.getById(id)
-                if event is not None and event.canAccess(self._aw):
-                    yield event
+        def _iterate_objs(query_string):
+            query = index.search(query_string, self._orderBy)
+            counter = 0
 
-        for event in sorted(itertools.islice(_iterate_objs(query), self._offset, self._offset + self._limit),
-                            key=self._sortingKeys.get(self._orderBy), reverse=self._descending):
+            # Query the DB in chunks of 1000 records per query until the limit is satisfied
+            for row in query.yield_per(5):
+                eventId = row[0]
+                event = ch.getById(eventId)
+                if event is not None and event.canAccess(self._aw):
+                    counter += 1
+                    # Start yielding only when the counter reaches the given offset
+                    if (self._offset is None) or (counter > self._offset):
+                        yield event
+                        # Stop queried the DB when the limit is satisfied
+                        if (self._limit is not None) and (counter == self._offset + self._limit):
+                            break
+
+        obj_list = None
+        if self._orderBy in ['start', 'id', None]:
+            obj_list = _iterate_objs(query)
+        else:
+            obj_list = sorted(_iterate_objs(query), key=self._sortingKeys.get(self._orderBy), reverse=self._descending)
+        for event in obj_list:
             yield {
                 'id': event.getId(),
                 'title': event.getTitle(),
