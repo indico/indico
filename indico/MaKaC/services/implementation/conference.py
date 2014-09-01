@@ -528,6 +528,8 @@ class ConferenceListContributions (ConferenceListModificationBase):
         contributions = self._conf.getContributionList()
         result = {}
         for cont in contributions:
+            if not cont.isScheduled():
+                continue
             session = (" (" + cont.getSession().getTitle() + ")") if (cont.getSession() is not None) else ""
             time = " (" + formatDateTime(cont.getAdjustedStartDate(), format="dd MMM yyyy HH:mm") + ")"
             result[cont.getId()] = cont.getTitle() + session + time
