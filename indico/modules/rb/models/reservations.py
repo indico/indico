@@ -512,6 +512,11 @@ class Reservation(Serializer, db.Model):
                 for conflict in conflicts['pending']:
                     conflict.reject(user, u'Rejected due to collision with a confirmed reservation')
 
+        # Mark occurrences as notified if created within the notification window
+        for occurrence in self.occurrences:
+            if occurrence.is_valid and occurrence.is_in_notification_window():
+                occurrence.notification_sent = True
+
     @classmethod
     def create_from_data(cls, room, data, user, prebook=None):
         """Creates a new reservation.

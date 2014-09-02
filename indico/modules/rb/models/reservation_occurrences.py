@@ -17,11 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
+from datetime import datetime, date
 
 from dateutil import rrule
-from sqlalchemy import Date, or_
-from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import Date, or_, func
+from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy.sql import cast
 
 from indico.core.db import db
@@ -227,6 +227,35 @@ class ReservationOccurrence(db.Model, Serializer):
 
         q = q.order_by(Room.id)
         return q
+
+    @hybrid_method
+    def is_in_notification_window(self, delayed_only=False):
+        from indico.modules.rb import settings
+        days_until_occurrence = (self.start_dt.date() - date.today()).days
+        notification_window = (self.reservation.room.notification_before_days
+                               or settings.get('notification_before_days', 0))
+        if self.start_dt < datetime.now():
+            return False
+        if delayed_only:
+            # Notify only of delayed occurrences (happening in less than N days)
+            return days_until_occurrence < notification_window
+        else:
+            # Notify of today and delayed occurrences (happening in N or less days)
+            return days_until_occurrence <= notification_window
+
+    @is_in_notification_window.expression
+    def is_in_notification_window(self, delayed_only=False):
+        from indico.modules.rb import settings
+        from indico.modules.rb.models.rooms import Room
+        days_until_occurrence = cast(self.start_dt, Date) - cast(func.now(), Date)
+        notification_window = func.coalesce(Room.notification_before_days,
+                                            settings.get('notification_before_days', 0))
+        if delayed_only:
+            # Notify only of delayed occurrences (happening in less than N days)
+            return (days_until_occurrence < notification_window) & (ReservationOccurrence.start_dt >= datetime.now())
+        else:
+            # Notify of today and delayed occurrences (happening in N or less days)
+            return (days_until_occurrence <= notification_window) & (ReservationOccurrence.start_dt >= datetime.now())
 
     def overlaps(self, occurrence, skip_self=False):
         if self.reservation and occurrence.reservation and self.reservation.room_id != occurrence.reservation.room_id:
