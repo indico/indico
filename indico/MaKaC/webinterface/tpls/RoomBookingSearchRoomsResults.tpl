@@ -45,7 +45,7 @@
                                   % endif
                                 </td>
                                 <td ${ on_click_details_url } align='center'>
-                                  ${ room.capacity }
+                                  ${ room.capacity if room.capacity is not None else _('n/a') }
                                 </td>
                                 <td ${ on_click_details_url }>
                                   ${ room.site }
