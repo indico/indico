@@ -19,7 +19,7 @@
 
 from functools import wraps
 
-from flask import has_request_context, g
+from flask import has_request_context, g, current_app
 
 
 def make_hashable(obj):
@@ -50,7 +50,7 @@ def memoize_request(f):
     """Memoizes a function during the current request"""
     @wraps(f)
     def memoizer(*args, **kwargs):
-        if not has_request_context():
+        if not has_request_context() or current_app.config['TESTING']:
             # No memoization outside request context
             return f(*args, **kwargs)
 

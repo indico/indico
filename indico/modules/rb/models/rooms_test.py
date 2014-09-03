@@ -19,10 +19,10 @@ pytest_plugins = 'indico.modules.rb.testing.fixtures'
 
 
 class TestRoom:
-    def test_owner(self, test_room, dummy_user):
-        assert test_room.owner.id == dummy_user.id
+    def test_owner(self, dummy_room, dummy_user):
+        assert dummy_room.owner.id == dummy_user.id
 
-    def test_full_name(self, test_room):
-        assert test_room.full_name == '123-4-56'
-        test_room.name = 'Test'
-        assert test_room.full_name == '123-4-56 - Test'
+    def test_full_name(self, dummy_room):
+        assert dummy_room.full_name == '123-4-56'
+        dummy_room.name = 'Test'
+        assert dummy_room.full_name == '123-4-56 - Test'
