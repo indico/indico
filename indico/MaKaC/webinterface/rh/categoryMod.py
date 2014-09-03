@@ -484,13 +484,13 @@ class _ActionConferenceReallocation:
         params["confs"] = self._confs
         return p.display( **params )
 
-    def perform( self, confs ):
-        #ToDo: check if the current user can create conferences on the
-        #   destination category
-        if self._confs == []:
+    def perform(self, confs):
+        # TODO: check if the current user can create conferences on the destination category
+        if not self._confs:
             self._confs = confs
         for conf in self._confs:
-            self._categ.moveConference(conf, self._target)
+            if self._categ == conf.getOwner():
+                self._categ.moveConference(conf, self._target)
 
 
 class RHCategoryActionConferences(RHCategModifBase):
