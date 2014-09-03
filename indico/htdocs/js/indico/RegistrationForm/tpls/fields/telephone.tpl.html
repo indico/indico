@@ -6,9 +6,9 @@
         ng-model="userdata[fieldName]"
         ng-required="field.mandatory"
         ng-class="{hasError: validationStarted && nestedForm.$invalid}"
-        ng-pattern="/(\+?\s*(\d\s*))/">
+        ng-pattern="/^(\(\+\d*\)|\+)?\s*(\d(\s*|\-))+$/">
 </ng-form>
 
 <span class="inputDescription">
-    (+) 999 99 99 99
+    (+41) 123 45 6789
 </span>

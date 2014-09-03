@@ -1296,7 +1296,7 @@ class TelephoneInput(FieldInputType, Fossilizable):
     fossilizes(IRegFormTelephoneInputFieldFossil)
 
     _id = "telephone"
-    _REGEX = r'^\s*\+?\s*\d+(\s*\-?\s*\d+)*\s*$'
+    _REGEX = r'^(\(\+\d*\)|\+)?\s*(\d(\s*|\-))+$'
     _PATTERN = re.compile(_REGEX)
 
     def getName(cls):
