@@ -31,6 +31,7 @@ from babel.dates import format_timedelta as _format_timedelta
 from babel.dates import get_timezone
 from babel.numbers import format_number as _format_number
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
+from dateutil.relativedelta import relativedelta
 
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
@@ -264,3 +265,11 @@ def round_up_to_minutes(dt, precision=15):
     secs_in_current_hour = (dt.minute * 60) + dt.second + (dt.microsecond * 1e-6)
     delta = (secs_in_current_hour // increment) * increment + increment - secs_in_current_hour
     return dt + timedelta(seconds=delta)
+
+
+def get_month_start(date):
+    return date + relativedelta(day=1)
+
+
+def get_month_end(date):
+    return date + relativedelta(day=1, months=+1, days=-1)
