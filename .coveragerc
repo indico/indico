@@ -1,0 +1,9 @@
+[run]
+branch = true
+source = indico
+include = indico/modules/rb/models/*.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__

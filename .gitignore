@@ -45,3 +45,6 @@ node_modules
 .noseids
 indico/tests/report/*.txt
 test.txt
+.coverage
+coverage.xml
+htmlcov/

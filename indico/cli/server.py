@@ -28,7 +28,7 @@ from flask import current_app
 from flask_script import Command, Option
 from werkzeug.debug import DebuggedApplication
 from werkzeug.exceptions import NotFound
-from werkzeug.wsgi import DispatcherMiddleware
+from werkzeug.wsgi import DispatcherMiddleware, SharedDataMiddleware
 
 from indico.core.config import Config
 from indico.core.logger import Logger
@@ -331,7 +331,10 @@ def start_web_server(app, host='localhost', port=0, with_ssl=False, keep_base_ur
         evalex_whitelist = True
 
     console.info(' * Using BaseURL {0}'.format(base_url))
-    app = make_indico_dispatcher(app)
+    app.wsgi_app = make_indico_dispatcher(app.wsgi_app)
+    app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
+        '/htmlcov': os.path.join(app.root_path, '..', 'htmlcov')
+    }, cache=False)
     server = WerkzeugServer(app, host, used_port, reload_on_change=reload_on_change, evalex_whitelist=evalex_whitelist,
                             enable_ssl=with_ssl, ssl_cert=ssl_cert, ssl_key=ssl_key)
     signal.signal(signal.SIGINT, _sigint)
