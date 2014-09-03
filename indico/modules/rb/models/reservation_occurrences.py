@@ -229,28 +229,26 @@ class ReservationOccurrence(db.Model, Serializer):
         return q
 
     @hybrid_method
-    def is_in_notification_window(self, delayed_only=False):
+    def is_in_notification_window(self, exclude_first_day=False):
         from indico.modules.rb import settings
         days_until_occurrence = (self.start_dt.date() - date.today()).days
         notification_window = (self.reservation.room.notification_before_days
                                or settings.get('notification_before_days', 0))
         if self.start_dt < datetime.now():
             return False
-        if delayed_only:
-            # Notify only of delayed occurrences (happening in less than N days)
+        if exclude_first_day:
             return days_until_occurrence < notification_window
         else:
-            # Notify of today and delayed occurrences (happening in N or less days)
             return days_until_occurrence <= notification_window
 
     @is_in_notification_window.expression
-    def is_in_notification_window(self, delayed_only=False):
+    def is_in_notification_window(self, exclude_first_day=False):
         from indico.modules.rb import settings
         from indico.modules.rb.models.rooms import Room
         days_until_occurrence = cast(self.start_dt, Date) - cast(func.now(), Date)
         notification_window = func.coalesce(Room.notification_before_days,
                                             settings.get('notification_before_days', 0))
-        if delayed_only:
+        if exclude_first_day:
             # Notify only of delayed occurrences (happening in less than N days)
             return (days_until_occurrence < notification_window) & (ReservationOccurrence.start_dt >= datetime.now())
         else:
