@@ -301,7 +301,7 @@ ndDirectives.directive('ndDatepicker', function($compile) {
                     attributes.id = scope.id;
                 }
                 attributes['ng-class'] = "{hasError: validation && dateForm.$invalid}";
-                if (scope.required) {
+                if (scope.$eval(scope.required)) {
                     attributes.required = "required";
                 }
 
