@@ -707,9 +707,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     def check_advance_days(self, end_date, user=None, quiet=False):
         if not self.max_advance_days:
-            return
+            return True
         if user and (user.isRBAdmin() or self.is_owned_by(user)):
-            return
+            return True
         advance_days = (end_date - date.today()).days
         ok = advance_days < self.max_advance_days
         if quiet:
