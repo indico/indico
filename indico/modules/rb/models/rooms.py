@@ -68,7 +68,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     ]
 
     __calendar_public__ = [
-        'id', 'building', 'name', 'floor', 'number', 'kind', 'booking_url', 'details_url', 'location_name'
+        'id', 'building', 'name', 'floor', 'number', 'kind', 'booking_url', 'details_url', 'location_name',
+        'max_advance_days'
     ]
 
     __api_public__ = (

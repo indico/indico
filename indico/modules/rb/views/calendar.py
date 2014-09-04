@@ -208,6 +208,8 @@ class RoomBookingCalendarWidget(object):
                     bar = Bar.from_candidate(cand, room.id, start_dt, end_dt, blocking)
                     self.bars.append(bar)
 
+        self._produce_disabled_bars()  # If we have candidate bars we also want to show when the room cannot be booked.
+
     def _produce_prereservation_overlap_bars(self):
         for _, occurrences in groupby((o for o in self.occurrences if not o.reservation.is_accepted),
                                       key=lambda o: o.reservation.room_id):
@@ -235,6 +237,16 @@ class RoomBookingCalendarWidget(object):
                              for day in self.iter_days()
                              if blocking.start_date <= day <= blocking.end_date)
 
+    def _produce_disabled_bars(self):
+        # Produces bars for days when bookings cannot be made.
+        for room in self.rooms:
+            self.bars.extend(
+                Bar(datetime.combine(day, time()), datetime.combine(day, time(23, 59)), kind=Bar.DISABLED,
+                    room_id=room.id)
+                for day in self.iter_days()
+                if not room.check_advance_days(day, user=session.user, quiet=True)
+            )
+
 
 class Bar(Serializer):
     __public__ = [
@@ -242,7 +254,7 @@ class Bar(Serializer):
         ('reservation_end', 'resvEndDT')
     ]
 
-    BLOCKED, PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, PRECONFLICT, CONFLICT = range(7)
+    BLOCKED, PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, PRECONFLICT, CONFLICT, DISABLED = range(8)
     _mapping = {
         BLOCKED: 'blocked',                 # A blocked-room period
         CANDIDATE: 'candidate',             # A reservation candidate
@@ -250,16 +262,17 @@ class Bar(Serializer):
         PREBOOKED: 'pre-booked',            # A unconfirmed reservation
         PRECONCURRENT: 'pre-concurrent',    # A conflict between unconfirmed reservations
         PRECONFLICT: 'pre-conflict',        # A conflicting unconfirmed reservation
-        UNAVAILABLE: 'unavailable'          # A confirmed reservation
+        UNAVAILABLE: 'unavailable',         # A confirmed reservation
+        DISABLED: 'disabled'                # A period during which bookings are disabled
     }
 
-    def __init__(self, start, end, kind=None, reservation=None, overlapping=False, blocking=None):
+    def __init__(self, start, end, kind=None, reservation=None, overlapping=False, blocking=None, room_id=None):
         self.start = start
         self.end = end
         self.reservation = reservation
         self.reservation_start = None
         self.reservation_end = None
-        self.room_id = None
+        self.room_id = room_id
         self.blocking = None
 
         if reservation is not None:
@@ -291,8 +304,7 @@ class Bar(Serializer):
 
     @classmethod
     def from_candidate(cls, candidate, room_id, resv_start, resv_end, blocking=None):
-        self = cls(candidate.start_dt, candidate.end_dt, cls.CANDIDATE, blocking=blocking)
-        self.room_id = room_id
+        self = cls(candidate.start_dt, candidate.end_dt, cls.CANDIDATE, blocking=blocking, room_id=room_id)
         self.reservation_start = resv_start
         self.reservation_end = resv_end
         return self
@@ -303,10 +315,8 @@ class Bar(Serializer):
 
     @classmethod
     def from_blocked_room(cls, blocked_room, day):
-        bar = cls(datetime.combine(day, time()), datetime.combine(day, time(23, 59)), Bar.BLOCKED,
-                  blocking=blocked_room.blocking)
-        bar.room_id = blocked_room.room_id
-        return bar
+        return cls(datetime.combine(day, time()), datetime.combine(day, time(23, 59)), Bar.BLOCKED,
+                   blocking=blocked_room.blocking, room_id=blocked_room.room_id)
 
     @property
     def date(self):

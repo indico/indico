@@ -100,6 +100,19 @@
     border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 }
 
+.barDisable { /* Bar representing a period where booking is disabled */
+    background-color: #708090;
+    border-color: #4E5964 #4E5964 #434C56;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+
+    &:hover {
+        border-color: #4E5964 #4E5964 #434C56 !important;
+        border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) !important;
+        opacity: 1;
+        filter:alpha(opacity=70);
+    }
+}
+
 .barProt.barCand {
     background-image: none;
     background-color: #DA4F49;
