@@ -183,6 +183,7 @@ class RoomBookingCalendarWidget(object):
         if self.candidates is not None:
             self._produce_candidate_bars()
             self._produce_conflict_bars()
+            self._produce_out_of_range_bars()
         if self.show_blockings:
             self._produce_blocking_bars()
 
@@ -207,8 +208,6 @@ class RoomBookingCalendarWidget(object):
                 for cand in candidates:
                     bar = Bar.from_candidate(cand, room.id, start_dt, end_dt, blocking)
                     self.bars.append(bar)
-
-        self._produce_disabled_bars()  # If we have candidate bars we also want to show when the room cannot be booked.
 
     def _produce_prereservation_overlap_bars(self):
         for _, occurrences in groupby((o for o in self.occurrences if not o.reservation.is_accepted),
@@ -237,11 +236,10 @@ class RoomBookingCalendarWidget(object):
                              for day in self.iter_days()
                              if blocking.start_date <= day <= blocking.end_date)
 
-    def _produce_disabled_bars(self):
-        # Produces bars for days when bookings cannot be made.
+    def _produce_out_of_range_bars(self):
         for room in self.rooms:
             self.bars.extend(
-                Bar(datetime.combine(day, time()), datetime.combine(day, time(23, 59)), kind=Bar.DISABLED,
+                Bar(datetime.combine(day, time()), datetime.combine(day, time(23, 59)), kind=Bar.OUT_OF_RANGE,
                     room_id=room.id)
                 for day in self.iter_days()
                 if not room.check_advance_days(day, user=session.user, quiet=True)
@@ -254,7 +252,7 @@ class Bar(Serializer):
         ('reservation_end', 'resvEndDT')
     ]
 
-    BLOCKED, PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, PRECONFLICT, CONFLICT, DISABLED = range(8)
+    BLOCKED, PREBOOKED, PRECONCURRENT, UNAVAILABLE, CANDIDATE, PRECONFLICT, CONFLICT, OUT_OF_RANGE = range(8)
     _mapping = {
         BLOCKED: 'blocked',                 # A blocked-room period
         CANDIDATE: 'candidate',             # A reservation candidate
@@ -263,7 +261,7 @@ class Bar(Serializer):
         PRECONCURRENT: 'pre-concurrent',    # A conflict between unconfirmed reservations
         PRECONFLICT: 'pre-conflict',        # A conflicting unconfirmed reservation
         UNAVAILABLE: 'unavailable',         # A confirmed reservation
-        DISABLED: 'disabled'                # A period during which bookings are disabled
+        OUT_OF_RANGE: 'out_of_range'        # A period out of the booking range
     }
 
     def __init__(self, start, end, kind=None, reservation=None, overlapping=False, blocking=None, room_id=None):
