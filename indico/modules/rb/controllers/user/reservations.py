@@ -375,6 +375,10 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
                 start_date = datetime.strptime(request.args['start_date'], '%Y-%m-%d').date()
             except ValueError:
                 pass
+            else:
+                if not self._room.check_advance_days(start_date, user=session.user, quiet=True):
+                    start_date = date.today()
+                    flash(_(u"This room cannot be booked at the desired date, using today's date instead."), 'warning')
 
         self.past_date = start_date is not None and start_date < date.today()
         if start_date is None or start_date <= date.today():
