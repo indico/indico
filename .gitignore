@@ -39,6 +39,7 @@ node_modules
 # IDE files
 .idea
 *.sublime-*
+*.komodoproject
 
 # testing
 .noseids
