@@ -157,4 +157,4 @@ class ModifyBookingForm(NewBookingSimpleForm):
 
     def validate_start_dt(self, field):
         if field.data.date() < self._old_start_date and not session.user.isAdmin():
-            raise ValidationError(_(u'The start time cannot be moved into the paste.'))
+            raise ValidationError(_(u'The start time cannot be moved into the past.'))
