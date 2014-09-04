@@ -35,7 +35,7 @@ class MockAvatarHolder:
 
     @classmethod
     def getById(cls, id_):
-        return cls._avatars[id_]
+        return cls._avatars.get(id_)
 
 
 class MockAvatar(object):
