@@ -16,7 +16,9 @@
 
 import pytest
 
+from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.room_attributes import RoomAttribute
 from indico.modules.rb.models.rooms import Room
 
 
@@ -24,8 +26,8 @@ from indico.modules.rb.models.rooms import Room
 def create_location(db):
     """Returns a callable which lets you create locations"""
 
-    def _create_location(**params):
-        location = Location(**params)
+    def _create_location(name, **params):
+        location = Location(name=name, **params)
         db.session.add(location)
         db.session.flush()
         return location
@@ -36,7 +38,7 @@ def create_location(db):
 @pytest.fixture
 def dummy_location(db, create_location):
     """Gives you a dummy default location"""
-    loc = create_location(name='Test')
+    loc = create_location('Test')
     loc.set_default()
     db.session.flush()
     return loc
@@ -66,3 +68,33 @@ def create_room(db, dummy_location, dummy_user):
 def dummy_room(create_room):
     """Gives you a dummy room"""
     return create_room()
+
+
+@pytest.fixture
+def create_room_attribute(db, dummy_location):
+    """Returns a callable which let you create room attributes"""
+
+    def _create_attribute(name, **params):
+        params.setdefault('location', dummy_location)
+        params.setdefault('title', name)
+        params.setdefault('type', 'str')
+        params.setdefault('is_required', False)
+        params.setdefault('is_hidden', False)
+        attr = RoomAttribute(name=name, **params)
+        db.session.flush()
+        return attr
+
+    return _create_attribute
+
+
+@pytest.fixture
+def create_equipment_type(db, dummy_location):
+    """Returns a callable which let you create equipment types"""
+
+    def _create_equipment_type(name, **params):
+        params.setdefault('location', dummy_location)
+        eq = EquipmentType(name=name, **params)
+        db.session.flush()
+        return eq
+
+    return _create_equipment_type

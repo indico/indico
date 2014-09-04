@@ -36,3 +36,9 @@ def monkeypatch_methods(monkeypatch):
             monkeypatch.setattr('{}.{}'.format(target, name), method)
 
     return _monkeypatch_methods
+
+
+@pytest.fixture(params=(True, False))
+def bool_flag(request):
+    """Parametrizes the test with a boolean value that is once true and once false"""
+    return request.param
