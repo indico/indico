@@ -601,6 +601,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             attr_assoc.value = value
             attr_assoc.attribute = attr
             self.attributes.append(attr_assoc)
+        db.session.flush()
 
     @property
     def notification_emails(self):
