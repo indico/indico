@@ -37,56 +37,62 @@ def test_is_map_available(dummy_location, db):
     assert dummy_location.is_map_available
 
 
-def test_default_location(dummy_location, create_location):
-    assert Location.default_location == dummy_location
-    create_location(name='Foo')  # should not change the default
-    assert Location.default_location == dummy_location
+def test_default_location(create_location):
+    assert Location.default_location is None
+    location = create_location('Foo', is_default=True)
+    assert Location.default_location == location
+    create_location(name='Bar')  # should not change the default
+    assert Location.default_location == location
 
 
-def test_set_default(dummy_location, create_location):
-    assert dummy_location.is_default
-    other_location = create_location(name='Foo')
+def test_set_default(create_location):
+    location = create_location('Foo')
+    other_location = create_location('Bar')
+    assert not location.is_default
     assert not other_location.is_default
-    other_location.set_default()
-    assert other_location.is_default
-    assert not dummy_location.is_default
+    location.set_default()
+    assert location.is_default
+    assert not other_location.is_default
+    assert Location.default_location == location
     # Make sure calling it again does not flip the default state
+    location.set_default()
+    assert location.is_default
+    assert not other_location.is_default
+    # Change the default
     other_location.set_default()
+    assert not location.is_default
     assert other_location.is_default
-    assert not dummy_location.is_default
-    assert Location.default_location == other_location
 
 
-def test_get_attribute_by_name(db, dummy_location):
+def test_get_attribute_by_name(dummy_location, create_room_attribute):
     assert dummy_location.get_attribute_by_name('foo') is None
-    attr = RoomAttribute(name='foo', title='foo', type='str', is_required=False, is_hidden=False)
-    dummy_location.attributes.append(attr)
-    db.session.flush()
+    attr = create_room_attribute('foo')
     assert dummy_location.get_attribute_by_name('foo') == attr
     assert dummy_location.get_attribute_by_name('bar') is None
 
 
-def test_get_equipment_by_name(db, dummy_location):
+def test_get_equipment_by_name(dummy_location, create_equipment_type):
     assert dummy_location.get_equipment_by_name('foo') is None
-    eq = EquipmentType(name='foo')
-    dummy_location.equipment_types.append(eq)
-    db.session.flush()
+    eq = create_equipment_type('foo')
     assert dummy_location.get_equipment_by_name('foo') == eq
     assert dummy_location.get_equipment_by_name('bar') is None
 
 
-def test_get_buildings(db, dummy_location, dummy_user, create_room, dummy_room):
-    assert dummy_room.longitude is None
-    assert dummy_room.latitude is None
+def test_get_buildings(db, dummy_location, create_room):
+    room = create_room()
+    assert dummy_location.rooms.count() == 1
+    assert room.longitude is None
+    assert room.latitude is None
     assert not dummy_location.get_buildings()  # no buildings with coordinates
-    create_room(building='111', floor='1', number='1', name='', owner_id=dummy_user.id, longitude=1.23, latitude=4.56)
-    create_room(building='111', floor='1', number='2', name='', owner_id=dummy_user.id, longitude=1.23, latitude=4.56)
-    create_room(building='222', floor='1', number='1', name='', owner_id=dummy_user.id, longitude=1.3, latitude=3.7)
-    create_room(building='222', floor='1', number='1', name='', owner_id=dummy_user.id)
+    create_room(building='111', longitude=1.23, latitude=4.56)
+    create_room(building='111', longitude=1.23, latitude=4.56)
+    create_room(building='222', longitude=1.3, latitude=3.7)
+    create_room(building='222')
     db.session.flush()
     buildings = dummy_location.get_buildings()
+    assert buildings
     for building in buildings:
-        rooms = Room.find_all(building=building['number'])
+        rooms = dummy_location.rooms.filter_by(building=building['number']).all()
         assert {r['id'] for r in building['rooms']} == {r.id for r in rooms}
         assert any(r.latitude and r.longitude for r in rooms)  # at least one room in the building needs coordinates
         for room in rooms:
