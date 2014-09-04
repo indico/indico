@@ -88,8 +88,8 @@ ${ form.repeat_interval(type='hidden') }
             }
         });
 
-        $('#sDatePlace').datepicker('setDate', "${ format_date(form.start_dt.data, format='short') }");
-        $('#eDatePlace').datepicker('setDate', "${ format_date(form.end_dt.data, format='short') }");
+        $('#sDatePlace').datepicker('setDate', "${ form.start_dt.data.strftime('%d/%m/%Y') }");
+        $('#eDatePlace').datepicker('setDate', "${ form.end_dt.data.strftime('%d/%m/%Y') }");
         $('#eDatePlace').datepicker('option', 'minDate', $('#sDatePlace').datepicker('getDate'));
 
         $("#repeatability input:radio[name=repeat_frequency]").change(function() {
