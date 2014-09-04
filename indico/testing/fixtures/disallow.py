@@ -14,25 +14,27 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import inspect
-
 import pytest
 
 
-@pytest.fixture
-def monkeypatch_methods(monkeypatch):
-    """Monkeypatches all methods from `cls` onto `target`
+@pytest.fixture(autouse=True)
+def disallow_emails(monkeypatch):
+    """Prevents any code from connecting to a SMTP server"""
 
-    This utility lets you eaasily mock multiple methods in an existing class.
-    In case of classmethods the binding will not be changed, i.e. `cls` will
-    keep pointing to the source class and not the target class.
-    """
+    def _fail(*args, **kwargs):
+        pytest.fail('Code tried to send an email unexpectedly')
 
-    def _monkeypatch_methods(target, cls):
-        for name, method in inspect.getmembers(cls, inspect.ismethod):
-            if method.im_self is None:
-                # For unbound methods we need to copy the underlying function
-                method = method.im_func
-            monkeypatch.setattr('{}.{}'.format(target, name), method)
+    monkeypatch.setattr('smtplib.SMTP.connect', _fail)
+    monkeypatch.setattr('logging.handlers.SMTPHandler.emit', _fail)
 
-    return _monkeypatch_methods
+
+@pytest.fixture(autouse=True)
+def disallow_zodb(monkeypatch):
+    """Prevents any code from connecting to ZODB"""
+
+    @staticmethod
+    def _fail(*args, **kwargs):
+        __tracebackhide__ = True
+        pytest.fail('Code tried to connect to ZODB')
+
+    monkeypatch.setattr('indico.core.db.manager.DBMgr.getInstance', _fail)

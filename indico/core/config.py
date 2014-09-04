@@ -28,7 +28,7 @@ import socket
 import sys
 import urlparse
 
-from flask import request
+from flask import request, current_app
 
 import MaKaC
 from indico.core.db import DBMgr
@@ -787,6 +787,9 @@ class Config:
         # to be loaded from setup.py and at that point we don't have db access
         # and therefore the import will fail.
         import MaKaC.common.info as info
+
+        if current_app.config['TESTING']:
+            return 'Default.css'
 
         with DBMgr.getInstance().global_connection():
             defTemplate = info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultTemplateSet()

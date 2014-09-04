@@ -23,20 +23,21 @@ from indico.core.config import Config
 from indico.core.logger import Logger
 
 
-pytest_plugins = ('indico.testing.fixtures.app', 'indico.testing.fixtures.database', 'indico.testing.fixtures.user',
-                  'indico.testing.fixtures.util')
+pytest_plugins = ('indico.testing.fixtures.app', 'indico.testing.fixtures.database', 'indico.testing.fixtures.disallow',
+                  'indico.testing.fixtures.user', 'indico.testing.fixtures.util')
 
 
 def pytest_configure(config):
     config.indico_temp_dir = py.path.local(tempfile.mkdtemp(prefix='indicotesttmp.'))
     # Throw away all indico.conf options early
     Config.getInstance().reset({
+        'DBConnectionParams': ('localhost', 0),  # invalid port - just so we never connect to a real ZODB!
+        'SmtpServer': ('localhost', 0),  # invalid port - just in case so we NEVER send emails!
         'CacheBackend': 'null',
         'Loggers': [],
         'UploadedFilesTempDir': config.indico_temp_dir.strpath,
         'XMLCacheDir': config.indico_temp_dir.strpath,
-        'ArchiveDir': config.indico_temp_dir.strpath,
-        'SmtpServer': ('localhost', 99999)  # invalid port - just in case so we NEVER send emails!
+        'ArchiveDir': config.indico_temp_dir.strpath
     })
     # Make sure we don't write any log files (or worse: send emails)
     Logger.reset()

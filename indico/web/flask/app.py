@@ -242,7 +242,8 @@ def make_app(set_path=False, db_setup=True, testing=False):
     fix_root_path(app)
     configure_app(app, set_path)
     setup_jinja(app)
-    setup_assets()
+    with app.app_context():
+        setup_assets()
 
     if db_setup:
         configure_db(app)
@@ -252,7 +253,8 @@ def make_app(set_path=False, db_setup=True, testing=False):
     add_blueprints(app)
     if app.config['INDICO_COMPAT_ROUTES']:
         add_compat_blueprints(app)
-    add_plugin_blueprints(app)
+    if not app.config['TESTING']:
+        add_plugin_blueprints(app)
 
     Logger.init_app(app)
 
