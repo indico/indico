@@ -175,10 +175,9 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBase):
             user.addRegistrant(rp)
             rp.setAvatar(user)
 
+        # This creates the email to the new registrant and SENDS the email to the organizers if necessary... WTF.
+        email = self._regForm.getNotification().createEmailNewRegistrant(self._regForm, rp)
         if self._regForm.isSendRegEmail() and rp.getEmail().strip():
-            # avoid multiple sending in case of db conflict
-            email = self._regForm.getNotification().createEmailNewRegistrant(self._regForm, rp)
-
             modEticket = self._conf.getRegistrationForm().getETicket()
 
             if modEticket.isEnabled() and modEticket.isAttachedToEmail():
@@ -187,7 +186,6 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBase):
                     'binary': TicketToPDF(self._target, rp).getPDFBin(),
                 }
                 email["attachments"] = [attachment]
-
             GenericMailer.send(email)
 
         if canManageRegistration and user != self._getUser():
