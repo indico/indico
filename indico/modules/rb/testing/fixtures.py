@@ -23,6 +23,7 @@ from indico.modules.rb.models.rooms import Room
 @pytest.fixture
 def create_location(db):
     """Returns a callable which lets you create locations"""
+
     def _create_location(**params):
         location = Location(**params)
         db.session.add(location)
@@ -37,15 +38,20 @@ def dummy_location(db, create_location):
     """Gives you a dummy default location"""
     loc = create_location(name='Test')
     loc.set_default()
-    db.session.add(loc)
     db.session.flush()
     return loc
 
 
 @pytest.fixture
-def create_room(db, dummy_location):
+def create_room(db, dummy_location, dummy_user):
     """Returns a callable which lets you create rooms"""
+
     def _create_room(**params):
+        params.setdefault('building', '1')
+        params.setdefault('floor', '2')
+        params.setdefault('number', '3')
+        params.setdefault('name', '')
+        params.setdefault('owner_id', dummy_user.id)
         params.setdefault('location', dummy_location)
         room = Room(**params)
         room.update_name()
@@ -57,9 +63,6 @@ def create_room(db, dummy_location):
 
 
 @pytest.fixture
-def dummy_room(db, create_room, dummy_user):
+def dummy_room(create_room):
     """Gives you a dummy room"""
-    room = create_room(building='123', floor='4', number='56', name='', owner_id=dummy_user.id)
-    db.session.add(room)
-    db.session.flush()
-    return room
+    return create_room()

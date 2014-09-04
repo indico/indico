@@ -14,17 +14,24 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import pytest
+
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
 
 
-class TestRoom:
-    def test_owner(self, dummy_room, dummy_user):
-        assert dummy_room.owner.id == dummy_user.id
-        dummy_room.owner_id = 'xxx'
-        assert dummy_room.owner is None
+def test_owner(dummy_room, dummy_user):
+    assert dummy_room.owner.id == dummy_user.id
+    dummy_room.owner_id = 'xxx'
+    assert dummy_room.owner is None
 
-    def test_full_name(self, dummy_room):
-        assert dummy_room.full_name == '123-4-56'
-        dummy_room.name = 'Test'
-        assert dummy_room.full_name == '123-4-56 - Test'
+
+@pytest.mark.parametrize(('room_args', 'expected_name'), (
+    ({}, u'1-2-3'),
+    ({'building': u'X'}, u'X-2-3'),
+    ({'name': u'Test'}, u'1-2-3 - Test'),
+    ({'name': u'm\xf6p'}, u'1-2-3 - m\xf6p')
+))
+def test_full_name(create_room, room_args, expected_name):
+    room = create_room(**room_args)
+    assert room.full_name == expected_name
