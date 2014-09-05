@@ -21,27 +21,30 @@ from MaKaC.user import AvatarHolder
 
 
 @pytest.yield_fixture
-def dummy_user_factory(monkeypatch_methods):
+def create_user(monkeypatch_methods):
     """Returns a callable which lets you create dummy users"""
     monkeypatch_methods('MaKaC.user.AvatarHolder', MockAvatarHolder)
 
     _avatars = []
     ah = AvatarHolder()
 
-    def _dummy_user_factory(id_):
+    def _create_user(id_, name='Pig', surname='Guinea', email='p.guinea@example.com'):
         avatar = MockAvatar()
         avatar.id = id_
+        avatar.name = name
+        avatar.surname = surname
+        avatar.email = email
         ah.add(avatar)
         _avatars.append(avatar)
         return avatar
 
-    yield _dummy_user_factory
+    yield _create_user
 
     for avatar in _avatars:
         ah.remove(avatar)
 
 
 @pytest.fixture
-def dummy_user(dummy_user_factory):
+def dummy_user(create_user):
     """Creates a mocked dummy avatar"""
-    return dummy_user_factory('dummy')
+    return create_user('dummy')

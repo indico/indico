@@ -41,3 +41,12 @@ class MockAvatarHolder:
 class MockAvatar(object):
     def __repr__(self):
         return '<MockAvatar({})>'.format(self.id)
+
+    def getEmail(self):
+        return self.email
+
+    def getFullName(self):
+        return '{}, {}'.format(self.surname.upper(), self.name)
+
+    def getId(self):
+        return self.id
