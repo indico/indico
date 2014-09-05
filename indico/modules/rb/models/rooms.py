@@ -259,6 +259,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             return u'{}'.format(self.generate_name())
 
     @property
+    def has_special_name(self):
+        return self.name and self.name != self.generate_name()
+
+    @property
     @cached(_cache)
     def has_booking_groups(self):
         return self.has_attribute('allowed-booking-group')
@@ -269,13 +273,14 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return self.has_equipment('Computer Projector')
 
     @property
-    def has_special_name(self):
-        return self.name and self.name != self.generate_name()
-
-    @property
     @cached(_cache)
     def has_webcast_recording(self):
         return self.has_equipment('Webcast/Recording')
+
+    @property
+    @cached(_cache)
+    def has_vc(self):
+        return self.has_equipment('Video conference')
 
     @property
     @cached(_cache)
@@ -307,11 +312,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             infos.append(_(u'video conference'))
 
         return u', '.join(map(unicode, infos))
-
-    @property
-    @cached(_cache)
-    def has_vc(self):
-        return self.has_equipment('Video conference')
 
     @property
     def large_photo_url(self):

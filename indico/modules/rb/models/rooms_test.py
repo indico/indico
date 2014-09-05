@@ -29,6 +29,29 @@ def test_is_auto_confirm(create_room, bool_flag):
     assert Room.find_first(is_auto_confirm=not bool_flag) == room
 
 
+@pytest.mark.parametrize(('building', 'floor', 'number', 'name', 'expected_name'), (
+    (u'1', u'2', u'3', u'',       u'1-2-3'),
+    (u'1', u'2', u'X', u'',       u'1-2-X'),
+    (u'1', u'X', u'3', u'',       u'1-X-3'),
+    (u'X', u'2', u'3', u'',       u'X-2-3'),
+    (u'1', u'2', u'3', u'Test',   u'1-2-3 - Test'),
+    (u'1', u'2', u'3', u'm\xf6p', u'1-2-3 - m\xf6p')
+))
+def test_full_name(create_room, building, floor, number, name, expected_name):
+    room = create_room(building=building, floor=floor, number=number, name=name)
+    assert room.full_name == expected_name
+
+
+@pytest.mark.parametrize(('name', 'expected'), (
+    (u'',      False),
+    (u'1-2-3', False),
+    (u'Test',  True),
+))
+def test_has_special_name(create_room, name, expected):
+    room = create_room(name=name)
+    assert room.has_special_name == expected
+
+
 @pytest.mark.parametrize(('value', 'expected'), (
     (u'foo', True),
     (u'',    False)
@@ -52,6 +75,13 @@ def test_has_webcast_recording(create_equipment_type, dummy_room, db):
     dummy_room.available_equipment.append(create_equipment_type(u'Webcast/Recording'))
     db.session.flush()
     assert dummy_room.has_webcast_recording
+
+
+def test_has_vc(create_equipment_type, dummy_room, db):
+    assert not dummy_room.has_vc
+    dummy_room.available_equipment.append(create_equipment_type(u'Video conference'))
+    db.session.flush()
+    assert dummy_room.has_vc
 
 
 @pytest.mark.parametrize(('reservable', 'booking_group', 'expected'), (
@@ -110,16 +140,3 @@ def test_owner(dummy_room, dummy_user):
     assert dummy_room.owner.id == dummy_user.id
     dummy_room.owner_id = u'xxx'
     assert dummy_room.owner is None
-
-
-@pytest.mark.parametrize(('building', 'floor', 'number', 'name', 'expected_name'), (
-    (u'1', u'2', u'3', u'',       u'1-2-3'),
-    (u'1', u'2', u'X', u'',       u'1-2-X'),
-    (u'1', u'X', u'3', u'',       u'1-X-3'),
-    (u'X', u'2', u'3', u'',       u'X-2-3'),
-    (u'1', u'2', u'3', u'Test',   u'1-2-3 - Test'),
-    (u'1', u'2', u'3', u'm\xf6p', u'1-2-3 - m\xf6p')
-))
-def test_full_name(create_room, building, floor, number, name, expected_name):
-    room = create_room(building=building, floor=floor, number=number, name=name)
-    assert room.full_name == expected_name
