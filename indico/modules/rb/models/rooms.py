@@ -329,6 +329,14 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
         return u', '.join(map(unicode, infos))
 
+    @property
+    def owner(self):
+        return AvatarHolder().getById(self.owner_id)
+
+    @property
+    def notification_emails(self):
+        return set(filter(None, map(unicode.strip, self.get_attribute_value(u'notification-email', u'').split(u','))))
+
     @return_ascii
     def __repr__(self):
         return u'<Room({0}, {1}, {2})>'.format(
@@ -341,11 +349,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return self.available_equipment.filter_by(name=equipment_name).count() > 0
 
     def find_available_vc_equipment(self):
-        vc_equipment = self.available_equipment \
-                           .correlate(Room) \
-                           .with_entities(EquipmentType.id) \
-                           .filter_by(name='Video conference') \
-                           .as_scalar()
+        vc_equipment = (self.available_equipment
+                        .correlate(Room)
+                        .with_entities(EquipmentType.id)
+                        .filter_by(name='Video conference')
+                        .as_scalar())
         return self.available_equipment.filter(EquipmentType.parent_id == vc_equipment)
 
     def get_attribute_by_name(self, attribute_name):
@@ -559,10 +567,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 rooms = matching_capacity_rooms
         return rooms
 
-    @property
-    def owner(self):
-        return AvatarHolder().getById(self.owner_id)
-
     def has_live_reservations(self):
         return self.reservations.filter_by(
             is_archived=False,
@@ -601,10 +605,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             attr_assoc.attribute = attr
             self.attributes.append(attr_assoc)
         db.session.flush()
-
-    @property
-    def notification_emails(self):
-        return set(filter(None, map(unicode.strip, self.get_attribute_value(u'notification-email', u'').split(u','))))
 
     def _can_be_booked(self, avatar, prebook=False, ignore_admin=False):
         if not avatar or not rb_check_user_access(avatar):
