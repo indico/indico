@@ -78,7 +78,7 @@ def import_all_models():
             package = os.path.relpath(root, package_root).replace(os.sep, '.')
             modules += ['indico.{}.{}'.format(package, name[:-3])
                         for name in files
-                        if name.endswith('.py') and name != '__init__.py']
+                        if name.endswith('.py') and name != '__init__.py' and not name.endswith('_test.py')]
 
     for module in modules:
         import_module(module)
