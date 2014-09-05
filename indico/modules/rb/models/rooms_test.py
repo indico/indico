@@ -89,6 +89,23 @@ def test_location_name(dummy_room, dummy_location):
     assert dummy_room.location_name == dummy_location.name
 
 
+@pytest.mark.parametrize(('capacity', 'is_reservable', 'reservations_need_confirmation', 'has_vc', 'expected'), (
+    (1, False, True,  False, u'1 person, private, needs confirmation'),
+    (2, False, True,  False, u'2 people, private, needs confirmation'),
+    (2, True,  True,  False, u'2 people, public, needs confirmation'),
+    (2, False, False, False, u'2 people, private, auto-confirmation'),
+    (2, False, True,  True,  u'2 people, private, needs confirmation, video conference')
+))
+def test_marker_description(db, create_room, create_equipment_type,
+                            capacity, is_reservable, reservations_need_confirmation, has_vc, expected):
+    room = create_room(capacity=capacity, is_reservable=is_reservable,
+                       reservations_need_confirmation=reservations_need_confirmation)
+    if has_vc:
+        room.available_equipment.append(create_equipment_type(u'Video conference'))
+        db.session.flush()
+    assert room.marker_description == expected
+
+
 def test_owner(dummy_room, dummy_user):
     assert dummy_room.owner.id == dummy_user.id
     dummy_room.owner_id = u'xxx'
