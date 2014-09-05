@@ -476,9 +476,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
         if only_active:
             query = query.filter(Room.is_active)
-        if filters:
+        if filters:  # pragma: no cover
             query = query.filter(*filters)
-        if order:
+        if order:  # pragma: no cover
             query = query.order_by(*order)
 
         keys = ('room',) + tuple(args)

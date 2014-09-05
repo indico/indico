@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict, OrderedDict
-from itertools import groupby
+from itertools import groupby, chain, combinations
 
 from flask import render_template_string
 
@@ -69,3 +69,10 @@ def render_nested(objects, template=NESTED_TEMPLATE):
             children[obj.parent_id][obj.id] = {'name': obj.name, 'children': OrderedDict()}
             children[obj.id] = children[obj.parent_id][obj.id]['children']
     return render_template_string(template, items=tree)
+
+
+def powerset(iterable):
+    """powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"""
+    # Taken from https://docs.python.org/2/library/itertools.html#recipes
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))

@@ -14,11 +14,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import itertools
 from operator import itemgetter
 
 import pytest
 
 from indico.modules.rb.models.rooms import Room
+from indico.util.struct.iterables import powerset
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
@@ -305,3 +307,58 @@ def test_find_with_attribute(dummy_room, create_room, create_room_attribute):
         room.set_attribute_value(u'foo', value)
         expected.add((room, value))
     assert set(Room.find_with_attribute(u'foo')) == expected
+
+
+def test_get_with_data_errors():
+    with pytest.raises(ValueError):
+        Room.get_with_data(foo='bar')
+
+
+@pytest.mark.parametrize(('only_active', 'data'), list(itertools.product(
+    (True, False),
+    powerset(('equipment', 'vc_equipment', 'non_vc_equipment'))
+)))
+def test_get_with_data(db, create_room, create_equipment_type, only_active, data):
+    eq = create_equipment_type(u'eq')
+    vc = create_equipment_type(u'Video conference')
+    vc1 = create_equipment_type(u'vc1')
+    vc2 = create_equipment_type(u'vc2')
+    vc.children.append(vc1)
+    vc.children.append(vc2)
+
+    rooms = {
+        'inactive': {'room': create_room(is_active=False),
+                     'equipment': set(),
+                     'vc_equipment': set(),
+                     'non_vc_equipment': set()},
+        'no_eq': {'room': create_room(),
+                  'equipment': set(),
+                  'vc_equipment': set(),
+                  'non_vc_equipment': set()},
+        'non_vc_eq': {'room': create_room(),
+                      'equipment': {eq},
+                      'vc_equipment': set(),
+                      'non_vc_equipment': {eq}},
+        'vc_eq': {'room': create_room(),
+                  'equipment': {vc, vc1, vc2},
+                  'vc_equipment': {vc1, vc2},
+                  'non_vc_equipment': {vc}},
+        'all_eq': {'room': create_room(),
+                   'equipment': {eq, vc, vc1, vc2},
+                   'vc_equipment': {vc1, vc2},
+                   'non_vc_equipment': {vc, eq}}
+    }
+    room_types = {room_data['room']: type_ for type_, room_data in rooms.iteritems()}
+    for room in rooms.itervalues():
+        room['room'].available_equipment = room['equipment']
+    db.session.flush()
+    results = list(Room.get_with_data(*data, only_active=only_active))
+    assert len(results) == len(rooms) - only_active
+    for row in results:
+        room = row.pop('room')
+        assert row.viewkeys() == set(data)
+        room_type = room_types[room]
+        if room_type == 'inactive':
+            assert not only_active
+        for key in data:
+            assert set(row[key]) == {x.name for x in rooms[room_type][key]}
