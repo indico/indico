@@ -470,12 +470,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                     .as_scalar()
                 ))
 
-        if not entities:
-            raise ValueError('No data provided')
-
-        query = query.with_entities(*entities) \
-                     .outerjoin(Location, Location.id == Room.location_id) \
-                     .group_by(Location.name, Room.id)
+        query = (query.with_entities(*entities)
+                 .outerjoin(Location, Location.id == Room.location_id)
+                 .group_by(Location.name, Room.id))
 
         if only_active:
             query = query.filter(Room.is_active)
