@@ -365,6 +365,29 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def has_attribute(self, attribute_name):
         return self.get_attribute_by_name(attribute_name) is not None
 
+    @cached(_cache)
+    def get_attribute_value(self, name, default=None):
+        attr = self.get_attribute_by_name(name)
+        return attr.value if attr else default
+
+    def set_attribute_value(self, name, value):
+        attr = self.get_attribute_by_name(name)
+        if attr:
+            if value:
+                attr.value = value
+            else:
+                self.attributes.filter(RoomAttributeAssociation.attribute_id == attr.attribute_id) \
+                    .delete(synchronize_session='fetch')
+        elif value:
+            attr = self.location.get_attribute_by_name(name)
+            if not attr:
+                raise ValueError("Attribute {} not supported in location {}".format(name, self.location_name))
+            attr_assoc = RoomAttributeAssociation()
+            attr_assoc.value = value
+            attr_assoc.attribute = attr
+            self.attributes.append(attr_assoc)
+        db.session.flush()
+
     def getLocator(self):
         locator = Locator()
         locator['roomLocation'] = self.location_name
@@ -582,29 +605,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 .filter(or_(Blocking.is_active_at(d) for d in dates),
                         BlockedRoom.state.in_(states))
                 .all())
-
-    @cached(_cache)
-    def get_attribute_value(self, name, default=None):
-        attr = self.get_attribute_by_name(name)
-        return attr.value if attr else default
-
-    def set_attribute_value(self, name, value):
-        attr = self.get_attribute_by_name(name)
-        if attr:
-            if value:
-                attr.value = value
-            else:
-                self.attributes.filter(RoomAttributeAssociation.attribute_id == attr.attribute_id) \
-                    .delete(synchronize_session='fetch')
-        elif value:
-            attr = self.location.get_attribute_by_name(name)
-            if not attr:
-                raise ValueError("Attribute {} not supported in location {}".format(name, self.location_name))
-            attr_assoc = RoomAttributeAssociation()
-            attr_assoc.value = value
-            attr_assoc.attribute = attr
-            self.attributes.append(attr_assoc)
-        db.session.flush()
 
     def _can_be_booked(self, avatar, prebook=False, ignore_admin=False):
         if not avatar or not rb_check_user_access(avatar):

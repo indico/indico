@@ -20,6 +20,7 @@ from indico.modules.rb.models.rooms import Room
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
+_notset = object()
 
 
 def test_is_auto_confirm(create_room, bool_flag):
@@ -166,3 +167,88 @@ def test_owner(dummy_room, dummy_user):
     assert dummy_room.owner.id == dummy_user.id
     dummy_room.owner_id = u'xxx'
     assert dummy_room.owner is None
+
+
+@pytest.mark.parametrize(('value', 'emails'), (
+    (u'', set()),
+    (u'example@example.com', {u'example@example.com'}),
+    (u'  example@example.com   ,m\xf6p@example.cm\xf6pm  ', {u'example@example.com', u'm\xf6p@example.cm\xf6pm'}),
+))
+def test_notification_emails(create_room_attribute, dummy_room, value, emails):
+    create_room_attribute(u'notification-email')
+    dummy_room.set_attribute_value(u'notification-email', value)
+    assert dummy_room.notification_emails == emails
+
+
+@pytest.mark.parametrize(('name', 'expected'), (
+    (u'foo', True),
+    (u'bar', True),
+    (u'xxx', False),  # existent
+    (u'yyy', False),  # not existent
+))
+def test_has_equipment(create_equipment_type, dummy_room, name, expected):
+    dummy_room.available_equipment.append(create_equipment_type(u'foo'))
+    dummy_room.available_equipment.append(create_equipment_type(u'bar'))
+    create_equipment_type(u'xxx')
+    assert dummy_room.has_equipment(name) == expected
+
+
+def test_find_available_vc_equipment(db, dummy_room, create_equipment_type):
+    foo = create_equipment_type(u'foo')
+    vc = create_equipment_type(u'Video conference')
+    vc_items = [create_equipment_type(u'vc1'), create_equipment_type(u'vc2')]
+    vc.children += vc_items
+    dummy_room.available_equipment.extend(vc_items + [vc, foo])
+    db.session.flush()
+    assert set(dummy_room.find_available_vc_equipment()) == set(vc_items)
+
+
+def test_get_attribute_by_name(create_room_attribute, dummy_room):
+    attr = create_room_attribute(u'foo')
+    assert dummy_room.get_attribute_by_name(u'foo') is None
+    dummy_room.set_attribute_value(u'foo', u'bar')
+    assert dummy_room.get_attribute_by_name(u'foo').attribute == attr
+
+
+def test_has_attribute(create_room_attribute, dummy_room):
+    create_room_attribute(u'foo')
+    assert not dummy_room.has_attribute(u'foo')
+    dummy_room.set_attribute_value(u'foo', u'bar')
+    assert dummy_room.has_attribute(u'foo')
+
+
+@pytest.mark.parametrize(('value', 'expected'), (
+    (u'',        _notset),
+    (None,       _notset),
+    (0,          _notset),
+    ([],         _notset),
+    (u'foo',     u'foo'),
+    (123,        123),
+    (True,       True),
+    (['a', 'b'], ['a', 'b']),
+))
+def test_get_attribute_value(create_room_attribute, dummy_room, value, expected):
+    assert dummy_room.get_attribute_value(u'foo', _notset) is _notset
+    create_room_attribute(u'foo')
+    assert dummy_room.get_attribute_value(u'foo', _notset) is _notset
+    dummy_room.set_attribute_value(u'foo', value)
+    assert dummy_room.get_attribute_value(u'foo', _notset) == expected
+
+
+def test_set_attribute_value(create_room_attribute, dummy_room):
+    # setting an attribute that doesn't exist fails
+    with pytest.raises(ValueError):
+        dummy_room.set_attribute_value(u'foo', u'something')
+    create_room_attribute(u'foo')
+    # the value can be cleared even if it is not set
+    dummy_room.set_attribute_value(u'foo', None)
+    assert dummy_room.get_attribute_value(u'foo', _notset) is _notset
+    # set it to some value
+    dummy_room.set_attribute_value(u'foo', u'test')
+    assert dummy_room.get_attribute_value(u'foo') == u'test'
+    # set to some other value while we have an existing association entry
+    dummy_room.set_attribute_value(u'foo', u'something')
+    assert dummy_room.get_attribute_value(u'foo') == u'something'
+    # clear it
+    dummy_room.set_attribute_value(u'foo', None)
+    assert dummy_room.get_attribute_value(u'foo', _notset) is _notset
