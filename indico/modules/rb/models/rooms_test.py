@@ -55,9 +55,9 @@ def test_has_webcast_recording(create_equipment_type, dummy_room, db):
 
 
 @pytest.mark.parametrize(('reservable', 'booking_group', 'expected'), (
-    (True, '', True),
-    (True, 'xxx', False),
-    (False, '', False),
+    (True,  '',    True),
+    (True,  'xxx', False),
+    (False, '',    False),
     (False, 'xxx', False)
 ))
 def test_is_public(create_room_attribute, dummy_room, reservable, booking_group, expected):
@@ -69,13 +69,13 @@ def test_is_public(create_room_attribute, dummy_room, reservable, booking_group,
 
 @pytest.mark.parametrize(('is_reservable', 'reservations_need_confirmation', 'booking_group', 'expected_kind'), (
     (False, False, 'foo', 'privateRoom'),
-    (False, True, 'foo', 'privateRoom'),
-    (True, False, 'foo', 'privateRoom'),
-    (True, True, 'foo', 'privateRoom'),
-    (False, False, '', 'privateRoom'),
-    (False, True, '', 'privateRoom'),
-    (True, False, '', 'basicRoom'),
-    (True, True, '', 'moderatedRoom')
+    (False, True,  'foo', 'privateRoom'),
+    (True,  False, 'foo', 'privateRoom'),
+    (True,  True,  'foo', 'privateRoom'),
+    (False, False, '',    'privateRoom'),
+    (False, True,  '',    'privateRoom'),
+    (True,  False, '',    'basicRoom'),
+    (True,  True,  '',    'moderatedRoom')
 ))
 def test_kind(create_room, create_room_attribute,
               is_reservable, reservations_need_confirmation, booking_group, expected_kind):
