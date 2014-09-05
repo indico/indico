@@ -90,24 +90,36 @@ def test_is_valid(create_reservation, is_accepted, is_rejected, is_cancelled, ex
 # ======================================================================================================================
 
 
-def test_booked_for_user(dummy_reservation, dummy_user, create_user):
+def test_booked_for_user(dummy_reservation, dummy_user):
     assert dummy_reservation.booked_for_user == dummy_user
+
+
+def test_booked_for_user_after_change(dummy_reservation, create_user):
     other_user = create_user('other')
-    # Change user
     dummy_reservation.booked_for_user = other_user
     assert dummy_reservation.booked_for_user == other_user
     assert dummy_reservation.booked_for_id == other_user.id
     assert dummy_reservation.booked_for_name == other_user.getFullName()
-    # Have no booked_for_id
+
+
+def test_booked_for_user_with_no_id(dummy_reservation):
     dummy_reservation.booked_for_id = None
     assert dummy_reservation.booked_for_user is None
 
 
 def test_booked_for_user_email(dummy_reservation, dummy_user):
     assert dummy_reservation.booked_for_user_email == dummy_user.email
-    dummy_user.email = 'new.email@test.com'
+
+
+def test_booked_for_user_email_after_change(dummy_reservation, dummy_user, create_user):
+    dummy_user.email = 'new.email@example.com'
     assert dummy_reservation.booked_for_user_email == dummy_user.email
-    # Have no user_id
+    other_user = create_user('other')
+    dummy_reservation.booked_for_user = other_user
+    assert dummy_reservation.booked_for_user_email == other_user.email
+
+
+def test_booked_for_user_email_with_no_id(dummy_reservation):
     dummy_reservation.booked_for_id = None
     assert dummy_reservation.booked_for_user_email is None
 
