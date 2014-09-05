@@ -448,25 +448,23 @@ class AlarmTask(SendMailTask):
         if check:
             from MaKaC.conference import ConferenceHolder
             if not ConferenceHolder().hasKey(self.conf.getId()):
-                self.getLogger().warning("Conference %s no longer exists! "
-                                     "Deleting alarm." % self.conf.getId())
+                self.getLogger().warning("Conference %s no longer exists! Deleting alarm.".format(self.conf.getId()))
                 self.conf.removeAlarm(self)
                 self.suicide()
             elif self.conf.getStartDate() <= self._getCurrentDateTime():
-                self.getLogger().warning("Conference %s already started. "
-                                     "Deleting alarm." % self.conf.getId())
+                self.getLogger().warning("Conference %s already started. Deleting alarm.".format(self.conf.getId()))
                 self.conf.removeAlarm(self)
                 self.suicide()
                 return False
 
         # Email
         self.setUpSubject()
-        if self.getToAllParticipants() :
+        if self.getToAllParticipants():
             if self.conf.getType() == "conference":
                 for r in self.conf.getRegistrantsList():
                     self.addToUser(r)
             else:
-                for p in self.conf.getParticipation().getParticipantList() :
+                for p in self.conf.getParticipation().getParticipantList():
                     self.addToUser(p)
 
         from MaKaC.webinterface import urlHandlers
@@ -475,7 +473,8 @@ class AlarmTask(SendMailTask):
         else:
             url = urlHandlers.UHConferenceDisplay.getURL(self.conf)
 
-        self.setText(render_template('alarm_email.txt',
+        self.setText(render_template(
+            'alarm_email.txt',
             event=self.conf.fossilize(),
             url=url,
             note=self.note,
