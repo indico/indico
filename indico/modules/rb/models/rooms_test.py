@@ -91,12 +91,14 @@ def test_owner(dummy_room, dummy_user):
     assert dummy_room.owner is None
 
 
-@pytest.mark.parametrize(('room_args', 'expected_name'), (
-    ({}, u'1-2-3'),
-    ({'building': u'X'}, u'X-2-3'),
-    ({'name': u'Test'}, u'1-2-3 - Test'),
-    ({'name': u'm\xf6p'}, u'1-2-3 - m\xf6p')
+@pytest.mark.parametrize(('building', 'floor', 'number', 'name', 'expected_name'), (
+    (u'1', u'2', u'3', u'',       u'1-2-3'),
+    (u'1', u'2', u'X', u'',       u'1-2-X'),
+    (u'1', u'X', u'3', u'',       u'1-X-3'),
+    (u'X', u'2', u'3', u'',       u'X-2-3'),
+    (u'1', u'2', u'3', u'Test',   u'1-2-3 - Test'),
+    (u'1', u'2', u'3', u'm\xf6p', u'1-2-3 - m\xf6p')
 ))
-def test_full_name(create_room, room_args, expected_name):
-    room = create_room(**room_args)
+def test_full_name(create_room, building, floor, number, name, expected_name):
+    room = create_room(building=building, floor=floor, number=number, name=name)
     assert room.full_name == expected_name
