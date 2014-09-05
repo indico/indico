@@ -29,6 +29,16 @@ def test_is_auto_confirm(create_room, bool_flag):
     assert Room.find_first(is_auto_confirm=not bool_flag) == room
 
 
+def test_booking_url(dummy_room):
+    assert Room().booking_url is None
+    assert dummy_room.booking_url is not None
+
+
+def test_details_url(dummy_room):
+    assert Room().details_url is None
+    assert dummy_room.details_url is not None
+
+
 @pytest.mark.parametrize(('building', 'floor', 'number', 'name', 'expected_name'), (
     (u'1', u'2', u'3', u'',       u'1-2-3'),
     (u'1', u'2', u'X', u'',       u'1-2-X'),
