@@ -252,6 +252,22 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return str(UH.UHRoomBookingRoomDetails.getURL(target=self))
 
     @property
+    def large_photo_url(self):
+        if self.id is None:
+            return None
+        return url_for('rooms.photo', self, size='large')
+
+    @property
+    def small_photo_url(self):
+        if self.id is None:
+            return None
+        return url_for('rooms.photo', self, size='small')
+
+    @property
+    def has_photo(self):
+        return self.photo_id is not None
+
+    @property
     def full_name(self):
         if self.has_special_name:
             return u'{} - {}'.format(self.generate_name(), self.name)
@@ -312,22 +328,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             infos.append(_(u'video conference'))
 
         return u', '.join(map(unicode, infos))
-
-    @property
-    def large_photo_url(self):
-        if self.id is None:
-            return None
-        return url_for('rooms.photo', self, size='large')
-
-    @property
-    def small_photo_url(self):
-        if self.id is None:
-            return None
-        return url_for('rooms.photo', self, size='small')
-
-    @property
-    def has_photo(self):
-        return self.photo_id is not None
 
     @return_ascii
     def __repr__(self):

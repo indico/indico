@@ -39,6 +39,22 @@ def test_details_url(dummy_room):
     assert dummy_room.details_url is not None
 
 
+def test_large_photo_url(dummy_room):
+    assert Room().large_photo_url is None
+    assert dummy_room.large_photo_url is not None
+
+
+def test_small_photo_url(dummy_room):
+    assert Room().small_photo_url is None
+    assert dummy_room.small_photo_url is not None
+
+
+def test_has_photo(dummy_room):
+    assert not dummy_room.has_photo
+    dummy_room.photo_id = 0
+    assert dummy_room.has_photo
+
+
 @pytest.mark.parametrize(('building', 'floor', 'number', 'name', 'expected_name'), (
     (u'1', u'2', u'3', u'',       u'1-2-3'),
     (u'1', u'2', u'X', u'',       u'1-2-X'),
