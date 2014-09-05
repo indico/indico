@@ -67,6 +67,24 @@ def test_is_public(create_room_attribute, dummy_room, reservable, booking_group,
     assert dummy_room.is_public == expected
 
 
+@pytest.mark.parametrize(('is_reservable', 'reservations_need_confirmation', 'booking_group', 'expected_kind'), (
+    (False, False, 'foo', 'privateRoom'),
+    (False, True, 'foo', 'privateRoom'),
+    (True, False, 'foo', 'privateRoom'),
+    (True, True, 'foo', 'privateRoom'),
+    (False, False, '', 'privateRoom'),
+    (False, True, '', 'privateRoom'),
+    (True, False, '', 'basicRoom'),
+    (True, True, '', 'moderatedRoom')
+))
+def test_kind(create_room, create_room_attribute,
+              is_reservable, reservations_need_confirmation, booking_group, expected_kind):
+    room = create_room(is_reservable=is_reservable, reservations_need_confirmation=reservations_need_confirmation)
+    create_room_attribute('allowed-booking-group')
+    room.set_attribute_value('allowed-booking-group', booking_group)
+    assert room.kind == expected_kind
+
+
 def test_owner(dummy_room, dummy_user):
     assert dummy_room.owner.id == dummy_user.id
     dummy_room.owner_id = 'xxx'

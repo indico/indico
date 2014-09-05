@@ -286,11 +286,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def kind(self):
         if not self.is_reservable or self.has_booking_groups:
             return 'privateRoom'
-        elif self.is_reservable and self.reservations_need_confirmation:
+        elif self.reservations_need_confirmation:
             return 'moderatedRoom'
-        elif self.is_reservable:
+        else:
             return 'basicRoom'
-        return ''
 
     @property
     def location_name(self):
