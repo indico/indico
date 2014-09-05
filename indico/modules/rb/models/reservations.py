@@ -284,6 +284,14 @@ class Reservation(Serializer, db.Model):
         return set(filter(None, map(unicode.strip, self.contact_email.split(u','))))
 
     @property
+    def created_by_user(self):
+        return AvatarHolder().getById(self.created_by_id) if self.created_by_id else None
+
+    @created_by_user.setter
+    def created_by_user(self, user):
+        self.created_by_id = user.getId()
+
+    @property
     def details_url(self):
         return url_for('rooms.roomBooking-bookingDetails', self, _external=True)
 
@@ -400,14 +408,6 @@ class Reservation(Serializer, db.Model):
                 data['occurrences'] = occurrence_data.getlist(id_)
 
         return result.values()
-
-    @property
-    def created_by_user(self):
-        return AvatarHolder().getById(self.created_by_id) if self.created_by_id else None
-
-    @created_by_user.setter
-    def created_by_user(self, user):
-        self.created_by_id = user.getId() if user else None
 
     def accept(self, user):
         self.is_accepted = True

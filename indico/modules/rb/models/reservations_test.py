@@ -136,6 +136,22 @@ def test_contact_emails(create_reservation, emails, expected):
     assert reservation.contact_emails == expected
 
 
+def test_created_by_user(dummy_reservation, dummy_user):
+    assert dummy_reservation.created_by_user == dummy_user
+
+
+def test_created_by_user_after_change(dummy_reservation, create_user):
+    other_user = create_user('other')
+    dummy_reservation.created_by_user = other_user
+    assert dummy_reservation.created_by_user == other_user
+    assert dummy_reservation.created_by_id == other_user.id
+
+
+def test_created_by_user_with_no_id(dummy_reservation):
+    dummy_reservation.created_by_id = None
+    assert dummy_reservation.created_by_user is None
+
+
 def test_details_url(dummy_reservation):
     dummy_reservation.details_url
 
