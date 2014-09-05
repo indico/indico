@@ -15,10 +15,7 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.modules.rb.models.aspects import Aspect
-from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.room_attributes import RoomAttribute
-from indico.modules.rb.models.rooms import Room
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
