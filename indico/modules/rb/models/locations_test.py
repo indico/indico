@@ -30,7 +30,7 @@ def test_getLocator(dummy_location):
 
 def test_is_map_available(dummy_location, db):
     assert not dummy_location.is_map_available
-    dummy_location.aspects.append(Aspect(name='Test', center_latitude='', center_longitude='', zoom_level=0,
+    dummy_location.aspects.append(Aspect(name=u'Test', center_latitude=u'', center_longitude=u'', zoom_level=0,
                                          top_left_latitude=0, top_left_longitude=0, bottom_right_latitude=0,
                                          bottom_right_longitude=0))
     db.session.flush()
@@ -39,15 +39,15 @@ def test_is_map_available(dummy_location, db):
 
 def test_default_location(create_location):
     assert Location.default_location is None
-    location = create_location('Foo', is_default=True)
+    location = create_location(u'Foo', is_default=True)
     assert Location.default_location == location
-    create_location(name='Bar')  # should not change the default
+    create_location(name=u'Bar')  # should not change the default
     assert Location.default_location == location
 
 
 def test_set_default(create_location):
-    location = create_location('Foo')
-    other_location = create_location('Bar')
+    location = create_location(u'Foo')
+    other_location = create_location(u'Bar')
     assert not location.is_default
     assert not other_location.is_default
     location.set_default()
@@ -65,17 +65,17 @@ def test_set_default(create_location):
 
 
 def test_get_attribute_by_name(dummy_location, create_room_attribute):
-    assert dummy_location.get_attribute_by_name('foo') is None
-    attr = create_room_attribute('foo')
-    assert dummy_location.get_attribute_by_name('foo') == attr
-    assert dummy_location.get_attribute_by_name('bar') is None
+    assert dummy_location.get_attribute_by_name(u'foo') is None
+    attr = create_room_attribute(u'foo')
+    assert dummy_location.get_attribute_by_name(u'foo') == attr
+    assert dummy_location.get_attribute_by_name(u'bar') is None
 
 
 def test_get_equipment_by_name(dummy_location, create_equipment_type):
-    assert dummy_location.get_equipment_by_name('foo') is None
-    eq = create_equipment_type('foo')
-    assert dummy_location.get_equipment_by_name('foo') == eq
-    assert dummy_location.get_equipment_by_name('bar') is None
+    assert dummy_location.get_equipment_by_name(u'foo') is None
+    eq = create_equipment_type(u'foo')
+    assert dummy_location.get_equipment_by_name(u'foo') == eq
+    assert dummy_location.get_equipment_by_name(u'bar') is None
 
 
 def test_get_buildings(db, dummy_location, create_room):
@@ -84,10 +84,10 @@ def test_get_buildings(db, dummy_location, create_room):
     assert room.longitude is None
     assert room.latitude is None
     assert not dummy_location.get_buildings()  # no buildings with coordinates
-    create_room(building='111', longitude=1.23, latitude=4.56)
-    create_room(building='111', longitude=1.23, latitude=4.56)
-    create_room(building='222', longitude=1.3, latitude=3.7)
-    create_room(building='222')
+    create_room(building=u'111', longitude=1.23, latitude=4.56)
+    create_room(building=u'111', longitude=1.23, latitude=4.56)
+    create_room(building=u'222', longitude=1.3, latitude=3.7)
+    create_room(building=u'222')
     db.session.flush()
     buildings = dummy_location.get_buildings()
     assert buildings

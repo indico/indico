@@ -30,64 +30,68 @@ def test_is_auto_confirm(create_room, bool_flag):
 
 
 @pytest.mark.parametrize(('value', 'expected'), (
-    ('xxx', True),
-    ('', False)
+    (u'foo', True),
+    (u'',    False)
 ))
 def test_has_booking_groups(create_room_attribute, dummy_room, value, expected):
-    create_room_attribute('allowed-booking-group')
+    create_room_attribute(u'allowed-booking-group')
     assert not dummy_room.has_booking_groups
-    dummy_room.set_attribute_value('allowed-booking-group', value)
+    dummy_room.set_attribute_value(u'allowed-booking-group', value)
     assert dummy_room.has_booking_groups == expected
 
 
 def test_has_projector(create_equipment_type, dummy_room, db):
     assert not dummy_room.has_projector
-    dummy_room.available_equipment.append(create_equipment_type('Computer Projector'))
+    dummy_room.available_equipment.append(create_equipment_type(u'Computer Projector'))
     db.session.flush()
     assert dummy_room.has_projector
 
 
 def test_has_webcast_recording(create_equipment_type, dummy_room, db):
     assert not dummy_room.has_webcast_recording
-    dummy_room.available_equipment.append(create_equipment_type('Webcast/Recording'))
+    dummy_room.available_equipment.append(create_equipment_type(u'Webcast/Recording'))
     db.session.flush()
     assert dummy_room.has_webcast_recording
 
 
 @pytest.mark.parametrize(('reservable', 'booking_group', 'expected'), (
-    (True,  '',    True),
-    (True,  'xxx', False),
-    (False, '',    False),
-    (False, 'xxx', False)
+    (True,  u'',    True),
+    (True,  u'foo', False),
+    (False, u'',    False),
+    (False, u'foo', False)
 ))
 def test_is_public(create_room_attribute, dummy_room, reservable, booking_group, expected):
-    create_room_attribute('allowed-booking-group')
-    dummy_room.set_attribute_value('allowed-booking-group', booking_group)
+    create_room_attribute(u'allowed-booking-group')
+    dummy_room.set_attribute_value(u'allowed-booking-group', booking_group)
     dummy_room.is_reservable = reservable
     assert dummy_room.is_public == expected
 
 
 @pytest.mark.parametrize(('is_reservable', 'reservations_need_confirmation', 'booking_group', 'expected_kind'), (
-    (False, False, 'foo', 'privateRoom'),
-    (False, True,  'foo', 'privateRoom'),
-    (True,  False, 'foo', 'privateRoom'),
-    (True,  True,  'foo', 'privateRoom'),
-    (False, False, '',    'privateRoom'),
-    (False, True,  '',    'privateRoom'),
-    (True,  False, '',    'basicRoom'),
-    (True,  True,  '',    'moderatedRoom')
+    (False, False, u'foo', u'privateRoom'),
+    (False, True,  u'foo', u'privateRoom'),
+    (True,  False, u'foo', u'privateRoom'),
+    (True,  True,  u'foo', u'privateRoom'),
+    (False, False, u'',    u'privateRoom'),
+    (False, True,  u'',    u'privateRoom'),
+    (True,  False, u'',    u'basicRoom'),
+    (True,  True,  u'',    u'moderatedRoom')
 ))
 def test_kind(create_room, create_room_attribute,
               is_reservable, reservations_need_confirmation, booking_group, expected_kind):
     room = create_room(is_reservable=is_reservable, reservations_need_confirmation=reservations_need_confirmation)
-    create_room_attribute('allowed-booking-group')
-    room.set_attribute_value('allowed-booking-group', booking_group)
+    create_room_attribute(u'allowed-booking-group')
+    room.set_attribute_value(u'allowed-booking-group', booking_group)
     assert room.kind == expected_kind
+
+
+def test_location_name(dummy_room, dummy_location):
+    assert dummy_room.location_name == dummy_location.name
 
 
 def test_owner(dummy_room, dummy_user):
     assert dummy_room.owner.id == dummy_user.id
-    dummy_room.owner_id = 'xxx'
+    dummy_room.owner_id = u'xxx'
     assert dummy_room.owner is None
 
 
