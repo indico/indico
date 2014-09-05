@@ -246,6 +246,14 @@ class Reservation(Serializer, db.Model):
         return self.end_dt < datetime.now()
 
     @hybrid_property
+    def is_pending(self):
+        return not (self.is_accepted or self.is_rejected or self.is_cancelled)
+
+    @is_pending.expression
+    def is_pending(self):
+        return ~(Reservation.is_accepted | Reservation.is_rejected | Reservation.is_cancelled)
+
+    @hybrid_property
     def is_repeating(self):
         return self.repeat_frequency != RepeatFrequency.NEVER
 
@@ -257,23 +265,27 @@ class Reservation(Serializer, db.Model):
     def is_valid(self):
         return self.is_accepted & ~(self.is_rejected | self.is_cancelled)
 
-    @return_ascii
-    def __repr__(self):
-        return u'<Reservation({0}, {1}, {2}, {3}, {4})>'.format(
-            self.id,
-            self.room_id,
-            self.booked_for_name,
-            self.start_dt,
-            self.end_dt
-        )
+    @property
+    def booked_for_user(self):
+        return AvatarHolder().getById(self.booked_for_id) if self.booked_for_id else None
 
-    @hybrid_property
-    def is_pending(self):
-        return not (self.is_accepted or self.is_rejected or self.is_cancelled)
+    @booked_for_user.setter
+    def booked_for_user(self, user):
+        self.booked_for_id = user.getId()
+        self.booked_for_name = user.getFullName()
 
-    @is_pending.expression
-    def is_pending(self):
-        return ~(Reservation.is_accepted | Reservation.is_rejected | Reservation.is_cancelled)
+    @property
+    def booked_for_user_email(self):
+        user = self.booked_for_user
+        return self.booked_for_user.getEmail() if user else None
+
+    @property
+    def contact_emails(self):
+        return set(filter(None, map(unicode.strip, self.contact_email.split(u','))))
+
+    @property
+    def details_url(self):
+        return url_for('rooms.roomBooking-bookingDetails', self, _external=True)
 
     @property
     def location_name(self):
@@ -284,31 +296,36 @@ class Reservation(Serializer, db.Model):
         return self.repeat_frequency, self.repeat_interval
 
     @property
-    def details_url(self):
-        return url_for('rooms.roomBooking-bookingDetails', self, _external=True)
-
-    @property
     def status_string(self):
         parts = []
         if self.is_valid:
-            parts.append(_("Valid"))
+            parts.append(_(u"Valid"))
         else:
             if self.is_cancelled:
-                parts.append(_("Cancelled"))
+                parts.append(_(u"Cancelled"))
             if self.is_rejected:
-                parts.append(_("Rejected"))
+                parts.append(_(u"Rejected"))
             if not self.is_accepted:
-                parts.append(_("Not confirmed"))
+                parts.append(_(u"Not confirmed"))
         if self.is_archived:
-            parts.append(_("Archived"))
+            parts.append(_(u"Archived"))
         else:
-            parts.append(_("Live"))
-        return ', '.join(parts)
+            parts.append(_(u"Live"))
+        return u', '.join(map(unicode, parts))
+
+    @return_ascii
+    def __repr__(self):
+        return u'<Reservation({0}, {1}, {2}, {3}, {4})>'.format(
+            self.id,
+            self.room_id,
+            self.booked_for_name,
+            self.start_dt,
+            self.end_dt
+        )
 
     @property
     def event(self):
         from MaKaC.conference import ConferenceHolder
-
         return ConferenceHolder().getById(str(self.event_id))
 
     @event.setter
@@ -391,23 +408,6 @@ class Reservation(Serializer, db.Model):
     @created_by_user.setter
     def created_by_user(self, user):
         self.created_by_id = user.getId() if user else None
-
-    @property
-    def booked_for_user(self):
-        return AvatarHolder().getById(self.booked_for_id) if self.booked_for_id else None
-
-    @booked_for_user.setter
-    def booked_for_user(self, user):
-        self.booked_for_id = user.getId() if user else None
-
-    @property
-    def booked_for_user_email(self):
-        user = self.booked_for_user
-        return self.booked_for_user.getEmail() if user else None
-
-    @property
-    def contact_emails(self):
-        return set(filter(None, map(unicode.strip, self.contact_email.split(u','))))
 
     def accept(self, user):
         self.is_accepted = True
