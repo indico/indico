@@ -362,3 +362,13 @@ def test_get_with_data(db, create_room, create_equipment_type, only_active, data
             assert not only_active
         for key in data:
             assert set(row[key]) == {x.name for x in rooms[room_type][key]}
+
+
+def test_max_capacity(create_room):
+    assert not Room.query.count()
+    assert Room.max_capacity == 0
+    create_room(capacity=0)
+    assert Room.max_capacity == 0
+    create_room(capacity=10)
+    create_room(capacity=5)
+    assert Room.max_capacity == 10
