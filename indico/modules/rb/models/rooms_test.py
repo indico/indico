@@ -14,6 +14,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from operator import itemgetter
+
 import pytest
 
 from indico.modules.rb.models.rooms import Room
@@ -252,3 +254,54 @@ def test_set_attribute_value(create_room_attribute, dummy_room):
     # clear it
     dummy_room.set_attribute_value(u'foo', None)
     assert dummy_room.get_attribute_value(u'foo', _notset) is _notset
+
+
+def test_getLocator(dummy_location, dummy_room):
+    assert dummy_room.getLocator() == {'roomLocation': dummy_location.name, 'roomID': dummy_room.id}
+
+
+@pytest.mark.parametrize(('building', 'floor', 'number', 'name', 'expected_name'), (
+    (u'1', u'2', u'3', u'',       u'1-2-3'),
+    (u'1', u'2', u'X', u'',       u'1-2-X'),
+    (u'1', u'X', u'3', u'',       u'1-X-3'),
+    (u'X', u'2', u'3', u'',       u'X-2-3'),
+    (u'1', u'2', u'3', u'Test',   u'Test')
+))
+def test_update_name(create_room, building, floor, number, name, expected_name):
+    room = create_room()
+    room.building = building
+    room.floor = floor
+    room.number = number
+    room.name = name
+    assert room.name == name
+    room.update_name()
+    assert room.name == expected_name
+
+
+def test_find_all(create_location, create_room):
+    # Here we just test if we get the rooms in natural sort order
+    loc1 = create_location('Z')
+    loc2 = create_location('A')
+    data = [
+        (2, dict(location=loc1, building=u'1',   floor=u'2', number=u'3', name=u'')),
+        (3, dict(location=loc1, building=u'2',   floor=u'2', number=u'3', name=u'')),
+        (5, dict(location=loc1, building=u'100', floor=u'2', number=u'3', name=u'')),
+        (4, dict(location=loc1, building=u'10',  floor=u'2', number=u'3', name=u'')),
+        (1, dict(location=loc2, building=u'999', floor=u'2', number=u'3', name=u''))
+    ]
+    rooms = [(pos, create_room(**params)) for pos, params in data]
+    sorted_rooms = map(itemgetter(1), sorted(rooms, key=itemgetter(0)))
+    assert sorted_rooms == Room.find_all()
+
+
+def test_find_with_attribute(dummy_room, create_room, create_room_attribute):
+    assert Room.find_all() == [dummy_room]  # one room without the attribute
+    assert not Room.find_with_attribute(u'foo')
+    create_room_attribute(u'foo')
+    assert not Room.find_with_attribute(u'foo')
+    expected = set()
+    for room in [create_room(), create_room()]:
+        value = u'bar-{}'.format(room.id)
+        room.set_attribute_value(u'foo', value)
+        expected.add((room, value))
+    assert set(Room.find_with_attribute(u'foo')) == expected
