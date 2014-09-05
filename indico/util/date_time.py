@@ -67,13 +67,16 @@ def utc_to_server(dt):
     return dt.astimezone(server_tz)
 
 
-def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=False):
+def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=False, keep_tz=False):
     """
     Basically a wrapper around Babel's own format_datetime
     """
     if not locale:
         locale = currentLocale()
-    if not timezone and dt.tzinfo:
+    if keep_tz:
+        assert timezone is None
+        timezone = dt.tzinfo
+    elif not timezone and dt.tzinfo:
         timezone = DisplayTZ().getDisplayTZ()
     elif server_tz:
         timezone = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()

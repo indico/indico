@@ -35,6 +35,8 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util import update_session_options
 from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
 from indico.core.config import Config
+from indico.web.flask.util import url_for
+from indico.util.i18n import _
 
 
 # Defines base classes for tasks, and some specific tasks as well
@@ -402,8 +404,8 @@ class AlarmTask(SendMailTask):
         return self._relative
 
     def setUpSubject(self):
-        startDateTime = format_datetime(self.conf.getAdjustedStartDate(), format="short")
-        self.setSubject(_("Event reminder: %s (%s %s)") % (self.conf.getTitle(), startDateTime, self.conf.getTimezone()))
+        start_dt = format_datetime(self.conf.getAdjustedStartDate(), format='short', keep_tz=True)
+        self.setSubject(_("Event reminder: {} ({} {})").format(self.conf.getTitle(), start_dt, self.conf.getTimezone()))
 
     def addToUser(self, user):
         super(AlarmTask, self).addToUser(user)
@@ -467,12 +469,7 @@ class AlarmTask(SendMailTask):
                 for p in self.conf.getParticipation().getParticipantList():
                     self.addToUser(p)
 
-        from MaKaC.webinterface import urlHandlers
-        if Config.getInstance().getShortEventURL() != "":
-            url = "%s%s" % (Config.getInstance().getShortEventURL(),self.conf.getId())
-        else:
-            url = urlHandlers.UHConferenceDisplay.getURL(self.conf)
-
+        url = url_for('event.shorturl', self.conf, _external=True)
         self.setText(render_template(
             'alarm_email.txt',
             event=self.conf.fossilize(),
