@@ -296,6 +296,15 @@ class Reservation(Serializer, db.Model):
         return url_for('rooms.roomBooking-bookingDetails', self, _external=True)
 
     @property
+    def event(self):
+        from MaKaC.conference import ConferenceHolder
+        return ConferenceHolder().getById(str(self.event_id))
+
+    @event.setter
+    def event(self, event):
+        self.event_id = int(event.getId()) if event else None
+
+    @property
     def location_name(self):
         return self.room.location_name
 
@@ -330,15 +339,6 @@ class Reservation(Serializer, db.Model):
             self.start_dt,
             self.end_dt
         )
-
-    @property
-    def event(self):
-        from MaKaC.conference import ConferenceHolder
-        return ConferenceHolder().getById(str(self.event_id))
-
-    @event.setter
-    def event(self, event):
-        self.event_id = int(event.getId())
 
     def get_vc_equipment(self):
         vc_equipment = self.room.available_equipment \
