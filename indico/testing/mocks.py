@@ -50,3 +50,33 @@ class MockAvatar(object):
 
     def getId(self):
         return self.id
+
+
+class MockConferenceHolder:
+    _events = {}
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def add(cls, event):
+        if event.id in cls._events:
+            __tracebackhide__ = True
+            raise Exception("Event '{}' already exists".format(event.id))
+        cls._events[event.id] = event
+
+    @classmethod
+    def remove(cls, event):
+        del cls._events[event.id]
+
+    @classmethod
+    def getById(cls, id_):
+        return cls._events.get(id_)
+
+
+class MockConference(object):
+    def __repr__(self):
+        return '<MockConference({})>'.format(self.id)
+
+    def getId(self):
+        return self.id
