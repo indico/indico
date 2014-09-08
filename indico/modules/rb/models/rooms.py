@@ -517,7 +517,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def find_with_filters(filters, avatar):
         from indico.modules.rb.models.locations import Location
 
-        equipment_count = len(filters['available_equipment'])
+        equipment_count = len(filters.get('available_equipment', ()))
         equipment_subquery = None
         if equipment_count:
             equipment_subquery = (
@@ -531,23 +531,25 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 .as_scalar()
             )
 
+        capacity = filters.get('capacity')
         q = (
             Room.query
             .join(Location.rooms)
             .filter(
-                Location.id == filters['location'].id if filters['location'] else True,
-                ((Room.capacity >= (filters['capacity'] * 0.8)) | (Room.capacity == None)) if filters['capacity'] else True,
-                Room.is_reservable if filters['is_only_public'] else True,
-                Room.is_auto_confirm if filters['is_auto_confirm'] else True,
+                Location.id == filters['location'].id if filters.get('location') else True,
+                ((Room.capacity >= (capacity * 0.8)) | (Room.capacity == None)) if capacity else True,
+                Room.is_reservable if filters.get('is_only_public') else True,
+                Room.is_auto_confirm if filters.get('is_auto_confirm') else True,
                 Room.is_active if filters.get('is_only_active', False) else True,
                 (equipment_subquery == equipment_count) if equipment_subquery is not None else True)
         )
 
-        if filters['available'] != -1:
+        if filters.get('available', -1) != -1:
             repetition = RepeatMapping.getNewMapping(ast.literal_eval(filters['repeatability']))
             is_available = Room.filter_available(filters['start_dt'], filters['end_dt'], repetition,
-                                                 include_pre_bookings=filters['include_pre_bookings'],
-                                                 include_pending_blockings=filters['include_pending_blockings'])
+                                                 include_pre_bookings=filters.get('include_pre_bookings', True),
+                                                 include_pending_blockings=filters.get('include_pending_blockings',
+                                                                                       True))
             # Filter the search results
             if filters['available'] == 0:  # booked/unavailable
                 q = q.filter(~is_available)
@@ -557,7 +559,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         free_search_columns = (
             'name', 'site', 'division', 'building', 'floor', 'number', 'telephone', 'key_location', 'comments'
         )
-        if filters['details']:
+        if filters.get('details'):
             # Attributes are stored JSON-encoded, so we need to JSON-encode the provided string and remove the quotes
             # afterwards since PostgreSQL currently does not expose a function to decode a JSON string:
             # http://www.postgresql.org/message-id/51FBF787.5000408@dunslane.net
@@ -572,17 +574,16 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         q = q.order_by(Room.capacity)
         rooms = q.all()
         # Apply a bunch of filters which are *much* easier to do here than in SQL!
-        if filters['is_only_public']:
+        if filters.get('is_only_public'):
             # This may trigger additional SQL queries but is_public is cached and doing this check here is *much* easier
             rooms = [r for r in rooms if r.is_public]
         if filters.get('is_only_my_rooms'):
             rooms = [r for r in rooms if r.is_owned_by(avatar)]
-        if filters['capacity']:
-            # Unless it would result in an empty resultset we don't want to show room with >20% more capacity
+        if capacity:
+            # Unless it would result in an empty resultset we don't want to show rooms with >20% more capacity
             # than requested. This cannot be done easily in SQL so we do that logic here after the SQL query already
             # weeded out rooms that are too small
-            matching_capacity_rooms = [r for r in rooms
-                                       if r.capacity is None or r.capacity <= filters['capacity'] * 1.2]
+            matching_capacity_rooms = [r for r in rooms if r.capacity is None or r.capacity <= capacity * 1.2]
             if matching_capacity_rooms:
                 rooms = matching_capacity_rooms
         return rooms
