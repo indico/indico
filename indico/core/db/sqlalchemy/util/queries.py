@@ -49,3 +49,12 @@ def db_dates_overlap(entity, start_column, start, end_column, end, inclusive=Fal
         return (element_start <= end) & (start <= element_end)
     else:
         return (element_start < end) & (start < element_end)
+
+
+def escape_like(value):
+    """Escapes a string to be used as a plain string in LIKE"""
+    escape_char = u'\\'
+    return (value
+            .replace(escape_char, escape_char * 2)  # literal escape char needs to be escaped
+            .replace(u'%', escape_char + u'%')      # we don't want % wildcards inside the value
+            .replace(u'_', escape_char + u'_'))     # same for _ wildcards

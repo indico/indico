@@ -34,6 +34,7 @@ from MaKaC.user import Avatar, AvatarHolder
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.util.cache import versioned_cache, cached
+from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.core.errors import IndicoError
 from indico.modules.rb.utils import rb_check_user_access
 from indico.modules.rb.models.blockings import Blocking
@@ -564,8 +565,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             # afterwards since PostgreSQL currently does not expose a function to decode a JSON string:
             # http://www.postgresql.org/message-id/51FBF787.5000408@dunslane.net
             details = filters['details'].lower()
-            details_str = u'%{}%'.format(details)
-            details_json = u'%{}%'.format(json.dumps(details)[1:-1])
+            details_str = u'%{}%'.format(escape_like(details))
+            details_json = u'%{}%'.format(escape_like(json.dumps(details)[1:-1]))
             free_search_criteria = [getattr(Room, c).ilike(details_str) for c in free_search_columns]
             free_search_criteria.append(Room.attributes.any(cast(RoomAttributeAssociation.value, db.String)
                                                             .ilike(details_json)))
