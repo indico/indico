@@ -28,12 +28,13 @@ def create_user(monkeypatch_methods):
     _avatars = []
     ah = AvatarHolder()
 
-    def _create_user(id_, name='Pig', surname='Guinea', email='p.guinea@example.com'):
+    def _create_user(id_, name='Pig', surname='Guinea', email='p.guinea@example.com', rb_admin=False):
         avatar = MockAvatar()
         avatar.id = id_
         avatar.name = name
         avatar.surname = surname
         avatar.email = email
+        avatar.rb_admin = rb_admin
         ah.add(avatar)
         _avatars.append(avatar)
         return avatar

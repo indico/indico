@@ -45,11 +45,17 @@ class MockAvatar(object):
     def getEmail(self):
         return self.email
 
+    def getEmails(self):
+        return [self.email]
+
     def getFullName(self):
         return '{}, {}'.format(self.surname.upper(), self.name)
 
     def getId(self):
         return self.id
+
+    def isRBAdmin(self):
+        return self.rb_admin
 
 
 class MockConferenceHolder:
