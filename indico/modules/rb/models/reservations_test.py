@@ -156,6 +156,14 @@ def test_details_url(dummy_reservation):
     dummy_reservation.details_url
 
 
+def test_event(dummy_reservation, dummy_event):
+    dummy_reservation.event = dummy_event
+    assert dummy_reservation.event.id == dummy_event.id
+    assert dummy_reservation.event == dummy_event
+    dummy_reservation.event = None
+    assert dummy_reservation.event is None
+
+
 def test_location_name(dummy_reservation, dummy_location):
     assert dummy_location.name == dummy_reservation.location_name
 
@@ -192,3 +200,151 @@ def test_status_string(create_reservation, is_accepted, is_rejected, is_cancelle
         params['end_dt'] = datetime.now() + relativedelta(days=1, hours=2)
     reservation = create_reservation(**params)
     assert str(reservation.status_string) == expected
+
+
+# ======================================================================================================================
+# staticmethod tests
+# ======================================================================================================================
+
+
+# ======================================================================================================================
+# method tests
+# ======================================================================================================================
+
+
+@pytest.mark.parametrize(('is_admin', 'is_owner', 'expected'), (
+    (True,  True,  True),
+    (True,  False, True),
+    (False, True,  True),
+    (False, False, False),
+))
+def test_can_be_accepted(dummy_reservation, dummy_room, create_user, is_admin, is_owner, expected):
+    user = create_user('user')
+    if is_admin:
+        user.rb_admin = True
+    if is_owner:
+        dummy_room.owner_id = user.id
+    assert dummy_reservation.can_be_accepted(user) == expected
+
+
+@pytest.mark.parametrize(('is_admin', 'is_created_by', 'is_booked_for', 'expected'), (
+    (True,  True,  True,  True),
+    (True,  True,  False, True),
+    (True,  False, True,  True),
+    (True,  False, False, True),
+    (False, True,  True,  True),
+    (False, True,  False, True),
+    (False, False, True,  True),
+    (False, False, False, False),
+))
+def test_can_be_cancelled(dummy_reservation, create_user, is_admin, is_created_by, is_booked_for, expected):
+    user = create_user('user')
+    user.rb_admin = is_admin
+    if is_created_by:
+        dummy_reservation.created_by_user = user
+    if is_booked_for:
+        dummy_reservation.booked_for_user = user
+    assert dummy_reservation.can_be_cancelled(user) == expected
+
+
+@pytest.mark.parametrize(('is_admin', 'expected'), (
+    (True,  True),
+    (False, False),
+))
+def test_can_be_deleted(dummy_reservation, dummy_user, is_admin, expected):
+    if is_admin:
+        dummy_user.rb_admin = True
+    assert dummy_reservation.can_be_deleted(dummy_user) == expected
+
+
+@pytest.mark.parametrize(('is_rejected', 'is_cancelled',
+                          'is_admin', 'is_created_by', 'is_booked_for', 'is_room_owner', 'expected'), (
+    # rejected/cancelled cases
+    (True,  True,  True,  True,  True,  True,  False),
+    (True,  True,  True,  True,  True,  False, False),
+    (True,  True,  True,  True,  False, True,  False),
+    (True,  True,  True,  True,  False, False, False),
+    (True,  True,  True,  False, True,  True,  False),
+    (True,  True,  True,  False, True,  False, False),
+    (True,  True,  True,  False, False, True,  False),
+    (True,  True,  True,  False, False, False, False),
+    (True,  True,  False, True,  True,  True,  False),
+    (True,  True,  False, True,  True,  False, False),
+    (True,  True,  False, True,  False, True,  False),
+    (True,  True,  False, True,  False, False, False),
+    (True,  True,  False, False, True,  True,  False),
+    (True,  True,  False, False, True,  False, False),
+    (True,  True,  False, False, False, True,  False),
+    (True,  True,  False, False, False, False, False),
+    (True,  False, True,  True,  True,  True,  False),
+    (True,  False, True,  True,  True,  False, False),
+    (True,  False, True,  True,  False, True,  False),
+    (True,  False, True,  True,  False, False, False),
+    (True,  False, True,  False, True,  True,  False),
+    (True,  False, True,  False, True,  False, False),
+    (True,  False, True,  False, False, True,  False),
+    (True,  False, True,  False, False, False, False),
+    (True,  False, False, True,  True,  True,  False),
+    (True,  False, False, True,  True,  False, False),
+    (True,  False, False, True,  False, True,  False),
+    (True,  False, False, True,  False, False, False),
+    (True,  False, False, False, True,  True,  False),
+    (True,  False, False, False, True,  False, False),
+    (True,  False, False, False, False, True,  False),
+    (True,  False, False, False, False, False, False),
+    (False, True,  True,  True,  True,  True,  False),
+    (False, True,  True,  True,  True,  False, False),
+    (False, True,  True,  True,  False, True,  False),
+    (False, True,  True,  True,  False, False, False),
+    (False, True,  True,  False, True,  True,  False),
+    (False, True,  True,  False, True,  False, False),
+    (False, True,  True,  False, False, True,  False),
+    (False, True,  True,  False, False, False, False),
+    (False, True,  False, True,  True,  True,  False),
+    (False, True,  False, True,  True,  False, False),
+    (False, True,  False, True,  False, True,  False),
+    (False, True,  False, True,  False, False, False),
+    (False, True,  False, False, True,  True,  False),
+    (False, True,  False, False, True,  False, False),
+    (False, True,  False, False, False, True,  False),
+    (False, True,  False, False, False, False, False),
+    # Admin cases
+    (False, False, True,  True,  True,  True,  True),
+    (False, False, True,  True,  True,  False, True),
+    (False, False, True,  True,  False, True,  True),
+    (False, False, True,  True,  False, False, True),
+    (False, False, True,  False, True,  True,  True),
+    (False, False, True,  False, True,  False, True),
+    (False, False, True,  False, False, True,  True),
+    (False, False, True,  False, False, False, True),
+    # Other cases
+    (False, False, False, True,  True,  True,  True),
+    (False, False, False, True,  True,  False, True),
+    (False, False, False, True,  False, True,  True),
+    (False, False, False, True,  False, False, True),
+    (False, False, False, False, True,  True,  True),
+    (False, False, False, False, True,  False, True),
+    (False, False, False, False, False, True,  True),
+    (False, False, False, False, False, False, False),
+))
+def test_can_be_modified(dummy_reservation, dummy_room, create_user,
+                         is_rejected, is_cancelled, is_admin, is_created_by, is_booked_for, is_room_owner, expected):
+    user = create_user('user')
+    user.rb_admin = is_admin
+    if is_created_by:
+        dummy_reservation.created_by_user = user
+    if is_booked_for:
+        dummy_reservation.booked_for_user = user
+    if is_room_owner:
+        dummy_room.owner_id = user.id
+    dummy_reservation.is_rejected = is_rejected
+    dummy_reservation.is_cancelled = is_cancelled
+    assert dummy_reservation.can_be_modified(user) == expected
+
+
+def test_can_be_action_with_no_user(dummy_reservation):
+    assert dummy_reservation.can_be_accepted(None) is False
+    assert dummy_reservation.can_be_cancelled(None) is False
+    assert dummy_reservation.can_be_deleted(None) is False
+    assert dummy_reservation.can_be_modified(None) is False
+    assert dummy_reservation.can_be_rejected(None) is False
