@@ -361,33 +361,20 @@ class VidyoOperations(object):
             if faultString.startswith('Room not found for roomID'):
                 return VidyoError("unknownRoom", "delete")
             else:
-                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's deleteRoom operation got WebFault: %s""" %
-                            (confId, bookingId, e.fault.faultstring))
+                Logger.get('Vidyo').exception(
+                    """Evt:%s, booking:%s, Admin API's deleteRoom operation got WebFault: %s"""
+                    % (confId, bookingId, e.fault.faultstring))
                 raise
 
     @classmethod
-    def connectRoom(cls, booking, roomId, query):
-        confId = booking.getConference().getId()
-        bookingId = booking.getId()
-        try:
-            searchFilter = SOAPObjectFactory.createFilter('user', query)
-            userApiAnswer = UserApi.search(searchFilter)
-            if userApiAnswer.total == 0:
-                return VidyoError("noExistsRoom", "connect", _("The conference room is not registered in the vidyo service. ") + VidyoTools.getContactSupportText())
-            legacyMember = userApiAnswer.Entity[0].entityID
-            AdminApi.connectRoom(roomId, legacyMember)
-        except WebFault, e:
-            faultString = e.fault.faultstring
-            if faultString.startswith('ConferenceID is invalid'):
-                return VidyoError("unknownRoom", "connect")
-            elif (faultString.startswith('Failed to Invite to Conference') or
-                  faultString.startswith('Status of invited member is not Online')):
-                message = _("The connection has failed. ") + VidyoTools.getContactSupportText()
-                return VidyoError("connectFailed", "connect", message)
-            else:
-                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's connectRoom operation got WebFault: %s""" %
-                        (confId, bookingId, e.fault.faultstring))
-                raise
+    def connect_room(cls, roomId, query):
+        answer = RavemApi.connectRoom(roomId, query)
+        json_answer = answer.json()
+        if not answer.ok or 'error' in json_answer:
+            raise RavemApiException(
+                _(u"Vidyo connection to the room (id: {0}, query: {1}) failed. status: {2}, reason: {3}".format(
+                    roomId, query, answer.status_code, json_answer.get('error', u"unknown")))
+            )
 
     @classmethod
     def disconnectRoom(cls, booking, connectionStatus, roomIp="", roomPanoramaUser=""):

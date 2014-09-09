@@ -531,7 +531,7 @@ class CSBooking(CSBookingBase):
                     time.sleep(5)
 
         query = (getVidyoOptionValue("prefixConnect") + confRoomIp) if confRoomIp else confRoomPanoramaUser
-        result = ExternalOperationsManager.execute(self, "connectRoom", VidyoOperations.connectRoom, self, self._roomId,
+        result = ExternalOperationsManager.execute(self, "connect_room", VidyoOperations.connect_room, self._roomId,
                                                    query)
         if isinstance(result, VidyoError):
             return result
