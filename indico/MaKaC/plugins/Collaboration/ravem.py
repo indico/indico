@@ -18,11 +18,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-from indico.core.logger import Logger
-from requests.auth import HTTPDigestAuth
-import requests
 from urllib import urlencode
+
+import requests
+
+from indico.core.logger import Logger
+from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
+from requests.auth import HTTPDigestAuth
+
 
 
 class RavemClient(object):
