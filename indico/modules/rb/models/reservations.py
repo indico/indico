@@ -341,13 +341,45 @@ class Reservation(Serializer, db.Model):
             self.end_dt
         )
 
-    def get_vc_equipment(self):
-        vc_equipment = self.room.available_equipment \
-                           .correlate(ReservationOccurrence) \
-                           .with_entities(EquipmentType.id) \
-                           .filter_by(name='Video conference') \
-                           .as_scalar()
-        return self.used_equipment.filter(EquipmentType.parent_id == vc_equipment)
+    @classmethod
+    def create_from_data(cls, room, data, user, prebook=None):
+        """Creates a new reservation.
+
+        :param room: The Room that's being booked.
+        :param data: A dict containing the booking data, usually from a :class:`NewBookingConfirmForm` instance
+        :param user: The :class:`Avatar` who creates the booking.
+        :param prebook: Instead of determining the booking type from the user's
+                        permissions, always use the given mode.
+        """
+
+        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booked_for_id',
+                           'contact_email', 'contact_phone', 'booking_reason', 'used_equipment',
+                           'needs_assistance', 'uses_vc', 'needs_vc_assistance')
+
+        if data['repeat_frequency'] == RepeatFrequency.NEVER and data['start_dt'].date() != data['end_dt'].date():
+            raise ValueError('end_dt != start_dt for non-repeating booking')
+
+        if prebook is None:
+            prebook = not room.can_be_booked(user)
+            if prebook and not room.can_be_prebooked(user):
+                raise NoReportError('You cannot book this room')
+
+        room.check_advance_days(data['end_dt'].date(), user)
+        room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user)
+
+        reservation = cls()
+        for field in populate_fields:
+            if field in data:
+                setattr(reservation, field, data[field])
+        reservation.room = room
+        reservation.booked_for_name = reservation.booked_for_user.getFullName()
+        reservation.is_accepted = not prebook
+        reservation.created_by_user = user
+        reservation.create_occurrences(True, user)
+        if not any(occ.is_valid for occ in reservation.occurrences):
+            raise NoReportError(_('Reservation has no valid occurrences'))
+        notify_creation(reservation)
+        return reservation
 
     @staticmethod
     def get_with_data(*args, **kwargs):
@@ -410,6 +442,14 @@ class Reservation(Serializer, db.Model):
 
         return result.values()
 
+    @staticmethod
+    def find_overlapping_with(room, occurrences, reservation_id=None):
+        return Reservation.find(Reservation.room == room,
+                                Reservation.id != reservation_id,
+                                ReservationOccurrence.is_valid,
+                                ReservationOccurrence.filter_overlap(occurrences),
+                                _join=ReservationOccurrence)
+
     def accept(self, user):
         self.is_accepted = True
         self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=['Reservation accepted']))
@@ -422,6 +462,9 @@ class Reservation(Serializer, db.Model):
                 continue
             occurrence.reject(user, u'Rejected due to collision with a confirmed reservation')
 
+    def add_edit_log(self, edit_log):
+        self.edit_logs.append(edit_log)
+
     def cancel(self, user, reason=None, silent=False):
         self.is_cancelled = True
         self.rejection_reason = reason
@@ -431,44 +474,34 @@ class Reservation(Serializer, db.Model):
             log_msg = u'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
             self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
 
-    def reject(self, user, reason, silent=False):
-        self.is_rejected = True
-        self.rejection_reason = reason
-        self.occurrences.filter_by(is_valid=True).update({'is_rejected': True, 'rejection_reason': reason},
-                                                         synchronize_session='fetch')
-        if not silent:
-            notify_rejection(self)
-            log_msg = u'Reservation rejected: {}'.format(reason)
-            self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
+    def can_be_accepted(self, user):
+        return user and (user.isRBAdmin() or self.room.is_owned_by(user))
 
-    def add_edit_log(self, edit_log):
-        self.edit_logs.append(edit_log)
+    def can_be_cancelled(self, user):
+        return user and (self.is_owned_by(user) or user.isRBAdmin() or self.is_booked_for(user))
 
-    def find_excluded_days(self):
-        return self.occurrences.filter(~ReservationOccurrence.is_valid)
+    def can_be_deleted(self, user):
+        return user and user.isRBAdmin()
 
-    @staticmethod
-    def find_overlapping_with(room, occurrences, reservation_id=None):
-        return Reservation.find(Reservation.room == room,
-                                Reservation.id != reservation_id,
-                                ReservationOccurrence.is_valid,
-                                ReservationOccurrence.filter_overlap(occurrences),
-                                _join=ReservationOccurrence)
+    def can_be_modified(self, user):
+        if not user:
+            return False
+        if self.is_rejected or self.is_cancelled:
+            return False
+        if user.isRBAdmin():
+            return True
+        return self.created_by_user == user or self.is_booked_for(user) or self.room.is_owned_by(user)
 
-    def find_overlapping(self):
-        occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
-        return Reservation.find_overlapping_with(self.room, occurrences, self.id)
+    def can_be_rejected(self, user):
+        return user and (user.isRBAdmin() or self.room.is_owned_by(user))
 
-    def get_conflicting_occurrences(self):
-        valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
-        colliding_occurrences = ReservationOccurrence.find_overlapping_with(self.room, valid_occurrences, self.id).all()
-        conflicts = defaultdict(lambda: dict(confirmed=[], pending=[]))
-        for occurrence in valid_occurrences:
-            for colliding in colliding_occurrences:
-                if occurrence.overlaps(colliding):
-                    key = 'confirmed' if colliding.reservation.is_accepted else 'pending'
-                    conflicts[occurrence][key].append(colliding)
-        return conflicts
+    def get_vc_equipment(self):
+        vc_equipment = self.room.available_equipment \
+                           .correlate(ReservationOccurrence) \
+                           .with_entities(EquipmentType.id) \
+                           .filter_by(name='Video conference') \
+                           .as_scalar()
+        return self.used_equipment.filter(EquipmentType.parent_id == vc_equipment)
 
     def create_occurrences(self, skip_conflicts, user):
         ReservationOccurrence.create_series_for_reservation(self)
@@ -515,45 +548,35 @@ class Reservation(Serializer, db.Model):
                 for conflict in conflicts['pending']:
                     conflict.reject(user, u'Rejected due to collision with a confirmed reservation')
 
-    @classmethod
-    def create_from_data(cls, room, data, user, prebook=None):
-        """Creates a new reservation.
+    def find_excluded_days(self):
+        return self.occurrences.filter(~ReservationOccurrence.is_valid)
 
-        :param room: The Room that's being booked.
-        :param data: A dict containing the booking data, usually from a :class:`NewBookingConfirmForm` instance
-        :param user: The :class:`Avatar` who creates the booking.
-        :param prebook: Instead of determining the booking type from the user's
-                        permissions, always use the given mode.
-        """
+    def find_overlapping(self):
+        occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
+        return Reservation.find_overlapping_with(self.room, occurrences, self.id)
 
-        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booked_for_id',
-                           'contact_email', 'contact_phone', 'booking_reason', 'used_equipment',
-                           'needs_assistance', 'uses_vc', 'needs_vc_assistance')
+    def getLocator(self):
+        locator = Locator()
+        locator['roomLocation'] = self.location_name
+        locator['resvID'] = self.id
+        return locator
 
-        if data['repeat_frequency'] == RepeatFrequency.NEVER and data['start_dt'].date() != data['end_dt'].date():
-            raise ValueError('end_dt != start_dt for non-repeating booking')
+    def get_conflicting_occurrences(self):
+        valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
+        colliding_occurrences = ReservationOccurrence.find_overlapping_with(self.room, valid_occurrences, self.id).all()
+        conflicts = defaultdict(lambda: dict(confirmed=[], pending=[]))
+        for occurrence in valid_occurrences:
+            for colliding in colliding_occurrences:
+                if occurrence.overlaps(colliding):
+                    key = 'confirmed' if colliding.reservation.is_accepted else 'pending'
+                    conflicts[occurrence][key].append(colliding)
+        return conflicts
 
-        if prebook is None:
-            prebook = not room.can_be_booked(user)
-            if prebook and not room.can_be_prebooked(user):
-                raise NoReportError('You cannot book this room')
+    def is_owned_by(self, avatar):
+        return self.created_by_id == avatar.id
 
-        room.check_advance_days(data['end_dt'].date(), user)
-        room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user)
-
-        reservation = cls()
-        for field in populate_fields:
-            if field in data:
-                setattr(reservation, field, data[field])
-        reservation.room = room
-        reservation.booked_for_name = reservation.booked_for_user.getFullName()
-        reservation.is_accepted = not prebook
-        reservation.created_by_user = user
-        reservation.create_occurrences(True, user)
-        if not any(occ.is_valid for occ in reservation.occurrences):
-            raise NoReportError(_('Reservation has no valid occurrences'))
-        notify_creation(reservation)
-        return reservation
+    def is_booked_for(self, user):
+        return user and (self.booked_for_user == user or self.contact_email in user.getEmails())
 
     def modify(self, data, user):
         """Modifies an existing reservation.
@@ -679,35 +702,12 @@ class Reservation(Serializer, db.Model):
         notify_modification(self, changes)
         return True
 
-    def getLocator(self):
-        locator = Locator()
-        locator['roomLocation'] = self.location_name
-        locator['resvID'] = self.id
-        return locator
-
-    def can_be_modified(self, user):
-        if not user:
-            return False
-        if self.is_rejected or self.is_cancelled:
-            return False
-        if user.isRBAdmin():
-            return True
-        return self.created_by_user == user or self.is_booked_for(user) or self.room.is_owned_by(user)
-
-    def can_be_cancelled(self, user):
-        return user and (self.is_owned_by(user) or user.isRBAdmin() or self.is_booked_for(user))
-
-    def can_be_accepted(self, user):
-        return user and (user.isRBAdmin() or self.room.is_owned_by(user))
-
-    def can_be_rejected(self, user):
-        return user and (user.isRBAdmin() or self.room.is_owned_by(user))
-
-    def can_be_deleted(self, user):
-        return user and user.isRBAdmin()
-
-    def is_owned_by(self, avatar):
-        return self.created_by_id == avatar.id
-
-    def is_booked_for(self, user):
-        return user and (self.booked_for_user == user or self.contact_email in user.getEmails())
+    def reject(self, user, reason, silent=False):
+        self.is_rejected = True
+        self.rejection_reason = reason
+        self.occurrences.filter_by(is_valid=True).update({'is_rejected': True, 'rejection_reason': reason},
+                                                         synchronize_session='fetch')
+        if not silent:
+            notify_rejection(self)
+            log_msg = u'Reservation rejected: {}'.format(reason)
+            self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
