@@ -28,7 +28,8 @@ def create_user(monkeypatch_methods):
     _avatars = []
     ah = AvatarHolder()
 
-    def _create_user(id_, name='Pig', surname='Guinea', email='p.guinea@example.com', rb_admin=False):
+    def _create_user(id_, name='Pig', surname='Guinea', rb_admin=False, **kwargs):
+        email = kwargs.get('email', '{}@example.com'.format(id_))
         avatar = MockAvatar()
         avatar.id = id_
         avatar.name = name
