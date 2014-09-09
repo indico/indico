@@ -32,7 +32,7 @@ pytest_plugins = 'indico.modules.rb.testing.fixtures'
 @pytest.mark.parametrize(('days_delta', 'expected'), (
     (-1, True),   # Reservation in the past
     (1,  False),  # Reservation in the future
-    (0,  False),   # Reservation in course
+    (0,  False),  # Reservation in course
 ))
 def test_is_archived(create_reservation, days_delta, expected):
     start_dt = datetime.now() + relativedelta(days=days_delta, hours=-1)
@@ -153,7 +153,7 @@ def test_created_by_user_with_no_id(dummy_reservation):
 
 
 def test_details_url(dummy_reservation):
-    dummy_reservation.details_url
+    assert dummy_reservation.details_url
 
 
 def test_event(dummy_reservation, dummy_event):
@@ -343,8 +343,8 @@ def test_can_be_modified(dummy_reservation, dummy_room, create_user,
 
 
 def test_can_be_action_with_no_user(dummy_reservation):
-    assert dummy_reservation.can_be_accepted(None) is False
-    assert dummy_reservation.can_be_cancelled(None) is False
-    assert dummy_reservation.can_be_deleted(None) is False
-    assert dummy_reservation.can_be_modified(None) is False
-    assert dummy_reservation.can_be_rejected(None) is False
+    assert not dummy_reservation.can_be_accepted(None)
+    assert not dummy_reservation.can_be_cancelled(None)
+    assert not dummy_reservation.can_be_deleted(None)
+    assert not dummy_reservation.can_be_modified(None)
+    assert not dummy_reservation.can_be_rejected(None)
