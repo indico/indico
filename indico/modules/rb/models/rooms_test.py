@@ -471,8 +471,8 @@ def test_find_with_filters_only_public(dummy_room, create_room_attribute,
     (u'dummy', True),
     (u'other', False)
 ))
-def test_find_with_filters_only_my_rooms(dummy_room, dummy_user_factory, owner_id, match):
-    user = MockAvatarHolder().getById(owner_id) or dummy_user_factory(owner_id)
+def test_find_with_filters_only_my_rooms(dummy_room, create_user, owner_id, match):
+    user = MockAvatarHolder().getById(owner_id) or create_user(owner_id)
     if match:
         assert set(Room.find_with_filters({'is_only_my_rooms': True}, user)) == {dummy_room}
     else:
