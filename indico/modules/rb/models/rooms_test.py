@@ -169,8 +169,17 @@ def test_marker_description(db, create_room, create_equipment_type,
 
 
 def test_owner(dummy_room, dummy_user):
-    assert dummy_room.owner.id == dummy_user.id
-    dummy_room.owner_id = u'xxx'
+    assert dummy_room.owner == dummy_user
+
+
+def test_owner_after_change(dummy_room, create_user):
+    other_user = create_user('other')
+    dummy_room.owner = other_user
+    assert dummy_room.owner == other_user
+
+
+def test_owner_with_no_id(dummy_room):
+    dummy_room.owner_id = None
     assert dummy_room.owner is None
 
 

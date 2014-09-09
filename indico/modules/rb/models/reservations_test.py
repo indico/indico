@@ -336,7 +336,7 @@ def test_can_be_modified(dummy_reservation, dummy_room, create_user,
     if is_booked_for:
         dummy_reservation.booked_for_user = user
     if is_room_owner:
-        dummy_room.owner_id = user.id
+        dummy_room.owner = user
     dummy_reservation.is_rejected = is_rejected
     dummy_reservation.is_cancelled = is_cancelled
     assert dummy_reservation.can_be_modified(user) == expected

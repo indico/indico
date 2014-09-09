@@ -334,6 +334,10 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def owner(self):
         return AvatarHolder().getById(self.owner_id)
 
+    @owner.setter
+    def owner(self, user):
+        self.owner_id = user.getId()
+
     @property
     def notification_emails(self):
         return set(filter(None, map(unicode.strip, self.get_attribute_value(u'notification-email', u'').split(u','))))
