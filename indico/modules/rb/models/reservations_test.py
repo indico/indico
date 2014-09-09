@@ -198,19 +198,15 @@ def test_status_string(create_reservation, is_accepted, is_rejected, is_cancelle
 # ======================================================================================================================
 
 
-@pytest.mark.parametrize(('is_admin', 'is_owner', 'expected'), (
-    (True,  True,  True),
-    (True,  False, True),
-    (False, True,  True),
-    (False, False, False),
-))
-def test_can_be_accepted(dummy_reservation, dummy_room, create_user, is_admin, is_owner, expected):
+@pytest.mark.parametrize(('is_admin', 'is_owner', 'expected'), bool_matrix('..', expect=any))
+def test_can_be_accepted_rejected(dummy_reservation, dummy_room, create_user, is_admin, is_owner, expected):
     user = create_user('user')
     if is_admin:
         user.rb_admin = True
     if is_owner:
         dummy_room.owner_id = user.id
     assert dummy_reservation.can_be_accepted(user) == expected
+    assert dummy_reservation.can_be_rejected(user) == expected
 
 
 @pytest.mark.parametrize(('is_admin', 'is_created_by', 'is_booked_for', 'expected'),
