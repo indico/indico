@@ -86,6 +86,10 @@ class RavemApi(object):
         return cls._api_operation("getstatus", where="vc_endpoint_vidyo_username", value=vidyo_panorama_id)
 
     @classmethod
+    def connectRoom(cls, vidyo_room_id, query):
+        return cls._api_operation('videoconference/connect', vidyo_room_id=vidyo_room_id, query=query)
+
+    @classmethod
     def disconnectLegacyEndpoint(cls, room_ip, service_type, room_name):
         return cls._api_operation("videoconference/disconnect", type=service_type, where="vc_endpoint_legacy_ip",
                                   value=room_ip, vidyo_room_name=room_name)
@@ -94,3 +98,7 @@ class RavemApi(object):
     def disconnectVidyoPanorama(cls, vidyo_panorama_id, service_type, room_name):
         return cls._api_operation("videoconference/disconnect", type=service_type, where="vc_endpoint_vidyo_username",
                                   value=vidyo_panorama_id, vidyo_room_name=room_name)
+
+
+class RavemApiException(Exception):
+    pass
