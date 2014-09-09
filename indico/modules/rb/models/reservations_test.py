@@ -15,12 +15,12 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
-from itertools import product
 
 import pytest
 from dateutil.relativedelta import relativedelta
 
 from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
+from indico.testing.util import bool_matrix
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
@@ -44,8 +44,7 @@ def test_is_archived(create_reservation, days_delta, expected):
 
 
 @pytest.mark.parametrize(('is_accepted', 'is_rejected', 'is_cancelled', 'expected'),
-                         # Pending if neither accepted/rejected/cancelled
-                         tuple(x for x in product((True, False), repeat=4) if x[-1] != any(x[:-1])))
+                         bool_matrix('...', expect=lambda x: not any(x)))  # neither accepted/rejected/cancelled
 def test_is_pending(create_reservation, is_accepted, is_rejected, is_cancelled, expected):
     reservation = create_reservation(is_accepted=is_accepted, is_rejected=is_rejected, is_cancelled=is_cancelled)
     assert reservation.is_pending == expected
@@ -65,10 +64,7 @@ def test_is_repeating(create_reservation, repeat_frequency, expected):
 
 
 @pytest.mark.parametrize(('is_accepted', 'is_rejected', 'is_cancelled', 'expected'),
-                         # Expect True only if the booking is accepted and not rejected/cancelled
-                         tuple(x
-                               for x in product((True, False), repeat=4)
-                               if x[-1] == (x[:-1] == (True, False, False))))
+                         bool_matrix('...', expect=(True, False, False)))  # accepted, not rejected/cancelled
 def test_is_valid(create_reservation, is_accepted, is_rejected, is_cancelled, expected):
     reservation = create_reservation(is_accepted=is_accepted, is_rejected=is_rejected, is_cancelled=is_cancelled)
     assert reservation.is_valid == expected
@@ -218,8 +214,7 @@ def test_can_be_accepted(dummy_reservation, dummy_room, create_user, is_admin, i
 
 
 @pytest.mark.parametrize(('is_admin', 'is_created_by', 'is_booked_for', 'expected'),
-                         # Admin/Creator/Bookee can cancel, one is enough
-                         tuple(x for x in product((True, False), repeat=4) if x[-1] == any(x[:-1])))
+                         bool_matrix('...', expect=any))  # admin/creator/booked-for, one is enough
 def test_can_be_cancelled(dummy_reservation, create_user, is_admin, is_created_by, is_booked_for, expected):
     user = create_user('user')
     user.rb_admin = is_admin
@@ -240,20 +235,12 @@ def test_can_be_deleted(dummy_reservation, dummy_user, is_admin, expected):
     assert dummy_reservation.can_be_deleted(dummy_user) == expected
 
 
-can_be_modified_matrix = (
-    # booking rejected or cancelled: always expect False
-    tuple(x for x in product((True, False), repeat=7) if x[:2] != (False, False) and not x[-1]) +
-    # admin: always expect True
-    tuple(x for x in product((True, False), repeat=7) if x[:3] == (False, False, True) and x[-1]) +
-    # creator, booked for, room owner: any of them is sufficient: expect True
-    tuple(x for x in product((True, False), repeat=7) if x[:3] == (False, False, False) and any(x[3:6]) and x[-1]) +
-    # otherwise we expect False
-    ((False,) * 7,)
+@pytest.mark.parametrize(
+    ('is_rejected', 'is_cancelled', 'is_admin', 'is_created_by', 'is_booked_for', 'is_room_owner', 'expected'),
+    bool_matrix('!00....', expect=False) +                # rejected or cancelled
+    bool_matrix(' 001...', expect=True) +                 # admin
+    bool_matrix(' 000...', expect=lambda x: any(x[3:]))   # creator, booked for, room owner
 )
-
-
-@pytest.mark.parametrize(('is_rejected', 'is_cancelled', 'is_admin', 'is_created_by', 'is_booked_for', 'is_room_owner',
-                          'expected'), can_be_modified_matrix)
 def test_can_be_modified(dummy_reservation, dummy_room, create_user,
                          is_rejected, is_cancelled, is_admin, is_created_by, is_booked_for, is_room_owner, expected):
     user = create_user('user')
