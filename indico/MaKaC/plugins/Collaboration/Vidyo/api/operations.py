@@ -16,13 +16,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from MaKaC.plugins.Collaboration.base import CollaborationException
+from MaKaC.plugins.Collaboration.ravem import RavemApi, RavemApiException
 from MaKaC.plugins.Collaboration.Vidyo.common import getVidyoOptionValue, VidyoError, VidyoTools
 from MaKaC.plugins.Collaboration.Vidyo.api.factory import SOAPObjectFactory
-from MaKaC.plugins.Collaboration.Vidyo.api.api import AdminApi, UserApi
-from MaKaC.plugins.Collaboration.ravem import RavemApi
+from MaKaC.plugins.Collaboration.Vidyo.api.api import AdminApi  # , UserApi
 from suds import WebFault
-from MaKaC.plugins.Collaboration.base import CollaborationException
 from indico.core.logger import Logger
+from indico.util.i18n import _
 
 
 class VidyoOperations(object):
@@ -50,7 +51,8 @@ class VidyoOperations(object):
     @classmethod
     def createRoom(cls, booking):
         """ Attempts to create a public room in Vidyo.
-            Returns None on success. Will also set booking.setAccountName() if success, with the Indico & Vidyo login used successfully.
+            Returns None on success. Will also set booking.setAccountName() if success, with the Indico & Vidyo login
+            used successfully.
             Returns a VidyoError instance if there are problems.
 
             :param booking: the CSBooking object inside which we try to create the room
@@ -99,7 +101,8 @@ class VidyoOperations(object):
         while not roomCreated and loginToUse < len(possibleLogins):
             #we loop changing the ownerName and the extension until room is created
 
-            newRoom = SOAPObjectFactory.createRoom(roomNameForVidyo, description, possibleLogins[loginToUse], extension, pin, moderatorPin)
+            newRoom = SOAPObjectFactory.createRoom(roomNameForVidyo, description, possibleLogins[loginToUse], extension,
+                                                   pin, moderatorPin)
             try:
                 AdminApi.addRoom(newRoom)
                 roomCreated = True
@@ -123,8 +126,9 @@ class VidyoOperations(object):
                     extension = baseExtension + str(extensionSuffix)
                     extensionSuffix = extensionSuffix + 1
                 else:
-                    Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's addRoom operation got WebFault: %s""" %
-                                (confId, bookingId, e.fault.faultstring))
+                    Logger.get('Vidyo').exception(
+                        """Evt:%s, booking:%s, Admin API's addRoom operation got WebFault: %s"""
+                        % (confId, bookingId, e.fault.faultstring))
                     raise
 
         #if we could not create the room, the owner did not have any Vidyo accounts
@@ -176,9 +180,9 @@ class VidyoOperations(object):
         roomId = booking.getRoomId()
         roomName = booking.getBookingParamByName("roomName")
         description = booking.getBookingParamByName("roomDescription")
-        newOwner = booking.getOwnerObject() #an avatar object
-        ownerAccountName = booking.getOwnerAccount() #a str
-        oldOwner = oldBookingParams["owner"] #an IAvatarFossil fossil
+        newOwner = booking.getOwnerObject()  # an avatar object
+        ownerAccountName = booking.getOwnerAccount()  # a str
+        oldOwner = oldBookingParams["owner"]  # an IAvatarFossil fossil
         pin = booking.getPin()
         moderatorPin = booking.getModeratorPin()
 
@@ -215,7 +219,8 @@ class VidyoOperations(object):
             if not useOldAccountName:
                 ownerAccountName = possibleLogins[loginToUse]
 
-            newRoom = SOAPObjectFactory.createRoom(roomNameForVidyo, description, ownerAccountName, booking.getExtension(), pin, moderatorPin)
+            newRoom = SOAPObjectFactory.createRoom(roomNameForVidyo, description, ownerAccountName,
+                                                   booking.getExtension(), pin, moderatorPin)
             try:
                 AdminApi.updateRoom(roomId, newRoom)
                 roomModified = True
@@ -240,14 +245,14 @@ class VidyoOperations(object):
                         return VidyoError("PINLength", "modify")
 
                 else:
-                    Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's updateRoom operation got WebFault: %s""" %
-                                    (confId, bookingId, e.fault.faultstring))
+                    Logger.get('Vidyo').exception(
+                        """Evt:%s, booking:%s, Admin API's updateRoom operation got WebFault: %s"""
+                        % (confId, bookingId, e.fault.faultstring))
                     raise
 
         #if we could not create the room, the owner did not have any Vidyo accounts
         if not roomModified and loginToUse == len(possibleLogins):
             return VidyoError("badOwner", "modify")
-
 
         # we retrieve the just created room; we need to do this because Vidyo will have
         # added extra data like the room id, the url
@@ -258,8 +263,8 @@ class VidyoOperations(object):
             if faultString.startswith('Room not found for roomID'):
                 return VidyoError("unknownRoom", "modify")
             else:
-                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's getRoom operation got WebFault: %s""" %
-                            (confId, bookingId, e.fault.faultstring))
+                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's getRoom operation got WebFault: %s"""
+                                              % (confId, bookingId, e.fault.faultstring))
                 raise
 
         return modifiedRoom
@@ -278,8 +283,9 @@ class VidyoOperations(object):
             if faultString.startswith('Room not found for roomID'):
                 return VidyoError("unknownRoom", "setAutomute")
             else:
-                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's setAutomute operation got WebFault: %s""" %
-                            (confId, bookingId, e.fault.faultstring))
+                Logger.get('Vidyo').exception(
+                    """Evt:%s, booking:%s, Admin API's setAutomute operation got WebFault: %s"""
+                    % (confId, bookingId, e.fault.faultstring))
 
     @classmethod
     def getAutomute(cls, booking):
@@ -294,8 +300,10 @@ class VidyoOperations(object):
             if faultString.startswith('Room not found for roomID'):
                 return VidyoError("unknownRoom", "getAutomute")
             else:
-                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's getAutomute operation got WebFault: %s""" %
-                            (confId, bookingId, e.fault.faultstring))
+                Logger.get('Vidyo').exception(
+                    """Evt:%s, booking:%s, Admin API's getAutomute operation got WebFault: %s"""
+                    % (confId, bookingId, e.fault.faultstring))
+
     @classmethod
     def setModeratorPIN(cls, booking):
         confId = booking.getConference().getId()
@@ -310,8 +318,9 @@ class VidyoOperations(object):
             if faultString.startswith('Room not found for roomID'):
                 return VidyoError("unknownRoom", "setModeratorPIN")
             else:
-                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's setModeratorPIN operation got WebFault: %s""" %
-                            (confId, bookingId, e.fault.faultstring))
+                Logger.get('Vidyo').exception(
+                    """Evt:%s, booking:%s, Admin API's setModeratorPIN operation got WebFault: %s"""
+                    % (confId, bookingId, e.fault.faultstring))
 
     @classmethod
     def queryRoom(cls, booking, roomId):
@@ -334,8 +343,8 @@ class VidyoOperations(object):
             if faultString.startswith('Room not found for roomID'):
                 return VidyoError("unknownRoom", "checkStatus")
             else:
-                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's getRoom operation got WebFault: %s""" %
-                            (confId, bookingId, e.fault.faultstring))
+                Logger.get('Vidyo').exception("""Evt:%s, booking:%s, Admin API's getRoom operation got WebFault: %s"""
+                                              % (confId, bookingId, e.fault.faultstring))
                 raise
 
         return adminApiRoom
@@ -390,19 +399,23 @@ class VidyoOperations(object):
         else:
             roomName = ""
         try:
-            if roomIp != "":
+            if roomIp:
                 answer = RavemApi.disconnectLegacyEndpoint(roomIp, serviceType, roomName)
-            else:
+            elif roomPanoramaUser:
                 answer = RavemApi.disconnectVidyoPanorama(roomPanoramaUser, serviceType, roomName)
+            else:
+                raise ValueError("Room missing. PLease indicate a roomIp or a roomPanaoramUser.")
             if not answer.ok or "error" in answer.json():
                 Logger.get('Vidyo').exception("""Evt:%s, booking:%s,
                                               Ravem API's disconnect operation not successfull: %s""" %
                                               (booking.getConference().getId(), booking.getId(), answer.text))
                 return VidyoError("disconnectFailed", "disconnect",
-                                  _("Vidyo was unable to disconnect the conference room. {0}").format(VidyoTools.getContactSupportText()))
+                                  _("Vidyo was unable to disconnect the conference room. {0}")
+                                  .format(VidyoTools.getContactSupportText()))
         except Exception:
             return VidyoError("disconnectFailed", "disconnect",
-                              _("Vidyo was unable to disconnect the conference room. {0}").format(VidyoTools.getContactSupportText()))
+                              _("Vidyo was unable to disconnect the conference room. {0}")
+                              .format(VidyoTools.getContactSupportText()))
 
     @classmethod
     def isRoomConnected(cls, booking, roomIp="", roomPanoramaUser=""):
@@ -416,7 +429,9 @@ class VidyoOperations(object):
                                               Ravem API's isConnected operation not successfull: %s""" %
                                               (booking.getConference().getId(), booking.getId(), answer.text))
                 return VidyoError("roomCheckFailed", "roomConnected",
-                                  _("There was a problem obtaining the room status from Vidyo. {0}").format(VidyoTools.getContactSupportText()))
+                                  _("There was a problem obtaining the room status from Vidyo. {0}")
+                                  .format(VidyoTools.getContactSupportText()))
+
             result = {"roomName": None, "isConnected": False, "service": None}
             answer = answer.json()
             if "result" in answer:
@@ -428,8 +443,8 @@ class VidyoOperations(object):
             return result
         except Exception:
             return VidyoError("roomCheckFailed", "roomConnected",
-                              _("There was a problem obtaining the room status from Vidyo. {0}").format(
-                                    VidyoTools.getContactSupportText()))
+                              _("There was a problem obtaining the room status from Vidyo. {0}")
+                              .format(VidyoTools.getContactSupportText()))
 
     @classmethod
     def searchRooms(cls, query, offset=None, limit=None):
