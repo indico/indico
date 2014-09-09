@@ -15,11 +15,13 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
+from itertools import product
 
 import pytest
 from dateutil.relativedelta import relativedelta
 
 from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
+
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
 
@@ -41,16 +43,9 @@ def test_is_archived(create_reservation, days_delta, expected):
     assert reservation.is_archived == expected
 
 
-@pytest.mark.parametrize(('is_accepted', 'is_rejected', 'is_cancelled', 'expected'), (
-    (True,  True,  True,  False),
-    (True,  True,  False, False),
-    (True,  False, True,  False),
-    (True,  False, False, False),
-    (False, True,  True,  False),
-    (False, True,  False, False),
-    (False, False, True,  False),
-    (False, False, False, True),
-))
+@pytest.mark.parametrize(('is_accepted', 'is_rejected', 'is_cancelled', 'expected'),
+                         # Pending if neither accepted/rejected/cancelled
+                         tuple(x for x in product((True, False), repeat=4) if x[-1] != any(x[:-1])))
 def test_is_pending(create_reservation, is_accepted, is_rejected, is_cancelled, expected):
     reservation = create_reservation(is_accepted=is_accepted, is_rejected=is_rejected, is_cancelled=is_cancelled)
     assert reservation.is_pending == expected
@@ -69,16 +64,11 @@ def test_is_repeating(create_reservation, repeat_frequency, expected):
     assert reservation.is_repeating == expected
 
 
-@pytest.mark.parametrize(('is_accepted', 'is_rejected', 'is_cancelled', 'expected'), (
-    (True,  True,  True,  False),
-    (True,  True,  False, False),
-    (True,  False, True,  False),
-    (True,  False, False, True),
-    (False, True,  True,  False),
-    (False, True,  False, False),
-    (False, False, True,  False),
-    (False, False, False, False),
-))
+@pytest.mark.parametrize(('is_accepted', 'is_rejected', 'is_cancelled', 'expected'),
+                         # Expect True only if the booking is accepted and not rejected/cancelled
+                         tuple(x
+                               for x in product((True, False), repeat=4)
+                               if x[-1] == (x[:-1] == (True, False, False))))
 def test_is_valid(create_reservation, is_accepted, is_rejected, is_cancelled, expected):
     reservation = create_reservation(is_accepted=is_accepted, is_rejected=is_rejected, is_cancelled=is_cancelled)
     assert reservation.is_valid == expected
@@ -227,16 +217,9 @@ def test_can_be_accepted(dummy_reservation, dummy_room, create_user, is_admin, i
     assert dummy_reservation.can_be_accepted(user) == expected
 
 
-@pytest.mark.parametrize(('is_admin', 'is_created_by', 'is_booked_for', 'expected'), (
-    (True,  True,  True,  True),
-    (True,  True,  False, True),
-    (True,  False, True,  True),
-    (True,  False, False, True),
-    (False, True,  True,  True),
-    (False, True,  False, True),
-    (False, False, True,  True),
-    (False, False, False, False),
-))
+@pytest.mark.parametrize(('is_admin', 'is_created_by', 'is_booked_for', 'expected'),
+                         # Admin/Creator/Bookee can cancel, one is enough
+                         tuple(x for x in product((True, False), repeat=4) if x[-1] == any(x[:-1])))
 def test_can_be_cancelled(dummy_reservation, create_user, is_admin, is_created_by, is_booked_for, expected):
     user = create_user('user')
     user.rb_admin = is_admin
@@ -257,76 +240,20 @@ def test_can_be_deleted(dummy_reservation, dummy_user, is_admin, expected):
     assert dummy_reservation.can_be_deleted(dummy_user) == expected
 
 
-@pytest.mark.parametrize(('is_rejected', 'is_cancelled',
-                          'is_admin', 'is_created_by', 'is_booked_for', 'is_room_owner', 'expected'), (
-    # rejected/cancelled cases
-    (True,  True,  True,  True,  True,  True,  False),
-    (True,  True,  True,  True,  True,  False, False),
-    (True,  True,  True,  True,  False, True,  False),
-    (True,  True,  True,  True,  False, False, False),
-    (True,  True,  True,  False, True,  True,  False),
-    (True,  True,  True,  False, True,  False, False),
-    (True,  True,  True,  False, False, True,  False),
-    (True,  True,  True,  False, False, False, False),
-    (True,  True,  False, True,  True,  True,  False),
-    (True,  True,  False, True,  True,  False, False),
-    (True,  True,  False, True,  False, True,  False),
-    (True,  True,  False, True,  False, False, False),
-    (True,  True,  False, False, True,  True,  False),
-    (True,  True,  False, False, True,  False, False),
-    (True,  True,  False, False, False, True,  False),
-    (True,  True,  False, False, False, False, False),
-    (True,  False, True,  True,  True,  True,  False),
-    (True,  False, True,  True,  True,  False, False),
-    (True,  False, True,  True,  False, True,  False),
-    (True,  False, True,  True,  False, False, False),
-    (True,  False, True,  False, True,  True,  False),
-    (True,  False, True,  False, True,  False, False),
-    (True,  False, True,  False, False, True,  False),
-    (True,  False, True,  False, False, False, False),
-    (True,  False, False, True,  True,  True,  False),
-    (True,  False, False, True,  True,  False, False),
-    (True,  False, False, True,  False, True,  False),
-    (True,  False, False, True,  False, False, False),
-    (True,  False, False, False, True,  True,  False),
-    (True,  False, False, False, True,  False, False),
-    (True,  False, False, False, False, True,  False),
-    (True,  False, False, False, False, False, False),
-    (False, True,  True,  True,  True,  True,  False),
-    (False, True,  True,  True,  True,  False, False),
-    (False, True,  True,  True,  False, True,  False),
-    (False, True,  True,  True,  False, False, False),
-    (False, True,  True,  False, True,  True,  False),
-    (False, True,  True,  False, True,  False, False),
-    (False, True,  True,  False, False, True,  False),
-    (False, True,  True,  False, False, False, False),
-    (False, True,  False, True,  True,  True,  False),
-    (False, True,  False, True,  True,  False, False),
-    (False, True,  False, True,  False, True,  False),
-    (False, True,  False, True,  False, False, False),
-    (False, True,  False, False, True,  True,  False),
-    (False, True,  False, False, True,  False, False),
-    (False, True,  False, False, False, True,  False),
-    (False, True,  False, False, False, False, False),
-    # Admin cases
-    (False, False, True,  True,  True,  True,  True),
-    (False, False, True,  True,  True,  False, True),
-    (False, False, True,  True,  False, True,  True),
-    (False, False, True,  True,  False, False, True),
-    (False, False, True,  False, True,  True,  True),
-    (False, False, True,  False, True,  False, True),
-    (False, False, True,  False, False, True,  True),
-    (False, False, True,  False, False, False, True),
-    # Other cases
-    (False, False, False, True,  True,  True,  True),
-    (False, False, False, True,  True,  False, True),
-    (False, False, False, True,  False, True,  True),
-    (False, False, False, True,  False, False, True),
-    (False, False, False, False, True,  True,  True),
-    (False, False, False, False, True,  False, True),
-    (False, False, False, False, False, True,  True),
-    (False, False, False, False, False, False, False),
-))
+can_be_modified_matrix = (
+    # booking rejected or cancelled: always expect False
+    tuple(x for x in product((True, False), repeat=7) if x[:2] != (False, False) and not x[-1]) +
+    # admin: always expect True
+    tuple(x for x in product((True, False), repeat=7) if x[:3] == (False, False, True) and x[-1]) +
+    # creator, booked for, room owner: any of them is sufficient: expect True
+    tuple(x for x in product((True, False), repeat=7) if x[:3] == (False, False, False) and any(x[3:6]) and x[-1]) +
+    # otherwise we expect False
+    ((False,) * 7,)
+)
+
+
+@pytest.mark.parametrize(('is_rejected', 'is_cancelled', 'is_admin', 'is_created_by', 'is_booked_for', 'is_room_owner',
+                          'expected'), can_be_modified_matrix)
 def test_can_be_modified(dummy_reservation, dummy_room, create_user,
                          is_rejected, is_cancelled, is_admin, is_created_by, is_booked_for, is_room_owner, expected):
     user = create_user('user')
