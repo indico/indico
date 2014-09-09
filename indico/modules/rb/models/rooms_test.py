@@ -20,6 +20,7 @@ from operator import itemgetter
 import pytest
 
 from indico.modules.rb.models.rooms import Room
+from indico.testing.mocks import MockAvatarHolder
 from indico.util.struct.iterables import powerset
 
 
@@ -372,3 +373,155 @@ def test_max_capacity(create_room):
     create_room(capacity=10)
     create_room(capacity=5)
     assert Room.max_capacity == 10
+
+
+# @pytest.mark.parametrize(('available_equipment', 'expected_result'), (
+#     ({1, 2}, {1}),
+# ))
+# def test_find_with_filters(create_room, create_equipment_type, create_room_attribute, dummy_user,
+#                            available_equipment, expected_result):
+#     create_room_attribute(u'foo')
+#     equipment = {
+#         1: create_equipment_type(u'eq1'),
+#         2: create_equipment_type(u'eq2')
+#     }
+#     rooms = {
+#         1: create_room(),
+#         2: create_room(owner_id='whatever')
+#     }
+#     rooms[1].set_attribute_value(u'foo', u'test')
+#     rooms[1].available_equipment.append(equipment[1])
+#     rooms[2].available_equipment.extend(equipment.viewvalues())
+#     filters = {
+#         'available_equipment': map(equipment.get, available_equipment),
+#         'location': None,
+#         'capacity': None,
+#         'is_only_public': False,
+#         'is_auto_confirm': False,
+#         'is_only_active': False,
+#         'is_only_my_rooms': False,
+#         'available': -1,
+#         'details': None
+#     }
+#     result = Room.find_with_filters(filters, dummy_user)
+#     print result
+#     assert result == map(rooms.get, expected_result)
+
+
+def test_find_with_filters_equipment(db, dummy_room, create_room, create_equipment_type):
+    other_room = create_room()
+    assert set(Room.find_with_filters({}, None)) == set(Room.find_all())
+    eq1 = create_equipment_type(u'eq1')
+    eq2 = create_equipment_type(u'eq2')
+    assert not Room.find_with_filters({'available_equipment': {eq1}}, None)
+    dummy_room.available_equipment.append(eq1)
+    db.session.flush()
+    assert set(Room.find_with_filters({'available_equipment': {eq1}}, None)) == {dummy_room}
+    assert not Room.find_with_filters({'available_equipment': {eq1, eq2}}, None)
+    dummy_room.available_equipment.append(eq2)
+    other_room.available_equipment.append(eq2)
+    db.session.flush()
+    assert set(Room.find_with_filters({'available_equipment': {eq1}}, None)) == {dummy_room}
+    assert set(Room.find_with_filters({'available_equipment': {eq2}}, None)) == {dummy_room, other_room}
+    assert set(Room.find_with_filters({'available_equipment': {eq1, eq2}}, None)) == {dummy_room}
+
+
+@pytest.mark.parametrize(('capacity', 'other_capacity', 'search_capacity', 'match', 'match_other'), (
+    (100,  79,  100, True,  False),  # 79 outside 80..120
+    (110,  95,  100, True,  True),   # 110, 95 inside 80..120
+    (120,  80,  100, True,  True),   # 120, 80 exactly on the edges
+    (121,  80,  100, False, True),   # 121 outside range
+    (121,  50,  100, True,  False),  # 121 exceeds upper bound = match anyway to avoid getting no results
+    (79,   50,  100, False, False),  # 79 outside lower bound => hard limit
+    (None, 999, 999, True,  True),   # no capacity always matches
+))
+def test_find_with_filters_capacity(db, dummy_room, create_room,
+                                    capacity, other_capacity, search_capacity, match, match_other):
+    other_room = create_room()
+    assert set(Room.find_with_filters({}, None)) == set(Room.find_all())
+    dummy_room.capacity = capacity
+    other_room.capacity = other_capacity
+    db.session.flush()
+    expected = set()
+    if match:
+        expected.add(dummy_room)
+    if match_other:
+        expected.add(other_room)
+    assert set(Room.find_with_filters({'capacity': search_capacity}, None)) == expected
+
+
+@pytest.mark.parametrize(('is_reservable', 'booking_group', 'match'), (
+    (True,  None,   True),
+    (True,  u'foo', False),
+    (False, None,   False),
+    (False, u'foo', False)
+))
+def test_find_with_filters_only_public(dummy_room, create_room_attribute,
+                                       is_reservable, booking_group, match):
+    create_room_attribute(u'allowed-booking-group')
+    dummy_room.is_reservable = is_reservable
+    dummy_room.set_attribute_value(u'allowed-booking-group', booking_group)
+    if match:
+        assert set(Room.find_with_filters({'is_only_public': True}, None)) == {dummy_room}
+    else:
+        assert not Room.find_with_filters({'is_only_public': True}, None)
+
+
+@pytest.mark.parametrize(('owner_id', 'match'), (
+    (u'dummy', True),
+    (u'other', False)
+))
+def test_find_with_filters_only_my_rooms(dummy_room, dummy_user_factory, owner_id, match):
+    user = MockAvatarHolder().getById(owner_id) or dummy_user_factory(owner_id)
+    if match:
+        assert set(Room.find_with_filters({'is_only_my_rooms': True}, user)) == {dummy_room}
+    else:
+        assert not Room.find_with_filters({'is_only_my_rooms': True}, user)
+
+
+# TODO: test_find_with_filters_available
+
+
+@pytest.mark.parametrize('col', ('name', 'site', 'division', 'building', 'floor', 'number', 'telephone',
+                                 'key_location', 'comments'))
+def test_find_with_filters_details_cols(db, dummy_room, create_room, col):
+    create_room()  # some room we won't find!
+    assert set(Room.find_with_filters({}, None)) == set(Room.find_all())
+    assert not Room.find_with_filters({'details': u'meow'}, None)
+    setattr(dummy_room, col, u'meow')
+    db.session.flush()
+    assert set(Room.find_with_filters({'details': u'meow'}, None)) == {dummy_room}
+
+
+find_with_filters_details = (
+    (u'meow',     u'meow',     None),
+    (u'meow',     u'MEOW',     None),
+    (u'foo"bar',  u'foo"bar',  None),
+    (ur'foo\bar', ur'foo\bar', None),
+    (u'test%bla', u'test%bla', u'testXbla'),
+    (u'test_bla', u'test_bla', u'testXbla')
+)
+
+
+@pytest.mark.parametrize(('value', 'search_value', 'other_value'), find_with_filters_details)
+def test_find_with_filters_details_values(db, dummy_room, create_room, value, search_value, other_value):
+    other_room = create_room()
+    assert set(Room.find_with_filters({}, None)) == set(Room.find_all())
+    assert not Room.find_with_filters({'details': search_value}, None)
+    dummy_room.comments = value
+    other_room.comments = other_value
+    db.session.flush()
+    assert set(Room.find_with_filters({'details': search_value}, None)) == {dummy_room}
+
+
+@pytest.mark.parametrize(('value', 'search_value', 'other_value'), find_with_filters_details)
+def test_find_with_filters_details_attrs(dummy_room, create_room, create_room_attribute,
+                                         value, search_value, other_value):
+    other_room = create_room()
+    assert set(Room.find_with_filters({}, None)) == set(Room.find_all())
+    assert not Room.find_with_filters({'details': search_value}, None)
+    create_room_attribute(u'foo')
+    assert not Room.find_with_filters({'details': search_value}, None)
+    dummy_room.set_attribute_value(u'foo', value)
+    other_room.set_attribute_value(u'foo', other_value)
+    assert set(Room.find_with_filters({'details': search_value}, None)) == {dummy_room}
