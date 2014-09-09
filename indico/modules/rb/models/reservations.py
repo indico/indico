@@ -179,7 +179,8 @@ class Reservation(Serializer, db.Model):
     )
     contact_phone = db.Column(
         db.String,
-        nullable=False
+        nullable=False,
+        default=''
     )
     is_accepted = db.Column(
         db.Boolean,
