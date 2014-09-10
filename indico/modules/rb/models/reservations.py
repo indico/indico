@@ -376,7 +376,7 @@ class Reservation(Serializer, db.Model):
         reservation.booked_for_name = reservation.booked_for_user.getFullName()
         reservation.is_accepted = not prebook
         reservation.created_by_user = user
-        reservation.create_occurrences(True, user)
+        reservation.create_occurrences(True)
         if not any(occ.is_valid for occ in reservation.occurrences):
             raise NoReportError(_('Reservation has no valid occurrences'))
         notify_creation(reservation)
@@ -512,9 +512,12 @@ class Reservation(Serializer, db.Model):
                            .as_scalar()
         return self.used_equipment.filter(EquipmentType.parent_id == vc_equipment)
 
-    def create_occurrences(self, skip_conflicts, user):
+    def create_occurrences(self, skip_conflicts, user=None):
         ReservationOccurrence.create_series_for_reservation(self)
         db.session.flush()
+
+        if not user:
+            user = self.created_by_user
 
         # Check for conflicts with nonbookable periods
         if not user.isRBAdmin():
