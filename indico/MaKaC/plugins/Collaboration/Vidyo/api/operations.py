@@ -16,14 +16,15 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.plugins.Collaboration.base import CollaborationException
-from MaKaC.plugins.Collaboration.ravem import RavemApi, RavemApiException
-from MaKaC.plugins.Collaboration.Vidyo.common import getVidyoOptionValue, VidyoError, VidyoTools
-from MaKaC.plugins.Collaboration.Vidyo.api.factory import SOAPObjectFactory
-from MaKaC.plugins.Collaboration.Vidyo.api.api import AdminApi  # , UserApi
 from suds import WebFault
-from indico.core.logger import Logger
+
 from indico.util.i18n import _
+from indico.core.logger import Logger
+from MaKaC.plugins.Collaboration import ravem
+from MaKaC.plugins.Collaboration.base import CollaborationException
+from MaKaC.plugins.Collaboration.Vidyo.common import VidyoError, VidyoTools, getVidyoOptionValue
+from MaKaC.plugins.Collaboration.Vidyo.api.api import AdminApi
+from MaKaC.plugins.Collaboration.Vidyo.api.factory import SOAPObjectFactory
 
 
 class VidyoOperations(object):
@@ -368,10 +369,10 @@ class VidyoOperations(object):
 
     @classmethod
     def connect_room(cls, roomId, query):
-        answer = RavemApi.connectRoom(roomId, query)
+        answer = ravem.connect_room(roomId, query)
         json_answer = answer.json()
         if not answer.ok or 'error' in json_answer:
-            raise RavemApiException(
+            raise ravem.RavemApiException(
                 _(u"Vidyo connection to the room (id: {0}, query: {1}) failed. status: {2}, reason: {3}".format(
                     roomId, query, answer.status_code, json_answer.get('error', u"unknown")))
             )
@@ -380,16 +381,16 @@ class VidyoOperations(object):
     def disconnectRoom(cls, booking, connectionStatus, roomIp="", roomPanoramaUser=""):
         serviceType = connectionStatus.get("service")
         # roomName should be empty if we are forcing disconnection (otherwise we'd be sending the wrong name and
-        # disconnetion would fail)
+        # disconnection would fail)
         if connectionStatus.get("roomName") == booking.getBookingParamByName("roomName"):
             roomName = booking.getBookingParamByName("roomName")
         else:
             roomName = ""
         try:
             if roomIp:
-                answer = RavemApi.disconnectLegacyEndpoint(roomIp, serviceType, roomName)
+                answer = ravem.disconnect_legacy_endpoint(roomIp, serviceType, roomName)
             elif roomPanoramaUser:
-                answer = RavemApi.disconnectVidyoPanorama(roomPanoramaUser, serviceType, roomName)
+                answer = ravem.disconnect_vidyo_panorama(roomPanoramaUser, serviceType, roomName)
             else:
                 raise ValueError("Room missing. PLease indicate a roomIp or a roomPanaoramUser.")
             if not answer.ok or "error" in answer.json():
@@ -408,9 +409,9 @@ class VidyoOperations(object):
     def isRoomConnected(cls, booking, roomIp="", roomPanoramaUser=""):
         try:
             if roomIp != "":
-                answer = RavemApi.isLegacyEndpointConnected(roomIp)
+                answer = ravem.get_legacy_endpoint_status(roomIp)
             else:
-                answer = RavemApi.isVidyoPanoramaConnected(roomPanoramaUser)
+                answer = ravem.get_vidyo_panorama_status(roomPanoramaUser)
             if not answer.ok or "error" in answer.json():
                 Logger.get('Vidyo').exception("""Evt:%s, booking:%s,
                                               Ravem API's isConnected operation not successfull: %s""" %
