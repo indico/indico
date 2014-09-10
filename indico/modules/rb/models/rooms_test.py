@@ -611,11 +611,6 @@ def test_can_be_prebooked(dummy_room, create_user, create_room_attribute,
     assert dummy_room.can_be_prebooked(user, ignore_admin=ignore_admin) == expected
 
 
-def test_can_be_booked_prebooked_no_user(dummy_room):
-    assert not dummy_room.can_be_booked(None)
-    assert not dummy_room.can_be_prebooked(None)
-
-
 @pytest.mark.parametrize(('has_acl', 'in_acl', 'expected'), (
     (False, False, True),
     (True,  True,  True),
@@ -631,3 +626,29 @@ def test_can_be_booked_prebooked_no_rb_access(db, dummy_room, dummy_user, create
         db.session.flush()
     assert dummy_room.can_be_booked(user) == expected
     assert dummy_room.can_be_prebooked(user) == expected
+
+
+@pytest.mark.parametrize(('is_owner', 'is_admin', 'expected'), bool_matrix('..', expect=any))
+def test_can_be_overridden(dummy_room, create_user, is_owner, is_admin, expected):
+    user = create_user(u'user', rb_admin=is_admin)
+    if is_owner:
+        dummy_room.owner = user
+    assert dummy_room.can_be_overridden(user) == expected
+
+
+@pytest.mark.parametrize(('is_admin', 'expected'), (
+    (True,  True),
+    (False, False)
+))
+def test_can_be_modified_deleted(dummy_room, create_user, is_admin, expected):
+    user = create_user(u'user', rb_admin=is_admin)
+    assert dummy_room.can_be_modified(user) == expected
+    assert dummy_room.can_be_deleted(user) == expected
+
+
+def test_can_be_no_user(dummy_room):
+    assert not dummy_room.can_be_booked(None)
+    assert not dummy_room.can_be_prebooked(None)
+    assert not dummy_room.can_be_overridden(None)
+    assert not dummy_room.can_be_modified(None)
+    assert not dummy_room.can_be_deleted(None)
