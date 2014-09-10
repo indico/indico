@@ -560,6 +560,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 q = q.filter(~is_available)
             elif filters['available'] == 1:  # available
                 q = q.filter(is_available)
+            else:
+                raise ValueError('Unexpected availability value')
 
         free_search_columns = (
             'name', 'site', 'division', 'building', 'floor', 'number', 'telephone', 'key_location', 'comments'

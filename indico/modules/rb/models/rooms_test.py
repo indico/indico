@@ -15,6 +15,7 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import itertools
+from datetime import timedelta, datetime
 from operator import itemgetter
 
 import pytest
@@ -488,7 +489,28 @@ def test_find_with_filters_only_my_rooms(dummy_room, create_user, owner_id, matc
         assert not Room.find_with_filters({'is_only_my_rooms': True}, user)
 
 
-# TODO: test_find_with_filters_available
+@pytest.mark.parametrize('available', (True, False))
+def test_find_with_filters_availability(dummy_room, dummy_reservation, available):
+    if available:
+        start_dt = dummy_reservation.end_dt + timedelta(days=1)
+        end_dt = start_dt + timedelta(days=1)
+    else:
+        start_dt = dummy_reservation.start_dt
+        end_dt = dummy_reservation.end_dt
+    filters = {'available': int(available),
+               'repeatability': 'None',
+               'start_dt': start_dt,
+               'end_dt': end_dt}
+    assert set(Room.find_with_filters(filters, None)) == {dummy_room}
+
+
+def test_find_with_filters_availability_error():
+    with pytest.raises(ValueError):
+        filters = {'available': 123,
+                   'repeatability': 'None',
+                   'start_dt': datetime.now(),
+                   'end_dt': datetime.now()}
+        Room.find_with_filters(filters, None)
 
 
 @pytest.mark.parametrize('col', ('name', 'site', 'division', 'building', 'floor', 'number', 'telephone',
