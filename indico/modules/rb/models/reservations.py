@@ -584,13 +584,13 @@ class Reservation(Serializer, db.Model):
                     conflicts[occurrence][key].append(colliding)
         return conflicts
 
-    def is_owned_by(self, avatar):
-        return self.created_by_id == avatar.id
-
     def is_booked_for(self, user):
         if user is None:
             return False
         return self.booked_for_user == user or bool(set(self.contact_emails) & set(user.getEmails()))
+
+    def is_owned_by(self, avatar):
+        return self.created_by_id == avatar.id
 
     def modify(self, data, user):
         """Modifies an existing reservation.
