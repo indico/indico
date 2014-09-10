@@ -80,6 +80,27 @@ def dummy_reservation(create_reservation):
 
 
 @pytest.fixture
+def create_occurrence(create_reservation):
+    def _create_occurrence(start_dt=None, end_dt=None, room=None):
+        params = {}
+        if start_dt is not None:
+            params['start_dt'] = start_dt
+        if end_dt is not None:
+            params['end_dt'] = end_dt
+        if room is not None:
+            params['room'] = room
+        reservation = create_reservation(**params)
+        return reservation.occurrences[0]
+
+    return _create_occurrence
+
+
+@pytest.fixture
+def dummy_occurrence(create_occurrence):
+    return create_occurrence()
+
+
+@pytest.fixture
 def create_room(db, dummy_location, dummy_user):
     """Returns a callable which lets you create rooms"""
 
