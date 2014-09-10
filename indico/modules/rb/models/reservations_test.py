@@ -55,8 +55,7 @@ def test_is_pending(create_reservation, is_accepted, is_rejected, is_cancelled, 
     (RepeatFrequency.NEVER, False),
     (RepeatFrequency.DAY,   True),
     (RepeatFrequency.WEEK,  True),
-    (RepeatFrequency.MONTH, True),
-    (RepeatFrequency.YEAR,  True),
+    (RepeatFrequency.MONTH, True)
 ))
 def test_is_repeating(create_reservation, repeat_frequency, expected):
     reservation = create_reservation(repeat_frequency=repeat_frequency)

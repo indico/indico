@@ -60,7 +60,6 @@ class RepeatFrequency(int, IndicoEnum):
     DAY = 1
     WEEK = 2
     MONTH = 3
-    YEAR = 4
 
 
 class RepeatMapping(object):

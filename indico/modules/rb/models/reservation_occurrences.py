@@ -147,9 +147,6 @@ class ReservationOccurrence(db.Model, Serializer):
             else:
                 raise IndicoError('Unsupported interval {}'.format(repeat_interval))
 
-        elif repeat_frequency == RepeatFrequency.YEAR:
-            raise IndicoError('Unsupported frequency')
-
         raise IndicoError('Unexpected frequency {}'.format(repeat_frequency))
 
     @staticmethod
