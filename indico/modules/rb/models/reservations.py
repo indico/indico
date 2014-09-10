@@ -585,7 +585,9 @@ class Reservation(Serializer, db.Model):
         return self.created_by_id == avatar.id
 
     def is_booked_for(self, user):
-        return user and (self.booked_for_user == user or self.contact_email in user.getEmails())
+        if not user:
+            return False
+        return self.booked_for_user == user or bool(set(self.contact_emails) & set(user.getEmails()))
 
     def modify(self, data, user):
         """Modifies an existing reservation.
