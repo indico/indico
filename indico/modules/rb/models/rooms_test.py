@@ -385,37 +385,28 @@ def test_max_capacity(create_room):
     assert Room.max_capacity == 10
 
 
-# @pytest.mark.parametrize(('available_equipment', 'expected_result'), (
-#     ({1, 2}, {1}),
-# ))
-# def test_find_with_filters(create_room, create_equipment_type, create_room_attribute, dummy_user,
-#                            available_equipment, expected_result):
-#     create_room_attribute(u'foo')
-#     equipment = {
-#         1: create_equipment_type(u'eq1'),
-#         2: create_equipment_type(u'eq2')
-#     }
-#     rooms = {
-#         1: create_room(),
-#         2: create_room(owner_id='whatever')
-#     }
-#     rooms[1].set_attribute_value(u'foo', u'test')
-#     rooms[1].available_equipment.append(equipment[1])
-#     rooms[2].available_equipment.extend(equipment.viewvalues())
-#     filters = {
-#         'available_equipment': map(equipment.get, available_equipment),
-#         'location': None,
-#         'capacity': None,
-#         'is_only_public': False,
-#         'is_auto_confirm': False,
-#         'is_only_active': False,
-#         'is_only_my_rooms': False,
-#         'available': -1,
-#         'details': None
-#     }
-#     result = Room.find_with_filters(filters, dummy_user)
-#     print result
-#     assert result == map(rooms.get, expected_result)
+def test_find_with_filters(db, dummy_room, create_room, dummy_user, create_equipment_type, create_room_attribute,
+                           dummy_reservation):
+    # Simple testcase that ensures we find the room when many filters are used
+    other_room = create_room()
+    assert set(Room.find_with_filters({}, dummy_user)) == {dummy_room, other_room}
+    create_room_attribute(u'attr')
+    eq = create_equipment_type(u'eq')
+    dummy_room.capacity = 100
+    dummy_room.is_reservable = True
+    dummy_room.available_equipment.append(eq)
+    dummy_room.set_attribute_value(u'attr', u'meowmeow')
+    db.session.flush()
+    filters = {'available_equipment': {eq},
+               'capacity': 90,
+               'only_public': True,
+               'is_only_my_rooms': True,
+               'details': u'meow',
+               'available': 0,
+               'repeatability': 'None',
+               'start_dt': dummy_reservation.start_dt,
+               'end_dt': dummy_reservation.end_dt}
+    assert set(Room.find_with_filters(filters, dummy_user)) == {dummy_room}
 
 
 def test_find_with_filters_equipment(db, dummy_room, create_room, create_equipment_type):
