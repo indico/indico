@@ -60,6 +60,9 @@ class MockAvatar(object):
     def is_member_of_group(self, group_name):
         return group_name in self.groups
 
+    def containsUser(self, avatar):
+        return avatar == self
+
 
 class MockConferenceHolder:
     _events = {}

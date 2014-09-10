@@ -20,6 +20,7 @@ from operator import itemgetter
 
 import pytest
 
+from indico.modules.rb import settings
 from indico.modules.rb.models.rooms import Room
 from indico.testing.mocks import MockAvatarHolder
 from indico.testing.util import bool_matrix
@@ -608,3 +609,25 @@ def test_can_be_prebooked(dummy_room, create_user, create_room_attribute,
     if has_group:
         dummy_room.set_attribute_value(u'allowed-booking-group', u'bookers')
     assert dummy_room.can_be_prebooked(user, ignore_admin=ignore_admin) == expected
+
+
+def test_can_be_booked_prebooked_no_user(dummy_room):
+    assert not dummy_room.can_be_booked(None)
+    assert not dummy_room.can_be_prebooked(None)
+
+
+@pytest.mark.parametrize(('has_acl', 'in_acl', 'expected'), (
+    (False, False, True),
+    (True,  True,  True),
+    (True,  False, False),
+))
+def test_can_be_booked_prebooked_no_rb_access(db, dummy_room, dummy_user, create_user, has_acl, in_acl, expected):
+    user = create_user(u'user')
+    if has_acl:
+        acl = [(u'Avatar', dummy_user.id)]
+        if in_acl:
+            acl.append((u'Avatar', user.id))
+        settings.set('authorized_principals', acl)
+        db.session.flush()
+    assert dummy_room.can_be_booked(user) == expected
+    assert dummy_room.can_be_prebooked(user) == expected
