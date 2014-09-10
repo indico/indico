@@ -22,6 +22,7 @@ import pytest
 
 from indico.modules.rb.models.rooms import Room
 from indico.testing.mocks import MockAvatarHolder
+from indico.testing.util import bool_matrix
 from indico.util.struct.iterables import powerset
 
 
@@ -557,3 +558,53 @@ def test_has_live_reservations(dummy_room, create_reservation):
     create_reservation(start_dt=datetime.combine(date.today() + timedelta(days=1), time(8)),
                        end_dt=datetime.combine(date.today() + timedelta(days=1), time(10)))
     assert dummy_room.has_live_reservations()
+
+
+@pytest.mark.parametrize(
+    ('is_admin', 'ignore_admin', 'is_active', 'is_owned_by', 'is_reservable', 'has_group', 'in_group', 'expected'),
+    set(bool_matrix('10.....',                 expect=True) +           # admin
+        bool_matrix('..0....', mask='10.....', expect=False, ) +        # inactive
+        bool_matrix('..11...',                 expect=True) +           # owned
+        bool_matrix('..100..', mask='10.....', expect=False) +          # not reservable
+        bool_matrix('..1010.',                 expect=True) +           # no group
+        bool_matrix('..1011.', mask='10.....', expect=lambda x: x[6]))  # user in group
+)
+def test_can_be_booked(dummy_room, create_user, create_room_attribute,
+                       is_admin, ignore_admin, is_active, is_owned_by, is_reservable, has_group, in_group, expected):
+    create_room_attribute(u'allowed-booking-group')
+    user = create_user(u'user', rb_admin=is_admin)
+    dummy_room.is_active = is_active
+    dummy_room.is_reservable = is_reservable
+    if in_group:
+        user.groups.add(u'bookers')
+    if is_owned_by:
+        dummy_room.owner = user
+    if has_group:
+        dummy_room.set_attribute_value(u'allowed-booking-group', u'bookers')
+    assert dummy_room.can_be_booked(user, ignore_admin=ignore_admin) == expected
+    assert dummy_room.can_be_prebooked(user, ignore_admin=ignore_admin) == expected
+
+
+@pytest.mark.parametrize(
+    ('is_admin', 'ignore_admin', 'is_active', 'is_owned_by', 'is_reservable', 'has_group', 'in_group', 'expected'),
+    set(bool_matrix('10.....',                 expect=True) +           # admin
+        bool_matrix('..0....', mask='10.....', expect=False, ) +        # inactive
+        bool_matrix('..11...',                 expect=True) +           # owned
+        bool_matrix('..100..', mask='10.....', expect=False) +          # not reservable
+        bool_matrix('..1010.',                 expect=True) +           # no group
+        bool_matrix('..1011.', mask='10.....', expect=lambda x: x[6]))  # user in group
+)
+def test_can_be_prebooked(dummy_room, create_user, create_room_attribute,
+                          is_admin, ignore_admin, is_active, is_owned_by, is_reservable, has_group, in_group, expected):
+    create_room_attribute(u'allowed-booking-group')
+    user = create_user(u'user', rb_admin=is_admin)
+    dummy_room.is_active = is_active
+    dummy_room.is_reservable = is_reservable
+    dummy_room.reservations_need_confirmation = True
+    if in_group:
+        user.groups.add(u'bookers')
+    if is_owned_by:
+        dummy_room.owner = user
+    if has_group:
+        dummy_room.set_attribute_value(u'allowed-booking-group', u'bookers')
+    assert dummy_room.can_be_prebooked(user, ignore_admin=ignore_admin) == expected
