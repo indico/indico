@@ -14,7 +14,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
+from datetime import date
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -38,8 +38,8 @@ pytest_plugins = 'indico.modules.rb.testing.fixtures'
     (0,  False),  # Reservation in course
 ))
 def test_is_archived(create_reservation, days_delta, expected):
-    start_dt = datetime.now() + relativedelta(days=days_delta, hours=-1)
-    end_dt = datetime.now() + relativedelta(days=days_delta, hours=+1)
+    start_dt = date.today() + relativedelta(days=days_delta, hour=0, minute=0)
+    end_dt = date.today() + relativedelta(days=days_delta, hour=23, minute=59)
     reservation = create_reservation(start_dt=start_dt, end_dt=end_dt)
     assert reservation.is_archived == expected
 
@@ -179,11 +179,11 @@ def test_repetition(dummy_reservation):
 def test_status_string(create_reservation, is_accepted, is_rejected, is_cancelled, is_archived, expected):
     params = {'is_accepted': is_accepted, 'is_rejected': is_rejected, 'is_cancelled': is_cancelled}
     if is_archived:
-        params['start_dt'] = datetime.now() + relativedelta(days=-1, hours=-1)
-        params['end_dt'] = datetime.now() + relativedelta(days=-1, hours=+1)
+        params['start_dt'] = date.today() + relativedelta(days=-1, hour=8)
+        params['end_dt'] = date.today() + relativedelta(days=-1, hour=17)
     else:
-        params['start_dt'] = datetime.now() + relativedelta(days=1, hours=1)
-        params['end_dt'] = datetime.now() + relativedelta(days=1, hours=2)
+        params['start_dt'] = date.today() + relativedelta(days=1, hour=8)
+        params['end_dt'] = date.today() + relativedelta(days=1, hour=17)
     reservation = create_reservation(**params)
     assert str(reservation.status_string) == expected
 
