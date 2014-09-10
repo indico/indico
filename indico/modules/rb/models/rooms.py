@@ -660,13 +660,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     @cached(_cache)
     def is_owned_by(self, avatar):
-        """
-        Returns True if user is responsible for this room. False otherwise.
-        """
-        # legacy check, currently every room must be owned by someone
-        if not self.owner_id:
-            return None
-
+        """Checks if the user is managing the room (owner or manager)"""
         if self.owner_id == avatar.id:
             return True
         manager_group = self.get_attribute_value('manager-group')
