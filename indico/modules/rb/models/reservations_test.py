@@ -20,6 +20,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 
 from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
+from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.testing.util import bool_matrix
 
 
@@ -55,7 +56,7 @@ def test_is_pending(create_reservation, is_accepted, is_rejected, is_cancelled, 
     (RepeatFrequency.NEVER, False),
     (RepeatFrequency.DAY,   True),
     (RepeatFrequency.WEEK,  True),
-    (RepeatFrequency.MONTH, True)
+    (RepeatFrequency.MONTH, True),
 ))
 def test_is_repeating(create_reservation, repeat_frequency, expected):
     reservation = create_reservation(repeat_frequency=repeat_frequency)
@@ -197,13 +198,18 @@ def test_status_string(create_reservation, is_accepted, is_rejected, is_cancelle
 # ======================================================================================================================
 
 
+def test_add_edit_log(db, dummy_reservation):
+    dummy_reservation.add_edit_log(ReservationEditLog(user_name='user', info='Some change'))
+    assert dummy_reservation.edit_logs.count() == 1
+
+
 @pytest.mark.parametrize(('is_admin', 'is_owner', 'expected'), bool_matrix('..', expect=any))
-def test_can_be_accepted_rejected(dummy_reservation, dummy_room, create_user, is_admin, is_owner, expected):
+def test_can_be_accepted_rejected(dummy_reservation, create_user, is_admin, is_owner, expected):
     user = create_user('user')
     if is_admin:
         user.rb_admin = True
     if is_owner:
-        dummy_room.owner_id = user.id
+        dummy_reservation.room.owner = user
     assert dummy_reservation.can_be_accepted(user) == expected
     assert dummy_reservation.can_be_rejected(user) == expected
 
@@ -236,7 +242,7 @@ def test_can_be_deleted(dummy_reservation, dummy_user, is_admin, expected):
     bool_matrix(' 001...', expect=True) +                 # admin
     bool_matrix(' 000...', expect=lambda x: any(x[3:]))   # creator, booked for, room owner
 )
-def test_can_be_modified(dummy_reservation, dummy_room, create_user,
+def test_can_be_modified(dummy_reservation, create_user,
                          is_rejected, is_cancelled, is_admin, is_created_by, is_booked_for, is_room_owner, expected):
     user = create_user('user')
     user.rb_admin = is_admin
@@ -245,10 +251,22 @@ def test_can_be_modified(dummy_reservation, dummy_room, create_user,
     if is_booked_for:
         dummy_reservation.booked_for_user = user
     if is_room_owner:
-        dummy_room.owner = user
+        dummy_reservation.room.owner = user
     dummy_reservation.is_rejected = is_rejected
     dummy_reservation.is_cancelled = is_cancelled
     assert dummy_reservation.can_be_modified(user) == expected
+
+
+@pytest.mark.parametrize(
+    ('is_admin', 'is_room_owner', 'expected'),
+    bool_matrix('..', expect=any)
+)
+def test_can_be_rejected(dummy_reservation, create_user, is_admin, is_room_owner, expected):
+    user = create_user('user')
+    user.rb_admin = is_admin
+    if is_room_owner:
+        dummy_reservation.room.owner = user
+    assert dummy_reservation.can_be_rejected(user) == expected
 
 
 def test_can_be_action_with_no_user(dummy_reservation):
@@ -257,3 +275,31 @@ def test_can_be_action_with_no_user(dummy_reservation):
     assert not dummy_reservation.can_be_deleted(None)
     assert not dummy_reservation.can_be_modified(None)
     assert not dummy_reservation.can_be_rejected(None)
+
+
+def test_getLocator(dummy_reservation, dummy_location):
+    assert dummy_reservation.getLocator() == {'roomLocation': dummy_location.name, 'resvID': dummy_reservation.id}
+
+
+@pytest.mark.parametrize(('is_booked_for', 'contact_email', 'expected'), (
+    (True, '', True),
+    (False, '', False),
+    (False, 'dummy@example.com', True),
+    (False, 'other@example.com', False),
+    (False, 'dummy@example.com, other@example.com', True),
+    (False, 'other1@example.com, other2@example.com', False),
+))
+def test_is_booked_for(dummy_reservation, dummy_user, create_user, is_booked_for, contact_email, expected):
+    if not is_booked_for:
+        other_user = create_user('other')
+        dummy_reservation.booked_for_user = other_user
+    dummy_reservation.contact_email = contact_email
+    assert dummy_reservation.is_booked_for(dummy_user) == expected
+
+
+def test_is_booked_for_no_user(dummy_reservation):
+    assert not dummy_reservation.is_booked_for(None)
+
+
+def test_is_created_by(dummy_reservation, dummy_user):
+    assert dummy_reservation.is_owned_by(dummy_user)
