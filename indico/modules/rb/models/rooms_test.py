@@ -15,7 +15,7 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import itertools
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date, time
 from operator import itemgetter
 
 import pytest
@@ -556,3 +556,13 @@ def test_find_with_filters_details_attrs(dummy_room, create_room, create_room_at
     dummy_room.set_attribute_value(u'foo', value)
     other_room.set_attribute_value(u'foo', other_value)
     assert set(Room.find_with_filters({'details': search_value}, None)) == {dummy_room}
+
+
+def test_has_live_reservations(dummy_room, create_reservation):
+    assert not dummy_room.has_live_reservations()
+    create_reservation(start_dt=datetime.combine(date.today() - timedelta(days=1), time(8)),
+                       end_dt=datetime.combine(date.today() - timedelta(days=1), time(10)))
+    assert not dummy_room.has_live_reservations()
+    create_reservation(start_dt=datetime.combine(date.today() + timedelta(days=1), time(8)),
+                       end_dt=datetime.combine(date.today() + timedelta(days=1), time(10)))
+    assert dummy_room.has_live_reservations()
