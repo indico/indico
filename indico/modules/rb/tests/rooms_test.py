@@ -292,10 +292,10 @@ class TestRoom(DBTest):
     def test_can_be_overriden(self):
         for r, room in self.iterRooms():
             if room.is_owned_by(self._avatar1):
-                assert_true(room.can_be_overriden(self._avatar1))
-                assert_true(room.can_be_overriden(self._dummy))
+                assert_true(room.can_be_overridden(self._avatar1))
+                assert_true(room.can_be_overridden(self._dummy))
             else:
-                assert_true(room.can_be_overriden(self._dummy))
+                assert_true(room.can_be_overridden(self._dummy))
 
     @with_context('database')
     def test_can_be_modified(self):

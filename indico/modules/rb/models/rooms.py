@@ -632,15 +632,15 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         """
         return self._can_be_booked(avatar, ignore_admin=ignore_admin)
 
-    def can_be_overriden(self, avatar):
-        return avatar.isRBAdmin() or self.is_owned_by(avatar)
-
     def can_be_prebooked(self, avatar, ignore_admin=False):
         """
         Reservable rooms can be pre-booked by anyone.
         Other rooms - only by their responsibles.
         """
         return self._can_be_booked(avatar, prebook=True, ignore_admin=ignore_admin)
+
+    def can_be_overridden(self, avatar):
+        return avatar.isRBAdmin() or self.is_owned_by(avatar)
 
     def can_be_modified(self, accessWrapper):
         """Only admin can modify rooms."""
