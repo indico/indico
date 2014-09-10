@@ -515,7 +515,7 @@ class Reservation(Serializer, db.Model):
         ReservationOccurrence.create_series_for_reservation(self)
         db.session.flush()
 
-        if not user:
+        if user is None:
             user = self.created_by_user
 
         # Check for conflicts with nonbookable periods
