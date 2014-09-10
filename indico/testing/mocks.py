@@ -57,6 +57,9 @@ class MockAvatar(object):
     def isRBAdmin(self):
         return self.rb_admin
 
+    def is_member_of_group(self, group_name):
+        return group_name in self.groups
+
 
 class MockConferenceHolder:
     _events = {}
