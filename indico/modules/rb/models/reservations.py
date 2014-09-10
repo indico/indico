@@ -175,7 +175,8 @@ class Reservation(Serializer, db.Model):
     )
     contact_email = db.Column(
         db.String,
-        nullable=False
+        nullable=False,
+        default=''
     )
     contact_phone = db.Column(
         db.String,
