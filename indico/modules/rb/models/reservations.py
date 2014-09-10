@@ -475,22 +475,22 @@ class Reservation(Serializer, db.Model):
             self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
 
     def can_be_accepted(self, user):
-        if not user:
+        if user is None:
             return False
         return user.isRBAdmin() or self.room.is_owned_by(user)
 
     def can_be_cancelled(self, user):
-        if not user:
+        if user is None:
             return False
         return self.is_owned_by(user) or user.isRBAdmin() or self.is_booked_for(user)
 
     def can_be_deleted(self, user):
-        if not user:
+        if user is None:
             return False
         return user.isRBAdmin()
 
     def can_be_modified(self, user):
-        if not user:
+        if user is None:
             return False
         if self.is_rejected or self.is_cancelled:
             return False
@@ -499,7 +499,7 @@ class Reservation(Serializer, db.Model):
         return self.created_by_user == user or self.is_booked_for(user) or self.room.is_owned_by(user)
 
     def can_be_rejected(self, user):
-        if not user:
+        if user is None:
             return False
         return user.isRBAdmin() or self.room.is_owned_by(user)
 
@@ -587,7 +587,7 @@ class Reservation(Serializer, db.Model):
         return self.created_by_id == avatar.id
 
     def is_booked_for(self, user):
-        if not user:
+        if user is None:
             return False
         return self.booked_for_user == user or bool(set(self.contact_emails) & set(user.getEmails()))
 
