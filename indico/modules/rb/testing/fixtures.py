@@ -14,13 +14,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
+from datetime import date
 
 import pytest
+from dateutil.relativedelta import relativedelta
 
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
 from indico.modules.rb.models.room_attributes import RoomAttribute
 from indico.modules.rb.models.rooms import Room
 
@@ -50,16 +51,18 @@ def dummy_location(db, create_location):
 @pytest.fixture
 def create_reservation(db, dummy_room, dummy_user):
     def _create_reservation(**params):
-        params.setdefault('start_dt', datetime.now())
-        params.setdefault('end_dt', datetime.now())
-        params.setdefault('booked_for_id', dummy_user.id)
-        params.setdefault('booked_for_name', dummy_user.getFullName())
+        params.setdefault('start_dt', date.today() + relativedelta(hour=8, minute=30))
+        params.setdefault('end_dt', date.today() + relativedelta(hour=17, minute=30))
+        params.setdefault('repeat_frequency', RepeatFrequency.NEVER)
+        params.setdefault('repeat_interval', 1)
         params.setdefault('contact_email', dummy_user.email)
-        params.setdefault('created_by_id', dummy_user.id)
         params.setdefault('is_accepted', True)
         params.setdefault('booking_reason', 'Testing')
         params.setdefault('room', dummy_room)
         reservation = Reservation(**params)
+        reservation.booked_for_user = dummy_user
+        reservation.created_by_user = dummy_user
+        reservation.create_occurrences(skip_conflicts=False)
         db.session.add(reservation)
         db.session.flush()
         return reservation
