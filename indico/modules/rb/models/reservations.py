@@ -464,6 +464,7 @@ class Reservation(Serializer, db.Model):
 
     def add_edit_log(self, edit_log):
         self.edit_logs.append(edit_log)
+        db.session.flush()
 
     def cancel(self, user, reason=None, silent=False):
         self.is_cancelled = True
