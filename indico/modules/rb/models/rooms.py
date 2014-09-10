@@ -26,11 +26,9 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import joinedload
 
 from MaKaC.webinterface import urlHandlers as UH
-from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.Locators import Locator
 from MaKaC.common.cache import GenericCache
-from MaKaC.errors import MaKaCError
-from MaKaC.user import Avatar, AvatarHolder
+from MaKaC.user import AvatarHolder
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.util.cache import versioned_cache, cached
@@ -642,21 +640,14 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def can_be_overridden(self, avatar):
         return avatar.isRBAdmin() or self.is_owned_by(avatar)
 
-    def can_be_modified(self, accessWrapper):
+    def can_be_modified(self, avatar):
         """Only admin can modify rooms."""
-        if not accessWrapper:
+        if not avatar:
             return False
+        return avatar.isRBAdmin()
 
-        if isinstance(accessWrapper, AccessWrapper):
-            avatar = accessWrapper.getUser()
-            return avatar.isRBAdmin() if avatar else False
-        elif isinstance(accessWrapper, Avatar):
-            return accessWrapper.isRBAdmin()
-
-        raise MaKaCError(_('canModify requires either AccessWrapper or Avatar object'))
-
-    def can_be_deleted(self, accessWrapper):
-        return self.can_be_modified(accessWrapper)
+    def can_be_deleted(self, avatar):
+        return self.can_be_modified(avatar)
 
     @cached(_cache)
     def is_owned_by(self, avatar):
