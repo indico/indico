@@ -652,3 +652,19 @@ def test_can_be_no_user(dummy_room):
     assert not dummy_room.can_be_overridden(None)
     assert not dummy_room.can_be_modified(None)
     assert not dummy_room.can_be_deleted(None)
+
+
+@pytest.mark.parametrize(('is_owner', 'has_group', 'in_group', 'expected'),
+                         bool_matrix('...', expect=lambda x: x[0] or all(x[1:])))
+def test_ownership_functions(dummy_room, create_user, create_room_attribute, is_owner, has_group, in_group, expected):
+    user = create_user(u'user')
+    create_room_attribute(u'manager-group')
+    if is_owner:
+        dummy_room.owner = user
+    if has_group:
+        dummy_room.set_attribute_value(u'manager-group', u'managers')
+    if in_group:
+        user.groups.add(u'managers')
+    assert dummy_room.is_owned_by(user) == expected
+    assert Room.user_owns_rooms(user) == expected
+    assert set(Room.get_owned_by(user)) == ({dummy_room} if expected else set())
