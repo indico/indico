@@ -46,6 +46,9 @@ class DummyDict(object):
     def __setattr__(self, name, value):
         return None
 
+    def __nonzero__(self):
+        return False
+
     def __str__(self):
         return "<DummyDict>"
 

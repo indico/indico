@@ -163,7 +163,11 @@
                             ${ _('Capacity') }&nbsp;&nbsp;
                           </td>
                           <td align="left" class="blacktext">
-                            ${ room.capacity } ${ _('seats') }
+                            % if room.capacity is not None:
+                              ${ room.capacity } ${ _('seats') }
+                            % else:
+                              ${ _('n/a') }
+                            % endif
                           </td>
                         </tr>
                         <tr>

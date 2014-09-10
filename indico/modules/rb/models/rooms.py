@@ -509,7 +509,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             .join(Location.rooms)
             .filter(
                 Location.id == filters['location'].id if filters['location'] else True,
-                (Room.capacity >= (filters['capacity'] * 0.8)) if filters['capacity'] else True,
+                ((Room.capacity >= (filters['capacity'] * 0.8)) | (Room.capacity == None)) if filters['capacity'] else True,
                 Room.is_reservable if filters['is_only_public'] else True,
                 Room.is_auto_confirm if filters['is_auto_confirm'] else True,
                 Room.is_active if filters.get('is_only_active', False) else True,
@@ -551,10 +551,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if filters.get('is_only_my_rooms'):
             rooms = [r for r in rooms if r.is_owned_by(avatar)]
         if filters['capacity']:
-            # Unless it would result in an empty resultset we don't want to show room which >20% more capacity
+            # Unless it would result in an empty resultset we don't want to show room with >20% more capacity
             # than requested. This cannot be done easily in SQL so we do that logic here after the SQL query already
             # weeded out rooms that are too small
-            matching_capacity_rooms = [r for r in rooms if r.capacity <= filters['capacity'] * 1.2]
+            matching_capacity_rooms = [r for r in rooms
+                                       if r.capacity is None or r.capacity <= filters['capacity'] * 1.2]
             if matching_capacity_rooms:
                 rooms = matching_capacity_rooms
         return rooms

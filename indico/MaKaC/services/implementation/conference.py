@@ -528,6 +528,8 @@ class ConferenceListContributions (ConferenceListModificationBase):
         contributions = self._conf.getContributionList()
         result = {}
         for cont in contributions:
+            if not cont.isScheduled():
+                continue
             session = (" (" + cont.getSession().getTitle() + ")") if (cont.getSession() is not None) else ""
             time = " (" + formatDateTime(cont.getAdjustedStartDate(), format="dd MMM yyyy HH:mm") + ")"
             result[cont.getId()] = cont.getTitle() + session + time
@@ -1427,6 +1429,10 @@ class ConferenceRemoveChairPerson(ConferenceChairPersonBase):
 
     def _getAnswer(self):
         chair = self._conf.getChairById(self._chairId)
+
+        if chair is None:
+            raise NoReportError(_('Someone may have deleted this chairperson meanwhile. Please refresh the page.'))
+
         self._conf.removeChair(chair)
         self._conf.getAccessController().revokeSubmission(chair)
         return self._getChairPersonsList()

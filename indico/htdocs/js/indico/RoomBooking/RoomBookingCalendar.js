@@ -88,9 +88,7 @@ type ("RoomBookingRoom", [],
             this.type = roomData.kind;
             this.details_url = roomData.details_url;
             this.bookingUrl = build_url(roomData.booking_url, {
-                day: date.substring(8, 10),
-                month: date.substring(5, 7),
-                year: date.substring(0, 4)
+                start_date: date
             });
         });
 
