@@ -20,6 +20,7 @@ from operator import itemgetter
 
 import pytest
 
+from indico.core.errors import IndicoError
 from indico.modules.rb import settings
 from indico.modules.rb.models.rooms import Room
 from indico.testing.mocks import MockAvatarHolder
@@ -668,3 +669,27 @@ def test_ownership_functions(dummy_room, create_user, create_room_attribute, is_
     assert dummy_room.is_owned_by(user) == expected
     assert Room.user_owns_rooms(user) == expected
     assert set(Room.get_owned_by(user)) == ({dummy_room} if expected else set())
+
+
+@pytest.mark.parametrize(('is_admin', 'is_owner', 'max_advance_days', 'days_delta', 'success'), (
+    (True,  False, 10,   15, True),
+    (False, True,  10,   15, True),
+    (False, False, None, 15, True),
+    (False, False, 0,    15, True),
+    (False, False, 10,   -5, True),
+    (False, False, 10,   10, False),
+    (False, False, 10,   15, False)
+))
+def test_check_advance_days(create_user, dummy_room, is_admin, is_owner, max_advance_days, days_delta, success):
+    user = create_user(u'user', rb_admin=is_admin)
+    dummy_room.max_advance_days = max_advance_days
+    end_date = date.today() + timedelta(days=days_delta)
+    if is_owner:
+        dummy_room.owner = user
+    if success:
+        assert dummy_room.check_advance_days(end_date, user, quiet=True)
+        assert dummy_room.check_advance_days(end_date, user)
+    else:
+        assert not dummy_room.check_advance_days(end_date, user, quiet=True)
+        with pytest.raises(IndicoError):
+            dummy_room.check_advance_days(end_date, user)
