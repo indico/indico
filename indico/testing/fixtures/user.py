@@ -16,8 +16,8 @@
 
 import pytest
 
-from indico.testing.mocks import MockAvatar, MockAvatarHolder
-from MaKaC.user import AvatarHolder
+from indico.testing.mocks import MockAvatar, MockAvatarHolder, MockGroupHolder, MockGroup
+from MaKaC.user import AvatarHolder, GroupHolder
 
 
 @pytest.yield_fixture
@@ -50,3 +50,30 @@ def create_user(monkeypatch_methods):
 def dummy_user(create_user):
     """Creates a mocked dummy avatar"""
     return create_user('dummy')
+
+
+@pytest.yield_fixture
+def create_group(monkeypatch_methods):
+    """Returns a callable which lets you create dummy groups"""
+    monkeypatch_methods('MaKaC.user.GroupHolder', MockGroupHolder)
+
+    _groups = []
+    gh = GroupHolder()
+
+    def _create_group(id_):
+        group = MockGroup()
+        group.id = id_
+        gh.add(group)
+        _groups.append(group)
+        return group
+
+    yield _create_group
+
+    for group in _groups:
+        gh.remove(group)
+
+
+@pytest.fixture
+def dummy_group(create_group):
+    """Creates a mocked dummy group"""
+    return create_group('dummy')

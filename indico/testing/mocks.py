@@ -67,7 +67,39 @@ class MockAvatar(object):
         return avatar == self
 
 
+class MockGroupHolder:
+    # This class is monkeypatched on top of the real group holder
+    _groups = {}
+
+    def __init__(self):
+        pass
+
+    @classmethod
+    def add(cls, group):
+        if group.id in cls._groups:
+            __tracebackhide__ = True
+            raise Exception(u"Group '{}' already exists".format(group.id))
+        cls._groups[group.id] = group
+
+    @classmethod
+    def remove(cls, group):
+        del cls._groups[group.id]
+
+    @classmethod
+    def getById(cls, id_):
+        return cls._groups.get(id_)
+
+
+class MockGroup(object):
+    def __repr__(self):
+        return '<MockGroup({})>'.format(self.id)
+
+    def containsUser(self, avatar):
+        return self.id in avatar.groups
+
+
 class MockConferenceHolder:
+    # This class is monkeypatched on top of the real conferenceholder
     _events = {}
 
     def __init__(self):
