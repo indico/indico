@@ -71,6 +71,10 @@ class Blocking(db.Model):
 
     @hybrid_method
     def is_active_at(self, d):
+        return self.start_date <= d <= self.end_date
+
+    @is_active_at.expression
+    def is_active_at(self, d):
         return (self.start_date <= d) & (d <= self.end_date)
 
     @property
@@ -89,7 +93,7 @@ class Blocking(db.Model):
         """
         if not user:
             return False
-        return user == self.created_by_user or user.isAdmin()
+        return user == self.created_by_user or user.isRBAdmin()
 
     def can_be_deleted(self, user):
         return self.can_be_modified(user)
@@ -107,7 +111,7 @@ class Blocking(db.Model):
         if self.created_by_user == user:
             return True
         if not explicit_only:
-            if user.isAdmin():
+            if user.isRBAdmin():
                 return True
             elif room and room.is_owned_by(user):
                 return True
