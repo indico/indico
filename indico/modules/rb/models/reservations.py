@@ -462,10 +462,6 @@ class Reservation(Serializer, db.Model):
                 continue
             occurrence.reject(user, u'Rejected due to collision with a confirmed reservation')
 
-    def add_edit_log(self, edit_log):
-        self.edit_logs.append(edit_log)
-        db.session.flush()
-
     def cancel(self, user, reason=None, silent=False):
         self.is_cancelled = True
         self.rejection_reason = reason
@@ -474,6 +470,20 @@ class Reservation(Serializer, db.Model):
             notify_cancellation(self)
             log_msg = u'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
             self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
+
+    def reject(self, user, reason, silent=False):
+        self.is_rejected = True
+        self.rejection_reason = reason
+        self.occurrences.filter_by(is_valid=True).update({'is_rejected': True, 'rejection_reason': reason},
+                                                         synchronize_session='fetch')
+        if not silent:
+            notify_rejection(self)
+            log_msg = u'Reservation rejected: {}'.format(reason)
+            self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
+
+    def add_edit_log(self, edit_log):
+        self.edit_logs.append(edit_log)
+        db.session.flush()
 
     def can_be_accepted(self, user):
         if user is None:
@@ -715,13 +725,3 @@ class Reservation(Serializer, db.Model):
 
         notify_modification(self, changes)
         return True
-
-    def reject(self, user, reason, silent=False):
-        self.is_rejected = True
-        self.rejection_reason = reason
-        self.occurrences.filter_by(is_valid=True).update({'is_rejected': True, 'rejection_reason': reason},
-                                                         synchronize_session='fetch')
-        if not silent:
-            notify_rejection(self)
-            log_msg = u'Reservation rejected: {}'.format(reason)
-            self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))

@@ -224,22 +224,7 @@ class ReservationOccurrence(db.Model, Serializer):
             qs = u'%{}%'.format(filters['reason'])
             q = q.filter(Reservation.booking_reason.ilike(qs))
 
-        q = q.order_by(Room.id)
-        return q
-
-    def overlaps(self, occurrence, skip_self=False):
-        if self.reservation and occurrence.reservation and self.reservation.room_id != occurrence.reservation.room_id:
-            raise ValueError('ReservationOccurrence objects of different rooms')
-        if skip_self and self.reservation and occurrence.reservation and self.reservation == occurrence.reservation:
-            return False
-        return date_time.overlaps((self.start_dt, self.end_dt), (occurrence.start_dt, occurrence.end_dt))
-
-    def get_overlap(self, occurrence, skip_self=False):
-        if self.reservation and occurrence.reservation and self.reservation.room_id != occurrence.reservation.room_id:
-            raise ValueError('ReservationOccurrence objects of different rooms')
-        if skip_self and self.reservation and occurrence.reservation and self.reservation == occurrence.reservation:
-            return None, None
-        return date_time.get_overlap((self.start_dt, self.end_dt), (occurrence.start_dt, occurrence.end_dt))
+        return q.order_by(Room.id)
 
     @proxy_to_reservation_if_single_occurrence
     def cancel(self, user, reason=None, silent=False):
@@ -254,6 +239,20 @@ class ReservationOccurrence(db.Model, Serializer):
             if self.reservation.occurrences.filter_by(is_valid=True).count():
                 from indico.modules.rb.notifications.reservation_occurrences import notify_cancellation
                 notify_cancellation(self)
+
+    def get_overlap(self, occurrence, skip_self=False):
+        if self.reservation and occurrence.reservation and self.reservation.room_id != occurrence.reservation.room_id:
+            raise ValueError('ReservationOccurrence objects of different rooms')
+        if skip_self and self.reservation and occurrence.reservation and self.reservation == occurrence.reservation:
+            return None, None
+        return date_time.get_overlap((self.start_dt, self.end_dt), (occurrence.start_dt, occurrence.end_dt))
+
+    def overlaps(self, occurrence, skip_self=False):
+        if self.reservation and occurrence.reservation and self.reservation.room_id != occurrence.reservation.room_id:
+            raise ValueError('ReservationOccurrence objects of different rooms')
+        if skip_self and self.reservation and occurrence.reservation and self.reservation == occurrence.reservation:
+            return False
+        return date_time.overlaps((self.start_dt, self.end_dt), (occurrence.start_dt, occurrence.end_dt))
 
     @proxy_to_reservation_if_single_occurrence
     def reject(self, user, reason, silent=False):
