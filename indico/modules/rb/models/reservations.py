@@ -465,7 +465,8 @@ class Reservation(Serializer, db.Model):
     def cancel(self, user, reason=None, silent=False):
         self.is_cancelled = True
         self.rejection_reason = reason
-        self.occurrences.filter_by(is_valid=True).update({'is_cancelled': True}, synchronize_session='fetch')
+        self.occurrences.filter_by(is_valid=True).update({'is_cancelled': True, 'rejection_reason': reason},
+                                                         synchronize_session='fetch')
         if not silent:
             notify_cancellation(self)
             log_msg = u'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
