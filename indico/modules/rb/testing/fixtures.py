@@ -18,7 +18,9 @@ from datetime import date
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from indico.modules.rb.models.blocked_rooms import BlockedRoom
 
+from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
@@ -129,3 +131,23 @@ def create_equipment_type(db, dummy_location):
         return eq
 
     return _create_equipment_type
+
+
+@pytest.fixture
+def create_blocking(db, dummy_room, dummy_user):
+    """Returns a callable which lets you create blockings"""
+    def _create_blocking(**params):
+        room = params.pop('room', dummy_room)
+        state = params.pop('state', BlockedRoom.State.accepted)
+        params.setdefault('start_date', date.today())
+        params.setdefault('end_date', date.today())
+        params.setdefault('reason', u'Blocked')
+        params.setdefault('created_by_user', dummy_user)
+        blocking = Blocking(**params)
+        if room is not None:
+            blocking.blocked_rooms.append(BlockedRoom(room=room, state=state))
+        db.session.add(blocking)
+        db.session.flush()
+        return blocking
+
+    return _create_blocking
