@@ -22,6 +22,7 @@ import pytest
 
 from indico.core.errors import IndicoError
 from indico.modules.rb import settings
+from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.rooms import Room
 from indico.testing.mocks import MockAvatarHolder
 from indico.testing.util import bool_matrix
@@ -693,3 +694,36 @@ def test_check_advance_days(create_user, dummy_room, is_admin, is_owner, max_adv
         assert not dummy_room.check_advance_days(end_date, user, quiet=True)
         with pytest.raises(IndicoError):
             dummy_room.check_advance_days(end_date, user)
+
+
+def test_check_advance_days_no_user(dummy_room):
+    dummy_room.max_advance_days = 10
+    end_date = date.today() + timedelta(days=15)
+    assert not dummy_room.check_advance_days(end_date, quiet=True)
+
+
+@pytest.mark.parametrize(('is_admin', 'is_owner', 'fits', 'success'), bool_matrix('...', expect=any))
+def test_check_bookable_hours(db, dummy_room, create_user, is_admin, is_owner, fits, success):
+    user = create_user(u'user', rb_admin=is_admin)
+    if is_owner:
+        dummy_room.owner = user
+    dummy_room.bookable_hours = [BookableHours(start_time=time(12), end_time=time(14))]
+    db.session.flush()
+    booking_hours = (time(12), time(13)) if fits else (time(8), time(9))
+    if success:
+        assert dummy_room.check_bookable_hours(booking_hours[0], booking_hours[1], user, quiet=True)
+        assert dummy_room.check_bookable_hours(booking_hours[0], booking_hours[1], user)
+    else:
+        assert not dummy_room.check_bookable_hours(booking_hours[0], booking_hours[1], user, quiet=True)
+        with pytest.raises(IndicoError):
+            dummy_room.check_bookable_hours(booking_hours[0], booking_hours[1], user)
+
+
+def test_check_bookable_hours_hours(dummy_room):
+    assert dummy_room.check_bookable_hours(time(8), time(9), quiet=True)
+
+
+def test_check_bookable_hours_no_user(db, dummy_room):
+    dummy_room.bookable_hours = [BookableHours(start_time=time(12), end_time=time(14))]
+    db.session.flush()
+    assert not dummy_room.check_bookable_hours(time(8), time(9), quiet=True)
