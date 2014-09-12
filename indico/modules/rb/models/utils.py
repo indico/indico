@@ -36,7 +36,7 @@ def unimplemented(exceptions=(Exception,), message='Unimplemented'):
     return _unimplemented
 
 
-def proxy_to_reservation_if_single_occurrence(f):
+def proxy_to_reservation_if_last_valid_occurrence(f):
     """Forwards a method call to `self.reservation` if there is only one occurrence."""
     @wraps(f)
     def wrapper(self, *args, **kwargs):

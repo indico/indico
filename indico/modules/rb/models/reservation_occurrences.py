@@ -28,7 +28,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import db_dates_overlap
 from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
-from indico.modules.rb.models.utils import proxy_to_reservation_if_single_occurrence
+from indico.modules.rb.models.utils import proxy_to_reservation_if_last_valid_occurrence
 from indico.util import date_time
 from indico.util.date_time import iterdays, format_date
 from indico.util.serializer import Serializer
@@ -226,7 +226,7 @@ class ReservationOccurrence(db.Model, Serializer):
 
         return q.order_by(Room.id)
 
-    @proxy_to_reservation_if_single_occurrence
+    @proxy_to_reservation_if_last_valid_occurrence
     def cancel(self, user, reason=None, silent=False):
         self.is_cancelled = True
         self.rejection_reason = reason
@@ -252,7 +252,7 @@ class ReservationOccurrence(db.Model, Serializer):
             return False
         return date_time.overlaps((self.start_dt, self.end_dt), (occurrence.start_dt, occurrence.end_dt))
 
-    @proxy_to_reservation_if_single_occurrence
+    @proxy_to_reservation_if_last_valid_occurrence
     def reject(self, user, reason, silent=False):
         self.is_rejected = True
         self.rejection_reason = reason
