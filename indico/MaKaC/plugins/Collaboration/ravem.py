@@ -42,17 +42,20 @@ from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 __all__ = ['get_legacy_endpoint_status', 'get_vidyo_panorama_status', 'connect_room', 'disconnect_legacy_endpoint',
            'disconnect_vidyo_panorama', 'RavemApiException']
 
+
 def _ravem_request(operation, **kwargs):
     """Emits a given operation to the RAVEM API.
 
     This function is meant to be used to easily generate calls to the RAVEM API.
-    The RAVEM url, username and password are automatically fetched from the CollaborationTools each time.
+    The RAVEM URL, user name and password are automatically fetched from the
+    CollaborationTools each time.
 
     :param operation: str -- The RAVEM operation to perform.
-    :param **kwargs: The field names and values used for the RAVEM API as strings
+    :param \*\*kwargs: The field names and values used for the RAVEM API as
+    strings
 
-    :returns: :class: requests.models.Response -- The response from the RAVEM API usually as a JSON (with an `error` message if
-    the call failed.)
+    :returns: :class: requests.models.Response -- The response from the RAVEM
+    API usually as a JSON (with an `error` message if the call failed.)
     """
     api_url = CollaborationTools.getCollaborationOptionValue('ravemAPIURL')
     username = CollaborationTools.getCollaborationOptionValue('ravemUsername')
@@ -72,8 +75,8 @@ def get_legacy_endpoint_status(room_ip):
 
     :param room_ip: str -- the IP of the room
 
-    :returns: :class: requests.models.Response -- The response from the RAVEM API usually as a JSON with an `error` message if
-    the call failed.)
+    :returns: :class: requests.models.Response -- The response from the RAVEM
+    API usually as a JSON (with an `error` message if the call failed.)
     """
     return _ravem_request('getstatus', where='vc_endpoint_legacy_ip', value=room_ip)
 
@@ -81,12 +84,13 @@ def get_legacy_endpoint_status(room_ip):
 def get_vidyo_panorama_status(vidyo_panorama_id):
     """Returns the status of a Vidyo panorama endpoint.
 
-    This function returns the status of a room equipped with a Vidyo panorama device.
+    This function returns the status of a room equipped with a Vidyo
+    panorama device.
 
-    :param vidyo_panorama_id: str -- the Vidyo username of the room
+    :param vidyo_panorama_id: str -- the Vidyo user name of the room
 
-    :returns: :class: requests.models.Response -- The response from the RAVEM API usually as a JSON (with an `error` message if
-    the call failed.)
+    :returns: :class: requests.models.Response -- The response from the RAVEM
+    API usually as a JSON (with an `error` message if the call failed.)
     """
     return _ravem_request('getstatus', where='vc_endpoint_vidyo_username', value=vidyo_panorama_id)
 
@@ -94,14 +98,16 @@ def get_vidyo_panorama_status(vidyo_panorama_id):
 def connect_room(vidyo_room_id, query):
     """Connects to a room using the RAVEM API.
 
-    This function will connect to a room using a legacy or Vidyo panorama endpoint based on the Vidyo room id and a
-    search query to find the room from the Vidyo user API.
+    This function will connect to a room using a legacy or Vidyo panorama
+    endpoint based on the Vidyo room id and a search query to find the room from
+    the Vidyo user API.
 
     :param vidyo_room_id: str -- target Vidyo room ID
-    :param query: str -- search query to find the conference room from Vidyo User API
+    :param query: str -- search query to find the conference room from Vidyo
+    User API
 
-    :returns: :class: requests.models.Response -- The response from the RAVEM API usually as a JSON (with an `error` message if
-    the call failed.)
+    :returns: :class: requests.models.Response -- The response from the RAVEM
+    API usually as a JSON (with an `error` message if the call failed.)
     """
     return _ravem_request('videoconference/connect', vidyo_room_id=vidyo_room_id, query=query)
 
@@ -109,35 +115,37 @@ def connect_room(vidyo_room_id, query):
 def disconnect_legacy_endpoint(room_ip, service_type, room_name):
     """Disconnects from a room with a legacy endpoint using the RAVEM API.
 
-    This function will disconnect from a room with a legacy endpoint based on the Vidyo room id and a search query to
-    find the room from the Vidyo user API.
+    This function will disconnect from a room with a legacy endpoint based on
+    the Vidyo room id and a search query to find the room from the Vidyo user
+    API.
 
     :param room_ip: str -- target Vidyo room ID
     :param service_type: str -- The endpoint type (usually `vidyo` or `other`)
     :param room_name: str -- The Vidyo room name
 
-    :returns: :class: requests.models.Response -- The response from the RAVEM API usually as a JSON (with an `error` message if
-    the call failed.)
+    :returns: :class: requests.models.Response -- The response from the RAVEM
+    API usually as a JSON (with an `error` message if the call failed.)
     """
-    return _ravem_request("videoconference/disconnect", type=service_type, where="vc_endpoint_legacy_ip", value=room_ip,
-                         vidyo_room_name=room_name)
+    return _ravem_request('videoconference/disconnect', type=service_type, where='vc_endpoint_legacy_ip', value=room_ip,
+                          vidyo_room_name=room_name)
 
 
 def disconnect_vidyo_panorama(vidyo_panorama_id, service_type, room_name):
     """Disconnects from a room with a Vidyo panorama endpoint using the RAVEM API.
 
-    This function will disconnect from a room with a Vidyo panorama endpoint based on the Vidyo room id and a search
-    query to find the room from the Vidyo user API.
+    This function will disconnect from a room with a Vidyo panorama endpoint
+    based on the Vidyo room id and a search query to find the room from the
+    Vidyo user API.
 
-    :param vidyo_panorama_id: str -- target Vidyo username
+    :param vidyo_panorama_id: str -- target Vidyo user name
     :param service_type: str -- The endpoint type (usually `vidyo` or `other`)
     :param room_name: str -- The Vidyo room name
 
-    :returns: :class: requests.models.Response -- The response from the RAVEM API usually as a JSON (with an `error` message if
-    the call failed.)
+    :returns: :class: requests.models.Response -- The response from the RAVEM
+    API usually as a JSON (with an `error` message if the call failed.)
     """
-    return _ravem_request("videoconference/disconnect", type=service_type, where="vc_endpoint_vidyo_username",
-                         value=vidyo_panorama_id, vidyo_room_name=room_name)
+    return _ravem_request('videoconference/disconnect', type=service_type, where='vc_endpoint_vidyo_username',
+                          value=vidyo_panorama_id, vidyo_room_name=room_name)
 
 
 class RavemApiException(Exception):
