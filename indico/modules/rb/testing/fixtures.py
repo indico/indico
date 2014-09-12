@@ -174,3 +174,9 @@ def create_blocking(db, dummy_room, dummy_user):
         return blocking
 
     return _create_blocking
+
+
+@pytest.fixture
+def dummy_blocking(create_blocking):
+    """Gives you a dummy blocking"""
+    return create_blocking()
