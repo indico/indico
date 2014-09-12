@@ -48,6 +48,9 @@ class MockAvatar(object):
     def getEmails(self):
         return [self.email]
 
+    def getFirstName(self):
+        return self.name
+
     def getFullName(self):
         return '{}, {}'.format(self.surname.upper(), self.name)
 
