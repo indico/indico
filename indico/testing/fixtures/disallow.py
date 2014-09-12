@@ -14,18 +14,35 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from smtplib import SMTP
+
 import pytest
 
 
 @pytest.fixture(autouse=True)
 def disallow_emails(monkeypatch):
-    """Prevents any code from connecting to a SMTP server"""
+    """Prevents any code from connecting to a SMTP server.
 
-    def _fail(*args, **kwargs):
+    Returns a set where you can add `(host, port)` combinations that
+    should be exempt from the SMTP restriction.
+    """
+
+    orig_connect = SMTP.connect
+    allowed = set()
+
+    def _connect(self, host='localhost', port=0):
+        if (host, port) in allowed:
+            return orig_connect(self, host, port)
+        __tracebackhide__ = True
         pytest.fail('Code tried to send an email unexpectedly')
 
-    monkeypatch.setattr('smtplib.SMTP.connect', _fail)
-    monkeypatch.setattr('logging.handlers.SMTPHandler.emit', _fail)
+    def _emit(*args, **kwargs):
+        __tracebackhide__ = True
+        pytest.fail('Logger tried to send an email')
+
+    monkeypatch.setattr(SMTP, 'connect', _connect)
+    monkeypatch.setattr('logging.handlers.SMTPHandler.emit', _emit)
+    return allowed
 
 
 @pytest.fixture(autouse=True)

@@ -590,6 +590,14 @@ class Config:
         self._configVars.update(custom)
         self._deriveOptions()
 
+    def update(self, **options):
+        """Updates the config with new values"""
+        invalid = set(options) - self._configVars.viewkeys()
+        if invalid:
+            raise ValueError('Tried to add invalid config options: {}'.format(', '.join(invalid)))
+        self._configVars.update(options)
+        self._deriveOptions()
+
     def _deriveOptions(self):
 
         webinterface_dir = os.path.join(os.path.dirname(MaKaC.__file__), 'webinterface')
