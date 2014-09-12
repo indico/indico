@@ -16,16 +16,20 @@
 
 from datetime import datetime
 
+import pytest
+
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 
 
-pytest_plugins = 'indico.modules.rb.testing.fixtures'
-
-
-def test_overlaps():
+@pytest.mark.parametrize(('start_dt', 'end_dt', 'expected'), (
+    ('2014-12-04 00:00', '2014-12-06 00:00', True),
+    ('2014-12-05 00:01', '2014-12-05 00:01', True),
+    ('2014-12-05 00:00', '2014-12-05 00:00', False),
+    ('2014-12-01 00:00', '2014-12-05 00:00', False),
+    ('2014-12-06 00:00', '2014-12-07 00:00', False),
+))
+def test_overlaps(start_dt, end_dt, expected):
+    start_dt = datetime.strptime(start_dt, '%Y-%m-%d %H:%M')
+    end_dt = datetime.strptime(end_dt, '%Y-%m-%d %H:%M')
     nbp = NonBookablePeriod(start_dt=datetime(2014, 12, 5), end_dt=datetime(2014, 12, 6))
-    assert nbp.overlaps(datetime(2014, 12, 4), datetime(2014, 12, 6))
-    assert nbp.overlaps(datetime(2014, 12, 5, 0, 1), datetime(2014, 12, 5, 0, 1))
-    assert not nbp.overlaps(datetime(2014, 12, 5), datetime(2014, 12, 5))
-    assert not nbp.overlaps(datetime(2014, 12, 1), datetime(2014, 12, 5))
-    assert not nbp.overlaps(datetime(2014, 12, 6), datetime(2014, 12, 7))
+    assert nbp.overlaps(start_dt, end_dt) == expected

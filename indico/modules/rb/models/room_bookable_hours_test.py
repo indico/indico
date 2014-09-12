@@ -14,22 +14,27 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import time
+from datetime import datetime, time
+
+import pytest
 
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 
 
-pytest_plugins = 'indico.modules.rb.testing.fixtures'
-
-
-def test_fits_period():
+@pytest.mark.parametrize(('start_time', 'end_time', 'expected'), (
+    ('12:00', '13:00', True),
+    ('14:00', '15:00', True),
+    ('12:00', '15:00', True),
+    ('12:30', '14:30', True),
+    ('12:00', '12:00', True),
+    ('15:00', '15:00', True),
+    ('15:00', '15:01', False),
+    ('00:00', '12:00', False),
+    ('11:00', '16:00', False),
+    ('14:00', '16:00', False),
+))
+def test_fits_period(start_time, end_time, expected):
+    start_time = datetime.strptime(start_time, '%H:%M').time()
+    end_time = datetime.strptime(end_time, '%H:%M').time()
     bh = BookableHours(start_time=time(12), end_time=time(15))
-    assert bh.fits_period(time(12), time(13))
-    assert bh.fits_period(time(14), time(15))
-    assert bh.fits_period(time(12), time(15))
-    assert bh.fits_period(time(12, 30), time(14, 30))
-    assert bh.fits_period(time(12), time(12))
-    assert bh.fits_period(time(15), time(15))
-    assert not bh.fits_period(time(0), time(12))
-    assert not bh.fits_period(time(15), time(15, 1))
-    assert not bh.fits_period(time(11), time(16))
+    assert bh.fits_period(start_time, end_time) == expected
