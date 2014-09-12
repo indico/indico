@@ -37,7 +37,9 @@ def bool_matrix(template, expect, mask=None):
     The `expect` param can be a boolean value if you always want the same value,
     a tuple if you want only a single row to be true or a callable receiving the
     whole row. In some cases the builtin callables `any` or `all` are appropriate
-    callables, in other cases a custom (lambda) function is necessary.
+    callables, in other cases a custom (lambda) function is necessary. You can also
+    pass the strings `any_dynamic` or `all_dynamic` which are similar to `any`/`all`
+    but only check entries which do not have a fixed value in the template.
 
     In exclusion mode any row matching the template is skipped. It can be enabled
     by prefixing the template with a `!` character::
@@ -62,7 +64,7 @@ def bool_matrix(template, expect, mask=None):
      (False, True,  True, False, False))
 
     :param template: row template
-    :param expect: bool value, tuple or callable
+    :param expect: string, bool value, tuple or callable
     :param mask: exclusion mask
     """
     template = template.replace(' ', '')
@@ -95,7 +97,11 @@ def bool_matrix(template, expect, mask=None):
         if any(x is not None for x in mask):
             iterable = (x for x in iterable if any(x[i] != v for i, v in enumerate(mask) if v is not None))
     # add the "expected" value which can depend on the other values
-    if callable(expect):
+    if expect == 'any_dynamic':
+        iterable = (x + (any(y for i, y in enumerate(x) if template[i] is None),) for x in iterable)
+    elif expect == 'all_dynamic':
+        iterable = (x + (all(y for i, y in enumerate(x) if template[i] is None),) for x in iterable)
+    elif callable(expect):
         iterable = (x + (expect(x),) for x in iterable)
     elif isinstance(expect, (tuple, list)):
         iterable = (x + (x == expect,) for x in iterable)
