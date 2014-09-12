@@ -22,10 +22,13 @@ import pytest
 
 from indico.core.errors import IndicoError
 from indico.modules.rb import settings
+from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.rooms import Room
 from indico.testing.mocks import MockAvatarHolder
 from indico.testing.util import bool_matrix
+from indico.util.date_time import get_day_start, get_day_end
 from indico.util.struct.iterables import powerset
 
 
@@ -387,6 +390,39 @@ def test_max_capacity(create_room):
     create_room(capacity=10)
     create_room(capacity=5)
     assert Room.max_capacity == 10
+
+
+@pytest.mark.parametrize(
+    ('has_booking', 'has_blocking',
+     'has_pre_booking', 'include_pre_bookings',
+     'has_pending_blocking', 'include_pending_blockings',
+     'filtered'),
+    set(bool_matrix('00.0.0', expect=False) +                                # nothing confirmed/pending
+        bool_matrix('000.0.', expect=False) +                                # nothing pending included
+        bool_matrix('1.....', expect=True) +                                 # confirmed booking
+        bool_matrix('.1....', expect=True) +                                 # active blocking
+        bool_matrix('00....', expect=lambda x: all(x[2:4]) or all(x[4:6])))  # included pending booking/blocking
+)
+def test_filter_available(dummy_room, create_reservation, create_blocking,
+                          has_booking, has_blocking,
+                          has_pre_booking, include_pre_bookings,
+                          has_pending_blocking, include_pending_blockings, filtered):
+    if has_booking:
+        create_reservation(start_dt=datetime.combine(date.today(), time(8)),
+                           end_dt=datetime.combine(date.today(), time(10)))
+    if has_pre_booking:
+        create_reservation(start_dt=datetime.combine(date.today(), time(10)),
+                           end_dt=datetime.combine(date.today(), time(12)),
+                           is_accepted=False)
+    if has_blocking:
+        create_blocking()
+    if has_pending_blocking:
+        create_blocking(state=BlockedRoom.State.pending)
+    availabilty_filter = Room.filter_available(get_day_start(date.today()), get_day_end(date.today()),
+                                               (RepeatFrequency.NEVER, 0),
+                                               include_pre_bookings=include_pre_bookings,
+                                               include_pending_blockings=include_pending_blockings)
+    assert set(Room.find_all(availabilty_filter)) == (set() if filtered else {dummy_room})
 
 
 def test_find_with_filters(db, dummy_room, create_room, dummy_user, create_equipment_type, create_room_attribute,
