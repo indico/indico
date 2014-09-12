@@ -235,10 +235,8 @@ class ReservationOccurrence(db.Model, Serializer):
             if reason:
                 log.append(u'Reason: {}'.format(reason))
             self.reservation.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=log))
-            # Notification sent only when the reservation is still valid
-            if self.reservation.occurrences.filter_by(is_valid=True).count():
-                from indico.modules.rb.notifications.reservation_occurrences import notify_cancellation
-                notify_cancellation(self)
+            from indico.modules.rb.notifications.reservation_occurrences import notify_cancellation
+            notify_cancellation(self)
 
     def get_overlap(self, occurrence, skip_self=False):
         if self.reservation and occurrence.reservation and self.reservation.room_id != occurrence.reservation.room_id:
@@ -262,7 +260,5 @@ class ReservationOccurrence(db.Model, Serializer):
             log = [u'Day rejected: {}'.format(format_date(self.date)),
                    u'Reason: {}'.format(reason)]
             self.reservation.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=log))
-            # Notification sent only when the reservation is still valid
-            if self.reservation.occurrences.filter_by(is_valid=True).count():
-                from indico.modules.rb.notifications.reservation_occurrences import notify_rejection
-                notify_rejection(self)
+            from indico.modules.rb.notifications.reservation_occurrences import notify_rejection
+            notify_rejection(self)
