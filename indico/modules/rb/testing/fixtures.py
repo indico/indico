@@ -44,7 +44,7 @@ def create_location(db):
 @pytest.fixture
 def dummy_location(db, create_location):
     """Gives you a dummy default location"""
-    loc = create_location('Test')
+    loc = create_location(u'Test')
     loc.set_default()
     db.session.flush()
     return loc
@@ -52,6 +52,7 @@ def dummy_location(db, create_location):
 
 @pytest.fixture
 def create_reservation(db, dummy_room, dummy_user):
+    """Returns a callable which lets you create reservations"""
     def _create_reservation(**params):
         params.setdefault('start_dt', date.today() + relativedelta(hour=8, minute=30))
         params.setdefault('end_dt', date.today() + relativedelta(hour=17, minute=30))
@@ -59,7 +60,7 @@ def create_reservation(db, dummy_room, dummy_user):
         params.setdefault('repeat_interval', int(params['repeat_frequency'] != RepeatFrequency.NEVER))
         params.setdefault('contact_email', dummy_user.email)
         params.setdefault('is_accepted', True)
-        params.setdefault('booking_reason', 'Testing')
+        params.setdefault('booking_reason', u'Testing')
         params.setdefault('room', dummy_room)
         reservation = Reservation(**params)
         reservation.booked_for_user = dummy_user
@@ -74,6 +75,7 @@ def create_reservation(db, dummy_room, dummy_user):
 
 @pytest.fixture
 def dummy_reservation(create_reservation):
+    """Gives you a dummy reservation"""
     return create_reservation()
 
 
@@ -82,9 +84,9 @@ def create_room(db, dummy_location, dummy_user):
     """Returns a callable which lets you create rooms"""
 
     def _create_room(**params):
-        params.setdefault('building', '1')
-        params.setdefault('floor', '2')
-        params.setdefault('number', '3')
+        params.setdefault('building', u'1')
+        params.setdefault('floor', u'2')
+        params.setdefault('number', u'3')
         params.setdefault('name', '')
         params.setdefault('owner_id', dummy_user.id)
         params.setdefault('location', dummy_location)
@@ -110,7 +112,7 @@ def create_room_attribute(db, dummy_location):
     def _create_attribute(name, **params):
         params.setdefault('location', dummy_location)
         params.setdefault('title', name)
-        params.setdefault('type', 'str')
+        params.setdefault('type', u'str')
         params.setdefault('is_required', False)
         params.setdefault('is_hidden', False)
         attr = RoomAttribute(name=name, **params)
