@@ -57,11 +57,11 @@ def overlapping_combination_from_2am_to_4am(request):
 
 @pytest.fixture
 def overlapping_occurrences(create_occurrence):
-    occ_db = create_occurrence(start_dt=date.today() + relativedelta(hour=2),
+    db_occ = create_occurrence(start_dt=date.today() + relativedelta(hour=2),
                                end_dt=date.today() + relativedelta(hour=4))
     occ = ReservationOccurrence(start_dt=date.today() + relativedelta(hour=1),
                                 end_dt=date.today() + relativedelta(hour=5))
-    return occ_db, occ
+    return db_occ, occ
 
 
 # ======================================================================================================================
@@ -225,27 +225,27 @@ def test_filter_overlap(create_occurrence, overlapping_combination_from_2am_to_4
 
 
 def test_find_overlapping_with_different_room(overlapping_occurrences, create_room):
-    occ_db, occ = overlapping_occurrences
-    assert occ_db in ReservationOccurrence.find_overlapping_with(room=occ_db.reservation.room, occurrences=[occ]).all()
-    assert occ_db not in ReservationOccurrence.find_overlapping_with(room=create_room(), occurrences=[occ]).all()
+    db_occ, occ = overlapping_occurrences
+    assert db_occ in ReservationOccurrence.find_overlapping_with(room=db_occ.reservation.room, occurrences=[occ]).all()
+    assert db_occ not in ReservationOccurrence.find_overlapping_with(room=create_room(), occurrences=[occ]).all()
 
 
 def test_find_overlapping_with_is_not_valid(db, overlapping_occurrences):
-    occ_db, occ = overlapping_occurrences
-    assert occ_db in ReservationOccurrence.find_overlapping_with(room=occ_db.reservation.room,
+    db_occ, occ = overlapping_occurrences
+    assert db_occ in ReservationOccurrence.find_overlapping_with(room=db_occ.reservation.room,
                                                                  occurrences=[occ]).all()
-    occ_db.is_cancelled = True
+    db_occ.is_cancelled = True
     db.session.flush()
-    assert occ_db not in ReservationOccurrence.find_overlapping_with(room=occ_db.reservation.room,
+    assert db_occ not in ReservationOccurrence.find_overlapping_with(room=db_occ.reservation.room,
                                                                      occurrences=[occ]).all()
 
 
 def test_find_overlapping_with_skip_reservation(overlapping_occurrences):
-    occ_db, occ = overlapping_occurrences
-    assert occ_db in ReservationOccurrence.find_overlapping_with(room=occ_db.reservation.room, occurrences=[occ]).all()
-    assert occ_db not in ReservationOccurrence.find_overlapping_with(room=occ_db.reservation.room,
+    db_occ, occ = overlapping_occurrences
+    assert db_occ in ReservationOccurrence.find_overlapping_with(room=db_occ.reservation.room, occurrences=[occ]).all()
+    assert db_occ not in ReservationOccurrence.find_overlapping_with(room=db_occ.reservation.room,
                                                                      occurrences=[occ],
-                                                                     reservation_id=occ_db.reservation.id).all()
+                                                                     reservation_id=db_occ.reservation.id).all()
 
 
 # ======================================================================================================================
