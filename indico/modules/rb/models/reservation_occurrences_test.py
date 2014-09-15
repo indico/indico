@@ -109,20 +109,24 @@ def test_iter_start_time_single(interval):
 
 
 @pytest.mark.parametrize(('interval', 'days_elapsed', 'expected_length'), (
-    (0, 0, 1),
-    (2, 0, 1),
-    (0, 10, 11),
-    (2, 10, 11),
+    (0, 0, None),
+    (1, 0, 1),
+    (1, 10, 11),
+    (2, 0, None),
 ))
 def test_iter_start_time_daily(interval, days_elapsed, expected_length):
     assert days_elapsed >= 0
     params = {'start': date.today() + relativedelta(hour=8),
               'end': date.today() + relativedelta(days=days_elapsed, hour=17),
               'repetition': (RepeatFrequency.DAY, interval)}
-    days = list(ReservationOccurrence.iter_start_time(**params))
-    assert len(days) == expected_length
-    for i, day in enumerate(days):
-        assert day.date() == date.today() + relativedelta(days=i)
+    if expected_length is None:
+        with pytest.raises(IndicoError):
+            ReservationOccurrence.iter_start_time(**params)
+    else:
+        days = list(ReservationOccurrence.iter_start_time(**params))
+        assert len(days) == expected_length
+        for i, day in enumerate(days):
+            assert day.date() == date.today() + relativedelta(days=i)
 
 
 @pytest.mark.parametrize(('interval', 'days_elapsed', 'expected_length'), (
