@@ -165,10 +165,8 @@ type("RoomBookingWidget", ["IWidget"],
                  function(key, elem){
                      return self._favoriteDecorator(key, elem);
                  });
-         }
-         else {
-             this.roomChooser = Html.input('text', {className: "roomTextField",
-                                                    name: "_roomName"});
+         } else {
+            this.roomChooser = Html.input('text', { className: "roomTextField", name: "_roomName" });
          }
 
          this.addressArea = new RealtimeTextArea({});
@@ -410,26 +408,25 @@ type("RoomBookingVerticalReservationWidget", ["RoomBookingReservationWidget"],
             draw: function() {
                 var rbActive = Indico.Settings.RoomBookingModuleActive;
 
-                this.inheritText = this.parentInfo?Html.span(
-                    {},
-                    $T('Inherit from parent {0}: ').format(this.parentName),
-                    Html.span({},
-                              this.parentInfo.get('room') + " (" +
-                              this.parentInfo.get('location') + ")")):'';
-                    return Html.div(
-                            'roomWidget',
-                                 Html.div({style:{paddingTop:'5px', clear:'left'}},
-                                    Html.div('roomVerticalWidgetTitle', $T("Location")),
-                                    Html.div({style: {cssFloat:'left'}}, this.locationChooser.draw())),
-                                    Html.div({style:{paddingTop:'5px'}},
-                                        Html.div('roomVerticalWidgetTitle', $T("Room")),
-                                        Html.div({style: {cssFloat:'left'}},
-                                                            rbActive ?
-                                                            this.roomChooser.draw() :
-                                                            this.roomChooser)),
-                                Html.div({style:{paddingTop:'5px', clear:'left'}},
-                                         this.parentInfo?this.inheritCheckbox:'', this.inheritText)
-                                );
+                this.inheritText = this.parentInfo
+                    ? Html.span({}, $T('Inherit from parent {0}: ').format(this.parentName),
+                        Html.span({}, this.parentInfo.get('room') + " (" + this.parentInfo.get('location') + ")"))
+                    : '';
+                return Html.div(
+                        'roomWidget',
+                        Html.div({style:{paddingTop:'5px', clear:'left'}},
+                            Html.div('roomVerticalWidgetTitle', $T("Location")),
+                            Html.div({style: {cssFloat:'left'}}, this.locationChooser.draw())),
+                        Html.div({style:{paddingTop:'5px'}},
+                            Html.div('roomVerticalWidgetTitle', $T("Room")),
+                            Html.div({style: {cssFloat:'left'}}, rbActive
+                                     ? this.roomChooser.draw()
+                                     : this.roomChooser)),
+                        Html.div({style:{paddingTop:'5px', clear:'left'}}, this.parentInfo
+                                 ? this.inheritCheckbox
+                                 : '',
+                                 this.inheritText)
+                );
             }
 
         },
