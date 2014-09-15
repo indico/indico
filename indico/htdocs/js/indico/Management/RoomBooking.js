@@ -217,15 +217,17 @@ type("RoomBookingWidget", ["IWidget"],
          }
 
          this.locationChooser.observe(function(value){
-             if (rbActive && value !== '' && locations !== null) {
-                 if (locations[value]) {
-                     self.roomChooser.setLoading(true);
-                     self._loadRooms(value);
-                 } else {
-                     self.roomChooser.setOptionList({});
-                 }
-                 self.roomChooser.set('');
-             }
+            if (rbActive) { // existing location
+                if (value !== '' && locations !== null && locations[value]) {
+                    self.roomChooser.setLoading(true);
+                    self._loadRooms(value);
+                    self.locationChooser.set(locations[value]);
+                } else { // custom location
+                    self.roomChooser.setOptionList({});
+                    self.locationChooser.set(value || ''); // if undef, set to empty string
+                }
+                self.roomChooser.set(''); // reset room on location change
+            }
          });
 
          this._startBind();
