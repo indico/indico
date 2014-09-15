@@ -227,19 +227,23 @@ def test_get_overlap(start_hour, end_hour, expected_overlap):
 
 
 def test_get_overlap_different_rooms(create_occurrence, create_room):
+    other_room = create_room()
+    occ1 = create_occurrence()
+    occ2 = create_occurrence(room=other_room)
     with pytest.raises(ValueError):
-        other_room = create_room()
-        occ1 = create_occurrence()
-        occ2 = create_occurrence(room=other_room)
         occ1.get_overlap(occ2)
 
 
-def test_get_overlaps_self(dummy_occurrence, bool_flag):
-    if bool_flag:
+@pytest.mark.parametrize('skip_self', (
+    (True),
+    (False),
+))
+def test_get_overlaps_self(dummy_occurrence, skip_self):
+    if skip_self:
         expected_overlap = (None, None)
     else:
         expected_overlap = (dummy_occurrence.start_dt, dummy_occurrence.end_dt)
-    assert dummy_occurrence.get_overlap(dummy_occurrence, skip_self=bool_flag) == expected_overlap
+    assert dummy_occurrence.get_overlap(dummy_occurrence, skip_self=skip_self) == expected_overlap
 
 
 @pytest.mark.parametrize(('start_hour', 'end_hour', 'expected'), (
@@ -269,10 +273,10 @@ def test_overlaps(start_hour, end_hour, expected):
 
 
 def test_overlaps_different_rooms(create_occurrence, create_room):
+    other_room = create_room()
+    occ1 = create_occurrence()
+    occ2 = create_occurrence(room=other_room)
     with pytest.raises(ValueError):
-        other_room = create_room()
-        occ1 = create_occurrence()
-        occ2 = create_occurrence(room=other_room)
         occ1.overlaps(occ2)
 
 
