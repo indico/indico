@@ -415,7 +415,7 @@ def test_filter_available(dummy_room, create_reservation, create_blocking,
                            end_dt=datetime.combine(date.today(), time(12)),
                            is_accepted=False)
     if has_blocking:
-        create_blocking()
+        create_blocking(state=BlockedRoom.State.accepted)
     if has_pending_blocking:
         create_blocking(state=BlockedRoom.State.pending)
     availabilty_filter = Room.filter_available(get_day_start(date.today()), get_day_end(date.today()),

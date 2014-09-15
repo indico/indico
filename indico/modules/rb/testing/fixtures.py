@@ -161,14 +161,16 @@ def create_blocking(db, dummy_room, dummy_user):
     """Returns a callable which lets you create blockings"""
     def _create_blocking(**params):
         room = params.pop('room', dummy_room)
-        state = params.pop('state', BlockedRoom.State.accepted)
+        state = params.pop('state', BlockedRoom.State.pending)
         params.setdefault('start_date', date.today())
         params.setdefault('end_date', date.today())
         params.setdefault('reason', u'Blocked')
         params.setdefault('created_by_user', dummy_user)
         blocking = Blocking(**params)
         if room is not None:
-            blocking.blocked_rooms.append(BlockedRoom(room=room, state=state))
+            br = BlockedRoom(room=room, state=state, blocking=blocking)
+            if state == BlockedRoom.State.accepted:
+                br.approve(notify_blocker=False)
         db.session.add(blocking)
         db.session.flush()
         return blocking
