@@ -36,6 +36,15 @@ def creation_params():
             'repetition': (RepeatFrequency.DAY, 1)}
 
 
+@pytest.fixture
+def overlapping_occurrences(create_occurrence):
+    occ_db = create_occurrence(start_dt=date.today() + relativedelta(hour=2),
+                               end_dt=date.today() + relativedelta(hour=4))
+    occ = ReservationOccurrence(start_dt=date.today() + relativedelta(hour=1),
+                                end_dt=date.today() + relativedelta(hour=5))
+    return occ_db, occ
+
+
 # ======================================================================================================================
 # Hybrid property tests
 # ======================================================================================================================
@@ -190,11 +199,55 @@ def test_iter_start_time_monthly_5th_monday_is_always_last():
     assert days[3].date() == date(2014, 12, 29)  # 5th monday of october
 
 
-def test_iter_start_time_invalid():
-    invalid_frequency = -1
-    assert invalid_frequency not in RepeatFrequency
-    with pytest.raises(IndicoError):
-        ReservationOccurrence.iter_start_time(start=date.today(), end=date.today(), repetition=(invalid_frequency, 0))
+@pytest.mark.parametrize(('start_hour', 'end_hour', 'expected'), (
+    # Before
+    (0, 1, False),
+    # Right before
+    (1, 2, False),
+    # Overlapping start
+    (1, 3, True),
+    # Overlapping start and end
+    (1, 5, True),
+    # Exactly the same
+    (2, 4, True),
+    # Overlapping end
+    (3, 5, True),
+    # Right after
+    (4, 5, False),
+    # After
+    (5, 6, False),
+))
+def test_filter_overlap(create_occurrence, start_hour, end_hour, expected):
+    occ1 = create_occurrence(start_dt=date.today() + relativedelta(hour=2),
+                             end_dt=date.today() + relativedelta(hour=4))
+    occ2 = ReservationOccurrence(start_dt=date.today() + relativedelta(hour=start_hour),
+                                 end_dt=date.today() + relativedelta(hour=end_hour))
+    overlap_filter = ReservationOccurrence.filter_overlap([occ2])
+    assert (occ1 in ReservationOccurrence.find_all(overlap_filter)) == expected
+
+
+def test_find_overlapping_with_different_room(overlapping_occurrences, create_room):
+    occ_db, occ = overlapping_occurrences
+    assert occ_db in ReservationOccurrence.find_overlapping_with(room=occ_db.reservation.room, occurrences=[occ]).all()
+    assert occ_db not in ReservationOccurrence.find_overlapping_with(room=create_room(), occurrences=[occ]).all()
+
+
+def test_find_overlapping_with_is_not_valid(db, overlapping_occurrences):
+    occ_db, occ = overlapping_occurrences
+    assert occ_db in ReservationOccurrence.find_overlapping_with(room=occ_db.reservation.room,
+                                                                 occurrences=[occ]).all()
+    occ_db.is_cancelled = True
+    db.session.flush()
+    assert occ_db not in ReservationOccurrence.find_overlapping_with(room=occ_db.reservation.room,
+                                                                     occurrences=[occ]).all()
+
+
+def test_find_overlapping_with_skip_reservation(overlapping_occurrences):
+    occ_db, occ = overlapping_occurrences
+    assert occ_db in ReservationOccurrence.find_overlapping_with(room=occ_db.reservation.room, occurrences=[occ]).all()
+    assert occ_db not in ReservationOccurrence.find_overlapping_with(room=occ_db.reservation.room,
+                                                                     occurrences=[occ],
+                                                                     reservation_id=occ_db.reservation.id).all()
 
 
 # ======================================================================================================================
