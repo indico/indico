@@ -5786,7 +5786,8 @@ div.cloneElements {
 }
 
 .ttentryArrowsBackground.ttentryArrowsShifted, .ttentryArrows.ttentryArrowsShifted {
-    margin-right: 25px;
+    margin: 2px 25px 0 0;
+    border: none;
 }
 
 .ttentryArrowsBackground {
