@@ -17,7 +17,7 @@
 from itertools import product, imap
 
 
-def bool_matrix(template, expect, mask=None):
+def bool_matrix(template, mask=None, expect=None):
     """Creates a boolean matrix suitable for parametrized tests.
 
     This function lets you create a boolean matrix with certain columns being
@@ -97,7 +97,9 @@ def bool_matrix(template, expect, mask=None):
         if any(x is not None for x in mask):
             iterable = (x for x in iterable if any(x[i] != v for i, v in enumerate(mask) if v is not None))
     # add the "expected" value which can depend on the other values
-    if expect == 'any_dynamic':
+    if expect is None:
+        pass
+    elif expect == 'any_dynamic':
         iterable = (x + (any(y for i, y in enumerate(x) if template[i] is None),) for x in iterable)
     elif expect == 'all_dynamic':
         iterable = (x + (all(y for i, y in enumerate(x) if template[i] is None),) for x in iterable)

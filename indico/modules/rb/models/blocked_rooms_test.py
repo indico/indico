@@ -13,11 +13,13 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 from datetime import date, timedelta, datetime
 
 import pytest
 
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from indico.testing.util import bool_matrix
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
@@ -78,11 +80,20 @@ def test_find_with_filters_state(create_blocking, state):
     assert set(BlockedRoom.find_with_filters({'state': state})) == {blocking.blocked_rooms[0]}
 
 
-def test_reject(dummy_blocking, smtp):
-    # XXX: create colliding reservation by other user to ensure it's not rejected?
+@pytest.mark.parametrize(('with_user', 'with_reason'), bool_matrix('..'))
+def test_reject(dummy_user, dummy_blocking, smtp, with_user, with_reason):
     br = dummy_blocking.blocked_rooms[0]
     assert br.state == BlockedRoom.State.pending
-    br.reject()
+    kwargs = {}
+    if with_user:
+        kwargs['user'] = dummy_user
+    if with_reason:
+        kwargs['reason'] = u'foo'
+    br.reject(**kwargs)
     assert br.state == BlockedRoom.State.rejected
     assert len(smtp.outbox) == 1
-    assert smtp.outbox[0]['subject'] == 'Room blocking REJECTED'
+    mail = smtp.outbox[0]
+    assert mail['subject'] == 'Room blocking REJECTED'
+    assert mail['to'] == dummy_blocking.created_by_user.getEmail()
+    if with_reason:
+        assert kwargs['reason'] in mail.as_string()
