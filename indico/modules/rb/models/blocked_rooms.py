@@ -81,7 +81,7 @@ class BlockedRoom(db.Model):
         if filters.get('start_date') and filters.get('end_date'):
             q = q.filter(Blocking.start_date <= filters['end_date'],
                          Blocking.end_date >= filters['start_date'])
-        if filters.get('state'):
+        if 'state' in filters:
             q = q.filter(BlockedRoom.state == filters['state'])
         return q
 
