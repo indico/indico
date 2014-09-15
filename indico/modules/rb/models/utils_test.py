@@ -14,3 +14,21 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import pytest
+
+from indico.core.errors import IndicoError
+from indico.modules.rb.models.utils import unimplemented
+
+
+@pytest.mark.parametrize(('raised', 'caught', 'message'), (
+    (RuntimeError, IndicoError, 'foo'),
+    (Exception,    Exception,   'bar'),
+    (ValueError,   ValueError,  'bar')
+))
+def test_unimplemented(raised, caught, message):
+    @unimplemented(RuntimeError, message='foo')
+    def _func():
+        raise raised('bar')
+
+    exc_info = pytest.raises(caught, _func)
+    assert exc_info.value.message == message
