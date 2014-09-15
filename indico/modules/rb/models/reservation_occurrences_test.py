@@ -14,7 +14,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import date
+from datetime import date, time
+from itertools import izip
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -26,6 +27,13 @@ from indico.testing.util import bool_matrix
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
+
+
+@pytest.fixture
+def creation_params():
+    return {'start': date.today() + relativedelta(hour=8),
+            'end': date.today() + relativedelta(days=1, hour=17),
+            'repetition': (RepeatFrequency.DAY, 1)}
 
 
 # ======================================================================================================================
@@ -51,6 +59,41 @@ def test_is_valid(db, dummy_occurrence, is_rejected, is_cancelled, expected):
 # ======================================================================================================================
 # staticmethod tests
 # ======================================================================================================================
+
+
+def test_create_series_for_reservation(dummy_reservation):
+    ReservationOccurrence.create_series_for_reservation(dummy_reservation)
+    occurrences = ReservationOccurrence.iter_create_occurrences(start=dummy_reservation.start_dt,
+                                                                end=dummy_reservation.end_dt,
+                                                                repetition=dummy_reservation.repetition)
+    for occ1, occ2 in izip(dummy_reservation.occurrences, occurrences):
+        assert occ1.start_dt == occ2.start_dt
+        assert occ1.end_dt == occ2.end_dt
+        assert occ1.is_cancelled == dummy_reservation.is_cancelled
+        assert occ1.is_rejected == dummy_reservation.is_rejected
+        assert occ1.rejection_reason == dummy_reservation.rejection_reason
+
+
+def test_create_series(creation_params):
+    for occ1, occ2 in izip(list(ReservationOccurrence.iter_create_occurrences(**creation_params)),
+                           ReservationOccurrence.create_series(**creation_params)):
+        assert occ1.start_dt == occ2.start_dt
+        assert occ1.end_dt == occ2.end_dt
+
+
+def test_iter_create_occurrences(creation_params):
+    occurrences = list(ReservationOccurrence.iter_create_occurrences(**creation_params))
+    assert len(occurrences) == 2
+    for occ in occurrences:
+        assert occ.start_dt.time() == time(8)
+        assert occ.end_dt.time() == time(17)
+
+
+def test_iter_start_time_invalid():
+    invalid_frequency = -1
+    assert invalid_frequency not in RepeatFrequency
+    with pytest.raises(IndicoError):
+        ReservationOccurrence.iter_start_time(start=date.today(), end=date.today(), repetition=(invalid_frequency, 0))
 
 
 @pytest.mark.parametrize('interval', (
