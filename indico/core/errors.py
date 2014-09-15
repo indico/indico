@@ -32,19 +32,19 @@ class IndicoError(Exception):
     code = -32000  # json-rpc server specific errors starting code
 
     def __init__(self, message='', area='', explanation=''):
-        self._message = message
+        self.message = message
         self._area = area
         self._explanation = explanation
 
     @ensure_str
     def __str__(self):
         if self._area:
-            return '{} - {}'.format(self._area, self._message)
+            return '{} - {}'.format(self._area, self.message)
         else:
-            return self._message
+            return self.message
 
     def getMessage(self):
-        return self._message
+        return self.message
 
     def getArea(self):
         return self._area
