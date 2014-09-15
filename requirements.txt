@@ -18,10 +18,12 @@ pyatom==1.2
 pycountry==1.2
 cov-core==1.14.0
 coverage==3.7.1
+mock==1.0.1
 pytest==2.6.1
 pytest-capturelog==0.7
 pytest-cov==1.8.0
 pytest-localserver==0.3.3
+pytest-mock==0.3.0
 python-dateutil==1.5
 pytz==2014.4
 reportlab==2.5
