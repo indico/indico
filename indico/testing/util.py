@@ -14,6 +14,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import operator
+import re
 from itertools import product, imap
 
 
@@ -113,3 +115,29 @@ def bool_matrix(template, mask=None, expect=None):
     if not matrix:
         raise ValueError('empty matrix')
     return matrix
+
+
+def extract_emails(smtp, required=True, count=None, regex=False, **kwargs):
+    """Extracts emails from an smtp outbox.
+
+    :param smtp: The `smtp` fixture from the testcase
+    :param required: Fail if no matching emails were found
+    :param count: Require exactly `count` emails to be found
+    :param kwargs: Header values to match against
+    """
+    compare = re.match if regex else operator.eq
+    found = []
+    for mail in smtp.outbox:
+        for header, value in kwargs.iteritems():
+            if not compare(value, mail[header]):
+                break
+        else:  # everything matched
+            found.append(mail)
+    found_set = set(found)
+    smtp.outbox = [mail for mail in smtp.outbox if mail not in found_set]
+    __tracebackhide__ = True
+    if required:
+        assert found, 'No matching emails found'
+    if count is not None:
+        assert len(found) == count, 'Expected {} emails, got {}'.format(count, len(found))
+    return found
