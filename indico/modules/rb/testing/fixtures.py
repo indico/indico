@@ -81,6 +81,7 @@ def dummy_reservation(create_reservation):
 
 @pytest.fixture
 def create_occurrence(create_reservation):
+    """Returns a callable which lets you create reservation occurrences"""
     def _create_occurrence(start_dt=None, end_dt=None, room=None):
         params = {}
         if start_dt is not None:
@@ -97,6 +98,7 @@ def create_occurrence(create_reservation):
 
 @pytest.fixture
 def dummy_occurrence(create_occurrence):
+    """Gives you a dummy reservation occurrence"""
     return create_occurrence()
 
 
