@@ -65,14 +65,11 @@ import re
 from MaKaC.i18n import _
 from MaKaC.common import utils
 
-from indico.util.i18n import i18nformat, ngettext
+from indico.util.i18n import i18nformat
 from indico.util.date_time import format_date
 from indico.util.string import safe_upper, safe_slice, html_color_to_rgb
 from indico.util import json
 from MaKaC.common.Configuration import Config
-
-from indico.util import mdx_latex
-import markdown, sys
 
 styles = getSampleStyleSheet()
 charRplace = [

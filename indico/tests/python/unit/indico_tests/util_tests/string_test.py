@@ -113,6 +113,10 @@ class TestHTMLColorConversion(IndicoTestCase):
         self.assertEqual(html_color_to_rgb('#0000ff'), (0, 0, 1.0))
         self.assertEqual(html_color_to_rgb('#010aff'), (1 / 255.0, 10 / 255.0, 1.0))
 
+        self.assertRaises(ValueError, html_color_to_rgb, 'foo')
+        self.assertRaises(ValueError, html_color_to_rgb, '#1234')
+        self.assertRaises(ValueError, html_color_to_rgb, '#1234567')
+
     def testConversion3Chars(self):
         """
         Test conversion: HTML colors -> RGB (3 chars)
