@@ -36,6 +36,25 @@ def creation_params():
             'repetition': (RepeatFrequency.DAY, 1)}
 
 
+@pytest.fixture(params=(
+    (0, 1, (None, None)),  # Before
+    (1, 2, (None, None)),  # Right before
+    (1, 3, (2, 3)),        # Overlapping start
+    (1, 5, (2, 4)),        # Overlapping start and end
+    (2, 4, (2, 4)),        # Exactly the same
+    (3, 5, (3, 4)),        # Overlapping end
+    (4, 5, (None, None)),  # Right after
+    (5, 6, (None, None)),  # After
+))
+def overlapping_combination_from_2am_to_4am(request):
+    def _get_values(boolean=True):
+        start_hour = request.param[0]
+        end_hour = request.param[1]
+        expected_overlap = any(request.param[2]) if boolean else request.param[2]
+        return start_hour, end_hour, expected_overlap
+    return _get_values
+
+
 @pytest.fixture
 def overlapping_occurrences(create_occurrence):
     occ_db = create_occurrence(start_dt=date.today() + relativedelta(hour=2),
@@ -105,11 +124,7 @@ def test_iter_start_time_invalid():
         ReservationOccurrence.iter_start_time(start=date.today(), end=date.today(), repetition=(invalid_frequency, 0))
 
 
-@pytest.mark.parametrize('interval', (
-    (0),
-    (1),
-    (2),
-))
+@pytest.mark.parametrize('interval', (0, 1, 2))
 def test_iter_start_time_single(interval):
     days = list(ReservationOccurrence.iter_start_time(start=date.today() + relativedelta(hour=8),
                                                       end=date.today() + relativedelta(hour=17),
@@ -199,25 +214,8 @@ def test_iter_start_time_monthly_5th_monday_is_always_last():
     assert days[3].date() == date(2014, 12, 29)  # 5th monday of october
 
 
-@pytest.mark.parametrize(('start_hour', 'end_hour', 'expected'), (
-    # Before
-    (0, 1, False),
-    # Right before
-    (1, 2, False),
-    # Overlapping start
-    (1, 3, True),
-    # Overlapping start and end
-    (1, 5, True),
-    # Exactly the same
-    (2, 4, True),
-    # Overlapping end
-    (3, 5, True),
-    # Right after
-    (4, 5, False),
-    # After
-    (5, 6, False),
-))
-def test_filter_overlap(create_occurrence, start_hour, end_hour, expected):
+def test_filter_overlap(create_occurrence, overlapping_combination_from_2am_to_4am):
+    start_hour, end_hour, expected = overlapping_combination_from_2am_to_4am()
     occ1 = create_occurrence(start_dt=date.today() + relativedelta(hour=2),
                              end_dt=date.today() + relativedelta(hour=4))
     occ2 = ReservationOccurrence(start_dt=date.today() + relativedelta(hour=start_hour),
@@ -295,25 +293,8 @@ def test_reject_single_occurrence(dummy_occurrence, dummy_user):
     assert dummy_occurrence.reservation.rejection_reason == 'rejected'
 
 
-@pytest.mark.parametrize(('start_hour', 'end_hour', 'expected_overlap'), (
-    # Before
-    (0, 1, (None, None)),
-    # Right before
-    (1, 2, (None, None)),
-    # Overlapping start
-    (1, 3, (2, 3)),
-    # Overlapping start and end
-    (1, 5, (2, 4)),
-    # Exactly the same
-    (2, 4, (2, 4)),
-    # Overlapping end
-    (3, 5, (3, 4)),
-    # Right after
-    (4, 5, (None, None)),
-    # After
-    (5, 6, (None, None)),
-))
-def test_get_overlap(start_hour, end_hour, expected_overlap):
+def test_get_overlap(overlapping_combination_from_2am_to_4am):
+    start_hour, end_hour, expected_overlap = overlapping_combination_from_2am_to_4am(boolean=False)
     occ1 = ReservationOccurrence(start_dt=date.today() + relativedelta(hour=2),
                                  end_dt=date.today() + relativedelta(hour=4))
     occ2 = ReservationOccurrence(start_dt=date.today() + relativedelta(hour=start_hour),
@@ -346,25 +327,8 @@ def test_get_overlaps_self(dummy_occurrence, skip_self):
     assert dummy_occurrence.get_overlap(dummy_occurrence, skip_self=skip_self) == expected_overlap
 
 
-@pytest.mark.parametrize(('start_hour', 'end_hour', 'expected'), (
-    # Before
-    (0, 1, False),
-    # Right before
-    (1, 2, False),
-    # Overlapping start
-    (1, 3, True),
-    # Overlapping start and end
-    (1, 5, True),
-    # Exactly the same
-    (2, 4, True),
-    # Overlapping end
-    (3, 5, True),
-    # Right after
-    (4, 5, False),
-    # After
-    (5, 6, False),
-))
-def test_overlaps(start_hour, end_hour, expected):
+def test_overlaps(overlapping_combination_from_2am_to_4am):
+    start_hour, end_hour, expected = overlapping_combination_from_2am_to_4am()
     occ1 = ReservationOccurrence(start_dt=date.today() + relativedelta(hour=2),
                                  end_dt=date.today() + relativedelta(hour=4))
     occ2 = ReservationOccurrence(start_dt=date.today() + relativedelta(hour=start_hour),
