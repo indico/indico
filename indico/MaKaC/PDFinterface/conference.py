@@ -67,7 +67,7 @@ from MaKaC.common import utils
 
 from indico.util.i18n import i18nformat, ngettext
 from indico.util.date_time import format_date
-from indico.util.string import safe_upper, safe_slice
+from indico.util.string import safe_upper, safe_slice, html_color_to_rgb
 from indico.util import json
 from MaKaC.common.Configuration import Config
 
@@ -784,20 +784,9 @@ class TimeTablePlain(PDFWithTOC):
         subContStyle.leftIndent=15
         self._styles["subContrib"]=subContStyle
 
-    def _HTMLColorToRGB(self, colorstring):
-        """ convert #RRGGBB to an (R, G, B) tuple """
-        colorstring = colorstring.strip()
-        if colorstring[0] == '#': colorstring = colorstring[1:]
-        if len(colorstring) != 6:
-            raise ValueError, "input #%s is not in #RRGGBB format" % colorstring
-        r, g, b = colorstring[:2], colorstring[2:4], colorstring[4:]
-        r, g, b = [float(int(n, 16))/256 for n in (r, g, b)]
-        #raise MaKaCError(str((r,g,b)))
-        return (r, g, b)
-
-    def _getSessionColor(self,ses):
+    def _getSessionColor(self, ses):
         HTMLcolor = ses.getSession().getColor()
-        color = self._HTMLColorToRGB(HTMLcolor)
+        color = html_color_to_rgb(HTMLcolor.strip())
         return color
 
     def _processContribution(self,contrib,l):
