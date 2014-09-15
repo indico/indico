@@ -76,3 +76,13 @@ def test_find_with_filters_state(create_blocking, state):
     create_blocking(state=other_state)
     blocking = create_blocking(state=state)
     assert set(BlockedRoom.find_with_filters({'state': state})) == {blocking.blocked_rooms[0]}
+
+
+def test_reject(dummy_blocking, smtp):
+    # XXX: create colliding reservation by other user to ensure it's not rejected?
+    br = dummy_blocking.blocked_rooms[0]
+    assert br.state == BlockedRoom.State.pending
+    br.reject()
+    assert br.state == BlockedRoom.State.rejected
+    assert len(smtp.outbox) == 1
+    assert smtp.outbox[0]['subject'] == 'Room blocking REJECTED'
