@@ -158,11 +158,11 @@ class ReservationOccurrence(db.Model, Serializer):
                    for occ in occurrences)
 
     @staticmethod
-    def find_overlapping_with(room, occurrences, reservation_id=None):
+    def find_overlapping_with(room, occurrences, skip_reservation_id=None):
         from indico.modules.rb.models.reservations import Reservation
 
         return ReservationOccurrence.find(Reservation.room == room,
-                                          Reservation.id != reservation_id,
+                                          Reservation.id != skip_reservation_id,
                                           ReservationOccurrence.is_valid,
                                           ReservationOccurrence.filter_overlap(occurrences),
                                           _eager=ReservationOccurrence.reservation,

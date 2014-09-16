@@ -434,9 +434,9 @@ class Reservation(Serializer, db.Model):
         return result.values()
 
     @staticmethod
-    def find_overlapping_with(room, occurrences, reservation_id=None):
+    def find_overlapping_with(room, occurrences, skip_reservation_id=None):
         return Reservation.find(Reservation.room == room,
-                                Reservation.id != reservation_id,
+                                Reservation.id != skip_reservation_id,
                                 ReservationOccurrence.is_valid,
                                 ReservationOccurrence.filter_overlap(occurrences),
                                 _join=ReservationOccurrence)

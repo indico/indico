@@ -245,7 +245,7 @@ def test_find_overlapping_with_skip_reservation(overlapping_occurrences):
     assert db_occ in ReservationOccurrence.find_overlapping_with(room=db_occ.reservation.room, occurrences=[occ]).all()
     assert db_occ not in ReservationOccurrence.find_overlapping_with(room=db_occ.reservation.room,
                                                                      occurrences=[occ],
-                                                                     reservation_id=db_occ.reservation.id).all()
+                                                                     skip_reservation_id=db_occ.reservation.id).all()
 
 
 # ======================================================================================================================
