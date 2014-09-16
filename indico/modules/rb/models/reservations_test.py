@@ -37,9 +37,11 @@ def overlapping_reservation(create_reservation):
                                        end_dt=date.today() + relativedelta(hour=5))
     return reservation, occurrence
 
+
 # ======================================================================================================================
 # RepeatMapping tests
 # ======================================================================================================================
+
 
 @pytest.mark.parametrize(('repetition', 'legacy', 'short_name', 'message'), (
     ((RepeatFrequency.NEVER, 0), None, 'none',            'Single reservation'),
@@ -242,7 +244,7 @@ def test_find_overlapping_with_different_room(overlapping_reservation, create_ro
     assert reservation not in Reservation.find_overlapping_with(room=create_room(), occurrences=[occurrence]).all()
 
 
-def test_find_overlapping_with_is_not_valid(db, overlapping_reservation, dummy_user):
+def test_find_overlapping_with_is_not_valid(overlapping_reservation, dummy_user):
     reservation, occurrence = overlapping_reservation
     assert reservation in Reservation.find_overlapping_with(room=reservation.room,
                                                             occurrences=[occurrence]).all()
@@ -410,6 +412,13 @@ def test_find_excluded_days(db, create_reservation):
         occ.is_cancelled = True
     db.session.flush()
     assert set(reservation.find_excluded_days().all()) == {occ for occ in reservation.occurrences if not occ.is_valid}
+
+
+def test_find_overlapping(create_reservation):
+    resv1 = create_reservation(is_accepted=False)
+    assert not resv1.find_overlapping().count()
+    resv2 = create_reservation(is_accepted=False)
+    assert resv1.find_overlapping().one() == resv2
 
 
 def test_getLocator(dummy_reservation, dummy_location):
