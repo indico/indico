@@ -50,7 +50,7 @@ class WPRoomBookingBookingDetails(WPRoomBookingBase):
         params['endpoints'] = self.endpoints
         params['assistance_emails'] = settings.get('assistance_emails', [])
         params['vc_equipment'] = ', '.join(eq.name for eq in reservation.get_vc_equipment())
-        params['repetition'] = RepeatMapping.getMessage(*reservation.repetition)
+        params['repetition'] = RepeatMapping.get_message(*reservation.repetition)
         params['edit_logs'] = reservation.edit_logs.order_by(ReservationEditLog.timestamp.desc()).all()
         params['excluded_days'] = reservation.find_excluded_days().all()
         return WTemplated('RoomBookingDetails').getHTML(params)

@@ -482,7 +482,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
             confirm_form = form
 
         conflicts, pre_conflicts = self._get_all_conflicts(room, form)
-        repeat_msg = RepeatMapping.getMessage(form.repeat_frequency.data, form.repeat_interval.data)
+        repeat_msg = RepeatMapping.get_message(form.repeat_frequency.data, form.repeat_interval.data)
         return self._get_view('confirm', form=confirm_form, room=room, start_dt=form.start_dt.data,
                               end_dt=form.end_dt.data, repeat_frequency=form.repeat_frequency.data,
                               repeat_interval=form.repeat_interval.data, repeat_msg=repeat_msg, conflicts=conflicts,

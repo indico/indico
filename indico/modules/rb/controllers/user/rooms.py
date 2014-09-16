@@ -75,7 +75,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
                                                                                    Location.working_time_start),
                                                  default_end_dt=datetime.combine(date.today(),
                                                                                  Location.working_time_end),
-                                                 repeat_mapping=RepeatMapping.getMapping()).display()
+                                                 repeat_mapping=RepeatMapping.mapping).display()
             self._cache.set(key, html, 3600)
         return html
 

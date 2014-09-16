@@ -63,44 +63,35 @@ class RepeatFrequency(int, IndicoEnum):
 
 
 class RepeatMapping(object):
-    _mapping = {
-        (RepeatFrequency.NEVER, 0): (N_('Single reservation'), None, 'none'),
-        (RepeatFrequency.DAY, 1): (N_('Repeat daily'), 0, 'daily'),
-        (RepeatFrequency.WEEK, 1): (N_('Repeat once a week'), 1, 'weekly'),
-        (RepeatFrequency.WEEK, 2): (N_('Repeat once every two week'), 2, 'everyTwoWeeks'),
-        (RepeatFrequency.WEEK, 3): (N_('Repeat once every three week'), 3, 'everyThreeWeeks'),
-        (RepeatFrequency.MONTH, 1): (N_('Repeat every month'), 4, 'monthly')
+    mapping = {
+        (RepeatFrequency.NEVER, 0): (N_('Single reservation'),           None, 'none'),
+        (RepeatFrequency.DAY,   1): (N_('Repeat daily'),                 0,    'daily'),
+        (RepeatFrequency.WEEK,  1): (N_('Repeat once a week'),           1,    'weekly'),
+        (RepeatFrequency.WEEK,  2): (N_('Repeat once every two week'),   2,    'everyTwoWeeks'),
+        (RepeatFrequency.WEEK,  3): (N_('Repeat once every three week'), 3,    'everyThreeWeeks'),
+        (RepeatFrequency.MONTH, 1): (N_('Repeat every month'),           4,    'monthly')
     }
 
     @classmethod
     @unimplemented(exceptions=(KeyError,), message=_('Unimplemented repetition pair'))
-    def getMessage(cls, repeat_frequency, repeat_interval):
-        return cls._mapping[(repeat_frequency, repeat_interval)][0]
-
-    @classmethod
-    @unimplemented(exceptions=(KeyError,), message=_('Unimplemented repetition pair'))
-    def getOldMapping(cls, repeat_frequency, repeat_interval):
-        return cls._mapping[(repeat_frequency, repeat_interval)][1]
+    def get_message(cls, repeat_frequency, repeat_interval):
+        return cls.mapping[(repeat_frequency, repeat_interval)][0]
 
     @classmethod
     @unimplemented(exceptions=(KeyError,), message=_('Unimplemented repetition pair'))
     def get_short_name(cls, repeat_frequency, repeat_interval):
         # for the API
-        return cls._mapping[(repeat_frequency, repeat_interval)][2]
+        return cls.mapping[(repeat_frequency, repeat_interval)][2]
 
     @classmethod
     @unimplemented(exceptions=(KeyError,), message=_('Unknown old repeatability'))
-    def getNewMapping(cls, repeat):
+    def convert_legacy_repeatability(cls, repeat):
         if repeat is None or repeat < 5:
-            for k, (_, v, _) in cls._mapping.iteritems():
+            for k, (_, v, _) in cls.mapping.iteritems():
                 if v == repeat:
                     return k
         else:
             raise KeyError('Undefined old repeat: {}'.format(repeat))
-
-    @classmethod
-    def getMapping(cls):
-        return cls._mapping
 
 
 class Reservation(Serializer, db.Model):
@@ -674,7 +665,7 @@ class Reservation(Serializer, db.Model):
                     # the correct change data
                     changes['repetition'] = {'old': old_repetition,
                                              'new': self.repetition,
-                                             'converter': lambda x: RepeatMapping.getMessage(*x)}
+                                             'converter': lambda x: RepeatMapping.get_message(*x)}
                 else:
                     changes[field] = {'old': old, 'new': new, 'converter': converter}
 

@@ -117,10 +117,6 @@ def setup(main_zodb_uri, rb_zodb_uri, sqlalchemy_uri):
     return main_root, rb_root, app
 
 
-def convert_reservation_repeatability(old):
-    return RepeatMapping.getNewMapping(old)
-
-
 def generate_name(old_room):
     return '{}-{}-{}'.format(
         old_room.building,
@@ -390,7 +386,7 @@ def migrate_reservations(main_root, rb_root, avatar_id_map):
             print cformat('  %{red!}skipping resv for dead room {0.room.id}: {0.id} ({0._utcCreatedDT})').format(v)
             continue
 
-        repeat_frequency, repeat_interval = convert_reservation_repeatability(v.repeatability)
+        repeat_frequency, repeat_interval = RepeatMapping.convert_legacy_repeatability(v.repeatability)
         booked_for_id = getattr(v, 'bookedForId', None)
 
         r = Reservation(

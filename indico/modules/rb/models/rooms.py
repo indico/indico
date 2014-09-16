@@ -548,7 +548,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         )
 
         if filters.get('available', -1) != -1:
-            repetition = RepeatMapping.getNewMapping(ast.literal_eval(filters['repeatability']))
+            repetition = RepeatMapping.convert_legacy_repeatability(ast.literal_eval(filters['repeatability']))
             is_available = Room.filter_available(filters['start_dt'], filters['end_dt'], repetition,
                                                  include_pre_bookings=filters.get('include_pre_bookings', True),
                                                  include_pending_blockings=filters.get('include_pending_blockings',
