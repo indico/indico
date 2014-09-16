@@ -79,7 +79,7 @@ class NewBookingFormBase(IndicoForm):
     repeat_interval = IntegerField('Repeat interval', validators=[NumberRange(0, 3)], default=0)
 
     def validate_repeat_interval(self, field):
-        if (self.repeat_frequency.data, self.repeat_interval.data) not in RepeatMapping._mapping:
+        if (self.repeat_frequency.data, self.repeat_interval.data) not in RepeatMapping.mapping:
             raise ValidationError('Invalid repeat step')
 
     def validate_start_dt(self, field):
