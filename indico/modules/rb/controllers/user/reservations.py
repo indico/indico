@@ -427,15 +427,19 @@ class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBooki
         return RHRoomBookingNewBookingSimple._get_view(self, clone_booking=self._reservation, **kwargs)
 
     def _make_form(self):
-        defaults = FormDefaults(
-            self._reservation,
-            skip_attrs={'room_id', 'booked_for_id', 'booked_for_name', 'contact_email', 'contact_phone'},
-            room_id=self._room.id,
-            booked_for_id=session.user.id,
-            booked_for_name=session.user.getStraightFullName().decode('utf-8'),
-            contact_email=session.user.getEmail().decode('utf-8'),
-            contact_phone=session.user.getPhone().decode('utf-8')
-        )
+
+        changes = {'room_id': self._room.id}
+
+        if self._reservation.created_by_id != session.user.id:
+            # if the user is cloning someone else's booking, set him/her as booked_for
+            changes.update(booked_for_id=session.user.id,
+                           booked_for_name=session.user.getStraightFullName().decode('utf-8'),
+                           contact_email=session.user.getEmail().decode('utf-8'),
+                           contact_phone=session.user.getPhone().decode('utf-8'))
+
+        defaults = FormDefaults(self._reservation,
+                                skip_attrs=set(changes),
+                                **changes)
 
         return self._make_confirm_form(self._room, defaults=defaults, form_class=NewBookingSimpleForm)
 
