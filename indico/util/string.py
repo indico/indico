@@ -241,7 +241,7 @@ def seems_html(string):
 
 
 def strip_control_chars(string):
-    return re.sub(r'[\x0B-\x1F]', u'', string)
+    return re.sub(r'[\x0B-\x1F]', '', string)
 
 
 def html_color_to_rgb(hexcolor):
