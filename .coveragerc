@@ -1,7 +1,10 @@
 [run]
 branch = true
 source = indico
-include = indico/modules/rb/models/*.py
+include =
+    indico/modules/rb/*.py
+    indico/util/string.py
+    indico/web/flask/templating.py
 
 [report]
 exclude_lines =
