@@ -222,6 +222,44 @@ def test_status_string(create_reservation, is_accepted, is_rejected, is_cancelle
 # ======================================================================================================================
 
 
+@pytest.mark.parametrize('silent', (True, False))
+def test_cancel(smtp, create_reservation, dummy_user, silent):
+    reservation = create_reservation(start_dt=date.today() + relativedelta(hour=8),
+                                     end_dt=date.today() + relativedelta(days=10, hour=17),
+                                     repeat_frequency=RepeatFrequency.DAY)
+    assert not reservation.is_cancelled
+    assert not any(occ.is_cancelled for occ in reservation.occurrences)
+    reservation.cancel(user=dummy_user, reason='cancelled', silent=silent)
+    assert reservation.is_cancelled
+    assert reservation.rejection_reason == 'cancelled'
+    assert all(occ.is_cancelled for occ in reservation.occurrences)
+    if silent:
+        assert not reservation.edit_logs.count()
+        assert not smtp.outbox
+    else:
+        assert reservation.edit_logs.count() == 1
+        assert smtp.outbox
+
+
+@pytest.mark.parametrize('silent', (True, False))
+def test_reject(smtp, create_reservation, dummy_user, silent):
+    reservation = create_reservation(start_dt=date.today() + relativedelta(hour=8),
+                                     end_dt=date.today() + relativedelta(days=10, hour=17),
+                                     repeat_frequency=RepeatFrequency.DAY)
+    assert not reservation.is_rejected
+    assert not any(occ.is_rejected for occ in reservation.occurrences)
+    reservation.reject(user=dummy_user, reason='rejected', silent=silent)
+    assert reservation.is_rejected
+    assert reservation.rejection_reason == 'rejected'
+    assert all(occ.is_rejected for occ in reservation.occurrences)
+    if silent:
+        assert not reservation.edit_logs.count()
+        assert not smtp.outbox
+    else:
+        assert reservation.edit_logs.count() == 1
+        assert smtp.outbox
+
+
 def test_add_edit_log(db, dummy_reservation):
     dummy_reservation.add_edit_log(ReservationEditLog(user_name='user', info='Some change'))
     assert dummy_reservation.edit_logs.count() == 1

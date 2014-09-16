@@ -271,6 +271,7 @@ def test_cancel(smtp, create_reservation, dummy_user, silent, reason):
     assert not occurrence.reservation.is_cancelled
     if silent:
         assert not occurrence.reservation.edit_logs.count()
+        assert not smtp.outbox
     else:
         assert occurrence.reservation.edit_logs.count() == 1
         assert occurrence.reservation.edit_logs[0].user_name == dummy_user.getFullName()
@@ -311,6 +312,7 @@ def test_reject(smtp, create_reservation, dummy_user, silent):
     assert not occurrence.reservation.is_rejected
     if silent:
         assert not occurrence.reservation.edit_logs.count()
+        assert not smtp.outbox
     else:
         assert occurrence.reservation.edit_logs.count() == 1
         assert occurrence.reservation.edit_logs[0].user_name == dummy_user.getFullName()
