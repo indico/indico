@@ -23,7 +23,7 @@ from dateutil.relativedelta import relativedelta
 from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.testing.util import bool_matrix
+from indico.testing.util import bool_matrix, extract_emails
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
@@ -274,16 +274,16 @@ def test_cancel(smtp, create_reservation, dummy_user, silent, reason):
     else:
         assert occurrence.reservation.edit_logs.count() == 1
         assert occurrence.reservation.edit_logs[0].user_name == dummy_user.getFullName()
-        assert smtp.outbox
+        extract_emails(smtp, count=2, regex=True, subject=r'Booking cancelled on .+ \(SINGLE OCCURRENCE\)')
         if reason:
             assert len(occurrence.reservation.edit_logs[0].info) == 2
         else:
             assert len(occurrence.reservation.edit_logs[0].info) == 1
+    assert not smtp.outbox
 
 
 @pytest.mark.parametrize('silent', (True, False))
-@pytest.mark.usefixtures('smtp')
-def test_cancel_single_occurrence(dummy_occurrence, dummy_user, silent):
+def test_cancel_single_occurrence(smtp, dummy_occurrence, dummy_user, silent):
     dummy_occurrence.cancel(user=dummy_user, reason='cancelled', silent=silent)
     assert dummy_occurrence.is_cancelled
     assert dummy_occurrence.rejection_reason == 'cancelled'
@@ -293,6 +293,9 @@ def test_cancel_single_occurrence(dummy_occurrence, dummy_user, silent):
         assert not dummy_occurrence.reservation.edit_logs.count()
     else:
         assert dummy_occurrence.reservation.edit_logs.count()
+        mails = extract_emails(smtp, count=2, regex=True, subject=r'Booking cancelled on')
+        assert not any('SINGLE OCCURRENCE' in mail['subject'] for mail in mails)
+    assert not smtp.outbox
 
 
 @pytest.mark.parametrize('silent', (True, False))
@@ -312,12 +315,12 @@ def test_reject(smtp, create_reservation, dummy_user, silent):
         assert occurrence.reservation.edit_logs.count() == 1
         assert occurrence.reservation.edit_logs[0].user_name == dummy_user.getFullName()
         assert len(occurrence.reservation.edit_logs[0].info) == 2
-        assert smtp.outbox
+        extract_emails(smtp, count=2, regex=True, subject=r'Booking rejected on .+ \(SINGLE OCCURRENCE\)')
+    assert not smtp.outbox
 
 
 @pytest.mark.parametrize('silent', (True, False))
-@pytest.mark.usefixtures('smtp')
-def test_reject_single_occurrence(dummy_occurrence, dummy_user, silent):
+def test_reject_single_occurrence(smtp, dummy_occurrence, dummy_user, silent):
     dummy_occurrence.reject(user=dummy_user, reason='rejected', silent=silent)
     assert dummy_occurrence.is_rejected
     assert dummy_occurrence.rejection_reason == 'rejected'
@@ -327,6 +330,9 @@ def test_reject_single_occurrence(dummy_occurrence, dummy_user, silent):
         assert not dummy_occurrence.reservation.edit_logs.count()
     else:
         assert dummy_occurrence.reservation.edit_logs.count()
+        mails = extract_emails(smtp, count=2, regex=True, subject='Booking rejected on')
+        assert not any('SINGLE OCCURRENCE' in mail['subject'] for mail in mails)
+    assert not smtp.outbox
 
 
 def test_get_overlap(overlapping_combination_from_2am_to_4am):

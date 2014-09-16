@@ -125,7 +125,7 @@ def extract_emails(smtp, required=True, count=None, regex=False, **kwargs):
     :param count: Require exactly `count` emails to be found
     :param kwargs: Header values to match against
     """
-    compare = re.match if regex else operator.eq
+    compare = re.search if regex else operator.eq
     found = []
     for mail in smtp.outbox:
         for header, value in kwargs.iteritems():
