@@ -21,12 +21,21 @@ from dateutil.relativedelta import relativedelta
 
 from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservations import Reservation, RepeatFrequency, RepeatMapping
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.testing.util import bool_matrix
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
 
+
+@pytest.fixture
+def overlapping_reservation(create_reservation):
+    reservation = create_reservation(start_dt=date.today() + relativedelta(hour=2),
+                                     end_dt=date.today() + relativedelta(hour=4))
+    occurrence = ReservationOccurrence(start_dt=date.today() + relativedelta(hour=1),
+                                       end_dt=date.today() + relativedelta(hour=5))
+    return reservation, occurrence
 
 # ======================================================================================================================
 # RepeatMapping tests
@@ -215,6 +224,29 @@ def test_status_string(create_reservation, is_accepted, is_rejected, is_cancelle
 # ======================================================================================================================
 # staticmethod tests
 # ======================================================================================================================
+
+
+def test_find_overlapping_with_different_room(overlapping_reservation, create_room):
+    reservation, occurrence = overlapping_reservation
+    assert reservation in Reservation.find_overlapping_with(room=reservation.room, occurrences=[occurrence]).all()
+    assert reservation not in Reservation.find_overlapping_with(room=create_room(), occurrences=[occurrence]).all()
+
+
+def test_find_overlapping_with_is_not_valid(db, overlapping_reservation, dummy_user):
+    reservation, occurrence = overlapping_reservation
+    assert reservation in Reservation.find_overlapping_with(room=reservation.room,
+                                                            occurrences=[occurrence]).all()
+    reservation.cancel(dummy_user, silent=True)
+    assert reservation not in Reservation.find_overlapping_with(room=reservation.room,
+                                                                occurrences=[occurrence]).all()
+
+
+def test_find_overlapping_with_skip_reservation(overlapping_reservation):
+    reservation, occurrence = overlapping_reservation
+    assert reservation in Reservation.find_overlapping_with(room=reservation.room, occurrences=[occurrence]).all()
+    assert reservation not in Reservation.find_overlapping_with(room=reservation.room,
+                                                                occurrences=[occurrence],
+                                                                skip_reservation_id=reservation.id).all()
 
 
 # ======================================================================================================================
