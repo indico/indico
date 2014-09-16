@@ -133,10 +133,10 @@ def test_iter_start_time_single(interval):
 
 
 @pytest.mark.parametrize(('interval', 'days_elapsed', 'expected_length'), (
-    (0, 0, None),
-    (1, 0, 1),
+    (0, 0,  None),
+    (1, 0,  1),
     (1, 10, 11),
-    (2, 0, None),
+    (2, 0,  None),
 ))
 def test_iter_start_time_daily(interval, days_elapsed, expected_length):
     assert days_elapsed >= 0
@@ -154,17 +154,17 @@ def test_iter_start_time_daily(interval, days_elapsed, expected_length):
 
 
 @pytest.mark.parametrize(('interval', 'days_elapsed', 'expected_length'), (
-    (0, 0, None),
-    (1, 0, 1),
-    (1, 7, 2),
+    (0, 0,  None),
+    (1, 0,  1),
+    (1, 7,  2),
     (1, 21, 4),
-    (2, 7, 1),
+    (2, 7,  1),
     (2, 14, 2),
     (2, 42, 4),
     (3, 14, 1),
     (3, 21, 2),
     (3, 63, 4),
-    (4, 0, None),
+    (4, 0,  None),
 ))
 def test_iter_start_time_weekly(interval, days_elapsed, expected_length):
     assert days_elapsed >= 0
@@ -182,10 +182,10 @@ def test_iter_start_time_weekly(interval, days_elapsed, expected_length):
 
 
 @pytest.mark.parametrize(('interval', 'days_elapsed', 'expected_length'), (
-    (0, 0, None),
-    (1, 0, 1),
+    (0, 0,  None),
+    (1, 0,  1),
     (1, 40, 2),
-    (2, 0, None),
+    (2, 0,  None),
 ))
 def test_iter_start_time_monthly(interval, days_elapsed, expected_length):
     assert days_elapsed >= 0
@@ -254,8 +254,8 @@ def test_find_overlapping_with_skip_reservation(overlapping_occurrences):
 
 
 @pytest.mark.parametrize(('silent', 'reason'), (
-    (True, 'cancelled'),
-    (True, ''),
+    (True,  'cancelled'),
+    (True,  ''),
     (False, 'cancelled'),
     (False, ''),
 ))
@@ -282,7 +282,8 @@ def test_cancel(smtp, create_reservation, dummy_user, silent, reason):
 
 
 @pytest.mark.parametrize('silent', (True, False))
-def test_cancel_single_occurrence(smtp, dummy_occurrence, dummy_user, silent):
+@pytest.mark.usefixtures('smtp')
+def test_cancel_single_occurrence(dummy_occurrence, dummy_user, silent):
     dummy_occurrence.cancel(user=dummy_user, reason='cancelled', silent=silent)
     assert dummy_occurrence.is_cancelled
     assert dummy_occurrence.rejection_reason == 'cancelled'
@@ -315,7 +316,8 @@ def test_reject(smtp, create_reservation, dummy_user, silent):
 
 
 @pytest.mark.parametrize('silent', (True, False))
-def test_reject_single_occurrence(smtp, dummy_occurrence, dummy_user, silent):
+@pytest.mark.usefixtures('smtp')
+def test_reject_single_occurrence(dummy_occurrence, dummy_user, silent):
     dummy_occurrence.reject(user=dummy_user, reason='rejected', silent=silent)
     assert dummy_occurrence.is_rejected
     assert dummy_occurrence.rejection_reason == 'rejected'
@@ -349,10 +351,7 @@ def test_get_overlap_different_rooms(create_occurrence, create_room):
         occ1.get_overlap(occ2)
 
 
-@pytest.mark.parametrize('skip_self', (
-    (True),
-    (False),
-))
+@pytest.mark.parametrize('skip_self', (True, False))
 def test_get_overlaps_self(dummy_occurrence, skip_self):
     if skip_self:
         expected_overlap = (None, None)
@@ -378,5 +377,6 @@ def test_overlaps_different_rooms(create_occurrence, create_room):
         occ1.overlaps(occ2)
 
 
-def test_overlaps_self(dummy_occurrence, bool_flag):
-    assert dummy_occurrence.overlaps(dummy_occurrence, skip_self=bool_flag) == (not bool_flag)
+@pytest.mark.parametrize('skip_self', (True, False))
+def test_overlaps_self(dummy_occurrence, skip_self):
+    assert dummy_occurrence.overlaps(dummy_occurrence, skip_self=skip_self) == (not skip_self)

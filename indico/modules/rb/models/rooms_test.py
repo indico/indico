@@ -36,30 +36,26 @@ pytest_plugins = 'indico.modules.rb.testing.fixtures'
 _notset = object()
 
 
-def test_is_auto_confirm(create_room, bool_flag):
-    room = create_room(reservations_need_confirmation=bool_flag)
-    assert room.is_auto_confirm != bool_flag
-    assert Room.find_first(is_auto_confirm=bool_flag) is None
-    assert Room.find_first(is_auto_confirm=not bool_flag) == room
+@pytest.mark.parametrize('need_confirmation', (True, False))
+def test_is_auto_confirm(create_room, need_confirmation):
+    room = create_room(reservations_need_confirmation=need_confirmation)
+    assert room.is_auto_confirm != need_confirmation
+    assert Room.find_first(is_auto_confirm=need_confirmation) is None
+    assert Room.find_first(is_auto_confirm=not need_confirmation) == room
 
 
-def test_booking_url(dummy_room):
-    assert Room().booking_url is None
+def test_urls_transient_object():
+    room = Room()
+    assert room.booking_url is None
+    assert room.details_url is None
+    assert room.large_photo_url is None
+    assert room.small_photo_url is None
+
+
+def test_urls(dummy_room):
     assert dummy_room.booking_url is not None
-
-
-def test_details_url(dummy_room):
-    assert Room().details_url is None
     assert dummy_room.details_url is not None
-
-
-def test_large_photo_url(dummy_room):
-    assert Room().large_photo_url is None
     assert dummy_room.large_photo_url is not None
-
-
-def test_small_photo_url(dummy_room):
-    assert Room().small_photo_url is None
     assert dummy_room.small_photo_url is not None
 
 

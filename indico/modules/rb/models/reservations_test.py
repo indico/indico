@@ -282,7 +282,7 @@ def test_getLocator(dummy_reservation, dummy_location):
 
 
 @pytest.mark.parametrize(('is_booked_for', 'contact_email', 'expected'), (
-    (True, '', True),
+    (True,  '', True),
     (False, '', False),
     (False, 'dummy@example.com', True),
     (False, 'other@example.com', False),
