@@ -19,12 +19,36 @@ from datetime import date
 import pytest
 from dateutil.relativedelta import relativedelta
 
-from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
+from indico.core.errors import IndicoError
+from indico.modules.rb.models.reservations import Reservation, RepeatFrequency, RepeatMapping
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.testing.util import bool_matrix
 
 
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
+
+
+# ======================================================================================================================
+# RepeatMapping tests
+# ======================================================================================================================
+
+@pytest.mark.parametrize(('repetition', 'legacy', 'short_name', 'message'), (
+    ((RepeatFrequency.NEVER, 0), None, 'none',            'Single reservation'),
+    ((RepeatFrequency.DAY,   1), 0,    'daily',           'Repeat daily'),
+    ((RepeatFrequency.WEEK,  1), 1,    'weekly',          'Repeat once a week'),
+    ((RepeatFrequency.WEEK,  2), 2,    'everyTwoWeeks',   'Repeat once every two weeks'),
+    ((RepeatFrequency.WEEK,  3), 3,    'everyThreeWeeks', 'Repeat once every three weeks'),
+    ((RepeatFrequency.MONTH, 1), 4,    'monthly',         'Repeat every month'),
+))
+def test_repeat_mapping(repetition, legacy, short_name, message):
+    assert RepeatMapping.get_message(*repetition) == message
+    assert RepeatMapping.get_short_name(*repetition) == short_name
+    assert RepeatMapping.convert_legacy_repeatability(legacy) == repetition
+
+
+def test_repeat_mapping_invalid_legacy():
+    with pytest.raises(IndicoError):
+        RepeatMapping.convert_legacy_repeatability(123)
 
 
 # ======================================================================================================================
