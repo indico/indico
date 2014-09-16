@@ -301,6 +301,27 @@ def test_can_be_action_with_no_user(dummy_reservation):
     assert not dummy_reservation.can_be_rejected(None)
 
 
+def test_get_vc_equipment(db, dummy_reservation, create_equipment_type):
+    foo = create_equipment_type(u'foo')
+    vc = create_equipment_type(u'Video conference')
+    vc_items = [create_equipment_type(u'vc1'), create_equipment_type(u'vc2')]
+    vc.children += vc_items
+    dummy_reservation.room.available_equipment.extend(vc_items + [vc, foo])
+    dummy_reservation.used_equipment = [vc_items[0]]
+    db.session.flush()
+    assert set(dummy_reservation.get_vc_equipment().all()) == {vc_items[0]}
+
+
+def test_find_excluded_days(db, create_reservation):
+    reservation = create_reservation(start_dt=date.today() + relativedelta(hour=8),
+                                     end_dt=date.today() + relativedelta(days=5, hour=10),
+                                     repeat_frequency=RepeatFrequency.DAY)
+    for occ in reservation.occurrences[::2]:
+        occ.is_cancelled = True
+    db.session.flush()
+    assert set(reservation.find_excluded_days().all()) == {occ for occ in reservation.occurrences if not occ.is_valid}
+
+
 def test_getLocator(dummy_reservation, dummy_location):
     assert dummy_reservation.getLocator() == {'roomLocation': dummy_location.name, 'resvID': dummy_reservation.id}
 
