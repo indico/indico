@@ -388,17 +388,6 @@ def test_can_be_action_with_no_user(dummy_reservation):
     assert not dummy_reservation.can_be_rejected(None)
 
 
-def test_get_vc_equipment(db, dummy_reservation, create_equipment_type):
-    foo = create_equipment_type(u'foo')
-    vc = create_equipment_type(u'Video conference')
-    vc_items = [create_equipment_type(u'vc1'), create_equipment_type(u'vc2')]
-    vc.children += vc_items
-    dummy_reservation.room.available_equipment.extend(vc_items + [vc, foo])
-    dummy_reservation.used_equipment = [vc_items[0]]
-    db.session.flush()
-    assert set(dummy_reservation.get_vc_equipment().all()) == {vc_items[0]}
-
-
 @pytest.mark.xfail
 def test_create_occurrences():
     raise NotImplementedError
@@ -428,6 +417,17 @@ def test_getLocator(dummy_reservation, dummy_location):
 @pytest.mark.xfail
 def test_get_conflicting_occurrences():
     raise NotImplementedError
+
+
+def test_get_vc_equipment(db, dummy_reservation, create_equipment_type):
+    foo = create_equipment_type(u'foo')
+    vc = create_equipment_type(u'Video conference')
+    vc_items = [create_equipment_type(u'vc1'), create_equipment_type(u'vc2')]
+    vc.children += vc_items
+    dummy_reservation.room.available_equipment.extend(vc_items + [vc, foo])
+    dummy_reservation.used_equipment = [vc_items[0]]
+    db.session.flush()
+    assert set(dummy_reservation.get_vc_equipment().all()) == {vc_items[0]}
 
 
 @pytest.mark.parametrize(('is_booked_for', 'contact_email', 'expected'), (

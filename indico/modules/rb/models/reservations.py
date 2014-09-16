@@ -506,14 +506,6 @@ class Reservation(Serializer, db.Model):
             return False
         return user.isRBAdmin() or self.room.is_owned_by(user)
 
-    def get_vc_equipment(self):
-        vc_equipment = self.room.available_equipment \
-                           .correlate(ReservationOccurrence) \
-                           .with_entities(EquipmentType.id) \
-                           .filter_by(name='Video conference') \
-                           .as_scalar()
-        return self.used_equipment.filter(EquipmentType.parent_id == vc_equipment)
-
     def create_occurrences(self, skip_conflicts, user=None):
         ReservationOccurrence.create_series_for_reservation(self)
         db.session.flush()
@@ -585,6 +577,14 @@ class Reservation(Serializer, db.Model):
                     key = 'confirmed' if colliding.reservation.is_accepted else 'pending'
                     conflicts[occurrence][key].append(colliding)
         return conflicts
+
+    def get_vc_equipment(self):
+        vc_equipment = self.room.available_equipment \
+                           .correlate(ReservationOccurrence) \
+                           .with_entities(EquipmentType.id) \
+                           .filter_by(name='Video conference') \
+                           .as_scalar()
+        return self.used_equipment.filter(EquipmentType.parent_id == vc_equipment)
 
     def is_booked_for(self, user):
         if user is None:
