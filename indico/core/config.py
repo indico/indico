@@ -540,7 +540,8 @@ class Config:
         'SentryDSN'                 : None,
         'SentryLoggingLevel'        : 'WARNING',
         'CategoryCleanup'           : {},
-        'JanitorUserId'             : 0
+        'JanitorUserId'             : 0,
+        'Plugins'                   : {}
     }
 
     if sys.platform == 'win32':

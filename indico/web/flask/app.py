@@ -42,6 +42,7 @@ from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
+from indico.core.plugins import plugin_engine
 from indico.web.assets import core_env, register_all_css, register_all_js
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
@@ -90,6 +91,7 @@ def configure_app(app, set_path=False):
     app.config['INDICO_SESSION_PERMANENT'] = cfg.getSessionLifetime() > 0
     app.config['INDICO_HTDOCS'] = cfg.getHtdocsDir()
     app.config['INDICO_COMPAT_ROUTES'] = cfg.getRouteOldUrls()
+    app.config['PLUGINENGINE_PLUGINS'] = cfg.getPlugins()
     if set_path:
         base = url_parse(cfg.getBaseURL())
         app.config['SERVER_NAME'] = base.netloc
@@ -255,7 +257,9 @@ def make_app(set_path=False, db_setup=True, testing=False):
         add_compat_blueprints(app)
     if not app.config['TESTING']:
         add_plugin_blueprints(app)
-
     Logger.init_app(app)
+    plugin_engine.init_app(app, Logger.get('plugins'))
+    if not plugin_engine.load_plugins(app):
+        raise Exception('Could not load some plugins: {}'.format(', '.join(plugin_engine.get_failed_plugins(app))))
 
     return app
