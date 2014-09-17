@@ -30,7 +30,7 @@ from indico.web.flask.app import make_app
 
 def _main(args):
     today = date.today()
-    past_month = today - relativedelta(months=1)
+    past_month = today - relativedelta(days=29)
     past_year = today - relativedelta(years=1)
 
     if not args.locations:

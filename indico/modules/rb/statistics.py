@@ -16,7 +16,7 @@ def calculate_rooms_bookable_time(rooms, start_date=None, end_date=None):
     if end_date is None:
         end_date = datetime.utcnow()
     if start_date is None:
-        start_date = end_date - relativedelta(months=1)
+        start_date = end_date - relativedelta(days=29)
     working_time_start = datetime.combine(date.today(), Location.working_time_start)
     working_time_end = datetime.combine(date.today(), Location.working_time_end)
     working_time_per_day = (working_time_end - working_time_start).seconds
@@ -28,7 +28,7 @@ def calculate_rooms_booked_time(rooms, start_date=None, end_date=None):
     if end_date is None:
         end_date = date.today()
     if start_date is None:
-        start_date = end_date - relativedelta(months=1)
+        start_date = end_date - relativedelta(days=29)
     # Reservations on working days
     reservations = Reservation.find(Reservation.room_id.in_(r.id for r in rooms),
                                     extract('dow', ReservationOccurrence.start_dt) < 5,
