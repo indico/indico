@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import os
 import re
 import traceback
+from types import GeneratorType
 
 from flask import send_from_directory, request, _app_ctx_stack
 from flask import current_app as app
@@ -32,6 +33,7 @@ from werkzeug.urls import url_parse
 
 import indico.util.date_time as date_time_util
 from indico.core.config import Config
+from indico.core import signals
 from indico.util.i18n import gettext, ngettext
 from indico.core.logger import Logger
 from MaKaC.i18n import _
@@ -194,11 +196,23 @@ def add_compat_blueprints(app):
         app.register_blueprint(blueprint)
 
 
-def add_plugin_blueprints(app):
+def add_legacy_plugin_blueprints(app):
     for blueprint in RHMapMemory()._blueprints:
         if not app.config['INDICO_COMPAT_ROUTES'] and blueprint.name.startswith('compat_'):
             continue
         app.register_blueprint(blueprint)
+
+
+def add_plugin_blueprints(app):
+    blueprint_names = set()
+    for _, blueprints in signals.get_blueprints.send(app):
+        if not isinstance(blueprints, GeneratorType):
+            blueprints = (blueprints,)
+        for blueprint in blueprints:
+            if blueprint.name in blueprint_names:
+                raise Exception("Blueprint '{}' defined by multiple plugins".format(blueprint.name))
+            blueprint_names.add(blueprint.name)
+            app.register_blueprint(blueprint)
 
 
 def handle_404(exception):
@@ -256,10 +270,11 @@ def make_app(set_path=False, db_setup=True, testing=False):
     if app.config['INDICO_COMPAT_ROUTES']:
         add_compat_blueprints(app)
     if not app.config['TESTING']:
-        add_plugin_blueprints(app)
+        add_legacy_plugin_blueprints(app)
     Logger.init_app(app)
     plugin_engine.init_app(app, Logger.get('plugins'))
     if not plugin_engine.load_plugins(app):
         raise Exception('Could not load some plugins: {}'.format(', '.join(plugin_engine.get_failed_plugins(app))))
-
+    # Below this points plugins are available, i.e. sending signals makes sense
+    add_plugin_blueprints(app)
     return app

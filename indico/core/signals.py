@@ -18,5 +18,21 @@ from blinker import Namespace
 
 _signals = Namespace()
 
-cli = _signals.signal('cli')
-shell_context = _signals.signal('shell-context')
+cli = _signals.signal('cli', """
+Called before running the Flask-Script manager of the `indico`
+commandline script. *sender* is the Flask-Script manager which
+can be used to register additional commands/managers
+""")
+
+shell_context = _signals.signal('shell-context', """
+Called after adding stuff to the `indico shell` context.
+Receives the `add_to_context` keyword argument with a function
+which allows you to add custom items to the context.
+""")
+
+get_blueprints = _signals.signal('get-blueprints', """
+Expected to return IndicoPluginBlueprint-based blueprints
+which will be registered on the application. A single blueprint
+can be returned directly, to return multiple blueprints, simply
+yield them.
+""")

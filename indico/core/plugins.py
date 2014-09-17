@@ -16,8 +16,19 @@
 
 from flask_pluginengine import PluginEngine, Plugin
 
+from indico.web.flask.wrappers import IndicoBlueprint
+
 plugin_engine = PluginEngine()
 
 
 class IndicoPlugin(Plugin):
     pass
+
+
+class IndicoPluginBlueprint(IndicoBlueprint):
+    """Like IndicoBlueprint, but it uses its own static folder by default."""
+
+    def __init__(self, name, *args, **kwargs):
+        kwargs.setdefault('static_folder', 'static')
+        kwargs.setdefault('static_url_path', '/static/{}'.format(name))
+        super(IndicoPluginBlueprint, self).__init__(name, *args, **kwargs)
