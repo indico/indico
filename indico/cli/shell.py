@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
@@ -18,14 +15,16 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import datetime
-from flask import current_app
+from functools import partial
 from operator import itemgetter
 
 import transaction
+from flask import current_app
 from flask_script import Shell
 from werkzeug.local import LocalProxy
 
 import MaKaC
+from indico.core import signals
 from indico.core.config import Config
 from indico.util.console import colored
 from indico.core.db import DBMgr, db
@@ -92,5 +91,6 @@ class IndicoShell(Shell):
             _add_to_context(context, DBMgr.getInstance(), 'dbi', doc='zodb db interface', color='cyan!')
             _add_to_context(context, db, 'db', doc='sqlalchemy db interface', color='cyan!')
             _add_to_context(context, transaction, doc='transaction module', color='cyan!')
+            signals.shell_context.send(add_to_context=partial(_add_to_context, context))
 
         return self._context

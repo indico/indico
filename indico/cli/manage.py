@@ -23,25 +23,23 @@ from indico.cli.admin import IndicoAdminManager
 from indico.cli.database import DatabaseManager
 from indico.cli.server import IndicoDevServer
 from indico.cli.shell import IndicoShell
+from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.migration import migrate
 from indico.web.flask.app import make_app
 
 
-def app_factory():
+def main():
     app = make_app()
     migrate.init_app(app, db, os.path.join(app.root_path, '..', 'migrations'))
-    return app
+    manager = Manager(app, with_default_commands=False)
 
+    manager.add_command('shell', IndicoShell())
+    manager.add_command('admin', IndicoAdminManager)
+    manager.add_command('db', DatabaseManager)
+    manager.add_command('runserver', IndicoDevServer())
+    signals.cli.send(manager)
 
-manager = Manager(app_factory, with_default_commands=False)
-manager.add_command('admin', IndicoAdminManager)
-manager.add_command('db', DatabaseManager)
-manager.add_command('runserver', IndicoDevServer())
-manager.add_command('shell', IndicoShell())
-
-
-def main():
     try:
         manager.run()
     except KeyboardInterrupt:
