@@ -34,9 +34,11 @@ from sqlalchemy import func
 
 from indico.core.logger import Logger
 from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy.custom import fulltext
 from indico.util.string import remove_accents
 from indico.modules.events.models.events import IndexedEvent
 from indico.modules.categories.models.categories import IndexedCategory
+
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.timezoneUtils import date2utctimestamp, datetimeToUnixTime
 from MaKaC.errors import MaKaCError
@@ -1289,7 +1291,8 @@ class CategoryTitleIndex(object):
 
     def search(self, search_string, limit=None, offset=None):
         query = (db.session.query(IndexedCategory.id)
-                 .filter(IndexedCategory.title_vector.op('@@')(func.plainto_tsquery('simple', search_string)))
+                 .filter(IndexedCategory.title_vector.op('@@')(
+                     func.to_tsquery('simple', fulltext.preprocess_ts_string(search_string))))
                  .limit(limit)
                  .offset(offset))
         return map(itemgetter(0), query)
@@ -1328,7 +1331,8 @@ class ConferenceIndex(object):
             order = None
 
         return (db.session.query(IndexedEvent.id)
-                  .filter(IndexedEvent.title_vector.op('@@')(func.plainto_tsquery('simple', search_string)))
+                  .filter(IndexedEvent.title_vector.op('@@')(
+                      func.to_tsquery('simple', fulltext.preprocess_ts_string(search_string))))
                   .order_by(order))
 
     def initialize(self, items):
