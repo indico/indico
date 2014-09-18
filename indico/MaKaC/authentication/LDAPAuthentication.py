@@ -93,11 +93,11 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
     description = "LDAP Login"
 
     _operations = {
-    'email': '(mail={0})',
-    'name': '(givenName={0})',
-    'surName': '(sn={0})',
-    'organisation': '(|(o={0})(ou={0}))',
-    'login': '(cn={0})'
+        'email': '(mail={0})',
+        'name': '(givenName={0})',
+        'surName': '(sn={0})',
+        'organisation': '(|(o={0})(ou={0}))',
+        'login': '(cn={0})'
     }
 
     def __init__(self):
@@ -288,7 +288,7 @@ class LDAPIdentity(PIdentity):
         log = Logger.get('auth.ldap')
         log.info("authenticate(%s)" % id.getLogin())
         data = AuthenticatorMgr().getById(self.getAuthenticatorTag()).checkLoginPassword(id.getLogin(),
-                                                                                                     id.getPassword())
+                                                                                         id.getPassword())
         if not data or self.getLogin().lower() != id.getLogin().lower():
             return None
         # modify Avatar with the up-to-date info from LDAP
@@ -365,7 +365,7 @@ class LDAPConnector(object):
 
     def _findDN(self, dn, filterstr, param):
         result = self.l.search_s(dn, ldap.SCOPE_SUBTREE,
-                               filterstr.format(param))
+                                 filterstr.format(param))
 
         for dn, data in result:
             if dn:
