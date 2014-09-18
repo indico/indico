@@ -138,7 +138,7 @@ class ServiceRunner(Observable):
                         try:
                             result = processRequest(method, copy.deepcopy(params))
                         except NoReportError as e:
-                            raise ServiceNoReportError(e.getMsg())
+                            raise ServiceNoReportError(e.getMessage())
                         except (NoReportIndicoError, FormValuesError) as e:
                             raise ServiceNoReportError(e.getMessage(), title=_("Error"))
 
