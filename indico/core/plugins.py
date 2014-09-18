@@ -18,11 +18,13 @@ from flask_pluginengine import PluginEngine, Plugin
 
 from indico.web.flask.wrappers import IndicoBlueprint
 
-plugin_engine = PluginEngine()
-
 
 class IndicoPlugin(Plugin):
     pass
+
+
+class IndicoPluginEngine(PluginEngine):
+    plugin_class = IndicoPlugin
 
 
 class IndicoPluginBlueprint(IndicoBlueprint):
@@ -32,3 +34,6 @@ class IndicoPluginBlueprint(IndicoBlueprint):
         kwargs.setdefault('static_folder', 'static')
         kwargs.setdefault('static_url_path', '/static/{}'.format(name))
         super(IndicoPluginBlueprint, self).__init__(name, *args, **kwargs)
+
+
+plugin_engine = IndicoPluginEngine()
