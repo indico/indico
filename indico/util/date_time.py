@@ -261,6 +261,6 @@ def round_up_to_minutes(dt, precision=15):
     :returns: datetime -- the time rounded up by the given precision in minutes.
     """
     increment = precision * 60
-    secs_in_current_hour = dt.minute * 60 + dt.second + dt.microsecond * 1e-6
+    secs_in_current_hour = (dt.minute * 60) + dt.second + (dt.microsecond * 1e-6)
     delta = (secs_in_current_hour // increment) * increment + increment - secs_in_current_hour
     return dt + timedelta(seconds=delta)

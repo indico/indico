@@ -48,15 +48,15 @@
         % if past_date:
             <div id="past-date-warning" class="highlight-message-box">
                 <div class="message-text">
-                    ${_(u"Looks like you were trying to book a room in the past so we moved you forward to the present.") }
+                    ${_("Looks like you were trying to book a room in the past so we moved you forward to the present.") }
                 </div>
             </div>
         % endif
         % if date_changed:
             <div id="date-changed-warning" class="highlight-message-box">
                 <div class="message-text">
-                    ${ _(u"It's late, so we selected the next day for you.") }<br>
-                    <small> ${ _(u"You can still select today in the calendar.") }</small>
+                    ${ _("It's late, so we selected the next day for you.") }<br>
+                    <small> ${ _("You can still select today in the calendar.") }</small>
                 </div>
             </div>
         % endif

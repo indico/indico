@@ -86,8 +86,9 @@ def get_default_booking_interval(duration=90, precision=15, force_today=False):
         23:50 or within the amount of minutes of the precision from midnight.
         For example with a precision of 30 minutes, if the current time is 23:42
         then the meeting will be the following day.
-    :returns: (datetime, datetime) -- A tuple with the start and end times of
-        the booking
+    :returns: (datetime, datetime, bool) -- A tuple with the start and end times
+        of the booking and a boolean which is `True` if the date was changed
+        from today and `False` otherwise.
     :raises: ValueError if the duration is less than 1 minute
     """
     if duration < 1:
@@ -102,7 +103,7 @@ def get_default_booking_interval(duration=90, precision=15, force_today=False):
     if end_dt.date() > start_dt.date():
         end_dt = get_day_end(start_dt.date())
 
-    if (not force_today and start_dt > work_end or
+    if ((not force_today and start_dt > work_end) or
             start_dt.date() > date.today() or
             end_dt - start_dt < timedelta(minutes=10)):
         date_changed = True
