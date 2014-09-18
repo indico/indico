@@ -122,6 +122,22 @@
     }
 }
 
+.highlight-message-box {
+    @extend %message-box;
+    @include icon-before('icon-lamp');
+
+    background-color: $light-blue;
+    border: 1px solid $dark-blue;
+
+    &:before {
+        color: $dark-blue;
+    }
+
+    .message-box-footer {
+        background: darken(#$light-blue, 5%);
+    }
+}
+
 .success-message-box {
     @extend %message-box;
     @include icon-before('icon-checkmark');
