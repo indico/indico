@@ -22,8 +22,8 @@
             ${ _('Booking time & date') }
         </h2>
         <%include file="RoomBookingNewBookingPeriodWidget.tpl"
-                  args="form=form, can_override=can_override, min_date=(reservation.start_dt if reservation else None)
-        "/>
+                  args="form=form, can_override=can_override, min_date=(reservation.start_dt if reservation else None),
+                        date_changed=date_changed, past_date=past_date"/>
 
         % if calendar:
             <h2 class="group-title">

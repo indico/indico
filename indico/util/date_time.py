@@ -249,3 +249,18 @@ def get_day_end(day):
         tzinfo = day.tzinfo
         day = day.date()
     return datetime.combine(day, dt_time(23, 59, tzinfo=tzinfo))
+
+
+def round_up_to_minutes(dt, precision=15):
+    """
+    Rounds up a date time object to the given precision in minutes.
+
+    :param dt: datetime -- the time to round up
+    :param precision: int -- the precision to round up by in minutes. Negative
+        values for the precision are allowed but will round down instead of up.
+    :returns: datetime -- the time rounded up by the given precision in minutes.
+    """
+    increment = precision * 60
+    secs_in_current_hour = dt.minute * 60 + dt.second + dt.microsecond * 1e-6
+    delta = (secs_in_current_hour // increment) * increment + increment - secs_in_current_hour
+    return dt + timedelta(seconds=delta)
