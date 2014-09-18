@@ -81,7 +81,6 @@ from MaKaC.user import Group, PrincipalHolder
 
 RETRIEVED_FIELDS = ['uid', 'cn', 'mail', 'o', 'ou', 'company', 'givenName',
                     'sn', 'postalAddress', 'userPrincipalName', "telephoneNumber", "facsimileTelephoneNumber"]
-UID_FIELD = "cn"  # or uid
 MEMBER_ATTR = "member"
 MEMBER_PAGE_SIZE = 1500
 
@@ -139,7 +138,7 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             return None
 
         # Use the correct case
-        li.setLogin(data[UID_FIELD])
+        li.setLogin(data[get_login_attribute()])
 
         # Search if user already exist, using email address
         import MaKaC.user as user
@@ -221,8 +220,8 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             if not ret:
                 return None
             # I have no idea if this check is needed at all (probably it's not), but it cannot hurt!
-            if ret.get(UID_FIELD, '').lower() != userName.lower():
-                Logger.get('auth.ldap').info('user %s != %s' % (userName, ret.get(UID_FIELD)))
+            if ret.get(get_login_attribute(), '').lower() != userName.lower():
+                Logger.get('auth.ldap').info('user %s != %s' % (userName, ret.get(get_login_attribute())))
                 return None
             return ret
         except ldap.INVALID_CREDENTIALS:
@@ -673,7 +672,7 @@ class LDAPTools:
     def extractUserDataFromLdapData(ret):
         """extracts user data from a LDAP record as a dictionary, edit to modify for your needs"""
         udata= {}
-        udata["login"] = ret[UID_FIELD]
+        udata["login"] = ret[get_login_attribute()]
         udata["email"] = ret['mail']
         udata["name"]= ret.get('givenName', '')
         udata["surName"]= ret.get('sn', '')
@@ -703,7 +702,7 @@ class LDAPTools:
 
     @staticmethod
     def extractUIDFromDN(dn):
-        m = re.search('%s=([^,]*),' % UID_FIELD.upper(), dn)
+        m = re.search('%s=([^,]*),' % get_login_attribute().upper(), dn)
         if m:
             return m.group(1)
         return None
@@ -715,3 +714,7 @@ class RequestListener(Component):
     # IServerRequestListener
     def requestFinished(self, obj):
         LDAPConnector.destroy()
+
+
+def get_login_attribute():
+    return Configuration.Config.getInstance().getAuthenticatorConfigById('LDAP').get('loginAttribute', 'uid')

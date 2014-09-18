@@ -311,6 +311,10 @@ MaxUploadFileSize = 0
 #
 #                                 # custom user filter
 #                                  'customUserFilter': "(objectCategory=user)"
+#
+#                                 # The LDAP record attribute that will be matched as the username for the login.
+#                                 # (defaults to 'uid' if not specified)
+#                                  'loginAttribute' : 'cn'
 #                                 }
 #
 #
