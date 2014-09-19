@@ -17,9 +17,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import string
+
+from flask import session
 from persistent.dict import PersistentDict
 
-import string
 import MaKaC.webinterface.pages.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.user as user
@@ -50,19 +52,22 @@ class RCAdmin(object):
         serverAdmins = minfo.getAdminList()
         return serverAdmins.isAdmin(user)
 
-class RHAdminBase( RHProtected ):
 
-    def _checkParams( self, params ):
-        RHProtected._checkParams( self, params )
+class RHAdminBase(RHProtected):
+    def _checkParams(self, params):
+        RHProtected._checkParams(self, params)
         self._minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
 
-    def _checkProtection( self ):
-        RHProtected._checkProtection( self )
-        self._al = self._minfo.getAdminList()
-        if not self._al.isAdmin( self._getUser() ):
-            if self._getUser() != None and len( self._al.getList() )==0:
+    def _checkProtection(self):
+        RHProtected._checkProtection(self)
+        if not session.user and not self._doProcess:
+            return
+        self._al = HelperMaKaCInfo.getMaKaCInfoInstance().getAdminList()
+        if not session.user.isAdmin():
+            if not self._al.getList():  # XXX can we just fail here instead of pretending the user is an admin?!
                 return
             raise AdminError("area")
+
 
 class RHAdminArea( RHAdminBase ):
     _uh = urlHandlers.UHAdminArea
