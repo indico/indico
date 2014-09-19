@@ -29,7 +29,7 @@ from indico.modules.rb.models.utils import Serializer
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
-from indico.util.date_time import iterdays, format_time
+from indico.util.date_time import iterdays, format_time, overlaps
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.util.struct.iterables import group_list
@@ -195,12 +195,12 @@ class RoomBookingCalendarWidget(object):
                 # Check if there's a blocking
                 for blocked_room in blocked_rooms:
                     blocking = blocked_room.blocking
-                    if blocking.start_date <= start_dt.date() <= blocking.end_date:
+                    if overlaps((start_dt.date(), end_dt.date()), (blocking.start_date, blocking.end_date),
+                                inclusive=True):
                         break
                 else:
                     # In case we didn't break the loop due to a match
                     blocking = None
-
                 for cand in candidates:
                     bar = Bar.from_candidate(cand, room.id, start_dt, end_dt, blocking)
                     self.bars.append(bar)

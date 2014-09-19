@@ -369,7 +369,7 @@ type ("RoomBookingCalendarDrawer", [],
                         }
 
                         else if (result.blocked) {
-                            element.addClass("barConf");
+                            $('.barDefault.barCand').addClass('barConf');
                             self._setDialog("search-again");
                             $('#booking-dialog-content').html(
                                 $T("This room is blocked on this date and you don't have permissions to book it.")
