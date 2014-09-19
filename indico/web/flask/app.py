@@ -22,9 +22,8 @@ from __future__ import absolute_import
 import os
 import re
 import traceback
-from types import GeneratorType
 
-from flask import send_from_directory, request, _app_ctx_stack
+from flask import send_from_directory, request, _app_ctx_stack, Blueprint
 from flask import current_app as app
 from flask.ext.sqlalchemy import models_committed
 from sqlalchemy.orm import configure_mappers
@@ -206,14 +205,19 @@ def add_legacy_plugin_blueprints(app):
 
 def add_plugin_blueprints(app):
     blueprint_names = set()
-    for _, blueprints in signals.get_blueprints.send(app):
-        if not isinstance(blueprints, GeneratorType):
+    for _, (plugin, blueprints) in signals.get_blueprints.send(app):
+        if blueprints is None:
+            continue
+        elif isinstance(blueprints, Blueprint):
             blueprints = (blueprints,)
         for blueprint in blueprints:
+            if blueprint.name not in (plugin.name, '{}_compat'.format(plugin.name)):
+                raise Exception("Blueprint '{}' does not match plugin name '{}'".format(blueprint.name, plugin.name))
             if blueprint.name in blueprint_names:
                 raise Exception("Blueprint '{}' defined by multiple plugins".format(blueprint.name))
             blueprint_names.add(blueprint.name)
-            app.register_blueprint(blueprint)
+            with plugin.plugin_context():
+                app.register_blueprint(blueprint)
 
 
 def handle_404(exception):

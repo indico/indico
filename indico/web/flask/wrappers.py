@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
@@ -19,10 +16,14 @@
 
 from __future__ import absolute_import
 
+import os
 from contextlib import contextmanager
+
 from flask import Flask, Blueprint
 from flask.blueprints import BlueprintSetupState
+from flask.templating import DispatchingJinjaLoader
 from flask.wrappers import Request
+from jinja2 import PrefixLoader, ChoiceLoader, TemplateNotFound, FileSystemLoader
 from werkzeug.utils import cached_property
 
 from MaKaC.common import HelperMaKaCInfo
@@ -52,9 +53,33 @@ class IndicoRequest(Request):
         return rv
 
 
+class PluginPrefixLoader(PrefixLoader):
+    """Prefix loader that uses plugin names"""
+    def __init__(self):
+        super(PluginPrefixLoader, self).__init__(None, ':')
+
+    def get_loader(self, template):
+        from indico.core.plugins import plugin_engine
+        try:
+            plugin_name, name = template.split(self.delimiter, 1)
+        except ValueError:
+            raise TemplateNotFound(template)
+        plugin = plugin_engine.get_plugin(plugin_name)
+        if plugin is None:
+            raise TemplateNotFound(template)
+        loader = FileSystemLoader(os.path.join(plugin.root_path, 'templates'))
+        return loader, name
+
+    def list_templates(self):
+        raise TypeError('this loader cannot iterate over all templates')
+
+
 class IndicoFlask(Flask):
     request_class = IndicoRequest
     session_interface = IndicoSessionInterface()
+
+    def create_global_jinja_loader(self):
+        return ChoiceLoader([PluginPrefixLoader(), DispatchingJinjaLoader(self)])
 
 
 class IndicoBlueprintSetupState(BlueprintSetupState):

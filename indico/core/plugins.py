@@ -14,26 +14,52 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask_pluginengine import PluginEngine, Plugin
+from flask_pluginengine import PluginEngine, Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin
 
-from indico.web.flask.wrappers import IndicoBlueprint
+from indico.core import signals
+from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 
 
 class IndicoPlugin(Plugin):
-    pass
+    def init(self):
+        self.connect(signals.cli, self.add_cli_command)
+        self.connect(signals.shell_context, self.extend_shell_context)
+        self.connect(signals.get_blueprints, lambda app: (self, self.get_blueprints()))
+
+    def register_blueprint(self, blueprint):
+        if not hasattr(self, '_blueprints'):
+            self._blueprints = set()
+            self.connect(signals.get_blueprints, lambda app: (self, self._blueprints))
+        self._blueprints.add(blueprint)
+
+    def get_blueprints(self):
+        """Return blueprints to be registered on the application
+
+        A single blueprint can be returned directly, for multiple blueprint you need
+        to yield them.
+        """
+        pass
+
+    def add_cli_command(self, manager):
+        """Add custom commands/submanagers to the manager of the `indico` cli tool."""
+        pass
+
+    def extend_shell_context(self, sender, add_to_context):
+        """Add custom items to the `indico shell` context."""
+        pass
 
 
 class IndicoPluginEngine(PluginEngine):
     plugin_class = IndicoPlugin
 
 
-class IndicoPluginBlueprint(IndicoBlueprint):
-    """Like IndicoBlueprint, but it uses its own static folder by default."""
+class IndicoPluginBlueprintSetupState(PluginBlueprintSetupStateMixin, IndicoBlueprintSetupState):
+    pass
 
-    def __init__(self, name, *args, **kwargs):
-        kwargs.setdefault('static_folder', 'static')
-        kwargs.setdefault('static_url_path', '/static/{}'.format(name))
-        super(IndicoPluginBlueprint, self).__init__(name, *args, **kwargs)
+
+class IndicoPluginBlueprint(PluginBlueprintMixin, IndicoBlueprint):
+    def make_setup_state(self, app, options, first_registration=False):
+        return IndicoPluginBlueprintSetupState(self, app, options, first_registration)
 
 
 plugin_engine = IndicoPluginEngine()
