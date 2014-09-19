@@ -17,19 +17,21 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-
 import posixpath
-from flask import request, session
+from itertools import chain
 from urlparse import urlparse
-from indico.web import assets
+
+from flask import request, session
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.plugins.base import OldObservable
+from indico.core import signals
+from indico.web import assets
 from indico.core.config import Config
+from indico.util.i18n import i18nformat
+from MaKaC.plugins.base import OldObservable
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
-from indico.util.i18n import i18nformat
 
 
 class WPBase(OldObservable):
@@ -127,13 +129,16 @@ class WPBase(OldObservable):
 
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
 
+        plugin_css = list(chain.from_iterable(files for _, files in signals.inject_css.send(self.__class__)))
+        plugin_js = list(chain.from_iterable(files for _, files in signals.inject_js.send(self.__class__)))
+
         return wcomponents.WHTMLHeader().getHTML({
             "area": area,
             "baseurl": self._getBaseURL(),
             "conf": Config.getInstance(),
             "page": self,
-            "extraCSS": map(self._fix_path, self.getCSSFiles()),
-            "extraJSFiles": map(self._fix_path, self.getJSFiles()),
+            "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css),
+            "extraJSFiles": map(self._fix_path, self.getJSFiles() + plugin_js),
             "extraJS": self._extraJS,
             "language": session.lang,
             "social": info.getSocialAppConfig(),

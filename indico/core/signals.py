@@ -36,3 +36,13 @@ which will be registered on the application. A single blueprint
 can be returned directly, to return multiple blueprints, simply
 yield them.
 """)
+
+inject_css = _signals.signal('inject-css', """
+Expected to return a list of CSS URLs which are loaded after all
+other CSS. The *sender* is the WP class of the page.
+""")
+
+inject_js = _signals.signal('inject-js', """
+Expected to return a list of JS URLs which are loaded after all
+other JS. The *sender* is the WP class of the page.
+""")

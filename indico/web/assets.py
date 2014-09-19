@@ -33,6 +33,17 @@ from webassets import Bundle, Environment
 from indico.core.config import Config
 
 
+def configure_pyscss(environment):
+    config = Config.getInstance()
+    base_url_path = urlparse(config.getBaseURL()).path
+    environment.config['PYSCSS_DEBUG_INFO'] = environment.debug and config.getSCSSDebugInfo()
+    environment.config['PYSCSS_STATIC_URL'] = '{0}/static/'.format(base_url_path)
+    environment.config['PYSCSS_LOAD_PATHS'] = [
+        os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass'),
+        os.path.join(config.getHtdocsDir(), 'sass')
+    ]
+
+
 class IndicoEnvironment(Environment):
     def __init__(self):
         config = Config.getInstance()
@@ -42,12 +53,7 @@ class IndicoEnvironment(Environment):
 
         super(IndicoEnvironment, self).__init__(output_dir, url)
         self.debug = config.getDebug()
-        self.config['PYSCSS_DEBUG_INFO'] = self.debug and config.getSCSSDebugInfo()
-        self.config['PYSCSS_STATIC_URL'] = '{0}/static/'.format(url_path)
-        self.config['PYSCSS_LOAD_PATHS'] = [
-            os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass'),
-            os.path.join(config.getHtdocsDir(), 'sass')
-        ]
+        configure_pyscss(self)
 
         self.append_path(config.getHtdocsDir(), '/')
         self.append_path(os.path.join(config.getHtdocsDir(), 'css'), '{0}/css'.format(url_path))
