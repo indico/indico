@@ -13,11 +13,14 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from flask import request
+
+from flask import request, flash, redirect
 
 from indico.core.plugins import plugin_engine
 from indico.core.plugins.views import WPPlugins
 from MaKaC.webinterface.rh.admins import RHAdminBase
+from indico.modules.rb.forms.base import FormDefaults
+from indico.util.i18n import _
 
 
 class RHPlugins(RHAdminBase):
@@ -30,4 +33,13 @@ class RHPluginDetails(RHAdminBase):
         self.plugin = plugin_engine.get_plugin(request.view_args['plugin'])
 
     def _process(self):
-        return WPPlugins.render_template('details.html', plugin=self.plugin)
+        plugin = self.plugin
+        form = None
+        if plugin.settings_form:
+            defaults = FormDefaults(**plugin.settings.get_all())
+            form = plugin.settings_form(obj=defaults)
+            if form.validate_on_submit():
+                plugin.settings.set_multi(form.data)
+                flash(_(u'Settings saved'), 'success')
+                return redirect(request.url)
+        return WPPlugins.render_template('details.html', plugin=plugin, form=form)

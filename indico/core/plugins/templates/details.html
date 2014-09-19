@@ -2,4 +2,18 @@
 <h2>{{ plugin.title }}</h2>
 <p>{{ plugin.description }}</p>
 
-TODO plugin settings if available
+{% if not form %}
+    {% trans %}This plugin does not have any settings.{% endtrans %}
+{% else %}
+    <form method="post" action="">
+        <table>
+            {% for field in form.visible_fields %}
+                <tr>
+                    <td style="text-align: right; vertical-align: top;">{{ field.label() }}</td>
+                    <td>{{ field(**plugin.settings_form_field_opts.get(field.short_name, {})) }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        <input class="i-button" type="submit" value="{% trans %}Save{% endtrans %}">
+    </form>
+{% endif %}

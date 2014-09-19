@@ -21,4 +21,4 @@ plugins_blueprint = _bp = IndicoBlueprint('plugins', __name__, url_prefix='/admi
                                           template_folder='templates')
 
 _bp.add_url_rule('/', 'index', RHPlugins)
-_bp.add_url_rule('/<plugin>/', 'details', RHPluginDetails)
+_bp.add_url_rule('/<plugin>/', 'details', RHPluginDetails, methods=('GET', 'POST'))

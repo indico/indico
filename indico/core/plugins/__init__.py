@@ -22,14 +22,19 @@ from flask_pluginengine import (PluginEngine, Plugin, PluginBlueprintMixin, Plug
                                 current_plugin)
 from markupsafe import Markup
 from webassets import Environment, Bundle
+from werkzeug.utils import cached_property
 
 from indico.core import signals
 from indico.core.config import Config
+from indico.core.models.settings import SettingsProxy
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 
 
 class IndicoPlugin(Plugin):
+    settings_form = None
+    settings_form_field_opts = {}
+
     def init(self):
         self.connect(signals.cli, self.add_cli_command)
         self.connect(signals.shell_context, lambda _, add_to_context: self.extend_shell_context(add_to_context))
@@ -105,6 +110,10 @@ class IndicoPlugin(Plugin):
         if view_class is not None:
             kwargs['sender'] = view_class
         self.connect(signals.inject_js, lambda _: self.assets[name].urls(), **kwargs)
+
+    @cached_property
+    def settings(self):
+        return SettingsProxy('plugin_{}'.format(self.name))
 
 
 def plugin_js_assets(bundle):
