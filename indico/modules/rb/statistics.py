@@ -31,7 +31,7 @@ def calculate_rooms_booked_time(rooms, start_date=None, end_date=None):
         start_date = end_date - relativedelta(days=29)
     # Reservations on working days
     reservations = Reservation.find(Reservation.room_id.in_(r.id for r in rooms),
-                                    extract('dow', ReservationOccurrence.start_dt) <= 5,
+                                    extract('dow', ReservationOccurrence.start_dt).between(1, 5),
                                     ReservationOccurrence.start_dt >= start_date,
                                     ReservationOccurrence.end_dt <= end_date,
                                     ReservationOccurrence.is_valid,
