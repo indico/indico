@@ -28,6 +28,7 @@ from flask import request, redirect, Blueprint
 from flask import current_app as app
 from flask import url_for as _url_for
 from flask import send_file as _send_file
+from werkzeug.wrappers import Response as WerkzeugResponse
 from werkzeug.datastructures import Headers, FileStorage
 from werkzeug.exceptions import NotFound, HTTPException
 from werkzeug.routing import BaseConverter, UnicodeConverter, RequestRedirect, BuildError
@@ -400,7 +401,7 @@ class ResponseUtil(object):
         if self.call:
             raise Exception('Cannot use make_response when a callable is set')
 
-        if isinstance(res, app.response_class):
+        if isinstance(res, (app.response_class, WerkzeugResponse)):
             if self.modified:
                 # If we receive a response - most likely one created by send_file - we do not allow any
                 # external modifications.

@@ -490,7 +490,6 @@ class RH(RequestHandlerBase):
         self._checkCSRF()
         self._reqParams = copy.copy(params)
 
-
     def _process_retry_do(self, profile):
         profile_name, res = '', ''
         # old code gets parameters from call
