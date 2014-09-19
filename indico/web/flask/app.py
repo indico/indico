@@ -62,10 +62,11 @@ from indico.web.flask.blueprints.event import event_display, event_creation, eve
 from indico.web.flask.blueprints.files import files
 from indico.web.flask.blueprints.admin import admin
 from indico.web.flask.blueprints.rooms_admin import rooms_admin
+from indico.core.plugins.blueprints import plugins_blueprint
 
 
 BLUEPRINTS = (legacy, api, misc, user, oauth, rooms, category, category_mgmt, event_display,
-              event_creation, event_mgmt, files, admin, rooms_admin)
+              event_creation, event_mgmt, files, admin, rooms_admin, plugins_blueprint)
 COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, user, oauth, rooms, category, category_mgmt, event_display,
                                                 event_creation, event_mgmt, files, admin, rooms_admin))
 

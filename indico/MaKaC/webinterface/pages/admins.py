@@ -60,6 +60,7 @@ from indico.modules import ModuleHolder
 from indico.util.date_time import timedelta_split
 from indico.util.i18n import i18nformat
 from indico.util.redis import client as redis_client
+from indico.web.flask.util import url_for
 
 
 class WPAdminsBase( WPMainBase ):
@@ -115,6 +116,9 @@ class WPAdminsBase( WPMainBase ):
         self._pluginsMenuItem = wcomponents.SideMenuItem(_("Plugins"),
             urlHandlers.UHAdminPlugins.getURL())
         mainSection.addItem( self._pluginsMenuItem)
+
+        self._pluginsNewMenuItem = wcomponents.SideMenuItem(_("Plugins (New)"), url_for('plugins.index'))
+        mainSection.addItem(self._pluginsNewMenuItem)
 
         self._homepageMenuItem = wcomponents.SideMenuItem(_("Homepage"),
             urlHandlers.UHUpdateNews.getURL())
