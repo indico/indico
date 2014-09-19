@@ -21,7 +21,7 @@ import posixpath
 from itertools import chain
 from urlparse import urlparse
 
-from flask import request, session
+from flask import request, session, render_template, g
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -32,6 +32,31 @@ from indico.util.i18n import i18nformat
 from MaKaC.plugins.base import OldObservable
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
+
+
+class WPJinjaMixin:
+    """Mixin for WPs backed by Jinja templates.
+
+    This allows you to use a single WP class and its layout, CSS,
+    etc. for multiple pages in a lightweight way while still being
+    able to use a subclass if more
+    """
+
+    @classmethod
+    def render_template(cls, template=None, **context):
+        """Renders a jinja template inside the WP
+
+        :param template: the name of the template - if unsed, the
+                         `_template` attribute of the class is used
+        :param context: the variables that should be available in the
+                        context of the template
+        """
+        context['_jinja_template'] = template or cls._template
+        return cls(g.rh, **context).display()
+
+    def _getPageContent(self, params):
+        template = params.pop('_jinja_template')
+        return render_template(template, **params)
 
 
 class WPBase(OldObservable):

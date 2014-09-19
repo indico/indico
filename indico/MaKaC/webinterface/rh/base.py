@@ -31,7 +31,7 @@ from xml.sax.saxutils import escape
 
 import oauth2 as oauth
 import transaction
-from flask import request, session
+from flask import request, session, g
 from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound
 from ZEO.Exceptions import ClientDisconnected
 from ZODB.POSException import ConflictError, POSKeyError
@@ -560,6 +560,7 @@ class RH(RequestHandlerBase):
         # clear the context
         ContextManager.destroy()
         ContextManager.set('currentRH', self)
+        g.rh = self
 
         #redirect to https if necessary
         if self._checkHttpsRedirect():

@@ -14,21 +14,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import render_template
-
 from MaKaC.webinterface.pages.admins import WPAdminsBase
+from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 
-class WPPluginsBase(WPAdminsBase):
+class WPPlugins(WPJinjaMixin, WPAdminsBase):
     def _setActiveSideMenuItem(self):
         self._pluginsNewMenuItem.setActive()
-
-
-class WPPlugins(WPPluginsBase):
-    def _getPageContent(self, params):
-        return render_template('index.html', **params)
-
-
-class WPPluginDetails(WPPluginsBase):
-    def _getPageContent(self, params):
-        return render_template('details.html', **params)

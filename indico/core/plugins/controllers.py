@@ -16,13 +16,13 @@
 from flask import request
 
 from indico.core.plugins import plugin_engine
-from indico.core.plugins.views import WPPlugins, WPPluginDetails
+from indico.core.plugins.views import WPPlugins
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
 class RHPlugins(RHAdminBase):
     def _process(self):
-        return WPPlugins(self, active_plugins=plugin_engine.get_active_plugins()).display()
+        return WPPlugins.render_template('index.html', active_plugins=plugin_engine.get_active_plugins())
 
 
 class RHPluginDetails(RHAdminBase):
@@ -30,4 +30,4 @@ class RHPluginDetails(RHAdminBase):
         self.plugin = plugin_engine.get_plugin(request.view_args['plugin'])
 
     def _process(self):
-        return WPPluginDetails(self, plugin=self.plugin).display()
+        return WPPlugins.render_template('details.html', plugin=self.plugin)
