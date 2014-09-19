@@ -217,6 +217,8 @@ def add_plugin_blueprints(app):
                 raise Exception("Blueprint '{}' does not match plugin name '{}'".format(blueprint.name, plugin.name))
             if blueprint.name in blueprint_names:
                 raise Exception("Blueprint '{}' defined by multiple plugins".format(blueprint.name))
+            if not app.config['INDICO_COMPAT_ROUTES'] and blueprint.name.startswith('compat_'):
+                continue
             blueprint_names.add(blueprint.name)
             with plugin.plugin_context():
                 app.register_blueprint(blueprint)
