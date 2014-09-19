@@ -8,7 +8,7 @@
 
 <%include file="ErrorList.tpl" args='errors=form.error_list, msg=_("There are some errors in the data you submitted")'/>
 
-<form id="bookingForm" method="POST">
+<form id="bookingForm" method="POST" data-only-conflicts="${ int(only_conflicts) }">
     <h2 class="group-title">
     <i class="icon-location"></i>
         ${ _('Room details') }
@@ -56,7 +56,7 @@
     % endif
 
     % if form.submit_book:
-        ${ form.submit_book(class_='i-button highlight js-submit-booking') }
+        ${ form.submit_book(class_='i-button highlight js-submit-booking', disabled=only_conflicts) }
     % endif
     % if form.submit_prebook:
         ${ form.submit_prebook(class_='i-button highlight js-submit-booking') }

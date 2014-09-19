@@ -323,7 +323,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
             series_start = start_dt + offset
             series_end = end_dt + offset
             if series_start < flexible_start_dt:
-                    continue
+                continue
             candidates[series_start, series_end] = ReservationOccurrence.create_series(series_start, series_end,
                                                                                        (repeat_frequency,
                                                                                         repeat_interval))
@@ -409,6 +409,9 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
         else:
             occurrences, candidates = self._get_all_occurrences([self._room.id], form)
             conflicts, pre_conflicts = self._get_all_conflicts(self._room, form)
+            candidate_days = {occ.date for candidate in candidates.itervalues() for occ in candidate}
+            conflicting_days = {occ.date for occ in conflicts.iterkeys()}
+            only_conflicts = candidate_days <= conflicting_days
 
         if form.validate_on_submit() and not form.submit_check.data:
             return self._create_booking_response(form, room)
@@ -420,6 +423,7 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
                               occurrences=occurrences,
                               candidates=candidates,
                               conflicts=conflicts,
+                              only_conflicts=only_conflicts,
                               pre_conflicts=pre_conflicts,
                               start_dt=form.start_dt.data,
                               end_dt=form.end_dt.data,

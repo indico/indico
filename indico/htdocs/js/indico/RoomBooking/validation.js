@@ -128,15 +128,19 @@
     }
 
     function validate_conflict() {
-        var understood = _.every($('.js-confirm-warning'), function(e) {
+        var canSubmit = _.every($('.js-confirm-warning'), function(e) {
             return e.checked;
         });
 
         var buttons = $('.js-submit-booking');
         var tooltip = $T('Please, confirm first you understood the implications of the conflicts mentioned above.');
+        if ($('#bookingForm').data('onlyConflicts')) {
+            tooltip = $T('Unable to book for the selected day(s).');
+            canSubmit = false;
+        }
 
-        buttons.prop('disabled', !understood);
-        if (!understood) {
+        buttons.prop('disabled', !canSubmit);
+        if (!canSubmit) {
             if (!buttons.parent().hasClass('qtip-disabled-wrapper')) {
                 buttons.wrap($('<span>', {class: 'qtip-disabled-wrapper'}));
                 buttons.after($('<span>', {class: 'qtip-disabled-holder', title: tooltip}));
@@ -148,7 +152,7 @@
             }
         }
 
-        return understood;
+        return canSubmit;
     }
 
     $(function() {
