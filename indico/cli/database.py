@@ -44,3 +44,6 @@ def prepare():
         return
     print colored('Creating tables', 'green')
     db.create_all()
+
+
+del DatabaseManager._commands['init']
