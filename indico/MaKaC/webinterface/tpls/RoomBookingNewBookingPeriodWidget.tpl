@@ -95,8 +95,8 @@ ${ form.repeat_interval(type='hidden') }
                 if ($('#sDatePlace').datepicker('getDate') > $('#eDatePlace').datepicker('getDate')) {
                     $('#eDatePlace').datepicker('setDate', $('#sDatePlace').datepicker('getDate'));
                 }
-                $('#eDatePlace').datepicker('option', 'minDate', $('#sDatePlace').datepicker('getDate'));
                 $('.js-default-date-warning').fadeOut();
+                setEndMinDate();
                 combineDatetime();
                 checkHolidays();
                 validateForm();
@@ -107,32 +107,25 @@ ${ form.repeat_interval(type='hidden') }
         $('#eDatePlace').datepicker('setDate', "${ form.end_dt.data.strftime('%d/%m/%Y') }");
         $('#eDatePlace').datepicker('option', 'minDate', $('#sDatePlace').datepicker('getDate'));
 
-        $("#repeatability input:radio[name=repeat_frequency]").change(function() {
+        $('#repeatability input:radio[name=repeat_frequency]').change(function() {
             checkFrequency();
         });
 
         function checkFrequency() {
-            var frequency = $("#repeatability input:radio[name=repeat_frequency]:checked").val();
+            var frequency = $('#repeatability input:radio[name=repeat_frequency]:checked').val();
 
             if (frequency === '0') {
                 $('#sDatePlaceTitle').text("${ _('Booking date') }");
                 $('#eDatePlaceDiv').hide();
+                $('#repeat_interval').val('0');
             } else {
                 $('#sDatePlaceTitle').text("${_('Start date')}");
                 $('#eDatePlaceDiv').show();
+                $('#repeat_interval').val('1');
             }
 
-            if (frequency == '1') {
-                $("#flexibleDates input:radio").prop("disabled", true);
-            } else {
-                $("#flexibleDates input:radio").prop("disabled", false);
-            }
-
-            if (frequency === '0') {
-                $('#repeat_interval').val(0);
-            } else {
-                $('#repeat_interval').val(1);
-            }
+            $('#flexibleDates input:radio').prop('disabled', frequency === '1');
+            $('#eDatePlace').datepicker('setDate', setEndMinDate());
         }
 
         function combineDatetime() {
@@ -165,6 +158,23 @@ ${ form.repeat_interval(type='hidden') }
                     $('#holidays-warning').toggle(!!msg);
                 }
             });
+        }
+
+        function setEndMinDate() {
+            var frequency = $('#repeatability input:radio[name=repeat_frequency]:checked').val();
+            var minDate = $('#sDatePlace').datepicker('getDate');
+            var dateOffset = {
+                '1': 'days',
+                '2': 'weeks',
+                '3': 'months'
+            };
+
+            if (dateOffset.hasOwnProperty(frequency)) {
+                minDate = moment(minDate).add(1, dateOffset[frequency]).toDate();
+            }
+
+            $('#eDatePlace').datepicker('option', 'minDate', minDate);
+            return minDate;
         }
 
         checkFrequency();
