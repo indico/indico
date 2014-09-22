@@ -26,6 +26,8 @@ from werkzeug.utils import cached_property
 
 from indico.core import signals
 from indico.core.config import Config
+from indico.core.db import db
+from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.models.settings import SettingsProxy
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
@@ -40,6 +42,7 @@ class IndicoPlugin(Plugin):
         self.connect(signals.shell_context, lambda _, add_to_context: self.extend_shell_context(add_to_context))
         self.connect(signals.get_blueprints, lambda app: (self, self.get_blueprints()))
         self._setup_assets()
+        self._import_models()
 
     def _setup_assets(self):
         config = Config.getInstance()
@@ -49,6 +52,19 @@ class IndicoPlugin(Plugin):
         self.assets = Environment(output_dir, url, debug=config.getDebug())
         configure_pyscss(self.assets)
         self.register_assets()
+
+    def _import_models(self):
+        old_models = set(db.Model._decl_class_registry.items())
+        import_all_models(self.package_name)
+        added_models = set(db.Model._decl_class_registry.items()) - old_models
+        # Ensure that only plugin schemas have been touched. It would be nice if we could actually
+        # restrict a plugin to plugin_PLUGNNAME but since we load all models from the plugin's package
+        # which could contain more than one plugin this is not easily possible.
+        for name, model in added_models:
+            schema = model.__table__.schema
+            if not schema.startswith('plugin_'):
+                raise Exception("Plugin '{}' added a model which is not in a plugin schema ('{}' in '{}')"
+                                .format(self.name, name, schema))
 
     def get_blueprints(self):
         """Return blueprints to be registered on the application

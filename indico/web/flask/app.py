@@ -25,7 +25,8 @@ import traceback
 
 from flask import send_from_directory, request, _app_ctx_stack, Blueprint
 from flask import current_app as app
-from flask.ext.sqlalchemy import models_committed
+from flask_sqlalchemy import models_committed
+from flask_pluginengine import plugins_loaded
 from sqlalchemy.orm import configure_mappers
 from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
@@ -176,7 +177,8 @@ def configure_db(app):
     db.init_app(app)
     if not app.config['TESTING']:
         apply_db_loggers(app.debug)
-    configure_mappers()  # Make sure all backrefs are set
+
+    plugins_loaded.connect(lambda sender: configure_mappers(), app, weak=False)
     models_committed.connect(on_models_committed, app)
 
 

@@ -15,6 +15,7 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import os
+import pkg_resources
 from importlib import import_module
 
 from flask_sqlalchemy import Model
@@ -68,15 +69,26 @@ class IndicoModel(Model):
         pass
 
 
-def import_all_models():
-    """Utility that imports all modules in indico/**/models/"""
-    up_segments = ['..'] * __name__.count('.')
-    package_root = os.path.normpath(os.path.join(__file__, *up_segments))
+def import_all_models(package_name=None):
+    """Utility that imports all modules in indico/**/models/
+
+    :param package_name: Package name to scan for models. If unset,
+                         the top-level package containing this file
+                         is used.
+    """
+    if package_name:
+        distribution = pkg_resources.get_distribution(package_name)
+        package_root = os.path.join(distribution.location, package_name)
+    else:
+        # Don't use pkg_resources since `indico` is still a namespace package...`
+        package_name = 'indico'
+        up_segments = ['..'] * __name__.count('.')
+        package_root = os.path.normpath(os.path.join(__file__, *up_segments))
     modules = []
     for root, dirs, files in os.walk(package_root):
         if os.path.basename(root) == 'models':
             package = os.path.relpath(root, package_root).replace(os.sep, '.')
-            modules += ['indico.{}.{}'.format(package, name[:-3])
+            modules += ['{}.{}.{}'.format(package_name, package, name[:-3])
                         for name in files
                         if name.endswith('.py') and name != '__init__.py' and not name.endswith('_test.py')]
 
