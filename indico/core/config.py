@@ -671,6 +671,10 @@ class Config:
             except ImportError, e:
                 raise MaKaCError('Could not import redis: %s' % e.message)
 
+        else:
+            if self.getCacheBackend() == 'redis':
+                raise MaKaCError('Cannot use redis CacheBackend with no RedisConnectionURL')
+
         if self.getStaticFileMethod() is not None and len(self.getStaticFileMethod()) != 2:
             raise MaKaCError('StaticFileMethod must be None, a string or a 2-tuple')
 

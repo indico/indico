@@ -36,7 +36,7 @@ from indico.web.http_api.fossils import IConferenceMetadataWithContribsFossil, I
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 from indico.core.db.sqlalchemy import db
-from indico.modules.events.models.events import IndexedEvent
+from indico.modules.fulltextindexes.models.events import IndexedEvent
 from sqlalchemy import func
 
 # indico legacy imports
@@ -352,14 +352,14 @@ class EventSearchFetcher(IteratedDataFetcher):
 
             # Query the DB in chunks of 1000 records per query until the limit is satisfied
             for row in query.yield_per(5):
-                eventId = row[0]
-                event = ch.getById(eventId)
+                event_id = row[0]
+                event = ch.getById(event_id)
                 if event is not None and event.canAccess(self._aw):
                     counter += 1
                     # Start yielding only when the counter reaches the given offset
                     if (self._offset is None) or (counter > self._offset):
                         yield event
-                        # Stop queried the DB when the limit is satisfied
+                        # Stop querying the DB when the limit is satisfied
                         if (self._limit is not None) and (counter == self._offset + self._limit):
                             break
 

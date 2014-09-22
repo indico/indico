@@ -17,11 +17,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import re
+
 from flask.ext.sqlalchemy import Model, connection_stack
 from sqlalchemy import MetaData, ForeignKeyConstraint, Table
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.orm import joinedload, joinedload_all
 from sqlalchemy.sql.ddl import DropConstraint, DropTable, DropSchema
+
+
+TS_REGEX = re.compile(r'([@<>!()&|])')
 
 
 class IndicoModel(Model):
@@ -116,3 +121,8 @@ def delete_all_tables(db):
         if schema != 'public':
             conn.execute(DropSchema(schema))
     transaction.commit()
+
+
+def preprocess_ts_string(text, prefix=True):
+    atoms = [TS_REGEX.sub(r'\\\1', atom.strip()) for atom in text.split()]
+    return ' & '.join('{}:*'.format(atom) if prefix else atom for atom in atoms)
