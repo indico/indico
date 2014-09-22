@@ -21,8 +21,9 @@ import ast
 import json
 from datetime import date
 
-from sqlalchemy import and_, func, or_, cast
-from sqlalchemy.ext.hybrid import hybrid_property
+from dateutil.relativedelta import relativedelta
+from sqlalchemy import and_, func, or_, cast, Date
+from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy.orm import joinedload
 
 from MaKaC.webinterface import urlHandlers as UH
@@ -44,6 +45,7 @@ from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.utils import Serializer, cached, versioned_cache
+from indico.util.date_time import round_up_month
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.string import return_ascii, natural_sort_key
@@ -667,6 +669,28 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if not manager_group:
             return False
         return avatar.is_member_of_group(manager_group.encode('utf-8'))
+
+    @hybrid_method
+    def is_in_digest_window(self, exclude_first_day=False):
+        from indico.modules.rb import settings
+        digest_start = round_up_month(date.today(), from_day=2)
+        days_until_next_digest = (digest_start - date.today()).days
+        digest_window = self.notification_before_days or settings.get('notification_before_days', 0)
+        if exclude_first_day:
+            return days_until_next_digest < digest_window
+        else:
+            return days_until_next_digest <= digest_window
+
+    @is_in_digest_window.expression
+    def is_in_digest_window(self, exclude_first_day=False):
+        from indico.modules.rb import settings
+        digest_start = round_up_month(date.today(), from_day=2)
+        days_until_next_digest = cast(digest_start, Date) - cast(func.now(), Date)
+        digest_window = func.coalesce(self.notification_before_days, settings.get('notification_before_days', 0))
+        if exclude_first_day:
+            return days_until_next_digest < digest_window
+        else:
+            return days_until_next_digest <= digest_window
 
     @classmethod
     def get_owned_by(cls, user):
