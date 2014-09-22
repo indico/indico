@@ -273,3 +273,15 @@ def get_month_start(date):
 
 def get_month_end(date):
     return date + relativedelta(day=1, months=+1, days=-1)
+
+
+def round_up_month(date, from_day=1):
+    """Rounds up a date to the next month unless its day is before *from_day*.
+
+    :param date: date object
+    :param from_day: day from which one to round *date* up
+    """
+    if date.day >= from_day:
+        return date + relativedelta(day=1, months=+1)
+    else:
+        return date
