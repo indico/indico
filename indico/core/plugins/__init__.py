@@ -38,6 +38,7 @@ class IndicoPlugin(Plugin):
     settings_form_field_opts = {}
 
     def init(self):
+        self.alembic_versions_path = os.path.join(self.root_path, 'migrations')
         self.connect(signals.cli, self.add_cli_command)
         self.connect(signals.shell_context, lambda _, add_to_context: self.extend_shell_context(add_to_context))
         self.connect(signals.get_blueprints, lambda app: (self, self.get_blueprints()))

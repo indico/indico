@@ -20,7 +20,7 @@ import sys
 from flask_script import Manager
 
 from indico.cli.admin import IndicoAdminManager
-from indico.cli.database import DatabaseManager
+from indico.cli.database import DatabaseManager, PluginDatabaseManager
 from indico.cli.server import IndicoDevServer
 from indico.cli.shell import IndicoShell
 from indico.core import signals
@@ -37,6 +37,7 @@ def main():
     manager.add_command('shell', IndicoShell())
     manager.add_command('admin', IndicoAdminManager)
     manager.add_command('db', DatabaseManager)
+    manager.add_command('plugindb', PluginDatabaseManager)
     manager.add_command('runserver', IndicoDevServer())
     signals.cli.send(manager)
 

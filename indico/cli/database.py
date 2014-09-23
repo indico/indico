@@ -14,12 +14,20 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import os
+import sys
+from copy import deepcopy
 
+import alembic.command
+from alembic.script import ScriptDirectory
 from flask_migrate import MigrateCommand as DatabaseManager
 from flask_migrate import stamp
+from flask_pluginengine import current_plugin
+from flask_script import Command
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.management import get_all_tables
+from indico.core.plugins import plugin_engine
 from indico.util.console import colored, cformat
 
 
@@ -32,7 +40,7 @@ def prepare():
         stamp()
         # Retrieve the table list again, that way we fail if the alembic version table was not created
         tables = get_all_tables(db)
-    tables['public'].remove('alembic_version')
+    tables['public'] = [t for t in tables['public'] if not t.startswith('alembic_version')]
     if any(tables.viewvalues()):
         print colored('Your database is not empty!', 'red')
         print colored('If you just added a new table/model, create an alembic revision instead!', 'yellow')
@@ -46,4 +54,83 @@ def prepare():
     db.create_all()
 
 
-del DatabaseManager._commands['init']
+del DatabaseManager._commands['init']  # not useful since we already have a migration environment
+
+
+class PluginScriptDirectory(ScriptDirectory):
+    """Like `ScriptDirectory` but lets you override the paths from outside.
+
+    This is a pretty ugly hack but alembic doesn't give us a nice way to do it...
+    """
+    dir = None
+    versions = None
+
+    def __init__(self, *args, **kwargs):
+        super(PluginScriptDirectory, self).__init__(*args, **kwargs)
+        self.dir = PluginScriptDirectory.dir
+        self.versions = current_plugin.alembic_versions_path
+
+    @classmethod
+    def from_config(cls, config):
+        instance = super(PluginScriptDirectory, cls).from_config(config)
+        instance.dir = PluginScriptDirectory.dir
+        instance.versions = current_plugin.alembic_versions_path
+        return instance
+
+
+class PluginDBCommand(Command):
+    """Like `Command`, but specific to plugin DB migrations.
+
+    Executes its underlying function for all plugins and makes
+    flask-migrate use the plugin's migrations.
+    """
+    @classmethod
+    def from_command(cls, command):
+        """Clones an existing command.
+
+        :param command: A Flask-Script `Command`
+        """
+        new_command = cls()
+        new_command.run = command.run
+        new_command.__doc__ = command.__doc__
+        new_command.help_args = command.help_args
+        new_command.option_list = tuple(command.option_list)
+        return new_command
+
+    def __call__(self, app=None, *args, **kwargs):
+        PluginScriptDirectory.dir = os.path.join(app.root_path, 'core', 'plugins', 'alembic')
+        alembic.command.ScriptDirectory = PluginScriptDirectory
+
+        with app.app_context():
+            active_plugins = plugin_engine.get_active_plugins()
+            plugins = set(kwargs.pop('plugins'))
+            if plugins:
+                invalid_plugins = plugins - active_plugins.viewkeys()
+                if invalid_plugins:
+                    print cformat('%{red!}Invalid plugin(s) specified: {}').format(', '.join(invalid_plugins))
+                    sys.exit(1)
+            for plugin in active_plugins.itervalues():
+                if plugins and plugin.name not in plugins:
+                    continue
+                print cformat("%{cyan!}executing command for plugin '{}'").format(plugin.name)
+                with plugin.plugin_context():
+                    super(PluginDBCommand, self).__call__(app, *args, **kwargs)
+
+    def create_parser(self, *args, **kwargs):
+        parser = super(PluginDBCommand, self).create_parser(*args, **kwargs)
+        parser.add_argument('--plugin', dest='plugins', action='append', default=[], metavar='PLUGIN',
+                            help='Plugin name to work on - can be used multiple times')
+        return parser
+
+
+def _make_plugin_database_manager():
+    """Clones DatabaseManager and adapts its commands to plugin database migrations"""
+    manager = deepcopy(DatabaseManager)
+    manager.description = 'Perform database migrations for plugins'
+    del manager._commands['prepare']  # not needed for plugins
+    for name, command in manager._commands.iteritems():
+        manager._commands[name] = PluginDBCommand.from_command(command)
+    return manager
+
+
+PluginDatabaseManager = _make_plugin_database_manager()
