@@ -77,6 +77,7 @@ class Setting(db.Model):
             setting = cls(module=module, name=name)
             db.session.add(setting)
         setting.value = value
+        db.session.flush()
 
     @classmethod
     def set_multi(cls, module, items):
@@ -86,16 +87,19 @@ class Setting(db.Model):
             db.session.add(setting)
         for name in items.viewkeys() & existing.viewkeys():
             existing[name].value = items[name]
+        db.session.flush()
 
     @classmethod
     def delete(cls, module, *names):
         if not names:
             return
         Setting.find(Setting.name.in_(names), Setting.module == module).delete(synchronize_session='fetch')
+        db.session.flush()
 
     @classmethod
     def delete_all(cls, module):
         Setting.find(module=module).delete()
+        db.session.flush()
 
 
 class SettingsProxy(object):
