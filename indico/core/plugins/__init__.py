@@ -86,7 +86,7 @@ class IndicoPlugin(Plugin):
         """Add assets to the plugin's webassets environment.
 
         In most cases the whole method can consist of calls to
-        :meth:`register_js_bundle` and :meth:`register_scss_bundle`.
+        :meth:`register_js_bundle` and :meth:`register_css_bundle`.
         """
         pass
 
@@ -97,7 +97,7 @@ class IndicoPlugin(Plugin):
         self.assets.register(name, bundle)
 
     def register_css_bundle(self, name, *files):
-        """Registers a SCSS bundle in the plugin's webassets environment"""
+        """Registers an SCSS bundle in the plugin's webassets environment"""
         pretty_name = re.sub(r'_css$', '', name)
         bundle = Bundle(*files,
                         filters=('pyscss', 'cssrewrite', 'cssmin'),
