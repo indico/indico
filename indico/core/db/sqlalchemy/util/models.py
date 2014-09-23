@@ -18,6 +18,7 @@ import os
 import pkg_resources
 from importlib import import_module
 
+from flask import g
 from flask_sqlalchemy import Model
 from sqlalchemy.orm import joinedload, joinedload_all
 
@@ -66,7 +67,8 @@ class IndicoModel(Model):
 
         :param change: The operation that has been committed (delete/change/update)
         """
-        pass
+        if hasattr(g, 'memoize_cache'):
+            del g.memoize_cache
 
 
 def import_all_models(package_name=None):
