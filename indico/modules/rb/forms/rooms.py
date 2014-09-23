@@ -114,7 +114,7 @@ class RoomForm(IndicoForm):
     reservations_need_confirmation = BooleanField(_(u'Confirmations'))
     notification_for_assistance = BooleanField(_(u'Assistance'))
     notification_before_days = IntegerField(_(u'Send booking reminders X days before'),
-                                            [Optional(), NumberRange(min=0, max=9)], default=0)
+                                            [Optional(), NumberRange(min=1, max=9)], default=1)
     notification_for_responsible = BooleanField(_(u'Remind room manager too'))
     notifications_enabled = BooleanField(_(u'Reminders enabled'), default=True)
     owner_id = HiddenField(_(u'Responsible user'), [DataRequired()])

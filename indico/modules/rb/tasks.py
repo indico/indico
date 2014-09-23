@@ -79,6 +79,7 @@ class OccurrenceNotifications(PeriodicUniqueTask):
             Reservation.is_accepted,
             Reservation.repeat_frequency != RepeatFrequency.WEEK,
             ReservationOccurrence.is_valid,
+            ReservationOccurrence.start_dt >= datetime.now(),
             ~ReservationOccurrence.notification_sent,
             _build_notification_window_filter(),
             _join=[Reservation, Room]
