@@ -414,15 +414,15 @@ class MaterialFactoryRegistry:
     }
 
     @classmethod
-    def getById( cls, matId ):
+    def getById(cls, matId):
         return cls._registry.get(matId, DefaultMaterialFactory.getInstance(matId))
 
     @classmethod
-    def getList( cls ):
+    def getList(cls):
         return cls._registry.values()
 
     @classmethod
-    def getIdList( cls ):
+    def getIdList(cls):
         return cls._registry.keys()
 
     @classmethod
@@ -447,13 +447,11 @@ class MaterialFactoryRegistry:
         # NOTE: This method is a bit alien. It's just here because
         # we couldn't find a better place
 
-        matDict = dict((title.lower(), title.title()) for title in cls.getAllowed(target))
-
+        matDict = dict((title.title(), title.lower()) for title in cls.getAllowed(target))
         for material in target.getAllMaterialList():
-            matDict[material.getId()] = material.getTitle()
+            matDict[material.getTitle().title()] = material.getId()
 
-        return sorted(matDict.iteritems(), key=lambda x: x[1])
-
+        return [(x[1], x[0]) for x in sorted(matDict.iteritems())]
 
 
 class CategoryMFRegistry(MaterialFactoryRegistry):
@@ -469,11 +467,12 @@ class ConfMFRegistry(MaterialFactoryRegistry):
 
 class SessionMFRegistry(MaterialFactoryRegistry):
 
-    _registry = { MinutesFactory._id: MinutesFactory }
+    _registry = {MinutesFactory._id: MinutesFactory}
 
 
 class ContribMFRegistry(MaterialFactoryRegistry):
     pass
+
 
 class SubContributionMFRegistry(MaterialFactoryRegistry):
     pass
