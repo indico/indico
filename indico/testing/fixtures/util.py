@@ -15,8 +15,11 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import inspect
+from datetime import datetime
 
+import freezegun
 import pytest
+from sqlalchemy.sql.functions import _FunctionGenerator
 
 
 @pytest.fixture
@@ -36,3 +39,30 @@ def monkeypatch_methods(monkeypatch):
             monkeypatch.setattr('{}.{}'.format(target, name), method)
 
     return _monkeypatch_methods
+
+
+@pytest.yield_fixture
+def freeze_time(monkeypatch):
+    """Returns a function that freezes the current time
+
+    It affects datetime.now, date.today, etc. and also SQLAlchemy's `func.now()`
+    which simply returns the current time from `datetime.now()` instead of
+    retrieving it using the actual `now()` function of PostgreSQL.
+    """
+    freezer = [None]
+    orig_call = _FunctionGenerator.__call__
+
+    def FunctionGenerator_call(self, *args, **kwargs):
+        if self._FunctionGenerator__names == ['now']:
+            return datetime.now()
+        return orig_call(self, *args, **kwargs)
+
+    monkeypatch.setattr(_FunctionGenerator, '__call__', FunctionGenerator_call)
+
+    def _freeze_time(time_to_freeze):
+        freezer[0] = freezegun.freeze_time(time_to_freeze)
+        freezer[0].start()
+
+    yield _freeze_time
+    if freezer[0]:
+        freezer[0].stop()
