@@ -18,6 +18,7 @@ Contents:
    ./extension.rst
    ./livesync.rst
    ./http_api/index.rst
+   ./plugins/index.rst
 
 
 Indices and tables

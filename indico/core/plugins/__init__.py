@@ -34,10 +34,34 @@ from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 
 
 class IndicoPlugin(Plugin):
+    """Base class for an Indico plugin
+
+    All your plugins need to inherit from this class. It extends the
+    `Plugin` class from Flask-PluginEngine with useful indico-specific
+    functionality that makes it easier to write custom plugins.
+
+    When creating your plugin, the class-level docstring is used to
+    generate the friendly name and description of a plugin. Its first
+    line becomes the name while everything else goes into the description.
+
+    This class provides methods for some of the more common hooks Indico
+    provides. Additional signals are defined in :mod:`~indico.core.signals`
+    and can be connected to custom functions using :meth:`connect`.
+    """
+
+    #: WTForm for the plugin's settings. All fields must return JSON-serializable types.
     settings_form = None
+    #: A dictionary which can contain the kwargs for a specific field in the `settings_form`.
     settings_form_field_opts = {}
 
     def init(self):
+        """Called when the plugin is being loaded/initialized.
+
+        If you want to run custom initialization code, this is the
+        method to override. Make sure to call the base method or
+        the other overridable methods in this class will not be
+        called anymore.
+        """
         self.alembic_versions_path = os.path.join(self.root_path, 'migrations')
         self.connect(signals.cli, self.add_cli_command)
         self.connect(signals.shell_context, lambda _, add_to_context: self.extend_shell_context(add_to_context))
@@ -71,7 +95,7 @@ class IndicoPlugin(Plugin):
         """Return blueprints to be registered on the application
 
         A single blueprint can be returned directly, for multiple blueprint you need
-        to yield them.
+        to yield them or return an iterable.
         """
         pass
 
@@ -134,11 +158,13 @@ class IndicoPlugin(Plugin):
 
 
 def plugin_js_assets(bundle):
+    """Jinja template function to generate HTML tags for a JS asset bundle."""
     return Markup('\n'.join('<script src="{}"></script>'.format(url)
                             for url in current_plugin.assets[bundle].urls()))
 
 
 def plugin_css_assets(bundle):
+    """Jinja template function to generate HTML tags for a CSS asset bundle."""
     return Markup('\n'.join('<link rel="stylesheet" type="text/css" href="{}">'.format(url)
                             for url in current_plugin.assets[bundle].urls()))
 
@@ -152,6 +178,12 @@ class IndicoPluginBlueprintSetupState(PluginBlueprintSetupStateMixin, IndicoBlue
 
 
 class IndicoPluginBlueprint(PluginBlueprintMixin, IndicoBlueprint):
+    """The Blueprint class all plugins need to use.
+
+    It contains the necessary logic to run the blueprint's view
+    functions inside the correct plugin context and to make the
+    static folder work.
+    """
     def make_setup_state(self, app, options, first_registration=False):
         return IndicoPluginBlueprintSetupState(self, app, options, first_registration)
 

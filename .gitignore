@@ -48,3 +48,6 @@ test.txt
 .coverage
 coverage.xml
 htmlcov/
+
+# sphinx
+/doc/dev/source/extension.rst

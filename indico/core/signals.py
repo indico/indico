@@ -16,6 +16,8 @@
 
 from blinker import Namespace
 
+__all__ = ('cli', 'shell_context', 'get_blueprints', 'inject_css', 'inject_js')
+
 _signals = Namespace()
 
 cli = _signals.signal('cli', """
@@ -32,9 +34,12 @@ which allows you to add custom items to the context.
 
 get_blueprints = _signals.signal('get-blueprints', """
 Expected to return IndicoPluginBlueprint-based blueprints
-which will be registered on the application. A single blueprint
-can be returned directly, to return multiple blueprints, simply
-yield them.
+which will be registered on the application. The signal MUST return
+a `(plugin, blueprints)` tuple for technical reasons (the application
+needs to know from which plugin a blueprint originates). `blueprints`
+can be either a single Blueprint or an iterable containing no more
+than two blueprints. The Blueprint must be named either *PLUGINNAME*
+or *PLUGINNAME_compat*.
 """)
 
 inject_css = _signals.signal('inject-css', """
