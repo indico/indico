@@ -72,8 +72,11 @@ class SchedulerApp(object):
         root_logger.addHandler(self.mailer)
 
         logger = logging.getLogger('daemon')
+        config = {}
+        if Config.getInstance().getDebug():
+            config['sleep_interval'] = 1
         try:
-            Scheduler().run()
+            Scheduler(**config).run()
             return_val = 0
         except base.SchedulerQuitException:
             logger.info("Daemon shut down successfully")
