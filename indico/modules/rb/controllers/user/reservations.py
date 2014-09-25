@@ -426,8 +426,8 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
                               repeat_frequency=form.repeat_frequency.data,
                               repeat_interval=form.repeat_interval.data,
                               can_override=can_override,
-                              past_date=self.past_date,
-                              date_changed=self.date_changed).display()
+                              past_date=not form.is_submitted() and self.past_date,
+                              date_changed=not form.is_submitted() and self.date_changed).display()
 
 
 class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBookingSimple):
@@ -540,7 +540,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
         # GET or form errors => show step 1 page
         return self._get_view('select_room', errors=form.error_list, rooms=self._rooms, form=form,
                               max_room_capacity=Room.max_capacity, can_override=session.user.isRBAdmin(),
-                              date_changed=self.date_changed).display()
+                              date_changed=not form.is_submitted() and self.date_changed).display()
 
     def _process_select_period(self):
         form = self._make_select_period_form()
