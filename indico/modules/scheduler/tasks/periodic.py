@@ -179,24 +179,6 @@ class CategoryStatisticsUpdaterTask(PeriodicUniqueTask):
                                             self.getLogger())
 
 
-# TODO: Isolate CERN Specific
-class FoundationSyncTask(PeriodicUniqueTask):
-    """
-    Synchronizes room data (along with associated room managers
-    and equipment) with Foundation database.
-
-    Also, updates list of CERN Official Holidays
-
-    (This is object for a task class)
-    """
-    def __init__(self, frequency, **kwargs):
-        super(FoundationSyncTask, self).__init__(frequency, **kwargs)
-
-    def run(self):
-        from MaKaC.common.FoundationSync.foundation_sync import FoundationSync
-        FoundationSync(self.getLogger()).run_all()
-
-
 class SamplePeriodicTask(PeriodicTask):
     def run(self):
         base.TimeSource.get().sleep(1)

@@ -45,7 +45,8 @@ globalname_dict = {
     "FoundationSyncTask": ("indico.modules.scheduler.tasks.periodic", None),
     "SamplePeriodicTask": ("indico.modules.scheduler.tasks.periodic", None),
     'RoomReservationTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
-    'RoomReservationEndTask': ('indico.modules.scheduler.tasks', 'DeletedTask')
+    'RoomReservationEndTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
+    'FoundationSyncTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
 }
 
 modulename_dict = {
@@ -59,7 +60,10 @@ class MigratedDB(DB):
         from IC"""
 
     def classFactory(self, connection, modulename, globalname):
-        if globalname in globalname_dict:
+        # indico_ are new plugins, we don't need/want this kind of migration there
+        # The main reason for this check is not having to rename FoundationSyncTask
+        # which was deleted from core and now resides in a plugin.
+        if globalname in globalname_dict and not modulename.startswith('indico_'):
             if globalname_dict[globalname][0]:
                 modulename = globalname_dict[globalname][0]
             if globalname_dict[globalname][1]:
@@ -72,5 +76,5 @@ class MigratedDB(DB):
             # This is the case of a module with submodules
             for former_mod_name in modulename_dict:
                 if former_mod_name[-1] == "." and modulename.startswith(former_mod_name):
-                        modulename = modulename_dict[former_mod_name] + modulename[len(former_mod_name):]
+                    modulename = modulename_dict[former_mod_name] + modulename[len(former_mod_name):]
         return DB.classFactory(self, connection, modulename, globalname)
