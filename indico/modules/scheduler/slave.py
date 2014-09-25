@@ -43,10 +43,7 @@ class _Worker(object):
         self._taskId = taskId
         self._config = configData
         self._executionDelay = delay
-
-        # Import it here to avoid circular import
-        from indico.web.flask.app import make_app
-        self._app = make_app(True)
+        self._app = None
 
     def _prepare(self):
         """
@@ -86,6 +83,10 @@ class _Worker(object):
                 transaction.commit()
 
     def run(self):
+        # Import it here to avoid circular import
+        from indico.web.flask.app import make_app
+        self._app = make_app(True)
+
         self._prepare()
         self._logger.info('Running task {}.. (delay: {})'.format(self._task.id, self._executionDelay))
 
