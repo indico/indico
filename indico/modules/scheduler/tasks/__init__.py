@@ -450,11 +450,11 @@ class AlarmTask(SendMailTask):
         if check:
             from MaKaC.conference import ConferenceHolder
             if not ConferenceHolder().hasKey(self.conf.getId()):
-                self.getLogger().warning("Conference %s no longer exists! Deleting alarm.".format(self.conf.getId()))
+                self.getLogger().warning("Conference {} no longer exists! Deleting alarm.".format(self.conf.getId()))
                 self.conf.removeAlarm(self)
                 self.suicide()
             elif self.conf.getStartDate() <= self._getCurrentDateTime():
-                self.getLogger().warning("Conference %s already started. Deleting alarm.".format(self.conf.getId()))
+                self.getLogger().warning("Conference {} already started. Deleting alarm.".format(self.conf.getId()))
                 self.conf.removeAlarm(self)
                 self.suicide()
                 return False
