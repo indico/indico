@@ -139,6 +139,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         nullable=False,
         default=False
     )
+    notifications_enabled = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
     telephone = db.Column(
         db.String
     )

@@ -39,6 +39,9 @@
     <div id="notification_for_assistanceCH" class="tip">
         ${ _("Send notifications asking for assistance with room setup") }
     </div>
+    <div id="notifications_enabledCH" class="tip">
+        ${ _("Enable/disable notifications for this room") }
+    </div>
     <div id="key_locationCH" class="tip">
         ${ _("How to obtain a key. Typically a phone number.") }
     </div>
@@ -154,7 +157,7 @@
                                 <%
                                     fields = ['is_active', 'is_reservable', 'reservations_need_confirmation',
                                               'notification_for_assistance', 'notification_before_days',
-                                              'notification_for_responsible']
+                                              'notification_for_responsible', 'notifications_enabled']
                                     field_args = {
                                         'notification_before_days': dict(style='width: 20px;', maxlength=1)
                                     }

@@ -42,6 +42,7 @@ class OccurrenceDigest(PeriodicUniqueTask):
         digest_end = get_month_end(digest_start)
 
         occurrences = ReservationOccurrence.find(
+            Room.notifications_enabled,
             Reservation.is_accepted,
             Reservation.repeat_frequency == RepeatFrequency.WEEK,
             ReservationOccurrence.is_valid,
@@ -74,6 +75,7 @@ class OccurrenceNotifications(PeriodicUniqueTask):
             return
 
         occurrences = ReservationOccurrence.find(
+            Room.notifications_enabled,
             Reservation.is_accepted,
             Reservation.repeat_frequency != RepeatFrequency.WEEK,
             ReservationOccurrence.is_valid,

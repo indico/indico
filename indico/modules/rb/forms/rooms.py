@@ -116,6 +116,7 @@ class RoomForm(IndicoForm):
     notification_before_days = IntegerField(_(u'Notification on booking start - X days before'),
                                             [Optional(), NumberRange(min=0, max=9)], default=0)
     notification_for_responsible = BooleanField(_(u'Notification to responsible, too'))
+    notifications_enabled = BooleanField(_(u'Notifications enabled'), default=True)
     owner_id = HiddenField(_(u'Responsible user'), [DataRequired()])
     key_location = StringField(_(u'Where is key?'))
     telephone = StringField(_(u'Telephone'))
