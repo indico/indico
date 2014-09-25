@@ -34,6 +34,10 @@ class OccurrenceDigest(PeriodicUniqueTask):
     DISABLE_ZODB_HOOK = True
 
     def run(self):
+        if not settings.get('notifications_enabled', True):
+            self._v_logger.info('Digest not sent because notifications are globally disabled')
+            return
+
         digest_start = round_up_month(date.today(), from_day=2)
         digest_end = get_month_end(digest_start)
 
@@ -65,6 +69,10 @@ class OccurrenceNotifications(PeriodicUniqueTask):
     DISABLE_ZODB_HOOK = True
 
     def run(self):
+        if not settings.get('notifications_enabled', True):
+            self._v_logger.info('Notifications not sent because notifications are globally disabled')
+            return
+
         occurrences = ReservationOccurrence.find(
             Reservation.is_accepted,
             Reservation.repeat_frequency != RepeatFrequency.WEEK,
