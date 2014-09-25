@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
@@ -17,7 +14,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask.ext.wtf import Form
+from flask_wtf import Form
 from wtforms.fields.core import FieldList
 from wtforms.widgets.core import HiddenInput
 
@@ -49,10 +46,12 @@ class IndicoForm(Form):
 
     @property
     def visible_fields(self):
+        """A list containing all fields that are not hidden."""
         return [field for field in self if not isinstance(field.widget, HiddenInput)]
 
     @property
     def error_list(self):
+        """A list containing all errors, prefixed with the field's label.'"""
         all_errors = []
         for field_name, errors in self.errors.iteritems():
             for error in errors:

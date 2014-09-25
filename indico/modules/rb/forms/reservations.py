@@ -27,9 +27,9 @@ from wtforms_components import TimeField
 from wtforms.widgets.core import HiddenInput
 from wtforms.fields.simple import HiddenField, TextAreaField, SubmitField
 
-from indico.modules.rb.forms.base import IndicoForm, DataWrapper
-from indico.modules.rb.forms.fields import IndicoQuerySelectMultipleCheckboxField
-from indico.modules.rb.forms.validators import IndicoEmail, UsedIf
+from indico.web.forms.base import IndicoForm, DataWrapper
+from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField
+from indico.web.forms.validators import IndicoEmail, UsedIf
 from indico.modules.rb.models.reservations import RepeatMapping, RepeatFrequency
 from indico.util.i18n import _
 

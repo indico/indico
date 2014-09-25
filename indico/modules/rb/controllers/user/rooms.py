@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN)
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN)
 ##
 ## Indico is free software: you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -24,11 +21,9 @@ from flask import request, session
 from sqlalchemy import func
 from werkzeug.datastructures import MultiDict
 
-from MaKaC.common.cache import GenericCache
 from indico.core.errors import IndicoError
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.decorators import requires_location, requires_room
-from indico.modules.rb.forms.base import FormDefaults
 from indico.modules.rb.forms.rooms import SearchRoomsForm
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
@@ -39,6 +34,8 @@ from indico.modules.rb.statistics import calculate_rooms_occupancy, compose_room
 from indico.modules.rb.views.user.rooms import (WPRoomBookingSearchRooms, WPRoomBookingMapOfRooms,
                                                 WPRoomBookingMapOfRoomsWidget, WPRoomBookingRoomDetails,
                                                 WPRoomBookingRoomStats, WPRoomBookingSearchRoomsResults)
+from indico.web.forms.base import FormDefaults
+from MaKaC.common.cache import GenericCache
 
 
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):

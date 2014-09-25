@@ -18,9 +18,9 @@ from flask import request, flash, redirect
 
 from indico.core.plugins import plugin_engine
 from indico.core.plugins.views import WPPlugins
-from MaKaC.webinterface.rh.admins import RHAdminBase
-from indico.modules.rb.forms.base import FormDefaults
+from indico.web.forms.base import FormDefaults
 from indico.util.i18n import _
+from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
 class RHPlugins(RHAdminBase):

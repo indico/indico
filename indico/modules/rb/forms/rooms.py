@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
@@ -28,14 +25,14 @@ from wtforms.widgets.core import HiddenInput
 from wtforms.fields.simple import HiddenField, TextAreaField, FileField
 from wtforms_components import TimeField
 
-from indico.modules.rb.forms.base import IndicoForm
-from indico.modules.rb.forms.fields import IndicoQuerySelectMultipleCheckboxField
-from indico.modules.rb.forms.validators import UsedIf
-from indico.modules.rb.forms.widgets import ConcatWidget
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.util.i18n import _
 from indico.util.struct.iterables import group_nested
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField
+from indico.web.forms.validators import UsedIf
+from indico.web.forms.widgets import ConcatWidget
 
 
 def _get_equipment_label(eq):

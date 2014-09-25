@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN)
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN)
 ##
 ## Indico is free software: you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,20 +12,15 @@
 ## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
+## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from flask import request, flash
 from wtforms import TextField
 from wtforms.validators import DataRequired
-from MaKaC.common.cache import GenericCache
-from MaKaC.user import AvatarHolder
-from MaKaC.webinterface import urlHandlers as UH
 
 from indico.core.db import db
 from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
-from indico.modules.rb.forms.base import FormDefaults
 from indico.modules.rb.forms.rooms import RoomForm
-from indico.modules.rb.forms.validators import IndicoEmail
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.room_attributes import RoomAttributeAssociation, RoomAttribute
 from indico.modules.rb.controllers.decorators import requires_location, requires_room
@@ -39,6 +31,12 @@ from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.views.admin import rooms as room_views
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
+from indico.web.forms.validators import IndicoEmail
+from MaKaC.common.cache import GenericCache
+from MaKaC.user import AvatarHolder
+from MaKaC.webinterface import urlHandlers as UH
+
 
 _cache = GenericCache('Rooms')
 

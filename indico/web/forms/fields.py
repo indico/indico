@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
@@ -23,11 +20,11 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField
 from wtforms.widgets.core import CheckboxInput
 
-from indico.modules.rb.forms.widgets import PrincipalWidget
 from indico.util.fossilize import fossilize
 from indico.util.user import retrieve_principals
 from indico.util.string import is_valid_mail
 from indico.util.i18n import _
+from indico.web.forms.widgets import PrincipalWidget
 
 
 class IndicoQuerySelectMultipleField(QuerySelectMultipleField):

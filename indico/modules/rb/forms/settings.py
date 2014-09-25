@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
@@ -20,8 +17,8 @@
 from wtforms.fields.core import IntegerField, BooleanField
 from wtforms.validators import InputRequired, NumberRange
 
-from indico.modules.rb.forms.base import IndicoForm
-from indico.modules.rb.forms.fields import EmailListField, PrincipalField
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import EmailListField, PrincipalField
 from indico.util.i18n import _
 
 

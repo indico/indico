@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN)
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN)
 ##
 ## Indico is free software: you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,7 +25,6 @@ from werkzeug.datastructures import MultiDict
 from indico.core.db import db
 from indico.core.errors import IndicoError, AccessError, NoReportError, NotFoundError
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.forms.base import FormDefaults
 from indico.modules.rb.forms.reservations import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
                                                   NewBookingConfirmForm, NewBookingSimpleForm, ModifyBookingForm)
 from indico.modules.rb.models.locations import Location
@@ -46,6 +42,7 @@ from indico.util.date_time import get_datetime_from_request
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
 
 
 class RHRoomBookingBookingMixin:

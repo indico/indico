@@ -22,12 +22,12 @@ from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
-from indico.modules.rb.forms.base import IndicoForm
-from indico.modules.rb.forms.fields import JSONField
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.rooms import Room
 from indico.util.i18n import _
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import JSONField
 from MaKaC.user import AvatarHolder, GroupHolder
 
 

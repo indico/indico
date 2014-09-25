@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico
-## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN)
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN)
 ##
 ## Indico is free software: you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -22,7 +19,6 @@ from datetime import date
 
 from flask import flash, request, session
 
-from indico.modules.rb.forms.base import FormDefaults
 from indico.modules.rb.forms.blockings import CreateBlockingForm, BlockingForm
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.notifications.blockings import notify_request
@@ -30,6 +26,7 @@ from indico.util.i18n import _
 from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
