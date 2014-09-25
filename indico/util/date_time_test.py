@@ -14,11 +14,16 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.util.string import seems_html
+import pytest
+from dateutil.parser import parse
+
+from indico.util.date_time import round_up_month
 
 
-def test_seems_html():
-    assert seems_html('<b>test')
-    assert seems_html('a <b> c')
-    assert not seems_html('test')
-    assert not seems_html('a < b > c')
+@pytest.mark.parametrize(('current_date', 'from_day', 'expected_month'), (
+    ('2014-10-01', None, 11),
+    ('2014-10-01', 1,    11),
+    ('2014-10-01', 2,    10),
+))
+def test_round_up_month(current_date, from_day, expected_month):
+    assert round_up_month(parse(current_date), from_day=from_day).month == expected_month
