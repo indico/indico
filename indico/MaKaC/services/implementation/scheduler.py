@@ -51,8 +51,7 @@ class GetWaitingTaskList(SchedulerModuleAdminService):
     """
 
     def _getAnswer(self):
-        return fossilize.fossilize(list(v for (k,v) in
-                                        self.schedModule.getWaitingQueue()))
+        return fossilize.fossilize([v for k, v in self.schedModule.getWaitingQueue()])
 
 
 class GetRunningTaskList(SchedulerModuleAdminService):
@@ -70,7 +69,7 @@ class GetFailedTaskList(SchedulerModuleAdminService):
     """
 
     def _getAnswer(self):
-        return fossilize.fossilize(self.schedModule.getFailedIndex().values())
+        return fossilize.fossilize(list(reversed(self.schedModule.getFailedIndex().values())))
 
 
 class GetFinishedTaskList(SchedulerModuleAdminService):
