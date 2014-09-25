@@ -19,15 +19,27 @@ from wtforms.fields.core import FieldList
 from wtforms.widgets.core import HiddenInput
 
 
-class DataWrapper(object):
+class _DataWrapper(object):
     """Wrapper for the return value of generated_data properties"""
     def __init__(self, data):
         self.data = data
 
+    def __repr__(self):
+        return '<DataWrapper({!r})>'.format(self.data)
+
+
+class generated_data(property):
+    """property decorator for generated data in forms"""
+
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        if self.fget is None:
+            raise AttributeError("unreadable attribute")
+        return _DataWrapper(self.fget(obj))
+
 
 class IndicoForm(Form):
-    __generated_data__ = ()
-
     def populate_obj(self, obj, fields=None, skip=None, existing_only=False):
         """Populates the given object with form data.
 
@@ -67,8 +79,10 @@ class IndicoForm(Form):
     def data(self):
         """Extends form.data with generated data from properties"""
         data = super(IndicoForm, self).data
-        for key in self.__generated_data__:
-            data[key] = getattr(self, key).data
+        cls = type(self)
+        for field in dir(cls):
+            if isinstance(getattr(cls, field), generated_data):
+                data[field] = getattr(self, field).data
         return data
 
 

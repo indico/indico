@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
@@ -27,7 +24,7 @@ from wtforms_components import TimeField
 from wtforms.widgets.core import HiddenInput
 from wtforms.fields.simple import HiddenField, TextAreaField, SubmitField
 
-from indico.web.forms.base import IndicoForm, DataWrapper
+from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField
 from indico.web.forms.validators import IndicoEmail, UsedIf
 from indico.modules.rb.models.reservations import RepeatMapping, RepeatFrequency
@@ -35,8 +32,6 @@ from indico.util.i18n import _
 
 
 class BookingSearchForm(IndicoForm):
-    __generated_data__ = ('start_dt', 'end_dt')
-
     room_ids = SelectMultipleField('Rooms', [DataRequired()], coerce=int)
 
     start_date = DateField('Start Date', [InputRequired()], parse_kwargs={'dayfirst': True})
@@ -60,13 +55,13 @@ class BookingSearchForm(IndicoForm):
     needs_vc_assistance = BooleanField('Video Conference Setup Assistance')
     needs_assistance = BooleanField('General Assistance')
 
-    @property
+    @generated_data
     def start_dt(self):
-        return DataWrapper(datetime.combine(self.start_date.data, self.start_time.data))
+        return datetime.combine(self.start_date.data, self.start_time.data)
 
-    @property
+    @generated_data
     def end_dt(self):
-        return DataWrapper(datetime.combine(self.end_date.data, self.end_time.data))
+        return datetime.combine(self.end_date.data, self.end_time.data)
 
 
 class NewBookingFormBase(IndicoForm):
