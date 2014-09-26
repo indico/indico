@@ -66,6 +66,7 @@ from urlparse import urlparse
 from zope.interface import implements
 
 # indico imports
+from indico.core.config import Config
 from indico.core.extpoint import Component
 from indico.core.extpoint.rh import IServerRequestListener
 from indico.util.contextManager import ContextManager
@@ -75,7 +76,6 @@ from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, S
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.common.logger import Logger
-from indico.core import config as Configuration
 from MaKaC.user import Group, PrincipalHolder
 
 
@@ -325,8 +325,7 @@ class LDAPConnector(object):
     """
 
     def __init__(self):
-        conf = Configuration.Config.getInstance()
-        ldapConfig = conf.getAuthenticatorConfigById("LDAP")
+        ldapConfig = Config.getInstance().getAuthenticatorConfigById("LDAP")
         self.ldapUri = ldapConfig.get('uri')
         self.ldapPeopleFilter, self.ldapPeopleDN = ldapConfig.get('peopleDNQuery')
         self.groupsEnabled = ldapConfig.get('groupDNQuery') is not None
@@ -717,4 +716,4 @@ class RequestListener(Component):
 
 
 def get_login_attribute():
-    return Configuration.Config.getInstance().getAuthenticatorConfigById('LDAP').get('loginAttribute', 'uid')
+    return Config.getInstance().getAuthenticatorConfigById('LDAP').get('loginAttribute', 'uid')
