@@ -33,7 +33,7 @@ from MaKaC.errors import MaKaCError
 from MaKaC.user import Avatar, AvatarHolder
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
-from indico.core.errors import IndicoError
+from indico.core.errors import NoReportError
 from indico.modules.rb.utils import rb_check_user_access
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
@@ -687,7 +687,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             return ok
         elif not ok:
             msg = _('You cannot book this room more than {} days in advance')
-            raise IndicoError(msg.format(self.max_advance_days))
+            raise NoReportError(msg.format(self.max_advance_days))
 
     def check_bookable_hours(self, start_time, end_time, user=None, quiet=False):
         if user and (user.isRBAdmin() or self.is_owned_by(user)):
@@ -700,4 +700,4 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 return True
         if quiet:
             return False
-        raise IndicoError('Room cannot be booked at this time')
+        raise NoReportError('Room cannot be booked at this time')
