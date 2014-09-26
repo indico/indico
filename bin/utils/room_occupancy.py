@@ -29,9 +29,9 @@ from indico.web.flask.app import make_app
 
 
 def _main(args):
-    today = date.today()
-    past_month = today - relativedelta(days=29)
-    past_year = today - relativedelta(years=1)
+    yesterday = date.today() - relativedelta(days=1)
+    past_month = yesterday - relativedelta(days=29)
+    past_year = yesterday - relativedelta(years=1)
 
     if not args.locations:
         rooms = Room.find_all()
@@ -41,8 +41,8 @@ def _main(args):
     print 'Month\tYear\tRoom'
     for room in rooms:
         print '{1:.3f}\t{2:.3f}\t{0}'.format(room.full_name,
-                                             calculate_rooms_occupancy([room], past_month, today) * 100,
-                                             calculate_rooms_occupancy([room], past_year, today) * 100)
+                                             calculate_rooms_occupancy([room], past_month, yesterday) * 100,
+                                             calculate_rooms_occupancy([room], past_year, yesterday) * 100)
 
 
 def main():

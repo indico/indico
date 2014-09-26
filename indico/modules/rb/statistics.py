@@ -14,7 +14,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 
 def calculate_rooms_bookable_time(rooms, start_date=None, end_date=None):
     if end_date is None:
-        end_date = datetime.utcnow()
+        end_date = date.today() - relativedelta(days=1)
     if start_date is None:
         start_date = end_date - relativedelta(days=29)
     working_time_start = datetime.combine(date.today(), Location.working_time_start)
@@ -26,7 +26,7 @@ def calculate_rooms_bookable_time(rooms, start_date=None, end_date=None):
 
 def calculate_rooms_booked_time(rooms, start_date=None, end_date=None):
     if end_date is None:
-        end_date = date.today()
+        end_date = date.today() - relativedelta(days=1)
     if start_date is None:
         start_date = end_date - relativedelta(days=29)
     # Reservations on working days
