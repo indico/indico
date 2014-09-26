@@ -1,8 +1,6 @@
 :mod:`indico.tests` - test framework
 =================================================
 
-.. automodule:: indico.tests
-   :members:
 
 ============
 Architecture
