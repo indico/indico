@@ -46,14 +46,14 @@
             <div class="message-text"></div>
         </div>
         % if past_date:
-            <div id="past-date-warning" class="highlight-message-box">
+            <div class="highlight-message-box js-default-date-warning">
                 <div class="message-text">
                     ${_("Looks like you were trying to book a room in the past so we moved you forward to the present.") }
                 </div>
             </div>
         % endif
         % if date_changed:
-            <div id="date-changed-warning" class="highlight-message-box">
+            <div class="highlight-message-box js-default-date-warning">
                 <div class="message-text">
                     ${ _("It's late, so we selected the next day for you.") }<br>
                     <small> ${ _("You can still select today in the calendar.") }</small>
@@ -96,7 +96,7 @@ ${ form.repeat_interval(type='hidden') }
                     $('#eDatePlace').datepicker('setDate', $('#sDatePlace').datepicker('getDate'));
                 }
                 $('#eDatePlace').datepicker('option', 'minDate', $('#sDatePlace').datepicker('getDate'));
-                $('#date-changed-warning, #past-date-warning').fadeOut();
+                $('.js-default-date-warning').fadeOut();
                 combineDatetime();
                 checkHolidays();
                 validateForm();

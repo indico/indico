@@ -54,7 +54,11 @@
 
         function restoreUserData() {
             if (rbUserData.startDate) {
-                $("#sDatePlace").datepicker('setDate', moment(rbUserData.startDate).toDate());
+                var savedStartDate = moment(rbUserData.startDate).toDate();
+                if ($('#sDatePlace').datepicker('getDate').getTime() != savedStartDate.getTime()) {
+                    $('.js-default-date-warning').hide();
+                }
+                $('#sDatePlace').datepicker('setDate', savedStartDate);
             }
             if (rbUserData.endDate) {
                 $("#eDatePlace").datepicker('setDate', moment(rbUserData.endDate).toDate());
