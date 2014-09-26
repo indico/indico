@@ -56,23 +56,20 @@ See indico.conf for information about customization options.
 try:
     import ldap
     import ldap.filter
-    import re
-except:
+except ImportError:
     pass
 
+import re
 from urlparse import urlparse
 
-# dependency libs
 from zope.interface import implements
 
-# indico imports
 from indico.core.config import Config
 from indico.core.extpoint import Component
 from indico.core.extpoint.rh import IServerRequestListener
 from indico.core.logger import Logger
 from indico.util.contextManager import ContextManager
 
-# legacy indico imports
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, SSOHandler
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.errors import MaKaCError
