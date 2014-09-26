@@ -101,38 +101,11 @@ $(document).ready(function(){
 
     /* Time formatting */
     if (currentLanguage === "fr_FR") {
-        moment.lang("fr", {
-            calendar: {
-                lastDay : '[Hier]',
-                sameDay : "[Aujourd'hui]",
-                nextDay : '[Demain]',
-                nextWeek : 'dddd',
-                lastWeek : 'DD MMM YYYY',
-                sameElse : 'DD MMM YYYY'
-            }
-        });
+        moment.locale('fr')
     } else if (currentLanguage === "es_ES") {
-        moment.lang("es", {
-            calendar: {
-                lastDay : '[Ayer]',
-                sameDay : "[Hoy]",
-                nextDay : '[Mañana]',
-                nextWeek : 'dddd',
-                lastWeek : 'DD MMM YYYY',
-                sameElse : 'DD MMM YYYY'
-            }
-        });
+        moment.locale('es')
     } else {
-        moment.lang("en", {
-            calendar: {
-                lastDay : '[Yesterday]',
-                sameDay : '[Today]',
-                nextDay : '[Tomorrow]',
-                nextWeek : 'dddd',
-                lastWeek : 'DD MMM YYYY',
-                sameElse : 'DD MMM YYYY'
-            }
-        });
+        moment.locale('en')
     }
 
     /* AJAX query */

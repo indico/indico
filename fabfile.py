@@ -292,9 +292,17 @@ def install_jqplot():
 @recipe('underscore')
 def install_underscore():
     """
-    Install jquery from Git
+    Install underscore from Git
     """
     _install_dependencies('underscore', 'underscore.js', 'js')
+
+
+@recipe('rrule')  # rrule.js
+def install_rrule():
+    """
+    Install rrule from Git
+    """
+    _install_dependencies('rrule', 'lib/rrule.js', 'js')
 
 
 @recipe('qtip2')

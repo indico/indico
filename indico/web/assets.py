@@ -137,6 +137,7 @@ indico_management = Bundle(
     filters='rjsmin', output='js/indico_management_%(version)s.min.js')
 
 indico_room_booking = Bundle(
+    'js/lib/rrule.js',
     *namespace('js/indico/RoomBooking',
 
                'util.js',
@@ -316,8 +317,8 @@ ie_compatibility = Bundle('js/selectivizr.js',
 moment = Bundle(
     *namespace('js/moment',
                'moment.js',
-               'lang/es.js',
-               'lang/fr.js'),
+               'locale/es.js',
+               'locale/fr.js'),
     filters='rjsmin', output='js/moment_%(version)s.min.js')
 
 jqplot_js = Bundle(
