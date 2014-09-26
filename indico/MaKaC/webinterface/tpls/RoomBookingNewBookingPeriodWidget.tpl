@@ -69,6 +69,13 @@ ${ form.repeat_interval(type='hidden') }
 
 <script>
     $(document).ready(function() {
+        var validEndDates = null;
+        var frequencies = {
+                '1' : RRule.DAILY,
+                '2' : RRule.WEEKLY,
+                '3' : RRule.MONTHLY
+            };
+
         $('#timerange').timerange({
             initStartTime: '${ form.start_dt.data.strftime("%H:%M") }',
             initEndTime: '${ form.end_dt.data.strftime("%H:%M") }',
@@ -90,22 +97,29 @@ ${ form.repeat_interval(type='hidden') }
             showButtonPanel: true,
             changeMonth: true,
             changeYear: true,
-            showOn: 'focus',
-            onSelect: function(selectedDate) {
-                if ($('#sDatePlace').datepicker('getDate') > $('#eDatePlace').datepicker('getDate')) {
-                    $('#eDatePlace').datepicker('setDate', $('#sDatePlace').datepicker('getDate'));
-                }
-                $('.js-default-date-warning').fadeOut();
-                setEndMinDate();
-                combineDatetime();
-                checkHolidays();
-                validateForm();
-            }
+            showOn: 'focus'
         });
+
+        $('#eDatePlace').datepicker('option', 'beforeShowDay', function validateDate(date) {
+            if (validEndDates === null) {
+                return [true, '', ''];
+            }
+            return [validEndDates.indexOf(date.getTime()) !== -1, '', ''];
+        });
+
+        $('#sDatePlace').datepicker('option', 'onSelect', function startDateOnSelect(selectedDateText) {
+            disableInvalidDays();
+            $('#eDatePlace').datepicker('refresh');
+
+            selectEndDate();
+            commonOnSelect();
+        });
+
+        $('#eDatePlace').datepicker('option', 'onSelect', function endDateOnSelect(selectedDate) { commonOnSelect(); });
+        $('#eDatePlace').datepicker('option', 'onChangeMonthYear', function endDateOnChange() { disableInvalidDays(); });
 
         $('#sDatePlace').datepicker('setDate', "${ form.start_dt.data.strftime('%d/%m/%Y') }");
         $('#eDatePlace').datepicker('setDate', "${ form.end_dt.data.strftime('%d/%m/%Y') }");
-        $('#eDatePlace').datepicker('option', 'minDate', $('#sDatePlace').datepicker('getDate'));
 
         $('#repeatability input:radio[name=repeat_frequency]').change(function() {
             checkFrequency();
@@ -122,10 +136,12 @@ ${ form.repeat_interval(type='hidden') }
                 $('#sDatePlaceTitle').text("${_('Start date')}");
                 $('#eDatePlaceDiv').show();
                 $('#repeat_interval').val('1');
+                disableInvalidDays();
+                $('#eDatePlace').datepicker('refresh');
+                selectEndDate();
             }
 
             $('#flexibleDates input:radio').prop('disabled', frequency === '1');
-            $('#eDatePlace').datepicker('setDate', setEndMinDate());
         }
 
         function combineDatetime() {
@@ -160,21 +176,78 @@ ${ form.repeat_interval(type='hidden') }
             });
         }
 
-        function setEndMinDate() {
+        function disableInvalidDays() {
+            var start_date = $('#sDatePlace').datepicker('getDate');
+            var endMonth = parseInt($('#eDatePlace .ui-datepicker-month').val());
+            var endYear = parseInt($('#eDatePlace .ui-datepicker-year').val());
+            var end_date = new Date(endMonth > 9 ? endYear + 1 : endYear, (endMonth + 2) % 12, 1);
             var frequency = $('#repeatability input:radio[name=repeat_frequency]:checked').val();
-            var minDate = $('#sDatePlace').datepicker('getDate');
-            var dateOffset = {
-                '1': 'days',
-                '2': 'weeks',
-                '3': 'months'
-            };
 
-            if (dateOffset.hasOwnProperty(frequency)) {
-                minDate = moment(minDate).add(1, dateOffset[frequency]).toDate();
+            validEndDates = generateValidEndDates(start_date, end_date, frequencies[frequency]);
+        }
+
+        function selectEndDate() {
+            var repetition = {};
+            repetition[RRule.DAILY] = 'days';
+            repetition[RRule.WEEKLY] = 'weeks';
+            repetition[RRule.MONTHLY] = 'months';
+            var start_date = $('#sDatePlace').datepicker('getDate');
+            var selected_end_date = $('#eDatePlace').datepicker('getDate');
+            var frequency = frequencies[$('#repeatability input:radio[name=repeat_frequency]:checked').val()];
+
+            if (selected_end_date.getTime() <= start_date.getTime()) {
+                var end_date = moment(start_date).add(2, repetition[frequency]).toDate();
+                var forceSetEndDate = true;
+            } else {
+                var end_date = moment(selected_end_date).add(1, repetition[frequency]).toDate();
+                var forceSetEndDate = false;
+            }
+            var endDates = generateValidEndDates(start_date, end_date, frequency);
+
+            if (endDates !== null && !! endDates.length &&
+                    (forceSetEndDate || endDates.indexOf(end_date.getTime()) === -1)) {
+                $('#eDatePlace').datepicker('setDate', getClosestDate(endDates, selected_end_date));
+                $('#eDatePlace').datepicker('refresh');
+            }
+        }
+
+        function commonOnSelect() {
+            $('.js-default-date-warning').fadeOut();
+            combineDatetime();
+            checkHolidays();
+            validateForm();
+        }
+
+        function getClosestDate(dates, date) {
+            // dates must be a sorted array of int which represent value in ms
+            // date is a date or a date in ms
+            if (date instanceof Date) {
+                date = date.getTime();
             }
 
-            $('#eDatePlace').datepicker('option', 'minDate', minDate);
-            return minDate;
+            var min = 0, max = dates.length - 1;
+            var lo = 0, hi = dates.length - 1, mid = null;
+            while (lo <= hi) {
+                mid = Math.floor((lo + hi) / 2);
+                if (date < dates[mid]) {
+                    hi = mid -1
+                } else if (date > dates[mid]) {
+                    lo = mid + 1;
+                } else {
+                    return new Date(dates[mid]);
+                }
+            }
+
+            // Check for invalid indexes
+            if (hi < 0 && lo <= dates.length - 1) {
+                return new Date(dates[lo]);
+            } else if (lo > dates.length - 1 && hi >= 0) {
+                return new Date(dates[hi]);
+            }
+
+            dLo = Math.abs(date - dates[lo]);
+            dHi = Math.abs(date - dates[hi]);
+            return dLo <= dHi ? new Date(dates[lo]) : new Date(dates[hi]);
         }
 
         checkFrequency();

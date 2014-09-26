@@ -20,6 +20,46 @@
     var validatingConflicts = false;
     var clickedButton = null;
 
+    window.generateValidEndDates = function generateValidEndDates(start_date, end_date, frequency) {
+        if (! (start_date instanceof Date) || ! (end_date instanceof Date) ||
+                [RRule.DAILY, RRule.WEEKLY, RRule.MONTHLY].indexOf(frequency) === -1) {
+            return null;
+        }
+
+        var position = Math.ceil(start_date.getDate()/7);
+        if (position === 5) {
+            position = -1;
+        }
+        var rules = {};
+        rules[RRule.DAILY] = {
+            freq   : RRule.DAILY,
+            dtstart: start_date,
+            until  : end_date,
+        };
+        rules[RRule.WEEKLY] = {
+            freq    : RRule.WEEKLY,
+            dtstart : start_date,
+            until   : end_date,
+            interval: 1 // No UI to set this up for now.
+        };
+        rules[RRule.MONTHLY] = {
+            freq     : RRule.MONTHLY,
+            dtstart  : start_date,
+            until    : end_date,
+            byweekday: RRule[start_date.getDayName().slice(0,2).toUpperCase()],
+            bysetpos : position
+        };
+
+        var rule = new RRule(rules[frequency]);
+        return $.map(rule.all(), function resetTime(d) {
+            if (d <= start_date) { // the start date is not valid as an
+                return null;       // end date for repetitive bookings.
+            }
+            return d.setHours(0,0,0,0);
+        });
+
+    }
+
     window.validateForm = function validateForm() {
         var isValid = true;
 
@@ -63,7 +103,6 @@
             }
             isValid = isValid && !vcErrors;
         }
-
         return isValid;
     };
 
@@ -82,29 +121,32 @@
                 break;
             // Repeat daily
             case "1":
-                repeatability = 'days';
-                message = $T("Period shorter than 1 day");
+                repeatability = RRule.DAILY;
+                message = $T("Invalid end date for daily repetition");
                 break;
             // Repeat weekly
             case "2":
-                repeatability = 'weeks';
-                message = $T("Period shorter than 1 week");
+                repeatability = RRule.WEEKLY;
+                message = $T("Invalid end date for weekly repetition");
                 break;
             // Repeat monthly
             case "3":
-                repeatability = 'months';
-                message = $T("Period shorter than 1 month");
+                repeatability = RRule.MONTHLY;
+                message = $T("Invalid end date for monthly repetition");
                 break;
             default:
                 valid = false;
         }
 
-        if (valid && !single_day) {
-            var start_date = moment($('#sDatePlace').datepicker('getDate'));
-            var end_date = moment($('#eDatePlace').datepicker('getDate'));
+        var start_date = $('#sDatePlace').datepicker('getDate');
+        var end_date = $('#eDatePlace').datepicker('getDate');
 
-            if (end_date.diff(start_date, repeatability) < 1) {
-                valid = false;
+        if (valid && !single_day) {
+            valid = end_date > start_date;
+            if (valid) {
+                var validEndDates = window.generateValidEndDates(start_date, end_date, repeatability);
+                valid = !! validEndDates.length && validEndDates.indexOf(end_date.getTime()) !== -1;
+
             }
         }
 
