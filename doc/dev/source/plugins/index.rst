@@ -7,8 +7,9 @@ Contents:
    :numbered:
    :maxdepth: 1
 
-   ./plugin.rst
-   ./signals.rst
+   plugin.rst
+   models.rst
+   signals.rst
 
 .. Indices and tables
 .. ==================
