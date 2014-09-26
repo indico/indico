@@ -1,3 +1,5 @@
+<% from indico.modules.rb import settings %>
+
 <!-- CONTEXT HELP DIVS -->
 <div id="tooltipPool" style="display: none;">
     <div id="nameCH" class="tip">
@@ -157,7 +159,9 @@
                                 <%
                                     fields = ['is_active', 'is_reservable', 'reservations_need_confirmation',
                                               'notification_for_assistance', 'notification_before_days',
-                                              'notification_for_responsible', 'notifications_enabled']
+                                              'notification_for_responsible','notifications_enabled']
+                                    reminder_fields = {'notification_before_days', 'notification_for_responsible',
+                                                       'notifications_enabled'}
                                     field_args = {
                                         'notification_before_days': dict(style='width: 20px;', maxlength=1)
                                     }
@@ -169,7 +173,12 @@
                                             <small>${ form[field].label.text }</small>
                                         </td>
                                         <td align="left" class="blacktext">
-                                            ${ form[field](**field_args.get(field, {})) } ${ contextHelp(field + 'CH') }
+                                            % if field in reminder_fields and not settings.get('notifications_enabled', True):
+                                                ${ form[field](disabled=True, **field_args.get(field, {})) }
+                                            % else:
+                                                ${ form[field](**field_args.get(field, {})) }
+                                            % endif
+                                            ${ contextHelp(field + 'CH') }
                                         </td>
                                     </tr>
                                 % endfor
