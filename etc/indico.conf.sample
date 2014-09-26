@@ -279,13 +279,13 @@ MaxUploadFileSize = 0
 #
 #                                 # The LDAP record attribute that will be matched as the username for the login.
 #                                 # (defaults to 'uid' if not specified)
-#                                  'loginAttribute' : 'cn'
+#                                  'loginAttribute' : 'uid'
 #                                 }
 #
 #
 # The default configuration will use only Indico's authentication system.
 
-AuthenticatorList    = [('Local', {})]
+AuthenticatorList = [('Local', {})]
 
 # If you only want to allow users to login via SSO you can disable the normal login page.
 # DisplayLoginPage = True
