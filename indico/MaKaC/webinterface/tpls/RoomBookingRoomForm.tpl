@@ -31,16 +31,16 @@
         ${ _("Whether bookings must be accepted by person responsible.") }
     </div>
     <div id="notification_before_daysCH" class="tip">
-        ${ _("Send the start notification X days before an occurrence (leave empty to use default)")  }
+        ${ _("Send booking reminders X days before an occurrence (leave empty to use default)")  }
     </div>
     <div id="notification_for_responsibleCH" class="tip">
-        ${ _("Send start/end notifications to the room responsible, too.") }
+        ${ _("Send reminders to the room manager, too.") }
     </div>
     <div id="notification_for_assistanceCH" class="tip">
         ${ _("Send notifications asking for assistance with room setup") }
     </div>
     <div id="notifications_enabledCH" class="tip">
-        ${ _("Enable/disable notifications for this room") }
+        ${ _("Enable/disable reminders for this room") }
     </div>
     <div id="key_locationCH" class="tip">
         ${ _("How to obtain a key. Typically a phone number.") }
