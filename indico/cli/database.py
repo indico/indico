@@ -112,6 +112,9 @@ class PluginDBCommand(Command):
             for plugin in active_plugins.itervalues():
                 if plugins and plugin.name not in plugins:
                     continue
+                if not os.path.exists(plugin.alembic_versions_path):
+                    print cformat("%{cyan}skipping plugin '{}' (no migrations folder)").format(plugin.name)
+                    continue
                 print cformat("%{cyan!}executing command for plugin '{}'").format(plugin.name)
                 with plugin.plugin_context():
                     super(PluginDBCommand, self).__call__(app, *args, **kwargs)
