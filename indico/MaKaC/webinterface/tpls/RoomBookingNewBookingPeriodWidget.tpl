@@ -69,6 +69,7 @@ ${ form.repeat_interval(type='hidden') }
 
 <script>
     $(document).ready(function() {
+        'use strict';
         var validEndDates = null;
         var frequencies = {
                 '1' : RRule.DAILY,
@@ -115,8 +116,8 @@ ${ form.repeat_interval(type='hidden') }
             commonOnSelect();
         });
 
-        $('#eDatePlace').datepicker('option', 'onSelect', function endDateOnSelect(selectedDate) { commonOnSelect(); });
-        $('#eDatePlace').datepicker('option', 'onChangeMonthYear', function endDateOnChange() { disableInvalidDays(); });
+        $('#eDatePlace').datepicker('option', 'onSelect', commonOnSelect);
+        $('#eDatePlace').datepicker('option', 'onChangeMonthYear', disableInvalidDays);
 
         $('#sDatePlace').datepicker('setDate', "${ form.start_dt.data.strftime('%d/%m/%Y') }");
         $('#eDatePlace').datepicker('setDate', "${ form.end_dt.data.strftime('%d/%m/%Y') }");
@@ -145,14 +146,14 @@ ${ form.repeat_interval(type='hidden') }
         }
 
         function combineDatetime() {
-            var start_date = moment($('#sDatePlace').datepicker('getDate')).format('D/MM/YYYY');
-            var end_date = moment($('#eDatePlace').datepicker('getDate')).format('D/MM/YYYY');
-            var start_time = $('#timerange').timerange('getStartTime');
-            var end_time = $('#timerange').timerange('getEndTime');
+            var startDate = moment($('#sDatePlace').datepicker('getDate')).format('D/MM/YYYY');
+            var endDate = moment($('#eDatePlace').datepicker('getDate')).format('D/MM/YYYY');
+            var startTime = $('#timerange').timerange('getStartTime');
+            var endTime = $('#timerange').timerange('getEndTime');
 
 
-            $('#start_dt').val('{0} {1}'.format(start_date, start_time));
-            $('#end_dt').val('{0} {1}'.format(end_date, end_time));
+            $('#start_dt').val('{0} {1}'.format(startDate, startTime));
+            $('#end_dt').val('{0} {1}'.format(endDate, endTime));
         }
 
         function checkHolidays() {
@@ -177,13 +178,14 @@ ${ form.repeat_interval(type='hidden') }
         }
 
         function disableInvalidDays() {
-            var start_date = $('#sDatePlace').datepicker('getDate');
-            var endMonth = parseInt($('#eDatePlace .ui-datepicker-month').val());
-            var endYear = parseInt($('#eDatePlace .ui-datepicker-year').val());
-            var end_date = new Date(endMonth > 9 ? endYear + 1 : endYear, (endMonth + 2) % 12, 1);
+            var startDate = $('#sDatePlace').datepicker('getDate');
+            var endMonth = +$('#eDatePlace .ui-datepicker-month').val();
+            var endYear = +$('#eDatePlace .ui-datepicker-year').val();
+            // Create a date on the first of the month, two months after the endMonth, endYear values.
+            var endDate = new Date(endMonth > 9 ? endYear + 1 : endYear, (endMonth + 2) % 12, 1);
             var frequency = $('#repeatability input:radio[name=repeat_frequency]:checked').val();
 
-            validEndDates = generateValidEndDates(start_date, end_date, frequencies[frequency]);
+            validEndDates = generateValidEndDates(startDate, endDate, frequencies[frequency]);
         }
 
         function selectEndDate() {
@@ -191,22 +193,23 @@ ${ form.repeat_interval(type='hidden') }
             repetition[RRule.DAILY] = 'days';
             repetition[RRule.WEEKLY] = 'weeks';
             repetition[RRule.MONTHLY] = 'months';
-            var start_date = $('#sDatePlace').datepicker('getDate');
-            var selected_end_date = $('#eDatePlace').datepicker('getDate');
+            var startDate = $('#sDatePlace').datepicker('getDate');
+            var selectedEndDate = $('#eDatePlace').datepicker('getDate');
             var frequency = frequencies[$('#repeatability input:radio[name=repeat_frequency]:checked').val()];
+            var forceSetEndDate = false;
+            var endDate;
 
-            if (selected_end_date.getTime() <= start_date.getTime()) {
-                var end_date = moment(start_date).add(2, repetition[frequency]).toDate();
-                var forceSetEndDate = true;
+            if (selectedEndDate.getTime() <= startDate.getTime()) {
+                endDate = moment(startDate).add(2, repetition[frequency]).toDate();
+                forceSetEndDate = true;
             } else {
-                var end_date = moment(selected_end_date).add(1, repetition[frequency]).toDate();
-                var forceSetEndDate = false;
+                endDate = moment(selectedEndDate).add(1, repetition[frequency]).toDate();
             }
-            var endDates = generateValidEndDates(start_date, end_date, frequency);
+            var endDates = generateValidEndDates(startDate, endDate, frequency);
 
-            if (endDates !== null && !! endDates.length &&
-                    (forceSetEndDate || endDates.indexOf(end_date.getTime()) === -1)) {
-                $('#eDatePlace').datepicker('setDate', getClosestDate(endDates, selected_end_date));
+            if (endDates !== null && endDates.length &&
+                    (forceSetEndDate || endDates.indexOf(selectedEndDate.getTime()) === -1)) {
+                $('#eDatePlace').datepicker('setDate', getClosestDate(endDates, selectedEndDate));
                 $('#eDatePlace').datepicker('refresh');
             }
         }
@@ -230,7 +233,7 @@ ${ form.repeat_interval(type='hidden') }
             while (lo <= hi) {
                 mid = Math.floor((lo + hi) / 2);
                 if (date < dates[mid]) {
-                    hi = mid -1
+                    hi = mid - 1;
                 } else if (date > dates[mid]) {
                     lo = mid + 1;
                 } else {
@@ -245,8 +248,8 @@ ${ form.repeat_interval(type='hidden') }
                 return new Date(dates[hi]);
             }
 
-            dLo = Math.abs(date - dates[lo]);
-            dHi = Math.abs(date - dates[hi]);
+            var dLo = Math.abs(date - dates[lo]);
+            var dHi = Math.abs(date - dates[hi]);
             return dLo <= dHi ? new Date(dates[lo]) : new Date(dates[hi]);
         }
 
