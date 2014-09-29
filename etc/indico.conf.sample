@@ -384,3 +384,11 @@ OAuthAccessTokenTTL = 10000
 # notification that encourages its usage when the user accesses the Desktop Indico
 # from a mobile device. One only needs to add the URL of Indico mobile here:
 # MobileURL = "http://m.indico.your.domain"
+
+#------------------------------------------------------------------------------
+# ACTIVE PLUGINS
+#------------------------------------------------------------------------------
+
+# List of plugins to be loaded on server start.
+#
+# Plugins = {'example'}
