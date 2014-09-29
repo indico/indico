@@ -85,7 +85,7 @@ class PluginDBCommand(Command):
     flask-migrate use the plugin's migrations.
     """
     @classmethod
-    def from_command(cls, command):
+    def from_command(cls, command, require_plugin_arg):
         """Clones an existing command.
 
         :param command: A Flask-Script `Command`
@@ -95,6 +95,7 @@ class PluginDBCommand(Command):
         new_command.__doc__ = command.__doc__
         new_command.help_args = command.help_args
         new_command.option_list = tuple(command.option_list)
+        new_command.require_plugin_arg = require_plugin_arg
         return new_command
 
     def __call__(self, app=None, *args, **kwargs):
@@ -122,6 +123,7 @@ class PluginDBCommand(Command):
     def create_parser(self, *args, **kwargs):
         parser = super(PluginDBCommand, self).create_parser(*args, **kwargs)
         parser.add_argument('--plugin', dest='plugins', action='append', default=[], metavar='PLUGIN',
+                            required=self.require_plugin_arg,
                             help='Plugin name to work on - can be used multiple times')
         return parser
 
@@ -131,8 +133,9 @@ def _make_plugin_database_manager():
     manager = deepcopy(DatabaseManager)
     manager.description = 'Perform database migrations for plugins'
     del manager._commands['prepare']  # not needed for plugins
+    single_plugin_commands = {'migrate', 'revision', 'downgrade', 'stamp'}
     for name, command in manager._commands.iteritems():
-        manager._commands[name] = PluginDBCommand.from_command(command)
+        manager._commands[name] = PluginDBCommand.from_command(command, name in single_plugin_commands)
     return manager
 
 
