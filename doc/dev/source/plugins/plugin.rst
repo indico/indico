@@ -62,7 +62,7 @@ The plugin can specify its settings via a :class:`~indico.web.forms.base.IndicoF
 
 The plugin can also specify request handlers and templates. Templates will be loaded from a `templates` folder within
 your plugin folder. Your plugin can even load templates from other modules by prefixing the name of the template
-`'other_plugin:example'`. ::
+`'other_plugin:example'` with `render_template()`. ::
 
     class WPExample(WPMainBase):
         def _getBody(self, params):
