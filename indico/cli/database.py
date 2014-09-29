@@ -20,6 +20,7 @@ from copy import deepcopy
 
 import alembic.command
 from alembic.script import ScriptDirectory
+from flask import current_app
 from flask_migrate import MigrateCommand as DatabaseManager
 from flask_migrate import stamp
 from flask_pluginengine import current_plugin
@@ -38,8 +39,19 @@ def prepare():
     if 'alembic_version' not in tables['public']:
         print colored('Setting the alembic version to HEAD', 'green')
         stamp()
-        # Retrieve the table list again, that way we fail if the alembic version table was not created
+        PluginScriptDirectory.dir = os.path.join(current_app.root_path, 'core', 'plugins', 'alembic')
+        alembic.command.ScriptDirectory = PluginScriptDirectory
+        plugin_msg = cformat("%{cyan}Setting the alembic version of the %{cyan!}{}%{reset}%{cyan} "
+                             "plugin to HEAD%{reset}")
+        for plugin in plugin_engine.get_active_plugins().itervalues():
+            if not os.path.exists(plugin.alembic_versions_path):
+                continue
+            print plugin_msg.format(plugin.name)
+            with plugin.plugin_context():
+                stamp()
+        # Retrieve the table list again, just in case we created unexpected hables
         tables = get_all_tables(db)
+
     tables['public'] = [t for t in tables['public'] if not t.startswith('alembic_version')]
     if any(tables.viewvalues()):
         print colored('Your database is not empty!', 'red')
