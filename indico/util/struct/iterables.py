@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
@@ -15,7 +12,7 @@
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict, OrderedDict
 from itertools import groupby, chain, combinations
@@ -76,3 +73,20 @@ def powerset(iterable):
     # Taken from https://docs.python.org/2/library/itertools.html#recipes
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s)+1))
+
+
+def committing_iterator(iterable, n=100):
+    """Iterates over *iterable* and commits every *n* items.
+
+    It also issues a commit after the iterator has been exhausted.
+
+    :param iterable: An iterable object
+    :param n: Number of items to commit after
+    """
+    from indico.core.db import db
+
+    for i, data in enumerate(iterable, 1):
+        yield data
+        if i % n == 0:
+            db.session.commit()
+    db.session.commit()
