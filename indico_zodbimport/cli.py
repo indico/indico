@@ -30,6 +30,7 @@ from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.migration import migrate as alembic_migrate
 from indico.core.db.sqlalchemy.util.management import delete_all_tables
 from indico.core.db.sqlalchemy.util.session import update_session_options
+from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
 from indico.util.decorators import classproperty
 from indico_zodbimport.util import UnbreakingDB, get_storage
@@ -51,6 +52,9 @@ def cli(ctx, **kwargs):
 
 
 class Importer(object):
+    #: Specify plugins that need to be loaded for the import (e.g. to access its .settings property)
+    plugins = frozenset()
+
     def __init__(self, sqlalchemy_uri, zodb_uri, destructive):
         self.sqlalchemy_uri = sqlalchemy_uri
         self.zodb_uri = zodb_uri
@@ -87,7 +91,14 @@ class Importer(object):
         update_session_options(db)  # get rid of the zope transaction extension
 
         self.app = app = Flask('indico_zodbimport')
+        app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
+        app.config['PLUGINENGINE_PLUGINS'] = self.plugins
         app.config['SQLALCHEMY_DATABASE_URI'] = self.sqlalchemy_uri
+        plugin_engine.init_app(app)
+        if not plugin_engine.load_plugins(app):
+            print cformat('%{red!}Could not load some plugins: {}%{reset}').format(
+                ', '.join(plugin_engine.get_failed_plugins(app)))
+            sys.exit(1)
         db.init_app(app)
         alembic_migrate.init_app(app, db, os.path.join(app.root_path, '..', 'migrations'))
 
