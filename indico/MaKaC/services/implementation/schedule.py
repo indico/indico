@@ -723,8 +723,8 @@ class ModifyStartEndDate(ScheduleOperation):
         # The order to set the start date and duration is important, please keep it like this.
         # Otherwise, by modifying the startDate we might find entries inside a slot that are
         # temporarly outside and an exception will be raised.
-        self._schEntry.setDuration(dur=duration,check=checkFlag)
         self._schEntry.setStartDate(self._startDate, moveEntries=1, check=checkFlag)
+        self._schEntry.setDuration(dur=duration,check=checkFlag)
 
         # In case of 'reschedule', calculate the time difference
         if self._reschedule:
