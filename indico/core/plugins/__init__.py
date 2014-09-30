@@ -30,6 +30,7 @@ from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.models.settings import SettingsProxy
 from indico.util.decorators import cached_classproperty
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
+from indico.web.flask.util import url_for
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 
 
@@ -170,6 +171,12 @@ def plugin_css_assets(bundle):
     """Jinja template function to generate HTML tags for a CSS asset bundle."""
     return Markup('\n'.join('<link rel="stylesheet" type="text/css" href="{}">'.format(url)
                             for url in current_plugin.assets[bundle].urls()))
+
+
+def url_for_plugin(endpoint, *targets, **values):
+    """Like url_for but prepending plugin_ to endpoint."""
+    endpoint = 'plugin_{}'.format(endpoint)
+    return url_for(endpoint, *targets, **values)
 
 
 class IndicoPluginEngine(PluginEngine):

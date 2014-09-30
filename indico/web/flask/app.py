@@ -44,7 +44,7 @@ from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
-from indico.core.plugins import plugin_engine, plugin_css_assets, plugin_js_assets
+from indico.core.plugins import plugin_engine, plugin_css_assets, plugin_js_assets, url_for_plugin
 from indico.web.assets import core_env, register_all_css, register_all_js
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
@@ -123,6 +123,7 @@ def setup_jinja(app):
     app.add_template_filter(EnsureUnicodeExtension.ensure_unicode)
     # Global functions
     app.add_template_global(url_for)
+    app.add_template_global(url_for_plugin)
     app.add_template_global(url_rule_to_js)
     app.add_template_global(IndicoConfigWrapper(config), 'indico_config')
     app.add_template_global(config.getSystemIconURL, 'system_icon')
@@ -216,7 +217,8 @@ def add_plugin_blueprints(app):
         elif isinstance(blueprints, Blueprint):
             blueprints = (blueprints,)
         for blueprint in blueprints:
-            if blueprint.name not in (plugin.name, '{}_compat'.format(plugin.name)):
+            expected_name = 'plugin_{}'.format(plugin.name)
+            if blueprint.name not in (expected_name, 'compat_{}'.format(expected_name)):
                 raise Exception("Blueprint '{}' does not match plugin name '{}'".format(blueprint.name, plugin.name))
             if blueprint.name in blueprint_names:
                 raise Exception("Blueprint '{}' defined by multiple plugins".format(blueprint.name))
