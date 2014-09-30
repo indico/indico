@@ -18,3 +18,5 @@ one. Check the documentation of each signal on how it's used.
    :annotation:
 .. autodata:: indico.core.signals.inject_js
    :annotation:
+.. autodata:: indico.core.signals.event_management_sidemenu
+   :annotation:

@@ -51,3 +51,9 @@ inject_js = _signals.signal('inject-js', """
 Expected to return a list of JS URLs which are loaded after all
 other JS. The *sender* is the WP class of the page.
 """)
+
+event_management_sidemenu = _signals.signal('event-management-sidemenu', """
+Expected to return a list of SideMenuItem objects to be added to the event
+management side menu. Receives the event object. The *sender* is the
+WPConferenceModifBase class.
+""")

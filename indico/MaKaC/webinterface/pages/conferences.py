@@ -23,7 +23,7 @@ import os
 import random
 import time
 import urllib
-from indico.util import json
+from itertools import chain
 
 from datetime import timedelta, datetime
 from xml.sax.saxutils import quoteattr, escape
@@ -80,6 +80,8 @@ from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.common.TemplateExec import render
 
+from indico.core import signals
+from indico.util import json
 from indico.web.flask.util import url_for
 
 
@@ -1469,9 +1471,17 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         self._notify('fillManagementSideMenu', self._pluginsDictMenuItem)
         for element in self._pluginsDictMenuItem.values():
             try:
-                self._generalSection.addItem( element)
-            except Exception, e:
-                Logger.get('Conference').error("Exception while trying to access the plugin elements of the side menu: %s" %str(e))
+                self._generalSection.addItem(element)
+            except Exception as e:
+                Logger.get('Conference').error(
+                    "Exception while trying to access the plugin elements of the side menu: {}".format(str(e)))
+
+        for item in list(chain.from_iterable(items for _, items in signals.event_management_sidemenu.send(self._conf))):
+            try:
+                self._generalSection.addItem(item)
+            except Exception as e:
+                Logger.get('Conference').error(
+                    "Exception while trying to access the plugin elements of the side menu: {}".format(str(e)))
 
         self._sideMenu.addSection(self._generalSection)
 
