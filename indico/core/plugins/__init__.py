@@ -28,7 +28,7 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.models.settings import SettingsProxy
-from indico.util.decorators import cached_classproperty
+from indico.util.decorators import cached_classproperty, classproperty
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
 from indico.web.flask.util import url_for
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
@@ -153,9 +153,19 @@ class IndicoPlugin(Plugin):
             kwargs['sender'] = view_class
         self.connect(signals.inject_js, lambda _: self.assets[name].urls(), **kwargs)
 
+    @classproperty
+    @classmethod
+    def instance(cls):
+        """The Plugin instance used by the current app"""
+        instance = plugin_engine.get_plugin(cls.name)
+        if instance is None:
+            raise RuntimeError('Plugin is not active in the current app')
+        return instance
+
     @cached_classproperty
     @classmethod
     def settings(cls):
+        """:class:`SettingsProxy` for the plugin's settings"""
         if cls.name is None:
             raise RuntimeError('Plugin has not been loaded yet')
         return SettingsProxy('plugin_{}'.format(cls.name))
