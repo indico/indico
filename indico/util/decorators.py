@@ -33,14 +33,23 @@ class classproperty(property):
 
 
 class cached_classproperty(property):
-    def __get__(self, obj, type=None):
+    def __get__(self, obj, objtype=None):
         # The property name is the function's name
         name = self.fget.__get__(True).im_func.__name__
-        value = object.__getattribute__(type, name)
+        # In case of inheritance the attribute might be defined in a superclass
+        for mrotype in objtype.__mro__:
+            try:
+                value = object.__getattribute__(mrotype, name)
+            except AttributeError:
+                pass
+            else:
+                break
+        else:
+            raise AttributeError(name)
         # We we have a cached_classproperty, the value has not been resolved yet
         if isinstance(value, cached_classproperty):
-            value = self.fget.__get__(None, type)()
-            setattr(type, name, value)
+            value = self.fget.__get__(None, objtype)()
+            setattr(objtype, name, value)
         return value
 
 
