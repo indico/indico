@@ -110,6 +110,9 @@ class Importer(object):
             self.tz = pytz.utc
 
         with app.app_context():
+            if not self.pre_check():
+                sys.exit(1)
+
             if self.destructive:
                 print cformat('%{yellow!}*** DANGER')
                 print cformat('%{yellow!}***%{reset} '
@@ -132,6 +135,30 @@ class Importer(object):
 
     def connect_zodb(self):
         self.zodb_root = UnbreakingDB(get_storage(self.zodb_uri)).open().root()
+
+    def check_plugin_schema(self, name):
+        """Checks if a plugin schema exists in the database.
+
+        :param name: Name of the plugin
+        """
+        sql = 'SELECT COUNT(*) FROM "information_schema"."schemata" WHERE "schema_name" = :name'
+        count = db.engine.execute(db.text(sql), name='plugin_{}'.format(name)).scalar()
+        if not count:
+            print cformat('%{red!}Plugin schema does not exist%{reset}')
+            print cformat('Run %{yellow!}indico plugindb upgrade --plugin {}%{reset} to create it').format(name)
+            return False
+        return True
+
+    def pre_check(self):
+        """Early checks before doing anything.
+
+        Add checks here that should run before performing any
+        modifications. You could use this method to check if
+        the database contains the necessary tables.
+
+        :return: bool indicating if the migration should run
+        """
+        return True
 
     def has_data(self):
         return False
