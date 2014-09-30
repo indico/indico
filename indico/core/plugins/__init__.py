@@ -22,13 +22,13 @@ from flask_pluginengine import (PluginEngine, Plugin, PluginBlueprintMixin, Plug
                                 current_plugin)
 from markupsafe import Markup
 from webassets import Environment, Bundle
-from werkzeug.utils import cached_property
 
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.models.settings import SettingsProxy
+from indico.util.decorators import cached_classproperty
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 
@@ -152,9 +152,12 @@ class IndicoPlugin(Plugin):
             kwargs['sender'] = view_class
         self.connect(signals.inject_js, lambda _: self.assets[name].urls(), **kwargs)
 
-    @cached_property
-    def settings(self):
-        return SettingsProxy('plugin_{}'.format(self.name))
+    @cached_classproperty
+    @classmethod
+    def settings(cls):
+        if cls.name is None:
+            raise RuntimeError('Plugin has not been loaded yet')
+        return SettingsProxy('plugin_{}'.format(cls.name))
 
 
 def plugin_js_assets(bundle):

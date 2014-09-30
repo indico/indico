@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
@@ -157,3 +154,7 @@ class SettingsProxy(object):
     def delete_all(self):
         """Deletes all settings."""
         return Setting.delete_all(self.module)
+
+    @return_ascii
+    def __repr__(self):
+        return u'<SettingsProxy({})>'.format(self.module)
