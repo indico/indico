@@ -1,0 +1,2 @@
+Put ZODB-to-SQLAlchemy migration scripts in here if they import data
+from the indico core, i.e. anything that is not in a plugin.

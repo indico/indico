@@ -439,6 +439,7 @@ if __name__ == '__main__':
                           find_packages(where='indico',
                                         exclude=['htdocs*', 'MaKaC*']))
     foundPackages.append('indico')
+    foundPackages.append('indico_zodbimport')
 
     cmdclass = {'sdist': sdist_indico,
                 'bdist': _bdist_indico(dataFiles),
@@ -475,6 +476,10 @@ if __name__ == '__main__':
             indico_ctl = MaKaC.consoleScripts.indicoCtl:main
             indico_livesync = indico.ext.livesync.console:main
             indico = indico.cli.manage:main
+            indico-zodbimport = indico_zodbimport.cli:main
+
+            [indico.zodb_importers]
+            roombooking = indico_zodbimport.modules.roombooking:RoomBookingImporter
 
             [indico.ext_types]
 
