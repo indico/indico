@@ -26,5 +26,7 @@ For example, a receiver function could look like this::
    :annotation:
 .. autodata:: indico.core.signals.inject_js
    :annotation:
+.. autodata:: indico.core.signals.template_hook
+   :annotation:
 .. autodata:: indico.core.signals.event_management_sidemenu
    :annotation:

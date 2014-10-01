@@ -16,6 +16,7 @@
 
 import os
 import re
+from heapq import heappush
 from urlparse import urlparse
 
 from flask_pluginengine import (PluginEngine, Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin,
@@ -153,6 +154,26 @@ class IndicoPlugin(Plugin):
             kwargs['sender'] = view_class
         self.connect(signals.inject_js, lambda _: self.assets[name].urls(), **kwargs)
 
+    def template_hook(self, name, receiver, markup=True):
+        """Registers a function to be called when a template hook is invoked.
+
+        The receiver function should always support arbitrary ``**kwargs``
+        to prevent breakage in future Indico versions which might add new
+        arguments to a hook::
+
+            def receiver(something, **kwargs):
+                return do_stuff(something)
+
+        It needs to return a unicode string. If you intend to return plaintext
+        it is adviable to set the `markup` param to `False` which results in the
+        string being considered "unsafe" which will cause it to be HTML-escaped.
+
+        :param name: The name of the template hook.
+        :param receiver: The receiver function.
+        :param markup: If the returned data is HTML
+        """
+        self.connect(signals.template_hook, lambda _, **kw: (markup, receiver(**kw)), sender=unicode(name))
+
     @classproperty
     @classmethod
     def instance(cls):
@@ -181,6 +202,27 @@ def plugin_css_assets(bundle):
     """Jinja template function to generate HTML tags for a CSS asset bundle."""
     return Markup('\n'.join('<link rel="stylesheet" type="text/css" href="{}">'.format(url)
                             for url in current_plugin.assets[bundle].urls()))
+
+
+def plugin_hook(*name, **kwargs):
+    """Template function to let plugins add their own data to a template.
+
+    :param name: The name of the hook.  Only accepts one argument.
+    :param kwargs: Data to pass to the signal receivers.
+    """
+    if len(name) != 1:
+        raise TypeError('plugin_hook() accepts only one positional argument, {} given'.format(len(name)))
+    name = name[0]
+    values = []
+    for _, (is_markup, value) in signals.template_hook.send(unicode(name), **kwargs):
+        if isinstance(value, tuple):
+            priority, value = value
+        else:
+            priority = 50
+        if is_markup:
+            value = Markup(value)
+        heappush(values, (priority, value))
+    return Markup(u'\n').join(x[1] for x in values)
 
 
 def url_for_plugin(endpoint, *targets, **values):
