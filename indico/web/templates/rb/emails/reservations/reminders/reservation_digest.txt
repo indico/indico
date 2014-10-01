@@ -2,7 +2,7 @@
 {% block recipient %}{{ owner.getName() if owner else 'user' }}{% endblock %}
 
 {% block email_body -%}
-This is a reminder digest about a weekly booking at your name:
+This is a reminder digest about a weekly booking under your name:
 
 Room: {{ reservation.room.name }}
 Time: {{ reservation.start_dt | format_time }} - {{ reservation.end_dt | format_time }}
