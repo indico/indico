@@ -82,6 +82,7 @@ from MaKaC.common.TemplateExec import render
 
 from indico.core import signals
 from indico.util import json
+from indico.util.signals import list_from_signal
 from indico.web.flask.util import url_for
 
 
@@ -1476,8 +1477,10 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
                 Logger.get('Conference').error(
                     "Exception while trying to access the plugin elements of the side menu: {}".format(str(e)))
 
-        for item in list(chain.from_iterable(items for _, items in signals.event_management_sidemenu.send(self._conf))):
+        self._pluginMenuItems = {}
+        for name, item in list_from_signal(signals.event_management_sidemenu.send(self._conf)):
             try:
+                self._pluginMenuItems[name] = item
                 self._generalSection.addItem(item)
             except Exception as e:
                 Logger.get('Conference').error(
