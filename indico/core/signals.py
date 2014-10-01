@@ -51,13 +51,12 @@ other JS. The *sender* is the WP class of the page.
 """)
 
 template_hook = _signals.signal('template-hook', """
-Expected to return a ``(is_markup, value)`` tuple. The returned value
-will be inserted at the location where this signal is triggered.
-If `is_markup` is True, the value will be wrapped in a `Markup` object
-which will cause it to be rendered as HTML.
-The value can also be a ``(priority, value)`` tuple to ensure a
-specific order if multiple plugins use the same hook. The default
-priority is `50`.
+Expected to return a ``(is_markup, priority, value)`` tuple.
+The returned value will be inserted at the location where
+this signal is triggered; if multiple receivers are connected
+to the signal, they will be ordered by priority.
+If `is_markup` is True, the value will be wrapped in a `Markup`
+object which will cause it to be rendered as HTML.
 The *sender* is the name of the actual hook. The keyword arguments
 depend on the hook.
 """)

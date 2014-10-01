@@ -154,7 +154,7 @@ class IndicoPlugin(Plugin):
             kwargs['sender'] = view_class
         self.connect(signals.inject_js, lambda _: self.assets[name].urls(), **kwargs)
 
-    def template_hook(self, name, receiver, markup=True):
+    def template_hook(self, name, receiver, priority=50, markup=True):
         """Registers a function to be called when a template hook is invoked.
 
         The receiver function should always support arbitrary ``**kwargs``
@@ -170,9 +170,11 @@ class IndicoPlugin(Plugin):
 
         :param name: The name of the template hook.
         :param receiver: The receiver function.
+        :param priority: The priority to use when multiple plugins
+                         inject data for the same hook.
         :param markup: If the returned data is HTML
         """
-        self.connect(signals.template_hook, lambda _, **kw: (markup, receiver(**kw)), sender=unicode(name))
+        self.connect(signals.template_hook, lambda _, **kw: (markup, priority, receiver(**kw)), sender=unicode(name))
 
     @classproperty
     @classmethod
@@ -214,11 +216,7 @@ def plugin_hook(*name, **kwargs):
         raise TypeError('plugin_hook() accepts only one positional argument, {} given'.format(len(name)))
     name = name[0]
     values = []
-    for _, (is_markup, value) in signals.template_hook.send(unicode(name), **kwargs):
-        if isinstance(value, tuple):
-            priority, value = value
-        else:
-            priority = 50
+    for _, (is_markup, priority, value) in signals.template_hook.send(unicode(name), **kwargs):
         if is_markup:
             value = Markup(value)
         heappush(values, (priority, value))
