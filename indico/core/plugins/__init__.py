@@ -20,7 +20,7 @@ from heapq import heappush
 from urlparse import urlparse
 
 from flask_pluginengine import (PluginEngine, Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin,
-                                current_plugin)
+                                current_plugin, render_plugin_template)
 from markupsafe import Markup
 from webassets import Environment, Bundle
 
@@ -33,6 +33,7 @@ from indico.util.decorators import cached_classproperty, classproperty
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
 from indico.web.flask.util import url_for
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
+from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 
 class IndicoPlugin(Plugin):
@@ -251,5 +252,10 @@ class IndicoPluginBlueprint(PluginBlueprintMixin, IndicoBlueprint):
     def make_setup_state(self, app, options, first_registration=False):
         return IndicoPluginBlueprintSetupState(self, app, options, first_registration)
 
+
+class WPJinjaMixinPlugin(WPJinjaMixin):
+    def _getPageContent(self, params):
+        template = params.pop('_jinja_template')
+        return render_plugin_template(template, **params)
 
 plugin_engine = IndicoPluginEngine()
