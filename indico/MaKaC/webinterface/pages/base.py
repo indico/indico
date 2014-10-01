@@ -43,7 +43,7 @@ class WPJinjaMixin:
     """
 
     @classmethod
-    def render_template(cls, template=None, **context):
+    def render_template(cls, template=None, *wp_args, **context):
         """Renders a jinja template inside the WP
 
         :param template: the name of the template - if unsed, the
@@ -52,7 +52,7 @@ class WPJinjaMixin:
                         context of the template
         """
         context['_jinja_template'] = template or cls._template
-        return cls(g.rh, **context).display()
+        return cls(g.rh, *wp_args, **context).display()
 
     def _getPageContent(self, params):
         template = params.pop('_jinja_template')
