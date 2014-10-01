@@ -1033,7 +1033,7 @@ class Avatar(Persistent, Fossilizable):
 
         if self.isAdmin():
             return True
-        principals = retrieve_principals(settings.get('admin_principals', []))
+        principals = retrieve_principals(settings.get('admin_principals'))
         return any(principal.containsUser(self) for principal in principals)
 
     @property

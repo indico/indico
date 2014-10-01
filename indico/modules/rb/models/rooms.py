@@ -674,7 +674,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         from indico.modules.rb import settings
         digest_start = round_up_month(date.today(), from_day=2)
         days_until_next_digest = (digest_start - date.today()).days
-        digest_window = self.notification_before_days or settings.get('notification_before_days', 1)
+        digest_window = self.notification_before_days or settings.get('notification_before_days')
         if exclude_first_day:
             return days_until_next_digest < digest_window
         else:
@@ -685,7 +685,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         from indico.modules.rb import settings
         digest_start = round_up_month(date.today(), from_day=2)
         days_until_next_digest = cast(digest_start, Date) - cast(func.now(), Date)
-        digest_window = func.coalesce(self.notification_before_days, settings.get('notification_before_days', 1))
+        digest_window = func.coalesce(self.notification_before_days, settings.get('notification_before_days'))
         if exclude_first_day:
             return days_until_next_digest < digest_window
         else:

@@ -19,4 +19,12 @@
 
 from indico.core.models.settings import SettingsProxy
 
-settings = SettingsProxy('roombooking')
+settings = SettingsProxy('roombooking', {
+    'admin_principals': [],
+    'authorized_principals': [],
+    'assistance_emails': [],
+    'vc_support_emails': [],
+    'notification_hour': 6,
+    'notification_before_days': 1,
+    'notifications_enabled': True
+})

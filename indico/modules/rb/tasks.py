@@ -13,7 +13,7 @@ from indico.util.date_time import get_month_end, round_up_month
 
 
 def _build_notification_window_filter():
-    if datetime.now().hour >= settings.get('notification_hour', 6):
+    if datetime.now().hour >= settings.get('notification_hour'):
         # Both today and delayed notifications
         return ReservationOccurrence.is_in_notification_window()
     else:
@@ -22,7 +22,7 @@ def _build_notification_window_filter():
 
 
 def _build_digest_window_filter():
-    if datetime.now().hour >= settings.get('notification_hour', 6):
+    if datetime.now().hour >= settings.get('notification_hour'):
         # Both today and delayed digests
         return Room.is_in_digest_window()
     else:
@@ -34,7 +34,7 @@ class OccurrenceDigest(PeriodicUniqueTask):
     DISABLE_ZODB_HOOK = True
 
     def run(self):
-        if not settings.get('notifications_enabled', True):
+        if not settings.get('notifications_enabled'):
             self._v_logger.info('Digest not sent because notifications are globally disabled')
             return
 
@@ -70,8 +70,8 @@ class OccurrenceNotifications(PeriodicUniqueTask):
     DISABLE_ZODB_HOOK = True
 
     def run(self):
-        if not settings.get('notifications_enabled', True):
-            self._v_logger.info('Notifications not sent because notifications are globally disabled')
+        if not settings.get('notifications_enabled'):
+            self._v_logger.info('Notifications not sent because they are globally disabled')
             return
 
         occurrences = ReservationOccurrence.find(

@@ -32,7 +32,7 @@ def rb_check_user_access(user):
 
     if user.isRBAdmin():
         return True
-    principals = retrieve_principals(settings.get('authorized_principals', []))
+    principals = retrieve_principals(settings.get('authorized_principals'))
     if not principals:  # everyone has access
         return True
     return any(principal.containsUser(user) for principal in principals)
@@ -56,7 +56,7 @@ def rb_merge_users(new_id, old_id):
     Reservation.find(booked_for_id=old_id).update({'booked_for_id': new_id})
     Room.find(owner_id=old_id).update({'owner_id': new_id})
     for key in ('authorized_principals', 'admin_principals'):
-        principals = settings.get(key, [])
+        principals = settings.get(key)
         principals = principals_merge_users(principals, new_id, old_id)
         settings.set(key, principals)
 
