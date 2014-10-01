@@ -201,7 +201,9 @@ class WerkzeugServer(object):
         else:
             assert self._server is None  # otherwise the socket is already bound
             self._test_socket()
-            werkzeug.serving.run_with_reloader(self._run_new_server)
+            cfg_dir = Config.getInstance().getConfigurationDir()
+            extra_files = [os.path.join(cfg_dir, name) for name in ('logging.conf', 'indico.conf')]
+            werkzeug.serving.run_with_reloader(self._run_new_server, extra_files)
 
     @staticmethod
     def _patch_shutdown_request():
