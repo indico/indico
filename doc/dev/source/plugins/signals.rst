@@ -8,6 +8,14 @@ should not do). Each signal has a *sender* which can be any object
 Some signals also make use of their return value or even require
 one. Check the documentation of each signal on how it's used.
 
+To avoid breakage with newer versions of Indico, it is highly
+advised to always accept extra ``**kwargs`` in your signal receiver.
+For example, a receiver function could look like this::
+
+    def receiver(sender, something, **kwargs):
+        do_stuff_with(something)
+
+
 .. autodata:: indico.core.signals.cli
    :annotation:
 .. autodata:: indico.core.signals.shell_context
