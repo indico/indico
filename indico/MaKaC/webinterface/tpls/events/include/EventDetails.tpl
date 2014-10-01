@@ -113,6 +113,8 @@
 % endif
 
 ${pluginDetails}
+${ plugin_hook('event-header', event=conf) }
+
 % if conf.getSupportInfo().getEmail() or conf.getSupportInfo().getTelephone():
 <tr>
     <td class="leftCol">${supportEmailCaption}</td>
