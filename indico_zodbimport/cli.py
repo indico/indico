@@ -22,7 +22,6 @@ from pkg_resources import iter_entry_points
 
 import click
 import pytz
-from flask import Flask
 from flask_migrate import stamp
 from sqlalchemy.sql import func, select
 
@@ -33,6 +32,7 @@ from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
 from indico.util.decorators import classproperty
+from indico.web.flask.wrappers import IndicoFlask
 from indico_zodbimport.util import UnbreakingDB, get_storage
 
 
@@ -90,7 +90,7 @@ class Importer(object):
     def setup(self):
         update_session_options(db)  # get rid of the zope transaction extension
 
-        self.app = app = Flask('indico_zodbimport')
+        self.app = app = IndicoFlask('indico_zodbimport')
         app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
         app.config['PLUGINENGINE_PLUGINS'] = self.plugins
         app.config['SQLALCHEMY_DATABASE_URI'] = self.sqlalchemy_uri

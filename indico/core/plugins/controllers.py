@@ -35,11 +35,12 @@ class RHPluginDetails(RHAdminBase):
     def _process(self):
         plugin = self.plugin
         form = None
-        if plugin.settings_form:
-            defaults = FormDefaults(**plugin.settings.get_all())
-            form = plugin.settings_form(obj=defaults)
-            if form.validate_on_submit():
-                plugin.settings.set_multi(form.data)
-                flash(_(u'Settings saved'), 'success')
-                return redirect(request.url)
+        with plugin.plugin_context():
+            if plugin.settings_form:
+                defaults = FormDefaults(**plugin.settings.get_all())
+                form = plugin.settings_form(obj=defaults)
+                if form.validate_on_submit():
+                    plugin.settings.set_multi(form.data)
+                    flash(_(u'Settings saved'), 'success')
+                    return redirect(request.url)
         return WPPlugins.render_template('details.html', plugin=plugin, form=form)

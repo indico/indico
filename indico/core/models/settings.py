@@ -20,6 +20,9 @@ from indico.core.db.sqlalchemy import db
 from indico.util.string import return_ascii
 
 
+_default = object()
+
+
 class Setting(db.Model):
     __tablename__ = 'settings'
     __table_args__ = (db.Index('ix_settings_module_key', 'module', 'name'),
@@ -102,8 +105,9 @@ class Setting(db.Model):
 class SettingsProxy(object):
     """Proxy class to access settings for a certain module"""
 
-    def __init__(self, module):
+    def __init__(self, module, defaults=None):
         self.module = module
+        self.defaults = defaults or {}
 
     def get_setting(self, name):
         """Retrieves a single setting.
@@ -113,21 +117,29 @@ class SettingsProxy(object):
         """
         return Setting.get_setting(self.module, name)
 
-    def get_all(self):
+    def get_all(self, no_defaults=False):
         """Retrieves all settings
 
+        :param no_defaults: Only return existing settings and ignore defaults.
         :return: Dict containing the settings
         """
-        return Setting.get_all(self.module)
+        if no_defaults:
+            return Setting.get_all(self.module)
+        settings = dict(self.defaults)
+        settings.update(Setting.get_all(self.module))
+        return settings
 
-    def get(self, name, default=None):
+    def get(self, name, default=_default):
         """Retrieves the value of a single setting.
 
         :param name: Setting name
         :param default: Default value in case the setting does not exist
         :return: The settings's value or the default value
         """
-        return Setting.get(self.module, name, default)
+        setting = Setting.get(self.module, name, default)
+        if setting is _default:
+            return self.defaults.get(name)
+        return setting
 
     def set(self, name, value):
         """Sets a single setting.

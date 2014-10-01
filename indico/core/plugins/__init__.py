@@ -55,6 +55,8 @@ class IndicoPlugin(Plugin):
     settings_form = None
     #: A dictionary which can contain the kwargs for a specific field in the `settings_form`.
     settings_form_field_opts = {}
+    #: A dictionary containing default values for settings
+    default_settings = {}
 
     def init(self):
         """Called when the plugin is being loaded/initialized.
@@ -191,7 +193,9 @@ class IndicoPlugin(Plugin):
         """:class:`SettingsProxy` for the plugin's settings"""
         if cls.name is None:
             raise RuntimeError('Plugin has not been loaded yet')
-        return SettingsProxy('plugin_{}'.format(cls.name))
+        instance = cls.instance
+        with instance.plugin_context():  # in case the default settings come from a property
+            return SettingsProxy('plugin_{}'.format(cls.name), instance.default_settings)
 
 
 def plugin_js_assets(bundle):
