@@ -121,6 +121,8 @@ class RoomMapper(Persistent):
         groupdict = self.applyRegularExpressions(roomName)
         if groupdict:
             return self.getBaseMapURL().format(**groupdict)
+        if not roomName:
+            return ''
         if Config.getInstance().getIsRoomBookingActive():
             from indico.modules.rb.models.rooms import Room
             room = Room.find_first(name=roomName)
