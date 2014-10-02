@@ -24,7 +24,7 @@ from indico.util.fossilize import fossilize
 from indico.util.user import retrieve_principals
 from indico.util.string import is_valid_mail
 from indico.util.i18n import _
-from indico.web.forms.widgets import PrincipalWidget
+from indico.web.forms.widgets import PrincipalWidget, MultipleItemsWidget
 
 
 class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
@@ -109,3 +109,29 @@ class PrincipalField(HiddenField):
 
     def _value(self):
         return map(fossilize, retrieve_principals(self.data or []))
+
+
+class MultipleItemsField(HiddenField):
+    """A field with multiple items consisting of multiple string values.
+
+    :param fields: A list of ``(fieldname, title)`` tuples
+    """
+    widget = MultipleItemsWidget()
+
+    def __init__(self, *args, **kwargs):
+        self.fields = kwargs.pop('fields')
+        super(MultipleItemsField, self).__init__(*args, **kwargs)
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = json.loads(valuelist[0])
+
+    def pre_validate(self, form):
+        for item in self.data:
+            if not isinstance(item, dict):
+                raise ValueError(u'Invalid item type: {}'.format(type(item).__name__))
+            elif item.viewkeys() != {x[0] for x in self.fields}:
+                raise ValueError(u'Invalid item (bad keys): {}'.format(', '.join(item.viewkeys())))
+
+    def _value(self):
+        return self.data or []

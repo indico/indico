@@ -38,3 +38,19 @@ class PrincipalWidget(object):
     """Renders a user/group selector widget"""
     def __call__(self, field):
         return HTMLString(render_template('forms/principal_widget.html', field=field))
+
+
+class JinjaWidget(object):
+    """Renders a field using a custom Jinja template"""
+    def __init__(self, template, render_func=render_template):
+        self.template = template
+        self.render_func = render_func
+
+    def __call__(self, field):
+        return HTMLString(self.render_func(self.template, field=field))
+
+
+class MultipleItemsWidget(object):
+    """Renders a `MultipleItemsField` using a nice JavaScript widget"""
+    def __call__(self, field):
+        return HTMLString(render_template('forms/multiple_items_widget.html', field=field))

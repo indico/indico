@@ -1,0 +1,77 @@
+{% set value_json = field._value() | tojson %}
+<input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}">
+<table id="{{ field.id }}-widget">
+    <thead>
+        <tr>
+            {% for _, title in field.fields -%}
+                <th>{{ title }}</th>
+            {% endfor -%}
+            <th><a href="#" class="icon-plus js-add-row" title="Add"></a></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    (function() {
+        var columns = {{ field.fields | tojson }};
+        var widget = $('#{{ field.id }}-widget');
+        var widgetBody = widget.children('tbody');
+        var field = $('#{{ field.id }}');
+        var data = JSON.parse(field.val());
+        var deleteButton = $('<a>', {'class': 'icon-remove js-remove-row', 'href': '#', 'title': 'Delete'});
+        var saveButton = $('<a>', {'class': 'icon-disk js-save-row', 'href': '#', 'title': 'Save'});
+
+        data.forEach(function(item, i) {
+            createRow(item);
+        });
+
+        widget.on('click', '.js-remove-row', function(e) {
+            e.preventDefault();
+            var row = $(this).closest('tr');
+            data.splice(row.index(), 1);
+            updateField();
+            row.remove();
+        }).on('click', '.js-save-row', function(e) {
+            e.preventDefault();
+            var row = $(this).closest('tr');
+            var item = {};
+            columns.forEach(function(col, i) {
+                item[col[0]] = row.find('input').eq(i).val();
+            });
+            row.remove();
+            data.push(item);
+            updateField();
+            createRow(item);
+        }).on('click', '.js-add-row', function(e) {
+            e.preventDefault();
+            createRow();
+        }).on('keypress', 'input', function(e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                $(this).closest('tr').find('.js-save-row').trigger('click');
+            }
+        });
+
+        function createRow(item) {
+            var row = $('<tr>');
+            columns.forEach(function(col) {
+                var colData = item ? {
+                    text: item[col[0]]
+                } : {
+                    html: $('<input>', {
+                        type: 'text'
+                        // can't set placeholder here due to the jquery.placeholder plugin
+                    }).attr('placeholder', col[1])
+                };
+                $('<td>', colData).appendTo(row);
+            });
+            $('<td>', {html: item ? deleteButton.clone() : saveButton.clone()}).appendTo(row);
+            widgetBody.append(row);
+        }
+
+        function updateField() {
+            field.val(JSON.stringify(data));
+        }
+    })();
+</script>
