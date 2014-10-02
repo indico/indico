@@ -54,3 +54,9 @@ class MultipleItemsWidget(object):
     """Renders a `MultipleItemsField` using a nice JavaScript widget"""
     def __call__(self, field):
         return HTMLString(render_template('forms/multiple_items_widget.html', field=field))
+
+
+class CKEditorWidget(JinjaWidget):
+    """Renders a CKEditor WYSIWYG editor"""
+    def __init__(self):
+        super(CKEditorWidget, self).__init__('forms/ckeditor_widget.html')
