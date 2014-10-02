@@ -114,8 +114,8 @@ def stringToDate(str):
 
 class WPConferenceBase(base.WPDecorated):
 
-    def __init__(self, rh, conference):
-        WPDecorated.__init__(self, rh)
+    def __init__(self, rh, conference, **kwargs):
+        WPDecorated.__init__(self, rh, **kwargs)
         self._navigationTarget = self._conf = conference
         tz = self._tz = DisplayTZ(rh._aw, self._conf).getDisplayTZ()
         sDate = self.sDate = self._conf.getAdjustedScreenStartDate(tz)
