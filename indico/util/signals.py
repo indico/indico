@@ -17,11 +17,20 @@
 from types import GeneratorType
 
 
-def list_from_signal(signal_response):
-    values = []
+def values_from_signal(signal_response):
+    """Combines the results from both single-value and multi-value signals.
+
+    The signal needs to return either a single object (which is not a
+    generator) or a generator (usually by returning its values using
+    `yield`).
+
+    :param signal_response: The return value of a Signal's `.send()` method
+    :return: A set containing the results
+    """
+    values = set()
     for _, value in signal_response:
         if isinstance(value, GeneratorType):
-            values.extend(value)
+            values.update(value)
         else:
-            values.append(value)
+            values.add(value)
     return values
