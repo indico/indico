@@ -48,6 +48,8 @@ class WPJinjaMixin:
 
         :param template: the name of the template - if unsed, the
                          `_template` attribute of the class is used
+        :param wp_args: list of arguments to be passed to the WP class
+                        `__init__` method
         :param context: the variables that should be available in the
                         context of the template
         """
