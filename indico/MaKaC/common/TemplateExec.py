@@ -32,7 +32,6 @@ import MaKaC
 from MaKaC.plugins.base import PluginsHolder
 import xml.sax.saxutils
 
-from indico.core.plugins import plugin_hook
 from indico.util.date_time import format_number, format_datetime, format_date, format_time
 from indico.util.i18n import ngettext
 from indico.util.contextManager import ContextManager
@@ -327,6 +326,7 @@ def escapeHTMLForJS(s):
 
 
 def mako_plugin_hook(*name, **kwargs):
+    from indico.core.plugins import plugin_hook
     kwargs = {k: unicode(v, 'utf-8') if isinstance(v, str) else v for k, v in kwargs.iteritems()}
     result = plugin_hook(*name, **kwargs)
     return result.encode('utf-8')
