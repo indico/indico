@@ -271,6 +271,20 @@ def install_jquery():
             local('cp dist/jquery.js {0}/'.format(dest_dir))
 
 
+@recipe('jqplot')
+def install_jqplot():
+    """Install jQPlot from Git"""
+    with lcd(os.path.join(env.ext_dir, 'jqplot')):
+        dest_dir_js = os.path.join(lib_dir(env.src_dir, 'js'), 'jqplot')
+        dest_dir_css = lib_dir(env.src_dir, 'css')
+        dest_dir_js_core = os.path.join(dest_dir_js, 'core')
+        dest_dir_js_plugins = os.path.join(dest_dir_js, 'plugins')
+        local('mkdir -p {}'.format(dest_dir_js_core))
+        local('cp src/core/*.js {}'.format(dest_dir_js_core))
+        local('cp src/core/*.css {}'.format(dest_dir_css))
+        local('cp -r src/plugins {}'.format(dest_dir_js_plugins))
+
+
 @recipe('underscore')
 def install_underscore():
     """

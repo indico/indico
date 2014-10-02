@@ -308,6 +308,17 @@ moment = Bundle(
                'lang/fr.js'),
     filters='rjsmin', output='js/moment_%(version)s.min.js')
 
+jqplot_js = Bundle(
+    'js/lib/jqplot/core/jquery.jqplot.js',
+    'js/lib/jqplot/plugins/*/*.js',
+    filters='rjsmin', output='js/jqplot_%(version)s.min.js'
+)
+
+jqplot_css = Bundle(
+    'css/lib/jquery.jqplot.css',
+    filters='cssmin', output='css/jqplot_%(version)s.min.css'
+)
+
 mathjax_js = Bundle(
     'js/lib/mathjax/MathJax.js',
     'js/custom/pagedown_mathjax.js',
@@ -376,6 +387,7 @@ def register_all_js(env):
     env.register('abstracts_js', abstracts_js)
     env.register('contributions_js', contributions_js)
     env.register('mathjax_js', mathjax_js)
+    env.register('jqplot_js', jqplot_js)
 
 
 def register_all_css(env, main_css_file):
@@ -398,6 +410,7 @@ def register_all_css(env, main_css_file):
 
     env.register('base_css', base_css)
     env.register('indico_badges_css', indico_badges_css)
+    env.register('jqplot_css', jqplot_css)
 
     # SASS/SCSS
     env.register('registrationform_sass', registrationform_sass)
