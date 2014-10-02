@@ -44,8 +44,8 @@ from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
-from indico.core.plugins import plugin_engine, plugin_css_assets, plugin_js_assets, plugin_hook, url_for_plugin
-from indico.web.assets import core_env, register_all_css, register_all_js
+from indico.core.plugins import plugin_engine, include_plugin_css_assets, include_plugin_js_assets, plugin_hook, url_for_plugin
+from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
                                    IndicoConfigWrapper)
@@ -127,8 +127,10 @@ def setup_jinja(app):
     app.add_template_global(url_rule_to_js)
     app.add_template_global(IndicoConfigWrapper(config), 'indico_config')
     app.add_template_global(config.getSystemIconURL, 'system_icon')
-    app.add_template_global(plugin_css_assets)
-    app.add_template_global(plugin_js_assets)
+    app.add_template_global(include_css_assets)
+    app.add_template_global(include_js_assets)
+    app.add_template_global(include_plugin_css_assets)
+    app.add_template_global(include_plugin_js_assets)
     app.add_template_global(plugin_hook)
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))

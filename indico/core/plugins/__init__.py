@@ -199,16 +199,16 @@ class IndicoPlugin(Plugin):
             return SettingsProxy('plugin_{}'.format(cls.name), instance.default_settings)
 
 
-def plugin_js_assets(bundle):
-    """Jinja template function to generate HTML tags for a JS asset bundle."""
+def include_plugin_js_assets(bundle_name):
+    """Jinja template function to generate HTML tags for a plugin JS asset bundle."""
     return Markup('\n'.join('<script src="{}"></script>'.format(url)
-                            for url in current_plugin.assets[bundle].urls()))
+                            for url in current_plugin.assets[bundle_name].urls()))
 
 
-def plugin_css_assets(bundle):
-    """Jinja template function to generate HTML tags for a CSS asset bundle."""
+def include_plugin_css_assets(bundle_name):
+    """Jinja template function to generate HTML tags for a plugin CSS asset bundle."""
     return Markup('\n'.join('<link rel="stylesheet" type="text/css" href="{}">'.format(url)
-                            for url in current_plugin.assets[bundle].urls()))
+                            for url in current_plugin.assets[bundle_name].urls()))
 
 
 def plugin_hook(*name, **kwargs):

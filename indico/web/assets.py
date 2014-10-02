@@ -27,6 +27,7 @@ import os
 from urlparse import urlparse
 
 # 3rd party libs
+from markupsafe import Markup
 from webassets import Bundle, Environment
 
 # legacy imports
@@ -74,6 +75,17 @@ class PluginEnvironment(Environment):
 
 def namespace(dir_ns, *list_files):
     return [os.path.join(dir_ns, f) for f in list_files]
+
+
+def include_js_assets(bundle_name):
+    """Jinja template function to generate HTML tags for a JS asset bundle."""
+    return Markup('\n'.join('<script src="{}"></script>'.format(url) for url in core_env[bundle_name].urls()))
+
+
+def include_css_assets(bundle_name):
+    """Jinja template function to generate HTML tags for a CSS asset bundle."""
+    return Markup('\n'.join('<link rel="stylesheet" type="text/css" href="{}">'.format(url)
+                            for url in core_env[bundle_name].urls()))
 
 
 indico_core = Bundle(
