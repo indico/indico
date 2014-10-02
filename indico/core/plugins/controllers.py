@@ -43,4 +43,4 @@ class RHPluginDetails(RHAdminBase):
                     plugin.settings.set_multi(form.data)
                     flash(_(u'Settings saved'), 'success')
                     return redirect(request.url)
-        return WPPlugins.render_template('details.html', plugin=plugin, form=form)
+            return WPPlugins.render_template('details.html', plugin=plugin, form=form)

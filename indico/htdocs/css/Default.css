@@ -7340,3 +7340,12 @@ ul.speaker_list > li .contributions li {
 .watermark {
    color: gray;
 }
+
+.plugin-settings-form input[type=text] {
+    width: 400px;
+}
+
+.plugin-settings-form textarea {
+    width: 400px;
+    height: 200px;
+}

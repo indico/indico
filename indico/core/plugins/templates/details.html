@@ -5,12 +5,30 @@
 {% if not form %}
     {% trans %}This plugin does not have any settings.{% endtrans %}
 {% else %}
-    <form method="post" action="">
+    {% if form.errors %}
+        <div class="error-message-box">
+            <div class="message-text">
+                {% trans %}Please correct the following errors:{% endtrans %}
+                <ul>
+                    {% for error in form.error_list -%}
+                        <li>{{ error }}</li>
+                    {% endfor -%}
+                </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    <form method="post" action="" class="plugin-settings-form">
         <table>
             {% for field in form.visible_fields %}
                 <tr>
                     <td style="text-align: right; vertical-align: top;">{{ field.label() }}</td>
-                    <td>{{ field(**plugin.settings_form_field_opts.get(field.short_name, {})) }}</td>
+                    <td>
+                        {{ field(**plugin.settings_form_field_opts.get(field.short_name, {})) }}
+                        {% if field.description %}
+                            <p style="margin-top: 0.25em;"><em>{{ field.description | safe }}</em></p>
+                        {% endif %}
+                    </td>
                 </tr>
             {% endfor %}
         </table>
