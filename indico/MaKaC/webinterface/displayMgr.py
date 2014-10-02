@@ -17,20 +17,25 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.db import DBMgr
+import re
+
 from BTrees import OOBTree
 from persistent import Persistent
+from MaKaC.common.url import EndpointURL
+
+import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
+from indico.core import signals
+from indico.core.db import DBMgr
+from indico.util.contextManager import ContextManager
+from indico.util.i18n import _, N_
 from MaKaC.common.Counter import Counter
 from MaKaC.common.Locators import Locator
 from MaKaC.webinterface import urlHandlers
 from MaKaC.trashCan import TrashCanManager
-import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
 from MaKaC.errors import MaKaCError
 from MaKaC.conference import LocalFile
 from MaKaC.plugins.base import Observable
-import re
-from indico.util.contextManager import ContextManager
-from indico.util.i18n import _, N_
+from indico.util.signals import values_from_signal
 
 
 class ConfDisplayMgrRegistery:
@@ -186,8 +191,12 @@ class ConfDisplayMgr(DisplayMgr):
         self._displayNavigationBar = value
 
     def getMenu(self):
-        if self._menu.getParent() == None:
+        if self._menu.getParent() is None:
             self._menu.setParent(self)
+        plugin_items = frozenset(x.name for x in values_from_signal(signals.event_sidemenu.send()))
+        if getattr(self, 'plugin_items', frozenset()) != plugin_items:
+            self._menu.updateSystemLink()
+        self.plugin_items = plugin_items
         return self._menu
 
     def getConference(self):
@@ -236,6 +245,38 @@ class ConfDisplayMgr(DisplayMgr):
         except AttributeError, e:
             self._styleMngr = StyleManager(self._conf)
         return self._styleMngr
+
+
+class EventMenuEntry(object):
+    """Defines an endpoint-based conference menu entry.
+
+    :param endpoint: Name of the endpoint for building the link's target URL
+    :param caption: Caption of the link
+    :param parent: Name of the parent link
+    :param name: Name of the link. Defaults to the endpoint.
+    :param plugin: True if the endpoint is in a plugin
+    :param visible: Callback to set the visibility of the link.
+                    Invoked with the event as its only argument,
+                    must return True or False.
+    """
+    def __init__(self, endpoint, caption, parent=None, name=None, plugin=False, visible=None):
+        if plugin:
+            endpoint = 'plugin_{}'.format(endpoint)
+        self.endpoint = endpoint
+        self.caption = caption
+        self.parent = parent or ''  # the code actually expects '' and not None for top-level items m(
+        self.name = name or endpoint
+        self.visible = visible
+
+    def __hash__(self):
+        return hash((self.endpoint, self.name))
+
+    def __eq__(self, other):
+        return (self.endpoint, self.name) == (other.endpoint, other.name)
+
+    def __repr__(self):
+        return '<EventMenuEntry({}, {}, {})>'.format(self.name, self.endpoint, self.caption)
+
 
 class Menu(Persistent):
     """
@@ -312,7 +353,7 @@ class Menu(Persistent):
 
     def _createSystemLink(self, name, linksData):
         data = linksData.get(name, None)
-        if data == None:
+        if data is None:
             raise MaKaCError(_("error in the system link structure of the menu"))
         if data["parent"] == "":
             #create the link at the fisrt level
@@ -832,7 +873,12 @@ class SystemLink(Link):
         if isinstance(self._URLHandler, str):
             if self._URLHandler.startswith("http"):  # Fix for hardcoded URLs
                 self.getMenu().updateSystemLink()
-            handler = getattr(urlHandlers, self._URLHandler)
+            if '.' in self._URLHandler:
+                return EndpointURL(self._URLHandler,
+                                   urlHandlers.URLHandler._want_secure_url(),
+                                   urlHandlers.URLHandler._getParams(self.getMenu().getConference(), {}))
+            else:
+                handler = getattr(urlHandlers, self._URLHandler)
         else:
             handler = self._URLHandler
         return handler.getURL(self.getMenu().getConference())
@@ -874,6 +920,9 @@ class SystemLink(Link):
 class SystemLinkData(Observable):
 
     def __init__(self, conf=None):
+        plugin_entries = None
+        if not hasattr(self, '_linkData') or not hasattr(self, '_linkDataOrderedKeys'):
+            plugin_entries = values_from_signal(signals.event_sidemenu.send())
         #the following dict is used to update the system link of the menu. each new entry is added to the menu,
         #and all entries in the menu whiche are not is this dict are removed.
         if not hasattr(self, "_linkData"):
@@ -1007,6 +1056,13 @@ class SystemLinkData(Observable):
                     "parent": "evaluation"}
             }
             self._notify('confDisplaySMFillDict', {'dict': self._linkData, 'conf': conf})
+            for entry in plugin_entries:
+                assert entry.name not in self._linkData
+                self._linkData[entry.name] = {
+                    'caption': entry.caption,
+                    'URL': entry.endpoint,
+                    'parent': entry.parent
+                }
 
         #this ordered list allow us to keep the order we want for the menu
         if not hasattr(self, "_linkDataOrderedKeys"):
@@ -1042,11 +1098,13 @@ class SystemLinkData(Observable):
                                         "newEvaluation",
                                         "viewMyEvaluation"]
             self._notify('confDisplaySMFillOrderedKeys', self._linkDataOrderedKeys)
+            self._linkDataOrderedKeys += [x.name for x in plugin_entries]
 
     def getLinkData(self):
         return self._linkData
+
     def getLinkDataOrderedKeys(self):
-        self.__init__() #init self._linkDataOrderedKeys if it isn't defined.
+        self.__init__()  # init self._linkDataOrderedKeys if it isn't defined.
         return self._linkDataOrderedKeys
 
 

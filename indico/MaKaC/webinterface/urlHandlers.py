@@ -21,7 +21,7 @@ import os
 import string
 import urlparse
 
-from flask import request, session, url_for
+from flask import request, session, url_for, has_request_context
 
 import MaKaC.user as user
 from MaKaC.common.url import URL, EndpointURL
@@ -84,6 +84,17 @@ class URLHandler(object):
             return re.sub(r'^event\.', '', cls._endpoint) + '.html'
 
     @classmethod
+    def _want_secure_url(cls, force_secure=None):
+        if not Config.getInstance().getBaseSecureURL():
+            return False
+        elif force_secure is not None:
+            return force_secure
+        elif not has_request_context():
+            return False
+        else:
+            return request.is_secure
+
+    @classmethod
     def _getURL(cls, _force_secure=None, **params):
         """ Gives the full URL for the corresponding request handler.
 
@@ -92,15 +103,7 @@ class URLHandler(object):
                 params - (dict) parameters to be added to the URL.
         """
 
-        try:
-            secure = _force_secure if _force_secure is not None else request.is_secure
-        except RuntimeError:
-            # Outside Flask request context
-            secure = False
-
-        if not Config.getInstance().getBaseSecureURL():
-            secure = False
-
+        secure = cls._want_secure_url(_force_secure)
         if not cls._endpoint:
             # Legacy UH containing a relativeURL
             cfg = Config.getInstance()

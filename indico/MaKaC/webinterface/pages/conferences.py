@@ -23,7 +23,6 @@ import os
 import random
 import time
 import urllib
-from itertools import chain
 
 from datetime import timedelta, datetime
 from xml.sax.saxutils import quoteattr, escape
@@ -300,8 +299,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             self._uploadPaperOpt.setVisible(False)
             self._downloadTemplateOpt.setVisible(False)
 
-
-        if awUser != None:
+        if awUser is not None:
 
             conferenceRoles = awUser.getLinkedTo()["conference"]
 
@@ -326,6 +324,11 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
 
                 if showeditorarea and (self._conf.getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
                     self._judgeeditorListOpt.setVisible(True)
+
+        for item in values_from_signal(signals.event_sidemenu.send()):
+            if item.visible is not None:
+                link = self._sectionMenu.getLinkByName(item.name)
+                link.setVisible(item.visible(self._conf))
 
     def _defineToolBar(self):
         pass

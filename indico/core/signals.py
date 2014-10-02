@@ -66,3 +66,8 @@ Expected to return `(plugin_menu_item_name, SideMenuItem)` tuples to be added to
 the event management side menu. Receives the event object. The *sender* is the
 WPConferenceModifBase class.
 """)
+
+event_sidemenu = _signals.signal('event-sidemenu', """
+Expected to return ``EventMenuEntry`` objects to be added to the event side menu.
+A single entry can be returned directly, multiple entries must be yielded.
+""")
