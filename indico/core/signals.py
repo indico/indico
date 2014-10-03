@@ -63,8 +63,7 @@ depend on the hook.
 
 event_management_sidemenu = _signals.signal('event-management-sidemenu', """
 Expected to return `(plugin_menu_item_name, SideMenuItem)` tuples to be added to
-the event management side menu. Receives the event object. The *sender* is the
-WPConferenceModifBase class.
+the event management side menu. The *sender* is the event object.
 """)
 
 event_sidemenu = _signals.signal('event-sidemenu', """
