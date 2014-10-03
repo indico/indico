@@ -45,7 +45,7 @@ def docsFor(mod, iface, content):
 
 
 def _rst_title(text, char='='):
-   return "%s\n%s\n%s\n" % (char * len(text), text, char * len(text))
+    return "\n%s\n%s\n%s\n" % (char * len(text), text, char * len(text))
 
 
 def gatherInfo(mod, content):

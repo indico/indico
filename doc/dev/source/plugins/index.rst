@@ -8,7 +8,6 @@ Contents:
    :maxdepth: 1
 
    plugin.rst
-   models.rst
    signals.rst
 
 .. Indices and tables

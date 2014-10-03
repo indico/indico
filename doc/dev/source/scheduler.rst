@@ -77,7 +77,7 @@ Tasks
 
 .. autoclass:: indico.modules.scheduler.tasks.BaseTask
 .. autoclass:: indico.modules.scheduler.tasks.OneShotTask
-.. autoclass:: indico.modules.scheduler.tasks.PeriodicTask
+.. autoclass:: indico.modules.scheduler.tasks.periodic.PeriodicTask
 
 ======
 Module
