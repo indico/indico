@@ -465,8 +465,6 @@ class WPServicesCommon( WPAdminsBase ):
                 urlHandlers.UHAdminOAuthConsumers.getURL() )
         self._subTabOauth_Authorized = self._subTabOauth.newSubTab( "oauth_authorized", _("Authorized"), \
                 urlHandlers.UHAdminOAuthAuthorized.getURL() )
-        self._subTabAnalytics = self._tabCtrl.newTab( "analytics", _("Analytics"), \
-                urlHandlers.UHAnalytics.getURL() )
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
@@ -2242,31 +2240,6 @@ class WIPBasedACL(wcomponents.WTemplated):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["ipList"] = minfo.getIPBasedACLMgr().get_full_access_acl()
         vars["removeIcon"] = Config.getInstance().getSystemIconURL("remove")
-        return vars
-
-
-class WPAnalytics(WPServicesCommon):
-
-    def __init__(self, rh):
-        WPServicesCommon.__init__(self, rh)
-
-    def _getTabContent(self, params):
-        wc = WAnalytics()
-        return wc.getHTML(params)
-
-    def _setActiveTab(self):
-        self._subTabAnalytics.setActive()
-
-
-class WAnalytics(wcomponents.WTemplated):
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        vars["analyticsActive"] = minfo.isAnalyticsActive()
-        vars["analyticsCode"] = minfo.getAnalyticsCode()
-        vars["analyticsCodeLocation"] = minfo.getAnalyticsCodeLocation()
-        vars["analyticsFormURL"] = urlHandlers.UHSaveAnalytics.getURL()
         return vars
 
 

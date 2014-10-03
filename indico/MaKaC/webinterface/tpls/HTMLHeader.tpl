@@ -15,10 +15,6 @@
         <meta property="fb:app_id" content="${social['facebook']['appId']}"/>
 % endif
 
-% if analyticsActive and analyticsCodeLocation == "head":
-        ${analyticsCode}
-% endif
-
 % if baseUrl == 'static':
         <script type="text/javascript">
         window.indicoOfflineSite = true;
@@ -77,6 +73,4 @@
     </head>
     <body data-user-id="${ user.getId() if user else 'null' }">
         ${ page._getWarningMessage() }
-    % if analyticsActive and analyticsCodeLocation == "body":
-        ${analyticsCode}
-    % endif
+

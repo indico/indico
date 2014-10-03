@@ -365,32 +365,3 @@ class RHIPBasedACLFullAccessRevoke( RHServicesBase ):
             ip_acl_mgr.revoke_full_access(ipAddress)
 
         self._redirect(urlHandlers.UHIPBasedACL.getURL())
-
-class RHAnalytics( RHServicesBase ):
-    _uh = urlHandlers.UHAnalytics
-
-    def _process( self ):
-        p = adminPages.WPAnalytics(self)
-        return p.display()
-
-
-class RHSaveAnalytics(RHServicesBase):
-    _uh = urlHandlers.UHSaveAnalytics
-
-    def _checkParams( self, params ):
-        RHServicesBase._checkParams( self, params )
-        self._params = params
-        self._analyticsActive = self._params.get('analyticsActive') == 'yes'
-        self._analyticsCode = self._params.get('analyticsCode')
-        self._analyticsCodeLocation = self._params.get('analyticsCodeLocation')
-        self._doNotSanitizeFields.append("analyticsCode")
-
-    def _process(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if 'analyticsActive' in self._params:
-            minfo.setAnalyticsActive(self._analyticsActive)
-        if 'analyticsCode' in self._params:
-            minfo.setAnalyticsCode(self._analyticsCode)
-        if 'analyticsCodeLocation' in self._params:
-            minfo.setAnalyticsCodeLocation(self._analyticsCodeLocation)
-        self._redirect( urlHandlers.UHAnalytics.getURL() )

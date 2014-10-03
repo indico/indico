@@ -2364,14 +2364,6 @@ class UHAdminOAuthAuthorized(URLHandler):
     _endpoint = 'admin.adminServices-oauthAuthorized'
 
 
-class UHAnalytics(URLHandler):
-    _endpoint = 'admin.adminServices-analytics'
-
-
-class UHSaveAnalytics(URLHandler):
-    _endpoint = 'admin.adminServices-saveAnalytics'
-
-
 class UHBadgeTemplates(URLHandler):
     _endpoint = 'admin.badgeTemplates'
 

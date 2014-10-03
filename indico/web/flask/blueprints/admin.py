@@ -134,10 +134,6 @@ admin.add_url_rule('/api/keys', 'adminServices-apiKeys', api.RHAdminAPIKeys)
 admin.add_url_rule('/oauth/consumers', 'adminServices-oauthAuthorized', oauth.RHAdminOAuthAuthorized)
 admin.add_url_rule('/oauth/authorized', 'adminServices-oauthConsumers', oauth.RHAdminOAuthConsumers)
 
-# Analytics
-admin.add_url_rule('/analytics', 'adminServices-analytics', services.RHAnalytics)
-admin.add_url_rule('/analytics', 'adminServices-saveAnalytics', services.RHSaveAnalytics, methods=('POST',))
-
 # Webcast
 admin.add_url_rule('/webcast/live', 'adminServices-webcast', services.RHWebcast, methods=('GET', 'POST'))
 admin.add_url_rule('/webcast/setup/', 'adminServices-webcastSetup', services.RHWebcastSetup)

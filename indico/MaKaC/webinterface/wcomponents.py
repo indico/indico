@@ -244,10 +244,6 @@ class WHTMLHeader(WTemplated):
 
     def getVars(self):
         tvars = WTemplated.getVars(self)
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        tvars["analyticsActive"] = minfo.isAnalyticsActive()
-        tvars["analyticsCode"] = minfo.getAnalyticsCode()
-        tvars["analyticsCodeLocation"] = minfo.getAnalyticsCodeLocation()
         tvars['timestamp'] = "%d" % os.stat(__file__).st_mtime
         return tvars
 
