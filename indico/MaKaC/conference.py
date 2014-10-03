@@ -8479,7 +8479,8 @@ class Contribution(CommonObjectBase, Locatable):
         if not self._authors.has_key( part.getId() ):
             return
         del self._authors[ part.getId() ]
-        part.delete()
+        if not self.isSpeaker(part):
+            part.delete()
 
     def addPrimaryAuthor(self, part, index=None):
         """
