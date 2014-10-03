@@ -9,6 +9,7 @@ Contents:
 
    plugin.rst
    signals.rst
+   models.rst
 
 .. Indices and tables
 .. ==================
