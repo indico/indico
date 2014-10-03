@@ -503,7 +503,6 @@ class Config:
         'XMLCacheDir'               : "/opt/indico/cache",
         'OfflineStore'              : "",
         'CacheBackend'              : 'files',
-        'WhooshBackend'             : 'files',
         'MemcachedServers'          : [],
         'RedisCacheURL'             : None,
         'SmtpServer'                : ('localhost', 25),
@@ -680,11 +679,9 @@ class Config:
             except ImportError, e:
                 raise MaKaCError('Could not import redis: %s' % e.message)
 
-        if not self.getRedisConnectionURL():
-            if self.getWhooshBackend() == 'redis':
-                raise MaKaCError('Cannot use redis WhooshBackend with no RedisConnectionURL')
+        else:
             if self.getCacheBackend() == 'redis':
-                raise MaKaCError('Cannot use redis WhooshBackend with no RedisConnectionURL')
+                raise MaKaCError('Cannot use redis CacheBackend with no RedisConnectionURL')
 
         if self.getStaticFileMethod() is not None and len(self.getStaticFileMethod()) != 2:
             raise MaKaCError('StaticFileMethod must be None, a string or a 2-tuple')

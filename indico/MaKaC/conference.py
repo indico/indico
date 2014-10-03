@@ -78,8 +78,7 @@ from MaKaC.common.Counter import Counter
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
 from MaKaC.accessControl import AccessController, AdminList
-from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NotFoundError, \
-    FormValuesError
+from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NotFoundError, FormValuesError
 from MaKaC import registration, epayment
 from MaKaC.evaluation import Evaluation
 from MaKaC.trashCan import TrashCanManager
@@ -98,7 +97,6 @@ from MaKaC.webinterface import urlHandlers
 
 from indico.core.logger import Logger
 from MaKaC.common.contextManager import ContextManager
-from MaKaC.webinterface.common.tools import escape_html
 import zope.interface
 
 from indico.modules.scheduler import Client, tasks
@@ -2715,7 +2713,7 @@ class Conference(CommonObjectBase, Locatable):
         # do some checks first
         if sDate > eDate:
             # obvious case
-            raise MaKaCError( _("Start date cannot be after the end date"), _("Event"))
+            raise FormValuesError(_("Start date cannot be after the end date"), _("Event"))
 
         elif sDate == oldStartDate and eDate == oldEndDate:
             # if there's nothing to do (yet another obvious case)

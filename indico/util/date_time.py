@@ -31,6 +31,7 @@ from babel.dates import format_timedelta as _format_timedelta
 from babel.dates import get_timezone
 from babel.numbers import format_number as _format_number
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
+from dateutil.relativedelta import relativedelta
 
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
@@ -249,3 +250,38 @@ def get_day_end(day):
         tzinfo = day.tzinfo
         day = day.date()
     return datetime.combine(day, dt_time(23, 59, tzinfo=tzinfo))
+
+
+def round_up_to_minutes(dt, precision=15):
+    """
+    Rounds up a date time object to the given precision in minutes.
+
+    :param dt: datetime -- the time to round up
+    :param precision: int -- the precision to round up by in minutes. Negative
+        values for the precision are allowed but will round down instead of up.
+    :returns: datetime -- the time rounded up by the given precision in minutes.
+    """
+    increment = precision * 60
+    secs_in_current_hour = (dt.minute * 60) + dt.second + (dt.microsecond * 1e-6)
+    delta = (secs_in_current_hour // increment) * increment + increment - secs_in_current_hour
+    return dt + timedelta(seconds=delta)
+
+
+def get_month_start(date):
+    return date + relativedelta(day=1)
+
+
+def get_month_end(date):
+    return date + relativedelta(day=1, months=+1, days=-1)
+
+
+def round_up_month(date, from_day=1):
+    """Rounds up a date to the next month unless its day is before *from_day*.
+
+    :param date: date object
+    :param from_day: day from which one to round *date* up
+    """
+    if date.day >= from_day:
+        return date + relativedelta(day=1, months=+1)
+    else:
+        return date

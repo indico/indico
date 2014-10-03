@@ -611,10 +611,13 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
                  return false;
              });
 
+         var startDate = parseInt(this.eventData.startDate.time.substring(0, 2)) * 60 + parseInt(this.eventData.startDate.time.substring(3, 5));
+         var endDate = parseInt(this.eventData.endDate.time.substring(0, 2)) * 60 + parseInt(this.eventData.endDate.time.substring(3, 5));
+         var shifted = (endDate - startDate < 20) ? " ttentryArrowsShifted" : "";
 
          this.arrows = Html.div({},
-                             Html.div({className: "ttentryArrowsBackground"}),
-                             Html.div({className: "ttentryArrows"}, arrowUp, arrowDown));
+                             Html.div({className: "ttentryArrowsBackground" + shifted}),
+                             Html.div({className: "ttentryArrows" + shifted}, arrowUp, arrowDown));
          this.DragAndDropBlockMixin();
      });
 
@@ -1119,9 +1122,9 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                 menuItems["blockProperties"] = { action: function() {
                     self.managementActions.editSessionSlot(self.eventData);
                     self.close();
-                }, display: $T('Basic edition')};
+                }, display: $T('Basic edit')};
                 if (!self.managementActions.isSessionTimetable) {
-                    menuItems["sessionProperties"] = {action: self.managementActions.editEntry(self.eventData), display: $T('Full session edition')};
+                    menuItems["sessionProperties"] = {action: self.managementActions.editEntry(self.eventData), display: $T('Full session edit')};
                     menuItems["sessionProtection"] = {action: self.managementActions.editEntryProtection(self.eventData), display: $T('Edit protection')};
                 }
 
@@ -1145,8 +1148,8 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                 menuItems['contributionProperties'] = {action: function() {
                     self.managementActions.editContribution(self.eventData);
                     self.close();
-                }, display: $T('Basic edition')};
-                menuItems["contributionFullEdition"] = {action: self.managementActions.editEntry(self.eventData), display: $T('Full edition')};
+                }, display: $T('Basic edit')};
+                menuItems["contributionFullEdition"] = {action: self.managementActions.editEntry(self.eventData), display: $T('Full edit')};
                 menuItems["contributionProtection"] = {action: self.managementActions.editEntryProtection(self.eventData), display: $T('Edit protection')};
                 editLink.observeClick(function() {
                     var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);
@@ -1849,8 +1852,8 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
 
                 var editLink = Html.a({className: 'dropDownMenu', style: {fontWeight: 'bold'}}, $T('Edit'));
                 var menuItems = {};
-                menuItems["blockProperties"] = { action: function() {self.managementActions.editContribution(blockData);}, display: $T('Basic edition')};
-                menuItems["contributionFullEdition"] = {action: self.managementActions.editEntry(blockData), display: $T('Full edition')};
+                menuItems["blockProperties"] = { action: function() {self.managementActions.editContribution(blockData);}, display: $T('Basic edit')};
+                menuItems["contributionFullEdition"] = {action: self.managementActions.editEntry(blockData), display: $T('Full edit')};
                 menuItems["contributionProtection"] = {action: self.managementActions.editEntryProtection(blockData), display: $T('Edit protection')};
                 editLink.observeClick(function() {
                     var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);

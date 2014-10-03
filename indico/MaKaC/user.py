@@ -402,30 +402,15 @@ class Avatar(Persistent, Fossilizable):
             if 'title' in userData:
                 self.setTitle(userData["title"])
             if 'organisation' in userData:
-                if len(userData["organisation"])>0:
-                    for org in userData["organisation"]:
-                        if not self.getOrganisation():
-                            self.setOrganisation(org)
-                        else:
-                            self.addOrganisation(org)
+                self.setOrganisation(userData['organisation'])
             if 'address' in userData:
-                if len(userData["address"])>0:
-                    for addr in userData["address"]:
-                        self.addAddress(addr)
+                self.setAddress(userData["address"])
             if 'email' in userData:
-                if type(userData["email"]) == str:
-                    self.setEmail(userData["email"])
-                elif len(userData["email"])>0:
-                    for em in userData["email"]:
-                        self.setEmail(em)
+                self.setEmail(userData["email"])
             if 'telephone' in userData:
-                if len(userData["telephone"])>0:
-                    for tel in userData["telephone"]:
-                        self.addTelephone(tel)
+                self.setTelephone(userData["telephone"])
             if 'fax' in userData:
-                if len(userData["fax"])>0:
-                    for fax in userData["fax"]:
-                        self.addTelephone(fax)
+                self.setFax(userData["fax"])
 
             ############################
             #Fermi timezone awareness  #

@@ -17,7 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from wtforms.fields.core import IntegerField
+from wtforms.fields.core import IntegerField, BooleanField
 from wtforms.validators import InputRequired, NumberRange
 
 from indico.modules.rb.forms.base import IndicoForm
@@ -29,8 +29,9 @@ class SettingsForm(IndicoForm):
     admin_principals = PrincipalField(_(u'Administrators'), groups=True)
     authorized_principals = PrincipalField(_(u'Authorized users/groups'), groups=True)
     assistance_emails = EmailListField(_(u'Assistance email addresses (one per line)'))
-    notification_hour = IntegerField(_(u'Hour at which occurrence notifications should be sent'),
+    notification_hour = IntegerField(_(u'Hour at which booking reminders should be sent'),
                                      [InputRequired(), NumberRange(0, 23)], default=6)
-    notification_before_days = IntegerField(_(u'Send occurrence notifications X days before the occurrence'),
+    notification_before_days = IntegerField(_(u'Send booking reminders X days before'),
                                             [InputRequired()], default=0)
+    notifications_enabled = BooleanField(_(u'Reminders enabled'), default=True)
     vc_support_emails = EmailListField(_(u'Videoconference support email addresses (one per line)'))

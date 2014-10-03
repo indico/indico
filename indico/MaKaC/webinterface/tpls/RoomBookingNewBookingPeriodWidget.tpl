@@ -1,4 +1,4 @@
-<%page args="form=None, flexibility=False, can_override=False, min_date=None"/>
+<%page args="form=None, flexibility=False, can_override=False, min_date=None, date_changed=None, past_date=None"/>
 
 <!-- Slider -->
 <div id="timerange"></div>
@@ -45,6 +45,21 @@
         <div id="holidays-warning" class="info-message-box" style="display: none">
             <div class="message-text"></div>
         </div>
+        % if past_date:
+            <div class="highlight-message-box js-default-date-warning">
+                <div class="message-text">
+                    ${_("Looks like you were trying to book a room in the past so we moved you forward to the present.") }
+                </div>
+            </div>
+        % endif
+        % if date_changed:
+            <div class="highlight-message-box js-default-date-warning">
+                <div class="message-text">
+                    ${ _("It's late, so we selected the next day for you.") }<br>
+                    <small> ${ _("You can still select today in the calendar.") }</small>
+                </div>
+            </div>
+        % endif
     </div>
 </div>
 
@@ -81,7 +96,7 @@ ${ form.repeat_interval(type='hidden') }
                     $('#eDatePlace').datepicker('setDate', $('#sDatePlace').datepicker('getDate'));
                 }
                 $('#eDatePlace').datepicker('option', 'minDate', $('#sDatePlace').datepicker('getDate'));
-
+                $('.js-default-date-warning').fadeOut();
                 combineDatetime();
                 checkHolidays();
                 validateForm();

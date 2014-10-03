@@ -1,6 +1,13 @@
 <%page args="form=None, reservation=None"/>
 
-% if conflicts:
+% if only_conflicts:
+    <div class="warning-message-box new-booking-message-box">
+        <div class="message-text">
+            ${ _("Unable to book! This room is not available for the day(s) you selected.") }<br>
+            <small>${ _("Please select another room or a different time.")}</small>
+        </div>
+    </div>
+% elif conflicts:
     <div class="warning-message-box new-booking-message-box">
         <div class="message-text">
             ${ _('Some of your days will not be booked as they overlap with other existing bookings.') }

@@ -35,6 +35,7 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.utils import get_default_booking_interval
 from indico.modules.rb.views.user.reservations import (WPRoomBookingSearchBookings, WPRoomBookingSearchBookingsResults,
                                                        WPRoomBookingCalendar, WPRoomBookingNewBookingSelectRoom,
                                                        WPRoomBookingNewBookingSelectPeriod,
@@ -246,6 +247,9 @@ class RHRoomBookingSearchPendingBookingsMyRooms(_MyRoomsMixin, RHRoomBookingSear
 
 
 class RHRoomBookingNewBookingBase(RHRoomBookingBase):
+    DEFAULT_START_TIME_PRECISION = 15  # minutes
+    DEFAULT_BOOKING_DURATION = 90  # minutes
+
     def _make_confirm_form(self, room, step=None, defaults=None, form_class=NewBookingConfirmForm):
         # Note: ALWAYS pass defaults as a kwargs! For-Event room booking depends on it!
         # Step 3
@@ -319,7 +323,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
             series_start = start_dt + offset
             series_end = end_dt + offset
             if series_start < flexible_start_dt:
-                    continue
+                continue
             candidates[series_start, series_end] = ReservationOccurrence.create_series(series_start, series_end,
                                                                                        (repeat_frequency,
                                                                                         repeat_interval))
@@ -358,13 +362,30 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
             raise NotFoundError('This room does not exist')
 
     def _make_form(self):
+        start_date = None
+        force_today = False
         if 'start_date' in request.args:
-            start_date = datetime.strptime(request.args['start_date'], '%Y-%m-%d').date()
+            force_today = True
+            try:
+                start_date = datetime.strptime(request.args['start_date'], '%Y-%m-%d').date()
+            except ValueError:
+                pass
+
+        self.past_date = start_date is not None and start_date < date.today()
+        if start_date is None or start_date <= date.today():
+            start_dt, end_dt, self.date_changed = get_default_booking_interval(
+                duration=self.DEFAULT_BOOKING_DURATION,
+                precision=self.DEFAULT_START_TIME_PRECISION,
+                force_today=force_today
+            )
+            self.date_changed = self.date_changed and not self.past_date
         else:
-            start_date = date.today()
+            start_dt = datetime.combine(start_date, Location.working_time_start)
+            end_dt = datetime.combine(start_date, Location.working_time_end)
+            self.date_changed = False
         defaults = FormDefaults(room_id=self._room.id,
-                                start_dt=datetime.combine(start_date, Location.working_time_start),
-                                end_dt=datetime.combine(start_date, Location.working_time_end),
+                                start_dt=start_dt,
+                                end_dt=end_dt,
                                 booked_for_id=session.user.id,
                                 booked_for_name=session.user.getStraightFullName().decode('utf-8'),
                                 contact_email=session.user.getEmail().decode('utf-8'),
@@ -388,6 +409,9 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
         else:
             occurrences, candidates = self._get_all_occurrences([self._room.id], form)
             conflicts, pre_conflicts = self._get_all_conflicts(self._room, form)
+            candidate_days = {occ.date for candidate in candidates.itervalues() for occ in candidate}
+            conflicting_days = {occ.date for occ in conflicts.iterkeys()}
+            only_conflicts = candidate_days <= conflicting_days
 
         if form.validate_on_submit() and not form.submit_check.data:
             return self._create_booking_response(form, room)
@@ -399,12 +423,15 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
                               occurrences=occurrences,
                               candidates=candidates,
                               conflicts=conflicts,
+                              only_conflicts=only_conflicts,
                               pre_conflicts=pre_conflicts,
                               start_dt=form.start_dt.data,
                               end_dt=form.end_dt.data,
                               repeat_frequency=form.repeat_frequency.data,
                               repeat_interval=form.repeat_interval.data,
-                              can_override=can_override).display()
+                              can_override=can_override,
+                              past_date=not form.is_submitted() and self.past_date,
+                              date_changed=not form.is_submitted() and self.date_changed).display()
 
 
 class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBookingSimple):
@@ -427,15 +454,19 @@ class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBooki
         return RHRoomBookingNewBookingSimple._get_view(self, clone_booking=self._reservation, **kwargs)
 
     def _make_form(self):
-        defaults = FormDefaults(
-            self._reservation,
-            skip_attrs={'room_id', 'booked_for_id', 'booked_for_name', 'contact_email', 'contact_phone'},
-            room_id=self._room.id,
-            booked_for_id=session.user.id,
-            booked_for_name=session.user.getStraightFullName().decode('utf-8'),
-            contact_email=session.user.getEmail().decode('utf-8'),
-            contact_phone=session.user.getPhone().decode('utf-8')
-        )
+
+        changes = {'room_id': self._room.id}
+
+        if self._reservation.created_by_id != session.user.id:
+            # if the user is cloning someone else's booking, set him/her as booked_for
+            changes.update(booked_for_id=session.user.id,
+                           booked_for_name=session.user.getStraightFullName().decode('utf-8'),
+                           contact_email=session.user.getEmail().decode('utf-8'),
+                           contact_phone=session.user.getPhone().decode('utf-8'))
+
+        defaults = FormDefaults(self._reservation,
+                                skip_attrs=set(changes),
+                                **changes)
 
         return self._make_confirm_form(self._room, defaults=defaults, form_class=NewBookingSimpleForm)
 
@@ -454,13 +485,14 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
         return views[view](self, **kwargs)
 
     def _get_select_room_form_defaults(self):
-        return FormDefaults(start_dt=datetime.combine(date.today(), Location.working_time_start),
-                            end_dt=datetime.combine(date.today(), Location.working_time_end))
+        start_dt, end_dt, self.date_changed = get_default_booking_interval(duration=self.DEFAULT_BOOKING_DURATION,
+                                                                           precision=self.DEFAULT_START_TIME_PRECISION,
+                                                                           force_today=False)
+        return FormDefaults(start_dt=start_dt, end_dt=end_dt)
 
     def _make_select_room_form(self):
         # Step 1
         self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.full_name))
-
         form = NewBookingCriteriaForm(obj=self._get_select_room_form_defaults())
         form.room_ids.choices = [(r.id, None) for r in self._rooms]
         return form
@@ -511,7 +543,8 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
 
         # GET or form errors => show step 1 page
         return self._get_view('select_room', errors=form.error_list, rooms=self._rooms, form=form,
-                              max_room_capacity=Room.max_capacity, can_override=session.user.isRBAdmin()).display()
+                              max_room_capacity=Room.max_capacity, can_override=session.user.isRBAdmin(),
+                              date_changed=not form.is_submitted() and self.date_changed).display()
 
     def _process_select_period(self):
         form = self._make_select_period_form()

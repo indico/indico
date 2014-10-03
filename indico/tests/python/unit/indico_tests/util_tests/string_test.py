@@ -25,7 +25,8 @@ from flask import render_template_string
 
 from MaKaC.common import utils
 from indico.tests.python.unit.util import IndicoTestCase, with_context
-from indico.util.string import permissive_format, remove_extra_spaces, remove_tags, fix_broken_string, is_valid_mail
+from indico.util.string import permissive_format, remove_extra_spaces, remove_tags, fix_broken_string, is_valid_mail, \
+    html_color_to_rgb
 
 
 class TestPermissiveFormat(IndicoTestCase):
@@ -98,6 +99,32 @@ class TestDecodingEncoding(IndicoTestCase):
         string_value = u"mettre à l'essai".encode("latin1")
         fixed_string = fix_broken_string(string_value)
         self.assertEqual(string_value.decode("latin1").encode("utf-8"), fixed_string)
+
+
+class TestHTMLColorConversion(IndicoTestCase):
+
+    def testConversion6Chars(self):
+        """
+        Test conversion: HTML colors -> RGB (6 chars)
+        """
+        self.assertEqual(html_color_to_rgb('#000000'), (0.0, 0, 0))
+        self.assertEqual(html_color_to_rgb('#ff0000'), (1.0, 0, 0))
+        self.assertEqual(html_color_to_rgb('#00ff00'), (0, 1.0, 0))
+        self.assertEqual(html_color_to_rgb('#0000ff'), (0, 0, 1.0))
+        self.assertEqual(html_color_to_rgb('#010aff'), (1 / 255.0, 10 / 255.0, 1.0))
+
+        self.assertRaises(ValueError, html_color_to_rgb, 'foo')
+        self.assertRaises(ValueError, html_color_to_rgb, '#1234')
+        self.assertRaises(ValueError, html_color_to_rgb, '#1234567')
+
+    def testConversion3Chars(self):
+        """
+        Test conversion: HTML colors -> RGB (3 chars)
+        """
+        self.assertEqual(html_color_to_rgb('#000'), (0, 0, 0))
+        self.assertEqual(html_color_to_rgb('#f00'), (1.0, 0, 0))
+        self.assertEqual(html_color_to_rgb('#0f0'), (0, 1.0, 0))
+        self.assertEqual(html_color_to_rgb('#00f'), (0, 0, 1.0))
 
 
 class TestIsValidEmail(IndicoTestCase):

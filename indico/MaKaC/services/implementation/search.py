@@ -26,15 +26,14 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.fossils.user import IAvatarFossil, IGroupFossil
 from MaKaC.common.fossilize import fossilize
 
-from zope.index.text import parsetree
 from MaKaC.services.implementation.user import UserComparator
 
-from indico.core.config import Config
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
 #################################
 # User and group search
 #################################
+
 
 class SearchBase(ServiceBase):
 
@@ -67,7 +66,7 @@ class SearchUsers(SearchBase):
         results = search.searchUsers(self._surName, self._name, self._organisation, self._email,
                                      self._confId, self._exactMatch, self._searchExt)
 
-        #will use either IAvatarFossil or IContributionParticipationFossil
+        # will use either IAvatarFossil or IContributionParticipationFossil
         fossilizedResults = fossilize(results)
         fossilizedResults.sort(cmp=UserComparator.cmpUsers)
 
@@ -97,16 +96,16 @@ class SearchUsersGroups(ServiceBase):
 
     def _getAnswer(self):
         results = {}
-        users = search.searchUsers(surName = self._params.get("surName", ""),
-                               name = self._params.get("name", ""),
-                               organisation = self._params.get("organisation", ""),
-                               email = self._params.get("email", ""),
-                               conferenceId = self._params.get("conferenceId", None),
-                               exactMatch = self._params.get("exactMatch", False),
-                               searchExt = self._params.get("searchExt", False))
+        users = search.searchUsers(surName=self._params.get("surName", ""),
+                                   name=self._params.get("name", ""),
+                                   organisation=self._params.get("organisation", ""),
+                                   email=self._params.get("email", ""),
+                                   conferenceId=self._params.get("conferenceId", None),
+                                   exactMatch=self._params.get("exactMatch", False),
+                                   searchExt=self._params.get("searchExt", False))
 
-        groups = search.searchGroups(group = self._params.get("group", ""),
-                               searchExt = self._params.get("searchExt", False))
+        groups = search.searchGroups(group=self._params.get("group", ""),
+                                     searchExt=self._params.get("searchExt", False))
 
         fossilizedUsers = [human.fossilize(IAvatarFossil) for human in users]
         fossilizedGroups = [group.fossilize(IGroupFossil) for group in groups]
@@ -137,13 +136,12 @@ class SearchCategoryNames(ServiceBase):
         import MaKaC.common.indexes as indexes
         nameIdx = indexes.IndexesHolder().getIndex('categoryName')
 
-        query = ' '.join(map(lambda y: "*%s*" % y, self._searchString.split()))
-        foundEntries = nameIdx.search(query, limit=7)
+        foundEntries = nameIdx.search(self._searchString, limit=7)
         number = len(foundEntries)
 
         entryNames = []
 
-        for (categId, value) in foundEntries:
+        for categId in foundEntries:
             categ = CategoryManager().getById(categId)
             entryNames.append({
                 'title': categ.getTitle(),
@@ -157,47 +155,9 @@ class SearchCategoryNames(ServiceBase):
             }
 
 
-#################################
-# Conference search
-#################################
-
-class SearchConferenceTitles(ServiceBase):
-
-    def _checkParams(self):
-        self._searchString = self._params.get("value")
-
-    def _getAnswer(self):
-
-        import MaKaC.common.indexes as indexes
-        nameIdx = indexes.IndexesHolder().getIndex('conferenceTitle')
-
-        query = ' '.join(map(lambda y: "*%s*" % y, self._searchString.split()))
-        foundEntries = nameIdx.search(query)
-
-        number = len(foundEntries)
-
-        # get only the first 10 results
-        foundEntries = foundEntries[:7]
-
-        entryTitles = []
-
-        for (confId, value) in foundEntries:
-            conference = CategoryManager().getById(confId)
-            entryTitles.append({
-                'title': conference.getTitle(),
-                'url': str(urlHandlers.UHConferenceDisplay.getURL(conference))
-                })
-
-        return {
-            "list": entryTitles,
-            "number": number
-            }
-
-
 methodMap = {
-    "users" : SearchUsers,
-    "groups" : SearchGroups,
+    "users": SearchUsers,
+    "groups": SearchGroups,
     "usersGroups": SearchUsersGroups,
-    "categoryName": SearchCategoryNames,
-    "conferenceTitles": SearchConferenceTitles
+    "categoryName": SearchCategoryNames
 }

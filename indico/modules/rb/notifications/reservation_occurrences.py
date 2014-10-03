@@ -4,9 +4,10 @@ from flask import render_template
 
 from indico.core.config import Config
 from indico.modules.rb.models.reservations import RepeatFrequency
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.notifications.reservations import ReservationNotification
 from indico.modules.rb.notifications.util import email_sender
-from indico.util.date_time import format_datetime
+from indico.util.date_time import format_datetime, get_month_end, get_month_start
 
 
 class ReservationOccurrenceNotification(ReservationNotification):
@@ -75,7 +76,7 @@ def notify_rejection(occurrence):
 @email_sender
 def notify_upcoming_occurrence(occurrence):
     if occurrence.start_dt.date() < date.today():
-        raise ValueError('This reservation occurrence started in the past')
+        raise ValueError("This reservation occurrence started in the past")
 
     to_list = []
     reservation_user = occurrence.reservation.booked_for_user
@@ -92,10 +93,52 @@ def notify_upcoming_occurrence(occurrence):
 
     from_addr = Config.getInstance().getNoReplyEmail()
     subject = 'Reservation reminder'
-    text = render_template('rb/emails/reservations/upcoming_occurrence_email.txt',
+    text = render_template('rb/emails/reservations/reminders/upcoming_occurrence.txt',
                            occurrence=occurrence,
                            owner=reservation_user,
                            RepeatFrequency=RepeatFrequency)
+
+    return {
+        'fromAddr': from_addr,
+        'toList': to_list,
+        'ccList': cc_list,
+        'subject': subject,
+        'body': text
+    }
+
+
+@email_sender
+def notify_reservation_digest(reservation, occurrences):
+    if not occurrences:
+        return
+    if reservation.end_dt.date() < date.today():
+        raise ValueError("This reservation has already ended")
+    if reservation.repeat_frequency != RepeatFrequency.WEEK:
+        raise ValueError("This reservation is not weekly")
+    if any(occ.reservation != reservation for occ in occurrences):
+        raise ValueError("Some occurrences don't belong to the reservation")
+    if any(occurrences[0].start_dt.month != occ.start_dt.month for occ in occurrences):
+        raise ValueError("Occurrences happening in different months")
+
+    to_list = []
+    reservation_user = reservation.booked_for_user
+    if reservation_user is not None:
+        to_list.append(reservation_user.getEmail())
+
+    cc_list = []
+    room = reservation.room
+    if room.notification_for_responsible:
+        cc_list.append(room.owner.getEmail())
+
+    if not to_list and not cc_list:
+        return
+
+    from_addr = Config.getInstance().getNoReplyEmail()
+    subject = 'Reservation reminder digest'
+    text = render_template('rb/emails/reservations/reminders/reservation_digest.txt',
+                           reservation=reservation,
+                           occurrences=occurrences,
+                           owner=reservation_user)
 
     return {
         'fromAddr': from_addr,

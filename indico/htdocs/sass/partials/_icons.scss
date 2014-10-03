@@ -345,7 +345,15 @@ you can use the generic selector below, but it's slower:
 .icon-circle-small:before {
     content: "\e2ab";
 }
-
+.icon-enter:before {
+    content: "\e37b";
+}
+.icon-exit:before {
+    content: "\e37c";
+}
+.icon-lamp:before {
+    content: "\e24e";
+}
 
 /* KEEP THE FOLLOWING DEFINITIONS: necessary when rendering the icon 'after' e.g. mixin icon-after */
 .icon-arrow-down-after:after {
@@ -358,11 +366,4 @@ you can use the generic selector below, but it's slower:
 
 .icon-location-after:after {
     content: "\e002";
-}
-
-.icon-enter:before {
-	content: "\e37b";
-}
-.icon-exit:before {
-	content: "\e37c";
 }

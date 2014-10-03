@@ -160,7 +160,8 @@ class RHRoomBookingRoomStats(RHRoomBookingBase):
         self._occupancy_period = request.args.get('period', 'pastmonth')
         self._end = date.today()
         if self._occupancy_period == 'pastmonth':
-            self._start = self._end - relativedelta(months=1)
+            self._end = self._end - relativedelta(days=1)
+            self._start = self._end - relativedelta(days=29)
         elif self._occupancy_period == 'thisyear':
             self._start = date(self._end.year, 1, 1)
         elif self._occupancy_period == 'sinceever':

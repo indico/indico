@@ -497,17 +497,17 @@ class TimeSchedule(Schedule, Persistent):
 
         if diff is not None:
             from MaKaC.conference import SessionSlot
-            sessionsAlreadyModif=[]
+            sessionsAlreadyModif = []
             for entry in entriesList:
                 if isinstance(entry.getOwner(), SessionSlot):
-                    session=entry.getOwner().getSession()
+                    session = entry.getOwner().getSession()
                     if session not in sessionsAlreadyModif:
                         # if the slot is the first in the session schedule
                         # we also change the session start date
-                        if session.getSchedule().getEntries()[0].getOwner()==entry.getOwner():
-                            session.setStartDate(session.getStartDate()+diff, check=0, moveEntries=0)
+                        if session.getSchedule().getEntries()[0].getOwner() == entry.getOwner():
+                            session.setStartDate(session.getStartDate() + diff, check=0, moveEntries=0)
                         sessionsAlreadyModif.append(session)
-                entry.setStartDate(entry.getStartDate()+diff, check=0, moveEntries=1)
+                entry.setStartDate(entry.getStartDate() + diff, check=2, moveEntries=1)
 
 
 class SchEntry(Persistent, Fossilizable):

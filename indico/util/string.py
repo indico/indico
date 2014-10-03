@@ -241,4 +241,23 @@ def seems_html(string):
 
 
 def strip_control_chars(string):
-    return re.sub(r'[\x0B-\x1F]', u'', string)
+    return re.sub(r'[\x0B-\x1F]', '', string)
+
+
+def html_color_to_rgb(hexcolor):
+    """
+    convert #RRGGBB to an (R, G, B) tuple
+    """
+
+    if not hexcolor.startswith('#'):
+        raise ValueError("Invalid color string '{}' (should start with '#')".format(hexcolor))
+
+    hexcolor = hexcolor[1:]
+
+    if len(hexcolor) not in {3, 6}:
+        raise ValueError("'#{}'' is not in #RRGGBB or #RGB format".format(hexcolor))
+
+    if len(hexcolor) == 3:
+        hexcolor = ''.join(c * 2 for c in hexcolor)
+
+    return tuple(float(int(hexcolor[i:i + 2], 16)) / 255 for i in range(0, 6, 2))

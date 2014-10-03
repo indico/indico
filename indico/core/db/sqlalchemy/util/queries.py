@@ -14,7 +14,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import re
+
 from sqlalchemy import over, func
+
+
+TS_REGEX = re.compile(r'([@<>!()&|])')
 
 
 def limit_groups(query, model, partition_by, order_by, limit=None, offset=0):
@@ -58,3 +63,8 @@ def escape_like(value):
             .replace(escape_char, escape_char * 2)  # literal escape char needs to be escaped
             .replace(u'%', escape_char + u'%')      # we don't want % wildcards inside the value
             .replace(u'_', escape_char + u'_'))     # same for _ wildcards
+
+
+def preprocess_ts_string(text, prefix=True):
+    atoms = [TS_REGEX.sub(r'\\\1', atom.strip()) for atom in text.split()]
+    return ' & '.join('{}:*'.format(atom) if prefix else atom for atom in atoms)

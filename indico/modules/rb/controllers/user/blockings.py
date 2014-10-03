@@ -172,7 +172,7 @@ class RHRoomBookingBlockingList(RHRoomBookingBase):
         elif self.timeframe == 'recent':
             criteria += [Blocking.end_date >= date.today()]
 
-        blockings = Blocking.find(*criteria).order_by(Blocking.start_date.desc()).all()
+        blockings = Blocking.find(*criteria, _eager_all='blocked_rooms.room').order_by(Blocking.start_date.desc()).all()
         return WPRoomBookingBlockingList(self, blockings=blockings).display()
 
 

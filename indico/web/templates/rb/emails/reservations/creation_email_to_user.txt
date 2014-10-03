@@ -4,8 +4,12 @@
 {% block body -%}
 The conference room {{ reservation.room.full_name }}
 has been {% block prebooked_prefix %}{% endblock %}booked for {{ reservation.booked_for_name }}
-reason: {{ reservation.booking_reason }}
-from {{ reservation.start_dt | format_date }} to {{ reservation.end_dt | format_date }} between {{ reservation.start_dt | format_time }} and {{ reservation.end_dt | format_time }}
+{% if reservation.repeat_frequency == RepeatFrequency.NEVER -%}
+    on {{ reservation.start_dt | format_date }} from {{ reservation.start_dt | format_time }} to {{ reservation.end_dt | format_time }}.
+{%- else -%}
+    {{ RepeatMapping.get_short_name(reservation.repeat_frequency, reservation.repeat_interval) }} from {{ reservation.start_dt | format_date }} to {{ reservation.end_dt | format_date }} between {{ reservation.start_dt | format_time }} and {{ reservation.end_dt | format_time }}.
+{%- endif %}
+Reason: {{ reservation.booking_reason }}
 {%- block confirmed_booking -%}
 {%- if excluded_days %}
     (Note that there are {{ excluded_days }} excluded days. For further info, check your reservation)

@@ -18,7 +18,7 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict, OrderedDict
-from datetime import datetime
+from datetime import datetime, date
 
 from sqlalchemy import Date, Time
 from sqlalchemy.ext.declarative import declared_attr
@@ -41,7 +41,7 @@ from indico.modules.rb.models.utils import unimplemented
 from indico.modules.rb.notifications.reservations import (notify_confirmation, notify_cancellation,
                                                           notify_creation, notify_modification,
                                                           notify_rejection)
-from indico.util.date_time import now_utc, format_date, format_time
+from indico.util.date_time import now_utc, format_date, format_time, get_month_end, round_up_month
 from indico.util.i18n import _, N_
 from indico.util.serializer import Serializer
 from indico.util.string import return_ascii
@@ -553,6 +553,20 @@ class Reservation(Serializer, db.Model):
                 # Reject OTHER occurrences
                 for conflict in conflicts['pending']:
                     conflict.reject(user, u'Rejected due to collision with a confirmed reservation')
+
+        # Mark occurrences created within the notification window as notified
+        for occurrence in self.occurrences:
+            if occurrence.is_valid and occurrence.is_in_notification_window():
+                occurrence.notification_sent = True
+
+        # Mark occurrences created within the digest window as notified
+        if self.repeat_frequency == RepeatFrequency.WEEK:
+            if self.room.is_in_digest_window():
+                digest_start = round_up_month(date.today())
+            else:
+                digest_start = date.today()
+            digest_end = get_month_end(digest_start)
+            self.occurrences.filter(ReservationOccurrence.start_dt <= digest_end).update({'notification_sent': True})
 
     def find_excluded_days(self):
         return self.occurrences.filter(~ReservationOccurrence.is_valid)

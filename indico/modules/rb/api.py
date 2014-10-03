@@ -22,7 +22,7 @@ from datetime import datetime
 import icalendar
 import pytz
 from babel.dates import get_timezone
-from sqlalchemy import Time, Date
+from sqlalchemy import Time, Date, or_
 from sqlalchemy.sql import cast
 from werkzeug.datastructures import OrderedMultiDict, MultiDict
 
@@ -121,8 +121,13 @@ class RoomNameHook(RoomBookingHookBase):
             return
 
         search_str = '%{}%'.format(self._room_name)
-        rooms_data = Room.get_with_data('vc_equipment', 'non_vc_equipment',
-                                        filters=[Room.location_id == loc.id, Room.name.ilike(search_str)])
+        rooms_data = Room.get_with_data(
+            'vc_equipment', 'non_vc_equipment', filters=[
+                Room.location_id == loc.id,
+                or_((Room.building + '-' + Room.floor + '-' + Room.number).ilike(search_str),
+                    Room.name.ilike(search_str))
+            ])
+
         for result in rooms_data:
             yield _serializable_room(result)
 

@@ -56,32 +56,28 @@ See indico.conf for information about customization options.
 try:
     import ldap
     import ldap.filter
-    import re
-except:
+except ImportError:
     pass
 
+import re
 from urlparse import urlparse
 
-# dependency libs
 from zope.interface import implements
 
-# indico imports
+from indico.core.config import Config
 from indico.core.extpoint import Component
 from indico.core.extpoint.rh import IServerRequestListener
+from indico.core.logger import Logger
 from indico.util.contextManager import ContextManager
 
-# legacy indico imports
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, SSOHandler
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.errors import MaKaCError
-from indico.core import config as Configuration
-from indico.core.logger import Logger
 from MaKaC.user import Group, PrincipalHolder
 
 
 RETRIEVED_FIELDS = ['uid', 'cn', 'mail', 'o', 'ou', 'company', 'givenName',
                     'sn', 'postalAddress', 'userPrincipalName', "telephoneNumber", "facsimileTelephoneNumber"]
-UID_FIELD = "cn"  # or uid
 MEMBER_ATTR = "member"
 MEMBER_PAGE_SIZE = 1500
 
@@ -93,11 +89,11 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
     description = "LDAP Login"
 
     _operations = {
-    'email': '(mail={0})',
-    'name': '(givenName={0})',
-    'surName': '(sn={0})',
-    'organisation': '(|(o={0})(ou={0}))',
-    'login': '(cn={0})'
+        'email': '(mail={0})',
+        'name': '(givenName={0})',
+        'surName': '(sn={0})',
+        'organisation': '(|(o={0})(ou={0}))',
+        'login': '(cn={0})'
     }
 
     def __init__(self):
@@ -139,7 +135,7 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             return None
 
         # Use the correct case
-        li.setLogin(data[UID_FIELD])
+        li.setLogin(data[get_login_attribute()])
 
         # Search if user already exist, using email address
         import MaKaC.user as user
@@ -221,8 +217,8 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
             if not ret:
                 return None
             # I have no idea if this check is needed at all (probably it's not), but it cannot hurt!
-            if ret.get(UID_FIELD, '').lower() != userName.lower():
-                Logger.get('auth.ldap').info('user %s != %s' % (userName, ret.get(UID_FIELD)))
+            if ret.get(get_login_attribute(), '').lower() != userName.lower():
+                Logger.get('auth.ldap').info('user %s != %s' % (userName, ret.get(get_login_attribute())))
                 return None
             return ret
         except ldap.INVALID_CREDENTIALS:
@@ -288,7 +284,7 @@ class LDAPIdentity(PIdentity):
         log = Logger.get('auth.ldap')
         log.info("authenticate(%s)" % id.getLogin())
         data = AuthenticatorMgr().getById(self.getAuthenticatorTag()).checkLoginPassword(id.getLogin(),
-                                                                                                     id.getPassword())
+                                                                                         id.getPassword())
         if not data or self.getLogin().lower() != id.getLogin().lower():
             return None
         # modify Avatar with the up-to-date info from LDAP
@@ -326,8 +322,7 @@ class LDAPConnector(object):
     """
 
     def __init__(self):
-        conf = Configuration.Config.getInstance()
-        ldapConfig = conf.getAuthenticatorConfigById("LDAP")
+        ldapConfig = Config.getInstance().getAuthenticatorConfigById("LDAP")
         self.ldapUri = ldapConfig.get('uri')
         self.ldapPeopleFilter, self.ldapPeopleDN = ldapConfig.get('peopleDNQuery')
         self.groupsEnabled = ldapConfig.get('groupDNQuery') is not None
@@ -365,7 +360,7 @@ class LDAPConnector(object):
 
     def _findDN(self, dn, filterstr, param):
         result = self.l.search_s(dn, ldap.SCOPE_SUBTREE,
-                               filterstr.format(param))
+                                 filterstr.format(param))
 
         for dn, data in result:
             if dn:
@@ -673,7 +668,7 @@ class LDAPTools:
     def extractUserDataFromLdapData(ret):
         """extracts user data from a LDAP record as a dictionary, edit to modify for your needs"""
         udata= {}
-        udata["login"] = ret[UID_FIELD]
+        udata["login"] = ret[get_login_attribute()]
         udata["email"] = ret['mail']
         udata["name"]= ret.get('givenName', '')
         udata["surName"]= ret.get('sn', '')
@@ -703,7 +698,7 @@ class LDAPTools:
 
     @staticmethod
     def extractUIDFromDN(dn):
-        m = re.search('%s=([^,]*),' % UID_FIELD.upper(), dn)
+        m = re.search('%s=([^,]*),' % get_login_attribute().upper(), dn)
         if m:
             return m.group(1)
         return None
@@ -715,3 +710,7 @@ class RequestListener(Component):
     # IServerRequestListener
     def requestFinished(self, obj):
         LDAPConnector.destroy()
+
+
+def get_login_attribute():
+    return Config.getInstance().getAuthenticatorConfigById('LDAP').get('loginAttribute', 'uid')
