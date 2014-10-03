@@ -44,10 +44,10 @@
         % endfor
         <![endif]-->
 
-    <script type="text/javascript">
-      var currentLanguage = '${ language }';
-      loadDictionary(currentLanguage);
-    </script>
+        <script type="text/javascript">
+          var currentLanguage = '${ language }';
+          loadDictionary(currentLanguage);
+        </script>
 
         <!-- Page Specific CSS files-->
         % for cssFile in extraCSS:
@@ -72,6 +72,8 @@
 
         <!-- Other Page Specific -->
         ${ page._getHeadContent() }
+
+        ${ plugin_hook('page-header', template=self) }
     </head>
     <body data-user-id="${ user.getId() if user else 'null' }">
         ${ page._getWarningMessage() }
