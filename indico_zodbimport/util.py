@@ -69,3 +69,14 @@ def convert_to_unicode(val):
     elif val is None:
         return u''
     raise RuntimeError('Unexpected type is found for unicode conversion')
+
+
+def convert_principal_list(opt):
+    """Converts a 'users' plugin setting to the new format"""
+    principals = set()
+    for principal in opt.getValue():
+        if principal.__class__.__name__ == 'Avatar':
+            principals.add(('Avatar', principal.id))
+        else:
+            principals.add(('Group', principal.id))
+    return list(principals)

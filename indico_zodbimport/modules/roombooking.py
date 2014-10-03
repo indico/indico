@@ -46,7 +46,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.util.console import cformat, verbose_iterator
 from indico.util.date_time import as_utc
 from indico.util.string import safe_upper, is_valid_mail
-from indico_zodbimport import Importer, convert_to_unicode
+from indico_zodbimport import Importer, convert_to_unicode, convert_principal_list
 from indico_zodbimport.util import UnbreakingDB, get_storage
 
 
@@ -137,15 +137,8 @@ class RoomBookingImporter(Importer):
         opts = self.zodb_root['plugins']['RoomBooking']._PluginBase__options
 
         # Admins & authorized users/groups
-        for old_key, new_key in (('AuthorisedUsersGroups', 'authorized_principals'),
-                                 ('Managers', 'admin_principals')):
-            principals = set()
-            for principal in opts[old_key].getValue():
-                if principal.__class__.__name__ == 'Avatar':
-                    principals.add(('Avatar', principal.id))
-                else:
-                    principals.add(('Group', principal.id))
-            rb_settings.set(new_key, list(principals))
+        rb_settings.set('authorized_principals', convert_principal_list(opts['AuthorisedUsersGroups']))
+        rb_settings.set('admin_principals', convert_principal_list(opts['Managers']))
         # Assistance emails
         emails = [email for email in opts['assistanceNotificationEmails'].getValue() if is_valid_mail(email, False)]
         rb_settings.set('assistance_emails', emails)
