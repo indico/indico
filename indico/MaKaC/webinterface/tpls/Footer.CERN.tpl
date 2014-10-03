@@ -13,9 +13,5 @@
     </a>
     <div class="text" style="width: 200px">${ _("Powered by ")} <a href="http://indico-software.org">Indico</a></div>
 
-    % if extraFooterContent:
-        % for extra in extraFooterContent:
-            <%include file="${extra['path']}" args="extargs=extra['args']"/>
-        % endfor
-    % endif
+    ${ plugin_hook('page-footer') }
 </%block>

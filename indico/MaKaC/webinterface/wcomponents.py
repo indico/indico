@@ -771,7 +771,6 @@ class WEventFooter(WFooter):
         v["app_data"] = app_data
         v["showSocial"] = app_data.get('active', False) and self._conf.getDisplayMgr().getShowSocialApps()
         v['conf'] = self._conf
-        self._notify('eventDetailFooter', v)
 
         return v
 
