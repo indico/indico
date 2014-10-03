@@ -17,8 +17,8 @@
 import json
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
-from wtforms.fields.simple import HiddenField, TextAreaField
-from wtforms.widgets.core import CheckboxInput
+from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
+from wtforms.widgets.core import CheckboxInput, PasswordInput
 
 from indico.util.fossilize import fossilize
 from indico.util.user import retrieve_principals
@@ -82,6 +82,11 @@ class EmailListField(TextListField):
     def _validate_item(self, line):
         if not is_valid_mail(line, False):
             raise ValueError(_(u'Invalid email address: {}').format(line))
+
+
+class UnsafePasswordField(PasswordField):
+    """Password field which does not hide the current value."""
+    widget = PasswordInput(hide_value=False)
 
 
 class PrincipalField(HiddenField):

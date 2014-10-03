@@ -7341,7 +7341,7 @@ ul.speaker_list > li .contributions li {
    color: gray;
 }
 
-.plugin-settings-form input[type=text] {
+.plugin-settings-form input[type=text], .plugin-settings-form input[type=password] {
     width: 400px;
 }
 
