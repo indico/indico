@@ -240,7 +240,12 @@ class IndicoPluginEngine(PluginEngine):
 
 
 class IndicoPluginBlueprintSetupState(PluginBlueprintSetupStateMixin, IndicoBlueprintSetupState):
-    pass
+    def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
+        if rule.startswith('/static'):
+            with self._unprefixed():
+                super(IndicoPluginBlueprintSetupState, self).add_url_rule(rule, endpoint, view_func, **options)
+        else:
+            super(IndicoPluginBlueprintSetupState, self).add_url_rule(rule, endpoint, view_func, **options)
 
 
 class IndicoPluginBlueprint(PluginBlueprintMixin, IndicoBlueprint):
