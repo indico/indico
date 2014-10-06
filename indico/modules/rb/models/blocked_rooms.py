@@ -125,7 +125,7 @@ class BlockedRoom(db.Model):
             _join=Reservation
         )
 
-        reason = 'Conflict with blocking {}: {}'.format(self.blocking.id, self.blocking.reason)
+        reason = u'Conflict with blocking {}: {}'.format(self.blocking.id, self.blocking.reason)
 
         for reservation in reservations:
             if self.blocking.can_be_overridden(reservation.created_by_user, reservation.room):
