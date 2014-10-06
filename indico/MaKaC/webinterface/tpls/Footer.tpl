@@ -26,6 +26,8 @@ else:
           <img src="${ systemIcon("indico_small") }" alt="${ _("Indico - Integrated Digital Conference")}" style="vertical-align: middle; margin-right: 2px;"/>
             <span style="vertical-align: middle;">${ _("Powered by ")} <a href="http://indico-software.org">Indico</a></span>
   </%block>
+
+    ${ plugin_hook('page-footer') }
 </div>
 
 % if Config.getInstance().getWorkerName():
