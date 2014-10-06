@@ -190,9 +190,9 @@ def url_for(endpoint, *targets, **values):
     However, there is usually no need to do so. This is just so you can use it in places where sometimes a UH
     might be passed instead.
 
-    The `target` argument allows you to pass some object having a `getLocator` method returning a dict. This
-    should be used e.g. when generating an URL for an event since `getLocator()` provides the `{'confId': 123}`
-    dict instead of you having to pass `confId=event.getId()` as a kwarg.
+    The `target` argument allows you to pass some object having a `locator` property or `getLocator` method
+    returning a dict. This should be used e.g. when generating an URL for an event since ``getLocator()``
+    provides the ``{'confId': 123}`` dict instead of you having to pass ``confId=event.getId()`` as a kwarg.
 
     For details on Flask's url_for, please see its documentation.
     Anyway, the important arguments you can put in `values` besides actual arguments are:
@@ -217,7 +217,11 @@ def url_for(endpoint, *targets, **values):
         locator = {}
         for target in targets:
             if target:  # don't fail on None or mako's Undefined
-                locator.update(target.getLocator())
+                try:
+                    target_locator = target.locator
+                except AttributeError:
+                    target_locator = target.getLocator()
+                locator.update(target_locator)
         intersection = set(locator.iterkeys()) & set(values.iterkeys())
         if intersection:
             raise ValueError('url_for kwargs collide with locator: %s' % ', '.join(intersection))
