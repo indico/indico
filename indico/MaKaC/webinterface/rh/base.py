@@ -32,6 +32,7 @@ from xml.sax.saxutils import escape
 import oauth2 as oauth
 import transaction
 from flask import request, session, g
+from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound
 from ZEO.Exceptions import ClientDisconnected
 from ZODB.POSException import ConflictError, POSKeyError
@@ -49,7 +50,7 @@ from MaKaC.errors import (
     MaKaCError,
     ModificationError,
     NotLoggedError,
-)
+    NotFoundError)
 from MaKaC.plugins.base import OldObservable
 from MaKaC.webinterface.mail import GenericMailer
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -492,16 +493,19 @@ class RH(RequestHandlerBase):
 
     def _process_retry_do(self, profile):
         profile_name, res = '', ''
-        # old code gets parameters from call
-        # new code utilizes of flask.request
-        if len(inspect.getargspec(self._checkParams).args) < 2:
-            self._checkParams()
-        else:
-            self._checkParams(self._reqParams)
+        try:
+            # old code gets parameters from call
+            # new code utilizes of flask.request
+            if len(inspect.getargspec(self._checkParams).args) < 2:
+                self._checkParams()
+            else:
+                self._checkParams(self._reqParams)
 
-        func = getattr(self, '_checkParams_' + request.method, None)
-        if func:
-            func()
+            func = getattr(self, '_checkParams_' + request.method, None)
+            if func:
+                func()
+        except NoResultFound:  # sqlalchemy .one() not finding anything
+            raise NotFoundError(_('The specified item could not be found.'), title=_('Item not found'))
 
         self._checkProtection()
         func = getattr(self, '_checkProtection_' + request.method, None)
