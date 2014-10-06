@@ -229,8 +229,9 @@ def plugin_hook(*name, **kwargs):
 
 
 def url_for_plugin(endpoint, *targets, **values):
-    """Like :func:`~indico.web.flask.util.url_for` but prepending ``'plugin_'`` to the endpoint."""
-    endpoint = 'plugin_{}'.format(endpoint)
+    """Like :func:`~indico.web.flask.util.url_for` but prepending ``'plugin_'`` to the blueprint name."""
+    if '.' in endpoint[1:]:  # 'foo' or '.foo' should not get the prefix
+        endpoint = 'plugin_{}'.format(endpoint)
     return url_for(endpoint, *targets, **values)
 
 
