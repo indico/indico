@@ -16,7 +16,6 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from indico.util.string import safe_upper
 
 import urllib
 from datetime import datetime, timedelta
@@ -35,6 +34,7 @@ import MaKaC.webinterface.timetable as timetable
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.webinterface.navigation as navigation
+from MaKaC.conference import EventCloner
 from indico.core.config import Config
 from xml.sax.saxutils import quoteattr, escape
 from MaKaC.webinterface.general import WebFactory
@@ -45,7 +45,9 @@ from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_date
+from indico.util.string import safe_upper
 import MaKaC.common.timezoneUtils as timezoneUtils
+
 
 class WebFactory(WebFactory):
     ##Don't remove this commentary. Its purpose is to be sure that those words/sentences are in the dictionary after extraction. It also prevents the developper to create an init for this class and update the 283 Webfactory occurences...
@@ -616,8 +618,8 @@ class WMConfModifListings (conferences.WConfModifListings):
 
 class WPMConfClone(conferences.WPConfClone):
 
-    def _getTabContent( self, params ):
-        p = conferences.WConferenceClone( self._conf )
+    def _getTabContent(self, params):
+        p = conferences.WConferenceClone(self._conf)
         pars = {
             "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
             "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
@@ -627,9 +629,12 @@ class WPMConfClone(conferences.WPConfClone):
                      <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>
                """)
         }
-        #let the plugins add their own elements
+        # let the plugins add their own elements
         self._notify('addCheckBox2CloneConf', pars)
-        return p.getHTML( pars )
+
+        pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
+        return p.getHTML(pars)
+
 
 ##TimeTable view##
 class WPMConfModifSchedule(conferences.WPConfModifScheduleGraphic):

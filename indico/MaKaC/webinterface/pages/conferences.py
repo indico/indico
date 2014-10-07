@@ -53,6 +53,7 @@ from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.PDFinterface.base import PDFSizes
 from pytz import timezone
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
+from MaKaC.conference import EventCloner
 from MaKaC.badgeDesignConf import BadgeDesignConfiguration
 from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.pages import main
@@ -2677,6 +2678,7 @@ class WPConfClone( WPConfModifToolsBase, OldObservable ):
                                      <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>""") }
         #let the plugins add their own elements
         self._notify('addCheckBox2CloneConf', pars)
+        pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
         return p.getHTML(pars)
 
 #---------------------------------------------------------------------------------------

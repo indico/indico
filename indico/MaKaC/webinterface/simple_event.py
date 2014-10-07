@@ -30,6 +30,7 @@ import MaKaC.webinterface.navigation as navigation
 import MaKaC.webinterface.displayMgr as displayMgr
 from indico.core.config import Config
 from xml.sax.saxutils import quoteattr
+from MaKaC.conference import EventCloner
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface.materialFactories import ConfMFRegistry
@@ -298,7 +299,8 @@ class WPSEConfClone(WPSEConfModifToolsBase, Observable):
         }
         #let the plugins add their own elements
         self._notify('addCheckBox2CloneConf', pars)
-        return p.getHTML( pars )
+        pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
+        return p.getHTML(pars)
 
 
 #################### Event Creation #####################################

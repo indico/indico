@@ -54,7 +54,7 @@ import tempfile
 import copy
 import stat
 from datetime import datetime, timedelta
-from flask import session
+from flask import session, request
 
 from MaKaC.contributionReviewing import ReviewManager
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
@@ -100,12 +100,13 @@ from MaKaC.common.contextManager import ContextManager
 import zope.interface
 
 from indico.modules.scheduler import Client, tasks
-from indico.util.date_time import utc_timestamp
+from indico.core import signals
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
 from indico.core.db import DBMgr
 from indico.core.db.event import SupportInfo
 from indico.core.config import Config
-
+from indico.util.date_time import utc_timestamp
+from indico.util.signals import values_from_signal
 from indico.util.redis import write_client as redis_write_client
 import indico.util.redis.avatar_links as avatar_links
 
@@ -4338,6 +4339,7 @@ class Conference(CommonObjectBase, Locatable):
 
         #we inform the plugins in case they want to add anything to the new conference
         self._notify('cloneEvent', {'conf': conf, 'user': userPerformingClone, 'options': options})
+        EventCloner.clone_event(self, conf)
         return conf
 
     def newAlarm(self, when, enqueue=True):
@@ -12358,3 +12360,57 @@ class BOAConfig(Persistent):
         if not hasattr(self, '_modificationDS'):
             self._modificationDS = nowutc()
         return self._modificationDS
+
+
+class EventCloner(object):
+    """Base class to let plugins plug into the event cloning mechanism"""
+
+    @staticmethod
+    def get_plugin_items(event):
+        """Returns the items/checkboxes for the clone options provided by plugins"""
+        plugin_options = []
+        for plugin_cloner in values_from_signal(signals.event_management_clone.send(event), single_value=True):
+            with plugin_cloner.plugin.plugin_context():
+                for name, (title, enabled) in plugin_cloner.get_options().iteritems():
+                    full_name = plugin_cloner.full_option_name(name)
+                    plugin_options.append(
+                        """<li><input type="checkbox" name="cloners" id="cloner-{0}" value="{0}" {2}>{1}</li>""".format(
+                            full_name, title, 'disabled' if not enabled else ''
+                        )
+                    )
+        return '\n'.join(plugin_options)
+
+    @staticmethod
+    def clone_event(old_event, new_event):
+        """Calls the various cloning methods from plugins"""
+        selected = set(request.values.getlist('cloners'))
+        for plugin_cloner in values_from_signal(signals.event_management_clone.send(old_event), single_value=True):
+            with plugin_cloner.plugin.plugin_context():
+                selected_options = {name for name, (_, enabled) in plugin_cloner.get_options().iteritems()
+                                    if enabled and plugin_cloner.full_option_name(name) in selected}
+                plugin_cloner.clone(new_event, selected_options)
+
+    def __init__(self, plugin, event):
+        self.plugin = plugin
+        self.event = event
+
+    def full_option_name(self, option):
+        return '{}-{}'.format(self.__module__, option)
+
+    def get_options(self):
+        """Returns a dict containing the clone options.
+
+        :return: dict mapping option names to ``title, enabled`` tuples
+        """
+        raise NotImplementedError
+
+    def clone(self, new_event, options):
+        """Performs the actual cloning.
+
+        This method is always called, even if no options are selected!
+
+        :param new_event: The new event created during the clone
+        :param options: A set containing the options provided by
+                        this class which the user has selected
+        """
+        raise NotImplementedError
