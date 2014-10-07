@@ -21,6 +21,7 @@ from importlib import import_module
 from flask import g
 from flask_sqlalchemy import Model
 from sqlalchemy.orm import joinedload, joinedload_all
+from sqlalchemy.orm.attributes import get_history
 
 
 class IndicoModel(Model):
@@ -96,3 +97,12 @@ def import_all_models(package_name=None):
 
     for module in modules:
         import_module(module)
+
+
+def attrs_changed(obj, *attrs):
+    """Checks if the given fields have been changed since the last flush
+
+    :param obj: SQLAlchemy-mapped object
+    :param attrs: attribute names
+    """
+    return any(get_history(obj, attr).has_changes() for attr in attrs)
