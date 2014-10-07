@@ -34,3 +34,5 @@ For example, a receiver function could look like this::
    :annotation:
 .. autodata:: indico.core.signals.event_sidemenu
    :annotation:
+.. autodata:: indico.core.signals.event_deleted
+   :annotation:

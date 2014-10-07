@@ -2652,6 +2652,8 @@ class Conference(CommonObjectBase, Locatable):
             except Exception, e2:
                 Logger.get('Conference').error("Exception while notifying a conference deletion: %s (origin: %s)" % (str(e2), str(e)))
 
+        signals.event_deleted.send(self)
+
         self.notifyContributions()
 
         # will have to remove it from all the owners (categories) and the

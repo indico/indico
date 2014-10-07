@@ -75,3 +75,7 @@ event_sidemenu = _signals.signal('event-sidemenu', """
 Expected to return ``EventMenuEntry`` objects to be added to the event side menu.
 A single entry can be returned directly, multiple entries must be yielded.
 """)
+
+event_deleted = _signals.signal('event-deleted', """
+Called when an event is deleted. The *sender* is the event object.
+""")
