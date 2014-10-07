@@ -624,7 +624,7 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
 
         return self._get_view(form=form, room=room, rooms=Room.find_all(), occurrences=occurrences,
                               candidates=candidates, conflicts=conflicts, pre_conflicts=pre_conflicts,
-                              start_dt=form.start_dt.data, end_dt=form.end_dt.data,
+                              start_dt=form.start_dt.data, end_dt=form.end_dt.data, only_conflicts=False,
                               repeat_frequency=form.repeat_frequency.data, repeat_interval=form.repeat_interval.data,
                               reservation=self._reservation, can_override=room.can_be_overriden(session.user)).display()
 
