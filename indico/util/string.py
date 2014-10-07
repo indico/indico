@@ -261,3 +261,14 @@ def html_color_to_rgb(hexcolor):
         hexcolor = ''.join(c * 2 for c in hexcolor)
 
     return tuple(float(int(hexcolor[i:i + 2], 16)) / 255 for i in range(0, 6, 2))
+
+
+def strip_whitespace(s):
+    """Removes trailing/leading whitespace if a string was passed.
+
+    This utility is useful in cases where you might get None or
+    non-string values such as WTForms filters.
+    """
+    if isinstance(s, basestring):
+        s = s.strip()
+    return s
