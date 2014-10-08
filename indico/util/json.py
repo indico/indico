@@ -22,6 +22,7 @@ from __future__ import absolute_import
 import traceback
 from datetime import datetime
 
+from flask import current_app
 from persistent.dict import PersistentDict
 
 from indico.core.config import Config
@@ -85,8 +86,8 @@ def create_json_error_answer(exception):
             'inner': traceback.format_exc()
         }
 
-    return dumps({
+    return current_app.response_class(dumps({
         'version': Config.getInstance().getVersion(),
         'result': None,
         'error': details
-    })
+    }), mimetype='application/json')
