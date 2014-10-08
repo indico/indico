@@ -485,7 +485,6 @@ if __name__ == '__main__':
 
             statistics = indico.ext.statistics
             Collaboration = MaKaC.plugins.Collaboration
-            InstantMessaging = MaKaC.plugins.InstantMessaging
             EPayment = MaKaC.plugins.EPayment
             livesync = indico.ext.livesync
             importer = indico.ext.importer
@@ -511,8 +510,6 @@ if __name__ == '__main__':
 
             importer.invenio = indico.ext.importer.invenio
             importer.dummy = indico.ext.importer.dummy
-
-            InstantMessaging.XMPP = MaKaC.plugins.InstantMessaging.XMPP
 
             livesync.invenio = indico.ext.livesync.invenio
             livesync.cern_search = indico.ext.livesync.cern_search
