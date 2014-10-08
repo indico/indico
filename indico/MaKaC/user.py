@@ -402,13 +402,13 @@ class Avatar(Persistent, Fossilizable):
             if 'title' in userData:
                 self.setTitle(userData["title"])
             if 'organisation' in userData:
-                self.setOrganisation(userData['organisation'])
+                self.setOrganisation(userData['organisation'][0])
             if 'address' in userData:
-                self.setAddress(userData["address"])
+                self.setAddress(userData["address"][0])
             if 'email' in userData:
-                self.setEmail(userData["email"])
-            if 'telephone' in userData:
-                self.setTelephone(userData["telephone"])
+                self.setEmail(userData["email"][0])
+            if 'phone' in userData:
+                self.setTelephone(userData["phone"])
             if 'fax' in userData:
                 self.setFax(userData["fax"])
 
