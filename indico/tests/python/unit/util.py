@@ -35,7 +35,7 @@ import contextlib
 from indico.util.benchmark import Benchmark
 from indico.util.contextManager import ContextManager
 from indico.util.fossilize import clearCache
-from indico.util.i18n import setLocale
+from indico.util.i18n import set_session_lang
 
 # indico legacy imports
 from indico.core.logger import Logger
@@ -173,7 +173,7 @@ class RequestEnvironment_Feature(IndicoTestFeature):
         self._startRequest()
         with self._make_app_request_context(config):
             self._mock_session_user()
-            setLocale('en_GB')
+            set_session_lang('en_GB')
             yield
         self._endRequest()
 
@@ -200,7 +200,7 @@ class IndicoTestCase(unittest.TestCase, FeatureLoadingObject):
             testMethod = getattr(self, self._testMethodName)
             if getattr(testMethod, '_slow', False):
                 self.skipTest('Slow tests disabled')
-        setLocale('en_GB')
+        set_session_lang('en_GB')
         Logger.removeHandler('smtp')
         clearCache()  # init/clear fossil cache
         self._configFeatures(self)

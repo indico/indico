@@ -63,7 +63,7 @@ from indico.core.logger import Logger
 from indico.util import json
 from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
-from indico.util.i18n import _, availableLocales, setLocale
+from indico.util.i18n import _, set_session_lang
 from indico.util.redis import RedisError
 from indico.web.flask.util import ResponseUtil
 
@@ -130,20 +130,11 @@ class RequestHandlerBase(OldObservable):
         return self._params
 
     def _setLang(self, params=None):
-
-        # allow to choose the lang from params
-        if params and 'lang' in params:
-            newLang = params.get('lang', '')
-            for lang in availableLocales:
-                if newLang.lower() == lang.lower():
-                    session.lang = lang
-                    break
-
         lang = session.lang
-        Logger.get('i18n').debug("lang:%s" % lang)
+        Logger.get('i18n').debug("language: %s".format(lang))
         if lang is None:
             lang = "en_GB"
-        setLocale(lang)
+        set_session_lang(lang)
 
     def _getTruncatedParams(self):
         """Truncates params"""

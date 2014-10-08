@@ -23,6 +23,7 @@ from indico.cli.admin import IndicoAdminManager
 from indico.cli.database import DatabaseManager, PluginDatabaseManager
 from indico.cli.server import IndicoDevServer
 from indico.cli.shell import IndicoShell
+from indico.cli.i18n import IndicoI18nManager
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.migration import migrate
@@ -39,6 +40,7 @@ def main():
     manager.add_command('db', DatabaseManager)
     manager.add_command('plugindb', PluginDatabaseManager)
     manager.add_command('runserver', IndicoDevServer())
+    manager.add_command('i18n', IndicoI18nManager)
     signals.cli.send(manager)
 
     try:

@@ -27,18 +27,19 @@ import MaKaC.user as user
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError, Warning, ResultWithWarning
 
 from MaKaC.common import info
-from indico.core.config import Config
 from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
 from MaKaC.common.fossilize import fossilize
 
-from indico.util.i18n import getLocaleDisplayNames, availableLocales
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 import MaKaC.common.indexes as indexes
 from MaKaC.common.utils import validMail
+
+from indico.core.config import Config
 from indico.util.redis import avatar_links
+from indico.util.i18n import get_all_locales, set_session_lang
 from indico.web.http_api.auth import APIKey
 from indico.web.flask.util import url_for
 
@@ -268,21 +269,23 @@ class UserHidePastEvents(UserModifyBase):
         self._target.getPersonalInfo().setShowPastEvents(False)
         return True
 
+
 class UserGetLanguages(UserBaseService):
 
-    def _getAnswer( self):
-        return getLocaleDisplayNames()
+    def _getAnswer(self):
+        return list(get_all_locales())
 
 
 class UserSetLanguage(UserModifyBase):
 
     def _checkParams(self):
         UserModifyBase._checkParams(self)
-        self._lang = self._params.get("lang",None)
+        self._lang = self._params.get("lang", None)
 
-    def _getAnswer( self):
-        if self._lang and self._lang in availableLocales:
+    def _getAnswer(self):
+        if self._lang and self._lang in {locale[0] for locale in get_all_locales()}:
             self._target.setLang(self._lang)
+            set_session_lang(self._lang)
             return True
         else:
             return False

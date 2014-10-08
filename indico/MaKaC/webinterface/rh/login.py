@@ -16,10 +16,11 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import session, request
 
 import os
-from indico.core.config import Config
+
+from flask import session, request
+
 from MaKaC.common.cache import GenericCache
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
@@ -33,7 +34,10 @@ from MaKaC.common import pendingQueues
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.errors import UserError, MaKaCError, FormValuesError, NoReportError
 import MaKaC.common.info as info
+
 from indico.web.flask.util import send_file
+from indico.core.config import Config
+from indico.util.i18n import set_session_lang
 
 
 class RHSignInBase(base.RH):
@@ -57,6 +61,7 @@ class RHSignInBase(base.RH):
         tz = tzUtil.getSessionTZ()
         session.timezone = tz
         session.user = av
+        set_session_lang(av.getLang())
         if Config.getInstance().getBaseSecureURL().startswith('https://'):
             self._url = str(self._url).replace('http://', 'https://')
 

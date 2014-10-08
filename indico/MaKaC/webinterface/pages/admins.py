@@ -58,7 +58,7 @@ from MaKaC.webinterface.pages.base import WPDecorated
 # indico
 from indico.modules import ModuleHolder
 from indico.util.date_time import timedelta_split
-from indico.util.i18n import i18nformat
+from indico.util.i18n import i18nformat, get_all_locales
 from indico.util.redis import client as redis_client
 from indico.web.flask.util import url_for
 
@@ -232,8 +232,8 @@ class WPAdmins( WPAdminsBase ):
 
 class WGeneralInfoModification(wcomponents.WTemplated):
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         genInfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["title"] = genInfo.getTitle()
         vars["organisation"] = genInfo.getOrganisation()
@@ -243,8 +243,9 @@ class WGeneralInfoModification(wcomponents.WTemplated):
             selected_tz = genInfo.getTimezone()
         except:
             selected_tz = 'UTC'
-        vars["timezone"]=TimezoneRegistry.getShortSelectItemsHTML(selected_tz)
-        vars["language"]= genInfo.getLang()
+        vars["timezone"] = TimezoneRegistry.getShortSelectItemsHTML(selected_tz)
+        vars["language"] = genInfo.getLang()
+        vars["language_list"] = get_all_locales()
         return vars
 
 

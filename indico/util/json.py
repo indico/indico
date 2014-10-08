@@ -27,7 +27,7 @@ from persistent.dict import PersistentDict
 
 from indico.core.config import Config
 from indico.core.errors import IndicoError
-from indico.util.i18n import LazyProxy
+from babel.support import LazyProxy
 
 try:
     import simplejson as _json

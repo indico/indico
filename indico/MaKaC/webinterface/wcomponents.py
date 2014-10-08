@@ -18,7 +18,7 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from flask import request, session
 
-from indico.util.translations import LazyProxy
+from babel.support import LazyProxy
 
 from MaKaC.plugins import OldObservable
 from MaKaC.plugins.base import extension_point
@@ -69,7 +69,7 @@ from MaKaC.common.Announcement import getAnnoucementMgrInstance
 import MaKaC.common.TemplateExec as templateEngine
 
 from indico.core.db import DBMgr
-from indico.util.i18n import i18nformat, parseLocale, getLocaleDisplayNames
+from indico.util.i18n import i18nformat, parse_locale, get_all_locales
 from indico.util.date_time import utc_timestamp, is_same_month
 from indico.core.index import Catalog
 
@@ -316,9 +316,8 @@ class WHeader(WTemplated):
         vars["ActiveTimezoneDisplay"] = self._getTimezoneDisplay(vars["ActiveTimezone"])
 
         vars["SelectedLanguage"] = selLang
-        locale = parseLocale(selLang)
-        vars["SelectedLanguageName"] = locale.languages[locale.language].encode('utf-8')
-        vars["Languages"] = getLocaleDisplayNames()
+        vars["SelectedLanguageName"] = parse_locale(selLang).language_name
+        vars["Languages"] = get_all_locales()
 
         if DBMgr.getInstance().isConnected():
             vars["title"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTitle()
@@ -1928,6 +1927,8 @@ class WUserRegistration(WTemplated):
         vars["timezoneOptions"]=TimezoneRegistry.getShortSelectItemsHTML(tz)
         vars["displayTZModeOptions"]=DisplayTimezoneRegistry.getSelectItemsHTML(tzmode)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+
+        vars['all_languages'] = get_all_locales()
         if vars.get("defaultLang","") == "":
             vars["defaultLang"] = minfo.getLang()
         return vars

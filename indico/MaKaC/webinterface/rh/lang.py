@@ -22,6 +22,8 @@ from flask import request
 
 import MaKaC.webinterface.rh.base as base
 from indico.core.config import Config
+from indico.util.i18n import set_session_lang
+
 
 class RHChangeLang(base.RH):
 
@@ -32,6 +34,7 @@ class RHChangeLang(base.RH):
 
         if self._getUser():
             self._getUser().setLang(self._language)
+            set_session_lang(self._language)
 
         # No need to do any more processing here. The language change is processed in RH base
         # Remove lang param from referer

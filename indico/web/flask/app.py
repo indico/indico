@@ -27,6 +27,7 @@ from flask import send_from_directory, request, _app_ctx_stack, Blueprint
 from flask import current_app as app
 from flask_sqlalchemy import models_committed
 from flask_pluginengine import plugins_loaded
+
 from sqlalchemy.orm import configure_mappers
 from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
@@ -34,7 +35,7 @@ from werkzeug.urls import url_parse
 import indico.util.date_time as date_time_util
 from indico.core.config import Config
 from indico.core import signals
-from indico.util.i18n import gettext, ngettext
+from indico.util.i18n import gettext, ngettext, babel
 from indico.core.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.plugins.base import RHMapMemory
@@ -275,6 +276,9 @@ def make_app(set_path=False, db_setup=True, testing=False):
     fix_root_path(app)
     configure_app(app, set_path)
     setup_jinja(app)
+
+    babel.init_app(app)
+
     with app.app_context():
         setup_assets()
 

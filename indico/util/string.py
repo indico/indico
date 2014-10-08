@@ -34,7 +34,7 @@ try:
 except ImportError:
     translitcodec = None
 
-from indico.util.translations import LazyProxy
+from babel.support import LazyProxy
 
 
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small']

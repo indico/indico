@@ -31,7 +31,7 @@ from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.webinterface.rh.conferenceBase import RHCustomizable
 from indico.util.contextManager import ContextManager
 from MaKaC.common.offlineWebsiteCreator import OfflineEvent
-from indico.util.i18n import setLocale
+from indico.util.i18n import set_session_lang
 from MaKaC.accessControl import AccessWrapper
 from indico.util import fossilize
 
@@ -49,7 +49,7 @@ class OfflineEventGeneratorTask(OneShotTask):
     def _run(self):
         Logger.get('OfflineEventGeneratorTask').info("Started generation of the offline website for task: %s" %
                                                      self._task.id)
-        setLocale(self._task.avatar.getLang())
+        set_session_lang(self._task.avatar.getLang())
         self._rh = RHCustomizable()
         self._aw = self._rh._aw = AccessWrapper()
         self._rh._conf = self._rh._target = self._task.conference

@@ -29,19 +29,11 @@ import sys
 from distutils.sysconfig import get_python_lib, get_python_version
 from distutils.cmd import Command
 from distutils.command import bdist
-from indico.util import i18n
 
 
 import pkg_resources
 from setuptools.command import develop, sdist, bdist_egg, easy_install, test
 from setuptools import setup, find_packages, findall
-
-
-try:
-    from babel.messages import frontend as babel
-    BABEL_PRESENT = True
-except ImportError:
-    BABEL_PRESENT = False
 
 
 DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras"]
@@ -449,11 +441,6 @@ if __name__ == '__main__':
                 'test': test_indico,
                 'egg_filename': egg_filename
                 }
-
-    if BABEL_PRESENT:
-        for cmdname in ['init_catalog', 'extract_messages', 'compile_catalog', 'update_catalog']:
-            cmdclass['%s_js' % cmdname] = getattr(babel, cmdname)
-        cmdclass['compile_catalog_js'] = i18n.generate_messages_js
 
     setup(name="indico",
           cmdclass=cmdclass,

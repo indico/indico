@@ -32,7 +32,7 @@ from pkg_resources import parse_version
 
 from indico.core.config import Config
 from indico.core.db import DBMgr, db
-from indico.core.db.sqlalchemy.util import update_session_options
+from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.index import Catalog
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.tasks import OccurrenceNotifications
@@ -57,8 +57,6 @@ from MaKaC.review import AbstractField
 
 
 MIGRATION_TASKS = []
-
-i18n.setLocale('en_GB')
 
 
 class ControlledExit(Exception):

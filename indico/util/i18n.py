@@ -17,85 +17,108 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 # system lib imports
-import os
 import re
-import sys
 
 # stdlib imports
-from distutils.cmd import Command
 import ast
 
-# external lib imports
-import pkg_resources
+from babel.core import Locale
+from babel.support import Translations
 
-try:
-    from babel.support import Translations
-    from translations import *
-
-    _ = gettext = lazyTranslations.gettext
-    ngettext = lazyTranslations.ngettext
-
-    L_ = gettext_lazy = forceLazyTranslations.gettext
-
-    # Just a marker for message extraction
-    N_ = lambda text: text
-
-except ImportError:
-    # no Babel
-    pass
+from flask import session, request
+from flask_babelex import Babel, lazy_gettext, get_domain
 
 
-try:
-    INDICO_DIST = pkg_resources.get_distribution('indico')
-except pkg_resources.DistributionNotFound:
-    INDICO_DIST = None
-
-if INDICO_DIST:
-    LOCALE_DIR = INDICO_DIST.get_resource_filename('indico', 'indico/locale')
-
-LOCALE_DOMAIN = 'messages'
 RE_TR_FUNCTION = re.compile(r"_\(\"([^\"]*)\"\)|_\('([^']*)'\)", re.DOTALL | re.MULTILINE)
-
 
 defaultLocale = 'en_GB'
 
+babel = Babel()
 
-def setLocale(locale):
+
+def smart_func(func_name):
+    def _wrap(*args, **kwargs):
+        """
+        Returns either a translated string or a lazy-translatable object,
+        depending on whether there is a session language or not (respectively)
+        """
+
+        if session and session.lang or func_name != 'ugettext':
+            # straight translation
+            translations = get_domain().get_translations()
+            return getattr(translations, func_name)(*args, **kwargs).encode('utf-8')
+        else:
+            # otherwise, defer translation to eval time
+            return lazy_gettext(*args, **kwargs)
+    return _wrap
+
+
+# Shortcuts
+_ = gettext = smart_func('ugettext')
+ngettext = smart_func('ungettext')
+L_ = gettext_lazy = lazy_gettext
+
+# Just a marker for message extraction
+N_ = lambda text: text
+
+
+class IndicoLocale(Locale):
     """
-    Set the current locale in the current thread context
+    Extends the Babel Locale class with some utility methods
     """
-    ContextManager.set('locale', locale)
-    ContextManager.set('translation', Translations.load(LOCALE_DIR, locale, LOCALE_DOMAIN))
+    def weekday(self, daynum, short=True):
+        """
+        Returns the week day given the index
+        """
+        return self.days['format']['abbreviated' if short else 'wide'][daynum].encode('utf-8')
 
 
-def currentLocale():
-    return IndicoLocale.parse(ContextManager.get('locale', defaultLocale))
-
-
-def getAllLocales():
+class IndicoTranslations(Translations):
     """
-    List all available locales/translations
+    Routes translations through the 'smart' translators defined above
     """
-    if INDICO_DIST:
-        return [loc for loc in INDICO_DIST.resource_listdir('indico/locale') if '.' not in loc]
+
+    def ugettext(self, message):
+        return gettext(message)
+
+    def ungettext(self, msgid1, msgid2, n):
+        return ngettext(msgid1, msgid2, n)
+
+
+IndicoTranslations().install(unicode=True)
+
+
+@babel.localeselector
+def get_locale():
+    language = session.lang
+    if language is not None:
+        return language
     else:
+        return request.accept_languages.best_match([str(l) for l in get_all_locales()])
+
+currentLocale = get_locale
+
+
+def get_all_locales():
+    """
+    List all available locales/names e.g. ('pt_PT', 'Portuguese')
+    """
+    if babel.app is None:
         return []
+    else:
+        return {(str(t), t.language_name) for t in babel.list_translations()}
 
 
-availableLocales = getAllLocales()
-
-
-def getLocaleDisplayNames():
+def set_session_lang(lang):
     """
-    List of (locale_id, locale_name) tuples
+    Set the current locale in the current request context
     """
-
-    locales = [IndicoLocale.parse(loc) for loc in availableLocales]
-    return list((str(loc), loc.languages[loc.language].encode('utf-8')) for loc in locales)
+    session.lang = lang
 
 
-def parseLocale(locale):
+def parse_locale(locale):
     """
+    Get a Locale object from a locale id
     """
     return IndicoLocale.parse(locale)
 
@@ -105,48 +128,7 @@ def i18nformat(text):
     ATTENTION: only used for backward-compatibility
     Parses old '_() inside strings hack', translating as needed
     """
-    return RE_TR_FUNCTION.sub(lambda x: _(filter(lambda y: y != None, x.groups())[0]), text)
-
-
-class generate_messages_js(Command):
-    """
-    Translates *.po files to a JSON dict, with a little help of pojson
-    """
-
-    description = "generates JSON from po"
-    user_options = [('input-dir=', None, 'input dir'),
-                    ('output-dir=', None, 'output dir'),
-                    ('domain=', None, 'domain')]
-    boolean_options = []
-
-    def initialize_options(self):
-        self.input_dir = None
-        self.output_dir = None
-        self.domain = None
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        try:
-            pkg_resources.require('pojson')
-        except pkg_resources.DistributionNotFound:
-            print """
-            pojson not found! pojson is needed for JS i18n file generation, if you're building Indico from source. Please install it.
-            i.e. try 'easy_install pojson'"""
-            sys.exit(-1)
-
-        from pojson import convert
-
-        localeDirs = [name for name in os.listdir(self.input_dir) if os.path.isdir(os.path.join(self.input_dir, name))]
-
-        for locale in localeDirs:
-            result = convert(os.path.join(
-                self.input_dir, locale, "LC_MESSAGES", 'messages-js.po'), pretty_print=True)
-            fname = os.path.join(self.output_dir, '%s.js' % locale)
-            with open(fname, 'w') as f:
-                f.write((u"var json_locale_data = {0};".format(result)).encode('utf-8'))
-            print 'wrote %s' % fname
+    return RE_TR_FUNCTION.sub(lambda x: _(filter(lambda y: y is not None, x.groups())[0]), text)
 
 
 def extract(fileobj, keywords, commentTags, options):
@@ -165,5 +147,5 @@ def extract_node(node, keywords, commentTags, options, parents=[None]):
             yield (node.lineno, '', line.split('\n'), ['old style recursive strings'])
     else:
         for cnode in ast.iter_child_nodes(node):
-            for rslt in  extract_node(cnode, keywords, commentTags, options, parents=(parents + [node])):
+            for rslt in extract_node(cnode, keywords, commentTags, options, parents=(parents + [node])):
                 yield rslt
