@@ -454,7 +454,7 @@ class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBooki
         return RHRoomBookingNewBookingSimple._get_view(self, clone_booking=self._reservation, **kwargs)
 
     def _make_form(self):
-
+        self.past_date = self.date_changed = False
         changes = {'room_id': self._room.id}
 
         if self._reservation.created_by_id != session.user.id:
