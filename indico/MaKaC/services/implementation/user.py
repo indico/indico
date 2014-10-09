@@ -273,7 +273,7 @@ class UserHidePastEvents(UserModifyBase):
 class UserGetLanguages(UserBaseService):
 
     def _getAnswer(self):
-        return list(get_all_locales())
+        return list(get_all_locales().iteritems())
 
 
 class UserSetLanguage(UserModifyBase):
@@ -283,7 +283,7 @@ class UserSetLanguage(UserModifyBase):
         self._lang = self._params.get("lang", None)
 
     def _getAnswer(self):
-        if self._lang and self._lang in {locale[0] for locale in get_all_locales()}:
+        if self._lang and self._lang in get_all_locales():
             self._target.setLang(self._lang)
             set_session_lang(self._lang)
             return True

@@ -9,7 +9,7 @@
         <form id="languageForm" method="post" action="${ urlHandlers.UHChangeLang.getURL() }">
             <span>${_("Language:")}</span>
             <select name="lang" onchange="$E('languageForm').dom.submit();">
-            % for k,v in Languages:
+            % for k, v in Languages.iteritems():
                 <option value="${ k }" ${"selected" if SelectedLanguage == k else ""}>${ v }</option>
             % endfor
             </select>

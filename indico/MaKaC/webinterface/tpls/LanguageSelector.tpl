@@ -22,7 +22,7 @@ languageLink.observeClick(function(e) {
     var inputHidden = $E('languageInputHidden');
 
     // build a dictionary that represents the menu
-    % for k,v in Languages:
+    % for k,v in Languages.iteritems():
         menuItems['${ v }'] = {action:function() {inputHidden.dom.value = '${ k }'; form.dom.submit()}, display:'${ v }'};
     % endfor
 

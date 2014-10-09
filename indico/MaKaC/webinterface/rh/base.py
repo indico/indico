@@ -129,9 +129,9 @@ class RequestHandlerBase(OldObservable):
     def getRequestParams(self):
         return self._params
 
-    def _setLang(self, params=None):
+    def _setLang(self):
         lang = session.lang
-        Logger.get('i18n').debug("language: %s".format(lang))
+        Logger.get('i18n').debug("set language: {}".format(lang))
         if lang is None:
             lang = "en_GB"
         set_session_lang(lang)
@@ -469,7 +469,7 @@ class RH(RequestHandlerBase):
         # in the user session
         self._aw.setIP(request.remote_addr)
         self._setSessionUser()
-        self._setLang(params)
+        self._setLang()
         if self._getAuth():
             if self._getUser():
                 Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (

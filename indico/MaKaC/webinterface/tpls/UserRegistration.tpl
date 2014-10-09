@@ -59,8 +59,8 @@ ${ locator }
   <td align="right"><font color="gray"><font color="red">* </font> ${ _("Language")}</font></td>
   <td bgcolor="white" width="100%" align="left">
   <select size=1 name="lang">
-    % for l in all_languages:
-        <option value="${l[0]}" ${'selected="selected"' if l[0]==defaultLang else ""}>${l[1]}</option><br>
+    % for lang_code, lang_name in all_languages.iteritems():
+        <option value="${lang_code}" ${'selected="selected"' if lang_code == defaultLang else ""}>${lang_name}</option><br>
     % endfor
   </select>
   </td>

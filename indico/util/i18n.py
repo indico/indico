@@ -24,6 +24,7 @@ import ast
 
 from babel.core import Locale
 from babel.support import Translations
+from babel import negotiate_locale
 
 from flask import session, request
 from flask_babelex import Babel, lazy_gettext, get_domain
@@ -56,7 +57,7 @@ def smart_func(func_name):
 # Shortcuts
 _ = gettext = smart_func('ugettext')
 ngettext = smart_func('ungettext')
-L_ = gettext_lazy = lazy_gettext
+L_ = lazy_gettext
 
 # Just a marker for message extraction
 N_ = lambda text: text
@@ -94,7 +95,8 @@ def get_locale():
     if language is not None:
         return language
     else:
-        return request.accept_languages.best_match([str(l) for l in get_all_locales()])
+        preferred = [x.replace('-', '_') for x in request.accept_languages.values()]
+        return negotiate_locale(preferred, get_all_locales())
 
 currentLocale = get_locale
 
@@ -106,7 +108,7 @@ def get_all_locales():
     if babel.app is None:
         return []
     else:
-        return {(str(t), t.language_name) for t in babel.list_translations()}
+        return {str(t): t.language_name for t in babel.list_translations()}
 
 
 def set_session_lang(lang):

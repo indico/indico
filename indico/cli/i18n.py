@@ -1,15 +1,14 @@
 import os
 import re
-import sys
 
 from functools import wraps
 from distutils.dist import Distribution
 from distutils.cmd import Command as distutils_Command
+from pkgutil import walk_packages
 
 from flask_script import Manager, Command, Option
 from babel.messages import frontend
-
-from pkgutil import walk_packages
+from pojson import convert
 
 
 IndicoI18nManager = Manager(usage="Takes care of i18n-related operations")
@@ -121,21 +120,9 @@ class compile_catalog_js(distutils_Command):
         pass
 
     def run(self):
-        import pkg_resources
-        try:
-            pkg_resources.require('pojson')
-        except pkg_resources.DistributionNotFound:
-            print """
-            pojson not found! pojson is needed for JS i18n file generation.
-            If you're building Indico from source. Please install it.
-            i.e. try 'easy_install pojson'"""
-            sys.exit(-1)
+        locale_dirs = [name for name in os.listdir(self.input_dir) if os.path.isdir(os.path.join(self.input_dir, name))]
 
-        from pojson import convert
-
-        localeDirs = [name for name in os.listdir(self.input_dir) if os.path.isdir(os.path.join(self.input_dir, name))]
-
-        for locale in localeDirs:
+        for locale in locale_dirs:
             result = convert(os.path.join(
                 self.input_dir, locale, "LC_MESSAGES", 'messages-js.po'), pretty_print=True)
             fname = os.path.join(self.output_dir, '%s.js' % locale)
@@ -147,8 +134,9 @@ class compile_catalog_js(distutils_Command):
 cmd_list = ['init_catalog', 'extract_messages', 'compile_catalog', 'update_catalog']
 cmd_list += [cmd + '_js' for cmd in cmd_list]
 
-for cmd in cmd_list:
-    cmd_class = compile_catalog_js if cmd == 'compile_catalog_js' else getattr(frontend, re.sub(r'_js$', '', cmd))
+for cmd_name in cmd_list:
+    cmd_class = compile_catalog_js if cmd_name == 'compile_catalog_js' \
+        else getattr(frontend, re.sub(r'_js$', '', cmd_name))
 
     command = Command(wrap_distutils_command(cmd_class))
 
@@ -163,6 +151,6 @@ for cmd in cmd_list:
 
         command.add_option(Option(*opts, dest=var_name,
                                   action=(None if opt.endswith('=') else 'store_true'), help=description,
-                                  default=DEFAULT_OPTIONS.get(cmd, {}).get(var_name)))
+                                  default=DEFAULT_OPTIONS.get(cmd_name, {}).get(var_name)))
 
-    IndicoI18nManager.add_command(cmd, command)
+    IndicoI18nManager.add_command(cmd_name, command)
