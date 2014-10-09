@@ -31,6 +31,7 @@ from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.models.settings import SettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 from MaKaC.webinterface.pages.base import WPJinjaMixin
@@ -233,6 +234,12 @@ def url_for_plugin(endpoint, *targets, **values):
     if '.' in endpoint[1:]:  # 'foo' or '.foo' should not get the prefix
         endpoint = 'plugin_{}'.format(endpoint)
     return url_for(endpoint, *targets, **values)
+
+
+def get_plugin_template_module(template_name, **context):
+    """Like :func:`~indico.web.flask.templating.get_template_module`, but using plugin templates"""
+    template_name = '{}:{}'.format(current_plugin.name, template_name)
+    return get_template_module(template_name, **context)
 
 
 class IndicoPluginEngine(PluginEngine):
