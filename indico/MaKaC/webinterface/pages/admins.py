@@ -113,12 +113,11 @@ class WPAdminsBase( WPMainBase ):
             urlHandlers.UHWebcast.getURL())
         mainSection.addItem( self._servicesMenuItem)
 
-        self._pluginsMenuItem = wcomponents.SideMenuItem(_("Plugins"),
-            urlHandlers.UHAdminPlugins.getURL())
-        mainSection.addItem( self._pluginsMenuItem)
+        self._pluginsOldMenuItem = wcomponents.SideMenuItem(_("Plugins (Old)"), urlHandlers.UHAdminPlugins.getURL())
+        mainSection.addItem(self._pluginsOldMenuItem)
 
-        self._pluginsNewMenuItem = wcomponents.SideMenuItem(_("Plugins (New)"), url_for('plugins.index'))
-        mainSection.addItem(self._pluginsNewMenuItem)
+        self._pluginsMenuItem = wcomponents.SideMenuItem(_("Plugins"), url_for('plugins.index'))
+        mainSection.addItem(self._pluginsMenuItem)
 
         self._homepageMenuItem = wcomponents.SideMenuItem(_("Homepage"),
             urlHandlers.UHUpdateNews.getURL())
@@ -363,7 +362,7 @@ class WPAdminPlugins( WPAdminsBase ):
                                                                        urlHandlers.UHAdminPlugins.getURL( pluginType ))
 
     def _setActiveSideMenuItem(self):
-        self._pluginsMenuItem.setActive()
+        self._pluginsOldMenuItem.setActive()
 
     def _setActiveTab(self):
         if self._pluginTypeId is None:

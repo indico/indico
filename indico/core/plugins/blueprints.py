@@ -17,7 +17,7 @@
 from indico.core.plugins.controllers import RHPlugins, RHPluginDetails
 from indico.web.flask.wrappers import IndicoBlueprint
 
-plugins_blueprint = _bp = IndicoBlueprint('plugins', __name__, url_prefix='/admin/plugins-new',
+plugins_blueprint = _bp = IndicoBlueprint('plugins', __name__, url_prefix='/admin/plugins',
                                           template_folder='templates')
 
 _bp.add_url_rule('/', 'index', RHPlugins)
