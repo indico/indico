@@ -42,6 +42,7 @@ from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.pages import admins
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase, RHAlarmBase, RHSubmitMaterialBase
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
+from indico.core import signals
 from indico.core.config import Config
 from MaKaC.errors import MaKaCError, FormValuesError,ModificationError,\
     ConferenceClosedError, NoReportError, NotFoundError
@@ -60,6 +61,7 @@ from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, Con
 from MaKaC.common import utils
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.util.signals import values_from_signal
 from MaKaC.plugins.base import Observable
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept, AbstractStatusProposedToReject
@@ -194,12 +196,14 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         self._isPluginManagerOrAdmin = any(self._notify("isPluginTypeAdmin", {"user": self._getUser()}) +
                                            self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"}) +
                                            self._notify("isPluginManager", {"user": self._getUser(), "conf": self._target, "plugins": "any"}))
+        self._plugin_urls = values_from_signal(signals.event_management_url.send(self._conf), single_value=True)
 
     def _checkProtection(self):
-        if not (self._isRegistrar or self._isPRM or self._isReferee or self._isPluginManagerOrAdmin):
+        if not (self._isRegistrar or self._isPRM or self._isReferee or self._isPluginManagerOrAdmin or
+                self._plugin_urls):
             RHConferenceModifKey._checkProtection(self)
 
-    def _process( self ):
+    def _process(self):
         url = None
         if self._redirectURL != "":
             url = self._redirectURL
@@ -213,6 +217,8 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
             url = urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf )
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
+        elif self._plugin_urls:
+            url = next(iter(self._plugin_urls), None)
         elif self._isPluginManagerOrAdmin:
             urls = self._notify("conferencePluginManagementURL", {"conf": self._target, "secure": self.use_https()})
             if urls:
@@ -220,7 +226,7 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         if not url:
             url = urlHandlers.UHConfManagementAccess.getURL( self._conf )
 
-        self._redirect( url )
+        self._redirect(url)
 
 
 class RHConferenceCloseModifKey(RHConferenceBase):

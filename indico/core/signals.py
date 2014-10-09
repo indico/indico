@@ -71,6 +71,16 @@ Expected to return an instance of a ``EventCloner`` subclass implementing
 the cloning behavior. The *sender* is the event object.
 """)
 
+event_management_url = _signals.signal('event-management-url', """
+Expected to return a URL for the event management page of the plugin.
+This is used when someone who does not have event management access wants
+to go to the event management area. He is then redirected to one of the URLs
+returned by plugins, i.e. it is not guaranteed that the user ends up on a
+specific plugin's management page. The signal should return None if the current
+user (available via ``session.user``) cannot access the management area.
+The *sender* is the event object.
+""")
+
 event_sidemenu = _signals.signal('event-sidemenu', """
 Expected to return ``EventMenuEntry`` objects to be added to the event side menu.
 A single entry can be returned directly, multiple entries must be yielded.
