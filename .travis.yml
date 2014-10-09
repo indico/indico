@@ -4,6 +4,7 @@ python:
 addons:
   postgresql: 9.2
 install:
+  - pip install -r requirements.txt
   - python setup.py develop
 script:
   - py.test -v
