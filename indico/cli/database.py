@@ -143,7 +143,8 @@ class PluginDBCommand(Command):
 def _make_plugin_database_manager():
     """Clones DatabaseManager and adapts its commands to plugin database migrations"""
     manager = deepcopy(DatabaseManager)
-    manager.description = 'Perform database migrations for plugins'
+    manager.description += ' for plugins'
+    manager.help += ' for plugins'
     del manager._commands['prepare']  # not needed for plugins
     single_plugin_commands = {'migrate', 'revision', 'downgrade', 'stamp'}
     for name, command in manager._commands.iteritems():
