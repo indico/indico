@@ -39,8 +39,15 @@ class WPJinjaMixin:
 
     This allows you to use a single WP class and its layout, CSS,
     etc. for multiple pages in a lightweight way while still being
-    able to use a subclass if more
+    able to use a subclass if more.
+
+    To avoid collisions between blueprint and application templates,
+    your blueprint template folders should have a subfolder named like
+    the blueprint. To avoid writing it all the time, you can store it
+    as `template_prefix` (with a trailing slash) in yor WP class.
     """
+
+    template_prefix = ''
 
     @classmethod
     def render_template(cls, template=None, *wp_args, **context):
@@ -53,7 +60,7 @@ class WPJinjaMixin:
         :param context: the variables that should be available in the
                         context of the template
         """
-        context['_jinja_template'] = template or cls._template
+        context['_jinja_template'] = cls.template_prefix + (template or cls._template)
         return cls(g.rh, *wp_args, **context).display()
 
     def _getPageContent(self, params):
