@@ -222,7 +222,6 @@ class ServiceBase(RequestHandlerBase):
 
         ContextManager.set('currentRH', self)
 
-        self._setLang()
         self._checkParams()
         self._checkProtection()
 

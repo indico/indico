@@ -78,8 +78,7 @@ class IndicoSession(BaseSession):
         elif self.user:
             return self.user.getLang()
         else:
-            with DBMgr.getInstance().global_connection():
-                return HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
+            return None
 
     @lang.setter
     def lang(self, lang):

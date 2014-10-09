@@ -26,13 +26,13 @@ from babel.core import Locale
 from babel.support import Translations
 from babel import negotiate_locale
 
-from flask import session, request
+from flask import session, request, has_request_context
 from flask_babelex import Babel, lazy_gettext, get_domain
+
+from MaKaC.common.info import HelperMaKaCInfo
 
 
 RE_TR_FUNCTION = re.compile(r"_\(\"([^\"]*)\"\)|_\('([^']*)'\)", re.DOTALL | re.MULTILINE)
-
-defaultLocale = 'en_GB'
 
 babel = Babel()
 
@@ -44,7 +44,7 @@ def smart_func(func_name):
         depending on whether there is a session language or not (respectively)
         """
 
-        if session and session.lang or func_name != 'ugettext':
+        if (has_request_context() and session.lang) or func_name != 'ugettext':
             # straight translation
             translations = get_domain().get_translations()
             return getattr(translations, func_name)(*args, **kwargs).encode('utf-8')
@@ -90,15 +90,32 @@ IndicoTranslations().install(unicode=True)
 
 
 @babel.localeselector
-def get_locale():
+def set_best_lang():
+    """
+    Get the best language/locale for the current user. This means that first
+    the session will be checked, and then in the absence of an explicitly-set
+    language, we will try to guess it from the browser settings and only
+    after that fall back to the server's default.
+    """
+
     language = session.lang
+
     if language is not None:
         return language
     else:
+        # try to use browser language
         preferred = [x.replace('-', '_') for x in request.accept_languages.values()]
-        return negotiate_locale(preferred, get_all_locales())
+        resolved_lang = negotiate_locale(preferred, get_all_locales())
 
-currentLocale = get_locale
+        if not resolved_lang:
+            # fall back to server default
+            minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+            resolved_lang = minfo.getLang()
+
+        session.lang = resolved_lang
+        return resolved_lang
+
+currentLocale = set_best_lang
 
 
 def get_all_locales():
@@ -106,14 +123,14 @@ def get_all_locales():
     List all available locales/names e.g. ('pt_PT', 'Portuguese')
     """
     if babel.app is None:
-        return []
+        return {}
     else:
         return {str(t): t.language_name for t in babel.list_translations()}
 
 
 def set_session_lang(lang):
     """
-    Set the current locale in the current request context
+    Set the current language in the current request context
     """
     session.lang = lang
 
@@ -130,6 +147,11 @@ def i18nformat(text):
     ATTENTION: only used for backward-compatibility
     Parses old '_() inside strings hack', translating as needed
     """
+
+    # this is a bit of a dirty hack, but cannot risk emitting lazy proxies here
+    if not session.lang:
+        set_best_lang()
+
     return RE_TR_FUNCTION.sub(lambda x: _(filter(lambda y: y is not None, x.groups())[0]), text)
 
 

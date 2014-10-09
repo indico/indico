@@ -63,7 +63,6 @@ from indico.core.logger import Logger
 from indico.util import json
 from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
-from indico.util.i18n import _, set_session_lang
 from indico.util.redis import RedisError
 from indico.web.flask.util import ResponseUtil
 
@@ -128,13 +127,6 @@ class RequestHandlerBase(OldObservable):
 
     def getRequestParams(self):
         return self._params
-
-    def _setLang(self):
-        lang = session.lang
-        Logger.get('i18n').debug("set language: {}".format(lang))
-        if lang is None:
-            lang = "en_GB"
-        set_session_lang(lang)
 
     def _getTruncatedParams(self):
         """Truncates params"""
@@ -469,7 +461,6 @@ class RH(RequestHandlerBase):
         # in the user session
         self._aw.setIP(request.remote_addr)
         self._setSessionUser()
-        self._setLang()
         if self._getAuth():
             if self._getUser():
                 Logger.get('requestHandler').info('Request %s identified with user %s (%s)' % (
