@@ -31,6 +31,7 @@ from MaKaC.conference import Reviewing, Link
 from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
 from MaKaC.i18n import _
 
+from indico.core import signals
 from indico.web.flask.util import send_file
 from indico.modules import ModuleHolder
 
@@ -60,7 +61,7 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
             RHDisplayBaseProtected._checkProtection( self )
 
     def _process( self ):
-        self._notify('materialDownloaded', self._file)
+        signals.material_downloaded.send(self._conf, resource=self._file)
         if isinstance(self._file, Link):
             self._redirect(self._file.getURL())
         elif self._file.getId() == "minutes":

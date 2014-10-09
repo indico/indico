@@ -16,18 +16,19 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 from flask import session, request
 
-import tempfile
-from MaKaC.errors import MaKaCError
 import MaKaC.webinterface.pages.material as material
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.conference as conference
+from indico.core import signals
+from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHMaterialBase
-from indico.core.config import Config
 from MaKaC.export import fileConverter
 from MaKaC.i18n import _
+
 
 class RHMaterialDisplayBase( RHMaterialBase, RHDisplayBaseProtected ):
 
@@ -57,9 +58,7 @@ class RHMaterialDisplayCommon:
 
         if len(self._material.getResourceList()) == 1:
             res = self._material.getResourceList()[0]
-
-            self._notify('materialDownloaded', res)
-
+            signals.material_downloaded.send(self._conf, resource=res)
             if isinstance(res, conference.Link):
                 url = res.getURL()
                 if url.find(".wmv") != -1:

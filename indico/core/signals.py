@@ -89,3 +89,8 @@ A single entry can be returned directly, multiple entries must be yielded.
 event_deleted = _signals.signal('event-deleted', """
 Called when an event is deleted. The *sender* is the event object.
 """)
+
+material_downloaded = _signals.signal('material-downloaded', """
+Notifies a file being downloaded. The *sender* is the event and the resource is
+the file being downloaded.
+""")
