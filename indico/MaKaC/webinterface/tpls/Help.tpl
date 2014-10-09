@@ -28,6 +28,21 @@
             </div>
         </div>
         ${pluginDocs}
+        % for title, entries in extra_sections.iteritems():
+            <div class="title">${ title }</div>
+            % for entry_title, (html_url, pdf_url) in entries.iteritems():
+                <div class="content">
+                    <div class="item clearfix">
+                        <div class="icons">
+                            <a href="${ html_url }" style="vertical-align: top">Web</a>
+                            |
+                            <a href="${ pdf_url }"><img src="images/pdf_small.png" alt="PDF version"></a>
+                        </div>
+                        <a href="${ html_url }">${ entry_title }</a>
+                    </div>
+                </div>
+            % endfor
+        % endfor
         <div class="title">${ _("Paper Reviewing Guides")}<img src="${ systemIcon('new') }" style="padding-left: 5px;" alt="new" /></div>
         <div class="content">
             <div class="item clearfix">

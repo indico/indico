@@ -21,7 +21,6 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.rh.admins import RCAdmin
-from MaKaC.plugins import PluginsHolder
 from MaKaC.i18n import _
 
 
@@ -31,7 +30,7 @@ class WPHelp(WPMainBase):
 
     def _getBody(self, params):
         wc = WHelp(self._rh)
-        return wc.getHTML()
+        return wc.getHTML(params)
 
 
 class WHelp(wcomponents.WTemplated):

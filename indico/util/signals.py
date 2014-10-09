@@ -17,7 +17,7 @@
 from types import GeneratorType
 
 
-def values_from_signal(signal_response, single_value=False, skip_none=True):
+def values_from_signal(signal_response, single_value=False, skip_none=True, as_list=False):
     """Combines the results from both single-value and multi-value signals.
 
     The signal needs to return either a single object (which is not a
@@ -28,14 +28,17 @@ def values_from_signal(signal_response, single_value=False, skip_none=True):
     :param single_value: If each return value should be treated aas a single
                          value in all cases (disables the generator check)
     :param skip_none: If None return values should be skipped
+    :param as_list: If you want a list instead of a set (only use this if
+                    you need non-hashable return values, the order is still
+                    not defined!)
     :return: A set containing the results
     """
-    values = set()
+    values = []
     for _, value in signal_response:
         if not single_value and isinstance(value, GeneratorType):
-            values.update(value)
+            values.extend(value)
         else:
-            values.add(value)
+            values.append(value)
     if skip_none:
-        values = {v for v in values if v is not None}
-    return values
+        values = [v for v in values if v is not None]
+    return values if as_list else set(values)

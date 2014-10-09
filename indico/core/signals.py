@@ -61,6 +61,17 @@ The *sender* is the name of the actual hook. The keyword arguments
 depend on the hook.
 """)
 
+indico_help = _signals.signal('indico-help', """
+Expected to return a dict containing entries for the *Indico help* page::
+
+    entries = {
+        _('Section title'): {
+            _('Item title'): ('ihelp/.../item.html', 'ihelp/.../item.pdf'),
+            _('Item title 2'): ('ihelp/.../item2.html', 'ihelp/.../item2.pdf')
+        }
+    }
+""")
+
 event_management_sidemenu = _signals.signal('event-management-sidemenu', """
 Expected to return `(plugin_menu_item_name, SideMenuItem)` tuples to be added to
 the event management side menu. The *sender* is the event object.

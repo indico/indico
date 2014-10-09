@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-##
-##
 ## This file is part of Indico.
 ## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
@@ -17,20 +14,15 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import MaKaC.webinterface.rh.base as base
-import MaKaC.webinterface.pages.help as help
-
-class RHHelp( base.RH ):
-
-    def _process( self ):
-        p = help.WPHelp(self)
-        return p.display()
+from indico.core import signals
+from indico.util.signals import values_from_signal
+from MaKaC.webinterface.pages.help import WPHelp
+from MaKaC.webinterface.rh.base import RH
 
 
-
-
-
-
-
-
-
+class RHHelp(RH):
+    def _process(self):
+        extra_sections = {}
+        for sections in values_from_signal(signals.indico_help.send(), single_value=True, as_list=True):
+            extra_sections.update(sections)
+        return WPHelp(self, extra_sections=extra_sections).display()
