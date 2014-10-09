@@ -102,6 +102,6 @@ Called when an event is deleted. The *sender* is the event object.
 """)
 
 material_downloaded = _signals.signal('material-downloaded', """
-Notifies a file being downloaded. The *sender* is the event and the resource is
-the file being downloaded.
+Notifies a file being downloaded. The *sender* is the event and the downloaded
+file is passed in the *resource* kwarg.
 """)
