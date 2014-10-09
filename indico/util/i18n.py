@@ -16,17 +16,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-# system lib imports
-import re
-
-# stdlib imports
 import ast
+import re
 
 from babel.core import Locale
 from babel.support import Translations
 from babel import negotiate_locale
-
-from flask import session, request, has_request_context
+from flask import session, request, has_request_context, current_app
 from flask_babelex import Babel, lazy_gettext, get_domain
 
 from MaKaC.common.info import HelperMaKaCInfo
@@ -98,22 +94,22 @@ def set_best_lang():
     after that fall back to the server's default.
     """
 
-    language = session.lang
+    if not has_request_context():
+        return 'en_GB' if current_app.config['TESTING'] else HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
+    elif session.lang is not None:
+        return session.lang
 
-    if language is not None:
-        return language
-    else:
-        # try to use browser language
-        preferred = [x.replace('-', '_') for x in request.accept_languages.values()]
-        resolved_lang = negotiate_locale(preferred, get_all_locales())
+    # try to use browser language
+    preferred = [x.replace('-', '_') for x in request.accept_languages.values()]
+    resolved_lang = negotiate_locale(preferred, get_all_locales())
 
-        if not resolved_lang:
-            # fall back to server default
-            minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-            resolved_lang = minfo.getLang()
+    if not resolved_lang:
+        # fall back to server default
+        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+        resolved_lang = minfo.getLang()
 
-        session.lang = resolved_lang
-        return resolved_lang
+    session.lang = resolved_lang
+    return resolved_lang
 
 currentLocale = set_best_lang
 
