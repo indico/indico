@@ -34,7 +34,8 @@ class RHChangeLang(base.RH):
 
         if self._getUser():
             self._getUser().setLang(self._language)
-            set_session_lang(self._language)
+
+        set_session_lang(self._language)
 
         # No need to do any more processing here. The language change is processed in RH base
         # Remove lang param from referer
