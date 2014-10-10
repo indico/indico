@@ -1353,9 +1353,8 @@ class WPUserExistWithIdentityNonAdmin(WPUserExistWithIdentity):
 
 
 class WPUserBase(WPUserCommon):
-
-    def __init__( self, rh, av=None ):
-        WPUserCommon.__init__( self, rh )
+    def __init__(self, rh, av=None, **kwargs):
+        WPUserCommon.__init__(self, rh, **kwargs)
         self._avatar = av
 
 

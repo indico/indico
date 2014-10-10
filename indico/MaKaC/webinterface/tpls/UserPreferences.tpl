@@ -19,6 +19,12 @@
     % if pluginUserPreferences:
         ${pluginUserPreferences}
     % endif
+    % for title, content in plugin_preferences:
+        <tr>
+            <td class="titleCellTD" nowrap><span class="titleCellFormat">${ title }</span></td>
+            <td class="blacktext spaceLeft" nowrap>${ content }</td>
+        </tr>
+    % endfor
 </table>
 
 <script type="text/javascript">

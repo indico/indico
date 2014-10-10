@@ -33,11 +33,13 @@ from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.accessControl import AdminList
 from MaKaC.webinterface.rh.base import RH, RHProtected
 from MaKaC.authentication import AuthenticatorMgr
+from indico.core import signals
 from indico.core.db import DBMgr
 from MaKaC.common import pendingQueues
 from MaKaC.i18n import _
 from indico.util.redis import suggestions
 from indico.util.redis import write_client as redis_write_client
+from indico.util.signals import values_from_signal
 
 
 class RHUserManagementSwitchAuthorisedAccountCreation( admins.RHAdminBase ):
@@ -321,7 +323,8 @@ class RHUserPreferences( RHUserBase ):
                 raise errors.AccessControlError("user")
 
     def _process( self ):
-        p = adminPages.WPUserPreferences( self, self._avatar )
+        plugin_preferences = values_from_signal(signals.user_preferences.send(self._avatar))
+        p = adminPages.WPUserPreferences(self, self._avatar, plugin_preferences=plugin_preferences)
         return p.display()
 
 class RHUserPersBase( base.RHDisplayBaseProtected ):

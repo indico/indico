@@ -72,6 +72,13 @@ Expected to return a dict containing entries for the *Indico help* page::
     }
 """)
 
+user_preferences = _signals.signal('user-preferences', """
+Expected to return/yield one or more ``(title, content)`` tuples which are
+shown on the "User Preferences" page. The *sender* is the user for whom the
+preferences page is being shown which might not be the currently logged-in
+user!
+""")
+
 event_management_sidemenu = _signals.signal('event-management-sidemenu', """
 Expected to return `(plugin_menu_item_name, SideMenuItem)` tuples to be added to
 the event management side menu. The *sender* is the event object.
