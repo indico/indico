@@ -16,31 +16,12 @@ For example, a receiver function could look like this::
         do_stuff_with(something)
 
 
-.. autodata:: indico.core.signals.cli
-   :annotation:
-.. autodata:: indico.core.signals.shell_context
-   :annotation:
-.. autodata:: indico.core.signals.get_blueprints
-   :annotation:
-.. autodata:: indico.core.signals.inject_css
-   :annotation:
-.. autodata:: indico.core.signals.inject_js
-   :annotation:
-.. autodata:: indico.core.signals.template_hook
-   :annotation:
-.. autodata:: indico.core.signals.indico_help
-   :annotation:
-.. autodata:: indico.core.signals.user_preferences
-   :annotation:
-.. autodata:: indico.core.signals.event_management_sidemenu
-   :annotation:
-.. autodata:: indico.core.signals.event_management_clone
-   :annotation:
-.. autodata:: indico.core.signals.event_management_url
-   :annotation:
-.. autodata:: indico.core.signals.event_sidemenu
-   :annotation:
-.. autodata:: indico.core.signals.event_deleted
-   :annotation:
-.. autodata:: indico.core.signals.material_downloaded
-   :annotation:
+
+.. exec::
+    from indico.core import signals
+    from blinker import Signal
+    for name in dir(signals):
+        attr = getattr(signals, name)
+        if isinstance(getattr(signals, name), Signal):
+            print '.. autodata:: indico.core.signals.{}'.format(name)
+            print '   :annotation:'
