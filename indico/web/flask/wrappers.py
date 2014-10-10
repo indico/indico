@@ -28,6 +28,7 @@ from MaKaC.common import HelperMaKaCInfo
 from indico.web.flask.session import IndicoSessionInterface
 from indico.web.flask.util import make_view_func
 from indico.core.db import DBMgr
+from indico.util.json import IndicoJSONEncoder
 
 
 class IndicoRequest(Request):
@@ -52,6 +53,7 @@ class IndicoRequest(Request):
 
 
 class IndicoFlask(PluginFlaskMixin, Flask):
+    json_encoder = IndicoJSONEncoder
     request_class = IndicoRequest
     session_interface = IndicoSessionInterface()
 

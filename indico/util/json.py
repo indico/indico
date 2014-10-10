@@ -20,7 +20,7 @@
 from __future__ import absolute_import
 
 import traceback
-from datetime import datetime
+from datetime import datetime, date
 
 from flask import current_app
 from persistent.dict import PersistentDict
@@ -35,7 +35,7 @@ except ImportError:
     import json as _json
 
 
-class _JSONEncoder(_json.JSONEncoder):
+class IndicoJSONEncoder(_json.JSONEncoder):
     """
     Custom JSON encoder that supports more types
      * datetime objects
@@ -46,8 +46,10 @@ class _JSONEncoder(_json.JSONEncoder):
             return str(o)
         elif isinstance(o, PersistentDict):
             return dict(o)
-        elif type(o) is datetime:
+        elif isinstance(o, datetime):
             return {'date': str(o.date()), 'time': str(o.time()), 'tz': str(o.tzinfo)}
+        elif isinstance(o, date):
+            return str(o)
         return _json.JSONEncoder.default(self, o)
 
 
@@ -58,7 +60,7 @@ def dumps(obj, **kwargs):
     if kwargs.pop('pretty', False):
         kwargs['indent'] = 4 * ' '
     textarea = kwargs.pop('textarea', False)
-    ret = _json.dumps(obj, cls=_JSONEncoder, **kwargs).replace('/', '\\/')
+    ret = _json.dumps(obj, cls=IndicoJSONEncoder, **kwargs).replace('/', '\\/')
 
     if textarea:
         return '<html><head></head><body><textarea>%s</textarea></body></html>' % ret
