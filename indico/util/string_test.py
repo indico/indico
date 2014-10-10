@@ -14,7 +14,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.util.string import seems_html
+import pytest
+
+from indico.util.string import seems_html, to_unicode
 
 
 def test_seems_html():
@@ -22,3 +24,15 @@ def test_seems_html():
     assert seems_html('a <b> c')
     assert not seems_html('test')
     assert not seems_html('a < b > c')
+
+
+@pytest.mark.parametrize(('input', 'output'), (
+    (b'foo', u'foo'),            # ascii
+    (u'foo', u'foo'),            # unicode
+    (b'm\xc3\xb6p', u'm\xf6p'),  # utf8
+    (b'm\xf6p', u'm\xf6p'),      # latin1
+    (b'm\xc3\xb6p m\xf6p',       # mixed...
+     u'm\xc3\xb6p m\xf6p'),      # ...decoded as latin1
+))
+def test_to_unicode(input, output):
+    assert to_unicode(input) == output
