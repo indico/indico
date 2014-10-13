@@ -4676,6 +4676,7 @@ class Conference(CommonObjectBase, Locatable):
         rp.setOwner( self )
         self.getRegistrants()[rp.getId()] = rp
         self._notify('registrantAdded', user)
+        signals.event_registrant_changed.send(self, user=user, registrant=rp, action='added')
         self.notifyModification()
 
     def updateRegistrantIndexByEmail(self, rp, newEmail):
@@ -4702,6 +4703,7 @@ class Conference(CommonObjectBase, Locatable):
         if part.getAvatar() is not None:
             part.getAvatar().removeRegistrant(part)
         self._notify('registrantRemoved', part)
+        signals.event_registrant_changed.send(self, user=part.getAvatar(), registrant=part, action='deleted')
         TrashCanManager().add(part)
         self.notifyModification()
 

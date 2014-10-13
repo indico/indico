@@ -108,6 +108,15 @@ event_deleted = _signals.signal('event-deleted', """
 Called when an event is deleted. The *sender* is the event object.
 """)
 
+event_registrant_changed = _signals.signal('event-registrant-changed', """
+Called when an event registrant is added or removed. The `sender` is the event,
+and the following kwargs are available:
+
+* `user` - the registrant's :class:`Avatar`
+* `registrant` - the :class:`Registrant`
+* `action` - the action, i.e. ``'deleted'`` or ``'added'``)
+""")
+
 material_downloaded = _signals.signal('material-downloaded', """
 Notifies a file being downloaded. The *sender* is the event and the downloaded
 file is passed in the *resource* kwarg.
