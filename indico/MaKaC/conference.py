@@ -2763,6 +2763,10 @@ class Conference(CommonObjectBase, Locatable):
         self.indexConf()
 
         # notify observers
+        old_data = (oldStartDate, oldEndDate)
+        new_data = (self.getStartDate(), self.getEndDate())
+        if old_data != new_data:
+            signals.event_data_changed.send(self, attr='dates', old=old_data, new=new_data)
         try:
             self._notify('dateChanged', {'oldStartDate': oldStartDate, 'newStartDate': self.getStartDate(), 'oldEndDate': oldEndDate, 'newEndDate': self.getEndDate()})
         except Exception, e:
@@ -2826,6 +2830,8 @@ class Conference(CommonObjectBase, Locatable):
 
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
+            if oldSdate != sDate:
+                signals.event_data_changed.send(self, attr='start_date', old=oldSdate, new=sDate)
             try:
                 self._notify('startDateChanged', {'newDate': sDate, 'oldDate': oldSdate})
             except Exception, e:
@@ -2952,6 +2958,8 @@ class Conference(CommonObjectBase, Locatable):
 
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
+            if oldEdate != eDate:
+                signals.event_data_changed.send(self, attr='end_date', old=oldEdate, new=eDate)
             try:
                 self._notify('endDateChanged', {'newDate': eDate, 'oldDate': oldEdate})
             except Exception, e:
@@ -3099,13 +3107,13 @@ class Conference(CommonObjectBase, Locatable):
         nameIdx.unindex(self)
         nameIdx.index(self)
 
-        #we notify the observers that the conference's title has changed
+        if oldTitle != title:
+            signals.event_data_changed.send(self, attr='title', old=oldTitle, new=title)
         try:
             self._notify('eventTitleChanged', oldTitle, title)
         except Exception, e:
             Logger.get('Conference').exception("Exception while notifying the observer of a conference title change for conference %s: %s" %
                                                (self.getId(), str(e)))
-
 
     def getDescription(self):
         """returns (String) the description of the conference"""
@@ -3115,6 +3123,8 @@ class Conference(CommonObjectBase, Locatable):
         """changes the current description of the conference"""
         oldDescription = self.description
         self.description = desc
+        if oldDescription != desc:
+            signals.event_data_changed.send(self, attr='description', old=oldDescription, new=desc)
         self._notify('eventDescriptionChanged', oldDescription, desc)
         self.notifyModification()
 

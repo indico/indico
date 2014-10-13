@@ -41,6 +41,7 @@ from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
 import MaKaC.conference as conference
 from MaKaC.conference import ConferenceChair
 import MaKaC.statistics as statistics
+from indico.core import signals
 from indico.core.config import Config
 import MaKaC.user as user
 import MaKaC.common.info as info
@@ -447,6 +448,12 @@ class UtilsConference:
         newRoom = confData.get( "locationBookedRoom" )  or  \
                    confData.get( "roomName" )  or  ""
 
+        loc = c.getLocation()
+        room = c.getRoom()
+        old_data = {'location': loc.name if loc else '',
+                    'address': loc.address if loc else '',
+                    'room': room.name if room else ''}
+
         if newLocation.strip() == "":
             c.setLocation( None )
         else:
@@ -462,6 +469,7 @@ class UtilsConference:
             l.setAddress( confData.get("locationAddress","") )
 
         if newRoom.strip() == "":
+            r = None
             c.setRoom( None )
         else:
             r = c.getRoom()
@@ -476,6 +484,11 @@ class UtilsConference:
 
         if changed:
             c._notify('placeChanged')
+            new_data = {'location': l.name if l else '',
+                        'address': l.address if l else '',
+                        'room': r.name if r else ''}
+            if old_data != new_data:
+                signals.event_data_changed.send(c, attr='location', old=old_data, new=new_data)
 
         emailstr = setValidEmailSeparators(confData.get("supportEmail", ""))
 

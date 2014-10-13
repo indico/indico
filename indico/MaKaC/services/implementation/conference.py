@@ -25,6 +25,7 @@ Asynchronous request handlers for conference-related data modification.
 # 3rd party imports
 from email.utils import formataddr
 from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
+from indico.core import signals
 from indico.util.string import permissive_format
 
 import datetime
@@ -213,6 +214,10 @@ class ConferenceBookingModification(ConferenceTextModificationBase):
         room = self._target.getRoom()
         loc = self._target.getLocation()
 
+        old_data = {'location': loc.name if loc else '',
+                    'address': loc.address if loc else '',
+                    'room': room.name if room else ''}
+
         newLocation = self._value.get('location')
         newRoom = self._value.get('room')
 
@@ -238,10 +243,17 @@ class ConferenceBookingModification(ConferenceTextModificationBase):
             loc.setName(newLocation)
             changed = True
 
-        loc.setAddress(self._value['address'])
+        if loc.getAddress() != self._value['address']:
+            loc.setAddress(self._value['address'])
+            changed = True
 
         if changed:
             self._target._notify('placeChanged')
+            new_data = {'location': loc.name,
+                        'address': loc.address,
+                        'room': room.name}
+            if old_data != new_data:
+                signals.event_data_changed.send(self._target, attr='location', old=old_data, new=new_data)
 
     def _handleGet(self):
 

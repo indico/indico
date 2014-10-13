@@ -114,7 +114,7 @@ and the following kwargs are available:
 
 * `user` - the registrant's :class:`Avatar` (or ``None``)
 * `registrant` - the :class:`Registrant`
-* `action` - the action, i.e. ``'removed'`` or ``'added'``)
+* `action` - the action, i.e. ``'removed'`` or ``'added'``
 """)
 
 event_participant_changed = _signals.signal('event-participant-changed', """
@@ -124,7 +124,24 @@ and the following kwargs are available:
 * `user` - the participant's :class:`Avatar` (or ``None``)
 * `participant` - the :class:`Participant`
 * `old_status` - the previous participation status
-* `action` - the action, i.e. ``'removed'`` or ``'added'``)
+* `action` - the action, i.e. ``'removed'`` or ``'added'``
+""")
+
+event_data_changed = _signals.signal('event-data-changed', """
+Called when the basic data of an event is changed. The `sender` is the event,
+and the following kwargs are available:
+
+* `attr` - the changed attribute (`title`, `description`, `dates`, `start_date`, `end_date` or `location`)
+* `old` - the old value
+* `new` - the new value
+
+If the `dates` changed, both `old` and `new` are ``(start_date, end_date)`` tuples.
+If the `location` changed, both `old` and `new` are dicts containing `location`, `address` and `room`.
+
+If your plugin reacts to date changes, always make sure to handle all three types.
+Depending on the code performing the change, sometimes separate `start_date` and
+`end_date` changes are triggered while in other cases a single `dates` change is
+triggered.
 """)
 
 material_downloaded = _signals.signal('material-downloaded', """
