@@ -1,3 +1,5 @@
 pojson
 babel
 repoze.sphinx.autointerface
+flask
+ZODB3
