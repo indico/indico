@@ -112,9 +112,19 @@ event_registrant_changed = _signals.signal('event-registrant-changed', """
 Called when an event registrant is added or removed. The `sender` is the event,
 and the following kwargs are available:
 
-* `user` - the registrant's :class:`Avatar`
+* `user` - the registrant's :class:`Avatar` (or ``None``)
 * `registrant` - the :class:`Registrant`
-* `action` - the action, i.e. ``'deleted'`` or ``'added'``)
+* `action` - the action, i.e. ``'removed'`` or ``'added'``)
+""")
+
+event_participant_changed = _signals.signal('event-participant-changed', """
+Called when an event participant is added or removed. The `sender` is the event,
+and the following kwargs are available:
+
+* `user` - the participant's :class:`Avatar` (or ``None``)
+* `participant` - the :class:`Participant`
+* `old_status` - the previous participation status
+* `action` - the action, i.e. ``'removed'`` or ``'added'``)
 """)
 
 material_downloaded = _signals.signal('material-downloaded', """

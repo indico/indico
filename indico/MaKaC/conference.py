@@ -4703,7 +4703,7 @@ class Conference(CommonObjectBase, Locatable):
         if part.getAvatar() is not None:
             part.getAvatar().removeRegistrant(part)
         self._notify('registrantRemoved', part)
-        signals.event_registrant_changed.send(self, user=part.getAvatar(), registrant=part, action='deleted')
+        signals.event_registrant_changed.send(self, user=part.getAvatar(), registrant=part, action='removed')
         TrashCanManager().add(part)
         self.notifyModification()
 

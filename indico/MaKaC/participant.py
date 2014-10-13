@@ -28,6 +28,7 @@ from MaKaC.webinterface.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common import utils
 from MaKaC.i18n import _
+from indico.core import signals
 from indico.core.config import Config
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.participant import IParticipantMinimalFossil
@@ -435,6 +436,9 @@ class Participation(Persistent, Observable):
         if avatar:
             avatar.unlinkTo(self._conference,"participant")
         self._notify('participantRemoved', self._conference, participant)
+        if participant._status in {'added', 'accepted'}:
+            signals.event_participant_changed.send(self._conference, user=avatar, participant=participant,
+                                                   old_status=participant._status, action='removed')
         self.notifyModification()
         return True
 
@@ -882,6 +886,7 @@ class Participant(Persistent, Fossilizable):
         return self._status in ["accepted", "added"]
 
     def setStatusAdded(self, responsibleUser=None):
+        old_status = self._status
         self._status = "added"
         #if self._status is None or self._status == "pending" :
         #    self._status = "added"
@@ -891,6 +896,8 @@ class Participant(Persistent, Fossilizable):
         #    self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
 
         self._participation._notify('participantAdded', self.getConference(), self)
+        signals.event_participant_changed.send(self.getConference(), user=self._avatar, participant=self,
+                                               old_status=old_status, action='added')
         logData = self.getParticipantData()
         logData["subject"] = "%s : status set to ADDED"%self.getWholeName()
         self.getConference().getLogHandler().logAction(logData,
@@ -899,11 +906,14 @@ class Participant(Persistent, Fossilizable):
         return True
 
     def setStatusRefused(self, responsibleUser=None):
-        if self._status != "added" :
+        if self._status != "added":
             return False
+        old_status = self._status
         self._status = "refused"
 
         self._participation._notify('participantRemoved', self.getConference(), self)
+        signals.event_participant_changed.send(self.getConference(), user=self._avatar, participant=self,
+                                               old_status=old_status, action='removed')
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to REFUSED")%self.getWholeName()
         self.getConference().getLogHandler().logAction(logData,
@@ -938,9 +948,13 @@ class Participant(Persistent, Fossilizable):
     def setStatusAccepted(self, responsibleUser=None):
         if self._status not in ('invited', 'added'):
             return False
+        old_status = self._status
         self._status = "accepted"
 
         self._participation._notify('participantAdded', self.getConference(), self)
+        if old_status != 'added':
+            signals.event_participant_changed.send(self.getConference(), user=self._avatar, participant=self,
+                                                   old_status=old_status, action='added')
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to ACCEPTED")%self.getWholeName()
         self.getConference().getLogHandler().logAction(logData,
@@ -951,9 +965,13 @@ class Participant(Persistent, Fossilizable):
     def setStatusRejected(self, responsibleUser=None):
         if self._status not in ('invited', 'added'):
             return False
+        old_status = self._status
         self._status = "rejected"
 
         self._participation._notify('participantRemoved', self.getConference(), self)
+        if old_status == 'added':
+            signals.event_participant_changed.send(self.getConference(), user=self._avatar, participant=self,
+                                                   old_status=old_status, action='removed')
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to REJECTED")%self.getWholeName()
         self.getConference().getLogHandler().logAction(logData,
