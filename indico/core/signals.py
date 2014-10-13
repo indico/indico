@@ -125,6 +125,11 @@ and the following kwargs are available:
 * `participant` - the :class:`Participant`
 * `old_status` - the previous participation status
 * `action` - the action, i.e. ``'removed'`` or ``'added'``
+
+This signal is only triggered if the participation state actually changed, i.e. he's
+considered `added` if he was added/approved by a manager or if he accepted an invitation.
+The participant is considered `removed` if he's participating (added by a manager or accepted
+an invitation) and he's removed from the event or refuses/rejects participation.
 """)
 
 event_data_changed = _signals.signal('event-data-changed', """
