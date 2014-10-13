@@ -35,7 +35,6 @@ from MaKaC import errors
 # indico imports
 from indico.core.config import Config
 from indico.core.db import DBMgr
-from indico.util.i18n import currentLocale
 # backward compatibility
 from indico.util.string import truncate
 

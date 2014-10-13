@@ -35,7 +35,7 @@ from dateutil.relativedelta import relativedelta
 
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
-from indico.util.i18n import currentLocale
+from indico.util.i18n import get_current_locale
 
 
 now_utc = nowutc
@@ -73,7 +73,7 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=F
     Basically a wrapper around Babel's own format_datetime
     """
     if not locale:
-        locale = currentLocale()
+        locale = get_current_locale()
     if keep_tz:
         assert timezone is None
         timezone = dt.tzinfo
@@ -90,7 +90,7 @@ def format_date(d, format='medium', locale=None):
     Basically a wrapper around Babel's own format_date
     """
     if not locale:
-        locale = currentLocale()
+        locale = get_current_locale()
 
     return _format_date(d, format=format, locale=locale).encode('utf-8')
 
@@ -100,7 +100,7 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
     Basically a wrapper around Babel's own format_time
     """
     if not locale:
-        locale = currentLocale()
+        locale = get_current_locale()
     if not timezone and t.tzinfo:
         timezone = DisplayTZ().getDisplayTZ()
     elif server_tz:
@@ -116,7 +116,7 @@ def format_timedelta(td, format='short', locale=None):
     Basically a wrapper around Babel's own format_timedelta
     """
     if not locale:
-        locale = currentLocale()
+        locale = get_current_locale()
 
     return _format_timedelta(td, format=format, locale=locale).encode('utf-8')
 
@@ -130,7 +130,7 @@ def format_human_date(dt, format='medium', locale=None):
     oneday = timedelta(days=1)
 
     if not locale:
-        locale = currentLocale()
+        locale = get_current_locale()
 
     if dt == today - oneday:
         return _("yesterday")
@@ -144,7 +144,7 @@ def format_human_date(dt, format='medium', locale=None):
 
 def format_number(number, locale=None):
     if not locale:
-        locale = currentLocale()
+        locale = get_current_locale()
     return _format_number(number, locale=locale).encode('utf-8')
 
 

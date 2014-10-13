@@ -23,7 +23,6 @@ System tests for indico.ext.livesync
 Here, the notification parts of the plugin are tested in a global way.
 """
 
-from indico.util.i18n import currentLocale
 from indico.tests.python.unit.util import IndicoTestCase
 
 # plugin imports

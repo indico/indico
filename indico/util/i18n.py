@@ -111,7 +111,9 @@ def set_best_lang():
     session.lang = resolved_lang
     return resolved_lang
 
-currentLocale = set_best_lang
+
+def get_current_locale():
+    return IndicoLocale.parse(set_best_lang())
 
 
 def get_all_locales():
@@ -148,7 +150,7 @@ def i18nformat(text):
     if not session.lang:
         set_best_lang()
 
-    return RE_TR_FUNCTION.sub(lambda x: _(filter(lambda y: y is not None, x.groups())[0]), text)
+    return RE_TR_FUNCTION.sub(lambda x: _(next(y for y in x.groups() if y is not None)), text)
 
 
 def extract(fileobj, keywords, commentTags, options):

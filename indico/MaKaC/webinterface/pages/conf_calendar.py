@@ -23,7 +23,7 @@ import time
 import random
 import MaKaC.webinterface.pages.main as main
 from MaKaC.i18n import _
-from indico.util.i18n import i18nformat, currentLocale
+from indico.util.i18n import i18nformat, get_current_locale
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.pages.main import WPMainBase
@@ -176,8 +176,9 @@ class WCalendarMonthItem:
                 </table>
                 %s
                 """) % (self._month.getName(), self._month.getYear(),
-                        ''.join(list('<td align="right" bgcolor="#CCCCCC">%s</td>' % currentLocale().weekday(wd)[:2] for wd in xrange(0, 7))),
-                        "\n".join(res),"\n".join(divs))
+                        ''.join(list('<td align="right" bgcolor="#CCCCCC">%s</td>'.format(
+                            get_current_locale().weekday(wd)[:2]) for wd in xrange(0, 7))),
+                        "\n".join(res), "\n".join(divs))
 
         return str
 
