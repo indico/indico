@@ -17,11 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import binascii
 import os
-from email.Utils import formatdate
 
 from indico.core.config import Config
 from indico.core.logger import Logger
+from indico.core.plugins import plugin_engine
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.rh import base
 import MaKaC.common.TemplateExec as templateEngine
@@ -45,8 +46,12 @@ class RHGetVarsJs(base.RH):
         if not fileName:
             fileName = "%s.tpl" % self._tplName
 
+        active_pluings = ''.join(plugin_engine.get_active_plugins().keys())
+        plugins_hash = '{:08x}'.format(binascii.crc32(active_pluings) & 0xffffffff)
+        plugins_hash = plugins_hash if plugins_hash else ''
+
         self._tplFile = os.path.join(dirName, fileName)
-        self._cacheFile = os.path.join(cfg.getTempDir(), fileName + ".tmp")
+        self._cacheFile = os.path.join(cfg.getTempDir(), '{}.{}.tmp'.format(fileName, plugins_hash))
 
         if not os.access(self._cacheFile, os.R_OK):
             base.RH.process(self, params)
