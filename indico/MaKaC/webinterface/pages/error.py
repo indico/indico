@@ -29,8 +29,8 @@ class WErrorWSGI(WTemplated):
 
     def getVars(self):
         vars = WTemplated.getVars(self)
-        vars["errorTitle"] = "%s"%self._ex[0]
-        vars["errorText"] = "%s"%self._ex[1]
+        vars["errorTitle"] = str(self._ex[0])
+        vars["errorText"] = str(self._ex[1])
         return vars
 
 

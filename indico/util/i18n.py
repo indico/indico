@@ -26,6 +26,7 @@ from flask import session, request, has_request_context, current_app
 from flask_babelex import Babel, lazy_gettext, get_domain
 
 from MaKaC.common.info import HelperMaKaCInfo
+from indico.core.db import DBMgr
 
 
 RE_TR_FUNCTION = re.compile(r"_\(\"([^\"]*)\"\)|_\('([^']*)'\)", re.DOTALL | re.MULTILINE)
@@ -104,9 +105,10 @@ def set_best_lang():
     resolved_lang = negotiate_locale(preferred, get_all_locales())
 
     if not resolved_lang:
-        # fall back to server default
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        resolved_lang = minfo.getLang()
+        with DBMgr.getInstance().global_connection():
+            # fall back to server default
+            minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+            resolved_lang = minfo.getLang()
 
     session.lang = resolved_lang
     return resolved_lang
