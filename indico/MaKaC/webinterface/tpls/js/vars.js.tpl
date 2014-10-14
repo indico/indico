@@ -156,3 +156,5 @@ var Indico = {
     }
 
 };
+
+${ plugin_hook('vars-js') }

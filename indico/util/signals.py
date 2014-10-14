@@ -25,7 +25,7 @@ def values_from_signal(signal_response, single_value=False, skip_none=True, as_l
     `yield`).
 
     :param signal_response: The return value of a Signal's `.send()` method
-    :param single_value: If each return value should be treated aas a single
+    :param single_value: If each return value should be treated as a single
                          value in all cases (disables the generator check)
     :param skip_none: If None return values should be skipped
     :param as_list: If you want a list instead of a set (only use this if

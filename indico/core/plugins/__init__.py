@@ -14,6 +14,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import json
 import os
 import re
 from heapq import heappush
@@ -30,6 +31,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.models.settings import SettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
+from indico.util.signals import values_from_signal
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -75,6 +77,7 @@ class IndicoPlugin(Plugin):
         self.connect(signals.cli, self.add_cli_command)
         self.connect(signals.shell_context, lambda _, add_to_context: self.extend_shell_context(add_to_context))
         self.connect(signals.get_blueprints, lambda app: (self, self.get_blueprints()))
+        self.template_hook('vars-js', self.inject_vars_js)
         self._setup_assets()
         self._import_models()
 
@@ -107,6 +110,10 @@ class IndicoPlugin(Plugin):
         to yield them or return an iterable.
         """
         pass
+
+    def get_vars_js(self):
+        """Return a dictionary with variables to be added to vars.js file"""
+        return None
 
     def add_cli_command(self, manager):
         """Add custom commands/submanagers to the manager of the `indico` cli tool."""
@@ -160,6 +167,12 @@ class IndicoPlugin(Plugin):
         if view_class is not None:
             kwargs['sender'] = view_class
         self.connect(signals.inject_js, lambda _: self.assets[name].urls(), **kwargs)
+
+    def inject_vars_js(self):
+        """Returns a string that will define variables for the plugin in the vars.js file"""
+        vars_js = self.get_vars_js()
+        if vars_js:
+            return 'var {}Plugin = {};'.format(self.name.title(), json.dumps(vars_js))
 
     def template_hook(self, name, receiver, priority=50, markup=True):
         """Registers a function to be called when a template hook is invoked.
@@ -225,11 +238,13 @@ def plugin_hook(*name, **kwargs):
         raise TypeError('plugin_hook() accepts only one positional argument, {} given'.format(len(name)))
     name = name[0]
     values = []
-    for _, (is_markup, priority, value) in signals.template_hook.send(unicode(name), **kwargs):
-        if is_markup:
-            value = Markup(value)
-        heappush(values, (priority, value))
-    return Markup(u'\n').join(x[1] for x in values)
+    for is_markup, priority, value in values_from_signal(signals.template_hook.send(unicode(name), **kwargs),
+                                                         single_value=True):
+        if value:
+            if is_markup:
+                value = Markup(value)
+            heappush(values, (priority, value))
+    return Markup(u'\n').join(x[1] for x in values) if values else ''
 
 
 def url_for_plugin(endpoint, *targets, **values):
