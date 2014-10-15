@@ -34,7 +34,7 @@ from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.signals import values_from_signal
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
+from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 
@@ -245,6 +245,11 @@ def plugin_hook(*name, **kwargs):
                 value = Markup(value)
             heappush(values, (priority, value))
     return Markup(u'\n').join(x[1] for x in values) if values else ''
+
+
+def plugin_url_rule_to_js(endpoint):
+    """Like :func:`~indico.web.flask.util.url_rule_to_js` but prepending plugin name prefix to the endpoint"""
+    return url_rule_to_js('plugin_{}.{}'.format(current_plugin.name, endpoint))
 
 
 def url_for_plugin(endpoint, *targets, **values):
