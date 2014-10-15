@@ -406,6 +406,7 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
             candidates = {}
             conflicts = {}
             pre_conflicts = {}
+            only_conflicts = False
         else:
             occurrences, candidates = self._get_all_occurrences([self._room.id], form)
             conflicts, pre_conflicts = self._get_all_conflicts(self._room, form)
