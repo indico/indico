@@ -206,6 +206,14 @@ class RoomBookingImporter(Importer):
         print cformat('%{white!}migrating equipment')
         for name, eqs in eq.iteritems():
             l = Location.find_first(name=name)
+
+            if l is None:
+                print cformat('%{yellow!}*** WARNING')
+                print cformat("%{{yellow!}}***%{{reset}} Location '{}' does not exist. Skipped equipment: {}".format(
+                    name, eqs
+                ))
+                continue
+
             l.equipment_types.extend(EquipmentType(name=x) for x in eqs)
             print cformat('- [%{cyan}{}%{reset}] {}').format(name, eqs)
             db.session.add(l)
@@ -215,6 +223,14 @@ class RoomBookingImporter(Importer):
         print cformat('%{white!}migrating vc equipment')
         for name, vcs in vc.iteritems():
             l = Location.find_first(name=name)
+
+            if l is None:
+                print cformat('%{yellow!}*** WARNING')
+                print cformat("%{{yellow!}}***%{{reset}} Location '{}' does not exist. Skipped VC equipment: {}".format(
+                    name, vcs
+                ))
+                continue
+
             pvc = l.get_equipment_by_name('Video conference')
             for vc_name in vcs:
                 req = EquipmentType(name=vc_name)
@@ -226,8 +242,17 @@ class RoomBookingImporter(Importer):
         print
 
         print cformat('%{white!}migrating rooms')
+
         for old_room_id, old_room in self.rb_root['Rooms'].iteritems():
             l = Location.find_first(name=old_room._locationName)
+
+            if l is None:
+                print cformat('%{yellow!}*** WARNING')
+                print cformat("%{{yellow!}}***%{{reset}} Location '{}' does not exist. Skipped room '{}'".format(
+                    old_room._locationName, old_room.id
+                ))
+                continue
+
             r = Room(
                 id=old_room_id,
                 name=convert_to_unicode((old_room._name or '').strip() or generate_name(old_room)),
