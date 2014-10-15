@@ -470,7 +470,6 @@ if __name__ == '__main__':
 
             [indico.ext_types]
 
-            statistics = indico.ext.statistics
             Collaboration = MaKaC.plugins.Collaboration
             EPayment = MaKaC.plugins.EPayment
             livesync = indico.ext.livesync
@@ -479,8 +478,6 @@ if __name__ == '__main__':
             search = indico.ext.search
 
             [indico.ext]
-
-            statistics.piwik = indico.ext.statistics.piwik
 
             Collaboration.EVO = MaKaC.plugins.Collaboration.EVO
             Collaboration.WebEx = MaKaC.plugins.Collaboration.WebEx
