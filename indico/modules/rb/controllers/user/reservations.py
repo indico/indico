@@ -281,7 +281,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         pre_conflicts = defaultdict(list)
 
         candidates = ReservationOccurrence.create_series(form.start_dt.data, form.end_dt.data,
-                                                         (form.repeat_interval.data, form.repeat_interval.data))
+                                                         (form.repeat_frequency.data, form.repeat_interval.data))
         occurrences = ReservationOccurrence.find_overlapping_with(room, candidates, reservation_id).all()
 
         for cand in candidates:
