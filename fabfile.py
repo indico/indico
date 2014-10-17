@@ -279,7 +279,7 @@ def install_jqplot():
         dest_dir_css = lib_dir(env.src_dir, 'css')
         dest_dir_js_core = os.path.join(dest_dir_js, 'core')
         dest_dir_js_plugins = os.path.join(dest_dir_js, 'plugins')
-        local('mkdir -p {}'.format(dest_dir_js_core))
+        local('mkdir -p {} {}'.format(dest_dir_js_core, dest_dir_css))
         local('cp src/core/*.js {}'.format(dest_dir_js_core))
         local('cp src/core/*.css {}'.format(dest_dir_css))
         local('cp -r src/plugins {}'.format(dest_dir_js_plugins))
