@@ -100,14 +100,20 @@
             float: left;
         }
 
-        .i-box + .i-box {
-            margin-left: $margin;
+        .i-box {
+            margin-right: $margin;
+            &:last-child {
+                margin-right: 0px;
+            }
         }
     }
 
     &.vert {
-        .i-box + .i-box {
-            margin-top: $margin;
+        .i-box{
+            margin-bottom: $margin;
+            &:last-child {
+                margin-bottom: 0px;
+            }
         }
     }
 }

@@ -276,12 +276,14 @@ function getSelectedRegistrants() {
     return selected;
 }
 
-var atLeastOneRegistrantSelected = function(){
+var atLeastOneRegistrantSelected = function(quiet) {
     if (newUser || getSelectedRegistrants().length > 0){
         return true;
     } else {
-        var dialog = new WarningPopup($T("Warning"), $T("No registrant selected! Please select at least one."));
-        dialog.open();
+        if (!quiet) {
+            var dialog = new WarningPopup($T("Warning"), $T("No registrant selected! Please select at least one."));
+            dialog.open();
+        }
         return false;
     }
 };
@@ -323,6 +325,9 @@ IndicoUI.executeOnLoad(function(){
 
     $("#show_stats").bind('menu_select',function(event) {
         InsertHiddenField("info.x", "Show+stats", false);
+        if (! atLeastOneRegistrantSelected(true)) {
+            $("input[name='registrant']").prop('checked', true);
+        }
         $('#registrantsForm').submit();
      });
 

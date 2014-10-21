@@ -16,22 +16,38 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "partials/boxes";
-@import "partials/buttons";
-@import "partials/core";
-@import "partials/main";
-@import "partials/dialogs";
-@import "partials/fonts";
-@import "partials/icons";
-@import "partials/inputs";
-@import "partials/jquery.indico.clearableinput";
-@import "partials/lists";
-@import "partials/messageboxes";
-@import "partials/progress";
-@import "partials/qtips";
-@import "partials/sidebars";
-@import "partials/tables";
-@import "partials/toolbars";
-@import "partials/typography";
-@import "partials/widgets";
-@import "partials/main";
+ .i-progress {
+    &, &> [class^="i-progress-"] {
+        height: 100%;
+        width: 100%;
+        vertical-align: middle;
+        color: $light-gray;
+        text-align: center;
+        position: relative;
+        display: inline-block;
+    }
+    overflow: hidden;
+    min-width: 100px;
+    min-height: 20px;
+    line-height: 20px;
+    background-color: $dark-gray;
+    &> .i-progress-bar {
+        float: left;
+        width: 0%;
+        background-color: $dark-blue;
+        @include transition(width 0.6s linear);
+    }
+    &> .i-progress-label {
+        position: absolute;
+        left: 0;
+        right: 0;
+    }
+    &.i-progress-small {
+        min-width: 80px;
+    }
+    &.i-progress-large {
+        min-width: 120px;
+    }
+}
+
+
