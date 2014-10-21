@@ -912,3 +912,121 @@ textarea.regFormDescriptionInputMgmt {
         padding-right: 3.6em !important;
     }
 }
+
+// ============================================================================
+// RegistrantsListStats-related
+// ============================================================================
+
+.i-box.registrant-stats > .i-box-header > .i-box-text {
+    color: $light-black;
+    font-style: italic;
+}
+
+table.registrant-stats {
+    border-collapse: collapse;
+    thead {
+        tr:last-child th {
+            font-weight: bold;
+            border-bottom: 2px solid $gray;
+            padding-right: 5px;
+        }
+        th {
+            padding-right: 10px;
+            text-align: center;
+        }
+    }
+    tbody {
+        tr {
+            &:nth-child(even) {
+                background-color: $light-gray;
+            }
+            &:nth-child(odd) {
+                background-color: white;
+            }
+            &:first-child td {
+                border-top: 0;
+            }
+            &:not(.sub-row) td.cancelled-event:first-child {
+                position: relative;
+                &:after {
+                    border-bottom: 2px solid $red;
+                    content: "";
+                    left: 1%;
+                    position: absolute;
+                    right: 1%;
+                    top: 47%;
+                    width: 98%;
+                }
+            }
+        }
+        td {
+            border-top: 1px solid $gray;
+
+            &:first-child, &:last-child {
+                font-weight: bold;
+            }
+            &.paid-unpaid-progress > .i-progress > .i-progress-bar {
+                &:first-child {
+                    background: $green;
+                }
+                &:nth-child(2) {
+                    background: $red;
+                }
+            }
+            &.no-stats-data {
+                color: $dark-gray;
+            }
+            &.paid-amount span {
+                color: $green;
+            }
+            &.unpaid-amount {
+                &:before {
+                    content: "(";
+                }
+                &:after {
+                    content: ")";
+                }
+                span {
+                    color: $red;
+                }
+            }
+            &.stick-left {
+                padding-right: 1px;
+            }
+            &.stick-right {
+                padding-left: 1px;
+            }
+        }
+    }
+    tr {
+        &.header-row  {
+            cursor: pointer;
+
+            td:first-child {
+                @include icon-before('icon-stack-minus');
+                border-bottom: 0;
+
+            }
+            &.collapsed td:first-child {
+                @include icon-before('icon-stack-plus');
+            }
+        }
+        &.single-row td:first-child:before {
+           content: "\2001";
+        }
+        &.sub-row + tr.sub-row td:first-child {
+            border-top: 0px;
+        }
+    }
+    th, td {
+        padding: 5px;
+        text-align: right;
+
+        &:first-child {
+            text-align: left;
+        }
+        i[class^="icon-"] {
+            vertical-align: middle;
+        }
+    }
+}
