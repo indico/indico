@@ -59,6 +59,9 @@ class IndicoPlugin(Plugin):
     settings_form_field_opts = {}
     #: A dictionary containing default values for settings
     default_settings = {}
+    #: If the plugin should be hidden in the admin interface (useful for plugins which only
+    #: provide a base for other plugins)
+    hidden = False
 
     def init(self):
         """Called when the plugin is being loaded/initialized.

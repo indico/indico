@@ -15,6 +15,7 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask import request, flash, redirect
+from werkzeug.exceptions import NotFound
 
 from indico.core.plugins import plugin_engine
 from indico.core.plugins.views import WPPlugins
@@ -25,12 +26,15 @@ from MaKaC.webinterface.rh.admins import RHAdminBase
 
 class RHPlugins(RHAdminBase):
     def _process(self):
-        return WPPlugins.render_template('index.html', active_plugins=plugin_engine.get_active_plugins().viewvalues())
+        plugins = [p for p in plugin_engine.get_active_plugins().viewvalues() if not p.hidden]
+        return WPPlugins.render_template('index.html', active_plugins=plugins)
 
 
 class RHPluginDetails(RHAdminBase):
     def _checkParams(self):
         self.plugin = plugin_engine.get_plugin(request.view_args['plugin'])
+        if not self.plugin or self.plugin.hidden:
+            raise NotFound
 
     def _process(self):
         plugin = self.plugin
