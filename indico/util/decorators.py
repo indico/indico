@@ -21,8 +21,9 @@ import traceback
 from functools import wraps
 
 from flask import request
+from werkzeug.exceptions import NotFound
 
-from indico.core.errors import IndicoError
+from indico.core.errors import IndicoError, NotFoundError
 from indico.core.logger import Logger
 from indico.util.json import create_json_error_answer
 
@@ -87,6 +88,8 @@ def jsonify_error(function=None, logger_name=None, logger_message=None, logging_
     Returns response of error handlers in JSON if requested in JSON
     and logs the exception that ended the request.
     """
+    no_tb_exceptions = (NotFound, NotFoundError)
+
     def _jsonify_error(f):
         @wraps(f)
         def wrapper(*args, **kw):
@@ -97,7 +100,9 @@ def jsonify_error(function=None, logger_name=None, logger_message=None, logging_
             else:
                 raise IndicoError('Wrong usage of jsonify_error: No error found in params')
 
-            tb = traceback.format_exc() if logging_level != 'exception' else ''
+            tb = ''
+            if logging_level != 'exception' and not isinstance(exception, no_tb_exceptions):
+                tb = traceback.format_exc()
             getattr(Logger.get(logger_name), logging_level)(
                 logger_message if logger_message else
                 'Request {0} finished with {1}: {2}\n{3}'.format(

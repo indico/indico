@@ -397,8 +397,11 @@ class RH(RequestHandlerBase):
     def _processNotFoundError(self, e):
         self._responseUtil.status = 404
         if isinstance(e, NotFound):
-            message = str(e)
-            explanation = e.description
+            message = _("Page not found")  # that's a bit nicer than "404: Not Found"
+            if e.description == NotFound.description:
+                explanation = _("The page you are looking for doesn't exist.")
+            else:
+                explanation = e.description
         else:
             message = e.getMessage()
             explanation = e.getExplanation()
