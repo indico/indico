@@ -25,7 +25,7 @@ from MaKaC.webinterface.rh.admins import RHAdminBase
 
 class RHPlugins(RHAdminBase):
     def _process(self):
-        return WPPlugins.render_template('index.html', active_plugins=plugin_engine.get_active_plugins())
+        return WPPlugins.render_template('index.html', active_plugins=plugin_engine.get_active_plugins().viewvalues())
 
 
 class RHPluginDetails(RHAdminBase):

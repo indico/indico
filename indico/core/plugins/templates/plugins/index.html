@@ -1,6 +1,6 @@
 <h1>{% trans %}Plugins{% endtrans %}</h1>
 <ul>
-    {% for name, plugin in active_plugins | dictsort %}
+    {% for plugin in active_plugins | sort(attribute='title') %}
         <li><a href="{{ url_for('.details', plugin=plugin.name) }}">{{ plugin.title }}</a></li>
     {% endfor %}
 </ul>
