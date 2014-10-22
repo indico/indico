@@ -443,7 +443,7 @@ class VidyoOperations(object):
 
             rooms = AdminApi.getRooms(search_filter)
 
-            if rooms.total:
+            if rooms.total and hasattr(rooms, 'room'):
                 return rooms.room
             return []
 
