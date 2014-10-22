@@ -29,6 +29,7 @@ from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
+from indico.core.logger import Logger
 from indico.core.models.settings import SettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.signals import values_from_signal
@@ -204,6 +205,11 @@ class IndicoPlugin(Plugin):
         if instance is None:
             raise RuntimeError('Plugin is not active in the current app')
         return instance
+
+    @classproperty
+    @classmethod
+    def logger(cls):
+        return Logger.get('plugin.{}'.format(cls.name))
 
     @cached_classproperty
     @classmethod
