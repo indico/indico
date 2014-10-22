@@ -45,23 +45,37 @@ class WPJinjaMixin:
     your blueprint template folders should have a subfolder named like
     the blueprint. To avoid writing it all the time, you can store it
     as `template_prefix` (with a trailing slash) in yor WP class.
+    This only applies to the indico core as plugins always use a separate
+    template namespace!
     """
 
     template_prefix = ''
 
     @classmethod
-    def render_template(cls, template=None, *wp_args, **context):
+    def render_template(cls, template_name_or_list=None, *wp_args, **context):
         """Renders a jinja template inside the WP
 
-        :param template: the name of the template - if unsed, the
-                         `_template` attribute of the class is used
-        :param wp_args: list of arguments to be passed to the WP class
-                        `__init__` method
-        :param context: the variables that should be available in the
-                        context of the template
+        :param template_name_or_list: the name of the template - if unsed, the
+                                      `_template` attribute of the class is used.
+                                      can also be a list containing multiple
+                                      templates (the first existing one is used)
+        :param wp_args: list of arguments to be passed to the WP's' constructor
+        :param context: the variables that should be available in the context of
+                        the template
         """
-        context['_jinja_template'] = cls.template_prefix + (template or cls._template)
+        context['_jinja_template'] = cls._prefix_template(template_name_or_list or cls._template)
         return cls(g.rh, *wp_args, **context).display()
+
+    @classmethod
+    def _prefix_template(cls, template):
+        if isinstance(template, basestring):
+            return cls.template_prefix + template
+        else:
+            templates = []
+            for tpl in template:
+                pos = tpl.find(':') + 1
+                templates.append(tpl[:pos] + cls.template_prefix + tpl[pos:])
+            return templates
 
     def _getPageContent(self, params):
         template = params.pop('_jinja_template')
