@@ -53,10 +53,10 @@ from indico.modules import ModuleHolder
 from indico.modules.upcoming import WUpcomingEvents
 from MaKaC.user import Group
 
-class WPCategoryBase ( main.WPMainBase ):
 
-    def __init__( self, rh, categ ):
-        main.WPMainBase.__init__( self, rh )
+class WPCategoryBase (main.WPMainBase):
+    def __init__(self, rh, categ, **kwargs):
+        main.WPMainBase.__init__(self, rh, **kwargs)
         self._target = categ
         title = "Indico"
         if self._target:
