@@ -250,6 +250,9 @@ def url_rule_to_js(endpoint):
     if hasattr(endpoint, '_endpoint'):
         endpoint = endpoint._endpoint
 
+    if endpoint[0] == '.':
+        endpoint = request.blueprint + endpoint
+
     # based on werkzeug.contrib.jsrouting
     # we skip UnicodeConverter in the converters list since that one is the default and never needs custom js code
     return {

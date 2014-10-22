@@ -249,7 +249,9 @@ def plugin_hook(*name, **kwargs):
 
 def plugin_url_rule_to_js(endpoint):
     """Like :func:`~indico.web.flask.util.url_rule_to_js` but prepending plugin name prefix to the endpoint"""
-    return url_rule_to_js('plugin_{}.{}'.format(current_plugin.name, endpoint))
+    if '.' in endpoint[1:]:  # 'foo' or '.foo' should not get the prefix
+        endpoint = 'plugin_{}'.format(endpoint)
+    return url_rule_to_js(endpoint)
 
 
 def url_for_plugin(endpoint, *targets, **values):
