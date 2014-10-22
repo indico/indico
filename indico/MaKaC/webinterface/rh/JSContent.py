@@ -46,9 +46,8 @@ class RHGetVarsJs(base.RH):
         if not fileName:
             fileName = "%s.tpl" % self._tplName
 
-        active_pluings = ''.join(plugin_engine.get_active_plugins().keys())
-        plugins_hash = '{:08x}'.format(binascii.crc32(active_pluings) & 0xffffffff)
-        plugins_hash = plugins_hash if plugins_hash else ''
+        active_plugins = '-'.join(plugin_engine.get_active_plugins())
+        plugins_hash = '{:08x}'.format(binascii.crc32(active_plugins) & 0xffffffff)
 
         self._tplFile = os.path.join(dirName, fileName)
         self._cacheFile = os.path.join(cfg.getTempDir(), '{}.{}.tmp'.format(fileName, plugins_hash))
