@@ -40,9 +40,9 @@
             <td nowrap class="dataCaptionTD"><span class="titleCellFormat"> ${ _("Show in header")}</span>
               <br>
               <br>
-              <img src=${ enablePic } alt="${ _("Click to disable")}"> <small> ${ _("Enabled announ.")}</small>
+              <img src=${ enablePic } alt="${ _("Click to disable")}"> <small> ${ _("Enabled")}</small>
               <br>
-              <img src=${ disablePic } alt="${ _("Click to enable")}"> <small> ${ _("Disabled announ.")}</small>
+              <img src=${ disablePic } alt="${ _("Click to enable")}"> <small> ${ _("Disabled")}</small>
             </td>
             <td bgcolor="white" width="65%" class="blacktext">
               <table align="left">
