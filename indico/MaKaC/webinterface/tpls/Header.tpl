@@ -21,6 +21,7 @@ urlMeeting.addParam("event_type","meeting")
         % if searchBox != '':
             ${ searchBox }
         % endif
+        ${ plugin_hook('page-header', category=currentCategory) }
 
         <!--
             set fixed height on anchor to assure that the height is
