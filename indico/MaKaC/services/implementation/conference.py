@@ -619,8 +619,12 @@ class ConferenceDeleteContributions (ConferenceModifBase):
     def _getAnswer(self):
         for contribId in self._selectedContributions:
             contrib = self._conf.getContributionById(contribId)
+            if not contrib:
+                continue
             if contrib.getSession() is not None and contrib.getSession().isClosed():
-                raise ServiceAccessError(_("""The contribution "%s" cannot be deleted because it is inside of the session "%s" that is closed""") % (contrib.getId(), contrib.getSession().getTitle()))
+                msg = _("""The contribution "{}" cannot be deleted because it is inside of the session "{}" that """
+                        """is closed""").format(contrib.getId(), contrib.getSession().getTitle())
+                raise ServiceAccessError(msg)
             contrib.getParent().getSchedule().removeEntry(contrib.getSchEntry())
             self._conf.removeContribution(contrib)
 
