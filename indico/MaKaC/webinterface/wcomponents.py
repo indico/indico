@@ -242,11 +242,6 @@ class WHTMLHeader(WTemplated):
     def __init__(self, tpl_name=None):
         WTemplated.__init__(self)
 
-    def getVars(self):
-        tvars = WTemplated.getVars(self)
-        tvars['timestamp'] = "%d" % os.stat(__file__).st_mtime
-        return tvars
-
 
 class WHeader(WTemplated):
     """Templating web component for generating a common HTML header for
