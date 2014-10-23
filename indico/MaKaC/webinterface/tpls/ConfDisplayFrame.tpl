@@ -31,7 +31,7 @@ else:
         </div>
         <div class="confSubTitleBox" ${ bgColorStyle }>
             <div class="confSubTitleContent">
-                ${ searchBox }
+                ${ plugin_hook('conference-header', event=conf) }
                 <div class="confSubTitle" ${ textColorStyle }>
                    <div class="datePlace">
                         <div class="date">${ confDateInterval }</div>
