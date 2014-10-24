@@ -19,59 +19,13 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 # stdlib imports
-import os
 import zope.interface
-from webassets import Bundle
-
-# legacy imports
-from MaKaC.plugins.base import Observable
-from indico.core.config import Config
 
 # indico imports
-from indico.web.assets import PluginEnvironment
 from indico.core.extpoint import Component
-from indico.core.extpoint.events import ITimetableContributor
 from indico.core.extpoint.plugins import IPluginDocumentationContributor
 from indico.ext import importer
 from indico.ext.importer.pages import WPluginHelp
-
-
-class ImporterContributor(Component, Observable):
-    """
-    Adds interface extension to event's timetable modification websites.
-    """
-
-    zope.interface.implements(ITimetableContributor)
-
-    @classmethod
-    def includeTimetableJSFiles(cls, obj, params={}):
-        """
-        Includes additional javascript file.
-        """
-        asset_env = PluginEnvironment('importer', os.path.dirname(__file__), 'importer')
-
-        asset_env.register('importer_js', Bundle('js/importer.js',
-                                                 filters='rjsmin',
-                                                 output="importer__%(version)s.min.js"))
-        params['paths'].extend(asset_env['importer_js'].urls())
-
-    @classmethod
-    def includeTimetableCSSFiles(cls, obj, params={}):
-        """
-        Includes additional Css files.
-        """
-        asset_env = PluginEnvironment('importer', os.path.dirname(__file__), 'importer')
-        asset_env.register('importer_css', Bundle('css/importer.css',
-                                                  filters='cssmin',
-                                                  output="importer__%(version)s.min.css"))
-        params['paths'].extend(asset_env['importer_css'].urls())
-
-    @classmethod
-    def customTimetableLinks(cls, obj, params={}):
-        """
-        Inserts an "Import" link in a timetable header.
-        """
-        params.update({"Import" : "createImporterDialog"})
 
 
 class PluginDocumentationContributor(Component):
