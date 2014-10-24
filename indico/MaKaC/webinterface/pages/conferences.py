@@ -2009,11 +2009,7 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
         self._timetableMenuItem.setActive()
 
     def getJSFiles(self):
-        pluginJSFiles = {"paths" : []}
-        self._notify("includeTimetableJSFiles", pluginJSFiles)
-        return WPConferenceModifBase.getJSFiles(self) + \
-               self._includeJSPackage('Timetable') + \
-               pluginJSFiles['paths']
+        return WPConferenceModifBase.getJSFiles(self) + self._includeJSPackage('Timetable')
 
     def _getSchedule(self):
         custom_links = {k: v for k, v in values_from_signal(signals.timetable_buttons.send(self))}
@@ -2022,13 +2018,6 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
     def _getTTPage( self, params ):
         wc = self._getSchedule()
         return wc.getHTML(params)
-
-    def _getHeadContent(self):
-
-        baseurl = self._getBaseURL()
-        pluginCSSFiles = {"paths": []}
-        self._notify("includeTimetableCSSFiles", pluginCSSFiles)
-        return ".".join(["""<link rel="stylesheet" href="%s">""" % path for path in pluginCSSFiles['paths']])
 
     def _getPageContent(self, params):
         return self._getTTPage(params)
