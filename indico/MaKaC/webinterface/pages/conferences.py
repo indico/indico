@@ -2016,9 +2016,8 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
                pluginJSFiles['paths']
 
     def _getSchedule(self):
-        self._customLinks = {}
-        self._notify("customTimetableLinks", self._customLinks)
-        return WConfModifScheduleGraphic( self._conf, self._customLinks )
+        custom_links = {k: v for k, v in values_from_signal(signals.timetable_buttons.send(self))}
+        return WConfModifScheduleGraphic(self._conf, custom_links)
 
     def _getTTPage( self, params ):
         wc = self._getSchedule()

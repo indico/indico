@@ -153,3 +153,8 @@ material_downloaded = _signals.signal('material-downloaded', """
 Notifies a file being downloaded. The *sender* is the event and the downloaded
 file is passed in the *resource* kwarg.
 """)
+
+timetable_buttons = _signals.signal('timetable-buttons', """
+Expects returning a list of tuples ('button_name', 'js_call_name').
+Called when building the timetable view.
+""")
