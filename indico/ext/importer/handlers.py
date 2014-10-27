@@ -17,24 +17,12 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-# stdlib imports
-import pkg_resources
-
 # legacy imports
 from MaKaC.services.implementation.base import ServiceBase
 from MaKaC.plugins.base import PluginsHolder
 
 # indico imports
-from indico.web.handlers import RHHtdocs
 from indico.ext.importer.helpers import ImporterHelper
-import indico.ext.importer
-
-
-class RHImporterHtdocs(RHHtdocs):
-    """Static file handler for Importer plugin"""
-
-    _local_path = pkg_resources.resource_filename(indico.ext.importer.__name__, "htdocs")
-    _min_dir = 'importer'
 
 
 class DataImportService(ServiceBase):
