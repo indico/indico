@@ -18,7 +18,7 @@ var widthOffset = 300;
 
 $(function() {
     var historyBroker = new BrowserHistoryBroker();
-    var timetable = new TopLevelManagementTimeTable(ttdata, eventInfo, document.body.clientWidth - widthOffset,$E('timetableDiv'), false, historyBroker, false, ${ customLinks });
+    var timetable = new TopLevelManagementTimeTable(ttdata, eventInfo, document.body.clientWidth - widthOffset,$E('timetableDiv'), false, historyBroker, false, ${ customLinks | j,n });
 
     $E('timetableDiv').set(timetable.draw());
     timetable.postDraw();
