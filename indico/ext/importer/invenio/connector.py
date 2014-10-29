@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Invenio.
-## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+## Copyright (C) 2010, 2011, 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 3 of the
+## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
 ## Invenio is distributed in the hope that it will be useful, but
@@ -14,14 +14,17 @@
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Invenio;if not, see <http://www.gnu.org/licenses/>.
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 """
 Tools to connect to distant Invenio servers using Invenio APIs.
+
 
 Example of use:
 
 from InvenioConnector import *
-cds = InvenioConnector("http://cdsweb.cern.ch")
+cds = InvenioConnector("http://cds.cern.ch")
 
 results = cds.search("higgs")
 
@@ -35,35 +38,103 @@ FIXME:
 - implement cache expiration
 - exceptions handling
 - parsing of <!-- Search-Engine-Total-Number-Of-Results: N -->
-- better checking of input parameters (especially InvenioConnector.__init__ "url")
-- improve behaviour when running locally (perform_request_search *requiring* "req" object)
+- better checking of input parameters
+- improve behaviour when running locally
+    (perform_request_search *requiring* "req" object)
 """
+
+from __future__ import print_function
+
 import urllib
 import urllib2
+import requests
 import xml.sax
 import re
 import tempfile
 import os
 import time
-from email import mime, Encoders
-import StringIO
+import sys
+
+from requests.exceptions import (ConnectionError, InvalidSchema, InvalidURL,
+                                 MissingSchema, RequestException)
+
+MECHANIZE_CLIENTFORM_VERSION_CHANGE = (0, 2, 0)
+try:
+    import mechanize
+    if mechanize.__version__ < MECHANIZE_CLIENTFORM_VERSION_CHANGE:
+        OLD_MECHANIZE_VERSION = True
+        import ClientForm
+    else:
+        OLD_MECHANIZE_VERSION = False
+    MECHANIZE_AVAILABLE = True
+except ImportError:
+    MECHANIZE_AVAILABLE = False
+
 try:
     # if we are running locally, we can optimize :-)
-    from invenio.config import CFG_SITE_URL
-    from invenio.bibtask import task_low_level_submission
-    from invenio.search_engine import perform_request_search
-    from invenio.bibformat import format_records
-    LOCAL_SITE_URL = CFG_SITE_URL
+    from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_RECORD, CFG_CERN_SITE
+    from invenio.legacy.bibsched.bibtask import task_low_level_submission
+    from invenio.legacy.search_engine import perform_request_search, collection_restricted_p
+    from invenio.modules.formatter import format_records
+    from invenio.utils.url import make_user_agent_string
+    LOCAL_SITE_URLS = [CFG_SITE_URL, CFG_SITE_SECURE_URL]
+    CFG_USER_AGENT = make_user_agent_string("invenio_connector")
 except ImportError:
-    LOCAL_SITE_URL = None
+    LOCAL_SITE_URLS = None
+    CFG_CERN_SITE = 0
+    CFG_USER_AGENT = "invenio_connector"
 
-class InvenioConnector:
+CFG_CDS_URL = "http://cds.cern.ch/"
+
+class InvenioConnectorAuthError(Exception):
+    """
+    This exception is called by InvenioConnector when authentication fails during
+    remote or local connections.
+    """
+    def __init__(self, value):
+        """
+        Set the internal "value" attribute to that of the passed "value" parameter.
+        @param value: an error string to display to the user.
+        @type value: string
+        """
+        Exception.__init__(self)
+        self.value = value
+    def __str__(self):
+        """
+        Return oneself as a string (actually, return the contents of self.value).
+        @return: representation of error
+        @rtype: string
+        """
+        return str(self.value)
+
+class InvenioConnectorServerError(Exception):
+    """
+    This exception is called by InvenioConnector when using it on a machine with no
+    Invenio installed and no remote server URL is given during instantiation.
+    """
+    def __init__(self, value):
+        """
+        Set the internal "value" attribute to that of the passed "value" parameter.
+        @param value: an error string to display to the user.
+        @type value: string
+        """
+        Exception.__init__(self)
+        self.value = value
+    def __str__(self):
+        """
+        Return oneself as a string (actually, return the contents of self.value).
+        @return: representation of error
+        @rtype: string
+        """
+        return str(self.value)
+
+class InvenioConnector(object):
     """
     Creates an connector to a server running Invenio
     """
 
-    def __init__(self, url, local_import_path="invenio",
-                 user_agent="invenio_connector"):
+    def __init__(self, url=None, user="", password="", login_method="Local",
+                 local_import_path="invenio", insecure_login=False):
         """
         Initialize a new instance of the server at given URL.
 
@@ -72,67 +143,124 @@ class InvenioConnector:
         you can choose from which base path to import the necessary file
         specifying the local_import_path parameter.
 
-        Parameters:
-                       url - *str* the url to which this instance will
-                             be connected
+        @param url: the url to which this instance will be connected.
+            Defaults to CFG_SITE_URL, if available.
+        @type url: string
+        @param user: the optional username for interacting with the Invenio
+            instance in an authenticated way.
+        @type user: string
+        @param password: the corresponding password.
+        @type password: string
+        @param login_method: the name of the login method the Invenio instance
+            is expecting for this user (in case there is more than one).
+        @type login_method: string
+        @param local_import_path: the base path from which the connector should
+            try to load the local connector, if available. Eg "invenio" will
+            lead to "import invenio.dbquery"
+        @type local_import_path: string
 
-         local_import_path - *str* the base path from which the
-                             connector should try to load the local
-                             connector, if available. Eg "invenio"
-                             will lead to "import invenio.dbquery"
-         """
-        self.server_url = url
-        self.user_agent = user_agent
+        @raise InvenioConnectorAuthError: if no secure URL is given for authentication
+        @raise InvenioConnectorServerError: if no URL is given on a machine without Invenio installed
+        """
+        if url == None and LOCAL_SITE_URLS != None:
+            self.server_url = LOCAL_SITE_URLS[0] # Default to CFG_SITE_URL
+        elif url == None:
+            raise InvenioConnectorServerError("You do not seem to have Invenio installed and no remote URL is given")
+        else:
+            self.server_url = url
+        self._validate_server_url()
+
+        self.local = LOCAL_SITE_URLS and self.server_url in LOCAL_SITE_URLS
         self.cached_queries = {}
         self.cached_records = {}
         self.cached_baskets = {}
+        self.user = user
+        self.password = password
+        self.login_method = login_method
+        self.browser = None
+        if self.user:
+            if not insecure_login and not self.server_url.startswith('https://'):
+                raise InvenioConnectorAuthError("You have to use a secure URL (HTTPS) to login")
+            if MECHANIZE_AVAILABLE:
+                self._init_browser()
+                self._check_credentials()
+            else:
+                self.user = None
+                raise InvenioConnectorAuthError("The Python module Mechanize (and ClientForm" \
+                                                " if Mechanize version < 0.2.0) must" \
+                                                " be installed to perform authenticated requests.")
 
-    def search(self, p="", f="", c="", rg=10, sf="", so="d", sp="",
-               rm="", of="", ot="", p1="", f1="", m1="", op1="",
-               p2="", f2="", m2="", op2="", p3="", f3="", m3="",
-               jrec=0, recid=-1, recidb=-1, d1="", d1y=0, d1m=0,
-               d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", ap=0,
-               read_cache=True):
+    def _init_browser(self):
+        """
+        Ovveride this method with the appropriate way to prepare a logged in
+        browser.
+        """
+        self.browser = mechanize.Browser()
+        self.browser.set_handle_robots(False)
+        self.browser.open(self.server_url + "/youraccount/login")
+        self.browser.select_form(nr=0)
+        try:
+            self.browser['nickname'] = self.user
+            self.browser['password'] = self.password
+        except:
+            self.browser['p_un'] = self.user
+            self.browser['p_pw'] = self.password
+        # Set login_method to be writable
+        self.browser.form.find_control('login_method').readonly = False
+        self.browser['login_method'] = self.login_method
+        self.browser.submit()
+
+    def _check_credentials(self):
+        out = self.browser.response().read()
+        if not 'youraccount/logout' in out:
+            raise InvenioConnectorAuthError("It was not possible to successfully login with the provided credentials" + out)
+
+    def search(self, read_cache=True, **kwparams):
         """
         Returns records corresponding to the given search query.
+
+        See docstring of invenio.legacy.search_engine.perform_request_search()
+        for an overview of available parameters.
+
+        @raise InvenioConnectorAuthError: if authentication fails
         """
         parse_results = False
+        of = kwparams.get('of', "")
         if of == "":
             parse_results = True
             of = "xm"
-
-        params = {'p': p, 'f': f, 'c': c, 'rg': rg,
-                  'sf': sf, 'so': so, 'sp': sp,
-                  'rm': rm, 'of': of,
-                  'p1':p1, 'f1': f1, 'm1': m1, 'op1': op1,
-                  'p2': p2, 'f2': f2, 'm2': m2, 'op2': op2,
-                  'p3': p3, 'f3': f3, 'm3': m3, 'jrec':jrec,
-                  'd1': d1, 'd1y':d1y, 'd1m': d1m, 'd1d': d1d,
-                  'd2': d2, 'd2y': d2y, 'd2m': d2m, 'd2d': d2d,
-                  'dt': dt, 'ap': ap , 'recid': recid, 'recidb': recidb,
-                   'ot': ot}
-        if recid == -1:
-            del params['recid']
-        if recidb == -1:
-            del params['recidb']
-        params = urllib.urlencode(params)
+            kwparams['of'] = of
+        params = urllib.urlencode(kwparams, doseq=1)
 
         # Are we running locally? If so, better directly access the
         # search engine directly
-        if LOCAL_SITE_URL == self.server_url and \
-               of != 't':
-            results = perform_request_search(p=p, f=f, c=c, rg=rg, sf=sf, so=so, sp=so, rm=rm,
-                                            p1=p1, f1=f1, m1=m1, op1=op1,
-                                            p2=p2, f2=f2, m2=m2, op2=op2,
-                                            p3=p3, f3=f3, m3=m3, jrec=jrec,
-                                            recid=recid, recidb=recidb, of='id', ot=ot,
-                                            d1=d1, d1y=d1y, d1m=d1m, d1d=d1d,
-                                            d2=d2, d2y=d2y, d2m=d2m, d2d=d2d, dt=dt, ap=ap)
+        if self.local and of != 't':
+            # See if user tries to search any restricted collection
+            c = kwparams.get('c', "")
+            if c != "":
+                if type(c) is list:
+                    colls = c
+                else:
+                    colls = [c]
+                for collection in colls:
+                    if collection_restricted_p(collection):
+                        if self.user:
+                            self._check_credentials()
+                            continue
+                        raise InvenioConnectorAuthError("You are trying to search a restricted collection. Please authenticate yourself.\n")
+            kwparams['of'] = 'id'
+            results = perform_request_search(**kwparams)
             if of.lower() != 'id':
                 results = format_records(results, of)
         else:
-            if not self.cached_queries.has_key(params + str(parse_results)) or not read_cache:
-                results = urllib2.urlopen(self.server_url + "/search?" + params)
+            if params + str(parse_results) not in self.cached_queries or not read_cache:
+                if self.user:
+                    results = self.browser.open(self.server_url + "/search?" + params)
+                else:
+                    results = urllib2.urlopen(self.server_url + "/search?" + params)
+                if 'youraccount/login' in results.geturl():
+                    # Current user not able to search collection
+                    raise InvenioConnectorAuthError("You are trying to search a restricted collection. Please authenticate yourself.\n")
             else:
                 return self.cached_queries[params + str(parse_results)]
 
@@ -152,13 +280,48 @@ class InvenioConnector:
             # pylint: enable=E1103
 
             if of == "id":
-                if type(res) is str:
-                    # Transform to list
-                    res = [int(recid.strip()) for recid in \
-                    res.strip("[]").split(",") if recid.strip() != ""]
-                res.reverse()
+                try:
+                    if type(res) is str:
+                        # Transform to list
+                        res = [int(recid.strip()) for recid in \
+                        res.strip("[]").split(",") if recid.strip() != ""]
+                    res.reverse()
+                except (ValueError, AttributeError):
+                    res = []
             self.cached_queries[params + str(parse_results)] = res
             return self.cached_queries[params + str(parse_results)]
+
+    def search_with_retry(self, sleeptime=3.0, retrycount=3, **params):
+        """
+        This function performs a search given a dictionary of search(..)
+        parameters. It accounts for server timeouts as necessary and
+        will retry some number of times.
+
+        @param sleeptime: number of seconds to sleep between retries
+        @type sleeptime: float
+
+        @param retrycount: number of times to retry given search
+        @type retrycount: int
+
+        @param params: search parameters
+        @type params: **kwds
+
+        @rtype: list
+        @return: returns records in given format
+        """
+        results = []
+        count = 0
+        while count < retrycount:
+            try:
+                results = self.search(**params)
+                break
+            except urllib2.URLError:
+                sys.stderr.write("Timeout while searching...Retrying\n")
+                time.sleep(sleeptime)
+                count += 1
+        else:
+            sys.stderr.write("Aborting search after %d attempts.\n" % (retrycount,))
+        return results
 
     def search_similar_records(self, recid):
         """
@@ -172,12 +335,20 @@ class InvenioConnector:
         """
         return self.search(p="recid:" + str(recid), rm="citation")
 
-    def get_records_from_basket(self, bskid, read_cache=True):
+    def get_records_from_basket(self, bskid, group_basket=False, read_cache=True):
         """
         Returns the records from the (public) basket with given bskid
         """
-        if not self.cached_baskets.has_key(bskid) or not read_cache:
-            results = urllib2.urlopen(self.server_url + \
+        if bskid not in self.cached_baskets or not read_cache:
+            if self.user:
+                if group_basket:
+                    group_basket = '&category=G'
+                else:
+                    group_basket = ''
+                results = self.browser.open(self.server_url + \
+                        "/yourbaskets/display?of=xm&bskid=" + str(bskid) + group_basket)
+            else:
+                results = urllib2.urlopen(self.server_url + \
                         "/yourbaskets/display_public?of=xm&bskid=" + str(bskid))
         else:
             return self.cached_baskets[bskid]
@@ -190,7 +361,7 @@ class InvenioConnector:
         """
         Returns the record with given recid
         """
-        if self.cached_records.has_key(recid) or not read_cache:
+        if recid in self.cached_records or not read_cache:
             return self.cached_records[recid]
         else:
             return self.search(p="recid:" + str(recid))
@@ -212,7 +383,7 @@ class InvenioConnector:
             raise NameError, "Incorrect mode " + str(mode)
 
         # Are we running locally? If so, submit directly
-        if LOCAL_SITE_URL == self.server_url:
+        if self.local:
             (code, marcxml_filepath) = tempfile.mkstemp(prefix="upload_%s" % \
                                                         time.strftime("%Y%m%d_%H%M%S_",
                                                                       time.localtime()))
@@ -221,31 +392,12 @@ class InvenioConnector:
             marcxml_file_d.close()
             return task_low_level_submission("bibupload", "", mode, marcxml_filepath)
         else:
-            # add parameters
-            tpart = mime.Text.MIMEText(mode)
-            tpart.add_header("Content-Disposition", "form-data", name='mode')
-
-            # add file
-            fpart = mime.Base.MIMEBase('application', "octet-stream")
-            fpart.set_payload(marcxml)
-            fpart.add_header('Content-Disposition',
-                             'form-data; name="file"; filename="marcxml_upload.xml"')
-
-            #Encoders.encode_base64(fpart)
-
-            BOUNDARY = '------------------------------6510e6bc42e6'
-
-            data = BOUNDARY + '\n' + fpart.as_string() + '\n' + \
-                   BOUNDARY + '\n' + tpart.as_string() + '\n' + BOUNDARY + '--\n'
-
-            data = data.replace('\n', '\r\n')
-
-            req = urllib2.Request(self.server_url + "/batchuploader/robotupload",
-                                  data,
-                                  {'User-Agent': self.user_agent,
-                                   'Content-Type': 'multipart/form-data; boundary=%s' %
-                                   BOUNDARY[2:]})
-            return urllib2.urlopen(req)
+            params = urllib.urlencode({'file': marcxml,
+                                        'mode': mode})
+            ## We don't use self.browser as batchuploader is protected by IP
+            opener = urllib2.build_opener()
+            opener.addheaders = [('User-Agent', CFG_USER_AGENT)]
+            return opener.open(self.server_url + "/batchuploader/robotupload", params,)
 
     def _parse_results(self, results, cached_records):
         """
@@ -260,6 +412,31 @@ class InvenioConnector:
         parser.setContentHandler(handler)
         parser.parse(results)
         return handler.records
+
+    def _validate_server_url(self):
+        """Validates self.server_url"""
+        try:
+            request = requests.head(self.server_url)
+            if request.status_code >= 400:
+                raise InvenioConnectorServerError(
+                    "Unexpected status code '%d' accessing URL: %s"
+                    % (request.status_code, self.server_url))
+        except (InvalidSchema, MissingSchema) as err:
+            raise InvenioConnectorServerError(
+                "Bad schema, expecting http:// or https://:\n %s" % (err,))
+        except ConnectionError as err:
+            raise InvenioConnectorServerError(
+                "Couldn't establish connection to '%s':\n %s"
+                % (self.server_url, err))
+        except InvalidURL as err:
+            raise InvenioConnectorServerError(
+                "Invalid URL '%s':\n %s"
+                % (self.server_url, err))
+        except RequestException as err:
+            raise InvenioConnectorServerError(
+                "Unknown error connecting to '%s':\n %s"
+                % (self.server_url, err))
+
 
 class Record(dict):
     """
@@ -290,7 +467,7 @@ class Record(dict):
         if subcode is not None:
             subfields = []
             for datafield in datafields:
-                if datafield.has_key(subcode):
+                if subcode in datafield:
                     subfields.extend(datafield[subcode])
             return subfields
         else:
@@ -318,9 +495,55 @@ class Record(dict):
         """
         if self.server_url is not None and \
             self.recid is not None:
-            return self.server_url + "/record/" + str(self.recid)
+            return self.server_url + "/"+ CFG_SITE_RECORD +"/" + str(self.recid)
         else:
             return None
+if MECHANIZE_AVAILABLE:
+    class _SGMLParserFactory(mechanize.DefaultFactory):
+        """
+        Black magic to be able to interact with CERN SSO forms.
+        """
+        def __init__(self, i_want_broken_xhtml_support=False):
+            if OLD_MECHANIZE_VERSION:
+                forms_factory = mechanize.FormsFactory(
+                    form_parser_class=ClientForm.XHTMLCompatibleFormParser)
+            else:
+                forms_factory = mechanize.FormsFactory(
+                    form_parser_class=mechanize.XHTMLCompatibleFormParser)
+            mechanize.Factory.__init__(
+                self,
+                forms_factory=forms_factory,
+                links_factory=mechanize.LinksFactory(),
+                title_factory=mechanize.TitleFactory(),
+                response_type_finder=mechanize._html.ResponseTypeFinder(
+                    allow_xhtml=i_want_broken_xhtml_support),
+                )
+
+    class CDSInvenioConnector(InvenioConnector):
+        def __init__(self, user="", password="", local_import_path="invenio"):
+            """
+            This is a specialized InvenioConnector class suitable to connect
+            to the CERN Document Server (CDS), which uses centralized SSO.
+            """
+            cds_url = CFG_CDS_URL
+            if user:
+                cds_url = cds_url.replace('http', 'https')
+            super(CDSInvenioConnector, self).__init__(cds_url, user, password, local_import_path=local_import_path)
+
+        def _init_browser(self):
+            """
+            @note: update this everytime the CERN SSO login form is refactored.
+            """
+            self.browser = mechanize.Browser(factory=_SGMLParserFactory(i_want_broken_xhtml_support=True))
+            self.browser.set_handle_robots(False)
+            self.browser.open(self.server_url)
+            self.browser.follow_link(text_regex="Sign in")
+            self.browser.select_form(nr=0)
+            self.browser.form['ctl00$ctl00$NICEMasterPageBodyContent$SiteContentPlaceholder$txtFormsLogin'] = self.user
+            self.browser.form['ctl00$ctl00$NICEMasterPageBodyContent$SiteContentPlaceholder$txtFormsPassword'] = self.password
+            self.browser.submit()
+            self.browser.select_form(nr=0)
+            self.browser.submit()
 
 class RecordsHandler(xml.sax.handler.ContentHandler):
     "MARCXML Parser"
@@ -355,7 +578,7 @@ class RecordsHandler(xml.sax.handler.ContentHandler):
             self.cur_datafield = ""
             self.cur_tag = tag
             self.cur_controlfield = []
-            if not self.cur_record.has_key(tag):
+            if tag not in self.cur_record:
                 self.cur_record[tag] = self.cur_controlfield
             self.in_controlfield = True
 
@@ -366,7 +589,7 @@ class RecordsHandler(xml.sax.handler.ContentHandler):
             if ind1 == " ": ind1 = "_"
             ind2 = attributes["ind2"]
             if ind2 == " ": ind2 = "_"
-            if not self.cur_record.has_key(tag + ind1 + ind2):
+            if tag + ind1 + ind2 not in self.cur_record:
                 self.cur_record[tag + ind1 + ind2] = []
             self.cur_datafield = {}
             self.cur_record[tag + ind1 + ind2].append(self.cur_datafield)
@@ -374,7 +597,7 @@ class RecordsHandler(xml.sax.handler.ContentHandler):
 
         elif name == "subfield":
             subcode = attributes["code"]
-            if not self.cur_datafield.has_key(subcode):
+            if subcode not in self.cur_datafield:
                 self.cur_subfield = []
                 self.cur_datafield[subcode] = self.cur_subfield
             else:
@@ -387,10 +610,10 @@ class RecordsHandler(xml.sax.handler.ContentHandler):
         elif self.in_controlfield:
             self.buffer += data
         elif "Search-Engine-Total-Number-Of-Results:" in data:
-            print data
+            print(data)
             match_obj = re.search("\d+", data)
             if match_obj:
-                print int(match_obj.group())
+                print(int(match_obj.group()))
                 self.counts = int(match_obj.group())
 
     def endElement(self, name):
@@ -399,7 +622,7 @@ class RecordsHandler(xml.sax.handler.ContentHandler):
         elif name == "controlfield":
             if self.cur_tag == "001":
                 self.recid = int(self.buffer)
-                if self.cached_records.has_key(self.recid):
+                if self.recid in self.cached_records:
                     # Record has already been parsed, no need to add
                     pass
                 else:
