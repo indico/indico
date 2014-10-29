@@ -16,8 +16,13 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import absolute_import
 
+from contextlib import contextmanager
 from functools import partial
+
+from sqlalchemy.exc import IntegrityError
+from ZODB.POSException import ConflictError
 
 from indico.util.contextManager import ContextManager
 
@@ -40,3 +45,14 @@ def flush_after_commit_queue(execute):
         for func in queue:
             func()
     del queue[:]
+
+
+@contextmanager
+def retry_request_on_conflict():
+    """Converts an SQLIntegrityError to a conflict error (which triggers a retry)"""
+    try:
+        yield
+    except IntegrityError as e:
+        if 'duplicate key value violates' not in str(e):
+            raise
+        raise ConflictError(str(e))
