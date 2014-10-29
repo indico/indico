@@ -475,7 +475,6 @@ if __name__ == '__main__':
             livesync = indico.ext.livesync
             importer = indico.ext.importer
             calendaring = indico.ext.calendaring
-            search = indico.ext.search
 
             [indico.ext]
 
@@ -499,9 +498,6 @@ if __name__ == '__main__':
             livesync.cern_search = indico.ext.livesync.cern_search
 
             calendaring.outlook = indico.ext.calendaring.outlook
-
-            search.invenio = indico.ext.search.invenio
-
             """,
           zip_safe=False,
           packages=foundPackages,

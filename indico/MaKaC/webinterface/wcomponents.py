@@ -321,9 +321,7 @@ class WHeader(WTemplated):
             vars["title"] = "Indico"
             vars["organization"] = ""
 
-        vars['searchBox']= ""
         vars["categId"] = self.__currentCategory.getId() if self.__currentCategory else 0
-        extension_point("fillCategoryHeader", vars)
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars['roomBooking'] = Config.getInstance().getIsRoomBookingActive()

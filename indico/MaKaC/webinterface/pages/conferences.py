@@ -497,10 +497,9 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"].replace("#","")
         vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"].replace("#","")
 
-        vars['searchBox']= ""
         vars["confId"] = self._conf.getId()
         vars["dm"] = dm
-        extension_point("fillConferenceHeader", vars)
+        vars["conf"] = self._conf
         return vars
 
 

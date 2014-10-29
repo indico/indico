@@ -178,14 +178,6 @@ class INavigationContributor(IContributor):
         conference main page
         """
 
-    #Conference display related
-
-    def fillConferenceHeader(self, obj, params):
-        """
-        Inserts an element in the conference header
-        """
-        pass
-
     #Meetings and lectures display related
     def meetingAndLectureDisplay(self, obj, params):
         """
@@ -217,13 +209,6 @@ class INavigationContributor(IContributor):
         pass
 
     #Category Header related
-
-    def fillCategoryHeader(self, obj, params):
-        """
-        Inserts an element in the category header
-        """
-        pass
-
 
     def includeMainJSFiles(self, obj):
         """

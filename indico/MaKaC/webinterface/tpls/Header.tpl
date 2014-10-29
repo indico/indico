@@ -18,9 +18,6 @@ urlMeeting.addParam("event_type","meeting")
 <div class="page-header clearfix">
         <%include file="SessionBar.tpl" args="dark=False"/>
 
-        % if searchBox != '':
-            ${ searchBox }
-        % endif
         ${ plugin_hook('page-header', category=currentCategory) }
 
         <!--

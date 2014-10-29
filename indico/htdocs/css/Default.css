@@ -1679,11 +1679,6 @@ div.UIForm
     width: 100%;
 }
 
-div.UISearchForm
-{
-    background: #EEEEEE;
-}
-
 div.UIFormRow {
     clear: both;
     display: block;
@@ -1954,217 +1949,6 @@ ul.UIPeopleList li.UIError
     padding-left: 20px;
 }
 
-.UIInPlaceTextField
-{
-}
-
-#search-advanced-help-tooltip code {
-    font-size: 1.1em;
-}
-
-#search-advanced-help-tooltip .field {
-    color: #8a8a45;
-}
-
-#search-advanced-help-tooltip .negation {
-    color: #b00;
-}
-
-div#UISearchBox
-{
-    position: absolute;
-    right: 0.5em;
-    top: 50px;
-    border: none;
-    font-size: 13px;
-    z-index: 1;
-}
-
-div#UISearchBox .searchButton
-{
-    float: right;
-    border-left: 1px solid #003042;
-    width: 28px;
-    height: 21px;
-    line-height: 21px;
-    cursor: pointer;
-    background: #444;
-    text-align: center;
-    color: #fafafa;
-}
-
-div#UISearchBox #searchControls
-{
-    width: auto;
-    border: 1px solid #003042;
-    height: 21px;
-    overflow: hidden;
-    background-color: white;
-}
-
-div#UISearchBox #searchControls input
-{
-    border: 0;
-    font-weight: normal;
-    color: #333;
-}
-
-div#UISearchBox #searchText
-{
-    margin-left: 3px;
-    min-width: 150px;
-    width: auto;
-    height: 19px;
-}
-
-div#UISearchBox #extraOptions
-{
-    border: 1px solid #888888;
-    border-radius: 6px;
-    min-width: 250px;
-    display: none;
-    position: absolute;
-    top: 23px;
-    right: 0px;
-    background-color: white;
-}
-
-
-div#UISearchBox #extraOptions table {
-    width:auto;
-}
-
-div#UISearchBox #extraOptions table td:first-child {
-    padding-left: 10px;
-}
-
-div#UISearchBox #extraOptions input {
-    margin-left: 8px;
-    font-size: 12px;
-    width: 148px;
-}
-
-div#UISearchBox #extraOptions select {
-    margin-left: 8px;
-    font-size: 12px;
-    width: 148px;
-}
-
-div#UISearchBox #extraOptions td {
-    font-size: 12px;
-    color: #444;
-}
-
-div#UISearchBox #advancedOptionsLabel {
-    text-align: center;
-    padding: 5px;
-    border-radius: 6px 6px 0 0;
-    background-color: #ECECEC;
-    font-style: italic;
-    border-bottom: 1px solid #AAAAAA;
-}
-
-div#UISearch
-{
-    position:relative;
-    border: none;
-    font-size: 13px;
-    z-index: 1;
-}
-
-div#UISearch .searchButton
-{
-    float:right;
-    border-left: 1px solid #888;
-    width: auto;
-}
-
-div#UISearch #searchText2
-{
-    padding:3px;
-    width: auto;
-}
-
-div#UISearch #searchControls
-{
-    width: auto;
-    border: 1px solid #888;
-    height: 21px;
-    overflow: hidden;
-    background-color: white;
-}
-
-div#UISearch #searchControls input
-{
-    border: 0;
-    color: black;
-    font-weight: normal;
-}
-
-div.searchTag
-{
-    max-width:112px;
-    display:table-cell;
-    line-height: 13px;
-    height: 13px;
-    vertical-align: middle;
-    margin: 1px 1px 1px 1px;
-    padding: 2px 5px;
-    float: left;
-    user-select: none;
-    -ms-user-select:none;
-    -o-user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: -moz-none;
-    font-size: 11px;
-    overflow: hidden;
-    opacity: 0.6;
-}
-
-.searchTag .where
-{
-    max-width:100px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow:ellipsis;
-    float:left;
-}
-
-.everywhere
-{
-    color: #fff !important;
-    border: 1px solid #566E89;
-    text-shadow: 0 1px 0 #666;
-    background-color: #aaa;
-    cursor: default;
-
-}
-.inCategory
-{
-    color: #fff;
-    border: 1px solid #566E89;
-    background-color: #8EA1B7;
-    text-shadow: 0 1px 0 #666;
-    cursor: default;
-}
-.inCategoryOver
-{
-    color: #566E89;
-    border: 1px solid #566E89;
-    background-color: #8EA1B7;
-    cursor: pointer;
-}
-.cross
-{
-    font-weight:bold;
-    color: #566E89;
-    float: right;
-    cursor: pointer;
-    font-size: 10px;
-    margin-left:4px;
-    line-height: 12px;
-}
-
 .arrowExpandIcon
 {
     background: transparent url(../images/menu_arrow_black.png) scroll no-repeat center center;
@@ -2226,14 +2010,6 @@ div.UITidyDialog li
 {
     font-size: x-small;
     color: red;
-}
-
-div.UIMicroSearchBox
-{
-    background: #AACCFF;
-    font-size: xx-small;
-    width:250px;
-    position: absolute;
 }
 
 ul.UIUserEvtList
@@ -5204,57 +4980,6 @@ div.CategoryEventListDiv {
     overflow: auto;
 }
 
-.searchResultDescription {
-    font-size: 13px;
-    color: #666666;
-    margin: 5px;
-    margin-left: 10px;
-    padding: 5px;
-}
-
-a.searchResultTitle{
-    font-size: 14px;
-}
-
-a.searchResultLink{
-    color: #76A2C4;
-}
-
-ul.searchResultList {
-    padding: 0px;
-    list-style-type: none;
-}
-
-li.searchResultEvent {
-    border-bottom: 1px solid #DDDDDD;
-    padding: 5px;
-}
-
-li.searchResultContribution {
-    border-bottom: 1px solid #DDDDDD;
-    padding: 5px;
-}
-
-ul.authorList {
-    margin-bottom: 5px;
-    margin-top: 5px;
-}
-
-.searchPublicWarning {
-    color:#FF4444;
-    padding:10px;
-}
-
-.Search {
-    font-size: 34px;
-    font-family: Times New Roman;
-    color: #B14300;
-    font-weight: normal;
-    margin: 0;
-    padding: 0;
-}
-
-
 div.UnscheduledContribListDiv {
     margin-bottom: 10px;
     height:300px;
@@ -5482,68 +5207,11 @@ div.fitInnerTimetableDialog {
     color: #666666;
 }
 
-.suggestionBox {
-    border: 1px solid #888888;
-    width: 290px;
-    overflow: hidden;
-    background-color: white;
-}
-
-.suggestionBoxList {
-    background-color: #FFFFFF;
-    padding: 3px;
-    margin: 0 0 0 0;
-}
-
-.suggestionBoxList li {
-    list-style-type: none;
-    padding: 3px;
-    border-top:1px solid #DDDDDD;
-    cursor: pointer;
-}
-
 .loadingPast {
     background: transparent url('../images/loading.gif') no-repeat;
     padding-left: 25px;
     margin-left: 10px;
     display: none;
-}
-
-.searchSuggestionTitle {
-    color: #0B63A5;
-    font-size: 12px;
-}
-
-.searchSuggestionHighlight {
-    font-weight: bold;
-}
-
-.searchSuggestionPath {
-    color: #444444;
-    font-size: 9px;
-}
-
-.searchSuggestionSelected {
-    background-color: #ECECEC;
-}
-
-.searchSuggestionOtherResults {
-    background-color: #FFFFFF;
-    color:#777777;
-    font-size:12px;
-    font-style:italic;
-    text-align:center;
-    margin-top: 5px;
-    margin-bottom: 3px;
-}
-
-.searchSuggestionHelpBox {
-    background-color: #FFFFFF;
-    color:#555555;
-    font-size:12px;
-    font-style: italic;
-    margin: 0 0 0;
-    padding: 5px;
 }
 
 .fixPreOverflow pre{

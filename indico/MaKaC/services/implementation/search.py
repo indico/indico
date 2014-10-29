@@ -119,45 +119,8 @@ class SearchUsersGroups(ServiceBase):
         return results
 
 
-#################################
-# Category search
-#################################
-
-class SearchCategoryNames(ServiceBase):
-
-    def _checkParams(self):
-        self._searchString = self._params.get("value")
-
-    def _getPath(self, cat):
-        return cat.getCategoryPathTitles()[1:-1]
-
-    def _getAnswer(self):
-
-        import MaKaC.common.indexes as indexes
-        nameIdx = indexes.IndexesHolder().getIndex('categoryName')
-
-        foundEntries = nameIdx.search(self._searchString, limit=7)
-        number = len(foundEntries)
-
-        entryNames = []
-
-        for categId in foundEntries:
-            categ = CategoryManager().getById(categId)
-            entryNames.append({
-                'title': categ.getTitle(),
-                'path': self._getPath(categ),
-                'url': str(urlHandlers.UHCategoryDisplay.getURL(categ))
-                })
-
-        return {
-            "list": entryNames,
-            "number": number
-            }
-
-
 methodMap = {
     "users": SearchUsers,
     "groups": SearchGroups,
-    "usersGroups": SearchUsersGroups,
-    "categoryName": SearchCategoryNames
+    "usersGroups": SearchUsersGroups
 }
