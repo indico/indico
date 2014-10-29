@@ -473,9 +473,6 @@ class Record(dict):
         else:
             return datafields
 
-    def __contains__(self, item):
-        return dict.__contains__(item)
-
     def __repr__(self):
         return "Record(" + dict.__repr__(self) + ")"
 
