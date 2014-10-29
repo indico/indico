@@ -474,7 +474,6 @@ if __name__ == '__main__':
             EPayment = MaKaC.plugins.EPayment
             livesync = indico.ext.livesync
             importer = indico.ext.importer
-            calendaring = indico.ext.calendaring
 
             [indico.ext]
 
@@ -496,8 +495,6 @@ if __name__ == '__main__':
 
             livesync.invenio = indico.ext.livesync.invenio
             livesync.cern_search = indico.ext.livesync.cern_search
-
-            calendaring.outlook = indico.ext.calendaring.outlook
             """,
           zip_safe=False,
           packages=foundPackages,
