@@ -1286,7 +1286,7 @@ class CategoryTitleIndex(object):
         db.session.flush()
 
     def unindex(self, obj):
-        db.session.query(IndexedCategory).filter(IndexedCategory.id == obj.getId()).delete()
+        IndexedCategory.find(id=obj.getId()).delete()
         db.session.flush()
 
     def search(self, search_string, limit=None, offset=None):
@@ -1318,11 +1318,10 @@ class ConferenceIndex(object):
         db.session.flush()
 
     def unindex(self, obj):
-        db.session.query(IndexedEvent).filter(IndexedEvent.id == obj.getId()).delete()
+        IndexedEvent.find(id=obj.getId()).delete()
         db.session.flush()
 
     def search(self, search_string, order_by='start'):
-        order = IndexedEvent.start_date.desc()
         if order_by == 'start':
             order = IndexedEvent.start_date.desc()
         elif order_by == 'id':
