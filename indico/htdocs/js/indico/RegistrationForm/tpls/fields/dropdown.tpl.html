@@ -15,7 +15,7 @@
             ng-disabled="!hasPlacesLeft(item, getValue(fieldName), field.input) || paymentBlocked(item, userdata)"
             ng-selected="item.caption == getValue(fieldName)">
             {{ item.caption }}
-            {{ getBillableStr(item, getValue(fieldName), field.input) }}
+            {{ getBillableStr(item, input, field.input) }}
             </span>
         </option>
     </select>

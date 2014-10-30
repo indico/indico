@@ -219,14 +219,14 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
 
     $scope.getNoPlacesLeft = function(item, userValue, type) {
         var noPlaces = item.noPlacesLeft;
-        if(type === 'checkbox' && userValue === 'yes'){
-            noPlaces += 1;
-        } else if (type === 'radio' && item.caption === userValue) {
-            noPlaces += 1;
+        if (type === 'checkbox' && userValue) {
+            noPlaces -= 1;
+        } else if (type === 'radio' && item.id === userValue) {
+            noPlaces -= 1;
         } else if (type === 'accomodation' && item.id === userValue) {
-            noPlaces += 1;
+            noPlaces -= 1;
         } else if (type === 'socialEvent') {
-            noPlaces += userValue;
+            noPlaces -= userValue;
         }
         return noPlaces;
     };

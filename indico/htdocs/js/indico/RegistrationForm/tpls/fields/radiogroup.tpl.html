@@ -22,7 +22,7 @@
                     ({{ "no places left" | i18n }})
                 </font>
                 <font ng-switch-when="true" color="green" style="margin-left:25px;">
-                    [{{ getNoPlacesLeft(item, getValue(fieldName), field.input) }} {{ 'place(s) left' | i18n }}]
+                    [{{ getNoPlacesLeft(item, radioValue.id, field.input) }} {{ 'place(s) left' | i18n }}]
                 </font>
             </span>
         </li>
