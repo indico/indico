@@ -191,11 +191,6 @@
         </tr>
 </table>
 <table class="Revtab" width="95%" cellspacing="0" align="center" border="0" style="padding-left:20px; margin-bottom:1em">
-<!--
-    <tr>
-        <td nowrap class="groupTitle" colspan=4>Contributions to judge as Referee</td>
-    </tr>
--->
     <thead>
         <tr>
             <td></td>

@@ -11620,7 +11620,8 @@ class LocalFile(Resource):
             locator['fileExt'] = 'html'
         else:
             try:
-                locator['fileExt'] = self.fileType.lower() or os.path.splitext(self.fileName)[1].lower().lstrip('.')
+                locator['fileExt'] = (self.fileType.lower() or
+                                      os.path.splitext(self.fileName)[1].lower().lstrip('.') or None)
             except Exception:
                 locator['fileExt'] = 'bin'  # no extension => use a dummy
         return locator

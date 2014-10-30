@@ -32,6 +32,7 @@ from BTrees.OOBTree import OOBTree, OOSet
 from zope.index.text import textindex
 from sqlalchemy import func
 
+from indico.core.db.util import retry_request_on_conflict
 from indico.core.logger import Logger
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
@@ -1283,10 +1284,11 @@ class CategoryTitleIndex(object):
         self.unindex(obj)
         category = IndexedCategory(id=obj.getId(), title=obj.getTitle())
         db.session.add(category)
-        db.session.flush()
+        with retry_request_on_conflict():
+            db.session.flush()
 
     def unindex(self, obj):
-        db.session.query(IndexedCategory).filter(IndexedCategory.id == obj.getId()).delete()
+        IndexedCategory.find(id=obj.getId()).delete()
         db.session.flush()
 
     def search(self, search_string, limit=None, offset=None):
@@ -1315,14 +1317,14 @@ class ConferenceIndex(object):
         self.unindex(obj)
         event = IndexedEvent(id=obj.getId(), title=obj.getTitle(), start_date=obj.getStartDate())
         db.session.add(event)
-        db.session.flush()
+        with retry_request_on_conflict():
+            db.session.flush()
 
     def unindex(self, obj):
-        db.session.query(IndexedEvent).filter(IndexedEvent.id == obj.getId()).delete()
+        IndexedEvent.find(id=obj.getId()).delete()
         db.session.flush()
 
     def search(self, search_string, order_by='start'):
-        order = IndexedEvent.start_date.desc()
         if order_by == 'start':
             order = IndexedEvent.start_date.desc()
         elif order_by == 'id':

@@ -655,14 +655,14 @@ class Reservation(Serializer, db.Model):
             if field == 'used_equipment':
                 # Dynamic relationship
                 old = sorted(old.all())
-                converter = lambda x: ', '.join(x.name for x in x)
+                converter = lambda x: u', '.join(x.name for x in x)
             if old != new:
                 # Apply the change
                 setattr(self, field, data[field])
                 # Booked for id updates also update the (redundant) name
                 if field == 'booked_for_id':
                     old = self.booked_for_name
-                    new = self.booked_for_name = self.booked_for_user.getFullName()
+                    new = self.booked_for_name = self.booked_for_user.getFullName().decode('utf-8')
                 # If any occurrence-related field changed we need to recreate the occurrences
                 if field in occurrence_fields:
                     update_occurrences = True
@@ -687,7 +687,7 @@ class Reservation(Serializer, db.Model):
             return False
 
         # Create a verbose log entry for the modification
-        log = ['Booking modified']
+        log = [u'Booking modified']
         for field, change in changes.iteritems():
             field_title = field_names.get(field, field)
             converter = change['converter']

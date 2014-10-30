@@ -361,7 +361,7 @@
 % endif
 
 % if CanEditDueDates:
-    % if ContributionReviewManager.hasReferee():
+    % if ContributionReviewManager.hasReferee() and ContributionReviewManager.getLastReview().getRefereeDueDate():
         $('#inPlaceEditRefereeDueDate').html(new DateWidget('reviewing.contribution.changeDueDate',
                 {conference: '${ Conference.getId() }',
                  contribution: '${ ContributionReviewManager.getContribution().getId() }',
@@ -369,7 +369,7 @@
                  ${formatDateTime(ContributionReviewManager.getLastReview().getAdjustedRefereeDueDate()) | h,j}).draw().dom);
     % endif
 
-    % if ContributionReviewManager.hasEditor():
+    % if ContributionReviewManager.hasEditor() and ContributionReviewManager.getLastReview().getRefereeDueDate():
         $('#inPlaceEditEditorDueDate').html(new DateWidget('reviewing.contribution.changeDueDate',
                 {conference: '${ Conference.getId() }',
                  contribution: '${ ContributionReviewManager.getContribution().getId() }',
@@ -377,7 +377,7 @@
                  ${formatDateTime(ContributionReviewManager.getLastReview().getAdjustedEditorDueDate()) | h,j}).draw().dom);
     % endif
 
-    % if ContributionReviewManager.hasReviewers():
+    % if ContributionReviewManager.hasReviewers() and ContributionReviewManager.getLastReview().getRefereeDueDate():
         $('#inPlaceEditReviewerDueDate').html(new DateWidget('reviewing.contribution.changeDueDate',
                 {conference: '${ Conference.getId() }',
                  contribution: '${ ContributionReviewManager.getContribution().getId() }',

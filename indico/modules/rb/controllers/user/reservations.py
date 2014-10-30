@@ -278,7 +278,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         pre_conflicts = defaultdict(list)
 
         candidates = ReservationOccurrence.create_series(form.start_dt.data, form.end_dt.data,
-                                                         (form.repeat_interval.data, form.repeat_interval.data))
+                                                         (form.repeat_frequency.data, form.repeat_interval.data))
         occurrences = ReservationOccurrence.find_overlapping_with(room, candidates, reservation_id).all()
 
         for cand in candidates:
@@ -403,6 +403,7 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
             candidates = {}
             conflicts = {}
             pre_conflicts = {}
+            only_conflicts = False
         else:
             occurrences, candidates = self._get_all_occurrences([self._room.id], form)
             conflicts, pre_conflicts = self._get_all_conflicts(self._room, form)
@@ -451,7 +452,7 @@ class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBooki
         return RHRoomBookingNewBookingSimple._get_view(self, clone_booking=self._reservation, **kwargs)
 
     def _make_form(self):
-
+        self.past_date = self.date_changed = False
         changes = {'room_id': self._room.id}
 
         if self._reservation.created_by_id != session.user.id:
@@ -621,7 +622,7 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
 
         return self._get_view(form=form, room=room, rooms=Room.find_all(), occurrences=occurrences,
                               candidates=candidates, conflicts=conflicts, pre_conflicts=pre_conflicts,
-                              start_dt=form.start_dt.data, end_dt=form.end_dt.data,
+                              start_dt=form.start_dt.data, end_dt=form.end_dt.data, only_conflicts=False,
                               repeat_frequency=form.repeat_frequency.data, repeat_interval=form.repeat_interval.data,
                               reservation=self._reservation,
                               can_override=room.can_be_overridden(session.user)).display()

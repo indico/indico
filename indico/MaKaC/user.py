@@ -402,13 +402,13 @@ class Avatar(Persistent, Fossilizable):
             if 'title' in userData:
                 self.setTitle(userData["title"])
             if 'organisation' in userData:
-                self.setOrganisation(userData['organisation'])
+                self.setOrganisation(self._flatten(userData['organisation']))
             if 'address' in userData:
-                self.setAddress(userData["address"])
+                self.setAddress(self._flatten(userData["address"]))
             if 'email' in userData:
-                self.setEmail(userData["email"])
-            if 'telephone' in userData:
-                self.setTelephone(userData["telephone"])
+                self.setEmail(self._flatten(userData["email"]))
+            if 'phone' in userData:
+                self.setTelephone(userData["phone"])
             if 'fax' in userData:
                 self.setFax(userData["fax"])
 
@@ -422,6 +422,12 @@ class Avatar(Persistent, Fossilizable):
                 self.setTimezone(info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
 
             self.setDisplayTZMode(userData.get("displayTZMode", "Event Timezone"))
+
+    def _flatten(self, data):
+        if isinstance(data, (list, set, tuple)):
+            return data[0]
+        else:
+            return data
 
     def __repr__(self):
         return '<Avatar({0}, {1})>'.format(self.getId(), self.getFullName())

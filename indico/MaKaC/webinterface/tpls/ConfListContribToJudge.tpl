@@ -21,7 +21,11 @@
         % if not isinstance(c.getStatus(), ContribStatusNone):
         <tr valign="top" onmouseover="this.style.backgroundColor='#ECECEC'" onmouseout="this.style.backgroundColor='transparent'">
             <td style="padding-right:5px;padding-left:5px;">${ c.getId() }</td>
-            <td style="padding-right:5px;padding-left:5px;"><a href="${ urlHandlers.UHContributionModifReviewing.getURL(c) }">${ c.getTitle() }</a></td>
+            <td style="padding-right:5px;padding-left:5px;">
+                <a href="${ url_for('event_mgmt.contributionReviewing-contributionReviewingJudgements', c) }">
+                    ${ c.getTitle() }
+                </a>
+            </td>
             <td style="padding-right:5px;padding-left:5px;">
                 ${_("Review {0}").format(len(c.getReviewManager().getVersioning()))}
             </td>

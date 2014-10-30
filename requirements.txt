@@ -11,7 +11,7 @@ icalendar==3.8.2
 jsmin==2.0.2
 lxml==2.3.4
 pojson==0.4
-polib==1.0.0
+polib==1.0.5
 py==1.4.23
 pyPdf==1.13
 pyatom==1.2

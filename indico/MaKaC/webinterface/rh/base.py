@@ -568,10 +568,13 @@ class RH(RequestHandlerBase):
 
                     try:
                         Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), request.remote_addr))
+                        profile_name, res = self._process_retry(params, i, profile, forced_conflicts)
+                        # notify components that the request has finished
+                        self._notify('requestFinished')
                         if i < forced_conflicts:  # raise conflict error if enabled to easily handle conflict error case
                             raise ConflictError
-                        profile_name, res = self._process_retry(params, i, profile, forced_conflicts)
                         transaction.commit()
+                        DBMgr.getInstance().endRequest(commit=False)
                         break
                     except (ConflictError, POSKeyError):
                         transaction.abort()
@@ -587,10 +590,6 @@ class RH(RequestHandlerBase):
         except Exception as e:
             transaction.abort()
             res = self._getMethodByExceptionName(e)(e)
-        finally:
-            # notify components that the request has finished
-            self._notify('requestFinished')
-            DBMgr.getInstance().endRequest()
 
         totalTime = (datetime.now() - self._startTime)
         textLog.append('{} : Request ended'.format(totalTime))
