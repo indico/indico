@@ -2012,7 +2012,7 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
         return WPConferenceModifBase.getJSFiles(self) + self._includeJSPackage('Timetable')
 
     def _getSchedule(self):
-        custom_links = {k: v for k, v in values_from_signal(signals.timetable_buttons.send(self))}
+        custom_links = dict(values_from_signal(signals.timetable_buttons.send(self)))
         return WConfModifScheduleGraphic(self._conf, custom_links)
 
     def _getTTPage( self, params ):

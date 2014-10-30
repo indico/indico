@@ -959,7 +959,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         var customLinks = $();
         for(var linkName in this.customLinks){
-            var link = $('<a href="#"/>').text(linkName)
+            var link = $('<a href="#">').text(linkName)
                                          .addClass('js-{0}'.format(this.customLinks[linkName]))
                                          .data('timetable', self);
             customLinks = customLinks.add(link);

@@ -489,9 +489,6 @@ if __name__ == '__main__':
             EPayment.yellowPay = MaKaC.plugins.EPayment.yellowPay
             EPayment.skipjack = MaKaC.plugins.EPayment.skipjack
 
-            importer.invenio = indico.ext.importer.invenio
-            importer.dummy = indico.ext.importer.dummy
-
             livesync.invenio = indico.ext.livesync.invenio
             livesync.cern_search = indico.ext.livesync.cern_search
             """,
