@@ -1,0 +1,41 @@
+.i-badges-list {
+    display: block;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -webkit-justify-content: space-around;
+    justify-content: space-around;
+    text-align: center;
+    margin-top: -0.4em;
+    margin-bottom: 0.8em;
+}
+
+.i-badge {
+    @include border-radius();
+    display: inline-block;
+    display: -webkit-inline-flex;
+    display: inline-flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-justify-content: space-around;
+    justify-content: space-around;
+    min-width: 8.2em;
+    max-width: 11em;
+    padding: 0.2em 0.8em 0.8em;
+    margin: 0.4em 1em;
+    text-align: center;
+    color: $light-gray;
+    background-color: $dark-blue;
+    & > [class^="i-badge-"] {
+        display: block;
+        margin: 0 auto;
+    }
+    & > .i-badge-value {
+        font-size: 3.6em;
+        font-weight: bold;
+    }
+    & > .i-badge-legend {
+        font-size: 1em;
+    }
+}
