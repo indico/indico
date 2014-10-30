@@ -54,7 +54,7 @@
     {% endif %}
      {% if data.num_countries %}
         <div class="stats-item">
-            <span>{% trans %}Repartition of countries{% endtrans %}</span><span></span>
+            <span>{% trans %}Registrants per country{% endtrans %}</span><span></span>
         </div>
         <div id="countriesPlot" style="width:500px; height:{{height}}px;"></div>
         <script>
@@ -76,8 +76,6 @@
                             animation: { speed: 1000 },
                             barDirection: 'horizontal',
                             barWidth: 18,
-                            // highlightMouseOver: true,
-                            // highlightColors: ['#EDF3FD']
                         },
                         pointLabels: {
                             show: true,
@@ -86,9 +84,6 @@
                             edgeTolerance: -2
                         },
                         shadow: false,
-                        highlighter: {
-                            tooltipLocation: 's',
-                        }
                     },
                     axes: {
                         yaxis: {
