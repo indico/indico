@@ -17,11 +17,12 @@
 import json
 import os
 import re
+from copy import deepcopy
 from heapq import heappush
 from urlparse import urlparse
 
 from flask_pluginengine import (PluginEngine, Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin,
-                                current_plugin, render_plugin_template)
+                                current_plugin, render_plugin_template, wrap_in_plugin_context)
 from markupsafe import Markup
 from webassets import Environment, Bundle
 
@@ -286,6 +287,19 @@ def get_plugin_template_module(template_name, **context):
     """Like :func:`~indico.web.flask.templating.get_template_module`, but using plugin templates"""
     template_name = '{}:{}'.format(current_plugin.name, template_name)
     return get_template_module(template_name, **context)
+
+
+def wrap_cli_manager(manager, plugin):
+    """Wraps all commands of a flask-script `Manager` in a plugin context.
+
+    This actually clones the manager, so the original one is left untouched.
+    """
+    manager = deepcopy(manager)
+    for name, command in manager._commands.iteritems():
+        command = deepcopy(command)
+        command.run = wrap_in_plugin_context(plugin, command.run)
+        manager._commands[name] = command
+    return manager
 
 
 class IndicoPluginEngine(PluginEngine):
