@@ -28,7 +28,7 @@
 
         <span ng-if="hasPlacesLimit(field)" ng-switch="hasPlacesLeft(field, userdata[getName(field.id)], field.input)">
             <span ng-switch-when="true" class="placesLeft">
-                [{{getNoPlacesLeft(field, userdata[getName(field.id)], field.input)}} {{ 'place(s) left' | i18n }}]
+                [{{ getNoPlacesLeft(field, checkboxValue, field.input) }} {{ 'place(s) left' | i18n }}]
             </span>
             <span ng-switch-when="false" class="noPlacesLeft">
                 ({{ 'no places left' | i18n }})
