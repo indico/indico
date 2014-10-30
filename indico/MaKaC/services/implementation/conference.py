@@ -620,6 +620,7 @@ class ConferenceDeleteContributions (ConferenceModifBase):
         for contribId in self._selectedContributions:
             contrib = self._conf.getContributionById(contribId)
             if not contrib:
+                Logger.get().warning('Contribution {} in event {} was not deleted: Could not be found'.format(contribId, self._conf.getId()))
                 continue
             if contrib.getSession() is not None and contrib.getSession().isClosed():
                 msg = _("""The contribution "{}" cannot be deleted because it is inside of the session "{}" that """
