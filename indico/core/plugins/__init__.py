@@ -158,16 +158,27 @@ class IndicoPlugin(Plugin):
             kwargs['sender'] = view_class
         self.connect(signals.inject_css, lambda _: self.assets[name].urls(), **kwargs)
 
-    def inject_js(self, name, view_class=None):
+    def inject_js(self, name, view_class=None, subclasses=True):
+        self._inject_asset(signals.inject_js, name, view_class, subclasses)
+
+    def _inject_asset(self, signal, name, view_class=None, subclasses=True):
         """Injects a JS bundle into Indico's pages
 
+        :param signal: the signal to use for injection
         :param name: Name of the bundle
         :param view_class: If a WP class is specified, only inject it into pages using that class
+        :param subclasses: also inject into subclasses of `view_class`
         """
-        kwargs = {}
-        if view_class is not None:
-            kwargs['sender'] = view_class
-        self.connect(signals.inject_js, lambda _: self.assets[name].urls(), **kwargs)
+        if view_class is None:
+            self.connect(signal, lambda _: self.assets[name].urls())
+        elif not subclasses:
+            self.connect(signal, lambda _: self.assets[name].urls(), sender=view_class)
+        else:
+            def _func(sender):
+                if issubclass(sender, view_class):
+                    return self.assets[name].urls()
+
+            self.connect(signal, _func)
 
     def inject_vars_js(self):
         """Returns a string that will define variables for the plugin in the vars.js file"""

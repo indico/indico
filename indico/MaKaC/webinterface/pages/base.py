@@ -29,6 +29,7 @@ from indico.core import signals
 from indico.web import assets
 from indico.core.config import Config
 from indico.util.i18n import i18nformat
+from indico.util.signals import values_from_signal
 from MaKaC.plugins.base import OldObservable
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
@@ -177,8 +178,8 @@ class WPBase(OldObservable):
 
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
 
-        plugin_css = list(chain.from_iterable(files for _, files in signals.inject_css.send(self.__class__)))
-        plugin_js = list(chain.from_iterable(files for _, files in signals.inject_js.send(self.__class__)))
+        plugin_css = values_from_signal(signals.inject_css.send(self.__class__), as_list=True, multi_value_types=list)
+        plugin_js = values_from_signal(signals.inject_js.send(self.__class__), as_list=True, multi_value_types=list)
 
         return wcomponents.WHTMLHeader().getHTML({
             "area": area,
