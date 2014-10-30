@@ -626,6 +626,8 @@ class ConferenceDeleteContributions (ConferenceModifBase):
                     raise ServiceAccessError(msg)
                 contrib.getParent().getSchedule().removeEntry(contrib.getSchEntry())
                 self._conf.removeContribution(contrib)
+            else:
+                Logger.get().warning('Contribution {} in event {} was not deleted: Could not be found'.format(contribId, self._conf.getId()))
 
 #########################
 # Contribution filtering
