@@ -147,22 +147,26 @@ class IndicoPlugin(Plugin):
                         depends=SASS_BASE_MODULES)
         self.assets.register(name, bundle)
 
-    def inject_css(self, name, view_class=None):
+    def inject_css(self, name, view_class=None, subclasses=True):
         """Injects a CSS bundle into Indico's pages
 
         :param name: Name of the bundle
         :param view_class: If a WP class is specified, only inject it into pages using that class
+        :param subclasses: also inject into subclasses of `view_class`
         """
-        kwargs = {}
-        if view_class is not None:
-            kwargs['sender'] = view_class
-        self.connect(signals.inject_css, lambda _: self.assets[name].urls(), **kwargs)
+        self._inject_asset(signals.inject_css, name, view_class, subclasses)
 
     def inject_js(self, name, view_class=None, subclasses=True):
+        """Injects a JS bundle into Indico's pages
+
+        :param name: Name of the bundle
+        :param view_class: If a WP class is specified, only inject it into pages using that class
+        :param subclasses: also inject into subclasses of `view_class`
+        """
         self._inject_asset(signals.inject_js, name, view_class, subclasses)
 
     def _inject_asset(self, signal, name, view_class=None, subclasses=True):
-        """Injects a JS bundle into Indico's pages
+        """Injects an asset bundle into Indico's pages
 
         :param signal: the signal to use for injection
         :param name: Name of the bundle
