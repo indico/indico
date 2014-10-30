@@ -18,6 +18,7 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import registrationFormModif, registrantsModif
+from MaKaC.webinterface.rh.registration_stats import RHRegistrationStats
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 
@@ -177,3 +178,5 @@ event_mgmt.add_url_rule('/registration/users/<registrantId>/payment', 'confModif
 event_mgmt.add_url_rule('/registration/users/<registrantId>/payment/save',
                         'confModifRegistrants-peformModifyTransaction',
                         registrantsModif.RHRegistrantTransactionPerformModify, methods=('POST',))
+
+event_mgmt.add_url_rule('/registration/stats', 'registration_stats', RHRegistrationStats)

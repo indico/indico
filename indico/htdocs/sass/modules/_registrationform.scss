@@ -18,11 +18,9 @@
 
 @import 'base';
 @import 'compass';
-@import 'partials/icons';
-@import 'partials/boxes';
 
 // ============================================================================
-// Base clases
+// Base classes
 // ============================================================================
 
 %regform-section {
@@ -917,116 +915,178 @@ textarea.regFormDescriptionInputMgmt {
 // RegistrantsListStats-related
 // ============================================================================
 
-.i-box.registrant-stats > .i-box-header > .i-box-text {
-    color: $light-black;
-    font-style: italic;
-}
+.i-box.registrant-stats {
+    &> .i-box-header {
+        & > .i-box-title { float: left; }
+        & > .i-box-header-text {
+            color: $light-black;
+            font-style: italic;
 
-table.registrant-stats {
-    border-collapse: collapse;
-    thead {
-        tr:last-child th {
-            font-weight: bold;
-            border-bottom: 2px solid $gray;
-            padding-right: 5px;
-        }
-        th {
-            padding-right: 10px;
-            text-align: center;
-        }
-    }
-    tbody {
-        tr {
-            &:nth-child(even) {
-                background-color: $light-gray;
-            }
-            &:nth-child(odd) {
-                background-color: white;
-            }
-            &:first-child td {
-                border-top: 0;
-            }
-            &:not(.sub-row) td.cancelled-event:first-child {
-                position: relative;
-                &:after {
-                    border-bottom: 2px solid $red;
-                    content: "";
-                    left: 1%;
-                    position: absolute;
-                    right: 1%;
-                    top: 47%;
-                    width: 98%;
-                }
-            }
-        }
-        td {
-            border-top: 1px solid $gray;
-
-            &:first-child, &:last-child {
+            &.currency-info {
+                @include border-radius();
+                font-style: normal;
                 font-weight: bold;
+                font-size: 0.8em;
+                float: right;
+                text-align: center;
+                color: $light-gray;
+                background-color: $dark-blue;
+                padding: 0.3em;
+
             }
-            &.paid-unpaid-progress > .i-progress > .i-progress-bar {
-                &:first-child {
-                    background: $green;
+
+            &.headline { clear: both; }
+        }
+    }
+    &> .i-box-content {
+        &> table.registrant-stats {
+            border-collapse: collapse;
+
+            thead {
+                tr:last-child th {
+                    font-weight: bold;
+                    border-bottom: 2px solid $gray;
+                    padding-right: 5px;
                 }
-                &:nth-child(2) {
-                    background: $red;
+                th {
+                    padding-right: 10px;
+                    text-align: center;
                 }
             }
-            &.no-stats-data {
+            tbody {
+                tr {
+                    &:nth-child(even) { background-color: $light-gray; }
+                    &:nth-child(odd) { background-color: white; }
+                    &:first-child td { border-top: 0; }
+
+                    &:not(.sub-row) td.cancelled-item:first-child {
+                        position: relative;
+
+                        &:after {
+                            border-bottom: 2px solid $light-black;
+                            content: "";
+                            left: 1%;
+                            position: absolute;
+                            right: 1%;
+                            top: 48%;
+                            width: 98%;
+                        }
+                    }
+                }
+                td {
+                    border-top: 1px solid $gray;
+
+                    &:first-child, &:last-child { font-weight: bold; }
+
+                    &.paid-unpaid-progress > .i-progress > .i-progress-bar {
+                        &:first-child { background: $pastel-green; }
+                        &:nth-child(2) { background: $pastel-red; }
+                    }
+                    &.no-stats-data { color: $dark-gray; }
+                    &.paid-amount span { color: $green; }
+                    &.unpaid-amount {
+                        &:before { content: "("; }
+                        &:after { content: ")"; }
+                        span { color: $red; }
+                    }
+                    &.stick-left { padding-right: 1px; }
+                    &.stick-right { padding-left: 1px; }
+                }
+            }
+            tr {
+                td:first-child:before {
+                    display: inline-block;
+                    line-height: 1em;
+                    font-size: 1.2em;
+                    vertical-align: middle;
+                    font-weight: bold;
+                }
+                &.header-row  {
+                    cursor: pointer;
+                    @include user-select(none);
+
+                    td:first-child {
+                        @include icon-before('icon-arrow-down');
+
+                        border-bottom: 0;
+                        &:before {
+                            @include transition(transform 0.15s ease-out);
+
+                            -webkit-transform-origin: 50%  51%; // improve blurry text on rotate with chrome
+                        }
+                    }
+                    &.collapsed td:first-child:before { @include rotate(-90deg); }
+                }
+                &.single-row td:first-child:before { content: "\2001"; }
+                &.sub-row td:first-child { border-top: 0px; }
+            }
+            th, td {
+                padding: 5px;
+                text-align: right;
+
+                &:first-child { text-align: left; }
+                i[class^="icon-"] { vertical-align: middle; }
+            }
+        }
+
+        .stats-overview {
+            font-size: 2em;
+            font-weight: bold;
+            color: $light-black;
+            display: block;
+
+            &> *.no-info {
+                font-size: 1em;
                 color: $dark-gray;
+                font-style: italic;
+                font-weight: lighter;
             }
-            &.paid-amount span {
-                color: $green;
-            }
-            &.unpaid-amount {
-                &:before {
-                    content: "(";
-                }
-                &:after {
-                    content: ")";
-                }
-                span {
-                    color: $red;
-                }
-            }
-            &.stick-left {
-                padding-right: 1px;
-            }
-            &.stick-right {
-                padding-left: 1px;
+            &> *:last-child {
+                float: right;
+                clear: both;
             }
         }
-    }
-    tr {
-        &.header-row  {
-            cursor: pointer;
 
-            td:first-child {
-                @include icon-before('icon-stack-minus');
-                border-bottom: 0;
-
-            }
-            &.collapsed td:first-child {
-                @include icon-before('icon-stack-plus');
-            }
-        }
-        &.single-row td:first-child:before {
-           content: "\2001";
-        }
-        &.sub-row + tr.sub-row td:first-child {
-            border-top: 0px;
-        }
-    }
-    th, td {
-        padding: 5px;
-        text-align: right;
-
-        &:first-child {
-            text-align: left;
-        }
-        i[class^="icon-"] {
+        .stats-item {
+            display: block;
+            width: 100%;
+            position: relative;
+            margin: 0.6em 0;
+            font-size: 1.2em;
+            height: 1.5em;
             vertical-align: middle;
+            color: $black;
+            &> * {
+                &:first-child {
+                    position: relative;
+                    line-height: 1.5em;
+                    float: left;
+                    margin-right: 0.4em;
+                }
+                &:last-child {
+                    display: block;
+                    overflow: auto;
+
+                    & > .i-progress {
+                        background-color: $pastel-green;
+
+                        & > .i-progress-bar {
+                            background-color: $pastel-red;
+                        }
+                    }
+                }
+            }
         }
+
+        .jqplot-point-label { color: white; }
+        .jqplot-yaxis-tick {
+            right: 0;
+            margin-right: 0.5em;
+        }
+        .jqplot-xaxis-tick { margin-top: 0.2em; }
+    }
+
+    #countriesPlot {
+        margin-top: -1.2em;
     }
 }

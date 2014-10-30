@@ -242,7 +242,6 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
         self._emailSelected = params.has_key("emailSelected")
         self._tablePDF = params.has_key("pdf.table")
         self._bookPDF = params.has_key("pdf.book")
-        self._info = params.has_key("info.x")
         self._excel = params.has_key("excel")
         self._reglist = params.get("reglist","").split(",")
         self._display = self._normaliseListParam(params.get("disp",[]))
@@ -281,13 +280,6 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
                     regs.append(self._conf.getRegistrantById(reg))
             r = RHRegistrantBookPDF(self,self._conf,regs, self._display)
             return r.pdf()
-        elif self._info:
-            regs =[]
-            for reg in self._selectedRegistrants:
-                if self._conf.getRegistrantById(reg) != None:
-                    regs.append(self._conf.getRegistrantById(reg))
-            r = RHRegistrantsInfo(self,self._conf,regs)
-            return r.info()
         elif self._excel:
             regs =[]
             for reg in self._selectedRegistrants:
@@ -334,16 +326,6 @@ class RHRegistrantListRemove(RHRegistrantListModifBase):
                 self._conf.removeRegistrant(reg)
         self._redirect(urlHandlers.UHConfModifRegistrantList.getURL(self._conf))
 
-class RHRegistrantsInfo:
-
-    def __init__( self, rh, conf, reglist ):
-        self._conf = conf
-        self._list = reglist
-        self._rh = rh
-
-    def info(self):
-        p=registrants.WPRegistrantsInfo(self._rh, self._conf)
-        return p.display(reglist=self._list)
 
 class RHRegistrantBookPDF:
     def __init__( self, rh,conf,reglist, disp ):

@@ -17,14 +17,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from collections import defaultdict, namedtuple
 from datetime import timedelta
-from itertools import groupby
 import math
 import string
-
-from babel import Locale
-from flask import session
 
 from MaKaC import registration
 import MaKaC.common.filters as filters
@@ -36,10 +31,11 @@ from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 import MaKaC.webinterface.urlHandlers as urlHandlers
+from flask import render_template
 from conferences import WConfModifBadgePDFOptions
 from indico.core.config import Config
 from indico.util. date_time import format_datetime
-from indico.util.i18n import i18nformat#, get_current_locale
+from indico.util.i18n import i18nformat
 from indico.web.flask.util import url_for
 from xml.sax.saxutils import escape
 from xml.sax.saxutils import quoteattr
@@ -748,335 +744,15 @@ class WPEMail ( WPConfModifRegistrantListBase ):
         return wc.getHTML()
 
 
-class Cell(namedtuple('Cell', ['type', 'colspan', 'classes', 'qtip', 'data'])):
-    def __new__(cls, type=None, colspan=1, classes=None, qtip=None, data=None):
-        if classes is None:
-            classes = []
-        if data is None:
-            if type == 'str':
-                data = ''
-            elif type == 'progress-stacked':
-                data = [[0], '0']
-            elif type == 'progress':
-                data = (0, '0')
-            elif type == 'currency':
-                data = (0, 'EUR')
-            elif type == 'icon':
-                data = 'warning'
-        return super(Cell, cls).__new__(cls, type, colspan, classes, qtip, data)
+class WPRegistrationStats(registrationForm.WPConfModifRegFormBase):
+    def getJSFiles(self):
+        return registrationForm.WPConfModifRegFormBase.getJSFiles(self) + self._includeJSPackage('jqplot_js', prefix='')
 
+    def _setActiveTab(self):
+        self._tabStats.setActive()
 
-class SocialEventsStats(object):
-    class EventData(namedtuple('EventData', ['regs', 'attending', 'attendance', 'capacity', 'billable', 'cancelled',
-                                             'cancel_reason', 'price', 'fixed_price', 'paid', 'paid_amount', 'unpaid',
-                                             'unpaid_amount'])):
-        def __new__(cls, regs=0, attending=0, attendance=0, capacity=0, billable=False, cancelled=False,
-                    cancel_reason='', price=0, fixed_price=False, paid=0, paid_amount=0, unpaid=0, unpaid_amount=0):
-            return super(SocialEventsStats.EventData, cls).__new__(
-                cls, regs, attending, attendance, capacity, billable, cancelled, cancel_reason, price,
-                fixed_price, paid, paid_amount, unpaid, unpaid_amount)
-
-    def __init__(self, conf, registrants):
-        self.all_free = True
-        self._form = conf.getRegistrationForm().getSocialEventForm()
-        self._currency = conf.getRegistrationForm().getCurrency()
-        self._events = {e.getId(): e for e in self._form.getSocialEventList() if e is not None}
-        # Sorting the events is necessary for groupby
-        self._reg_events = sorted([e for r in registrants for e in r.getSocialEvents() if e is not None],
-                                  key=lambda e: (e.getCaption(), e.getId(), e.getPrice(), e.isPricePerPlace()))
-        self._no_regs = len(registrants)
-        for e in self._reg_events:
-            self._events.setdefault(e.getId(), e.getSocialEventItem())
-        self._data = defaultdict(list)
-        self._compute()
-
-    def _compute(self):
-        billed_events = {}
-        for k, evts in groupby((e for e in self._reg_events if e.isBillable() and float(e.getPrice())),
-                               lambda e: (e.getCaption(), e.getId(), e.getPrice(), e.isPricePerPlace())):
-            evts = list(evts)
-            billed_events[k] = SocialEventsStats.EventData(
-                regs=len(evts),
-                attending=sum(e.getNoPlaces() for e in evts),
-                attendance=next((e.getSocialEventItem().getCurrentNoPlaces()
-                                 for e in evts if e.getSocialEventItem().getCurrentNoPlaces()), 0),
-                capacity=next((e.getSocialEventItem().getPlacesLimit()
-                               for e in evts if e.getSocialEventItem().getPlacesLimit()), 0),
-                billable=True,
-                cancelled=next((e.isCancelled() for e in evts), False),
-                cancel_reason=next((e.getCancelledReason() for e in evts if e.getCancelledReason()), None),
-                price=k[2],
-                fixed_price=not k[3],
-                paid=len([e for e in evts if e.getRegistrant().getPayed()]),
-                paid_amount=sum(self._compute_amout(e) for e in evts if e.getRegistrant().getPayed()),
-                unpaid=len([e for e in evts if not e.getRegistrant().getPayed()]),
-                unpaid_amount=sum(self._compute_amout(e) for e in evts if not e.getRegistrant().getPayed())
-            )
-
-        no_billed_events = {}
-        for k, evts in groupby((e for e in self._reg_events if not e.isBillable()
-                                or (e.isBillable() and not float(e.getPrice()))),
-                               lambda e: (e.getCaption(), e.getId())):
-            evts = list(evts)
-            no_billed_events[k] = SocialEventsStats.EventData(
-                regs=len(evts),
-                attending=sum(e.getNoPlaces() for e in evts),
-                attendance=next((e.getSocialEventItem().getCurrentNoPlaces()
-                                 for e in evts if e.getSocialEventItem().getCurrentNoPlaces()), 0),
-                capacity=next((e.getSocialEventItem().getPlacesLimit()
-                               for e in evts if e.getSocialEventItem().getPlacesLimit()), 0),
-                billable=False,
-                cancelled=next((e.isCancelled() for e in evts), False),
-                cancel_reason=next((e.getCancelledReason() for e in evts if e.getCancelledReason()), None)
-            )
-
-        # Add events with no registrants
-        for e in self._events.itervalues():
-            if e.isBillable() and e.getPrice() > 0:
-                billed_events.setdefault(
-                    (e.getCaption(), e.getId(), e.getPrice(), e.isPricePerPlace()),
-                    SocialEventsStats.EventData(
-                        capacity=e.getPlacesLimit(),
-                        billable=True,
-                        cancelled=e.isCancelled(),
-                        cancel_reason=(e.getCancelledReason() if e.getCancelledReason() else _("No reason given")),
-                        price=e.getPrice(),
-                        fixed_price=not e.isPricePerPlace())
-                )
-            else:
-                no_billed_events.setdefault(
-                    (e.getCaption(), e.getId()),
-                    SocialEventsStats.EventData(capacity=e.getPlacesLimit(), fixed_price=not e.isPricePerPlace()))
-
-        self.all_free = not billed_events
-        for (name, id, price, fixed_price), evt in billed_events.iteritems():
-            self._data[(name, id)].append(evt)
-        for (name, id), evt in no_billed_events.iteritems():
-            self._data[(name, id)].append(evt)
-
-    @property
-    def selection_type(self):
-        return self._form.getSelectionTypeId()
-
-    @property
-    def mandatory(self):
-        return self._form.getMandatory()
-
-    @property
-    def title(self):
-        return self._form.getTitle()
-
-    def __nonzero__(self):
-        return bool(self._data)
-
-    def get_table(self):
-        """
-        Returns a table containing the stats of the social events.
-
-        :returns: dict -- A table with a list of head cells (key: `'head'`) and
-                  a list of rows (key: `'rows'`) where each row is a list of
-                  cells.
-        """
-        table = defaultdict(list)
-        table['head'] = [
-            Cell(type='str', data=_("Event")),
-            Cell(type='str', data=_("Registrants")),
-            Cell(type='str', data=_("Attendees"))
-        ]
-        if not self.all_free:
-            table['head'].extend([
-                Cell(type='str', data=_("Price"), colspan=2),
-                Cell(type='str', data=_("Registrations paid")),
-                Cell(type='str', data=_("Total paid (unpaid)"), colspan=2),
-                Cell(type='str', data=_("Total"))
-            ])
-
-        for (name, id), event in sorted(self._data.iteritems()):
-            evt_no_regs = sum(event_data.regs for event_data in event)
-            cancelled = ['cancelled-event'] if next((d.cancelled for d in event), False) else None
-            cancel_reason = None if cancelled is None else _("Cancelled: {}").format(
-                next((d.cancel_reason for d in event if d.cancel_reason), _("No reason")))
-            # Header/Single row
-            table['rows'].append(('single-row' if len(event) == 1 else 'header-row', [
-                Cell(type='str', data=name, classes=cancelled, qtip=cancel_reason),
-                Cell(type='progress', data=(float(evt_no_regs) / self._no_regs, '{} / {}'.format(
-                     evt_no_regs, self._no_regs)) if self._no_regs else None),
-                self._get_attendance(event),
-            ] + self._get_billing(event)))
-
-            if len(event) == 1:
-                continue
-
-            # Optional sub-rows
-            table['rows'].extend(('sub-row', [
-                Cell(type='str'),
-                Cell(type='progress', data=(float(details.regs) / evt_no_regs, '{} / {}'.format(
-                     details.regs, evt_no_regs)) if evt_no_regs else None),
-                Cell(type='str', data=details.attending)
-            ] + self._get_billing_details(details)) for details in event)
-
-        return table
-
-    def _get_attendance(self, event):
-        attending = sum(d.attending for d in event)
-        capacity = next((d.capacity for d in event if d.capacity), 0)
-        if not capacity:
-            return Cell(type='str', data=attending)
-
-        attendance = next((d.attendance for d in event if d.attendance), 0)
-        if attending == attendance:
-            label = '{} / {}'.format(attendance, capacity)
-            qtip = '{} attendees, {} place(s) available'.format(attendance, capacity - attendance)
-        else:
-            label = '{} (+{}) / {}'.format(attending, capacity - attending, capacity)
-            qtip = '{} attendees ({} selected), {} place(s) available'.format(attendance, attending,
-                                                                              capacity - attendance)
-        return Cell(type='progress', qtip=qtip, data=(float(attendance) / capacity, label))
-
-    def _get_billing(self, event):
-        """
-        Get overall billing stats for an event.
-
-        This correspond to a header row which represents the aggregation of the
-        sub rows for an event in the table.
-
-        :param event: list of SocialEventsStats.EventData -- The event for which
-                      to generate the billing aggregation.
-        :returns: list -- part of a row as a list of cells.
-        """
-        if self.all_free:  # hide billing details if no events require payments
-            return []
-
-        # Only one kind of payment (currency, price and fixed price or not)
-        # or only no payment so we move the sub row up as the header row.
-        if len(event) == 1:
-            return self._get_billing_details(event[0])
-
-        paid = sum(d.paid for d in event if d.billable)
-        paid_amount = sum(d.paid_amount for d in event if d.billable)
-
-        unpaid = sum(d.unpaid for d in event if d.billable)
-        unpaid_amount = sum(d.unpaid_amount for d in event if d.billable)
-
-        total = paid + unpaid
-        total_amount = paid_amount + unpaid_amount
-
-        progress = [[float(paid) / total, float(unpaid) / total], '{} / {}'.format(paid, total)] if total else None
-
-        return [
-            Cell(colspan=2),
-            Cell(type='progress-stacked', data=progress, classes=['paid-unpaid-progress']),
-            Cell(type='currency', data=(paid_amount, self._currency), classes=['paid-amount', 'stick-left']),
-            Cell(type='currency', data=(unpaid_amount, self._currency), classes=['unpaid-amount', 'stick-right']),
-            Cell(type='currency', data=(total_amount, self._currency))
-        ]
-
-    def _get_billing_details(self, details):
-        """
-        Get billing details for an event.
-
-        This correspond to a sub line for an event in the table kind of payment.
-
-        :param details: SocialEventsStats.EventData -- The details of an event
-                        for which to generate billing information.
-        :returns: list -- part of a row as a list of cells.
-        """
-        if self.all_free:  # hide billing details if no events require payments
-            return []
-
-        # The users icon is displayed when accompanying guests must pay as well.
-        price_details = (Cell(type='str', classes=['stick-left']) if details.fixed_price else
-                         Cell(type='icon', data='users', qtip='accompanying guests must pay', classes=['stick-left']))
-        if not details.billable:
-            return [
-                price_details,
-                Cell(type='currency', data=(0, self._currency), classes=['stick-right']), Cell(),
-                Cell(type='currency', data=(0, self._currency), classes=['paid-amount', 'stick-left']),
-                Cell(type='currency', data=(0, self._currency), classes=['unpaid-amount', 'stick-right']),
-                Cell(type='currency', data=(0, self._currency))
-            ]
-
-        progress = [[float(details.paid) / details.regs, float(details.unpaid) / details.regs],
-                    '{0.paid} / {0.regs}'.format(details)] if details.regs else None
-
-        return [
-            price_details,
-            Cell(type='currency', data=(float(details.price), self._currency), classes=['stick-right']),
-            Cell(type='progress-stacked', data=progress, classes=['paid-unpaid-progress']),
-            Cell(type='currency', data=(details.paid_amount, self._currency), classes=['paid-amount', 'stick-left']),
-            Cell(type='currency', data=(details.unpaid_amount, self._currency),
-                 classes=['unpaid-amount', 'stick-right']),
-            Cell(type='currency', data=(details.paid_amount + details.unpaid_amount, self._currency))
-        ]
-
-    def _compute_amout(self, event):
-        return (float(event.getPrice()) * event.getNoPlaces()) if event.isPricePerPlace() else float(event.getPrice())
-
-
-class WConfModifRegistrantsInfo(wcomponents.WTemplated):
-
-    def __init__(self, conf, reglist):
-        self._conf = conf
-        self._reglist = reglist
-
-    def _getAccommodationTypesInfoHTML(self):
-        acco_types = defaultdict(
-            int,
-            ((acco, 0) for acco in self._conf.getRegistrationForm().getAccommodationForm().getAccommodationTypesList()
-                if acco is not None))
-        total = 0
-        for reg in self._reglist:
-            acco_type = reg.getAccommodation().getAccommodationType()
-            if acco_type is not None:
-                acco_types[acco_type] += 1
-                total += 1
-        html = sorted(['<tr><td>{}</td><td>{}</td><td>{:.0f} %</td></tr>'.format(
-                       a_type.getCaption(), value, round(value * 100.0 / total) if total else 0)
-                       for a_type, value in acco_types.iteritems()])
-        html.append('<tfoot><tr><td>Total</td><td>{}</td><td>100 %</td></tr></tfoot>'.format(total))
-        return ''.join(html), total
-
-    def _getSocialEventsInfoHTML(self):
-        stats = SocialEventsStats(self._conf, self._reglist)
-        return stats.to_html()
-
-    def _getSessionsInfoHTML(self):
-        sessions = {
-            s.getId(): s for s in self._conf.getRegistrationForm().getSessionsForm().getSessionList() if s is not None
-        }
-        sessions_counter = defaultdict(int, ((s, 0) for s in sessions.iterkeys()))
-        total = 0
-        for reg in self._reglist:
-            for s in reg.getSessionList():
-                if s is not None:
-                    sessions_counter[s.getId()] += 1
-                    sessions.setdefault(s.getId(), s)
-                    total += 1
-        html = sorted(['<tr><td>{}</td><td>{}</td><td>{:.0f} %</td></tr>'.format(
-                       sessions[s].getTitle(), amount, round(amount * 100.0 / total) if total else 0)
-                       for s, amount in sessions_counter.iteritems()])
-        html.append('<tfoot><tr><td>Total</td><td>{}</td><td>100 %</td></tr></tfoot>'.format(total))
-        return ''.join(html), total
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars['no_registrants'] = (len(self._reglist) if len(self._reglist) < len(self._conf.getRegistrantsList())
-                                  else 'All')
-        vars["accommodationTypes"], vars["numAccoTypes"] = self._getAccommodationTypesInfoHTML()
-        vars["social_events"] = SocialEventsStats(self._conf, self._reglist)
-        vars["sessions"], vars["numSessions"] = self._getSessionsInfoHTML()
-        vars["accoCaption"] = self._conf.getRegistrationForm().getAccommodationForm().getTitle()
-        vars["sessionsCaption"] = self._conf.getRegistrationForm().getSessionsForm().getTitle()
-        vars["backURL"] = quoteattr(str(urlHandlers.UHConfModifRegistrantList.getURL(self._conf)))
-        return vars
-
-
-class WPRegistrantsInfo ( WPConfModifRegistrantListBase ):
-
-    def _getTabContent(self,params):
-        reglist = params["reglist"]
-        wc = WConfModifRegistrantsInfo(self._conf, reglist)
-        return wc.getHTML()
+    def _getTabContent(self, params):
+        return render_template('events/registration/stats.html', stats=params['stats']).encode('utf-8')
 
 
 class WPRegistrantBase( WPConferenceModifBase ):

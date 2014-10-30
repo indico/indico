@@ -96,7 +96,6 @@
                                     <a href="#" class="i-button" id="send_email">${_("Email")}</a>
                                     <a href="#" class="i-button" id="print_badges">${_("Print Badges")}</a>
                                     <a href="#" class="i-button" id="attachments">${_("Attachments")}</a>
-                                    <a href="#" class="i-button" id="show_stats">${_("Show stats")}</a>
                                     <a class="i-button arrow button" href="#" data-toggle="dropdown">
                                       ${_("Export")}
                                     </a>
@@ -320,14 +319,6 @@ IndicoUI.executeOnLoad(function(){
 
     $("#attachments").bind('menu_select',function(event) {
         InsertHiddenField("PKG", "attachments", false);
-        $('#registrantsForm').submit();
-     });
-
-    $("#show_stats").bind('menu_select',function(event) {
-        InsertHiddenField("info.x", "Show+stats", false);
-        if (! atLeastOneRegistrantSelected(true)) {
-            $("input[name='registrant']").prop('checked', true);
-        }
         $('#registrantsForm').submit();
      });
 

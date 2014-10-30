@@ -125,13 +125,13 @@ class WPBase(OldObservable):
     def getJSFiles(self):
         return self._asset_env['base_js'].urls()
 
-    def _includeJSPackage(self, pkg_names):
+    def _includeJSPackage(self, pkg_names, prefix='indico_'):
         if not isinstance(pkg_names, list):
             pkg_names = [pkg_names]
 
         return [url
                 for pkg_name in pkg_names
-                for url in self._asset_env['indico_' + pkg_name.lower()].urls()]
+                for url in self._asset_env[prefix + pkg_name.lower()].urls()]
 
     def _getJavaScriptUserData(self):
         """

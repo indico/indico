@@ -54,15 +54,17 @@ class WPConfModifRegFormBase(conferences.WPConferenceModifBase):
                                                         urlHandlers.UHConfModifRegistrationModification.getURL(self._conf))
         self._tabRegistrants = self._tabCtrl.newTab("registrants", _("Registrants"),
                                                     urlHandlers.UHConfModifRegistrantList.getURL(self._conf))
+        self._tabStats = self._tabCtrl.newTab('stats', _("Stats"), url_for('event_mgmt.registration_stats', self._conf))
         self._tabEPay = self._tabCtrl.newTab("epay", _("e-payment"), urlHandlers.UHConfModifEPayment.getURL(self._conf))
         self._tabETicket = self._tabCtrl.newTab("eticket", _("e-ticket"),
-                								url_for("event_mgmt.confModifETicket", self._conf))
+                                                url_for("event_mgmt.confModifETicket", self._conf))
 
         self._setActiveTab()
 
         if not self._conf.hasEnabledSection("regForm"):
             self._tabRegFormSetup.disable()
             self._tabRegistrants.disable()
+            self._tabStats.disable()
             self._tabEPay.disable()
             self._tabRegistrationPreview.disable()
             self._tabETicket.disable()

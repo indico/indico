@@ -23,6 +23,8 @@ import os
 import re
 import traceback
 
+from babel.numbers import format_currency, get_currency_name
+
 from flask import send_from_directory, request, _app_ctx_stack, Blueprint
 from flask import current_app as app
 from flask_sqlalchemy import models_committed
@@ -135,6 +137,8 @@ def setup_jinja(app):
     app.add_template_global(include_plugin_js_assets)
     app.add_template_global(plugin_hook)
     app.add_template_global(is_single_line_field, '_is_single_line_field')
+    app.add_template_global(format_currency)
+    app.add_template_global(get_currency_name)
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))
