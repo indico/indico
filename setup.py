@@ -473,7 +473,6 @@ if __name__ == '__main__':
             Collaboration = MaKaC.plugins.Collaboration
             EPayment = MaKaC.plugins.EPayment
             livesync = indico.ext.livesync
-            importer = indico.ext.importer
 
             [indico.ext]
 
