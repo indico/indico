@@ -1,6 +1,15 @@
 <h1>{% trans %}Plugins{% endtrans %}</h1>
-<ul>
+<div class="plugins-list">
     {% for plugin in active_plugins | sort(attribute='title') %}
-        <li><a href="{{ url_for('.details', plugin=plugin.name) }}">{{ plugin.title }}</a></li>
+        <a class="plugin" href="{{ url_for('.details', plugin=plugin.name) }}" title="Settings for {{ plugin.title }}">
+            <div class="plugin-content">
+                <span class="plugin-icon"><i class="icon-powercord"></i></span>
+                <span class="plugin-title">{{ plugin.title }}</span>
+                <div class="plugin-bottom-bar">
+                    <span class="plugin-version">v{{ plugin.version }}</span>
+                    <span class="plugin-settings"><i class="icon-settings"></i></span>
+                </div>
+            </div>
+        </a>
     {% endfor %}
-</ul>
+</div>
