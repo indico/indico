@@ -30,6 +30,7 @@ DEFAULT_OPTIONS = {
     },
 
     'compile_catalog': {
+        'domain': 'messages',
         'directory': TRANSLATIONS_DIR
     },
 
