@@ -28,6 +28,8 @@ import time
 from operator import itemgetter
 from getpass import getpass
 
+from colorclass import Color
+
 from indico.util.string import is_valid_mail
 
 
@@ -113,7 +115,8 @@ def verbose_iterator(iterable, total, get_id, get_title):
             text = fmt.format(i, total, (i / total * 100.0), remaining, get_id(item), title)
             print('\r', ' ' * term_width, end='', sep='')
             # terminal width + ansi control code length - trailing reset code (4)
-            print('\r', text[:term_width + len(text) - len(strip_ansi(text)) - 4], cformat('%{reset}'), end='', sep='')
+            print('\r', text[:term_width + len(text.value_colors) - len(text.value_no_colors) - 4], cformat('%{reset}'),
+                  end='', sep='')
             sys.stdout.flush()
 
         yield item
@@ -160,9 +163,9 @@ except ImportError:
 
 
 def _cformat_sub(m):
-    bg = 'on_{}'.format(m.group('bg')) if m.group('bg') else None
+    bg = u'on_{}'.format(m.group('bg')) if m.group('bg') else None
     attrs = ['bold'] if m.group('fg_bold') else None
-    return colored('', m.group('fg'), bg, attrs=attrs)[:-4]
+    return colored(u'', m.group('fg'), bg, attrs=attrs)[:-4]
 
 
 def cformat(string):
@@ -170,12 +173,12 @@ def cformat(string):
 
     Bold foreground can be achieved by suffixing the color with a '!'
     """
-    reset = colored('')
-    string = string.replace('%{reset}', reset)
-    string = re.sub(r'%\{(?P<fg>[a-z]+)(?P<fg_bold>!?)(?:,(?P<bg>[a-z]+))?}', _cformat_sub, string)
+    reset = colored(u'')
+    string = string.replace(u'%{reset}', reset)
+    string = re.sub(ur'%\{(?P<fg>[a-z]+)(?P<fg_bold>!?)(?:,(?P<bg>[a-z]+))?}', _cformat_sub, string)
     if not string.endswith(reset):
         string += reset
-    return string
+    return Color(string)
 
 
 # Error/warning/info message util methods
