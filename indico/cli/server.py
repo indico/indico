@@ -28,6 +28,7 @@ from flask import current_app
 from flask_script import Command, Option
 from werkzeug.debug import DebuggedApplication
 from werkzeug.exceptions import NotFound
+from werkzeug.serving import WSGIRequestHandler
 from werkzeug.wsgi import DispatcherMiddleware, SharedDataMiddleware
 
 from indico.core.config import Config
@@ -64,7 +65,9 @@ class IndicoDevServer(Command):
             Option('--enable-evalex', action='store_true',
                    help="enable the werkzeug debugger's python shell in tracebacks and via /console)"),
             Option('--evalex-from', action='append', metavar='IP',
-                   help="restricts the evalex shell to the given ips (can be used multiple times)")
+                   help="restricts the evalex shell to the given ips (can be used multiple times)"),
+            Option('--quiet', action='store_true',
+                   help="don't log successful requests for common static files")
         )
 
     def run(self, **args):
@@ -75,7 +78,7 @@ class IndicoDevServer(Command):
         start_web_server(app, host=args['host'], port=args['port'], keep_base_url=args['keep_base_url'],
                          with_ssl=args['with_ssl'], ssl_cert=args['ssl_cert'], ssl_key=args['ssl_key'],
                          enable_evalex=args['enable_evalex'], evalex_from=args['evalex_from'],
-                         reload_on_change=not args['disable_reloader'])
+                         reload_on_change=not args['disable_reloader'], quiet=args['quiet'])
 
 
 def make_indico_dispatcher(wsgi_app):
@@ -115,9 +118,20 @@ class DebuggedIndico(DebuggedApplication):
         return super(DebuggedIndico, self).__call__(environ, start_response)
 
 
+class QuietWSGIRequestHandler(WSGIRequestHandler):
+    INDICO_URL_PREFIX = ''  # set from outside based on BaseURL
+    IGNORED_PATH_PREFIXES = {'/vars.js', '/js/', '/css/', '/static/', '/images/'}
+
+    def log_request(self, code='-', size='-'):
+        if code not in (304, 200):
+            super(QuietWSGIRequestHandler, self).log_request(code, size)
+        elif not any(self.path.startswith(self.INDICO_URL_PREFIX + x) for x in self.IGNORED_PATH_PREFIXES):
+            super(QuietWSGIRequestHandler, self).log_request(code, size)
+
+
 class WerkzeugServer(object):
     def __init__(self, app, host='localhost', port=8000, enable_ssl=False, ssl_key=None, ssl_cert=None,
-                 reload_on_change=False, use_debugger=True, evalex_whitelist=None):
+                 reload_on_change=False, use_debugger=True, evalex_whitelist=None, quiet=False):
         """
         Run an Indico server based on the Werkzeug server
         """
@@ -135,6 +149,7 @@ class WerkzeugServer(object):
         self.reload_on_change = reload_on_change
         self.use_debugger = use_debugger
         self.evalex_whitelist = evalex_whitelist
+        self.quiet = quiet
 
         logger = logging.getLogger('werkzeug')
         logger.setLevel(logging.DEBUG)
@@ -161,6 +176,7 @@ class WerkzeugServer(object):
         if self.use_debugger:
             app = DebuggedIndico(app, self.evalex_whitelist)
         self._server = werkzeug.serving.make_server(self.host, self.port, app, threaded=True,
+                                                    request_handler=QuietWSGIRequestHandler if self.quiet else None,
                                                     ssl_context=self.ssl_context)
         self.addr = self._server.socket.getsockname()[:2]
         return self._server
@@ -258,7 +274,7 @@ def setup_logging(level):
 
 
 def start_web_server(app, host='localhost', port=0, with_ssl=False, keep_base_url=True, ssl_cert=None, ssl_key=None,
-                     reload_on_change=False, enable_evalex=False, evalex_from=None):
+                     reload_on_change=False, enable_evalex=False, evalex_from=None, quiet=False):
     config = Config.getInstance()
     # Let Indico know that we are using the embedded server. This causes it to re-raise exceptions so they
     # end up in the Werkzeug debugger.
@@ -337,7 +353,8 @@ def start_web_server(app, host='localhost', port=0, with_ssl=False, keep_base_ur
     app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
         '/htmlcov': os.path.join(app.root_path, '..', 'htmlcov')
     }, cache=False)
+    QuietWSGIRequestHandler.INDICO_URL_PREFIX = url_data.path.rstrip('/')
     server = WerkzeugServer(app, host, used_port, reload_on_change=reload_on_change, evalex_whitelist=evalex_whitelist,
-                            enable_ssl=with_ssl, ssl_cert=ssl_cert, ssl_key=ssl_key)
+                            enable_ssl=with_ssl, ssl_cert=ssl_cert, ssl_key=ssl_key, quiet=quiet)
     signal.signal(signal.SIGINT, _sigint)
     server.run()
