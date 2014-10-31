@@ -52,7 +52,26 @@ class vars(object):
     htdocsDir = None
 
 
-###  Methods required by setup() ##############################################
+def compile_languages(cmd):
+    """
+    Compile all language files
+    Needed to generate binary distro
+    """
+    from babel.messages import frontend
+    from indico.util.setup import compile_catalog_js
+
+    compile_cmd = frontend.compile_catalog(cmd.distribution)
+    compile_js_cmd = compile_catalog_js(cmd.distribution)
+
+    cmd.distribution._set_command_options(compile_cmd)
+    cmd.distribution._set_command_options(compile_js_cmd)
+
+    compile_cmd.finalize_options()
+    compile_js_cmd.finalize_options()
+
+    compile_cmd.run()
+    compile_js_cmd.run()
+
 
 def read_requirements_file(fname):
     with open(fname, 'r') as f:
@@ -110,7 +129,7 @@ class sdist_indico(sdist.sdist):
 def _bdist_indico(dataFiles):
     class bdist_indico(bdist.bdist):
         def run(self):
-            compileAllLanguages(self)
+            compile_languages(self)
             bdist.bdist.run(self)
 
     bdist_indico.dataFiles = dataFiles
@@ -120,7 +139,7 @@ def _bdist_indico(dataFiles):
 def _bdist_egg_indico(dataFiles):
     class bdist_egg_indico(bdist_egg.bdist_egg):
         def run(self):
-            compileAllLanguages(self)
+            compile_languages(self)
             bdist_egg.bdist_egg.run(self)
 
     bdist_egg_indico.dataFiles = dataFiles
@@ -229,7 +248,7 @@ Please specify the directory where you'd like it to be placed.
         _updateMaKaCEggCache(os.path.join(os.path.dirname(__file__), 'indico', 'MaKaC', '__init__.py'),
                              directories['tmp'])
 
-        compileAllLanguages(self)
+        compile_languages(self)
         print '''
 %s
         ''' % _databaseText('etc')

@@ -3,13 +3,12 @@ import re
 
 from functools import wraps
 from distutils.dist import Distribution
-from distutils.cmd import Command as distutils_Command
 from pkgutil import walk_packages
 
 from flask_script import Manager, Command, Option
 from babel.messages import frontend
-from pojson import convert
 
+from indico.util.setup import compile_catalog_js
 
 IndicoI18nManager = Manager(usage="Takes care of i18n-related operations")
 
@@ -98,37 +97,6 @@ def wrap_distutils_command(command_class):
         command.run()
 
     return _wrapper
-
-
-class compile_catalog_js(distutils_Command):
-    """
-    Translates *.po files to a JSON dict, with a little help from pojson
-    """
-
-    description = "generates JSON from po"
-    user_options = [('input-dir=', None, 'input dir'),
-                    ('output-dir=', None, 'output dir'),
-                    ('domain=', None, 'domain')]
-    boolean_options = []
-
-    def initialize_options(self):
-        self.input_dir = None
-        self.output_dir = None
-        self.domain = None
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        locale_dirs = [name for name in os.listdir(self.input_dir) if os.path.isdir(os.path.join(self.input_dir, name))]
-
-        for locale in locale_dirs:
-            result = convert(os.path.join(
-                self.input_dir, locale, "LC_MESSAGES", 'messages-js.po'), pretty_print=True)
-            fname = os.path.join(self.output_dir, '%s.js' % locale)
-            with open(fname, 'w') as f:
-                f.write((u"var json_locale_data = {0};".format(result)).encode('utf-8'))
-            print 'wrote %s' % fname
 
 
 cmd_list = ['init_catalog', 'extract_messages', 'compile_catalog', 'update_catalog']
