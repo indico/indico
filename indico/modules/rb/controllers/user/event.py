@@ -316,6 +316,7 @@ class RHRoomBookingEventNewBooking(RHRoomBookingEventBase, RHRoomBookingNewBooki
         defaults = RHRoomBookingNewBooking._get_select_room_form_defaults(self)
         for key, value in _get_defaults_from_object(self._assign_to or self.event).iteritems():
             defaults[key] = value
+        self.date_changed = False  # date is not changed but retrieved from defaults
         return defaults
 
     def _make_confirm_form(self, *args, **kwargs):
