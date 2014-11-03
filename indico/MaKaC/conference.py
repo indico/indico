@@ -1372,7 +1372,8 @@ class Category(CommonObjectBase):
 
         self.__ac.setProtection(private)
         self._notify('protectionChanged', oldProtection, private)
-        signals.category_protection_changed.send(self, old=oldProtection, new=private)
+        if oldProtection != private:
+            signals.category_protection_changed.send(self, old=oldProtection, new=private)
 
     def hasProtectedOwner(self):
         return self.__ac._getFatherProtection()
@@ -2642,10 +2643,10 @@ class Conference(CommonObjectBase, Locatable):
             # take care of subcontributions
             for sc in c.getSubContributionList():
                 sc._notify('deleted', c)
-                signals.subcontribution_deleted.send(sc)
+                signals.subcontribution_deleted.send(sc, parent=c)
 
             c._notify('deleted', self)
-            signals.contribution_deleted.send(c)
+            signals.contribution_deleted.send(c, parent=self)
 
     def delete(self, user=None):
         """deletes the conference from the system.
@@ -8118,7 +8119,7 @@ class Contribution(CommonObjectBase, Locatable):
 
         if oldParent != None:
             self._notify('deleted', oldParent)
-            signals.contribution_deleted.send(self)
+            signals.contribution_deleted.send(self, parent=oldParent)
 
             self.setTrack(None)
             for mat in self.getMaterialList():
@@ -10589,7 +10590,7 @@ class SubContribution(CommonObjectBase, Locatable):
     def delete(self):
 
         self._notify('deleted', self.getOwner())
-        signals.subcontribution_deleted.send(self)
+        signals.subcontribution_deleted.send(self, parent=self.getOwner())
 
         while len(self.getSpeakerList()) > 0:
             self.removeSpeaker(self.getSpeakerList()[0])
