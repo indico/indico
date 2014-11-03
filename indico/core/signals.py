@@ -61,6 +61,14 @@ The *sender* is the name of the actual hook. The keyword arguments
 depend on the hook.
 """)
 
+after_process = _signals.signal('after-process', """
+Called after an Indico request has been processed.
+""")
+
+before_retry = _signals.signal('before-retry', """
+Called before an Indico request is being retried.
+""")
+
 indico_help = _signals.signal('indico-help', """
 Expected to return a dict containing entries for the *Indico help* page::
 

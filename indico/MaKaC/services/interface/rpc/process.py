@@ -36,6 +36,7 @@ from MaKaC.services.interface.rpc.common import (CausedError,
                                                  NoReportError as ServiceNoReportError)
 from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
+from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import DBMgr
 from indico.core.logger import Logger
@@ -128,6 +129,7 @@ class ServiceRunner(Observable):
                     if i > 0:
                         # notify components that the request is being retried
                         self._notify('requestRetry', i)
+                        signals.before_retry.send()
 
                     self._invokeMethodRetryBefore()
                     try:
@@ -137,6 +139,7 @@ class ServiceRunner(Observable):
                             raise ConflictError
                         try:
                             result = processRequest(method, copy.deepcopy(params))
+                            signals.after_process.send()
                         except NoReportError as e:
                             raise ServiceNoReportError(e.getMessage())
                         except (NoReportIndicoError, FormValuesError) as e:

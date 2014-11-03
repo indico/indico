@@ -57,6 +57,7 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.errors as errors
 from MaKaC.webinterface.pages.error import WErrorWSGI
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
+from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import DBMgr
 from indico.core.logger import Logger
@@ -565,12 +566,14 @@ class RH(RequestHandlerBase):
                 with retry:
                     if i > 0:
                         self._notify('requestRetry', i)  # notify components about retry
+                        signals.before_retry.send()
 
                     try:
                         Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), request.remote_addr))
                         profile_name, res = self._process_retry(params, i, profile, forced_conflicts)
                         # notify components that the request has finished
                         self._notify('requestFinished')
+                        signals.after_process.send()
                         if i < forced_conflicts:  # raise conflict error if enabled to easily handle conflict error case
                             raise ConflictError
                         transaction.commit()
