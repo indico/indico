@@ -50,14 +50,14 @@ def uniqueId(obj):
 
 
 def uid_to_obj(uid):
-    from MaKaC import conference
+    from MaKaC.conference import ConferenceHolder
 
     m = UID_RE.match(uid)
     if not m:
         return m
     else:
         d = m.groupdict()
-        obj = conference.ConferenceHolder().getById(d['event'])
+        obj = ConferenceHolder().getById(d['event'])
         if 'session' in d:
             obj = obj.getSessionById(d['session'])
         if 'contrib' in d:
@@ -73,7 +73,7 @@ def truncate_path(full_path, inner_chars=30, last_node=True):
         'inner_chars'. Top node is removed and last node can be removed as well.
     """
 
-    if (last_node):
+    if last_node:
         path = full_path[1:]
     else:
         path = full_path[1:-1]
