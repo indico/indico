@@ -17,6 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
+
 from datetime import datetime, date
 from math import ceil
 
@@ -132,7 +134,7 @@ class ReservationOccurrence(db.Model, Serializer):
             if repeat_interval == 1:
                 return rrule.rrule(rrule.DAILY, dtstart=start, until=end)
             else:
-                raise IndicoError('Unsuported interval')
+                raise IndicoError('Unsupported interval')
 
         elif repeat_frequency == RepeatFrequency.WEEK:
             if 0 < repeat_interval < 4:
@@ -142,7 +144,7 @@ class ReservationOccurrence(db.Model, Serializer):
 
         elif repeat_frequency == RepeatFrequency.MONTH:
             if repeat_interval == 1:
-                position = ceil(start.day / 7)
+                position = int(ceil(start.day / 7))
                 if position == 5:
                     # The fifth weekday of the month will always be the last one
                     position = -1
