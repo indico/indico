@@ -30,3 +30,10 @@ def app_context(app):
     """Creates a flask app context"""
     with app.app_context():
         yield app
+
+
+@pytest.yield_fixture
+def request_context(app_context):
+    """Creates a flask request context"""
+    with app_context.test_request_context():
+        yield
