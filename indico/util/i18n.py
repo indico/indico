@@ -23,7 +23,8 @@ from babel.core import Locale
 from babel.support import Translations
 from babel import negotiate_locale
 from flask import session, request, has_request_context, current_app
-from flask_babelex import Babel, lazy_gettext, get_domain
+from flask_babelex import Babel, get_domain
+from speaklater import make_lazy_gettext
 
 from MaKaC.common.info import HelperMaKaCInfo
 from indico.core.db import DBMgr
@@ -32,6 +33,27 @@ from indico.core.db import DBMgr
 RE_TR_FUNCTION = re.compile(r"_\(\"([^\"]*)\"\)|_\('([^']*)'\)", re.DOTALL | re.MULTILINE)
 
 babel = Babel()
+
+
+def gettext_unicode(*args, **kwargs):
+
+    func_name = kwargs.pop('func_name', 'ugettext')
+
+    if not isinstance(args[0], unicode):
+        args = [(text.decode('utf-8') if isinstance(text, str) else text) for text in args]
+        using_unicode = False
+    else:
+        using_unicode = True
+
+    res = getattr(get_domain().get_translations(), func_name)(*args, **kwargs)
+
+    if using_unicode:
+        return res
+    else:
+        return res.encode('utf-8')
+
+
+lazy_gettext = make_lazy_gettext(lambda: gettext_unicode)
 
 
 def smart_func(func_name):
@@ -43,11 +65,11 @@ def smart_func(func_name):
 
         if (has_request_context() and session.lang) or func_name != 'ugettext':
             # straight translation
-            translations = get_domain().get_translations()
-            return getattr(translations, func_name)(*args, **kwargs).encode('utf-8')
+            return gettext_unicode(*args, func_name=func_name, **kwargs)
+
         else:
             # otherwise, defer translation to eval time
-            return lazy_gettext(*args, **kwargs)
+            return lazy_gettext(*args)
     return _wrap
 
 
