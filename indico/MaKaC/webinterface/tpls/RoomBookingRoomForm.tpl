@@ -106,7 +106,7 @@
                 % if errors:
                     <br>
                     <span style="color: Red; margin-left: 6px;">
-                      ${ N_('Saving failed. There is an error', 'Saving failed. There are {0} errors', len(errors)).format(len(errors)) }:
+                      ${ ngettext('Saving failed. There is an error', 'Saving failed. There are {0} errors', len(errors)).format(len(errors)) }:
                     </span>
                     <ul>
                         % for error in errors:

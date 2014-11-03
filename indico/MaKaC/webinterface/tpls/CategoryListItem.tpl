@@ -15,7 +15,7 @@
         % if nconf == 0:
             ${_("empty")}
         % else:
-            ${N_('%s event', '%s events', nconf) % format_number(nconf)}
+            ${ngettext('{} event', '{} events', nconf).format(format_number(nconf))}
         % endif
     </span>
 

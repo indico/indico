@@ -417,7 +417,7 @@ def registerHelpers(objDict):
         from MaKaC.common.fossilize import fossilize
         objDict['fossilize'] = fossilize
     if not 'N_' in objDict:
-        objDict['N_'] = ngettext
+        objDict['ngettext'] = ngettext
     if not 'format_number' in objDict:
         objDict['format_number'] = format_number
     objDict.setdefault('safe_upper', safe_upper)

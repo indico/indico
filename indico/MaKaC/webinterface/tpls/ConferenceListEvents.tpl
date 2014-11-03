@@ -1,6 +1,6 @@
 <%page args="items=None, aw=None, conferenceDisplayURLGen=None"/>
 <%
-    from datetime import timedelta, datetime
+    from datetime import timedelta, date
     from MaKaC.common.timezoneUtils import nowutc
     todayDate = nowutc()
 %>
@@ -20,7 +20,7 @@
                 cls = 'currentMonth'
         %>
         <h4 class="${cls}" id="${'eventList-%d-%d' % (currentYear, currentMonth)}">
-        <span>${ datetime(itemStartDate.year, itemStartDate.month, 1).strftime("%B %Y") }</span></h4>
+        <span>${ format_date(date(itemStartDate.year, itemStartDate.month, 1), 'MMMM yyyy') }</span></h4>
         <ul>
     % endif
     <%include file="ConferenceListItem.tpl" args="aw=aw, lItem=item, conferenceDisplayURLGen=conferenceDisplayURLGen"/>

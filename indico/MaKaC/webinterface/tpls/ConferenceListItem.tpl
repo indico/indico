@@ -17,11 +17,11 @@ if todayDate  >= startDate and todayDate <= endDate:
     happeningNowClass = "today"
 
 if startDate.year != endDate.year:
-    evtDate = "%s - %s" % (startDate.strftime("%d %b %Y"),endDate.strftime("%d %b %Y"))
+    evtDate = "%s - %s" % (format_date(startDate, "dd MMM yyyy"), format_date(endDate, "dd MMM yyyy"))
 elif (startDate.month != endDate.month) or (startDate.day != endDate.day):
-    evtDate = "%s - %s" % (startDate.strftime("%d %b"),endDate.strftime("%d %b"))
+    evtDate = "%s - %s" % (format_date(startDate, "dd MMM"), format_date(endDate, "dd MMM"))
 else:
-    evtDate = "%s"%startDate.strftime("%d %b")
+    evtDate = "%s" % format_date(startDate, "dd MMM")
 
 eventTitle = escape(remove_tags(lItem.getTitle().strip())) or "[no title]"
 
@@ -38,7 +38,7 @@ if lItem.getType() == "simple_event":
         <a href="${ urlHandlers.UHConferenceToiCal.getURL(lItem) }"><img src="${ systemIcon("ical_grey") }" alt="iCal export" /></a>
     </span>
     <span class="listName">
-        <span class="date ${ happeningNowClass }">${ evtDate }<time itemprop="startDate" datetime="${ startDate.strftime("%Y-%m-%d") }" /></span><a href="${ conferenceDisplayURLGen(lItem)}" itemprop="url" ><span itemprop="summary">${ eventTitle }</span></a>
+        <span class="date ${ happeningNowClass }">${ evtDate }<time itemprop="startDate" datetime="${ startDate.isoformat() }" /></span><a href="${ conferenceDisplayURLGen(lItem)}" itemprop="url" ><span itemprop="summary">${ eventTitle }</span></a>
 
           <span class="protected">
             <% prot = getProtection(lItem) %>
