@@ -992,6 +992,7 @@ class Category(CommonObjectBase):
         TrashCanManager().add(self)
 
         self._notify('deleted', oldOwner)
+        signals.category_deleted.send(self)
 
         return
 
@@ -1010,6 +1011,7 @@ class Category(CommonObjectBase):
         catDateAllIdx.indexCateg(self)
 
         self._notify('moved', oldOwner, newOwner)
+        signals.category_moved.send(self, old_parent=oldOwner, new_parent=newOwner)
 
     def getName(self):
         return self.name
@@ -1038,6 +1040,7 @@ class Category(CommonObjectBase):
         self.removeConference(conf)
         toCateg._addConference(conf)
         conf._notify('moved', self, toCateg)
+        signals.event_moved.send(conf, old_parent=self, new_parent=toCateg)
 
     def _addSubCategory(self, newSc):
         #categories can only contain either conferences either other categories
@@ -1077,6 +1080,7 @@ class Category(CommonObjectBase):
 
         Catalog.getIdx('categ_conf_sd').add_category(sc.getId())
         sc._notify('created', self)
+        signals.category_created.send(sc, parent=self)
 
         self._addSubCategory(sc)
         sc.setOrder(self.getSubCategoryList()[-1].getOrder() + 1)
@@ -1134,6 +1138,7 @@ class Category(CommonObjectBase):
         conf.linkCreator()
 
         conf._notify('created', self)
+        signals.event_created.send(conf, parent=self)
 
         return conf
 
@@ -2630,8 +2635,10 @@ class Conference(CommonObjectBase, Locatable):
             # take care of subcontributions
             for sc in c.getSubContributionList():
                 sc._notify('deleted', c)
+                signals.subcontribution_deleted.send(sc)
 
             c._notify('deleted', self)
+            signals.contribution_deleted.send(c)
 
     def delete(self, user=None):
         """deletes the conference from the system.
@@ -3430,6 +3437,7 @@ class Conference(CommonObjectBase, Locatable):
             self.addContribSubmitter(newContrib,sub)
 
         newContrib._notify('created', self)
+        signals.contribution_created.send(newContrib, parent=self)
         self.notifyModification()
 
     def hasContribution(self,contrib):
@@ -7128,6 +7136,7 @@ class SessionSlot(Persistent, Observable, Fossilizable, Locatable):
 
     def delete(self):
         self._notify('deleted', self)
+        signals.session_slot_deleted.send(self)
         self.getSchedule().clear()
         if self.getSession() is not None:
             self.getSession().removeSlot(self)
@@ -8099,6 +8108,7 @@ class Contribution(CommonObjectBase, Locatable):
 
         if oldParent != None:
             self._notify('deleted', oldParent)
+            signals.contribution_deleted.send(self)
 
             self.setTrack(None)
             for mat in self.getMaterialList():
@@ -9101,6 +9111,7 @@ class Contribution(CommonObjectBase, Locatable):
         newSub = SubContribution()
         self.addSubContribution(newSub)
         newSub._notify('created', self)
+        signals.subcontribution_created.send(newSub, parent=self)
         return newSub
 
     def addSubContribution( self, newSubCont ):
@@ -10561,6 +10572,7 @@ class SubContribution(CommonObjectBase, Locatable):
     def delete(self):
 
         self._notify('deleted', self.getOwner())
+        signals.subcontribution_deleted.send(self)
 
         while len(self.getSpeakerList()) > 0:
             self.removeSpeaker(self.getSpeakerList()[0])

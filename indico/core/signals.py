@@ -149,6 +149,38 @@ Depending on the code performing the change, sometimes separate `start_date` and
 triggered.
 """)
 
+event_moved = _signals.signal('event-moved', """
+Called when an event is moved to a different category. The `sender` is the event,
+the old/new categories are passed using the `old_parent` and `new_parent` kwargs.
+""")
+
+event_created = _signals.signal('event-created', """
+Called when a new event is created. The `sender` is the new event, its
+parent category is passed in the `parent` kwarg.
+""")
+
+session_slot_deleted = _signals.signal('session-slot-deleted', """
+Called when a session slot is deleted. The *sender* is the session slot.
+""")
+
+contribution_created = _signals.signal('contribution-created', """
+Called when a new contribution is created. The `sender` is the new contribution,
+its parent category is passed in the `parent` kwarg.
+""")
+
+contribution_deleted = _signals.signal('contribution-deleted', """
+Called when a contribution is deleted. The *sender* is the contribution.
+""")
+
+subcontribution_created = _signals.signal('subcontribution-created', """
+Called when a new subcontribution is created. The `sender` is the new subcontribution,
+its parent category is passed in the `parent` kwarg.
+""")
+
+subcontribution_deleted = _signals.signal('subcontribution-deleted', """
+Called when a subcontribution is deleted. The *sender* is the subcontribution.
+""")
+
 material_downloaded = _signals.signal('material-downloaded', """
 Notifies a file being downloaded. The *sender* is the event and the downloaded
 file is passed in the *resource* kwarg.
@@ -157,4 +189,18 @@ file is passed in the *resource* kwarg.
 timetable_buttons = _signals.signal('timetable-buttons', """
 Expected to return a list of tuples ('button_name', 'js_call_name').
 Called when building the timetable view.
+""")
+
+category_moved = _signals.signal('category-moved', """
+Called when the parent of a category is changed. The `sender` is the category,
+the old/new parents are passed using the `old_parent` and `new_parent` kwargs.
+""")
+
+category_created = _signals.signal('category-created', """
+Called when a new category is created. The `sender` is the new category, its
+parent category is passed in the `parent` kwarg.
+""")
+
+category_deleted = _signals.signal('category-deleted', """
+Called when a category is deleted. The *sender* is the category.
 """)
