@@ -385,9 +385,6 @@ class Category(CommonObjectBase):
         path = '/'.join(self.getCategoryPathTitles()[:-1])
         return '<Category({0}, {1}, {2})>'.format(self.getId(), self.getName(), path)
 
-    def __str__(self):
-        return "<Category %s@%s>" % (self.getId(), hex(id(self)))
-
     def getAccessController(self):
         return self.__ac
 
@@ -2128,9 +2125,6 @@ class Conference(CommonObjectBase, Locatable):
 
     def __repr__(self):
         return '<Conference({0}, {1}, {2})'.format(self.getId(), self.getTitle(), self.getStartDate())
-
-    def __str__(self):
-        return "<Conference %s@%s>" % (self.getId(), hex(id(self)))
 
     @staticmethod
     def _cmpByDate(self, toCmp):
