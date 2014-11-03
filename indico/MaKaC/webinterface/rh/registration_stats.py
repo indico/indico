@@ -22,12 +22,9 @@ from itertools import groupby
 from operator import methodcaller
 
 from indico.util.date_time import now_utc
-from indico.util.i18n import get_current_locale
-from MaKaC.i18n import _
+from indico.util.i18n import _, get_current_locale
 from MaKaC.webinterface.pages.registrants import WPRegistrationStats
 from MaKaC.webinterface.rh.registrationFormModif import RHRegistrationFormModifBase
-
-__all__ = ["OverviewStats", "AccommodationStats", "SessionStats", "SocialEventsStats"]
 
 
 class RHRegistrationStats(RHRegistrationFormModifBase):
@@ -54,7 +51,7 @@ class StatsBase(object):
         rendering. It should be a template extending
         `events/registration/_stats_box.html`.
 
-        :param conf: Confernece -- the conference object
+        :param conf: Conference -- the conference object
         :param title: str -- the title for the stats box
         :param headline: str -- the headline for the stats box
         :param template: str -- the Jinja template to render the stats box
@@ -93,8 +90,7 @@ class StatsBase(object):
 
         :returns: str -- the currency abbreviation
         """
-        return (self._conf.getRegistrationForm().getCurrency() if self._conf.getRegistrationForm().getCurrency()
-                else 'CHF')
+        return self._conf.getRegistrationForm().getCurrency() or 'CHF'
 
 
 class Cell(namedtuple('Cell', ['type', 'colspan', 'classes', 'qtip', 'data'])):
@@ -245,6 +241,7 @@ class TableStats(object):
             data[self._get_name_id_from_key(key)].append(item)
         for key, item in not_billed_items.iteritems():
             data[self._get_name_id_from_alt_key(key)].append(item)
+
         return data, bool(billed_items)
 
     def get_table(self):
@@ -258,7 +255,7 @@ class TableStats(object):
         If an item has a single aggregation if will have a single row as a main
         row.
 
-        :returns: dict -- A table with a list of head cells (key: `'head'`) and
+        :return: dict -- A table with a list of head cells (key: `'head'`) and
                   a list of rows (key: `'rows'`) where each row is a list of
                   cells.
         """
@@ -297,7 +294,7 @@ class TableStats(object):
 
         :returns: bool -- `True` if the item is billable, false otherwise
         """
-        return item.isBillable() and float(item.getPrice())
+        return item.isBillable() and float(item.getPrice()) > 0
 
     def _get_billing(self, item_details):
         """
@@ -370,7 +367,7 @@ class TableStats(object):
 
         Must be overridden by children accordingly based on items and reg items.
         """
-        raise NotImplementedError('The method _item_from_ritem should be implemented by the subclass.')
+        raise NotImplementedError
 
     def _key_fn(self, item):
         """
@@ -383,7 +380,7 @@ class TableStats(object):
         :param item: the item from which to derive a key.
         :returns: tuple -- tuple to be used as a key to sort and group items by.
         """
-        raise NotImplementedError('The method _key_fn should be implemented by the subclass.')
+        raise NotImplementedError
 
     def _alt_key_fn(self, item):
         """
@@ -396,7 +393,7 @@ class TableStats(object):
         :param item: the item from which to derive a key.
         :returns: tuple -- tuple to be used as a key to sort and group items by.
         """
-        raise NotImplementedError('The method _alt_key_fn should be implemented by the subclass.')
+        raise NotImplementedError
 
     def _billed_data_from_ritems(self, key, ritems):
         """
@@ -406,7 +403,7 @@ class TableStats(object):
         :param ritems: list -- list of reg items to be aggregated
         :returns: DataItem -- the aggregation of the `ritems`
         """
-        raise NotImplementedError('The method _billed_data_from_ritems should be implemented by the subclass.')
+        raise NotImplementedError
 
     def _not_billed_data_from_ritems(self, key, ritems):
         """
@@ -416,7 +413,7 @@ class TableStats(object):
         :param ritems: list -- list of reg items to be aggregated
         :returns: DataItem -- the aggregation of the `ritems`
         """
-        raise NotImplementedError('The method _not_billed_data_from_ritems should be implemented by the subclass.')
+        raise NotImplementedError
 
     def _billed_data_from_item(self, item):
         """
@@ -426,7 +423,7 @@ class TableStats(object):
         :param item: list -- item to be aggregated
         :returns: DataItem -- the aggregation of the `item`
         """
-        raise NotImplementedError('The method _billed_data_from_items should be implemented by the subclass.')
+        raise NotImplementedError
 
     def _not_billed_data_from_item(self, item):
         """
@@ -436,7 +433,7 @@ class TableStats(object):
         :param item: list -- item to be aggregated
         :returns: DataItem -- the aggregation of the `item`
         """
-        raise NotImplementedError('The method _not_billed_data_from_items should be implemented by the subclass.')
+        raise NotImplementedError
 
     def _get_name_id_from_key(self, key):
         """
@@ -446,7 +443,7 @@ class TableStats(object):
 
         :returns: (name, id) -- a tuple containing the name and id of item
         """
-        raise NotImplementedError('The method _get_name_id_from_key should be implemented by the subclass.')
+        raise NotImplementedError
 
     def _get_name_id_from_alt_key(self, key):
         """
@@ -456,7 +453,7 @@ class TableStats(object):
 
         :returns: (name, id) -- a tuple containing the name and id of item
         """
-        raise NotImplementedError('The method _get_name_id_from_alt_key should be implemented by the subclass.')
+        raise NotImplementedError
 
     def _get_table_head(self):
         """
@@ -464,7 +461,7 @@ class TableStats(object):
 
         :returns: [Cell] -- the headers of the table.
         """
-        raise NotImplementedError('The method _get_table_head should be implemented by the subclass.')
+        raise NotImplementedError
 
     def _cancel_reason_from_item(self, details):
         """
@@ -481,7 +478,7 @@ class TableStats(object):
         :returns: str -- a cancel reason if an item has the `cancelled` flag
                          set, `None` otherwise.
         """
-        raise NotImplementedError('The method _cancel_reason_from_item should be implemented by the subclass.')
+        raise NotImplementedError
 
     def _get_main_row(self, item_details, item_name, num_regs, cancel_reason):
         """
@@ -498,7 +495,7 @@ class TableStats(object):
 
         :returns: [Cell] -- the list of cells constituting the row.
         """
-        raise NotImplementedError('The method _get_main_row should be implemented by the subclass.')
+        raise NotImplementedError
 
     def _get_sub_row(self, details, num_regs):
         """
@@ -512,7 +509,7 @@ class TableStats(object):
 
         :returns: [Cell] -- the list of cells constituting the row.
         """
-        raise NotImplementedError('The method _get_sub_row should be implemented by the subclass.')
+        raise NotImplementedError
 
 
 class OverviewStats(StatsBase):
@@ -538,9 +535,9 @@ class OverviewStats(StatsBase):
         locale = get_current_locale()
         countries = defaultdict(int)
         for country_code, regs in groupby(self.registrants_sorted, methodcaller('getCountry')):
-            country = locale.territories.get(country_code, 'to_delete')
+            country = locale.territories.get(country_code)
             countries[country] += sum(1 for x in regs)
-        others = [countries.pop('to_delete', 0), _("Others")]
+        others = [countries.pop(None, 0), _("Others")]
         if not countries:  # no country data for any registrants
             return [], 0
         num_countries = len(countries)

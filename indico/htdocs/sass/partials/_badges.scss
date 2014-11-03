@@ -11,6 +11,11 @@
     margin-bottom: 0.8em;
 }
 
+%i-badge-elem {
+    display: block;
+    margin: 0 auto;
+}
+
 .i-badge {
     @include border-radius();
     display: inline-block;
@@ -27,15 +32,15 @@
     text-align: center;
     color: $light-gray;
     background-color: $dark-blue;
-    & > [class^="i-badge-"] {
-        display: block;
-        margin: 0 auto;
-    }
     & > .i-badge-value {
+        @extend %i-badge-elem;
+
         font-size: 3.6em;
         font-weight: bold;
     }
     & > .i-badge-legend {
+        @extend %i-badge-elem;
+
         font-size: 1em;
     }
 }

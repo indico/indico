@@ -5481,7 +5481,8 @@ class Accommodation(Persistent):
             self._accommodationType = at
 
     def getCaption(self):
-        return self.getAccommodationType().getCaption() if self.getAccommodationType() is not None else ''
+        acc_type = self.getAccommodationType()
+        return acc_type.getCaption() if acc_type is not None else ''
 
     def getId(self):
         return self.getAccommodationType().getId() if self.getAccommodationType() is not None else ''

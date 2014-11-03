@@ -17,28 +17,28 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import timedelta
 import math
 import string
+from datetime import timedelta
+from xml.sax.saxutils import escape, quoteattr
+
+from flask import render_template
+
+import MaKaC.webinterface.pages.registrationForm as registrationForm
+import MaKaC.webinterface.urlHandlers as urlHandlers
+from indico.core.config import Config
+from indico.util.date_time import format_datetime
+from indico.util.i18n import i18nformat
+from indico.web.flask.util import url_for
 
 from MaKaC import registration
-import MaKaC.common.filters as filters
+from MaKaC.common import filters
 from MaKaC.i18n import _
 from MaKaC.webinterface import wcomponents
 from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.webinterface.common.registrantNotificator import EmailNotificator
-from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
-import MaKaC.webinterface.pages.registrationForm as registrationForm
-import MaKaC.webinterface.urlHandlers as urlHandlers
-from flask import render_template
-from conferences import WConfModifBadgePDFOptions
-from indico.core.config import Config
-from indico.util. date_time import format_datetime
-from indico.util.i18n import i18nformat
-from indico.web.flask.util import url_for
-from xml.sax.saxutils import escape
-from xml.sax.saxutils import quoteattr
+from MaKaC.webinterface.pages.conferences import (WConfDisplayBodyBase, WConfModifBadgePDFOptions,
+                                                  WPConferenceDefaultDisplayBase, WPConferenceModifBase)
 
 
 # ----------------- MANAGEMENT AREA ---------------------------
