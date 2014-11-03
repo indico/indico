@@ -240,7 +240,7 @@ class ScheduleEditContributionBase(ScheduleOperation, LocationSetter):
 
 
     def _performOperation(self):
-        self._contribution.setTitle(self._title, notify = False)
+        self._contribution.setTitle(self._title)
 
         self._contribution.setKeywords('\n'.join(self._keywords))
 

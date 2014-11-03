@@ -17,17 +17,17 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import ZODB
+
 import itertools
 from persistent import Persistent
 from functools import wraps
 
+from indico.core import signals
 from indico.core.db import DBMgr
 from MaKaC.common import info
 import MaKaC
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.plugins import Observable
-from indico.core.logger import Logger
 
 def isFullyAccess(level):
     def wrap(func):
@@ -122,17 +122,14 @@ class AccessController( Persistent, Observable ):
                 if o is not None and o.isProtected():
                     return 1
             return 0
-
-            #return self._fatherProtection
-        except:
-            #Logger.get('accessController').exception('_getFatherProtection')
+        except Exception:
             self._fatherProtection = 0
             return 0
 
     def isHidden( self ):
         try:
             return self._hideFromUnauthorizedUsers
-        except:
+        except AttributeError:
             self._hideFromUnauthorizedUsers = 0
             return 0
 
@@ -169,6 +166,7 @@ class AccessController( Persistent, Observable ):
             self.allowed.append( principal )
             self._p_changed = 1
         self._notify('accessGranted', principal)
+        signals.access_granted.send(self, principal=principal)
 
     def getAccessEmail(self):
         try:
@@ -181,11 +179,13 @@ class AccessController( Persistent, Observable ):
         if not email in self.getAccessEmail():
             self.getAccessEmail().append(email)
         self._notify('accessGranted', email)
+        signals.access_granted.send(self, principal=email)
 
     def revokeAccessEmail(self, email):
         if email in self.getAccessEmail.keys():
             self.getAccessEmail().remove(email)
         self._notify('accessRevoked', email)
+        signals.access_revoked.send(self, principal=email)
 
     def revokeAccess( self, principal ):
         """revokes read access for the related resource to the specified
@@ -200,6 +200,7 @@ class AccessController( Persistent, Observable ):
             self.allowed.remove( principal )
             self._p_changed = 1
         self._notify('accessRevoked', principal)
+        signals.access_revoked.send(self, principal=principal)
 
     def setAccessKey( self, key="" ):
         self.accessKey = key
@@ -274,6 +275,7 @@ class AccessController( Persistent, Observable ):
             self.getModificationEmail().append(email)
             self._p_changed = 1
             self._notify('modificationGranted', email)
+            signals.modification_granted.send(self, principal=email)
             return True
         return False
 
@@ -282,6 +284,7 @@ class AccessController( Persistent, Observable ):
             self.getModificationEmail().remove(email)
             self._p_changed = 1
         self._notify('modificationRevoked', email)
+        signals.modification_revoked.send(self, principal=email)
 
     def grantModification( self, principal ):
         """grants modification access for the related resource to the specified
@@ -291,6 +294,7 @@ class AccessController( Persistent, Observable ):
             self.managers.append( principal )
             self._p_changed = 1
         self._notify('modificationGranted', principal)
+        signals.modification_granted.send(self, principal=principal)
 
     def revokeModification( self, principal ):
         """revokes modification access for the related resource to the
@@ -299,6 +303,7 @@ class AccessController( Persistent, Observable ):
             self.managers.remove( principal )
             self._p_changed = 1
         self._notify('modificationRevoked', principal)
+        signals.modification_revoked.send(self, principal=principal)
 
     def canModify( self, user ):
         """tells whether the specified user has modification privileges"""

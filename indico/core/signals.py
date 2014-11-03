@@ -143,6 +143,9 @@ and the following kwargs are available:
 If the `dates` changed, both `old` and `new` are ``(start_date, end_date)`` tuples.
 If the `location` changed, both `old` and `new` are dicts containing `location`, `address` and `room`.
 
+`attr` may be ``None`` in cases where it's not known which data has been changed.
+In that case, both `old` and `new` are ``None``, too.
+
 If your plugin reacts to date changes, always make sure to handle all three types.
 Depending on the code performing the change, sometimes separate `start_date` and
 `end_date` changes are triggered while in other cases a single `dates` change is
@@ -159,6 +162,11 @@ Called when a new event is created. The `sender` is the new event, its
 parent category is passed in the `parent` kwarg.
 """)
 
+event_protection_changed = _signals.signal('event-protection-changed', """
+Called when the protection mode of the event changed. The `sender` is the event,
+`old`/`new` contain the corresponding values.
+""")
+
 session_slot_deleted = _signals.signal('session-slot-deleted', """
 Called when a session slot is deleted. The *sender* is the session slot.
 """)
@@ -172,6 +180,20 @@ contribution_deleted = _signals.signal('contribution-deleted', """
 Called when a contribution is deleted. The *sender* is the contribution.
 """)
 
+contribution_title_changed = _signals.signal('contribution-title-changed', """
+Called when the title of a contribution is changed. The `sender` is the contribution,
+the old/new titles are passed in the `old` and `new` kwargs.
+""")
+
+contribution_data_changed = _signals.signal('contribution-data-changed', """
+Called when some data of the contribution changed. The `sender` is the contribution.
+""")
+
+contribution_protection_changed = _signals.signal('contribution-protection-changed', """
+Called when the protection mode of the contribution changed. The `sender` is the contribution,
+`old`/`new` contain the corresponding values.
+""")
+
 subcontribution_created = _signals.signal('subcontribution-created', """
 Called when a new subcontribution is created. The `sender` is the new subcontribution,
 its parent category is passed in the `parent` kwarg.
@@ -179,6 +201,15 @@ its parent category is passed in the `parent` kwarg.
 
 subcontribution_deleted = _signals.signal('subcontribution-deleted', """
 Called when a subcontribution is deleted. The *sender* is the subcontribution.
+""")
+
+subcontribution_title_changed = _signals.signal('subcontribution-title-changed', """
+Called when the title of a subcontribution is changed. The `sender` is the subcontribution,
+the old/new titles are passed in the `old` and `new` kwargs.
+""")
+
+subcontribution_data_changed = _signals.signal('subcontribution-data-changed', """
+Called when some data of the subcontribution changed. The `sender` is the subcontribution.
 """)
 
 material_downloaded = _signals.signal('material-downloaded', """
@@ -202,5 +233,59 @@ parent category is passed in the `parent` kwarg.
 """)
 
 category_deleted = _signals.signal('category-deleted', """
-Called when a category is deleted. The *sender* is the category.
+Called when a category is deleted. The `sender` is the category.
+""")
+
+category_title_changed = _signals.signal('category-title-changed', """
+Called when the title of a category is changed. The `sender` is the category,
+the old/new titles are passed in the `old` and `new` kwargs.
+""")
+
+category_data_changed = _signals.signal('category-data-changed', """
+Called when some data of the category changed. The `sender` is the category.
+""")
+
+category_protection_changed = _signals.signal('category-protection-changed', """
+Called when the protection mode of the category changed. The `sender` is the category,
+`old`/`new` contain the corresponding values.
+""")
+
+access_granted = _signals.signal('access-granted', """
+Called when a principal in an `AccessController` is granted access. The `sender`
+is the `AccessController`; the `principal` is passed as a kwarg.
+""")
+
+access_revoked = _signals.signal('access-revoked', """
+Called when a principal in an `AccessController` is revoked access. The `sender`
+is the `AccessController`; the `principal` is passed as a kwarg.
+""")
+
+modification_granted = _signals.signal('modification-granted', """
+Called when a principal in an `AccessController` is granted modification access. The `sender`
+is the `AccessController`; the `principal` is passed as a kwarg.
+""")
+
+modification_revoked = _signals.signal('modification-revoked', """
+Called when a principal in an `AccessController` is revoked modification access. The `sender`
+is the `AccessController`; the `principal` is passed as a kwarg.
+""")
+
+category_domain_access_granted = _signals.signal('category-domain-access-granted', """
+Called when an IP restriction is added to a category. The `sender` is the category class,
+the `domain` is that domain that has been added.
+""")
+
+category_domain_access_revoked = _signals.signal('category-domain-access-revoked', """
+Called when an IP restriction is removed from a category. The `sender` is the category class,
+the `domain` is that domain that has been removed.
+""")
+
+event_domain_access_granted = _signals.signal('event-domain-access-granted', """
+Called when an IP restriction is added to an event. The `sender` is the event class,
+the `domain` is that domain that has been added.
+""")
+
+event_domain_access_revoked = _signals.signal('event-domain-access-revoked', """
+Called when an IP restriction is removed from an event. The `sender` is the event class,
+the `domain` is that domain that has been removed.
 """)

@@ -1026,6 +1026,7 @@ class Category(CommonObjectBase):
         nameIdx.index(self)
 
         self._notify('categoryTitleChanged', oldName, newName)
+        signals.category_title_changed.send(self, old=oldName, new=newName)
 
     def getDescription(self):
         return self.description
@@ -1371,6 +1372,7 @@ class Category(CommonObjectBase):
 
         self.__ac.setProtection(private)
         self._notify('protectionChanged', oldProtection, private)
+        signals.category_protection_changed.send(self, old=oldProtection, new=private)
 
     def hasProtectedOwner(self):
         return self.__ac._getFatherProtection()
@@ -1468,10 +1470,13 @@ class Category(CommonObjectBase):
     def requireDomain(self, dom):
         self.__ac.requireDomain(dom)
         self._notify('accessDomainAdded', dom)
+        signals.category_domain_access_granted.send(self, domain=dom)
 
     def freeDomain(self, dom):
         self.__ac.freeDomain(dom)
         self._notify('accessDomainRemoved', dom)
+        signals.category_domain_access_revoked.send(self, domain=dom)
+
 
     def getDomainList(self):
         return self.__ac.getRequiredDomainList()
@@ -1489,6 +1494,7 @@ class Category(CommonObjectBase):
         """
         if raiseEvent:
             self._notify('infoChanged')
+            signals.category_data_changed.send(self)
         self._p_changed = 1
 
 
@@ -2533,6 +2539,7 @@ class Conference(CommonObjectBase, Locatable):
 
         if raiseEvent:
             self._notify('infoChanged')
+            signals.event_data_changed.send(self, attr=None, old=None, new=None)
 
         self.cleanCache()
         self._p_changed=1
@@ -3653,10 +3660,12 @@ class Conference(CommonObjectBase, Locatable):
     def requireDomain(self, dom):
         self.__ac.requireDomain(dom)
         self._notify('accessDomainAdded', dom)
+        signals.event_domain_access_granted.send(self, domain=dom)
 
     def freeDomain(self, dom):
         self.__ac.freeDomain(dom)
         self._notify('accessDomainRemoved', dom)
+        signals.event_domain_access_revoked.send(self, domain=dom)
 
     def getDomainList(self):
         return self.__ac.getRequiredDomainList()
@@ -3705,6 +3714,7 @@ class Conference(CommonObjectBase, Locatable):
         if oldValue != private:
             # notify listeners
             self._notify('protectionChanged', oldValue, private)
+            signals.event_protection_changed.send(self, old=oldValue, new=private)
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
@@ -8047,7 +8057,7 @@ class Contribution(CommonObjectBase, Locatable):
 
         if raiseEvent:
             self._notify('infoChanged')
-
+            signals.contribution_data_changed.send(self)
 
         if cleanCache:
             self.cleanCache()
@@ -8165,6 +8175,8 @@ class Contribution(CommonObjectBase, Locatable):
 
         if notify:
             self._notify('contributionTitleChanged', oldTitle, newTitle)
+            if oldTitle != newTitle:
+                signals.contribution_title_changed.send(self, old=oldTitle, new=newTitle)
             self.notifyModification()
 
     def getTitle( self ):
@@ -8947,6 +8959,7 @@ class Contribution(CommonObjectBase, Locatable):
         if oldValue != private:
             # notify listeners
             self._notify('protectionChanged', oldValue, private)
+            signals.contribution_protection_changed.send(self, old=oldValue, new=private)
 
     def grantAccess(self, prin):
         self.__ac.grantAccess( prin )
@@ -10128,6 +10141,7 @@ class SubContribution(CommonObjectBase, Locatable):
             parent.setModificationDate()
         if raiseEvent:
             self._notify('infoChanged')
+            signals.subcontribution_data_changed.send(self)
         self._p_changed = 1
 
     def getCategoriesPath(self):
@@ -10155,7 +10169,10 @@ class SubContribution(CommonObjectBase, Locatable):
         return "%ssc%s" % (self.getParent().getUniqueId(),self.id)
 
     def setTitle( self, newTitle ):
+        old_title = self.title
         self.title = newTitle.strip()
+        if old_title != self.title:
+            signals.subcontribution_title_changed.send(self, old=old_title, new=self.title)
         self.notifyModification()
 
     def getTitle( self ):
