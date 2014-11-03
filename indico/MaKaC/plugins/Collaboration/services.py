@@ -22,8 +22,8 @@ Services for Collaboration plugins
 from flask import request
 
 from MaKaC.services.implementation.contribution import ContributionDisplayBase
-from MaKaC.services.implementation.conference import ConferenceModifBase, ConferenceDisplayBase
-from MaKaC.services.implementation.base import TextModificationBase, ParameterManager, AdminService
+from MaKaC.services.implementation.conference import ConferenceModifBase, ConferenceDisplayBase, ConferenceBase
+from MaKaC.services.implementation.base import TextModificationBase, ParameterManager, AdminService, ServiceBase
 from indico.core.index import Catalog
 from MaKaC.plugins.Collaboration.base import SpeakerStatusEnum
 from MaKaC.plugins.Collaboration.urlHandlers import UHCollaborationElectronicAgreementForm
@@ -45,7 +45,6 @@ from MaKaC.webinterface.user import UserListModificationBase,\
     UserModificationBase
 from MaKaC.common.fossilize import fossilize
 
-from indico.util.i18n import N_
 
 MODULE_NAME = "Video Services"
 
@@ -586,7 +585,8 @@ class SendElectronicAgreement(ConferenceModifBase):
                                              MODULE_NAME)
         return report
 
-class RejectElectronicAgreement(ConferenceDisplayBase):
+
+class RejectElectronicAgreement(ServiceBase, ConferenceBase):
 
     MESSAGE_REJECT = """Dear manager,
 
@@ -600,7 +600,7 @@ Best Regards,
 CERN Recording Team"""
 
     def _checkParams(self):
-        ConferenceDisplayBase._checkParams(self)
+        ConferenceBase._checkParams(self)
         self.authKey = self._params["authKey"]
         self.reason = self._params["reason"]
 
@@ -630,7 +630,8 @@ CERN Recording Team"""
                 GenericMailer.sendAndLog(notification, self._conf,
                                          MODULE_NAME)
 
-class AcceptElectronicAgreement(ConferenceDisplayBase):
+
+class AcceptElectronicAgreement(ServiceBase, ConferenceBase):
 
     MESSAGE_ACCEPT = """Dear manager,
 
@@ -643,7 +644,7 @@ Best Regards,
 CERN Recording Team"""
 
     def _checkParams(self):
-        ConferenceDisplayBase._checkParams(self)
+        ConferenceBase._checkParams(self)
         self.authKey = self._params["authKey"]
 
     def _getAnswer(self):
