@@ -15165,10 +15165,10 @@ msgstr "vide"
 #: MaKaC/webinterface/tpls/CategoryListItem.tpl:18
 #: indico/MaKaC/webinterface/tpls/CategoryListItem.tpl:18
 #, python-format
-msgid "%s event"
-msgid_plural "%s events"
-msgstr[0] ""
-msgstr[1] "%s évènement"
+msgid "{} event"
+msgid_plural "{} events"
+msgstr[0] "{} évènement"
+msgstr[1] "{} évènements"
 
 #: MaKaC/webinterface/tpls/CategoryListItem.tpl:22
 #: indico/MaKaC/webinterface/tpls/CategoryListItem.tpl:22
