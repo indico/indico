@@ -49,25 +49,6 @@ def uniqueId(obj):
     return ret
 
 
-def uid_to_obj(uid):
-    from MaKaC.conference import ConferenceHolder
-
-    m = UID_RE.match(uid)
-    if not m:
-        return m
-    else:
-        d = m.groupdict()
-        obj = ConferenceHolder().getById(d['event'])
-        if 'session' in d:
-            obj = obj.getSessionById(d['session'])
-        if 'contrib' in d:
-            obj = obj.getContributionById(d['contrib'])
-        if 'subcont' in d:
-            obj = obj.getSubContributionById(d['subcont'])
-
-        return obj
-
-
 def truncate_path(full_path, inner_chars=30, last_node=True):
     """ Truncate inner nodes of a given path until they take less than
         'inner_chars'. Top node is removed and last node can be removed as well.
