@@ -7732,12 +7732,9 @@ class Contribution(CommonObjectBase, Locatable):
             return cmp(self.getId(), other.getId())
         return cmp(self.getConference(), other.getConference())
 
-    def __str__(self):
-        if self.parent:
-            parentId = self.parent.getId()
-        else:
-            parentId = None
-        return "<Contribution %s:%s@%s>" % (parentId, self.getId(), hex(id(self)))
+    def __repr__(self):
+        parent_id = self.parent.getId() if self.parent else None
+        return '<Contribution({}, {}, {})>'.format(self.getId(), self.getTitle(), parent_id)
 
     def getVerboseType(self):
         return 'Contribution'
@@ -10054,17 +10051,14 @@ class SubContribution(CommonObjectBase, Locatable):
         self._authorGen = Counter()
         self._keywords = ""
 
-    def __str__(self):
+    def __repr__(self):
         if self.parent:
-            parentId = self.parent.getId()
-            if self.getConference():
-                grandpaId = self.getConference().getId()
-            else:
-                grandpaId = None
+            parent_id = self.parent.getId()
+            event_id = self.getConference().getId() if self.getConference() else None
         else:
-            parentId = None
-            grandpaId = None
-        return "<SubCont %s:%s:%s@%s>" % (grandpaId, parentId, self.getId(), hex(id(self)))
+            parent_id = None
+            event_id = None
+        return '<SubContribution({}, {}, {}.{})>'.format(self.getId(), self.getTitle(), event_id, parent_id)
 
     def updateNonInheritingChildren(self, elem, delete=False):
         self.getOwner().updateNonInheritingChildren(elem, delete)
