@@ -175,22 +175,32 @@ type("StartEndDateWidget", ["InlineEditWidget"],
 
              this.startDate.askForErrorCheck();
              this.endDate.askForErrorCheck();
-
              if (this.startDate.inError() || this.endDate.inError()) {
                  valid = false;
              } else {
 
                  var sDateTime = Util.parseJSDateTime(this.startDate.get(), IndicoDateTimeFormats.Server);
                  var eDateTime = Util.parseJSDateTime(this.endDate.get(), IndicoDateTimeFormats.Server);
-
+                 var minDate = new Date('1901-12-13 21:45:52+00:00');
+                 var maxDate = new Date('2038-01-19 04:14:07+00:00');
                  if (sDateTime >= eDateTime) {
                      valid = false;
                      this.startDate.setError($T('Start date should be before end date'));
                      this.endDate.setError($T('End date should be after start date'));
                  } else {
-                     valid = true;
-                     this.startDate.setError(null);
-                     this.endDate.setError(null);
+                    if (sDateTime < minDate || maxDate < sDateTime) {
+                        valid = false;
+                        this.startDate.setError($T("The start date is invalid.").format(minDate, maxDate));
+                    }
+                    if (eDateTime < minDate || maxDate < eDateTime) {
+                        valid = false;
+                        this.endDate.setError($T("The end date is invalid.").format(minDate, maxDate));
+                    }
+                    if (valid) {
+                        valid = true;
+                        this.startDate.setError(null);
+                        this.endDate.setError(null);
+                    }
                  }
              }
 

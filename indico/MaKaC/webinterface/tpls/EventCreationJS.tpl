@@ -13,6 +13,32 @@
         return ret;
     }
 
+    function isDateStorable(date) {
+        // returns whether the given date is within the range which can be stored in the db.
+        var minDate = new Date('1901-12-13 21:45:52+00:00');
+        var maxDate = new Date('2038-01-19 04:14:07+00:00');
+        return minDate <= date && date <=  maxDate;
+    }
+
+    function showDatesStorageErrorPopup(startDate, endDate) {
+        // Show a pop-up if the start or end dates are outside the range which
+        // can be stored in the database.
+        var errorMsgs= [];
+
+        if (!isDateStorable(startDate)) {
+            errorMsgs.push($T("The start date is invalid."));
+        }
+        if (!isDateStorable(endDate)) {
+            errorMsgs.push($T("The end date is invalid."));
+        }
+        if (errorMsgs.length) {
+            var popupTitle = errorMsgs.length === 1 ? $T("Invalid date") : $T("Invalid dates");
+            var popup = new ErrorPopup(popupTitle, errorMsgs, "");
+            popup.open();
+        }
+        return !!errorMsgs.length;
+    }
+
     var advOptSwitch = true;
     function showAdvancedOptions() {
         if (advOptSwitch) {
@@ -42,6 +68,26 @@
         });
         return ret;
     }
+
+    function showLectureDatesStorageErrorPopup() {
+        // Show a pop-up if any of the start dates are outside the range which
+        // can be stored in the database.
+        var errorMsgs = [];
+        $.each(dateFieldList, function(i, field) {
+            date = Util.parseJSDateTime(field.get(), IndicoDateTimeFormats.Default);
+            if (!isDateStorable(date)) {
+                errorMsgs.push($T("Invalid lecture date: {0}").format(date));
+            }
+        });
+
+        if (errorMsgs.length) {
+            var popupTitle = errorMsgs.length === 1 ? $T("Invalid date") : $T("Invalid dates");
+            var popup = new ErrorPopup(popupTitle, errorMsgs, "");
+            popup.open();
+        }
+        return !!errorMsgs.length;
+    }
+
 
 
     function createDateContainer(num) {
