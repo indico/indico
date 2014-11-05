@@ -529,6 +529,17 @@ def collaborationRequestIndexCreate(dbi, withRBDB, prevVersion):
     """
     Creating new "All Requests" index
     """
+
+    collab_plugin = PluginsHolder().getPluginType('Collaboration')
+
+    if not collab_plugin.isUsable():
+        print console.colored('  Collaboration plugin not usable - jumping task', 'yellow')
+        return
+
+    elif not collab_plugin.isActive():
+        print console.colored('  Collaboration plugin not active - jumping task', 'blue')
+        return
+
     ci = IndexesHolder().getById('collaboration')
     ci.indexAll(index_names=['All Requests'], dbi=dbi)
     dbi.commit()
