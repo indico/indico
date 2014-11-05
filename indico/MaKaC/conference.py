@@ -65,7 +65,7 @@ from persistent import Persistent
 from BTrees.OOBTree import OOBTree, OOTreeSet, OOSet
 from BTrees.OIBTree import OIBTree,OISet,union
 import MaKaC
-import MaKaC.common.indexes as indexes
+from MaKaC.common import indexes
 from MaKaC.common.timezoneUtils import nowutc, maxDatetime
 import MaKaC.fileRepository as fileRepository
 from MaKaC.schedule import ConferenceSchedule, SessionSchedule,SlotSchedule,\
@@ -77,7 +77,7 @@ from MaKaC.common.Counter import Counter
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
 from MaKaC.accessControl import AccessController, AdminList
-from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NoReportError
+from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NoReportError, FormValuesError
 from MaKaC import registration, epayment
 from MaKaC.evaluation import Evaluation
 from MaKaC.trashCan import TrashCanManager
@@ -103,7 +103,7 @@ from MaKaC.webinterface.common.tools import escape_html
 import zope.interface
 
 from indico.modules.scheduler import Client, tasks
-from indico.util.date_time import utc_timestamp
+from indico.util.date_time import utc_timestamp, format_datetime
 from indico.core.index import IIndexableByStartDateTime, IUniqueIdProvider, Catalog
 from indico.core.db import DBMgr
 from indico.core.db.event import SupportInfo
@@ -2842,9 +2842,10 @@ class Conference(CommonObjectBase, Locatable):
         ###################################
         # Fermi timezone awareness        #
         ###################################
-        if sDate.year < 1900:
-            sDate = timezone('UTC').localize(1900,sDate.month, \
-                    sDate.day,sDate.hour,sDate.minute)
+        if not indexes.BTREE_MIN_UTC_DATE <= sDate <= indexes.BTREE_MAX_UTC_DATE:
+            raise FormValuesError(_("The start date must be between {} and {}.").format(
+                format_datetime(indexes.BTREE_MIN_UTC_DATE),
+                format_datetime(indexes.BTREE_MAX_UTC_DATE)))
         ###################################
         # Fermi timezone awareness        #
         ###################################
@@ -2990,8 +2991,10 @@ class Conference(CommonObjectBase, Locatable):
             raise MaKaCError("date should be timezone aware")
         if eDate == self.getEndDate():
             return
-        if eDate.year < 1900:
-            eDate = datetime(1900,eDate.month,eDate.day,eDate.hour,eDate.minute)
+        if not indexes.BTREE_MIN_UTC_DATE <= eDate <= indexes.BTREE_MAX_UTC_DATE:
+            raise FormValuesError(_("The end date must be between {} and {}.").format(
+                format_datetime(indexes.BTREE_MIN_UTC_DATE),
+                format_datetime(indexes.BTREE_MAX_UTC_DATE)))
         if check != 0:
             self.verifyEndDate(eDate)
         if index:

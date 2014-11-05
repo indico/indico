@@ -125,7 +125,11 @@
         protectionChooserExecOnLoad("${categ["id"]}", "${protection}");
 
         injectValuesInForm($E('eventCreationForm'),function() {
-                if (!verifyLectureDates()) {
+                if (verifyLectureDates()) {
+                    if (showLectureDatesStorageErrorPopup()) {
+                        return false;
+                    }
+                } else {
                     var popup = new ErrorPopup("Invalid dates", [$T('Dates have an invalid format: dd/mm/yyyy hh:mm')], "");
                     popup.open();
                     return false

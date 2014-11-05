@@ -20,27 +20,30 @@
 """This file contains various indexes which will be used in the system in order
     to optimise some functionalities.
 """
-from persistent import Persistent
+from datetime import datetime, timedelta
+import itertools
+
 from BTrees.IOBTree import IOBTree
 from BTrees.OOBTree import OOBTree, OOSet
+from persistent import Persistent
+from pytz import timezone
+from zope.index.text import textindex
+
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.timezoneUtils import date2utctimestamp, datetimeToUnixTime
 from MaKaC.errors import MaKaCError
-from datetime import datetime, timedelta
-from pytz import timezone
 from MaKaC.common.logger import Logger
 from MaKaC.plugins.base import extension_point
-from zope.index.text import textindex
+
 from indico.util.string import remove_accents
-import pytz
-import itertools
-import string
 
 # BTrees are 32 bit by default
 # TODO: make this configurable
 # 0111 111 .... max signed int
 BTREE_MAX_INT = 0x7FFFFFFF
 BTREE_MIN_INT = -0x80000000
+BTREE_MAX_UTC_DATE = timezone('UTC').localize(datetime.fromtimestamp(BTREE_MAX_INT))
+BTREE_MIN_UTC_DATE = timezone('UTC').localize(datetime.fromtimestamp(BTREE_MIN_INT))
 
 
 class Index(Persistent):
@@ -893,7 +896,7 @@ class CalendarDayIndex(Persistent):
         confIdx = ConferenceHolder()._getIdx()
 
         for ts, confs in self._idxDay.iteritems():
-            dt = pytz.timezone('UTC').localize(datetime.utcfromtimestamp(ts))
+            dt = timezone('UTC').localize(datetime.utcfromtimestamp(ts))
 
             for conf in confs:
                 # it has to be in the conference holder
