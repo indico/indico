@@ -223,12 +223,21 @@
 <script type="text/javascript">
     var isLecture = ${ jsBoolean(IsLecture) };
     var WRWebcastCapable = ${ jsBoolean(WebcastCapable) };
-    var WR_contributions = ${ jsonEncode(Contributions) };
-    var WR_contributions_able = ${ jsonEncode(ContributionsAble) };
-    var WR_contributions_unable = ${ jsonEncode(ContributionsUnable) };
-    var NWebcastCapableContributions = ${NWebcastCapableContributions};
-    var NTalks = ${NTalks};
-    var WR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasWebcastCapableTalks) };
+    % if IsLecture:
+        var WR_contributions = [];
+        var WR_contributions_able = [];
+        var WR_contributions_unable = [];
+        var NWebcastCapableContributions = 0;
+        var NTalks = 0;
+        var WR_contributionsLoaded = true;
+    % else:
+        var WR_contributions = ${ jsonEncode(Contributions) };
+        var WR_contributions_able = ${ jsonEncode(ContributionsAble) };
+        var WR_contributions_unable = ${ jsonEncode(ContributionsUnable) };
+        var NWebcastCapableContributions = ${NWebcastCapableContributions};
+        var NTalks = ${NTalks};
+        var WR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasWebcastCapableTalks) };
+    % endif
 
 % if (not WebcastCapable and WebcastCapableRooms) or (NTalks > NWebcastCapableContributions and WebcastCapable):
 

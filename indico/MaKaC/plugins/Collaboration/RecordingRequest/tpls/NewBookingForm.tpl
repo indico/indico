@@ -242,12 +242,21 @@
 <script type="text/javascript">
     var isLecture = ${ jsBoolean(IsLecture) };
     var RRRecordingCapable = ${ jsBoolean(RecordingCapable) };
-    var RR_contributions = ${ jsonEncode(Contributions) };
-    var RR_contributions_able = ${ jsonEncode(ContributionsAble) };
-    var RR_contributions_unable = ${ jsonEncode(ContributionsUnable) };
-    var NRecordingCapableContributions = ${NRecordingCapableContributions};
-    var NTalks = ${NTalks};
-    var RR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasRecordingCapableTalks) };
+    % if IsLecture:
+        var RR_contributions = [];
+        var RR_contributions_able = [];
+        var RR_contributions_unable = [];
+        var NRecordingCapableContributions = 0;
+        var NTalks = 0;
+        var RR_contributionsLoaded = true;
+    % else:
+        var RR_contributions = ${ jsonEncode(Contributions) };
+        var RR_contributions_able = ${ jsonEncode(ContributionsAble) };
+        var RR_contributions_unable = ${ jsonEncode(ContributionsUnable) };
+        var NRecordingCapableContributions = ${NRecordingCapableContributions};
+        var NTalks = ${NTalks};
+        var RR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasRecordingCapableTalks) };
+    % endif
 
 % if (not RecordingCapable and RecordingCapableRooms) or (NTalks > NRecordingCapableContributions and RecordingCapable):
 
