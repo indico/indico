@@ -190,14 +190,13 @@ type("StartEndDateWidget", ["InlineEditWidget"],
                  } else {
                     if (sDateTime < minDate || maxDate < sDateTime) {
                         valid = false;
-                        this.startDate.setError($T("The start date is invalid.").format(minDate, maxDate));
+                        this.startDate.setError($T("The start date is invalid."));
                     }
                     if (eDateTime < minDate || maxDate < eDateTime) {
                         valid = false;
-                        this.endDate.setError($T("The end date is invalid.").format(minDate, maxDate));
+                        this.endDate.setError($T("The end date is invalid."));
                     }
                     if (valid) {
-                        valid = true;
                         this.startDate.setError(null);
                         this.endDate.setError(null);
                     }

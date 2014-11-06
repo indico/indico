@@ -24,7 +24,6 @@
 import itertools
 from datetime import datetime, timedelta
 from operator import itemgetter
-from pytz import timezone
 
 import pytz
 from persistent import Persistent
@@ -52,8 +51,8 @@ from MaKaC.plugins.base import extension_point
 # 0111 111 .... max signed int
 BTREE_MAX_INT = 0x7FFFFFFF
 BTREE_MIN_INT = -0x80000000
-BTREE_MAX_UTC_DATE = timezone('UTC').localize(datetime.fromtimestamp(BTREE_MAX_INT))
-BTREE_MIN_UTC_DATE = timezone('UTC').localize(datetime.fromtimestamp(BTREE_MIN_INT))
+BTREE_MAX_UTC_DATE = pytz.timezone('UTC').localize(datetime.fromtimestamp(BTREE_MAX_INT))
+BTREE_MIN_UTC_DATE = pytz.timezone('UTC').localize(datetime.fromtimestamp(BTREE_MIN_INT))
 
 class Index(Persistent):
     _name = ""

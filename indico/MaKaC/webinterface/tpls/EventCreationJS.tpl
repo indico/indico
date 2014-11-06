@@ -23,7 +23,7 @@
     function showDatesStorageErrorPopup(startDate, endDate) {
         // Show a pop-up if the start or end dates are outside the range which
         // can be stored in the database.
-        var errorMsgs= [];
+        var errorMsgs = [];
 
         if (!isDateStorable(startDate)) {
             errorMsgs.push($T("The start date is invalid."));
