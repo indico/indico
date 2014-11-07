@@ -73,7 +73,7 @@ def user_grant(user_id):
     """Grants administration rights to a given user"""
     avatar = AvatarHolder().getById(user_id)
     if avatar is None:
-        error("The user does not exists")
+        error("This user does not exist")
         return
     print_user_info(avatar)
     if avatar.isAdmin():
@@ -92,7 +92,7 @@ def user_revoke(user_id):
     """Revokes administration rights from a given user"""
     avatar = AvatarHolder().getById(user_id)
     if avatar is None:
-        error("The user does not exists")
+        error("This user does not exist")
         return
     print_user_info(avatar)
     if not avatar.isAdmin():
