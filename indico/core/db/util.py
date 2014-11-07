@@ -19,12 +19,15 @@
 from __future__ import absolute_import
 
 from contextlib import contextmanager
-from functools import partial
+from functools import partial, wraps
 
+import transaction
 from sqlalchemy.exc import IntegrityError
 from ZODB.POSException import ConflictError
 
+from indico.core.db import DBMgr
 from indico.util.contextManager import ContextManager
+from indico.util.decorators import smart_decorator
 
 
 def run_after_commit(f):
@@ -56,3 +59,27 @@ def retry_request_on_conflict():
         if 'duplicate key value violates' not in str(e):
             raise
         raise ConflictError(str(e))
+
+
+@smart_decorator
+def with_zodb(fn, commit=True):
+    """Runs a function within a ZODB connection/transaction
+
+    :param commit: if the transaction should be committed
+    """
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        with DBMgr.getInstance().global_connection():
+            try:
+                result = fn(*args, **kwargs)
+            except:
+                transaction.abort()
+                raise
+            else:
+                if commit:
+                    transaction.commit()
+                else:
+                    transaction.abort()
+            return result
+
+    return wrapper

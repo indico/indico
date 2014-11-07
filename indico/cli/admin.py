@@ -1,11 +1,8 @@
 from __future__ import print_function
 
-from functools import wraps
-
-import transaction
 from flask_script import Manager, prompt, prompt_bool
 
-from indico.core.db import DBMgr
+from indico.core.db.util import with_zodb
 from indico.util.console import cformat, prompt_email, prompt_pass, success, error, warning
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.errors import UserError
@@ -23,21 +20,6 @@ def print_user_info(avatar):
     print("  Email: {}".format(avatar.getEmail()))
     print("  Affiliation: {}".format(avatar.getAffiliation()))
     print()
-
-
-def with_zodb(fn):
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        with DBMgr.getInstance().global_connection():
-            try:
-                result = fn(*args, **kwargs)
-            except:
-                transaction.abort()
-                raise
-            else:
-                transaction.commit()
-            return result
-    return wrapper
 
 
 @IndicoAdminManager.option('-a', '--admin', action='store_true', dest="grant_admin",
