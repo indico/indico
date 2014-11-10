@@ -92,8 +92,21 @@ def committing_iterator(iterable, n=100):
     db.session.commit()
 
 
-def grouper(iterable, n, fillvalue=None):
-    """Collect data into fixed-length chunks or blocks"""
+def grouper(iterable, n, fillvalue=None, skip_missing=False):
+    """Collect data into fixed-length chunks or blocks
+
+    :param iterable: an iterable object
+    :param n: number of items per chunk
+    :param fillvalue: value to pad the last chunk with if necessary
+    :param skip_missing: if the last chunk should be smaller instead
+                         of being padded with `fillvalue`
+    """
     # Taken from https://docs.python.org/2/library/itertools.html#recipes
     args = [iter(iterable)] * n
-    return izip_longest(fillvalue=fillvalue, *args)
+    if not skip_missing:
+        return izip_longest(fillvalue=fillvalue, *args)
+    else:
+        # skips the missing items in the last tuple instead of padding it
+        fillvalue = object()
+        return (tuple(x for x in chunk if x is not fillvalue)
+                for chunk in izip_longest(fillvalue=fillvalue, *args))
