@@ -1,0 +1,43 @@
+{% macro _render_errors(errors) -%}
+    <ul>
+        {%- for error in errors -%}
+            <li>{{ error }}</li>
+        {%- endfor -%}
+    </ul>
+{%- endmacro %}
+
+{% macro form_header(method='post', action='', orientation='horizontal', id='') -%}
+    <form method="{{ method }}" action="{{ action }}" class="i-form {{ orientation }}"{%if id %} id="{{ id }}"{% endif %}>
+{%- endmacro %}
+
+{% macro form_row(field, defaults={}, orientation='') %}
+    <div class="form-group{% if field.errors %} has-error{% endif %} {{ orientation }}">
+        <div class="form-label form-block{% if is_single_line_field(field) %} form-label-middle{% endif %}
+                    {%- if field.type == 'BooleanField' %} form-label-empty{% endif -%}">
+            {%- if field.widget.input_type != 'checkbox' -%}
+                {{ field.label() }}
+            {%- endif -%}
+        </div>
+        <div class="form-field form-block"{% if field.errors %} data-error="{{ _render_errors(field.errors) }}"{% endif %}>
+            {{ field(**defaults) }}
+            {% if field.widget.input_type == 'checkbox' %}
+                <div class="checkbox-label">{{ field.label() }}</div>
+            {% endif %}
+            {% if field.description %}
+                <p class="form-field-description"><em>{{ field.description | safe }}</em></p>
+            {% endif %}
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro form_footer() -%}
+    {% if caller %}
+        <div class="form-group">
+            <div class="form-label form-block"></div>
+            <div class="form-field form-block">
+                {{ caller() }}
+            </div>
+        </div>
+    {% endif %}
+    </form>
+{% endmacro %}

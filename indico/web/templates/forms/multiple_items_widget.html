@@ -1,22 +1,25 @@
 {% set value_json = field._value() | tojson %}
 <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}">
-<table id="{{ field.id }}-widget">
-    <thead>
-        <tr>
-            {% for _, title in field.fields -%}
-                <th>{{ title }}</th>
-            {% endfor -%}
-            <th><a href="#" class="icon-plus js-add-row" title="Add"></a></th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+<div id="{{ field.id }}-widget">
+    <table class="i-table-widget">
+        <thead>
+            <tr>
+                {% for _, title in field.fields -%}
+                    <th>{{ title }}</th>
+                {% endfor -%}
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <a href="#" class="js-add-row i-button i-form-button">{% trans %}Add link{% endtrans %}</a>
+</div>
 
 <script>
     (function() {
         var columns = {{ field.fields | tojson }};
         var widget = $('#{{ field.id }}-widget');
-        var widgetBody = widget.children('tbody');
+        var widgetBody = widget.children('table').children('tbody');
         var field = $('#{{ field.id }}');
         var data = JSON.parse(field.val());
         var deleteButton = $('<a>', {'class': 'icon-remove js-remove-row', 'href': '#', 'title': 'Delete'});
@@ -60,7 +63,8 @@
                     text: item[col[0]]
                 } : {
                     html: $('<input>', {
-                        type: 'text'
+                        type: 'text',
+                        class: 'table-input'
                         // can't set placeholder here due to the jquery.placeholder plugin
                     }).attr('placeholder', col[1])
                 };
