@@ -15,7 +15,7 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict, OrderedDict
-from itertools import groupby, chain, combinations
+from itertools import groupby, chain, combinations, izip_longest
 
 from flask import render_template_string
 
@@ -90,3 +90,10 @@ def committing_iterator(iterable, n=100):
         if i % n == 0:
             db.session.commit()
     db.session.commit()
+
+
+def grouper(iterable, n, fillvalue=None):
+    """Collect data into fixed-length chunks or blocks"""
+    # Taken from https://docs.python.org/2/library/itertools.html#recipes
+    args = [iter(iterable)] * n
+    return izip_longest(fillvalue=fillvalue, *args)
