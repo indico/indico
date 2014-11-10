@@ -1919,7 +1919,7 @@ class WConfRegistrantsList(WConfDisplayBodyBase):
         return i18nformat("""<tr>
         <td width="100%%">
                     <br>
-                    <form action=%s method="POST">
+                    <form action="%s" method="POST">
                         %s
                         <table width="100%%" align="center" border="0" style="border-left: 1px solid #777777;border-top: 1px solid #777777;">
                             <tr>
