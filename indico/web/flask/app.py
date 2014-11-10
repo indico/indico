@@ -51,6 +51,7 @@ from indico.web.flask.templating import EnsureUnicodeExtension, underline
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
                                    IndicoConfigWrapper)
 from indico.web.flask.wrappers import IndicoFlask
+from indico.web.forms.jinja_helpers import is_single_line_field
 
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.rooms import rooms
@@ -133,6 +134,7 @@ def setup_jinja(app):
     app.add_template_global(include_plugin_css_assets)
     app.add_template_global(include_plugin_js_assets)
     app.add_template_global(plugin_hook)
+    app.add_template_global(is_single_line_field)
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))

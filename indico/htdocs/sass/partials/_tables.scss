@@ -196,3 +196,32 @@ td.i-table {
         }
     }
 }
+
+
+// ============================================================================
+// Widget table
+// ============================================================================
+
+.i-table-widget {
+    @include border-radius();
+    width: 100%;
+    max-width: 100%;
+    border-spacing: 0;
+    border: 1px solid $gray;
+    text-align: center;
+
+    tr > td, tr > th {
+        padding: 8px;
+        line-height: 1.5;
+        vertical-align: top;
+    }
+
+    tr > th {
+        background-color: $light-gray;
+    }
+
+    tr > td {
+        border-top: 1px solid $gray;
+        vertical-align: middle;
+    }
+}

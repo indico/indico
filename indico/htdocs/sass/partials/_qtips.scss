@@ -57,3 +57,18 @@
         width: 100%;
     }
 }
+
+.qtip-error {
+    color: $red;
+    font-size: 1em;
+    border-color: $red;
+    background-color: $light-red;
+    box-shadow: 0 0 4px rgba($red, 0.2), 0 0 0.3em white inset;
+
+    ul {
+        list-style-type: none;
+        padding-left: 0;
+        margin: 0.1em 0;
+        line-height: 1.5em;
+    }
+}

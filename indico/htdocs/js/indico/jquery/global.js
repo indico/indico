@@ -136,4 +136,25 @@ $(document).ready(function() {
     });
 
     $('input, textarea').placeholder();
+
+    // Select the field pf an i-form which has an error and display the tooltip.
+    // Ugly selector, but it can be improved my adding a specific class
+    // to the fields themselves (not just the wrapper).
+    $('.i-form .has-error > .form-field > *:first-child').qtip({
+        content: {
+            text: function() { return $(this).parent().data('error'); }
+        },
+        position: {
+            my: 'left middle',
+            at: 'middle right'
+        },
+        hide: false,
+        style: {
+            classes: 'qtip-rounded qtip-shadow qtip-error'
+        },
+        show: {
+            when: false,
+            ready: true
+        }
+    });
 });
