@@ -22,8 +22,8 @@
         var widgetBody = widget.children('table').children('tbody');
         var field = $('#{{ field.id }}');
         var data = JSON.parse(field.val());
-        var deleteButton = $('<a>', {'class': 'icon-remove js-remove-row', 'href': '#', 'title': 'Delete'});
-        var saveButton = $('<a>', {'class': 'icon-disk js-save-row', 'href': '#', 'title': 'Save'});
+        var deleteButton = $('<a>', {'class': 'icon-remove js-remove-row', 'href': '#', 'title': $T('Delete')});
+        var saveButton = $('<a>', {'class': 'icon-disk js-save-row', 'href': '#', 'title': $T('Save')});
 
         data.forEach(function(item, i) {
             createRow(item);
@@ -63,8 +63,8 @@
                     text: item[col[0]]
                 } : {
                     html: $('<input>', {
-                        type: 'text',
-                        class: 'table-input'
+                        'type': 'text',
+                        'class': 'table-input'
                         // can't set placeholder here due to the jquery.placeholder plugin
                     }).attr('placeholder', col[1])
                 };
