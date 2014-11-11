@@ -360,3 +360,11 @@ button::-moz-focus-inner {
 .trusted, .trusted:hover {
     color: #0B8D00 !important;
 }
+
+/* Remove special border added in Firefox */
+button::-moz-focus-inner,
+input[type="button"]::-moz-focus-inner,
+input[type="submit"]::-moz-focus-inner,
+input[type="reset"]::-moz-focus-inner {
+    border: 0 none !important;
+}
