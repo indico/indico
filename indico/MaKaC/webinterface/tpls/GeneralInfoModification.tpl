@@ -26,8 +26,8 @@
       <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Language")}</span></td>
       <td bgcolor="white" width="100%">&nbsp;
          <select name="lang">
-           % for l in language_list:
-           <option ${"selected" if l[0] == language else ""} value="${ l[0] }">${ l[1] }</option>
+           % for code, name in sorted(language_list.items(), key=lambda x: x[1]):
+           <option ${"selected" if code == language else ""} value="${ code }">${ name }</option>
            % endfor
          </select>
       </td>
