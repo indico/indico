@@ -6,11 +6,11 @@
     </ul>
 {%- endmacro %}
 
-{% macro form_header(method='post', action='', orientation='horizontal', id='') -%}
-    <form method="{{ method }}" action="{{ action }}" class="i-form {{ orientation }}"{%if id %} id="{{ id }}"{% endif %}>
+{% macro form_header(method='post', action='', orientation='horizontal', id=none) -%}
+    <form method="{{ method }}" action="{{ action }}" class="i-form {{ orientation }}"{% if id %} id="{{ id }}"{% endif %}>
 {%- endmacro %}
 
-{% macro form_row(field, defaults={}, orientation='') %}
+{% macro form_row(field, widget_attrs={}, orientation='') %}
     <div class="form-group{% if field.errors %} has-error{% endif %} {{ orientation }}">
         <div class="form-label form-block{% if _is_single_line_field(field) %} form-label-middle{% endif %}
                     {%- if field.type == 'BooleanField' %} form-label-empty{% endif -%}">
@@ -19,7 +19,7 @@
             {%- endif -%}
         </div>
         <div class="form-field form-block"{% if field.errors %} data-error="{{ _render_errors(field.errors) }}"{% endif %}>
-            {{ field(**defaults) }}
+            {{ field(**widget_attrs) }}
             {% if field.widget.input_type == 'checkbox' %}
                 <div class="checkbox-label">{{ field.label() }}</div>
             {% endif %}
