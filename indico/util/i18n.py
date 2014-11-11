@@ -142,12 +142,12 @@ def get_current_locale():
 
 def get_all_locales():
     """
-    List all available locales/names e.g. ('pt_PT', 'Portuguese')
+    List all available locales/names e.g. {'pt_PT': 'Portuguese'}
     """
     if babel.app is None:
         return {}
     else:
-        return {str(t): t.language_name for t in babel.list_translations()}
+        return {str(t): t.language_name.title() for t in babel.list_translations()}
 
 
 def set_session_lang(lang):
