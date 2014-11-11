@@ -224,4 +224,8 @@ td.i-table {
         border-top: 1px solid $gray;
         vertical-align: middle;
     }
+
+    th.action-column {
+        width: 1px;
+    }
 }

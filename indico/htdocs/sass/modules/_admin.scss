@@ -37,7 +37,7 @@ a.plugin {
         color: $dark-blue;
     }
 
-    [class^="plugin-"] {
+    .plugin-center-block {
         display: block;
         margin: 0 auto;
         box-sizing: border-box;

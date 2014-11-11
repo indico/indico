@@ -299,8 +299,7 @@ $switchTransition: .15s ease-out;
         }
 
         .form-field {
-            input:not(.i-button):not([type="checkbox"]),
-            textarea {
+            textarea, input:not(.i-button):not([type="checkbox"]) {
                 @include border-radius();
                 display: block;
                 height: 2.5em;
