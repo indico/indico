@@ -299,7 +299,7 @@ $switchTransition: .15s ease-out;
         }
 
         .form-field {
-            textarea, input:not(.i-button):not([type="checkbox"]) {
+            textarea, input:not(.i-button):not([type="checkbox"]):not([type="radio"]) {
                 @include border-radius();
                 display: block;
                 height: 2.5em;
@@ -313,7 +313,7 @@ $switchTransition: .15s ease-out;
                 width: 400px;
             }
 
-            input[type="checkbox"] {
+            input[type="checkbox"], input[type="radio"] {
                 margin-left: 0;
             }
 
@@ -415,5 +415,14 @@ $switchTransition: .15s ease-out;
 
     .i-form-button {
         margin: 0.5em 0;
+    }
+}
+
+.i-radio {
+    label {
+        display: inline-block;
+        margin-left: 0.5em;
+        position: relative;
+        bottom: 1px;
     }
 }

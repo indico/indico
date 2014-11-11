@@ -1,0 +1,6 @@
+{% for subfield in field %}
+    <div class="i-radio">
+        {{ subfield() }}
+        {{ subfield.label }}
+    </div>
+{% endfor %}
