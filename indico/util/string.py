@@ -28,20 +28,19 @@ import unicodedata
 import markdown
 import bleach
 from lxml import html, etree
+from speaklater import _LazyString
 
 try:
     import translitcodec
 except ImportError:
     translitcodec = None
 
-from babel.support import LazyProxy
-
 
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small']
 
 
 def encode_if_unicode(s):
-    if isinstance(s, LazyProxy) and isinstance(s.value, unicode):
+    if isinstance(s, _LazyString) and isinstance(s.value, unicode):
         s = unicode(s)
     return s.encode('utf-8') if isinstance(s, unicode) else s
 

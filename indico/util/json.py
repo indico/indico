@@ -24,10 +24,10 @@ from datetime import datetime, date
 
 from flask import current_app
 from persistent.dict import PersistentDict
+from speaklater import _LazyString
 
 from indico.core.config import Config
 from indico.core.errors import IndicoError
-from babel.support import LazyProxy
 
 try:
     import simplejson as _json
@@ -42,8 +42,8 @@ class IndicoJSONEncoder(_json.JSONEncoder):
      * PersistentDict
     """
     def default(self, o):
-        if isinstance(o, LazyProxy):
-            return str(o)
+        if isinstance(o, _LazyString):
+            return o.value
         elif isinstance(o, PersistentDict):
             return dict(o)
         elif isinstance(o, datetime):

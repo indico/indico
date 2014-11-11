@@ -16,9 +16,6 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import request, session
-
-from babel.support import LazyProxy
 
 from MaKaC.plugins import OldObservable
 from MaKaC.plugins.base import extension_point
@@ -30,9 +27,10 @@ import exceptions
 import urllib
 import pkg_resources
 import binascii
+from flask import request, session
 from lxml import etree
-from operator import attrgetter
 from pytz import timezone
+from speaklater import _LazyString
 from datetime import timedelta, datetime
 from dateutil.relativedelta import relativedelta
 from xml.sax.saxutils import escape, quoteattr
@@ -217,7 +215,7 @@ class WTemplated(OldObservable):
     def htmlText(param):
         if not param:
             return ''
-        if not isinstance(param, (basestring, LazyProxy)):
+        if not isinstance(param, (basestring, _LazyString)):
             param = repr(param)
         if isinstance(param, unicode):
             param = param.encode('utf-8')
