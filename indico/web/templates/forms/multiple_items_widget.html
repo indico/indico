@@ -22,8 +22,8 @@
         var widgetBody = widget.children('table').children('tbody');
         var field = $('#{{ field.id }}');
         var data = JSON.parse(field.val());
-        var deleteButton = $('<a>', {'class': 'icon-remove js-remove-row', 'href': '#', 'title': $T('Delete')});
-        var saveButton = $('<a>', {'class': 'icon-disk js-save-row', 'href': '#', 'title': $T('Save')});
+        var deleteButton = $('<a>', {'class': 'action-icon icon-remove js-remove-row', 'href': '#', 'title': $T('Delete')});
+        var saveButton = $('<a>', {'class': 'action-icon icon-disk js-save-row', 'href': '#', 'title': $T('Save')});
 
         data.forEach(function(item, i) {
             createRow(item);
@@ -70,7 +70,7 @@
                 };
                 $('<td>', colData).appendTo(row);
             });
-            $('<td>', {html: item ? deleteButton.clone() : saveButton.clone()}).appendTo(row);
+            $('<td>', {html: item ? deleteButton.clone() : saveButton.clone().add(deleteButton.clone())}).appendTo(row);
             widgetBody.append(row);
         }
 
