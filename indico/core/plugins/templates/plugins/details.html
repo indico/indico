@@ -1,8 +1,11 @@
 {% from 'forms/form_widget.html' import form_header, form_row, form_footer  %}
 
-<h1>{% trans %}Plugin Details{% endtrans %}</h1>
-<h2>{{ plugin.title }}</h2>
-<p>{{ plugin.description }}</p>
+<div class="plugin-header">
+    <h1>{{ plugin.title }}</h1>
+    <h2>{% if not form %}{% trans %}Plugin Details{% endtrans %}{% else %}{% trans %}Plugin Settings{% endtrans %}{% endif %}</h2>
+</div>
+
+<p class="plugin-description">{{ plugin.description }}</p>
 
 {% if not form %}
     {% trans %}This plugin does not have any settings.{% endtrans %}
