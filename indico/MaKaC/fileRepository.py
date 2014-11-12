@@ -108,20 +108,24 @@ class MaterialLocalRepository(Persistent):
     def getFiles(self):
         return self.__files
 
-    def __getFilePath( self, id ):
+    def __getFilePath(self, id):
         # this os.path.split is to be removed, just to keep compatibility with
-        #   old filerepository where the full path was stored
+        # old filerepository where the full path was stored
         fp = self.__files[id]
         path = os.path.join(self._getRepositoryPath(), fp)
         if os.path.exists(path):
             return path
-        #legacy
-        elif os.path.exists(path.decode("utf-8",'strict').encode("iso-8859-1",'replace')):
-            return path.decode("utf-8",'strict').encode("iso-8859-1",'replace')
-        elif os.path.exists(path.decode("utf-8",'replace').encode(sys.getfilesystemencoding(),'replace')):
-            return path.decode("utf-8",'replace').encode(sys.getfilesystemencoding(),'replace')
-        else:
-            return path
+        # legacy
+        iso_path = path.decode("utf-8", 'strict').encode("iso-8859-1", 'replace')
+        if os.path.exists(iso_path):
+            return iso_path
+        fs_path = path.decode("utf-8", 'replace').encode(sys.getfilesystemencoding(), 'replace')
+        if os.path.exists(fs_path):
+            return fs_path
+        ascii_path = path.decode("utf-8", 'replace').encode('ascii', 'replace')
+        if os.path.exists(ascii_path):
+            return ascii_path
+        return path
 
     def getFilePath( self, id ):
         return self.__getFilePath(id)
