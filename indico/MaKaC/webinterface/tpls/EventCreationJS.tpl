@@ -13,8 +13,11 @@
         return ret;
     }
 
-    function isDateStorable(date) {
-        // returns whether the given date is within the range which can be stored in the db.
+    function isDateValid(date) {
+        // returns whether the given date is within the valid booking range.
+        // This function is used to verify a date is within the valid range
+        // of dates which can be stored in ZODB (this should be changed once the
+        // db is migrated)
         var minDate = new Date('1901-12-13 21:45:52+00:00');
         var maxDate = new Date('2038-01-19 04:14:07+00:00');
         return minDate <= date && date <=  maxDate;
@@ -23,12 +26,14 @@
     function showDatesStorageErrorPopup(startDate, endDate) {
         // Show a pop-up if the start or end dates are outside the range which
         // can be stored in the database.
+        // This function handles gracefully dates which cannot be stored in ZODB
+        // and it should be removed once the db is migrated.
         var errorMsgs = [];
 
-        if (!isDateStorable(startDate)) {
+        if (!isDateValid(startDate)) {
             errorMsgs.push($T("The start date is invalid."));
         }
-        if (!isDateStorable(endDate)) {
+        if (!isDateValid(endDate)) {
             errorMsgs.push($T("The end date is invalid."));
         }
         if (errorMsgs.length) {
@@ -75,7 +80,7 @@
         var errorMsgs = [];
         $.each(dateFieldList, function(i, field) {
             date = Util.parseJSDateTime(field.get(), IndicoDateTimeFormats.Default);
-            if (!isDateStorable(date)) {
+            if (!isDateValid(date)) {
                 errorMsgs.push($T("Invalid lecture date: {0}").format(date));
             }
         });
