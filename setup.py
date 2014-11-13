@@ -484,6 +484,9 @@ if __name__ == '__main__':
             indico = indico.cli.manage:main
             indico-zodbimport = indico_zodbimport.cli:main
 
+            [pytest11]
+            indico = indico.testing.pytest_plugin
+
             [indico.zodb_importers]
             roombooking = indico_zodbimport.modules.roombooking:RoomBookingImporter
 
