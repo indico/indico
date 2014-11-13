@@ -5,3 +5,5 @@ nodeenv
 fabric
 sphinx
 repoze.sphinx.autointerface
+pygments
+sqlparse
