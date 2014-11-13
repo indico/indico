@@ -87,7 +87,12 @@ $toolbar-thin-height: 1.9em;
         }
 
         &.arrow:last-of-type {
-            @include border-right($gray);
+            border-right-width: 1px;
+            border-right-style: solid;
+        }
+
+        &.arrow:last-of-type:not(.highlight):not(.accept):not(.danger):not(.warning) {
+            border-color: $gray;
         }
     }
 
