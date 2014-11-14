@@ -304,6 +304,10 @@ button::-moz-focus-inner {
     margin-top: 5px;
 }
 
+.i-button.bottom {
+    margin-top: 1em;
+}
+
 .i-button[class*="icon-"].icon-only:before {
     margin-right: 0;
 }
