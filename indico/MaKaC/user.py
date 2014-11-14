@@ -500,7 +500,11 @@ class Avatar(Persistent, Fossilizable):
         related = union(self.getLinkTo('category', 'favorite'), self.getLinkTo('category', 'manager'))
         res = []
         for id, score in suggestions.get_suggestions(self, 'category').iteritems():
-            categ = MaKaC.conference.CategoryManager().getById(id)
+            try:
+                categ = MaKaC.conference.CategoryManager().getById(id)
+            except KeyError:
+                suggestions.unsuggest(self, 'category', id)
+                continue
             if not categ or categ.isSuggestionsDisabled() or categ in related:
                 continue
             if any(p.isSuggestionsDisabled() for p in categ.iterParents()):
