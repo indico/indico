@@ -208,7 +208,7 @@ td.i-table {
     max-width: 100%;
     border-spacing: 0;
     border: 1px solid $gray;
-    text-align: center;
+    text-align: left;
 
     tr > td, tr > th {
         padding: 8px;
@@ -231,5 +231,50 @@ td.i-table {
 
     a.action-icon {
         margin: 0 0.5em;
+    }
+
+
+    .toolbar {
+        margin: 0;
+    }
+
+    // Collapsable rows
+    .toggle-details {
+        color: $light-black;
+    }
+
+    .details-row {
+        padding: 0;
+        border: none;
+    }
+
+    .details-container {
+        text-align: left;
+        padding: 8px;
+        overflow: hidden;
+        display: none;
+
+        .details-row {
+            clear: both;
+        }
+
+        .details-item {
+            display: inline-block;
+            float: left;
+            padding: 0.4em;
+            box-sizing: border-box;
+            border-top: 1px dashed #e1e1e1;
+
+            &.details-label {
+                width: 20%;
+                font-weight: bold;
+                text-align: right;
+                border-right: 1px dashed #e1e1e1;
+            }
+
+            &.details-value {
+                width: 80%;
+            }
+        }
     }
 }
