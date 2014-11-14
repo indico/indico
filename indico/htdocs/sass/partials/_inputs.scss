@@ -300,7 +300,7 @@ $switchTransition: .15s ease-out;
         }
 
         .form-field {
-            textarea, input:not(.i-button):not([type="checkbox"]):not([type="radio"]) {
+            textarea, select, input:not(.i-button):not([type="checkbox"]):not([type="radio"]) {
                 @include border-radius();
                 display: block;
                 height: 2.5em;
@@ -324,6 +324,10 @@ $switchTransition: .15s ease-out;
 
             textarea {
                 height: auto;
+            }
+
+            select {
+                background-color: white;
             }
         }
 
