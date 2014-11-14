@@ -16,6 +16,7 @@
 
 
 import logging
+import re
 import sys
 import tempfile
 
@@ -34,6 +35,7 @@ def pytest_configure(config):
     # Load all the plugins defined in pytest_plugins
     config.pluginmanager.consider_module(sys.modules[__name__])
     config.indico_temp_dir = py.path.local(tempfile.mkdtemp(prefix='indicotesttmp.'))
+    plugins = filter(None, [x.strip() for x in re.split(r'[\s,;]+', config.getini('indico_plugins'))])
     # Throw away all indico.conf options early
     Config.getInstance().reset({
         'DBConnectionParams': ('localhost', 0),  # invalid port - just so we never connect to a real ZODB!
@@ -42,7 +44,8 @@ def pytest_configure(config):
         'Loggers': [],
         'UploadedFilesTempDir': config.indico_temp_dir.strpath,
         'XMLCacheDir': config.indico_temp_dir.strpath,
-        'ArchiveDir': config.indico_temp_dir.strpath
+        'ArchiveDir': config.indico_temp_dir.strpath,
+        'Plugins': plugins
     })
     # Make sure we don't write any log files (or worse: send emails)
     Logger.reset()
@@ -52,3 +55,7 @@ def pytest_configure(config):
 
 def pytest_unconfigure(config):
     config.indico_temp_dir.remove(rec=True)
+
+
+def pytest_addoption(parser):
+    parser.addini('indico_plugins', 'List of indico plugins to load')
