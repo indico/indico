@@ -225,7 +225,8 @@ td.i-table {
         vertical-align: middle;
     }
 
-    th.action-column {
+    th.small-column, th.action-column {
+        white-space: nowrap;
         width: 1px;
     }
 

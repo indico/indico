@@ -96,3 +96,10 @@ a.plugin {
     color: $dark-gray;
     font-size: 1.2em;
 }
+
+.code {
+    @include border-radius();
+    border: 1px solid $gray;
+    background: $light-gray;
+    padding: 1em 1.5em;
+}
