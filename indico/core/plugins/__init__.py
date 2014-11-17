@@ -148,40 +148,51 @@ class IndicoPlugin(Plugin):
                         depends=SASS_BASE_MODULES)
         self.assets.register(name, bundle)
 
-    def inject_css(self, name, view_class=None, subclasses=True):
+    def inject_css(self, name, view_class=None, subclasses=True, condition=None):
         """Injects a CSS bundle into Indico's pages
 
         :param name: Name of the bundle
         :param view_class: If a WP class is specified, only inject it into pages using that class
         :param subclasses: also inject into subclasses of `view_class`
+        :param condition: a callable to determine whether to inject or not. only called, when the
+                          view_class criterion matches
         """
-        self._inject_asset(signals.inject_css, name, view_class, subclasses)
+        self._inject_asset(signals.inject_css, name, view_class, subclasses, condition)
 
-    def inject_js(self, name, view_class=None, subclasses=True):
+    def inject_js(self, name, view_class=None, subclasses=True, condition=None):
         """Injects a JS bundle into Indico's pages
 
         :param name: Name of the bundle
         :param view_class: If a WP class is specified, only inject it into pages using that class
         :param subclasses: also inject into subclasses of `view_class`
+        :param condition: a callable to determine whether to inject or not. only called, when the
+                          view_class criterion matches
         """
-        self._inject_asset(signals.inject_js, name, view_class, subclasses)
+        self._inject_asset(signals.inject_js, name, view_class, subclasses, condition)
 
-    def _inject_asset(self, signal, name, view_class=None, subclasses=True):
+    def _inject_asset(self, signal, name, view_class=None, subclasses=True, condition=None):
         """Injects an asset bundle into Indico's pages
 
         :param signal: the signal to use for injection
         :param name: Name of the bundle
         :param view_class: If a WP class is specified, only inject it into pages using that class
         :param subclasses: also inject into subclasses of `view_class`
+        :param condition: a callable to determine whether to inject or not. only called, when the
+                          view_class criterion matches
         """
+
+        def _do_inject(sender):
+            if condition is None or condition():
+                return self.assets[name].urls()
+
         if view_class is None:
-            self.connect(signal, lambda _: self.assets[name].urls())
+            self.connect(signal, _do_inject)
         elif not subclasses:
-            self.connect(signal, lambda _: self.assets[name].urls(), sender=view_class)
+            self.connect(signal, _do_inject, sender=view_class)
         else:
             def _func(sender):
                 if issubclass(sender, view_class):
-                    return self.assets[name].urls()
+                    return _do_inject(sender)
 
             self.connect(signal, _func)
 
