@@ -70,7 +70,7 @@
                 };
                 $('<td>', colData).appendTo(row);
             });
-            $('<td>', {html: item ? deleteButton.clone() : saveButton.clone().add(deleteButton.clone())}).appendTo(row);
+            $('<td>', {html: item ? deleteButton.clone() : deleteButton.clone().add(saveButton.clone())}).appendTo(row);
             widgetBody.append(row);
         }
 
