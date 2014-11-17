@@ -30,7 +30,7 @@ from getpass import getpass
 
 from colorclass import Color
 
-from indico.util.string import is_valid_mail
+from indico.util.string import is_valid_mail, to_unicode
 
 
 def strip_ansi(s, _re=re.compile(r'\x1b\[[;\d]*[A-Za-z]')):
@@ -111,7 +111,7 @@ def verbose_iterator(iterable, total, get_id, get_title):
         if i % 10 == 0 or i == total:
             remaining_seconds = int((time.time() - start_time) / i * (total - i))
             remaining = '{:02}:{:02}'.format(remaining_seconds // 60, remaining_seconds % 60)
-            title = get_title(item).replace('\n', ' ')
+            title = to_unicode(get_title(item).replace('\n', ' '))
             text = fmt.format(i, total, (i / total * 100.0), remaining, get_id(item), title)
             print('\r', ' ' * term_width, end='', sep='')
             # terminal width + ansi control code length - trailing reset code (4)
