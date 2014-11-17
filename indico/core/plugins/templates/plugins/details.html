@@ -19,3 +19,5 @@
         <a href="{{ url_for('.index') }}" class="i-button big">{% trans %}Cancel{% endtrans %}</a>
     {% endcall %}
 {% endif %}
+
+{{ plugin_hook('plugin-details', plugin=plugin) }}
