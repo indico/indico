@@ -31,9 +31,10 @@ from xml.sax.saxutils import escape
 
 import oauth2 as oauth
 import transaction
-from flask import request, session, g
+from flask import request, session, g, current_app
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound
+from werkzeug.wrappers import Response
 from ZEO.Exceptions import ClientDisconnected
 from ZODB.POSException import ConflictError, POSKeyError
 
@@ -483,13 +484,19 @@ class RH(RequestHandlerBase):
             # old code gets parameters from call
             # new code utilizes of flask.request
             if len(inspect.getargspec(self._checkParams).args) < 2:
-                self._checkParams()
+                cp_result = self._checkParams()
             else:
-                self._checkParams(self._reqParams)
+                cp_result = self._checkParams(self._reqParams)
+
+            if isinstance(cp_result, (current_app.response_class, Response)):
+                return '', cp_result
 
             func = getattr(self, '_checkParams_' + request.method, None)
             if func:
-                func()
+                cp_result = func()
+                if isinstance(cp_result, (current_app.response_class, Response)):
+                    return '', cp_result
+
         except NoResultFound:  # sqlalchemy .one() not finding anything
             raise NotFoundError(_('The specified item could not be found.'), title=_('Item not found'))
 
