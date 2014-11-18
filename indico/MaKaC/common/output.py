@@ -1233,7 +1233,7 @@ class outputGenerator(Observable):
         self._generateLinkField(urlHandlers.UHConferenceDisplay, conf,
                                 "Event details", out)
 
-        self._generateAccessList(conf, out, specifyId=False)
+        self._generateAccessList(conf, out, specifyId=True)
 
     def contribToXMLMarc21(self,cont,includeMaterial=1, out=None, overrideCache=False):
         if not out:
@@ -1404,7 +1404,7 @@ class outputGenerator(Observable):
         self._generateLinkField(urlHandlers.UHConferenceDisplay,
                                 cont.getConference(), "Event details", out)
 
-        self._generateAccessList(cont, out, specifyId=False)
+        self._generateAccessList(cont, out, specifyId=True)
     ####
     #fb
 
@@ -1565,7 +1565,7 @@ class outputGenerator(Observable):
         self._generateLinkField(urlHandlers.UHConferenceDisplay,
                                 subCont.getConference(), "Event details", out)
 
-        self._generateAccessList(subCont, out, specifyId=None)
+        self._generateAccessList(subCont, out, specifyId=True)
 
 
     def materialToXMLMarc21(self,mat, out=None):
