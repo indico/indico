@@ -75,8 +75,8 @@ from MaKaC.errors import MaKaCError
 from MaKaC.common.logger import Logger
 from MaKaC.user import Group, PrincipalHolder
 
-
-RETRIEVED_FIELDS = ['uid', 'cn', 'mail', 'o', 'ou', 'company', 'givenName',
+EMAIL_FIELD = 'mail'
+RETRIEVED_FIELDS = ['uid', 'cn', EMAIL_FIELD, 'o', 'ou', 'company', 'givenName',
                     'sn', 'postalAddress', 'userPrincipalName', "telephoneNumber", "facsimileTelephoneNumber"]
 MEMBER_ATTR = "member"
 MEMBER_PAGE_SIZE = 1500
@@ -128,39 +128,35 @@ class LDAPAuthenticator(Authenthicator, SSOHandler):
         return None
 
     def createUser(self, li):
+        from MaKaC.user import Avatar, AvatarHolder
         Logger.get('auth.ldap').debug("create '%s'" % li.getLogin())
         # first, check if authentication is OK
         data = self.checkLoginPassword(li.getLogin(), li.getPassword())
         if not data:
             return None
+        # Search if user already exist, using email address
+        ldapc = LDAPConnector.getInstance()
+        av = get_existing_user(data[get_login_attribute()], ldapc.lookupUserEmails(li.getLogin()))
 
         # Use the correct case
         li.setLogin(data[get_login_attribute()])
-
-        # Search if user already exist, using email address
-        import MaKaC.user as user
-        ah = user.AvatarHolder()
-        userList = ah.match({"email": data["mail"]}, searchInAuthenticators=False)
-        if len(userList) == 0:
+        if not av:
             # User doesn't exist, create it
             try:
-                av = user.Avatar()
+                av = Avatar()
                 udata = LDAPTools.extractUserDataFromLdapData(data)
                 av.setName(udata['name'])
                 av.setSurName(udata['surName'])
                 av.setOrganisation(udata['organisation'])
                 av.setEmail(udata['email'])
                 av.setAddress(udata['address'])
-                ah.add(av)
+                AvatarHolder().add(av)
                 av.activateAccount()
                 Logger.get('auth.ldap').info("created '%s'" % li.getLogin())
             except KeyError:
                 raise MaKaCError("LDAP account does not contain the mandatory"
                                  "data to create an Indico account.")
-        else:
-            # user found
-            Logger.get('auth.ldap').info("found user '%s'" % li.getLogin())
-            av = userList[0]
+
         #now create the LDAP identity for the user
         na = LDAPAuthenticator()
         na.add(na.createIdentity(li, av))
@@ -280,7 +276,6 @@ class LDAPIdentity(PIdentity):
         """
         id is MaKaC.user.LoginInfo instance, self.user is Avatar
         """
-
         log = Logger.get('auth.ldap')
         log.info("authenticate(%s)" % id.getLogin())
         data = AuthenticatorMgr().getById(self.getAuthenticatorTag()).checkLoginPassword(id.getLogin(),
@@ -427,14 +422,21 @@ class LDAPConnector(object):
             self._addAttribute(objectAttr, result_data, name)
         return objectAttr
 
-
     def _addAttribute(self, objectAttr, attrMap, attrName):
         """
         safely adds attribute
         """
         if attrName in attrMap:
             attr = attrMap[attrName]
-            if len(attr) == 1:
+            if attrName == 'mail':
+                login = objectAttr[get_login_attribute()]
+                # The login attribute is a single value but we don't know if it
+                # has been processed by a previous call to this function or not
+                if isinstance(login, list):
+                    login = login[0]
+                avatar = get_existing_user(login, attr)
+                objectAttr[attrName] = avatar.getEmail() if avatar else sorted(e.lower() for e in attr)[0]
+            elif len(attr) == 1:
                 objectAttr[attrName] = attr[0]
             else:
                 objectAttr[attrName] = attr
@@ -446,7 +448,6 @@ class LDAPConnector(object):
         keys and strings as values
         returns None if a user is not found
         """
-
         res = self.l.search_s(
             self.ldapPeopleDN, ldap.SCOPE_SUBTREE,
             self.ldapPeopleFilter.format(uid))
@@ -457,11 +458,17 @@ class LDAPConnector(object):
                 return self._objectAttributes(dn, data, RETRIEVED_FIELDS)
         return None
 
+    def lookupUserEmails(self, uid):
+        res = self.l.search_s(self.ldapPeopleDN, ldap.SCOPE_SUBTREE, self.ldapPeopleFilter.format(uid))
+
+        for dn, data in res:
+            if dn:
+                return data[EMAIL_FIELD]
+
     def findUsers(self, ufilter):
         """
         Finds users according to a specified filter
         """
-
         d = {}
         res = self.l.search_s(self.ldapPeopleDN, ldap.SCOPE_SUBTREE, ufilter)
         for dn, data in res:
@@ -714,3 +721,18 @@ class RequestListener(Component):
 
 def get_login_attribute():
     return Config.getInstance().getAuthenticatorConfigById('LDAP').get('loginAttribute', 'uid')
+
+
+def get_existing_user(login, emails):
+    from MaKaC.user import AvatarHolder
+    avatars = {avatar
+               for email in emails
+               for avatar in AvatarHolder().match({'email': email}, searchInAuthenticators=False)}
+    matching = (avatar
+                for avatar in avatars
+                for identity in avatar.identities
+                if identity.getAuthenticatorTag() == 'LDAP' and identity.getLogin() == login)
+    avatar = next(matching, None)
+    if avatar:
+        Logger.get('auth.ldap').info("found user '{}'".format(login))
+    return avatar
