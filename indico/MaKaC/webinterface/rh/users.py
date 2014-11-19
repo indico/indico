@@ -527,8 +527,8 @@ class RHActiveSecondaryEmail(base.RH):
 
         for sMail in av.getPendingSecondaryEmails():
             if md5(sMail).hexdigest() == self._key:
-                av.removePendingSecondaryEmail(sMail)
-                av.addSecondaryEmail(sMail)
+                av.removePendingSecondaryEmail(sMail, reindex=True)
+                av.addSecondaryEmail(sMail, reindex=True)
                 p = adminPages.WPUserActiveSecondaryEmail(self, av, sMail)
                 return p.display()
         else:
