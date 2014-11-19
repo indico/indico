@@ -249,34 +249,30 @@ td.i-table {
         border: none;
     }
 
-    .details-container {
+    dl.details-container {
         text-align: left;
         padding: 8px;
         overflow: hidden;
         display: none;
 
-        .details-row {
-            clear: both;
-        }
-
-        .details-item {
+        dt, dd {
             display: inline-block;
             float: left;
             padding: 0.4em;
             box-sizing: border-box;
             border-top: 1px dashed #e1e1e1;
+        }
 
-            &.details-label {
-                width: 20%;
-                font-weight: bold;
-                text-align: right;
-                border-right: 1px dashed #e1e1e1;
-            }
+        dt {
+            width: 20%;
+            font-weight: bold;
+            text-align: right;
+            border-right: 1px dashed #e1e1e1;
+        }
 
-            &.details-value {
-                width: 80%;
-                margin: 0;
-            }
+        dd {
+            width: 80%;
+            margin: 0;
         }
     }
 }
