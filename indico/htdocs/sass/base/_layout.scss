@@ -19,6 +19,10 @@
    along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
+.fixed-width {
+    max-width: 800px !important;
+}
+
 .titled-rule {
     color: $dark-gray;
     font-size: 0.9em;

@@ -328,6 +328,7 @@ $switchTransition: .15s ease-out;
 
             select {
                 background-color: white;
+                padding-left: 0;
 
                 &:-moz-focusring {
                     color: transparent;
