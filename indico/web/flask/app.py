@@ -217,7 +217,7 @@ def add_legacy_plugin_blueprints(app):
 
 def add_plugin_blueprints(app):
     blueprint_names = set()
-    for _, (plugin, blueprints) in signals.get_blueprints.send(app):
+    for _, (plugin, blueprints) in signals.plugin.get_blueprints.send(app):
         if blueprints is None:
             continue
         elif isinstance(blueprints, Blueprint):

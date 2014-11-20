@@ -112,6 +112,6 @@ class IndicoShell(Shell):
             add_to_context(DBMgr.getInstance(), 'dbi', doc='zodb db interface', color='cyan!')
             add_to_context(db, 'db', doc='sqlalchemy db interface', color='cyan!')
             add_to_context(transaction, doc='transaction module', color='cyan!')
-            signals.shell_context.send(add_to_context=add_to_context)
+            signals.plugin.shell_context.send(add_to_context=add_to_context)
 
         return self._context

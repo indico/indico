@@ -166,7 +166,7 @@ class AccessController( Persistent, Observable ):
             self.allowed.append( principal )
             self._p_changed = 1
         self._notify('accessGranted', principal)
-        signals.access_granted.send(self, principal=principal)
+        signals.acl.access_granted.send(self, principal=principal)
 
     def getAccessEmail(self):
         try:
@@ -179,13 +179,13 @@ class AccessController( Persistent, Observable ):
         if not email in self.getAccessEmail():
             self.getAccessEmail().append(email)
         self._notify('accessGranted', email)
-        signals.access_granted.send(self, principal=email)
+        signals.acl.access_granted.send(self, principal=email)
 
     def revokeAccessEmail(self, email):
         if email in self.getAccessEmail.keys():
             self.getAccessEmail().remove(email)
         self._notify('accessRevoked', email)
-        signals.access_revoked.send(self, principal=email)
+        signals.acl.access_revoked.send(self, principal=email)
 
     def revokeAccess( self, principal ):
         """revokes read access for the related resource to the specified
@@ -200,7 +200,7 @@ class AccessController( Persistent, Observable ):
             self.allowed.remove( principal )
             self._p_changed = 1
         self._notify('accessRevoked', principal)
-        signals.access_revoked.send(self, principal=principal)
+        signals.acl.access_revoked.send(self, principal=principal)
 
     def setAccessKey( self, key="" ):
         self.accessKey = key
@@ -275,7 +275,7 @@ class AccessController( Persistent, Observable ):
             self.getModificationEmail().append(email)
             self._p_changed = 1
             self._notify('modificationGranted', email)
-            signals.modification_granted.send(self, principal=email)
+            signals.acl.modification_granted.send(self, principal=email)
             return True
         return False
 
@@ -284,7 +284,7 @@ class AccessController( Persistent, Observable ):
             self.getModificationEmail().remove(email)
             self._p_changed = 1
         self._notify('modificationRevoked', email)
-        signals.modification_revoked.send(self, principal=email)
+        signals.acl.modification_revoked.send(self, principal=email)
 
     def grantModification( self, principal ):
         """grants modification access for the related resource to the specified
@@ -294,7 +294,7 @@ class AccessController( Persistent, Observable ):
             self.managers.append( principal )
             self._p_changed = 1
         self._notify('modificationGranted', principal)
-        signals.modification_granted.send(self, principal=principal)
+        signals.acl.modification_granted.send(self, principal=principal)
 
     def revokeModification( self, principal ):
         """revokes modification access for the related resource to the
@@ -303,7 +303,7 @@ class AccessController( Persistent, Observable ):
             self.managers.remove( principal )
             self._p_changed = 1
         self._notify('modificationRevoked', principal)
-        signals.modification_revoked.send(self, principal=principal)
+        signals.acl.modification_revoked.send(self, principal=principal)
 
     def canModify( self, user ):
         """tells whether the specified user has modification privileges"""

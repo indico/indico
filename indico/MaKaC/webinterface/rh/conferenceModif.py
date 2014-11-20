@@ -196,7 +196,8 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         self._isPluginManagerOrAdmin = any(self._notify("isPluginTypeAdmin", {"user": self._getUser()}) +
                                            self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"}) +
                                            self._notify("isPluginManager", {"user": self._getUser(), "conf": self._target, "plugins": "any"}))
-        self._plugin_urls = values_from_signal(signals.event_management_url.send(self._conf), single_value=True)
+        self._plugin_urls = values_from_signal(signals.event_management.management_url.send(self._conf),
+                                               single_value=True)
 
     def _checkProtection(self):
         if not (self._isRegistrar or self._isPRM or self._isReferee or self._isPluginManagerOrAdmin or

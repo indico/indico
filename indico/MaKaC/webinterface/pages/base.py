@@ -178,8 +178,10 @@ class WPBase(OldObservable):
 
         info = HelperMaKaCInfo().getMaKaCInfoInstance()
 
-        plugin_css = values_from_signal(signals.inject_css.send(self.__class__), as_list=True, multi_value_types=list)
-        plugin_js = values_from_signal(signals.inject_js.send(self.__class__), as_list=True, multi_value_types=list)
+        plugin_css = values_from_signal(signals.plugin.inject_css.send(self.__class__), as_list=True,
+                                        multi_value_types=list)
+        plugin_js = values_from_signal(signals.plugin.inject_js.send(self.__class__), as_list=True,
+                                       multi_value_types=list)
 
         return wcomponents.WHTMLHeader().getHTML({
             "area": area,

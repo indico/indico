@@ -58,7 +58,7 @@ class RHMaterialDisplayCommon:
 
         if len(self._material.getResourceList()) == 1:
             res = self._material.getResourceList()[0]
-            signals.material_downloaded.send(self._conf, resource=res)
+            signals.event.material_downloaded.send(self._conf, resource=res)
             if isinstance(res, conference.Link):
                 url = res.getURL()
                 if url.find(".wmv") != -1:

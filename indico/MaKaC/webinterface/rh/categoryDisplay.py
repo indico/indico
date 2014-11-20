@@ -488,7 +488,7 @@ class UtilsConference:
                         'address': l.address if l else '',
                         'room': r.name if r else ''}
             if old_data != new_data:
-                signals.event_data_changed.send(c, attr='location', old=old_data, new=new_data)
+                signals.event.data_changed.send(c, attr='location', old=old_data, new=new_data)
 
         emailstr = setValidEmailSeparators(confData.get("supportEmail", ""))
 

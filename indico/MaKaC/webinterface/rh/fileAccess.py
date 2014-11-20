@@ -61,7 +61,7 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
             RHDisplayBaseProtected._checkProtection( self )
 
     def _process( self ):
-        signals.material_downloaded.send(self._conf, resource=self._file)
+        signals.event.material_downloaded.send(self._conf, resource=self._file)
         if isinstance(self._file, Link):
             self._redirect(self._file.getURL())
         elif self._file.getId() == "minutes":

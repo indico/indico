@@ -437,7 +437,7 @@ class Participation(Persistent, Observable):
             avatar.unlinkTo(self._conference,"participant")
         self._notify('participantRemoved', self._conference, participant)
         if participant._status in {'added', 'accepted'}:
-            signals.event_participant_changed.send(self._conference, user=avatar, participant=participant,
+            signals.event.participant_changed.send(self._conference, user=avatar, participant=participant,
                                                    old_status=participant._status, action='removed')
         self.notifyModification()
         return True
@@ -896,7 +896,7 @@ class Participant(Persistent, Fossilizable):
         #    self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
 
         self._participation._notify('participantAdded', self.getConference(), self)
-        signals.event_participant_changed.send(self.getConference(), user=self._avatar, participant=self,
+        signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
                                                old_status=old_status, action='added')
         logData = self.getParticipantData()
         logData["subject"] = "%s : status set to ADDED"%self.getWholeName()
@@ -912,7 +912,7 @@ class Participant(Persistent, Fossilizable):
         self._status = "refused"
 
         self._participation._notify('participantRemoved', self.getConference(), self)
-        signals.event_participant_changed.send(self.getConference(), user=self._avatar, participant=self,
+        signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
                                                old_status=old_status, action='removed')
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to REFUSED")%self.getWholeName()
@@ -953,7 +953,7 @@ class Participant(Persistent, Fossilizable):
 
         self._participation._notify('participantAdded', self.getConference(), self)
         if old_status != 'added':
-            signals.event_participant_changed.send(self.getConference(), user=self._avatar, participant=self,
+            signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
                                                    old_status=old_status, action='added')
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to ACCEPTED")%self.getWholeName()
@@ -970,7 +970,7 @@ class Participant(Persistent, Fossilizable):
 
         self._participation._notify('participantRemoved', self.getConference(), self)
         if old_status == 'added':
-            signals.event_participant_changed.send(self.getConference(), user=self._avatar, participant=self,
+            signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
                                                    old_status=old_status, action='removed')
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to REJECTED")%self.getWholeName()

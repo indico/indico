@@ -992,7 +992,7 @@ class Category(CommonObjectBase):
         TrashCanManager().add(self)
 
         self._notify('deleted', oldOwner)
-        signals.category_deleted.send(self)
+        signals.category.deleted.send(self)
 
         return
 
@@ -1011,7 +1011,7 @@ class Category(CommonObjectBase):
         catDateAllIdx.indexCateg(self)
 
         self._notify('moved', oldOwner, newOwner)
-        signals.category_moved.send(self, old_parent=oldOwner, new_parent=newOwner)
+        signals.category.moved.send(self, old_parent=oldOwner, new_parent=newOwner)
 
     def getName(self):
         return self.name
@@ -1026,7 +1026,7 @@ class Category(CommonObjectBase):
         nameIdx.index(self)
 
         self._notify('categoryTitleChanged', oldName, newName)
-        signals.category_title_changed.send(self, old=oldName, new=newName)
+        signals.category.title_changed.send(self, old=oldName, new=newName)
 
     def getDescription(self):
         return self.description
@@ -1041,7 +1041,7 @@ class Category(CommonObjectBase):
         self.removeConference(conf)
         toCateg._addConference(conf)
         conf._notify('moved', self, toCateg)
-        signals.event_moved.send(conf, old_parent=self, new_parent=toCateg)
+        signals.event.moved.send(conf, old_parent=self, new_parent=toCateg)
 
     def _addSubCategory(self, newSc):
         #categories can only contain either conferences either other categories
@@ -1081,7 +1081,7 @@ class Category(CommonObjectBase):
 
         Catalog.getIdx('categ_conf_sd').add_category(sc.getId())
         sc._notify('created', self)
-        signals.category_created.send(sc, parent=self)
+        signals.category.created.send(sc, parent=self)
 
         self._addSubCategory(sc)
         sc.setOrder(self.getSubCategoryList()[-1].getOrder() + 1)
@@ -1139,7 +1139,7 @@ class Category(CommonObjectBase):
         conf.linkCreator()
 
         conf._notify('created', self)
-        signals.event_created.send(conf, parent=self)
+        signals.event.created.send(conf, parent=self)
 
         return conf
 
@@ -1373,7 +1373,7 @@ class Category(CommonObjectBase):
         self.__ac.setProtection(private)
         self._notify('protectionChanged', oldProtection, private)
         if oldProtection != private:
-            signals.category_protection_changed.send(self, old=oldProtection, new=private)
+            signals.category.protection_changed.send(self, old=oldProtection, new=private)
 
     def hasProtectedOwner(self):
         return self.__ac._getFatherProtection()
@@ -1471,12 +1471,12 @@ class Category(CommonObjectBase):
     def requireDomain(self, dom):
         self.__ac.requireDomain(dom)
         self._notify('accessDomainAdded', dom)
-        signals.category_domain_access_granted.send(self, domain=dom)
+        signals.category.domain_access_granted.send(self, domain=dom)
 
     def freeDomain(self, dom):
         self.__ac.freeDomain(dom)
         self._notify('accessDomainRemoved', dom)
-        signals.category_domain_access_revoked.send(self, domain=dom)
+        signals.category.domain_access_revoked.send(self, domain=dom)
 
 
     def getDomainList(self):
@@ -1495,7 +1495,7 @@ class Category(CommonObjectBase):
         """
         if raiseEvent:
             self._notify('infoChanged')
-            signals.category_data_changed.send(self)
+            signals.category.data_changed.send(self)
         self._p_changed = 1
 
 
@@ -2540,7 +2540,7 @@ class Conference(CommonObjectBase, Locatable):
 
         if raiseEvent:
             self._notify('infoChanged')
-            signals.event_data_changed.send(self, attr=None, old=None, new=None)
+            signals.event.data_changed.send(self, attr=None, old=None, new=None)
 
         self.cleanCache()
         self._p_changed=1
@@ -2643,10 +2643,10 @@ class Conference(CommonObjectBase, Locatable):
             # take care of subcontributions
             for sc in c.getSubContributionList():
                 sc._notify('deleted', c)
-                signals.subcontribution_deleted.send(sc, parent=c)
+                signals.event.subcontribution_deleted.send(sc, parent=c)
 
             c._notify('deleted', self)
-            signals.contribution_deleted.send(c, parent=self)
+            signals.event.contribution_deleted.send(c, parent=self)
 
     def delete(self, user=None):
         """deletes the conference from the system.
@@ -2661,7 +2661,7 @@ class Conference(CommonObjectBase, Locatable):
             except Exception, e2:
                 Logger.get('Conference').error("Exception while notifying a conference deletion: %s (origin: %s)" % (str(e2), str(e)))
 
-        signals.event_deleted.send(self)
+        signals.event.deleted.send(self)
 
         self.notifyContributions()
 
@@ -2775,7 +2775,7 @@ class Conference(CommonObjectBase, Locatable):
         old_data = (oldStartDate, oldEndDate)
         new_data = (self.getStartDate(), self.getEndDate())
         if old_data != new_data:
-            signals.event_data_changed.send(self, attr='dates', old=old_data, new=new_data)
+            signals.event.data_changed.send(self, attr='dates', old=old_data, new=new_data)
         try:
             self._notify('dateChanged', {'oldStartDate': oldStartDate, 'newStartDate': self.getStartDate(), 'oldEndDate': oldEndDate, 'newEndDate': self.getEndDate()})
         except Exception, e:
@@ -2840,7 +2840,7 @@ class Conference(CommonObjectBase, Locatable):
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
             if oldSdate != sDate:
-                signals.event_data_changed.send(self, attr='start_date', old=oldSdate, new=sDate)
+                signals.event.data_changed.send(self, attr='start_date', old=oldSdate, new=sDate)
             try:
                 self._notify('startDateChanged', {'newDate': sDate, 'oldDate': oldSdate})
             except Exception, e:
@@ -2968,7 +2968,7 @@ class Conference(CommonObjectBase, Locatable):
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
             if oldEdate != eDate:
-                signals.event_data_changed.send(self, attr='end_date', old=oldEdate, new=eDate)
+                signals.event.data_changed.send(self, attr='end_date', old=oldEdate, new=eDate)
             try:
                 self._notify('endDateChanged', {'newDate': eDate, 'oldDate': oldEdate})
             except Exception, e:
@@ -3117,7 +3117,7 @@ class Conference(CommonObjectBase, Locatable):
         nameIdx.index(self)
 
         if oldTitle != title:
-            signals.event_data_changed.send(self, attr='title', old=oldTitle, new=title)
+            signals.event.data_changed.send(self, attr='title', old=oldTitle, new=title)
         try:
             self._notify('eventTitleChanged', oldTitle, title)
         except Exception, e:
@@ -3133,7 +3133,7 @@ class Conference(CommonObjectBase, Locatable):
         oldDescription = self.description
         self.description = desc
         if oldDescription != desc:
-            signals.event_data_changed.send(self, attr='description', old=oldDescription, new=desc)
+            signals.event.data_changed.send(self, attr='description', old=oldDescription, new=desc)
         self._notify('eventDescriptionChanged', oldDescription, desc)
         self.notifyModification()
 
@@ -3445,7 +3445,7 @@ class Conference(CommonObjectBase, Locatable):
             self.addContribSubmitter(newContrib,sub)
 
         newContrib._notify('created', self)
-        signals.contribution_created.send(newContrib, parent=self)
+        signals.event.contribution_created.send(newContrib, parent=self)
         self.notifyModification()
 
     def hasContribution(self,contrib):
@@ -3661,12 +3661,12 @@ class Conference(CommonObjectBase, Locatable):
     def requireDomain(self, dom):
         self.__ac.requireDomain(dom)
         self._notify('accessDomainAdded', dom)
-        signals.event_domain_access_granted.send(self, domain=dom)
+        signals.event.domain_access_granted.send(self, domain=dom)
 
     def freeDomain(self, dom):
         self.__ac.freeDomain(dom)
         self._notify('accessDomainRemoved', dom)
-        signals.event_domain_access_revoked.send(self, domain=dom)
+        signals.event.domain_access_revoked.send(self, domain=dom)
 
     def getDomainList(self):
         return self.__ac.getRequiredDomainList()
@@ -3715,7 +3715,7 @@ class Conference(CommonObjectBase, Locatable):
         if oldValue != private:
             # notify listeners
             self._notify('protectionChanged', oldValue, private)
-            signals.event_protection_changed.send(self, old=oldValue, new=private)
+            signals.event.protection_changed.send(self, old=oldValue, new=private)
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
@@ -4699,7 +4699,7 @@ class Conference(CommonObjectBase, Locatable):
         rp.setOwner( self )
         self.getRegistrants()[rp.getId()] = rp
         self._notify('registrantAdded', user)
-        signals.event_registrant_changed.send(self, user=user, registrant=rp, action='added')
+        signals.event.registrant_changed.send(self, user=user, registrant=rp, action='added')
         self.notifyModification()
 
     def updateRegistrantIndexByEmail(self, rp, newEmail):
@@ -4726,7 +4726,7 @@ class Conference(CommonObjectBase, Locatable):
         if part.getAvatar() is not None:
             part.getAvatar().removeRegistrant(part)
         self._notify('registrantRemoved', part)
-        signals.event_registrant_changed.send(self, user=part.getAvatar(), registrant=part, action='removed')
+        signals.event.registrant_changed.send(self, user=part.getAvatar(), registrant=part, action='removed')
         TrashCanManager().add(part)
         self.notifyModification()
 
@@ -7147,7 +7147,7 @@ class SessionSlot(Persistent, Observable, Fossilizable, Locatable):
 
     def delete(self):
         self._notify('deleted', self)
-        signals.session_slot_deleted.send(self)
+        signals.event.session_slot_deleted.send(self)
         self.getSchedule().clear()
         if self.getSession() is not None:
             self.getSession().removeSlot(self)
@@ -8055,7 +8055,7 @@ class Contribution(CommonObjectBase, Locatable):
 
         if raiseEvent:
             self._notify('infoChanged')
-            signals.contribution_data_changed.send(self)
+            signals.event.contribution_data_changed.send(self)
 
         if cleanCache:
             self.cleanCache()
@@ -8116,7 +8116,7 @@ class Contribution(CommonObjectBase, Locatable):
 
         if oldParent != None:
             self._notify('deleted', oldParent)
-            signals.contribution_deleted.send(self, parent=oldParent)
+            signals.event.contribution_deleted.send(self, parent=oldParent)
 
             self.setTrack(None)
             for mat in self.getMaterialList():
@@ -8174,7 +8174,7 @@ class Contribution(CommonObjectBase, Locatable):
         if notify:
             self._notify('contributionTitleChanged', oldTitle, newTitle)
             if oldTitle != newTitle:
-                signals.contribution_title_changed.send(self, old=oldTitle, new=newTitle)
+                signals.event.contribution_title_changed.send(self, old=oldTitle, new=newTitle)
             self.notifyModification()
 
     def getTitle( self ):
@@ -8957,7 +8957,7 @@ class Contribution(CommonObjectBase, Locatable):
         if oldValue != private:
             # notify listeners
             self._notify('protectionChanged', oldValue, private)
-            signals.contribution_protection_changed.send(self, old=oldValue, new=private)
+            signals.event.contribution_protection_changed.send(self, old=oldValue, new=private)
 
     def grantAccess(self, prin):
         self.__ac.grantAccess( prin )
@@ -9122,7 +9122,7 @@ class Contribution(CommonObjectBase, Locatable):
         newSub = SubContribution()
         self.addSubContribution(newSub)
         newSub._notify('created', self)
-        signals.subcontribution_created.send(newSub, parent=self)
+        signals.event.subcontribution_created.send(newSub, parent=self)
         return newSub
 
     def addSubContribution( self, newSubCont ):
@@ -10136,7 +10136,7 @@ class SubContribution(CommonObjectBase, Locatable):
             parent.setModificationDate()
         if raiseEvent:
             self._notify('infoChanged')
-            signals.subcontribution_data_changed.send(self)
+            signals.event.subcontribution_data_changed.send(self)
         self._p_changed = 1
 
     def getCategoriesPath(self):
@@ -10167,7 +10167,7 @@ class SubContribution(CommonObjectBase, Locatable):
         old_title = self.title
         self.title = newTitle.strip()
         if old_title != self.title:
-            signals.subcontribution_title_changed.send(self, old=old_title, new=self.title)
+            signals.event.subcontribution_title_changed.send(self, old=old_title, new=self.title)
         self.notifyModification()
 
     def getTitle( self ):
@@ -10584,7 +10584,7 @@ class SubContribution(CommonObjectBase, Locatable):
     def delete(self):
 
         self._notify('deleted', self.getOwner())
-        signals.subcontribution_deleted.send(self, parent=self.getOwner())
+        signals.event.subcontribution_deleted.send(self, parent=self.getOwner())
 
         while len(self.getSpeakerList()) > 0:
             self.removeSpeaker(self.getSpeakerList()[0])
@@ -12402,7 +12402,7 @@ class EventCloner(object):
     def get_plugin_items(event):
         """Returns the items/checkboxes for the clone options provided by plugins"""
         plugin_options = []
-        for plugin_cloner in values_from_signal(signals.event_management_clone.send(event), single_value=True):
+        for plugin_cloner in values_from_signal(signals.event_management.clone.send(event), single_value=True):
             with plugin_cloner.plugin.plugin_context():
                 for name, (title, enabled) in plugin_cloner.get_options().iteritems():
                     full_name = plugin_cloner.full_option_name(name)
@@ -12417,7 +12417,7 @@ class EventCloner(object):
     def clone_event(old_event, new_event):
         """Calls the various cloning methods from plugins"""
         selected = set(request.values.getlist('cloners'))
-        for plugin_cloner in values_from_signal(signals.event_management_clone.send(old_event), single_value=True):
+        for plugin_cloner in values_from_signal(signals.event_management.clone.send(old_event), single_value=True):
             with plugin_cloner.plugin.plugin_context():
                 selected_options = {name for name, (_, enabled) in plugin_cloner.get_options().iteritems()
                                     if enabled and plugin_cloner.full_option_name(name) in selected}

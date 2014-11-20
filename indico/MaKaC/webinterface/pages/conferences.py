@@ -326,7 +326,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                 if showeditorarea and (self._conf.getConfPaperReview().getChoice() == CPR.LAYOUT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
                     self._judgeeditorListOpt.setVisible(True)
 
-        for item in values_from_signal(signals.event_sidemenu.send()):
+        for item in values_from_signal(signals.event.sidemenu.send()):
             if item.visible is not None:
                 link = self._sectionMenu.getLinkByName(item.name)
                 link.setVisible(item.visible(self._conf))
@@ -1481,7 +1481,7 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
                     "Exception while trying to access the plugin elements of the side menu: {}".format(str(e)))
 
         self._pluginMenuItems = {}
-        for name, item in values_from_signal(signals.event_management_sidemenu.send(self._conf)):
+        for name, item in values_from_signal(signals.event_management.sidemenu.send(self._conf)):
             try:
                 self._pluginMenuItems[name] = item
                 self._generalSection.addItem(item)
@@ -2012,7 +2012,7 @@ class WPConfModifScheduleGraphic( WPConferenceModifBase ):
         return WPConferenceModifBase.getJSFiles(self) + self._includeJSPackage('Timetable')
 
     def _getSchedule(self):
-        custom_links = dict(values_from_signal(signals.timetable_buttons.send(self)))
+        custom_links = dict(values_from_signal(signals.event.timetable_buttons.send(self)))
         return WConfModifScheduleGraphic(self._conf, custom_links)
 
     def _getTTPage( self, params ):

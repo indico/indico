@@ -193,7 +193,7 @@ class ConfDisplayMgr(DisplayMgr):
     def getMenu(self):
         if self._menu.getParent() is None:
             self._menu.setParent(self)
-        plugin_items = frozenset(x.name for x in values_from_signal(signals.event_sidemenu.send()))
+        plugin_items = frozenset(x.name for x in values_from_signal(signals.event.sidemenu.send()))
         if getattr(self, 'plugin_items', frozenset()) != plugin_items:
             self._menu.updateSystemLink()
         self.plugin_items = plugin_items
@@ -922,7 +922,7 @@ class SystemLinkData(Observable):
     def __init__(self, conf=None):
         plugin_entries = None
         if not hasattr(self, '_linkData') or not hasattr(self, '_linkDataOrderedKeys'):
-            plugin_entries = values_from_signal(signals.event_sidemenu.send())
+            plugin_entries = values_from_signal(signals.event.sidemenu.send())
         #the following dict is used to update the system link of the menu. each new entry is added to the menu,
         #and all entries in the menu whiche are not is this dict are removed.
         if not hasattr(self, "_linkData"):

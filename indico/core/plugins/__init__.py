@@ -76,9 +76,9 @@ class IndicoPlugin(Plugin):
         called anymore.
         """
         self.alembic_versions_path = os.path.join(self.root_path, 'migrations')
-        self.connect(signals.cli, self.add_cli_command)
-        self.connect(signals.shell_context, lambda _, add_to_context: self.extend_shell_context(add_to_context))
-        self.connect(signals.get_blueprints, lambda app: (self, self.get_blueprints()))
+        self.connect(signals.plugin.cli, self.add_cli_command)
+        self.connect(signals.plugin.shell_context, lambda _, add_to_context: self.extend_shell_context(add_to_context))
+        self.connect(signals.plugin.get_blueprints, lambda app: (self, self.get_blueprints()))
         self.template_hook('vars-js', self.inject_vars_js)
         self._setup_assets()
         self._import_models()
@@ -157,7 +157,7 @@ class IndicoPlugin(Plugin):
         :param condition: a callable to determine whether to inject or not. only called, when the
                           view_class criterion matches
         """
-        self._inject_asset(signals.inject_css, name, view_class, subclasses, condition)
+        self._inject_asset(signals.plugin.inject_css, name, view_class, subclasses, condition)
 
     def inject_js(self, name, view_class=None, subclasses=True, condition=None):
         """Injects a JS bundle into Indico's pages
@@ -168,7 +168,7 @@ class IndicoPlugin(Plugin):
         :param condition: a callable to determine whether to inject or not. only called, when the
                           view_class criterion matches
         """
-        self._inject_asset(signals.inject_js, name, view_class, subclasses, condition)
+        self._inject_asset(signals.plugin.inject_js, name, view_class, subclasses, condition)
 
     def _inject_asset(self, signal, name, view_class=None, subclasses=True, condition=None):
         """Injects an asset bundle into Indico's pages
@@ -222,7 +222,8 @@ class IndicoPlugin(Plugin):
                          inject data for the same hook.
         :param markup: If the returned data is HTML
         """
-        self.connect(signals.template_hook, lambda _, **kw: (markup, priority, receiver(**kw)), sender=unicode(name))
+        self.connect(signals.plugin.template_hook, lambda _, **kw: (markup, priority, receiver(**kw)),
+                     sender=unicode(name))
 
     @classproperty
     @classmethod
@@ -271,7 +272,7 @@ def plugin_hook(*name, **kwargs):
         raise TypeError('plugin_hook() accepts only one positional argument, {} given'.format(len(name)))
     name = name[0]
     values = []
-    for is_markup, priority, value in values_from_signal(signals.template_hook.send(unicode(name), **kwargs),
+    for is_markup, priority, value in values_from_signal(signals.plugin.template_hook.send(unicode(name), **kwargs),
                                                          single_value=True):
         if value:
             if is_markup:

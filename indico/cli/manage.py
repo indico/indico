@@ -41,7 +41,7 @@ def main():
     manager.add_command('plugindb', PluginDatabaseManager)
     manager.add_command('runserver', IndicoDevServer())
     manager.add_command('i18n', IndicoI18nManager)
-    signals.cli.send(manager)
+    signals.plugin.cli.send(manager)
 
     try:
         manager.run()

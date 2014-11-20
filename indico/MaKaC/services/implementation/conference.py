@@ -200,7 +200,7 @@ class ConferenceTypeModification(ConferenceTextModificationBase):
             dispMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._target)
             dispMgr.setDefaultStyle(styleMgr.getDefaultStyleForEventType(newType))
             self._target._notify('infoChanged')
-            signals.event_data_changed.send(self._target, attr=None, old=None, new=None)
+            signals.event.data_changed.send(self._target, attr=None, old=None, new=None)
 
     def _handleGet(self):
         return self._target.getType()
@@ -254,7 +254,7 @@ class ConferenceBookingModification(ConferenceTextModificationBase):
                         'address': loc.address,
                         'room': room.name}
             if old_data != new_data:
-                signals.event_data_changed.send(self._target, attr='location', old=old_data, new=new_data)
+                signals.event.data_changed.send(self._target, attr='location', old=old_data, new=new_data)
 
     def _handleGet(self):
 
