@@ -371,7 +371,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
                     self._conf)
                 submitOpt = i18nformat(
                     """%s<li><a href=%s>
-                        _("View or modify your already registration")
+                        _("View or modify your registration data")
                        </a></li>""") % (submitOpt,
                                         quoteattr(str(modify_registration_url)))
             if registered and self._conf.getRegistrationForm().getETicket().isEnabled() and \
