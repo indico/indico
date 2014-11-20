@@ -14,7 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.signals import _signals
+from blinker import Namespace
+
+_signals = Namespace()
 
 
 access_granted = _signals.signal('access-granted', """
@@ -35,14 +37,4 @@ is the `AccessController`; the `principal` is passed as a kwarg.
 modification_revoked = _signals.signal('modification-revoked', """
 Called when a principal in an `AccessController` is revoked modification access. The `sender`
 is the `AccessController`; the `principal` is passed as a kwarg.
-""")
-
-event_domain_access_granted = _signals.signal('event-domain-access-granted', """
-Called when an IP restriction is added to an event. The `sender` is the event class,
-the `domain` is that domain that has been added.
-""")
-
-event_domain_access_revoked = _signals.signal('event-domain-access-revoked', """
-Called when an IP restriction is removed from an event. The `sender` is the event class,
-the `domain` is that domain that has been removed.
 """)

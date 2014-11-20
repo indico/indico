@@ -14,20 +14,22 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.signals import _signals
+from blinker import Namespace
+
+_signals = Namespace()
 
 
-event_management_sidemenu = _signals.signal('event-management-sidemenu', """
+sidemenu = _signals.signal('sidemenu', """
 Expected to return `(plugin_menu_item_name, SideMenuItem)` tuples to be added to
 the event management side menu. The *sender* is the event object.
 """)
 
-event_management_clone = _signals.signal('event-management-clone', """
+clone = _signals.signal('clone', """
 Expected to return an instance of a ``EventCloner`` subclass implementing
 the cloning behavior. The *sender* is the event object.
 """)
 
-event_management_url = _signals.signal('event-management-url', """
+management_url = _signals.signal('management-url', """
 Expected to return a URL for the event management page of the plugin.
 This is used when someone who does not have event management access wants
 to go to the event management area. He is then redirected to one of the URLs

@@ -14,7 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.signals import _signals
+from blinker import Namespace
+
+_signals = Namespace()
 
 
 after_process = _signals.signal('after-process', """

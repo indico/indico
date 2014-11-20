@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.signals import _signals
+from indico.core.signals.event import _signals
 
 
 contribution_created = _signals.signal('contribution-created', """

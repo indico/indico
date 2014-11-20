@@ -14,19 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.signals import _signals
+from indico.core.signals.event import _signals
 
 
-event_sidemenu = _signals.signal('event-sidemenu', """
+sidemenu = _signals.signal('sidemenu', """
 Expected to return ``EventMenuEntry`` objects to be added to the event side menu.
 A single entry can be returned directly, multiple entries must be yielded.
 """)
 
-event_deleted = _signals.signal('event-deleted', """
+deleted = _signals.signal('deleted', """
 Called when an event is deleted. The *sender* is the event object.
 """)
 
-event_data_changed = _signals.signal('event-data-changed', """
+data_changed = _signals.signal('data-changed', """
 Called when the basic data of an event is changed. The `sender` is the event,
 and the following kwargs are available:
 
@@ -46,19 +46,29 @@ Depending on the code performing the change, sometimes separate `start_date` and
 triggered.
 """)
 
-event_moved = _signals.signal('event-moved', """
+moved = _signals.signal('moved', """
 Called when an event is moved to a different category. The `sender` is the event,
 the old/new categories are passed using the `old_parent` and `new_parent` kwargs.
 """)
 
-event_created = _signals.signal('event-created', """
+created = _signals.signal('created', """
 Called when a new event is created. The `sender` is the new event, its
 parent category is passed in the `parent` kwarg.
 """)
 
-event_protection_changed = _signals.signal('event-protection-changed', """
+protection_changed = _signals.signal('protection-changed', """
 Called when the protection mode of the event changed. The `sender` is the event,
 `old`/`new` contain the corresponding values.
+""")
+
+domain_access_granted = _signals.signal('domain-access-granted', """
+Called when an IP restriction is added to an event. The `sender` is the event class,
+the `domain` is that domain that has been added.
+""")
+
+domain_access_revoked = _signals.signal('domain-access-revoked', """
+Called when an IP restriction is removed from an event. The `sender` is the event class,
+the `domain` is that domain that has been removed.
 """)
 
 session_slot_deleted = _signals.signal('session-slot-deleted', """
@@ -75,7 +85,7 @@ Expected to return a list of tuples ('button_name', 'js_call_name').
 Called when building the timetable view.
 """)
 
-event_registrant_changed = _signals.signal('event-registrant-changed', """
+registrant_changed = _signals.signal('registrant-changed', """
 Called when an event registrant is added or removed. The `sender` is the event,
 and the following kwargs are available:
 
@@ -84,7 +94,7 @@ and the following kwargs are available:
 * `action` - the action, i.e. ``'removed'`` or ``'added'``
 """)
 
-event_participant_changed = _signals.signal('event-participant-changed', """
+participant_changed = _signals.signal('participant-changed', """
 Called when an event participant is added or removed. The `sender` is the event,
 and the following kwargs are available:
 

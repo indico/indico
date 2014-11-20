@@ -14,43 +14,45 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.signals import _signals
+from blinker import Namespace
+
+_signals = Namespace()
 
 
-category_moved = _signals.signal('category-moved', """
+moved = _signals.signal('moved', """
 Called when the parent of a category is changed. The `sender` is the category,
 the old/new parents are passed using the `old_parent` and `new_parent` kwargs.
 """)
 
-category_created = _signals.signal('category-created', """
+created = _signals.signal('created', """
 Called when a new category is created. The `sender` is the new category, its
 parent category is passed in the `parent` kwarg.
 """)
 
-category_deleted = _signals.signal('category-deleted', """
+deleted = _signals.signal('deleted', """
 Called when a category is deleted. The `sender` is the category.
 """)
 
-category_title_changed = _signals.signal('category-title-changed', """
+title_changed = _signals.signal('title-changed', """
 Called when the title of a category is changed. The `sender` is the category,
 the old/new titles are passed in the `old` and `new` kwargs.
 """)
 
-category_data_changed = _signals.signal('category-data-changed', """
+data_changed = _signals.signal('data-changed', """
 Called when some data of the category changed. The `sender` is the category.
 """)
 
-category_protection_changed = _signals.signal('category-protection-changed', """
+protection_changed = _signals.signal('protection-changed', """
 Called when the protection mode of the category changed. The `sender` is the category,
 `old`/`new` contain the corresponding values.
 """)
 
-category_domain_access_granted = _signals.signal('category-domain-access-granted', """
+domain_access_granted = _signals.signal('domain-access-granted', """
 Called when an IP restriction is added to a category. The `sender` is the category class,
 the `domain` is that domain that has been added.
 """)
 
-category_domain_access_revoked = _signals.signal('category-domain-access-revoked', """
+domain_access_revoked = _signals.signal('domain-access-revoked', """
 Called when an IP restriction is removed from a category. The `sender` is the category class,
 the `domain` is that domain that has been removed.
 """)

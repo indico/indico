@@ -14,12 +14,5 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from blinker import Namespace
-
-_signals = Namespace()
-
-from indico.core.signals.acls import *
-from indico.core.signals.categories import *
+from indico.core.signals import acl, category, event, event_management, plugin
 from indico.core.signals.core import *
-from indico.core.signals.events import *
-from indico.core.signals.plugins import *
