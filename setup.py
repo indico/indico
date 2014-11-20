@@ -480,7 +480,6 @@ if __name__ == '__main__':
             indico_scheduler = indico.modules.scheduler.daemon_script:main
             indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main
             indico_ctl = MaKaC.consoleScripts.indicoCtl:main
-            indico_livesync = indico.ext.livesync.console:main
             indico = indico.cli.manage:main
             indico-zodbimport = indico_zodbimport.cli:main
 
@@ -494,7 +493,6 @@ if __name__ == '__main__':
 
             Collaboration = MaKaC.plugins.Collaboration
             EPayment = MaKaC.plugins.EPayment
-            livesync = indico.ext.livesync
 
             [indico.ext]
 
@@ -510,9 +508,6 @@ if __name__ == '__main__':
             EPayment.worldPay = MaKaC.plugins.EPayment.worldPay
             EPayment.yellowPay = MaKaC.plugins.EPayment.yellowPay
             EPayment.skipjack = MaKaC.plugins.EPayment.skipjack
-
-            livesync.invenio = indico.ext.livesync.invenio
-            livesync.cern_search = indico.ext.livesync.cern_search
             """,
           zip_safe=False,
           packages=foundPackages,
