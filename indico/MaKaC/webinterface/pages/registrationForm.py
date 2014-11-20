@@ -345,14 +345,72 @@ class WPRegistrationForm(conferences.WPConferenceDefaultDisplayBase):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._regFormOpt)
 
+    def getCSSFiles(self):
+        return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
+            self._asset_env['registrationform_sass'].urls()
+
 
 class WConfRegistrationForm(WConfDisplayBodyBase):
 
     _linkname = "registrationForm"
 
-    def __init__(self, conf, av):
+    def __init__(self, conf, av, registrant=None):
         self._conf = conf
         self._avatar = av
+        self._registrant = av.getRegistrantById(conf.getId()) if av else registrant
+
+    def _formatValue(self, fieldInput, value):
+        try:
+            return str(fieldInput.getValueDisplay(value))
+        except:
+            return str(value).strip()
+
+    def _getAccommodationHTML(self):
+        regForm = self._conf.getRegistrationForm()
+        if regForm.getAccommodationForm().isEnabled():
+            accommodation = self._registrant.getAccommodation()
+            accoType = i18nformat("""<span class="not-selected">_("Not selected")</span>""")
+            cancelled = ""
+            if accommodation is not None and accommodation.getAccommodationType() is not None:
+                accoType = accommodation.getAccommodationType().getCaption()
+                if accommodation.getAccommodationType().isCancelled():
+                    cancelled = """<span class="not-selected">( """ + _("disabled") + """)</span>"""
+            arrivalDate = """<span class="not-selected">""" + _("Not selected") + """</span>"""
+            if accommodation is not None and accommodation.getArrivalDate() is not None:
+                arrivalDate = accommodation.getArrivalDate().strftime("%d-%B-%Y")
+            departureDate = """<span class="not-selected">""" + _("Not selected") + """</span>"""
+            if accommodation is not None and accommodation.getDepartureDate() is not None:
+                departureDate = accommodation.getDepartureDate().strftime("%d-%B-%Y")
+            accoTypeHTML = ""
+            if regForm.getAccommodationForm().getAccommodationTypesList() != []:
+                accoTypeHTML = i18nformat("""
+                          <tr>
+                            <td align="left" class="regform-done-caption">_("Type")</td>
+                            <td align="left" class="regform-done-data">%s %s</td>
+                          </tr>""" % (accoType, cancelled))
+
+            text = i18nformat("""
+                        <table>
+                          <tr>
+                            <td align="left" class="regform-done-caption">_("Arrival")</td>
+                            <td align="left" class="regform-done-data">%s</td>
+                          </tr>
+                          <tr>
+                            <td align="left" class="regform-done-caption">_("Departure")</td>
+                            <td align="left" class="regform-done-data">%s</td>
+                          </tr>
+                          %s
+                        </table>
+                        """) % (arrivalDate, departureDate, accoTypeHTML)
+            return i18nformat("""
+                    <tr>
+                      <td class="regform-done-title">_("Accommodation")</td>
+                    </tr>
+                    <tr>
+                      <td>%s</td>
+                    </tr>
+                    """) % (text)
+        return ""
 
     def _getActionsHTML(self):
         html = ""
@@ -393,11 +451,332 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
                    """) % (submitOpt)
         return html
 
+    def _getFormItemsHTMLBillable(self, bf, total):
+        html = [""]
+        for item in bf.getBilledItems():
+            caption = item.getCaption()
+            currency = item.getCurrency()
+            price = item.getPrice()
+            quantity = item.getQuantity()
+            total["value"] += price * quantity
+            if quantity > 0:
+                html.append("""
+                        <tr class="regform-done-table-item">
+                           <td align="left">%s</td>
+                           <td align="right" nowrap>%i</td>
+                           <td align="right" nowrap>%s</td>
+                           <td align="right" nowrap>%s <em>%s</em></td>
+                        </tr>
+                        """ % (caption, quantity, price, price * quantity, currency))
+        return "".join(html)
+
+    def _getFormSections(self):
+        sects = []
+        regForm = self._conf.getRegistrationForm()
+        for formSection in regForm.getSortedForms():
+            if formSection.getId() == "reasonParticipation":
+                sects.append(self._getReasonParticipationHTML())
+            elif formSection.getId() == "sessions":
+                sects.append(self._getSessionsHTML())
+            elif formSection.getId() == "accommodation":
+                sects.append(self._getAccommodationHTML())
+            elif formSection.getId() == "socialEvents":
+                sects.append(self._getSocialEventsHTML())
+            elif formSection.getId() == "furtherInformation":
+                pass
+            else:
+                sects.append(self._getMiscellaneousInfoHTML(formSection))
+        return "".join(s.decode('utf-8') for s in sects).encode('utf-8')
+
+    def _getMiscellaneousInfoHTML(self, gsf):
+        html = []
+        if gsf.isEnabled():
+            html.append("""
+                <tr>
+                  <td class="regform-done-title">%s</td>
+                </tr>
+                <tr>
+                  <td>%s</td>
+                </tr>
+                """ % (gsf.getTitle(), self._getMiscInfoItemsHTML(gsf)))
+        return "".join(html)
+
+    def _getMiscInfoItemsHTML(self, gsf):
+        regForm = self._conf.getRegistrationForm()
+        miscGroup = self._registrant.getMiscellaneousGroupById(gsf.getId())
+        html = ["""<table>"""]
+        for f in (f for f in gsf.getSortedFields() if not isinstance(f.getInput(), LabelInput)):
+            miscItem = None
+            fieldInput = None
+            if miscGroup is not None:
+                miscItem = miscGroup.getResponseItemById(f.getId())
+                if miscItem is None:  # for fields created after the registration of the user, we skip it.
+                    continue
+                fieldInput = miscItem.getGeneralField().getInput()
+            v = """<span class="not-selected">""" + _("No value selected") + """</span>"""
+            if miscItem is not None:
+                v = miscItem.getValue()
+            if v is None:
+                v = ""
+            html.append("""
+                    <tr>
+                       <td class="regform-done-caption">%s</td>
+                       <td class="regform-done-data">%s</td>
+                    </tr>
+                    """ % (f.getCaption(), self._formatValue(fieldInput, v)))
+        if miscGroup is not None:
+            for miscItem in (f for f in miscGroup.getResponseItemList() if not isinstance(f.getGeneralField().getInput(), LabelInput)):
+                fieldInput = miscItem.getGeneralField().getInput()
+                f = gsf.getFieldById(miscItem.getId())
+                if f is None:
+                    html.append(i18nformat("""
+                                <tr>
+                                   <td class="regform-done-caption">%s</td>
+                                   <td class="regform-done-data">%s <span class="not-selected">(_("Cancelled"))</span></td>
+                                </tr>
+                                """) % (miscItem.getCaption(), self._formatValue(fieldInput, miscItem.getValue())))
+        if len(html) == 1:
+            html.append(i18nformat("""
+                        <tr><td><font color="black"><i>--_("No fields")--</i></font></td></tr>
+                        """))
+        html.append("</table>")
+        return "".join(html)
+
+    def _getMiscInfoItemsHTMLBillable(self, gsf, total):
+        miscGroup = self._registrant.getMiscellaneousGroupById(gsf.getId())
+        html = [""""""]
+        if miscGroup is not None:
+            for miscItem in miscGroup.getResponseItemList():
+                price = 0.0
+                quantity = 0
+                value = ""
+                caption = miscItem.getCaption()
+                currency = miscItem.getCurrency()
+                if miscItem is not None:
+                    if gsf.getGeneralSection().getFieldById(miscItem.getId()) is None:
+                        continue
+                    if miscItem.getGeneralField().isDisabled():
+                        continue
+                    fieldInput = miscItem.getGeneralField().getInput()
+                    if miscItem.isBillable():
+                        value = miscItem.getValue()
+                        price = string.atof(miscItem.getPrice())
+                        quantity = miscItem.getQuantity()
+                        total["value"] += price * quantity
+                if value != "":
+                    value = ":%s" % value
+                if quantity > 0:
+                    html.append("""
+                            <tr class="regform-done-table-item">
+                               <td>%s: %s%s</td>
+                               <td align="right" nowrap>%i</td>
+                               <td align="right" nowrap>%s</td>
+                               <td align="right" nowrap>%s <em>%s</em></td>
+                            </tr>
+                            """ % (gsf.getTitle(), caption, self._formatValue(fieldInput, value),
+                                   quantity, price, price * quantity, currency))
+        return "".join(html)
+
+    def _getPaymentInfo(self):
+        if not self._registrant:
+            return
+        regForm = self._conf.getRegistrationForm()
+        modPay = self._conf.getModPay()
+        html = []
+        if modPay.isActivated() and self._registrant.doPay():
+            total = {}
+            total["value"] = 0
+            html.append(i18nformat(""" <tr><td colspan="2">
+                        <table width="100%" cellpadding="3" cellspacing="0">
+                            <tr>
+                                <td class="regform-done-table-title">
+                                    _("Item")
+                                </td>
+                                <td align="right" class="regform-done-table-title">
+                                    _("Quantity")
+                                </td>
+                                <td align="right" class="regform-done-table-title" nowrap>
+                                    _("Unit Price")
+                                </td>
+                                <td align="right" class="regform-done-table-title">
+                                    _("Cost")
+                                </td>
+                            </tr>
+                        """))
+            for gsf in self._registrant.getMiscellaneousGroupList():
+                html.append("""%s""" % (self._getMiscInfoItemsHTMLBillable(gsf, total)))
+            for bf in self._registrant.getBilledForms():
+                html.append("""%s""" % (self._getFormItemsHTMLBillable(bf, total)))
+
+            url = urlHandlers.UHConfRegistrationFormconfirmBooking.getURL(self._registrant)
+            url.addParam("registrantId", self._registrant.getId())
+            url.addParam("confId", self._conf.getId())
+
+            condChecking = ""
+            if modPay.hasPaymentConditions():
+                condChecking = i18nformat("""
+                                <tr>
+                                    <td>
+                                        <div class="regform-done-conditions checkbox-with-text">
+                                            <input type="checkbox" name="conditions"/>
+                                            <div>_("I have read and accept the terms and conditions and understand that by confirming this order I will be entering into a binding transaction") (<a href="#" onClick="window.open('%s','Conditions','width=400,height=200,resizable = yes,scrollbars = yes'); return false;">Terms and conditions</a>).</div>
+                                        </div>
+                                    </td>
+                                </tr>""" % str(urlHandlers.UHConfRegistrationFormConditions.getURL(self._conf)))
+
+            html.append(i18nformat("""
+                                <tr>
+                                    <td align="right" class="regform-done-table-total" colspan="3">
+                                        _("TOTAL")
+                                    </td>
+                                    <td align="right" class="regform-done-table-total" nowrap>
+                                        %s <em>%s</em>
+                                    </td>
+                                </tr>
+                                <form name="epay" action="%s" method="POST">
+                                    <tr>
+                                      <table width="100%%">
+                                        %s
+                                        <tr>
+                                            <td align="right">
+                                                <div class="i-button highlight regform-done-checkout" onclick="checkConditions()">
+                                                    _('Checkout')
+                                                    <i class="icon-next"></i>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                       </table>
+                                    </tr>
+                                </form>
+                            </table></td></tr>
+                            """) % (total["value"], regForm.getCurrency(), url, condChecking))
+        return "".join(html)
+
+    def _getReasonParticipationHTML(self):
+        regForm = self._conf.getRegistrationForm()
+        if regForm.getReasonParticipationForm().isEnabled():
+            if self.htmlText(self._registrant.getReasonParticipation()) is not "":
+                text = self.htmlText(self._registrant.getReasonParticipation())
+            else:
+                text = """<span class="not-selected">""" + _("No reason given") + """</span>"""
+            return i18nformat("""
+                    <tr>
+                      <td class="regform-done-title">_("Reason for participation")</td>
+                    </tr>
+                    <tr>
+                      <td>%s</td>
+                    </tr>
+                    """) % (text)
+        return ""
+
+    def _getSessionsHTML(self):
+        regForm = self._conf.getRegistrationForm()
+        sessions = self._registrant.getSessionList()
+        if regForm.getSessionsForm().isEnabled():
+            if regForm.getSessionsForm().getType() == "2priorities":
+                session1 = i18nformat("""<span class="not-selected">_("Not selected")</span>""")
+                session2 = i18nformat("""<span class="not-selected">_("Not selected")</span>""")
+                if len(sessions) > 0:
+                    session1 = sessions[0].getTitle()
+                    if sessions[0].isCancelled():
+                        session1 = i18nformat("""%s <span class="not-selected">(_("Cancelled"))</span>""") % session1
+                if len(sessions) > 1:
+                    session2 = sessions[1].getTitle()
+                    if sessions[1].isCancelled():
+                        session2 = i18nformat("""%s <span class="not-selected">(_("Cancelled"))</span>""") % session2
+                text = i18nformat("""
+                        <table>
+                          <tr>
+                            <td class="regform-done-caption">_("Preferred choice")</td>
+                            <td class="regform-done-data">%s</td>
+                          </tr>
+                          <tr>
+                            <td class="regform-done-caption">_("Secondary choice")</td>
+                            <td class="regform-done-data">%s</td>
+                          </tr>
+                        </table>
+                        """) % (session1, session2)
+                return _("""
+                        <tr>
+                          <td class="regform-done-title">%s</td>
+                        </tr>
+                        <tr>
+                          <td>%s</td>
+                        </tr>
+                        """) % (regForm.getSessionsForm().getTitle(), text)
+            if regForm.getSessionsForm().getType() == "all":
+                sessionList = i18nformat("""<span class="not-selected">_("No sessions selected")</span>""")
+                if len(sessions) > 0:
+                    sessionList = ["<ul>"]
+                    for ses in sessions:
+                        sesText = "<li>%s</li>" % ses.getTitle()
+                        if ses.isCancelled():
+                            sesText = i18nformat("""<li>%s <span class="not-selected">(_("Cancelled"))</span></li>""") % ses.getTitle()
+                        sessionList.append(sesText)
+                    sessionList.append("</ul>")
+                    sessionList = "".join(sessionList)
+                text = """
+                        <table>
+                          <tr>
+                            <td align="left">%s</td>
+                          </tr>
+                        </table>
+                        """ % (sessionList)
+                return _("""
+                        <tr>
+                          <td class="regform-done-title">%s</td>
+                        </tr>
+                        <tr>
+                          <td>%s</td>
+                        </tr>
+                        """) % (regForm.getSessionsForm().getTitle(), text)
+        return ""
+
+    def _getSocialEventsHTML(self):
+        regForm = self._conf.getRegistrationForm()
+        text = ""
+        if regForm.getSocialEventForm().isEnabled():
+            socialEvents = self._registrant.getSocialEvents()
+            r = []
+            for se in socialEvents:
+                cancelled = ""
+                if se.isCancelled():
+                    cancelled = i18nformat("""<span class="not-selected">(_("Cancelled"))</span>""")
+                    if se.getCancelledReason().strip():
+                        cancelled = i18nformat("""<span class="not-selected">(_("Cancelled"): %s)</span>""") % se.getCancelledReason().strip()
+                r.append(i18nformat("""
+                            <tr>
+                                <td align="left">
+                                    <span class="regform-done-caption">%s</span>
+                                    <span class="regFormDonePlacesNeeded">%s _("place(s) needed")</span>
+                                    <span>%s</span>
+                                </td>
+                            </tr>
+                         """) % (se.getCaption(), se.getNoPlaces(), cancelled))
+            if r == []:
+                text = """<span class="not-selected">""" + _("No social events selected") + """</span>"""
+            else:
+                text = """
+                        <table>
+                          %s
+                        </table>
+                        """ % ("".join(r))
+            text = _("""
+                    <tr>
+                      <td class="regform-done-title">%s</td>
+                    </tr>
+                    <tr>
+                      <td>%s</td>
+                    </tr>
+                    """) % (regForm.getSocialEventForm().getTitle(), text)
+        return text
+
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)
         regForm = self._conf.getRegistrationForm()
 
         wvars["confId"] = self._conf.getId()
+        wvars["registrant"] = self._registrant
         wvars["body_title"] = self._getTitle()
         wvars["startDate"] = regForm.getStartRegistrationDate().strftime("%d %B %Y")
         wvars["endDate"] = regForm.getEndRegistrationDate().strftime("%d %B %Y")
@@ -420,6 +799,14 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
                                     <td width="100%%" align="left">%s</td>
                                 </tr>
                                 """) % regForm.getContactInfo()
+
+        if self._registrant:
+            wvars["payment_info"] = self._getPaymentInfo()
+            wvars["registration_info"] = self._getFormSections()
+            modEticket = self._conf.getRegistrationForm().getETicket()
+            if modEticket.isEnabled() and modEticket.isShownAfterRegistration():
+                wvars["pdf_ticket_url"] = url_for("event.e-ticket-pdf", self._registrant,
+                                                  authkey=self._registrant.getRandomId())
         return wvars
 
 
