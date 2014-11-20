@@ -46,4 +46,41 @@
         </tr>
     </table>
     <br>
+
+    %if registrant:
+        <div id="registration-summary" class="regform-done">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    ${ _('Registration summary') }
+                </div>
+                % if pdf_ticket_url:
+                    <div class="right">
+                        <a class="i-button highlight icon-ticket" target="blank" href="${pdf_ticket_url}">
+                            ${ _("Download E-ticket") }
+                        </a>
+                    </div>
+                % endif
+            </div>
+            <div class="i-box-content">
+                <table width="100%" cellpadding="0" cellspacing="0">
+                    ${ registration_info }
+                </table>
+            </div>
+        </div>
+
+        %if payment_info:
+            <div id="payment-summary" class="regform-done">
+                <div class="i-box-header">
+                    <div class="i-box-title">
+                        ${ _('Payment summary') }
+                    </div>
+                </div>
+                <div class="i-box-content">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                        ${ payment_info }
+                    </table>
+                </div>
+            </div>
+        %endif
+    %endif
 </%block>
