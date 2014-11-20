@@ -81,7 +81,7 @@ file is passed in the *resource* kwarg.
 """)
 
 timetable_buttons = _signals.signal('timetable-buttons', """
-Expected to return a list of tuples ('button_name', 'js_call_name').
+Expected to return a list of tuples ('button_name', 'js-call-class').
 Called when building the timetable view.
 """)
 
