@@ -114,7 +114,8 @@
     text-align: center;
 }
 
-.info-message-box, .message-message-box {
+.info-message-box,
+.message-message-box {      // Needed for default category 'message' of flash() in flashed_messaged.html
     @extend %message-box;
     @include icon-before('icon-info');
 
