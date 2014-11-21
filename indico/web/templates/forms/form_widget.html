@@ -41,3 +41,13 @@
     {% endif %}
     </form>
 {% endmacro %}
+
+{% macro form_fieldset(legend, description=none, disabled=false) %}
+    <fieldset{% if disabled %} disabled {% endif %}>
+        <legend>{{ legend }}</legend>
+        {% if description %}
+            <p class="description">{{ description }}</p>
+        {% endif %}
+        {{ caller() }}
+    </fieldset>
+{% endmacro %}

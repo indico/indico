@@ -427,6 +427,28 @@ $switchTransition: .15s ease-out;
     .i-form-button {
         margin: 0.5em 0;
     }
+
+    fieldset {
+        border: 1px solid $separator-color;
+        margin-bottom: 1em;
+        border-radius: 0.2em;
+
+        legend {
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+
+        p.description {
+            margin: 0.2em 0 0 0;
+            font-size: 1.1em;
+            padding-left: 2px; // align it with the legend
+            color: $dark-gray;
+        }
+
+        .form-group:first-of-type {
+            margin-top: 2em;
+        }
+    }
 }
 
 .i-radio {
