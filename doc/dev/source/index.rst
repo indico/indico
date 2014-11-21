@@ -1,7 +1,19 @@
-Indico API
-==========
+Indico Documentation
+====================
 
-Contents:
+============================
+Installation / Configuration
+============================
+
+.. toctree::
+   :maxdepth: 1
+   :numbered:
+
+   installation.rst
+
+===
+API
+===
 
 .. toctree::
    :maxdepth: 1
@@ -22,4 +34,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
