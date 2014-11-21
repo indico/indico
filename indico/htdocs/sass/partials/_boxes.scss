@@ -23,6 +23,7 @@
 %i-box-title {
     @extend %font-family-title-light;
     color: $dark-blue;
+    display: inline-block;
     font-size: 1.5em;
     font-weight: bold;
 }
@@ -70,8 +71,8 @@
 
         .i-box-buttons {
             float: right;
-            margin-left: 25px;
-            margin-bottom: -10px;
+            margin: 0;
+            padding: 0;
         }
     }
 
