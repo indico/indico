@@ -1,4 +1,4 @@
-{% from 'forms/form_widget.html' import form_header, form_row, form_footer  %}
+{% from 'forms/form_widget.html' import form_header, form_rows, form_footer  %}
 
 <div class="plugin-header">
     <h1>{{ plugin.title }}</h1>
@@ -11,9 +11,7 @@
     {% trans %}This plugin does not have any settings.{% endtrans %}
 {% else %}
     {{ form_header() }}
-    {% for field in form.visible_fields %}
-        {{ form_row(field, plugin.settings_form_field_opts.get(field.short_name, {})) }}
-    {% endfor %}
+    {{ form_rows(form, widget_attrs=plugin.settings_form_field_opts) }}
     {% call form_footer() %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
         <a href="{{ url_for('.index') }}" class="i-button big">{% trans %}Cancel{% endtrans %}</a>

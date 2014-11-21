@@ -30,6 +30,14 @@
     </div>
 {%- endmacro %}
 
+{% macro form_rows(form, fields=none, skip=(), orientation='', widget_attrs={}) %}
+    {% for field in form.visible_fields %}
+        {% if (fields is none or field.short_name in fields) and field.short_name not in skip %}
+            {{ form_row(field, widget_attrs.get(field.short_name, {}), orientation) }}
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
 {% macro form_footer() -%}
     {% if caller %}
         <div class="form-group">
