@@ -35,35 +35,33 @@
             %endif
         </div>
         <div class="i-box-content">
-            <table width="100%">
+            <table width="100%" align="center">
                 <tr>
-                    <td>
-                        <table width="100%" align="center">
-                            <tr>
-                                <td nowrap class="displayField">${ _("Registration opening day")}:</td>
-                                <td width="100%" align="left">${ startDate }</td>
-                            </tr>
-                            <tr>
-                                <td nowrap class="displayField">${ _("Registration deadline")}:</td>
-                                <td width="100%" align="left">${ endDate }</td>
-                            </tr>
-                            ${ usersLimit }
-                            ${ contactInfo }
-                        </table>
-                    </td>
+                    <td class="regform-done-caption">${ _("Opening date")}</td>
+                    <td class="regform-done-data">${ startDate }</td>
                 </tr>
                 <tr>
-                    <td><br></td>
+                    <td class="regform-done-caption">${ _("Closing date")}</td>
+                    <td class="regform-done-data">${ endDate }</td>
                 </tr>
-                <tr>
-                    <td>
-                        <table width="100%" align="center">
-                            <tr>
-                                <td><pre>${ announcement }</pre></td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
+                % if usersLimit:
+                    <tr>
+                        <td class="regform-done-caption">${ _("Capacity")}</td>
+                        <td class="regform-done-data">${ usersLimit }</td>
+                    </tr>
+                % endif
+                % if contactInfo:
+                    <tr>
+                        <td class="regform-done-caption">${ _("Contact info")}</td>
+                        <td class="regform-done-data">${ contactInfo }</td>
+                    </tr>
+                % endif
+                % if announcement:
+                    <tr>
+                        <td class="regform-done-caption">${ _("Contact info")}</td>
+                        <td class="regform-done-data">${ announcement }</td>
+                    </tr>
+                % endif
             </table>
         </div>
     </div>
