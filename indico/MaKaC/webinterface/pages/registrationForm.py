@@ -412,44 +412,17 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
                     """) % (text)
         return ""
 
-    def _getActionsHTML(self):
-        html = ""
+    def _getActions(self):
+        actions = []
         regForm = self._conf.getRegistrationForm()
-        if nowutc() < regForm.getStartRegistrationDate():
-            return html
-        else:
-            submitOpt = ""
-            registered = False
-            if self._avatar is not None:
-                registered = self._avatar.isRegisteredInConf(self._conf)
-            if regForm.inRegistrationPeriod() and not registered:
-                submitOpt = i18nformat("""<li><a href=%s> _("Show registration form")</a></li>""") % (quoteattr(str(urlHandlers.UHConfRegistrationFormDisplay.getURL(self._conf))))
-            if registered:
-                modify_registration_url = url_for(
-                    "event.confRegistrationFormDisplay-modify",
-                    self._conf)
-                submitOpt = i18nformat(
-                    """%s<li><a href=%s>
-                        _("View or modify your already registration")
-                       </a></li>""") % (submitOpt,
-                                        quoteattr(str(modify_registration_url)))
-            if registered and self._conf.getRegistrationForm().getETicket().isEnabled() and \
-                    self._conf.getRegistrationForm().getETicket().isShownAfterRegistration():
-                registrant = self._avatar.getRegistrantById(self._conf.getId())
-                e_ticket_url = url_for("event.e-ticket-pdf", registrant,
-                                       authkey=registrant.getRandomId())
-                submitOpt = i18nformat(
-                    """%s<li><a href=%s>
-                            _("Download your e-ticket")
-                       </a></li>""") % (submitOpt,
-                                        quoteattr(str(e_ticket_url)))
-            html = i18nformat("""
-            <b> _("Possible actions you can carry out"):</b>
-            <ul>
-                %s
-            </ul>
-                   """) % (submitOpt)
-        return html
+        eticket = regForm.getETicket()
+        if not self._registrant and regForm.inRegistrationPeriod():
+            actions.append('register')
+        if self._registrant and regForm.inModificationPeriod():
+            actions.append('modify')
+        if self._registrant and eticket.isEnabled() and eticket.isShownAfterRegistration():
+            actions.append('download')
+        return actions
 
     def _getFormItemsHTMLBillable(self, bf, total):
         html = [""]
@@ -616,7 +589,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
             if modPay.hasPaymentConditions():
                 condChecking = i18nformat("""
                                 <tr>
-                                    <td>
+                                    <td colspan="4">
                                         <div class="regform-done-conditions checkbox-with-text">
                                             <input type="checkbox" name="conditions"/>
                                             <div>_("I have read and accept the terms and conditions and understand that by confirming this order I will be entering into a binding transaction") (<a href="#" onClick="window.open('%s','Conditions','width=400,height=200,resizable = yes,scrollbars = yes'); return false;">Terms and conditions</a>).</div>
@@ -634,19 +607,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
                                     </td>
                                 </tr>
                                 <form name="epay" action="%s" method="POST">
-                                    <tr>
-                                      <table width="100%%">
-                                        %s
-                                        <tr>
-                                            <td align="right">
-                                                <div class="i-button highlight regform-done-checkout" onclick="checkConditions()">
-                                                    _('Checkout')
-                                                    <i class="icon-next"></i>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                       </table>
-                                    </tr>
+                                    %s
                                 </form>
                             </table></td></tr>
                             """) % (total["value"], regForm.getCurrency(), url, condChecking))
@@ -775,12 +736,13 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
         wvars = wcomponents.WTemplated.getVars(self)
         regForm = self._conf.getRegistrationForm()
 
+        wvars["conf"] = self._conf
         wvars["confId"] = self._conf.getId()
         wvars["registrant"] = self._registrant
         wvars["body_title"] = self._getTitle()
         wvars["startDate"] = regForm.getStartRegistrationDate().strftime("%d %B %Y")
         wvars["endDate"] = regForm.getEndRegistrationDate().strftime("%d %B %Y")
-        wvars["actions"] = self._getActionsHTML()
+        wvars["actions"] = self._getActions()
         wvars["announcement"] = regForm.getAnnouncement()
         wvars["title"] = regForm.getTitle()
         wvars["usersLimit"] = ""
@@ -803,10 +765,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
         if self._registrant:
             wvars["payment_info"] = self._getPaymentInfo()
             wvars["registration_info"] = self._getFormSections()
-            modEticket = self._conf.getRegistrationForm().getETicket()
-            if modEticket.isEnabled() and modEticket.isShownAfterRegistration():
-                wvars["pdf_ticket_url"] = url_for("event.e-ticket-pdf", self._registrant,
-                                                  authkey=self._registrant.getRandomId())
+
         return wvars
 
 
@@ -1278,7 +1237,7 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                                         %s
                                         <tr>
                                             <td align="right">
-                                                <div class="i-button highlight regform-done-checkout" onclick="checkConditions()">
+                                                <div class="action-button regform-done-checkout" onclick="checkConditions()">
                                                     _('Checkout')
                                                     <i class="icon-next"></i>
                                                 </div>
