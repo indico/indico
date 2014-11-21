@@ -25,6 +25,10 @@
         var deleteButton = $('<a>', {'class': 'action-icon icon-remove js-remove-row', 'href': '#', 'title': $T('Delete')});
         var saveButton = $('<a>', {'class': 'action-icon icon-disk js-save-row', 'href': '#', 'title': $T('Save')});
 
+        if (!data.length) {
+            createRow();
+        }
+
         data.forEach(function(item, i) {
             createRow(item);
         });
