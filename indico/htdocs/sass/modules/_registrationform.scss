@@ -18,8 +18,9 @@
 
 @import 'base';
 @import 'compass';
-@import 'partials/icons';
 @import 'partials/boxes';
+@import 'partials/buttons';
+@import 'partials/icons';
 
 // ============================================================================
 // Base clases
@@ -185,26 +186,6 @@
     @extend %regform-section;
     margin-bottom: 15px;
 
-    .i-box-header {
-        .i-box-title {
-            display: inline-block;
-        }
-
-        table {
-            .section-header-content {
-                width: 100%;
-            }
-
-            .section-toolbar {
-                width: 150px;
-            }
-        }
-
-        div[contenteditable] + div[contenteditable] {
-            margin-top: 3px;
-        }
-    }
-
     .regform-done-title {
         @include border-bottom(lighten($gray, $color-variation));
         display: block;
@@ -280,6 +261,12 @@
     .not-selected {
         color: $gray;
         font-style: italic;
+    }
+
+    .action-button {
+        @extend .i-button;
+        @extend .i-button.highlight;
+        @include icon-after('icon-next');
     }
 }
 
