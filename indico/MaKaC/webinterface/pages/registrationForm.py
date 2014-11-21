@@ -748,21 +748,12 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
         wvars["announcement"] = regForm.getAnnouncement()
         wvars["title"] = regForm.getTitle()
         wvars["usersLimit"] = ""
+
         if regForm.getUsersLimit() > 0:
-            wvars["usersLimit"] = i18nformat("""
-                                <tr>
-                                    <td nowrap class="displayField"><b> _("Max No. of registrants"):</b></td>
-                                    <td width="100%%" align="left">%s</td>
-                                </tr>
-                                """) % regForm.getUsersLimit()
+            wvars["usersLimit"] = regForm.getUsersLimit()
         wvars["contactInfo"] = ""
         if regForm.getContactInfo().strip() != "":
-            wvars["contactInfo"] = i18nformat("""
-                                <tr>
-                                    <td nowrap class="displayField"><b> _("Contact info"):</b></td>
-                                    <td width="100%%" align="left">%s</td>
-                                </tr>
-                                """) % regForm.getContactInfo()
+            wvars["contactInfo"] = regForm.getContactInfo()
 
         if self._registrant:
             wvars["payment_info"] = self._getPaymentInfo()
