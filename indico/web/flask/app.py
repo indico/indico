@@ -47,7 +47,8 @@ from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
-from indico.core.plugins import plugin_engine, include_plugin_css_assets, include_plugin_js_assets, plugin_hook, url_for_plugin
+from indico.core.plugins import (plugin_engine, include_plugin_css_assets, include_plugin_js_assets, plugin_hook,
+                                 url_for_plugin)
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import EnsureUnicodeExtension, underline
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
@@ -68,10 +69,11 @@ from indico.web.flask.blueprints.files import files
 from indico.web.flask.blueprints.admin import admin
 from indico.web.flask.blueprints.rooms_admin import rooms_admin
 from indico.core.plugins.blueprints import plugins_blueprint
+from indico.modules.payment.blueprint import payment_blueprint
 
 
 BLUEPRINTS = (legacy, api, misc, user, oauth, rooms, category, category_mgmt, event_display,
-              event_creation, event_mgmt, files, admin, rooms_admin, plugins_blueprint)
+              event_creation, event_mgmt, files, admin, rooms_admin, plugins_blueprint, payment_blueprint)
 COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, user, oauth, rooms, category, category_mgmt, event_display,
                                                 event_creation, event_mgmt, files, admin, rooms_admin))
 
