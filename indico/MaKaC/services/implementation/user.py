@@ -17,30 +17,27 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import time
-from hashlib import md5
+import uuid
 from flask import session
 
-from MaKaC.services.implementation.base import LoggedOnlyService, AdminService
-from MaKaC.services.implementation.base import ServiceBase
-
-import MaKaC.user as user
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError, Warning, ResultWithWarning
-
-from MaKaC.common import info
-from indico.core.config import Config
-from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
+from MaKaC.common import indexes, info
+from MaKaC.common.cache import GenericCache
 from MaKaC.common.fossilize import fossilize
-
-from indico.util.i18n import getLocaleDisplayNames, availableLocales
-from MaKaC.webinterface.common.timezones import TimezoneRegistry
-from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.webinterface.mail import GenericMailer, GenericNotification
-from MaKaC.webinterface.common.person_titles import TitlesRegistry
-import MaKaC.common.indexes as indexes
 from MaKaC.common.utils import validMail
+from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
+from MaKaC.rb_location import CrossLocationQueries
+from MaKaC.services.implementation.base import LoggedOnlyService, AdminService, ParameterManager, ServiceBase
+from MaKaC.services.interface.rpc.common import (ServiceError, ServiceAccessError, NoReportError, Warning,
+                                                 ResultWithWarning)
+from MaKaC.user import AvatarHolder
+from MaKaC.webinterface.common.person_titles import TitlesRegistry
+from MaKaC.webinterface.common.timezones import TimezoneRegistry
+from MaKaC.webinterface.mail import GenericMailer, GenericNotification
+from indico.core.config import Config
+from indico.util.i18n import _, getLocaleDisplayNames, availableLocales
 from indico.util.redis import avatar_links
-from indico.web.http_api.auth import APIKey
 from indico.web.flask.util import url_for
+from indico.web.http_api.auth import APIKey
 
 
 class UserComparator(object):
@@ -62,7 +59,7 @@ class UserBaseService(LoggedOnlyService):
         self._pm = ParameterManager(self._params)
         userId = self._pm.extract("userId", None)
         if userId is not None:
-            ah = user.AvatarHolder()
+            ah = AvatarHolder()
             self._target = ah.getById(userId)
         else:
             raise ServiceError("ERR-U5", _("User id not specified"))
@@ -135,7 +132,7 @@ class UserBasketBase:
         self._pm = ParameterManager(self._params)
         userId = self._pm.extract("userId", pType=str, allowEmpty=True)
         if userId is not None:
-            ah = user.AvatarHolder()
+            ah = AvatarHolder()
             self._target = ah.getById(userId)
         else:
             self._target = self._aw.getUser()
@@ -153,7 +150,7 @@ class UserAddToBasket(LoggedOnlyService, UserBasketBase):
 
         self._userList = []
         for userData in self._params['value']:
-            self._userList.append(user.AvatarHolder().getById(userData['id']))
+            self._userList.append(AvatarHolder().getById(userData['id']))
 
     def _getAnswer(self):
 
@@ -339,7 +336,7 @@ class UserPersonalDataBase(UserModifyBase):
         self._pm = ParameterManager(self._params)
         userId = self._pm.extract("userId", None)
         if userId is not None:
-            ah = user.AvatarHolder()
+            ah = AvatarHolder()
             self._user = self._avatar = self._target = ah.getById(userId)
         else:
             raise ServiceError("ERR-U5", _("User id not specified"))
@@ -489,7 +486,7 @@ class UserAcceptSecondaryEmail(UserModifyBase):
         self._secondaryEmail = self._params.get("secondaryEmail", None)
 
     def _getAnswer(self):
-        av = user.AvatarHolder().match({"email": self._secondaryEmai}, forceWithoutExtAuth=True)
+        av = AvatarHolder().match({"email": self._secondaryEmai}, forceWithoutExtAuth=True)
         if av and av[0] != self._user:
             raise NoReportError(_("The email address %s is already used by another user.") % self._secondaryEmai)
         self._user.addSecondaryEmail(self._secondaryEmail, reindex=True)
@@ -507,6 +504,7 @@ class UserSetPersistentSignatures(UserModifyBase):
         ak = self._target.getAPIKey()
         ak.setPersistentAllowed(not ak.isPersistentAllowed())
         return ak.isPersistentAllowed()
+
 
 class UserCreateKeyEnablePersistent(LoggedOnlyService):
 
@@ -531,7 +529,7 @@ class UserRefreshRedisLinks(AdminService):
         self._pm = ParameterManager(self._params)
         userId = self._pm.extract("userId", pType=str, allowEmpty=True)
         if userId is not None:
-            ah = user.AvatarHolder()
+            ah = AvatarHolder()
             self._avatar = ah.getById(userId)
         else:
             self._avatar = self._aw.getUser()

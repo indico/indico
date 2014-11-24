@@ -15,77 +15,82 @@
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import re
 from hashlib import md5
-from flask import session
+from flask import request, session
 
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.pages.admins as adminPages
-import MaKaC.user as user
 import MaKaC.common.info as info
 import MaKaC.errors as errors
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.mail as mail
-from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.accessControl import AdminList
-from MaKaC.webinterface.rh.base import RH, RHProtected
 from MaKaC.authentication import AuthenticatorMgr
-from indico.core.db import DBMgr
 from MaKaC.common import pendingQueues
-from MaKaC.i18n import _
+from MaKaC.common.cache import GenericCache
+from MaKaC.errors import MaKaCError, NotFoundError
+from MaKaC.user import Avatar, AvatarHolder, LoginInfo
+from MaKaC.webinterface import mail
+from MaKaC.webinterface.rh.base import RH, RHProtected
+from indico.core.db import DBMgr
+from indico.util.i18n import _
 from indico.util.redis import suggestions
 from indico.util.redis import write_client as redis_write_client
 
 
-class RHUserManagementSwitchAuthorisedAccountCreation( admins.RHAdminBase ):
+class RHUserManagementSwitchAuthorisedAccountCreation(admins.RHAdminBase):
 
-    def _process( self ):
+    def _process(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         minfo.setAuthorisedAccountCreation(not minfo.getAuthorisedAccountCreation())
         self._redirect(urlHandlers.UHUserManagement.getURL())
 
-class RHUserManagementSwitchNotifyAccountCreation( admins.RHAdminBase ):
 
-    def _process( self ):
+class RHUserManagementSwitchNotifyAccountCreation(admins.RHAdminBase):
+
+    def _process(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         minfo.setNotifyAccountCreation(not minfo.getNotifyAccountCreation())
         self._redirect(urlHandlers.UHUserManagement.getURL())
 
-class RHUserManagementSwitchModerateAccountCreation( admins.RHAdminBase ):
 
-    def _process( self ):
+class RHUserManagementSwitchModerateAccountCreation(admins.RHAdminBase):
+
+    def _process(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         minfo.setModerateAccountCreation(not minfo.getModerateAccountCreation())
         self._redirect(urlHandlers.UHUserManagement.getURL())
 
-class RHUserManagement( admins.RHAdminBase ):
 
-    def _checkParams( self, params ):
-        admins.RHAdminBase._checkParams( self, params )
+class RHUserManagement(admins.RHAdminBase):
+
+    def _checkParams(self, params):
+        admins.RHAdminBase._checkParams(self, params)
         self._params = params
 
-    def _process( self ):
-        p = adminPages.WPUserManagement( self, self._params )
-        return p.display()
-
-class RHUsers( admins.RHAdminBase ):
-
-    def _checkParams( self, params ):
-        admins.RHAdminBase._checkParams( self, params )
-        self._params = params
-
-    def _process( self ):
-        p = adminPages.WPUserList( self, self._params )
+    def _process(self):
+        p = adminPages.WPUserManagement(self, self._params)
         return p.display()
 
 
-class RHUserCreation( RH ):
+class RHUsers(admins.RHAdminBase):
+
+    def _checkParams(self, params):
+        admins.RHAdminBase._checkParams(self, params)
+        self._params = params
+
+    def _process(self):
+        p = adminPages.WPUserList(self, self._params)
+        return p.display()
+
+
+class RHUserCreation(RH):
     _uh = urlHandlers.UHUserCreation
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if self._aw.getUser() and self._aw.getUser() in minfo.getAdminList().getList():
             return
@@ -140,7 +145,7 @@ class RHUserCreation( RH ):
                 save = False
         if save:
             #Data are OK, Now check if there is an existing user or create a new one
-            ah = user.AvatarHolder()
+            ah = AvatarHolder()
             res = ah.match({"email": self._email}, exact=1, searchInAuthenticators=False)
             if res:
                 #we find a user with the same email
@@ -152,7 +157,7 @@ class RHUserCreation( RH ):
                 else:
                     #create the identity to the user and send the comfirmatio email
                     _UserUtils.setUserData(a, self._params)
-                    li = user.LoginInfo(self._login, self._password)
+                    li = LoginInfo(self._login, self._password)
                     id = authManager.createIdentity(li, a, "Local")
                     authManager.add(id)
                     DBMgr.getInstance().commit()
@@ -163,10 +168,10 @@ class RHUserCreation( RH ):
                         if minfo.getNotifyAccountCreation():
                             mail.sendAccountCreationNotification(a).send()
             else:
-                a = user.Avatar()
+                a = Avatar()
                 _UserUtils.setUserData(a, self._params)
                 ah.add(a)
-                li = user.LoginInfo(self._login, self._password)
+                li = LoginInfo(self._login, self._password)
                 id = authManager.createIdentity(li, a, "Local")
                 authManager.add(id)
                 DBMgr.getInstance().commit()
@@ -189,68 +194,70 @@ class RHUserCreation( RH ):
             return p.display()
 
     def _validMail(self, email):
-        if re.search("^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$",email):
+        if re.search("^[a-zA-Z][\w\.-]*[a-zA-Z0-9]@[a-zA-Z0-9][\w\.-]*[a-zA-Z0-9]\.[a-zA-Z][a-zA-Z\.]*[a-zA-Z]$",
+                     email):
             return True
         return False
 
-class RHUserCreated( RH ):
 
-    def _checkParams( self, params ):
-        self._av = user.AvatarHolder().getById(params["userId"])
+class RHUserCreated(RH):
 
-    def _process( self ):
+    def _checkParams(self, params):
+        self._av = AvatarHolder().getById(params["userId"])
+
+    def _process(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if self._aw.getUser() and self._aw.getUser() in minfo.getAdminList().getList():
-            p = adminPages.WPUserCreated( self, self._av )
+            p = adminPages.WPUserCreated(self, self._av)
         else:
-            p = adminPages.WPUserCreatedNonAdmin( self, self._av )
+            p = adminPages.WPUserCreatedNonAdmin(self, self._av)
         return p.display()
 
 
-class RHUserExistWithIdentity( RH ):
+class RHUserExistWithIdentity(RH):
 
-    def _checkParams( self, params ):
-        self._av = user.AvatarHolder().getById(params["userId"])
+    def _checkParams(self, params):
+        self._av = AvatarHolder().getById(params["userId"])
 
-    def _process( self ):
+    def _process(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if self._aw.getUser() and self._aw.getUser() in minfo.getAdminList().getList():
-            p = adminPages.WPUserExistWithIdentity( self, self._av )
+            p = adminPages.WPUserExistWithIdentity(self, self._av)
         else:
-            p = adminPages.WPUserExistWithIdentityNonAdmin( self, self._av )
+            p = adminPages.WPUserExistWithIdentityNonAdmin(self, self._av)
         return p.display()
 
 
 class _UserUtils:
 
     def setUserData(self, a, userData, reindex=False):
-        a.setName( userData["name"], reindex=reindex )
-        a.setSurName( userData["surName"], reindex=reindex )
-        a.setTitle( userData["title"] )
-        a.setOrganisation( userData["organisation"], reindex=reindex )
-        if userData.has_key("lang"):
-            a.setLang( userData["lang"] )
-        a.setAddress( userData["address"] )
-        a.setEmail( userData["email"], reindex )
-        a.setSecondaryEmails( userData.get("secEmails", [] ))
-        a.setTelephone( userData["telephone"] )
-        a.setFax( userData["fax"] )
-        if userData.has_key("showPastEvents"):
-            a.getPersonalInfo().setShowPastEvents( userData.has_key("showPastEvents"))
+        a.setName(userData["name"], reindex=reindex)
+        a.setSurName(userData["surName"], reindex=reindex)
+        a.setTitle(userData["title"])
+        a.setOrganisation(userData["organisation"], reindex=reindex)
+        if "lang" in userData:
+            a.setLang(userData["lang"])
+        a.setAddress(userData["address"])
+        a.setEmail(userData["email"], reindex)
+        a.setSecondaryEmails(userData.get("secEmails", []))
+        a.setTelephone(userData["telephone"])
+        a.setFax(userData["fax"])
+        if "showPastEvents" in userData:
+            a.getPersonalInfo().setShowPastEvents("showPastEvents" in userData)
 
         #################################
         # Fermi timezone awareness      #
         #################################
-        if userData.has_key("timezone"):
+        if "timezone" in userData:
             a.setTimezone(userData["timezone"])
-        if userData.has_key("displayTZMode"):
+        if "displayTZMode" in userData:
             a.setDisplayTZMode(userData["displayTZMode"])
 
         #################################
         # Fermi timezone awareness(end) #
         #################################
 
-    setUserData = classmethod( setUserData )
+    setUserData = classmethod(setUserData)
 
 
 class RHUserBase(RHProtected):
@@ -263,7 +270,7 @@ class RHUserBase(RHProtected):
         if not params.setdefault('userId', session.get('_avatarId')):
             raise MaKaCError(_("user id not specified"))
 
-        ah = user.AvatarHolder()
+        ah = AvatarHolder()
         self._target = self._avatar = ah.getById(params['userId'])
         if self._avatar is None:
             raise NotFoundError("The user id does not match any existing user.")
@@ -290,72 +297,76 @@ class RHUserDashboard(RHUserBase):
         return p.display()
 
 
-class RHUserDetails( RHUserBase):
+class RHUserDetails(RHUserBase):
     _uh = urlHandlers.UHUserDetails
 
-    def _process( self ):
-        p = adminPages.WPUserDetails( self, self._avatar )
+    def _process(self):
+        p = adminPages.WPUserDetails(self, self._avatar)
         return p.display()
 
 
-class RHUserBaskets( RHUserBase ):
+class RHUserBaskets(RHUserBase):
     _uh = urlHandlers.UHUserBaskets
 
-    def _checkProtection( self ):
-        RHUserBase._checkProtection( self )
+    def _checkProtection(self):
+        RHUserBase._checkProtection(self)
         if self._aw.getUser():
-            if not self._avatar.canModify( self._aw ):
+            if not self._avatar.canModify(self._aw):
                 raise errors.AccessControlError("user")
 
-    def _process( self ):
-        p = adminPages.WPUserBaskets( self, self._avatar )
+    def _process(self):
+        p = adminPages.WPUserBaskets(self, self._avatar)
         return p.display()
 
-class RHUserPreferences( RHUserBase ):
+
+class RHUserPreferences(RHUserBase):
     _uh = urlHandlers.UHUserPreferences
 
-    def _checkProtection( self ):
-        RHUserBase._checkProtection( self )
+    def _checkProtection(self):
+        RHUserBase._checkProtection(self)
         if self._aw.getUser():
-            if not self._avatar.canModify( self._aw ):
+            if not self._avatar.canModify(self._aw):
                 raise errors.AccessControlError("user")
 
-    def _process( self ):
-        p = adminPages.WPUserPreferences( self, self._avatar )
+    def _process(self):
+        p = adminPages.WPUserPreferences(self, self._avatar)
         return p.display()
 
-class RHUserPersBase( base.RHDisplayBaseProtected ):
 
-    def _checkParams( self, params ):
+class RHUserPersBase(base.RHDisplayBaseProtected):
+
+    def _checkParams(self, params):
         base.RHDisplayBaseProtected._checkParams(self, params)
 
-    def _checkProtection( self ):
-        RHProtected._checkSessionUser( self )
+    def _checkProtection(self):
+        RHProtected._checkSessionUser(self)
         if not self._aw.getUser():
             raise errors.AccessControlError("user")
 
-class RHUserActive( RHUserBase ):
 
-    def _checkProtection( self ):
+class RHUserActive(RHUserBase):
+
+    def _checkProtection(self):
         al = AdminList.getInstance()
         if not (self._aw.getUser() in al.getList()):
             raise errors.AccessError("user status")
 
-    def _process( self ):
+    def _process(self):
         self._avatar.activateAccount()
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getModerateAccountCreation():
             mail.sendAccountActivated(self._avatar).send()
         self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
 
-class RHUserDisable( RHUserBase ):
 
-    def _checkProtection( self ):
+class RHUserDisable(RHUserBase):
+
+    def _checkProtection(self):
         al = AdminList.getInstance()
         if not (self._aw.getUser() in al.getList()):
             raise errors.AccessError("user status")
 
-    def _process( self ):
+    def _process(self):
         self._avatar.disabledAccount()
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         if minfo.getModerateAccountCreation():
@@ -363,7 +374,7 @@ class RHUserDisable( RHUserBase ):
         self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
 
 
-class RHUserIdentityBase( RHUserBase ):
+class RHUserIdentityBase(RHUserBase):
 
     def _checkProtection(self):
         RHUserBase._checkProtection(self)
@@ -371,15 +382,15 @@ class RHUserIdentityBase( RHUserBase ):
             return False
         if not self._avatar.getIdentityList():
             return
-        if not self._avatar.canModify( self._aw ):
+        if not self._avatar.canModify(self._aw):
             raise errors.ModificationError("user")
 
 
-class RHUserIdentityCreation( RHUserIdentityBase ):
+class RHUserIdentityCreation(RHUserIdentityBase):
     _uh = urlHandlers.UHUserIdentityCreation
 
-    def _checkParams( self, params ):
-        RHUserIdentityBase._checkParams( self, params )
+    def _checkParams(self, params):
+        RHUserIdentityBase._checkParams(self, params)
         self._login = params.get("login", "")
         self._pwd = params.get("password", "")
         self._pwdBis = params.get("passwordBis", "")
@@ -411,14 +422,14 @@ class RHUserIdentityCreation( RHUserIdentityBase ):
                 ok = False
             if ok:
                 #create the indentity
-                li = user.LoginInfo( self._login, self._pwd )
-                id = authManager.createIdentity( li, self._avatar, self._system )
-                authManager.add( id )
-                self._redirect( urlHandlers.UHUserDetails.getURL( self._avatar ) )
+                li = LoginInfo(self._login, self._pwd)
+                id = authManager.createIdentity(li, self._avatar, self._system)
+                authManager.add(id)
+                self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
                 return
 
         self._params["msg"] = msg
-        p = adminPages.WPIdentityCreation( self, self._avatar, self._params )
+        p = adminPages.WPIdentityCreation(self, self._avatar, self._params)
         return p.display()
 
 
@@ -446,9 +457,9 @@ class RHUserIdPerformCreation(RHUserIdentityBase):
             self._redirect(self._fromURL + "&msg=You must enter the same password twice")
             return
         #create the indentity
-        li = user.LoginInfo( self._login, self._pwd )
-        id = authManager.createIdentity( li, self._avatar, self._system )
-        authManager.add( id )
+        li = LoginInfo(self._login, self._pwd)
+        id = authManager.createIdentity(li, self._avatar, self._system)
+        authManager.add(id)
         #commit and if OK, send activation mail
         DBMgr.getInstance().commit()
         scr = mail.sendConfirmationRequest(self._avatar)
@@ -493,20 +504,20 @@ class RHUserIdentityChangePassword(RHUserIdentityBase):
             return p.display()
 
 
-class RHUserRemoveIdentity( RHUserIdentityBase ):
+class RHUserRemoveIdentity(RHUserIdentityBase):
 
-    def _checkParams( self, params ):
-        RHUserIdentityBase._checkParams( self, params )
-        self._identityList = self._normaliseListParam(params.get("selIdentities",[]))
+    def _checkParams(self, params):
+        RHUserIdentityBase._checkParams(self, params)
+        self._identityList = self._normaliseListParam(params.get("selIdentities", []))
 
-    def _process( self ):
+    def _process(self):
         authManager = AuthenticatorMgr()
         for i in self._identityList:
             identity = authManager.getIdentityById(i)
             if len(identity.getUser().getIdentityList()) > 1:
                 authManager.removeIdentity(identity)
                 self._avatar.removeIdentity(identity)
-        self._redirect( urlHandlers.UHUserDetails.getURL( self._avatar ) )
+        self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
 
 
 class RHActiveSecondaryEmail(base.RH):
@@ -520,7 +531,7 @@ class RHActiveSecondaryEmail(base.RH):
 
     def _process(self):
 
-        av = user.AvatarHolder().getById(self._userId)
+        av = AvatarHolder().getById(self._userId)
 
         if not av:
             raise MaKaCError(_("The user id specified does not exist"))
