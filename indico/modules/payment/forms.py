@@ -16,24 +16,17 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, flash
-
-from indico.modules.payment import settings
-from indico.modules.payment.forms import SettingsForm
-from indico.modules.payment.views import WPPayment
 from indico.util.i18n import _
-from indico.web.flask.util import url_for
-from indico.web.forms.base import FormDefaults
-from MaKaC.webinterface.rh.admins import RHAdminBase
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import MultipleItemsField
 
 
-class RHPayment(RHAdminBase):
-    """Payment settings"""
+CURRENCY_CODE_LINK = 'http://en.wikipedia.org/wiki/ISO_4217#Active_codes'
 
-    def _process(self):
-        form = SettingsForm(obj=FormDefaults(**settings.get_all()))
-        if form.validate_on_submit():
-            settings.set_multi(form.data)
-            flash(_(u'Settings saved'), 'success')
-            return redirect(url_for('.index'))
-        return WPPayment.render_template('index.html', form=form)
+
+class SettingsForm(IndicoForm):
+    currencies = MultipleItemsField(_('Currencies'), fields=(('code', _('Code')), ('name', _('Name'))),
+                                    description=_("List of currencies that can be selected for an event. When deleting "
+                                                  "a currency, existing events will keep using it. The currency code "
+                                                  "must be a valid <a href='{0}'>ISO-4217</a> code such "
+                                                  "as 'EUR' or 'CHF'.").format(CURRENCY_CODE_LINK))

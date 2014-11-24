@@ -19,4 +19,4 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 payment_blueprint = _bp = IndicoBlueprint('payment', __name__, url_prefix='/admin/payment', template_folder='templates')
 
-_bp.add_url_rule('/', 'index', RHPayment)
+_bp.add_url_rule('/', 'index', RHPayment, methods=('GET', 'POST'))
