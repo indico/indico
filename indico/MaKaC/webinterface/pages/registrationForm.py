@@ -581,22 +581,6 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
             for bf in self._registrant.getBilledForms():
                 html.append("""%s""" % (self._getFormItemsHTMLBillable(bf, total)))
 
-            url = urlHandlers.UHConfRegistrationFormconfirmBooking.getURL(self._registrant)
-            url.addParam("registrantId", self._registrant.getId())
-            url.addParam("confId", self._conf.getId())
-
-            condChecking = ""
-            if modPay.hasPaymentConditions():
-                condChecking = i18nformat("""
-                                <tr>
-                                    <td colspan="4">
-                                        <div class="regform-done-conditions checkbox-with-text">
-                                            <input type="checkbox" name="conditions"/>
-                                            <div>_("I have read and accept the terms and conditions and understand that by confirming this order I will be entering into a binding transaction") (<a href="#" onClick="window.open('%s','Conditions','width=400,height=200,resizable = yes,scrollbars = yes'); return false;">Terms and conditions</a>).</div>
-                                        </div>
-                                    </td>
-                                </tr>""" % str(urlHandlers.UHConfRegistrationFormConditions.getURL(self._conf)))
-
             html.append(i18nformat("""
                                 <tr>
                                     <td align="right" class="regform-done-table-total" colspan="3">
@@ -606,11 +590,8 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
                                         %s <em>%s</em>
                                     </td>
                                 </tr>
-                                <form name="epay" action="%s" method="POST">
-                                    %s
-                                </form>
                             </table></td></tr>
-                            """) % (total["value"], regForm.getCurrency(), url, condChecking))
+                            """) % (total["value"], regForm.getCurrency()))
         return "".join(html)
 
     def _getReasonParticipationHTML(self):
@@ -755,6 +736,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
 
         if self._registrant:
             wvars["payment_info"] = self._getPaymentInfo()
+            wvars["payment_conditions"] = self._conf.getModPay().hasPaymentConditions()
             wvars["registration_info"] = self._getFormSections()
             if self._registrant.getRegistrationDate() is not None:
                 wvars["registration_date"] = self._registrant.getAdjustedRegistrationDate().strftime('%d-%B-%Y %H:%M')
