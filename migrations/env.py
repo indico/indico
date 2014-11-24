@@ -26,7 +26,9 @@ update_session_options(db)
 
 def _include_symbol(tablename, schema):
     # We ignore plugin tables in migrations
-    return not schema.startswith('plugin_')
+    if schema and schema.startswith('plugin_'):
+        return False
+    return not tablename.startswith('alembic_version_')
 
 
 def run_migrations_offline():
