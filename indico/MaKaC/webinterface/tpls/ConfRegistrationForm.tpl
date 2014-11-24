@@ -17,6 +17,12 @@
                 document.forms['epay'].submit();
             }
         }
+
+        function open_condictions() {
+            var conditions_url = ${ url_for('event.confRegistrationFormDisplay-conditions', conf) | n,j }
+            window.open(conditions_url, 'Conditions', 'width=400, height=200, resizable=yes, scrollbars=yes');
+            return false;
+        }
     </script>
 
     <input type="hidden" value="${confId}" id="conf_id">
@@ -67,26 +73,6 @@
     </div>
 
     % if registrant:
-        % if payment_info:
-            <div id="payment-summary" class="regform-done">
-                <div class="i-box-header">
-                    <div class="i-box-title">
-                        ${ _('Payment summary') }
-                    </div>
-                    <div class="right">
-                        <a class="action-button" onclick="checkConditions()">
-                            ${ _('Checkout') }
-                        </a>
-                    </div>
-                </div>
-                <div class="i-box-content">
-                    <table width="100%" cellpadding="0" cellspacing="0">
-                        ${ payment_info }
-                    </table>
-                </div>
-            </div>
-        % endif
-
         <div id="registration-summary" class="regform-done">
             <div class="i-box-header">
                 <div class="i-box-title">
@@ -137,5 +123,42 @@
                 </table>
             </div>
         </div>
+
+        % if payment_info:
+            <div id="payment-summary" class="regform-done">
+                <div class="i-box-header">
+                    <div class="i-box-title">
+                        ${ _('Payment summary') }
+                    </div>
+                </div>
+                <div class="i-box-content">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                        ${ payment_info }
+                    </table>
+                    <form name="epay" action="${ url_for('event.confRegistrationFormDisplay-confirmBooking', registrant) }" method="POST">
+                        <table class="regform-done-conditions" width="100%" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td>
+                                    % if payment_conditions:
+                                        <div class="checkbox-with-text">
+                                            <input type="checkbox" name="conditions"/>
+                                            <div>
+                                                ${ _("I have read and accept the terms and conditions and understand that by confirming this order I will be entering into a binding transaction") }
+                                                (<a href="#" onClick="open_condictions()">${ _("Terms and conditions") }</a>).
+                                            </div>
+                                        </div>
+                                    % endif
+                                </td>
+                                <td>
+                                    <a class="action-button" onclick="checkConditions()">
+                                        ${ _('Checkout') }
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        % endif
     % endif
 </%block>
