@@ -1025,18 +1025,6 @@ class SystemLinkData(Observable):
                     "caption": N_("Registration"),
                     "URL": 'UHConfRegistrationForm',
                     "parent": ""},
-                "ViewMyRegistration": {
-                    "caption": N_("Modify my Registration"),
-                    "URL": 'UHConfRegistrationFormModify',
-                    "parent": "registrationForm"},
-                "downloadETicket": {
-                    "caption": N_("Download e-ticket"),
-                    "URL": 'UHConferenceTicketPDF',
-                    "parent": "registrationForm"},
-                "NewRegistration": {
-                    "caption": N_("Registration Form"),
-                    "URL": 'UHConfRegistrationFormDisplay',
-                    "parent": "registrationForm"},
                 "registrants": {
                     "caption": N_("Participant List"),
                     "URL": 'UHConfRegistrantsList',
@@ -1090,9 +1078,6 @@ class SystemLinkData(Observable):
                                         "downloadtemplate",
                                         "abstractsBook",
                                         "registrationForm",
-                                        "ViewMyRegistration",
-                                        "downloadETicket",
-                                        "NewRegistration",
                                         "registrants",
                                         "evaluation",
                                         "newEvaluation",
