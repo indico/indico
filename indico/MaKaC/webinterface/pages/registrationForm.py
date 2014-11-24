@@ -777,7 +777,7 @@ class WPRegistrationFormDisplay(conferences.WPConferenceDefaultDisplayBase):
 
     def _defineSectionMenu(self):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._newRegFormOpt)
+        self._sectionMenu.setCurrentItem(self._regFormOpt)
 
     def getCSSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
@@ -786,7 +786,7 @@ class WPRegistrationFormDisplay(conferences.WPConferenceDefaultDisplayBase):
 
 class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
 
-    _linkname = "NewRegistration"
+    _linkname = "registrationForm"
 
     def __init__(self, conf, user):
         self._currentUser = user
@@ -913,7 +913,7 @@ class WPRegistrationFormSignIn(conferences.WPConferenceDefaultDisplayBase):
 
     def _defineSectionMenu(self):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._newRegFormOpt)
+        self._sectionMenu.setCurrentItem(self._regFormOpt)
 
 
 class WConfRegistrationFormSignIn(wcomponents.WTemplated):
@@ -942,7 +942,7 @@ class WPRegistrationFormModify(conferences.WPConferenceDefaultDisplayBase):
 
     def _defineSectionMenu(self):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._viewRegFormOpt)
+        self._sectionMenu.setCurrentItem(self._regFormOpt)
 
     def getCSSFiles(self):
         return conferences.WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
@@ -950,8 +950,6 @@ class WPRegistrationFormModify(conferences.WPConferenceDefaultDisplayBase):
 
 
 class WConfRegistrationFormModify(WConfRegistrationFormDisplay):
-
-    _linkname = "ViewMyRegistration"
 
     def getVars(self):
         wvars = WConfRegistrationFormDisplay.getVars(self)
