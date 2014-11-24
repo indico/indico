@@ -1,7 +1,7 @@
 <%inherit file="ConfDisplayBodyBase.tpl"/>
 
 <%block name="title">
-    ${body_title}
+    ${ body_title }
 </%block>
 
 <%block name="content">

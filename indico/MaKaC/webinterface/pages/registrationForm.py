@@ -792,6 +792,10 @@ class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
         self._currentUser = user
         self._conf = conf
 
+    def _getTitle(self):
+        title = WConfDisplayBodyBase._getTitle(self)
+        return _('{}: New'.format(title))
+
     def getSections(self):
         return self._conf.getRegistrationForm().getSortedForms()
 
@@ -950,6 +954,10 @@ class WPRegistrationFormModify(conferences.WPConferenceDefaultDisplayBase):
 
 
 class WConfRegistrationFormModify(WConfRegistrationFormDisplay):
+
+    def _getTitle(self):
+        title = WConfRegistrationFormDisplay._getTitle(self)
+        return _('{}: Modify'.format(title))
 
     def getVars(self):
         wvars = WConfRegistrationFormDisplay.getVars(self)
