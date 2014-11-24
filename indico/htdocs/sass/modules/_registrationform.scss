@@ -243,15 +243,11 @@
     }
 
     .regform-done-conditions {
-        margin-top: 5px;
+        margin-top: 20px;
 
         input[type=checkbox] {
             float: left;
             margin-left: 1px;
-        }
-
-        div {
-            margin-left: 21px;
         }
     }
 
@@ -269,6 +265,7 @@
         @extend .i-button;
         @extend .i-button.highlight;
         @include icon-after('icon-next');
+        white-space: nowrap;
     }
 }
 
