@@ -216,8 +216,8 @@ class RHRegistrationFormCreationDone(RHRegistrationFormRegistrantBase):
 
     def _processIfActive(self):
         if self._registrant is not None:
-            p = registrationForm.WPRegistrationFormCreationDone(self, self._conf, self._registrant)
-            return p.display()
+            p = registrationForm.WPRegistrationForm(self, self._conf)
+            return p.display(registrant=self._registrant)
 
 
 class RHConferenceTicketPDF(RHRegistrationFormCreationDone):
