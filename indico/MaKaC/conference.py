@@ -19,7 +19,7 @@
 
 from itertools import ifilter
 
-# fossil classes
+from indico.core.models.settings import EventSetting
 from indico.modules.rb.models.reservations import Reservation
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.plugins import Observable
@@ -2662,6 +2662,8 @@ class Conference(CommonObjectBase, Locatable):
                 Logger.get('Conference').error("Exception while notifying a conference deletion: %s (origin: %s)" % (str(e2), str(e)))
 
         signals.event.deleted.send(self)
+
+        EventSetting.delete_event(self.id)
 
         self.notifyContributions()
 
