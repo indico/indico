@@ -134,6 +134,9 @@ class WPAdminsBase(WPMainBase):
             urlHandlers.UHAdminsProtection.getURL())
         mainSection.addItem( self._protectionMenuItem)
 
+        self._paymentMenuItem = wcomponents.SideMenuItem(_("Payment"), url_for('payment.index'))
+        mainSection.addItem(self._paymentMenuItem)
+
         self._sideMenu.addSection(mainSection)
 
 
