@@ -1,21 +1,29 @@
+{% extends 'admin/base.html' %}
 {% from 'forms/form_widget.html' import form_header, form_rows, form_footer  %}
 
-<div class="plugin-header">
-    <h1>{{ plugin.title }}</h1>
-    <h2>{% if not form %}{% trans %}Plugin Details{% endtrans %}{% else %}{% trans %}Plugin Settings{% endtrans %}{% endif %}</h2>
-</div>
+{% block title %}{{ plugin.title }}{% endblock %}
 
-<p class="plugin-description">{{ plugin.description }}</p>
+{% block subtitle %}
+    {%- if not form -%}
+        {% trans %}Plugin Details{% endtrans %}
+    {%- else -%}
+        {% trans %}Plugin Settings{% endtrans %}
+    {%- endif -%}
+{% endblock %}
 
-{% if not form %}
-    {% trans %}This plugin does not have any settings.{% endtrans %}
-{% else %}
-    {{ form_header() }}
-    {{ form_rows(form, widget_attrs=plugin.settings_form_field_opts) }}
-    {% call form_footer() %}
-        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
-        <a href="{{ url_for('.index') }}" class="i-button big">{% trans %}Cancel{% endtrans %}</a>
-    {% endcall %}
-{% endif %}
+{% block description %}{{ plugin.description }}{% endblock %}
 
-{{ plugin_hook('plugin-details', plugin=plugin) }}
+{% block content %}
+    {% if not form %}
+        {% trans %}This plugin does not have any settings.{% endtrans %}
+    {% else %}
+        {{ form_header() }}
+        {{ form_rows(form, widget_attrs=plugin.settings_form_field_opts) }}
+        {% call form_footer() %}
+            <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
+            <a href="{{ url_for('.index') }}" class="i-button big">{% trans %}Cancel{% endtrans %}</a>
+        {% endcall %}
+    {% endif %}
+
+    {{ plugin_hook('plugin-details', plugin=plugin) }}
+{% endblock %}

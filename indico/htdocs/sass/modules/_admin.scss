@@ -75,7 +75,7 @@ a.plugin {
     }
 }
 
-.plugin-header {
+.admin-page-header {
     border-bottom: 1px solid $separator-color;
 
     h1, h2 {
@@ -90,7 +90,7 @@ a.plugin {
     }
 }
 
-.plugin-description {
+.admin-page-description {
     @extend %font-family-title;
     max-width: 800px;
     color: $dark-gray;
