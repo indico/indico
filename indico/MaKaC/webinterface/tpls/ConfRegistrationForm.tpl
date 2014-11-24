@@ -26,9 +26,9 @@
             <div class="i-box-title">
                 ${ _("Details") }
             </div>
-            %if 'register' in actions:
+            %if not registrant:
                 <div class="right">
-                    <a href="${ url_for('event.confRegistrationFormDisplay-display', conf) }" class="action-button">
+                    <a href="${ url_for('event.confRegistrationFormDisplay-display', conf) }" class="action-button  ${ 'disabled' if 'register' not in actions else '' }">
                         ${ _("Register now") }
                     </a>
                 </div>
