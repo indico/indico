@@ -35,7 +35,7 @@
             %endif
         </div>
         <div class="i-box-content">
-            <table width="100%" align="center">
+            <table width="100%">
                 <tr>
                     <td class="regform-done-caption">${ _("Opening date")}</td>
                     <td class="regform-done-data">${ startDate }</td>
@@ -111,6 +111,22 @@
             </div>
             <div class="i-box-content">
                 <table width="100%" cellpadding="0" cellspacing="0">
+                    % if registrant:
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td class="regform-done-caption">${ _("Registrant ID")}</td>
+                                        <td class="regform-done-data">${ registrant.getId() }</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="regform-done-caption">${ _("Registration date")}</td>
+                                        <td class="regform-done-data">${ registration_date }</td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    % endif
                     ${ registration_info }
                 </table>
             </div>
