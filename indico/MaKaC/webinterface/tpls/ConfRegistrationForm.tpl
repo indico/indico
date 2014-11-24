@@ -121,7 +121,13 @@
                                     </tr>
                                     <tr>
                                         <td class="regform-done-caption">${ _("Registration date")}</td>
-                                        <td class="regform-done-data">${ registration_date }</td>
+                                        <td class="regform-done-data">
+                                            % if registration_date:
+                                                ${ registration_date }
+                                            % else:
+                                                ${ _("Unknown") }
+                                            % endif
+                                        </td>
                                     </tr>
                                 </table>
                             </td>
