@@ -37,14 +37,17 @@ class Setting(db.Model):
     )
     module = db.Column(
         db.String,
-        index=True
+        index=True,
+        nullable=False
     )
     name = db.Column(
         db.String,
-        index=True
+        index=True,
+        nullable=False
     )
     value = db.Column(
-        JSON
+        JSON,
+        nullable=False
     )
 
     @return_ascii
