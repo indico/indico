@@ -48,3 +48,32 @@
 .ordered-list > li > .list-item-content > .list-item-content-data {
     float:right;
 }
+
+.i-data-list {
+    @extend %font-family-form;
+    max-width: 800px;
+    color: $light-black;
+    margin-top: 1em;
+    line-height: 1.5;
+
+    * {
+      box-sizing: border-box;
+    }
+
+    dt, dd {
+        display: inline-block;
+        margin: 0 0 0.7em 0;
+        padding: 0.3em 1em 0.3em 1em;
+    }
+
+    dt {
+        font-weight: bold;
+        text-align: right;
+        width: 20%;
+    }
+
+    dd {
+        width: 79%;
+        vertical-align: top;
+    }
+}
