@@ -19,7 +19,7 @@
 
 import re
 from hashlib import md5
-from flask import request, session
+from flask import flash, request, session
 
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.admins as admins
@@ -31,7 +31,7 @@ from MaKaC.accessControl import AdminList
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common import pendingQueues
 from MaKaC.common.cache import GenericCache
-from MaKaC.errors import MaKaCError, NotFoundError
+from MaKaC.errors import MaKaCError, NotFoundError, NoReportError
 from MaKaC.user import Avatar, AvatarHolder, LoginInfo
 from MaKaC.webinterface import mail
 from MaKaC.webinterface.rh.base import RH, RHProtected
@@ -39,7 +39,7 @@ from indico.core.db import DBMgr
 from indico.util.i18n import _
 from indico.util.redis import suggestions
 from indico.util.redis import write_client as redis_write_client
-
+from indico.web.flask.util import url_for
 
 class RHUserManagementSwitchAuthorisedAccountCreation(admins.RHAdminBase):
 
@@ -520,27 +520,50 @@ class RHUserRemoveIdentity(RHUserIdentityBase):
         self._redirect(urlHandlers.UHUserDetails.getURL(self._avatar))
 
 
-class RHActiveSecondaryEmail(base.RH):
-
-    _isMobile = False
-
-    def _checkParams(self, params):
-        base.RH._checkParams(self, params)
-        self._userId = params.get("userId", "").strip()
-        self._key = params.get("key", "").strip()
+class RHConfirmEmail(RHProtected):
+    # docstring
 
     def _process(self):
+        # retrieve data from the cache
+        # compare the avatar form the cache and the logged user
+        # if ok set the email
+        # else error message
+        avatar = session.user
+        token = request.view_args['token']
+        token_storage = GenericCache('confirm-email')
+        data = token_storage.get(token)
+        if not data:  # Invalid token ID
+            raise NoReportError('<br>'.join([
+                _("Invalid Token"),
+                _("You might have already validated the email address related to this link."),
+                _("Otherwise, make sure you have copy-pasted the URL correctly and try again.")
+            ]))
+        if avatar.getId() != data.get('uid'):
+            raise NoReportError('<br>'.join([
+                _("You are connected with the wrong account."),
+                _("Please connect with the correct account or add the address to this account and try again."),
+            ]))
 
-        av = AvatarHolder().getById(self._userId)
+        email_type = data.get('data_type')
+        if email_type not in {'email', 'secondaryEmails'}:
+            # Invalid email type
+            return
+        email = data.get('email')
+        existing = AvatarHolder().match({'email': email}, searchInAuthenticators=False)
+        if existing:
+            existing = [av for av in existing if av != avatar]
+            if existing:
+                raise NoReportError(_("The email address {0} is already used by another user.").format(email))
+            else:
+                raise NoReportError(_("It appears you are already using the email address {0}.").format(email))
 
-        if not av:
-            raise MaKaCError(_("The user id specified does not exist"))
+        if email_type == 'email':
+            avatar.setEmail(email, reindex=True)
+            flash_msg = _("{0} has been set as your primary email address.").format(email)
+        elif email_type == 'secondaryEmails':
+            avatar.addSecondaryEmail(email, reindex=True)
+            flash_msg = _("{0} has been added to your secondary email addresses.").format(email)
 
-        for sMail in av.getPendingSecondaryEmails():
-            if md5(sMail).hexdigest() == self._key:
-                av.removePendingSecondaryEmail(sMail, reindex=True)
-                av.addSecondaryEmail(sMail, reindex=True)
-                p = adminPages.WPUserActiveSecondaryEmail(self, av, sMail)
-                return p.display()
-        else:
-            raise MaKaCError(_("The email has already being confirmed or the key is wrong"))
+        token_storage.delete(token)
+        flash(flash_msg, 'success')
+        self._redirect(url_for('user.userDetails'))
