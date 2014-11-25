@@ -50,11 +50,10 @@ class AdminSettingsForm(IndicoForm):
 
 
 class EventSettingsForm(IndicoForm):
-    enabled = BooleanField(_('Enabled'), description=_('Enables the payment module.'))
     currency = SelectField(_('Currency'), [DataRequired()])
     conditions = TextAreaField(_('Conditions'), description=CONDITIONS_DESC)
-    summary_email = TextAreaField(_('Summary email message'), [DataRequired()], description=SUMMARY_EMAIL_DESC)
-    success_email = TextAreaField(_('Success email message'), [DataRequired()], description=SUCCESS_EMAIL_DESC)
+    summary_email = TextAreaField(_('Summary email message'), description=SUMMARY_EMAIL_DESC)
+    success_email = TextAreaField(_('Success email message'), description=SUCCESS_EMAIL_DESC)
 
     def __init__(self, *args, **kwargs):
         self._event = kwargs.pop('event')
