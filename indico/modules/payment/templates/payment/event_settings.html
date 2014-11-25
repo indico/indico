@@ -1,0 +1,24 @@
+{% if settings.enabled %}
+    <dl>
+        <dt>{% trans %}Status{% endtrans %}</dt>
+        <dd>{% trans %}<strong>Enabled</strong>{% endtrans %}</dd>
+        <dt>{% trans %}Currency{% endtrans %}</dt>
+        <dd>
+            {% if not settings.currency %}
+                {% trans %}None selected{% endtrans %}
+            {% else %}
+                {{ settings.currency }}{% if settings.currency in currencies %} {{ currencies[settings.currency] }}{% endif %}
+            {% endif %}
+        </dd>
+        <dt>{% trans %}Conditions{% endtrans %}</dt>
+        <dd>{{ settings.conditions or 'None' }}</dd>
+        <dt>{% trans %}Summary email message{% endtrans %}</dt>
+        <dd>{{ settings.summary_email or 'None' }}</dd>
+        <dt>{% trans %}Success email message{% endtrans %}</dt>
+        <dd>{{ settings.success_email or 'None' }}</dd>
+    </dl>
+
+    <a class="i-button" href="{{ url_for('.event_settings_edit', event) }}">{% trans %}Configure{% endtrans %}</a>
+{% else %}
+    <a class="i-button" href="{{ url_for('.event_settings_edit', event) }}">{% trans %}Enable & Configure{% endtrans %}</a>
+{% endif %}
