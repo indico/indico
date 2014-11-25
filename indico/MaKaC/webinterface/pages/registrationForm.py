@@ -742,7 +742,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
             wvars["payment_done"] = self._registrant.getPayed()
             wvars["registration_info"] = self._getFormSections()
             if self._registrant.getRegistrationDate() is not None:
-                wvars["registration_date"] = self._registrant.getAdjustedRegistrationDate().strftime('%d-%B-%Y %H:%M')
+                wvars["registration_date"] = self._registrant.getAdjustedRegistrationDate().strftime('%d %b %Y')
 
         return wvars
 

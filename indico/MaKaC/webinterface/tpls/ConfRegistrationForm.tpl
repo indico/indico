@@ -70,7 +70,7 @@
         <div id="registration-summary" class="regform-done">
             <div class="i-box-header">
                 <div class="i-box-title">
-                    ${ _('Registration summary') }
+                    ${ _('Summary') }
                 </div>
                 % if 'download' in actions or 'modify' in actions:
                     <div class="i-box-buttons toolbar thin right">
@@ -82,37 +82,35 @@
                             % endif
                             % if 'download' in actions:
                                 <a href="${ url_for('event.e-ticket-pdf', registrant, authkey=registrant.getRandomId()) }" class="i-button icon-ticket">
-                                    ${ _("E-ticket") }
+                                    ${ _("Get ticket") }
                                 </a>
                             % endif
                         </div>
                     </div>
                 % endif
+                <div class="regform-done-metadata right">
+                    <span>
+                        <span class="label">
+                            ${ _("Reference") }:
+                        </span>
+                        <span class="content">
+                            #${ registrant.getId() }
+                        </span>
+                    </span>
+                    % if registration_date:
+                        <span>
+                            <span class="label">
+                                ${ _("Date") }:
+                            </span>
+                            <span class="content">
+                                ${ registration_date }
+                            </span>
+                        </span>
+                    % endif
+                </div>
             </div>
             <div class="i-box-content">
                 <table width="100%" cellpadding="0" cellspacing="0">
-                    % if registrant:
-                        <tr>
-                            <td>
-                                <table>
-                                    <tr>
-                                        <td class="regform-done-caption">${ _("Registrant ID")}</td>
-                                        <td class="regform-done-data">${ registrant.getId() }</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="regform-done-caption">${ _("Registration date")}</td>
-                                        <td class="regform-done-data">
-                                            % if registration_date:
-                                                ${ registration_date }
-                                            % else:
-                                                ${ _("Unknown") }
-                                            % endif
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    % endif
                     ${ registration_info }
                 </table>
             </div>
@@ -122,7 +120,7 @@
             <div id="payment-summary" class="regform-done">
                 <div class="i-box-header">
                     <div class="i-box-title">
-                        ${ _('Payment summary') }
+                        ${ _('Invoice') }
                     </div>
                         % if payment_done:
                             <div class="payment-status payment-done right">
