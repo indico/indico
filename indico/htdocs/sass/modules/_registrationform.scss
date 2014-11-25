@@ -301,6 +301,9 @@
 
         i {
             font-size: 1.5em;
+            &:before {
+                vertical-align: -15%;
+            }
         }
     }
 }
