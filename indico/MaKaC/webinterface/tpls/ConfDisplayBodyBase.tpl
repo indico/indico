@@ -7,5 +7,6 @@
 </h2>
 
 <div>
+    ${ render_template('flashed_messages.html') }
     <%block name="content"></%block>
 </div>
