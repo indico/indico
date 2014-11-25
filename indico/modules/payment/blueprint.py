@@ -14,9 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.payment.controllers import RHPayment
+from __future__ import unicode_literals
+
+from indico.modules.payment.controllers import (RHPaymentAdminSettings, RHPaymentEventSettings,
+                                                RHPaymentEventSettingsEdit)
 from indico.web.flask.wrappers import IndicoBlueprint
 
-payment_blueprint = _bp = IndicoBlueprint('payment', __name__, url_prefix='/admin/payment', template_folder='templates')
+payment_blueprint = _bp = IndicoBlueprint('payment', __name__, template_folder='templates')
 
-_bp.add_url_rule('/', 'index', RHPayment, methods=('GET', 'POST'))
+# Admin
+_bp.add_url_rule('/admin/payment/', 'admin_settings', RHPaymentAdminSettings, methods=('GET', 'POST'))
+
+# Event management
+_bp.add_url_rule('/event/<confId>/manage/registration/payment/', 'event_settings', RHPaymentEventSettings)
+_bp.add_url_rule('/event/<confId>/manage/registration/payment/settings', 'event_settings_edit',
+                 RHPaymentEventSettingsEdit, methods=('GET', 'POST'))

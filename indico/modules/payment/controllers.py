@@ -18,22 +18,52 @@ from __future__ import unicode_literals
 
 from flask import redirect, flash
 
-from indico.modules.payment import settings
-from indico.modules.payment.forms import SettingsForm
-from indico.modules.payment.views import WPPayment
+from indico.modules.payment import settings, event_settings
+from indico.modules.payment.forms import AdminSettingsForm, EventSettingsForm
+from indico.modules.payment.views import WPPaymentAdmin, WPPaymentEventManagement
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.rh.admins import RHAdminBase
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-class RHPayment(RHAdminBase):
-    """Payment settings"""
+class RHPaymentAdminSettings(RHAdminBase):
+    """Payment settings (admin)"""
 
     def _process(self):
-        form = SettingsForm(obj=FormDefaults(**settings.get_all()))
+        form = AdminSettingsForm(obj=FormDefaults(**settings.get_all()))
         if form.validate_on_submit():
             settings.set_multi(form.data)
-            flash(_(u'Settings saved'), 'success')
-            return redirect(url_for('.index'))
-        return WPPayment.render_template('index.html', form=form)
+            flash(_('Settings saved'), 'success')
+            return redirect(url_for('.admin_settings'))
+        return WPPaymentAdmin.render_template('admin_settings.html', form=form)
+
+
+class RHPaymentEventSettings(RHConferenceModifBase):
+    """Payment settings (event)"""
+
+    def _process(self):
+        event = self._conf
+        currencies = dict(settings.get('currencies'))
+        return WPPaymentEventManagement.render_template('event_settings.html', event, event=event,
+                                                        settings=event_settings.get_all(event),
+                                                        currencies=currencies)
+
+
+class RHPaymentEventSettingsEdit(RHConferenceModifBase):
+    """Edit payment settings (event)"""
+
+    def _process(self):
+        event = self._conf
+        current_event_settings = event_settings.get_all(event)
+        defaults = FormDefaults(current_event_settings, skip_attrs={'enabled'}, **settings.get_all())
+        defaults.enabled = True
+        form = EventSettingsForm(prefix='payment-', obj=defaults, event=event)
+        if form.validate_on_submit():
+            enabled = not current_event_settings['enabled'] and form.enabled.data
+            event_settings.set_multi(event, form.data)
+            flash(_('Payment enabled') if enabled else _('Settings saved'), 'success')
+            return redirect(url_for('.event_settings', event))
+        return WPPaymentEventManagement.render_template('event_settings_edit.html', event, event=event,
+                                                        form=form)

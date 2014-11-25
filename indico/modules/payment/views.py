@@ -16,10 +16,21 @@
 
 from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
+from MaKaC.webinterface.pages.registrationForm import WPConfModifRegFormBase
 
 
-class WPPayment(WPJinjaMixin, WPAdminsBase):
+class WPPaymentJinjaMixin(WPJinjaMixin):
     template_prefix = 'payment/'
 
+
+class WPPaymentAdmin(WPPaymentJinjaMixin, WPAdminsBase):
     def _setActiveSideMenuItem(self):
         self._paymentMenuItem.setActive()
+
+
+class WPPaymentEventManagement(WPConfModifRegFormBase, WPPaymentJinjaMixin):
+    def _setActiveTab(self):
+        self._tabPayment.setActive()
+
+    def _getTabContent(self, params):
+        return WPPaymentJinjaMixin._getPageContent(self, params)
