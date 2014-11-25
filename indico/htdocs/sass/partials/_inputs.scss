@@ -451,6 +451,10 @@ $switchTransition: .15s ease-out;
     }
 }
 
+.has-warning {
+    color: $yellow;
+}
+
 .i-radio {
     label {
         display: inline-block;
