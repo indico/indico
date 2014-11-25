@@ -21,13 +21,14 @@ from MaKaC.conference import ConferenceHolder
 from MaKaC.epayment import TransactionPayLaterMod
 
 from indico.core.fossils.registration import IRegFormRegistrantBasicFossil, IRegFormRegistrantFullFossil
+from indico.modules.payment import event_settings as payment_event_settings
 
 from indico.web.http_api.hooks.base import HTTPAPIHook, DataFetcher
 from indico.web.http_api.hooks.event import EventBaseHook
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.responses import HTTPAPIError
 
-from indico.util.date_time import format_datetime, format_date
+from indico.util.date_time import format_datetime
 from indico.util.fossilize import fossilize
 
 
@@ -47,7 +48,7 @@ class SetPaidHook(EventBaseHook):
         registrant_id = self._pathParams["registrant_id"]
         self._conf = ConferenceHolder().getById(self._pathParams['event'])
         self._registrant = self._conf.getRegistrantById(registrant_id)
-        if not self._conf.getModPay().isActivated():
+        if not payment_event_settings.get(self._conf, 'active'):
             raise HTTPAPIError('E-payment is not enabled')
 
     def _hasAccess(self, aw):
