@@ -27,6 +27,15 @@
 
     <input type="hidden" value="${confId}" id="conf_id">
 
+    % if registrant and registrant.doPay():
+        <div class="highlight-message-box">
+            <div class="message-text">
+                ${ _("Please notice, your registration won't be complete until you perform the payment") }
+                <a href="#payment">${ _("here") }</a>.
+            </div>
+        </div>
+    % endif
+
     <div class="regform-done">
         <div class="i-box-header">
             <div class="i-box-title">
@@ -117,6 +126,7 @@
         </div>
 
         % if payment_info:
+            <a name="payment"></a>
             <div id="payment-summary" class="regform-done">
                 <div class="i-box-header">
                     <div class="i-box-title">
