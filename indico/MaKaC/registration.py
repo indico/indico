@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 from flask import request
 
 import random, time
@@ -37,7 +38,6 @@ from MaKaC.common.Locators import Locator
 from indico.core.config import Config
 from MaKaC.common.TemplateExec import inlineContextHelp
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface.common.tools import strip_ml_tags
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
@@ -47,10 +47,10 @@ from indico.util.date_time import format_datetime, format_date
 from indico.util.string import safe_upper
 from MaKaC.webinterface.common.countries import CountryHolder
 import re
-import tempfile, os
+import tempfile
 import string
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
-
+from indico.modules.payment import event_settings as payment_event_settings
 from indico.util.fossilize import Fossilizable, fossilizes
 from indico.core.fossils.registration import IRegFormTextInputFieldFossil, IRegFormTelephoneInputFieldFossil, \
     IRegFormTextareaInputFieldFossil, IRegFormNumberInputFieldFossil, IRegFormLabelInputFieldFossil, \
@@ -836,8 +836,6 @@ Congratulations, your registration to %s was successful%s See your information b
             return False
 
     def sendEmailNewRegistrantDetailsPay(self, regForm, registrant):
-        if not registrant.getConference().getModPay().isEnableSendEmailPaymentDetails():
-            return
         fromAddr = regForm.getNotificationSender()
         date = registrant.getConference().getStartDate()
         getTitle = strip_ml_tags(registrant.getConference().getTitle())
@@ -905,9 +903,9 @@ Please use this information for your payment (except for e-payment):\n
         # send email to participants
         paymentMsg = _("If you haven't paid for your registration yet, you can do it at %s") % urlHandlers.UHConfRegistrationFormCreationDone.getURL(registrant)
         if registrant.getEmail().strip() != "":
-            bodyReg = _("""%s\n\n%s\n\n%s\n\n%s""") % (
-                registrant.getConference().getModPay().getPaymentReceiptMsg(),
-                "\n".join(booking), body, paymentMsg)
+            event = registrant.getConference()
+            bodyReg = "{}\n\n{}\n\n{}\n\n{}".format(payment_event_settings.get(event, 'summary_email').encode('utf-8'),
+                                                    '\n'.join(booking), body, paymentMsg)
             to = registrant.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
             GenericMailer.send(GenericNotification(maildata))
@@ -969,9 +967,9 @@ Please use this information for your payment (except for e-payment):\n
             GenericMailer.send(GenericNotification(maildata))
         # send email to participant
         if regForm.isSendPaidEmail() and registrant.getEmail().strip() != "":
-            bodyReg = _("""%s\n\n%s\n\n%s""") % (registrant.getConference().getModPay().getPaymentSuccessMsg(),
-                                                                "\n".join(booking),
-                                                                body)
+            event = registrant.getConference()
+            bodyReg = "{}\n\n{}\n\n{}".format(payment_event_settings.get(event, 'success_email').encode('utf-8'),
+                                              '\n'.join(booking), body)
             to = registrant.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
             GenericMailer.send(GenericNotification(maildata))
