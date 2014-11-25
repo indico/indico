@@ -21,6 +21,7 @@
 @import 'partials/boxes';
 @import 'partials/buttons';
 @import 'partials/icons';
+@import 'partials/toolbars';
 
 // ============================================================================
 // Base clases
@@ -191,6 +192,25 @@
         display: block;
         font-size: 1.3em;
         margin: 15px 0 5px 0;
+    }
+
+    .regform-done-metadata {
+        line-height: $toolbar-thin-height;
+        margin: 0 1em;
+
+        > span:not(:last-child) {
+            margin-right: 0.7em;
+        }
+
+        .label {
+            color: $black;
+            font-weight: bold;
+        }
+
+        .content {
+            color: $light-black;
+            font-style: italic;
+        }
     }
 
     tr:first-child .regform-done-title {
