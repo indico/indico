@@ -16,8 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-
-from flask import session, request
+from flask import session, request, flash
 from cStringIO import StringIO
 
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay, RHConfSignIn
@@ -216,6 +215,7 @@ class RHRegistrationFormCreationDone(RHRegistrationFormRegistrantBase):
 
     def _processIfActive(self):
         if self._registrant is not None:
+            flash(_(u"Your registration has been recorded successfully."), 'success')
             p = registrationForm.WPRegistrationForm(self, self._conf)
             return p.display(registrant=self._registrant)
 
@@ -285,6 +285,7 @@ class RHRegistrationFormPerformModify(RHRegistrationFormCreation):
     _uh = urlHandlers.UHConfRegistrationFormModify
 
     def _process(self):
+        flash(_(u"Your registration has been modified successfully."), 'success')
         if self._getUser() is not None and self._getUser().isRegisteredInConf(self._conf):
             if not self._conf.getRegistrationForm().inRegistrationPeriod() and not self._conf.getRegistrationForm().inModificationPeriod():
                 p = registrationForm.WPRegistrationFormClosed(self, self._conf)
