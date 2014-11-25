@@ -31,7 +31,6 @@
     @extend .i-box;
     @extend .i-box.titled;
     margin-top: 25px;
-    width:750px;
 }
 
 .regform-section-title {
@@ -44,6 +43,7 @@
 
 .regform-section {
     @extend %regform-section;
+    width:750px;
 
     .i-box-header {
         table {
