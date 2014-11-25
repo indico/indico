@@ -365,7 +365,6 @@ class Avatar(Persistent, Fossilizable):
         self.address = [""]
         self.email = ""
         self.secondaryEmails = []
-        self.pendingSecondaryEmails = []
         self.telephone = [""]
         self.fax = [""]
         self.identities = []
@@ -833,28 +832,6 @@ class Avatar(Persistent, Fossilizable):
 
     def hasSecondaryEmail(self, email):
         return email.lower().strip() in self.getSecondaryEmails()
-
-    def getPendingSecondaryEmails(self):
-        try:
-            return self.pendingSecondaryEmails
-        except:
-            self.pendingSecondaryEmails = []
-            return self.pendingSecondaryEmails
-
-    def addPendingSecondaryEmail(self, email):
-        email = email.lower().strip()
-        if not email in self.getPendingSecondaryEmails():  # create attribute if not exist
-            self.pendingSecondaryEmails.append(email)
-            self._p_changed = 1
-
-    def removePendingSecondaryEmail(self, email):
-        email = email.lower().strip()
-        if email in self.getPendingSecondaryEmails():  # create attribute if not exist
-            self.pendingSecondaryEmails.remove(email)
-            self._p_changed = 1
-
-    def setPendingSecondaryEmails(self, emailList):
-        self.pendingSecondaryEmails = emailList
 
     def addTelephone(self, newTel):
         self.telephone.append(newTel)

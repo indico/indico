@@ -364,122 +364,203 @@ class UserPersonalDataBase(UserModifyBase):
 
 class UserSetPersonalData(UserPersonalDataBase):
 
+    def __init__(self, *args, **kwargs):
+        UserPersonalDataBase.__init__(self, *args, **kwargs)
+        self.process_data = {
+            'title': self._process_title,
+            'surName': self._process_surname,
+            'name': self._process_name,
+            'organisation': self._process_organisation,
+            'email': self._process_email,
+            'secondaryEmails': self._process_secondary_emails,
+            'telephone': self._process_telephone,
+            'fax': self._process_fax,
+            'address': self._process_address
+        }
+
     def _checkParams(self):
         UserPersonalDataBase._checkParams(self)
-        if (self._dataType == "surName" or self._dataType == "name" or self._dataType == "organisation"):
-            self._value = self._pm.extract("value", pType=str, allowEmpty=False)
-        elif self._dataType == "email":
-            self._value = self._pm.extract("value", pType=str, allowEmpty=False)
-            if not validMail(self._value):
-                raise ServiceAccessError(_("The email address is not valid"))
-        elif self._dataType == "secondaryEmails":
-            self._value = self._pm.extract("value", pType=str, allowEmpty=True)
-            if self._value and not validMail(self._value):
-                raise ServiceAccessError(_("The email address is not valid. Please, review it."))
+        if self._dataType in {"surName", "name", "organisation", "email", "secondaryEmails"}:
+            # empty only for secondary emails
+            self._value = self._pm.extract("value", pType=str, allowEmpty=self._dataType == "secondaryEmails")
+
         else:
             self._value = self._pm.extract("value", pType=str, allowEmpty=True)
 
-    def _buildEmailList(self):
-        emailList = []
-        if (self._value == ""):
-            return emailList
+    def _generate_emails_list(self):
+        self._value = self._value.replace(' ', ',').replace(';', ',')  # replace to have only one separator
+        return [email for email in self._value.split(',') if email]
+
+    def _confirm_email_address(self, email, data_type):
+        email = email.strip().lower()
+
+        if not validMail(email):
+            raise NoReportError(_("Invalid email address: {0}").format(email))
+
+        # Prevent adding the primary email as a secondary email
+        if data_type == 'secondaryEmails' and email == self._avatar.getEmail():
+            raise NoReportError(_("{0} is already the primary email address "
+                                  "and cannot be used as a secondary email address.").format(email))
+
+        # When setting a secondary email as primary, set it automatically and
+        # re-index the user's emails without sending a confirmation email
+        # (We assume the secondary emails are valid)
+        if data_type == 'email' and email in self._avatar.getSecondaryEmails():
+            self._avatar.removeSecondaryEmail(email)
+            self._avatar.setEmail(email, reindex=True)
+            return False
+
+        existing = AvatarHolder().match({'email': email}, searchInAuthenticators=False)
+        if existing:
+            existing = [av for av in existing if av != self._avatar]
+            if existing:
+                raise NoReportError(_("The email address {0} is already used by another user.").format(email))
+            else:  # The email is already set correctly for the user: Do nothing
+                return False
+
+        # New email address
+        token_storage = GenericCache('confirm-email')
+        data = {'email': email, 'data_type': data_type, 'uid': self._avatar.getId()}
+        token = str(uuid.uuid4())
+        while token_storage.get(token):
+            token = str(uuid.uuid4())
+        token_storage.set(token, data, 24 * 3600)
+        url = url_for('user.confirm_email', token=token, _external=True, _secure=True)
+
+        if data_type == 'email':
+            main_text = _("You requested to change your account's primary email address.")
         else:
-            # replace to have only one separator
-            self._value = self._value.replace(" ",",")
-            self._value = self._value.replace(";",",")
-            emailList = self._value.split(",")
-            return emailList
+            main_text = _("You added this email address to your account's secondary emails list.")
 
-    def _sendSecondaryEmailNotifiication(self, email):
-        data = {}
-        data["toList"] = [email]
-        data["fromAddr"] = Config.getInstance().getSupportEmail()
-        data["subject"] = """[Indico] Email address confirmation"""
-        data["body"] = """Dear %s,
+        confirmation_body = '\n'.join([
+            _("Dear {0},").format(self._avatar.getStraightFullName()), main_text,
+            _("Please click on (or paste in your browser) the link below within 24 hours"),
+            _("to confirm and activate this email address:"), '',
+            '{0}'.format(url), '',
+            _("Best regards,"), _("The Indico Team")
+        ])
 
-You have added a new email to your secondary email list.
+        confirmation = {
+            'toList': [email],
+            'fromAddr': Config.getInstance().getSupportEmail(),
+            'subject': _("[Indico] Verify your email address"),
+            'body': confirmation_body
+        }
 
-In order to confirm and activate this new email address, please open in your web browser the following URL:
-
-%s
-
-Once you have done it, the email address will appear in your profile.
-
-Best regards,
-Indico Team""" % (self._user.getStraightFullName(), url_for('user.userRegistration-validateSecondaryEmail',
-                                                            userId=self._user.getId(),
-                                                            key=md5(email).hexdigest(),
-                                                            _external=True))
-        GenericMailer.send(GenericNotification(data))
+        # Send mail with template message and link
+        GenericMailer.send(GenericNotification(confirmation))
+        return True
 
     def _getAnswer(self):
         if self._user:
-            idxs = indexes.IndexesHolder()
             funcGet = "get%s%s" % (self._dataType[0].upper(), self._dataType[1:])
             funcSet = "set%s%s" % (self._dataType[0].upper(), self._dataType[1:])
-            if self._dataType == "title":
-                if self._value in TitlesRegistry().getList():
-                    self._user.setTitle(self._value)
-                else:
-                    raise NoReportError(_("Invalid title value"))
-            elif self._dataType == "surName":
-                self._user.setFieldSynced('surName', False)
-                self._user.setSurName(self._value, reindex=True)
-            elif self._dataType == "name":
-                self._user.setFieldSynced('firstName', False)
-                self._user.setName(self._value, reindex=True)
-            elif self._dataType == "organisation":
-                self._user.setFieldSynced('affiliation', False)
-                self._user.setOrganisation(self._value, reindex=True)
-            elif self._dataType == "email":
-                # Check if there is any user with this email address
-                if self._value != self._avatar.getEmail():
-                    other = user.AvatarHolder().match({"email": self._value}, searchInAuthenticators=False)
-                    if other and other[0] != self._avatar:
-                        raise NoReportError(_("The email address %s is already used by another user.") % self._value)
-                self._user.setEmail(self._value, reindex=True)
-            elif self._dataType == "secondaryEmails":
-                emailList = self._buildEmailList()
-                secondaryEmails = []
-                newSecondaryEmailAdded = False
-                # check if every secondary email is valid
-                for sEmail in emailList:
-                    sEmail = sEmail.lower().strip()
-                    if sEmail != "":
-                        av = user.AvatarHolder().match({"email": sEmail}, searchInAuthenticators=False)
-                        if av and av[0] != self._avatar:
-                            raise NoReportError(_("The email address %s is already used by another user.") % sEmail)
-                        elif self._user.getEmail() == sEmail:  # do not accept primary email address as secondary
-                            continue
-                        elif self._user.hasSecondaryEmail(sEmail):
-                            secondaryEmails.append(sEmail)
-                        else:
-                            newSecondaryEmailAdded = True
-                            self._user.addPendingSecondaryEmail(sEmail)
-                            self._sendSecondaryEmailNotifiication(sEmail)
-                self._user.setSecondaryEmails(secondaryEmails, reindex=True)
-                if newSecondaryEmailAdded:
-                    warn = Warning(_("New secondary email address"), _("You will receive an email in order to confirm\
-                                      your new email address. Once confirmed, it will be shown in your profile."))
-                    return ResultWithWarning(", ".join(self._user.getSecondaryEmails()), warn).fossilize()
-                else:
-                    return ", ".join(self._user.getSecondaryEmails())
 
-            elif self._dataType == "telephone":
-                self._user.setFieldSynced('phone', False)
-                self._user.setTelephone(self._value)
-            elif self._dataType == "fax":
-                self._user.setFieldSynced('fax', False)
-                self._user.setFax(self._value)
-            elif self._dataType == "address":
-                self._user.setFieldSynced('address', False)
-                self._user.setAddress(self._value)
-            else:
-                getattr(self._user, funcSet)(self._value)
-
+            ret_val = self.process_data.get(self._dataType, getattr(self._user, funcSet))(self._value)
+            if ret_val is not None:
+                return ret_val
             return getattr(self._user, funcGet)()
+
         else:
             raise ServiceError("ERR-U5", _("User id not specified"))
+
+    def _process_title(self, new_title):
+        if self._value in TitlesRegistry().getList():
+            self._user.setTitle(new_title)
+        else:
+            raise NoReportError(_("Invalid title value"))
+
+    def _process_surname(self, new_surname):
+        self._user.setFieldSynced('surName', False)
+        self._user.setSurName(new_surname, reindex=True)
+
+    def _process_name(self, new_name):
+        self._user.setFieldSynced('firstName', False)
+        self._user.setName(new_name, reindex=True)
+
+    def _process_organisation(self, new_organisation):
+        self._user.setFieldSynced('affiliation', False)
+        self._user.setOrganisation(new_organisation, reindex=True)
+
+    def _process_email(self, new_email):
+        # Check if there is any user with this email address
+        try:
+            confirmation_sent = self._confirm_email_address(new_email, 'email')
+        except NoReportError as e:
+            raise e
+
+        if confirmation_sent:
+            warning = Warning(
+                _("New primary email address"),
+                _("You will receive an email at the following address {0} for verification. "
+                  "Once the address is verified, it will be set as your primary email address.").format(new_email)
+            )
+        else:  # Then the email has been set
+            warning = Warning(_("New primary email address set"),
+                              _("{0} has been set as your primary email address.").format(new_email))
+
+        return ResultWithWarning(self._user.getEmail(), warning).fossilize()
+
+    def _process_secondary_emails(self, value):
+        emails_to_confirm = []
+        emails_to_set = []
+        invalid_email_errors = []
+        secondary_emails = self._generate_emails_list()
+        for email in secondary_emails:
+            try:
+                if self._confirm_email_address(email, 'secondaryEmails'):
+                    emails_to_confirm.append(email)
+                else:
+                    emails_to_set.append(email)
+            except NoReportError as e:
+                invalid_email_errors.append(e.message)
+
+        self._avatar.setSecondaryEmails(emails_to_set, reindex=True)
+        # Generate confirmation message
+        if len(emails_to_confirm) == 1:
+            confirmation_title = _("New secondary email address")
+            confirmation_msg = _("You will receive an email at the following address: {0} for verification. "
+                                 "Once the address is verified, it will be shown on your profile.").format(email)
+        elif emails_to_confirm:
+            confirmation_title = _("New secondary email address")
+            confirmation_msg = _(
+                "You will receive emails at the following addresses: {0} for verification. "
+                "Once an address is verified, it will be shown on your profile.").format(', '.join(emails_to_confirm))
+        else:
+            confirmation_msg = None
+
+        # Generate error message
+        if len(invalid_email_errors) == 1:
+            error_msg = invalid_email_errors[0]
+        elif invalid_email_errors:
+            error_msg = ' '.join([_("Some email addresses were not set.")] + invalid_email_errors)
+        else:
+            error_msg = None
+
+        if error_msg and confirmation_msg:
+            return ResultWithWarning(
+                ', '.join(self._user.getSecondaryEmails()),
+                Warning(_("Warning, not all addresses were set"), ' '.join([error_msg, confirmation_msg]))
+            ).fossilize()
+        elif error_msg:
+            raise NoReportError(error_msg)
+        elif confirmation_msg:
+            return ResultWithWarning(', '.join(self._user.getSecondaryEmails()),
+                                     Warning(confirmation_title, confirmation_msg)).fossilize()
+
+        return ', '.join(self._user.getSecondaryEmails())
+
+    def _process_telephone(self, value):
+        self._user.setFieldSynced('phone', False)
+        self._user.setTelephone(self._value)
+
+    def _process_fax(self, value):
+        self._user.setFieldSynced('fax', False)
+        self._user.setFax(self._value)
+
+    def _process_address(self, value):
+        self._user.setFieldSynced('address', False)
+        self._user.setAddress(self._value)
 
 
 class UserSyncPersonalData(UserPersonalDataBase):
