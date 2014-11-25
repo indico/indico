@@ -50,12 +50,6 @@
                     <td class="regform-done-caption">${ _("Closing date")}</td>
                     <td class="regform-done-data">${ endDate }</td>
                 </tr>
-                % if usersLimit:
-                    <tr>
-                        <td class="regform-done-caption">${ _("Capacity")}</td>
-                        <td class="regform-done-data">${ usersLimit }</td>
-                    </tr>
-                % endif
                 % if contactInfo:
                     <tr>
                         <td class="regform-done-caption">${ _("Contact info")}</td>
