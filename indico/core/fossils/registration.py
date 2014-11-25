@@ -19,8 +19,8 @@
 
 from MaKaC.common.fossilize import IFossil
 from MaKaC.webinterface.urlHandlers import UHFileAccess
+from indico.modules.payment import event_settings as payment_event_settings
 from indico.util.date_time import format_date, format_datetime
-from MaKaC.common.Conversion import Conversion
 
 
 ###################
@@ -753,14 +753,14 @@ class IRegFormRegistrantBasicFossil(IFossil):
         If the user payed
         """
     getPayed.name = "paid"
-    getPayed.produce = lambda x: x.getPayed() if x.getConference().getModPay().isActivated() else None
+    getPayed.produce = lambda x: x.getPayed() if payment_event_settings.get(x.getConference(), 'active') else None
 
     def getTotal(self):
         """
         Total amount payed
         """
     getTotal.name = "amount_paid"
-    getTotal.produce = lambda x: x.getTotal() if x.getConference().getModPay().isActivated() else None
+    getTotal.produce = lambda x: x.getTotal() if payment_event_settings.get(x.getConference(), 'active') else None
 
     def isCheckedIn(self):
         """

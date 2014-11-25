@@ -16,6 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 from flask import session, request
 from cStringIO import StringIO
 
@@ -28,14 +29,13 @@ from indico.core.config import Config
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
 
-from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.utils import validMail
 from MaKaC.PDFinterface.conference import TicketToPDF
+from indico.modules.payment import event_settings as payment_event_settings
 from indico.web.flask.util import send_file
 
 from indico.util import json
-from indico.util.fossilize import fossilize
 
 
 class RHBaseRegistrationForm(RHConferenceBaseDisplay):
@@ -106,7 +106,7 @@ class RHRegistrationFormDisplay(RHRegistrationFormDisplayBase):
             if self._conf.getRegistrationForm().isFull():
                 p = registrationForm.WPRegistrationFormFull(self, self._conf)
             elif not self._conf.getRegistrationForm().inRegistrationPeriod() or \
-                    (self._conf.getModPay().isActivated() and
+                    (payment_event_settings.get(self._conf, 'active') and
                      self._conf.getRegistrationForm().getCurrency() == "not selected"):
                 p = registrationForm.WPRegistrationFormClosed(self, self._conf)
             else:

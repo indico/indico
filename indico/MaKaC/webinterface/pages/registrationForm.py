@@ -16,8 +16,8 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 from flask import session, request
-from indico.web.flask.util import url_for
 
 from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 import MaKaC.webinterface.pages.conferences as conferences
@@ -29,10 +29,10 @@ from xml.sax.saxutils import quoteattr
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.webinterface.pages.base import WPBase
 from MaKaC.i18n import _
+from indico.modules.payment import event_settings as payment_event_settings
 from indico.util.i18n import i18nformat
 from indico.util.fossilize import fossilize
-
-import inspect
+from indico.web.flask.util import url_for
 from MaKaC.registration import LabelInput
 
 
@@ -943,7 +943,7 @@ class WConfRegistrationFormCreationDone(WConfDisplayBodyBase):
                 self._registrant,
                 authkey=self._registrant.getRandomId())
 
-        if self._conf.getModPay().isActivated() and self._registrant.doPay():
+        if self._registrant.doPay() and payment_event_settings.get(self._conf, 'active'):
             wvars["epaymentAnnounce"] = """<br><span>Please, checkout your <a href="#payment-summary">payment</a> in order to proceed.</span>"""
         return wvars
 

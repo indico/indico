@@ -780,8 +780,7 @@ class Notification(Persistent):
         fromAddr = regForm.getNotificationSender()
         url = urlHandlers.UHConferenceDisplay.getURL(regForm.getConference())
 
-#        if rp.getConference().getModPay().isActivated():
-        if rp.getConference().getModPay().isActivated() and rp.doPay():
+        if rp.doPay() and payment_event_settings.get(rp.getConference(), 'active'):
             epaymentLink = "If you haven't paid for your registration yet, you can do it at %s" % urlHandlers.UHConfRegistrationFormCreationDone.getURL(rp)
             paymentWarning = ", but please, do not forget to proceed with the payment if you haven't done it yet (see the link at the end of this email)."
         else:
