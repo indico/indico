@@ -18,7 +18,6 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import posixpath
-from itertools import chain
 from urlparse import urlparse
 
 from flask import request, session, render_template, g

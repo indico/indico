@@ -1481,7 +1481,8 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
                     "Exception while trying to access the plugin elements of the side menu: {}".format(str(e)))
 
         self._pluginMenuItems = {}
-        for name, item in values_from_signal(signals.event_management.sidemenu.send(self._conf)):
+        for name, item in sorted(values_from_signal(signals.event_management.sidemenu.send(self._conf)),
+                                 key=lambda x: x[1]._title):
             try:
                 self._pluginMenuItems[name] = item
                 self._generalSection.addItem(item)
