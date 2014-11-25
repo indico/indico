@@ -267,6 +267,22 @@
         @include icon-after('icon-next');
         white-space: nowrap;
     }
+
+    .payment-status {
+        font-weight: bold;
+
+        &.payment-done {
+            color: $green;
+        }
+
+        &.payment-pending {
+            color: $red;
+        }
+
+        i {
+            font-size: 1.5em;
+        }
+    }
 }
 
 .regform-add-field-qtip {

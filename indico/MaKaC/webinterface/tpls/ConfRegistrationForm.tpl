@@ -130,33 +130,46 @@
                     <div class="i-box-title">
                         ${ _('Payment summary') }
                     </div>
+                        % if payment_done:
+                            <div class="payment-status payment-done right">
+                                ${ _("Paid") }
+                                <i class="icon-checkmark"></i>
+                            </div>
+                        % else:
+                            <div class="payment-status payment-pending right">
+                                ${ _("Pending") }
+                                <i class="icon-time"></i>
+                            </div>
+                        % endif
                 </div>
                 <div class="i-box-content">
                     <table width="100%" cellpadding="0" cellspacing="0">
                         ${ payment_info }
                     </table>
-                    <form name="epay" action="${ url_for('event.confRegistrationFormDisplay-confirmBooking', registrant) }" method="POST">
-                        <table class="regform-done-conditions" width="100%" cellpadding="0" cellspacing="0">
-                            <tr>
-                                <td>
-                                    % if payment_conditions:
-                                        <div class="checkbox-with-text">
-                                            <input type="checkbox" name="conditions"/>
-                                            <div>
-                                                ${ _("I have read and accept the terms and conditions and understand that by confirming this order I will be entering into a binding transaction") }
-                                                (<a href="#" onClick="open_condictions()">${ _("Terms and conditions") }</a>).
+                    % if not payment_done:
+                        <form name="epay" action="${ url_for('event.confRegistrationFormDisplay-confirmBooking', registrant) }" method="POST">
+                            <table class="regform-done-conditions" width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td>
+                                        % if payment_conditions:
+                                            <div class="checkbox-with-text">
+                                                <input type="checkbox" name="conditions"/>
+                                                <div>
+                                                    ${ _("I have read and accept the terms and conditions and understand that by confirming this order I will be entering into a binding transaction") }
+                                                    (<a href="#" onClick="open_condictions()">${ _("Terms and conditions") }</a>).
+                                                </div>
                                             </div>
-                                        </div>
-                                    % endif
-                                </td>
-                                <td>
-                                    <a class="action-button" onclick="checkConditions()">
-                                        ${ _('Checkout') }
-                                    </a>
-                                </td>
-                            </tr>
-                        </table>
-                    </form>
+                                        % endif
+                                    </td>
+                                    <td>
+                                        <a class="action-button" onclick="checkConditions()">
+                                            ${ _('Checkout') }
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    % endif
                 </div>
             </div>
         % endif

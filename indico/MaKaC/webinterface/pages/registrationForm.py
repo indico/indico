@@ -558,7 +558,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
         regForm = self._conf.getRegistrationForm()
         modPay = self._conf.getModPay()
         html = []
-        if modPay.isActivated() and self._registrant.doPay():
+        if modPay.isActivated() and self._registrant.getTotal():
             total = {}
             total["value"] = 0
             html.append(i18nformat(""" <tr><td colspan="2">
@@ -739,6 +739,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
         if self._registrant:
             wvars["payment_info"] = self._getPaymentInfo()
             wvars["payment_conditions"] = self._conf.getModPay().hasPaymentConditions()
+            wvars["payment_done"] = self._registrant.getPayed()
             wvars["registration_info"] = self._getFormSections()
             if self._registrant.getRegistrationDate() is not None:
                 wvars["registration_date"] = self._registrant.getAdjustedRegistrationDate().strftime('%d-%B-%Y %H:%M')
