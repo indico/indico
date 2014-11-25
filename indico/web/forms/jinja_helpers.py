@@ -14,10 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from wtforms.widgets.core import Input
+from wtforms.widgets.core import Input, Select
 
 
 def is_single_line_field(field):
+    if isinstance(field.widget, Select):
+        return not field.widget.multiple
     if isinstance(field.widget, Input):
         return field.widget.input_type not in {'checkbox', 'radio', 'hidden'}
     return getattr(field.widget, 'single_line', False)
