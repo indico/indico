@@ -132,17 +132,17 @@
                     <div class="i-box-title">
                         ${ _('Invoice') }
                     </div>
-                        % if payment_done:
-                            <div class="payment-status payment-done right">
-                                ${ _("Paid") }
-                                <i class="icon-checkmark"></i>
-                            </div>
-                        % else:
-                            <div class="payment-status payment-pending right">
-                                ${ _("Pending") }
-                                <i class="icon-time"></i>
-                            </div>
-                        % endif
+                    % if payment_done:
+                        <div class="payment-status payment-done right">
+                            ${ _("Paid") }
+                            <i class="icon-checkbox-checked"></i>
+                        </div>
+                    % else:
+                        <div class="payment-status payment-pending right">
+                            ${ _("Pending") }
+                            <i class="icon-time"></i>
+                        </div>
+                    % endif
                 </div>
                 <div class="i-box-content">
                     <table width="100%" cellpadding="0" cellspacing="0">
