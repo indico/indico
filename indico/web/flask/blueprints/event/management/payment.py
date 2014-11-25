@@ -22,16 +22,16 @@ from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # General settings
-event_mgmt.add_url_rule('/registration/payment/', 'confModifEpayment', ePaymentModif.RHEPaymentModif)
-event_mgmt.add_url_rule('/registration/payment/modify', 'confModifEpayment-dataModif',
+event_mgmt.add_url_rule('/registration/payment-old/', 'confModifEpayment', ePaymentModif.RHEPaymentModif)
+event_mgmt.add_url_rule('/registration/payment-old/modify', 'confModifEpayment-dataModif',
                         ePaymentModif.RHEPaymentModifDataModification, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/registration/payment/modify/save', 'confModifEpayment-performDataModif',
+event_mgmt.add_url_rule('/registration/payment-old/modify/save', 'confModifEpayment-performDataModif',
                         ePaymentModif.RHEPaymentModifPerformDataModification, methods=('POST',))
-event_mgmt.add_url_rule('/registration/payment/toggle', 'confModifEpayment-changeStatus',
+event_mgmt.add_url_rule('/registration/payment-old/toggle', 'confModifEpayment-changeStatus',
                         ePaymentModif.RHEPaymentModifChangeStatus, methods=('POST',))
 
 # Modules
-event_mgmt.add_url_rule('/registration/payment/modules/<EPaymentName>/<requestTag>', 'confModifEpayment-modifModule',
-                        ePaymentModif.RHModifModule, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/registration/payment/toggle/<epayment>', 'confModifEpayment-enableSection',
+event_mgmt.add_url_rule('/registration/payment-old/modules/<EPaymentName>/<requestTag>',
+                        'confModifEpayment-modifModule', ePaymentModif.RHModifModule, methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/registration/payment-old/toggle/<epayment>', 'confModifEpayment-enableSection',
                         ePaymentModif.RHEPaymentModifEnableSection, methods=('GET', 'POST'))
