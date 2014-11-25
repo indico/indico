@@ -281,8 +281,11 @@
 
     .action-button {
         @extend .i-button;
+        @extend .i-button.big;
         @extend .i-button.highlight;
         @include icon-after('icon-next');
+        font-weight: bold;
+        margin-right: 0;
         white-space: nowrap;
     }
 
