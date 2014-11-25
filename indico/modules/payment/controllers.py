@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, flash
+from flask import redirect, flash, request
 
 from indico.modules.payment import settings, event_settings
 from indico.modules.payment.forms import AdminSettingsForm, EventSettingsForm
@@ -57,13 +57,20 @@ class RHPaymentEventSettingsEdit(RHConferenceModifBase):
     def _process(self):
         event = self._conf
         current_event_settings = event_settings.get_all(event)
-        defaults = FormDefaults(current_event_settings, skip_attrs={'enabled'}, **settings.get_all())
-        defaults.enabled = True
+        defaults = FormDefaults(current_event_settings, **settings.get_all())
         form = EventSettingsForm(prefix='payment-', obj=defaults, event=event)
         if form.validate_on_submit():
-            enabled = not current_event_settings['enabled'] and form.enabled.data
             event_settings.set_multi(event, form.data)
-            flash(_('Payment enabled') if enabled else _('Settings saved'), 'success')
+            flash(_('Settings saved'), 'success')
             return redirect(url_for('.event_settings', event))
         return WPPaymentEventManagement.render_template('event_settings_edit.html', event, event=event,
                                                         form=form)
+
+
+class RHPaymentEventToggle(RHConferenceModifBase):
+    """Enable/disable payment for an event"""
+
+    def _process(self):
+        enabled = request.form['enabled'] == '1'
+        event_settings.set(self._conf, 'enabled', enabled)
+        return redirect(url_for('.event_settings', self._conf))
