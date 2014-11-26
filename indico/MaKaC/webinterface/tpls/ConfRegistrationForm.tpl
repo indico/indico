@@ -4,6 +4,49 @@
     ${ body_title }
 </%block>
 
+<%block name="info">
+    <div class="infogrid condensed">
+        <div class="infoline date">
+            <i class="icon icon-time"></i>
+            <div class="text">
+                <div>
+                    <span class="label">
+                        ${ _("From") }:
+                    </span>
+                    <span class="datetime">
+                        ${ startDate }
+                    </span>
+                </div>
+                <div>
+                    <span class="label">
+                        ${ _("To") }:
+                    </span>
+                    <span class="datetime">
+                        ${ endDate }
+                    </span>
+                </div>
+            </div>
+        </div>
+        % if contactInfo:
+            <div class="infoline">
+                <i class="icon icon-phone"></i>
+                <div class="text">
+                    <div class="label">${ _("Contact info") }</div>
+                    <div>${ contactInfo }</div>
+                </div>
+            </div>
+        % endif
+    </div>
+
+    % if announcement:
+        <div class="highlight-message-box">
+            <div class="message-text">
+                ${ announcement }
+            </div>
+        </div>
+    % endif
+</%block>
+
 <%block name="content">
     <script type="text/javascript">
         function checkConditions() {
@@ -32,7 +75,7 @@
     <input type="hidden" value="${confId}" id="conf_id">
 
     % if registrant and registrant.doPay():
-        <div class="highlight-message-box">
+        <div class="warning-message-box">
             <div class="message-text">
                 ${ _("Please notice, your registration won't be complete until you perform the payment") }
                 <a href="#payment" onclick="highlight_payment()">${ _("here") }</a>.
@@ -40,44 +83,13 @@
         </div>
     % endif
 
-    <div class="regform-done">
-        <div class="i-box-header">
-            <div class="i-box-title">
-                ${ _("Details") }
-            </div>
-            %if not registrant:
-                <div class="right">
-                    <a href="${ url_for('event.confRegistrationFormDisplay-display', conf) }" class="action-button  ${ 'disabled' if 'register' not in actions else '' }">
-                        ${ _("Register now") }
-                    </a>
-                </div>
-            %endif
+    %if not registrant:
+        <div class="right">
+            <a href="${ url_for('event.confRegistrationFormDisplay-display', conf) }" class="action-button  ${ 'disabled' if 'register' not in actions else '' }">
+                ${ _("Register now") }
+            </a>
         </div>
-        <div class="i-box-content">
-            <table width="100%">
-                <tr>
-                    <td class="regform-done-caption">${ _("Opening date")}</td>
-                    <td class="regform-done-data">${ startDate }</td>
-                </tr>
-                <tr>
-                    <td class="regform-done-caption">${ _("Closing date")}</td>
-                    <td class="regform-done-data">${ endDate }</td>
-                </tr>
-                % if contactInfo:
-                    <tr>
-                        <td class="regform-done-caption">${ _("Contact info")}</td>
-                        <td class="regform-done-data">${ contactInfo }</td>
-                    </tr>
-                % endif
-                % if announcement:
-                    <tr>
-                        <td class="regform-done-caption">${ _("Contact info")}</td>
-                        <td class="regform-done-data">${ announcement }</td>
-                    </tr>
-                % endif
-            </table>
-        </div>
-    </div>
+    %endif
 
     % if registrant:
         <div id="registration-summary" class="regform-done">
@@ -160,7 +172,7 @@
                                         % if payment_conditions:
                                             <div class="checkbox-with-text">
                                                 <input type="checkbox" name="conditions"/>
-                                                <div>
+                                                <div class="payment-terms-agreement">
                                                     ${ _("I have read and accept the terms and conditions and understand that by confirming this order I will be entering into a binding transaction") }
                                                     (<a href="#" onClick="open_condictions()">${ _("Terms and conditions") }</a>).
                                                 </div>
