@@ -430,13 +430,17 @@ $switchTransition: .15s ease-out;
     }
 
     fieldset {
-        border: 1px solid $separator-color;
+        border: 0;
         margin-bottom: 1em;
         border-radius: 0.2em;
 
         legend {
             font-weight: bold;
             font-size: 1.3em;
+            border-bottom: 1px solid #ebebeb;
+            width: 100%;
+            padding-bottom: 0.5em;
+            margin-bottom: 0.3em;
         }
 
         p.description {
