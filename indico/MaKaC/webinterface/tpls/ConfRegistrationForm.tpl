@@ -84,11 +84,19 @@
     % endif
 
     %if not registrant:
-        <div class="right">
-            <a href="${ url_for('event.confRegistrationFormDisplay-display', conf) }" class="action-button  ${ 'disabled' if 'register' not in actions else '' }">
-                ${ _("Register now") }
-            </a>
-        </div>
+        % if 'register' in actions:
+            <div class="right">
+                <a href="${ url_for('event.confRegistrationFormDisplay-display', conf) }" class="action-button">
+                    ${ _("Register now") }
+                </a>
+            </div>
+        % else:
+            <div class="info-message-box">
+                <div class="message-text">
+                    ${ _("This registration is now closed.") }
+                </div>
+            </div>
+        % endif
     %endif
 
     % if registrant:
@@ -100,11 +108,12 @@
                 % if 'download' in actions or 'modify' in actions:
                     <div class="i-box-buttons toolbar thin right">
                         <div class="group">
-                            % if 'modify' in actions:
-                                <a href="${ url_for('event.confRegistrationFormDisplay-modify', conf) }" class="i-button icon-edit">
-                                    ${ _("Modify") }
-                                </a>
-                            % endif
+                            <a href="${ url_for('event.confRegistrationFormDisplay-modify', conf) }"
+                               class="i-button icon-edit ${ 'disabled' if 'modify' not in actions else '' }"
+                               title="${ _('Modification period is over') if 'modify' not in actions else '' }"
+                               ${ 'onclick="return false"' if 'modify' not in actions else '' }>
+                                ${ _("Modify") }
+                            </a>
                             % if 'download' in actions:
                                 <a href="${ url_for('event.e-ticket-pdf', registrant, authkey=registrant.getRandomId()) }" class="i-button icon-ticket">
                                     ${ _("Get ticket") }
