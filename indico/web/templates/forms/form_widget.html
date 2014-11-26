@@ -17,6 +17,7 @@
             {%- if field.widget.input_type != 'checkbox' -%}
                 {{ field.label() }}
             {%- endif -%}
+            {%- if field.flags.required %}<i class="required">*</i>{% endif -%}
         </div>
         <div class="form-field form-block"{% if field.errors %} data-error="{{ _render_errors(field.errors) }}"{% endif %}>
             {{ field(**widget_attrs) }}
