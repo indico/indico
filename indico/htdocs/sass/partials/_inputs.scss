@@ -288,7 +288,8 @@ $switchTransition: .15s ease-out;
             margin-bottom: 0;
             display: inline-block;
             min-height: 2.5em;
-            line-height: 1.5
+            line-height: 1.5;
+            position: relative;
         }
 
         .form-label-middle {
@@ -458,4 +459,12 @@ $switchTransition: .15s ease-out;
         position: relative;
         bottom: 1px;
     }
+}
+
+.required {
+    position: absolute;
+    right: 0.1em;
+    color: #af0000;
+    font-size: 1.4em;
+    top: 0.4em;
 }
