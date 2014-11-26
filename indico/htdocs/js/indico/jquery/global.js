@@ -137,7 +137,7 @@ $(document).ready(function() {
 
     $('input, textarea').placeholder();
 
-    // Select the field pf an i-form which has an error and display the tooltip.
+    // Select the field of an i-form which has an error and display the tooltip.
     // Ugly selector, but it can be improved my adding a specific class
     // to the fields themselves (not just the wrapper).
     $('.i-form .has-error > .form-field > *:first-child').stickyTooltip('error', function() {
