@@ -11,8 +11,8 @@
                     <input type="checkbox" class="switch-input" id="toggle-payment"{% if settings.enabled %} checked{% endif %}>
                     <span class="switch-label" data-on="On" data-off="Off"></span>
                     <span class="switch-handle"></span>
-                    <input type="hidden" name="enabled" value="{{ (not settings.enabled) | int }}">
                 </label>
+                <input type="hidden" name="enabled" value="{{ (not settings.enabled) | int }}">
             </form>
         </dd>
         {% if settings.enabled %}
