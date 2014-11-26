@@ -23,6 +23,10 @@
             window.open(conditions_url, 'Conditions', 'width=400, height=200, resizable=yes, scrollbars=yes');
             return false;
         }
+
+        function highlight_payment() {
+            $('#payment-summary').effect('highlight')
+        }
     </script>
 
     <input type="hidden" value="${confId}" id="conf_id">
@@ -31,7 +35,7 @@
         <div class="highlight-message-box">
             <div class="message-text">
                 ${ _("Please notice, your registration won't be complete until you perform the payment") }
-                <a href="#payment">${ _("here") }</a>.
+                <a href="#payment" onclick="highlight_payment()">${ _("here") }</a>.
             </div>
         </div>
     % endif
