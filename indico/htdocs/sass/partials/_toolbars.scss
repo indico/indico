@@ -156,7 +156,7 @@ $toolbar-thin-height: 1.9em;
         @include border-radius(0);
         border-right: none;
 
-        &:not(.label) {
+        &:not(.label):not(.disabled):not(:disabled) {
             &:hover + .i-button {
                 border-left-color: $dark-gray;
             }
