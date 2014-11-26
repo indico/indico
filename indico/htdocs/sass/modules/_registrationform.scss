@@ -281,16 +281,6 @@
         font-style: italic;
     }
 
-    .action-button {
-        @extend .i-button;
-        @extend .i-button.big;
-        @extend .i-button.highlight;
-        @include icon-after('icon-next');
-        font-weight: bold;
-        margin-right: 0;
-        white-space: nowrap;
-    }
-
     .payment-status {
         font-weight: bold;
 
@@ -308,6 +298,10 @@
                 vertical-align: -15%;
             }
         }
+    }
+
+    .payment-terms-agreement {
+        color: $light-black;
     }
 }
 
@@ -342,6 +336,17 @@
     .i-big-button {
         margin: 2px 0;
     }
+}
+
+.action-button {
+    @extend .i-button;
+    @extend .i-button.big;
+    @extend .i-button.highlight;
+    @include icon-after('icon-next');
+    font-weight: bold;
+    margin-left: 2em;
+    margin-right: 0;
+    white-space: nowrap;
 }
 
 // ============================================================================
