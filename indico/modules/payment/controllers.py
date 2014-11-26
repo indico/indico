@@ -71,6 +71,11 @@ class RHPaymentEventToggle(RHConferenceModifBase):
     """Enable/disable payment for an event"""
 
     def _process(self):
+        event = self._conf
         enabled = request.form['enabled'] == '1'
-        event_settings.set(self._conf, 'enabled', enabled)
-        return redirect(url_for('.event_settings', self._conf))
+        if event_settings.get(event, 'enabled', None) is None:
+            copy_settings = {'currency', 'conditions', 'summary_email', 'success_email'}
+            data = {k: v for k, v in settings.get_all().iteritems() if k in copy_settings}
+            event_settings.set_multi(event, data)
+        event_settings.set(event, 'enabled', enabled)
+        return redirect(url_for('.event_settings', event))
