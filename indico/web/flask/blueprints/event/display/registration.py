@@ -28,7 +28,6 @@ event.add_url_rule('/registration/registrants', 'confRegistrantsDisplay-list', r
 # Registration
 # Sections
 event.add_url_rule('/registration/', 'confRegistrationFormDisplay', registrationFormDisplay.RHRegistrationForm)
-event.add_url_rule('/registration/', 'confRegistrationFormDisplay', registrationFormDisplay.RHRegistrationForm)
 event.add_url_rule('/registration/conditions', 'confRegistrationFormDisplay-conditions',
                    registrationFormDisplay.RHRegistrationFormConditions)
 event.add_url_rule('/registration/confirm', 'confRegistrationFormDisplay-confirmBooking',
