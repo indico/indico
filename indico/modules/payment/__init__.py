@@ -18,6 +18,8 @@ from __future__ import unicode_literals
 
 from indico.core.models.settings import SettingsProxy, EventSettingsProxy
 
+__all__ = ('settings', 'event_settings')
+
 settings = SettingsProxy('payment', {
     'currencies': [{'code': 'EUR', 'name': 'Euro'}, {'code': 'USD', 'name': 'US Dollar'}]
 })
