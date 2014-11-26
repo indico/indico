@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from wtforms.fields.core import SelectField, BooleanField
 from wtforms.fields.simple import TextAreaField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 
 from indico.modules.payment import settings
 from indico.util.i18n import _
@@ -44,9 +44,24 @@ class AdminSettingsForm(IndicoForm):
                                                   "a currency, existing events will keep using it. The currency code "
                                                   "must be a valid <a href='{0}'>ISO-4217</a> code such "
                                                   "as 'EUR' or 'CHF'.").format(CURRENCY_CODE_LINK))
+    currency = SelectField(_('Currency'), [DataRequired()],
+                           description=_('The default currency for new events. If you add a new currency, you need to '
+                                         'save the settings first for it to show up here.'))
     conditions = TextAreaField(_('Conditions'), description=CONDITIONS_DESC)
     summary_email = TextAreaField(_('Summary email message'), description=SUMMARY_EMAIL_DESC)
     success_email = TextAreaField(_('Success email message'), description=SUCCESS_EMAIL_DESC)
+
+    def __init__(self, *args, **kwargs):
+        super(AdminSettingsForm, self).__init__(*args, **kwargs)
+        self._set_currencies()
+
+    def _set_currencies(self):
+        currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in settings.get('currencies')]
+        self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
+
+    def validate_currency(self, field):
+        if field.data not in {c['code'] for c in self.currencies.data}:
+            raise ValidationError('Please select a different currency.')
 
 
 class EventSettingsForm(IndicoForm):
