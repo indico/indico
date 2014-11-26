@@ -190,6 +190,8 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBase):
         if canManageRegistration and user != self._getUser():
             self._redirect(RHRegistrantListModif._uh.getURL(self._conf))
         else:
+            if not rp.doPay():
+                flash(_(u"Your registration has been recorded successfully."), 'success')
             self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(rp))
 
 
@@ -215,7 +217,6 @@ class RHRegistrationFormCreationDone(RHRegistrationFormRegistrantBase):
 
     def _processIfActive(self):
         if self._registrant is not None:
-            flash(_(u"Your registration has been recorded successfully."), 'success')
             p = registrationForm.WPRegistrationForm(self, self._conf)
             return p.display(registrant=self._registrant)
 
