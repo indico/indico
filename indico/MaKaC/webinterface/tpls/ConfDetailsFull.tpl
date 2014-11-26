@@ -1,18 +1,22 @@
 <div class="conferenceDetails">
   <div itemprop="description" class="description ${'nohtml' if not description_html else ''}">${description}</div>
 
-  <div class="grid">
-  <div class="info_line date">
+  <div class="infogrid">
+  <div class="infoline date">
       <span  title="${_("Date/Time")}" class="icon icon-time" aria-hidden="true"></span>
       <div class="text">
-        <div class="date_start">${_('Starts <span class="datetime">{0} {1}</span>').format(dateInterval[0], dateInterval[1])}</div>
-        <div class="date_end">${_('Ends <span class="datetime">{0} {1}</span>').format(dateInterval[2], dateInterval[3])}</div>
+        <div class="date_start">
+            ${_('<span class="label">Starts</span> <span class="datetime">{0} {1}</span>').format(dateInterval[0], dateInterval[1])}
+        </div>
+        <div class="date_end">
+            ${_('<span class="label">Ends</span> <span class="datetime">{0} {1}</span>').format(dateInterval[2], dateInterval[3])}
+        </div>
         <div class="timezone">${timezone}</div>
       </div>
   </div>
 
   % if location:
-    <div class="info_line location">
+    <div class="infoline location">
         <span title="${_("Location")}" class="icon icon-location" aria-hidden="true"></span>
         <div class="place text">
           ${location}
@@ -27,7 +31,7 @@
   % endif
 
   % if chairs:
-  <div class="info_line chairs clear">
+  <div class="infoline chairs clear">
       <span  title="${_("Chairpersons")}" class="icon icon-chair" aria-hidden="true"></span>
       <ul class="chair_list text">
         % for chair in chairs:
@@ -48,7 +52,7 @@
   % endif
 
   % if material or isSubmitter:
-  <div class="info_line material">
+  <div class="infoline material">
       <span title="${_("Materials")}" class="icon icon-material-download" aria-hidden="true"></span>
       % if material:
           <ul class="text" style="float: left; padding: 0">
@@ -64,7 +68,7 @@
   % endif
 
   % if moreInfo:
-  <div class="info_line info">
+  <div class="infoline info">
       <span  title="${_("Extra information")}" class="icon icon-info" aria-hidden="true"></span>
       <div class="text ${'nohtml' if not moreInfo_html else ''}">${ moreInfo }</div>
   </div>
@@ -84,9 +88,9 @@ ${ actions }
          });
 
 % if isSubmitter:
-    $('.info_line.material').addClass('highlighted-area');
-    $('.info_line.material').css('background-color', '#f2f2f2');
-    $('.info_line.material').append('<span title="${_("Manage materials")}" class="right i-button icon-edit icon-only" style="float: right" id="manageMaterials" aria-hidden="true" ></span>');
+    $('.infoline.material').addClass('highlighted-area');
+    $('.infoline.material').css('background-color', '#f2f2f2');
+    $('.infoline.material').append('<span title="${_("Manage materials")}" class="right i-button icon-edit icon-only" style="float: right" id="manageMaterials" aria-hidden="true" ></span>');
 
 
     $("#manageMaterials").click(function(){
