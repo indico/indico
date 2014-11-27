@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function($) {
+(function($, global) {
     'use strict';
 
     $.fn.stickyTooltip = function(category, content) {
@@ -37,4 +37,8 @@
             }
         });
     };
-})(jQuery);
+
+    global.repositionTooltips = function repositionTooltips() {
+       $('.qtip').qtip('reposition');
+    };
+})(jQuery, window);

@@ -138,9 +138,20 @@ $(document).ready(function() {
     $('input, textarea').placeholder();
 
     // Select the field of an i-form which has an error and display the tooltip.
-    // Ugly selector, but it can be improved my adding a specific class
-    // to the fields themselves (not just the wrapper).
-    $('.i-form .has-error > .form-field > *:first-child').stickyTooltip('error', function() {
-        return $(this).parent().data('error');
+    $('.i-form .has-error > .form-field').each(function() {
+        var $this = $(this);
+        // Try a custom tooltip anchor
+        var input = $this.find('[data-tooltip-anchor]');
+        if (!input.length) {
+            // Try the first non-hidden input field
+            input = $this.children(':input:not(:hidden)').eq(0);
+        }
+        if (!input.length) {
+            // Try the first element that's not a hidden input
+            input = $this.children(':not(:input:hidden)').eq(0);
+        }
+        input.stickyTooltip('error', function() {
+            return $this.data('error');
+        });
     });
 });

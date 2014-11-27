@@ -368,7 +368,7 @@ $switchTransition: .15s ease-out;
                 color: $red;
             }
 
-            .form-field > input, .form-field > select, .form-field > textarea {
+            .form-field > input, .form-field > select, .form-field > textarea, .i-table-widget {
                 border-color: $red !important;
             }
         }

@@ -2,7 +2,7 @@
 <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}">
 <div id="{{ field.id }}-widget">
     <table class="i-table-widget">
-        <thead>
+        <thead data-tooltip-anchor>
             <tr>
                 {% for _, title in field.fields -%}
                     <th>{{ title }}</th>
@@ -39,6 +39,7 @@
             data.splice(row.index(), 1);
             updateField();
             row.remove();
+            repositionTooltips();
         }).on('click', '.js-save-row', function(e) {
             e.preventDefault();
             var row = $(this).closest('tr');
@@ -76,6 +77,7 @@
             });
             $('<td>', {html: item ? deleteButton.clone() : deleteButton.clone().add(saveButton.clone())}).appendTo(row);
             widgetBody.append(row);
+            repositionTooltips();
         }
 
         function updateField() {
