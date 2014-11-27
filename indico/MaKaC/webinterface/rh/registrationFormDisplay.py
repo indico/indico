@@ -16,7 +16,7 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from flask import session, request, flash
+from flask import session, request, flash, redirect
 from cStringIO import StringIO
 
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay, RHConfSignIn
@@ -32,7 +32,7 @@ from MaKaC.common.mail import GenericMailer
 from MaKaC.common.utils import validMail
 from MaKaC.PDFinterface.conference import TicketToPDF
 from indico.modules.payment import event_settings as payment_event_settings
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, url_for
 
 from indico.util import json
 
@@ -192,7 +192,7 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBase):
         else:
             if not rp.doPay():
                 flash(_(u"Your registration has been recorded successfully."), 'success')
-            self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(rp))
+            return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
 
 
 class RHRegistrationFormRegistrantBase(RHRegistrationFormDisplayBase):
@@ -207,21 +207,13 @@ class RHRegistrationFormRegistrantBase(RHRegistrationFormDisplayBase):
             raise NotFoundError(_("The registrant with id %s does not exist or has been deleted") % regId)
 
 
-class RHRegistrationFormCreationDone(RHRegistrationFormRegistrantBase):
+class RHConferenceTicketPDF(RHRegistrationFormRegistrantBase):
 
     def _checkParams(self, params):
         RHRegistrationFormRegistrantBase._checkParams(self, params)
         self._authkey = params.get("authkey", "")
         if self._registrant.getRandomId() != self._authkey or self._authkey == "":
             raise AccessError("You are not authorized to access this web page")
-
-    def _processIfActive(self):
-        if self._registrant is not None:
-            p = registrationForm.WPRegistrationForm(self, self._conf)
-            return p.display(registrant=self._registrant)
-
-
-class RHConferenceTicketPDF(RHRegistrationFormCreationDone):
 
     def _process(self):
         filename = "{0}-Ticket.pdf".format(self._target.getTitle())
