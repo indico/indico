@@ -21,6 +21,7 @@ from wtforms.validators import DataRequired
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+from MaKaC.accessControl import AccessWrapper
 
 
 class PaymentPluginSettingsFormBase(IndicoForm):
@@ -42,6 +43,14 @@ class PaymentPluginMixin(object):
         super(PaymentPluginMixin, self).init()
         if not self.name.startswith('payment_'):
             raise Exception('Payment plugins must be named payment_*')
+
+    def can_be_modified(self, user, event):
+        """Checks if the user is allowed to enable/disable/modify the payment method.
+
+        :param user: the :class:`Avatar` of the user
+        :param event: the :class:`Conference`
+        """
+        return event.canModify(AccessWrapper(user))
 
     @property
     def default_settings(self):
