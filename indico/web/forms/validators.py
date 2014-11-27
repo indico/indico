@@ -25,6 +25,8 @@ class UsedIf(object):
 
     If the field is not used, validation stops.
     """
+    field_flags = ('conditional',)
+
     def __init__(self, condition):
         self.condition = condition
 
