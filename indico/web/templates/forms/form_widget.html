@@ -20,7 +20,7 @@
             {%- if field.flags.required %}<i class="required" title="{% trans %}This field is required{% endtrans %}">*</i>{% endif -%}
         </div>
         <div class="form-field form-block"{% if field.errors %} data-error="{{ _render_errors(field.errors) }}"{% endif %}>
-            {% if field.flags.required %}
+            {% if field.flags.required and not field.flags.conditional %}
                 {{ field(required=true, **widget_attrs) }}
             {% else %}
                 {{ field(**widget_attrs) }}
