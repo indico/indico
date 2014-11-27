@@ -17,9 +17,11 @@
 from __future__ import unicode_literals
 
 from flask import redirect, flash, request
+from werkzeug.exceptions import NotFound
 
 from indico.modules.payment import settings, event_settings
 from indico.modules.payment.forms import AdminSettingsForm, EventSettingsForm
+from indico.modules.payment.util import get_payment_plugins
 from indico.modules.payment.views import WPPaymentAdmin, WPPaymentEventManagement
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -37,7 +39,7 @@ class RHPaymentAdminSettings(RHAdminBase):
             settings.set_multi(form.data)
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.admin_settings'))
-        return WPPaymentAdmin.render_template('admin_settings.html', form=form)
+        return WPPaymentAdmin.render_template('admin_settings.html', form=form, plugins=get_payment_plugins().values())
 
 
 class RHPaymentEventSettings(RHConferenceModifBase):
@@ -46,9 +48,12 @@ class RHPaymentEventSettings(RHConferenceModifBase):
     def _process(self):
         event = self._conf
         currencies = dict(settings.get('currencies'))
+        plugins = get_payment_plugins()
+        enabled_plugins = [plugin for plugin in plugins.itervalues() if plugin.event_settings.get(event, 'enabled')]
         return WPPaymentEventManagement.render_template('event_settings.html', event, event=event,
                                                         settings=event_settings.get_all(event),
-                                                        currencies=currencies)
+                                                        currencies=currencies, plugins=plugins.items(),
+                                                        enabled_plugins=enabled_plugins)
 
 
 class RHPaymentEventSettingsEdit(RHConferenceModifBase):
@@ -73,9 +78,34 @@ class RHPaymentEventToggle(RHConferenceModifBase):
     def _process(self):
         event = self._conf
         enabled = request.form['enabled'] == '1'
+        if enabled and not get_payment_plugins():
+            flash(_('There are no payment methods available. Please contact your Indico administrator.'), 'error')
+            return redirect(url_for('.event_settings', event))
         if event_settings.get(event, 'enabled', None) is None:
             copy_settings = {'currency', 'conditions', 'summary_email', 'success_email'}
             data = {k: v for k, v in settings.get_all().iteritems() if k in copy_settings}
             event_settings.set_multi(event, data)
         event_settings.set(event, 'enabled', enabled)
         return redirect(url_for('.event_settings', event))
+
+
+class RHPaymentEventPluginEdit(RHConferenceModifBase):
+    """Configure a payment plugin for an event"""
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        try:
+            self.plugin = get_payment_plugins()[request.view_args['method']]
+        except KeyError:
+            raise NotFound
+
+    def _process(self):
+        event = self._conf
+        defaults = FormDefaults(self.plugin.event_settings.get_all(event), **self.plugin.settings.get_all())
+        form = self.plugin.event_settings_form(prefix='payment-', obj=defaults)
+        if form.validate_on_submit():
+            self.plugin.event_settings.set_multi(event, form.data)
+            flash(_('Settings for {0} saved').format(self.plugin.title), 'success')
+            return redirect(url_for('.event_settings', event))
+        return WPPaymentEventManagement.render_template('event_plugin_edit.html', event, event=event, form=form,
+                                                        plugin=self.plugin)

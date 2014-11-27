@@ -17,8 +17,12 @@
 from __future__ import unicode_literals
 
 from indico.core.models.settings import SettingsProxy, EventSettingsProxy
+from indico.modules.payment.plugins import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
+                                            PaymentEventSettingsFormBase)
 
-__all__ = ('settings', 'event_settings')
+
+__all__ = ('settings', 'event_settings', 'PaymentPluginMixin', 'PaymentPluginSettingsFormBase',
+           'PaymentEventSettingsFormBase')
 
 settings = SettingsProxy('payment', {
     'currencies': [{'code': 'EUR', 'name': 'Euro'}, {'code': 'USD', 'name': 'US Dollar'}],
