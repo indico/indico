@@ -105,15 +105,17 @@
                 <div class="i-box-title">
                     ${ _('Summary') }
                 </div>
-                % if 'download' in actions or 'modify' in actions:
+                % if 'download' in actions or ('modify' in actions and registrant.getAvatar()):
                     <div class="i-box-buttons toolbar thin right">
                         <div class="group">
-                            <a href="${ url_for('event.confRegistrationFormDisplay-modify', conf) }"
-                               class="i-button icon-edit ${ 'disabled' if 'modify' not in actions else '' }"
-                               title="${ _('Modification period is over') if 'modify' not in actions else '' }"
-                               ${ 'onclick="return false"' if 'modify' not in actions else '' }>
-                                ${ _("Modify") }
-                            </a>
+                            % if registrant.getAvatar():
+                                <a href="${ url_for('event.confRegistrationFormDisplay-modify', conf) }"
+                                   class="i-button icon-edit ${ 'disabled' if 'modify' not in actions else '' }"
+                                   title="${ _('Modification period is over') if 'modify' not in actions else '' }"
+                                   ${ 'onclick="return false"' if 'modify' not in actions else '' }>
+                                    ${ _("Modify") }
+                                </a>
+                            % endif
                             % if 'download' in actions:
                                 <a href="${ url_for('event.e-ticket-pdf', conf, **authparams) }" class="i-button icon-ticket">
                                     ${ _("Get ticket") }
