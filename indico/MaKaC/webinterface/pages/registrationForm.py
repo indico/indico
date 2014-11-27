@@ -832,25 +832,6 @@ class WConfRegFormDeactivated(WConfDisplayBodyBase):
         return wvars
 
 
-class WPRegistrationFormAlreadyRegistered(conferences.WPConferenceDefaultDisplayBase):
-
-    navigationEntry = navigation.NERegistrationFormDisplay
-
-    def _getBody(self, params):
-        wc = WConfRegistrationFormAlreadyRegistered(self._conf)
-        return wc.getHTML()
-
-    def _defineSectionMenu(self):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._regFormOpt)
-
-
-class WConfRegistrationFormAlreadyRegistered(wcomponents.WTemplated):
-
-    def __init__(self, conf):
-        self._conf = conf
-
-
 class WPRegistrationFormconfirmBooking(conferences.WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NERegistrationFormDisplay
 
