@@ -288,11 +288,16 @@ $switchTransition: .15s ease-out;
             margin-bottom: 0;
             display: inline-block;
             min-height: 2.5em;
-            line-height: 1.5
+            line-height: 1.5;
+            position: relative;
         }
 
         .form-label-middle {
             padding-top: 0.5em;
+
+            .required {
+                top: 0.4em;
+            }
         }
 
         .form-label-empty {
@@ -429,13 +434,17 @@ $switchTransition: .15s ease-out;
     }
 
     fieldset {
-        border: 1px solid $separator-color;
+        border: 0;
         margin-bottom: 1em;
         border-radius: 0.2em;
 
         legend {
             font-weight: bold;
             font-size: 1.3em;
+            border-bottom: 1px solid #ebebeb;
+            width: 100%;
+            padding-bottom: 0.5em;
+            margin-bottom: 0.3em;
         }
 
         p.description {
@@ -458,4 +467,12 @@ $switchTransition: .15s ease-out;
         position: relative;
         bottom: 1px;
     }
+}
+
+.required {
+    position: absolute;
+    right: 0.1em;
+    color: #af0000;
+    font-size: 1.4em;
+    top: 0.03em;
 }
