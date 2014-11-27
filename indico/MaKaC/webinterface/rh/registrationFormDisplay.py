@@ -198,12 +198,13 @@ class RHRegistrationForm(RHRegistrationFormDisplayBase):
     def _checkParams(self, params):
         RHRegistrationFormDisplayBase._checkParams(self, params)
         self._registrant = None
-        registrant_id = params.get('registrantId', None)
-        if registrant_id:
-            self._registrant = self._conf.getRegistrantById(registrant_id)
+        self._registrant_id = params.get('registrantId', None)
+        self._authkey = None
+        if self._registrant_id:
+            self._registrant = self._conf.getRegistrantById(self._registrant_id)
             if self._registrant is None:
                 raise NotFoundError(_("The registrant with id {} does not exist or has been deleted")
-                                    .format(registrant_id))
+                                    .format(self._registrant_id))
             self._authkey = params.get('authkey', '')
             if self._registrant.getRandomId() != self._authkey or self._authkey == '':
                 raise AccessError()
@@ -212,7 +213,7 @@ class RHRegistrationForm(RHRegistrationFormDisplayBase):
 
     def _processIfActive(self):
         p = registrationForm.WPRegistrationForm(self, self._conf)
-        return p.display(registrant=self._registrant)
+        return p.display(registrant=self._registrant, registrant_id=self._registrant_id, authkey=self._authkey)
 
 
 class RHRegistrationFormRegistrantBase(RHRegistrationForm):

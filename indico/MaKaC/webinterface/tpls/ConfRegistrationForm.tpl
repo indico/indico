@@ -115,7 +115,7 @@
                                 ${ _("Modify") }
                             </a>
                             % if 'download' in actions:
-                                <a href="${ url_for('event.e-ticket-pdf', registrant, authkey=registrant.getRandomId()) }" class="i-button icon-ticket">
+                                <a href="${ url_for('event.e-ticket-pdf', conf, **authparams) }" class="i-button icon-ticket">
                                     ${ _("Get ticket") }
                                 </a>
                             % endif
