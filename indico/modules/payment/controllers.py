@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, flash, request
+from flask import redirect, flash, request, session
 from werkzeug.exceptions import NotFound
 
 from indico.modules.payment import settings, event_settings
@@ -101,11 +101,16 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
 
     def _process(self):
         event = self._conf
+        can_modify = self.plugin.can_be_modified(session.user, event)
         defaults = FormDefaults(self.plugin.event_settings.get_all(event), **self.plugin.settings.get_all())
         form = self.plugin.event_settings_form(prefix='payment-', obj=defaults)
-        if form.validate_on_submit():
+        if can_modify and form.validate_on_submit():
             self.plugin.event_settings.set_multi(event, form.data)
             flash(_('Settings for {0} saved').format(self.plugin.title), 'success')
             return redirect(url_for('.event_settings', event))
+        widget_attrs = {}
+        if not can_modify:
+            widget_attrs = {field.short_name: {'disabled': True} for field in form}
         return WPPaymentEventManagement.render_template('event_plugin_edit.html', event, event=event, form=form,
-                                                        plugin=self.plugin)
+                                                        plugin=self.plugin, can_modify=can_modify,
+                                                        widget_attrs=widget_attrs)
