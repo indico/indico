@@ -340,6 +340,10 @@ $switchTransition: .15s ease-out;
                     text-shadow: 0 0 0 #000;
                 }
             }
+
+            :invalid {
+                box-shadow: none !important;
+            }
         }
 
         &.horizontal {
@@ -373,8 +377,10 @@ $switchTransition: .15s ease-out;
                 color: $red;
             }
 
-            .form-field > input, .form-field > select, .form-field > textarea, .i-table-widget {
-                border-color: $red !important;
+            .form-field {
+                & > input, & > select, & > textarea, .i-table-widget {
+                    border-color: $red !important;
+                }
             }
         }
 
