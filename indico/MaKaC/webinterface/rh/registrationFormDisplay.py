@@ -92,7 +92,7 @@ class RHRegistrationFormDisplay(RHRegistrationFormDisplayBase):
 
     def _processIfActive(self):
         if self._getUser() is not None and self._getUser().isRegisteredInConf(self._conf):
-            p = registrationForm.WPRegistrationFormAlreadyRegistered(self, self._conf)
+            return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
         else:
             if self._conf.getRegistrationForm().isFull():
                 p = registrationForm.WPRegistrationFormFull(self, self._conf)
