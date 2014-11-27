@@ -21,9 +21,17 @@ from indico.core.models.settings import SettingsProxy, EventSettingsProxy
 __all__ = ('settings', 'event_settings')
 
 settings = SettingsProxy('payment', {
-    'currencies': [{'code': 'EUR', 'name': 'Euro'}, {'code': 'USD', 'name': 'US Dollar'}]
+    'currencies': [{'code': 'EUR', 'name': 'Euro'}, {'code': 'USD', 'name': 'US Dollar'}],
+    'currency': 'EUR',
+    'conditions': '',
+    'summary_email': '',
+    'success_email': ''
 })
 
 event_settings = EventSettingsProxy('payment', {
-    'enabled': False
+    'enabled': False,
+    'currency': 'EUR',
+    'conditions': '',
+    'summary_email': '',
+    'success_email': ''
 })
