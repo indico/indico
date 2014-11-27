@@ -75,29 +75,6 @@ a.plugin {
     }
 }
 
-.admin-page-header {
-    border-bottom: 1px solid $separator-color;
-
-    h1, h2 {
-        display: inline-block;
-        vertical-align: baseline;
-    }
-
-    h2 {
-        color: $light-black;
-        margin-left: 1em;
-        font-size: 1.2em;
-    }
-}
-
-.admin-page-description {
-    @extend %font-family-title;
-    max-width: 800px;
-    color: $dark-gray;
-    font-size: 1.2em;
-    margin-bottom: 2em;
-}
-
 .code {
     @include border-radius();
     border: 1px solid $gray;
