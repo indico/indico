@@ -31,7 +31,7 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
-from indico.core.models.settings import SettingsProxy
+from indico.core.models.settings import SettingsProxy, EventSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.signals import values_from_signal
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
@@ -63,6 +63,8 @@ class IndicoPlugin(Plugin):
     settings_form_field_opts = {}
     #: A dictionary containing default values for settings
     default_settings = {}
+    #: A dictionary containing default values for event-specific settings
+    default_event_settings = {}
     #: If the plugin should be hidden in the admin interface (useful for plugins which only
     #: provide a base for other plugins)
     hidden = False
@@ -248,6 +250,17 @@ class IndicoPlugin(Plugin):
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
             return SettingsProxy('plugin_{}'.format(cls.name), instance.default_settings)
+
+    @cached_classproperty
+    @classmethod
+    def event_settings(cls):
+        """:class:`EventSettingsProxy` for the plugin's event-specific settings"""
+        if cls.name is None:
+            raise RuntimeError('Plugin has not been loaded yet')
+        instance = cls.instance
+        with instance.plugin_context():  # in case the default settings come from a property
+            return EventSettingsProxy('plugin_{}'.format(cls.name), instance.default_event_settings)
+
 
 
 def include_plugin_js_assets(bundle_name):
