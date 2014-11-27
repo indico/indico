@@ -199,12 +199,18 @@ class RHRegistrationFormRegistrantBase(RHRegistrationFormDisplayBase):
     def _checkParams(self, params):
         RHRegistrationFormDisplayBase._checkParams(self, params)
         self._registrant = None
-        regId = params.get("registrantId", None)
-        if regId is None:
+        reg_id = params.get("registrantId", None)
+        if reg_id:
+            self._registrant = self._conf.getRegistrantById(reg_id)
+            if self._registrant is None:
+                raise NotFoundError(_("The registrant with id %s does not exist or has been deleted") % reg_id)
+        elif session.user:
+            self._registrant = session.user.getRegistrantById(self._conf.getId())
+            params['authkey'] = self._registrant.getRandomId()
+            if self._registrant is None:
+                raise NotFoundError(_("You are not registered or your registration has been deleted"))
+        else:
             raise MaKaCError(_("registrant id not set"))
-        self._registrant = self._conf.getRegistrantById(regId)
-        if self._registrant is None:
-            raise NotFoundError(_("The registrant with id %s does not exist or has been deleted") % regId)
 
 
 class RHConferenceTicketPDF(RHRegistrationFormRegistrantBase):
