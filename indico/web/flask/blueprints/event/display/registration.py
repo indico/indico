@@ -19,14 +19,15 @@
 
 from MaKaC.webinterface.rh import registrantsDisplay, registrationFormDisplay
 from indico.web.flask.blueprints.event.display import event
+from indico.web.flask.util import redirect_view
 
 
 # Registrants
 event.add_url_rule('/registration/registrants', 'confRegistrantsDisplay-list', registrantsDisplay.RHRegistrantsList)
 
 # Registration
-# Sections
-event.add_url_rule('/registration/', 'confRegistrationFormDisplay', registrationFormDisplay.RHRegistrationForm)
+event.add_url_rule('/registration/', 'confRegistrationFormDisplay',
+                   registrationFormDisplay.RHRegistrationForm)
 event.add_url_rule('/registration/conditions', 'confRegistrationFormDisplay-conditions',
                    registrationFormDisplay.RHRegistrationFormConditions)
 event.add_url_rule('/registration/confirm', 'confRegistrationFormDisplay-confirmBooking',
@@ -35,10 +36,7 @@ event.add_url_rule('/registration/pay', 'confRegistrationFormDisplay-confirmBook
                    registrationFormDisplay.RHRegistrationFormconfirmBookingDone)
 event.add_url_rule('/registration/register', 'confRegistrationFormDisplay-creation',
                    registrationFormDisplay.RHRegistrationFormCreation, methods=('POST',))
-event.add_url_rule('/registration/register/success', 'confRegistrationFormDisplay-creationDone',
-                   registrationFormDisplay.RHRegistrationFormCreationDone)
-event.add_url_rule('/registration/register/ticket.pdf',
-                   'e-ticket-pdf',
+event.add_url_rule('/registration/ticket.pdf', 'e-ticket-pdf',
                    registrationFormDisplay.RHConferenceTicketPDF)
 event.add_url_rule('/registration/register', 'confRegistrationFormDisplay-display',
                    registrationFormDisplay.RHRegistrationFormDisplay)
@@ -50,3 +48,7 @@ event.add_url_rule('/registration/signin', 'confRegistrationFormDisplay-signIn',
                    registrationFormDisplay.RHRegistrationFormSignIn)
 event.add_url_rule('/registration/userdata', 'confRegistrationFormDisplay-userData',
                    registrationFormDisplay.RHRegistrationFormUserData)
+
+# Legacy
+event.add_url_rule('/registration/register/success', 'confRegistrationFormDisplay-creationDone',
+                   redirect_view('event.confRegistrationFormDisplay'))

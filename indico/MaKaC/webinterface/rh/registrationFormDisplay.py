@@ -59,14 +59,6 @@ class RHBaseRegistrationForm(RHConferenceBaseDisplay):
             return self._processIfActive()
 
 
-class RHRegistrationForm(RHBaseRegistrationForm):
-    _uh = urlHandlers.UHConfRegistrationForm
-
-    def _processIfActive(self):
-        p = registrationForm.WPRegistrationForm(self, self._conf)
-        return p.display()
-
-
 class RHRegistrationFormSignIn(RHBaseRegistrationForm, RHConfSignIn):
     _uh = urlHandlers.UHConfRegistrationFormSignIn
 
@@ -190,37 +182,49 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBase):
         if canManageRegistration and user != self._getUser():
             self._redirect(RHRegistrantListModif._uh.getURL(self._conf))
         else:
+            params = {}
             if not rp.doPay():
                 flash(_(u"Your registration has been recorded successfully."), 'success')
-            return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
+            if not session.user:
+                params.update(rp.getLocator(), **{'authkey': rp.getRandomId()})
+            else:
+                params.update(self._conf.getLocator())
+            return redirect(url_for('event.confRegistrationFormDisplay', **params))
 
 
-class RHRegistrationFormRegistrantBase(RHRegistrationFormDisplayBase):
+class RHRegistrationForm(RHRegistrationFormDisplayBase):
+    _uh = urlHandlers.UHConfRegistrationForm
+
     def _checkParams(self, params):
         RHRegistrationFormDisplayBase._checkParams(self, params)
         self._registrant = None
-        reg_id = params.get("registrantId", None)
-        if reg_id:
-            self._registrant = self._conf.getRegistrantById(reg_id)
+        registrant_id = params.get('registrantId', None)
+        if registrant_id:
+            self._registrant = self._conf.getRegistrantById(registrant_id)
             if self._registrant is None:
-                raise NotFoundError(_("The registrant with id %s does not exist or has been deleted") % reg_id)
+                raise NotFoundError(_("The registrant with id {} does not exist or has been deleted")
+                                    .format(registrant_id))
+            self._authkey = params.get('authkey', '')
+            if self._registrant.getRandomId() != self._authkey or self._authkey == '':
+                raise AccessError()
         elif session.user:
             self._registrant = session.user.getRegistrantById(self._conf.getId())
-            params['authkey'] = self._registrant.getRandomId()
-            if self._registrant is None:
-                raise NotFoundError(_("You are not registered or your registration has been deleted"))
-        else:
-            raise MaKaCError(_("registrant id not set"))
+
+    def _processIfActive(self):
+        p = registrationForm.WPRegistrationForm(self, self._conf)
+        return p.display(registrant=self._registrant)
+
+
+class RHRegistrationFormRegistrantBase(RHRegistrationForm):
+    def _checkParams(self, params):
+        RHRegistrationForm._checkParams(self, params)
+        if self._registrant is None:
+            if not session.user and not params.get('registrantId', None):
+                raise MaKaCError(_("registrant id not set"))
+            raise NotFoundError(_("You are not registered or your registration has been deleted"))
 
 
 class RHConferenceTicketPDF(RHRegistrationFormRegistrantBase):
-
-    def _checkParams(self, params):
-        RHRegistrationFormRegistrantBase._checkParams(self, params)
-        self._authkey = params.get("authkey", "")
-        if self._registrant.getRandomId() != self._authkey or self._authkey == "":
-            raise AccessError("You are not authorized to access this web page")
-
     def _process(self):
         filename = "{0}-Ticket.pdf".format(self._target.getTitle())
         pdf = TicketToPDF(self._target, self._registrant)

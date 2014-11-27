@@ -354,10 +354,10 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
 
     _linkname = "registrationForm"
 
-    def __init__(self, conf, av, registrant=None):
+    def __init__(self, conf, av, registrant):
         self._conf = conf
         self._avatar = av
-        self._registrant = av.getRegistrantById(conf.getId()) if av else registrant
+        self._registrant = registrant
 
     def _formatValue(self, fieldInput, value):
         try:
