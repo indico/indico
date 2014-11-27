@@ -63,12 +63,15 @@ from indico.util.redis import client as redis_client
 from indico.web.flask.util import url_for
 
 
-class WPAdminsBase( WPMainBase ):
+class WPAdminsBase(WPMainBase):
 
     _userData = ['favorite-user-ids']
 
     def _getSiteArea(self):
         return "AdministrationArea"
+
+    def getCSSFiles(self):
+        return WPMainBase.getCSSFiles(self) + self._asset_env['admin_sass'].urls()
 
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + \

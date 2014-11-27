@@ -23,6 +23,3 @@ class WPPlugins(WPJinjaMixin, WPAdminsBase):
 
     def _setActiveSideMenuItem(self):
         self._pluginsMenuItem.setActive()
-
-    def getCSSFiles(self):
-        return WPAdminsBase.getCSSFiles(self) + self._asset_env['admin_sass'].urls()
