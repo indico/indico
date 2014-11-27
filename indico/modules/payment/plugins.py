@@ -45,4 +45,4 @@ class PaymentPluginMixin(object):
 
     @property
     def default_settings(self):
-        return {'method_name': 'Bank Transfer'}
+        return {'method_name': self.title}
