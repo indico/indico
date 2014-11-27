@@ -47,7 +47,7 @@ class RHPaymentEventSettings(RHConferenceModifBase):
 
     def _process(self):
         event = self._conf
-        currencies = dict(settings.get('currencies'))
+        currencies = {c['code']: c['name'] for c in settings.get('currencies')}
         plugins = get_payment_plugins()
         enabled_plugins = [plugin for plugin in plugins.itervalues() if plugin.event_settings.get(event, 'enabled')]
         return WPPaymentEventManagement.render_template('event_settings.html', event, event=event,
