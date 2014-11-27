@@ -269,20 +269,16 @@ class RHRegistrationFormconfirmBookingDone(RHRegistrationFormRegistrantBase):
 class RHRegistrationFormModify(RHRegistrationFormDisplayBase):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
 
-    def _process(self):
-        user = self._getUser()
-        canManageRegistration = self._conf.canManageRegistration(user)
-        if not canManageRegistration and (not self._regForm.isActivated() or not self._conf.hasEnabledSection("regForm")):
-            p = registrationForm.WPRegFormInactive(self, self._conf)
-            return p.display()
-        if user is not None and user.isRegisteredInConf(self._conf):
-            if not self._conf.getRegistrationForm().inRegistrationPeriod() and not self._conf.getRegistrationForm().inModificationPeriod():
-                p = registrationForm.WPRegistrationFormClosed(self, self._conf)
-                return p.display()
-            else:
-                p = registrationForm.WPRegistrationFormModify(self, self._conf)
-                return p.display()
-        self._redirect(urlHandlers.UHConfRegistrationForm.getURL(self._conf))
+    def _checkParams(self, params):
+        RHRegistrationFormDisplayBase._checkParams(self, params)
+        self._registrant = session.user.getRegistrantById(self._conf.getId()) if session.user else None
+
+    def _processIfActive(self):
+        if not self._registrant:
+            return redirect(url_for('event.confRegistrationFormDisplay-display', self._conf))
+        if not self._regForm.inModificationPeriod():
+            return registrationForm.WPRegistrationFormClosed(self, self._conf).display()
+        return registrationForm.WPRegistrationFormModify(self, self._conf).display()
 
 
 class RHRegistrationFormPerformModify(RHRegistrationFormCreation):
