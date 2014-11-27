@@ -32,7 +32,7 @@
                 {% if not settings.currency %}
                     {% trans %}None selected{% endtrans %}
                 {% else %}
-                    {{ settings.currency }}{% if settings.currency in currencies %} {{ currencies[settings.currency] }}{% endif %}
+                    {{ settings.currency }}{% if settings.currency in currencies %} ({{ currencies[settings.currency] }}){% endif %}
                 {% endif %}
             </dd>
             <dt>{% trans %}Conditions{% endtrans %}</dt>
@@ -57,7 +57,7 @@
                 <li>
                     <a href="{{ url_for('.event_plugin_edit', event, method=short_name) }}">{{ plugin.title }}</a>
                     {% if plugin in enabled_plugins %}
-                        ({% trans %}enabled{% endtrans %})
+                        ({% trans %}<strong>enabled</strong>{% endtrans %})
                     {% else %}
                         ({% trans %}disabled{% endtrans %})
                     {% endif %}
