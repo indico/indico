@@ -294,6 +294,10 @@ $switchTransition: .15s ease-out;
 
         .form-label-middle {
             padding-top: 0.5em;
+
+            .required {
+                top: 0.4em;
+            }
         }
 
         .form-label-empty {
@@ -470,5 +474,5 @@ $switchTransition: .15s ease-out;
     right: 0.1em;
     color: #af0000;
     font-size: 1.4em;
-    top: 0.4em;
+    top: 0.03em;
 }
