@@ -39,7 +39,8 @@ EMAIL_ENABLED_MSG = _('This email is currently <strong>enabled</strong>. You can
 
 
 class AdminSettingsForm(IndicoForm):
-    currencies = MultipleItemsField(_('Currencies'), fields=(('code', _('Code')), ('name', _('Name'))),
+    currencies = MultipleItemsField(_('Currencies'), [DataRequired()],
+                                    fields=(('code', _('Code')), ('name', _('Name'))),
                                     description=_("List of currencies that can be selected for an event. When deleting "
                                                   "a currency, existing events will keep using it. The currency code "
                                                   "must be a valid <a href='{0}'>ISO-4217</a> code such "
