@@ -340,7 +340,8 @@ class WPRegistrationForm(conferences.WPConferenceDefaultDisplayBase):
     navigationEntry = navigation.NERegistrationForm
 
     def _getBody(self, params):
-        wc = WConfRegistrationForm(self._conf, self._getAW().getUser(), params.get('registrant'))
+        wc = WConfRegistrationForm(self._conf, self._getAW().getUser(),
+                                   params.get('registrant'), params.get('registrant_id'), params.get('authkey'))
         return wc.getHTML()
 
     def _defineSectionMenu(self):
@@ -356,10 +357,11 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
 
     _linkname = "registrationForm"
 
-    def __init__(self, conf, av, registrant):
+    def __init__(self, conf, av, registrant, registrant_id=None, authkey=None):
         self._conf = conf
         self._avatar = av
         self._registrant = registrant
+        self._authparams = {'registrantId': registrant_id, 'authkey': authkey}
 
     def _formatValue(self, fieldInput, value):
         try:
@@ -722,6 +724,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
         wvars["conf"] = self._conf
         wvars["confId"] = self._conf.getId()
         wvars["registrant"] = self._registrant
+        wvars["authparams"] = self._authparams
         wvars["body_title"] = self._getTitle()
         wvars["startDate"] = regForm.getStartRegistrationDate().strftime("%d %B %Y")
         wvars["endDate"] = regForm.getEndRegistrationDate().strftime("%d %B %Y")
