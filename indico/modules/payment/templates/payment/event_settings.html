@@ -3,6 +3,17 @@
 {% block title %}{% trans %}Payment settings{% endtrans %}{% endblock %}
 
 {% block content %}
+    {% if settings.enabled and not enabled_plugins %}
+        <div class="warning-message-box fixed-width">
+            <div class="message-text">
+                {% trans -%}
+                    The payment module is enabled but you did not enable any payment methods. You must enable at least
+                    one method for the module to work properly.
+                {%- endtrans %}
+            </div>
+        </div>
+    {% endif %}
+
     <dl class="i-data-list">
         <dt>{% trans %}Status{% endtrans %}</dt>
         <dd>
@@ -34,6 +45,26 @@
             <dd><a class="i-button big" href="{{ url_for('.event_settings_edit', event) }}">{% trans %}Configure{% endtrans %}</a></dd>
         {% endif %}
     </dl>
+
+    {% if settings.enabled %}
+        <p class="fixed-width">
+            {% trans -%}
+                The following payment methods are available. You can enable, disable and configure them by clicking on the title.
+            {%- endtrans %}
+        </p>
+        <ul>
+            {% for short_name, plugin in plugins %}
+                <li>
+                    <a href="{{ url_for('.event_plugin_edit', event, method=short_name) }}">{{ plugin.title }}</a>
+                    {% if plugin in enabled_plugins %}
+                        ({% trans %}enabled{% endtrans %})
+                    {% else %}
+                        ({% trans %}disabled{% endtrans %})
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 
     <script>
         $('#toggle-payment').on('change', function() {
