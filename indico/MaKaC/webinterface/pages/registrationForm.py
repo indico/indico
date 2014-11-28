@@ -726,8 +726,9 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
         wvars["registrant"] = self._registrant
         wvars["authparams"] = self._authparams
         wvars["body_title"] = self._getTitle()
-        wvars["startDate"] = regForm.getStartRegistrationDate().strftime("%d %B %Y")
-        wvars["endDate"] = regForm.getEndRegistrationDate().strftime("%d %B %Y")
+        wvars["startDate"] = regForm.getStartRegistrationDate()
+        wvars["endDate"] = regForm.getEndRegistrationDate()
+        wvars["nowutc"] = nowutc()
         wvars["actions"] = self._getActions()
         wvars["announcement"] = regForm.getAnnouncement()
         wvars["title"] = regForm.getTitle()

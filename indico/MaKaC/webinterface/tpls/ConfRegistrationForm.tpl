@@ -14,7 +14,7 @@
                         ${ _("From") }:
                     </span>
                     <span class="datetime">
-                        ${ startDate }
+                        ${ startDate.strftime('%d %B %Y') }
                     </span>
                 </div>
                 <div>
@@ -22,7 +22,7 @@
                         ${ _("To") }:
                     </span>
                     <span class="datetime">
-                        ${ endDate }
+                        ${ endDate.strftime('%d %B %Y') }
                     </span>
                 </div>
             </div>
@@ -93,7 +93,11 @@
         % else:
             <div class="info-message-box">
                 <div class="message-text">
-                    ${ _("This registration is now closed.") }
+                    % if nowutc < startDate:
+                        ${ _("This registration is not open yet.") }
+                    % else:
+                        ${ _("This registration is now closed.") }
+                    % endif
                 </div>
             </div>
         % endif
