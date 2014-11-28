@@ -16,18 +16,19 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, flash, request, session
+from flask import redirect, flash, request, session, jsonify
 from werkzeug.exceptions import NotFound
 
 from indico.modules.payment import settings, event_settings
 from indico.modules.payment.forms import AdminSettingsForm, EventSettingsForm
-from indico.modules.payment.util import get_payment_plugins
-from indico.modules.payment.views import WPPaymentAdmin, WPPaymentEventManagement
+from indico.modules.payment.util import get_payment_plugins, get_active_payment_plugins
+from indico.modules.payment.views import WPPaymentAdmin, WPPaymentEventManagement, WPPaymentEvent
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from MaKaC.webinterface.rh.registrationFormDisplay import RHRegistrationFormRegistrantBase
 
 
 class RHPaymentAdminSettings(RHAdminBase):
@@ -114,3 +115,32 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
         return WPPaymentEventManagement.render_template('event_plugin_edit.html', event, event=event, form=form,
                                                         plugin=self.plugin, can_modify=can_modify,
                                                         widget_attrs=widget_attrs)
+
+
+class RHPaymentEventCheckout(RHRegistrationFormRegistrantBase):
+    """Payment/Checkout page for registrants"""
+
+    def _process(self):
+        event = self._conf
+        amount = self._registrant.getTotal()
+        currency = event_settings.get(event, 'currency')
+        return WPPaymentEvent.render_template('event_checkout.html', event, event=event, registrant=self._registrant,
+                                              plugins=get_active_payment_plugins(event).items(), amount=amount,
+                                              currency=currency)
+
+
+class RHPaymentEventForm(RHRegistrationFormRegistrantBase):
+    """Loads the form for the selected payment plugin"""
+
+    def _checkParams(self, params):
+        RHRegistrationFormRegistrantBase._checkParams(self, params)
+        try:
+            self.plugin = get_payment_plugins()[request.args['method']]
+        except KeyError:
+            raise NotFound
+
+    def _process(self):
+        with self.plugin.plugin_context():
+            html = self.plugin.render_payment_form(self._conf, self._registrant, self._registrant.getTotal(),
+                                                   event_settings.get(self._conf, 'currency'))
+        return jsonify(html=html)

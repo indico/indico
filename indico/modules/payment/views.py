@@ -16,6 +16,7 @@
 
 from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
+from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 from MaKaC.webinterface.pages.registrationForm import WPConfModifRegFormBase
 
 
@@ -33,4 +34,13 @@ class WPPaymentEventManagement(WPConfModifRegFormBase, WPPaymentJinjaMixin):
         self._tabPayment.setActive()
 
     def _getTabContent(self, params):
+        return WPPaymentJinjaMixin._getPageContent(self, params)
+
+
+class WPPaymentEvent(WPConferenceDefaultDisplayBase, WPPaymentJinjaMixin):
+    def _defineSectionMenu(self):
+        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
+        self._sectionMenu.setCurrentItem(self._regFormOpt)
+
+    def _getBody(self, params):
         return WPPaymentJinjaMixin._getPageContent(self, params)
