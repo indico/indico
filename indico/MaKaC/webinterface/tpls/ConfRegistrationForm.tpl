@@ -74,7 +74,7 @@
 
     <input type="hidden" value="${confId}" id="conf_id">
 
-    % if registrant and registrant.doPay():
+    % if payment_enabled and registrant and registrant.doPay():
         <div class="warning-message-box">
             <div class="message-text">
                 ${ _("Please notice, your registration won't be complete until you perform the payment") }

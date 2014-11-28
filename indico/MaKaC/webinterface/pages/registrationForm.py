@@ -556,7 +556,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
         return "".join(html)
 
     def _getPaymentInfo(self):
-        if not self._registrant:
+        if not self._registrant or not payment_event_settings.get(self._conf, 'enabled'):
             return
         regForm = self._conf.getRegistrationForm()
         modPay = self._conf.getModPay()
@@ -745,6 +745,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
 
         if self._registrant:
             wvars["payment_info"] = self._getPaymentInfo()
+            wvars["payment_enabled"] = payment_event_settings.get(self._conf, 'enabled')
             wvars["payment_conditions"] = self._conf.getModPay().hasPaymentConditions()
             wvars["payment_done"] = self._registrant.getPayed()
             wvars["registration_info"] = self._getFormSections()
