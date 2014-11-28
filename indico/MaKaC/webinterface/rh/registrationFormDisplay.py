@@ -176,7 +176,7 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBase):
             self._redirect(RHRegistrantListModif._uh.getURL(self._conf))
         else:
             params = {}
-            if not rp.doPay():
+            if not rp.doPay() or not payment_event_settings.get(self._conf, 'enabled'):
                 flash(_(u"Your registration has been recorded successfully."), 'success')
             if not session.user:
                 params.update(rp.getLocator(), **{'authkey': rp.getRandomId()})
