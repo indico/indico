@@ -190,9 +190,9 @@ def remove_tags(text):
     return remove_extra_spaces(pattern.sub(' ', text))
 
 
-def render_markdown(text):
+def render_markdown(text, **kwargs):
     """ Mako markdown to html filter """
-    return markdown.markdown(bleach.clean(text, tags=BLEACH_ALLOWED_TAGS)).encode('utf-8')
+    return markdown.markdown(bleach.clean(text, tags=BLEACH_ALLOWED_TAGS), **kwargs).encode('utf-8')
 
 
 def sanitize_for_platypus(text):

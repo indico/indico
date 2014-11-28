@@ -22,10 +22,17 @@ import functools
 from flask import current_app as app
 from jinja2.ext import Extension
 from jinja2.lexer import Token
+from markupsafe import Markup
+
+from indico.util.string import render_markdown
 
 
 def underline(s, sep='-'):
     return u'{0}\n{1}'.format(s, sep * len(s))
+
+
+def markdown(value):
+    return Markup(EnsureUnicodeExtension.ensure_unicode(render_markdown(value, extensions=('nl2br',))))
 
 
 def get_template_module(template_name, **context):
