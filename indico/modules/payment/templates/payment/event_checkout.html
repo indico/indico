@@ -1,0 +1,45 @@
+<p>You need to pay {{ format_currency(amount, currency, locale=session.lang) }} for your registration.
+Please select a payment method below to see the final price.</p>
+
+<select id="payment-method">
+    <option value="">{% trans %}Please choose an option{% endtrans %}</option>
+    {% for name, plugin in plugins %}
+        <option value="{{ name }}">{{ plugin.get_method_name(event) }}</option>
+    {% endfor %}
+</select>
+
+<div id="payment"></div>
+
+<script>
+    (function() {
+        var paymentContainer = $('#payment');
+
+        function selectPaymentMethod(method) {
+            $.ajax({
+                url: {{ url_for('.event_payment_form', event, registrant) | tojson }},
+                type: 'GET',
+                data: {
+                    method: method
+                },
+                dataType: 'json',
+                complete: IndicoUI.Dialogs.Util.progress(),
+                success: function(data) {
+                    paymentContainer.html('');
+                    if (handleAjaxError(data)) {
+                        return;
+                    }
+                    paymentContainer.html(data.html);
+                }
+            });
+        }
+
+        $('#payment-method').on('change', function() {
+            var method = $(this).val();
+            if (!method) {
+                paymentContainer.html('');
+                return;
+            }
+            selectPaymentMethod(method);
+        });
+    })();
+</script>

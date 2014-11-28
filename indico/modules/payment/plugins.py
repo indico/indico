@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from flask_pluginengine import render_plugin_template
 from wtforms.fields.core import StringField, BooleanField
 from wtforms.validators import DataRequired
 
@@ -55,3 +56,20 @@ class PaymentPluginMixin(object):
     @property
     def default_settings(self):
         return {'method_name': self.title}
+
+    def get_method_name(self, event):
+        """Returns the (customized) name of the payment method."""
+        return self.event_settings.get(event, 'method_name')
+
+    def render_payment_form(self, event, registrant, amount, currency):
+        """Returns the payment form shown to the user.
+
+        :param event: the :class:`Conference`
+        :param registrant: the :class:`Registrant`
+        :param amount: the amount of money the registrant has to pay
+        :param currency: the currency used for the payment
+        """
+        settings = self.settings.get_all()
+        event_settings = self.event_settings.get_all(event)
+        return render_plugin_template('event_payment_form.html', event=event, registrant=registrant, amount=amount,
+                                      currency=currency, settings=settings, event_settings=event_settings)
