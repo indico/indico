@@ -955,47 +955,6 @@ class WConfRegistrationFormFull(wcomponents.WTemplated):
         return wvars
 
 
-class WPRegistrationFormClosed(conferences.WPConferenceDefaultDisplayBase):
-    navigationEntry = navigation.NERegistrationFormDisplay
-
-    def _getBody(self, params):
-        wc = WConfRegistrationFormClosed(self._conf, self._rh)
-        return wc.getHTML()
-
-    def _defineSectionMenu(self):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._regFormOpt)
-
-
-class WConfRegistrationFormClosed(wcomponents.WTemplated):
-
-    def __init__(self, conf, rh):
-        self._conf = conf
-        self._rh = rh
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        regForm = self._conf.getRegistrationForm()
-        wvars["title"] = _("Impossible to register")
-        wvars["msg"] = _("No period for registration")
-        wvars["currency"] = regForm.getCurrency()
-        wvars["canManageRegistration"] = self._conf.canManageRegistration(self._rh._getUser())
-        if nowutc() < regForm.getStartRegistrationDate():
-            wvars["title"] = _("Registration is not open yet")
-            wvars["msg"] = _("Sorry, but the registration is not open yet:")
-        elif regForm.getAllowedEndRegistrationDate() < nowutc():
-            wvars["title"] = _("Registration is closed")
-            wvars["msg"] = _("Sorry, but the registration is now closed:")
-        elif regForm.getCurrency() == "not selected":
-            wvars['error'] = True
-            wvars['title'] = _('Registration not available')
-            wvars['msg'] = _('Sorry, but the registration is not currently available. \
-                              Please, contact the conference manager for more information.')
-        wvars["startDate"] = self._conf.getRegistrationForm().getStartRegistrationDate().strftime("%A %d %B %Y")
-        wvars["endDate"] = self._conf.getRegistrationForm().getEndRegistrationDate().strftime("%A %d %B %Y")
-        return wvars
-
-
 class WPRegistrationFormConditions(WPBase):
 
     def __init__(self, rh, conf):

@@ -99,7 +99,7 @@ class RHRegistrationFormDisplay(RHRegistrationFormDisplayBase):
             elif not self._conf.getRegistrationForm().inRegistrationPeriod() or \
                     (payment_event_settings.get(self._conf, 'active') and
                      self._conf.getRegistrationForm().getCurrency() == "not selected"):
-                p = registrationForm.WPRegistrationFormClosed(self, self._conf)
+                return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
             else:
                 p = registrationForm.WPRegistrationFormDisplay(self, self._conf)
         return p.display()
@@ -146,8 +146,8 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBase):
                 self._redirect(urlHandlers.UHConfRegistrationFormDisplay.getURL(self._conf))
                 return
             elif not self._conf.getRegistrationForm().inRegistrationPeriod():
-                p = registrationForm.WPRegistrationFormClosed(self, self._conf)
-                return p.display()
+                flash(_("Your registration couldn't be recorded."), 'error')
+                return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
         if user is None:
             if self._conf.hasRegistrantByEmail(email):
                 raise FormValuesError("There is already a user with the email \"%s\". Please choose another one" % email)
@@ -276,7 +276,8 @@ class RHRegistrationFormModify(RHRegistrationFormDisplayBase):
         if not self._registrant:
             return redirect(url_for('event.confRegistrationFormDisplay-display', self._conf))
         if not self._regForm.inModificationPeriod():
-            return registrationForm.WPRegistrationFormClosed(self, self._conf).display()
+            flash(_("The modification period is over."), 'error')
+            return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
         return registrationForm.WPRegistrationFormModify(self, self._conf).display()
 
 
@@ -284,11 +285,10 @@ class RHRegistrationFormPerformModify(RHRegistrationFormCreation):
     _uh = urlHandlers.UHConfRegistrationFormModify
 
     def _process(self):
-        flash(_(u"Your registration has been modified successfully."), 'success')
         if self._getUser() is not None and self._getUser().isRegisteredInConf(self._conf):
             if not self._conf.getRegistrationForm().inRegistrationPeriod() and not self._conf.getRegistrationForm().inModificationPeriod():
-                p = registrationForm.WPRegistrationFormClosed(self, self._conf)
-                return p.display()
+                flash(_("Your modification could not be recorded since the modification period is over."), 'error')
+                return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
             else:
                 rp = self._getUser().getRegistrantById(self._conf.getId())
                 # check if the email is being changed by another one that already exists
@@ -296,6 +296,7 @@ class RHRegistrationFormPerformModify(RHRegistrationFormCreation):
                     raise FormValuesError(_("There is already a user with the email \"%s\". Please choose another one") % self._getRequestParams().get("email", "--no email--"))
                 rp.setValues(self._getRequestParams(), self._getUser())
                 self._regForm.getNotification().sendEmailModificationRegistrant(self._regForm, rp)
+                flash(_(u"Your registration has been modified successfully."), 'success')
                 if rp.doPay():
                     self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(rp))
                 else:
