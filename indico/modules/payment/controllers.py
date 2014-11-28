@@ -124,8 +124,10 @@ class RHPaymentEventCheckout(RHRegistrationFormRegistrantBase):
         event = self._conf
         amount = self._registrant.getTotal()
         currency = event_settings.get(event, 'currency')
+        plugins = get_active_payment_plugins(event)
+        force_plugin = plugins.items()[0] if len(plugins) == 1 else None  # only one plugin available
         return WPPaymentEvent.render_template('event_checkout.html', event, event=event, registrant=self._registrant,
-                                              plugins=get_active_payment_plugins(event).items(), amount=amount,
+                                              plugins=plugins.items(), force_plugin=force_plugin, amount=amount,
                                               currency=currency)
 
 
