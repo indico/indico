@@ -927,7 +927,7 @@ class WPRegistrationFormModify(conferences.WPConferenceDefaultDisplayBase):
 class WConfRegistrationFormModify(WConfRegistrationFormDisplay):
 
     def _getTitle(self):
-        title = WConfRegistrationFormDisplay._getTitle(self)
+        title = WConfDisplayBodyBase._getTitle(self)
         return _('{}: Modify'.format(title))
 
     def getVars(self):
