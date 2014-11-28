@@ -17,23 +17,24 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import string
+from xml.sax.saxutils import quoteattr
+
 from flask import session, request
 
-from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
-import string
-from MaKaC.webinterface import wcomponents
-from xml.sax.saxutils import quoteattr
 from MaKaC.common.timezoneUtils import nowutc
-from MaKaC.webinterface.pages.base import WPBase
 from MaKaC.i18n import _
-from indico.modules.payment import event_settings as payment_event_settings
-from indico.util.i18n import i18nformat
-from indico.util.fossilize import fossilize
-from indico.web.flask.util import url_for
 from MaKaC.registration import LabelInput
+from MaKaC.webinterface import wcomponents
+from MaKaC.webinterface.pages.base import WPBase
+from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
+from indico.modules.payment import event_settings as payment_event_settings
+from indico.util.fossilize import fossilize
+from indico.util.i18n import i18nformat
+from indico.web.flask.util import url_for
 
 
 # ----------------- MANAGEMENT AREA ---------------------------
