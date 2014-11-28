@@ -87,6 +87,10 @@ type("RichTextEditor", ["IWidget", "Accessor"],
 
          onChange: function(callback) {
              this.getEditor().on('change', callback);
+         },
+
+         afterPaste: function(callback) {
+            this.getEditor().on('afterPaste', callback);
          }
 
      },
