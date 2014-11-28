@@ -79,11 +79,16 @@ def create_json_error_answer(exception):
     if isinstance(exception, IndicoError):
         details = exception.toDict()
     else:
+        exception_data = exception.__dict__
+        try:
+            _json.dumps(exception_data)
+        except Exception:
+            exception_data = {}
         details = {
             'code': type(exception).__name__,
             'type': 'unknown',
             'message': exception.message,
-            'data': exception.__dict__,
+            'data': exception_data,
             'requestInfo': {},
             'inner': traceback.format_exc()
         }
