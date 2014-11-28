@@ -23,6 +23,7 @@ import os
 import re
 import traceback
 
+from babel.numbers import format_currency
 from flask import send_from_directory, request, _app_ctx_stack, Blueprint
 from flask import current_app as app
 from flask_sqlalchemy import models_committed
@@ -48,7 +49,7 @@ from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.plugins import (plugin_engine, include_plugin_css_assets, include_plugin_js_assets, plugin_hook,
                                  url_for_plugin)
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
-from indico.web.flask.templating import EnsureUnicodeExtension, underline
+from indico.web.flask.templating import EnsureUnicodeExtension, underline, markdown
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
                                    IndicoConfigWrapper)
 from indico.web.flask.wrappers import IndicoFlask
@@ -136,6 +137,7 @@ def setup_jinja(app):
     app.add_template_global(include_plugin_css_assets)
     app.add_template_global(include_plugin_js_assets)
     app.add_template_global(plugin_hook)
+    app.add_template_global(format_currency)
     app.add_template_global(is_single_line_field, '_is_single_line_field')
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
@@ -145,6 +147,7 @@ def setup_jinja(app):
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_timedelta))
     # Filters (new ones returning unicode)
     app.add_template_filter(underline)
+    app.add_template_filter(markdown)
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext, ngettext, True)
