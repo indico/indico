@@ -247,9 +247,8 @@ class RHRegistrationFormconfirmBooking(RHRegistrationFormRegistrantBase):
         if self._registrant is not None:
             if self._regForm.isSendReceiptEmail():
                 self._regForm.getNotification().sendEmailNewRegistrantDetailsPay(self._regForm, self._registrant)
-            url = urlHandlers.UHConfRegistrationFormconfirmBookingDone.getURL(self._conf)
-            url.addParam("registrantId", self._registrant.getId())
-            self._redirect(url)
+            return redirect(url_for('event.confRegistrationFormDisplay-confirmBookingDone', self._conf,
+                                    **{'registrantId': self._registrant_id, 'authkey': self._authkey}))
 
 
 class RHRegistrationFormconfirmBookingDone(RHRegistrationFormRegistrantBase):

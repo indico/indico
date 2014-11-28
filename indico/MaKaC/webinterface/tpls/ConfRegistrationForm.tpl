@@ -176,7 +176,7 @@
                         ${ payment_info }
                     </table>
                     % if not payment_done:
-                        <form name="epay" action="${ url_for('event.confRegistrationFormDisplay-confirmBooking', registrant) }" method="POST">
+                        <form name="epay" action="${ url_for('event.confRegistrationFormDisplay-confirmBooking', conf, **authparams) }" method="POST">
                             <table class="regform-done-conditions" width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td>
