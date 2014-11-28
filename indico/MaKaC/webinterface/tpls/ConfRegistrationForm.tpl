@@ -93,10 +93,14 @@
         % else:
             <div class="info-message-box">
                 <div class="message-text">
-                    % if nowutc < startDate:
-                        ${ _("This registration is not open yet.") }
+                    % if in_registration_period and is_full:
+                        ${ _("This registration is complete already.") }
+                    % elif nowutc < startDate:
+                        ${ _("This registration period has not started yet.") }
+                    % elif nowutc > endDate:
+                        ${ _("This registration period is now over.") }
                     % else:
-                        ${ _("This registration is now closed.") }
+                        ${ _("This registration is closed.") }
                     % endif
                 </div>
             </div>
