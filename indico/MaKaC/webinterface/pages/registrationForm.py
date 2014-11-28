@@ -421,7 +421,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
         actions = []
         regForm = self._conf.getRegistrationForm()
         eticket = regForm.getETicket()
-        if not self._registrant and regForm.inRegistrationPeriod():
+        if not self._registrant and regForm.inRegistrationPeriod() and not regForm.isFull():
             actions.append('register')
         if self._registrant and regForm.inModificationPeriod():
             actions.append('modify')
@@ -727,6 +727,8 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
         wvars["registrant"] = self._registrant
         wvars["authparams"] = self._authparams
         wvars["body_title"] = self._getTitle()
+        wvars["in_registration_period"] = regForm.inRegistrationPeriod()
+        wvars["is_full"] = regForm.isFull()
         wvars["startDate"] = regForm.getStartRegistrationDate()
         wvars["endDate"] = regForm.getEndRegistrationDate()
         wvars["nowutc"] = nowutc()
@@ -933,29 +935,6 @@ class WConfRegistrationFormModify(WConfRegistrationFormDisplay):
     def getVars(self):
         wvars = WConfRegistrationFormDisplay.getVars(self)
         wvars["postURL"] = quoteattr(str(urlHandlers.UHConfRegistrationFormPerformModify.getURL(self._conf)))
-        return wvars
-
-
-class WPRegistrationFormFull(conferences.WPConferenceDefaultDisplayBase):
-    navigationEntry = navigation.NERegistrationFormDisplay
-
-    def _getBody(self, params):
-        wc = WConfRegistrationFormFull(self._conf)
-        return wc.getHTML()
-
-    def _defineSectionMenu(self):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._regFormOpt)
-
-
-class WConfRegistrationFormFull(wcomponents.WTemplated):
-
-    def __init__(self, conf):
-        self._conf = conf
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        wvars["limit"] = self._conf.getRegistrationForm().getUsersLimit()
         return wvars
 
 

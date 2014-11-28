@@ -91,16 +91,11 @@ class RHRegistrationFormDisplay(RHRegistrationFormDisplayBase):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
 
     def _processIfActive(self):
-        if self._getUser() is not None and self._getUser().isRegisteredInConf(self._conf):
+        if (self._conf.getRegistrationForm().isFull()
+            or not self._conf.getRegistrationForm().inRegistrationPeriod()
+            or (session.user and session.user.isRegisteredInConf(self._conf))):
             return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
-        else:
-            if self._conf.getRegistrationForm().isFull():
-                p = registrationForm.WPRegistrationFormFull(self, self._conf)
-            elif not self._conf.getRegistrationForm().inRegistrationPeriod():
-                return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
-            else:
-                p = registrationForm.WPRegistrationFormDisplay(self, self._conf)
-        return p.display()
+        return registrationForm.WPRegistrationFormDisplay(self, self._conf).display()
 
 
 class RHRegistrationFormCreation(RHRegistrationFormDisplayBase):
