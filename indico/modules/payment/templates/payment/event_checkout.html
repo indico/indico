@@ -11,16 +11,21 @@ Please select a payment method below to see the final price.</p>
 <div id="payment"></div>
 
 <script>
-    (function() {
+    (function(global) {
         var paymentContainer = $('#payment');
+        var paymentMethod = '';
 
-        function selectPaymentMethod(method) {
+        // You can use this function if your payment plugin has any dynamic data which affect the displayed information.
+        // For example, selecting different credit card types could cause different fees to be applied.
+        // Simply call reloadPaymentMethod({your: 'custom data'}) in the payment form template of your plugin and
+        // override render_payment_form in the plugin class.
+        global.reloadPaymentMethod = function reloadPaymentMethod(extraData) {
             $.ajax({
                 url: {{ url_for('.event_payment_form', event, registrant) | tojson }},
                 type: 'GET',
-                data: {
-                    method: method
-                },
+                data: $.extend({}, extraData || {}, {
+                    method: paymentMethod
+                }),
                 dataType: 'json',
                 complete: IndicoUI.Dialogs.Util.progress(),
                 success: function(data) {
@@ -31,15 +36,15 @@ Please select a payment method below to see the final price.</p>
                     paymentContainer.html(data.html);
                 }
             });
-        }
+        };
 
         $('#payment-method').on('change', function() {
-            var method = $(this).val();
-            if (!method) {
+            paymentMethod = $(this).val();
+            if (!paymentMethod) {
                 paymentContainer.html('');
                 return;
             }
-            selectPaymentMethod(method);
-        });
-    })();
+            reloadPaymentMethod();
+        }).trigger('change');
+    })(window);
 </script>
