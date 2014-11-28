@@ -96,9 +96,7 @@ class RHRegistrationFormDisplay(RHRegistrationFormDisplayBase):
         else:
             if self._conf.getRegistrationForm().isFull():
                 p = registrationForm.WPRegistrationFormFull(self, self._conf)
-            elif not self._conf.getRegistrationForm().inRegistrationPeriod() or \
-                    (payment_event_settings.get(self._conf, 'active') and
-                     self._conf.getRegistrationForm().getCurrency() == "not selected"):
+            elif not self._conf.getRegistrationForm().inRegistrationPeriod():
                 return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
             else:
                 p = registrationForm.WPRegistrationFormDisplay(self, self._conf)
