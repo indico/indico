@@ -797,7 +797,7 @@ class WConfRegistrationFormDisplay(WConfDisplayBodyBase):
         regForm = self._conf.getRegistrationForm()
         wvars["body_title"] = self._getTitle()
         wvars["title_regform"] = regForm.getTitle()
-        wvars["currency"] = self._conf.getRegistrationForm().getCurrency()
+        wvars["currency"] = payment_event_settings.get(self._conf, 'currency')
         wvars["postURL"] = quoteattr(str(urlHandlers.UHConfRegistrationFormCreation.getURL(self._conf)))
         wvars["conf"] = self._conf
         wvars['sections'] = fossilize(section for section in self.getSections() if section.isEnabled())
