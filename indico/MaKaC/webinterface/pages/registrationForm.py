@@ -556,12 +556,11 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
         return "".join(html)
 
     def _getPaymentInfo(self):
-        if not self._registrant or not payment_event_settings.get(self._conf, 'enabled'):
+        enabled = payment_event_settings.get(self._conf, 'enabled')
+        if not self._registrant or not enabled:
             return
-        regForm = self._conf.getRegistrationForm()
-        modPay = self._conf.getModPay()
         html = []
-        if modPay.isActivated() and self._registrant.getTotal():
+        if enabled and self._registrant.getTotal():
             total = {}
             total["value"] = 0
             html.append(i18nformat(""" <tr><td colspan="2">
@@ -596,7 +595,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
                                     </td>
                                 </tr>
                             </table></td></tr>
-                            """) % (total["value"], regForm.getCurrency()))
+                            """) % (total["value"], payment_event_settings.get(self._conf, 'currency')))
         return "".join(html)
 
     def _getReasonParticipationHTML(self):
@@ -746,7 +745,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
         if self._registrant:
             wvars["payment_info"] = self._getPaymentInfo()
             wvars["payment_enabled"] = payment_event_settings.get(self._conf, 'enabled')
-            wvars["payment_conditions"] = self._conf.getModPay().hasPaymentConditions()
+            wvars["payment_conditions"] = payment_event_settings.get(self._conf, 'conditions')
             wvars["payment_done"] = self._registrant.getPayed()
             wvars["registration_info"] = self._getFormSections()
             if self._registrant.getRegistrationDate() is not None:
@@ -957,7 +956,7 @@ class WConfRegistrationFormConditions(wcomponents.WTemplated):
 
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)
-        wvars["conditions"] = self._conf.getModPay().getConditions()
+        wvars["conditions"] = payment_event_settings.get(self._conf, 'conditions')
         return wvars
 
 
