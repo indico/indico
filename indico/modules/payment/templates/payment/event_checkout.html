@@ -28,7 +28,7 @@
         // override render_payment_form in the plugin class.
         global.reloadPaymentMethod = function reloadPaymentMethod(extraData) {
             $.ajax({
-                url: {{ url_for('.event_payment_form', event, registrant) | tojson }},
+                url: {{ url_for('.event_payment_form', event) | tojson }},
                 type: 'GET',
                 data: $.extend({}, extraData || {}, {
                     method: paymentMethod
