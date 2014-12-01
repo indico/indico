@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields.core import SelectField, BooleanField
+from wtforms.fields.core import SelectField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 

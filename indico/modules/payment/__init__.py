@@ -19,15 +19,22 @@ from __future__ import unicode_literals
 from indico.core.models.settings import SettingsProxy, EventSettingsProxy
 from indico.modules.payment.plugins import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
                                             PaymentEventSettingsFormBase)
+from indico.util.i18n import _
 
 
 __all__ = ('settings', 'event_settings', 'PaymentPluginMixin', 'PaymentPluginSettingsFormBase',
            'PaymentEventSettingsFormBase')
 
+CONDITIONS = ("CANCELLATION:\n"
+              "All refunds requests must be in writing by mail to the Conference Secretary as soon as possible.\n"
+              "The Conference committee reserves the right to refuse reimbursement of part or all of the fee in the"
+              "case of late cancellation. However, each case of cancellation would be considered individually.")
+
+
 settings = SettingsProxy('payment', {
     'currencies': [{'code': 'EUR', 'name': 'Euro'}, {'code': 'USD', 'name': 'US Dollar'}],
     'currency': 'EUR',
-    'conditions': '',
+    'conditions': CONDITIONS,
     'summary_email': '',
     'success_email': ''
 })
