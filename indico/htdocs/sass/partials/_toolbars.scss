@@ -154,7 +154,7 @@ $toolbar-thin-height: 1.9em;
 
     .i-button {
         @include border-radius(0);
-        border-right: none;
+        border-right-width: 0px;
 
         &:not(.label):not(.disabled):not(:disabled) {
             &:hover + .i-button {
@@ -177,15 +177,7 @@ $toolbar-thin-height: 1.9em;
         &:last-child {
             @include border-bottom-right-radius();
             @include border-top-right-radius();
-            @include border-right($gray);
-
-            &:hover {
-                border-right-color: $dark-gray;
-            }
-
-            &:active {
-                border-right-color: $gray;
-            }
+            border-right-width: 1px;
         }
 
         &.label {
