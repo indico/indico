@@ -72,7 +72,7 @@ class ObjectHolder:
 
     def _getIdx( self ):
         """Returns the holder/catalog where all the objects are stored"""
-        if self._idx == None:
+        if self._idx is None:
             self._setIdx()
         return self._idx
 

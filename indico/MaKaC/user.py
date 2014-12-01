@@ -485,14 +485,16 @@ class Avatar(Persistent, Fossilizable):
         favorites = self.getLinkTo('category', 'favorite')
         managed = self.getLinkTo('category', 'manager')
         res = {}
-        for categ in union(favorites, managed):
-            res[(categ.getTitle(), categ.getId())] = {
-                'categ': categ,
-                'favorite': categ in favorites,
-                'managed': categ in managed,
-                'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
-            }
-        return OrderedDict(sorted(res.items(), key=operator.itemgetter(0)))
+        if favorites or managed:
+            for categ in union(favorites, managed):
+                res[(categ.getTitle(), categ.getId())] = {
+                    'categ': categ,
+                    'favorite': categ in favorites,
+                    'managed': categ in managed,
+                    'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
+                }
+            return OrderedDict(sorted(res.items(), key=operator.itemgetter(0)))
+        return None
 
     def getSuggestedCategories(self):
         if not redis_write_client:
