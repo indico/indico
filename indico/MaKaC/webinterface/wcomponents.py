@@ -3706,7 +3706,7 @@ class WShowExistingReviewingMaterial(WTemplated):
         vars = WTemplated.getVars(self)
         reviewManager = self._target.getReviewManager()
         vars["Contribution"] = self._target
-        vars["CanModify"] = (self._target.getReviewing().getReviewingState() in [2, 3] if self._target.getReviewing() else False) and \
+        vars["CanModify"] = (self._target.getReviewing().getReviewingState() in [2, 3] if self._target.getReviewing() else True) and \
                             (self._target.canModify(self._rh._aw) or RCPaperReviewManager.hasRights(self._rh) \
                             or reviewManager.isReferee(self._rh._getUser()) or reviewManager.isEditor(self._rh._getUser()))
         vars["ShowWarning"] = (self._target.getReviewing().getReviewingState() == 2 if self._target.getReviewing() else False) and \
