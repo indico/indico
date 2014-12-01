@@ -10909,6 +10909,8 @@ class Material(CommonObjectBase):
         self.__ac.unlinkAvatars('access')
         for res in self.getResourceList():
             self.removeResource( res )
+        if self.getReviewingState():
+            self.owner._reviewManager = ReviewManager(self.owner)
         self.notify_protection_to_owner(self, delete=True)
         TrashCanManager().add(self)
 
