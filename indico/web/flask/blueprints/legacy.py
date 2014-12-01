@@ -188,7 +188,6 @@ legacy_endpoints = {
     'confModifTools-posterPrinting', 'confModifTools-posterPrintingPDF', 'confModifTools-posterSaveBackground',
     'confModifTools-saveAlarm', 'confModifTools-sendAlarmNow', 'confModifUserCompetences',
     'confRegistrantsDisplay-list', 'confRegistrationFormDisplay', 'confRegistrationFormDisplay-conditions',
-    'confRegistrationFormDisplay-confirmBooking', 'confRegistrationFormDisplay-confirmBookingDone',
     'confRegistrationFormDisplay-creation', 'confRegistrationFormDisplay-creationDone',
     'confRegistrationFormDisplay-display', 'confRegistrationFormDisplay-modify',
     'confRegistrationFormDisplay-performModify', 'confRegistrationFormDisplay-signIn', 'confSpeakerIndex', 'confUser',

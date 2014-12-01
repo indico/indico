@@ -31,10 +31,6 @@ event.add_url_rule('/registration/', 'confRegistrationFormDisplay',
                    registrationFormDisplay.RHRegistrationForm)
 event.add_url_rule('/registration/conditions', 'confRegistrationFormDisplay-conditions',
                    registrationFormDisplay.RHRegistrationFormConditions)
-event.add_url_rule('/registration/confirm', 'confRegistrationFormDisplay-confirmBooking',
-                   registrationFormDisplay.RHRegistrationFormconfirmBooking, methods=('GET', 'POST'))
-event.add_url_rule('/registration/pay', 'confRegistrationFormDisplay-confirmBookingDone',
-                   registrationFormDisplay.RHRegistrationFormconfirmBookingDone)
 event.add_url_rule('/registration/register', 'confRegistrationFormDisplay-creation',
                    registrationFormDisplay.RHRegistrationFormCreation, methods=('POST',))
 event.add_url_rule('/registration/ticket.pdf', 'e-ticket-pdf',

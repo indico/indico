@@ -2712,14 +2712,6 @@ class UHConferenceTicketPDF(URLHandler):
         return url
 
 
-class UHConfRegistrationFormconfirmBooking(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-confirmBooking'
-
-
-class UHConfRegistrationFormconfirmBookingDone(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-confirmBookingDone'
-
-
 class UHConfRegistrationFormModify(URLHandler):
     _endpoint = 'event.confRegistrationFormDisplay-modify'
 

@@ -225,39 +225,6 @@ class RHConferenceTicketPDF(RHRegistrationFormRegistrantBase):
         return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
-class RHRegistrationFormconfirmBooking(RHRegistrationFormRegistrantBase):
-    _uh = urlHandlers.UHConfRegistrationFormDisplay
-
-    def _checkParams(self, params):
-        RHRegistrationFormRegistrantBase._checkParams(self, params)
-        self._regForm = self._conf.getRegistrationForm()
-        if self._conf.getModPay().hasPaymentConditions() and params.get("conditions", "false") != "on":
-            raise NoReportError("You cannot pay without accepting the conditions")
-        else:
-            session['conditionsAccepted'] = True
-
-    def _processIfActive(self):
-        if self._registrant is not None:
-            if self._regForm.isSendReceiptEmail():
-                self._regForm.getNotification().sendEmailNewRegistrantDetailsPay(self._regForm, self._registrant)
-            return redirect(url_for('event.confRegistrationFormDisplay-confirmBookingDone', self._conf,
-                                    **{'registrantId': self._registrant_id, 'authkey': self._authkey}))
-
-
-class RHRegistrationFormconfirmBookingDone(RHRegistrationFormRegistrantBase):
-
-    def _checkParams(self, params):
-        RHRegistrationFormRegistrantBase._checkParams(self, params)
-        if not session.get('conditionsAccepted'):
-            self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(self._registrant))
-            self._doProcess = False
-
-    def _processIfActive(self):
-        if self._registrant is not None:
-            p = registrationForm.WPRegistrationFormconfirmBooking(self, self._conf, self._registrant)
-            return p.display()
-
-
 class RHRegistrationFormModify(RHRegistrationFormDisplayBase):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
 
