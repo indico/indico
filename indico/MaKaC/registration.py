@@ -85,7 +85,6 @@ class RegistrationForm(Persistent):
             self.setStartRegistrationDate(nowutc())
             self.setEndRegistrationDate(nowutc())
             self.setModificationEndDate(None)
-            self.setCurrency("not selected")
         else:
             self.activated = groupData.get("activated", False)
             self.title = groupData.get("name", "")
@@ -103,7 +102,6 @@ class RegistrationForm(Persistent):
             #if self.modificationEndDate is None:
             #    self.setModificationEndDate(nowutc())
             self.contactInfo = groupData.get("contactInfo", "")
-            self.setCurrency(groupData.get("Currency", ""))
         self.notification = Notification()
         self._eTicket = eticket.ETicket()
         # Status definition
@@ -140,7 +138,6 @@ class RegistrationForm(Persistent):
         form.setConference(conference)
         form.setAnnouncement(self.getAnnouncement())
         form.setContactInfo(self.getContactInfo())
-        form.setCurrency(self.getCurrency())
         registrationPeriodEnd = self.getConference().getStartDate() - self.getEndRegistrationDate()
         registrationPeriodStart = self.getConference().getStartDate() - self.getStartRegistrationDate()
         form.setEndRegistrationDate(conference.getStartDate() - registrationPeriodEnd)
@@ -190,14 +187,7 @@ class RegistrationForm(Persistent):
         return form
 
     def getCurrency(self):
-        try:
-            return self._currency
-        except:
-            self.setCurrency("not selected")
-        return self._currency
-
-    def setCurrency(self, currency):
-        self._currency = currency
+        return payment_event_settings.get(self._conf, 'currency')
 
     def getConference(self):
         return self._conf
