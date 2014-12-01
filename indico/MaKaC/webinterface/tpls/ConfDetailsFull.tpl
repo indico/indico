@@ -73,6 +73,47 @@
       <div class="text ${'nohtml' if not moreInfo_html else ''}">${ moreInfo }</div>
   </div>
   % endif
+
+  % if registration_enabled and in_registration_period or registrant:
+    <div class="infoline info">
+        <span class="icon icon-ticket"></span>
+        <div class="text">
+            <span class="label big">
+                ${ _("Registration") }
+            </span>
+            <div class="toolbar right">
+                % if not registrant:
+                    <a href="${ url_for('event.confRegistrationFormDisplay-display', conf) }" class="i-button next highlight">
+                        ${ _("Register now") }
+                    </a>
+                % else:
+                    <div class="group">
+                        <a href="${ url_for('event.confRegistrationFormDisplay-modify', conf) }"
+                           class="i-button icon-edit ${ 'disabled' if not in_modification_period else '' }"
+                           title="${ _('Modification period is over') if not in_modification_period else '' }"
+                           ${ 'onclick="return false"' if not in_modification_period else '' }>
+                            ${ _('Modify') }
+                        </a>
+                        % if ticket_enabled:
+                            <a href="${ url_for('event.e-ticket-pdf', conf) }" class="i-button icon-ticket">
+                                ${ _("Get ticket") }
+                            </a>
+                        % endif
+                    </div>
+                    <div class="group">
+                        <a href="${ url_for('event.confRegistrationFormDisplay', conf) }" class="i-button next highlight">
+                            % if registrant.doPay():
+                                ${ _("Checkout") }
+                            % else:
+                                ${ _("Summary") }
+                            % endif
+                        </a>
+                    </div>
+                % endif
+            </div>
+        </div>
+    </div>
+  % endif
   </div>
 
 </div>

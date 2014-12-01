@@ -663,6 +663,14 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         vars["moreInfo"] = info
         vars["actions"] = ''
         vars["isSubmitter"] = self._conf.getAccessController().canUserSubmit(self._aw.getUser()) or self._conf.canModify(self._aw)
+
+        regform = self._conf.getRegistrationForm()
+        if regform:
+            vars["registration_enabled"] = regform.isActivated()
+            vars["in_registration_period"] = regform.inRegistrationPeriod(nowutc())
+            vars["in_modification_period"] = regform.inModificationPeriod()
+            vars["ticket_enabled"] = regform.getETicket().isEnabled()
+            vars["registrant"] = session.user.getRegistrantById(self._conf.getId())
         return vars
 
 

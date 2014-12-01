@@ -50,8 +50,17 @@
         padding-right: 0.5em;
     }
 
+    .toolbar {
+        margin-bottom: 0;
+    }
+
     .label {
         font-weight: bold;
+
+        &.big {
+            font-size: 1rem;
+            line-height: 2rem;
+        }
     }
 
     .text {
@@ -75,7 +84,6 @@
     padding: 10px;
     clear: both;
     width: 100%;
-    font-family: Georgia, Times, Serif;
     background: #f4f4f4;
 }
 

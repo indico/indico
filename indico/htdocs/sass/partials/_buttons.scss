@@ -243,6 +243,11 @@ a.i-big-button {
     }
 }
 
+.i-button.next {
+    @include icon-after('icon-next');
+    font-weight: bold;
+}
+
 button::-moz-focus-inner {
   border: 0;
 }
