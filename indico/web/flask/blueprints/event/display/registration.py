@@ -49,3 +49,7 @@ event.add_url_rule('/registration/userdata', 'confRegistrationFormDisplay-userDa
 # Legacy
 event.add_url_rule('/registration/register/success', 'confRegistrationFormDisplay-creationDone',
                    redirect_view('event.confRegistrationFormDisplay'))
+event.add_url_rule('/registration/confirm', 'confRegistrationFormDisplay-confirmBooking',
+                   redirect_view('event.confRegistrationFormDisplay'))
+event.add_url_rule('/registration/pay', 'confRegistrationFormDisplay-confirmBookingDone',
+                   redirect_view('event.confRegistrationFormDisplay'))
