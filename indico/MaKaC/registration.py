@@ -4753,6 +4753,7 @@ class Registrant(Persistent, Fossilizable):
         self._parmasReturn = {}
         self._statuses = {}
         self._total = 0
+        self._currency = ''
         self._hasPay = False
         self._transactionInfo = None
 
@@ -4789,6 +4790,13 @@ class Registrant(Persistent, Fossilizable):
         except:
             self.setTotal(0)
         return self._total
+
+    def getCurrency(self):
+        try:
+            return self._currency
+        except Exception:
+            self._currency = self.getRegistrationForm().getCurrency()
+            return self._currency
 
     def updateTotal(self):
         total = 0
@@ -4830,6 +4838,7 @@ class Registrant(Persistent, Fossilizable):
 
     def setValues(self, data, av):
         self._avatar = av
+        self._currency = self.getRegistrationForm().getCurrency()
 
         if self.getRegistrationForm().getReasonParticipationForm().isEnabled():
             self.setReasonParticipation(data.get("reason", ""))
