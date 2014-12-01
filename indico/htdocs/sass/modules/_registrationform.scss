@@ -269,6 +269,10 @@
             float: left;
             margin-left: 1px;
         }
+
+        td:first-child {
+            width: 100%;
+        }
     }
 
     .regform-done-checkout {
