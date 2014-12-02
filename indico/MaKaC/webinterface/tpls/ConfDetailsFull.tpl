@@ -87,20 +87,19 @@
                         ${ _("Register now") }
                     </a>
                 % else:
-                    <div class="group">
-                        <a href="${ url_for('event.confRegistrationFormDisplay-modify', conf) }"
-                           class="i-button icon-edit ${ 'disabled' if not in_modification_period else '' }"
-                           title="${ _('Modification period is over') if not in_modification_period else '' }"
-                           ${ 'onclick="return false"' if not in_modification_period else '' }>
-                            ${ _('Modify') }
-                        </a>
-                        % if ticket_enabled:
+                    % if ticket_enabled:
+                        <div class="group">
                             <a href="${ url_for('event.e-ticket-pdf', conf) }" class="i-button icon-ticket">
                                 ${ _("Get ticket") }
                             </a>
-                        % endif
-                    </div>
+                        </div>
+                    % endif
                     <div class="group">
+                        % if in_modification_period:
+                            <a href="${ url_for('event.confRegistrationFormDisplay-modify', conf) }"class="i-button icon-edit">
+                                ${ _('Modify') }
+                            </a>
+                        % endif
                         <a href="${ url_for('event.confRegistrationFormDisplay', conf) }" class="i-button next highlight">
                             % if registrant.doPay():
                                 ${ _("Checkout") }
