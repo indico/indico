@@ -1600,6 +1600,10 @@ type("TextAreaEditWidget", ["InlineEditWidget"],
                 }
             },
 
+            _handleBackToEditMode: function() {
+                this.textarea.set(this._savedValue);
+            },
+
             _handleSuccess: function() {
                 if (this.successHandler) {
                     return this.successHandler();

@@ -18,14 +18,18 @@ import time
 import uuid
 from flask import session
 
+from MaKaC.services.interface.rpc.common import (HTMLSecurityError,
+                                                 NoReportError,
+                                                 ResultWithWarning,
+                                                 ServiceAccessError,
+                                                 ServiceError, Warning)
+
 from MaKaC.common import info
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.utils import validMail
 from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
 from MaKaC.services.implementation.base import LoggedOnlyService, AdminService, ParameterManager, ServiceBase
-from MaKaC.services.interface.rpc.common import (ServiceError, ServiceAccessError, NoReportError, Warning,
-                                                 ResultWithWarning)
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
@@ -372,6 +376,12 @@ class UserSetPersonalData(UserPersonalDataBase):
     def _generate_emails_list(self, value):
         value = value.replace(' ', ',').replace(';', ',')  # replace to have only one separator
         return [email for email in value.split(',') if email]
+
+    def process(self):
+        try:
+            return UserPersonalDataBase.process(self)
+        except HTMLSecurityError as e:
+            raise NoReportError(e.message)
 
     def _confirm_email_address(self, email, data_type):
         email = email.strip().lower()

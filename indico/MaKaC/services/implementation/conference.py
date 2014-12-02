@@ -51,10 +51,11 @@ from MaKaC.webinterface.common import contribFilters
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 import MaKaC.webinterface.pages.conferences as conferences
 
-from MaKaC.services.implementation.base import ProtectedModificationService, ListModificationBase, ParameterManager, \
-    ProtectedDisplayService, ServiceBase, TextModificationBase, HTMLModificationBase, DateTimeModificationBase, ExportToICalBase
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, Warning, \
-        ResultWithWarning, TimingNoReportError, NoReportError
+from MaKaC.services.implementation.base import (ProtectedModificationService, ListModificationBase, ParameterManager,
+                                                ProtectedDisplayService, ServiceBase, TextModificationBase,
+                                                HTMLModificationBase, DateTimeModificationBase, ExportToICalBase)
+from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportError, ResultWithWarning,
+                                                 ServiceAccessError, ServiceError, TimingNoReportError, Warning)
 
 
 # indico imports
@@ -324,6 +325,12 @@ class ConferenceKeywordsModification(ConferenceTextModificationBase):
 
     def _handleGet(self):
         return self._target.getKeywords()
+
+    def process(self):
+        try:
+            return ConferenceTextModificationBase.process(self)
+        except HTMLSecurityError as e:
+            raise NoReportError(e.message)
 
 
 class ConferenceSpeakerTextModification(ConferenceTextModificationBase):
