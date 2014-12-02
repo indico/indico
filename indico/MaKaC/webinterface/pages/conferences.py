@@ -670,7 +670,8 @@ class WConfDetailsBase( wcomponents.WTemplated ):
             vars["in_registration_period"] = regform.inRegistrationPeriod(nowutc())
             vars["in_modification_period"] = regform.inModificationPeriod()
             vars["ticket_enabled"] = regform.getETicket().isEnabled()
-            vars["registrant"] = session.user.getRegistrantById(self._conf.getId())
+            if session.user:
+                vars["registrant"] = session.user.getRegistrantById(self._conf.getId())
         return vars
 
 
