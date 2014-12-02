@@ -23,7 +23,7 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay, RHC
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC import registration
-from MaKaC.errors import FormValuesError, MaKaCError, AccessError, NotFoundError, NoReportError
+from MaKaC.errors import FormValuesError, MaKaCError, AccessError, NotFoundError
 from indico.core.config import Config
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif

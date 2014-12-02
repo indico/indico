@@ -669,6 +669,8 @@ class WConfDetailsBase( wcomponents.WTemplated ):
             vars["registration_enabled"] = regform.isActivated()
             vars["in_registration_period"] = regform.inRegistrationPeriod(nowutc())
             vars["in_modification_period"] = regform.inModificationPeriod()
+            vars["registration_deadline"] = format_date(regform.getEndRegistrationDate())
+            vars["modification_deadline"] = format_date(regform.getModificationEndDate())
             vars["ticket_enabled"] = regform.getETicket().isEnabled()
             if session.user:
                 vars["registrant"] = session.user.getRegistrantById(self._conf.getId())
