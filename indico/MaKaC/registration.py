@@ -4794,7 +4794,7 @@ class Registrant(Persistent, Fossilizable):
     def getCurrency(self):
         try:
             return self._currency
-        except Exception:
+        except AttributeError:
             self._currency = self.getRegistrationForm().getCurrency()
             return self._currency
 
