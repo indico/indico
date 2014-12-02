@@ -9,7 +9,7 @@ cds-indico-extras==0.2
 cssmin==0.1.4
 icalendar==3.8.2
 jsmin==2.0.2
-lxml==2.3.4
+lxml==3.4.1
 pojson==0.4
 polib==1.0.5
 pyPdf==1.13
@@ -25,7 +25,7 @@ pytest-cov==1.8.1
 pytest-localserver==0.3.3
 pytest-mock==0.4.0
 python-dateutil==1.5
-pytz==2014.4
+pytz==2014.10
 reportlab==2.5
 simplejson==2.6.2
 termcolor==1.1.0
@@ -46,7 +46,7 @@ Werkzeug==0.9.6
 Flask==0.10.1
 bcrypt==1.0.2
 beautifulsoup4==4.2.1
-Pillow==2.1.0
+Pillow==2.6.1
 qrcode==3.0
 Markdown==2.3.1
 bleach==1.4

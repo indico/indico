@@ -22,7 +22,8 @@ from indico.web.flask.blueprints.event.display import event
 
 
 # Registrants
-event.add_url_rule('/registration/registrants', 'confRegistrantsDisplay-list', registrantsDisplay.RHRegistrantsList)
+event.add_url_rule('/registration/registrants', 'confRegistrantsDisplay-list', registrantsDisplay.RHRegistrantsList,
+                   methods=["GET", "POST"])
 
 # Registration
 # Sections

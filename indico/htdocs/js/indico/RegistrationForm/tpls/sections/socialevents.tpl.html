@@ -9,7 +9,9 @@
 
     <tr ng-if="section.selectionType!='multiple' && !section.mandatory">
         <td>
-            <input type="radio" name="socialEvents" value="" ng-checked="userdata.socialEvents.length === 0 || userdata.socialEvents === undefined"
+            <input type="radio" name="socialEvents" value=""
+                ng-model="selectedRadioInput.id"
+                ng-checked="userdata.socialEvents.length === 0 || userdata.socialEvents === undefined"
                 ng-disabled="anyBillableEventPayed(userdata)"/>
             {{ 'None' | i18n }}
         </td>
@@ -17,9 +19,9 @@
     <tr ng-repeat="item in section.items | filter: {cancelled: 'false'}">
         <td ng-switch="section.selectionType">
             <input ng-switch-when="multiple"
+                type="checkbox" name="socialEvents" value="{{ item.id }}"
                 ng-model="selectedInputs[item.id]"
                 ng-required="section.mandatory && !anySelected()"
-                type="checkbox" name="socialEvents" value="{{ item.id }}"
                 ng-disabled="!hasPlacesLeft(item, getNoPlaces(item), 'socialEvent') || paymentBlocked(item, userdata) "/>
             <input ng-switch-default
                 type="radio" name="socialEvents" value="{{ item.id }}"
