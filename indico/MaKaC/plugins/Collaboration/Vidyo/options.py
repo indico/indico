@@ -145,5 +145,11 @@ globalOptions = [
     ('phoneNumbers', {"description": "VidyoVoice Phone Numbers",
                        "type": "list_multiline",
                        "editable": True,
-                       "defaultValue": [] })
+                       "defaultValue": [] }),
+    ('booking_admin_message', {
+        "description": "Message to append to Vidyo booking emails",
+        "type": "ckEditor",
+        "editable": True,
+        "defaultValue": ""
+    })
 ]
