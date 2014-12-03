@@ -31,7 +31,9 @@ There are two options:
 Fetching a release (recommended)
 --------------------------------
 
-You can do it from command line (**recommended**) executing::
+You can do it from command line (**recommended**) executing:
+
+.. code-block:: console
 
     # easy_install indico
 
@@ -43,11 +45,15 @@ From our Git repository
 
 You can find the source code in our `Github repository <https://github.com/indico/indico/>`_
 
-You should have checked out an ``indico`` directory. ``cd`` into it and simply do (as root)::
+You should have checked out an ``indico`` directory. ``cd`` into it and simply do (as root):
 
-    # fab setup_deps
+.. code-block:: console
 
-which will get the external dependencies, followed by::
+    $ fab setup_deps
+
+which will get the external dependencies, followed by:
+
+.. code-block:: console
 
     # python setup.py install
 
@@ -57,7 +63,9 @@ The setup script will fetch all the dependencies for you and install Indico as a
 Post-Install script
 ===================
 
-The next step is to run ``indico_initial_setup``::
+The next step is to run ``indico_initial_setup``:
+
+.. code-block:: console
 
     # indico_initial_setup
     No previous installation of Indico was found.
@@ -98,11 +106,15 @@ Configuring Apache (recommended)
 HTTP Mode
 +++++++++
 
-Create a new file in the ``sites-available`` folder of apache. It's located by default under ``/etc/apache2/sites-available/``::
+Create a new file in the ``sites-available`` folder of apache. It's located by default under ``/etc/apache2/sites-available/``:
 
-    jdoe@localhost ~$ sudo vim /etc/apache2/sites-available/indico
+.. code-block:: console
 
-Copy the next lines into that file, making sure to replace 'jdoe' with your username::
+    $ sudo vim /etc/apache2/sites-available/indico
+
+Copy the next lines into that file, making sure to replace ``jdoe`` with your username:
+
+.. code-block:: apacheconf
 
     AddDefaultCharset UTF-8
 
@@ -142,10 +154,10 @@ Copy the next lines into that file, making sure to replace 'jdoe' with your user
         Alias /indico/js "/opt/indico/htdocs/js"
         Alias /indico/ihelp "/opt/indico/htdocs/ihelp"
 
-            WSGIScriptAlias /indico "/opt/indico/htdocs/indico.wsgi"
+        WSGIScriptAlias /indico "/opt/indico/htdocs/indico.wsgi"
 
-            SSLEngine on
-            SSLCertificateFile    /etc/ssl/certs/ssl-cert-snakeoil.pem
+        SSLEngine on
+        SSLCertificateFile    /etc/ssl/certs/ssl-cert-snakeoil.pem
         SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
     </VirtualHost>
 
@@ -182,13 +194,17 @@ Indico might be installed as a uWSGI application, in order to run on Nginx (and 
     uid = www-data
     gid = www-data
 
-Then symlink this configuration file at ``/etc/uwsgi/apps-enabled/indico.ini``::
+Then symlink this configuration file at ``/etc/uwsgi/apps-enabled/indico.ini``:
+
+.. code-block:: console
 
     # ln -s ../apps-available/indico.ini /etc/uwsgi/apps-enabled/indico.ini
 
-The uWSGI daemon should be started after ZODB is running, and if you commit any changes to indico configuration, the daemon should also be restarted::
+The uWSGI daemon should be started after ZODB is running, and if you commit any changes to indico configuration, the daemon should also be restarted:
 
-    # /etc/init.d/uwsgi start
+.. code-block:: console
+
+    # service uwsgi start
 
 This will create the uwsgi daemon socket at ``/run/uwsgi/app/indico/socket``.
 
@@ -263,9 +279,11 @@ If the file ``/etc/nginx/uwsgi_params`` does not exist, create it with the follo
 
 Please note that the uwsgi_param ``UWSGI_SCHEME`` is not available by default, and it's required in case you configure a server with both HTTP and HTTPS.
 
-After setup, restart nginx::
+After setup, restart nginx:
 
-    # /etc/init.d/nginx restart
+.. code-block:: console
+
+    # service nginx restart
 
 ==================
 Indico config file
@@ -279,25 +297,23 @@ From v1.2 on, the URLs will be shorter, alike ``http://my.indico.srv/event/2413/
 Post-install tasks
 ==================
 
-If you wish to use the scheduler daemon (replaces old ``taskDaemon``), then you should run::
+If you wish to use the scheduler daemon (replaces old ``taskDaemon``), then you should run:
 
-    sudo -u apache indico_scheduler start
+.. code-block:: console
 
-Do not forget to delete the following file::
+    # sudo -u apache indico_scheduler start
 
-    /your/tmp/folder/vars.js.tpl.tmp
+If you have changed your server host name for some reason  you may need to delete ``/opt/indico/tmp/vars.js.tpl.tmp``.
 
 =========
 Migration
 =========
 
-In order to upgrade Indico you can do the following::
+In order to upgrade Indico you can do the following:
 
-    $ easy_install -U indico
+.. code-block:: console
 
-    $ indico_initial_setup --existing-config=/opt/indico/etc/indico.conf #replace with your path to your indico.conf
-
-    $ python /opt/indico/bin/migration/migrate.py --prev-version=<previous-version>
-
-    # restart apache
-    /path/to/httpd restart
+    # easy_install -U indico
+    # indico_initial_setup --existing-config=/opt/indico/etc/indico.conf  # replace with the path to your indico.conf
+    # python /opt/indico/bin/migration/migrate.py --prev-version=<previous-version>
+    # service httpd restart
