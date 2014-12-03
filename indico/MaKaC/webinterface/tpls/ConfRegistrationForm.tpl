@@ -48,30 +48,6 @@
 </%block>
 
 <%block name="content">
-    <script type="text/javascript">
-        function checkConditions() {
-            if (document.epay.conditions) {
-                if (!document.epay.conditions.checked) {
-                    new AlertPopup($T("Warning"), $T("Please, confirm that you have read the conditions.")).open();
-                } else {
-                    document.forms['epay'].submit();
-                }
-            } else {
-                document.forms['epay'].submit();
-            }
-        }
-
-        function open_condictions() {
-            var conditions_url = ${ url_for('event.confRegistrationFormDisplay-conditions', conf) | n,j }
-            window.open(conditions_url, 'Conditions', 'width=400, height=200, resizable=yes, scrollbars=yes');
-            return false;
-        }
-
-        function highlight_payment() {
-            $('#payment-summary').effect('highlight')
-        }
-    </script>
-
     <input type="hidden" value="${confId}" id="conf_id">
 
     % if payment_enabled and registrant and registrant.doPay():
@@ -212,5 +188,41 @@
                 </div>
             </div>
         % endif
+        % if authparams and authparams['registrantId'] and authparams['authkey']:
+            <div class="permalink-text">
+                <div>
+                    ${ _('You can always come back to this page with the following link:') }
+                </div>
+                <input type="text" class="permalink" value="${ url_for('event.confRegistrationFormDisplay', conf, _external=True, **authparams) }">
+            </div>
+        % endif
     % endif
+
+    <script type="text/javascript">
+        function checkConditions() {
+            if (document.epay.conditions) {
+                if (!document.epay.conditions.checked) {
+                    new AlertPopup($T("Warning"), $T("Please, confirm that you have read the conditions.")).open();
+                } else {
+                    document.forms['epay'].submit();
+                }
+            } else {
+                document.forms['epay'].submit();
+            }
+        }
+
+        function open_condictions() {
+            var conditions_url = ${ url_for('event.confRegistrationFormDisplay-conditions', conf) | n,j }
+            window.open(conditions_url, 'Conditions', 'width=400, height=200, resizable=yes, scrollbars=yes');
+            return false;
+        }
+
+        function highlight_payment() {
+            $('#payment-summary').effect('highlight')
+        }
+
+        $('input.permalink').on('keydown keypress keyup', function(e) {
+            e.preventDefault();
+        });
+    </script>
 </%block>

@@ -353,6 +353,21 @@
     white-space: nowrap;
 }
 
+.permalink-text {
+    color: $light-black;
+    margin-top: 2em;
+    text-align: center;
+
+    .permalink {
+        @extend %font-family-monospace;
+        color: $light-black;
+        font-size: 0.8em;
+        margin-top: 0.5em;
+        text-align: center;
+        width: 100%;
+    }
+}
+
 // ============================================================================
 // Editable-specific
 // ============================================================================
