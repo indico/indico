@@ -19,6 +19,8 @@ from __future__ import unicode_literals
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
+from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 from MaKaC.conference import ConferenceHolder
@@ -35,7 +37,7 @@ class PaymentTransaction(db.Model):
     __tablename__ = 'payment_transactions'
     __table_args__ = (db.CheckConstraint('status IN ({})'.format(', '.join(map(str, TransactionStatus)))),
                       db.CheckConstraint('amount > 0'),
-                      db.UniqueConstraint('event_id', 'registrant_id'),
+                      db.UniqueConstraint('event_id', 'registrant_id', 'timestamp'),
                       {'schema': 'events'})
 
     #: Entry ID
@@ -69,6 +71,13 @@ class PaymentTransaction(db.Model):
         db.String,
         nullable=False
     )
+    #: the date and time the transaction was recorded
+    timestamp = db.Column(
+        UTCDateTime,
+        default=now_utc,
+        index=True,
+        nullable=False
+    )
     #: plugin-specific data of the payment
     data = db.Column(
         JSON,
@@ -91,6 +100,6 @@ class PaymentTransaction(db.Model):
     @return_ascii
     def __repr__(self):
         # in case of a new object we might not have the default status set
-        return '<PaymentTransaction({}, {}, {}, {} {})>'.format(self.event_id, self.registrant_id,
-                                                                TransactionStatus(self.status).name, self.amount,
-                                                                self.currency)
+        return '<PaymentTransaction({}, {}, {}, {} {}, {})>'.format(self.event_id, self.registrant_id,
+                                                                    TransactionStatus(self.status).name, self.amount,
+                                                                    self.currency, self.timestamp)
