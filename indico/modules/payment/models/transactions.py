@@ -103,3 +103,9 @@ class PaymentTransaction(db.Model):
         return '<PaymentTransaction({}, {}, {}, {} {}, {})>'.format(self.event_id, self.registrant_id,
                                                                     TransactionStatus(self.status).name, self.amount,
                                                                     self.currency, self.timestamp)
+
+    @staticmethod
+    def find_latest_for_registrant(registrant):
+        return (PaymentTransaction.find(event_id=registrant.getConference().getId(), registrant_id=registrant.getId())
+                                  .order_by(PaymentTransaction.timestamp.desc())
+                                  .first())
