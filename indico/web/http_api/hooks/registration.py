@@ -23,6 +23,8 @@ from MaKaC.epayment import TransactionPayLaterMod
 from indico.core.fossils.registration import IRegFormRegistrantBasicFossil, IRegFormRegistrantFullFossil
 from indico.modules.payment import event_settings as payment_event_settings
 
+from indico.core.db import db
+from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
 from indico.web.http_api.hooks.base import HTTPAPIHook, DataFetcher
 from indico.web.http_api.hooks.event import EventBaseHook
 from indico.web.http_api.util import get_query_parameter
@@ -55,16 +57,20 @@ class SetPaidHook(EventBaseHook):
         return self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)
 
     def api_pay(self, aw):
-        if self.is_paid:
-            self._registrant.setPayed(True)
-            data = {}
-            data["OrderTotal"] = self._registrant.getTotal()
-            data["Currency"] = self._registrant.getRegistrationForm().getCurrency()
-            transaction = TransactionPayLaterMod(data)
-            self._registrant.setTransactionInfo(transaction)
-        else:
+        transaction = PaymentTransaction(event_id=self._conf.getId(),
+                                         registrant_id=self._registrant.getId(),
+                                         amount = self._registrant.getTotal(),
+                                         currency = self._registrant.getCurrency())
+        if self.is_paid and not self._registrant.getPayed():
+            tr = TransactionPayLaterMod({'OrderTotal': transaction.amount, 'Currency': transaction.currency})
+            self._registrant.setTransactionInfo(tr)
+            transaction.status = TransactionStatus.successful
+        elif not self.is_paid and self._registrant.getPayed():
             self._registrant.setTransactionInfo(None)
-            self._registrant.setPayed(False)
+            transaction.status = TransactionStatus.cancelled
+        if transaction.status:
+            db.session.add(transaction)
+            db.session.flush()
         return {
             "paid": self._registrant.getPayed(),
             "amount_paid": self._registrant.getTotal()

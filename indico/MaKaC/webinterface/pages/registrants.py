@@ -937,8 +937,10 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
             return  i18nformat("""<form action=%s method="POST">
                             <tr>
                               <td class="dataCaptionTD"><span class="dataCaptionFormat">  _("Amount")</span></td>
-                              <td bgcolor="white" class="blacktext">%s</td>
-                              <td valign="bottom"><input type="submit" name="Payment" value="_("modify")"></td>
+                              <td bgcolor="white" class="blacktext">%s
+                                <input type="submit" name="Payment" value="_("Mark as unpaid")">
+                              </td>
+                              <td valign="bottom"></td>
                             </tr>
                             <tr>
                               <td class="dataCaptionTD"><span class="dataCaptionFormat"> _("Payment")</span></td>
@@ -953,7 +955,7 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                               <td colspan="3" class="horizontalLine">&nbsp;</td>
                             </tr>
                      </form>
-                 """)%(quoteattr(str(urlHandlers.UHConfModifRegistrantTransactionModify.getURL(self._registrant))), "%.2f %s"%(self._registrant.getTotal(), self._registrant.getConference().getRegistrationForm().getCurrency()), transHTML,"".join(html))
+                 """)%(quoteattr(url_for('event_mgmt.confModifRegistrants-peformModifyTransaction', self._registrant, isPayed=False)), "%.2f %s"%(self._registrant.getTotal(), self._registrant.getConference().getRegistrationForm().getCurrency()), transHTML,"".join(html))
         elif self._registrant.doPay():
             urlEpayment=""
             if payment_event_settings.get(self._registrant.getConference(), 'active') and self._registrant.doPay():
@@ -961,18 +963,20 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
             return i18nformat(""" <form action=%s method="POST">
                             <tr>
                               <td class="dataCaptionTD"><span class="dataCaptionFormat">_("Amount")</span></td>
-                              <td bgcolor="white" class="blacktext">%s</td>
+                              <td bgcolor="white" class="blacktext">%s
+                                <input type="submit" name="Payment" value="_("Mark as paid")">
+                              </td>
                             </tr>
                             <tr>
                               <td class="dataCaptionTD"><span class="dataCaptionFormat">_("Payment")</span></td>
                               <td bgcolor="white" class="blacktext">%s%s</td>
-                              <td valign="bottom"><input type="submit" name="Payment" value="_("modify")" class="btn"></td>
+                              <td valign="bottom"></td>
                             </tr>
                             <tr>
                               <td colspan="3" class="horizontalLine">&nbsp;</td>
                             </tr>
                             </form>
-                            """)%(quoteattr(str(urlHandlers.UHConfModifRegistrantTransactionModify.getURL(self._registrant))), "%.2f %s"%(self._registrant.getTotal(), self._registrant.getConference().getRegistrationForm().getCurrency()),"unpaid",urlEpayment)
+                            """)%(quoteattr(url_for('event_mgmt.confModifRegistrants-peformModifyTransaction', self._registrant, isPayed=True)), "%.2f %s"%(self._registrant.getTotal(), self._registrant.getConference().getRegistrationForm().getCurrency()),"unpaid",urlEpayment)
         else :
             return  i18nformat(""" <form action="" method="POST">
                             <tr>

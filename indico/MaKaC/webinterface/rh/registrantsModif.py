@@ -16,15 +16,18 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 from cStringIO import StringIO
 
 from flask import session, request
-import MaKaC.webinterface.urlHandlers as urlHandlers
+
+import MaKaC.webinterface.common.regFilters as regFilters
 import MaKaC.webinterface.pages.registrants as registrants
+import MaKaC.webinterface.pages.registrationForm as registrationForm
+import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.fileAccess import RHFileAccess
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.export.excel import RegistrantsListToExcel
-import MaKaC.webinterface.common.regFilters as regFilters
 from MaKaC.errors import FormValuesError
 from MaKaC.common import utils
 from MaKaC.registration import SocialEvent, MiscellaneousInfoGroup
@@ -32,10 +35,12 @@ from MaKaC.webinterface.common import registrantNotificator
 from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC import epayment
 from MaKaC.i18n import _
-import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC.webinterface.rh import registrationFormModif
 from MaKaC.webinterface.rh.registrationFormModif import RHRegistrationFormModifBase
+from indico.core.db import db
+from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
 from indico.web.flask.util import send_file, url_for
+
 
 class RHRegistrantListModifBase( registrationFormModif.RHRegistrationFormModifBase ):
     pass
@@ -515,48 +520,29 @@ class RHRegistrantSessionModify( RHRegistrantModifBase ):
             p = registrants.WPRegistrantSessionModify(self, self._registrant)
             return p.display()
 
-class RHRegistrantTransactionModify( RHRegistrantModifBase ):
 
-    def _checkParams( self, params ):
-        RHRegistrantModifBase._checkParams(self, params)
-        self._cancel = params.has_key("cancel")
-
-    def _process( self ):
-
-        if not self._conf.getRegistrationForm().isActivated():
-            self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
-        else:
-            p = registrants.WPRegistrantTransactionModify(self, self._registrant)
-            return p.display()
-
-class RHRegistrantTransactionPerformModify( RHRegistrantModifBase ):
+class RHRegistrantTransactionPerformModify(RHRegistrantModifBase):
     _uh = urlHandlers.UHRegistrantModification
 
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         RHRegistrantModifBase._checkParams(self, params)
-        self._cancel = params.has_key("cancel")
         self._isPayed = params["isPayed"]
-#        if not self._cancel:
-#            self._regForm = self._conf.getRegistrationForm()
-#            sessionForm = self._regForm.getSessionsForm()
-#            if not sessionForm.isEnabled():
-#                self._cancel = True
-#                return
-#            self._sessions = sessionForm.getSessionsFromParams(params)
 
-    def _process( self ):
-        if not self._cancel:
-            if self._isPayed == "yes":
-                self._registrant.setPayed(True)
-                d={}
-                d["OrderTotal"]=self._registrant.getTotal()
-                d["Currency"]=self._registrant.getRegistrationForm().getCurrency()
-                tr=epayment.TransactionPayLaterMod(d)
-                self._registrant.setTransactionInfo(tr)
-            else :
-                self._registrant.setTransactionInfo(None)
-                self._registrant.setPayed(False)
-            #self._registrant.setSessions(self._sessions)
+    def _process(self):
+        transaction = PaymentTransaction(event_id=self._conf.getId(),
+                                         registrant_id=self._registrant.getId(),
+                                         amount = self._registrant.getTotal(),
+                                         currency = self._registrant.getCurrency())
+        if self._isPayed == '1' and not self._registrant.getPayed():
+            tr = epayment.TransactionPayLaterMod({'OrderTotal': transaction.amount, 'Currency': transaction.currency})
+            self._registrant.setTransactionInfo(tr)
+            transaction.status = TransactionStatus.successful
+        elif self._isPayed == '0' and self._registrant.getPayed():
+            self._registrant.setTransactionInfo(None)
+            transaction.status = TransactionStatus.cancelled
+        if transaction.status:
+            db.session.add(transaction)
+            db.session.flush()
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 

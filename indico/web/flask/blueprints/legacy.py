@@ -168,7 +168,7 @@ legacy_endpoints = {
     'confModifRegistrants-modifyAccommodation', 'confModifRegistrants-modifyMiscInfo',
     'confModifRegistrants-modifyReasonParticipation', 'confModifRegistrants-modifySessions',
     'confModifRegistrants-modifySocialEvents', 'confModifRegistrants-modifyStatuses',
-    'confModifRegistrants-modifyTransaction', 'confModifRegistrants-newRegistrant',
+    'confModifRegistrants-newRegistrant',
     'confModifRegistrants-peformModifyTransaction', 'confModifRegistrants-performModifyAccommodation',
     'confModifRegistrants-performModifyMiscInfo', 'confModifRegistrants-performModifyReasonParticipation',
     'confModifRegistrants-performModifySessions', 'confModifRegistrants-performModifySocialEvents',

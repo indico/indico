@@ -51,6 +51,7 @@ import tempfile
 import string
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from indico.modules.payment import event_settings as payment_event_settings
+from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
 from indico.util.fossilize import Fossilizable, fossilizes
 from indico.core.fossils.registration import IRegFormTextInputFieldFossil, IRegFormTelephoneInputFieldFossil, \
     IRegFormTextareaInputFieldFossil, IRegFormNumberInputFieldFossil, IRegFormLabelInputFieldFossil, \
@@ -4754,7 +4755,6 @@ class Registrant(Persistent, Fossilizable):
         self._statuses = {}
         self._total = 0
         self._currency = ''
-        self._hasPay = False
         self._transactionInfo = None
 
         self._randomId = self._generateRandomId()
@@ -4988,14 +4988,8 @@ class Registrant(Persistent, Fossilizable):
             return checkInDate.astimezone(timezone(tz))
 
     def getPayed(self):
-        try:
-            return self._hasPay
-        except:
-            self.setPayed(False)
-        return self._hasPay
-
-    def setPayed(self, hasPay):
-        self._hasPay = hasPay
+        transaction = PaymentTransaction.find_latest_for_registrant(self)
+        return transaction and transaction.status == TransactionStatus.successful
 
     def getTransactionInfo(self):
         try:

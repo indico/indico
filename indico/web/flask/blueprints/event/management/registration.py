@@ -173,8 +173,6 @@ event_mgmt.add_url_rule('/registration/users/<registrantId>/statuses/save',
                         'confModifRegistrants-performModifyStatuses',
                         registrantsModif.RHRegistrantStatusesPerformModify, methods=('POST',))
 # Payment
-event_mgmt.add_url_rule('/registration/users/<registrantId>/payment', 'confModifRegistrants-modifyTransaction',
-                        registrantsModif.RHRegistrantTransactionModify, methods=('GET', 'POST'))
 event_mgmt.add_url_rule('/registration/users/<registrantId>/payment/save',
                         'confModifRegistrants-peformModifyTransaction',
                         registrantsModif.RHRegistrantTransactionPerformModify, methods=('POST',))
