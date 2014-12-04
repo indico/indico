@@ -533,21 +533,23 @@ class RHConfirmEmail(RHProtected):
         token_storage = GenericCache('confirm-email')
         data = token_storage.get(token)
         if not data:  # Invalid token ID
-            raise NoReportError('<br>'.join([
-                _("Invalid Token"),
-                _("You might have already validated the email address related to this link."),
-                _("Otherwise, make sure you have copy-pasted the URL correctly and try again.")
-            ]))
+            raise NoReportError(
+                _("Invalid Token\n"
+                  "You might have already validated the email address related to this link.\n"
+                  "Otherwise, make sure you have copy-pasted the URL correctly and try again.").replace('\n', '<br>')
+            )
         if avatar.getId() != data.get('uid'):
-            raise NoReportError('<br>'.join([
-                _("You are connected with the wrong account."),
-                _("Please connect with the correct account or add the address to this account and try again."),
-            ]))
+            raise NoReportError(
+                _("You are connected with the wrong account.\n"
+                  "Please connect with the correct account or add the address to this account "
+                  "and try again.").replace('\n', '<br>')
+            )
 
         email_type = data.get('data_type')
         if email_type not in {'email', 'secondaryEmails'}:
             # Invalid email type
-            return
+            raise MaKaCError(_("Something went wrong while setting your email address: "
+                               "Invalid email type '{0}'.").format(email_type))
         email = data.get('email')
         existing = AvatarHolder().match({'email': email}, searchInAuthenticators=False)
         if existing:
@@ -564,6 +566,5 @@ class RHConfirmEmail(RHProtected):
             avatar.addSecondaryEmail(email, reindex=True)
             flash_msg = _("{0} has been added to your secondary email addresses.").format(email)
 
-        token_storage.delete(token)
         flash(flash_msg, 'success')
         self._redirect(url_for('user.userDetails'))
