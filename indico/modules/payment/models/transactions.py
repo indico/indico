@@ -23,13 +23,13 @@ from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
-from MaKaC.conference import ConferenceHolder
 
 
 class TransactionStatus(int, IndicoEnum):
     successful = 1  # payment successful
-    failed = 2  # payment failed/cancelled
+    failed = 2  # payment failed
     rejected = 3  # payment rejected after a previous success
+    cancelled = 4 # cancelled
 
 
 class PaymentTransaction(db.Model):
