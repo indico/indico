@@ -367,13 +367,13 @@ def unicodeSlice(s, start, end, encoding = 'utf-8'):
     return s.decode(encoding, 'replace')[start:end]
 
 
-def formatDateTime(dateTime, showWeek=False, format=None, locale=None, server_tz=False):
+def formatDateTime(dateTime, showWeek=False, format=None, locale=None, server_tz=False, keep_tz=False):
     week = "EEEE" if showWeek else ""
 
     if not format:
-        return format_datetime(dateTime, week+'d/M/yyyy H:mm', locale=locale, server_tz=server_tz)
+        return format_datetime(dateTime, week+'d/M/yyyy H:mm', locale=locale, server_tz=server_tz, keep_tz=keep_tz)
     else:
-        return format_datetime(dateTime, format, locale=locale, server_tz=server_tz)
+        return format_datetime(dateTime, format, locale=locale, server_tz=server_tz, keep_tz=keep_tz)
 
 
 def formatDate(date, showWeek=False, format=None, locale=None):
