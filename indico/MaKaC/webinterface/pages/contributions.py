@@ -820,7 +820,7 @@ class WContributionDataModification(wcomponents.WTemplated):
             vars["sHour"] = quoteattr(str(sDate.hour))
             vars["sMinute"] = quoteattr(str(sDate.minute))
         if self._contrib.getStartDate():
-            vars["dateTime"] = formatDateTime(self._contrib.getAdjustedStartDate())
+            vars["dateTime"] = formatDateTime(self._contrib.getAdjustedStartDate(), keep_tz=True)
         else:
             vars["dateTime"] = ""
         vars["duration"] = self._contrib.getDuration().seconds / 60
