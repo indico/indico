@@ -289,9 +289,9 @@ class SSOHandler:
             if personId == '-1':
                 personId = None
             ah = AvatarHolder()
-            for mail in re.split(";|,",email):
+            for mail in re.split(";|,", email):
                 av = ah.match({"email": mail}, exact=1, onlyActivated=False, searchInAuthenticators=False)
-                if av :
+                if av:
                     av = av[0]
                     # don't allow disabled accounts
                     if av.isDisabled():
@@ -308,6 +308,8 @@ class SSOHandler:
                     if personId != None and personId != av.getPersonId():
                         av.setPersonId(personId)
 
+                    self._postLogin(login, av, True)
+                    return av
 
             if not av:
                 avDict = {"email": re.split(";|,",email),
@@ -322,8 +324,8 @@ class SSOHandler:
                 av.setPersonId(personId)
                 av.activateAccount()
 
-            self._postLogin(login, av, True)
-            return av
+                self._postLogin(login, av, True)
+                return av
         return None
 
     def getLogoutCallbackURL(self):
