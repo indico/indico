@@ -605,9 +605,6 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
         form = ModifyBookingForm(obj=self._reservation, old_start_date=self._reservation.start_dt.date())
         form.used_equipment.query = room.find_available_vc_equipment()
 
-        if not room.notification_for_assistance and not self._reservation.needs_assistance:
-            del form.needs_assistance
-
         if form.is_submitted() and not form.validate():
             occurrences = {}
             candidates = {}
