@@ -80,7 +80,7 @@
     </tr>
     % endif
     % if PluginType.getOptions() is not None and len(PluginType.getOptions()) > 0:
-         <%include file="AdminPluginsOptionList.tpl" args="Object = PluginType, ObjectType = 'PluginType', Favorites = Favorites, Index = 0, rbActive = rbActive, baseURL = baseURL"/>
+         <%include file="AdminPluginsOptionList.tpl" args="Object = PluginType, ObjectType = 'PluginType', Favorites = Favorites, Index = 0, rbActive = rbActive, baseURL = baseURL, Id = PluginType.getId()"/>
     % endif
     % if not PluginType.getOptions() and True not in self_._notify('hasPluginSettings', PluginType.getId(), None):
     <tr>
@@ -100,9 +100,12 @@
 
     <div>
         % for i, plugin in enumerate(pluginList):
-        <div id="${plugin.getName()}OptionsDiv" style="display:none;">
+        <%
+            PluginOptionsListId = plugin.getName() + "OptionsDiv"
+        %>
+        <div id="${ PluginOptionsListId }" style="display:none;">
             % if plugin.hasAnyOptions():
-                <%include file="AdminPluginsOptionList.tpl" args="Object = plugin, ObjectType = 'Plugin', Favorites = Favorites, Index = i, rbActive = rbActive, baseURL = baseURL"/>
+                <%include file="AdminPluginsOptionList.tpl" args="Object = plugin, ObjectType = 'Plugin', Favorites = Favorites, Index = i, rbActive = rbActive, baseURL = baseURL, Id = PluginOptionsListId"/>
             % elif True in self_._notify('hasPluginSettings', PluginType.getId(), plugin.getId()):
                 ${ ''.join(list(elem for elem in self_._notify('getPluginSettingsHTML', PluginType.getId(), plugin.getId()) if elem != None)) }
             % else:

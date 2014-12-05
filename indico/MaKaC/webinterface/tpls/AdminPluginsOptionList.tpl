@@ -1,4 +1,4 @@
-<%page args="Object=None, ObjectType=None, Favorites=None, Index=None, rbActive=None, baseURL=None"/>
+<%page args="Object=None, ObjectType=None, Favorites=None, Index=None, rbActive=None, baseURL=None, Id=None"/>
 <% from MaKaC.fossils.user import IAvatarFossil %>
     % if ObjectType == "PluginType" :
     <form method="post" action="${ urlHandlers.UHAdminPluginsTypeSaveOptions.getURL(Object, subtab = Index) }" >
@@ -372,8 +372,8 @@
                     $(function setCkEditorInput() {
                         var editor = new RichTextEditor(600, 300);
                         $E('${ name }-ckEditor').set(editor.draw());
-                        editor.set('${ escapeHTMLForJS(option.getValue()) }');
-                        $('input[type="submit"][name="Save"]').on('hover', function setTextInput() {
+                        editor.set(${ option.getValue() | n, j });
+                        $('#${ Id }-save-btn').on('click', function setTextInput() {
                             $E("${ name }").dom.value = editor.get();
                         });
                     });
@@ -570,7 +570,7 @@
         % if len(Object.getOptionList(includeOnlyEditable=True, includeOnlyVisible=True)) > 0:
         <tr>
             <td colspan="2" style="text-align: right;">
-                <input type="submit" name="Save" value="${ _("Save settings") }" />
+                <input id="${ Id }-save-btn" type="submit" name="Save" value="${ _("Save settings") }" />
             </td>
         </tr>
         % endif
