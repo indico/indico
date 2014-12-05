@@ -329,6 +329,7 @@ class RHRegistrantListRemove(RHRegistrantListModifBase):
         if not self._cancel:
             for reg in self._selectedRegistrants:
                 self._conf.removeRegistrant(reg)
+                PaymentTransaction.query.filter_by(event_id=self._conf.getId(), registrant_id=reg).delete()
         self._redirect(urlHandlers.UHConfModifRegistrantList.getURL(self._conf))
 
 
