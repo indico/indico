@@ -71,6 +71,11 @@ class PaymentTransaction(db.Model):
         db.String,
         nullable=False
     )
+    #: the provider of the payment (e.g. manual, PayPal etc.)
+    provider = db.Column(
+        db.String,
+        nullable=False
+    )
     #: the date and time the transaction was recorded
     timestamp = db.Column(
         UTCDateTime,

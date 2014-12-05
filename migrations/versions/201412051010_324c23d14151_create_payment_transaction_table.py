@@ -1,8 +1,8 @@
 """Create payment transaction table
 
-Revision ID: 58301a9fba79
+Revision ID: 324c23d14151
 Revises: 36dc8c810ca7
-Create Date: 2014-12-04 09:06:36.947975
+Create Date: 2014-12-05 10:10:04.325749
 """
 
 import sqlalchemy as sa
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 
 # revision identifiers, used by Alembic.
-revision = '58301a9fba79'
+revision = '324c23d14151'
 down_revision = '36dc8c810ca7'
 
 
@@ -25,6 +25,7 @@ def upgrade():
                     sa.Column('amount', sa.Numeric(precision=8, scale=2), nullable=False),
                     sa.Column('currency', sa.String(), nullable=False),
                     sa.Column('timestamp', UTCDateTime(), nullable=False, index=True),
+                    sa.Column('provider', sa.String(), nullable=False),
                     sa.Column('data', postgresql.JSON(), nullable=False),
                     sa.CheckConstraint('amount > 0'),
                     sa.CheckConstraint('status IN (1, 2, 3, 4)'),
