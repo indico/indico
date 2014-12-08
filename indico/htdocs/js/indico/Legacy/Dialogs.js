@@ -658,6 +658,10 @@ extend(IndicoUI.Dialogs,
                   }
                 });
 
+                rtWidget.afterPaste(function afterPaste() {
+                  changedText.set(true);
+                });
+
                 // the editor is ready, so let's ask for data from the server
                 killProgress = IndicoUI.Dialogs.Util.progress();
                 req.refresh();

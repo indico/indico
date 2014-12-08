@@ -649,6 +649,8 @@ class Reservation(Serializer, db.Model):
         old_repetition = self.repetition
 
         for field in populate_fields:
+            if field not in data:
+                continue
             old = getattr(self, field)
             new = data[field]
             converter = unicode
