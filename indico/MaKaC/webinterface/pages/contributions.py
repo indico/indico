@@ -30,7 +30,7 @@ from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceModifBase, WPConferenceDefaultDisplayBase
 from MaKaC.webinterface.pages.main import WPMainBase
 from indico.core.config import Config
-from MaKaC.common.utils import isStringHTML, formatDateTime
+from MaKaC.common.utils import isStringHTML
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.fossilize import fossilize
@@ -38,7 +38,7 @@ from MaKaC.user import Avatar, AvatarHolder
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 
 from indico.util.i18n import i18nformat
-from indico.util.date_time import format_time, format_date
+from indico.util.date_time import format_time, format_date, format_datetime
 
 from MaKaC.common.TemplateExec import render
 
@@ -820,7 +820,7 @@ class WContributionDataModification(wcomponents.WTemplated):
             vars["sHour"] = quoteattr(str(sDate.hour))
             vars["sMinute"] = quoteattr(str(sDate.minute))
         if self._contrib.getStartDate():
-            vars["dateTime"] = formatDateTime(self._contrib.getAdjustedStartDate())
+            vars["dateTime"] = format_datetime(self._contrib.getAdjustedStartDate(), 'd/M/yyyy H:mm', keep_tz=True)
         else:
             vars["dateTime"] = ""
         vars["duration"] = self._contrib.getDuration().seconds / 60
