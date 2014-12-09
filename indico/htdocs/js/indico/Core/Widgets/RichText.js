@@ -393,8 +393,15 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, si
     // "wrapper" is the actual Indico API object that represents an editor
 
     try {
-
-        config = {language : userLanguage, width : width, height : height - 75};
+        config = {
+            language: userLanguage,
+            width   : width,
+            height  : height - 75,
+            //CKEDITOR Custom Config
+            blockedKeystrokes: [9 /* TAB */, CKEDITOR.SHIFT + 9  /* SHIFT + TAB */],
+            removeButtons      : '',
+            disableNativeSpellChecker: false
+        };
         if (simple) {
             config.toolbar = [
                 { name: 'clipboard', items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
