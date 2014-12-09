@@ -280,13 +280,13 @@ def install_jqplot():
         dest_dir_css = lib_dir(env.src_dir, 'css')
         dest_dir_js_core = os.path.join(dest_dir_js, 'core')
         dest_dir_js_plugins = os.path.join(dest_dir_js, 'plugins')
-        local('mkdir -p {} {}'.format(dest_dir_js_core, dest_dir_css))
-        local('cp src/core/*.js {}'.format(dest_dir_js_core))
-        local('cp src/core/*.css {}'.format(dest_dir_css))
+        local('mkdir -p {0} {1}'.format(dest_dir_js_core, dest_dir_css))
+        local('cp src/core/*.js {0}'.format(dest_dir_js_core))
+        local('cp src/core/*.css {0}'.format(dest_dir_css))
         for plugin_name in plugins:
             dest = os.path.join(dest_dir_js_plugins, plugin_name)
-            local('mkdir -p {}'.format(dest))
-            local('cp src/plugins/{}/* {}'.format(plugin_name, dest))
+            local('mkdir -p {0}'.format(dest))
+            local('cp src/plugins/{0}/* {1}'.format(plugin_name, dest))
 
 
 @recipe('underscore')
