@@ -1,0 +1,7 @@
+Confirmation<br>
+Params:
+<ol>
+    {% for key, value in params.iteritems() %}
+        <li><strong>{{ key }}:</strong> {{ value }}</li>
+    {% endfor %}
+</ol>

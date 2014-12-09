@@ -152,3 +152,38 @@ class RHPaymentEventForm(RHRegistrationFormRegistrantBase):
             html = self.plugin.render_payment_form(self._conf, self._registrant, self._registrant.getTotal(),
                                                    event_settings.get(self._conf, 'currency'))
         return jsonify(html=html)
+
+
+class RHPaymentEventConfirm(RHRegistrationFormRegistrantBase):
+    """Confirmation message after successful payment"""
+
+    def _checkParams(self, params):
+        RHRegistrationFormRegistrantBase._checkParams(self, params)
+        self._params = params
+
+    def _process(self):
+        event = self._conf
+        return WPPaymentEvent.render_template('event_payment_confirm.html', event, params=self._params)
+
+
+class RHPaymentEventCancel(RHRegistrationFormRegistrantBase):
+    """Cancellation message"""
+
+    def _checkParams(self, params):
+        RHRegistrationFormRegistrantBase._checkParams(self, params)
+
+    def _process(self):
+        event = self._conf
+        return WPPaymentEvent.render_template('event_payment_cancel.html', event)
+
+
+class RHPaymentEventNotify(RHRegistrationFormRegistrantBase):
+    """Process the notification sent by the payment provider"""
+
+    def _checkParams(self, params):
+        RHRegistrationFormRegistrantBase._checkParams(self, params)
+        self._params = params
+
+    def _process(self):
+        from indico.core.logger import Logger
+        Logger.get('payment').warning("Here are the notify request params from PayPal: %s" % str(self._params))
