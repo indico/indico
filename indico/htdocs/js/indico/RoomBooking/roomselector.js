@@ -202,11 +202,6 @@
                 .append(filter.search)
                 .on('click', 'a', function(e) {
                     e.stopPropagation();
-                })
-                .on('keydown', 'input', function(e){
-                    if (e.which == K.ENTER) {
-                        e.preventDefault();
-                    }
                 });
             filter.search.realtimefilter({
                 callback: function() {
@@ -301,11 +296,6 @@
                         }
                     })))
                 .append(filter.capacity)
-                .on('keydown', 'input', function(e){
-                    if (e.which == K.ENTER) {
-                        e.preventDefault();
-                    }
-                })
                 .appendTo(header);
             filter.capacity.realtimefilter({
                 clearable: false,
