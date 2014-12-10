@@ -175,15 +175,3 @@ class RHPaymentEventCancel(RHRegistrationFormRegistrantBase):
     def _process(self):
         event = self._conf
         return WPPaymentEvent.render_template('event_payment_cancel.html', event)
-
-
-class RHPaymentEventNotify(RHRegistrationFormRegistrantBase):
-    """Process the notification sent by the payment provider"""
-
-    def _checkParams(self, params):
-        RHRegistrationFormRegistrantBase._checkParams(self, params)
-        self._params = params
-
-    def _process(self):
-        from indico.core.logger import Logger
-        Logger.get('payment').warning("Here are the notify request params from PayPal: %s" % str(self._params))
