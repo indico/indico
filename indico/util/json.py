@@ -75,7 +75,7 @@ def loads(string):
     return _json.loads(string)
 
 
-def create_json_error_answer(exception):
+def create_json_error_answer(exception, status=200):
     if isinstance(exception, IndicoError):
         details = exception.toDict()
     else:
@@ -97,4 +97,4 @@ def create_json_error_answer(exception):
         'version': Config.getInstance().getVersion(),
         'result': None,
         'error': details
-    }), mimetype='application/json')
+    }), mimetype='application/json', status=status)

@@ -318,12 +318,11 @@ class RH(RequestHandlerBase):
             raise
         return errors.WPGenericError(self).display()
 
-    @jsonify_error(logging_level='exception')
+    @jsonify_error(status=500, logging_level='exception')
     def _processUnexpectedError(self, e):
         """Unexpected errors"""
 
         self._responseUtil.redirect = None
-        self._responseUtil.status = 500
         if Config.getInstance().getEmbeddedWebserver() or Config.getInstance().getPropagateAllExceptions():
             raise
         return errors.WPUnexpectedError(self).display()
@@ -334,11 +333,9 @@ class RH(RequestHandlerBase):
 
         return errors.WPHostnameResolveError(self).display()
 
-    @jsonify_error
+    @jsonify_error(status=403)
     def _processAccessError(self, e):
         """Treats access errors occured during the process of a RH."""
-
-        self._responseUtil.status = 403
         return errors.WPAccessError(self).display()
 
     @jsonify_error
@@ -362,7 +359,7 @@ class RH(RequestHandlerBase):
             return
         return errors.WPModificationError(self).display()
 
-    @jsonify_error
+    @jsonify_error(status=400)
     def _processBadRequestKeyError(self, e):
         """Request lacks a necessary key for processing"""
         msg = _('Required argument missing: %s') % e.message
@@ -395,9 +392,8 @@ class RH(RequestHandlerBase):
 
         return errors.WPNoReportError(self, e).display()
 
-    @jsonify_error
+    @jsonify_error(status=404)
     def _processNotFoundError(self, e):
-        self._responseUtil.status = 404
         if isinstance(e, NotFound):
             message = _("Page not found")  # that's a bit nicer than "404: Not Found"
             if e.description == NotFound.description:

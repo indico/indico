@@ -83,7 +83,7 @@ def cached_writable_property(cache_attr, cache_on_set=True):
     return _cached_writable_property
 
 
-def jsonify_error(function=None, logger_name=None, logger_message=None, logging_level='info'):
+def jsonify_error(function=None, logger_name=None, logger_message=None, logging_level='info', status=200):
     """
     Returns response of error handlers in JSON if requested in JSON
     and logs the exception that ended the request.
@@ -110,8 +110,9 @@ def jsonify_error(function=None, logger_name=None, logger_message=None, logging_
                 ).rstrip())
 
             if request.is_xhr or request.headers.get('Content-Type') == 'application/json':
-                return create_json_error_answer(exception)
+                return create_json_error_answer(exception, status=status)
             else:
+                args[0]._responseUtil.status = status
                 return f(*args, **kw)
         return wrapper
     if function:
