@@ -193,7 +193,7 @@
                 <div>
                     ${ _('You can always come back to this page with the following link:') }
                 </div>
-                <input type="text" class="permalink" value="${ url_for('event.confRegistrationFormDisplay', conf, _external=True, **authparams) }">
+                <input type="text" class="permalink" value="${ url_for('event.confRegistrationFormDisplay', conf, _external=True, **authparams) }" readonly>
             </div>
         % endif
     % endif
@@ -221,8 +221,10 @@
             $('#payment-summary').effect('highlight')
         }
 
-        $('input.permalink').on('keydown keypress keyup', function(e) {
-            e.preventDefault();
+        $('input.permalink').on('keydown', function(e) {
+            if (e.which == K.BACKSPACE) {
+                e.preventDefault();
+            }
         });
     </script>
 </%block>
