@@ -58,7 +58,7 @@ function expandMenu(domElem)
 
     if(!exists(elem.dom.extraShown))
     {
-        $('#extraOptions').width($('#searchControls').width()).slideDown('fast');
+        $('#extraOptions').css('display', 'table').slideDown('fast');
         $('#extraOptions').position({
             of: $('#searchControls'),
             my: 'right top',
