@@ -62,6 +62,7 @@ from MaKaC.services.implementation.user import UserComparator
 from indico.util.i18n import i18nformat
 from indico.util.redis import client as redis_client
 from indico.util.date_time import timedelta_split
+from indico.web.flask.util import url_for
 
 
 class WPAdminsBase( WPMainBase ):
@@ -2549,3 +2550,31 @@ class WAdminProtection(wcomponents.WTemplated):
         vars["protectionDisclaimerProtected"] = minfo.getProtectionDisclaimerProtected()
         vars["protectionDisclaimerRestricted"] = minfo.getProtectionDisclaimerRestricted()
         return vars
+
+
+class WRedirect(wcomponents.WTemplated):
+    def __init__(self, title, message, delay, link_text, url):
+        self.title = title
+        self.message = message
+        self.delay = delay
+        self.url = url
+        self.link_text = link_text
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars['title'] = self.title
+        vars['message'] = self.message
+        vars['delay'] = self.delay
+        vars['url'] = self.url
+        vars['link_text'] = self.link_text
+        return vars
+
+
+class WPRedirect(WPDecorated):
+    def __init__(self, rh, title, message, delay, endpoint, link_text=None, target=None, **args):
+        WPDecorated.__init__(self, rh)
+        url = url_for(endpoint, target, **args)
+        self.content = WRedirect(title, message, delay, link_text if link_text else url, url)
+
+    def _getBody(self, params):
+        return self.content.getHTML(params)
