@@ -566,5 +566,6 @@ class RHConfirmEmail(RHProtected):
             avatar.addSecondaryEmail(email, reindex=True)
             flash_msg = _("{0} has been added to your secondary email addresses.").format(email)
 
-        flash(flash_msg, 'success')
-        self._redirect(url_for('user.userDetails'))
+        p = adminPages.WPRedirect(self, _("Email address confirmed"), flash_msg, 10, 'user.userDetails',
+                                  link_text=_("your profile"))
+        return p.display()
