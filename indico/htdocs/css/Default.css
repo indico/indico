@@ -2022,6 +2022,8 @@ div#UISearchBox #extraOptions
     border: 1px solid #888888;
     border-radius: 6px;
     min-width: 250px;
+    white-space: nowrap;
+    width: 100%;
     display: none;
     position: absolute;
     top: 23px;
