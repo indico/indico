@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals
 
+from datetime import datetime
+import math
+
 from flask import redirect, flash, request, session, jsonify
 from werkzeug.exceptions import NotFound
 
@@ -127,6 +130,12 @@ class RHPaymentEventCheckout(RHRegistrationFormRegistrantBase):
             raise IndicoError("You cannot pay without accepting the conditions")
 
     def _process(self):
+        checkout_attempt_delta = None
+        if not self._registrant.isCheckoutSessionAlive():
+            self._registrant._checkout_attempt_dt = datetime.now()
+        else:
+            checkout_attempt_delta =  int(math.ceil((datetime.now() -
+                                                     self._registrant.getCheckoutAttemptDt()).total_seconds() / 60))
         event = self._conf
         amount = self._registrant.getTotal()
         currency = event_settings.get(event, 'currency')
@@ -134,7 +143,7 @@ class RHPaymentEventCheckout(RHRegistrationFormRegistrantBase):
         force_plugin = plugins.items()[0] if len(plugins) == 1 else None  # only one plugin available
         return WPPaymentEvent.render_template('event_checkout.html', event, event=event, registrant=self._registrant,
                                               plugins=plugins.items(), force_plugin=force_plugin, amount=amount,
-                                              currency=currency)
+                                              currency=currency, checkout_attempt_delta=checkout_attempt_delta)
 
 
 class RHPaymentEventForm(RHRegistrationFormRegistrantBase):

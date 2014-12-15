@@ -51,6 +51,7 @@ import tempfile
 import string
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from indico.modules.payment import event_settings as payment_event_settings
+from indico.modules.payment import settings as payment_settings
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
 from indico.util.fossilize import Fossilizable, fossilizes
 from indico.core.fossils.registration import IRegFormTextInputFieldFossil, IRegFormTelephoneInputFieldFossil, \
@@ -4756,6 +4757,7 @@ class Registrant(Persistent, Fossilizable):
         self._total = 0
         self._currency = ''
         self._transactionInfo = None
+        self._checkout_attempt_dt = None
 
         self._randomId = self._generateRandomId()
         self._attachmentsCounter = Counter()
@@ -5360,6 +5362,19 @@ class Registrant(Persistent, Fossilizable):
 
     def canUserModify(self, user):
         return self.getConference().canUserModify(user) or (user is not None and user == self.getAvatar())
+
+    def getCheckoutAttemptDt(self):
+        try:
+            return self._checkout_attempt_dt
+        except AttributeError:
+            return None
+
+    def isCheckoutSessionAlive(self):
+        checkout_attempt_dt = self.getCheckoutAttemptDt()
+        if checkout_attempt_dt:
+            checkout_session_timeout = payment_settings.get('checkout_session_timeout')
+            return datetime.now() - checkout_attempt_dt < timedelta(minutes=checkout_session_timeout)
+        return False
 
 
 class BilledItemsWrapper(object):
