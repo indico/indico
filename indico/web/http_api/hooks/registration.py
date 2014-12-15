@@ -23,8 +23,8 @@ from MaKaC.epayment import TransactionPayLaterMod
 from indico.core.fossils.registration import IRegFormRegistrantBasicFossil, IRegFormRegistrantFullFossil
 from indico.modules.payment import event_settings as payment_event_settings
 
-from indico.core.db import db
-from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction, TransactionStatus
+from indico.modules.payment.models.transactions import TransactionAction, TransactionStatus
+from indico.modules.payment.util import register_transaction
 from indico.web.http_api.hooks.base import HTTPAPIHook, DataFetcher
 from indico.web.http_api.hooks.event import EventBaseHook
 from indico.web.http_api.util import get_query_parameter
@@ -58,15 +58,12 @@ class SetPaidHook(EventBaseHook):
 
     def api_pay(self, aw):
         action = TransactionAction.complete if self._isPayed == '1' else TransactionAction.cancel
-        transaction = PaymentTransaction.create_next(event_id=self._conf.getId(),
-                                                     registrant_id=self._registrant.getId(),
-                                                     amount=self._registrant.getTotal(),
-                                                     currency=self._registrant.getCurrency(),
-                                                     provider='_manual',
-                                                     action=action)
+        transaction = register_transaction(event_id=self._conf.getId(),
+                                           registrant_id=self._registrant.getId(),
+                                           amount=self._registrant.getTotal(),
+                                           currency=self._registrant.getCurrency(),
+                                           action=action)
         if transaction:
-            db.session.add(transaction)
-            db.session.flush()
             if transaction.status == TransactionStatus.successful:
                 info = TransactionPayLaterMod({'OrderTotal': self._registrant.getTotal(),
                                                'Currency': self._registrant.getCurrency()})

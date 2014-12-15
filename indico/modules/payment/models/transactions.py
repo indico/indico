@@ -218,19 +218,16 @@ class PaymentTransaction(db.Model):
                                                                         self.timestamp)
 
     @classmethod
-    def create_next(cls, event_id, registrant_id, amount, currency, provider, action, data=None):
+    def create_next(cls, event_id, registrant_id, amount, currency, action, provider='_manual', data=None):
         from MaKaC.conference import ConferenceHolder
         event = ConferenceHolder().getById(event_id)
         registrant = event.getRegistrantById(registrant_id)
         if not registrant:
             raise NotFoundError("Registrant ID {} doesn't exist in event {}".format(registrant_id, event_id))
         previous_transaction = cls.find_latest_for_registrant(registrant)
-        new_transaction = PaymentTransaction(event_id=event_id,
-                                             registrant_id=registrant_id,
-                                             amount=amount,
-                                             currency=currency,
-                                             provider=provider,
-                                             data=data)
+        new_transaction = PaymentTransaction(event_id=event_id, registrant_id=registrant_id, amount=amount,
+                                             currency=currency, provider=provider, data=data)
+        double_payment = False
         try:
             next_status = TransactionStatusTransition.next(previous_transaction, action, provider)
         except InvalidTransactionStatus as e:
@@ -251,9 +248,10 @@ class PaymentTransaction(db.Model):
             return
         except DoublePaymentTransaction:
             next_status = TransactionStatus.successful
+            double_payment = True
             Logger.get('payment').warning("Received successful payment for an already paid registrant")
         new_transaction.status = next_status
-        return new_transaction
+        return new_transaction, double_payment
 
     @staticmethod
     def find_latest_for_registrant(registrant):

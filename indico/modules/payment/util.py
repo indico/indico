@@ -17,8 +17,10 @@
 from __future__ import unicode_literals
 
 import re
+from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.payment import PaymentPluginMixin
+from indico.modules.payment.models.transactions import PaymentTransaction
 
 
 remove_prefix_re = re.compile('^payment_')
@@ -34,3 +36,16 @@ def get_active_payment_plugins(event):
     """Returns a dict containing the active payment plugins of an event."""
     return {name: plugin for name, plugin in get_payment_plugins().iteritems()
             if plugin.event_settings.get(event, 'enabled')}
+
+
+def register_transaction(event_id, registrant_id, amount, currency, action, provider=None, data=None):
+    new_transaction, double_payment = PaymentTransaction.create_next(event_id=event_id, registrant_id=registrant_id,
+                                                                     amount=amount, currency=currency, action=action,
+                                                                     provider=provider, data=data)
+    if new_transaction:
+        db.session.add(new_transaction)
+        db.session.flush()
+        if double_payment:
+            # notify of conflict
+            pass
+        return new_transaction

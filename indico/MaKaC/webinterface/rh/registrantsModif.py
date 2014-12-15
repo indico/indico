@@ -37,8 +37,8 @@ from MaKaC import epayment
 from MaKaC.i18n import _
 from MaKaC.webinterface.rh import registrationFormModif
 from MaKaC.webinterface.rh.registrationFormModif import RHRegistrationFormModifBase
-from indico.core.db import db
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction, TransactionStatus
+from indico.modules.payment.util import register_transaction
 from indico.web.flask.util import send_file, url_for
 
 
@@ -531,15 +531,12 @@ class RHRegistrantTransactionPerformModify(RHRegistrantModifBase):
 
     def _process(self):
         action = TransactionAction.complete if self._isPayed == '1' else TransactionAction.cancel
-        transaction = PaymentTransaction.create_next(event_id=self._conf.getId(),
-                                                     registrant_id=self._registrant.getId(),
-                                                     amount=self._registrant.getTotal(),
-                                                     currency=self._registrant.getCurrency(),
-                                                     provider='_manual',
-                                                     action=action)
+        transaction = register_transaction(event_id=self._conf.getId(),
+                                           registrant_id=self._registrant.getId(),
+                                           amount=self._registrant.getTotal(),
+                                           currency=self._registrant.getCurrency(),
+                                           action=action)
         if transaction:
-            db.session.add(transaction)
-            db.session.flush()
             if transaction.status == TransactionStatus.successful:
                 info = epayment.TransactionPayLaterMod({'OrderTotal': self._registrant.getTotal(),
                                                         'Currency': self._registrant.getCurrency()})
