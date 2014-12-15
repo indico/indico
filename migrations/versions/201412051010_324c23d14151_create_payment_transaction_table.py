@@ -28,7 +28,7 @@ def upgrade():
                     sa.Column('provider', sa.String(), nullable=False),
                     sa.Column('data', postgresql.JSON(), nullable=False),
                     sa.CheckConstraint('amount > 0'),
-                    sa.CheckConstraint('status IN (1, 2, 3, 4)'),
+                    sa.CheckConstraint('status IN (1, 2, 3, 4, 5)'),
                     sa.PrimaryKeyConstraint('id'),
                     sa.UniqueConstraint('event_id', 'registrant_id', 'timestamp'),
                     schema='events')
