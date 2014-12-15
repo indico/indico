@@ -38,7 +38,7 @@ from MaKaC.i18n import _
 from MaKaC.webinterface.rh import registrationFormModif
 from MaKaC.webinterface.rh.registrationFormModif import RHRegistrationFormModifBase
 from indico.core.db import db
-from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
+from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction, TransactionStatus
 from indico.web.flask.util import send_file, url_for
 
 
@@ -530,21 +530,22 @@ class RHRegistrantTransactionPerformModify(RHRegistrantModifBase):
         self._isPayed = params["isPayed"]
 
     def _process(self):
-        transaction = PaymentTransaction(event_id=self._conf.getId(),
-                                         registrant_id=self._registrant.getId(),
-                                         amount = self._registrant.getTotal(),
-                                         currency = self._registrant.getCurrency(),
-                                         provider = 'manual')
-        if self._isPayed == '1' and not self._registrant.getPayed():
-            tr = epayment.TransactionPayLaterMod({'OrderTotal': transaction.amount, 'Currency': transaction.currency})
-            self._registrant.setTransactionInfo(tr)
-            transaction.status = TransactionStatus.successful
-        elif self._isPayed == '0' and self._registrant.getPayed():
-            self._registrant.setTransactionInfo(None)
-            transaction.status = TransactionStatus.cancelled
-        if transaction.status:
+        action = TransactionAction.complete if self._isPayed == '1' else TransactionAction.cancel
+        transaction = PaymentTransaction.create_next(event_id=self._conf.getId(),
+                                                     registrant_id=self._registrant.getId(),
+                                                     amount=self._registrant.getTotal(),
+                                                     currency=self._registrant.getCurrency(),
+                                                     provider='_manual',
+                                                     action=action)
+        if transaction:
             db.session.add(transaction)
             db.session.flush()
+            if transaction.status == TransactionStatus.successful:
+                info = epayment.TransactionPayLaterMod({'OrderTotal': self._registrant.getTotal(),
+                                                        'Currency': self._registrant.getCurrency()})
+                self._registrant.setTransactionInfo(info)
+            else:
+                self._registrant.setTransactionInfo(None)
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 

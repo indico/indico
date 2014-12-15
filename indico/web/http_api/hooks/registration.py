@@ -24,7 +24,7 @@ from indico.core.fossils.registration import IRegFormRegistrantBasicFossil, IReg
 from indico.modules.payment import event_settings as payment_event_settings
 
 from indico.core.db import db
-from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
+from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction, TransactionStatus
 from indico.web.http_api.hooks.base import HTTPAPIHook, DataFetcher
 from indico.web.http_api.hooks.event import EventBaseHook
 from indico.web.http_api.util import get_query_parameter
@@ -57,21 +57,22 @@ class SetPaidHook(EventBaseHook):
         return self._conf.canManageRegistration(aw.getUser()) or self._conf.canModify(aw)
 
     def api_pay(self, aw):
-        transaction = PaymentTransaction(event_id=self._conf.getId(),
-                                         registrant_id=self._registrant.getId(),
-                                         amount = self._registrant.getTotal(),
-                                         currency = self._registrant.getCurrency(),
-                                         provider = 'manual')
-        if self.is_paid and not self._registrant.getPayed():
-            tr = TransactionPayLaterMod({'OrderTotal': transaction.amount, 'Currency': transaction.currency})
-            self._registrant.setTransactionInfo(tr)
-            transaction.status = TransactionStatus.successful
-        elif not self.is_paid and self._registrant.getPayed():
-            self._registrant.setTransactionInfo(None)
-            transaction.status = TransactionStatus.cancelled
-        if transaction.status:
+        action = TransactionAction.complete if self._isPayed == '1' else TransactionAction.cancel
+        transaction = PaymentTransaction.create_next(event_id=self._conf.getId(),
+                                                     registrant_id=self._registrant.getId(),
+                                                     amount=self._registrant.getTotal(),
+                                                     currency=self._registrant.getCurrency(),
+                                                     provider='_manual',
+                                                     action=action)
+        if transaction:
             db.session.add(transaction)
             db.session.flush()
+            if transaction.status == TransactionStatus.successful:
+                info = TransactionPayLaterMod({'OrderTotal': self._registrant.getTotal(),
+                                               'Currency': self._registrant.getCurrency()})
+                self._registrant.setTransactionInfo(info)
+            else:
+                self._registrant.setTransactionInfo(None)
         return {
             "paid": self._registrant.getPayed(),
             "amount_paid": self._registrant.getTotal()
