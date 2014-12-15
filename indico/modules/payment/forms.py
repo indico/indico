@@ -16,9 +16,9 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields.core import SelectField
+from wtforms.fields.core import SelectField, IntegerField
 from wtforms.fields.simple import TextAreaField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import DataRequired, ValidationError, NumberRange
 
 from indico.modules.payment import settings
 from indico.util.i18n import _
@@ -36,6 +36,9 @@ EMAIL_DISABLED_MSG = _('This email is currently <strong>disabled</strong>. You c
                        '<a href="{0}">registration form setup</a>.')
 EMAIL_ENABLED_MSG = _('This email is currently <strong>enabled</strong>. You can disable it in the '
                       '<a href="{0}">registration form setup</a>.')
+CHECKOUT_SESSION_TIMEOUT_MSG = _('Time in minutes a checkout session will be alive. On checkout, a new session will '
+                                 'start. During this time, in every new checkout page a warning message will be '
+                                 'displayed in order to prevent duplicated payments.')
 
 
 class AdminSettingsForm(IndicoForm):
@@ -51,6 +54,8 @@ class AdminSettingsForm(IndicoForm):
     conditions = TextAreaField(_('Conditions'), description=CONDITIONS_DESC)
     summary_email = TextAreaField(_('Summary email message'), description=SUMMARY_EMAIL_DESC)
     success_email = TextAreaField(_('Success email message'), description=SUCCESS_EMAIL_DESC)
+    checkout_session_timeout = IntegerField('Checkout session timeout', validators=[DataRequired(), NumberRange(min=0)],
+                                            description=CHECKOUT_SESSION_TIMEOUT_MSG)
 
     def __init__(self, *args, **kwargs):
         super(AdminSettingsForm, self).__init__(*args, **kwargs)

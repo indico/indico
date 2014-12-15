@@ -36,7 +36,8 @@ settings = SettingsProxy('payment', {
     'currency': 'EUR',
     'conditions': CONDITIONS,
     'summary_email': '',
-    'success_email': ''
+    'success_email': '',
+    'checkout_session_timeout': 10
 })
 
 event_settings = EventSettingsProxy('payment', {
