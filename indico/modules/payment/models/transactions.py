@@ -20,10 +20,31 @@ from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
+from indico.core.errors import NotFoundError
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
+
+
+class InvalidTransactionStatus(Exception):
+    pass
+
+
+class InvalidManualTransactionAction(Exception):
+    pass
+
+
+class InvalidTransactionAction(Exception):
+    pass
+
+
+class IgnoredTransactionAction(Exception):
+    pass
+
+
+class DoublePaymentTransaction(Exception):
+    pass
 
 
 class TransactionAction(int, IndicoEnum):
@@ -60,8 +81,7 @@ class TransactionStatusTransition(object):
         elif transaction.status == TransactionStatus.pending:
             return cls._next_from_pending(action, manual_provider)
         else:
-            Logger.get('payment').error("Invalid transaction status code {}".format(transaction.status))
-            # TODO: raise?
+            raise InvalidTransactionStatus("Invalid transaction status code '{}'".format(transaction.status))
 
     @staticmethod
     def _next_from_initial(action, manual=False):
@@ -69,54 +89,53 @@ class TransactionStatusTransition(object):
             if action == TransactionAction.complete:
                 return TransactionStatus.successful
             elif action == TransactionAction.cancel:
-                Logger.get('payment').info("Ignored cancel action on initial status")
+                raise IgnoredTransactionAction("Ignored cancel action on initial status")
             else:
-                Logger.get('payment').error("Invalid manual action {} on initial status".format(action))
+                raise InvalidManualTransactionAction(action)
         elif action == TransactionAction.complete:
             return TransactionStatus.successful
         elif action == TransactionAction.pending:
             return TransactionStatus.pending
         elif action == TransactionAction.reject:
-            Logger.get('payment').warning("Ignored reject action on initial status")
+            raise IgnoredTransactionAction("Ignored reject action on initial status")
         else:
-            Logger.get('payment').error("invalid action {} on initial status".format(action))
+            raise InvalidTransactionAction(action)
 
     @staticmethod
     def _next_from_successful(action, manual=False):
         if manual:
             if action == TransactionAction.complete:
-                Logger.get('payment').info("Ignored complete action on successful status")
+                raise IgnoredTransactionAction("Ignored complete action on successful status")
             elif action == TransactionAction.cancel:
                 return TransactionStatus.cancelled
             else:
-                Logger.get('payment').error("Invalid manual action {} on successful status".format(action))
+                raise InvalidManualTransactionAction(action)
         elif action == TransactionAction.complete:
-            # TODO: duplicated payment!!!!!
-            return TransactionStatus.successful
+            raise DoublePaymentTransaction
         elif action == TransactionAction.pending:
-            Logger.get('payment').warning("Ignored pending action on successful status")
+            raise IgnoredTransactionAction("Ignored pending action on successful status")
         elif action == TransactionAction.reject:
-            Logger.get('payment').info("Ignored reject action on successful status")
+            raise IgnoredTransactionAction("Ignored reject action on successful status")
         else:
-            Logger.get('payment').error("invalid action {} on successful status".format(action))
+            raise InvalidTransactionAction(action)
 
     @staticmethod
     def _next_from_pending(action, manual=False):
         if manual:
             if action == TransactionAction.complete:
-                Logger.get('payment').info("Ignored complete action on pending status")
+                raise IgnoredTransactionAction("Ignored complete action on pending status")
             elif action == TransactionAction.cancel:
                 return TransactionStatus.cancelled
             else:
-                Logger.get('payment').error("Invalid manual action {} on successful status".format(action))
+                raise InvalidManualTransactionAction(action)
         elif action == TransactionAction.complete:
             return TransactionStatus.successful
         elif action == TransactionAction.pending:
-            Logger.get('payment').warning("Ignored pending action on pending status")
+            raise IgnoredTransactionAction("Ignored pending action on pending status")
         elif action == TransactionAction.reject:
             return TransactionStatus.rejected
         else:
-            Logger.get('payment').error("invalid action {} on pending status".format(action))
+            raise InvalidTransactionAction(action)
 
 
 class PaymentTransaction(db.Model):
@@ -199,34 +218,40 @@ class PaymentTransaction(db.Model):
                                                                         self.timestamp)
 
     @classmethod
-    def create_next(cls, registrant, event_id, registrant_id, amount, currency, provider, action, data=None, **kwargs):
+    def create_next(cls, event_id, registrant_id, amount, currency, provider, action, data=None):
         from MaKaC.conference import ConferenceHolder
         event = ConferenceHolder().getById(event_id)
         registrant = event.getRegistrantById(registrant_id)
+        if not registrant:
+            raise NotFoundError("Registrant ID {} doesn't exist in event {}".format(registrant_id, event_id))
         previous_transaction = cls.find_latest_for_registrant(registrant)
-
         new_transaction = PaymentTransaction(event_id=event_id,
                                              registrant_id=registrant_id,
                                              amount=amount,
                                              currency=currency,
                                              provider=provider,
                                              data=data)
-
         try:
             next_status = TransactionStatusTransition.next(previous_transaction, action, provider)
-        except Exception:
-            # TODO handle 4 types of transition exceptions
-            pass
-        except Exception:
-            # TODO handle 4 types of transition exceptions
-            pass
-        except Exception:
-            # TODO handle 4 types of transition exceptions
-            pass
-        except Exception:
-            # TODO handle 4 types of transition exceptions
-            pass
-
+        except InvalidTransactionStatus as e:
+            Logger.get('payment').exception(e)
+            Logger.get('payment').exception("Data received: {}".format(data))
+            return
+        except InvalidManualTransactionAction as e:
+            Logger.get('payment').exception("Invalid manual action code '{}' on initial status".format(e))
+            Logger.get('payment').exception("Data received: {}".format(data))
+            return
+        except InvalidTransactionAction as e:
+            Logger.get('payment').exception("Invalid action code '{}' on initial status".format(e))
+            Logger.get('payment').exception("Data received: {}".format(data))
+            return
+        except IgnoredTransactionAction as e:
+            Logger.get('payment').warning(e)
+            Logger.get('payment').warning("Data received: {}".format(data))
+            return
+        except DoublePaymentTransaction:
+            next_status = TransactionStatus.successful
+            Logger.get('payment').warning("Received successful payment for an already paid registrant")
         new_transaction.status = next_status
         return new_transaction
 
