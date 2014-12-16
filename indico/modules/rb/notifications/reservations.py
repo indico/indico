@@ -1,7 +1,6 @@
 from flask import render_template
 
-from indico.core.config import Config
-from indico.core.notifications import email_sender
+from indico.core.notifications import email_sender, make_email
 from indico.util.date_time import format_datetime
 
 
@@ -26,26 +25,18 @@ class ReservationNotification(object):
         template_params['RepeatMapping'] = RepeatMapping
         return render_template('rb/emails/reservations/{}.txt'.format(mail_params['template_name']), **template_params)
 
-    def _make_email(self, to_list, subject=None, body=None):
-        return {
-            'fromAddr': Config.getInstance().getNoReplyEmail(),
-            'toList': to_list,
-            'subject': subject,
-            'body': body
-        }
-
     def compose_email_to_user(self, **mail_params):
         creator = self.reservation.created_by_user
         to_list = {creator.getEmail()} | self.reservation.contact_emails
         subject = self._get_email_subject(**mail_params)
         body = self._make_body(mail_params, reservation=self.reservation)
-        return self._make_email(to_list, subject, body)
+        return make_email(to_list=to_list, subject=subject, body=body)
 
     def compose_email_to_manager(self, **mail_params):
         to_list = {self.reservation.room.owner.getEmail()} | self.reservation.room.notification_emails
         subject = self._get_email_subject(**mail_params)
         body = self._make_body(mail_params, reservation=self.reservation)
-        return self._make_email(to_list, subject, body)
+        return make_email(to_list=to_list, subject=subject, body=body)
 
     def compose_email_to_vc_support(self, **mail_params):
         from indico.modules.rb import settings
@@ -55,7 +46,7 @@ class ReservationNotification(object):
             if to_list:
                 subject = self._get_email_subject(**mail_params)
                 body = self._make_body(mail_params, reservation=self.reservation)
-                return self._make_email(to_list, subject, body)
+                return make_email(to_list=to_list, subject=subject, body=body)
 
     def compose_email_to_assistance(self, **mail_params):
         from indico.modules.rb import settings
@@ -66,7 +57,7 @@ class ReservationNotification(object):
                 if to_list:
                     subject = self._get_email_subject(**mail_params)
                     body = self._make_body(mail_params, reservation=self.reservation)
-                    return self._make_email(to_list, subject, body)
+                    return make_email(to_list=to_list, subject=subject, body=body)
 
 
 @email_sender

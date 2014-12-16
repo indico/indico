@@ -2,8 +2,7 @@ from datetime import date
 
 from flask import render_template
 
-from indico.core.config import Config
-from indico.core.notifications import email_sender
+from indico.core.notifications import email_sender, make_email
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.notifications.reservations import ReservationNotification
 from indico.util.date_time import format_datetime
@@ -90,20 +89,12 @@ def notify_upcoming_occurrence(occurrence):
     if not to_list and not cc_list:
         return
 
-    from_addr = Config.getInstance().getNoReplyEmail()
     subject = 'Reservation reminder'
     text = render_template('rb/emails/reservations/reminders/upcoming_occurrence.txt',
                            occurrence=occurrence,
                            owner=reservation_user,
                            RepeatFrequency=RepeatFrequency)
-
-    return {
-        'fromAddr': from_addr,
-        'toList': to_list,
-        'ccList': cc_list,
-        'subject': subject,
-        'body': text
-    }
+    return make_email(to_list=to_list, cc_list=cc_list, subject=subject, body=text)
 
 
 @email_sender
@@ -132,17 +123,9 @@ def notify_reservation_digest(reservation, occurrences):
     if not to_list and not cc_list:
         return
 
-    from_addr = Config.getInstance().getNoReplyEmail()
     subject = 'Reservation reminder digest'
     text = render_template('rb/emails/reservations/reminders/reservation_digest.txt',
                            reservation=reservation,
                            occurrences=occurrences,
                            owner=reservation_user)
-
-    return {
-        'fromAddr': from_addr,
-        'toList': to_list,
-        'ccList': cc_list,
-        'subject': subject,
-        'body': text
-    }
+    return make_email(to_list=to_list, cc_list=cc_list, subject=subject, body=text)
