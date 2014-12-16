@@ -1,7 +1,7 @@
 from flask import render_template
 
 from indico.core.config import Config
-from indico.modules.rb.notifications.util import email_sender
+from indico.core.notifications import email_sender
 
 
 @email_sender
