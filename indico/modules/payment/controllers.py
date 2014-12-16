@@ -163,7 +163,7 @@ class RHPaymentEventForm(RHRegistrationFormRegistrantBase):
         return jsonify(html=html)
 
 
-class RHPaymentEventConfirm(RHRegistrationFormRegistrantBase):
+class RHPaymentEventReturn(RHRegistrationFormRegistrantBase):
     """Confirmation message after successful payment"""
 
     def _checkParams(self, params):
@@ -172,7 +172,8 @@ class RHPaymentEventConfirm(RHRegistrationFormRegistrantBase):
 
     def _process(self):
         event = self._conf
-        return WPPaymentEvent.render_template('event_payment_confirm.html', event, params=self._params)
+        flash(_('Your payment request has been processed.'), 'success')
+        return redirect(url_for('event.confRegistrationFormDisplay', event))
 
 
 class RHPaymentEventCancel(RHRegistrationFormRegistrantBase):
@@ -183,4 +184,5 @@ class RHPaymentEventCancel(RHRegistrationFormRegistrantBase):
 
     def _process(self):
         event = self._conf
-        return WPPaymentEvent.render_template('event_payment_cancel.html', event)
+        flash(_('Your payment request was cancelled.'), 'info')
+        return redirect(url_for('event.confRegistrationFormDisplay', event))
