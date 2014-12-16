@@ -20,8 +20,8 @@ import re
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.payment import PaymentPluginMixin
+from indico.modules.payment.notifications import notify_double_payment
 from indico.modules.payment.models.transactions import PaymentTransaction
-
 
 remove_prefix_re = re.compile('^payment_')
 
@@ -46,6 +46,5 @@ def register_transaction(event_id, registrant_id, amount, currency, action, prov
         db.session.add(new_transaction)
         db.session.flush()
         if double_payment:
-            # notify of conflict
-            pass
+            notify_double_payment(event_id, registrant_id)
         return new_transaction
