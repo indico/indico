@@ -43,6 +43,8 @@ class PaymentEventSettingsFormBase(IndicoForm):
 class PaymentPluginMixin(object):
     settings_form = PaymentPluginSettingsFormBase
     event_settings_form = PaymentEventSettingsFormBase
+    #: Set containing all valid currencies. Set to `None` to allow all.
+    valid_currencies = None
 
     def init(self):
         super(PaymentPluginMixin, self).init()

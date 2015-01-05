@@ -113,14 +113,50 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
             RHConferenceModifBase._checkProtection(self)
         return True
 
+    def _check_currencies(self, form):
+        """Checks if the currencies are valid.
+
+        :return: `(auto_currency, invalid_currency)` - tuple containing the currency that should
+                 be automatically set on the event and a flag if the currency issues cannot be resolved
+                 automatically and require user interaction (i.e. saving the plugin settings is disallowed)
+        """
+        event = self._conf
+        valid_currencies = self.plugin.valid_currencies
+        currency = event_settings.get(event, 'currency')
+        if valid_currencies is None or currency in valid_currencies:
+            return False, False
+
+        if len(valid_currencies) == 1:
+            auto_currency = list(valid_currencies)[0]
+            for plugin in get_active_payment_plugins(event).itervalues():
+                if plugin.valid_currencies is not None and auto_currency not in plugin.valid_currencies:
+                    flash(_("This payment method only supports {}, but the payment method '{}' doesn't.").format(
+                        auto_currency, plugin.title
+                    ), 'error')
+                    return None, True
+            if not form.is_submitted():
+                flash(_("This payment method only supports {0}. Enabling it will automatically change the currency "
+                        "of the event to {0}!").format(auto_currency), 'warning')
+            return auto_currency, False
+
+        if not form.is_submitted():
+            flash(_("To enable this payment method, please use one of the following currencies: {}".format(
+                ', '.join(valid_currencies)
+            )), 'error')
+        return None, True
+
     def _process(self):
         event = self._conf
         can_modify = self.plugin.can_be_modified(session.user, event)
         defaults = FormDefaults(self.plugin.event_settings.get_all(event), **self.plugin.settings.get_all())
         form = self.plugin.event_settings_form(prefix='payment-', obj=defaults)
-        if can_modify and form.validate_on_submit():
+        auto_currency, invalid_currency = self._check_currencies(form)
+        if can_modify and form.validate_on_submit() and not invalid_currency:
             self.plugin.event_settings.set_multi(event, form.data)
-            flash(_('Settings for {0} saved').format(self.plugin.title), 'success')
+            flash(_('Settings for {} saved').format(self.plugin.title), 'success')
+            if form.enabled.data and auto_currency is not None:
+                event_settings.set(event, 'currency', auto_currency)
+                flash(_("The event's currency has been changed to {}.").format(auto_currency), 'warning')
             if self.protection_overridden:
                 return redirect(request.url)
             else:
@@ -130,7 +166,7 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
             widget_attrs = {field.short_name: {'disabled': True} for field in form}
         return WPPaymentEventManagement.render_template('event_plugin_edit.html', event, event=event, form=form,
                                                         plugin=self.plugin, can_modify=can_modify,
-                                                        widget_attrs=widget_attrs)
+                                                        widget_attrs=widget_attrs, invalid_currency=invalid_currency)
 
 
 class RHPaymentEventCheckout(RHRegistrationFormRegistrantBase):

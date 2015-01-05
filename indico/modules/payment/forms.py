@@ -21,6 +21,7 @@ from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError, NumberRange
 
 from indico.modules.payment import settings
+from indico.modules.payment.util import get_active_payment_plugins
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
@@ -99,3 +100,11 @@ class EventSettingsForm(IndicoForm):
         if event_currency and not any(x[0] == event_currency for x in currencies):
             currencies.append((event_currency, event_currency))
         self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
+
+    def validate_currency(self, field):
+        for plugin in get_active_payment_plugins(self._event).itervalues():
+            if plugin.valid_currencies is None:
+                continue
+            if field.data not in plugin.valid_currencies:
+                raise ValidationError(_("The currency is not supported by the payment method '{}'. "
+                                        "Please disable it first.").format(plugin.title))
