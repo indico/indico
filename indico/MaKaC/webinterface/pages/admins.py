@@ -2553,12 +2553,12 @@ class WAdminProtection(wcomponents.WTemplated):
 
 
 class WRedirect(wcomponents.WTemplated):
-    def __init__(self, title, message, delay, link_text, url):
+    def __init__(self, title, message, delay, url, link_text):
         self.title = title
         self.message = message
         self.delay = delay
-        self.url = url
         self.link_text = link_text
+        self.url = url
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
@@ -2571,10 +2571,9 @@ class WRedirect(wcomponents.WTemplated):
 
 
 class WPRedirect(WPDecorated):
-    def __init__(self, rh, title, message, delay, endpoint, link_text=None, target=None, **args):
+    def __init__(self, rh, title, message, delay, url, link_text=None,):
         WPDecorated.__init__(self, rh)
-        url = url_for(endpoint, target, **args)
-        self.content = WRedirect(title, message, delay, link_text if link_text else url, url)
+        self.content = WRedirect(title, message, delay, url, link_text if link_text else url)
 
     def _getBody(self, params):
         return self.content.getHTML(params)
