@@ -4,14 +4,16 @@
 {% block title %}{% trans %}Payment{% endtrans %}{% endblock %}
 
 {% block content %}
-    <div class="warning-message-box fixed-width">
-        <div class="message-text">
-            {% trans -%}
-                There are no payment plugins installed, so the payment module cannot be enabled for any event.
-                To install a payment plugin, install the plugin's Python package and enable it in <code>indico.conf</code>.
-            {%- endtrans %}
+    {% if not plugins %}
+        <div class="warning-message-box fixed-width">
+            <div class="message-text">
+                {% trans -%}
+                    There are no payment plugins installed, so the payment module cannot be enabled for any event.
+                    To install a payment plugin, install the plugin's Python package and enable it in <code>indico.conf</code>.
+                {%- endtrans %}
+            </div>
         </div>
-    </div>
+    {% endif %}
 
     {{ form_header() }}
     {{ form_rows(form) }}
