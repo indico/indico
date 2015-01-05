@@ -15,12 +15,16 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+import re
 
+from flask import session
 from flask_pluginengine import render_plugin_template
 from wtforms.fields.core import StringField, BooleanField
 from wtforms.validators import DataRequired
 
+from indico.core import signals
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from MaKaC.accessControl import AccessWrapper
 
@@ -44,6 +48,11 @@ class PaymentPluginMixin(object):
         super(PaymentPluginMixin, self).init()
         if not self.name.startswith('payment_'):
             raise Exception('Payment plugins must be named payment_*')
+        self.connect(signals.event_management.management_url, self.get_event_management_url)
+
+    @property
+    def default_settings(self):
+        return {'method_name': self.title}
 
     def can_be_modified(self, user, event):
         """Checks if the user is allowed to enable/disable/modify the payment method.
@@ -53,9 +62,14 @@ class PaymentPluginMixin(object):
         """
         return event.canModify(AccessWrapper(user))
 
-    @property
-    def default_settings(self):
-        return {'method_name': self.title}
+    def get_event_management_url(self, event, **kwargs):
+        # This is needed only in case a plugin overrides `can_be_modified` and grants access to users who do not have
+        # event management access. In this case they should be redirected to the plugin's edit payment page.
+        # In the future it might be useful to expose a limited version of the main payment page to those users since
+        # right now there is no good way to access both payment methods if there are two of this kind and you have
+        # access to both.
+        if self.can_be_modified(session.user, event):
+            return url_for('payment.event_plugin_edit', event, method=re.sub(r'^payment_', '', self.name))
 
     def get_method_name(self, event):
         """Returns the (customized) name of the payment method."""

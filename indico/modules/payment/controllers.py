@@ -104,6 +104,15 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
         except KeyError:
             raise NotFound
 
+    def _checkProtection(self):
+        self.protection_overridden = False
+        can_modify_plugin = self.plugin.can_be_modified(session.user, self._conf)
+        can_modify_event = self._conf.canModify(self.getAW())
+        self.protection_overridden = can_modify_plugin and not can_modify_event
+        if not can_modify_plugin and not can_modify_event:
+            RHConferenceModifBase._checkProtection(self)
+        return True
+
     def _process(self):
         event = self._conf
         can_modify = self.plugin.can_be_modified(session.user, event)
@@ -112,7 +121,10 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
         if can_modify and form.validate_on_submit():
             self.plugin.event_settings.set_multi(event, form.data)
             flash(_('Settings for {0} saved').format(self.plugin.title), 'success')
-            return redirect(url_for('.event_settings', event))
+            if self.protection_overridden:
+                return redirect(request.url)
+            else:
+                return redirect(url_for('.event_settings', event))
         widget_attrs = {}
         if not can_modify:
             widget_attrs = {field.short_name: {'disabled': True} for field in form}
