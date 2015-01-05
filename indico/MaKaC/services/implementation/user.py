@@ -25,7 +25,6 @@ from MaKaC.common.cache import GenericCache
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.utils import validMail
 from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
-from MaKaC.rb_location import CrossLocationQueries
 from MaKaC.services.implementation.base import LoggedOnlyService, AdminService, ParameterManager, ServiceBase
 from MaKaC.services.interface.rpc.common import (ServiceError, ServiceAccessError, NoReportError, Warning,
                                                  ResultWithWarning)
