@@ -130,6 +130,8 @@ class MultipleItemsField(HiddenField):
 
     def __init__(self, *args, **kwargs):
         self.fields = kwargs.pop('fields')
+        self.unique_field = kwargs.pop('unique_field', True)
+        self.field_names = dict(self.fields)
         super(MultipleItemsField, self).__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
@@ -137,11 +139,15 @@ class MultipleItemsField(HiddenField):
             self.data = json.loads(valuelist[0])
 
     def pre_validate(self, form):
+        unique_used = set()
         for item in self.data:
             if not isinstance(item, dict):
                 raise ValueError(u'Invalid item type: {}'.format(type(item).__name__))
             elif item.viewkeys() != {x[0] for x in self.fields}:
                 raise ValueError(u'Invalid item (bad keys): {}'.format(', '.join(item.viewkeys())))
+            if self.unique_field and item[self.unique_field] in unique_used:
+                raise ValueError(u'{} must be unique'.format(self.field_names[self.unique_field]))
+            unique_used.add(item[self.unique_field])
 
     def _value(self):
         return self.data or []
