@@ -39,6 +39,11 @@ class PaymentEventSettingsFormBase(IndicoForm):
     method_name = StringField(_('Name'), [DataRequired()],
                               description=_("The name of the payment method displayed to the user."))
 
+    def __init__(self, *args, **kwargs):
+        # Provide the plugin settings in case a plugin needs them for more complex form fields.
+        self._plugin_settings = kwargs.pop('plugin_settings')
+        super(PaymentEventSettingsFormBase, self).__init__(*args, **kwargs)
+
 
 class PaymentPluginMixin(object):
     settings_form = PaymentPluginSettingsFormBase

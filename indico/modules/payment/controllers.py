@@ -148,8 +148,9 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
     def _process(self):
         event = self._conf
         can_modify = self.plugin.can_be_modified(session.user, event)
-        defaults = FormDefaults(self.plugin.event_settings.get_all(event), **self.plugin.settings.get_all())
-        form = self.plugin.event_settings_form(prefix='payment-', obj=defaults)
+        plugin_settings = self.plugin.settings.get_all()
+        defaults = FormDefaults(self.plugin.event_settings.get_all(event), **plugin_settings)
+        form = self.plugin.event_settings_form(prefix='payment-', obj=defaults, plugin_settings=plugin_settings)
         auto_currency, invalid_currency = self._check_currencies(form)
         if can_modify and form.validate_on_submit() and not invalid_currency:
             self.plugin.event_settings.set_multi(event, form.data)
