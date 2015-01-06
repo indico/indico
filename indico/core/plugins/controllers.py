@@ -28,7 +28,7 @@ from MaKaC.webinterface.rh.admins import RHAdminBase
 
 class RHPlugins(RHAdminBase):
     def _process(self):
-        plugins = [p for p in plugin_engine.get_active_plugins().viewvalues() if not p.hidden]
+        plugins = [p for p in plugin_engine.get_active_plugins().viewvalues()]
         categories = defaultdict(list)
         other = []
         for plugin in plugins:
@@ -36,6 +36,11 @@ class RHPlugins(RHAdminBase):
                 categories[plugin.category].append(plugin)
             else:
                 other.append(plugin)
+
+        # Sort the plugins of each category in alphabetic order and in a way that the internal plugins are always
+        # listed in the front
+        for category in categories:
+            categories[category].sort(key=lambda plug: (not plug.hidden, plug.title))
         ordered_categories = OrderedDict(sorted(categories.items()))
         if other:
             ordered_categories['other'] = other

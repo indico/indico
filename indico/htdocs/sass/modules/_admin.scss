@@ -77,6 +77,14 @@ a.plugin {
             float: right;
         }
     }
+
+    &.internal {
+        cursor: default;
+
+        &:hover {
+            color: $light-black;
+        }
+    }
 }
 
 .code {
