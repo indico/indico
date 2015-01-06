@@ -25,7 +25,7 @@ from indico.util.fossilize import fossilize
 from indico.util.user import retrieve_principals
 from indico.util.string import is_valid_mail
 from indico.util.i18n import _
-from indico.web.forms.widgets import PrincipalWidget, MultipleItemsWidget, RadioButtonsWidget
+from indico.web.forms.widgets import PrincipalWidget, RadioButtonsWidget, JinjaWidget
 
 
 class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
@@ -126,11 +126,11 @@ class MultipleItemsField(HiddenField):
 
     :param fields: A list of ``(fieldname, title)`` tuples
     """
-    widget = MultipleItemsWidget()
+    widget = JinjaWidget('forms/multiple_items_widget.html')
 
     def __init__(self, *args, **kwargs):
         self.fields = kwargs.pop('fields')
-        self.unique_field = kwargs.pop('unique_field', True)
+        self.unique_field = kwargs.pop('unique_field', None)
         self.field_names = dict(self.fields)
         super(MultipleItemsField, self).__init__(*args, **kwargs)
 
@@ -151,3 +151,56 @@ class MultipleItemsField(HiddenField):
 
     def _value(self):
         return self.data or []
+
+
+class OverrideMultipleItemsField(HiddenField):
+    """A field similar to `MultipleItemsField` which allows the user to override some values.
+
+    :param fields: a list of ``(fieldname, title)`` tuples. Should match
+                   the fields of the corresponding `MultipleItemsField`.
+    :param field_data: the data from the corresponding `MultipleItemsField`.
+    :param unique_field: the name of the field which is unique among all rows
+    :param edit_fields: a set containing the field names which can be edited
+    """
+    widget = JinjaWidget('forms/override_multiple_items_widget.html')
+
+    def __init__(self, *args, **kwargs):
+        self.fields = kwargs.pop('fields')
+        self.field_data = kwargs.pop('field_data', None)  # usually set after creating the form instance
+        self.unique_field = kwargs.pop('unique_field')
+        self.edit_fields = set(kwargs.pop('edit_fields'))
+        super(OverrideMultipleItemsField, self).__init__(*args, **kwargs)
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = json.loads(valuelist[0])
+
+    def pre_validate(self, form):
+        valid_keys = {x[self.unique_field] for x in self.field_data}
+        for key, values in self.data.items():
+            if key not in valid_keys:
+                # e.g. a row removed from field_data that had a value before
+                del self.data[key]
+                continue
+            if values.viewkeys() > self.edit_fields:
+                # e.g. a field that was editable before
+                self.data[key] = {k: v for k, v in values.iteritems() if k in self.edit_fields}
+        # Remove anything empty
+        for key, values in self.data.items():
+            for field, value in values.items():
+                if not value:
+                    del values[field]
+            if not self.data[key]:
+                del self.data[key]
+
+    def _value(self):
+        return self.data or {}
+
+    def get_overridden_value(self, row, name):
+        """Utility for the widget to get the entered value for an editable field"""
+        key = self.get_row_key(row)
+        return self._value().get(key, {}).get(name, '')
+
+    def get_row_key(self, row):
+        """Utility for the widget to get the unique value for a row"""
+        return row[self.unique_field]

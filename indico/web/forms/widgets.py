@@ -50,12 +50,6 @@ class JinjaWidget(object):
         return HTMLString(self.render_func(self.template, field=field, **kwargs))
 
 
-class MultipleItemsWidget(object):
-    """Renders a `MultipleItemsField` using a nice JavaScript widget"""
-    def __call__(self, field, **kwargs):
-        return HTMLString(render_template('forms/multiple_items_widget.html', field=field))
-
-
 class CKEditorWidget(JinjaWidget):
     """Renders a CKEditor WYSIWYG editor"""
     def __init__(self):
