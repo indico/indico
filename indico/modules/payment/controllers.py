@@ -124,7 +124,7 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
         valid_currencies = self.plugin.valid_currencies
         currency = event_settings.get(event, 'currency')
         if valid_currencies is None or currency in valid_currencies:
-            return False, False
+            return None, False
 
         if len(valid_currencies) == 1:
             auto_currency = list(valid_currencies)[0]
