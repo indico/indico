@@ -201,7 +201,7 @@ class RHPaymentEventForm(RHRegistrationFormRegistrantBase):
     def _checkParams(self, params):
         RHRegistrationFormRegistrantBase._checkParams(self, params)
         try:
-            self.plugin = get_payment_plugins()[request.args['method']]
+            self.plugin = get_active_payment_plugins(self._conf)[request.args['method']]
         except KeyError:
             raise NotFound
 

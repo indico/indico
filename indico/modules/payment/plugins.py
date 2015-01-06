@@ -82,6 +82,18 @@ class PaymentPluginMixin(object):
         """Returns the (customized) name of the payment method."""
         return self.event_settings.get(event, 'method_name')
 
+    def adjust_payment_form_data(self, data):
+        """Updates the payment form data if necessary.
+
+        This method can be overridden to update e.g. the amount based on choices the user makes
+        in the payment form or to provide additional data to the form. To do so, `data` must
+        be modified.
+
+        :param data: a dict containing event, registrant, amount, currency,
+                     settings and event_settings
+        """
+        pass
+
     def render_payment_form(self, event, registrant, amount, currency):
         """Returns the payment form shown to the user.
 
@@ -92,5 +104,11 @@ class PaymentPluginMixin(object):
         """
         settings = self.settings.get_all()
         event_settings = self.event_settings.get_all(event)
-        return render_plugin_template('event_payment_form.html', event=event, registrant=registrant, amount=amount,
-                                      currency=currency, settings=settings, event_settings=event_settings)
+        data = {'event': event,
+                'registrant': registrant,
+                'amount': amount,
+                'currency': currency,
+                'settings': settings,
+                'event_settings': event_settings}
+        self.adjust_payment_form_data(data)
+        return render_plugin_template('event_payment_form.html', **data)
