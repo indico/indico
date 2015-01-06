@@ -182,8 +182,8 @@ class RHPaymentEventCheckout(RHRegistrationFormRegistrantBase):
         if not self._registrant.isCheckoutSessionAlive():
             self._registrant._checkout_attempt_dt = datetime.now()
         else:
-            checkout_attempt_delta =  int(math.ceil((datetime.now() -
-                                                     self._registrant.getCheckoutAttemptDt()).total_seconds() / 60))
+            checkout_attempt_dt = self._registrant.getCheckoutAttemptDt()
+            checkout_attempt_delta = int(math.ceil((datetime.now() - checkout_attempt_dt).total_seconds() / 60))
         event = self._conf
         amount = self._registrant.getTotal()
         currency = event_settings.get(event, 'currency')
