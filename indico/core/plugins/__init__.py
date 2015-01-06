@@ -68,6 +68,8 @@ class IndicoPlugin(Plugin):
     #: If the plugin should be hidden in the admin interface (useful for plugins which only
     #: provide a base for other plugins)
     hidden = False
+    #: The group category that the plugin belongs to
+    category = None
 
     def init(self):
         """Called when the plugin is being loaded/initialized.

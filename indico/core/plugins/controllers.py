@@ -17,6 +17,8 @@
 from flask import request, flash, redirect
 from werkzeug.exceptions import NotFound
 
+from collections import defaultdict, OrderedDict
+
 from indico.core.plugins import plugin_engine
 from indico.core.plugins.views import WPPlugins
 from indico.web.forms.base import FormDefaults
@@ -27,7 +29,17 @@ from MaKaC.webinterface.rh.admins import RHAdminBase
 class RHPlugins(RHAdminBase):
     def _process(self):
         plugins = [p for p in plugin_engine.get_active_plugins().viewvalues() if not p.hidden]
-        return WPPlugins.render_template('index.html', active_plugins=plugins)
+        categories = defaultdict(list)
+        other = []
+        for plugin in plugins:
+            if plugin.category:
+                categories[plugin.category].append(plugin)
+            else:
+                other.append(plugin)
+        ordered_categories = OrderedDict(sorted(categories.items()))
+        if other:
+            ordered_categories['other'] = other
+        return WPPlugins.render_template('index.html', categorized_plugins=ordered_categories)
 
 
 class RHPluginDetails(RHAdminBase):
