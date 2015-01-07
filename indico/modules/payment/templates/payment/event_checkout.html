@@ -45,7 +45,7 @@
 <script>
     (function(global) {
         var paymentContainer = $('#payment-content');
-        var paymentMethod = {{ (force_plugin[0] if force_plugin else '') | tojson }};
+        var paymentMethod = {{ (force_plugin[0] if force_plugin else '') | tojson }} || $('#payment-method').val();
 
         // You can use this function if your payment plugin has any dynamic data which affect the displayed information.
         // For example, selecting different credit card types could cause different fees to be applied.
