@@ -15,13 +15,31 @@ For example, a receiver function could look like this::
     def receiver(sender, something, **kwargs):
         do_stuff_with(something)
 
-
-
 .. exec::
-    from indico.core import signals
-    from blinker import Signal
-    for name in dir(signals):
-        attr = getattr(signals, name)
-        if isinstance(getattr(signals, name), Signal):
-            print '.. autodata:: indico.core.signals.{}'.format(name)
-            print '   :annotation:'
+    def main():
+        from types import ModuleType
+
+        from indico.core import signals
+        from blinker import Signal
+
+        def generate_signal_doc(module):
+
+            sorted_attributes = sorted(
+                ((getattr(module, n), n) for n in dir(module)),
+                key=lambda (a, n): (isinstance(a, ModuleType), module.__name__, n)
+            )
+            for attr, name in sorted_attributes:
+                if isinstance(attr, Signal):
+                    print '.. autodata:: {}.{}'.format(module.__name__, name)
+                    print '   :annotation:'
+
+                # core is always imported in __init__.py and
+                # event.__init__.py always import its submodules directly so we
+                # don't recurse in  those cases to avoid duplicate doc
+                elif (isinstance(attr, ModuleType) and
+                        name != 'core' and module.__name__ != 'indico.core.signals.event'):
+                    generate_signal_doc(attr)
+
+        generate_signal_doc(signals)
+
+    main()
