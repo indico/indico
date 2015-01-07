@@ -173,11 +173,6 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
 class RHPaymentEventCheckout(RHRegistrationFormRegistrantBase):
     """Payment/Checkout page for registrants"""
 
-    def _checkParams(self, params):
-        RHRegistrationFormRegistrantBase._checkParams(self, params)
-        if event_settings.get(self._conf, 'enabled') and params.get("conditions", "false") != "on":
-            raise IndicoError("You cannot pay without accepting the conditions")
-
     def _process(self):
         checkout_attempt_delta = None
         if not self._registrant.isCheckoutSessionAlive():

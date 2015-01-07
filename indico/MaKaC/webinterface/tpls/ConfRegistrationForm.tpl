@@ -162,28 +162,26 @@
                         ${ payment_info }
                     </table>
                     % if not payment_done:
-                        <form name="epay" action="${ url_for('payment.event_payment', conf, **authparams) }" method="POST">
                             <table class="regform-done-conditions" width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td>
                                         % if payment_conditions:
                                             <div class="checkbox-with-text">
-                                                <input type="checkbox" name="conditions"/>
+                                                <input type="checkbox" id="conditions-accepted">
                                                 <div class="payment-terms-agreement">
                                                     ${ _("I have read and accept the terms and conditions and understand that by confirming this order I will be entering into a binding transaction") }
-                                                    (<a href="#" onClick="open_condictions()">${ _("Terms and conditions") }</a>).
+                                                    (<a href="#" class="js-open-conditions">${ _("Terms and conditions") }</a>).
                                                 </div>
                                             </div>
                                         % endif
                                     </td>
                                     <td>
-                                        <a class="action-button" onclick="checkConditions()">
+                                        <a class="action-button" id="submit-checkout">
                                             ${ _('Checkout') }
                                         </a>
                                     </td>
                                 </tr>
                             </table>
-                        </form>
                     % endif
                 </div>
             </div>
@@ -199,23 +197,21 @@
     % endif
 
     <script type="text/javascript">
-        function checkConditions() {
-            if (document.epay.conditions) {
-                if (!document.epay.conditions.checked) {
-                    new AlertPopup($T("Warning"), $T("Please, confirm that you have read the conditions.")).open();
-                } else {
-                    document.forms['epay'].submit();
-                }
-            } else {
-                document.forms['epay'].submit();
-            }
-        }
-
-        function open_condictions() {
-            var conditions_url = ${ url_for('event.confRegistrationFormDisplay-conditions', conf) | n,j }
+        $('.js-open-conditions').on('click', function(e) {
+            e.preventDefault();
+            var conditions_url = ${ url_for('event.confRegistrationFormDisplay-conditions', conf) | n,j };
             window.open(conditions_url, 'Conditions', 'width=400, height=200, resizable=yes, scrollbars=yes');
-            return false;
-        }
+        });
+
+        $('#submit-checkout').on('click', function(e) {
+            e.preventDefault();
+            var conditions = $('#conditions-accepted');
+            if (conditions.length && !conditions.prop('checked')) {
+                new AlertPopup($T("Warning"), $T("Please, confirm that you have read the conditions.")).open();
+                return;
+            }
+            location.href = ${ url_for('payment.event_payment', conf, **authparams) | n,j };
+        });
 
         function highlight_payment() {
             $('#payment-summary').effect('highlight')
