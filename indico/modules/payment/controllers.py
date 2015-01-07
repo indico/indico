@@ -215,10 +215,6 @@ class RHPaymentEventForm(RHRegistrationFormRegistrantBase):
 class RHPaymentEventReturn(RHRegistrationFormRegistrantBase):
     """Confirmation message after successful payment"""
 
-    def _checkParams(self, params):
-        RHRegistrationFormRegistrantBase._checkParams(self, params)
-        self._params = params
-
     def _process(self):
         event = self._conf
         flash(_('Your payment request has been processed.'), 'success')
@@ -227,9 +223,6 @@ class RHPaymentEventReturn(RHRegistrationFormRegistrantBase):
 
 class RHPaymentEventCancel(RHRegistrationFormRegistrantBase):
     """Cancellation message"""
-
-    def _checkParams(self, params):
-        RHRegistrationFormRegistrantBase._checkParams(self, params)
 
     def _process(self):
         event = self._conf
