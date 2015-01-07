@@ -535,7 +535,8 @@ class RHRegistrantTransactionPerformModify(RHRegistrantModifBase):
                                            registrant_id=self._registrant.getId(),
                                            amount=self._registrant.getTotal(),
                                            currency=self._registrant.getCurrency(),
-                                           action=action)
+                                           action=action,
+                                           provider='_manual')
         if transaction:
             if transaction.status == TransactionStatus.successful:
                 info = epayment.TransactionPayLaterMod({'OrderTotal': self._registrant.getTotal(),
