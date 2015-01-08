@@ -22,6 +22,7 @@ from flask import Flask, Blueprint
 from flask.blueprints import BlueprintSetupState
 from flask.wrappers import Request
 from flask_pluginengine import PluginFlaskMixin
+from werkzeug.datastructures import ImmutableOrderedMultiDict
 from werkzeug.utils import cached_property
 
 from MaKaC.common import HelperMaKaCInfo
@@ -32,6 +33,8 @@ from indico.util.json import IndicoJSONEncoder
 
 
 class IndicoRequest(Request):
+    parameter_storage_class = ImmutableOrderedMultiDict
+
     @cached_property
     def remote_addr(self):
         """The remote address of the client."""
