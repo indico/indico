@@ -753,14 +753,14 @@ class IRegFormRegistrantBasicFossil(IFossil):
         If the user payed
         """
     getPayed.name = "paid"
-    getPayed.produce = lambda x: x.getPayed() if payment_event_settings.get(x.getConference(), 'active') else None
+    getPayed.produce = lambda x: x.getPayed() if payment_event_settings.get(x.getConference(), 'enabled') else None
 
     def getTotal(self):
         """
         Total amount payed
         """
     getTotal.name = "amount_paid"
-    getTotal.produce = lambda x: x.getTotal() if payment_event_settings.get(x.getConference(), 'active') else None
+    getTotal.produce = lambda x: x.getTotal() if payment_event_settings.get(x.getConference(), 'enabled') else None
 
     def isCheckedIn(self):
         """

@@ -50,7 +50,7 @@ class SetPaidHook(EventBaseHook):
         registrant_id = self._pathParams["registrant_id"]
         self._conf = ConferenceHolder().getById(self._pathParams['event'])
         self._registrant = self._conf.getRegistrantById(registrant_id)
-        if not payment_event_settings.get(self._conf, 'active'):
+        if not payment_event_settings.get(self._conf, 'enabled'):
             raise HTTPAPIError('E-payment is not enabled')
 
     def _hasAccess(self, aw):
