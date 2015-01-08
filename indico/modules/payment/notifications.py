@@ -17,6 +17,7 @@
 from flask import render_template
 
 from indico.core.notifications import email_sender, make_email
+from indico.modules.payment import event_settings
 from MaKaC.conference import ConferenceHolder
 
 
@@ -28,4 +29,13 @@ def notify_double_payment(event_id, registrant_id):
         return
     to = event.getCreator().getEmail()
     body = render_template('payment/emails/double_payment_email_to_manager.txt', event=event, registrant=registrant)
-    return make_email(to, subject="Double payment detected", body=body)
+    return make_email(to, subject='Double payment detected', body=body)
+
+
+@email_sender
+def notify_amount_inconsistency(event, registrant, amount):
+    currency = event_settings.get(event, 'currency')
+    to = event.getCreator().getEmail()
+    body = render_template('payment/emails/payment_inconsistency_email_to_manager.txt', event=event,
+                           registrant=registrant, amount=amount, currency=currency)
+    return make_email(to, subject='Payment inconsistency', body=body)
