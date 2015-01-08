@@ -233,19 +233,19 @@ class PaymentTransaction(db.Model):
         except InvalidTransactionStatus as e:
             Logger.get('payment').exception(e)
             Logger.get('payment').exception("Data received: {}".format(data))
-            return
+            return None, None
         except InvalidManualTransactionAction as e:
             Logger.get('payment').exception("Invalid manual action code '{}' on initial status".format(e))
             Logger.get('payment').exception("Data received: {}".format(data))
-            return
+            return None, None
         except InvalidTransactionAction as e:
             Logger.get('payment').exception("Invalid action code '{}' on initial status".format(e))
             Logger.get('payment').exception("Data received: {}".format(data))
-            return
+            return None, None
         except IgnoredTransactionAction as e:
             Logger.get('payment').warning(e)
             Logger.get('payment').warning("Data received: {}".format(data))
-            return
+            return None, None
         except DoublePaymentTransaction:
             next_status = TransactionStatus.successful
             double_payment = True

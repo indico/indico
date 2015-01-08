@@ -37,7 +37,8 @@ _bp.add_url_rule('/event/<confId>/manage/registration/payment/method/<method>', 
                  RHPaymentEventPluginEdit, methods=('GET', 'POST'))
 
 # Event
-_bp.add_url_rule('/event/<confId>/registration/payment/', 'event_payment', RHPaymentEventCheckout)
+_bp.add_url_rule('/event/<confId>/registration/payment/', 'event_payment', RHPaymentEventCheckout,
+                 methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/registration/payment/form', 'event_payment_form', RHPaymentEventForm)
 _bp.add_url_rule('/event/<confId>/registration/payment/return', 'event_payment_return',
                  RHPaymentEventReturn, methods=('GET', 'POST'))
