@@ -46,24 +46,35 @@
         {% endif %}
     </dl>
 
-    {% if settings.enabled %}
-        <p class="fixed-width">
-            {% trans -%}
-                The following payment methods are available. You can enable, disable and configure them by clicking on the title.
-            {%- endtrans %}
-        </p>
-        <ul>
-            {% for short_name, plugin in plugins %}
-                <li data-plugin="{{ plugin.name }}">
-                    <a href="{{ url_for('.event_plugin_edit', event, method=short_name) }}" class="js-plugin-edit">{{ plugin.title }}</a>
-                    {% if plugin in enabled_plugins %}
-                        ({% trans %}<strong>enabled</strong>{% endtrans %})
-                    {% else %}
-                        ({% trans %}disabled{% endtrans %})
-                    {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
+    {%- if settings.enabled %}
+    <p class="fixed-width">
+        {%- trans -%}
+            The following payment methods are available. You can enable, disable and configure them by clicking on them.
+        {%- endtrans -%}
+    </p>
+    <div class="plugins-list">
+        {%- for short_name, plugin in plugins %}
+        <a class="js-plugin-edit plugin {%- if plugin in enabled_plugins %} plugin-enabled {% else %} plugin-disabled {% endif -%}"
+           href="{{ url_for('.event_plugin_edit', event, method=short_name) }}">
+            <div class="plugin-content">
+                <span class="plugin-icon plugin-center-block">
+                    <img src="/images/maestro.gif">
+                </span>
+                <span class="plugin-title plugin-center-block">{{ plugin.title }}</span>
+                <div class="plugin-bottom-bar">
+                    <span class="plugin-version">
+                        {%- if plugin in enabled_plugins -%}
+                            <strong>{% trans %}enabled{% endtrans %}</strong>
+                        {%- else -%}
+                            {% trans %}disabled{% endtrans %}
+                        {%- endif -%}
+                    </span>
+                    <span class="plugin-settings"><i class="icon-arrow-right"></i></span>
+                </div>
+            </div>
+        </a>
+        {%- endfor %}
+    </div>
     {% endif %}
 
     <script>

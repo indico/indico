@@ -3,7 +3,7 @@
 
 {% block title %}{% trans %}Payment{% endtrans %}{% endblock %}
 
-{% block content %}
+{%- block content %}
     {% if not plugins %}
         <div class="warning-message-box fixed-width">
             <div class="message-text">
@@ -21,20 +21,26 @@
         <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
     {% endcall %}
 
-    {% if plugins %}
+    {%- if plugins %}
         <p>{% trans %}The following payment plugins are available:{% endtrans %}</p>
-        <ul>
-            {% for plugin in plugins %}
-                <li>
-                    <a class="js-plugin-details" href="{{ url_for('.admin_plugin_settings', plugin=plugin.name) }}">{{ plugin.title }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    <script>
-        $('.js-plugin-details').ajaxDialog({
-            title: $T('Payment plugin settings')
-        });
-    </script>
-{% endblock %}
+        {%- for plugin in plugins %}
+            <a class="js-plugin-details plugin" href="{{ url_for('.admin_plugin_settings', plugin=plugin.name) }}">
+                <div class="plugin-content">
+                    <span class="plugin-icon plugin-center-block">
+                        <img src="/images/maestro.gif">
+                    </span>
+                    <span class="plugin-title plugin-center-block">{{ plugin.title }}</span>
+                    <div class="plugin-bottom-bar">
+                        <span class="plugin-version">{{ plugin.version }}</span>
+                        <span class="plugin-settings"><i class="icon-arrow-right"></i></span>
+                    </div>
+                </div>
+            </a>
+        {%- endfor %}
+        <script>
+            $('.js-plugin-details').ajaxDialog({
+                title: $T('Payment plugin settings')
+            });
+        </script>
+    {%- endif %}
+{%- endblock %}
