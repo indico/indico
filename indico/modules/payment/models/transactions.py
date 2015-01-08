@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from flask import render_template
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
@@ -217,6 +218,10 @@ class PaymentTransaction(db.Model):
         except KeyError:
             return None
 
+    @property
+    def manual(self):
+        return self.provider == '_manual'
+
     @return_ascii
     def __repr__(self):
         # in case of a new object we might not have the default status set
@@ -227,8 +232,9 @@ class PaymentTransaction(db.Model):
 
     def render_details(self):
         """Renders the transaction details for the registrant details in event management"""
-        if self.provider == '_manual':
-            return 'manual todo'
+        if self.manual:
+            return render_template('payment/transaction_details_manual.html', transaction=self,
+                                   registrant=self.registrant)
         plugin = self.plugin
         if plugin is None:
             return '[plugin not loaded: {}]'.format(self.provider)

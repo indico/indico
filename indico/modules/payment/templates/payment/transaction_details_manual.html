@@ -1,0 +1,5 @@
+{% extends 'payment/transaction_details.html' %}
+{% block details %}
+    <dt>{% trans %}Marked as paid by{% endtrans %}</dt>
+    <dd>{{ transaction.data.changed_by_name }}</dd>
+{% endblock %}
