@@ -16,13 +16,12 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime
 import math
+from datetime import datetime
 
 from flask import redirect, flash, request, session, jsonify
 from werkzeug.exceptions import NotFound
 
-from indico.core.errors import IndicoError
 from indico.modules.payment import settings, event_settings
 from indico.modules.payment.forms import AdminSettingsForm, EventSettingsForm
 from indico.modules.payment.util import get_payment_plugins, get_active_payment_plugins

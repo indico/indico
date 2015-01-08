@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import re
+
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.payment import PaymentPluginMixin
