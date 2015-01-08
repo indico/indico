@@ -60,6 +60,7 @@
                 }),
                 dataType: 'json',
                 complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
                 success: function(data) {
                     paymentContainer.html('');
                     if (handleAjaxError(data)) {

@@ -19,6 +19,15 @@
     'use strict';
 
     global.handleAjaxError = function handleAjaxError(data) {
+        if (data.responseText) {
+            // $.ajax error callback, so data is the xhr object
+            try {
+                data = JSON.parse(data.responseText);
+            } catch(e) {
+                // Can't do much here.. it's an error and we dno't have any details.
+                return true;
+            }
+        }
         if (data.error) {
             IndicoUI.Dialogs.Util.error(data.error);
             return true;
