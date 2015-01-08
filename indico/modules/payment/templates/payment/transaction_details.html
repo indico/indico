@@ -1,0 +1,9 @@
+<dl class="i-data-list">
+    <dt>{% trans %}Payment date{% endtrans %}</dt>
+    <dd>{{ transaction.timestamp | format_datetime }}</dd>
+    <dt>{% trans %}Paid with{% endtrans %}</dt>
+    <dd>{{ plugin.title }}</dd>
+    <dt>{% trans %}Paid amount{% endtrans %}</dt>
+    <dd>{{ format_currency(transaction.amount, transaction.currency, locale=session.lang) }}</dd>
+    {% block details %}{% endblock %}
+</dl>

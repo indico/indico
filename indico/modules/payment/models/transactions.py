@@ -209,6 +209,14 @@ class PaymentTransaction(db.Model):
         self.registrant_id = int(registrant.getId())
         self.event_id = int(registrant.getConference().getId())
 
+    @property
+    def plugin(self):
+        from indico.modules.payment.util import get_payment_plugins
+        try:
+            return get_payment_plugins()[self.provider]
+        except KeyError:
+            return None
+
     @return_ascii
     def __repr__(self):
         # in case of a new object we might not have the default status set
@@ -216,6 +224,16 @@ class PaymentTransaction(db.Model):
                                                                         TransactionStatus(self.status).name,
                                                                         self.provider, self.amount, self.currency,
                                                                         self.timestamp)
+
+    def render_details(self):
+        """Renders the transaction details for the registrant details in event management"""
+        if self.provider == '_manual':
+            return 'manual todo'
+        plugin = self.plugin
+        if plugin is None:
+            return '[plugin not loaded: {}]'.format(self.provider)
+        with plugin.plugin_context():
+            return plugin.render_transaction_details(self)
 
     @classmethod
     def create_next(cls, event_id, registrant_id, amount, currency, action, provider='_manual', data=None):

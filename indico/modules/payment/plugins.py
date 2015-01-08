@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 import re
 
-from flask import session
+from flask import session, render_template
 from flask_pluginengine import render_plugin_template
 from wtforms.fields.core import StringField, BooleanField
 from wtforms.validators import DataRequired
@@ -112,3 +112,15 @@ class PaymentPluginMixin(object):
                 'event_settings': event_settings}
         self.adjust_payment_form_data(data)
         return render_plugin_template('event_payment_form.html', **data)
+
+    def render_transaction_details(self, transaction):
+        """Renders the transaction details for the registrant details in event management
+
+        Override this (or inherit from the template) to show more useful data such as transaction IDs
+
+        :param transaction: the :class:`PaymentTransaction`
+        """
+        # Try using the template in the plugin first in case it extends the default one
+        return render_template(['{}:transaction_details.html'.format(transaction.plugin.name),
+                                'payment/transaction_details.html'],
+                               plugin=transaction.plugin, transaction=transaction, registrant=transaction.registrant)

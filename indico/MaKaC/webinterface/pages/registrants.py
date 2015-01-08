@@ -27,6 +27,7 @@ from flask import render_template
 from indico.core.config import Config
 from indico.util.date_time import format_datetime
 from indico.modules.payment import event_settings as payment_event_settings
+from indico.modules.payment.models.transactions import PaymentTransaction
 from indico.util.i18n import i18nformat
 from indico.web.flask.util import url_for
 from MaKaC import registration
@@ -931,9 +932,8 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                            <td align="right"nowrap>%s&nbsp;&nbsp;%s</td>
                         </tr>
                         """)%(total,currency))
-            transHTML = ""
-            if self._registrant.getTransactionInfo():
-                transHTML = self._registrant.getTransactionInfo().getTransactionHTML()
+            transaction = PaymentTransaction.find_latest_for_registrant(self._registrant)
+            transHTML = transaction.render_details()
             return  i18nformat("""<form action=%s method="POST">
                             <tr>
                               <td class="dataCaptionTD"><span class="dataCaptionFormat">  _("Amount")</span></td>
@@ -955,7 +955,10 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
                               <td colspan="3" class="horizontalLine">&nbsp;</td>
                             </tr>
                      </form>
-                 """)%(quoteattr(url_for('event_mgmt.confModifRegistrants-peformModifyTransaction', self._registrant, isPayed=False)), "%.2f %s"%(self._registrant.getTotal(), self._registrant.getConference().getRegistrationForm().getCurrency()), transHTML,"".join(html))
+                 """) % (quoteattr(url_for('event_mgmt.confModifRegistrants-peformModifyTransaction', self._registrant, isPayed=False)),
+                       "%.2f %s" % (self._registrant.getTotal(), self._registrant.getConference().getRegistrationForm().getCurrency()),
+                       transHTML,
+                       "".join(html))
         elif self._registrant.doPay():
             urlEpayment=""
             if payment_event_settings.get(self._registrant.getConference(), 'enabled') and self._registrant.doPay():
