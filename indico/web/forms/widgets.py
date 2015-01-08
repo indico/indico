@@ -60,3 +60,13 @@ class RadioButtonsWidget(JinjaWidget):
     """Renders a radio button group"""
     def __init__(self):
         super(RadioButtonsWidget, self).__init__('forms/radio_buttons_widget.html')
+
+
+class SwitchWidget(JinjaWidget):
+    """Renders a switch widget"""
+    def __init__(self):
+        super(SwitchWidget, self).__init__('forms/switch_widget.html')
+
+    def __call__(self, field, **kwargs):
+        kwargs['checked'] = getattr(field, 'checked', field.data)
+        return super(SwitchWidget, self).__call__(field, **kwargs)

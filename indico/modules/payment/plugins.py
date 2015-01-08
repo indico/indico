@@ -28,6 +28,7 @@ from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.widgets import SwitchWidget
 from MaKaC.accessControl import AccessWrapper
 
 
@@ -37,7 +38,9 @@ class PaymentPluginSettingsFormBase(IndicoForm):
 
 
 class PaymentEventSettingsFormBase(IndicoForm):
-    enabled = BooleanField(_('Enabled'), description=_('Only enabled payment methods can be selected by registrants.'))
+    enabled = BooleanField(_('Enabled'),
+                           widget=SwitchWidget(),
+                           description=_('Only enabled payment methods can be selected by registrants.'))
     method_name = StringField(_('Name'), [DataRequired()],
                               description=_("The name of the payment method displayed to the user."))
 

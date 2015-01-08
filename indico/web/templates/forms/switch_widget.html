@@ -1,0 +1,6 @@
+<label class="switch">
+    <input id="{{ field.id }}" name="{{ field.name }}" type="checkbox" class="switch-input"
+     {%- if checked %} checked {% endif -%} value="{{ field._value() }}">
+    <span class="switch-label" data-on="Yes" data-off="No"></span>
+    <span class="switch-handle"></span>
+</label>

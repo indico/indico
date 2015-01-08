@@ -268,7 +268,7 @@ $switchTransition: .15s ease-out;
     color: $light-black;
     margin-top: 1em;
 
-    * {
+    *:not(.switch) {
       box-sizing: border-box;
     }
 
