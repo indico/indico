@@ -89,11 +89,11 @@ type("ExclusivePopup", ["Printable"], {
         if(popupStyle === undefined) {
             popupStyle = customStyle;
         }
-        var container = $('<div class="exclusivePopup"/>').css(popupStyle).append(content);
+        this.contentContainer = $('<div class="exclusivePopup"/>').css(popupStyle).append(content);
 
         this.showCloseButton = !!this.title;
         this._makeCanvas();
-        this.canvas.empty().css(customStyle).append(container);
+        this.canvas.empty().css(customStyle).append(this.contentContainer);
         this.dialogElement.css(customStyle);
     },
 

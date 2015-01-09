@@ -24,7 +24,7 @@ import os
 import re
 import time
 
-from flask import request, redirect, Blueprint
+from flask import request, redirect, Blueprint, jsonify, render_template
 from flask import current_app as app
 from flask import url_for as _url_for
 from flask import send_file as _send_file
@@ -275,6 +275,25 @@ def url_rule_to_js(endpoint):
             } for rule in app.url_map.iter_rules(endpoint)
         ]
     }
+
+
+def redirect_or_jsonify(location, flash=True, **json_data):
+    """Returns a redirect or json response.
+
+    If the request was an XHR we return JSON, otherwise we redirect.
+    Unless set to another value, the JSON data includes `success=True`
+
+    :param location: the redirect target
+    :param flash: if the json data should contain flashed messages
+    :param json_data: the data to include in the json response
+    """
+    if request.is_xhr:
+        json_data.setdefault('success', True)
+        if flash:
+            json_data['flashed_messages'] = render_template('flashed_messages.html')
+        return jsonify(**json_data)
+    else:
+        return redirect(location)
 
 
 def _is_office_mimetype(mimetype):

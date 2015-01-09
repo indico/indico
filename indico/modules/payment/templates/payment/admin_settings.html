@@ -26,9 +26,15 @@
         <ul>
             {% for plugin in plugins %}
                 <li>
-                    <a href="{{ url_for('plugins.details', plugin=plugin.name) }}">{{ plugin.title }}</a>
+                    <a class="js-plugin-details" href="{{ url_for('.admin_plugin_settings', plugin=plugin.name) }}">{{ plugin.title }}</a>
                 </li>
             {% endfor %}
         </ul>
     {% endif %}
+
+    <script>
+        $('.js-plugin-details').ajaxDialog({
+            title: $T('Payment plugin settings')
+        });
+    </script>
 {% endblock %}

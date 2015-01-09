@@ -20,7 +20,7 @@
 import posixpath
 from urlparse import urlparse
 
-from flask import request, session, render_template, g
+from flask import request, session, render_template, g, jsonify
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -63,8 +63,12 @@ class WPJinjaMixin:
         :param context: the variables that should be available in the context of
                         the template
         """
-        context['_jinja_template'] = cls._prefix_template(template_name_or_list or cls._template)
-        return cls(g.rh, *wp_args, **context).display()
+        template = cls._prefix_template(template_name_or_list or cls._template)
+        if request.is_xhr:
+            return jsonify(html=render_template(template, **context))
+        else:
+            context['_jinja_template'] = template
+            return cls(g.rh, *wp_args, **context).display()
 
     @classmethod
     def _prefix_template(cls, template):

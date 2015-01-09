@@ -22,6 +22,7 @@ from datetime import datetime
 from flask import redirect, flash, request, session, jsonify
 from werkzeug.exceptions import NotFound
 
+from indico.core.plugins.controllers import RHPluginDetails
 from indico.modules.payment import settings, event_settings
 from indico.modules.payment.forms import AdminSettingsForm, EventSettingsForm
 from indico.modules.payment.util import get_payment_plugins, get_active_payment_plugins
@@ -44,6 +45,11 @@ class RHPaymentAdminSettings(RHAdminBase):
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.admin_settings'))
         return WPPaymentAdmin.render_template('admin_settings.html', form=form, plugins=get_payment_plugins().values())
+
+
+class RHPaymentAdminPluginSettings(RHPluginDetails):
+    """Payment plugin settings (admin)"""
+    back_button_endpoint = 'payment.admin_settings'
 
 
 class RHPaymentEventSettings(RHConferenceModifBase):

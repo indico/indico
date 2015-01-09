@@ -195,6 +195,7 @@ indico_jquery = Bundle(
                'defaults.js',
                'global.js',
                'errors.js',
+               'ajaxdialog.js',
                'clearableinput.js',
                'actioninput.js',
                'fieldarea.js',

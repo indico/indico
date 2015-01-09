@@ -22,6 +22,7 @@ from collections import defaultdict, OrderedDict
 from indico.core.plugins import plugin_engine
 from indico.core.plugins.views import WPPlugins
 from indico.web.forms.base import FormDefaults
+from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.util.i18n import _
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
@@ -48,6 +49,8 @@ class RHPlugins(RHAdminBase):
 
 
 class RHPluginDetails(RHAdminBase):
+    back_button_endpoint = 'plugins.index'
+
     def _checkParams(self):
         self.plugin = plugin_engine.get_plugin(request.view_args['plugin'])
         if not self.plugin or self.plugin.hidden:
@@ -62,6 +65,7 @@ class RHPluginDetails(RHAdminBase):
                 form = plugin.settings_form(obj=defaults)
                 if form.validate_on_submit():
                     plugin.settings.set_multi(form.data)
-                    flash(_(u'Settings saved'), 'success')
-                    return redirect(request.url)
-            return WPPlugins.render_template('details.html', plugin=plugin, form=form)
+                    flash(_(u'Settings saved ({0})').format(plugin.title), 'success')
+                    return redirect_or_jsonify(request.url)
+            return WPPlugins.render_template('details.html', plugin=plugin, form=form,
+                                             back_url=url_for(self.back_button_endpoint))
