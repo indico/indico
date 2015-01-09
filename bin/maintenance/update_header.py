@@ -43,18 +43,15 @@ HEADER = """
 """
 
 
-"""
-Dictionary listing the files for which to change the header.
-
-The key is the extension of the file (without the dot) and the value is another
-dictionary containing two keys:
-  - 'regex' : A regular expression matching comments in the given file type
-  - 'format': A dictionary with the comment characters to add to the header.
-              There must be a `comment_start` inserted before the header,
-              `comment_middle` inserted at the beginning of each line except the
-              first and last one, and `comment_end` inserted at the end of the
-              header. (See the `HEADER` above)
-"""
+# Dictionary listing the files for which to change the header.
+# The key is the extension of the file (without the dot) and the value is another
+# dictionary containing two keys:
+#   - 'regex' : A regular expression matching comments in the given file type
+#   - 'format': A dictionary with the comment characters to add to the header.
+#               There must be a `comment_start` inserted before the header,
+#               `comment_middle` inserted at the beginning of each line except the
+#               first and last one, and `comment_end` inserted at the end of the
+#               header. (See the `HEADER` above)
 SUPPORTED_FILES = {
     'py': {
         'regex': re.compile('((^#|[\r\n]#).*)*'),
@@ -75,46 +72,42 @@ SUPPORTED_FILES = {
         'regex': re.compile('/\*(.|[\r\n])*?\*/'),
         'format': {'comment_start': '/*', 'comment_middle': ' *', 'comment_end': ' */'}},
     'xsl': {
-        'regex': re.compile('<\!--(.|[\r\n])*?-->'),
+        'regex': re.compile('<!--(.|[\r\n])*?-->'),
         'format': {'comment_start': '<!--\n   ', 'comment_middle': '   ', 'comment_end': '-->'}},
 }
 
 
-"""
-The substring which must be part of a comment block in order for the comment to
-be updated by the header.
-"""
+# The substring which must be part of a comment block in order for the comment to be updated by the header.
 SUBSTRING = 'Indico is free software;'
 
 
 USAGE = """
 python bin/maintenance/update_header.py [YEAR] [PATH]
 
-Updates all the header in the supported files ({supported_files}).
+Updates all the headers in the supported files ({supported_files}).
 By default, all the files tracked by git in the current repository are updated
 to the current year.
 
-You can specify a file or directory to update as well as a year (1000-2999) to
-update to, in the order you prefer. This will update all the supported files in
-the scope including those not tracked by git. IF the directory does not contain
-any supported files (or if the file specified is not supported) they (it) will
-not be updated.
-""".format(supported_files=', '.join(SUPPORTED_FILES.iterkeys())).strip()
+You can specify a year (1000-2999) to update to as well as a file or directory.
+This will update all the supported files in the scope including those not tracked
+by git. If the directory does not contain any supported files (or if the file
+specified is not supported) nothing will be updated.
+""".format(supported_files=', '.join(SUPPORTED_FILES)).strip()
 
 
-def gen_header(format, end_year):
-    format['end_year'] = end_year
-    return '\n'.join(line.rstrip() for line in HEADER.format(**format).strip().splitlines())
+def gen_header(data, end_year):
+    data['end_year'] = end_year
+    return '\n'.join(line.rstrip() for line in HEADER.format(**data).strip().splitlines())
 
 
-def _update_header(file_path, year, substring, regex, format):
+def _update_header(file_path, year, substring, regex, data):
     modified = False
     with open(file_path, 'r') as file_read:
         content = file_read.read()
         for match in regex.finditer(content):
             if substring in match.group():
                 print('{0}[{1}-{2}]'.format(file_path, match.start(), match.end()))
-                content = content[:match.start()] + gen_header(format, year) + content[match.end():]
+                content = content[:match.start()] + gen_header(data, year) + content[match.end():]
                 modified = True
         if modified:
             with open(file_path + '.tmp', 'w') as file_write:
@@ -130,65 +123,32 @@ def update_header(file_path, year):
     _update_header(file_path, year, SUBSTRING, SUPPORTED_FILES[ext]['regex'], SUPPORTED_FILES[ext]['format'])
 
 
-def _process_args(*args):
+def _process_args(args):
     year_regex = re.compile('^[12][0-9]{3}$')  # Year range 1000 - 2999
-    year, path, file_ = None, None, None
+    year = date.today().year
 
-    try:
-        if len(sys.argv) >= 4:
-            error_msg = ("[ERROR] At most 2 arguments, the license's end year and\n"
-                         "        a valid path (to a file or directory), are accepted.\n")
-            raise ValueError
-
-        elif len(sys.argv) == 3:  # year and path
-            error_msg = ("[ERROR] The arguments must be a valid path (to a file or directory)\n"
-                         "        and the license's end year, or vice-versa.\n")
-            _, arg1, arg2 = sys.argv
-
-            if year_regex.match(arg1):
-                year = arg1
-                if os.path.isdir(arg2):     # year directory
-                    path = os.path.abspath(arg2)
-                elif os.path.isfile(arg2):  # year file
-                    file_ = os.path.abspath(arg2)
-                else:
-                    raise ValueError
-            elif year_regex.match(arg2):
-                year = arg2
-                if os.path.isdir(arg1):     # directory year
-                    path = os.path.abspath(arg1)
-                elif os.path.isfile(arg1):  # file year
-                    file_ = os.path.abspath(arg1)
-                else:
-                    raise ValueError
-
-        elif len(sys.argv) == 2:  # year or path
-            error_msg = ("[ERROR] The argument must be a valid path (to a file or directory)\n"
-                         "        or the license's end year.\n")
-            arg = sys.argv[1]
-
-            if year_regex.match(arg):
-                year = arg
-            elif os.path.isdir(arg):
-                path = os.path.abspath(arg)
-            elif os.path.isfile(arg):
-                file_ = os.path.abspath(arg)
-            else:
-                raise ValueError
-
-        if year is None:
-            year = date.today().year
-    except ValueError:
-        print(error_msg, file=sys.stderr)
+    # Take year argument if we have one
+    if args and year_regex.match(args[0]):
+        year = int(args[0])
+        args = args[1:]
+    if not args:
+        return year, None, None
+    elif os.path.isdir(args[0]):
+        return year, args[0], None
+    elif os.path.isfile(args[0]):
+        return year, None, args[0]
+    else:
         print(USAGE)
         sys.exit(1)
 
-    return year, path, file_
-
 
 def main():
+    if '-h' in sys.argv or '--help' in sys.argv:
+        print(sys.argv)
+        print(USAGE)
+        sys.exit(1)
 
-    year, path, file_ = _process_args(*sys.argv)
+    year, path, file_ = _process_args(sys.argv[1:])
 
     if path is not None:
         print("updating headers to the year {year} for all the files in {path}...".format(year=year, path=path))
