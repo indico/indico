@@ -50,6 +50,7 @@ class WPJinjaMixin:
     """
 
     template_prefix = ''
+    render_template_func = staticmethod(render_template)
 
     @classmethod
     def render_template(cls, template_name_or_list=None, *wp_args, **context):
@@ -65,7 +66,7 @@ class WPJinjaMixin:
         """
         template = cls._prefix_template(template_name_or_list or cls._template)
         if request.is_xhr:
-            return jsonify(html=render_template(template, **context))
+            return jsonify(html=cls.render_template_func(template, **context))
         else:
             context['_jinja_template'] = template
             return cls(g.rh, *wp_args, **context).display()
@@ -83,7 +84,7 @@ class WPJinjaMixin:
 
     def _getPageContent(self, params):
         template = params.pop('_jinja_template')
-        return render_template(template, **params)
+        return self.render_template_func(template, **params)
 
 
 class WPBase(OldObservable):

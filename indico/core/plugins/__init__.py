@@ -354,9 +354,7 @@ class IndicoPluginBlueprint(PluginBlueprintMixin, IndicoBlueprint):
 
 
 class WPJinjaMixinPlugin(WPJinjaMixin):
-    def _getPageContent(self, params):
-        template = params.pop('_jinja_template')
-        return render_plugin_template(template, **params)
+    render_template_func = staticmethod(render_plugin_template)
 
 
 plugin_engine = IndicoPluginEngine()
