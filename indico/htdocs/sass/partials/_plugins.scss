@@ -20,6 +20,10 @@
 @import 'compass';
 @import 'partials/icons';
 
+.plugins-list h2 {
+    margin-top: 2em;
+}
+
 a.plugin {
     width: 9.2em;
     height: 9em;
@@ -32,11 +36,16 @@ a.plugin {
     background-color: $light-gray;
     position: relative;
     vertical-align: top;
+    @include transition(background-color 0.3s linear);
 
     &.plugin-disabled {
         background-color: $light-red;
         .plugin-bottom-bar .plugin-version {
             color: $red;
+        }
+
+        &:hover {
+            background-color: darken($light-red, $light-color-variation);
         }
     }
 
@@ -45,10 +54,14 @@ a.plugin {
         .plugin-bottom-bar .plugin-version {
             color: $green;
         }
+
+        &:hover {
+            background-color: darken($light-green, $light-color-variation);
+        }
     }
 
     &:hover {
-        color: $dark-blue;
+        background-color: darken($light-gray, $light-color-variation);
     }
 
     .plugin-center-block {
@@ -88,6 +101,14 @@ a.plugin {
 
         .plugin-settings {
             float: right;
+        }
+    }
+
+    &.internal {
+        cursor: default;
+
+        &:hover {
+            color: $light-black;
         }
     }
 }
