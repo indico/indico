@@ -36,7 +36,11 @@ a.plugin {
     background-color: $light-gray;
     position: relative;
     vertical-align: top;
-    @include transition(background-color 0.3s linear);
+    @include transition(background-color $default-transition-duration $default-transition-function);
+
+    &:not(.internal):hover {
+        background-color: darken($light-gray, $light-color-variation);
+    }
 
     &.plugin-disabled {
         background-color: $light-red;
@@ -58,10 +62,6 @@ a.plugin {
         &:hover {
             background-color: darken($light-green, $light-color-variation);
         }
-    }
-
-    &:hover {
-        background-color: darken($light-gray, $light-color-variation);
     }
 
     .plugin-center-block {
@@ -106,9 +106,5 @@ a.plugin {
 
     &.internal {
         cursor: default;
-
-        &:hover {
-            color: $light-black;
-        }
     }
 }
