@@ -255,20 +255,18 @@ class PaymentTransaction(db.Model):
         try:
             next_status = TransactionStatusTransition.next(previous_transaction, action, provider)
         except InvalidTransactionStatus as e:
-            Logger.get('payment').exception(e)
-            Logger.get('payment').exception("Data received: {}".format(data))
+            Logger.get('payment').exception("{}\nData received: {}".format(e, data))
             return None, None
         except InvalidManualTransactionAction as e:
-            Logger.get('payment').exception("Invalid manual action code '{}' on initial status".format(e))
-            Logger.get('payment').exception("Data received: {}".format(data))
+            Logger.get('payment').exception("Invalid manual action code '{}' on initial status\n"
+                                            "Data received: {}".format(e, data))
             return None, None
         except InvalidTransactionAction as e:
-            Logger.get('payment').exception("Invalid action code '{}' on initial status".format(e))
-            Logger.get('payment').exception("Data received: {}".format(data))
+            Logger.get('payment').exception("Invalid manual action code '{}' on initial status\n"
+                                            "Data received: {}".format(e, data))
             return None, None
         except IgnoredTransactionAction as e:
-            Logger.get('payment').warning(e)
-            Logger.get('payment').warning("Data received: {}".format(data))
+            Logger.get('payment').warning("{}\nData received: {}".format(e, data))
             return None, None
         except DoublePaymentTransaction:
             next_status = TransactionStatus.successful
