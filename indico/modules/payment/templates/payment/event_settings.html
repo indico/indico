@@ -54,7 +54,7 @@
     </p>
     <div class="plugins-list">
         {%- for short_name, plugin in plugins %}
-        <a class="js-plugin-edit plugin {%- if plugin in enabled_plugins %} plugin-enabled {% else %} plugin-disabled {% endif -%}"
+        <a id="plugin-{{ plugin.name }}" class="js-plugin-edit plugin {%- if plugin in enabled_plugins %} plugin-enabled {% else %} plugin-disabled {% endif -%}"
            href="{{ url_for('.event_plugin_edit', event, method=short_name) }}">
             <div class="plugin-content">
                 <span class="plugin-icon plugin-center-block">
@@ -62,13 +62,8 @@
                 </span>
                 <span class="plugin-title plugin-center-block">{{ plugin.title }}</span>
                 <div class="plugin-bottom-bar">
-                    <span class="plugin-version">
-                        {%- if plugin in enabled_plugins -%}
-                            <strong>{% trans %}enabled{% endtrans %}</strong>
-                        {%- else -%}
-                            {% trans %}disabled{% endtrans %}
-                        {%- endif -%}
-                    </span>
+                    <span class="plugin-version plugin-status-enabled">{% trans %}enabled{% endtrans %}</span>
+                    <span class="plugin-version plugin-status-disabled">{% trans %}disabled{% endtrans %}</span>
                     <span class="plugin-settings"><i class="icon-arrow-right"></i></span>
                 </div>
             </div>
@@ -84,8 +79,12 @@
 
         $('.js-plugin-edit').ajaxDialog({
             title: $T('Payment method settings'),
-            onClose: function(data) {
-                // TODO: update enabled display using data.plugin/data.enabled (only if data is not null)
+            onClose: function closePluginDialog(data) {
+                if (!data) { return; }
+
+                var plugin = $('#plugin-' + data.plugin);
+                plugin.toggleClass('plugin-enabled', data.enabled);
+                plugin.toggleClass('plugin-disabled', !data.enabled);
             }
         });
     </script>

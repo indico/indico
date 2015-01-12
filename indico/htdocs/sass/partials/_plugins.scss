@@ -44,9 +44,16 @@ a.plugin {
 
     &.plugin-disabled {
         background-color: $light-red;
-        .plugin-bottom-bar .plugin-version {
-            color: $red;
+        .plugin-bottom-bar {
+            &> .plugin-status-enabled {
+                display: none;
+            }
+
+            &> .plugin-status-disabled {
+                color: $red;
+            }
         }
+
 
         &:hover {
             background-color: darken($light-red, $light-color-variation);
@@ -55,8 +62,15 @@ a.plugin {
 
     &.plugin-enabled {
         background-color: $light-green;
-        .plugin-bottom-bar .plugin-version {
-            color: $green;
+        .plugin-bottom-bar {
+            &> .plugin-status-enabled {
+                color: $green;
+                font-weight: bold;
+            }
+
+            &> .plugin-status-disabled {
+                display: none;
+            }
         }
 
         &:hover {
