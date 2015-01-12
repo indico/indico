@@ -48,6 +48,7 @@
         $.ajax({
             type: 'GET',
             url: options.url,
+            complete: IndicoUI.Dialogs.Util.progress(),
             error: handleAjaxError,
             success: function(data) {
                 if (handleAjaxError(data)) {
