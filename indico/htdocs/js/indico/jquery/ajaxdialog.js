@@ -39,7 +39,8 @@
             title: null, // title of the dialog
             url: null, // url to GET the form from
             backSelector: '[data-button-back]', // elements in the form which will close the form
-            onClose: null  // callback to invoke after closing the dialog
+            onClose: null // callback to invoke after closing the dialog. first argument is null if closed manually,
+                          // otherwise the JSON returned by the server
         }, options);
 
         var popup = null;
@@ -59,7 +60,7 @@
         function showDialog(dialogData) {
             popup = new ExclusivePopup(options.title, function() {
                 if (options.onClose) {
-                    options.onClose();
+                    options.onClose(null);
                 }
                 return true;
             }, false, false);

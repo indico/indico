@@ -214,7 +214,7 @@
         });
 
         function highlight_payment() {
-            $('#payment-summary').effect('highlight')
+            $('#payment-summary').effect('highlight');
         }
 
         $('input.permalink').on('keydown', function(e) {
