@@ -58,7 +58,7 @@
            href="{{ url_for('.event_plugin_edit', event, method=short_name) }}">
             <div class="plugin-content">
                 <span class="plugin-icon plugin-center-block">
-                    <img src="/images/maestro.gif">
+                    <img src="{{ plugin.logo_url }}">
                 </span>
                 <span class="plugin-title plugin-center-block">{{ plugin.title }}</span>
                 <div class="plugin-bottom-bar">

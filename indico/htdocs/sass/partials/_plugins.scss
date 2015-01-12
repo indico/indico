@@ -67,7 +67,7 @@ a.plugin {
     .plugin-center-block {
         display: block;
         margin: 0 auto;
-        box-sizing: border-box;
+        @include box-sizing(border-box);
     }
 
     .plugin-content {
@@ -75,10 +75,15 @@ a.plugin {
     }
 
     .plugin-icon {
+        height: 1.3em;
+
         font-size: 3.6em;
         font-weight: bold;
+
         img {
+            margin: auto;
             max-width: 100%;
+            max-height: 100%;
         }
     }
 

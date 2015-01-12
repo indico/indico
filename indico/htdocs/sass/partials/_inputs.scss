@@ -269,7 +269,7 @@ $switchTransition: .15s ease-out;
     margin-top: 1em;
 
     *:not(.switch) {
-      box-sizing: border-box;
+      @include box-sizing(border-box);
     }
 
     .form-group {

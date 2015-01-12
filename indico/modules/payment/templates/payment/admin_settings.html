@@ -27,7 +27,7 @@
             <a class="js-plugin-details plugin" href="{{ url_for('.admin_plugin_settings', plugin=plugin.name) }}">
                 <div class="plugin-content">
                     <span class="plugin-icon plugin-center-block">
-                        <img src="/images/maestro.gif">
+                        <img src="{{ plugin.logo_url }}">
                     </span>
                     <span class="plugin-title plugin-center-block">{{ plugin.title }}</span>
                     <div class="plugin-bottom-bar">

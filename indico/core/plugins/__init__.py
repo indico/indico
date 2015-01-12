@@ -274,7 +274,6 @@ class IndicoPlugin(Plugin):
             return EventSettingsProxy('plugin_{}'.format(cls.name), instance.default_event_settings)
 
 
-
 def include_plugin_js_assets(bundle_name):
     """Jinja template function to generate HTML tags for a plugin JS asset bundle."""
     return Markup('\n'.join('<script src="{}"></script>'.format(url)
