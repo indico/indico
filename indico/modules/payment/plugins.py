@@ -24,6 +24,7 @@ from wtforms.fields.core import StringField, BooleanField
 from wtforms.validators import DataRequired
 
 from indico.core import signals
+from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
@@ -61,6 +62,12 @@ class PaymentPluginMixin(object):
     @property
     def default_settings(self):
         return {'method_name': self.title}
+
+    @classproperty
+    @classmethod
+    def category(self):
+        from indico.core.plugins import PluginCategory
+        return PluginCategory.payment
 
     def can_be_modified(self, user, event):
         """Checks if the user is allowed to enable/disable/modify the payment method.

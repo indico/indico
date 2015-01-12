@@ -33,12 +33,22 @@ from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.models.settings import SettingsProxy, EventSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
+from indico.util.i18n import _
 from indico.util.signals import values_from_signal
+from indico.util.struct.enum import IndicoEnum
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 from MaKaC.webinterface.pages.base import WPJinjaMixin
+
+
+class PluginCategory(unicode, IndicoEnum):
+    search = _('Search')
+    synchronization = _('Synchronization')
+    payment = _('Payment')
+    importers = _('Importers')
+    other = _('Other')
 
 
 class IndicoPlugin(Plugin):
