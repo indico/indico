@@ -39,6 +39,7 @@
             title: null, // title of the dialog
             url: null, // url to GET the form from
             backSelector: '[data-button-back]', // elements in the form which will close the form
+            clearFlashes: true, // clear existing flashed messages before showing new ones
             onClose: null // callback to invoke after closing the dialog. first argument is null if closed manually,
                           // otherwise the JSON returned by the server
         }, options);
@@ -108,6 +109,9 @@
                             return;
                         }
 
+                        if (options.clearFlashes) {
+                            $('#flashed-messages').empty();
+                        }
                         if (data.flashed_messages) {
                             var flashed = $(data.flashed_messages.trim()).children();
                             $('#flashed-messages').append(flashed);
