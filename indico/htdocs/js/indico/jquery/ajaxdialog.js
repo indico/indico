@@ -49,6 +49,7 @@
         $.ajax({
             type: 'GET',
             url: options.url,
+            cache: false, // IE caches GET AJAX requests. WTF.
             complete: IndicoUI.Dialogs.Util.progress(),
             error: handleAjaxError,
             success: function(data) {
