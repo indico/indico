@@ -28,7 +28,7 @@ from indico.modules.payment.forms import AdminSettingsForm, EventSettingsForm
 from indico.modules.payment.util import get_payment_plugins, get_active_payment_plugins
 from indico.modules.payment.views import WPPaymentAdmin, WPPaymentEventManagement, WPPaymentEvent
 from indico.util.i18n import _
-from indico.web.flask.util import url_for
+from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -164,9 +164,10 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
                 event_settings.set(event, 'currency', auto_currency)
                 flash(_("The event's currency has been changed to {}.").format(auto_currency), 'warning')
             if self.protection_overridden:
-                return redirect(request.url)
+                return redirect_or_jsonify(request.url)
             else:
-                return redirect(url_for('.event_settings', event))
+                return redirect_or_jsonify(url_for('.event_settings', event), plugin=self.plugin.name,
+                                           enabled=form.enabled.data)
         widget_attrs = {}
         if not can_modify:
             widget_attrs = {field.short_name: {'disabled': True} for field in form}

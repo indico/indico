@@ -54,8 +54,8 @@
         </p>
         <ul>
             {% for short_name, plugin in plugins %}
-                <li>
-                    <a href="{{ url_for('.event_plugin_edit', event, method=short_name) }}">{{ plugin.title }}</a>
+                <li data-plugin="{{ plugin.name }}">
+                    <a href="{{ url_for('.event_plugin_edit', event, method=short_name) }}" class="js-plugin-edit">{{ plugin.title }}</a>
                     {% if plugin in enabled_plugins %}
                         ({% trans %}<strong>enabled</strong>{% endtrans %})
                     {% else %}
@@ -69,6 +69,13 @@
     <script>
         $('#toggle-payment').on('change', function() {
             this.form.submit();
+        });
+
+        $('.js-plugin-edit').ajaxDialog({
+            title: $T('Payment method settings'),
+            onClose: function(data) {
+                // TODO: update enabled display using data.plugin/data.enabled (only if data is not null)
+            }
         });
     </script>
 {% endblock %}
