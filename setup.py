@@ -488,6 +488,7 @@ if __name__ == '__main__':
 
             [indico.zodb_importers]
             roombooking = indico_zodbimport.modules.roombooking:RoomBookingImporter
+            payment = indico_zodbimport.modules.payment:PaymentImporter
 
             [indico.ext_types]
 
