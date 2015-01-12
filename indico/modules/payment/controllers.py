@@ -25,7 +25,7 @@ from werkzeug.exceptions import NotFound
 from indico.core.plugins.controllers import RHPluginDetails
 from indico.modules.payment import settings, event_settings
 from indico.modules.payment.forms import AdminSettingsForm, EventSettingsForm
-from indico.modules.payment.util import get_payment_plugins, get_active_payment_plugins
+from indico.modules.payment.util import get_payment_plugins, get_active_payment_plugins, get_registrant_params
 from indico.modules.payment.views import WPPaymentAdmin, WPPaymentEventManagement, WPPaymentEvent
 from indico.util.i18n import _
 from indico.web.flask.util import url_for, redirect_or_jsonify
@@ -193,7 +193,8 @@ class RHPaymentEventCheckout(RHRegistrationFormRegistrantBase):
         force_plugin = plugins.items()[0] if len(plugins) == 1 else None  # only one plugin available
         return WPPaymentEvent.render_template('event_checkout.html', event, event=event, registrant=self._registrant,
                                               plugins=plugins.items(), force_plugin=force_plugin, amount=amount,
-                                              currency=currency, checkout_attempt_delta=checkout_attempt_delta)
+                                              currency=currency, checkout_attempt_delta=checkout_attempt_delta,
+                                              registrant_params=get_registrant_params())
 
 
 class RHPaymentEventForm(RHRegistrationFormRegistrantBase):

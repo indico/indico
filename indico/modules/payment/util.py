@@ -18,6 +18,9 @@ from __future__ import unicode_literals
 
 import re
 
+from flask import session, request
+from werkzeug.exceptions import BadRequest
+
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.payment import PaymentPluginMixin
@@ -49,3 +52,12 @@ def register_transaction(event_id, registrant_id, amount, currency, action, prov
         if double_payment:
             notify_double_payment(event_id, registrant_id)
         return new_transaction
+
+
+def get_registrant_params():
+    """Returns a dict containing the URL params for a registrant without an Indico account"""
+    if session.user:
+        return {}
+    registrant_id = request.values['registrantId']
+    authkey = request.values['authkey']
+    return {'registrantId': registrant_id, 'authkey': authkey}

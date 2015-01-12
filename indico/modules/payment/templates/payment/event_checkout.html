@@ -52,12 +52,12 @@
         // Simply call reloadPaymentMethod({your: 'custom data'}) in the payment form template of your plugin and
         // override render_payment_form in the plugin class.
         global.reloadPaymentMethod = function reloadPaymentMethod(extraData) {
+            var data = {{ registrant_params | tojson }};
+            data.method = paymentMethod;
             $.ajax({
                 url: {{ url_for('.event_payment_form', event) | tojson }},
                 type: 'GET',
-                data: $.extend({}, extraData || {}, {
-                    method: paymentMethod
-                }),
+                data: $.extend({}, extraData || {}, data),
                 dataType: 'json',
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
