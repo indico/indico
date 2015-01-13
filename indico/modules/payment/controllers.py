@@ -180,6 +180,9 @@ class RHPaymentEventCheckout(RHRegistrationFormRegistrantBase):
     """Payment/Checkout page for registrants"""
 
     def _process(self):
+        if self._registrant.getPayed():
+            flash(_('You have already paid for your registration.'), 'info')
+            return redirect(url_for('event.confRegistrationFormDisplay', self._conf, **get_registrant_params()))
         checkout_attempt_delta = None
         if not self._registrant.isCheckoutSessionAlive():
             self._registrant._checkout_attempt_dt = datetime.now()
