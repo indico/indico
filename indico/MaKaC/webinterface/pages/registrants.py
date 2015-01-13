@@ -1348,35 +1348,6 @@ class WConfModifRegistrantSessions2PrioritiesModify(WConfModifRegistrantSessions
         return vars
 
 
-
-class WPRegistrantTransactionModify( WPRegistrantModifMain ):
-
-    def _getTabContent( self, params ):
-        wc = WConfModifRegistrantTransactionModify(self._registrant)
-        p={"postURL":quoteattr(str(urlHandlers.UHConfModifRegistrantTransactionPeformModify.getURL(self._registrant)))}
-        return wc.getHTML(p)
-
-class WConfModifRegistrantTransactionModify(WConfModifRegistrantSessionsBase):
-
-    def _getTransactionHTML(self):
-        transaction = self._registrant.getTransactionInfo()
-        tmp=""
-        checkedYes=""
-        checkedNo=""
-        if (transaction is None):
-            checkedNo="selected"
-        elif (transaction is None or transaction.isChangeable()):
-            checkedYes="selected"
-        tmp=  i18nformat("""<select name="isPayed"><option value="yes" %s> _("yes")</option><option value="no" %s> _("no")</option></select>""")%(checkedYes, checkedNo)
-        return tmp
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars ["transation"] = self._getTransactionHTML()
-        vars ["price"] = self._registrant.getTotal()
-        vars ["Currency"] = self._registrant.getRegistrationForm().getCurrency()
-        return vars
-
 class WPRegistrantSessionModify( WPRegistrantModifMain ):
 
     def _getTabContent( self, params ):

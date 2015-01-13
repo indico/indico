@@ -2840,10 +2840,6 @@ class UHConfModifRegistrantSessionPeformModify(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrants-performModifySessions'
 
 
-class UHConfModifRegistrantTransactionPeformModify(URLHandler):
-    _endpoint = 'event_mgmt.confModifRegistrants-peformModifyTransaction'
-
-
 class UHConfModifRegistrantAccoModify(URLHandler):
     _endpoint = 'event_mgmt.confModifRegistrants-modifyAccommodation'
 

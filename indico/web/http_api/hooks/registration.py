@@ -58,18 +58,11 @@ class SetPaidHook(EventBaseHook):
 
     def api_pay(self, aw):
         action = TransactionAction.complete if self._isPayed == '1' else TransactionAction.cancel
-        transaction = register_transaction(event_id=self._conf.getId(),
-                                           registrant_id=self._registrant.getId(),
-                                           amount=self._registrant.getTotal(),
-                                           currency=self._registrant.getCurrency(),
-                                           action=action)
-        if transaction:
-            if transaction.status == TransactionStatus.successful:
-                info = TransactionPayLaterMod({'OrderTotal': self._registrant.getTotal(),
-                                               'Currency': self._registrant.getCurrency()})
-                self._registrant.setTransactionInfo(info)
-            else:
-                self._registrant.setTransactionInfo(None)
+        register_transaction(event_id=self._conf.getId(),
+                             registrant_id=self._registrant.getId(),
+                             amount=self._registrant.getTotal(),
+                             currency=self._registrant.getCurrency(),
+                             action=action)
         return {
             "paid": self._registrant.getPayed(),
             "amount_paid": self._registrant.getTotal()

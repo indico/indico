@@ -531,21 +531,14 @@ class RHRegistrantTransactionPerformModify(RHRegistrantModifBase):
 
     def _process(self):
         action = TransactionAction.complete if self._isPayed == '1' else TransactionAction.cancel
-        transaction = register_transaction(event_id=self._conf.getId(),
-                                           registrant_id=self._registrant.getId(),
-                                           amount=self._registrant.getTotal(),
-                                           currency=self._registrant.getCurrency(),
-                                           action=action,
-                                           provider='_manual',
-                                           data={'changed_by_name': session.user.getFullName(),
-                                                 'changed_by_id': session.user.getId()})
-        if transaction:
-            if transaction.status == TransactionStatus.successful:
-                info = epayment.TransactionPayLaterMod({'OrderTotal': self._registrant.getTotal(),
-                                                        'Currency': self._registrant.getCurrency()})
-                self._registrant.setTransactionInfo(info)
-            else:
-                self._registrant.setTransactionInfo(None)
+        register_transaction(event_id=self._conf.getId(),
+                             registrant_id=self._registrant.getId(),
+                             amount=self._registrant.getTotal(),
+                             currency=self._registrant.getCurrency(),
+                             action=action,
+                             provider='_manual',
+                             data={'changed_by_name': session.user.getFullName(),
+                                   'changed_by_id': session.user.getId()})
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 

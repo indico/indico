@@ -25,7 +25,7 @@ from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.payment import PaymentPluginMixin
 from indico.modules.payment.notifications import notify_double_payment
-from indico.modules.payment.models.transactions import PaymentTransaction
+from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
 
 remove_prefix_re = re.compile('^payment_')
 
@@ -51,6 +51,9 @@ def register_transaction(event_id, registrant_id, amount, currency, action, prov
         db.session.flush()
         if double_payment:
             notify_double_payment(event_id, registrant_id)
+        if new_transaction.status == TransactionStatus.successful:
+            rf = new_transaction.event.getRegistrationForm()
+            rf.getNotification().sendEmailNewRegistrantConfirmPay(rf, new_transaction.registrant)
         return new_transaction
 
 

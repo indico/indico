@@ -17,7 +17,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request
+from babel.numbers import format_currency
+from flask import request, session
 
 import random, time
 from uuid import uuid4
@@ -908,10 +909,12 @@ Please use this information for your payment (except for e-payment):\n
         idRegistrant = registrant.getIdPay()
 
         subject = _("""Payment successful for '%s': %s""") % (strip_ml_tags(registrant.getConference().getTitle()), registrant.getFullName())
-        body = _("""- detail of payment  : \n%s
-- date conference    : %s
-- name conference    : %s
-- registration id    : %s""") % (registrant.getTransactionInfo().getTransactionTxt(), date, getTitle, idRegistrant)
+        transaction = PaymentTransaction.find_latest_for_registrant(registrant)
+        body = _("""- paid amount        : {}
+- date conference    : {}
+- name conference    : {}
+- registration id    : {}""").format(format_currency(transaction.amount, transaction.currency, locale=session.lang),
+                                     date, getTitle, idRegistrant)
         booking = []
         total = 0
         booking.append("""Quantity\t\tItem\t\tunit.price\t\tCost""")
@@ -4992,16 +4995,6 @@ class Registrant(Persistent, Fossilizable):
     def getPayed(self):
         transaction = PaymentTransaction.find_latest_for_registrant(self)
         return transaction and transaction.status == TransactionStatus.successful
-
-    def getTransactionInfo(self):
-        try:
-            return self._transactionInfo
-        except:
-            self.setTransactionInfo(False)
-        return self._transactionInfo
-
-    def setTransactionInfo(self, transactionInfo):
-        self._transactionInfo = transactionInfo
 
     def _generateRandomId(self):
         n = datetime.now()
