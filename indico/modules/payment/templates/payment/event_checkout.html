@@ -57,6 +57,7 @@
             $.ajax({
                 url: {{ url_for('.event_payment_form', event) | tojson }},
                 type: 'GET',
+                cache: false,
                 data: $.extend({}, extraData || {}, data),
                 dataType: 'json',
                 complete: IndicoUI.Dialogs.Util.progress(),
