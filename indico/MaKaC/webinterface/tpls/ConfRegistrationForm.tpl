@@ -50,13 +50,22 @@
 <%block name="content">
     <input type="hidden" value="${confId}" id="conf_id">
 
-    % if payment_enabled and registrant and registrant.doPay():
-        <div class="warning-message-box">
-            <div class="message-text">
-                ${ _("Please notice, your registration won't be complete until you perform the payment") }
-                <a href="#payment" onclick="highlight_payment()">${ _("here") }</a>.
+    % if payment_enabled and registrant:
+        % if registrant.doPay():
+            <div class="warning-message-box">
+                <div class="message-text">
+                    ${ _("Please notice, your registration won't be complete until you perform the payment") }
+                    <a href="#payment" onclick="highlight_payment()">${ _("here") }</a>.
+                </div>
             </div>
-        </div>
+        % elif registrant.payment_status == TransactionStatus.pending:
+            <div class="warning-message-box">
+                <div class="message-text">
+                    ${ _("Your payment is being processed. Please notice, your registration won't be complete until you see a success message") }
+                    <a href="#payment" onclick="highlight_payment()">${ _("here") }</a>. ${ _("Come back to this page soon to check for new status") }.
+                </div>
+            </div>
+        % endif
     % endif
 
     %if not registrant:
@@ -150,9 +159,14 @@
                             ${ _("Paid") }
                             <i class="icon-checkbox-checked"></i>
                         </div>
-                    % else:
+                    % elif registrant.payment_status == TransactionStatus.pending:
                         <div class="payment-status payment-pending right">
                             ${ _("Pending") }
+                            <i class="icon-time"></i>
+                        </div>
+                    % else:
+                        <div class="payment-status payment-not-paid right">
+                            ${ _("Not paid") }
                             <i class="icon-time"></i>
                         </div>
                     % endif
@@ -161,7 +175,7 @@
                     <table width="100%" cellpadding="0" cellspacing="0">
                         ${ payment_info }
                     </table>
-                    % if not payment_done:
+                    % if not payment_done and registrant.payment_status != TransactionStatus.pending:
                             <table class="regform-done-conditions" width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td>

@@ -43,6 +43,7 @@ from MaKaC.webinterface.common.tools import strip_ml_tags
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from MaKaC.i18n import _
+from indico.util.caching import memoize_request
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_datetime, format_date
 from indico.util.string import safe_upper
@@ -4822,7 +4823,8 @@ class Registrant(Persistent, Fossilizable):
         self.setTotal(total)
 
     def doPay(self):
-        return self.getTotal() > 0 and not self.getPayed()
+        return (self.getTotal() > 0 and self.payment_status not in {TransactionStatus.successful,
+                                                                    TransactionStatus.pending})
 
     def setPersonalData(self, data):
 
@@ -4992,9 +4994,14 @@ class Registrant(Persistent, Fossilizable):
         if checkInDate:
             return checkInDate.astimezone(timezone(tz))
 
-    def getPayed(self):
+    @property
+    @memoize_request
+    def payment_status(self):
         transaction = PaymentTransaction.find_latest_for_registrant(self)
-        return transaction and transaction.status == TransactionStatus.successful
+        return transaction.status if transaction else None
+
+    def getPayed(self):
+        return self.payment_status == TransactionStatus.successful
 
     def _generateRandomId(self):
         n = datetime.now()

@@ -293,6 +293,10 @@
         }
 
         &.payment-pending {
+            color: $yellow;
+        }
+
+        &.payment-not-paid {
             color: $red;
         }
 

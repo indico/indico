@@ -32,6 +32,7 @@ from MaKaC.webinterface import wcomponents
 from MaKaC.webinterface.pages.base import WPBase
 from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 from indico.modules.payment import event_settings as payment_event_settings
+from indico.modules.payment.models.transactions import TransactionStatus
 from indico.util.fossilize import fossilize
 from indico.util.i18n import i18nformat
 from indico.web.flask.util import url_for
@@ -735,6 +736,7 @@ class WConfRegistrationForm(WConfDisplayBodyBase):
         wvars["announcement"] = regForm.getAnnouncement()
         wvars["title"] = regForm.getTitle()
         wvars["usersLimit"] = ""
+        wvars["TransactionStatus"] = TransactionStatus
 
         if regForm.getUsersLimit() > 0:
             wvars["usersLimit"] = regForm.getUsersLimit()
