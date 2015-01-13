@@ -211,21 +211,3 @@ class RHPaymentEventForm(RHRegistrationFormRegistrantBase):
             html = self.plugin.render_payment_form(self._conf, self._registrant, self._registrant.getTotal(),
                                                    event_settings.get(self._conf, 'currency'))
         return jsonify(html=html)
-
-
-class RHPaymentEventReturn(RHRegistrationFormRegistrantBase):
-    """Confirmation message after successful payment"""
-
-    def _process(self):
-        event = self._conf
-        flash(_('Your payment request has been processed.'), 'success')
-        return redirect(url_for('event.confRegistrationFormDisplay', event))
-
-
-class RHPaymentEventCancel(RHRegistrationFormRegistrantBase):
-    """Cancellation message"""
-
-    def _process(self):
-        event = self._conf
-        flash(_('Your payment request was cancelled.'), 'info')
-        return redirect(url_for('event.confRegistrationFormDisplay', event))
