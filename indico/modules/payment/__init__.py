@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from indico.core.models.settings import SettingsProxy, EventSettingsProxy
 from indico.modules.payment.plugins import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
                                             PaymentEventSettingsFormBase)
-from indico.util.i18n import _
 
 
 __all__ = ('settings', 'event_settings', 'PaymentPluginMixin', 'PaymentPluginSettingsFormBase',
@@ -38,7 +37,7 @@ settings = SettingsProxy('payment', {
     'summary_email': '',
     'success_email': '',
     'checkout_session_timeout': 10
-})
+}, True)
 
 event_settings = EventSettingsProxy('payment', {
     'enabled': False,
@@ -46,4 +45,4 @@ event_settings = EventSettingsProxy('payment', {
     'conditions': '',
     'summary_email': '',
     'success_email': ''
-})
+}, True)

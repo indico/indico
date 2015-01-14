@@ -152,12 +152,29 @@ def _get(cls, proxy, name, default, **kwargs):
     return setting
 
 
-class SettingsProxy(object):
-    """Proxy class to access settings for a certain module"""
+class SettingsProxyBase(object):
+    """Base proxy class to access settings for a certain module
 
-    def __init__(self, module, defaults=None):
+    :param module: the module to use
+    :param defaults: default values to use if there's nothing in the db
+    :param strict: in strict mode any key that's not in defaults is illegal
+                   and triggers a `ValueError`
+    """
+
+    def __init__(self, module, defaults=None, strict=False):
         self.module = module
         self.defaults = defaults or {}
+        self.strict = strict
+        if strict and not defaults:
+            raise ValueError('cannot use strict mode with no defaults')
+
+    def _check_strict(self, name):
+        if self.strict and name not in self.defaults:
+            raise ValueError('invalid setting: {}.{}'.format(self.module, name))
+
+
+class SettingsProxy(SettingsProxyBase):
+    """Proxy class to access settings for a certain module"""
 
     def get_setting(self, name):
         """Retrieves a single setting.
@@ -165,6 +182,7 @@ class SettingsProxy(object):
         :param name: Setting name
         :return: The setting
         """
+        self._check_strict(name)
         return Setting.get_setting(self.module, name)
 
     def get_all(self, no_defaults=False):
@@ -182,6 +200,7 @@ class SettingsProxy(object):
         :param default: Default value in case the setting does not exist
         :return: The settings's value or the default value
         """
+        self._check_strict(name)
         return _get(Setting, self, name, default)
 
     def set(self, name, value):
@@ -190,6 +209,7 @@ class SettingsProxy(object):
         :param name: Setting name
         :param value: Setting value; must be JSON-serializable
         """
+        self._check_strict(name)
         return Setting.set(self.module, name, value)
 
     def set_multi(self, items):
@@ -197,6 +217,8 @@ class SettingsProxy(object):
 
         :param items: Dict containing the new settings
         """
+        for name in items:
+            self._check_strict(name)
         return Setting.set_multi(self.module, items)
 
     def delete(self, *names):
@@ -204,6 +226,8 @@ class SettingsProxy(object):
 
         :param names: One or more names of settings to delete
         """
+        for name in names:
+            self._check_strict(name)
         return Setting.delete(self.module, names)
 
     def delete_all(self):
@@ -226,12 +250,8 @@ def event_or_id(f):
     return wrapper
 
 
-class EventSettingsProxy(object):
+class EventSettingsProxy(SettingsProxyBase):
     """Proxy class to access event-specific settings for a certain module"""
-
-    def __init__(self, module, defaults=None):
-        self.module = module
-        self.defaults = defaults or {}
 
     @event_or_id
     def get_setting(self, event, name):
@@ -241,6 +261,7 @@ class EventSettingsProxy(object):
         :param name: Setting name
         :return: The setting
         """
+        self._check_strict(name)
         return EventSetting.get_setting(self.module, name, event_id=event)
 
     @event_or_id
@@ -262,6 +283,7 @@ class EventSettingsProxy(object):
         :param default: Default value in case the setting does not exist
         :return: The settings's value or the default value
         """
+        self._check_strict(name)
         return _get(EventSetting, self, name, default, event_id=event)
 
     @event_or_id
@@ -272,6 +294,7 @@ class EventSettingsProxy(object):
         :param name: Setting name
         :param value: Setting value; must be JSON-serializable
         """
+        self._check_strict(name)
         return EventSetting.set(self.module, name, value, event_id=event)
 
     @event_or_id
@@ -281,6 +304,8 @@ class EventSettingsProxy(object):
         :param event: Event (or its ID)
         :param items: Dict containing the new settings
         """
+        for name in items:
+            self._check_strict(name)
         return EventSetting.set_multi(self.module, items, event_id=event)
 
     @event_or_id
@@ -290,6 +315,8 @@ class EventSettingsProxy(object):
         :param event: Event (or its ID)
         :param names: One or more names of settings to delete
         """
+        for name in names:
+            self._check_strict(name)
         return EventSetting.delete(self.module, names, event_id=event)
 
     @event_or_id
