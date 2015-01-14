@@ -140,11 +140,12 @@ class RoomBookingImporter(Importer):
         rb_settings.set('authorized_principals', convert_principal_list(opts['AuthorisedUsersGroups']))
         rb_settings.set('admin_principals', convert_principal_list(opts['Managers']))
         # Assistance emails
-        emails = [email for email in opts['assistanceNotificationEmails'].getValue() if is_valid_mail(email, False)]
+        emails = [email for email in opts['assistanceNotificationEmails']._PluginOption__value
+                  if is_valid_mail(email, False)]
         rb_settings.set('assistance_emails', emails)
         # Simple settings
-        rb_settings.set('notification_hour', opts['notificationHour'].getValue())
-        rb_settings.set('notification_before_days', opts['notificationBefore'].getValue())
+        rb_settings.set('notification_hour', opts['notificationHour']._PluginOption__value)
+        rb_settings.set('notification_before_days', opts['notificationBefore']._PluginOption__value)
         db.session.commit()
 
     def migrate_locations(self):
