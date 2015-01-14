@@ -17,7 +17,8 @@
                             {% if name in field.edit_fields %}
                                 <input class="table-input" type="text" placeholder="{{ row[name] }}"
                                        value="{{ field.get_overridden_value(row, name) }}"
-                                       data-key="{{ field.get_row_key(row) }}" data-field="{{ name }}">
+                                       data-key="{{ field.get_row_key(row) }}" data-field="{{ name }}"
+                                       {% if disabled %}disabled{% endif %}>
                             {% else %}
                                 {{ row[name] }}
                             {% endif %}
