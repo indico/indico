@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 import re
 
 from flask import session, request
-from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
