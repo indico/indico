@@ -58,11 +58,11 @@ class TransactionAction(int, IndicoEnum):
 class TransactionStatus(int, IndicoEnum):
     #: payment attempt succeeded
     successful = 1
-    #: payment attempt failed
-    cancelled = 2
-    #: payment on hold pending approval of merchant
-    failed = 3
     #: payment cancelled manually
+    cancelled = 2
+    #: payment attempt failed
+    failed = 3
+    #: payment on hold pending approval of merchant
     pending = 4
     #: payment rejected after being pending
     rejected = 5
