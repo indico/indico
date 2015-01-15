@@ -472,7 +472,7 @@ class Reservation(Serializer, db.Model):
         db.session.flush()
 
         # Check for conflicts with nonbookable periods
-        if not user.isRBAdmin():
+        if not user.isRBAdmin() and not self.room.is_owned_by(user):
             nonbookable_periods = self.room.nonbookable_periods.filter(NonBookablePeriod.end_dt > self.start_dt)
             for occurrence in self.occurrences:
                 if not occurrence.is_valid:
