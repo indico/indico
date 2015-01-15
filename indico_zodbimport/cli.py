@@ -136,6 +136,18 @@ class Importer(object):
     def connect_zodb(self):
         self.zodb_root = UnbreakingDB(get_storage(self.zodb_uri)).open().root()
 
+    def flushing_iterator(self, iterable, n=5000):
+        """Iterates over `iterable` and flushes the ZODB cache every `n` items.
+
+        :param iterable: an iterable object
+        :param n: number of items to flush after
+        """
+        conn = self.zodb_root._p_jar
+        for i, item in enumerate(iterable, 1):
+            yield item
+            if i % n == 0:
+                conn.sync()
+
     def check_plugin_schema(self, name):
         """Checks if a plugin schema exists in the database.
 
