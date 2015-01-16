@@ -23,20 +23,21 @@
 
     {%- if plugins %}
         <p>{% trans %}The following payment plugins are available:{% endtrans %}</p>
-        {%- for plugin in plugins %}
-            <a class="js-plugin-details plugin" href="{{ url_for('.admin_plugin_settings', plugin=plugin.name) }}">
-                <div class="plugin-content">
-                    <span class="plugin-icon plugin-center-block">
-                        <img src="{{ plugin.logo_url }}">
-                    </span>
-                    <span class="plugin-title plugin-center-block">{{ plugin.title }}</span>
-                    <div class="plugin-bottom-bar">
-                        <span class="plugin-version">{{ plugin.version }}</span>
-                        <span class="plugin-settings"><i class="icon-arrow-right"></i></span>
+        <div class="i-badges-list-left i-payments-list">
+            {%- for plugin in plugins %}
+                <a class="js-plugin-details i-badge i-badge-gray" href="{{ url_for('.admin_plugin_settings', plugin=plugin.name) }}">
+                    <div class="i-badge-legend">
+                        <span class="i-badge-legend-right">{{ plugin.version }}</span>
                     </div>
-                </div>
-            </a>
-        {%- endfor %}
+                    <div class="i-badge-content">
+                        <span class="i-badge-img">
+                            <img src="{{ plugin.logo_url }}">
+                        </span>
+                        <span class="i-badge-title">{{ plugin.title }}</span>
+                    </div>
+                </a>
+            {%- endfor %}
+        </div>
         <script>
             $('.js-plugin-details').ajaxDialog({
                 title: $T('Payment plugin settings')

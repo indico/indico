@@ -1,0 +1,71 @@
+/*
+ * This file is part of Indico.
+ * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+.i-payments-list {
+    & > .i-badge {
+        @include transition(background-color $default-transition-duration $default-transition-function);
+
+        width: 10em;
+        height: 10em;
+
+        &:not(.i-badge-disabled):hover {
+            background-color: darken($light-gray, 2*$light-color-variation);
+        }
+
+        &.i-payment-enabled {
+            background-color: $light-green;
+
+            &, & * { color: $green; }
+
+            &:hover {
+                background-color: darken($light-green, $light-color-variation);
+            }
+
+            & > .i-badge-legend {
+                border-color: $dark-green;
+
+                &> .i-payment-status-disabled { display: none; }
+            }
+        }
+
+        &.i-payment-disabled {
+            background-color: $light-red;
+
+            &, & * { color: $red; }
+
+            &:hover {
+                background-color: darken($light-red, $light-color-variation);
+            }
+
+            & > .i-badge-legend {
+                border-color: $dark-red;
+
+                &> .i-payment-status-enabled { display: none; }
+            }
+        }
+
+        & > .i-badge-content {
+            height: 7em;
+
+            & > .i-badge-title { font-size: 1em; }
+
+            & .i-badge-img > img { max-height: 4em; }
+        }
+    }
+}

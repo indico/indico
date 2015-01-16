@@ -16,114 +16,32 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
-@import 'compass';
-@import 'partials/icons';
 
-.plugins-list h2 {
-    margin-top: 2em;
-}
+.i-plugins-list {
+    & > h2 { margin-top: 2em; }
 
-a.plugin {
-    width: 9.2em;
-    height: 9em;
-    padding: 0.8em;
-    margin: 0.8em;
-    text-align: center;
-    display: inline-block;
-    box-shadow: 0 2px 1px rgba($black, 0.1);
-    color: $light-black;
-    background-color: $light-gray;
-    position: relative;
-    vertical-align: top;
-    @include transition(background-color $default-transition-duration $default-transition-function);
+    & > .i-badges-list-left {
+        & > .i-badge {
+            @include transition(background-color $default-transition-duration $default-transition-function);
 
-    &:not(.internal):hover {
-        background-color: darken($light-gray, $light-color-variation);
-    }
+            width: 10em;
 
-    &.plugin-disabled {
-        background-color: $light-red;
-        .plugin-bottom-bar {
-            &> .plugin-status-enabled {
-                display: none;
+            &.i-badge-disabled {
+                background-color: lighten($dark-blue, $light-color-variation);
+                background: repeating-linear-gradient(
+                    -40deg,
+                    $dark-blue,
+                    $dark-blue 10px,
+                    lighten($dark-blue, 0.5*$light-color-variation) 10px,
+                    lighten($dark-blue, 0.5*$light-color-variation) 20px
+                );
             }
 
-            &> .plugin-status-disabled {
-                color: $red;
-            }
-        }
-
-
-        &:hover {
-            background-color: darken($light-red, $light-color-variation);
-        }
-    }
-
-    &.plugin-enabled {
-        background-color: $light-green;
-        .plugin-bottom-bar {
-            &> .plugin-status-enabled {
-                color: $green;
-                font-weight: bold;
+            &:not(.i-badge-disabled):hover {
+                background-color: darken($dark-blue, 2*$light-color-variation);
             }
 
-            &> .plugin-status-disabled {
-                display: none;
-            }
+            & > .i-badge-content { height: 4.2em; }
         }
-
-        &:hover {
-            background-color: darken($light-green, $light-color-variation);
-        }
-    }
-
-    .plugin-center-block {
-        display: block;
-        margin: 0 auto;
-        @include box-sizing(border-box);
-    }
-
-    .plugin-content {
-        width: 100%;
-    }
-
-    .plugin-icon {
-        height: 1.3em;
-
-        font-size: 3.6em;
-        font-weight: bold;
-
-        img {
-            margin: auto;
-            max-width: 100%;
-            max-height: 100%;
-        }
-    }
-
-    .plugin-title {
-        font-size: 1.07em;
-        margin-top: 0.8em;
-    }
-
-    .plugin-bottom-bar {
-        position: absolute;
-        bottom: 0.6em;
-        left: 0.8em;
-        right: 0.8em;
-        text-align: left;
-        color: $gray;
-
-        .plugin-version {
-            float: left;
-        }
-
-        .plugin-settings {
-            float: right;
-        }
-    }
-
-    &.internal {
-        cursor: default;
     }
 }

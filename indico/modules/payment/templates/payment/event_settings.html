@@ -52,20 +52,19 @@
                 The following payment methods are available. You can enable, disable and configure them by clicking on them.
             {%- endtrans -%}
         </p>
-        <div class="plugins-list">
+        <div class="i-badges-list-left i-payments-list">
             {%- for short_name, plugin in plugins %}
-                <a id="plugin-{{ plugin.name }}" class="js-plugin-edit plugin {%- if plugin in enabled_plugins %} plugin-enabled {% else %} plugin-disabled {% endif -%}"
+                <a id="plugin-{{ plugin.name }}" class="js-plugin-edit i-badge {%- if plugin in enabled_plugins %} i-payment-enabled {% else %} i-payment-disabled {% endif -%}"
                    href="{{ url_for('.event_plugin_edit', event, method=short_name) }}">
-                    <div class="plugin-content">
-                        <span class="plugin-icon plugin-center-block">
+                    <div class="i-badge-legend">
+                        <span class="i-badge-legend-right i-payment-status-enabled">{% trans %}enabled{% endtrans %}</span>
+                        <span class="i-badge-legend-right i-payment-status-disabled">{% trans %}disabled{% endtrans %}</span>
+                    </div>
+                    <div class="i-badge-content">
+                        <span class="i-badge-img">
                             <img src="{{ plugin.logo_url }}">
                         </span>
-                        <span class="plugin-title plugin-center-block">{{ plugin.title }}</span>
-                        <div class="plugin-bottom-bar">
-                            <span class="plugin-version plugin-status-enabled">{% trans %}enabled{% endtrans %}</span>
-                            <span class="plugin-version plugin-status-disabled">{% trans %}disabled{% endtrans %}</span>
-                            <span class="plugin-settings"><i class="icon-arrow-right"></i></span>
-                        </div>
+                        <span class="i-badge-title">{{ plugin.title }}</span>
                     </div>
                 </a>
             {%- endfor %}
@@ -83,8 +82,8 @@
                 if (!data) { return; }
 
                 var plugin = $('#plugin-' + data.plugin);
-                plugin.toggleClass('plugin-enabled', data.enabled);
-                plugin.toggleClass('plugin-disabled', !data.enabled);
+                plugin.toggleClass('i-payment-enabled', data.enabled);
+                plugin.toggleClass('i-payment-disabled', !data.enabled);
             }
         });
     </script>
