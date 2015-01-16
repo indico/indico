@@ -1,0 +1,16 @@
+{% extends 'payment/emails/payment_confirmation_base.txt' %}
+
+{% macro get_body() -%}
+Dear {{ registrant.getFirstName() }} {{ registrant.getFamilyName() }},
+
+{{ success_email_msg }}
+
+Payment details:
+
+Amount: {{ format_currency(amount, currency, locale='en_GB') }}
+Registrant ID: {{ registrant.getId() }}
+Link to your registration: {{ reg_page }}
+
+Regards.
+
+{%- endmacro %}

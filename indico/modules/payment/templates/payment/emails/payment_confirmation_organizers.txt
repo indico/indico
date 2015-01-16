@@ -1,0 +1,16 @@
+{% extends 'payment/emails/payment_confirmation_base.txt' %}
+
+{% macro get_body() -%}
+Dear organizers of the event {{ event.getTitle() }},
+
+A registrant has successfully completed a payment.
+
+Payment details:
+
+Amount: {{ format_currency(amount, currency, locale='en_GB') }}
+Registrant ID: {{ registrant.getId() }}
+Link to registrant's page: {{ reg_page }}
+
+Regards.
+
+{%- endmacro %}

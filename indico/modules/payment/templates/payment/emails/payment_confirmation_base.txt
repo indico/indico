@@ -1,0 +1,3 @@
+{% macro get_subject() -%}
+    Payment confirmation for {{ event.getTitle() }}: {{ registrant.getFirstName() }} {{ registrant.getFamilyName() }}
+{%- endmacro %}

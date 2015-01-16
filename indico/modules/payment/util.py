@@ -23,7 +23,7 @@ from flask import session, request
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.payment import PaymentPluginMixin
-from indico.modules.payment.notifications import notify_double_payment
+from indico.modules.payment.notifications import notify_double_payment, notify_payment_confirmation
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
 
 remove_prefix_re = re.compile('^payment_')
@@ -51,8 +51,7 @@ def register_transaction(registrant, amount, currency, action, provider=None, da
         if double_payment:
             notify_double_payment(registrant)
         if new_transaction.status == TransactionStatus.successful:
-            rf = new_transaction.event.getRegistrationForm()
-            rf.getNotification().sendEmailNewRegistrantConfirmPay(rf, new_transaction.registrant)
+            notify_payment_confirmation(event_id, registrant_id, amount)
         return new_transaction
 
 

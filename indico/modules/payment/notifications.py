@@ -18,6 +18,9 @@ from flask import render_template
 
 from indico.core.notifications import email_sender, make_email
 from indico.modules.payment import event_settings as payment_event_settings
+from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
+from MaKaC.conference import ConferenceHolder
 
 
 @email_sender
@@ -36,3 +39,37 @@ def notify_amount_inconsistency(registrant, amount):
     body = render_template('payment/emails/payment_inconsistency_email_to_manager.txt', event=event,
                            registrant=registrant, amount=amount, currency=currency)
     return make_email(to, subject='Payment inconsistency', body=body)
+
+
+@email_sender
+def notify_payment_confirmation(event_id, registrant_id, amount):
+    event = ConferenceHolder().getById(event_id)
+    registrant = event.getRegistrantById(registrant_id)
+    if not registrant:
+        return
+    reg_form = registrant.getRegistrationForm()
+    from_address = reg_form.getNotificationSender()
+    currency = payment_event_settings.get(event, 'currency')
+
+    # Send email to organizers
+    notification = reg_form.getNotification()
+    to_list = notification.getToList()
+    cc_list = notification.getCCList()
+    if to_list or cc_list:
+        reg_page = url_for('event_mgmt.confModifRegistrants-modification', registrant, _external=True, _secure=True)
+        tpl = get_template_module('payment/emails/payment_confirmation_organizers.txt', event=event,
+                                  registrant=registrant, amount=amount, currency=currency, reg_page=reg_page)
+        yield make_email(to_list, cc_list, from_address=from_address, subject=tpl.get_subject(), body=tpl.get_body())
+
+    # Send email to the registrant
+    if reg_form.isSendPaidEmail():
+        success_email_msg = payment_event_settings.get(event, 'success_email')
+        params = {}
+        if not registrant.getAvatar():
+            params = {'registrant_id': registrant_id, 'authkey': registrant.getRandomId()}
+        reg_page = url_for('event.confRegistrationFormDisplay', event, _external=True, _secure=True, **params)
+        tpl = get_template_module('payment/emails/payment_confirmation_registrant.txt', event=event,
+                                  registrant=registrant, amount=amount, currency=currency,
+                                  success_email_msg=success_email_msg, reg_page=reg_page)
+        yield make_email(registrant.getEmail(), from_address=from_address, subject=tpl.get_subject(),
+                         body=tpl.get_body())
