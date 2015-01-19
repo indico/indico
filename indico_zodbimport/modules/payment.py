@@ -202,6 +202,8 @@ class PaymentImporter(Importer):
         }
 
     def _get_fiaspay_data(self, ti_data, event):
+        if ti_data['amount'] is None:
+            raise ValueError('Transaction has None amount')
         return {
             'amount': float(ti_data['amount']),
             'currency': event._registrationForm._currency,
