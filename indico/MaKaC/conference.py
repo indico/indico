@@ -79,7 +79,7 @@ from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
 from MaKaC.accessControl import AccessController, AdminList
 from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NotFoundError, FormValuesError
-from MaKaC import registration, epayment
+from MaKaC import registration
 from MaKaC.evaluation import Evaluation
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.user import AvatarHolder
@@ -4643,15 +4643,6 @@ class Conference(CommonObjectBase, Locatable):
         return None
 
     ## End of Videoconference bookings related
-
-    def getModPay(self):
-        try:
-            if self._modPay is None:
-                self._modPay= epayment.EPayment(self)
-        except AttributeError,e:
-            self._modPay= epayment.EPayment(self)
-        return self._modPay
-
 
     def getRegistrants(self):
         try:

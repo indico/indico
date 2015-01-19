@@ -16,8 +16,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import re
 import os
+import re
 import string
 import urlparse
 
@@ -2718,30 +2718,6 @@ class UHConfRegistrationFormModify(URLHandler):
 
 class UHConfRegistrationFormPerformModify(URLHandler):
     _endpoint = 'event.confRegistrationFormDisplay-performModify'
-
-
-###################################################################################
-## epayment url
-class UHConfModifEPayment(URLHandler):
-    _endpoint = 'event_mgmt.confModifEpayment'
-
-
-class UHConfModifEPaymentEnableSection(URLHandler):
-    _endpoint = 'event_mgmt.confModifEpayment-enableSection'
-
-
-class UHConfModifEPaymentChangeStatus(URLHandler):
-    _endpoint = 'event_mgmt.confModifEpayment-changeStatus'
-
-
-class UHConfModifEPaymentdetailPaymentModification(URLHandler):
-    _endpoint = 'event_mgmt.confModifEpayment-dataModif'
-
-
-class UHConfModifEPaymentPerformdetailPaymentModification(URLHandler):
-    _endpoint = 'event_mgmt.confModifEpayment-performDataModif'
-
-###################################################################################
 
 
 class UHConfModifRegForm(URLHandler):

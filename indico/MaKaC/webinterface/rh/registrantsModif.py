@@ -33,11 +33,10 @@ from MaKaC.common import utils
 from MaKaC.registration import SocialEvent, MiscellaneousInfoGroup
 from MaKaC.webinterface.common import registrantNotificator
 from MaKaC.errors import MaKaCError, NotFoundError
-from MaKaC import epayment
 from MaKaC.i18n import _
 from MaKaC.webinterface.rh import registrationFormModif
 from MaKaC.webinterface.rh.registrationFormModif import RHRegistrationFormModifBase
-from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction, TransactionStatus
+from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction
 from indico.modules.payment.util import register_transaction
 from indico.web.flask.util import send_file, url_for
 

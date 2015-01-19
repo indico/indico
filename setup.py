@@ -476,7 +476,6 @@ if __name__ == '__main__':
           license="http://www.gnu.org/licenses/gpl-3.0.txt",
           entry_points="""
             [console_scripts]
-
             indico_scheduler = indico.modules.scheduler.daemon_script:main
             indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main
             indico_ctl = MaKaC.consoleScripts.indicoCtl:main
@@ -491,12 +490,9 @@ if __name__ == '__main__':
             payment = indico_zodbimport.modules.payment:PaymentImporter
 
             [indico.ext_types]
-
             Collaboration = MaKaC.plugins.Collaboration
-            EPayment = MaKaC.plugins.EPayment
 
             [indico.ext]
-
             Collaboration.EVO = MaKaC.plugins.Collaboration.EVO
             Collaboration.WebEx = MaKaC.plugins.Collaboration.WebEx
             Collaboration.Vidyo = MaKaC.plugins.Collaboration.Vidyo
@@ -504,11 +500,6 @@ if __name__ == '__main__':
             Collaboration.RecordingManager = MaKaC.plugins.Collaboration.RecordingManager
             Collaboration.RecordingRequest = MaKaC.plugins.Collaboration.RecordingRequest
             Collaboration.WebcastRequest = MaKaC.plugins.Collaboration.WebcastRequest
-
-            EPayment.payPal = MaKaC.plugins.EPayment.payPal
-            EPayment.worldPay = MaKaC.plugins.EPayment.worldPay
-            EPayment.yellowPay = MaKaC.plugins.EPayment.yellowPay
-            EPayment.skipjack = MaKaC.plugins.EPayment.skipjack
             """,
           zip_safe=False,
           packages=foundPackages,

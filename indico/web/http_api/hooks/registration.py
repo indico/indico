@@ -18,12 +18,11 @@
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.conference import ConferenceHolder
-from MaKaC.epayment import TransactionPayLaterMod
 
 from indico.core.fossils.registration import IRegFormRegistrantBasicFossil, IRegFormRegistrantFullFossil
 from indico.modules.payment import event_settings as payment_event_settings
 
-from indico.modules.payment.models.transactions import TransactionAction, TransactionStatus
+from indico.modules.payment.models.transactions import TransactionAction
 from indico.modules.payment.util import register_transaction
 from indico.web.http_api.hooks.base import HTTPAPIHook, DataFetcher
 from indico.web.http_api.hooks.event import EventBaseHook

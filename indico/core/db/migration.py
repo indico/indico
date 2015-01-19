@@ -51,8 +51,7 @@ globalname_dict = {
 }
 
 modulename_dict = {
-    "IndexedCatalog.BTrees.": "BTrees.",
-    "MaKaC.plugins.EPayment.CERNYellowPay.": "indico.ext.epayment.cern."
+    "IndexedCatalog.BTrees.": "BTrees."
 }
 
 

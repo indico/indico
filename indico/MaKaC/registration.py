@@ -830,11 +830,12 @@ Congratulations, your registration to %s was successful%s See your information b
             return False
 
     def sendEmailNewRegistrantDetailsPay(self, regForm, registrant):
+        raise NotImplementedError('to be removed or migrated')
         fromAddr = regForm.getNotificationSender()
         date = registrant.getConference().getStartDate()
         getTitle = strip_ml_tags(registrant.getConference().getTitle())
         idRegistrant = registrant.getIdPay()
-        detailPayment = registrant.getConference().getModPay().getPaymentDetails()
+        detailPayment = None
         subject = _("""Payment summary for '%s': %s""") % (strip_ml_tags(registrant.getConference().getTitle()), registrant.getFullName())
         body = _("""
 Please use this information for your payment (except for e-payment):\n

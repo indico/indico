@@ -919,14 +919,6 @@ class WRegFormSectionBannerModif(WBannerModif):
         title=target.getTitle()
         WBannerModif.__init__(self, path, itemType, title)
 
-class WEpaymentBannerModif(WBannerModif):
-
-    def __init__( self, target, conf ):
-        path=[{"url": urlHandlers.UHConfModifEPayment.getURL(conf), "title":_("Epayment setup")}]
-
-        itemType="Epayment plugin"
-        title=target.getTitle()
-        WBannerModif.__init__(self, path, itemType, title)
 
 class WParticipantsBannerModif(WBannerModif):
 

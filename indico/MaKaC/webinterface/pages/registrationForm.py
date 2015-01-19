@@ -57,7 +57,6 @@ class WPConfModifRegFormBase(conferences.WPConferenceModifBase):
         self._tabRegistrants = self._tabCtrl.newTab("registrants", _("Registrants"),
                                                     urlHandlers.UHConfModifRegistrantList.getURL(self._conf))
         self._tabStats = self._tabCtrl.newTab('stats', _("Stats"), url_for('event_mgmt.registration_stats', self._conf))
-        self._tabEPay = self._tabCtrl.newTab("epay", _("e-payment"), urlHandlers.UHConfModifEPayment.getURL(self._conf))
         self._tabPayment = self._tabCtrl.newTab("payment", _("Payment"), url_for('payment.event_settings', self._conf))
         self._tabETicket = self._tabCtrl.newTab("eticket", _("E-Ticket"), url_for('event_mgmt.confModifETicket',
                                                                                   self._conf))
@@ -68,7 +67,7 @@ class WPConfModifRegFormBase(conferences.WPConferenceModifBase):
             self._tabRegFormSetup.disable()
             self._tabRegistrants.disable()
             self._tabStats.disable()
-            self._tabEPay.disable()
+            self._tabPayment.disable()
             self._tabRegistrationPreview.disable()
             self._tabETicket.disable()
 
@@ -840,37 +839,6 @@ class WConfRegFormDeactivated(WConfDisplayBodyBase):
         return wvars
 
 
-class WPRegistrationFormconfirmBooking(conferences.WPConferenceDefaultDisplayBase):
-    navigationEntry = navigation.NERegistrationFormDisplay
-
-    def __init__(self, rh, conf, reg):
-        conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
-        self._registrant = reg
-
-    def _getBody(self, params):
-        wc = WRegistrationFormconfirmBooking(self._registrant)
-        return wc.getHTML()
-
-    def _defineSectionMenu(self):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._regFormOpt)
-
-
-class WRegistrationFormconfirmBooking(wcomponents.WTemplated):
-    def __init__(self, registrant):
-        self._registrant = registrant
-        self._conf = self._registrant.getConference()
-        self.modPay = self._conf.getModPay()
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        wvars["modPayDetails"] = self.modPay.getPaymentDetails()
-        wvars["payMods"] = self.modPay.getSortedEnabledModPay()
-        wvars["registrant"] = self._registrant
-        wvars["conf"] = self._conf
-        wvars["lang"] = session.lang
-        wvars["secure"] = request.is_secure
-        return wvars
 
 
 class WPRegistrationFormSignIn(conferences.WPConferenceDefaultDisplayBase):
