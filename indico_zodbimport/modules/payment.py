@@ -19,7 +19,7 @@ from functools import partial
 
 from indico.core.db import db
 from indico.core.models.settings import EventSetting
-from indico.modules.payment import event_settings
+from indico.modules.payment import event_settings as payment_event_settings
 from indico.modules.payment import settings as global_settings
 from indico.util.console import cformat
 from indico.util.date_time import as_utc
@@ -71,7 +71,7 @@ class PaymentImporter(Importer):
 
         count = 0
 
-        EventSetting.delete_all(event_settings.module)
+        EventSetting.delete_all(payment_event_settings.module)
         for event in committing_iterator(self._iter_events()):
             old_payment = event._modPay
             default_conditions = global_settings.get('conditions')
@@ -88,7 +88,7 @@ class PaymentImporter(Importer):
                 'summary_email': getattr(old_payment, 'receiptMsg', default_summary_email),
                 'success_email': getattr(old_payment, 'successMsg', default_success_email),
             }
-            event_settings.set_multi(event, settings)
+            payment_event_settings.set_multi(event, settings)
 
             count += 1
             print cformat("%{cyan}<EventSettings(id={id:>6}, enabled={enabled}, "
