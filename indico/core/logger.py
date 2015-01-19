@@ -283,8 +283,7 @@ class Logger:
         fpath = os.path.join(configDir, fname)
 
         if not os.access(os.path.dirname(fpath), os.W_OK):
-            # if the file in the config is not accessible, use a "local" one
-            fpath = os.path.join(os.getcwd(), '.indico.log')
+            raise IOError("Logfile can't be writen")
 
         return fpath.replace('\\', '\\\\')
 
