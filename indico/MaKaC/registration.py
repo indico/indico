@@ -190,6 +190,7 @@ class RegistrationForm(Persistent):
 
         return form
 
+    @memoize_request
     def getCurrency(self):
         return payment_event_settings.get(self._conf, 'currency')
 
