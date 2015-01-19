@@ -67,7 +67,8 @@ class IndicoPlugin(Plugin):
     and can be connected to custom functions using :meth:`connect`.
     """
 
-    #: WTForm for the plugin's settings. All fields must return JSON-serializable types.
+    #: WTForm for the plugin's settings (requires `configurable=True`).
+    #: All fields must return JSON-serializable types.
     settings_form = None
     #: A dictionary which can contain the kwargs for a specific field in the `settings_form`.
     settings_form_field_opts = {}
@@ -75,9 +76,8 @@ class IndicoPlugin(Plugin):
     default_settings = {}
     #: A dictionary containing default values for event-specific settings
     default_event_settings = {}
-    #: If the plugin should be hidden in the admin interface (useful for plugins which only
-    #: provide a base for other plugins)
-    hidden = False
+    #: If the plugin should link to a details/config page in the admin interface
+    configurable = False
     #: The group category that the plugin belongs to
     category = None
 
@@ -89,6 +89,7 @@ class IndicoPlugin(Plugin):
         the other overridable methods in this class will not be
         called anymore.
         """
+        assert self.configurable or not self.settings_form, 'Non-configurable plugin cannot have a settings form'
         self.alembic_versions_path = os.path.join(self.root_path, 'migrations')
         self.connect(signals.plugin.cli, self.add_cli_command)
         self.connect(signals.plugin.shell_context, lambda _, add_to_context: self.extend_shell_context(add_to_context))

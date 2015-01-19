@@ -11,8 +11,8 @@
             <div class="i-badges-list-left">
                 {% for plugin in plugins %}
                     <a class="i-badge
-                    {%- if plugin.hidden %} i-badge-disabled{% endif %}"
-                    {%- if not plugin.hidden %} href="{{ url_for('.details', plugin=plugin.name) }}"
+                    {%- if not plugin.configurable %} i-badge-disabled{% endif %}"
+                    {%- if plugin.configurable %} href="{{ url_for('.details', plugin=plugin.name) }}"
                     {%- else %} title="{% trans %}This plugin has no configurable options{% endtrans %}"
                     {%- endif %}>
                         <div class="i-badge-legend">
