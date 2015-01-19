@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import re
 from functools import partial
 
@@ -107,23 +109,22 @@ class PaymentImporter(Importer):
         warnings = 0
 
         for event, registrant, transaction in committing_iterator(self._iter_transactions()):
-            data = self._get_transaction_data(transaction, event)
-
-            if data is None:
-                print cformat("%{red!}Unknown transaction type `{0.__class__.__name__}` "
-                              "(evt: {1}, reg: {2})!").format(transaction, event.id, registrant._id)
+            try:
+                data = self._get_transaction_data(transaction, event)
+            except ValueError as e:
+                print cformat("%{red!}{0} (evt: {1}, reg: {2})").format(e, event.id, registrant._id)
                 errors += 1
                 continue
 
-            elif data['provider'] == '_manual' and data['amount'] == 0.0:
+            if data['provider'] == '_manual' and data['amount'] == 0.0:
                 print cformat("%{yellow!}Skipping {0[provider]} transaction (evt: {1}, reg: {2}) "
-                              "with zero amount: {0[amount]} {0[currency]}.").format(data, event.id, registrant._id)
+                              "with zero amount: {0[amount]} {0[currency]}").format(data, event.id, registrant._id)
                 warnings += 1
                 continue
 
             elif data['amount'] < 0.0:
                 print cformat("%{yellow!}Skipping {0[provider]} transaction (evt: {1}, reg: {2}) "
-                              "with negative amount: {0[amount]} {0[currency]}.").format(data, event.id, registrant._id)
+                              "with negative amount: {0[amount]} {0[currency]}").format(data, event.id, registrant._id)
                 warnings += 1
                 continue
 
@@ -160,7 +161,7 @@ class PaymentImporter(Importer):
         try:
             method = mapping[ti.__class__.__name__]
         except KeyError:
-            return None
+            raise ValueError('Unknown transaction type: {}'.format(ti.__class__.__name__))
 
         return method(ti._Data)
 
