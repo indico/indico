@@ -2823,7 +2823,7 @@ class Conference(CommonObjectBase, Locatable):
             #else:
             #    entries = self.getSchedule().getEntriesOnDay(sDate.astimezone(timezone(self.getTimezone())))[:]
             entries = self.getSchedule().getEntries()[:]
-            self.getSchedule().moveEntriesBelow(diff, entries)
+            self.getSchedule().moveEntriesBelow(diff, entries, check=check)
         #datetime object is non-mutable so we must "force" the modification
         #   otherwise ZODB won't be able to notice the change
         self.notifyModification()

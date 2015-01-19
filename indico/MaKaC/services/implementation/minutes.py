@@ -101,8 +101,7 @@ class MinutesEdit(TextModificationBase, ProtectedModificationService):
     def _getCompiledMinutes(self):
         minutes = []
         entrylist = self._target.getSchedule().getEntries()
-        cList = self._target.getContributionList()
-        cList.sort(sortContributionByDate)
+
         for c in entrylist:
             if isinstance(c.getOwner(), conference.SessionSlot):
                 self._getSessionMinutes(minutes, c.getOwner().getSession())

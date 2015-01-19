@@ -119,8 +119,8 @@ def sortDomainsByName(x,y):
 def sortFilesByName(x,y):
     return cmp(x.getName().lower(),y.getName().lower())
 
-def sortContributionByDate(x,y):
-    return cmp(x.getStartDate(),y.getStartDate())
+def sortContributionByDate(x, y):
+    return cmp(x.getStartDate(), y.getStartDate())
 
 def sortSlotByDate(x,y):
     return cmp(x.getStartDate(),y.getStartDate())

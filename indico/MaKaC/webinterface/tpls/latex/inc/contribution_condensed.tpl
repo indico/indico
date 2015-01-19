@@ -94,7 +94,7 @@
             \sectionfont{\normalsize\rmfamily}
             \subsectionfont{\small\rmfamily}
             \small
-            ${ md_convert(content).encode('utf-8') }
+            ${ md_convert(content.decode('utf-8')).encode('utf-8') }
         }
 
         \vspace{0.5em}
