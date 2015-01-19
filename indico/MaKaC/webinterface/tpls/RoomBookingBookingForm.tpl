@@ -1,3 +1,4 @@
+<% from datetime import datetime %>
 <h2 class="page-title">
     % if reservation:
         ${ _('Modify booking') }
@@ -22,7 +23,7 @@
             ${ _('Booking time & date') }
         </h2>
         <%include file="RoomBookingNewBookingPeriodWidget.tpl"
-                  args="form=form, can_override=can_override, min_date=(reservation.start_dt if reservation else None),
+                  args="form=form, can_override=can_override, min_date=(min(reservation.start_dt, datetime.now()) if reservation else None),
                         date_changed=date_changed, past_date=past_date"/>
 
         % if calendar:
