@@ -18,21 +18,27 @@
 {% extends 'events/registration/_stats_box.html' %}
 {% block content -%}
 {% set height = data.countries|length * 24 + 28 %}
-    <div class="i-badges-list">
+    <div class="i-badges-list i-stats">
         <div class="i-badge">
-            <span class="i-badge-value" data-value="{{ data.registrants|length }}"></span>
-            <span class="i-badge-legend">{% trans %}Registrants{% endtrans %}</span>
+            <div class="i-badge-content">
+                <span class="i-badge-value" data-value="{{ data.registrants|length }}"></span>
+                <span class="i-badge-title">{% trans %}Registrants{% endtrans %}</span>
+            </div>
         </div>
         <div class="i-badge">
-            <span class="i-badge-value" data-value="{{ data.days_left }}"></span>
-            <span class="i-badge-legend">{% trans %}Days left<br>to register{% endtrans %}</span>
+            <div class="i-badge-content">
+                <span class="i-badge-value" data-value="{{ data.days_left }}"></span>
+                <span class="i-badge-title">{% trans %}Days left<br>to register{% endtrans %}</span>
+            </div>
         </div>
         {% set taken, total, progress = data.availability %}
         <div class="i-badge">
-            <span class="i-badge-value" {% if data.num_countries %} data-value="{{ data.num_countries}}" {% endif %}>
-                {% if not data.num_countries %} &ndash; {% endif %}
-            </span>
-            <span class="i-badge-legend">{% trans %}Countries{% endtrans %}</span>
+            <div class="i-badge-content">
+                <span class="i-badge-value" {% if data.num_countries %} data-value="{{ data.num_countries}}" {% endif %}>
+                    {% if not data.num_countries %} &ndash; {% endif %}
+                </span>
+                <span class="i-badge-title">{% trans %}Countries{% endtrans %}</span>
+            </div>
         </div>
     </div>
     {%- if total > 0 -%}

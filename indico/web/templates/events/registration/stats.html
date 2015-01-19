@@ -26,14 +26,14 @@
         $('.i-progress>.i-progress-bar').width(function getProgress() {
             return $(this).data('progress');
         });
-        $('.i-badge > .i-badge-value[data-value]').each(function loadValue() {
+        $('.i-badge > .i-badge-content > .i-badge-value[data-value]').each(function loadValue() {
             var $this = $(this);
             var val = $this.data('value');
             if (val == 0) {
                 $this.text(0);
                 return;
             }
-            jQuery({ Counter: 0 }).animate({ Counter: val }, {
+            $({ Counter: 0 }).animate({ Counter: val }, {
                 duration: 1000,
                 easing: 'swing',
                 step: function () {
