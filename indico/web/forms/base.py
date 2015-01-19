@@ -15,8 +15,11 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask_wtf import Form
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import FieldList
 from wtforms.widgets.core import HiddenInput
+
+from indico.util.string import strip_whitespace
 
 
 class _DataWrapper(object):
@@ -40,6 +43,14 @@ class generated_data(property):
 
 
 class IndicoForm(Form):
+    class Meta:
+        def bind_field(self, form, unbound_field, options):
+            # We don't set default filters for query-based fields as it breaks them if no query_factory is set
+            # while the Form is instantiated. Also, it's quite pointless for those fields...
+            filters = [strip_whitespace] if not issubclass(unbound_field.field_class, QuerySelectField) else []
+            filters += unbound_field.kwargs.get('filters', [])
+            return unbound_field.bind(form=form, filters=filters, **options)
+
     def populate_obj(self, obj, fields=None, skip=None, existing_only=False):
         """Populates the given object with form data.
 
