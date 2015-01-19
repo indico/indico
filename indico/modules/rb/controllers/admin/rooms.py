@@ -15,7 +15,7 @@
 ## along with Indico. If not, see <http://www.gnu.org/licenses/>.
 
 from flask import request, flash
-from wtforms import TextField
+from wtforms import StringField
 from wtforms.validators import DataRequired
 
 from indico.core.db import db
@@ -77,7 +77,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
             if attribute.name == 'notification-email':
                 validators.append(IndicoEmail(multi=True))
             field_name = 'attribute_{}'.format(attribute.id)
-            field = TextField(attribute.title, validators)
+            field = StringField(attribute.title, validators)
             setattr(form_class, field_name, field)
 
         # Create the form
