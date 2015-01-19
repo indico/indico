@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from functools import wraps
+from types import GeneratorType
 
 from indico.core.config import Config
 from MaKaC.common.mail import GenericMailer
@@ -27,7 +28,9 @@ def email_sender(fn):
         mails = fn(*args, **kwargs)
         if mails is None:
             return
-        if not isinstance(mails, list):
+        if isinstance(mails, GeneratorType):
+            mails = list(mails)
+        elif not isinstance(mails, list):
             mails = [mails]
         for mail in mails:
             GenericMailer.send(GenericNotification(mail))
