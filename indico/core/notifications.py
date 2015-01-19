@@ -25,6 +25,8 @@ def email_sender(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         mails = fn(*args, **kwargs)
+        if mails is None:
+            return
         if not isinstance(mails, list):
             mails = [mails]
         for mail in mails:
