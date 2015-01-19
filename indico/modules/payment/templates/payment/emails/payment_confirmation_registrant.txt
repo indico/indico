@@ -1,8 +1,12 @@
-{% extends 'payment/emails/payment_confirmation_base.txt' %}
+{% extends 'emails/base.txt' %}
 
-{% macro get_body() -%}
-Dear {{ registrant.getFirstName() }} {{ registrant.getFamilyName() }},
+{%- block subject -%}
+    Payment confirmation for {{ event.getTitle() }}: {{ registrant.getFirstName() }} {{ registrant.getFamilyName() }}
+{%- endblock -%}
 
+{% block header %}Dear {{ registrant.getFirstName() }} {{ registrant.getFamilyName() }}{% endblock %}
+
+{% block body %}
 {{ success_email_msg }}
 
 Payment details:
@@ -10,7 +14,4 @@ Payment details:
 Amount: {{ format_currency(amount, currency, locale='en_GB') }}
 Registrant ID: {{ registrant.getId() }}
 Link to your registration: {{ reg_page }}
-
-Regards.
-
-{%- endmacro %}
+{% endblock %}
