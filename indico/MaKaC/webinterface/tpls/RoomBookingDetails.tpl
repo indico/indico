@@ -389,7 +389,7 @@
                           % if reservation.can_be_cancelled(_session.user):
                             <a class="i-button" href="#" onclick="submit_cancel(); return false;">${ _('Cancel') }</a>
                           % endif
-                          % if reservation.can_be_rejected(_session.user) and not reservation.is_accepted:
+                          % if reservation.can_be_accepted(_session.user) and not reservation.is_accepted:
                             <a class="i-button" href="#" onclick="submit_accept(); return false;">${ _('Accept') }</a>
                           % endif
                           % if reservation.can_be_rejected(_session.user):
