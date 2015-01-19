@@ -236,6 +236,7 @@
             $(this).ajaxSubmit({
                 dataType: 'json',
                 data: extraData,
+                error: handleAjaxError,
                 success: function(data) {
                     if (handleAjaxError(data)) {
                         return;
