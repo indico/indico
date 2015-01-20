@@ -193,12 +193,19 @@ Thank you for using our system.
                 """)%(url,
                         self._user.getId(), \
                         self._user.getKey())
+<<<<<<< HEAD
+        maildata = { "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
+                    "toList": [self._user.getEmail()], 
+                    "subject": _("[%s] Confirmation request")%getSubjectIndicoTitle(), 
+                    "body": text }
+=======
         maildata = {
             "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
             "toList": [self._user.getEmail()],
             "subject": _("[%s] Confirmation request") % getSubjectIndicoTitle(),
             "body": text
             }
+>>>>>>> 317b5960783d14fbe6ae13b222c554430ce1536e
         GenericMailer.send(GenericNotification(maildata))
 
 class sendAccountCreationModeration:
@@ -215,12 +222,19 @@ class sendAccountCreationModeration:
 In order to activate it, please go to this URL:
 <%s>
 """% (name,urlHandlers.UHUserDetails.getURL( self._user ))
+<<<<<<< HEAD
+        maildata = { "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
+                    "toList": minfo.getAdminEmails(), 
+                    "subject": _("[Indico] New account request from %s") % name, 
+                    "body": text }
+=======
         maildata = {
             "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
             "toList": minfo.getAdminEmails(),
             "subject": _("[Indico] New account request from %s") % name,
             "body": text
             }
+>>>>>>> 317b5960783d14fbe6ae13b222c554430ce1536e
         GenericMailer.send(GenericNotification(maildata))
 
 class sendAccountCreationNotification:
@@ -235,12 +249,19 @@ class sendAccountCreationNotification:
 %s has created a new account in Indico.
 <%s>
 """ % (name,urlHandlers.UHUserDetails.getURL( self._user ))
+<<<<<<< HEAD
+        maildata = { "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getSupportEmail(),
+                    "toList": minfo.getAdminEmails(), 
+                    "subject": _("[Indico] New account creation"), 
+                    "body": text }
+=======
         maildata = {
             "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getSupportEmail(),
             "toList": minfo.getAdminEmails(),
             "subject": _("[Indico] New account creation"),
             "body": text
             }
+>>>>>>> 317b5960783d14fbe6ae13b222c554430ce1536e
         GenericMailer.send(GenericNotification(maildata))
 
 class sendAccountActivated:
@@ -256,12 +277,16 @@ You can now login using the following username: %s
 
 Thank you for using Indico.
                 """)%(self._user.getIdentityList()[0].getLogin())
+<<<<<<< HEAD
+        maildata = { "fromAddr": "Indico Mailer <%s>"%Config.getInstance().getNoReplyEmail(), "toList": [self._user.getEmail()], "subject": _("[%s] Registration accepted")%getSubjectIndicoTitle(), "body": text }
+=======
         maildata = {
             "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
             "toList": [self._user.getEmail()],
             "subject": _("[%s] Registration accepted") % getSubjectIndicoTitle(),
             "body": text
             }
+>>>>>>> 317b5960783d14fbe6ae13b222c554430ce1536e
         GenericMailer.send(GenericNotification(maildata))
 
 class sendAccountDisabled:
@@ -269,11 +294,34 @@ class sendAccountDisabled:
     def __init__( self, user ):
         self._user = user
 
+<<<<<<< HEAD
+    def send (self ):
+        idList = self._user.getIdentityList()
+        logins = []
+        for id in idList:
+            try:
+                pw = id.password
+            except AttributeError, e:
+                pw = _(" Sorry, you are using your NICE credentials to login into Indico. Please contact the CERN helpdesk in case you do not remember your password (helpdesk@cern.ch).")
+            logins.append( [id.getAuthenticatorTag(), id.getLogin(),pw])
+        if logins == []:
+            text = _("Sorry, we did not find your login.\nPlease, create one here:\n%s")%urlHandlers.UHUserDetails.getURL(self._user)
+        else:
+            text = _("Please, find your login and password:")
+            for l in logins:
+                text += "\n\n==================\n"
+                text += _("system:%s\n")%l[0]
+                text += _("Login:%s\n")%l[1]
+                text += _("Password:%s\n")%l[2]
+                text += "==================\n"
+        maildata = { "fromAddr": "Indico Mailer <%s>"%Config.getInstance().getNoReplyEmail(), "toList": [self._user.getEmail()], "subject": _("[%s] Login Information")%getSubjectIndicoTitle(), "body": text }
+=======
     def send( self ):
         text =  _("""Dear user,
 Your account has been disabled by the site administrator.
                 """)
         maildata = { "fromAddr": "Indico Mailer<%s>"%Config.getInstance().getNoReplyEmail(), "toList": [self._user.getEmail()], "subject": _("[%s] Account disabled")%getSubjectIndicoTitle(), "body": text }
+>>>>>>> 317b5960783d14fbe6ae13b222c554430ce1536e
         GenericMailer.send(GenericNotification(maildata))
 
 
