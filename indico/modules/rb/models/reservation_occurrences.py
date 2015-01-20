@@ -230,20 +230,6 @@ class ReservationOccurrence(db.Model, Serializer):
 
         return q.order_by(Room.id)
 
-    def overlaps(self, occurrence, skip_self=False):
-        if self.reservation and occurrence.reservation and self.reservation.room_id != occurrence.reservation.room_id:
-            raise ValueError('ReservationOccurrence objects of different rooms')
-        if skip_self and self.reservation and occurrence.reservation and self.reservation == occurrence.reservation:
-            return False
-        return date_time.overlaps((self.start_dt, self.end_dt), (occurrence.start_dt, occurrence.end_dt))
-
-    def get_overlap(self, occurrence, skip_self=False):
-        if self.reservation and occurrence.reservation and self.reservation.room_id != occurrence.reservation.room_id:
-            raise ValueError('ReservationOccurrence objects of different rooms')
-        if skip_self and self.reservation and occurrence.reservation and self.reservation == occurrence.reservation:
-            return None, None
-        return date_time.get_overlap((self.start_dt, self.end_dt), (occurrence.start_dt, occurrence.end_dt))
-
     @proxy_to_reservation_if_last_valid_occurrence
     def cancel(self, user, reason=None, silent=False):
         self.is_cancelled = True
