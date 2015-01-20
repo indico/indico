@@ -728,14 +728,14 @@ class ConferenceParticipantBase:
 
     def _sendEmailWithFormat(self, participant, data):
             data["toList"] = [participant.getEmail()]
-            urlInvitation = urlHandlers.UHConfParticipantsInvitation.getURL( self._conf )
-            urlInvitation.addParam("participantId","%s"%participant.getId())
-            urlRefusal = urlHandlers.UHConfParticipantsRefusal.getURL( self._conf )
-            urlRefusal.addParam("participantId","%s"%participant.getId())
+            urlInvitation = urlHandlers.UHConfParticipantsInvitation.getURL(self._conf)
+            urlInvitation.addParam("participantId", str(participant.getId()))
+            urlRefusal = urlHandlers.UHConfParticipantsRefusal.getURL(self._conf)
+            urlRefusal.addParam("participantId", str(participant.getId()))
 
             mailEnv = dict(name=participant.getFullName(),
                            confTitle=self._conf.getTitle(),
-                           url=urlHandlers.UHConferenceDisplay.getURL( self._conf ),
+                           url=urlHandlers.UHConferenceDisplay.getURL(self._conf),
                            urlRefusal=urlRefusal, urlInvitation=urlInvitation)
 
             data["body"] = permissive_format(data["body"], mailEnv)
