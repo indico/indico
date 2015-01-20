@@ -733,7 +733,7 @@ class ConferenceParticipantBase:
             urlRefusal = urlHandlers.UHConfParticipantsRefusal.getURL( self._conf )
             urlRefusal.addParam("participantId","%s"%participant.getId())
 
-            mailEnv = dict(name=participant.getEmail(),
+            mailEnv = dict(name=participant.getFullName(),
                            confTitle=self._conf.getTitle(),
                            url=urlHandlers.UHConferenceDisplay.getURL( self._conf ),
                            urlRefusal=urlRefusal, urlInvitation=urlInvitation)
