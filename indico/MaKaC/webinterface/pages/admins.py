@@ -62,6 +62,7 @@ from MaKaC.services.implementation.user import UserComparator
 from indico.util.i18n import i18nformat
 from indico.util.redis import client as redis_client
 from indico.util.date_time import timedelta_split
+from indico.web.flask.util import url_for
 
 
 class WPAdminsBase( WPMainBase ):
@@ -1497,19 +1498,6 @@ class WUserDetails(wcomponents.WTemplated):
         return "".join(html)
 
 
-class WUserActiveSecondaryEmail(wcomponents.WTemplated):
-
-    def __init__(self, av, email):
-        self._avatar = av
-        self._email = email
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["user"] = self._avatar
-        vars["email"] = self._email
-        return vars
-
-
 class WPPersonalArea(WPUserBase):
 
     def _getBody( self, params ):
@@ -1576,18 +1564,6 @@ class WPUserDetails( WPPersonalArea ):
 
     def _setActiveTab( self ):
         self._tabDetails.setActive()
-
-
-class WPUserActiveSecondaryEmail(WPDecorated):
-
-    def __init__(self, rh, av, email):
-        WPDecorated.__init__(self, rh)
-        self._avatar = av
-        self._email = email
-
-    def _getBody(self, params):
-        c = WUserActiveSecondaryEmail(self._avatar, self._email)
-        return c.getHTML(params)
 
 
 class WPUserBaskets( WPPersonalArea ):
@@ -2574,3 +2550,30 @@ class WAdminProtection(wcomponents.WTemplated):
         vars["protectionDisclaimerProtected"] = minfo.getProtectionDisclaimerProtected()
         vars["protectionDisclaimerRestricted"] = minfo.getProtectionDisclaimerRestricted()
         return vars
+
+
+class WRedirect(wcomponents.WTemplated):
+    def __init__(self, title, message, delay, url, link_text):
+        self.title = title
+        self.message = message
+        self.delay = delay
+        self.link_text = link_text
+        self.url = url
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars['title'] = self.title
+        vars['message'] = self.message
+        vars['delay'] = self.delay
+        vars['url'] = self.url
+        vars['link_text'] = self.link_text
+        return vars
+
+
+class WPRedirect(WPDecorated):
+    def __init__(self, rh, title, message, delay, url, link_text=None,):
+        WPDecorated.__init__(self, rh)
+        self.content = WRedirect(title, message, delay, url, link_text if link_text else url)
+
+    def _getBody(self, params):
+        return self.content.getHTML(params)
