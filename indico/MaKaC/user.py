@@ -1039,11 +1039,11 @@ class Avatar(Persistent, Fossilizable):
         Convenience method for checking whether this user is an admin for the RB module.
         Returns bool.
         """
-        from indico.modules.rb import settings
+        from indico.modules.rb import settings as rb_settings
 
         if self.isAdmin():
             return True
-        principals = retrieve_principals(settings.get('admin_principals'))
+        principals = retrieve_principals(rb_settings.get('admin_principals'))
         return any(principal.containsUser(self) for principal in principals)
 
     @property

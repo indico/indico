@@ -28,11 +28,11 @@ from indico.util.user import retrieve_principals, principals_merge_users
 @memoize_request
 def rb_check_user_access(user):
     """Checks if the user has access to the room booking system"""
-    from indico.modules.rb import settings
+    from indico.modules.rb import settings as rb_settings
 
     if user.isRBAdmin():
         return True
-    principals = retrieve_principals(settings.get('authorized_principals'))
+    principals = retrieve_principals(rb_settings.get('authorized_principals'))
     if not principals:  # everyone has access
         return True
     return any(principal.containsUser(user) for principal in principals)
@@ -44,7 +44,7 @@ def rb_merge_users(new_id, old_id):
     :param new_id: Target user
     :param old_id: Source user (being deleted in the merge)
     """
-    from indico.modules.rb import settings
+    from indico.modules.rb import settings as rb_settings
     from indico.modules.rb.models.blocking_principals import BlockingPrincipal
     from indico.modules.rb.models.blockings import Blocking
     from indico.modules.rb.models.reservations import Reservation
@@ -56,9 +56,9 @@ def rb_merge_users(new_id, old_id):
     Reservation.find(booked_for_id=old_id).update({'booked_for_id': new_id})
     Room.find(owner_id=old_id).update({'owner_id': new_id})
     for key in ('authorized_principals', 'admin_principals'):
-        principals = settings.get(key)
+        principals = rb_settings.get(key)
         principals = principals_merge_users(principals, new_id, old_id)
-        settings.set(key, principals)
+        rb_settings.set(key, principals)
 
 
 def get_default_booking_interval(duration=90, precision=15, force_today=False):

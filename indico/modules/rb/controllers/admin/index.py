@@ -17,7 +17,7 @@
 from flask import flash
 
 from indico.core.config import Config
-from indico.modules.rb import settings
+from indico.modules.rb import settings as rb_settings
 from indico.modules.rb.forms.settings import SettingsForm
 from indico.modules.rb.views.admin.index import WPRoomBookingPluginAdmin
 from indico.util.i18n import _
@@ -28,10 +28,10 @@ from MaKaC.webinterface.rh.admins import RHAdminBase
 
 class RHRoomBookingPluginAdmin(RHAdminBase):
     def _process(self):
-        defaults = FormDefaults(**settings.get_all())
+        defaults = FormDefaults(**rb_settings.get_all())
         form = SettingsForm(obj=defaults)
         if form.validate_on_submit():
-            settings.set_multi(form.data)
+            rb_settings.set_multi(form.data)
             flash(_(u'Settings saved'), 'success')
             self._redirect(url_for('rooms_admin.roomBookingPluginAdmin'))
             return

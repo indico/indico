@@ -1,4 +1,4 @@
-<% from indico.modules.rb import settings %>
+<% from indico.modules.rb import settings as rb_settings %>
 
 <!-- CONTEXT HELP DIVS -->
 <div id="tooltipPool" style="display: none;">
@@ -173,7 +173,7 @@
                                             <small>${ form[field].label.text }</small>
                                         </td>
                                         <td align="left" class="blacktext">
-                                            % if field in reminder_fields and not settings.get('notifications_enabled', True):
+                                            % if field in reminder_fields and not rb_settings.get('notifications_enabled', True):
                                                 ${ form[field](disabled=True, **field_args.get(field, {})) }
                                             % else:
                                                 ${ form[field](**field_args.get(field, {})) }

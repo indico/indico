@@ -426,10 +426,10 @@ def test_is_in_notification_window(db, create_occurrence, dummy_room,
 ))
 def test_is_in_notification_window_from_settings(db, create_occurrence, dummy_room,
                                                  notification_window, expected, expected_with_exclude):
-    from indico.modules.rb import settings
+    from indico.modules.rb import settings as rb_settings
     occurrence = create_occurrence(start_dt=datetime.now() + relativedelta(days=2))
     dummy_room.notification_before_days = None
-    settings.set('notification_before_days', notification_window)
+    rb_settings.set('notification_before_days', notification_window)
     assert_is_in_notification_window(occurrence, expected, expected_with_exclude)
 
 

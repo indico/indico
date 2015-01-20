@@ -21,7 +21,7 @@ from operator import itemgetter
 import pytest
 
 from indico.core.errors import IndicoError
-from indico.modules.rb import settings
+from indico.modules.rb import settings as rb_settings
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.room_bookable_hours import BookableHours
@@ -680,7 +680,7 @@ def test_can_be_booked_prebooked_no_rb_access(db, dummy_room, dummy_user, create
         acl = [(u'Avatar', dummy_user.id)]
         if in_acl:
             acl.append((u'Avatar', user.id))
-        settings.set('authorized_principals', acl)
+        rb_settings.set('authorized_principals', acl)
         db.session.flush()
     assert dummy_room.can_be_booked(user) == expected
     assert dummy_room.can_be_prebooked(user) == expected
@@ -801,7 +801,7 @@ def test_is_in_digest_window_from_settings(db, freeze_time, dummy_room,
                                            current_date, notification_window, expected, expected_with_exclude):
     freeze_time(current_date)
     dummy_room.notification_window = None
-    settings.set('notification_before_days', notification_window)
+    rb_settings.set('notification_before_days', notification_window)
     db.session.flush()
     assert_is_in_digest_window(dummy_room, expected, expected_with_exclude)
 

@@ -17,9 +17,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import itertools
-
-from indico.modules.rb import settings
+from indico.modules.rb import settings as rb_settings
 
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservations import RepeatMapping
@@ -48,7 +46,7 @@ class WPRoomBookingBookingDetails(WPRoomBookingBase):
     def _getBody(self, params):
         reservation = params['reservation']
         params['endpoints'] = self.endpoints
-        params['assistance_emails'] = settings.get('assistance_emails')
+        params['assistance_emails'] = rb_settings.get('assistance_emails')
         params['vc_equipment'] = ', '.join(eq.name for eq in reservation.get_vc_equipment())
         params['repetition'] = RepeatMapping.get_message(*reservation.repetition)
         params['edit_logs'] = reservation.edit_logs.order_by(ReservationEditLog.timestamp.desc()).all()
