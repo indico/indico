@@ -80,6 +80,9 @@ class IndicoPlugin(Plugin):
     configurable = False
     #: The group category that the plugin belongs to
     category = None
+    #: If `settings` and `event_settings` should use strict mode, i.e. only allow keys in
+    #: `default_settings` or `default_event_settings`
+    strict_settings = False
 
     def init(self):
         """Called when the plugin is being loaded/initialized.
@@ -262,7 +265,7 @@ class IndicoPlugin(Plugin):
             raise RuntimeError('Plugin has not been loaded yet')
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
-            return SettingsProxy('plugin_{}'.format(cls.name), instance.default_settings)
+            return SettingsProxy('plugin_{}'.format(cls.name), instance.default_settings, cls.strict_settings)
 
     @cached_classproperty
     @classmethod
@@ -272,7 +275,8 @@ class IndicoPlugin(Plugin):
             raise RuntimeError('Plugin has not been loaded yet')
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
-            return EventSettingsProxy('plugin_{}'.format(cls.name), instance.default_event_settings)
+            return EventSettingsProxy('plugin_{}'.format(cls.name), instance.default_event_settings,
+                                      cls.strict_settings)
 
 
 def include_plugin_js_assets(bundle_name):

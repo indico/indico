@@ -161,7 +161,7 @@ class SettingsProxyBase(object):
                    and triggers a `ValueError`
     """
 
-    def __init__(self, module, defaults=None, strict=False):
+    def __init__(self, module, defaults, strict=True):
         self.module = module
         self.defaults = defaults or {}
         self.strict = strict
