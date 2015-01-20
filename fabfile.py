@@ -274,7 +274,7 @@ def install_jquery():
 @recipe('jqplot')
 def install_jqplot():
     """Install jQPlot from Git"""
-    plugins = ['axis', 'cursor', 'highlighter']
+    plugins = ['axis', 'bar', 'cursor', 'highlighter', 'text']
     with lcd(os.path.join(env.ext_dir, 'jqplot')):
         dest_dir_js = os.path.join(lib_dir(env.src_dir, 'js'), 'jqplot')
         dest_dir_css = lib_dir(env.src_dir, 'css')
