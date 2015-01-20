@@ -14,7 +14,7 @@
   </td>
   <td>
     % if item.getAuthenticatorTag() == "Local":
-    <a href="${ urlHandlers.UHUserIdentityChangePassword.getURL(userId=avatar.getId(), identityId=item.getId()) }">
+    <a href="${ urlHandlers.UHUserIdentityChangePassword.getURL(userId=avatar.getId(), login=item.getId()) }">
       <small> ${ _("Change password") }</small>
     </a>
     % else:

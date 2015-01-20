@@ -1,0 +1,56 @@
+<div ng-hide="field.id == -1">
+    <table border="0" cellpadding="0" cellspacing="0"
+        class="regform-field"
+        ng-class="{disabled: field.disabled, editable: editMode}">
+        <tr>
+            <td ng-if="editMode" class="field-sortable-handle"/>
+            <td ng-if="!settings.singleColumn" class="field-caption">
+                <div>
+                    <label for="field-{{ section.id }}-{{ field.id }}"
+                        ng-bind-html="field.caption"></label>
+                    <span ng-show="field.mandatory" class="regFormMandatoryField">*</span>
+                </div>
+            </td>
+
+            <td ng-if="!settings.singleColumn">
+                <div ng-include="tplInput" class="field-input"></div>
+                <div ng-if="field.description"
+                    class="field-description"
+                    ng-bind-html="field.description">
+                </div>
+            </td>
+            <td ng-if="settings.singleColumn" ng-include="tplInput" class="field-input" colspan="2"></td>
+            <td ng-if="editMode" class="field-actions">
+                <a ng-if="canBeDeleted(field)"
+                    ng-click="fieldApi.removeField(field)"
+                    class="icon-remove"
+                    title="{{ 'Remove field' | i18n }}"/>
+                <a ng-if="field.disabled"
+                    ng-click="fieldApi.enableField(field)"
+                    class="icon-checkmark"
+                    title="{{ 'Enable field' | i18n }}"/>
+                <a ng-if="canBeDisabled(field) && !field.disabled"
+                    ng-click="fieldApi.disableField(field)"
+                    class="icon-disable"
+                    title="{{ 'Disable field' | i18n }}"/>
+                <a ng-click="openFieldSettings()"
+                    class="icon-settings"
+                    title="{{ 'Configure field' | i18n }}"/>
+            </td>
+        </tr>
+    </table>
+
+    <nd-dialog nd-field-dialog
+        ng-if="editMode"
+        show="dialog.open"
+        heading="{{ dialog.title() }}: {{ settings.fieldName }}"
+        ok-button="{{ dialog.okButton() }}"
+        cancel-button="{{ 'Cancel' | i18n }}"
+        ok-callback="dialog.onOk(dialogScope)"
+        cancel-callback="dialog.onCancel()"
+        validate="true"
+        config="settings"
+        data="field">
+    </nd-dialog>
+</div>
+

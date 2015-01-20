@@ -1,4 +1,4 @@
-<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="common" file="../../include/Common.tpl"/>
 <%!
     minutes = False
     checkEndTime = False
@@ -12,7 +12,7 @@
 <table class="eventWrapper" cellpadding="0">
 <tr>
   <td>
-  <%include file="${INCLUDECDS}/Header.tpl"/>
+  <%include file="include/Header.tpl"/>
   <% order = 1%>
   % for index, item in enumerate(entries):
     <%
@@ -28,7 +28,7 @@
     % if getItemType(item) in ['Contribution','Break']:
         <table class="dayList" cellspacing="0" cellpadding="4">
     % endif
-    <%include file="${INCLUDECDS}/${getItemType(item)}.tpl" args="item=item, parent=conf,minutes=self.attr.minutes, olist=self.attr.olist, checkEndTime=self.attr.checkEndTime, order=order, showDescriptionTitle = self.attr.showDescriptionTitle, checkOwnerLocation=self.attr.checkOwnerLocation"/>
+    <%include file="include/${getItemType(item)}.tpl" args="item=item, parent=conf,minutes=self.attr.minutes, olist=self.attr.olist, checkEndTime=self.attr.checkEndTime, order=order, showDescriptionTitle = self.attr.showDescriptionTitle, checkOwnerLocation=self.attr.checkOwnerLocation"/>
     % if getItemType(item) in ['Contribution','Break']:
         </table>
     % endif

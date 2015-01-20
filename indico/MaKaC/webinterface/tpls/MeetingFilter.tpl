@@ -11,7 +11,6 @@ else:
         <form id="filterForm" style="margin: 0pt;">
 
 
-        <input type="hidden" name="confId" value="${ confId }" />
         <input type="hidden" id="filterActive" name="filterActive" value="1" />
 
         <div style="float: right;">
@@ -41,7 +40,7 @@ else:
 <script type="text/javascript">
     var filterButtonClicked = false;
     var filterButtonState = false;
-    var filterLink = $E('filterLink');
+    var filterLink = $('#filterLink');
 
     var filterToggle = function() {
         if (!filterButtonClicked) {
@@ -61,7 +60,10 @@ else:
     };
 
     // Setup the filter button in the toolbar
-    filterLink.observeClick(function(event) { filterToggle() });
+    filterLink.on('click', function(e) {
+        e.preventDefault();
+        filterToggle();
+    });
 
     // When remove filter button clicked, if needed reset the form and do submit otherwise
     // just hide the filter div
@@ -80,7 +82,7 @@ else:
     });
 
     // Tooltip on filter icon
-    filterLink.dom.onmouseover = function(event) {
+    filterLink.on('mouseover', function(event) {
         IndicoUI.Widgets.Generic.tooltip(this, event,
             '<ul style="list-style-type:none;padding:3px;margin:0px">'+
             '<li>'+
@@ -95,7 +97,7 @@ else:
             '<\/li>'+
             '<\/ul>'
         );
-    };
+    });
 
     // Setup the hide contributions checkbox
     % if hideContributions == None:

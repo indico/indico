@@ -24,7 +24,11 @@
     <fieldset class="evalationResultsFieldset" style="margin-top: 20px;">
       <legend>${ _("Statistics")}</legend>
 
-      % if evaluation.getNbOfSubmissions()>0 :
+      % if not evaluation.getNbOfSubmissions():
+        <span style="color:#E25300">${ _("No submission yet...")}</span>
+      % elif not selectedSubmissions and selectedSubmissions is not None:
+        <span style="color:#E25300">${ _("No submitters selected...")}</span>
+      % else:
         % for q in evaluation.getQuestions():
         <!--stat of question : start-->
           ${'<font color="red">*</font>' if q.isRequired() else ""}
@@ -107,9 +111,6 @@
           <br/>
         <!--stat of question : end-->
         % endfor
-      % endif
-      % if evaluation.getNbOfSubmissions()<1 :
-        <span style="color:#E25300">${ _("No submission yet...")}</span>
       % endif
     </fieldset>
 </form>

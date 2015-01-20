@@ -1,18 +1,23 @@
+<%include file="MarkdownMathJaxHelp.tpl"/>
+
+
 <form id="ContributionDataModificationForm" method="POST" action="${ postURL }">
-    <table width="60%" align="center" border="0" style="border-left: 1px solid #777777">
+    <table width="60%" align="center" border="0" style="border-left: 1px solid #777777" id="abstract-field-table">
         <tr>
             <td class="groupTitle" colspan="2"> ${ _("Edit contribution data")}</td>
         </tr>
         <tr>
             <td class="titleCellTD">
-                <span class="titleCellFormat">${ _("Title")}</span>
+                <span class="titleCellFormat">${ _("Title")}</span><span class="mandatoryField"> *</span>
             </td>
             <td bgcolor="white" width="100%" valign="top" class="blacktext">
-                <input type="text" name="title" size="80" value=${ title } />
+                <input type="text" name="title" id="title" size="80" value=${ title } />
             </td>
         </tr>
         % if self_._rh._target.getConference().getAbstractMgr().isActive() and self_._rh._target.getConference().hasEnabledSection("cfa") and self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
-        ${ additionalFields }
+            % for field in additionalFields:
+                <%include file="AbstractField.tpl" args="field=field, fdict=fieldDict"/>
+            % endfor
         % else:
         <tr>
             <td class="titleCellTD">
@@ -54,7 +59,7 @@
         </tr>
         <tr align="center">
           <td colspan="2" class="buttonBar" valign="bottom" align="center">
-        <input type="submit" class="btn" value="${ _("ok")}" name="ok" />
+        <input type="submit" class="btn" value="${ _("ok")}" name="ok" id="ok" />
         <input type="submit" class="btn" value="${ _("cancel")}" name="cancel" />
           </td>
         </tr>
@@ -62,6 +67,13 @@
 </form>
 
 <script type="text/javascript">
+    var parameterManager = new IndicoUtil.parameterManager();
+    parameterManager.add($E('title'), 'text', false);
+
+    $("#ok").click(function() {
+        if (!parameterManager.check())
+            event.preventDefault();
+    });
 IndicoUI.executeOnLoad(function()
         {
             var info = new WatchObject();
@@ -92,5 +104,14 @@ rbWidget.setDateTimeInfo(info);
 
             injectValuesInForm($E('ContributionDataModificationForm'));
         });
+
+
+// Pagedown editor stuff
+
+function block_handler(text, rbg) {
+    return text.replace(/^ {0,3}""" *\n((?:.*?\n)+?) {0,3}""" *$/gm, function (whole, inner) {
+        return "<blockquote>" + rbg(inner) + "</blockquote>\n";
+    });
+}
 
 </script>

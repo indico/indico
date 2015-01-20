@@ -1,6 +1,4 @@
-<a id="timezoneSelectorLink" class="dropDownMenu fakeLink" style="display: inline-block;">
-    ${ ActiveTimezoneDisplay }
-</a>
+<a id="timezoneSelectorLink" href="#" class="i-button arrow icon-time">${ ActiveTimezoneDisplay }</a>
 
 <script type="text/javascript">
 var timezoneSelectorLink = $E('timezoneSelectorLink');
@@ -18,7 +16,7 @@ $("#timezoneSelectorLink").qtip({
 
     style: {
         width: '300px',
-        classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup ui-tooltip-timezone',
+        classes: 'qtip-rounded qtip-shadow qtip-popup qtip-timezone',
         tip: {
             corner: true,
             width: 20,
@@ -27,7 +25,7 @@ $("#timezoneSelectorLink").qtip({
     },
     position: {
         my: 'top center',
-        at: 'bottom center',
+        at: 'bottom center'
     },
     content: function(api){
         return $(tzSelector.getContent().dom);
@@ -48,4 +46,3 @@ $("#timezoneSelectorLink").qtip({
 });
 
 </script>
-

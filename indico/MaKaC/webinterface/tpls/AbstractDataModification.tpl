@@ -1,4 +1,14 @@
+<%inherit file="ConfDisplayBodyBase.tpl"/>
 <% from MaKaC.common import Config %>
+
+<%block name="title">
+    ${body_title}
+</%block>
+
+<%block name="content">
+
+<%include file="MarkdownMathJaxHelp.tpl"/>
+
 % if origin == "display":
 <form action=${ postURL } enctype="multipart/form-data" method="POST" width="100%" onsubmit="return onsubmitDisplayActions();">
     <table width="100%" align="center">
@@ -6,23 +16,11 @@
 <form action=${ postURL } enctype="multipart/form-data" method="POST" width="100%" onsubmit="return onsubmitManagementActions();">
     <table width="85%" align="left" style="padding: 5px 0 0 15px;">
 % endif
+
         <input type="hidden" name="origin" value=${ origin }>
-        % if errorList:
         <tr>
             <td>
-                <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
-                % for error in errorList:
-                    <tr>
-                        <td><span class="formError">${ error }</span></td>
-                    </tr>
-                % endfor
-                </table>
-            </td>
-        </tr>
-        % endif
-        <tr>
-            <td>
-                <table width="100%" class="groupTable" align="center">
+                <table class="groupTable">
                     <tr>
                         <td class="groupTitle">${ _("Abstract")}</td>
                     </tr>
@@ -31,51 +29,18 @@
                     </tr>
                     <tr>
                         <td>
-                            <table align="center" width="100%">
+                            <table id="abstract-field-table" style="min-width: 800px;">
                                 <tr>
                                     <td align="right" valign="top" white-space="nowrap">
                                         <span class="dataCaptionFormat">${ _("Title")}</span>
-                                        <span class="mandatoryField">*</span>
+                                        <span class="mandatoryField title">*</span>
                                     </td>
-                                    <td width="100%">
-                                        <input id="abstractTitle" type="text" name="title" value=${ title } style="width:100%">
+                                    <td>
+                                        <input id="abstractTitle" type="text" name="title" value=${abstractTitle} style="width:100%">
                                     </td>
                                 </tr>
                                 % for field in additionalFields:
-                                    % if not field.isActive():
-                                        <input type="hidden" name="f_${ field.getId() }" value="">
-                                    % else:
-                                        <tr>
-                                            <td>&nbsp;</td>
-                                        </tr>
-                                        <tr>
-                                            <td align="right" valign="top"  style="white-space:nowrap">
-                                                <span class="dataCaptionFormat">${ field.getCaption() }</span>&nbsp;${'<span class="mandatoryField">*</span>' if field.isMandatory() else ''}<br><br>
-                                                <% nbRows = 10 %>
-                                                % if field.getMaxLength() > 0:
-                                                    % if field.getLimitation() == "words":
-                                                        <% nbRows = int((int(field.getMaxLength())*4.5)/85) + 1 %>
-                                                        <input type="hidden" name="maxwords${ field.getId().replace(" ", "_")}" value="${ field.getMaxLength() }">
-                                                        <small><span id="maxLimitionCounter_${ field.getId().replace(" ", "_")}" style="padding-right:5px;">${ field.getMaxLength() } ${ _(" words left") }</span></small>
-                                                    % else:
-                                                        <% nbRows = int(int(field.getMaxLength())/85) + 1 %>
-                                                        <input type="hidden" name="maxchars${ field.getId().replace(" ", "_")}" value="${ field.getMaxLength() }">
-                                                        <small><span id="maxLimitionCounter_${ field.getId().replace(" ", "_")}" style="padding-right:5px;">${ field.getMaxLength() } ${ _(" chars left") }</span></small>
-                                                    % endif
-                                                % endif
-                                                % if (nbRows > 30):
-                                                    <% nbRows = 30 %>
-                                                % endif
-                                            </td>
-                                            <td width="100%">
-                                                % if field.getType() == "textarea":
-                                                    <textarea id="f_${ field.getId() }" name="f_${ field.getId() }" width="100%" rows="${ nbRows }" style="width:100%">${ fieldsDict["f_"+ field.getId()] }</textarea>
-                                                % elif field.getType() == "input":
-                                                    <input id="f_${ field.getId() }" name="f_${ field.getId() }" value="${ fieldsDict["f_"+ field.getId()] }" style="width:100%">
-                                                % endif
-                                            </td>
-                                        </tr>
-                                    % endif
+                                    <%include file="AbstractField.tpl" args="field=field, fdict=fieldDict"/>
                                 % endfor
                                 <tr><td>&nbsp;</td></tr>
                                 <tr>
@@ -248,13 +213,11 @@
                     </tr>
                     <tr>
                         <td width="100%">
-                            <table align="center" width="100%">
                                 <textarea name="comments" rows="8" style="width:100%;">${ comments }</textarea>
-                            </table>
                         </td>
                     </tr>
-				</table>
-			</td>
+                </table>
+            </td>
         </tr>
         <tr id="formError" style="display:none;">
             <td nowrap class="formError" style="padding-bottom:10px;">
@@ -279,8 +242,6 @@ function onsubmitManagementActions() {
     } else {
         return false;
     }
-    //setAuthorsParam();
-    //return true;
 }
 
 function onsubmitDisplayActions() {
@@ -294,13 +255,11 @@ function onsubmitDisplayActions() {
         }
         return false;
     }
-    //setAuthorsParam();
-    //return true;
 }
 
 % if attachedFilesAllowed:
 // attached files
-var initialFiles = ${ attachments };
+var initialFiles = ${ attachments | n,j };
 var attachedFilesManager = new AbstractFilesManager($E('inPlaceMaterial'), $E('inPlaceExistingMaterial'), $E('uploadFileLink'), $E('sizeError'), initialFiles);
 % endif
 
@@ -375,15 +334,25 @@ function createLimitedFieldsMgr() {
     for (var i=0; i<limitedFieldList.length; i++) {
         var isMandatory = (limitedFieldList[i][4] == "True");
         if (limitedFieldList[i][3] == "words") {
-            limitedFieldManagerList.push(new WordsManager($E(limitedFieldList[i][0]), limitedFieldList[i][1], $E(limitedFieldList[i][2]), isMandatory));
+            limitedFieldManagerList.push(new WordsManager($('[name="'+limitedFieldList[i][0]+'"]'), limitedFieldList[i][1], $E(limitedFieldList[i][2]), isMandatory));
         } else {
-            limitedFieldManagerList.push(new CharsManager($E(limitedFieldList[i][0]), limitedFieldList[i][1], $E(limitedFieldList[i][2]), isMandatory));
+            limitedFieldManagerList.push(new CharsManager($('[name="'+limitedFieldList[i][0]+'"]'), limitedFieldList[i][1], $E(limitedFieldList[i][2]), isMandatory));
         }
     }
 }
 
 // Add the mandatory fields to the parameter manager
 function addPMToMandatoryFields() {
+    // Correct mandatoryFieldList ids with "wmd-input-" prefix to match Pagedown's textareas
+    % for field in additionalFields:
+        % if field.getType() == "textarea":
+            var textarea_index = $.inArray('f_${ field.getId() }', mandatoryFieldList);
+            if(textarea_index > -1){
+                mandatoryFieldList[textarea_index] = "wmd-input-"+mandatoryFieldList[textarea_index];
+            }
+        % endif
+    % endfor
+
     for (var i=0; i<mandatoryFieldList.length; i++) {
         pmMandatoryFields.add($E(mandatoryFieldList[i]), null, false);
     }
@@ -392,8 +361,8 @@ function addPMToMandatoryFields() {
 //Check limited fields, mandatory fields, primary author and presenter
 function checkFields() {
     // restart track table class name if needed
-    var condLimited = checkLimitedFields();
     var condMandatory = pmMandatoryFields.check();
+    var condLimited = checkLimitedFields();
 % if attachedFilesAllowed:
     var filesSize = attachedFilesManager.checkTotalFilesSize();
 % else:
@@ -446,30 +415,5 @@ function checkLimitedFields() {
 createLimitedFieldsMgr();
 addPMToMandatoryFields();
 
-// Drag and drop for the authors
-$('#sortspace').tablesorter({
-
-    onDropFail: function() {
-        var popup = new AlertPopup($T('Warning'), $T('You cannot move the author to this list because there is already an author with the same email address.'));
-        popup.open();
-    },
-    canDrop: function(sortable, element) {
-        if (sortable.attr('id') == 'inPlacePrAuthors') {
-            return authorsManager.canDropElement('pr', element.attr('id'));
-        } else if (sortable.attr('id') == 'inPlaceCoAuthors') {
-            return authorsManager.canDropElement('co', element.attr('id'));
-        }
-        return false;
-    },
-    onUpdate: function() {
-        authorsManager.updatePositions();
-        authorsManager.checkPrAuthorsList();
-        return;
-    },
-    sortables: '.sortblock ul', // relative to element
-    sortableElements: '> li', // relative to sortable
-    handle: '.authorTable', // relative to sortable element - the handle to start sorting
-    placeholderHTML: '<li></li>' // the html to put inside the placeholder element
-});
-
 </script>
+</%block>

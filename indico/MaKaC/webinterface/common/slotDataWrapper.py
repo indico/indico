@@ -1,29 +1,29 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from datetime import timedelta,datetime
 from MaKaC.i18n import _
+from MaKaC.errors import MaKaCError, NoReportError
 from pytz import timezone
 
 class Convener:
-    
+
     def __init__(self,id,data={}):
         self._id=id
         self.setValues(data)
@@ -64,11 +64,11 @@ class Convener:
         return self._email
 
 class Slot:
-    
+
     def __init__(self, data={}):
         self.setValues(data)
-    
-    def setValues(self, data):       
+
+    def setValues(self, data):
         self._id=data.get("id","")
         self._session=data.get("session",None)
         self._title=data.get("title", "")
@@ -83,7 +83,7 @@ class Slot:
         self._endDate=None
         if data:
             tz = self._session.getConference().getTimezone()
-            
+
             if data.has_key("sDate"):
                 self._startDate=data["sDate"]
             elif data.get("sYear","")!="" and data.get("sMonth","")!="" and \
@@ -94,12 +94,12 @@ class Slot:
                                         int( data["sDay"] ), \
                                         int( data["sHour"] ), \
                                         int( data["sMinute"] ) ) )
-            
-            if data.has_key("eDate"):           
+
+            if data.has_key("eDate"):
                 self._endDate=data["eDate"]
             elif data.get("eYear","")!="" and data.get("eMonth","")!="" and \
                     data.get("eDay","")!="" and data.get("eHour","")!="" and \
-                    data.get("eMinute","")!="": 
+                    data.get("eMinute","")!="":
                 self._endDate=timezone(tz).localize(datetime( int( data["eYear"] ), \
                                     int( data["eMonth"] ), \
                                     int( data["eDay"] ), \
@@ -156,7 +156,7 @@ class Slot:
 
     def getSession(self):
         return self._session
-    
+
     def getTitle(self):
         return self._title
 
@@ -174,13 +174,13 @@ class Slot:
 
     def getAdjustedStartDate(self):
         return self._startDate.astimezone(timezone(self.getSession().getTimezone()))
-    
+
     def getEndDate(self):
         return self._endDate
 
     def getAdjustedEndDate(self):
         return self._endDate.astimezone(timezone(self.getSession().getTimezone()))
-    
+
     def getDuration(self):
         return self._duration
 
@@ -193,20 +193,16 @@ class Slot:
     def hasErrors(self):
         return False
 
-    def getErrors(self):
-        errors = []
-        idx = 1
+    def checkErrors(self):
         for conv in self.getConvenerList():
             if conv.getFirstName().strip() == "":
-                errors.append( _("FIRST NAME has not been specified for convener #%s")%idx )
+                raise NoReportError( _("FIRST NAME has not been specified for convener #%s")%idx )
             if conv.getFamilyName().strip() == "":
-                errors.append( _("SURNAME has not been specified for convener #%s")%idx )
+                raise NoReportError( _("SURNAME has not been specified for convener #%s")%idx )
             if conv.getAffiliation().strip() == "":
-                errors.append( _("AFFILIATION has not been specified for convener #%s")%idx )
+                raise NoReportError( _("AFFILIATION has not been specified for convener #%s")%idx )
             if conv.getEmail().strip() == "":
-                errors.append( _("EMAIL has not been specified for convener #%s")%idx )
-            idx += 1
-        return errors
+                raise NoReportError( _("EMAIL has not been specified for convener #%s")%idx )
 
     def updateSlot(self,slot):
         slot.setTitle(self.getTitle())
@@ -242,7 +238,7 @@ class Slot:
         for conv in l:
             conv.setId(i)
             i += 1
-    
+
     def removeConveners(self,idList):
         toRem=[]
         for conv in self._conveners:

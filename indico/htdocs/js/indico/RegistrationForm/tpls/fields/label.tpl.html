@@ -1,0 +1,11 @@
+<div class="field-input-only-content label-text" data-id="field-{{ section.id }}-{{ field.id }}">
+    <span>
+        <span ng-bind-html="field.caption"></span><br>
+        <small class="field-description"
+            ng-bind-html="field.description"></small>
+    </span>
+    <span ng-if="field.billable" class="label-price">
+        <span class="regFormPrice">{{ field.price }}</span>
+        <nd-currency currency="currency"></nd-currency>
+    </span>
+</div>

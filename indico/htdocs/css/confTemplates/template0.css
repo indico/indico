@@ -25,7 +25,7 @@
 		copying the path directly from management area.
 		You can also change background color to header by replacing the color #xxxxxx with your own color code */
 	
-	background: #xxxxxx url('../conferenceDisplay.py/getPic?confId=0&PicId=0') left top no-repeat; 
+	background: #xxxxxx url('../picture/0.png') left top no-repeat;
 }
 
 h1 {
@@ -51,7 +51,7 @@ h1 {
 		copying the path directly from management area.
 		You can also change the background color by replacing the color #xxxxxx with your own color code */
 	
-	background: #xxxxxx url('../conferenceDisplay.py/getPic?confId=0&PicId=0') left top no-repeat;
+	background: #xxxxxx url('../picture/0.png') left top no-repeat;
 
 }
 

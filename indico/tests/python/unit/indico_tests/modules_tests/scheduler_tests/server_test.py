@@ -1,37 +1,38 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 Tests for scheduler base classes
 """
-import unittest, threading, multiprocessing
-import time
+
 from datetime import timedelta
 from dateutil import rrule
+import threading
+import multiprocessing
+import os
 
-from MaKaC.common.db import DBMgr
-
-from indico.util.date_time import nowutc
+from indico.core.db import DBMgr
 from indico.modules.scheduler import Scheduler, SchedulerModule, Client, base
-from indico.modules.scheduler.tasks import OneShotTask, PeriodicTask
-from indico.tests.python.unit.util import IndicoTestFeature, IndicoTestCase
+from indico.modules.scheduler.tasks import OneShotTask
+from indico.modules.scheduler.tasks.periodic import PeriodicTask
+from indico.tests.python.unit.util import IndicoTestCase
+
 
 terminated = None
 
@@ -95,20 +96,15 @@ class Worker(threading.Thread):
 
 class SchedulerThread(threading.Thread):
 
-    def __init__(self, mode):
-        super(SchedulerThread, self).__init__()
-        self._mode = mode
-
     def run(self):
 
         s = Scheduler(sleep_interval=1,
-                      task_max_tries=1,
-                      multitask_mode=self._mode)
+                      task_max_tries=1)
         self.result = s.run()
 
 
 class _TestScheduler(IndicoTestCase):
-
+    _slow = True
     _requires = ['db.DummyUser']
 
     def tearDown(self):
@@ -123,7 +119,7 @@ class _TestScheduler(IndicoTestCase):
         with self._context('database'):
             self._smodule = SchedulerModule.getDBInstance()
 
-        self._sched = SchedulerThread(self._mode)
+        self._sched = SchedulerThread()
         self._sched.start()
 
     def _checkWorkersFinished(self, timeout, value=1):
@@ -170,6 +166,8 @@ class _TestScheduler(IndicoTestCase):
     def _assertStatus(self, expectedStatus):
         with self._context('database'):
             status = self._smodule.getStatus()
+            del status['pid']
+            del status['hostname']
             self.assertEqual(expectedStatus, status)
 
     def testSimpleFinish(self):
@@ -390,8 +388,4 @@ class _TestScheduler(IndicoTestCase):
 
 
 class TestProcessScheduler(_TestScheduler):
-    _mode = 'processes'
-
-
-#class TestThreadScheduler(_TestScheduler):
-#    _mode = 'threads'
+    pass

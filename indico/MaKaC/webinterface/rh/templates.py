@@ -1,27 +1,25 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common.general import *
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.webinterface.pages import admins as adminPages
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
@@ -94,6 +92,7 @@ class RHSetDefaultPDFOptions( RHTemplatesBase ):
         self.__pagesize = params.get("pagesize",'A4')
 
         self.__drawDashedRectangles = params.get("drawDashedRectangles", False) is not False
+        self.__landscape = params.get('landscape') == '1'
 
     def _process( self ):
         self.__defaultConferencePDFOptions.setTopMargin(self.__marginTop)
@@ -104,8 +103,9 @@ class RHSetDefaultPDFOptions( RHTemplatesBase ):
         self.__defaultConferencePDFOptions.setMarginRows(self.__marginRows)
         self.__defaultConferencePDFOptions.setPagesize(self.__pagesize)
         self.__defaultConferencePDFOptions.setDrawDashedRectangles(self.__drawDashedRectangles)
+        self.__defaultConferencePDFOptions.setLandscape(self.__landscape)
 
-        self._redirect(urlHandlers.UHTemplates.getURL())
+        self._redirect(urlHandlers.UHBadgeTemplates.getURL())
 
 class RHTemplateModifBase( RHConferenceBase, RHModificationBaseProtected ):
 

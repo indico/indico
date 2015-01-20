@@ -69,7 +69,7 @@
                         var uf = new UserListField('PluginOptionPeopleListDiv', 'PeopleList',
                                                    ${ jsonEncode(fossilize(option.getValue(), IAvatarFossil)) }, true, null,
                                                    true, false, null, null,
-                                                   false, false, true,
+                                                   false, false, false, true,
                                                    newPersonsHandler, userListNothing, removePersonHandler)
                         $E('userList${name}').set(uf.draw())
                     </script>
@@ -86,10 +86,11 @@
                         var info = '';
                         var example = '';
                         % if option.getSubType() == 'instantMessaging':
-                            info = Html.ul({style: {fontWeight: "bold"}},$T('In the URL field, the following patterns will be changed:'),
-                                    Html.li({style: {fontWeight: "lighter"}},$T('[chatroom] by the chat room name')),
-                                    Html.li({style: {fontWeight: "lighter"}},$T('[host] by the specified host')),
-                                    Html.li({style: {fontWeight: "lighter"}},$T('[nickname] by the nick chosen by the user.')));
+                            info = $("<ul style='font-weight: bold;'></ul>").append(
+                                        $T('In the URL field, the following patterns will be changed:'),
+                                        $("<li style='font-weight: lighter;'></li>").append($T('[chatroom] by the chat room name')),
+                                        $("<li style='font-weight: lighter;'></li>").append($T('[host] by the specified host')),
+                                        $("<li style='font-weight: lighter;'></li>").append($T('[nickname] by the nick chosen by the user.')));
                             example = $T('Example: http://[host]/resource/?x=[chatroom]@conference.[host]?join');
                         % elif option.getSubType() == 'webcastAudiences':
                             addLinkText = $T('Add new audience');
@@ -151,12 +152,11 @@
                             var errorLabel=Html.label({style:{'float': 'right', display: 'none'}, className: " invalid"}, $T('Name already in use'));
                             var linkName = new AutocheckTextBox({name: 'name', id:"linkname"}, errorLabel);
                             var linkStructure = Html.input("text", {});
-                            var div = Html.div({},IndicoUtil.createFormFromMap([
+                            var div = $("<div></div>").append(IndicoUtil.createFormFromMap([
                                                                     [linkNameLabel, Html.div({}, linkName.draw(), errorLabel)],
                                                                     [$T('URL'), Html.div({}, linkStructure)]]),
-                                                  Html.div({},
-                                    (info)),
-                                     Html.div({style:{color: "orange", fontSize: "smaller"}}, example));
+                                                              $("<div></div>").append(info),
+                                                              $("<div style='color: orange; font-size: smaller;'></div>").append(example));
                             var linksPopup = new ConfirmPopupWithPM(popupTitle,
                                     div,
                                                                         function(value){
@@ -188,6 +188,7 @@
                                                                             }
                                                                         }
                                                                 );
+
                             linksPopup.parameterManager.add(linkName, 'text', false);
                             linksPopup.parameterManager.add(linkStructure, 'text', false);
                             linksPopup.open();
@@ -202,7 +203,7 @@
                     <script type="text/javascript">
                         var addPaymentMethodText = $T('New payment method');
                         var noPaymentMethodsMsg = $T('No payment methods created yet. Click in New payment method if you want to do so!');
-                        var popupTitle = $T('Enter the name of the payment method and its Extra Fee');
+                        var popupTitle = $T('Enter the payment method data');
                         var paymentMethodNameLabel = $T('Payment method name');
                         var paymentMethodNameHeader = $T('Payment method name');
                         var info = '';
@@ -241,21 +242,18 @@
 
                                         var editButton = Widget.link(command(function(){
                                             var errorLabel=Html.label({style:{'float': 'right', display: 'none'}, className: " invalid"}, $T('Name already in use'));
-                                            var paymentMethodName = Html.div({}, paymentMethod.displayName);
+                                            var paymentMethodName = Html.div({}, paymentMethod.name);
                                             var paymentMethodDisplayName = Html.input("text", {}, paymentMethod.displayName);
                                             var paymentMethodType = Html.input("text", {}, paymentMethod.type);
                                             var paymentMethodExtraFee = Html.input("text", {}, paymentMethod.extraFee);
-
-                                            var div = Html.div({},IndicoUtil.createFormFromMap([
+                                            var div = $("<div></div>").append(IndicoUtil.createFormFromMap([
                                                                                     [paymentMethodNameLabel, Html.div({}, paymentMethodName)],
                                                                                     [$T('Display Name'), Html.div({}, paymentMethodDisplayName)],
                                                                                     [$T('Type'), Html.div({}, paymentMethodType)],
                                                                                     [$T('Extra Fee'), Html.div({}, paymentMethodExtraFee)]]),
-                                                                  Html.div({},
-                                                    (info)),
-                                                     Html.div({style:{color: "orange", fontSize: "smaller"}}, example));
-                                            var paymentMethodsPopup = new ConfirmPopupWithPM(popupTitle,
-                                                    div,
+                                                                              $("<div></div>").append(info),
+                                                                              $("<div style='color: orange; font-size: smaller;'></div>").append(example));
+                                            var paymentMethodsPopup = new ConfirmPopupWithPM(popupTitle, div,
                                                                                         function(value){
                                                                                             if(value){
                                                                                                 var killProgress = IndicoUI.Dialogs.Util.progress($T("Editing payment method..."));
@@ -325,16 +323,14 @@
                             var paymentMethodType = Html.input("text", {});
                             var paymentMethodExtraFee = Html.input("text", {});
 
-                            var div = Html.div({},IndicoUtil.createFormFromMap([
+                            var div = $("<div></div>").append(IndicoUtil.createFormFromMap([
                                                                     [paymentMethodNameLabel, Html.div({}, paymentMethodName.draw(), errorLabel)],
                                                                     [$T('Display Name'), Html.div({}, paymentMethodDisplayName)],
                                                                     [$T('Type'), Html.div({}, paymentMethodType)],
                                                                     [$T('Extra Fee'), Html.div({}, paymentMethodExtraFee)]]),
-                                                  Html.div({},
-                                    (info)),
-                                     Html.div({style:{color: "orange", fontSize: "smaller"}}, example));
-                            var paymentMethodsPopup = new ConfirmPopupWithPM(popupTitle,
-                                    div,
+                                                              $("<div></div>").append(info),
+                                                              $("<div style='color: orange; font-size: smaller'></div>").append(example));
+                            var paymentMethodsPopup = new ConfirmPopupWithPM(popupTitle, div,
                                                                         function(value){
                                                                             if(value){
                                                                                 var killProgress = IndicoUI.Dialogs.Util.progress($T("Creating new type of payment method..."));
@@ -380,7 +376,7 @@
 
                     <div id="editor" style="margin-bottom: 10px"></div>
                     <script type="text/javascript">
-                        var editor = new RichTextEditor(600, 300, 'IndicoFull');
+                        var editor = new RichTextEditor(600, 300);
                             $E('editor').set(editor.draw());
                             editor.set('${ escapeHTMLForJS(option.getValue()) }');
                             var fillText = function(text){
@@ -428,7 +424,7 @@
                             addNew = true;
                         % endif
                         <%
-                        roomList = dict((str(r.guid), '%s: %s' % (r.locationName, r.getFullName())) for r in option.getRooms())
+                        roomList = dict((str(r.id), '{}: {}'.format(r.location_name, r.full_name)) for r in option.getRooms())
                         %>
                         var rlf = new RoomListField('PeopleListDiv', 'PeopleList', ${ fossilize(roomList) }, addNew, addRoomHandler, removeRoomHandler);
 
@@ -477,12 +473,18 @@
                         var uf = new UserListField('PluginOptionPeopleListDiv', 'PeopleList',
                                                    ${ jsonEncode(fossilize(option.getValue())) }, true, null,
                                                    true, true, null, null,
-                                                   false, false, true,
+                                                   false, false, false, true,
                                                    newPersonsHandler, userListNothing, removePersonHandler)
                         $E('userGroupList${name}').set(uf.draw())
                     </script>
                 % elif option.getType() == "password":
                         <input name="${ name }" type="password" size="50" value="${ option.getValue() }">
+                % elif option.getType() == "select":
+                        <select name="${ name }">
+                        % for value in option.getOptions():
+                           <option value="${value}" ${"selected" if option.getValue() == value else ""}>${value}</option>
+                        % endfor
+                        </select>
                 % else:
                     % if option.getType() == list:
                         <% value=  ", ".join([str(v) for v in option.getValue()]) %>
@@ -570,10 +572,12 @@
             </td>
         </tr>
         % endif
+        % if len(Object.getOptionList(includeOnlyEditable=True, includeOnlyVisible=True)) > 0:
         <tr>
             <td colspan="2" style="text-align: right;">
                 <input type="submit" name="Save" value="${ _("Save settings") }" onclick="fillText(editor.get());"/>
             </td>
         </tr>
+        % endif
     </table>
     </form>

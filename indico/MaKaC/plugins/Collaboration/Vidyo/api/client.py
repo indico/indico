@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.plugins.Collaboration.Vidyo.common import getVidyoOptionValue
-from MaKaC.common.logger import Logger
-import suds
-
+from indico.core.logger import Logger
+from MaKaC.plugins.Collaboration.Vidyo.cache import SudsCache
+from suds import client, transport
 
 class ClientBase(object):
     """ Base class for AdminClient and UserClient
@@ -39,8 +38,11 @@ class ClientBase(object):
 #        if url.startswith('https'):
 #            return suds.transport.https.HttpAuthenticated(username=username, password=password, timeout = 30.0)
 #        else:
-        return suds.transport.http.HttpAuthenticated(username=username, password=password, timeout = 30.0)
+        return transport.https.HttpAuthenticated(username=username, password=password, timeout = 30.0)
 
+    @classmethod
+    def getCache(cls):
+        return SudsCache.getInstance()
 
 
 class AdminClient(ClientBase):
@@ -63,9 +65,12 @@ class AdminClient(ClientBase):
             if password is None:
                 password = getVidyoOptionValue('indicoPassword')
 
+            location = getVidyoOptionValue('baseAPILocation') + getVidyoOptionValue('adminAPIService')
+
             try:
-                cls._instance = suds.client.Client(adminAPIUrl,
-                                                   transport = ClientBase.getTransport(adminAPIUrl, username , password))
+                cls._instance = client.Client(adminAPIUrl,
+                                                   transport = ClientBase.getTransport(adminAPIUrl, username , password),
+                                                   location = location, cache = ClientBase.getCache())
             except Exception:
                 Logger.get("Vidyo").exception("Problem building AdminClient")
                 raise
@@ -91,9 +96,11 @@ class UserClient(ClientBase):
             if password is None:
                 password = getVidyoOptionValue('indicoPassword')
 
+            location = getVidyoOptionValue('baseAPILocation') + getVidyoOptionValue('userAPIService')
             try:
-                cls._instance = suds.client.Client(userAPIUrl,
-                                                   transport = ClientBase.getTransport(userAPIUrl, username , password))
+                cls._instance = client.Client(userAPIUrl,
+                                                   transport = ClientBase.getTransport(userAPIUrl, username , password),
+                                                   location=location, cache = ClientBase.getCache())
             except Exception:
                 Logger.get("Vidyo").exception("Problem building UserClient")
                 raise

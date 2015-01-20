@@ -6,19 +6,19 @@
             ${ _("The 'Home' Category is currently") }
             % if privacy == 'INHERITING' :
                 <span class="ACStatus" style="color: #128F33;">${ _("PUBLIC") }</span>
-            % elif privacy == 'PRIVATE' :
-                <span class="ACStatus" style="color: #B02B2C;">${ _("PRIVATE") }</span>
+            % elif privacy == 'RESTRICTED' :
+                <span class="ACStatus" style="color: #B02B2C;">${ _("RESTRICTED") }</span>
             % endif
             .
         </div>
         <div class="ACStatusDescDiv">
             % if privacy == 'INHERITING' :
                 ${ _("This means that it can be viewed by all the users.") }
-            % elif privacy == 'PRIVATE' :
+            % elif privacy == 'RESTRICTED' :
                 ${ _("This means that it can be viewed only by the users you specify in the following list.") }
             % endif
         </div>
-        % if privacy == 'PRIVATE' :
+        % if privacy == 'RESTRICTED' :
         <div class="ACUserListDiv">
             <div class="ACUserListWrapper" id="ACUserListWrapper">
             </div>
@@ -26,7 +26,7 @@
 
         <script type="text/javascript">
 
-            var allowedList = ${ offlineRequest(self_._rh, 'category.protection.getAllowedUsersList', dict(category=self_._rh._target.getId())) };
+            var allowedList = ${fossilize(self_._rh._target.getAllowedToAccessList()) | n,j};
 
             var removeUser = function(user, setResult){
                 jsonRpc(Indico.Urls.JsonRpcService, "category.protection.removeAllowedUser",
@@ -60,7 +60,7 @@
                     'userListDiv', 'userList',
                     allowedList, true, null,
                     true, true, null, null,
-                    false, false, false,
+                    false, false, false, false,
                     addUsers, null, removeUser);
 
             // ---- On Load
@@ -81,14 +81,14 @@
         <form action="${ setPrivacyURL }" method="POST">
             ${ locator }
             <div class="ACModifButtonsDiv">
-                % if privacy == 'PRIVATE' :
+                % if privacy == 'RESTRICTED' :
                 <div class="ACModifButtonEntry">
                     ${ _("Make it")} <input type="submit" class="btn" name="visibility" value="${ _("PUBLIC")}"> ${ _("(viewable by all the users). This operation may take a while to complete.") }
                 </div>
                 % endif
                 % if privacy == 'INHERITING':
                 <div class="ACModifButtonEntry">
-                    ${ _("Make it")} <input type="submit" class="btn" name="visibility" value="${ _("PRIVATE")}"> ${ _("(viewable only by the users you choose). This operation may take a while to complete.") }
+                    ${ _("Make it")} <input type="submit" class="btn" name="visibility" value="${ _("RESTRICTED")}"> ${ _("(viewable only by the users you choose). This operation may take a while to complete.") }
                 </div>
                 % endif
             </div>

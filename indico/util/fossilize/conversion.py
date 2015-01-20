@@ -1,28 +1,32 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 Conversion functions for fossils
 """
 
+from collections import defaultdict
+
 import pytz
+
+from MaKaC.user import Avatar
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 
 
 class Conversion(object):
@@ -76,6 +80,13 @@ class Conversion(object):
             return ''
 
     @classmethod
+    def roomFullName(cls, room):
+        if room:
+            return room.getFullName()
+        else:
+            return ''
+
+    @classmethod
     def locationName(cls, loc):
         if loc:
             return loc.getName()
@@ -108,12 +119,12 @@ class Conversion(object):
     @classmethod
     def parentSessionCode(cls, entry):
         from MaKaC.schedule import ContribSchEntry, BreakTimeSchEntry
-        from MaKaC.conference import SessionSlot
+        from MaKaC.conference import SessionSlot, Contribution
 
         session = None
         owner = entry.getOwner()
 
-        if type(entry) == ContribSchEntry or (type(entry) == BreakTimeSchEntry and type(owner) == SessionSlot):
+        if isinstance(owner, (SessionSlot, Contribution)):
             session = owner.getSession()
 
         if session:
@@ -169,11 +180,12 @@ class Conversion(object):
 
     @classmethod
     def reservationsList(cls, resvs):
-        res = {}
+        res = defaultdict(list)
         for resv in resvs:
-            if not res.has_key(resv.room.getFullName()):
-                res[resv.room.getFullName()] = []
-            res[resv.room.getFullName()].extend([{'startDateTime': cls.datetime(period.startDT), 'endDateTime':  cls.datetime(period.endDT)} for period in resv.splitToPeriods()])
+            occurrences = resv.occurrences.filter(ReservationOccurrence.is_valid)
+            res[resv.room.full_name] += [{'startDateTime': cls.datetime(occ.start_dt),
+                                          'endDateTime': cls.datetime(occ.end_dt)}
+                                         for occ in occurrences]
         return res
 
     @classmethod
@@ -188,9 +200,7 @@ class Conversion(object):
     @classmethod
     def url(cls, handler):
         def _url(locator):
-            url = handler.getURL()
-            url.addParams(locator)
-            return str(url)
+            return str(handler.getURL(**locator))
         return _url
 
     @classmethod
@@ -210,11 +220,20 @@ class Conversion(object):
         return {'id': id,
                 'name': name}
 
-#    @classmethod
-#    def resourceType(cls, obj):
-#
-#        from MaKaC.conference import Link
-#        if type(obj) == Link:
-#            return 'external'
-#        else:
-#            return 'stored'
+    @classmethod
+    def getReportNumbers(cls, obj):
+        from MaKaC.common import utils
+        return utils.getReportNumberItems(obj)
+
+    @classmethod
+    def allowedList(cls, obj):
+        allowed_emails = []
+        allowed_groups = []
+        for allowed in obj.getRecursiveAllowedToAccessList():
+            if isinstance(allowed, Avatar):
+                allowed_emails.extend(allowed.getEmails())
+            else:
+                allowed_groups.append(allowed.getId())
+
+        return {'users': allowed_emails,
+                'groups': allowed_groups}

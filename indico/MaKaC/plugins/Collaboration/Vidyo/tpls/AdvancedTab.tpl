@@ -9,7 +9,7 @@
     <img id="displayPinHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
 </div>
 
-<div class="collaborationAdvancedTabCheckboxDiv">
+<div class="collaborationAdvancedTabCheckboxDiv" style="margin-top:10px">
     <input type="checkbox" id="displayURL" class="centeredCheckBox" name="displayURL" value="yes" checked="checked" />
     <label for="displayURL" class="normal">${ _("Display auto-join URL in event page") }</label>
     <img id="displayURLHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
@@ -17,12 +17,12 @@
 
 <div class="collaborationAdvancedTabCheckboxDiv" style="margin-bottom:10px">
     <input type="checkbox" id="displayPhoneNumbers" class="centeredCheckBox" name="displayPhoneNumbers" value="yes" checked="checked" />
-    <label for="displayPhoneNumbers" class="normal">${ _("Display VidyoVoice phone numbers in event page") }</label>
+    <label for="displayPhoneNumbers" class="normal">${ _("Display phone access numbers in event page") }</label>
 </div>
 
 <div class="collaborationAdvancedTabTitleLine">
     <div class="collaborationAdvancedTabTitle">Other options</div>
 </div>
 <div style="margin-top:10px">
-<%include file="${TPLS}/ConfModifCollaborationDefaultAdvancedTab.tpl"/>
+<%include file="/Collaboration/ConfModifCollaborationDefaultAdvancedTab.tpl"/>
 </div>

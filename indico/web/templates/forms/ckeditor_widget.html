@@ -1,0 +1,15 @@
+<input type="hidden" name="{{ field.name }}" id="{{ field.id }}" value="{{ field._value() }}">
+<div id="{{ field.id }}-editor" style="margin-bottom: 10px;"></div>
+<script>
+    (function() {
+        var field = $('#{{ field.id }}');
+        var editor = new RichTextEditor(600, 300);
+        editor.set(field.val());
+        editor.onLoad(function() {
+            editor.onChange(function() {
+                field.val(editor.get());
+            });
+        });
+        $E('{{ field.id }}-editor').set(editor.draw());
+    })();
+</script>

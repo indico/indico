@@ -1,41 +1,27 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.conference as conference
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.i18n import _
-
-class WSpecialMaterialCreationBase( wcomponents.WMaterialCreation ):
-
-    def __init__( self, owner, factory ):
-        wcomponents.WMaterialCreation.__init__(self, owner)
-        self._factory = factory
-
-    def getVars( self ):
-        vars = wcomponents.WMaterialCreation.getVars( self )
-        vars["typeMaterial"] = self._factory.getId()
-        vars["title"] = self._factory.getTitle()
-        return vars
-
 
 class MaterialFactory:
     """Defines the class base for Material factories.
@@ -107,16 +93,11 @@ class MaterialFactory:
         return False
     appliesToMaterial=classmethod(appliesToMaterial)
 
-
-class WPaperCreation( WSpecialMaterialCreationBase ):
-    pass
-
 class PaperFactory(MaterialFactory):
 
     _id = "paper"
     _title = "Paper"
     _iconURL = Config.getInstance().getSystemIconURL("paper")
-    _creationWC = WPaperCreation
     _materialKlasses=[conference.Paper]
     _needsCreationPage = False
 
@@ -152,10 +133,6 @@ class PaperFactory(MaterialFactory):
         target.setPaper( m )
         return m
     create = classmethod( create )
-
-
-class WSlidesCreation( WSpecialMaterialCreationBase ):
-    pass
 
 
 class SlidesFactory(MaterialFactory):
@@ -199,15 +176,11 @@ class SlidesFactory(MaterialFactory):
         return m
     create = classmethod( create )
 
-class WVideoCreation( WSpecialMaterialCreationBase ):
-    pass
-
 class VideoFactory(MaterialFactory):
 
     _id = "video"
     _title = "Video"
     _iconURL = Config.getInstance().getSystemIconURL("video")
-    _creationWC = WVideoCreation
     _materialKlasses=[conference.Video]
     _needsCreationPage = False
 
@@ -243,9 +216,6 @@ class VideoFactory(MaterialFactory):
         target.setVideo( m )
         return m
     create = classmethod( create )
-
-class WPosterCreation( WSpecialMaterialCreationBase ):
-    pass
 
 class PosterFactory(MaterialFactory):
 
@@ -326,15 +296,11 @@ class MinutesFactory(MaterialFactory):
         return target.createMinutes()
     create = staticmethod( create )
 
-class WReviewingCreation( WSpecialMaterialCreationBase ):
-    pass
-
 class ReviewingFactory(MaterialFactory):
 
     _id = "reviewing"
     _title = "Reviewing"
     _iconURL = Config.getInstance().getSystemIconURL("material")
-    _creationWC = WReviewingCreation
     _materialKlasses=[conference.Reviewing]
     _needsCreationPage = False
 
@@ -431,12 +397,21 @@ class MaterialFactoryRegistry:
                   ReviewingFactory._id: ReviewingFactory }
 
     _allowedMaterials = {
-        'simple_event': [ "paper", "slides", "poster", "minutes", "agenda", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast", "video", "streaming video", "downloadable video" ],
-        'meeting': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ],
-        'conference' : ["paper", "slides", "poster", "minutes"],
-        'category': [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
-        }
+        'simple_event': ["paper", "slides", "poster", "minutes", "agenda", "pictures",
+                         "text", "more information", "document", "list of actions",
+                         "drawings", "proceedings", "live broadcast", "video",
+                         "streaming video", "downloadable video", "notes", "summary"],
 
+        'meeting': ["paper", "slides", "poster", "minutes", "agenda", "video",
+                    "pictures", "text", "more information", "document", "list of actions",
+                    "drawings", "proceedings", "live broadcast", "notes", "summary"],
+
+        'conference': ["paper", "slides", "poster", "minutes", "notes", "summary"],
+
+        'category': ["paper", "slides", "poster", "minutes", "agenda", "video", "pictures",
+                     "text", "more information", "document", "list of actions", "drawings",
+                     "proceedings", "live broadcast"]
+    }
 
     @classmethod
     def getById( cls, matId ):

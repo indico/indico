@@ -1,0 +1,11 @@
+<nd-table ng-if="(formData.items | filter:{cancelled: true}).length"
+    config="config.canceledTable"
+    form-data="formData.items"
+    filter="'cancelled'"
+    filter-value="true">
+</nd-table>
+<div ng-if="!(formData.items | filter:{cancelled: true}).length" class="info-message-box">
+    <div class="message-text">
+        {{ 'There are no cancelled events' | i18n }}
+    </div>
+</div>

@@ -9,7 +9,7 @@
             <td>
                 <span class="WRNoteText">
                     ${_("In order to send a Webcast request, you need to select a room capable of webcasting. ")}
-                    <span class='fakeLink' onclick='toggleWebcastCapableRooms();' id="webcastRoomsText">${_("See list of webcast-able rooms")}</span>
+                    <span class='fakeLink' onclick='toggleWebcastCapableRooms();' id="webcastRoomsText">${_("See list of webcastable rooms")}</span>
                 </span>
             </td>
         </tr>
@@ -59,6 +59,7 @@
 % endif
 
 
+% if IsLecture or NTalks > 0:
 <div id="WRForm">
 
     % if IsSingleBooking:
@@ -73,7 +74,7 @@
         </div>
         <div id="withdrawWebcastRequestTop" style="display:none;">
             <button onclick="withdraw('WebcastRequest')">${_("Withdraw request")}</button>
-            ${inlineContextHelp(_('Withdraw the Recording Request.'))}
+            ${inlineContextHelp(_('Withdraw the Webcast Request.'))}
         </div>
     </div>
     % endif
@@ -82,9 +83,18 @@
             <span style="color:#881122">${_("The webcast will not be broadcasted before all speakers have signed the %s (see Electronic Agreement tab)")%agreementName}</span>
     </div>
 
+% endif
+
+% if not IsLecture and NTalks == 0:
+    <div class="warning-message-box">
+        <div class="message-text">
+            ${_("Only the  contributions can be webcasted and there is no contribution in this event. Please go to Timetable and start adding them")}
+        </div>
+    </div>
+% endif
 
     <!-- DRAW BOX AROUND SECTION 1: SELECT CONTRIBUTIONS -->
-% if not IsLecture:
+% if not IsLecture and NTalks > 0:
     <div class="WRFormSection" id="contributionselectionDiv">
         <!-- WHICH CONTRIBUTIONS SHOULD BE WEBCASTED -->
         <div class="WRFormSubsection">
@@ -92,24 +102,28 @@
             <table>
                 <tr>
                     <td>
-                        <input type="radio" name="talks" value="all" id="allTalksRB" onclick="WR_hideTalks()" checked />
+                        <input type="radio" name="talks" value="all" id="allTalksRB" onclick="WR_hideTalks();" checked />
                     </td>
                     <td>
                         % if NTalks == NWebcastCapableContributions:
                         <label for="allTalksRB" id="allTalksRBLabel" >All talks</label>
                         % else:
                         <label for="allTalksRB" id="allTalksRBLabel">${_("All webcast-able talks.")}</label>
+                        % endif
                     </td>
                 </tr>
-                            % if WebcastCapable:
+                % if WebcastCapable and (NWebcastCapableContributions < NTalks):
                 <tr>
                     <td></td>
-                    <td>
-                        <span class="WRNoteTitle">${_("Note:")}</span>
-                        <span class="WRNoteText">
-                            ${_("Some of your talks")} (${ str(NTalks - NWebcastCapableContributions) + _(" out of ") + str(NTalks) }) ${_(" are not in a room capable of webcasting and thus cannot be webcasted.")}
-                        </span>
-                        <span class='fakeLink' onclick='toggleWebcastCapableRooms();' id="webcastRoomsText">${_("See list of webcast-able rooms")}</span>
+                    <td class="warning" id="not_capable_warning">
+                        <h3>${_("Note")}</h3>
+                        <p>
+                            ${_('<a class="uncapable">{1} of {0}</a> talks are not in a room capable of webcasting and thus cannot be webcasted.').format(NTalks, NTalks - NWebcastCapableContributions)}
+                            % if NWebcastCapableContributions:
+                              ${_('<a class="capable">The remaining {0}</a> will be webcasted').format(NWebcastCapableContributions)}
+                            % endif
+                        </p>
+                        <p><a href="#" class='fakeLink' id="webcastRoomsText">${_("See list of webcastable rooms")}</a></p>
                         <div id="webcastCapableRoomsDiv" style="display:none;">
                             <div style="padding-top:15px;padding-bottom:15px;">
                                 <span class="WRNoteText">${_("These are the rooms capable of webcasting:")} </span>
@@ -131,19 +145,18 @@
                                 </span>
                             </div>
                         </div>
-                            % endif
                     </td>
                 </tr>
-                        % endif
+                % endif
                 <tr>
                     <td>
-                        <input type="radio" name="talks" value="choose" id="chooseTalksRB" onclick="WR_loadTalks()" />
+                        <input type="radio" name="talks" value="choose" id="chooseTalksRB" onclick="WR_loadTalks(${isManager | n,j})" />
                     </td>
                     <td>
                         % if NTalks == NWebcastCapableContributions:
                         <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose talks.")}</label>
                         % else:
-                        <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose among webcast-able talks.")}</label>
+                        <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose among webcastable talks.")}</label>
                         % endif
                     </td>
                 </tr>
@@ -152,8 +165,6 @@
 
         <% displayText = ('none', 'block')[DisplayTalks and InitialChoose] %>
         <div id="contributionsDiv" class="WRFormSubsection" style="display: ${ displayText };">
-            <span class="WRQuestion">${_("Please choose among the webcast-able contributions below:")}</span>
-
             % if HasWebcastCapableTalks:
             <span class="fakeLink" style="margin-left: 20px;" onclick="WRSelectAllContributions()">Select all</span>
             <span class="horizontalSeparator">|</span>
@@ -168,11 +179,12 @@
     </div>
 % endif
 
+% if IsLecture or NTalks > 0:
     <div class="WRFormSubsection">
-        <span class="WRQuestion">${_("Please select the audience of the webcast:")}</span>
+        <span class="WRQuestion">${_("Please choose the restriction to apply to the webcast:")}</span>
         <div>
             <select name="audience">
-                <option value="">${_("Public")}</option>
+                <option value="">${_("No restriction (the webcast is public, anyone can watch)")}</option>
                 % for audience in Audiences:
                     <option value=${ quoteattr(audience['name']) }>${ audience['name'] }</option>
                 % endfor
@@ -207,26 +219,56 @@
     % endif
 </div>
 
+% endif
 <script type="text/javascript">
     var isLecture = ${ jsBoolean(IsLecture) };
     var WRWebcastCapable = ${ jsBoolean(WebcastCapable) };
-
-    var WR_contributions = ${ jsonEncode(Contributions) };
-
-    var WR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasWebcastCapableTalks) };
-</script>
+    % if IsLecture:
+        var WR_contributions = [];
+        var WR_contributions_able = [];
+        var WR_contributions_unable = [];
+        var NWebcastCapableContributions = 0;
+        var NTalks = 0;
+        var WR_contributionsLoaded = true;
+    % else:
+        var WR_contributions = ${ jsonEncode(Contributions) };
+        var WR_contributions_able = ${ jsonEncode(ContributionsAble) };
+        var WR_contributions_unable = ${ jsonEncode(ContributionsUnable) };
+        var NWebcastCapableContributions = ${NWebcastCapableContributions};
+        var NTalks = ${NTalks};
+        var WR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasWebcastCapableTalks) };
+    % endif
 
 % if (not WebcastCapable and WebcastCapableRooms) or (NTalks > NWebcastCapableContributions and WebcastCapable):
-<script type="text/javascript">
-    var webcastSwitch = false;
-    var toggleWebcastCapableRooms = function () {
-        IndicoUI.Effect.toggleAppearance($E('webcastCapableRoomsDiv'));
-        if (webcastSwitch) {
-            $E("webcastRoomsText").dom.innerHTML = $T("See list of webcast-able rooms.");
-        } else {
-            $E("webcastRoomsText").dom.innerHTML = $T("Hide list of webcast-able rooms.");
-        }
-        webcastSwitch = !webcastSwitch;
-    }
-</script>
+
+    function showRooms(){
+        $("#webcastRoomsText").text($T("Hide list of webcastable rooms."));
+        $("#webcastCapableRoomsDiv").show();
+    };
+
+    function hideRooms(){
+        $("#webcastRoomsText").text($T("See list of webcastable rooms."));
+        $("#webcastCapableRoomsDiv").hide();
+    };
+
+    $(function() {
+        $("#webcastRoomsText").click(function() {
+            if ($('#webcastCapableRoomsDiv').is(':hidden')) {
+                showRooms();
+            } else {
+                hideRooms();
+            }
+        });
+
+        $(".warning .capable").attr('href', '#').click(function() {
+            new ContributionsPopup($T("Contributions that can be Webcasted"),WR_contributions_able, false, function() {self.popupAllowClose = true; return true;}, true).open();
+            return false;
+        });
+        $(".warning .uncapable").attr('href', '#').click(function() {
+            new ContributionsPopup($T("Contributions that can't be Webcasted"),WR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}, false).open();
+            return false;
+        });
+    });
+
 % endif
+</script>

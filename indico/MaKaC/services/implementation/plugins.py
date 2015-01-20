@@ -1,28 +1,27 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.services.implementation.base import AdminService
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.plugins import PluginsHolder
 from MaKaC.webinterface.user import UserListModificationBase, UserModificationBase
-from MaKaC.webinterface.rh.base import RoomBookingDBMixin
+
 
 class PluginOptionsBase (AdminService):
 
@@ -86,7 +85,8 @@ class PluginOptionsRemoveUser ( PluginOptionsBase, UserModificationBase ):
 
         return True
 
-class PluginOptionsAddRooms ( RoomBookingDBMixin, PluginOptionsBase ):
+
+class PluginOptionsAddRooms(PluginOptionsBase):
 
     def _checkParams(self):
         PluginOptionsBase._checkParams(self)
@@ -94,7 +94,7 @@ class PluginOptionsAddRooms ( RoomBookingDBMixin, PluginOptionsBase ):
     def _getAnswer(self):
         if self._targetOption.getType() == 'rooms':
             optionValue = self._targetOption.getValue()
-            roomToAdd = self._params.get("room")
+            roomToAdd = int(self._params.get("room"))
             if roomToAdd not in optionValue:
                 optionValue.append(roomToAdd)
             self._targetOption._notifyModification()
@@ -103,6 +103,7 @@ class PluginOptionsAddRooms ( RoomBookingDBMixin, PluginOptionsBase ):
 
         return True
 
+
 class PluginOptionsRemoveRooms ( PluginOptionsBase ):
 
     def _checkParams(self):
@@ -110,7 +111,7 @@ class PluginOptionsRemoveRooms ( PluginOptionsBase ):
 
     def _getAnswer(self):
         if self._targetOption.getType() == 'rooms':
-            roomToRemove=self._params.get("room")
+            roomToRemove = int(self._params.get("room"))
             self._targetOption.getValue().remove(roomToRemove)
             self._targetOption._notifyModification()
         else:
@@ -148,6 +149,7 @@ class PluginOptionsRemoveLink ( PluginOptionsBase ):
                 links.remove(link)
         self._targetOption._notifyModification()
         return {'success': True, 'table': links}
+
 
 methodMap = {
     "addUsers": PluginOptionsAddUsers,

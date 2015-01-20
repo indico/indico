@@ -1,9 +1,27 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+##
+## Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 3 of the
+## License, or (at your option) any later version.
+##
+## Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-from MaKaC.user import Avatar
-from MaKaC.user import CERNGroup
+from MaKaC.user import Avatar, Group
 from MaKaC.conference import Category
 
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 
 class RecordingManagerMarcTagGenerator(object):
 
@@ -22,7 +40,7 @@ class RecordingManagerMarcTagGenerator(object):
             for user_obj in allowed_users:
                 if isinstance(user_obj, Avatar):
                     allowed_emails.append(user_obj.getEmail())
-                elif isinstance(user_obj, CERNGroup):
+                elif isinstance(user_obj, Group) and user_obj.groupType != "Default":
                     allowed_groups.append(user_obj.getId() + " [CERN]")
                 else:
                     allowed_emails.append("UNKNOWN: %s" % user_obj.getId())

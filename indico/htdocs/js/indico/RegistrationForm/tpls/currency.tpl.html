@@ -1,0 +1,8 @@
+<span ng-switch="currency">
+    <span ng-switch-when="not selected" class="no-currency-selected icon-warning"
+          title="There is no currency selected. Please go to the 'e-payment' tab and select the currency to be used in this registration form.">
+    </span>
+    <span ng-switch-default>
+        {{ currency }}
+    </span>
+</span>

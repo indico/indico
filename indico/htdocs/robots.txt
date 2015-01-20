@@ -1,10 +1,12 @@
 # recommended robots.txt for indico
 
 User-agent: *
-Disallow: /categoryMap.py
-Disallow: /wcalendar.py
-Disallow: /categOverview.py
-Disallow: /search.py
-Disallow: /scripts/export.py
+Disallow: /category/*/map
+Disallow: /category/*/overview
+Disallow: /category/*/overview.rss
+Disallow: /category/overview
+Disallow: /category/calendar/
+Disallow: /search
 Disallow: /api
+Disallow: /admin/
 Crawl-delay: 10

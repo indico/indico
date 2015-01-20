@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from seleniumTestCase import LoggedInSeleniumTestCase, setUpModule
 import unittest, time, re, datetime
@@ -25,7 +24,7 @@ import unittest, time, re, datetime
 class CategoryTests(LoggedInSeleniumTestCase):
 
     def test_general_settings(self):
-        self.go("/categoryModification.py?categId=0")
+        self.go("/category/0/manage/")
         self.click(css="input.btn")
         self.type(name="name", text="Sub-category")
         self.type(name="description", text="sub-category")
@@ -40,17 +39,18 @@ class CategoryTests(LoggedInSeleniumTestCase):
         self.click(name="confirm")
 
     def test_protection(self):
-        self.go("/categoryModification.py?categId=0")
+        self.go("/category/0/manage/")
         self.click(css="input.btn")
         self.type(name="name", text="Sub-category")
         self.type(name="description", text="sub-category")
         self.click(name="OK")
-        self.go("/categoryAC.py?categId=1")
+        self.go("/category/1/manage/access")
         self.click(id="inPlaceAddManagerButton")
         self.type(id="userSearchFocusField", text="fake")
         self.click(xpath="//input[@value='Search']")
         self.click(id="_GID1_existingAv0")
         self.click(css="button.ui-button")
+        time.sleep(1)
         self.click(name="changeToPublic")
         self.click(name="changeToPrivate")
         self.click(name="changeToInheriting")

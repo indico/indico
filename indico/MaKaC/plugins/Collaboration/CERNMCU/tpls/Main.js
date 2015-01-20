@@ -189,7 +189,7 @@
 
         var pinInfo;
         if (booking.bookingParams.hasPin) {
-            pinInfo = new HiddenText(booking.bookingParams.pin, Html.span("CERNMCUHiddenPIN", "****"), false).draw();
+            pinInfo = new HiddenText(booking.bookingParams.pin, Html.span("HiddenPIN", "****"), false).draw();
         } else {
             pinInfo = $T("No PIN was defined");
         }
@@ -257,9 +257,9 @@
         disableCustomId();
         % if IncludeInitialRoom:
             pf = new ParticipantListField([{type: 'room',
-                                           name: "${ InitialRoomName }",
-                                           institution: "${ InitialRoomInstitution }",
-                                           ip: "${ InitialRoomIP }",
+                                           name: "${escapeHTMLForJS(InitialRoomName)}",
+                                           institution: "${escapeHTMLForJS(InitialRoomInstitution)}",
+                                           ip: "${InitialRoomIP}",
                                            participantType: 'by_address'}])
             var ipRetrievalResult = ${ IPRetrievalResult }
 

@@ -1,11 +1,11 @@
 <%
 if bgColorCode:
-    bgColorStyle = """ style="background: %s; border-color: %s;" """%(bgColorCode, bgColorCode)
+    bgColorStyle = """ style="background: #%s; border-color: #%s;" """%(bgColorCode, bgColorCode)
 else:
     bgColorStyle = ""
 
 if textColorCode:
-    textColorStyle = """ style="color: %s;" """%(textColorCode)
+    textColorStyle = """ style="color: #%s;" """%(textColorCode)
 else:
     textColorStyle = ""
 %>
@@ -17,7 +17,7 @@ else:
             <div class="confTitle">
                 <h1>
                     <a href="${ displayURL }">
-                        <span class="conferencetitlelink" style="color:${ textColorCode }">
+                        <span class="conferencetitlelink" ${textColorStyle}>
                             % if logo :
                                 <div class="confLogoBox">
                                    ${ logo }
@@ -31,7 +31,7 @@ else:
         </div>
         <div class="confSubTitleBox" ${ bgColorStyle }>
             <div class="confSubTitleContent">
-                ${ searchBox }
+                ${ plugin_hook('conference-header', event=conf) }
                 <div class="confSubTitle" ${ textColorStyle }>
                    <div class="datePlace">
                         <div class="date">${ confDateInterval }</div>

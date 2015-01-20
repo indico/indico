@@ -1,3 +1,5 @@
+<%include file="MarkdownMathJaxHelp.tpl"/>
+
 <div style="padding:20px 0px">
 
 <a href="${urlHandlers.UHConfAbstractBook.getURL(conf)}">${_("Download book of abstracts")}</a>
@@ -10,7 +12,7 @@
         ${ _("Note that you need to enable the book of abstracts link in <a href='%s'>Layout->Menu</a>") % urlHandlers.UHConfModifDisplayMenu.getURL(conf) }.
     % endif
 % else:
-    ${ _("Note that you need to enable call for abstracts if you wish to provide a link in the <a href='%s'>event home page</a> menu, so users can download your book of abstracts")% urlHandlers.UHConferenceDisplay.getURL(conf) }.
+    ${ _("Note that you need to enable abstract submission if you wish to provide a link in the <a href='%s'>event home page</a> menu, so users can download your book of abstracts")% urlHandlers.UHConferenceDisplay.getURL(conf) }.
 % endif
 </div>
 </div>
@@ -19,8 +21,20 @@
 <table width="90%" align="center" border="0">
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Additional text")}</span></td>
-        <td>
-            <div class="blacktext" id="inPlaceEditAdditionalText">${ boaConfig.getText() }</div>
+        <td id="inPlaceEditAdditionalText" data-field-id="boa-text">
+            <div class="wmd-panel">
+              <div id="wmd-button-bar-f_boa-text" class="wmd-button-bar">
+                <button class="save-button i-button icon-disk">${_("Save")}</button>
+              </div>
+              <textarea class="wmd-input" id="wmd-input-f_boa-text" width="100%" rows="10" style="width:100%">${boaConfig.getText()}</textarea>
+            </div>
+            <div class="md-preview-wrapper edit">
+              <div id="wmd-preview-f_boa-text" class="wmd-preview"></div>
+              <div class="icon-arrow-up instructions">
+                  ${_('You can use {0} and {1} formulae.').format('<a href="#" class="markdown-info">Markdown</a>',
+                                                                  '<a href="#" class="latex-info">LaTeX</a>')}
+              </div>
+            </div>
         </td>
     </tr>
     <tr>
@@ -30,8 +44,14 @@
         </td>
     </tr>
     <tr>
+        <td class="dataCaptionTD"><span class="dataCaptionFormat" style="white-space: nowrap;"> ${ _("Corresponding Author")}</span></td>
+        <td class="blacktext" width="100%">
+            <div id="inPlaceEditCorrespondingAuthor" style="display:inline"></div>
+        </td>
+    </tr>
+    <tr>
         <td class="dataCaptionTD">
-            <span class="dataCaptionFormat"> ${ _("Miscellaneous options")}</span><br/><br/>
+            <span class="dataCaptionFormat" style="white-space: nowrap;"> ${ _("Miscellaneous options")}</span><br/><br/>
             <img src="${Config.getInstance().getSystemIconURL( 'enabledSection' )}" alt="${ _("Click to disable")}"> <small> ${ _("Enabled option")}</small>
             <br />
             <img src="${Config.getInstance().getSystemIconURL( 'disabledSection' )}" alt="${ _("Click to enable")}"> <small> ${ _("Disabled option")}</small>
@@ -63,17 +83,35 @@
     </td>
   </tr>
   <tr>
-    <td colspan="2"><button id="cacheRefresh"">${_("Force cache refresh")}</button></td>
+    <td colspan="2"><button id="cacheRefresh">${_("Force cache refresh")}</button></td>
   </tr>
 </table>
 
 <script type="text/javascript">
 
 $(function() {
-    <%  from MaKaC.common import info %>
-        $E('inPlaceEditAdditionalText').set(new RichTextInlineEditWidget('abstract.abstractsbook.changeAdditionalText', ${ jsonEncode(dict(conference="%s"%conf.getId())) }, ${ boaConfig.getText() | n,j }, 300, 45, "${_('No additional text')}").draw());
-    new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditSortBy'), 'abstract.abstractsbook.changeSortBy', ${dict(conference="%s"%conf.getId())}, ${sortByList|n,j}, '${sortBy}');
 
+    $('#inPlaceEditAdditionalText .wmd-input').pagedown('auto-save', {
+      wait_time: 10000,
+      save: function(data, success_cb) {
+        indicoRequest("abstract.abstractsbook.changeAdditionalText",
+          {
+            conference: '${conf.getId()}',
+            value: data
+          },
+          function(result, error) {
+              if (error) {
+                IndicoUtil.errorReport(error);
+              } else {
+                success_cb();
+              }
+          });
+      }
+    });
+
+        new IndicoUI.Widgets.Generic.selectionField($E('inPlaceEditSortBy'), 'abstract.abstractsbook.changeSortBy', ${dict(conference="%s"%conf.getId())}, ${sortByList|n,j}, '${sortBy}');
+        $('#inPlaceEditCorrespondingAuthor').html(new SelectEditWidget('abstract.abstractsbook.changeCorrespondingAuthor',
+                {'conference':'${conf.getId()}'}, ${correspondingAuthorList|n,j}, ${ jsonEncode(correspondingAuthor) }, null).draw().dom);
     $('#cacheToggle').click(function(){
         indicoRequest('abstract.abstractsbook.toggleCache',
                       {conference: '${conf.getId()}'},

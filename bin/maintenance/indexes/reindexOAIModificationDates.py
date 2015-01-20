@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common import db
+from indico.core.db import DBMgr
 from MaKaC.conference import ConferenceHolder
 from MaKaC import conference
 from MaKaC.trashCan import TrashCanManager
@@ -29,7 +28,7 @@ def date2txt(date):
     return date.strftime("%Y-%m-%d")
 
 def main():
-    db.DBMgr.getInstance().startRequest()
+    DBMgr.getInstance().startRequest()
     ch = ConferenceHolder()
     ih = indexes.IndexesHolder()
     catIdx = ih.getById("category")
@@ -41,14 +40,14 @@ def main():
     contIdx.initIndex()
     confIdxPr.initIndex()
     contIdxPr.initIndex()
-    db.DBMgr.getInstance().commit()
+    DBMgr.getInstance().commit()
     print "Count conferences..."
     ids = catIdx.getItems('0')
     totalConf = len(ids)
     print "%d conferences found"%totalConf
     ic = 1
-    db.DBMgr.getInstance().sync()
-    db.DBMgr.getInstance().endRequest()
+    DBMgr.getInstance().sync()
+    DBMgr.getInstance().endRequest()
     i = 0
     pubConf = 0
     privConf = 0
@@ -64,7 +63,7 @@ def main():
         startPrivConf = privConf
         for j in range(10):
             try:
-                db.DBMgr.getInstance().startRequest()
+                DBMgr.getInstance().startRequest()
                 for id in lids:
                     conf = ch.getById(id)
                     confIdx = ih.getById("OAIConferenceModificationDate")
@@ -89,7 +88,7 @@ def main():
                                 contIdxPr.indexContribution(sc)
                             else:
                                 contIdx.indexContribution(sc)
-                db.DBMgr.getInstance().endRequest()
+                DBMgr.getInstance().endRequest()
                 print "wait 0.5s..."
                 sleep(0.5)
                 break
@@ -99,7 +98,7 @@ def main():
                 ic = startic
                 pubConf = startPubConf
                 privConf = startPrivConf
-                db.DBMgr.getInstance().abort()
+                DBMgr.getInstance().abort()
     print "indexed conferences : %d public, %d private"%(pubConf, privConf)
 
 if __name__ == "__main__":

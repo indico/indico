@@ -86,7 +86,7 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
             <li><a href="${ categDisplayURL }">${ _("Go back to category page") }</a></li>
         </ul>
         <h1 class="categoryTitle">
-            ${ categoryTitle }&nbsp;
+            ${ categoryTitle | remove_tags }&nbsp;
             <span style="font-style: italic; font-size: 0.8em;">(${ _("calendar overview") })</span>
         </h1>
     </div>
@@ -141,23 +141,9 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
                                 <option>12</option>
                             </select>
                             <select name="year" style="min-width: 50px;">
-                                <option>2012</option>
-                                <option>2011</option>
-                                <option>2010</option>
-                                <option>2009</option>
-                                <option>2008</option>
-                                <option>2007</option>
-                                <option>2006</option>
-                                <option>2005</option>
-                                <option>2004</option>
-                                <option>2003</option>
-                                <option>2002</option>
-                                <option>2001</option>
-                                <option>2000</option>
-                                <option>1999</option>
-                                <option>1998</option>
-                                <option>1997</option>
-                                <option>1996</option>
+                                % for year in reversed(range(currentYear - 10, currentYear + 1)):
+                                    <option>${year}</option>
+                                % endfor
                             </select>
                         </td>
                     </tr>
@@ -185,10 +171,10 @@ if(document.captureEvents) {document.captureEvents(Event.MOUSEMOVE);}
 
                 var calendarOptionsForm = $E("calendarOptionsForm");
 
-                calendarOptionsForm.dom.months.selectedIndex=${ selectedmonths }-1;
-                calendarOptionsForm.dom.columns.selectedIndex=${ selectedcolumns }-1;
-                calendarOptionsForm.dom.month.selectedIndex=${ selectedmonth }-1;
-                calendarOptionsForm.dom.year.selectedIndex=2012-${ selectedyear };
+                calendarOptionsForm.dom.months.selectedIndex = ${selectedmonths} - 1;
+                calendarOptionsForm.dom.columns.selectedIndex = ${selectedcolumns} - 1;
+                calendarOptionsForm.dom.month.selectedIndex = ${selectedmonth} - 1;
+                calendarOptionsForm.dom.year.selectedIndex=  ${currentYear - selectedyear};
 
                 </script>
 

@@ -25,7 +25,6 @@ function deselectAll()
 //-->
 </script>
 <h3 class="groupTitle" style="background: rgb(229, 229, 229) none repeat scroll 0% 0%; -moz-background-clip: border; -moz-background-origin: padding; -moz-background-inline-policy: continuous; color: gray;">${ _("Get file package")}</h3>
-<p style="font-family: verdana, arial, sans-serif;font-weight: bold;font-size: 10px; color: red;">${ errors }</p>
 <form action=${ getPkgURL } method="post" name="getPkgForm">
     <table width="100%">
         <tr>
@@ -48,8 +47,17 @@ function deselectAll()
                   <tr>
                     <td class="groupTitle"> ${ _("Material type")}</td>
                   </tr>
-                  ${ materialType }
-                  </table>
+                  <tr>
+                    <td>
+                      % for materialTypeName in materialTypes:
+                      <div>
+                        <input name="materialType" type="checkbox" value="${materialTypeName}" checked="checked"/>${_(materialTypeName.capitalize())}
+                      </div>
+                      % endfor
+                      <input name="materialType" type="checkbox" value="other" checked="checked"/>${_("Other types")}
+                    </td>
+                  </tr>
+                </table>
                 </td>
                 <td valign="top" width="100%">
                   <table width="100%"e>

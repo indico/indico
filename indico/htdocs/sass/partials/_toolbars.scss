@@ -1,0 +1,291 @@
+/*
+ * This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+$toolbar-height: 2.2em;
+$toolbar-thin-height: 1.9em;
+
+.scrolling .toolbar {
+    margin: 0.5em 0em 0.5em 0em;
+}
+
+.toolbar {
+    $toolbar-button-height: 1.7em;
+
+    min-height: $toolbar-height;
+    margin-bottom: 0.5em;
+    padding: 3px 0;
+    vertical-align: middle;
+
+    &.inline {
+        margin-bottom: 0;
+        padding: 0;
+    }
+
+    &.thin {
+        $thin-button-height: 1.4em;
+        min-height: $toolbar-thin-height;
+
+        & .i-button {
+            height: $toolbar-thin-height;
+            line-height: $thin-button-height;
+        }
+
+        & input[type=text] {
+            height: $toolbar-thin-height;
+        }
+    }
+
+    &.thinner {
+        min-height: 1em;
+        margin-bottom: 0px;
+        padding: 0px;
+
+        & .i-button {
+            height: 1.5em;
+            line-height: 1.0em;
+        }
+        & .i-button[class*="icon-"]:before {
+            font-size: 1em;
+            vertical-align: 0%;
+        }
+
+    }
+
+    & > .option {
+        line-height: 2.5em;
+        margin-right: 1em;
+    }
+
+    .i-button {
+        display: block;
+        float: left;
+        font-weight: bold;
+        height: $toolbar-height;
+        line-height: $toolbar-button-height;
+        padding: 0.2em 0.7em 0.1em 0.7em !important;
+        text-align: center;
+
+        &.open {
+            color: $dark-gray !important;
+            background: #ddd;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.2) inset;
+        }
+
+        &.arrow:last-of-type {
+            border-right-width: 1px;
+            border-right-style: solid;
+        }
+
+        &.arrow:last-of-type:not(.highlight):not(.accept):not(.danger):not(.warning) {
+            border-color: $gray;
+        }
+    }
+
+    input[type=text] {
+        color: $black;
+        display: inline-block;
+        float: left;
+        height: $toolbar-height;
+        margin: 0;
+        padding: 0.2em 0.7em 0.1em 0.7em;
+    }
+
+    .dropdown {
+        display: none;
+        z-index: 1;
+
+        & > li {
+            white-space: nowrap;
+        }
+    }
+
+    .group {
+        @extend %toolbar-group;
+    }
+}
+
+.toolbar.table {
+    display: table;
+    table-layout: fixed;
+
+    .group {
+        display: table-row;
+
+        .i-button {
+            display: table-cell;
+            float: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
+}
+
+%toolbar-group {
+    @extend %toolbar-group-inputs;
+    @extend %toolbar-group-datepicker;
+    @extend %toolbar-group-slider;
+    display: inline-block;
+    padding: 0 0.4em;
+    margin-bottom: -2px;
+
+    &:first-child {
+        padding-left: 0;
+    }
+
+    &:last-child {
+        padding-right: 0;
+    }
+
+    .i-button {
+        @include border-radius(0);
+        border-right: none;
+
+        &:not(.label) {
+            &:hover + .i-button {
+                border-left-color: $dark-gray;
+            }
+        }
+
+        &.arrow:last-of-type {
+            @include border-bottom-right-radius();
+            @include border-top-right-radius();
+        }
+    }
+
+    .i-button:not(.hidden) {
+        &:first-child {
+            @include border-bottom-left-radius();
+            @include border-top-left-radius();
+        }
+
+        &:last-child {
+            @include border-bottom-right-radius();
+            @include border-top-right-radius();
+            @include border-right($gray);
+
+            &:hover {
+                border-right-color: $dark-gray;
+            }
+
+            &:active {
+                border-right-color: $gray;
+            }
+        }
+
+        &.label {
+            &:not(:last-child) {
+                @include border-bottom-right-radius(0);
+                @include border-top-right-radius(0);
+                border-right: none !important;
+            }
+
+            & ~ .i-button:not(.hidden):first-child {
+                @include border-bottom-left-radius(0);
+                @include border-top-left-radius(0);
+            }
+        }
+    }
+}
+
+%toolbar-group-inputs {
+    label.i-button {
+        &:not(.label) {
+            &:hover ~ .i-button {
+                border-left-color: $gray;
+            }
+        }
+    }
+
+    input[type=radio]:first-child,
+    input[type=text]:first-child {
+        + .i-button {
+            @include border-bottom-left-radius();
+            @include border-top-left-radius();
+        }
+    }
+
+    > .clearableinput {
+        float: left;
+    }
+
+    > input[type=text]:first-child,
+    > .clearableinput:first-child input[type=text] {
+        @include border-bottom-left-radius();
+        @include border-top-left-radius();
+    }
+
+    > input[type=text]:last-child,
+    > .clearableinput:last-child input[type=text] {
+        @include border-bottom-right-radius();
+        @include border-top-right-radius();
+    }
+
+    > input[type=text]:not(:last-child),
+    > .clearableinput:not(:last-child) {
+        & + .i-button {
+            border-left: none;
+        }
+    }
+}
+
+%toolbar-group-slider {
+    &.with-slider {
+        .slider {
+            padding-left: 1em !important;
+            padding-right: 1em !important;
+            width: 150px;
+
+            .ui-slider {
+                display: inline-block !important;
+                margin-top: 3px;
+                margin-left: -2px;
+                width: 100% !important;
+            }
+        }
+    }
+}
+
+%toolbar-group-datepicker {
+    &.with-datepicker {
+        .datepicker {
+            position: relative;
+
+            &:last-child {
+                input[type=text] {
+                    @include border-bottom-right-radius();
+                    @include border-top-right-radius();
+                }
+            }
+
+            .ui-datepicker-trigger {
+                float: right;
+                font-size: 1em;
+                line-height: $toolbar-height;
+                position: absolute;
+                margin: 0;
+                right: 5px;
+                top: auto;
+            }
+
+            &.thin .ui-datepicker-trigger {
+                line-height: $toolbar-thin-height;
+            }
+        }
+    }
+}

@@ -1,5 +1,5 @@
 <table class="groupTable">
-<form action="${ createGroupURL }" method="POST">
+<form action="${ createGroupURL }" method="GET">
 
 <tr>
   <td colspan="2"><div class="groupTitle">${ _("Group tools") }</div></td>

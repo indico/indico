@@ -1,0 +1,87 @@
+{% set value_json = field._value() | tojson %}
+<input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}">
+<div id="{{ field.id }}-widget">
+    <table class="i-table-widget">
+        <thead data-tooltip-anchor>
+            <tr>
+                {% for _, title in field.fields -%}
+                    <th>{{ title }}</th>
+                {% endfor -%}
+                <th class="action-column">Action</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <a href="#" class="js-add-row i-button icon-plus i-form-button">{% trans %}Add{% endtrans %}</a>
+</div>
+
+<script>
+    (function() {
+        var columns = {{ field.fields | tojson }};
+        var widget = $('#{{ field.id }}-widget');
+        var widgetBody = widget.children('table').children('tbody');
+        var field = $('#{{ field.id }}');
+        var data = JSON.parse(field.val());
+        var deleteButton = $('<a>', {'class': 'action-icon icon-remove js-remove-row', 'href': '#', 'title': $T('Delete')});
+        var saveButton = $('<a>', {'class': 'action-icon icon-disk js-save-row', 'href': '#', 'title': $T('Save')});
+
+        if (!data.length) {
+            createRow();
+        }
+
+        data.forEach(function(item, i) {
+            createRow(item);
+        });
+
+        widget.on('click', '.js-remove-row', function(e) {
+            e.preventDefault();
+            var row = $(this).closest('tr');
+            data.splice(row.index(), 1);
+            updateField();
+            row.remove();
+            repositionTooltips();
+        }).on('click', '.js-save-row', function(e) {
+            e.preventDefault();
+            var row = $(this).closest('tr');
+            var item = {};
+            columns.forEach(function(col, i) {
+                item[col[0]] = row.find('input').eq(i).val();
+            });
+            row.remove();
+            data.push(item);
+            updateField();
+            createRow(item);
+        }).on('click', '.js-add-row', function(e) {
+            e.preventDefault();
+            createRow();
+        }).on('keypress', 'input', function(e) {
+            if (e.keyCode == 13) {
+                e.preventDefault();
+                $(this).closest('tr').find('.js-save-row').trigger('click');
+            }
+        });
+
+        function createRow(item) {
+            var row = $('<tr>');
+            columns.forEach(function(col) {
+                var colData = item ? {
+                    text: item[col[0]]
+                } : {
+                    html: $('<input>', {
+                        'type': 'text',
+                        'class': 'table-input'
+                        // can't set placeholder here due to the jquery.placeholder plugin
+                    }).attr('placeholder', col[1])
+                };
+                $('<td>', colData).appendTo(row);
+            });
+            $('<td>', {html: item ? deleteButton.clone() : deleteButton.clone().add(saveButton.clone())}).appendTo(row);
+            widgetBody.append(row);
+            repositionTooltips();
+        }
+
+        function updateField() {
+            field.val(JSON.stringify(data));
+        }
+    })();
+</script>

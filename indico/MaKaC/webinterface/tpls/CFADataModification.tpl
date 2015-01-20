@@ -44,14 +44,14 @@
                     <b> ${ _("To List")}:&nbsp;</b>
                   </td>
                   <td align="left">
-                    <input type="text" size="50" name="toList" value="${ toList }">
+                    <input type="text" size="50" name="toList" id="toList" value="${ toList }">
                   </td>
                 <tr>
                   <td>
                     <b> ${ _("Cc List")}:&nbsp;</b>
                   </td>
                   <td align="left">
-                    <input type="text" size="50" name="ccList" value="${ ccList }">
+                    <input type="text" size="50" name="ccList" id="ccList" value="${ ccList }">
                   </td>
                 </tr>
                 <tr><td colspan="2"><small>( ${ _("You can write several email addresses separated by commas")})</small></td></tr>
@@ -63,7 +63,7 @@
             <td colspan="2" align="left">
                 <table align="left">
                     <tr>
-                        <td><input type="submit" class="btn" value="${ _("ok")}"></td>
+                        <td><input type="submit" class="btn" value="${ _("ok")}" id="ok"></td>
                         <td><input type="submit" class="btn" value="${ _("cancel")}" name=" ${ _("cancel")}"></td>
                     </tr>
                 </table>
@@ -73,7 +73,15 @@
 </form>
 
 <script type="text/javascript">
-// ---- On Load
+
+    var parameterManager = new IndicoUtil.parameterManager();
+    parameterManager.add($E('toList'), 'emaillist', true);
+    parameterManager.add($E('ccList'), 'emaillist', true);
+
+    $("#ok").click(function() {
+        if (!parameterManager.check())
+            event.preventDefault();
+    });
     IndicoUI.executeOnLoad(function()
     {
 

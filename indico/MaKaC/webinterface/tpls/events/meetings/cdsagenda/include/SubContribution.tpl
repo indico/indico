@@ -1,6 +1,6 @@
 <%page args="item, minutes=True"/>
 
-<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
 
 <tr>
     <td align="left">
@@ -10,17 +10,21 @@
     % if item.getDuration():
          <span class="itemDuration">(${prettyDuration(item.getDuration())})</span>
     % endif
-    % if len(item.getReportNumberHolder().listReportNumbers()) != 0:
-        (
-        % for rn in item.getReportNumberHolder().listReportNumbers():
-                ${rn[1]}&nbsp;
-        % endfor
-        )
-    % endif
+        % if item.getReportNumberHolder().listReportNumbers():
+            (
+            % for reportNumber in item.getReportNumberHolder().listReportNumbers():
+                % if reportNumberSystems[reportNumber[0]]["url"]:
+                    <a href="${reportNumberSystems[reportNumber[0]]["url"] + reportNumber[1]}" target="_blank">${reportNumber[1]} </a>
+                % else:
+                    ${reportNumber[1]}
+                % endif
+            % endfor
+            )
+        % endif
     % if len(item.getAllMaterialList()) > 0:
         % for material in item.getAllMaterialList():
             % if material.canView(accessWrapper):
-            <%include file="${INCLUDE}/Material.tpl" args="material=material, contribId=item.getId()"/>
+            <%include file="../../${INCLUDE}/Material.tpl" args="material=material, contribId=item.getId()"/>
             &nbsp;
             % endif
         % endfor
@@ -51,7 +55,7 @@
         % endif
         &nbsp;
         <div style="float:right">
-            <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+            <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
         </div>
     </td>
 

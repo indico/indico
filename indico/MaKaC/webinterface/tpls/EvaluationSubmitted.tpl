@@ -1,29 +1,21 @@
+<%inherit file="ConfDisplayBodyBase.tpl"/>
 
-  <table class="noticeMain" style="text-align: center;">
-    <tr>
-      <td class="title"> ${ _("Evaluation")}&nbsp;${status}</td>
-    </tr>
-    <tr>
-      <td class="td">
+<%block name="title">
+    ${body_title}
+</%block>
 
-        <br><br>
-        <table class="noticeInside" style="text-align: center; margin: auto;">
-          <tr>
-            <td> ${ _("Your information has been saved.<br/><br/>Thank you for your participation!")}</td>
-          </tr>
-        </table>
+<%block name="content">
+    <div class="success-message-box">
+        <div class="message-text">${_("Evaluation stored. Thanks for your participation!")}</div>
+    </div>
 
-        % if redirection!=None:
-          <br><br>
-          <script type="text/javascript">
+    % if redirection != None:
+        <script type="text/javascript">
             function redirUrl() { return "${redirection}"; }
             document.writeln("<input class='btn' type='button' value='OK' onclick='self.location.href=redirUrl()'/>");
-          </script>
-          <noscript>
+        </script>
+        <noscript>
             <a href="${redirection}">[ OK ]</a>
-          </noscript>
-        % endif
-
-      </td>
-    </tr>
-  </table>
+        </noscript>
+    % endif
+</%block>

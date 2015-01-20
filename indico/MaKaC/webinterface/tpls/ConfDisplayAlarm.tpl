@@ -2,14 +2,14 @@
 
 <%def name="printRecipientList(alarm)">
     <% addr = "" %>
-    % if len(alarm.getToAddrList()) > 0 :
-          <% addr = " <br> ".join(alarm.getToAddrList()) + " <br> " %>
-    % endif
     % for user in alarm.getToUserList():
           <% addr = addr + user.getEmail() + " <br> " %>
     % endfor
     % if alarm.getToAllParticipants() :
-          <% addr = "to all participants" %>
+          <% addr = "to all participants" + "<br>" %>
+    % endif
+    % if len(alarm.getToAddrList()) > 0 :
+          <% addr = addr + " <br> ".join(alarm.getToAddrList()) + "<br> " %>
     % endif
     ${addr}
 </%def>
@@ -40,12 +40,12 @@
             <table width="80%">
                 <tr>
                     <td nowrap class="titleCellFormat">${ _("Date")} (${ timezone }):</td>
-                    <td nowrap class="titleCellFormat">${ _("Subject")}:</b></td>
-                    <td nowrap class="titleCellFormat">${ _("To")}:</b></td>
+                    <td nowrap class="titleCellFormat">${ _("Subject")}:</td>
+                    <td nowrap class="titleCellFormat">${ _("To")}:</td>
                     <td nowrap class="titleCellFormat">${ _("Action")}:</td>
                 </tr>
             % if not alarmList:
-                <tr><td colspan="4"><em>${ _("There are not alarms yet")}</em></td></tr>
+                <tr><td colspan="4"><em>${ _("There are no alarms yet")}</em></td></tr>
             % else:
                 % for al in alarmList:
                     <tr>
@@ -59,7 +59,7 @@
                                 ${ ("(" +_("Sent the ") + al.getStartedOn().astimezone(confTZ).strftime(dtFormat) +")")}
                             </span>
                         % elif al.getId() :
-                            <a href="${modifyAlarmURL}?${al.getLocator().getURLForm()}" >${al.getSubject()}</a>
+                            <a href="${ urlHandlers.UHConfModifyAlarm.getURL(al) }" >${al.getSubject()}</a>
                         % else:
                             <span class="notScheduled">
                                 ${al.getSubject()}
@@ -71,10 +71,12 @@
                         % if al.getEndedOn():
                             <span class="alarmSentDelete">${_("Delete")}</span>
                         % elif al.getId():
-                            <a href="${deleteAlarmURL}?${al.getLocator().getURLForm()}" onclick="return confirm('${_("Are you sure to delete this alarm?")}');">${_("Delete")}</a>
+                            <a href="${ urlHandlers.UHConfDeleteAlarm.getURL(al) }"
+                               data-confirm='${_("Are you sure you want to delete this alarm?")}'
+                               data-title='${_("Delete alarm")}'>${_("Delete")}</a>
                         % else:
                             <span class="notScheduled">${_("Delete")}</span>
-                        % endif:
+                        % endif
                         </td>
                     </tr>
                 % endfor

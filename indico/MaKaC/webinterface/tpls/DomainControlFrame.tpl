@@ -4,26 +4,42 @@
 </tr>
 </table>
 <div>${ locator }</div>
-<div class="domain_control">
+<div class="domain_control" style="max-width: 600px;">
+  % if inheriting:
+    <div class="warning-message-box">
+      <div class="message-text">
+        ${_("This category is inheriting its domain access settings from its parent.")}
+      </div>
+    </div>
+  % endif
   <div id="message"></div>
+  <form autocomplete="off">
   <ul>
   % for dom, state in domains.iteritems():
     <li>
-      <input type="checkbox" name="selectedDomain" value="${dom.getId()}" ${'checked="checked"' if state else ''}>
+      <input type="checkbox" name="selectedDomain" value="${dom.getId()}" ${'checked' if state else ''}
+    ${'disabled' if inheriting else ''}>
         ${dom.getName()}
       </input>
     </li>
   % endfor
   </ul>
+  </form>
 </div>
+
 <script type="text/javascript">
-function smooth_slide(el, text) {
+
+function smooth_slide(el, text, immediately) {
+    if (immediately) {
+        el.html(text);
+        return;
+    }
     el.slideUp(function() {
         $(this).html(text)
     }).slideDown();
 }
 
-function refresh_state() {
+function refresh_state(immediately) {
     var el = $('.domain_control #message');
 
     var new_state = $(':checkbox:checked').length > 0;
@@ -31,26 +47,32 @@ function refresh_state() {
     if (new_state == el.data('enabled')) {
         return;
     } else if (new_state){
-        el.data('enabled', true);
-        smooth_slide(el, $T('<span class="protPrivate strong">Access restricted</span><p>Only users in the networks selected below will be able to access this event.</p>'));
+        smooth_slide(el, $T('<span class="protPrivate strong">Access restricted</span><p>Only users in the networks selected below will be able to access this event.</p>'), immediately);
     } else{
-        el.data('enabled', false);
-        smooth_slide(el, $T('<span class="protPublic strong">Accessible from everywhere</span><p>To restrict access to this event only to certain IP addresses, choose at least one of the networks below.</p>'));
+        smooth_slide(el, $T('<span class="protPublic strong">Accessible from everywhere</span><p>To restrict access to this event only to certain IP addresses, choose at least one of the networks below.</p>'), immediately);
     }
+
+    el.data('enabled', new_state);
 }
 
 $(function(){
-    refresh_state();
+    refresh_state(true);
 });
 
-$('input:checkbox', '.domain_control').live('change', function(){
-    $this = $(this);
-    indicoRequest('event.protection.toggleDomains',
-                  {
-                      confId: ${conference.getId()},
-                      domainId: $this.val(),
-                      add: $this.is(':checked')
-                  },
+$('.domain_control input:checkbox').on('change', function(){
+   var $this = $(this);
+   var params = {
+                  targetId: '${target.getId()}',
+                  domainId: $this.val(),
+                  add: $this.is(':checked')
+                };
+
+   % if event is not None:
+       params['confId'] = ${ event.getId() | n,j};
+   % endif
+
+    indicoRequest('${method}',
+                  params,
                   function(result, error) {
                       if(error) {
                           IndicoUtil.errorReport(error);

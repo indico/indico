@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """ This file has the common fossils for Collaboration
     There are 3 groups of fossils:
@@ -27,7 +26,8 @@
 
 
 from MaKaC.common.fossilize import IFossil
-from MaKaC.fossils.conference import IConferenceFossil
+from MaKaC.fossils.conference import IConferenceFossil, IConferenceMinimalFossil
+from MaKaC.fossils.contribution import IContributionFossil
 from MaKaC.common.Conversion import Conversion
 from MaKaC.plugins import Collaboration
 
@@ -77,9 +77,15 @@ class ICSBookingBaseFossil(IFossil):
     def getBookingParams(self):
         """ Returns a dictionary with the booking params. """
 
+    def hasAcceptReject(self):
+        """ Returns if this booking belongs to a plugin who has a "accept or reject" concept. """
 
 
 class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
+
+    def getConference(self):
+        """ Returns the assocaited event id """
+    getConference.result = IConferenceMinimalFossil
 
     def getWarning(self):
         """ Returns a warning object attached to this booking. (self._warning) """
@@ -105,8 +111,8 @@ class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
     def hasCheckStatus(self):
         """ Returns if this booking belongs to a plugin who has a "check status" concept. """
 
-    def hasAcceptReject(self):
-        """ Returns if this booking belongs to a plugin who has a "accept or reject" concept. """
+    def isLinkedToEquippedRoom(self):
+        pass
 
     def requiresServerCallForStart(self):
         """ Returns if this booking belongs to a plugin who requires a server call when the start button is pressed."""
@@ -116,10 +122,6 @@ class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
         """ Returns if this booking belongs to a plugin who requires a server call when the stop button is pressed. """
     requiresServerCallForStop.name = "requiresServerCallForStop"
 
-    def requiresServerCallForConnect(self):
-        """ Returns if this booking belongs to a plugin who requires a server call when the connect button is pressed. """
-    requiresServerCallForConnect.name = "requiresServerCallForConnect"
-
     def requiresClientCallForStart(self):
         """ Returns if this booking belongs to a plugin who requires a client call when the start button is pressed. """
     requiresClientCallForStart.name = "requiresClientCallForStart"
@@ -127,10 +129,6 @@ class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
     def requiresClientCallForStop(self):
         """ Returns if this booking belongs to a plugin who requires a client call when the stop button is pressed. """
     requiresClientCallForStop.name = "requiresClientCallForStop"
-
-    def requiresClientCallForConnect(self):
-        """ Returns if this booking belongs to a plugin who requires a client call when the connect button is pressed. """
-    requiresClientCallForConnect.name = "requiresClientCallForConnect"
 
     def canBeDeleted(self):
         """ Returns if this booking can be deleted, in the sense that the "Remove" button will be active and able to be pressed. """
@@ -144,10 +142,6 @@ class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
         """ Returns if this booking can be stopped, in the sense that the "Stop" button will be active and able to be pressed. """
     canBeStopped.name = 'canBeStopped'
 
-    def canBeConnected(self):
-        """ Returns if this booking can be connected, in the sense that the "Connect" button will be active and able to be pressed. """
-    canBeConnected.name = 'canBeConnected'
-
     def isPermittedToStart(self):
         """ Returns if this booking is allowed to start, in the sense that it will be started after the "Start" button is pressed.
             For example a booking should not be permitted to start before a given time, even if the button is active. """
@@ -156,10 +150,6 @@ class ICSBookingBaseConfModifFossil(ICSBookingBaseFossil):
     def isPermittedToStop(self):
         """ Returns if this booking is allowed to stop, in the sense that it will be started after the "Stop" button is pressed."""
     isPermittedToStop.name = "permissionToStop"
-
-    def isPermittedToConnect(self):
-        """ Returns if this booking is allowed to stop, in the sense that it will be started after the "Stop" button is pressed."""
-    isPermittedToConnect.name = "permissionToConnect"
 
     def canBeNotifiedOfEventDateChanges(self):
         """ Returns if bookings of this type should be able to be notified
@@ -180,6 +170,16 @@ class ICSBookingBaseIndexingFossil(ICSBookingBaseFossil):
     getModificationURL.name = "modificationURL"
     getModificationURL.convert = lambda url: str(url)
 
+
+class ICSBookingInstanceIndexingFossil(ICSBookingBaseIndexingFossil):
+    def getStartDate(self):
+        pass
+    getStartDate.name = "instanceDate"
+    getStartDate.convert = Conversion.datetime
+
+    def getTalk(self):
+        """ Returns fossil of the talk this booking relates to """
+    getTalk.result = IContributionFossil
 
 
 ##################### Error fossils #####################
@@ -253,9 +253,11 @@ class ICollaborationMetadataFossil(IFossil):
 
     def getStartDate(self):
         pass
+    getStartDate.produce = lambda s: s.getStartDate() or s.getConference().getStartDate()
 
     def getEndDate(self):
         pass
+    getEndDate.produce = lambda s: s.getEndDate() or s.getConference().getEndDate()
 
     def _getTitle(self):
         pass
@@ -268,6 +270,11 @@ class ICollaborationMetadataFossil(IFossil):
 
     def getUniqueId(self):
         pass
+
+    def getConference(self):
+        pass
+    getConference.name = 'event_id'
+    getConference.convert = lambda e: e.getId()
 
     def getLocation(self):
         pass

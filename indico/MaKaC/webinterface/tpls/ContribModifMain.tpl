@@ -21,7 +21,7 @@
                 </tr>
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Title")}</span></td>
-                    <td bgcolor="white" class="blacktext"><b>${ title }</b></td>
+                    <td bgcolor="white" class="blacktext title"><b>${ title }</b></td>
                     <form action="${ dataModificationURL }" method="POST">
                     <td rowspan="${ rowspan }" valign="bottom" align="right" width="1%">
                         <input type="submit" class="btn" value="${ _("modify")}">
@@ -29,7 +29,16 @@
                     </form>
                 </tr>
                 % if self_._rh._target.getConference().getAbstractMgr().isActive() and self_._rh._target.getConference().hasEnabledSection("cfa") and self_._rh._target.getConference().getAbstractMgr().hasAnyEnabledAbstractField():
-                ${ additionalFields }
+                    % for f in additionalFields:
+                        <tr>
+                            <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">${f.getCaption() | escape}</span></td>
+                            <td bgcolor="white" valign="top">
+                                <div class="md-preview-wrapper display">
+                                    ${contrib.getField(f.getId()) | m}
+                                </div>
+                            </td>
+                        </tr>
+                    % endfor
                 % else:
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Description")}</span></td>
@@ -122,7 +131,7 @@
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                                                     <span id="inPlacePrimaryAuthorsMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                                                        <a class="dropDownMenu fakeLink"  onclick="primaryAuthorManager.addManagementMenu();">${ _("Add primary author")}</a>
+                                                        <a class="dropDownMenu fakeLink" >${ _("Add primary author")}</a>
                                                     </span>
                                                 </td>
                                             </tr>
@@ -144,7 +153,7 @@
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                                                     <span id="inPlaceCoAuthorsMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                                                        <a class="dropDownMenu fakeLink"  onclick="coAuthorManager.addManagementMenu();">${ _("Add co-author")}</a>
+                                                        <a class="dropDownMenu fakeLink">${ _("Add co-author")}</a>
                                                     </span>
                                                 </td>
                                             </tr>
@@ -167,7 +176,7 @@
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                                                     <span id="inPlaceSpeakersMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                                                        <a class="dropDownMenu fakeLink" onclick="speakerManager.addManagementMenu();">${ _("Add presenter") if eventType == "conference" else  _("Add speakers")}</a>
+                                                        <a class="dropDownMenu fakeLink">${ _("Add presenter") if eventType == "conference" else  _("Add speakers")}</a>
                                                     </span>
                                                 </td>
                                             </tr>
@@ -181,14 +190,15 @@
                 <tr>
                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                 </tr>
+                % if Config.getInstance().getReportNumberSystems():
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Report numbers")}</span</td>
-                    <td bgcolor="white" colspan="2"><i>${ reportNumbersTable }</i></td>
+                    <td bgcolor="white" colspan="2">${ reportNumbersTable }</td>
                 </tr>
-                <tr>
                 <tr>
                     <td colspan="3" class="horizontalLine">&nbsp;</td>
                 </tr>
+                % endif
                 % if eventType == "conference":
                 ${ abstract }
                 ${ withdrawnInfo }
@@ -224,20 +234,26 @@
 
 <script>
 var confId = '${ self_._rh._target.getConference().getId() }';
+var methods = {'addNew': 'contribution.participants.addNewParticipant',
+               'addExisting': 'contribution.participants.addExistingParticipant',
+               'remove': 'contribution.participants.removeParticipant',
+               'edit': 'contribution.participants.editParticipantData',
+               'sendEmail': 'contribution.participants.sendEmailData',
+               'changeSubmission': 'contribution.participants.changeSubmissionRights'};
 % if eventType == "conference":
     //(confId, params, inPlaceListElem, inPlaceMenu, kindOfUser, userCaption, eventType, elementClass, initialList)
-    var primaryAuthorManager = new ParticipantsListManager(confId,
+    var primaryAuthorManager = new ParticipantsListManager(confId, methods,
         {confId: confId, contribId: '${ id }', kindOfList: "prAuthor"}, $E('inPlacePrimaryAuthors'), $E('inPlacePrimaryAuthorsMenu'),
         "prAuthor", "primary author", "conference", "UIAuthorMove", ${primaryAuthors | n,j});
     $('#inPlacePrimaryAuthors').data('manager', primaryAuthorManager);
 
-    var coAuthorManager = new ParticipantsListManager(confId,
+    var coAuthorManager = new ParticipantsListManager(confId, methods,
         {confId: confId, contribId: '${ id }', kindOfList: "coAuthor"}, $E('inPlaceCoAuthors'), $E('inPlaceCoAuthorsMenu'),
         "coAuthor", "co-author", "conference", "UIAuthorMove", ${coAuthors | n,j});
     $('#inPlaceCoAuthors').data('manager', coAuthorManager);
 
 % endif:
-    var speakerManager = new ParticipantsListManager(confId,
+    var speakerManager = new ParticipantsListManager(confId, methods,
         {confId: confId, contribId: '${ id }', kindOfList: "speaker"}, $E('inPlaceSpeakers'), $E('inPlaceSpeakersMenu'),
         "speaker", "speaker", "${eventType}", "UIAuthorMove", ${speakers | n,j});
     $('#inPlaceSpeakers').data('manager', speakerManager);
@@ -311,7 +327,6 @@ $('#sortspace').tablesorter({
     handle: '.authorMove', // relative to sortable element - the handle to start sorting
     placeholderHTML: '<li></li>' // the html to put inside the placeholder element
 });
-
 
 </script>
 

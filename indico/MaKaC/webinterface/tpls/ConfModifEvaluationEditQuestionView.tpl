@@ -25,7 +25,7 @@
                         </form>
                       </td>
                       <td style="padding-right:2px;">
-                        <form action="${removeQuestionUrl}" method="post" onsubmit="${removeQuestionConfirm}">
+                        <form action="${removeQuestionUrl}" method="post">
                             <div>
                                   ${removeQuestionInput}
                             </div>
@@ -53,3 +53,14 @@
           </tr>
         </table>
         <!--view of question end-->
+<script type="text/javascript">
+$("[id^=questionRemove]").click(function(){
+    var self = this;
+    new ConfirmPopup($T("Remove question"),$T("Do you really want to remove this question?"), function(confirmed) {
+        if(confirmed) {
+            $(self).closest("form").submit();
+        }
+    }).open();
+    return false;
+});
+</script>

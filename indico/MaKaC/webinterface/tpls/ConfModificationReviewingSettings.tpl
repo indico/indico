@@ -101,7 +101,7 @@
 % endif
 <table id="defaultDueDatesTable" style="padding-left: 20px; padding-bottom: 20px; min-width: 320px; display:${display}">
     <tr>
-        <td id="defaultDatesHelp" colspan="2" class="subGroupTitle" style="min-width:500px;">${ _("Default deadlines for the judgements")}</td>
+        <td id="defaultDatesHelp" colspan="2" class="subGroupTitle" style="min-width:500px;">${ _("Default deadlines for the assessments")}</td>
     </tr>
     % if ConfReview.hasPaperReviewing():
         <% display = 'table-row' %>
@@ -114,13 +114,6 @@
         </span></td>
         <td style="color: #000000;">
             <span id="inPlaceEditDefaultRefereeDueDate">
-                <% date = ConfReview.getAdjustedDefaultRefereeDueDate() %>
-                % if date is None:
-                    ${ _("Date has not been set yet.")}
-                % else:
-                    ${ formatDateTime(date) }
-                % endif
-            </span>
         </td>
     </tr>
     % if ConfReview.hasPaperEditing():
@@ -134,12 +127,6 @@
         </span></td>
         <td  style="color: #000000;">
             <span id="inPlaceEditDefaultEditorDueDate">
-                <% date = ConfReview.getAdjustedDefaultEditorDueDate() %>
-                % if date is None:
-                    ${ _("Date has not been set yet.")}
-                % else:
-                    ${ formatDateTime(date) }
-                % endif
             </span>
         </td>
         % if not ConfReview.hasPaperReviewing():
@@ -159,12 +146,6 @@
         </span></td>
         <td style="color: #000000;">
             <span id="inPlaceEditDefaultReviewerDueDate">
-                <% date = ConfReview.getAdjustedDefaultReviewerDueDate() %>
-                % if date is None:
-                    ${ _("Date has not been set yet.")}
-                % else:
-                    ${ formatDateTime(date) }
-                % endif
             </span>
         </td>
     </tr>
@@ -178,7 +159,7 @@
         % endif
         <tr id="autoEmails" style="display:${display}">
             <td id="automaticNotificationHelp"  class="subGroupTitle" style="width:500px;">${ _("Automatic e-mails can be sent")}:
-               ${inlineContextHelp(_('Here you can enable/disable automatic e-mails sending.<br/>Notifications can be send to the Reviewing Team in the next several situations<br/><ul><li>when are added/removed Reviewers for the conference</li><li>when are assinged/removed contributions to Reviewers</li><li>when authors of the contributions have been submitted materials</li></ul>Notifications can be send to the authors when their contributions had been judged by the Reviewers.'))}
+               ${inlineContextHelp(_('Here you can enable/disable automatic e-mails sending.<br/>Notifications can be send to the Reviewing Team in the next several situations<br/><ul><li>when are added/removed Reviewers for the conference</li><li>when are assinged/removed contributions to Reviewers</li><li>when authors of the contributions have been submitted materials</li></ul>Notifications can be send to the authors when their contributions had been assessed by the Reviewers.'))}
             </td>
         </tr>
         <tr id="autoEmailsPRMLabel" style="display:${display}">
@@ -224,6 +205,22 @@
         <td style="padding-left: 20px;">
             <div>
                 <span id="authorSubmittedMatRefereeNotifButton">
+                </span>
+            </div>
+        </td>
+       </tr>
+       <tr id="editorSubmittedRefereeNotif" style="white-space:nowrap; display: ${display}">
+        <td style="padding-left: 20px;">
+            <div>
+                <span id="editorSubmittedRefereeNotifButton">
+                </span>
+            </div>
+        </td>
+       </tr>
+        <tr id="reviewerSubmittedRefereeNotif" style="white-space:nowrap; display: ${display}">
+        <td style="padding-left: 20px;">
+            <div>
+                <span id="reviewerSubmittedRefereeNotifButton">
                 </span>
             </div>
         </td>
@@ -298,7 +295,7 @@
         % endif
         <tr id="autoEmailsAuthor" style="display:${display}">
            <td style="padding-top: 7px; padding-left: 7px;">
-               ${ _("To the Author of the paper when a judgement is submitted by")}:
+               ${ _("To the Author of the paper when an assessment is submitted by")}:
            </td>
         </tr>
          % if ConfReview.hasPaperReviewing():
@@ -422,6 +419,9 @@ var observer = function() {
         $E('authorSubmittedMatRefereeNotif').dom.style.display = 'none';
         $E('authorSubmittedMatEditorNotif').dom.style.display = 'none';
         $E('authorSubmittedMatReviewerNotif').dom.style.display = 'none';
+        $E('editorSubmittedRefereeNotif').dom.style.display = 'none';
+        $E('reviewerSubmittedRefereeNotif').dom.style.display = 'none';
+
         $E('templateTable').dom.style.display = 'none';
     }
     if (value == "Content reviewing") {
@@ -454,6 +454,8 @@ var observer = function() {
         $E('authorSubmittedMatRefereeNotif').dom.style.display = '';
         $E('authorSubmittedMatEditorNotif').dom.style.display = 'none';
         $E('authorSubmittedMatReviewerNotif').dom.style.display = '';
+        $E('editorSubmittedRefereeNotif').dom.style.display = 'none';
+        $E('reviewerSubmittedRefereeNotif').dom.style.display = '';
         $E('templateTable').dom.style.display = '';
 
         showReviewingStates();
@@ -491,6 +493,8 @@ var observer = function() {
         $E('authorSubmittedMatRefereeNotif').dom.style.display = 'none';
         $E('authorSubmittedMatEditorNotif').dom.style.display = '';
         $E('authorSubmittedMatReviewerNotif').dom.style.display = 'none';
+        $E('editorSubmittedRefereeNotif').dom.style.display = 'none';
+        $E('reviewerSubmittedRefereeNotif').dom.style.display = 'none';
         $E('templateTable').dom.style.display = '';
 
         showEditingCriteria();
@@ -526,6 +530,8 @@ var observer = function() {
         $E('authorSubmittedMatRefereeNotif').dom.style.display = '';
         $E('authorSubmittedMatEditorNotif').dom.style.display = '';
         $E('authorSubmittedMatReviewerNotif').dom.style.display = '';
+        $E('editorSubmittedRefereeNotif').dom.style.display = '';
+        $E('reviewerSubmittedRefereeNotif').dom.style.display = '';
         $E('templateTable').dom.style.display = '';
 
         showReviewingStates();
@@ -566,27 +572,21 @@ var showEditingCriteria = function() {
 
 
 var showDefaultRefereeDate = function() {
-    new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditDefaultRefereeDueDate'),
-                       'reviewing.conference.changeDefaultDueDate',
-                       {conference: '${ ConfReview.getConference().getId() }',
-                        dueDateToChange: 'Referee'},
-                       null, true);
+    $('#inPlaceEditDefaultRefereeDueDate').html(new DateDeadlineWidget('reviewing.conference.changeDefaultDueDate',
+            {conference: '${ ConfReview.getConference().getId() }',
+             dueDateToChange: 'Referee'}, ${ConfReview.getAdjustedDefaultRefereeDueDate() | n,j}, ${ConfReview.getConference().getNumberOfContributions() > 0 | n,j}).draw().dom);
 }
 
 var showDefaultEditorDate = function() {
-    new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditDefaultEditorDueDate'),
-                       'reviewing.conference.changeDefaultDueDate',
-                       {conference: '${ ConfReview.getConference().getId() }',
-                        dueDateToChange: 'Editor'},
-                       null, true);
+    $('#inPlaceEditDefaultEditorDueDate').html(new DateDeadlineWidget('reviewing.conference.changeDefaultDueDate',
+            {conference: '${ ConfReview.getConference().getId() }',
+             dueDateToChange: 'Editor'}, ${ConfReview.getAdjustedDefaultEditorDueDate() | n,j}, ${ConfReview.getConference().getNumberOfContributions() > 0 | n,j}).draw().dom);
 }
 
 var showDefaultReviewerDate = function() {
-    new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditDefaultReviewerDueDate'),
-                       'reviewing.conference.changeDefaultDueDate',
-                       {conference: '${ ConfReview.getConference().getId() }',
-                        dueDateToChange: 'Reviewer'},
-                       null, true);
+    $('#inPlaceEditDefaultReviewerDueDate').html(new DateDeadlineWidget('reviewing.conference.changeDefaultDueDate',
+        {conference: '${ ConfReview.getConference().getId() }',
+    dueDateToChange: 'Reviewer'}, ${ConfReview.getAdjustedDefaultReviewerDueDate() | n,j}, ${ConfReview.getConference().getNumberOfContributions() > 0 | n,j}).draw().dom);
 }
 
 
@@ -600,25 +600,28 @@ var TemplateList = function(){
                         var params = {conference: ${ ConfReview.getConference().getId() },
                                       templateId: selectedRow.dom.id.split("TemplateRow_")[1]};
                         var name = $E('TemplateSpanName_' + selectedRow.dom.id.split("TemplateRow_")[1]).dom.innerHTML;
-                        if (confirm("Are you sure you want to delete '"+ name +"'?")) {
-                            var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
-                            jsonRpc(Indico.Urls.JsonRpcService,
-                                'reviewing.conference.deleteTemplate',
-                                params,
-                                function(response,error) {
-                                        if (exists(error)) {
-                                            killProgress();
-                                            IndicoUtil.errorReport(error);
-                                        } else {
-                                            killProgress();
-                                            $E('templateListTable').remove(selectedRow);
-                                            tablerows = document.getElementById('templateListTableAll').rows.length;
-                                            if(tablerows == '1'){
-                                                $E('NoTemplateTable').dom.style.display = '';
-                                                $E('templateListTableAll').dom.style.display = 'none';}
-                                        }
-                                    });
-                        }
+
+                        new ConfirmPopup($T("Delete template"),$T("Are you sure you want to delete {0}?").format(name), function(confirmed) {
+                            if(confirmed) {
+                                var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+                                jsonRpc(Indico.Urls.JsonRpcService,
+                                    'reviewing.conference.deleteTemplate',
+                                    params,
+                                    function(response,error) {
+                                            if (exists(error)) {
+                                                killProgress();
+                                                IndicoUtil.errorReport(error);
+                                            } else {
+                                                killProgress();
+                                                $E('templateListTable').remove(selectedRow);
+                                                tablerows = document.getElementById('templateListTableAll').rows.length;
+                                                if(tablerows == '1'){
+                                                    $E('NoTemplateTable').dom.style.display = '';
+                                                    $E('templateListTableAll').dom.style.display = 'none';}
+                                            }
+                                        });
+                            }
+                        }).open();
                     };
 
                     var nameSpan = Html.span({id:'TemplateSpanName_'+'${ t.getId()}'}, '${ t.getName()}');
@@ -626,7 +629,8 @@ var TemplateList = function(){
 
                     var cellFormat = Html.td({id:'TemplateName_'+'${ t.getId()}', className:'content'}, '${ t.getFormat()}');
                     var cellDescription = Html.td({id:'TemplateName_'+'${ t.getId()}', className:'content'}, ${t.getDescription() | n,j});
-                    var downloadSpan = Html.span({className:'link'}, "Download");
+                    var downloadURL = "${ urlHandlers.UHDownloadContributionTemplate.getURL(t) }";
+                    var downloadSpan = Html.a({href: downloadURL}, "Download");
                     var barSpan = Html.span({className:'horizontalSeparator'}, "|");
                     var removeSpan = Html.span({className:'link'}, "Remove");
                     var cellActions = Html.td({className:'content', style:{textAlign: 'right'}});
@@ -637,10 +641,6 @@ var TemplateList = function(){
                     row.append(cellFormat);
                     row.append(cellDescription);
                     row.append(cellActions);
-
-                    downloadSpan.observeClick(function() {
-                        window.location = "${ urlHandlers.UHDownloadContributionTemplate.getURL() }" + "?reviewingTemplateId=" + '${ t.getId()}' + "&confId=${ ConfReview.getConference().getId()}";
-                    });
                     removeSpan.observeClick(function(event){
                         var selectedRow = $E('TemplateRow_'+'${t.getId()}');
                         deleteTpl(selectedRow);
@@ -653,107 +653,144 @@ var TemplateList = function(){
           }
 
 
-$E('PRMNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.PRMEmailNotif',
+$('#PRMNotifButton').html(new SwitchOptionButton('reviewing.conference.PRMEmailNotif',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'PRM'},
                                             $T('are added to/removed from the conference'),
-                                            'message1'
-));
+                                            $T("Saved"),
+                                            null,
+                                            false
+).draw());
 
-$E('refereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotif',
+$('#refereeNotifButton').html(new SwitchOptionButton('reviewing.conference.RefereeEmailNotif',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Referee'},
                                             $T('are added to/removed from the conference'),
-                                            'message2'
-));
-$E('reviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotif',
+                                            $T("Saved"),
+                                            null,
+                                            false
+).draw());
+$('#reviewerNotifButton').html(new SwitchOptionButton('reviewing.conference.ReviewerEmailNotif',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Reviewer'},
                                             $T('are added to/removed from the conference'),
-                                            'message3'
-));
-$E('editorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotif',
+                                            $T("Saved"),
+                                            null,
+                                            false
+).draw());
+$('#editorNotifButton').html(new SwitchOptionButton('reviewing.conference.EditorEmailNotif',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Editor'},
                                             $T('are added to/removed from the conference'),
-                                            'message4'
-));
-$E('refereeNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailNotifForContribution',
+                                            $T("Saved"),
+                                            null,
+                                            false
+).draw());
+$('#refereeNotifForContributionButton').html(new SwitchOptionButton('reviewing.conference.RefereeEmailNotifForContribution',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Referee'},
                                             $T('have been assigned to/unassigned from contributions'),
-                                            'message5'
-));
-$E('reviewerNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailNotifForContribution',
+                                            $T("Saved"),
+                                            null,
+                                            false
+).draw());
+$('#reviewerNotifForContributionButton').html(new SwitchOptionButton('reviewing.conference.ReviewerEmailNotifForContribution',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Reviewer'},
                                             $T('have been assigned to/unassigned from contributions'),
-                                            'message6'
-));
-$E('editorNotifForContributionButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailNotifForContribution',
+                                            $T("Saved"),
+                                            null,
+                                            false
+).draw());
+$('#editorNotifForContributionButton').html(new SwitchOptionButton('reviewing.conference.EditorEmailNotifForContribution',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Editor'},
                                             $T('have been assigned to/unassigned from contributions'),
-                                            'message7'
-));
-$E('refereeJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.RefereeEmailJudgementNotif',
+                                            $T("Saved"),
+                                            null,
+                                            false
+).draw());
+$('#refereeJudgementNotifButton').html(new SwitchOptionButton('reviewing.conference.RefereeEmailJudgementNotif',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Referee'},
-                                            $T('Referee'),
-                                            'message8'
-));
-$E('reviewerJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.ReviewerEmailJudgementNotif',
+                                            $T('Referee (for any assessment)'),
+                                            $T("Saved"),
+                                            null,
+                                            false
+).draw());
+$('#reviewerJudgementNotifButton').html(new SwitchOptionButton('reviewing.conference.ReviewerEmailJudgementNotif',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Reviewer'},
-                                            $T('Content Reviewer'),
-                                            'message9'
-));
-$E('editorJudgementNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.EditorEmailJudgementNotif',
+                                            $T('Content Reviewer (for assessments that imply corrections)'),
+                                            $T("Saved"),
+                                            null,
+                                            false
+).draw());
+$('#editorJudgementNotifButton').html(new SwitchOptionButton('reviewing.conference.EditorEmailJudgementNotif',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Editor'},
-                                            $T('Layout Reviewer'),
-                                            'message10'
-));
-$E('authorSubmittedMatRefereeNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatRefereeNotif',
+                                            $T('Layout Reviewer') + ${ _("' (for assessments that imply corrections)'") if ConferencePaperReview.reviewingModes[choice]!=ConferencePaperReview.reviewingModes[3] else "''"},
+                                            $T("Saved"),
+                                            null,
+                                            false
+).draw());
+$('#authorSubmittedMatRefereeNotifButton').html(new SwitchOptionButton('reviewing.conference.AuthorSubmittedMatRefereeNotif',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Referee'},
                                             $T('the author submits a paper'),
-                                            'message11'
-));
-$E('authorSubmittedMatReviewerNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatEditorNotif',
+                                            $T("Saved"),
+                                            null,
+                                            false
+).draw());
+$('#authorSubmittedMatReviewerNotifButton').html(new SwitchOptionButton('reviewing.conference.AuthorSubmittedMatEditorNotif',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Reviewer'},
                                             $T('the author submits a paper'),
-                                            'message12'
-));
-$E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOptionButton('reviewing.conference.AuthorSubmittedMatReviewerNotif',
+                                            $T("Saved"),
+                                            null,
+                                            false
+).draw());
+$('#authorSubmittedMatEditorNotifButton').html(new SwitchOptionButton('reviewing.conference.AuthorSubmittedMatReviewerNotif',
                                             {conference: '${ ConfReview.getConference().getId() }',
                                             AutoEmailsToChange: 'Editor'},
                                             $T('the author submits a paper'),
-                                            'message13'
-));
-
+                                            $T("Saved"),
+                                            null,
+                                            false
+).draw());
+$('#editorSubmittedRefereeNotifButton').html(new SwitchOptionButton('reviewing.conference.EditorSubmittedRefereeNotif',
+        {conference: '${ ConfReview.getConference().getId() }',
+        AutoEmailsToChange: 'Referee'},
+        $T('a layout reviewer submits an assessment'),
+        $T("Saved"),
+        null,
+        false
+).draw());
+$('#reviewerSubmittedRefereeNotifButton').html(new SwitchOptionButton('reviewing.conference.ReviewerSubmittedRefereeNotif',
+        {conference: '${ ConfReview.getConference().getId() }',
+    AutoEmailsToChange: 'Referee'},
+    $T('a content reviewer submits an assessment'),
+    $T("Saved"),
+    null,
+    false
+).draw());
 
 % if ConfReview.hasReviewing():
     TemplateList();
 
     $E('uploadTpl').observeClick(function(){ var popup = new UploadTemplateDialog( 'Upload Template',
         {conference: '${ ConfReview.getConference().getId() }'}, '350px', '30px',
-        ${ jsonEncode(Template.formats) }, '${ urlHandlers.UHSetTemplate.getURL() }',
+        ${ jsonEncode(Template.formats) }, '${ urlHandlers.UHSetTemplate.getURL(ConfReview.getConference()) }',
         function(value) {
             $E('NoTemplateTable').dom.style.display = 'none';
             $E('templateListTableAll').dom.style.display = '';
 
-            /* this is a little hack who is needed to get the URL of the new uploaded template*/
-            //linkDelete = "${ urlHandlers.UHDeleteContributionTemplate.getURL() }" + "?reviewingTemplateId=" + value.id + "&confId=${ ConfReview.getConference().getId()}";
-            //var deleteIcon = Html.img({className: 'imglink',style:{paddingLeft: '20px', verticalAlign: 'bottom', width: '15px', height: '15px'}, alt: 'delete template', src: imageSrc("remove")});
-            //var deleteLink = Html.a({href: linkDelete},deleteIcon);
-
             var row = Html.tr({id:'TemplateRow_' + value.id, className:'infoTR'});
             var params = {conference: '${ ConfReview.getConference().getId() }',templateId: value.id}
             var deleteTemplate = function() {
-                if (confirm("Are you sure you want to delete '"+ value.name+"'?")) {
-                    var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+                new ConfirmPopup($T("Delete template"),$T("Are you sure you want to delete {0}?").format(name), function(confirmed) {
+                    if(confirmed) {
+                        var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
                         jsonRpc(Indico.Urls.JsonRpcService,
                         'reviewing.conference.deleteTemplate',
                         params,
@@ -770,14 +807,19 @@ $E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
                                         $E('templateListTableAll').dom.style.display = 'none';}
                                 }
                             });
-                }
+                    }
+                }).open();
             };
 
             var nameSpan = Html.span({}, value.name);
             var cellName = Html.td({id:'TemplateName_'+ value.id, className:'content'}, nameSpan);
             var cellFormat = Html.td({id:'TemplateName_'+ value.id, className:'content'}, value.format);
             var cellDescription = Html.td({id:'TemplateName_'+ value.id, className:'content'}, value.description);
-            var downloadSpan = Html.span({className:'link'}, "Download");
+            var downloadURL = build_url(${ urlHandlers.UHDownloadContributionTemplate.getURL().js_router | j,n }, {
+                reviewingTemplateId: value.id,
+                confId: ${ConfReview.getConference().getId()}
+            });
+            var downloadSpan = Html.a({href: downloadURL}, "Download");
             var barSpan = Html.span({className:'horizontalSeparator'}, "|");
             var removeSpan = Html.span({className:'link'}, "Remove");
             var cellActions = Html.td({className:'content', style:{textAlign: 'right'}});
@@ -789,9 +831,6 @@ $E('authorSubmittedMatEditorNotifButton').set(IndicoUI.Widgets.Generic.switchOpt
             row.append(cellDescription);
             row.append(cellActions);
 
-            downloadSpan.observeClick(function() {
-                window.location = "${ urlHandlers.UHDownloadContributionTemplate.getURL() }" + "?reviewingTemplateId=" + value.id + "&confId=${ ConfReview.getConference().getId()}";
-            });
             removeSpan.observeClick(deleteTemplate);
 
             return $E('templateListTable').append(row);

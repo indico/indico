@@ -1,0 +1,85 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+#qtip-add-field {
+    background: $light-gray;
+}
+
+.qtip.informational {
+   @include sbox-shadow(rgba($dark-gray, 0.2) 0px 0px 3px 3px, lighten($light-gray, 20%) 0px 1px 0px 0px inset);
+   @include border-all(#ADD9ED);
+   background-color: #EDF3FD;
+   color: $light-black;
+
+   ul {
+      list-style-type: none;
+      padding-left: 2em;
+
+      li {
+         margin: 0.3em 0 0.3em 0;
+         line-height: 1.5em;
+      }
+
+      .mono {
+         padding: 0.2em;
+         background: #fff;
+      }
+   }
+}
+
+.qtip-disabled-wrapper {
+    display: inline-block;
+    position: relative;
+
+    .qtip-disabled-holder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+    }
+}
+
+.qtip {
+    ul {
+        list-style-type: none;
+        padding-left: 0;
+        margin: 0.1em 0;
+        line-height: 1.5em;
+    }
+}
+
+.qtip-error {
+    color: $red;
+    font-size: 1em;
+    border-color: $red;
+    background-color: $light-red;
+    box-shadow: 0 0 4px rgba($red, 0.2), 0 0 0.3em white inset;
+}
+
+
+.qtip-warning {
+    color: $dark-yellow;
+    font-size: 1em;
+    border-color: $yellow;
+    background-color: $light-yellow;
+    box-shadow: 0 0 4px rgba($yellow, 0.2), 0 0 0.3em white inset;
+}

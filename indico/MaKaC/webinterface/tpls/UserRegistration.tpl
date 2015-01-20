@@ -1,4 +1,3 @@
-<% from indico.util.i18n import getLocaleDisplayNames %>
 <center>
 <form action=${ postURL } method="POST">
 ${ locator }
@@ -60,8 +59,8 @@ ${ locator }
   <td align="right"><font color="gray"><font color="red">* </font> ${ _("Language")}</font></td>
   <td bgcolor="white" width="100%" align="left">
   <select size=1 name="lang">
-    % for l in getLocaleDisplayNames():
-        <option value="${l[0]}" ${'selected="selected"' if l[0]==defaultLang else ""}>${l[1]}</option><br>
+    % for lang_code, lang_name in all_languages.iteritems():
+        <option value="${lang_code}" ${'selected="selected"' if lang_code == defaultLang else ""}>${lang_name}</option><br>
     % endfor
   </select>
   </td>
@@ -100,8 +99,6 @@ ${ locator }
   <td colspan="2">
     <center><font color="red">${ _("You must enter a valid email address. An email will be sent to you to confirm the registration.")}</font></center>
     <br><b>${ _("Account data")}</b>
-    <br>${ _("Please note that your password will be stored in clear text in our database which will allow us to send it back to you in case you lost it. Try avoid using the same password as accounts you may have in other systems.")}
-  </td>
 </tr>
 <tr>
   <td colspan="2" bgcolor="black"></td>

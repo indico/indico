@@ -8,7 +8,7 @@
 
         % if conf.getChairList() or conf.getChairmanText():
         <span class="chairedBy">
-        chaired by ${common.renderUsers(conf.getChairList(), unformatted=conf.getChairmanText(), spanClass='author', title=False)}
+        ${ _("chaired by")} ${common.renderUsers(conf.getChairList(), unformatted=conf.getChairmanText(), spanClass='author', title=False)}
         </span>
         % endif
 
@@ -16,7 +16,7 @@
             ${common.renderEventTime(startDate, endDate, timezone)}
 
             % if getLocationInfo(conf) != ('', '', ''):
-                <br/>at <strong>${common.renderLocation(conf, span='headerRoomLink')}</strong>
+                <br/>${ _("at")} <strong>${common.renderLocation(conf, span='headerRoomLink')}</strong>
                 % if conf.getLocation():
                 <div class="address">${conf.getLocation().getAddress()}</div>
                 % endif

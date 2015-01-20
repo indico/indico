@@ -1,83 +1,65 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
-from MaKaC.common.general import *
+from indico.core.config import Config
+from MaKaC.errors import MaKaCError
 
-from MaKaC.common.Configuration import Config
-from MaKaC.authentication.LocalAuthentication import LocalAuthenticator
-
-
+from indico.util.importlib import import_module
 
 class AuthenticatorMgr:
 
     def __init__(self):
-
-        self.AuthenticatorList = []
-        config = Config.getInstance()
-        for  auth in config.getAuthenticatorList():
-            if auth == "Local":
-                self.AuthenticatorList.append( LocalAuthenticator() )
-            if auth == "Nice":
-                from MaKaC.authentication.NiceAuthentication import NiceAuthenticator
-                self.AuthenticatorList.append( NiceAuthenticator() )
-            if auth == "LDAP":
-                from MaKaC.authentication.LDAPAuthentication import LDAPAuthenticator
-                self.AuthenticatorList.append(LDAPAuthenticator())
-        self.create = True
-
+        self._authenticator_list = []
+        for auth, config in Config.getInstance().getAuthenticatorList():
+            try:
+                mod = import_module("MaKaC.authentication." + auth + "Authentication")
+                self._authenticator_list.append(getattr(mod, auth + "Authenticator")())
+            except ImportError:
+                raise MaKaCError("Impossible to load %s" % auth)
 
     def add( self, newId):
         auth = self.getById( newId.getAuthenticatorTag() )
         auth.add( newId )
 
-    def getById( self, id ):
-        for auth in self.AuthenticatorList:
-            if auth.getId() == id.strip():
+    def getById( self, authId ):
+        for auth in self.getList():
+            if auth.getId() == authId.strip():
                 return auth
         return None
 
-    def getAvatar( self, li , authenticator=None, create=None):
+    def getAvatar( self, li , authenticator=None):
         if authenticator:
             auth = self.getById(authenticator)
-            try:
-                return auth.getAvatar( li )
-            except KeyError, e:
-                pass
+            return auth.getAvatar( li )
         else:
-            for auth in self.AuthenticatorList:
-                try:
-                    valid=auth.getAvatar( li )
-                    if valid:
-                        return valid
-                except KeyError, e:
-                    pass
-            # The authentication failed. If create, check if we can create the user automaticaly
-            if self.create:
-                #check if the login is OK with Authenticator which can create a user
-                for auth in self.AuthenticatorList:
-                    if auth.getUserCreator():
-                        user = auth.getUserCreator().create(li)
-                        if user != None:
-                            if auth.getId().strip() == 'Nice':
-                                user.activateAccount()
-                            return user
+            for auth in self.getList():
+                valid = auth.getAvatar( li )
+                if valid:
+                    return valid
+            #check if the login is OK with Authenticator which can create a user
+            for auth in self.getList():
+                user = auth.createUser(li)
+                if user != None:
+                    if auth.canUserBeActivated():
+                        user.activateAccount()
+                    return user
         return None
 
     def getAvatarByLogin(self, login, auth = None):
@@ -95,12 +77,12 @@ class AuthenticatorMgr:
             :type auth: str, list or NoneType
         """
 
-        if auth == None:
+        if auth is None:
             # search all authenticators
-            authList = self.AuthenticatorList
+            authList = self.getList()
         else:
             # get the actual Authenticator objects
-            authList = list(self.getById(a) for a in auth)
+            authList = map(self.getById, auth)
 
         # we search for Avatars in each authenticator
         foundAvatars = {}
@@ -113,8 +95,8 @@ class AuthenticatorMgr:
 
         return foundAvatars
 
-    def isLoginFree( self, login):
-        for au in self.AuthenticatorList:
+    def isLoginAvailable(self, login):
+        for au in self.getList():
             try:
                 if au.getById(login):
                     return False
@@ -122,49 +104,60 @@ class AuthenticatorMgr:
                 pass
         return True
 
-    def _getDefaultAuthenticator( self ):
-        return self.AuthenticatorList[0]
+    def getDefaultAuthenticator(self):
+        return self.getList()[0]
 
     def getList(self):
-        return self.AuthenticatorList
+        return self._authenticator_list
+
+    def getAuthenticatorIdList(self):
+        return [auth.getId() for auth in self._authenticator_list]
+
+    def hasExternalAuthenticators(self):
+        for auth in self.getList():
+            if auth.getId() != 'Local':
+                return True
+        return False
 
     def createIdentity(self, li, avatar, system=""):
         auth = self.getById( system )
         if not auth:
-            auth = self._getDefaultAuthenticator()
+            auth = self.getDefaultAuthenticator()
         return auth.createIdentity(li, avatar)
 
-    def removeIdentity( self, Id):
+    def removeIdentity(self, identity):
         #check if there is almost another one identity
-        if len(Id.getUser().getIdentityList()) > 1:
-            auth = self.getById(Id.getAuthenticatorTag())
-            auth.remove(Id)
+        if len(identity.getUser().getIdentityList()) > 1:
+            auth = self.getById(identity.getAuthenticatorTag())
+            auth.remove(identity)
 
     def getIdentityById(self, id):
-        for auth in self.AuthenticatorList:
+        for auth in self.getList():
             try:
-                Id = auth.getById(id)
-                if Id:
-                    return Id
+                identity = auth.getById(id)
+                if identity:
+                    return identity
             except KeyError,e:
                 pass
         return None
 
-    def autoLogin(self, rh):
-        #Try to login from request handler
-        i = 0
-        for auth in self.AuthenticatorList:
-            av = auth.autoLogin(rh)
+    def isSSOLoginActive(self):
+        for auth in self.getList():
+            if auth.isSSOLoginActive():
+                return True
+        return False
+
+    def SSOLogin(self, rh, authId):
+        auth = self.getById( authId )
+        if auth and auth.isSSOLoginActive():
+            av = auth.retrieveAvatar(rh)
             if av:
-                rh._getSession().setVar("autoLogin", auth.getId())
+                session["SSOLogin"] = auth.getId()
                 return av
         return None
 
-    def autoLogout(self, rh):
-        authId = rh._getSession().getVar("autoLogin")
+    def getLogoutCallbackURL(self, rh):
+        authId = session.pop('SSOLogin', None)
         if authId:
-            rh._getSession().removeVar("autoLogin")
             auth = self.getById(authId)
-            return auth.autoLogout(rh)
-
-
+            return auth.getLogoutCallbackURL()

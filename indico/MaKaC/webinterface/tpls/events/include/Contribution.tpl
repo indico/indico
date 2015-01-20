@@ -24,11 +24,7 @@
             (${common.renderLocation(item, parent=parent, span='span')})
             </span>
         % endif
-        % if conf.getCSBookingManager() and conf.getCSBookingManager().hasVideoService(item.getUniqueId()):
-            % for video in conf.getCSBookingManager().getVideoServicesById(item.getUniqueId()):
-                <%include file="VideoService.tpl" args="video=video"/>
-            % endfor
-        % endif
+        ${"".join(pluginDetailsSessionContribs.get(item.getUniqueId(),""))}
     </span>
 
     % if item.getDescription():
@@ -39,18 +35,26 @@
         <tbody>
         % if item.getSpeakerList() or item.getSpeakerText():
         <tr>
-            <td class="leftCol">Speaker${'s' if len(item.getSpeakerList()) > 1 else ''}:</td>
+            <td class="leftCol">${ _("Speakers") if len(item.getSpeakerList()) > 1 else _("Speaker")}:</td>
             <td>${common.renderUsers(item.getSpeakerList(), unformatted=item.getSpeakerText())}</td>
         </tr>
         % endif
 
         % if item.getReportNumberHolder().listReportNumbers():
-            (${ ' '.join([rn[1] for rn in item.getReportNumberHolder().listReportNumbers()])})
+            (
+            % for reportNumber in item.getReportNumberHolder().listReportNumbers():
+                % if reportNumberSystems[reportNumber[0]]["url"]:
+                    <a href="${reportNumberSystems[reportNumber[0]]["url"] + reportNumber[1]}" target="_blank">${reportNumber[1]} </a>
+                % else:
+                    ${reportNumber[1]}
+                % endif
+            % endfor
+            )
         % endif
 
         % if len(item.getAllMaterialList()) > 0:
         <tr>
-            <td class="leftCol">Material:</td>
+            <td class="leftCol">${ _("Material")}:</td>
             <td>
             % for material in item.getAllMaterialList():
                 % if material.canView(accessWrapper):

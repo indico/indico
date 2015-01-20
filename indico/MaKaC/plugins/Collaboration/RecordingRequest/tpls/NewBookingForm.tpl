@@ -3,13 +3,12 @@
     % if RecordingCapableRooms:
     <table>
         <tr>
-            <td>
-                <span class="RRNoteTitle">${_("Note:")}</span>
+            <td>${_("Note:")}</span>
             </td>
             <td>
                 <span class="RRNoteText">
                     ${_("In order to send a Recording request, you need to select a room capable of recording. ")}
-                    <span class='fakeLink' onclick='toggleRecordingCapableRooms();' id="recordingRoomsText">${_("See list of record-able rooms")}</span>
+                    <span class='fakeLink' id="recordingRoomsText">${_("See list of recordable rooms")}</span>
                 </span>
             </td>
         </tr>
@@ -58,6 +57,8 @@
 </div>
 % endif
 
+
+% if IsLecture or NTalks > 0:
 <div id="RRForm">
 
     % if IsSingleBooking:
@@ -80,36 +81,47 @@
     <div>
             <span style="color:#881122">${_("The recordings will not be published before all speakers have signed the %s (see Electronic Agreement tab)")%agreementName}</span>
     </div>
+% endif
 
-
+% if not IsLecture and NTalks == 0:
+    <div class="warning-message-box">
+        <div class="message-text">
+            ${_("Only the contributions can be recorded and there is no contribution in this event. Please go to Timetable and start adding them")}
+        </div>
+    </div>
+% endif
 
     <!-- DRAW BOX AROUND SECTION 1: SELECT CONTRIBUTIONS -->
         <!-- WHICH CONTRIBUTIONS SHOULD BE RECORDED -->
-    % if not IsLecture:
+    % if not IsLecture and NTalks > 0:
     <div class="RRFormSection">
         <div class="RRFormSubsection">
             <span class="RRQuestion">${ _('Which talks would you like to have recorded?') }</span>
              <table>
                 <tr>
                     <td>
-                        <input type="radio" name="talks" value="all" id="allTalksRB" onclick="RR_hideTalks()" checked />
+                        <input type="radio" name="talks" value="all" id="allTalksRB" onclick="RR_hideTalks();" checked />
                     </td>
                     <td>
-                        % if NTalks == NWebcastCapableContributions:
+                        % if NTalks == NRecordingCapableContributions:
                         <label for="allTalksRB" id="allTalksRBLabel" >${_("All talks") }</label>
                         % else:
-                        <label for="allTalksRB" id="allTalksRBLabel">${_("All record-able talks.")}</label>
+                        <label for="allTalksRB" id="allTalksRBLabel">${_("All recordable talks.")}</label>
+                        % endif
                     </td>
                 </tr>
-                            % if RecordingCapable:
+                % if RecordingCapable and (NRecordingCapableContributions < NTalks):
                 <tr>
                     <td></td>
-                    <td>
-                        <span class="RRNoteTitle">${_("Note:")}</span>
-                        <span class="RRNoteText">
-                            ${_("Some of your talks (%d out of %d) are not in a room capable of recording and thus cannot be recorded.") % (NTalks - NRecordingCapableContributions, NTalks)}
-                        </span>
-                        <span class='fakeLink' onclick='toggleRecordingCapableRooms();' id="recordingRoomsText">${_("See list of record-able rooms")}</span>
+                    <td class="warning" id="not_capable_warning">
+                        <h3>${_("Note")}</h3>
+                        <p>
+                            ${_('<a class="uncapable">{1} of {0}</a> talks are not in a room capable of recording and thus cannot be recorded.').format(NTalks, NTalks - NRecordingCapableContributions)}
+                            % if NRecordingCapableContributions:
+                              ${_('<a class="capable">The remaining {0}</a> will be recorded').format(NRecordingCapableContributions)}
+                            % endif
+                        </p>
+                        <p><a class="fakeLink" id="recordingRoomsText">${_("See list of recordable rooms")}</a></p>
                         <div id="recordingCapableRoomsDiv" style="display:none;">
                             <div style="padding-top:15px;padding-bottom:15px;">
                                 <span class="RRNoteText">${_("These are the rooms capable of recording:")} </span>
@@ -131,19 +143,18 @@
                                 </span>
                             </div>
                         </div>
-                            % endif
                     </td>
                 </tr>
-                        % endif
+                % endif
                 <tr>
                     <td>
-                        <input type="radio" name="talks" value="choose" id="chooseTalksRB" onclick="RR_loadTalks()" />
+                        <input type="radio" name="talks" value="choose" id="chooseTalksRB" onclick="RR_loadTalks(${isManager | n,j});" />
                     </td>
                     <td>
                         % if NTalks == NRecordingCapableContributions:
                         <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose talks.")}</label>
                         % else:
-                        <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose among record-able talks.")}</label>
+                        <label for="chooseTalksRB" id="chooseTalksRBLabel">${_("Choose among recordable talks.")}</label>
                         % endif
                     </td>
                 </tr>
@@ -152,12 +163,10 @@
 
         <% displayText = ('none', 'block')[DisplayTalks and InitialChoose] %>
         <div id="contributionsDiv" class="RRFormSubsection" style="display: ${ displayText };">
-            <span class="WRQuestion">${_("Please choose among the record-able contributions below:")}</span>
-
             % if HasRecordingCapableTalks:
-            <span class="fakeLink" style="margin-left: 20px;" onclick="RRSelectAllContributions()">${_("Select all")}</span>
-            <span class="horizontalSeparator">|</span>
-            <span class="fakeLink" onclick="RRUnselectAllContributions()">${_("Select none")}</span>
+              <span class="fakeLink" style="margin-left: 20px;" onclick="RRSelectAllContributions()">${_("Select all")}</span>
+              <span class="horizontalSeparator">|</span>
+              <span class="fakeLink" onclick="RRUnselectAllContributions()">${_("Select none")}</span>
             % endif
 
             <div class="RRContributionListDiv">
@@ -167,6 +176,8 @@
         </div>
     </div>
     % endif
+
+% if IsLecture or NTalks > 0:
 
     <!-- DRAW BOX AROUND SECTION 2: TECHNICAL DETAILS FOR RECORDING -->
     <div class="RRFormSection">
@@ -226,27 +237,57 @@
         </div>
     </div>
     % endif
+% endif
 </div>
 <script type="text/javascript">
     var isLecture = ${ jsBoolean(IsLecture) };
     var RRRecordingCapable = ${ jsBoolean(RecordingCapable) };
-    var RR_contributions = ${ jsonEncode(Contributions) };
-    var RR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasRecordingCapableTalks) };
-</script>
-
+    % if IsLecture:
+        var RR_contributions = [];
+        var RR_contributions_able = [];
+        var RR_contributions_unable = [];
+        var NRecordingCapableContributions = 0;
+        var NTalks = 0;
+        var RR_contributionsLoaded = true;
+    % else:
+        var RR_contributions = ${ jsonEncode(Contributions) };
+        var RR_contributions_able = ${ jsonEncode(ContributionsAble) };
+        var RR_contributions_unable = ${ jsonEncode(ContributionsUnable) };
+        var NRecordingCapableContributions = ${NRecordingCapableContributions};
+        var NTalks = ${NTalks};
+        var RR_contributionsLoaded = ${ jsBoolean(DisplayTalks or not HasRecordingCapableTalks) };
+    % endif
 
 % if (not RecordingCapable and RecordingCapableRooms) or (NTalks > NRecordingCapableContributions and RecordingCapable):
-<script type="text/javascript">
-    var recordingSwitch = false;
-    var toggleRecordingCapableRooms = function () {
-        IndicoUI.Effect.toggleAppearance($E('recordingCapableRoomsDiv'));
-        if (webcastSwitch) {
-            $E("recordingRoomsText").dom.innerHTML = $T("See list of record-able rooms.");
-        } else {
-            $E("recordingRoomsText").dom.innerHTML = $T("Hide list of record-able rooms.");
-        }
-        recordingSwitch = !recordingSwitch;
-    }
-</script>
-% endif
 
+    function showRooms(){
+        $("#recordingRoomsText").text($T("Hide list of recordable rooms."));
+        $("#recordingCapableRoomsDiv").show();
+    };
+
+    function hideRooms(){
+        $("#recordingRoomsText").text($T("See list of recordable rooms."));
+        $("#recordingCapableRoomsDiv").hide();
+    };
+
+
+    $(function() {
+        $("#recordingRoomsText").click(function() {
+            if($('#recordingCapableRoomsDiv').is(':hidden')) {
+                showRooms();
+            } else {
+                hideRooms();
+            }
+        });
+
+        $(".warning .capable").attr('href', '#').click(function() {
+            new ContributionsPopup($T("Contributions that can be recorded"), RR_contributions_able, false, function() {self.popupAllowClose = true; return true;}, true).open();
+            return false;
+        });
+        $(".warning .uncapable").attr('href', '#').click(function() {
+            new ContributionsPopup($T("Contributions that can't be recorded"), RR_contributions_unable, false, function() {self.popupAllowClose = true; return true;}, false).open();
+            return false;
+        });
+    });
+% endif
+</script>

@@ -1,61 +1,42 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN)
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software: you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation, either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 # Autoinstalls setuptools if the user doesn't have them already
 import ez_setup
 ez_setup.use_setuptools()
 
-import commands
-import getopt
 import os
+import getpass
 import re
 import shutil
-import string
 import sys
-import itertools
 from distutils.sysconfig import get_python_lib, get_python_version
 from distutils.cmd import Command
 from distutils.command import bdist
-from indico.util import i18n
 
 
 import pkg_resources
-from setuptools.command import develop, install, sdist, bdist_egg, easy_install, test
+from setuptools.command import develop, sdist, bdist_egg, easy_install, test
 from setuptools import setup, find_packages, findall
 
 
-try:
-    from babel.messages import frontend as babel
-    BABEL_PRESENT = True
-except ImportError:
-    BABEL_PRESENT = False
-
-
-DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras",
-                   "https://github.com/collective/icalendar/tarball/6f899869d462a23d0ebd3f54fb237e8670242bc4#egg=icalendar-3.0"]
-
-DEVELOP_REQUIRES = ['pojson', 'termcolor']
-
-if sys.platform == 'linux2':
-    import pwd
-    import grp
+DEPENDENCY_URLS = ["http://indico-software.org/wiki/Admin/Installation/IndicoExtras"]
 
 
 class vars(object):
@@ -70,7 +51,32 @@ class vars(object):
     configurationDir = None
     htdocsDir = None
 
-###  Methods required by setup() ##############################################
+
+def compile_languages(cmd):
+    """
+    Compile all language files
+    Needed to generate binary distro
+    """
+    from babel.messages import frontend
+    from indico.util.setup import compile_catalog_js
+
+    compile_cmd = frontend.compile_catalog(cmd.distribution)
+    compile_js_cmd = compile_catalog_js(cmd.distribution)
+
+    cmd.distribution._set_command_options(compile_cmd)
+    cmd.distribution._set_command_options(compile_js_cmd)
+
+    compile_cmd.finalize_options()
+    compile_js_cmd.finalize_options()
+
+    compile_cmd.run()
+    compile_js_cmd.run()
+
+
+def read_requirements_file(fname):
+    with open(fname, 'r') as f:
+        return [dep.strip() for dep in f.readlines() if not (dep.startswith('-') or '://' in dep)]
+
 
 def _generateDataPaths(x):
 
@@ -90,64 +96,30 @@ def _generateDataPaths(x):
 
     return dataFiles
 
-def _getDataFiles(x):
-    """
-    Returns a fully populated data_files ready to be fed to setup()
-
-    WARNING: when creating a bdist_egg we need to include files inside bin,
-    doc, config & htdocs into the egg therefore we cannot fetch indico.conf
-    values directly because they will not refer to the proper place. We
-    include those files in the egg's root folder.
-    """
-
-    # setup expects a list like this (('foo/bar/baz', 'wiki.py'),
-    #                                 ('a/b/c', 'd.jpg'))
-    #
-    # What we do below is transform a list like this:
-    #                                (('foo', 'bar/baz/wiki.py'),
-    #                                 ('a', 'b/c/d.jpg'))
-    #
-    # first into a dict and then into a pallatable form for setuptools.
-
-    # This re will be used to filter out etc/*.conf files and therefore not overwritting them
-    dataFiles = _generateDataPaths((('bin', 'bin'),
-                                    ('doc', 'doc'),
-                                    ('etc', 'etc')))
-    return dataFiles
-
 
 def _getInstallRequires():
-    '''Returns external packages required by Indico
+    """Returns external packages required by Indico
 
-    These are the ones needed for runtime.'''
+    These are the ones needed for runtime."""
 
-    base =  ['ZODB3>=3.8', 'pytz', 'zope.index', 'zope.interface',
-             'lxml', 'cds-indico-extras', 'zc.queue', 'python-dateutil<2.0',
-             'pypdf', 'mako>=0.4.1', 'babel', 'icalendar>=3.0', 'pyatom',
-             'simplejson', 'python-cjson', 'webassets', 'jsmin', 'cssmin']
-
-    #for Python older than 2.7
-    if sys.version_info[0] <= 2 and sys.version_info[1] < 7:
-        base.append('argparse')
-
-    return base
+    return read_requirements_file(os.path.join(os.path.dirname(__file__), 'requirements.txt'))
 
 
 def _versionInit():
-        '''Retrieves the version number from indico/MaKaC/__init__.py and returns it'''
+    """Retrieves the version number from indico/MaKaC/__init__.py and returns it"""
 
-        from indico.MaKaC import __version__
-        v = __version__
+    from indico.MaKaC import __version__
+    v = __version__
 
-        print('Indico %s' % v)
+    print 'Indico %s' % v
 
-        return v
+    return v
 
 
 ###  Commands ###########################################################
 class sdist_indico(sdist.sdist):
-    user_options = sdist.sdist.user_options + \
-                   [('version=', None, 'version to distribute')]
+    user_options = (sdist.sdist.user_options +
+                    [('version=', None, 'version to distribute')])
     version = 'dev'
 
     def run(self):
@@ -157,7 +129,7 @@ class sdist_indico(sdist.sdist):
 def _bdist_indico(dataFiles):
     class bdist_indico(bdist.bdist):
         def run(self):
-            compileAllLanguages(self)
+            compile_languages(self)
             bdist.bdist.run(self)
 
     bdist_indico.dataFiles = dataFiles
@@ -167,7 +139,7 @@ def _bdist_indico(dataFiles):
 def _bdist_egg_indico(dataFiles):
     class bdist_egg_indico(bdist_egg.bdist_egg):
         def run(self):
-            compileAllLanguages(self)
+            compile_languages(self)
             bdist_egg.bdist_egg.run(self)
 
     bdist_egg_indico.dataFiles = dataFiles
@@ -181,32 +153,50 @@ class develop_indico(develop.develop):
         # create symlink to legacy MaKaC dir
         # this is so that the ".egg-link" created by the "develop" command works
         if sys.platform in ["linux2", "darwin"] and not os.path.exists('MaKaC'):
-            os.symlink('indico/MaKaC','MaKaC')
+            os.symlink('indico/MaKaC', 'MaKaC')
+
+        # install dev dependencies
+        env = pkg_resources.Environment()
+        easy_install.main(read_requirements_file(os.path.join(os.path.dirname(__file__), 'requirements.dev.txt')))
+        env.scan()
 
 
 class develop_config(develop_indico):
     description = "prepares the current directory for Indico development"
-    user_options = develop.develop.user_options + [('www-uid=', None, "Set user for cache/log/db (typically apache user)"),
-                    ('www-gid=', None, "Set group for cache/log/db (typically apache group)")]
+    user_options = (develop.develop.user_options +
+                    [('www-uid=', None, "Set user for cache/log/db (typically apache user)"),
+                     ('www-gid=', None, "Set group for cache/log/db (typically apache group)"),
+                     ('http-port=', None, "Set port used by HTTP server"),
+                     ('https-port=', None, "Set port used by HTTP server in HTTPS mode"),
+                     ('zodb-port=', None, "Set port used by ZODB"),
+                     ('smtp-port=', None, "Set port used for SMTP (e-mail sending)"),
+                     ('use-apache', None, "Use apache (will chmod directories accordingly)")])
 
     www_uid = None
     www_gid = None
+    http_port = 8000
+    https_port = 8443
+    zodb_port = 9675
+    use_apache = False
+    smtp_port = 8025
 
     def run(self):
         # dependencies, links, etc...
         develop_indico.run(self)
 
-        env = pkg_resources.Environment()
-        easy_install.main(DEVELOP_REQUIRES)
-        env.scan()
-
         local = 'etc/indico.conf'
         if os.path.exists(local):
-            print 'Upgrading existing etc/indico.conf..'
-            upgrade_indico_conf(local, 'etc/indico.conf.sample')
+            print 'Upgrading existing etc/indico.conf...'
         else:
             print 'Creating new etc/indico.conf..'
             shutil.copy('etc/indico.conf.sample', local)
+
+        upgrade_indico_conf(local, 'etc/indico.conf.sample', {
+                'BaseURL': 'http://localhost:{0}'.format(self.http_port),
+                'BaseSecureURL': 'https://localhost:{0}'.format(self.https_port),
+                'DBConnectionParams': ("localhost", int(self.zodb_port)),
+                'SmtpServer': ("localhost", int(self.smtp_port))
+                })
 
         for f in [x for x in ('etc/zdctl.conf', 'etc/zodb.conf', 'etc/logging.conf') if not os.path.exists(x)]:
             shutil.copy('%s.sample' % f, f)
@@ -215,7 +205,7 @@ class develop_config(develop_indico):
 Please specify the directory where you'd like it to be placed.
 (Note that putting it outside of your sourcecode tree is recommended)"""
         prefixDirDefault = os.path.dirname(os.getcwd())
-        prefixDir = raw_input('[%s]: ' % prefixDirDefault).strip()
+        prefixDir = raw_input('Full path [%s]: ' % prefixDirDefault).strip()
 
         if prefixDir == '':
             prefixDir = prefixDirDefault
@@ -229,31 +219,36 @@ Please specify the directory where you'd like it to be placed.
                 os.makedirs(d)
         print 'Done!'
 
-        directories['htdocs'] = os.path.join(os.getcwd(), 'indico', 'htdocs')
-        directories['bin'] = os.path.join(os.getcwd(), 'bin')
-        directories['etc'] = os.path.join(os.getcwd(), 'etc')
-        directories['doc'] = os.path.join(os.getcwd(), 'doc')
+        # add existing dirs
+        directories.update(dict((d, os.path.join(os.getcwd(), 'indico', d)) for d in ['htdocs', 'bin', 'etc', 'doc']))
 
         self._update_conf_dir_paths(local, directories)
 
-        directories.pop('htdocs') #avoid modifying the htdocs folder permissions (it brings problems with git)
+        # avoid modifying the htdocs folder permissions (it brings problems with git)
+        directories.pop('htdocs')
 
-        from MaKaC.consoleScripts.installBase import _databaseText, _findApacheUserGroup, _checkDirPermissions, _updateDbConfigFiles, _updateMaKaCEggCache
+        from MaKaC.consoleScripts.installBase import _databaseText, _findApacheUserGroup, _checkDirPermissions, \
+            _updateDbConfigFiles, _updateMaKaCEggCache
 
-        user = ''
-
+        user = getpass.getuser()
         sourcePath = os.getcwd()
 
-        # find the apache user/group
-        user, group = _findApacheUserGroup(self.www_uid, self.www_gid)
-        _checkDirPermissions(directories, dbInstalledBySetupPy=directories['db'], accessuser=user, accessgroup=group)
+        if self.use_apache:
+            # find the apache user/group
+            user, group = _findApacheUserGroup(self.www_uid, self.www_gid)
+            _checkDirPermissions(directories, dbInstalledBySetupPy=directories['db'], accessuser=user, accessgroup=group)
 
-        _updateDbConfigFiles(directories['db'], directories['log'], os.path.join(sourcePath, 'etc'), directories['tmp'], user)
+        _updateDbConfigFiles(os.path.join(sourcePath, 'etc'),
+                             db=directories['db'],
+                             log=directories['log'],
+                             tmp=directories['tmp'],
+                             port=self.zodb_port,
+                             uid=user)
 
-        _updateMaKaCEggCache(os.path.join(os.path.dirname(__file__), 'indico', 'MaKaC', '__init__.py'), directories['tmp'])
+        _updateMaKaCEggCache(os.path.join(os.path.dirname(__file__), 'indico', 'MaKaC', '__init__.py'),
+                             directories['tmp'])
 
-        updateIndicoConfPathInsideMaKaCConfig(os.path.join(os.path.dirname(__file__), ''), 'indico/MaKaC/common/MaKaCConfig.py')
-        compileAllLanguages(self)
+        compile_languages(self)
         print '''
 %s
         ''' % _databaseText('etc')
@@ -261,9 +256,10 @@ Please specify the directory where you'd like it to be placed.
     def _update_conf_dir_paths(self, filePath, dirs):
         fdata = open(filePath).read()
         for dir in dirs.items():
-            d = dir[1].replace("\\","/") # For Windows users
-            fdata = re.sub('\/opt\/indico\/%s'%dir[0], d, fdata)
+            d = dir[1].replace("\\", "/")  # For Windows users
+            fdata = re.sub('\/opt\/indico\/%s' % dir[0], d, fdata)
         open(filePath, 'w').write(fdata)
+
 
 class test_indico(test.test):
     """
@@ -271,7 +267,7 @@ class test_indico(test.test):
     """
 
     description = "Test Suite Framework"
-    user_options = test.test.user_options + [('specify=', None, "Use nosetests style (file.class:testcase)"),
+    user_options = (test.test.user_options + [('specify=', None, "Use nosetests style (file.class:testcase)"),
                     ('coverage', None, "Output coverage report in html"),
                     ('unit', None, "Run only Unit tests"),
                     ('functional', None, "Run only Functional tests"),
@@ -288,7 +284,8 @@ class test_indico(test.test):
                     ('html', None, "Make an HTML report (when possible)"),
                     ('record', None, "Record tests (for --functional)"),
                     ('silent', None, "Don't output anything in the console, just generate the report"),
-                    ('killself', None, "Kill this script right after the tests finished without waiting for db shutdown.")]
+                    ('clean-shutdown', None,
+                     "Do not kill this script right after the tests finished without waiting for db shutdown.")])
     boolean_options = []
 
     specify = None
@@ -304,7 +301,7 @@ class test_indico(test.test):
     silent = False
     mode = None
     server_url = None
-    killself = False
+    clean_shutdown = False
     html = False
     record = False
     log = False
@@ -328,7 +325,7 @@ class test_indico(test.test):
         if self.jsspecify and 'jsunit' not in testsToRun:
             testsToRun.append('jsunit')
 
-        if testsToRun == []:
+        if not testsToRun:
             testsToRun = allTests
         self.testsToRun = testsToRun
 
@@ -342,7 +339,7 @@ class test_indico(test.test):
         from indico.tests import TestManager
 
         options = {'silent': self.silent,
-                   'killself': self.killself,
+                   'killself': not self.clean_shutdown,
                    'html': self.html,
                    'browser': self.browser,
                    'mode': self.mode,
@@ -351,10 +348,10 @@ class test_indico(test.test):
                    'record': self.record,
                    'server_url': self.server_url,
                    'log': self.log,
-                   'xml':self.xml}
+                   'xml': self.xml}
 
         # get only options that are active
-        options = dict((k,v) for (k,v) in options.iteritems() if v)
+        options = dict((k, v) for (k, v) in options.iteritems() if v)
 
         manager = TestManager()
         result = self._wrap(manager.main, self.testsToRun, options)
@@ -403,11 +400,9 @@ class egg_filename(Command):
         basename = pkg_resources.Distribution(
             None, None, ei_cmd.egg_name, ei_cmd.egg_version,
             get_python_version(),
-            self.distribution.has_ext_modules() and pkg_utils.get_build_platform
-            ).egg_name()
+            self.distribution.has_ext_modules() and pkg_utils.get_build_platform).egg_name()
 
         print basename
-
 
     def run(self):
         pass
@@ -422,7 +417,6 @@ if __name__ == '__main__':
     #    shutil.copy('etc/indico.conf.sample', PWD_INDICO_CONF)
 
     from MaKaC.consoleScripts.installBase import *
-
 
     #Dirty trick: For running tests, we need to load all the modules and get rid of unnecessary outputs
     tempLoggingDir = None
@@ -439,24 +433,24 @@ if __name__ == '__main__':
     x = vars()
     x.packageDir = os.path.join(get_python_lib(), 'MaKaC')
 
-
     x.binDir = 'bin'
     x.documentationDir = 'doc'
     x.configurationDir = 'etc'
     x.htdocsDir = 'htdocs'
 
-    dataFiles = _getDataFiles(x)
+    dataFiles = _generateDataPaths((('bin', 'bin'), ('doc', 'doc'), ('etc', 'etc'), ('migrations', 'migrations')))
 
     foundPackages = list('MaKaC.%s' % pkg for pkg in
-                         find_packages(where = 'indico/MaKaC'))
+                         find_packages(where='indico/MaKaC'))
     foundPackages.append('MaKaC')
     foundPackages.append('htdocs')
 
     # add our namespace package
     foundPackages += list('indico.%s' % pkg for pkg in
-                         find_packages(where = 'indico',
-                                       exclude = ['htdocs*', 'MaKaC*']))
+                          find_packages(where='indico',
+                                        exclude=['htdocs*', 'MaKaC*']))
     foundPackages.append('indico')
+    foundPackages.append('indico_zodbimport')
 
     cmdclass = {'sdist': sdist_indico,
                 'bdist': _bdist_indico(dataFiles),
@@ -467,81 +461,66 @@ if __name__ == '__main__':
                 'egg_filename': egg_filename
                 }
 
-    if BABEL_PRESENT:
-        for cmdname in ['init_catalog', 'extract_messages', 'compile_catalog', 'update_catalog']:
-            cmdclass['%s_js' % cmdname] = getattr(babel, cmdname)
-        cmdclass['compile_catalog_js'] = i18n.generate_messages_js
-
-    setup(name = "indico",
-          cmdclass = cmdclass,
-          version = _versionInit(),
-          description = "Indico is a full-featured conference lifecycle management and meeting/lecture scheduling tool",
-          author = "Indico Team",
-          author_email = "indico-team@cern.ch",
-          url = "http://indico-software.org",
-          download_url = "http://indico-software.org/wiki/Releases/Indico0.98-rc1",
-          platforms = ["any"],
-          long_description = "Indico allows you to schedule conferences, from single talks to complex meetings with sessions and contributions. It also includes an advanced user delegation mechanism, allows paper reviewing, archival of conference information and electronic proceedings",
-          license = "http://www.gnu.org/licenses/gpl-2.0.txt",
-          entry_points = """
+    setup(name="indico",
+          cmdclass=cmdclass,
+          version=_versionInit(),
+          description="Indico is a full-featured conference lifecycle management and meeting/lecture scheduling tool",
+          author="Indico Team",
+          author_email="indico-team@cern.ch",
+          url="http://indico-software.org",
+          download_url="http://indico-software.org/wiki/Releases/Indico1.2",
+          platforms=["any"],
+          long_description="Indico allows you to schedule conferences, from single talks to complex meetings with "
+                           "sessions and contributions. It also includes an advanced user delegation mechanism, "
+                           "allows paper reviewing, archival of conference information and electronic proceedings",
+          license="http://www.gnu.org/licenses/gpl-3.0.txt",
+          entry_points="""
             [console_scripts]
 
             indico_scheduler = indico.modules.scheduler.daemon_script:main
             indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main
             indico_ctl = MaKaC.consoleScripts.indicoCtl:main
-            indico_livesync = indico.ext.livesync.console:main
-            indico_shell = indico.util.shell:main
+            indico = indico.cli.manage:main
+            indico-zodbimport = indico_zodbimport.cli:main
+
+            [pytest11]
+            indico = indico.testing.pytest_plugin
+
+            [indico.zodb_importers]
+            roombooking = indico_zodbimport.modules.roombooking:RoomBookingImporter
 
             [indico.ext_types]
 
-            statistics = indico.ext.statistics
             Collaboration = MaKaC.plugins.Collaboration
-            InstantMessaging = MaKaC.plugins.InstantMessaging
-            RoomBooking = MaKaC.plugins.RoomBooking
             EPayment = MaKaC.plugins.EPayment
-            livesync = indico.ext.livesync
-            importer = indico.ext.importer
 
             [indico.ext]
 
-            statistics.piwik = indico.ext.statistics.piwik
-
             Collaboration.EVO = MaKaC.plugins.Collaboration.EVO
+            Collaboration.WebEx = MaKaC.plugins.Collaboration.WebEx
             Collaboration.Vidyo = MaKaC.plugins.Collaboration.Vidyo
             Collaboration.CERNMCU = MaKaC.plugins.Collaboration.CERNMCU
             Collaboration.RecordingManager = MaKaC.plugins.Collaboration.RecordingManager
             Collaboration.RecordingRequest = MaKaC.plugins.Collaboration.RecordingRequest
             Collaboration.WebcastRequest = MaKaC.plugins.Collaboration.WebcastRequest
 
-            RoomBooking.CERN = MaKaC.plugins.RoomBooking.CERN
-            RoomBooking.default = MaKaC.plugins.RoomBooking.default
-
             EPayment.payPal = MaKaC.plugins.EPayment.payPal
             EPayment.worldPay = MaKaC.plugins.EPayment.worldPay
             EPayment.yellowPay = MaKaC.plugins.EPayment.yellowPay
             EPayment.skipjack = MaKaC.plugins.EPayment.skipjack
-
-            importer.invenio = indico.ext.importer.invenio
-            importer.dummy = indico.ext.importer.dummy
-
-            InstantMessaging.XMPP = MaKaC.plugins.InstantMessaging.XMPP
-
-            livesync.invenio = indico.ext.livesync.invenio
-            livesync.cern_search = indico.ext.livesync.cern_search
-
             """,
-          zip_safe = False,
-          packages = foundPackages,
-          package_dir = { 'indico': 'indico',
-                          'htdocs': os.path.join('indico', 'htdocs'),
-                          'MaKaC' : os.path.join('indico', 'MaKaC')},
-          package_data = {'indico': ['*.*']},
+          zip_safe=False,
+          packages=foundPackages,
+          package_dir={'indico': 'indico',
+                       'htdocs': os.path.join('indico', 'htdocs'),
+                       'MaKaC': os.path.join('indico', 'MaKaC')},
+          package_data={'indico': ['*.*']},
           include_package_data=True,
-          namespace_packages = ['indico', 'indico.ext'],
-          install_requires = _getInstallRequires(),
-          tests_require = ['nose', 'rednose', 'twill', 'selenium', 'figleaf'],
-          data_files = dataFiles,
-          dependency_links = DEPENDENCY_URLS
+          namespace_packages=['indico', 'indico.ext'],
+          install_requires=_getInstallRequires(),
+          tests_require=['nose', 'rednose', 'twill', 'selenium', 'figleaf', 'contextlib2'],
+          data_files=dataFiles,
+          dependency_links=DEPENDENCY_URLS
           )
 
     #delete the temp folder used for logging

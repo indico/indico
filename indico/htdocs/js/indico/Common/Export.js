@@ -236,71 +236,73 @@ type("ExportIcalInterface", [], {
 
 var exportPopups= {};
 
-$(function() {
-    $(".exportIcal").qtip({
+$(document).ready(function() {
 
-        style: {
-            width: '350px',
-            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
-            tip: {
-                corner: true,
-                width: 20,
-                height: 15
-            }
-        },
-        position: {
-            my: 'top center',
-            at: 'bottom center'
-        },
-        content: function(api){
-            return $('#icalExportPopup'+this[0].getAttribute("data-id"));
-            },
-        show: {
-            event: "click",
-            effect: function() {
-                $(this).fadeIn(300);
-            }
-        },
-        hide: {
-            event: 'unfocus click',
-            fixed: true,
-            effect: function() {
-                $(this).fadeOut(300);
-            }
+    $(".exportIcal").on('menu_select', function() {
+        var $button = $(this);
+
+        if ($button.hasClass('open')) {
+            return;
+        } else {
+            $button.addClass('open');
+
+            $("<a/>").qtip({
+                style: {
+                    width: '350px',
+                    classes: 'qtip-rounded qtip-shadow qtip-popup',
+                    tip: {
+                        corner: true,
+                        width: 20,
+                        height: 15
+                    }
+                },
+                position: {
+                    my: 'top center',
+                    at: 'bottom center',
+                    target: $button
+                },
+                content: function(api) {
+                    return $('#icalExportPopup' + $button.data("id"));
+                },
+                show: {
+                    ready: true,
+                    effect: function() {
+                        $(this).fadeIn(300);
+                    }
+                },
+                hide: {
+                    event: 'unfocus',
+                    fixed: true,
+                    target: $button,
+                    effect: function() {
+                        $(this).fadeOut(300);
+                        $button.removeClass('open');
+                    }
+                }
+            });
         }
+
+        return true;
     });
 
     $('body').delegate('.apiURL','click',function(e){
         $(this).select();
-    });
-
-    $('body').delegate('.agreementButtonPersistent','click',function(e){
-        $('#progressPersistentSignatures'+this.getAttribute('data-id')).html($(progressIndicator(true, false).dom));
-        exportPopups[this.getAttribute('data-id')].enablePersistentSignatures();
-    });
-
-    $('body').delegate('.agreementButtonKey','click',function(e){
-        exportPopups[this.getAttribute('data-id')].createKey(false, '#progressPersistentKey'+this.getAttribute('data-id'));
-    });
-
-    $('body').delegate('.agreeCheckBoxKey','click',function(e){
+    }).delegate('.agreementButtonPersistent','click',function(e){
+        var id = $(this).data('id');
+        $('#progressPersistentSignatures'+id).html($(progressIndicator(true, false).dom));
+        exportPopups[id].enablePersistentSignatures();
+    }).delegate('.agreementButtonKey','click',function(e){
+        var id = $(this).data('id');
+        exportPopups[id].createKey(false, '#progressPersistentKey'+id);
+    }).delegate('.agreeCheckBoxKey','click',function(e){
+        var id = $(this).data('id');
+        $('#agreementButtonKey' + id).prop('disabled', !this.checked);
+    }).delegate('.agreeCheckBoxPersistent','click',function(e){
+        var id = $(this).data('id');
+        $('#agreementButtonPersistent'+id).prop('disabled', !this.checked);
+        $('#agreeCheckBoxKey'+id).prop('checked', this.checked).prop('disabled', this.checked);
         if(this.checked){
-            $('#agreementButtonKey'+this.getAttribute('data-id')).removeAttr("disabled");
-        }else{
-            $('#agreementButtonKey'+this.getAttribute('data-id')).attr("disabled","disabled");
-        }
-    });
-
-    $('body').delegate('.agreeCheckBoxPersistent','click',function(e){
-        if(this.checked){
-            $('#agreementButtonPersistent'+this.getAttribute('data-id')).removeAttr("disabled");
-            $('#agreeCheckBoxKey'+this.getAttribute('data-id'))[0].checked = true;
-            $('#agreeCheckBoxKey'+this.getAttribute('data-id')).attr("disabled","disabled");
-            $('#agreementButtonKey'+this.getAttribute('data-id')).attr("disabled","disabled");
-        }else{
-            $('#agreementButtonPersistent'+this.getAttribute('data-id')).attr("disabled","disabled");
-            $('#agreeCheckBoxKey'+this.getAttribute('data-id')).removeAttr("disabled");
-            $('#agreeCheckBoxKey'+this.getAttribute('data-id'))[0].checked = false;
+            $('#agreementButtonKey'+id).prop('disabled', true);
         }
     });
 });

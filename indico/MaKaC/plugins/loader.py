@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 This module defines the PluginLoader class, that is responsible for providing methods
@@ -30,7 +29,7 @@ import os, sys, pkg_resources, pkgutil
 from persistent import Persistent
 
 # legacy MaKaC imports
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from MaKaC.errors import PluginError
 
 # package
@@ -55,6 +54,8 @@ class PluginLoader(object):
     _pmodules = {}
 
     _ptypesLoaded = set()
+
+    _loaded = set()
 
     @classmethod
     def loadPlugins(cls):
@@ -251,7 +252,7 @@ class PluginLoader(object):
                             "Is there an __init__.py?" %
                             (pid, pModuleName))
 
-        ppath = pmodule.__path__[0]
+        ppath = pkg_resources.resource_filename(pmodule.__name__, "")
         pmetadata = processPluginMetadata(pmodule)
 
         # If it was a module, we check that the "type" field in the metadata
@@ -297,54 +298,37 @@ class PluginLoader(object):
         Loads the submodules of a plugin (recursively)
         """
 
-        modulePath = module.__path__[0]
+        mod_path = module.__path__
 
         #dictionary whose keys are submodule names, and whose values are module objects
         foundSubModules = {}
 
-        #we check the files in the module folder
-        for itemName in os.listdir(modulePath):
+        for loader, mod_name, is_pkg in pkgutil.iter_modules(mod_path):
 
-            # we strip the extension from the item name
-            itemName, ext = os.path.splitext(itemName)
+            full_mod_name = "{0}.{1}".format(module.__name__, mod_name)
 
-            # if the item is a directory, we may have found a subpackage
-            if os.path.isdir(os.path.join(modulePath, itemName)):
+            if full_mod_name in cls._loaded:
+                continue
 
-                subModule = cls.importName("%s.%s" % (module.__name__, itemName),
-                                           mayFail = True)
+            smod = cls.importName(full_mod_name)
+            foundSubModules[mod_name] = smod
 
-                # we hit a folder that is not a package, such
-                # plugins are allowed to have those
-                if subModule == None:
-                    continue
-
-                # we store the submodule in the foundSubModules dictionary
-                foundSubModules[itemName] = subModule
-
-                if not subModule.__name__.split('.')[-1].startswith('test'):
+            if is_pkg:
+                if not smod.__name__.split('.')[-1].startswith('test'):
                     # we make a recursive call
-                    cls._loadSubModules(subModule)
-
-            # if the item is a .py file and not __init__, it's a submodule that is
-            # not a package
-            elif ext == ".py" and itemName != "__init__":
-
-                # this should return a subModule, unless there
-                # has been an error during import
-                subModule = cls.importName("%s.%s" % (module.__name__, itemName))
-                foundSubModules[itemName] = subModule
+                    cls._loadSubModules(smod)
 
         # once we have found all the submodules, we make sure they are in the
         # __dict__ of the module:
-        for subModuleName, subModule in foundSubModules.iteritems():
-            module.__dict__[subModuleName] = subModule
+        for smod_name, smod in foundSubModules.iteritems():
+            cls._loaded.add(smod_name)
+            module.__dict__[smod_name] = smod
 
             # also, if there is a "modules" variable in the __init__.py of the
             # plugin, we store the submodules there
             # (needed by legacy epayment modules)
             if hasattr(module, "modules"):
-                module.modules[subModuleName] = subModule
+                module.modules[smod_name] = smod
 
 
 class GlobalPluginOptions(Persistent):

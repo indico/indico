@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 /*
  * List of users: This component manage a list of users, you can search and add users to the list, remove and edit them.
@@ -30,7 +47,7 @@ type("ListOfUsersManager", [], {
         // params: (title, allowSearch, confId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
         //          showToggleFavouriteButtons, chooseProcess)
         var chooseUsersPopup = new ChooseUsersPopup(title, allowSearch, confId, enableGroups, includeFavourites, suggestedUsers,
-                                                    onlyOne, showToggleFavouriteButtons,
+                                                    onlyOne, showToggleFavouriteButtons, false,
                 function(userList) {self._manageUserList(self.methods["addExisting"], self._getAddExistingParams(userList, extraParams));}, extraDiv);
         chooseUsersPopup.execute();
     },
@@ -64,7 +81,7 @@ type("ListOfUsersManager", [], {
     },
 
     _personName: function(user) {
-        if (user._type == "Group" || user._type == "CERNGroup") {
+        if (user._type && user._type.indexOf("Group") != -1) {
             var fullName = user.name;
         } else {
             if (user.pending) {
@@ -91,12 +108,8 @@ type("ListOfUsersManager", [], {
 
         menu: function(user) {
             var self = this;
-            if (!user.pending && user._type != "Group" && user._type != "CERNGroup") {
-                var optionsMenuSpan = $('<span/>').css('float', 'right').hover(function() {
-                    $(this).addClass('mouseover');
-                }, function() {
-                    $(this).removeClass('mouseover');
-                });
+            if (!user.pending && user._type.indexOf("Group") == -1) {
+                var optionsMenuSpan = $('<span/>').css('float', 'right');
                 var optionsMenuLink = $('<a/>').attr({
                     id: user.id,
                     'class': 'dropDownMenu fakeLink',
@@ -111,7 +124,7 @@ type("ListOfUsersManager", [], {
 
         favorite: function(user) {
             if (user._type == "Avatar") {
-                return $('<span/>').css({padding:'3px', 'float':'right'}).
+                return $('<span/>').css({'float':'right'}).
                     html(new ToggleFavouriteButton(user, {}, IndicoGlobalVars['userData']['favorite-user-ids'][user.id]).draw().dom);
             }
         },
@@ -214,7 +227,7 @@ type("ListOfUsersManager", [], {
         var params = this.userListParams;
         params['userList'] = userList;
         extraParams = any(extraParams, {});
-        for(param in extraParams){
+        for(var param in extraParams){
             params[param] = extraParams[param]();
         }
         return params;
@@ -267,7 +280,7 @@ type("ListOfUsersManager", [], {
             if (user._type == 'Group')
                 elemStyle = "UIGroup";
 
-            var row = $('<li/>').attr('class', elemStyle)
+            var row = $('<li/>').attr('class', elemStyle);
 
             _(self._component_order).each(function(opt, idx) {
                 if (self.userOptions[opt]) {
@@ -437,7 +450,7 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
         // Create the popup to add new users
         var chooseUsersPopup = new ChooseUsersPopup(
             title, allowSearch, confId, enableGroups, includeFavourites,
-            suggestedUsers, onlyOne, showToggleFavouriteButtons,
+            suggestedUsers, onlyOne, showToggleFavouriteButtons, false,
             function(userList) {
                 for (var i=0; i<userList.length; i++) {
                     if (!self._isAlreadyInList(userList[i]['email'])) {
@@ -556,6 +569,52 @@ type("ListOfUsersManagerForForm", ["ListOfUsersManager"], {
              initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu) {
 
         this.ListOfUsersManager(confId, {}, {}, inPlaceListElem, userCaption, elementClass, allowGroups,
+                rightsToShow, nameOptions, userOptions, initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu);
+    }
+);
+
+/*
+ * List of users: The difference with ListOfUsersManager is that a checkbox to send mail to the current managers is shown
+ * You can also add your own options
+ * @param: confId -> Id of the conference (if needed)
+ * @param: methods -> json object with the methods for the indicoRequests, the methods have to be:
+ *    addExisting, addNew, edit, remove, upUser, downUser (for these functionalities, then you can add your own ones)
+ * @param: userListParams -> common params for all the indicoRequests for the component (ex. confId, contribId)
+ * @param: inPlaceListElem -> element of the webpage where the list will be.
+ * @param: userCaption -> String to show in the texts
+ * @param: elementClass -> Class for the <li> elements in the list
+ * @param: allowGroups -> Bool, true if to have groups in the list is allowed
+ * @param: rightsToShow -> dictionary object, It shows the rights that the added users will be able to have. These values has to be:
+ *         {submission: bool, management: bool, coordination: bool}
+ * @param: nameOptions -> json object, Options for the user's name in the list. The options are:
+ *         {'affiliation': bool, 'email': bool, 'title': bool}
+ * @param: userOptions -> dictionary object: Options that can be performanced for each user. The allowed values are:
+ *         {remove: bool, edit: bool, favorite: bool, arrows: bool, menu: bool}
+ * @param: initialList -> List, It contains the initial users to add when the component is loaded the first time
+ * @param: allowEmptyEmail -> Bool, true if it is allowed to have an empty email when we add a non existing user
+ * @param: blockOnRemove -> Bool, true if it is necessary to block the page when an user is removed
+ * @param: inPlaceMenu -> element where the menu with the options to add users will be placed
+ * @param: showEmailCheckbox -> Bool, true if we want to activate the notification
+ */
+type("ListOfUsersManagerProtection", ["ListOfUsersManager"], {
+
+    addExistingUser: function(){
+        if(this.showEmailCheckbox){
+            var sendEmailDiv = Html.div({className:"informationUserList", style:{marginTop: pixels(10)}});
+            var checkbox = Html.checkbox({style:{verticalAlign:"middle"}}, true);
+            checkbox.dom.id = "send-email-managers";
+            sendEmailDiv.append(Html.span({},checkbox, $T("Send email notification to the current category managers")));
+            this._addExistingUser($T("Add ") + this.userCaption, true, this.confId, this.allowGroups, true, true, false, true,{"sendEmailManagers": function(){return $("#send-email-managers")[0].checked;}}, sendEmailDiv);
+        }else {
+            this._addExistingUser($T("Add ") + this.userCaption, true, this.confId, this.allowGroups, true, true, false, true);
+        }
+    }
+},
+
+    function(confId, methods, userListParams, inPlaceListElem, userCaption, elementClass, allowGroups,
+             rightsToShow, nameOptions, userOptions, initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu, showEmailCheckbox) {
+        this.showEmailCheckbox = showEmailCheckbox;
+        this.ListOfUsersManager(confId, methods, userListParams, inPlaceListElem, userCaption, elementClass, allowGroups,
                 rightsToShow, nameOptions, userOptions, initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu);
     }
 );

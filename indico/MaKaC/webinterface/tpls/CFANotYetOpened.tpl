@@ -1,7 +1,13 @@
+<%inherit file="ConfDisplayBodyBase.tpl"/>
 
-<table width="90%" align="center">
-    <tr>
-        <td align="center"><font size="+2" color="red"> ${ _("Call for abstracts is NOT YET OPENED for this conference")}</font>
-        </td>
-    </tr>
-</table>
+<%block name="title">
+    ${body_title}
+</%block>
+
+<%block name="content">
+    <div class="info-message-box">
+        <div class="message-text">
+            ${_("Sorry, but submission is not open yet. It will be available on " + start_date + ".")}
+        </div>
+    </div>
+</%block>

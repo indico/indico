@@ -1,28 +1,27 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from xml.sax.saxutils import quoteattr
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC import review
 from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
 from MaKaC.webinterface.pages.conferences import WPConferenceModifAbstractBase
@@ -169,19 +168,20 @@ class NotifTplToAddrsFactory:
 
 class WConfModCFANotifTplNew(wcomponents.WTemplated):
 
-    def __init__(self,conf):
+    def __init__(self, conf):
         self._conf = conf
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["postURL"] = quoteattr(str(urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)))
-        vars["errors"] = vars.get("errorList",[])
-        vars["title"] = quoteattr(str(vars.get("title","")))
-        vars["description"] = self.htmlText(vars.get("description",""))
-        vars["subject"] = quoteattr(str(vars.get("subject","")))
-        vars["body"] = self.htmlText(vars.get("body",""))
-        vars["fromAddr"] = quoteattr(str(vars.get("fromAddr","")))
-        vars["CCAddrs"] = quoteattr(str(",".join(vars.get("ccList",[]))))
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["postURL"] = quoteattr(
+            str(urlHandlers.UHAbstractModNotifTplNew.getURL(self._conf)))
+        vars["errors"] = vars.get("errorList", [])
+        vars["title"] = quoteattr(str(vars.get("title", "")))
+        vars["description"] = self.htmlText(vars.get("description", ""))
+        vars["subject"] = quoteattr(str(vars.get("subject", "")))
+        vars["body"] = self.htmlText(vars.get("body", ""))
+        vars["fromAddr"] = quoteattr(str(vars.get("fromAddr", "")))
+        vars["CCAddrs"] = quoteattr(str(",".join(vars.get("ccList", []))))
         vars["toAddrsList"] = NotifTplToAddrsFactory.getToAddrList()
         vars["availableConditions"] = NotifTplConditionsFactory.getConditionList()
         vars["contribTypeList"] = self._conf.getContribTypeList()
@@ -189,13 +189,14 @@ class WConfModCFANotifTplNew(wcomponents.WTemplated):
         return vars
 
 
+
 class WConfModCFANotifTplEditData(wcomponents.WTemplated):
 
-    def __init__(self,notifTpl):
-        self._notifTpl=notifTpl
+    def __init__(self, notifTpl):
+        self._notifTpl = notifTpl
 
     def _getToAddrsHTML(self):
-        res=[]
+        res = []
         for toAddr in NotifTplToAddrsFactory.getToAddrList():
             checked = ""
             if self._notifTpl:
@@ -204,52 +205,59 @@ class WConfModCFANotifTplEditData(wcomponents.WTemplated):
             else:
                 if toAddr.isSelectedByDefault():
                     checked = "checked"
-            res.append("""<input name="toAddrs" type="checkbox" value=%s %s>%s<br>"""%(quoteattr(toAddr.getId()),checked,self.htmlText(toAddr.getLabel())))
+            res.append("""<input name="toAddrs" type="checkbox" value=%s %s>%s<br>""" % (quoteattr(toAddr.getId()), checked, self.htmlText(toAddr.getLabel())))
         return "".join(res)
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["postURL"] = quoteattr(str(urlHandlers.UHAbstractModNotifTplEdit.getURL(self._notifTpl)))
-        vars["errors"] = vars.get("errorList",[])
-        if not vars.has_key("title"):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars["postURL"] = quoteattr(
+            str(urlHandlers.UHAbstractModNotifTplEdit.getURL(self._notifTpl)))
+        vars["errors"] = vars.get("errorList", [])
+        if "title" not in vars:
             vars["title"] = quoteattr(str(self._notifTpl.getName()))
         else:
             vars["title"] = quoteattr(str(vars["title"]))
-        if not vars.has_key("description"):
-            vars["description"] = self.htmlText(self._notifTpl.getDescription())
+        if "description" not in vars:
+            vars["description"] = self.htmlText(
+                self._notifTpl.getDescription())
         else:
             vars["description"] = self.htmlText(vars["description"])
-        if not vars.has_key("subject"):
-            vars["subject"] = quoteattr(str(self._notifTpl.getTplSubjectShow(EmailNotificator.getVarList())))
+        if "subject" not in vars:
+            vars["subject"] = quoteattr(str(self._notifTpl.getTplSubjectShow(
+                EmailNotificator.getVarList())))
         else:
             vars["subject"] = quoteattr(str(vars["subject"]))
-        if not vars.has_key("body"):
-            vars["body"] = self.htmlText(self._notifTpl.getTplBodyShow(EmailNotificator.getVarList()))
+        if "body" not in vars:
+            vars["body"] = self.htmlText(
+                self._notifTpl.getTplBodyShow(EmailNotificator.getVarList()))
         else:
             vars["body"] = self.htmlText(vars["body"])
-        if not vars.has_key("fromAddr"):
+        if "fromAddr" not in vars:
             vars["fromAddr"] = quoteattr(str(self._notifTpl.getFromAddr()))
         else:
             vars["fromAddr"] = quoteattr(str(vars["fromAddr"]))
         vars["toAddrsList"] = NotifTplToAddrsFactory.getToAddrList()
         vars["notifTpl"] = self._notifTpl
-        if not vars.has_key("ccList"):
-            vars["CCAddrs"] = quoteattr(str(", ".join(self._notifTpl.getCCAddrList())))
+        if "ccList" not in vars:
+            vars["CCAddrs"] = quoteattr(
+                str(", ".join(self._notifTpl.getCCAddrList())))
         else:
             vars["CCAddrs"] = quoteattr(str(", ".join(vars["ccList"])))
         vars["CAasCCAddr"] = self._notifTpl.getCAasCCAddr()
         return vars
 
+
 class WPModCFANotifTplNew(WPConfModifAbstractsReviewingNotifTplBase):
 
-    def _getTabContent(self,params):
+    def _getTabContent(self, params):
         wc = WConfModCFANotifTplNew(self._conf)
-        params["errorList"]=params.get("errorList",[])
+        params["errorList"] = params.get("errorList", [])
         return wc.getHTML(params)
 
     def getJSFiles(self):
         return WPConfModifAbstractsReviewingNotifTplBase.getJSFiles(self) + \
-           self._includeJSPackage('Management')
+            self._includeJSPackage('Management')
+
 
 class WPModCFANotifTplBase(WPConferenceModifAbstractBase):
 
@@ -302,21 +310,23 @@ class WPModCFANotifTplDisplay(WPModCFANotifTplBase):
         return wc.getHTML()
 
 
+
 class WPModCFANotifTplEdit(WPModCFANotifTplBase):
 
     def __init__(self, rh, notifTpl):
-        WPConferenceModifAbstractBase.__init__(self, rh, notifTpl.getConference())
-        self._notifTpl=notifTpl
-
+        WPConferenceModifAbstractBase.__init__(
+            self, rh, notifTpl.getConference())
+        self._notifTpl = notifTpl
 
     def _getTabContent(self, params):
-        wc=WConfModCFANotifTplEditData(self._notifTpl)
-        params["errorList"]=params.get("errorList",[])
+        wc = WConfModCFANotifTplEditData(self._notifTpl)
+        params["errorList"] = params.get("errorList", [])
         return wc.getHTML(params)
 
     def getJSFiles(self):
         return WPConferenceModifAbstractBase.getJSFiles(self) + \
-            self._includeJSPackage('Abstracts')
+            self._includeJSPackage('Management')
+
 
 
 

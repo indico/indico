@@ -1,5 +1,3 @@
-<% declareTemplate(newTemplateStyle=True) %>
-
 span.RRWarningMessage {
     color: #D01F3C;
     font-weight: bold;
@@ -48,7 +46,7 @@ ul.RROptionList li.RRInnerQuestion {
     font-weight: bold;
 }
 
-div.RRFormSection label {
+div.RRFormSection label, ul.RROptionList label {
     font-weight: normal;
 }
 
@@ -77,4 +75,8 @@ span.RRContributionName {
 
 span.RRSpeakers {
 	overflow: auto;
+}
+
+#contributionsDiv {
+    padding-left: 20px;
 }

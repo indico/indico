@@ -1,29 +1,29 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
-from MaKaC.services.implementation.base import AdminService, TextModificationBase
+from MaKaC.services.implementation.base import AdminService, TextModificationBase, LoggedOnlyService
 
 from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.user import PrincipalHolder, AvatarHolder, GroupHolder
 import MaKaC.webcast as webcast
 import MaKaC.common.timezoneUtils as timezoneUtils
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 import MaKaC.common.info as info
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.user import IAvatarAllDetailsFossil
@@ -42,8 +42,10 @@ class AddWebcastAdministrators(AdminService):
         ph = PrincipalHolder()
         for user in self._userList:
             pr = ph.getById(user["id"])
-            if pr != None:
-                self._wm.addManager(pr)
+            if pr is None:
+                raise NoReportError(_("The user that you are trying to add does not exist anymore in the database"))
+            self._wm.addManager(pr)
+
         return fossilize(self._wm.getManagers())
 
 class RemoveWebcastAdministrator(AdminService):
@@ -53,15 +55,14 @@ class RemoveWebcastAdministrator(AdminService):
         pm = ParameterManager(self._params)
         self._wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
         self._userId = pm.extract("userId", pType=str, allowEmpty=False)
-        self._pr = PrincipalHolder().getById(self._userId)
-        if self._pr == None:
-            raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
 
     def _getAnswer( self):
         ph = PrincipalHolder()
         pr = ph.getById(self._userId)
         if pr != None:
             self._wm.removeManager(pr)
+        elif not self._wm.removeManagerById(self._userId):
+            raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
         return fossilize(self._wm.getManagers())
 
 
@@ -74,13 +75,32 @@ class AdminLoginAs(AdminService):
         self._userId = pm.extract("userId", pType=str, allowEmpty=False)
         self._av = AvatarHolder().getById(self._userId)
         if self._av == None:
-            raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
+            raise NoReportError(_("The user that you are trying to login as does not exist anymore in the database"))
 
     def _getAnswer(self):
         tzUtil = timezoneUtils.SessionTZ(self._av)
         tz = tzUtil.getSessionTZ()
-        self._getSession().setVar("ActiveTimezone", tz)
-        self._getSession().setUser(self._av)
+        # We don't overwrite a previous entry - the original (admin) user should be kept there
+        session.setdefault('login_as_orig_user', {
+            'timezone': session.timezone,
+            'user_id': session.user.getId(),
+            'user_name': session.user.getStraightAbrName()
+        })
+        session.user = self._av
+        session.timezone = tz
+        return True
+
+
+class AdminUndoLoginAs(LoggedOnlyService):
+
+    def _getAnswer(self):
+        try:
+            entry = session.pop('login_as_orig_user')
+        except KeyError:
+            raise NoReportError(_('No login-as history entry found'))
+
+        session.user = AvatarHolder().getById(entry['user_id'])
+        session.timezone = entry['timezone']
         return True
 
 
@@ -97,10 +117,9 @@ class AddAdministrator(AdminService):
         ph = PrincipalHolder()
         for user in self._userList:
             principal = ph.getById(user["id"])
-            if principal != None:
-                adminList.grant(principal)
-            else:
-                raise ServiceError("ER-U0", _("Cannot find user with id %s") % user["id"])
+            if principal is  None:
+                raise NoReportError(_("The user that you are trying to add does not exist anymore in the database"))
+            adminList.grant(principal)
         return fossilize(minfo.getAdminList())
 
 
@@ -118,7 +137,7 @@ class RemoveAdministrator(AdminService):
         user = ph.getById(self._userId)
         if user != None:
             adminList.revoke(user)
-        else:
+        elif not adminList.revokeById(self._userId):
             raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
         return fossilize(minfo.getAdminList())
 
@@ -145,10 +164,9 @@ class GroupAddExistingMember(GroupMemberBase):
         ph = PrincipalHolder()
         for user in self._userList:
             principal = ph.getById(user["id"])
-            if principal != None:
-                self._group.addMember(principal)
-            else:
-                raise ServiceError("ER-U0", _("Cannot find user with id %s") % user["id"])
+            if principal is None:
+                raise NoReportError(_("The user that you are trying to add does not exist anymore in the database"))
+            self._group.addMember(principal)
         return fossilize(self._group.getMemberList())
 
 
@@ -224,6 +242,7 @@ methodMap = {
     "general.removeAdmin": RemoveAdministrator,
 
     "header.loginAs": AdminLoginAs,
+    "header.undoLoginAs": AdminUndoLoginAs,
 
     "groups.addExistingMember": GroupAddExistingMember,
     "groups.removeMember": GroupRemoveMember,

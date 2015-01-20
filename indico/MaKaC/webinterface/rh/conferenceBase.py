@@ -1,49 +1,51 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 import tempfile
 import os
-import shutil
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 import MaKaC.webinterface.urlHandlers as urlHandlers
+from MaKaC.common import log
 from MaKaC.webinterface.rh.base import RH
-from MaKaC.errors import MaKaCError
-from MaKaC.common.Configuration import Config
-from MaKaC.conference import LocalFile,Link,Category
+from MaKaC.errors import MaKaCError, NotFoundError
+from indico.core.config import Config
+from MaKaC.conference import LocalFile, Link, Category
 from MaKaC.export import fileConverter
-from MaKaC.conference import Conference,Session,Contribution,SubContribution
+from MaKaC.conference import Conference, Session, Contribution, SubContribution
 from MaKaC.i18n import _
 from MaKaC.user import AvatarHolder, GroupHolder
 
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
+from MaKaC.common.timezoneUtils import nowutc
 
 from indico.util import json
+from indico.util.contextManager import ContextManager
 
 BYTES_1MB = 1024 * 1024
 
 
-class RHCustomizable( RH ):
+class RHCustomizable(RH):
 
-    def __init__( self, req ):
-        RH.__init__( self, req )
+    def __init__(self, req=None):
+        RH.__init__(self)
         self._wf = ""
 
     def getWebFactory( self ):
@@ -59,9 +61,10 @@ class RHConferenceSite( RHCustomizable ):
         l = locators.WebLocator()
         l.setConference( params )
         self._conf = self._target = l.getObject()
+        ContextManager.set("currentConference", self._conf)
 
-    def _getLoginURL( self ):
-        url = self.getRequestURL()
+    def _getLoginURL(self, return_url=None):
+        url = return_url or self.getRequestURL()
         if url == "":
             url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
         wr = webFactoryRegistry.WebFactoryRegistry()
@@ -113,29 +116,32 @@ class RHSubContributionBase( RHConferenceSite ):
         self._conf = self._contrib.getConference()
 
 
-class RHMaterialBase( RHConferenceSite ):
+class RHMaterialBase(RHConferenceSite):
 
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         l = locators.WebLocator()
-        l.setMaterial( params )
+        l.setMaterial(params)
         self._material = self._target = l.getObject()
         if self._material is None:
-            raise MaKaCError( _("The material you are trying to access does not exist or was removed"))
+            raise NotFoundError(_("The material you are trying to access does not exist or was removed").format(
+                                "<strong>{}</strong>".format(params['confId'])),
+                                title=_("Resource not found"))
+
         self._conf = self._material.getConference()
-        if self._conf == None:
-            self._categ=self._material.getCategory()
+        if self._conf is None:
+            self._categ = self._material.getCategory()
 
 
-class RHFileBase( RHConferenceSite ):
+class RHFileBase(RHConferenceSite):
 
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         l = locators.WebLocator()
-        l.setResource( params )
+        l.setResource(params)
         self._file = self._target = l.getObject()
-        if not isinstance(self._file, LocalFile):
-            raise MaKaCError("No file found, %s found instead"%type(self._file))
+#        if not isinstance(self._file, LocalFile):
+#            raise MaKaCError("No file found, %s found instead"%type(self._file))
         self._conf = self._file.getConference()
-        if self._conf == None:
+        if self._conf is None:
             self._categ = self._file.getCategory()
 
 
@@ -183,12 +189,6 @@ class RHAbstractBase( RHConferenceSite ):
 
 class RHSubmitMaterialBase(object):
 
-    _allowedMatsConference=["paper", "slides", "poster", "minutes"]
-    _allowedMatsforReviewing=["reviewing"]
-    _allowedMatsForMeetings = [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
-    _allowedMatsForSE = [ "paper", "slides", "poster", "minutes", "agenda", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast", "video", "streaming video", "downloadable video" ]
-    _allowedMatsCategory = [ "paper", "slides", "poster", "minutes", "agenda", "video", "pictures", "text", "more information", "document", "list of actions", "drawings", "proceedings", "live broadcast" ]
-
     def __init__(self):
         self._tempFiles = {}
         self._repositoryIds = None
@@ -202,21 +202,20 @@ class RHSubmitMaterialBase(object):
         return tempFileName
 
     #XXX: improve routine to avoid saving in temporary file
-    def _saveFileToTemp(self, fd):
-        if fd not in self._tempFiles:
+    def _saveFileToTemp(self, fs):
+        if fs not in self._tempFiles:
             fileName = self._getNewTempFile()
-            fd.seek(0) # not really needed since we only copy once but it can't hurt
-            with open(fileName, 'wb') as f:
-                shutil.copyfileobj(fd, f)
-            self._tempFiles[fd] = fileName
-            # queue file for deletion at end of request
+            fs.save(fileName)
+            self._tempFiles[fs] = fileName
             self._tempFilesToDelete.append(fileName)
-        return self._tempFiles[fd]
+        return self._tempFiles[fs]
 
     def _checkProtection(self):
         self._loggedIn = True
         if self._getUser() == None and (isinstance(self._target, Category) or not self._target.getConference().canKeyModify(self._aw)):
             self._loggedIn = False
+        elif self._getUser() and isinstance(self._target, Conference) and self._target.getAccessController().canUserSubmit(self._getUser()):
+            self._loggedIn = True
         else:
             super(RHSubmitMaterialBase, self)._checkProtection()
 
@@ -229,15 +228,16 @@ class RHSubmitMaterialBase(object):
 
         self._files = []
         self._links = []
-        self._topdf=params.has_key("topdf")
+        self._topdf = "topdf" in params
 
-        self._displayName = params.get("displayName","").strip()
-        self._uploadType = params.get("uploadType","")
-        self._materialId = params.get("materialId","")
-        self._description = params.get("description","")
+        self._displayName = params.get("displayName", "").strip()
+        self._uploadType = params.get("uploadType", "")
+        self._materialId = params.get("materialId", "")
+        self._description = params.get("description", "")
         self._statusSelection = int(params.get("statusSelection", 1))
         self._visibility = int(params.get("visibility", 0))
-        self._password = params.get("password","")
+        self._password = params.get("password", "")
+        self._doNotSanitizeFields.append("password")
 
         self._userList = json.loads(params.get("userList", "[]"))
         maxUploadFilesTotalSize = float(self._cfg.getMaxUploadFilesTotalSize())
@@ -254,15 +254,15 @@ class RHSubmitMaterialBase(object):
                 if type(fileUpload) != str and fileUpload.filename.strip() != "":
                     fDict = {}
 
-                    fDict["fileName"] = fileUpload.filename
-                    estimSize = int(self._req.headers_in["content-length"])
+                    fDict["fileName"] = fileUpload.filename.encode("utf-8")
+                    estimSize = request.content_length
 
                     if maxUploadFilesTotalSize and estimSize > (maxUploadFilesTotalSize * BYTES_1MB):
                         # if file is too big, do not save it in disk
                         fDict["filePath"] = ''
                         fDict["size"] = estimSize
                     else:
-                        fDict["filePath"] = self._saveFileToTemp(fileUpload.file)
+                        fDict["filePath"] = self._saveFileToTemp(fileUpload)
                         fDict["size"] = os.path.getsize(fDict["filePath"])
 
                     self._setErrorList(fDict)
@@ -274,10 +274,12 @@ class RHSubmitMaterialBase(object):
                 self._displayName = ""
                 self._description = ""
             else:
-                urls =  [params["url"]]
+                urls = [params["url"]]
 
             matType = params.get("materialType", "")
             for url in urls:
+                if not url.strip():
+                    continue
                 link = {}
                 link["url"] = url
                 link["matType"] = matType
@@ -285,10 +287,7 @@ class RHSubmitMaterialBase(object):
 
 
     def _setErrorList(self, fileEntry):
-        res=[]
-
         maxUploadFilesTotalSize = float(self._cfg.getMaxUploadFilesTotalSize())
-
         if self._uploadType == "file":
             if "filePath" in fileEntry and not fileEntry["filePath"].strip():
                 self._errorList.append(_("""A valid file to be submitted must be specified. """))
@@ -303,7 +302,6 @@ class RHSubmitMaterialBase(object):
 
         if self._materialId=="":
             self._errorList.append(_("""A material ID must be selected."""))
-        return res
 
     def _getMaterial(self, forceCreate = True):
         """
@@ -340,7 +338,7 @@ class RHSubmitMaterialBase(object):
         from MaKaC.common.fossilize import fossilize
         from MaKaC.fossils.conference import ILocalFileExtendedFossil, ILinkFossil
 
-        Logger.get('requestHandler').debug('Adding %s - request %s ' % (self._uploadType, id(self._req)))
+        Logger.get('requestHandler').debug('Adding %s - request %s' % (self._uploadType, request))
 
         mat, newlyCreated = self._getMaterial()
 
@@ -364,7 +362,8 @@ class RHSubmitMaterialBase(object):
                         resource.setName(self._displayName)
 
                     if not type(self._target) is Category:
-                        self._target.getConference().getLogHandler().logAction({"subject":"Added file %s%s" % (fileEntry["fileName"], text)}, "Files", user)
+                        log_info = {"subject":"Added file %s%s" % (fileEntry["fileName"], text)}
+                        self._target.getConference().getLogHandler().logAction(log_info, log.ModuleNames.MATERIAL)
                     resources.append(resource)
                     # in case of db conflict we do not want to send the file to conversion again, nor re-store the file
 
@@ -380,7 +379,8 @@ class RHSubmitMaterialBase(object):
                         resource.setName(self._displayName)
 
                     if not type(self._target) is Category:
-                        self._target.getConference().getLogHandler().logAction({"subject":"Added link %s%s" % (resource.getURL(), text)}, "Files", user)
+                        log_info = {"subject":"Added link %s%s" % (resource.getURL(), text)}
+                        self._target.getConference().getLogHandler().logAction(log_info, log.ModuleNames.MATERIAL)
                     resources.append(resource)
 
             status = "OK"
@@ -400,9 +400,12 @@ class RHSubmitMaterialBase(object):
                 mat.addResource(resource, forcedFileId=None)
 
             #apply conversion
-            if self._topdf and fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(os.path.splitext(resource.getFileName())[1].strip().lower()):
-                #Logger.get('conv').debug('Queueing %s for conversion' % resource.getFilePath())
-                fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), "pdf", mat)
+            if self._topdf and not isinstance(resource, Link):
+                file_ext = os.path.splitext(resource.getFileName())[1].strip().lower()
+                if fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(file_ext):
+                    # Logger.get('conv').debug('Queueing %s for conversion' % resource.getFilePath())
+                    fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), 'pdf', mat)
+                    resource.setPDFConversionRequestDate(nowutc())
 
             # store the repo id, for files
             if isinstance(resource, LocalFile) and self._repositoryIds is None:

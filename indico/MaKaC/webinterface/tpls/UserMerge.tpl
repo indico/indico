@@ -154,7 +154,7 @@ function selectUser(kindOfUser) {
         var caption = $T('principal user');
     else if (kindOfUser == 'selectToMerge')
         var caption = $T('user to merge');
-    var chooseUsersPopup = new ChooseUsersPopup($T('Select ')+caption, true, null, false, true, false, true, true,
+    var chooseUsersPopup = new ChooseUsersPopup($T('Select ')+caption, true, null, false, true, false, true, true, false,
                 function(user) {
                     if (kindOfUser == 'selectPrin')
                         updateUserData('principal', user[0]);

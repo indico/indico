@@ -1,13 +1,13 @@
+<script type="text/javascript">
+  var bookings = ${dict((b['id'], b) for b in fossilize(bookings))|n,j};
+</script>
+
+<% from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools %>
 <%
     ## Only show event-level video services.
-    event_bookings = filter(lambda x: x.hasSessionOrContributionLink() != True, bookings)
+    event_bookings = filter(lambda x: x.hasSessionOrContributionLink() != True and x.canBeDisplayed(), bookings)
 %>
 % if event_bookings:
-<script type="text/javascript">
-## Move this into js folder
-var videoServiceLaunchInfo = {};
-
-</script>
 <tr>
 <td class="leftCol">Video Services</td>
 <td>
@@ -31,7 +31,7 @@ var videoServiceLaunchInfo = {};
                     ${ 1 + moreScheduled } more scheduled bookings.
                 % endif
             </span>
-            <span id="collShowBookings" class="fakeLink collShowBookingsText">Show</span>
+            <span id="collShowBookings" class="fakeLink italic">Show</span>
         </div>
     </div>
 
@@ -50,7 +50,7 @@ var videoServiceLaunchInfo = {};
             ${getBookingType(booking)}
             ${formatTwoDates(booking.getAdjustedStartDate(timezone),
                              booking.getAdjustedEndDate(timezone),
-                             useToday=True, useTomorrow=True, dayFormat='%a %d/%m', capitalize=False)}\
+                             useToday=True, useTomorrow=True, dayFormat='EEE d/MMM', capitalize=False)}\
         % endif
         % if data.getFirstLineInfo(booking):
     : ${data.getFirstLineInfo(booking)}\
@@ -60,22 +60,38 @@ var videoServiceLaunchInfo = {};
     </span>
     <!-- <span style="margin-left:20px;"></span>  -->
 
-        % if launchInfo:
-        <a target="_blank" href="${launchInfo['launchLink']}" class="bookingLaunchLink" data-id="${bookingId}">
-            ${launchInfo['launchText']}
-        </a>
-        <script type="text/javascript">
-            videoServiceLaunchInfo["${bookingId}"] = ${jsonEncode(launchInfo['launchTooltip'])};
-        </script>
+        % if bookingInfo:
+        <span class="collaborationDisplayMoreInfo">More Info</span>
         % endif
 
         % if bookingInfo and launchInfo:
         <span style="margin-left:3px;margin-right:3px;">|</span>
         % endif
 
-        % if bookingInfo:
-    <span class="collaborationDisplayMoreInfo">More Info</span>
+        % if launchInfo:
+            % if launchInfo['launchLink']:
+                <a target="_blank" href="${launchInfo['launchLink']}" class="bookingLaunchLink" data-id="${bookingId}">
+                    ${launchInfo['launchText']}
+                </a>
+            % else:
+                <span style="font-weight:bold; color:#888" class="bookingLaunchLink"  data-id="${bookingId}" >${launchInfo['launchText']}</span>
+            % endif
+        <script type="text/javascript">
+            videoServiceLaunchInfo["${bookingId}"] = ${jsonEncode(launchInfo['launchTooltip'])};
+        </script>
         % endif
+
+        % if (bookingInfo or launchInfo) and booking.getType() == "Vidyo" and self_._rh._getUser() and booking.isLinkedToEquippedRoom():
+          % if conf.canModify(self_._rh._aw) or booking.getOwner()["id"] == self_._rh._getUser().getId() or \
+               (_request.remote_addr == VidyoTools.getLinkRoomAttribute(booking.getLinkObject(), attName='ip')):
+            <span style="margin-left:3px;margin-right:3px;">|</span>
+            <a class="fakeLink connect_room" data-booking-id="${booking.getId()}"
+               data-event="${conf.getId()}" data-location="${booking.getLinkVideoRoomLocation()}">
+               <span style="vertical-align: middle;" class="button-text"/>${_("Connect")} ${booking.getLinkVideoRoomLocation()}</span>
+               <span style="padding-left: 3px; vertical-align:middle" class="progress"></span></a>
+          % endif
+        % endif
+
     </span>
 
     % if bookingInfo:

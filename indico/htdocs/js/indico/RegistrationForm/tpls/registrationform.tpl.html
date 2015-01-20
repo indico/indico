@@ -1,0 +1,75 @@
+<form novalidate
+    id="registrationForm"
+    name="registrationForm"
+    class="RegistrationForm"
+    action="{{ postUrl }}"
+    method="POST"
+    enctype="multipart/form-data"
+    ng-submit="submit()">
+
+    <div ng-if="editMode"
+        ng-include="getTpl('toolbar.tpl.html')"></div>
+
+    <div ng-model="sections" class="regform-section-list" ui-sortable="sectionSortableOptions">
+        <div ng-animate="animations.section" ng-repeat="section in sections | filter: {enabled: true}">
+            <div ng-switch="section._type">
+                <nd-section nd-general-section
+                    ng-switch-default></nd-section>
+                <nd-section nd-general-section nd-personal-data-section
+                    ng-switch-when="PersonalDataForm"></nd-section>
+                <nd-section nd-accommodation-section
+                    ng-switch-when="AccommodationForm"></nd-section>
+                <nd-section nd-further-information-section
+                    ng-switch-when="FurtherInformationForm"></nd-section>
+                <nd-section nd-reason-section
+                    ng-switch-when="ReasonParticipationForm"></nd-section>
+                <nd-section nd-sessions-section
+                    ng-switch-when="SessionsForm"></nd-section>
+                <nd-section nd-social-event-section
+                    ng-switch-when="SocialEventForm"></nd-section>
+            </div>
+        </div>
+    </div>
+
+    <div ng-if="!editMode" align="center">
+        <div class="regform-mandatory-info">
+            <span>({{ 'All the fields marked with ' | i18n }}</span>
+            <span class="regFormMandatoryField">*</span>
+            <span>{{ ' are mandantory' | i18n }})</span>
+        </div>
+        <div ng-switch="updateMode">
+            <input type="submit" id="regformSubmit"
+                 ng-switch-default class="i-button highlight" value="{{ 'Register' | i18n }}">
+            <input type="submit" id="regformSubmit"
+                 ng-switch-when="true" class="i-button highlight" value="{{ 'Modify' | i18n }}">
+        </div>
+    </div>
+
+    <input type="hidden" value="{{ confId }}" id="conf_id">
+
+    <nd-dialog nd-add-section-dialog
+        ng-if="editMode"
+        show="dialogs.addsection"
+        heading="{{ 'New section' | i18n }}"
+        ok-button="{{ 'Add' | i18n }}"
+        ok-callback="api.createSection(dialogScope)"
+        validate="true"
+        data="sections">
+    </nd-dialog>
+
+    <nd-dialog nd-section-management-dialog
+        ng-if="editMode"
+        show="dialogs.management"
+        ok-button="{{ 'Close' | i18n }}"
+        ok-only="true"
+        heading="{{ 'Section Management' | i18n }}"
+        api="api"
+        data="sections">
+    </nd-dialog>
+
+    <nd-dialog nd-error-dialog
+        heading="{{ 'Form validation'| i18n }}"
+        show="dialogs.error"
+        ok-only="true">
+    </nd-confirmation-popup>
+</form>

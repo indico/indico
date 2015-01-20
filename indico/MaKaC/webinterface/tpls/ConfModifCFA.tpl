@@ -82,13 +82,22 @@
             <br/><a href="${ mandatoryUrl }"><img src="${ iconEnabled if areTracksMandatory else iconDisabled }" border="0"> ${ _("Make track selection mandatory") }</a>
             <br/><a href="${ attachUrl }"><img src="${ iconEnabled if canAttachFiles else iconDisabled }" border="0"> ${ _("Allow to attach files") }</a>
             <br/><a href="${ showSpeakerUrl }"><img src="${ iconEnabled if showSelectAsSpeaker else iconDisabled }" border="0"> ${ _("Allow to choose the presenter(s) of the abstracts") }</a>
-            <% makeMandSpk = _("Make mandatory the selection of at least one author as presenter") %>
+            <% makeMandSpk = _("Make the selection of at least one author as presenter mandatory") %>
             % if showSelectAsSpeaker:
                 <br/><a href="${ speakerMandatoryUrl }"><img src="${ iconEnabled if isSelectSpeakerMandatory else iconDisabled }" border="0"> ${makeMandSpk}</a>
             % else:
                 <br/><img src="${ iconDisabled }" border="0"> <span id="makePresenterMandatory" style="color:#777"> ${makeMandSpk}</span>
             % endif
-            <br/><a href="${ showAttachedFilesUrl }" id="showAttachedFiles" data-active="${'yes' if showAttachedFilesContribList else 'no'}"><img src="${ iconEnabled if showAttachedFilesContribList else iconDisabled }" border="0"> ${ _("Show files attached to abstracts in the contribution list") }</a>
+            <br/>
+            <a href="${ showAttachedFilesUrl }"
+               % if not showAttachedFilesContribList:
+                 data-confirm="${_("Please, note that if you enable this option the files (attached to the abstracts) will be public and accessible by everybody. Are you sure to continue?")}"
+                 data-title="${_("Show attached files")}"
+               % endif
+               >
+               <img src="${ iconEnabled if showAttachedFilesContribList else iconDisabled }" border="0" />
+               ${ _("Show files attached to abstracts in the contribution list")}
+            </a>
         </td>
     </tr>
     </tr>
@@ -114,8 +123,45 @@
         <td colspan="3" class="horizontalLine">&nbsp;</td>
     </tr>
 </table>
-<br>
+
+<%include file="ConfModifCFAAddFieldTooltip.tpl"/>
+
 <script type="text/javascript">
+$(function() {
+    $("#add-field-button").click(function(e) {
+        e.preventDefault();
+    }).qtip({
+        id: "add-field",
+        content: $("#qtip-content-add-field"),
+        position: {
+            at: "top right",
+            my: "bottom right"
+        },
+        show: {
+            event: "click"
+        },
+        hide: {
+            event: "unfocus click"
+        },
+        events: {
+            render: function(event, api) {
+                $("#qtip-content-add-field .i-big-button").click(function(e) {
+                    e.preventDefault();
+                    api.hide();
+                    var fieldType = $(this).data("fieldtype");
+                    new AbstractFieldDialogFactory().makeDialog(fieldType, ${confId}).open();
+                });
+            }
+        }
+    });
+
+    $(".edit-field").click(function(e) {
+        e.preventDefault();
+        var fieldId = $(this).data("id");
+        var fieldType = $(this).data("fieldtype");
+        new AbstractFieldDialogFactory().makeDialog(fieldType, ${confId}, fieldId).open();
+    });
+});
 
 var lateSubmissionAuthUsers = new ListOfUsersManager('${ confId }',
     {'addExisting': 'abstracts.lateSubmission.addExistingLateAuthUser', 'remove': 'abstracts.lateSubmission.removeLateAuthUser'},
@@ -124,12 +170,5 @@ var lateSubmissionAuthUsers = new ListOfUsersManager('${ confId }',
 
 IndicoUI.executeOnLoad(function(){
     $('#makePresenterMandatory').qtip({content: "${_('This option is automatically disabled when the option \'Allow to choose the presenter(s) of the abstracts\' is also disabled')}", position: {my: 'top middle', at: 'bottom middle'}});
-    $('#showAttachedFiles').click(function(){
-        if(this.dataset.active=='no'){
-            return confirm($T("Please, note that if you enable this option the files (attached to the abstracts) will be public and accessible by everybody. Are you sure to continue?"));
-        }
-        return true;
-
-    })
 });
 </script>

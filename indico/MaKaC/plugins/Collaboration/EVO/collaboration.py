@@ -1,39 +1,37 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from datetime import timedelta
+
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import nowutc, unixTimeToDatetime
 from MaKaC.plugins.Collaboration.base import CSBookingBase
 from MaKaC.plugins.Collaboration.EVO.common import EVOControlledException, getEVOAnswer, parseEVOAnswer, EVOException, \
     getMinStartDate, getMaxEndDate, OverlappedError, EVOError, ChangesFromEVOError, getRequestURL, EVOWarning, getEVOOptionValueByName
 from MaKaC.plugins.Collaboration.EVO.mail import NewEVOMeetingNotificationAdmin, EVOMeetingModifiedNotificationAdmin, EVOMeetingRemovalNotificationAdmin
-#    NewEVOMeetingNotificationManager, EVOMeetingModifiedNotificationManager,\
-#    EVOMeetingRemovalNotificationManager
 from MaKaC.common.mail import GenericMailer
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from MaKaC.i18n import _
-from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.plugins.Collaboration.EVO.fossils import ICSBookingConfModifFossil,\
     ICSBookingIndexingFossil
 from MaKaC.common.fossilize import fossilizes
+from indico.util.date_time import format_datetime
 
 class CSBooking(CSBookingBase): #already Fossilizable
     fossilizes(ICSBookingConfModifFossil, ICSBookingIndexingFossil)
@@ -350,7 +348,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
     def _getLaunchDisplayInfo(self):
         return {'launchText' : _("Join Now!"),
                 'launchLink' : str(self.getUrl()),
-                'launchTooltip': _("Click here to join the EVO meeting!")}
+                'launchTooltip': _("Click here to join the EVO meeting!") if self.canBeStarted() else _('This meeting starts on %s so you cannot join it yet')%format_datetime(self.getStartDate())}
 
     ## end of overrigind methods
 
@@ -425,8 +423,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
             try:
                 notification = NewEVOMeetingNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                         "MaKaC/plugins/Collaboration/EVO/collaboration.py",
-                                         self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('EVO').error(
                     """Could not send NewEVOMeetingNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
@@ -436,8 +433,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
             try:
                 notification = EVOMeetingModifiedNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                         "MaKaC/plugins/Collaboration/EVO/collaboration.py",
-                                         self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('EVO').error(
                     """Could not send EVOMeetingModifiedNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %
@@ -447,8 +443,7 @@ class CSBooking(CSBookingBase): #already Fossilizable
             try:
                 notification = EVOMeetingRemovalNotificationAdmin(self)
                 GenericMailer.sendAndLog(notification, self.getConference(),
-                                         "MaKaC/plugins/Collaboration/EVO/collaboration.py",
-                                         self.getConference().getCreator())
+                                         self.getPlugin().getName())
             except Exception,e:
                 Logger.get('EVO').error(
                     """Could not send EVOMeetingRemovalNotificationAdmin for booking with id %s of event with id %s, exception: %s""" %

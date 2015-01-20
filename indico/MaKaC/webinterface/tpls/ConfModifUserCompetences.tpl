@@ -15,7 +15,7 @@
     <tr>
         <td colspan="4">
             <div style="padding:5px; color:gray;">
-                <span class="collShowBookingsText">${ _("To define competences for each user could help you to choose better the user when you assign contributions.")}</span>
+                <span class="italic">${ _("To define competences for each user could help you to choose better the user when you assign contributions.")}</span>
             </div>
         </td>
     </tr>

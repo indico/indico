@@ -114,7 +114,7 @@ type("DataStore", ["DataReference"], {
 				  	});
 				  }
 				}
-	  	};
+	  	}
 			if (!exists(revision)) {
 				latestReferences[id] = reference;
 				latestReferencesUpdate[id] = update;
@@ -170,7 +170,7 @@ type("DataStore", ["DataReference"], {
 				newIdsWanted += count;
 			}
 			schedule(commit);
-		}
+		};
 		store.submit = function(id, data) {
 			toSubmit[id] = data;
 			schedule(commit);

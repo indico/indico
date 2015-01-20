@@ -1,11 +1,17 @@
+<%inherit file="ConfDisplayBodyBase.tpl"/>
 
-<br><br><br>
-<table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC;">
-    <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-    <tr>
-        <td>&nbsp;</td>
-        <td style="font-size: small;font-weight: bold;"><font color="red"> ${ _("Call for abstracts is already CLOSED for this conference")}</font></td>
-        <td>&nbsp;</td>
-    </tr>
-    <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-</table>
+<%block name="title">
+    ${body_title}
+</%block>
+
+<%block name="content">
+    <div class="info-message-box">
+        <div class="message-text">
+            % if is_modif: # easier to translate
+                ${_("Sorry, but the deadline for abstract modification finished on {date}.".format(date=end_date))}
+            % else:
+                ${_("Sorry, but the deadline for abstract submission finished on {date}.".format(date=end_date))}
+            % endif
+        </div>
+    </div>
+</%block>

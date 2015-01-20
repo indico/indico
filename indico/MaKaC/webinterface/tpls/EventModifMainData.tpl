@@ -185,12 +185,12 @@ additionalInfo = confObj.getContactInfo()
     <td colspan="2">
         <table width="100%">
             <tr>
-                <td class="blacktext" style="width: 100%">
-                    <ul id="chairPersonsList" class="UIPeopleList"></ul>
+                <td class="blacktext" style="width: 79%">
+                    <ul id="chairPersonsList" class="UIAuthorList"></ul>
                 </td>
-                <td nowrap valign="top">
+                <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                     <span id="addNewChairSpan" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
-                        <a id="addNewChairLink" class="dropDownMenu fakeLink"  style="margin-left: 15px; margin-right: 15px">${ _("Add chairperson") if eventType == "conference" or eventType == "meeting" else  _("Add speaker")}</a>
+                        <a id="addNewChairLink" class="dropDownMenu fakeLink">${ _("Add chairperson") if eventType == "conference" or eventType == "meeting" else  _("Add speaker")}</a>
                     </span>
                 </td>
             </tr>
@@ -214,9 +214,7 @@ $E('inPlaceEditTitle').set(new InputEditWidget('event.main.changeTitle',
         {'conference':'${ conferenceId }'}, ${ jsonEncode(title) }, false, null, null,
         null).draw());
 
-<% dMgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(confObj) %>
-
-$E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, {'caption': "${ dMgr.getSupportEmailCaption() }", 'email': confFossile.supportEmail}).draw());
+$E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, {'caption': confFossile.supportInfo.caption, 'email': confFossile.supportInfo.email, 'telephone': confFossile.supportInfo.telephone}).draw());
 
 % if evtType == 'lecture':
     $E('inPlaceEditOrganiserText').set(new InputEditWidget('event.main.changeOrganiserText',
@@ -251,8 +249,9 @@ var userCaption = "speaker";
 % endif
 
 $E('inPlaceEditShortURL').set(new URLPathEditWidget('event.main.changeShortURL',
-        {'conference':'${ conferenceId }'}, ${ jsonEncode(shortURLBase) }, ${ jsonEncode(shortURLTag) }, true, null, null,
-        null).draw());
+        {'conference':'${ conferenceId }'}, ${ jsonEncode(shortURLBase) }, ${ jsonEncode(shortURLTag) }, true, null, function(value) {
+            return IndicoUtil.parseShortURL(value);
+        }, $T("The short URL contains invalid characters. The allowed characters are alphanumeric, /, _, - and .")).draw());
 
 $E('inPlaceEditKeywords').set(new TextAreaEditWidget('event.main.changeKeywords', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, ${ jsonEncode(keywords) }).draw());
 
@@ -275,7 +274,7 @@ $E('inPlaceEditLocation').set([
     IndicoUI.Widgets.roomParamsShow,
     function(target, source){
         var info = $O(source.get().getAll());
-        var rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, null, nullRoomInfo(info), ${ favoriteRooms }, null);
+        var rbWidget = new RoomBookingWidget(Indico.Data.Locations, info, null, nullRoomInfo(info), ${ favoriteRooms | n,j }, null);
     target.set(rbWidget.draw())
         return {
       activate: function(){},
@@ -290,20 +289,18 @@ $E('inPlaceEditLocation').set([
       }
     };
     }
-  )(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, 'event.main.changeBooking',{conference: '${ conferenceId }'}, $O(${ offlineRequest(self_._rh,'event.main.changeBooking',dict(conference="%s"%conferenceId))})), context),
+  )(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, 'event.main.changeBooking',{conference: '${ conferenceId }'}, $O(${currentLocation | n,j})), context),
     IndicoUI.Aux.defaultEditMenu(context)]);
 
 // Search chairpersons/speakers
 
-var chairPersonsManager = new ListOfUsersManager(confFossile["id"],
+var chairPersonsManager = new ParticipantsListManager(confFossile["id"],
         {'addNew': 'event.main.addNewChairPerson',
          'addExisting': 'event.main.addExistingChairPerson',
          'remove': 'event.main.removeChairPerson',
-         'edit': 'event.main.editChairPerson'}, {confId: confFossile["id"]}, $E('chairPersonsList'),
-        "chairperson", "UIPerson", false,
-        {submission: false, management: true, coordination: false},
-        {title: true, affiliation: false, email:false},
-        {remove: true, edit: true, favorite: false, arrows: false, menu: false}, ${chairpersons | n,j},
-        true, false, $E('addNewChairSpan'));
-
+         'edit': 'event.main.editChairPerson',
+         'sendEmail': 'event.main.sendEmailData',
+         'changeSubmission': 'event.main.changeSubmissionRights'},
+        {confId: confFossile["id"], kindOfList: "chairperson"}, $E('chairPersonsList'), $E('addNewChairSpan'),
+         "chairperson", "chairperson", "conference", "UIAuthorMove",  ${chairpersons | n,j});
 </script>

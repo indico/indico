@@ -1,7 +1,15 @@
-
-<table width="90%" align="center">
-    <tr>
-        <td align="center"><font size="+2" color="red">${ _("This abstract can no longer be modified.")}</font>
-        </td>
-    </tr>
-</table>
+<div class="groupTitle">
+    ${_('Edit Abstract - Modification Closed')}
+</div>
+% if not underReview:
+<p>
+    ${_('The deadline for abstract modification has now passed, therefore you are no longer able to modify any abstracts for this event.')}
+</p>
+% else:
+<p>
+    ${_('This abstract is already under review and therefore you are no longer allowed to modify it.')}
+</p>
+% endif
+<p>
+    ${_('If you have further queries, please contact the event organizer.')}
+</p>

@@ -1,28 +1,27 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import sys
 import traceback
 from MaKaC.common.fossilize import Fossilizable, fossilizes
 from MaKaC.fossils.error import ICausedErrorFossil, INoReportErrorFossil, IWarningFossil,\
-    IResultWithWarningFossil
+    IResultWithWarningFossil, IResultWithHighlightFossil
 
 class CausedError(Exception, Fossilizable):
 
@@ -82,6 +81,11 @@ class NoReportError(CausedError):
     def getExplanation(self):
         return self._explanation
 
+class CSRFError(NoReportError):
+    def __init__(self):
+        NoReportError.__init__(self, _('Oops, looks like there was a problem with your current session. Please refresh the page and try again.'))
+        self.code = 'ERR-CSRF'
+
 class RequestError(CausedError):
     pass
 
@@ -136,4 +140,21 @@ class ResultWithWarning(Fossilizable):
         return self._warning
 
     def hasWarning(self):
+        return True
+
+class ResultWithHighlight(Fossilizable):
+
+    fossilizes(IResultWithHighlightFossil)
+
+    def __init__(self, result, highlight):
+        self._result = result
+        self._highlight = highlight
+
+    def getResult(self):
+        return self._result
+
+    def getHighlight(self):
+        return self._highlight
+
+    def hasHighlight(self):
         return True

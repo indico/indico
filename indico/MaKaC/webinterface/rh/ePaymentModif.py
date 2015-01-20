@@ -1,22 +1,24 @@
+
+
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import request
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.epayments as ePayments
@@ -24,7 +26,6 @@ import MaKaC.epayment as ePayment
 from datetime import datetime
 import MaKaC.webinterface.rh.conferenceModif as conferenceModif
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-#from MaKaC.registration import AccommodationType, SocialEventItem, RegistrationSession, GeneralSectionForm, GeneralField, FieldInputs, RadioItem, Status, StatusValue
 from MaKaC.errors import FormValuesError, MaKaCError
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.i18n import _
@@ -91,17 +92,6 @@ class RHEPaymentModifPerformDataModification( RHEPaymentModifBase ):
             self._conf.getRegistrationForm().setCurrency(params.get("Currency",""))
         self._redirect(urlHandlers.UHConfModifEPayment.getURL(self._conf))
 
-##class RHEPaymentmodifYellowPay( RHEPaymentModifBase ):
-##
-##    def _process( self ):
-##        p = ePayments.WPConfModifEPaymentYellowPay( self, self._conf )
-##        return p.display()
-##
-##class RHEPaymentmodifYellowPayDataModif( RHEPaymentModifBase ):
-##
-##    def _process( self ):
-##        p = ePayments.WPConfModifEPaymentYellowPayDataModif( self, self._conf )
-##        return p.display()
 
 class RHEPaymentModifEnableSection( RHEPaymentModifBase ):
 
@@ -115,53 +105,6 @@ class RHEPaymentModifEnableSection( RHEPaymentModifBase ):
             modPay.setEnabled(not modPay.isEnabled())
         self._redirect(urlHandlers.UHConfModifEPayment.getURL(self._conf))
 
-##class RHEPaymentmodifYellowPay( RHEPaymentModifBase ):
-##
-##    def _process( self ):
-##        p = ePayments.WPConfModifEPaymentYellowPay( self, self._conf )
-##        return p.display()
-##
-##class RHEPaymentmodifYellowPayDataModif( RHEPaymentModifBase ):
-##
-##    def _process( self ):
-##        p = ePayments.WPConfModifEPaymentYellowPayDataModif( self, self._conf )
-##        return p.display()
-##
-##class RHEPaymentmodifYellowPayPerformDataModif( RHEPaymentModifBase ):
-##
-##    def _checkParams( self, params ):
-##        RHEPaymentModifBase._checkParams( self, params )
-##        self._cancel = params.has_key("cancel")
-##
-##    def _process( self ):
-##        if not self._cancel:
-##            ses = self._conf.getModPay().getModYellowPay()
-##            ses.setValues(self._getRequestParams())
-##        self._redirect(urlHandlers.UHConfModifEPaymentYellowPay.getURL(self._conf))
-
-##class RHEPaymentmodifPayPal( RHEPaymentModifBase ):
-##
-##    def _process( self ):
-##        p = ePayments.WPConfModifEPaymentPayPal( self, self._conf )
-##        return p.display()
-##
-##class RHEPaymentmodifPayPalDataModif( RHEPaymentModifBase ):
-##
-##    def _process( self ):
-##        p = ePayments.WPConfModifEPaymentPayPalDataModif( self, self._conf )
-##        return p.display()
-
-##class RHEPaymentModifEnableSection( RHEPaymentModifBase ):
-##
-##    def _checkParams( self, params ):
-##        RHEPaymentModifBase._checkParams( self, params )
-##        self._epayment = params.get("epayment", "")
-##
-##    def _process( self ):
-##        modPay = self._conf.getModPay().getModPayById(self._epayment)
-##        if modPay is not None:
-##            modPay.setEnabled(not modPay.isEnabled())
-##        self._redirect(urlHandlers.UHConfModifEPayment.getURL(self._conf))
 
 class RHEPaymentmodifPayPalPerformDataModif( RHEPaymentModifBase ):
 
@@ -185,11 +128,8 @@ class RHRegistrationFormDisplayBase( RHConferenceBaseDisplay ):
         self._regForm = self._conf.getRegistrationForm()
 
     def _getLoginURL( self ):
-        url = self.getCurrentURL()
-        if url == "":
-            url = urlHandlers.UHWelcome.getURL()
-        urlLogin = str(urlHandlers.UHConfRegistrationFormSignIn.getURL( self._conf, url ))
-        from MaKaC.common import Config
+        urlLogin = str(urlHandlers.UHConfRegistrationFormSignIn.getURL(self._conf, request.url))
+        from indico.core.config import Config
         if Config.getInstance().getLoginURL().startswith("https"):
             urlLogin = urlLogin.replace("http://", "https://")
         return urlLogin

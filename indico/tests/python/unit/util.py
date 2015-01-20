@@ -1,37 +1,45 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 Some utils for unit tests
 """
 
 # system imports
-import unittest, sys, new, contextlib
+from contextlib import contextmanager
+from contextlib2 import ExitStack
+from flask import session
+from functools import wraps
+import os
+import unittest
+import new
+import contextlib
 
 # indico imports
+from indico.util.benchmark import Benchmark
 from indico.util.contextManager import ContextManager
-from indico.util.i18n import setLocale
+from indico.util.fossilize import clearCache
+from indico.util.i18n import set_session_lang
 
 # indico legacy imports
-from MaKaC.common import Config
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
+from indico.web.flask.app import make_app
 
 loadedFeatures = []
 
@@ -45,7 +53,8 @@ class FeatureLoadingObject(object):
         global loadedFeatures
 
         if type(ftr) == str:
-            modName, ftrName = ftr.split('.')
+            ftrName, modName = map(lambda p: p[::-1],
+                                   ftr[::-1].split('.', 1))
 
             ftrClsName = "%s_Feature" % ftrName
 
@@ -102,6 +111,7 @@ def with_context(context):
     Decorator
     """
     def wrapper(method):
+        @wraps(method)
         def testWrapped(self, *args, **kwargs):
             with self._context(context):
                 return method(self, *args, **kwargs)
@@ -134,15 +144,37 @@ class RequestEnvironment_Feature(IndicoTestFeature):
     """
 
     def _action_endRequest(self):
-        self._do._notify('requestFinished', None)
+        if hasattr(self, '_do'):
+            self._do._notify('requestFinished')
 
     def _action_startRequest(self):
-        self._do._notify('requestStarted', None)
+        if hasattr(self, '_do'):
+            self._do._notify('requestStarted')
 
-    def _context_request(self):
+    def _action_make_app_request_context(self, config):
+        # XXX: Check if this breaks SA tests. If yes, use an argument for db_setup
+        app = make_app(db_setup=False)
+        if config:
+            for k, v in config.iteritems():
+                app.config[k] = v
+        env = {
+            'environ_base': {
+                'REMOTE_ADDR': '127.0.0.1'
+            }
+        }
+        return app.test_request_context(**env)
+
+    def _action_mock_session_user(self):
+        # None of the current tests actually require a user in the session.
+        # If this changes, assign a avatar mock object here
+        session.user = None
+
+    def _context_request(self, config=None):
         self._startRequest()
-        setLocale('en_GB')
-        yield
+        with self._make_app_request_context(config):
+            self._mock_session_user()
+            set_session_lang('en_GB')
+            yield
         self._endRequest()
 
 
@@ -154,29 +186,41 @@ class IndicoTestCase(unittest.TestCase, FeatureLoadingObject):
     """
 
     _requires = []
+    _slow = False
 
     def __init__(self, *args, **kwargs):
+        self._benchmark = Benchmark()
         unittest.TestCase.__init__(self, *args, **kwargs)
         FeatureLoadingObject.__init__(self)
 
     def setUp(self):
-        setLocale('en_GB')
+        if os.environ.get('INDICO_SKIP_SLOW_TESTS') == '1':
+            if self._slow:
+                self.skipTest('Slow tests disabled')
+            testMethod = getattr(self, self._testMethodName)
+            if getattr(testMethod, '_slow', False):
+                self.skipTest('Slow tests disabled')
+        set_session_lang('en_GB')
         Logger.removeHandler('smtp')
+        clearCache()  # init/clear fossil cache
         self._configFeatures(self)
+        self._benchmark.start()
 
     def tearDown(self):
+        self._benchmark.stop()
         self._unconfigFeatures(self)
 
     @contextlib.contextmanager
     def _context(self, *contexts, **kwargs):
-        ctxs = []
-        res = []
-        for ctxname in contexts:
-            ctx = getattr(self, '_context_%s' % ctxname)(**kwargs)
-            res.append(ctx.next())
-            ctxs.append(ctx)
+        with ExitStack() as stack:
+            res = []
+            for ctxname in contexts:
+                ctx = contextmanager(getattr(self, '_context_%s' % ctxname))
+                res.append(stack.enter_context(ctx(**kwargs)))
+            yield res if len(res) > 1 else res[0]
 
-        yield res if len(res) > 1 else res[0]
-
-        for ctx in ctxs[::-1]:
-            ctx.next()
+    def run(self, result=None):
+        res = super(IndicoTestCase, self).run(result)
+        if os.environ.get('INDICO_BENCHMARK_TESTS') == '1':
+            self._benchmark.print_result(1, 2.5)
+        return res

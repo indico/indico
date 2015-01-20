@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 type("PreLoadHandler", [],
      {
          execute: function() {
@@ -97,7 +114,7 @@ type("ErrorReportDialog", ["ServiceDialogWithButtons"],
              this.error.userMail = email.get();
 
              if (!$.isArray(this.error.inner)) {
-                 this.error.inner = [this.error.inner];
+                 this.error.inner = this.error.inner ? [this.error.inner] : [];
              }
 
              // make sure the HTML sanitization filter won't ruin everything
@@ -108,13 +125,13 @@ type("ErrorReportDialog", ["ServiceDialogWithButtons"],
                            this.error,
                            function(result, error){
                                if (error) {
-                                   alert($T("Unable to send your error report: ") + error.message);
+                                   new AlertPopup($T("Error"), $T("Unable to send your error report: ") + error.message).open();
                                }
                                else {
                                    if (result) {
-                                       alert($T("Your report has been sent. Thank you!"));
+                                       new AlertPopup($T("Success"), $T("Your report has been sent. Thank you!")).open();
                                    } else {
-                                       alert($T("Your report could not be sent to the support address."));
+                                       new AlertPopup($T("Error"), $T("Your report could not be sent to the support address.")).open();
                                    }
                                    self.close();
                                }
@@ -176,7 +193,7 @@ type("NoReportErrorDialog", ["AlertPopup"], {
 
         if (this.error.code == 'ERR-P4') {
             content.append(Html.div({style:{marginTop:pixels(10)}},
-                    Html.a({href: Indico.Urls.Login+'?returnURL='+document.URL}, $T("Go to login page"))));
+                    Html.a({href: build_url(Indico.Urls.Login, {returnURL: document.URL})}, $T("Go to login page"))));
         }
 
         return content.dom;

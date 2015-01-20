@@ -5,14 +5,11 @@
     % if len(contributions) > 0:
         <table class="groupTable" align="center" cellspacing="0"  width="100%">
         <tr>
-            <td class="groupTitle" colspan="4" style="padding-top:25px;">Contributions</td>
-        </tr>
-        <tr>
         <td style="padding-top:10px; padding-left:5px;">
             <table class="infoTable" cellspacing="0" width="100%">
                 <tr>
                     <td nowrap class="tableHeader">${ _("Id") }</td>
-                    <td nowrap class="tableHeader">${ _("Name") }</td>
+                    <td nowrap class="tableHeader">${ _("Contribution") }</td>
                     % if Conference.getConfPaperReview().hasReviewing():
                     <td nowrap class="tableHeader">${ _("Reviewing Status") }</td>
                     % endif

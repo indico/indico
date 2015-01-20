@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 """
@@ -30,7 +29,7 @@ from MaKaC.common import utils
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.i18n import _
 from pytz import timezone
-from MaKaC.common.utils import daysBetween
+from indico.util.date_time import iterdays
 from MaKaC.common.Conversion import Conversion
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.fossilize import Fossilizable, fossilizes
@@ -38,6 +37,10 @@ from MaKaC.fossils.schedule import IContribSchEntryDisplayFossil,\
         IContribSchEntryMgmtFossil, IBreakTimeSchEntryFossil,\
         IBreakTimeSchEntryMgmtFossil,\
         ILinkedTimeSchEntryDisplayFossil, ILinkedTimeSchEntryMgmtFossil
+from MaKaC.common.cache import GenericCache
+from MaKaC.errors import NoReportError
+from indico.util.decorators import classproperty
+
 
 class Schedule:
     """base schedule class. Do NOT instantiate
@@ -192,6 +195,7 @@ class TimeSchedule(Schedule, Persistent):
         self._entries.append(entry)
         entry.setSchedule(self,self._getNewEntryId())
         self.reSchedule()
+        self._cleanCache(entry)
         self._p_changed = 1
 
     def _setEntryDuration(self,entry):
@@ -207,11 +211,22 @@ class TimeSchedule(Schedule, Persistent):
         return result
 
     def _removeEntry(self,entry):
+        self._cleanCache(entry)
         self._entries.remove(entry)
         entry.setSchedule(None,"")
         entry.setStartDate(None)
         entry.delete()
         self._p_changed = 1
+
+    def _cleanCache(self, entry):
+        if isinstance(entry, ContribSchEntry):
+            entry.getOwner().cleanCache()
+            self.getOwner().cleanCache()
+        elif isinstance(entry, BreakTimeSchEntry):
+            self.getOwner().cleanCache()
+            ScheduleToJson.cleanCache(entry, False)
+        else:
+            entry.getOwner().cleanCache()
 
     def removeEntry(self,entry):
         if entry is None or not self.hasEntry(entry):
@@ -404,8 +419,48 @@ class TimeSchedule(Schedule, Persistent):
     def moveDownEntry(self,entry,tz=None):
         pass
 
-    def rescheduleTimes(self, type, diff, tz, day=None):
-        pass
+    def rescheduleTimes(self, type, diff, day, doFit):
+        """
+        recalculate and reschedule the entries of the event with a time "diff" of separation.
+        """
+
+        from MaKaC.conference import SessionSlot
+        entries = self.getEntriesOnDay(day)
+        if type == "duration":
+            i = 0
+            while i < len(entries):
+                entry = entries[i]
+                if isinstance(entry.getOwner(), SessionSlot) and entry.getOwner().getSession().isClosed():
+                    raise EntryTimingError(_("""The modification of the session "%s" is not allowed because it is closed""") % entry.getOwner().getSession().getTitle())
+
+                if doFit:
+                    if isinstance(entry.getOwner(), SessionSlot):
+                        entry.getOwner().fit()
+                if i + 1 == len(entries):
+                    dur = entry.getDuration()
+                else:
+                    nextentry = entries[i + 1]
+                    dur = nextentry.getStartDate() - entry.getStartDate() - diff
+                if dur < timedelta(0):
+                    raise EntryTimingError( _("""With the time between entries you've chosen, the entry "%s" will have a duration less than zero minutes. Please, choose another time""") % entry.getTitle())
+                entry.setDuration(dur=dur, check=2)
+                i += 1
+        elif type == "startingTime":
+            st = day.replace(hour=self.getAdjustedStartDate().hour, minute=self.getAdjustedStartDate().minute).astimezone(timezone('UTC'))
+            for entry in entries:
+                if isinstance(entry.getOwner(), SessionSlot) and entry.getOwner().getSession().isClosed():
+                    raise EntryTimingError(_("""The modification of the session "%s" is not allowed because it is closed""") % entry.getOwner().getSession().getTitle())
+                if doFit:
+                    if isinstance(entry.getOwner(), SessionSlot):
+                        entry.getOwner().fit()
+                entry.setStartDate(st, check=2, moveEntries=1)
+                st = entry.getEndDate() + diff
+        elif type == "noAction" and doFit:
+            for entry in entries:
+                if isinstance(entry.getOwner(), SessionSlot):
+                    if entry.getOwner().getSession().isClosed():
+                        raise EntryTimingError(_("""The modification of the session "%s" is not allowed because it is closed""") % entry.getOwner().getSession().getTitle())
+                    entry.getOwner().fit()
 
     def clear(self):
         while len(self._entries)>0:
@@ -436,23 +491,23 @@ class TimeSchedule(Schedule, Persistent):
                 return d
         return None
 
-    def moveEntriesBelow(self, diff, entriesList):
+    def moveEntriesBelow(self, diff, entriesList, check=2):
         """diff: the difference we have to increase/decrease each entry of the list.
            entriesList: list of entries for applying the diff"""
 
         if diff is not None:
             from MaKaC.conference import SessionSlot
-            sessionsAlreadyModif=[]
+            sessionsAlreadyModif = []
             for entry in entriesList:
                 if isinstance(entry.getOwner(), SessionSlot):
-                    session=entry.getOwner().getSession()
+                    session = entry.getOwner().getSession()
                     if session not in sessionsAlreadyModif:
                         # if the slot is the first in the session schedule
                         # we also change the session start date
-                        if session.getSchedule().getEntries()[0].getOwner()==entry.getOwner():
-                            session.setStartDate(session.getStartDate()+diff, check=0, moveEntries=0)
+                        if session.getSchedule().getEntries()[0].getOwner() == entry.getOwner():
+                            session.setStartDate(session.getStartDate() + diff, check=0, moveEntries=0)
                         sessionsAlreadyModif.append(session)
-                entry.setStartDate(entry.getStartDate()+diff, check=0, moveEntries=1)
+                entry.setStartDate(entry.getStartDate() + diff, check=check, moveEntries=1)
 
 
 class SchEntry(Persistent, Fossilizable):
@@ -621,40 +676,6 @@ class ConferenceSchedule(TimeSchedule, Fossilizable):
         self.reSchedule()
         self._p_changed = 1
 
-    def rescheduleTimes( self, type, diff, day, doFit):
-        """
-        recalculate and reschedule the entries of the conference slot with a time "diff" of separation.
-        """
-        from MaKaC.conference import SessionSlot
-        entries = self.getEntriesOnDay(day)
-        if type=="duration":
-            i=0
-            while i<len(entries):
-                entry=entries[i]
-                if doFit:
-                    if isinstance( entry.getOwner(), SessionSlot ) :
-                        entry.getOwner().fit()
-                if i+1 == len(entries):
-                    dur=entry.getDuration()
-                else:
-                    nextentry=entries[i+1]
-                    dur=nextentry.getStartDate()-entry.getStartDate()-diff
-                if dur<timedelta(0):
-                    raise EntryTimingError( _("""With the time between entries you've chosen, the entry "%s" will have a duration less than zero minutes. Please, choose another time""")%entry.getTitle())
-                entry.setDuration(dur=dur, check=2)
-                i+=1
-        elif type=="startingTime":
-            st = day.replace(hour=self.getAdjustedStartDate().hour, minute=self.getAdjustedStartDate().minute).astimezone(timezone('UTC'))
-            for entry in entries:
-                if doFit:
-                    if isinstance( entry.getOwner(), SessionSlot ) :
-                        entry.getOwner().fit()
-                entry.setStartDate(st, check=2, moveEntries=1)
-                st=entry.getEndDate()+diff
-        elif type=="noAction" and doFit:
-            for entry in entries:
-                if isinstance( entry.getOwner(), SessionSlot ) :
-                    entry.getOwner().fit()
 
 class SessionSchedule(TimeSchedule):
     """
@@ -691,6 +712,7 @@ class SessionSchedule(TimeSchedule):
         if diff is not None:
             for entry in entriesList:
                 entry.setStartDate(entry.getStartDate()+diff, check=0, moveEntries=1)
+
 
 class SlotSchedule(TimeSchedule):
     """
@@ -755,6 +777,7 @@ class SlotSchedule(TimeSchedule):
         self._addEntry(entry,check)
 
 
+
     def moveUpEntry(self,entry):
         #not very smart, should be improved: contribs with same start date,
         #   can cause overlapings
@@ -809,7 +832,11 @@ class SlotSchedule(TimeSchedule):
            entriesList: list of entries for applying the diff"""
         if diff is not None:
             for entry in entriesList:
-                entry.setStartDate(entry.getStartDate()+diff, check=2, moveEntries=1)
+                entry.setStartDate(entry.getStartDate() + diff, check=2, moveEntries=1)
+
+    def rescheduleTimes(self, type, diff, day, doFit):
+        pass
+
 
 class PosterSlotSchedule(SlotSchedule):
 
@@ -849,7 +876,8 @@ class PosterSlotSchedule(SlotSchedule):
 
     def reSchedule(self):
         for e in self._entries:
-            e.setStartDate(self.getStartDate())
+            if e.getStartDate() != self.getStartDate():
+                e.setStartDate(self.getStartDate())
 
 class SlotSchTypeFactory:
     _sch={"standard":SlotSchedule,"poster":PosterSlotSchedule}
@@ -979,6 +1007,9 @@ class LinkedTimeSchEntry(TimeSchEntry):
                 entry.getStartDate()<self.getEndDate()) or \
                 (entry.getEndDate()>self.getStartDate() and \
                 entry.getEndDate()<=self.getEndDate())
+
+    def getUniqueId(self):
+        return self.getOwner().getUniqueId()
 
 
 class IndTimeSchEntry(TimeSchEntry):
@@ -1206,7 +1237,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
         if moveEntriesBelow == 1 and self.getSchedule():
             diff = (self.getStartDate() - oldStartDate) + (self.getDuration() - oldDuration)
             self.getSchedule().moveEntriesBelow(diff, entriesList)
-        self.notifyModification()
+        self.notifyModification(False)
 
 
     def getLocationParent( self ):
@@ -1216,6 +1247,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
     def setLocation(self, loc):
         self.place = loc
+        self.notifyModification()
 
     def getLocation(self):
         if self.getOwnLocation() is None:
@@ -1239,6 +1271,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
     def setRoom(self, room):
         self.room = room
+        self.notifyModification()
 
     def getRoom(self):
         if self.getOwnRoom() is None:
@@ -1332,10 +1365,11 @@ class BreakTimeSchEntry(IndTimeSchEntry):
                 owner.setEndDate(self.getEndDate(),check)
                 ContextManager.get('autoOps').append((self, "OWNER_END_DATE_EXTENDED",
                                                           owner, owner.getAdjustedEndDate()))
-        self.notifyModification()
+        self.notifyModification(cleanCache = self.getSchedule() is not None)
 
     def setColor(self,newColor):
         self._color=newColor
+        self.notifyModification()
     setBgColor=setColor
 
     def getColor(self):
@@ -1349,6 +1383,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
     def setTextColor(self,newColor):
         self._textColor=newColor
+        self.notifyModification()
 
     def getTextColor(self):
         try:
@@ -1360,6 +1395,7 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
     def setTextColorToLinks(self,v):
         self._textColorToLink=v
+        self.notifyModification()
 
     def isTextColorToLinks(self):
         try:
@@ -1374,6 +1410,16 @@ class BreakTimeSchEntry(IndTimeSchEntry):
 
     def recover(self):
         TrashCanManager().remove(self)
+
+    def getUniqueId(self):
+        return self.getOwner().getUniqueId() + "brk" + self.getId()
+
+    def notifyModification(self, cleanCache = True):
+        IndTimeSchEntry.notifyModification(self)
+        if cleanCache and self.getOwner() and not ContextManager.get('clean%s'%self.getUniqueId(), False):
+            ScheduleToJson.cleanCache(self)
+            ContextManager.set('clean%s'%self.getUniqueId(), True)
+
 
 class ContribSchEntry(LinkedTimeSchEntry):
 
@@ -1413,26 +1459,64 @@ class ContribSchEntry(LinkedTimeSchEntry):
     def getOwnLocation(self):
         return self.getOwner().getOwnLocation()
 
-class ScheduleToJson:
+
+class ScheduleToJson(object):
+
+    _cacheEntries = GenericCache("ConfTTEntries")
+    _cache = GenericCache("ConfTT")
+
+    @staticmethod
+    def get_versioned_key(cache, key, timezone):
+        num = int(cache.get('_version-%s' % key, 0))
+        return '%s.%d.%s' % (key, num, timezone)
+
+    @classproperty
+    @classmethod
+    def use_cache(cls):
+        return not ContextManager.get('offlineMode', False)
+
+    @staticmethod
+    def bump_cache_version(cache, key):
+        vkey = '_version-%s' % key
+        cache.set(vkey, int(cache.get(vkey, 0)) + 1)
+
+    @classmethod
+    def obtainFossil(cls, entry, tz, fossilInterface=None, mgmtMode=False, useAttrCache=False):
+
+        if mgmtMode or (not isinstance(entry, BreakTimeSchEntry) and not entry.getOwner().getAccessController().isFullyPublic()):
+        # We check if it is fully public because it could be some material protected
+        # that would create a security hole if we cache it
+            result = entry.fossilize(interfaceArg = fossilInterface, useAttrCache = useAttrCache, tz = tz, convert=True)
+        else:
+            cache_key = cls.get_versioned_key(cls._cacheEntries, entry.getUniqueId(), tz)
+
+            result = cls._cacheEntries.get(cache_key) if cls.use_cache else None
+
+            if result is None:
+                result = entry.fossilize(interfaceArg = fossilInterface, useAttrCache = useAttrCache, tz = tz, convert=True)
+                if cls.use_cache:
+                    cls._cacheEntries.set(cache_key, result, timedelta(minutes=5))
+
+        return result
 
     @staticmethod
     def processEntry(obj, tz, aw, mgmtMode = False, useAttrCache = False):
 
         if mgmtMode:
             if isinstance(obj, BreakTimeSchEntry):
-                entry = obj.fossilize(IBreakTimeSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz, convert=True)
+                entry = ScheduleToJson.obtainFossil(obj, tz, IBreakTimeSchEntryMgmtFossil, mgmtMode, useAttrCache)
             elif isinstance(obj, ContribSchEntry):
-                entry = obj.fossilize(IContribSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz, convert=True)
+                entry = ScheduleToJson.obtainFossil(obj, tz, IContribSchEntryMgmtFossil, mgmtMode, useAttrCache)
             elif isinstance(obj, LinkedTimeSchEntry):
-                entry = obj.fossilize(ILinkedTimeSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz, convert=True)
+                entry = ScheduleToJson.obtainFossil(obj, tz, ILinkedTimeSchEntryMgmtFossil, mgmtMode, useAttrCache)
             else:
-                entry = obj.fossilize(useAttrCache = useAttrCache, tz = tz, convert=True)
+                entry = ScheduleToJson.obtainFossil(obj, tz, None, mgmtMode, useAttrCache)
         else:
             # the fossils used for the display of entries
             # will be taken by default, since they're first
             # in the list of their respective Fossilizable
             # objects
-            entry = obj.fossilize(useAttrCache = useAttrCache, tz = tz, convert=True)
+            entry = ScheduleToJson.obtainFossil(obj, tz, None, mgmtMode, useAttrCache)
 
         genId = entry['id']
 
@@ -1447,17 +1531,17 @@ class ScheduleToJson:
                 if ScheduleToJson.checkProtection(contrib, aw):
                     if mgmtMode:
                         if isinstance(contrib, ContribSchEntry):
-                            contribData = contrib.fossilize(IContribSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz, convert=True)
+                            contribData = ScheduleToJson.obtainFossil(contrib, tz, IContribSchEntryMgmtFossil, mgmtMode, useAttrCache)
                         elif isinstance(contrib, BreakTimeSchEntry):
-                            contribData = contrib.fossilize(IBreakTimeSchEntryMgmtFossil, useAttrCache = useAttrCache, tz = tz, convert=True)
+                            contribData = ScheduleToJson.obtainFossil(contrib, tz, IBreakTimeSchEntryMgmtFossil, mgmtMode, useAttrCache)
                         else:
-                            contribData = contrib.fossilize(useAttrCache = useAttrCache, tz = tz, convert=True)
+                            contribData = ScheduleToJson.obtainFossil(contrib, tz, None, mgmtMode, useAttrCache)
                     else:
                         # the fossils used for the display of entries
                         # will be taken by default, since they're first
                         # in the list of their respective Fossilizable
                         # objects
-                        contribData = contrib.fossilize(useAttrCache = useAttrCache, tz = tz, convert=True)
+                        contribData = ScheduleToJson.obtainFossil(contrib, tz, None, mgmtMode, useAttrCache)
 
                     entries[contribData['id']] = contribData
 
@@ -1467,8 +1551,7 @@ class ScheduleToJson:
 
     @staticmethod
     def checkProtection(obj, aw):
-
-        if aw is None:
+        if aw is None or ContextManager.get('offlineMode', False):
             return True
 
         from MaKaC.conference import SessionSlot
@@ -1486,29 +1569,53 @@ class ScheduleToJson:
         return canBeDisplayed
 
     @staticmethod
-    def process(schedule, tz, aw, days = None, mgmtMode = False, useAttrCache = False, hideWeekends = False):
+    def isOnlyWeekend(days):
+        """
+        It checks if the event takes place only during the weekend
+        """
+        # If there are more than 2 days, there is at least one day that is not part of the weekend
+        if len(days) > 2:
+            return False
 
-        scheduleDict={}
+        for day in days:
+            if (datetime.strptime(day, "%Y%m%d").weekday() not in [5, 6]):
+                return False
+        return True
 
-        if not days:
-            days = daysBetween(schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz))
+    @classmethod
+    def process(cls, schedule, tz, aw, days=None, mgmtMode=False, useAttrCache=False, hideWeekends=False):
+        scheduleDict = {}
 
-        dates = [d.strftime("%Y%m%d") for d in days]
+        if cls.use_cache and not days and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
+            scheduleDict = cls._cache.get(cls.get_versioned_key(cls._cache, schedule.getOwner().getUniqueId(), tz))
 
-        # Generating the days dictionnary
-        for d in dates:
-            scheduleDict[d] = {}
+        if not scheduleDict:
+            scheduleDict={}
+            fullTT = False # This flag is used to indicate that we must save the general cache (not entries). When
+            if not days:   # asking only one day, we don't need to cache (it can generate issues)
+                fullTT = True
+                days = iterdays(schedule.getAdjustedStartDate(tz), schedule.getAdjustedEndDate(tz))
 
-        # Filling the day dictionnary with entries
-        for obj in schedule.getEntries():
+            dates = [d.strftime("%Y%m%d") for d in days]
 
-            if ScheduleToJson.checkProtection(obj, aw):
-                genId, resultData = ScheduleToJson.processEntry(obj, tz, aw, mgmtMode, useAttrCache)
-                day = obj.getAdjustedStartDate(tz).strftime("%Y%m%d")
-                # verify that start date is in dates
-                if day in dates:
-                    scheduleDict[day][genId] = resultData
-        if hideWeekends:
+            # Generating the days dictionnary
+            for d in dates:
+                scheduleDict[d] = {}
+
+            # Filling the day dictionnary with entries
+            for obj in schedule.getEntries():
+
+                if ScheduleToJson.checkProtection(obj, aw):
+                    day = obj.getAdjustedStartDate(tz).strftime("%Y%m%d")
+                    # verify that start date is in dates
+                    if day in dates:
+                        genId, resultData = ScheduleToJson.processEntry(obj, tz, aw, mgmtMode, useAttrCache)
+                        scheduleDict[day][genId] = resultData
+            if cls.use_cache and fullTT and schedule.getOwner().getAccessController().isFullyPublic() and not mgmtMode:
+                cls._cache.set(cls.get_versioned_key(cls._cache, schedule.getOwner().getUniqueId(), tz), scheduleDict,
+                               timedelta(minutes=5))
+
+        if hideWeekends and not ScheduleToJson.isOnlyWeekend(scheduleDict.keys()):
             for entry in scheduleDict.keys():
                 weekDay = datetime.strptime(entry, "%Y%m%d").weekday()
                 if scheduleDict[entry] == {} and (weekDay == 5 or weekDay == 6):
@@ -1526,3 +1633,13 @@ class ScheduleToJson:
             new_dict[key] = dict[key]
 
         return new_dict
+
+    @classmethod
+    def cleanCache(cls, obj, cleanConferenceCache=True):
+        cls.bump_cache_version(cls._cacheEntries, obj.getUniqueId())
+        if cleanConferenceCache:
+            cls.cleanConferenceCache(obj.getOwner().getConference())
+
+    @classmethod
+    def cleanConferenceCache(cls, obj):
+        cls.bump_cache_version(cls._cache, obj.getUniqueId())

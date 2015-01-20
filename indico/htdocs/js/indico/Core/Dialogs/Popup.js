@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 type("PopupDialog", ["PopupWidget"], {
     draw: function(content, x, y) {
         return this.PopupWidget.prototype.draw.call(this, content, x, y, null, true);
@@ -227,7 +244,16 @@ type("ExclusivePopupWithButtons", ["ExclusivePopup"], {
         if(this.defaultButton !== null) {
             this.buttons[this.defaultButton].focus();
         }
+
+        this.canvas.scrollblocker({
+            overflowType: "auto"
+        });
+    },
+    _onClose: function(e) {
+        this.ExclusivePopup.prototype._onClose.call(this, e);
+        $("body").off("mousewheel wheel");
     }
+
 }, function(title, closeButtonHandler, printable, showPrintButton, noCanvas){
     this.ExclusivePopup(title, closeButtonHandler, printable, showPrintButton, noCanvas);
 });
@@ -431,7 +457,7 @@ type("AlertPopup", ["ExclusivePopupWithButtons"],
 type("ConfirmPopup", ["ExclusivePopupWithButtons"],
     {
         draw: function() {
-            return this.ExclusivePopup.prototype.draw.call(this, this.content);
+            return this.ExclusivePopup.prototype.draw.call(this, this.content, this.style);
         },
         _getButtons: function() {
             var self = this;
@@ -448,11 +474,12 @@ type("ConfirmPopup", ["ExclusivePopupWithButtons"],
         }
     },
 
-    function(title, content, handler, buttonTitle, cancelButtonTitle) {
+    function(title, content, handler, buttonTitle, cancelButtonTitle, style) {
         var self = this;
 
         this.buttonTitle = buttonTitle || 'OK';
         this.cancelButtonTitle = cancelButtonTitle || 'Cancel';
+        this.style = style || {};
         this.content = content;
         this.handler = handler;
         this.ExclusivePopupWithButtons(title, function() {
@@ -466,11 +493,8 @@ type("ConfirmPopup", ["ExclusivePopupWithButtons"],
 /**
  * Works exactly the same as the ConfirmPopup, but includes a parametermanager to perform checks when pressing OK
  */
-type("ConfirmPopupWithPM", ["ExclusivePopupWithButtons"],
+type("ConfirmPopupWithPM", ["ConfirmPopup"],
     {
-        draw: function() {
-            return this.ExclusivePopup.prototype.draw.call(this, this.content);
-        },
         _getButtons: function() {
             var self = this;
             return [
@@ -487,18 +511,21 @@ type("ConfirmPopupWithPM", ["ExclusivePopupWithButtons"],
         }
     },
 
-    function(title, content, handler) {
-        var self = this;
-
-        this.content = content;
-        this.handler = handler;
+    function(title, content, handler, buttonTitle, cancelButtonTitle) {
         this.parameterManager = new IndicoUtil.parameterManager();
-        this.ExclusivePopupWithButtons(title, function(){
-            self.handler(false);
-            return true;
-        });
+        this.ConfirmPopup(title, content, handler, buttonTitle, cancelButtonTitle);
     }
 );
+
+type('ConfirmPopupWithReason', ['ConfirmPopupWithPM'], {
+
+}, function(title, content, handler, buttonTitle, cancelButtonTitle) {
+
+    this.reason = Html.textarea({style:{width:'100%'}});
+
+    this.ConfirmPopupWithPM(title, Html.div({}, content, Html.div({style: {marginTop:pixels(10)}},Html.div({style:{fontWeight:"bold"}}, $T("Reason: ")),this.reason)), handler, buttonTitle, cancelButtonTitle);
+    this.parameterManager.add(this.reason, 'text', false);
+});
 
 /**
  * Utility function to display a three buttons popup.
@@ -690,16 +717,25 @@ type("AuthorsPopup", ["ExclusivePopup"], {
         var container = $("<div/>");
         each(this.authorList, function(author) {
             var authorElem = $("<div/>");
-            var url = Indico.Urls.AuthorDisplay + '?confId=' + self.confId + '&contribId=' + self.contribId + '&authorId=' + author.id;
-            var link = $("<a/>").attr("href", url).text(author.fullName);
+            var url = build_url(Indico.Urls.AuthorDisplay, {
+                confId: self.confId,
+                contribId: self.contribId,
+                authorId: author.id
+            });
+            var link = $("<a/>").attr("href", url).text(author.name);
             var title = $("<div/>").css("color", "#444444").css("width", self.width + "px").css("font-size", "15px").append(link);
-            var emailUrl = Indico.Urls.AuthorEmail + '?confId=' + self.confId + '&sessionId=' + self.sessionId + '&contribId=' + self.contribId + '&authId=' + author.id;
+            var emailUrl = build_url(Indico.Urls.AuthorEmail, {
+                confId: self.confId,
+                sessionId: self.sessionId,
+                contribId: self.contribId,
+                authorId: author.id
+            });
 
             var infoDiv = $("<div/>").css("width", self.width +"px").css("border-bottom", "1px solid #EAEAEA").css("paddingBottom","5px").css("color", "#888").css("font-size", "12px");
             var emailDiv = $("<div/>").append($("<a/>").attr("href", emailUrl).text($T("Email author")));
             var affiliationDiv = $("<div/>").append($("<span/>").css("font-weight", "bold").text($T("Affiliation") + ": ")).append($("<span/>").text(author.affiliation));
-            infoDiv.append(affiliationDiv)
-            infoDiv.append(emailDiv)
+            infoDiv.append(affiliationDiv);
+            infoDiv.append(emailDiv);
             authorElem.append(title);
             authorElem.append(infoDiv);
             container.append(authorElem);
@@ -726,25 +762,41 @@ type("AuthorsPopup", ["ExclusivePopup"], {
 
 type("SubmitPopup", ["ExclusivePopupWithButtons"], {
 
+    _save: function() {
+        var self = this;
+        var killProgress = IndicoUI.Dialogs.Util.progress($T('Submitting paper for reviewing...'));
+
+        indicoRequest('reviewing.contribution.submitPaper',
+                self.args,
+                function(response,error) {
+                    if (exists(error)) {
+                        self.postDraw();
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                    } else {
+                        killProgress();
+                        window.location.reload(true);
+                    }
+                }
+               );
+    },
+
     draw: function() {
         var contentDiv = $("<div/>");
         var materialList = $("<div/>", {id: "reviewingMaterialListPlace1"});
-        this.form = $("<form/>", {action: this.action, method: "POST"});
-        contentDiv.append(materialList);
-        var warningDiv =  $("<div/>", {id: "submitWarningText"}).addClass("collaborationWarning");
+        var warningDiv =  $("<div/>", {id: "submitWarningText"}).addClass("rescheduleWarning");
         warningDiv.css("padding-bottom", "3px");
         warningDiv.css("padding-left", "3px");
         warningDiv.css("margin-top", "5px");
         warningDiv.css("display", "none");
-        warningDiv.text("Note that you cannot modify the reviewing material after submitting it.")
+        warningDiv.text("Note that you cannot modify the reviewing material after submitting it.");
         this.saveButton = this.buttons.eq(0);
         this.saveButton.disabledButtonWithTooltip({
             tooltip: $T('First you should add the materials and then by clicking on this button you will submit them for reviewing. They will be locked until the end of the process.'),
             disabled: true
         });
-        this.form.append(warningDiv);
         contentDiv.append(materialList);
-        contentDiv.append(this.form);
+        contentDiv.append(warningDiv);
         return this.ExclusivePopup.prototype.draw.call(this, contentDiv);
 
     },
@@ -763,7 +815,7 @@ type("SubmitPopup", ["ExclusivePopupWithButtons"], {
                 var confirm = new ConfirmPopup("Submit", $T('Do you want to send the paper for reviewing? After sending it, you will not be able to submit another file until it is reviewed.'),
                             function(action){
                     if(action){
-                        self.form.submit();
+                        self._save();
                     }
                 });
                 confirm.open();
@@ -774,11 +826,10 @@ type("SubmitPopup", ["ExclusivePopupWithButtons"], {
         ];
     }
     },
-     function(title, args, action) {
+     function(title, args) {
 
          this.title = title;
          this.args = args;
-         this.action = action;
          this.width = 400;
 
          this.ExclusivePopup(this.title, null, true, true);
@@ -789,17 +840,23 @@ type("UploadedPaperPopup", ["ExclusivePopup"], {
 
     draw: function() {
         var self = this;
-        var container = $("<ul/>").css("list-style", "none").css("padding", "0px");
-        each(this.resourceList, function(resource) {
-            var resourceElem = $("<li/>");
-            var details = $("<ul/>").css("list-style", "none").css("padding-left", "25px");
-            resourceElem.append($("<a/>").attr("href", resource.url).text(resource.name));
-            details.append($("<li/>").append($("<span/>").css("font-weight", "bold").text($T("File name")+": ")).append($("<span/>").text(resource.file.fileName)));
-            details.append($("<li/>").append($("<span/>").css("font-weight", "bold").text($T("File size")+": ")).append($("<span/>").text(Math.floor(resource.file.fileSize/1024)+ "KB")));
-            details.append($("<li/>").append($("<span/>").css("font-weight", "bold").text($T("File creation date")+": ")).append($("<span/>").text(resource.file.creationDate)));
-            resourceElem.append(details);
-            container.append(resourceElem);
-        });
+        var container = $("<div/>");
+        if(this.resourceList.length.get() > 0){
+            var paperList = $("<ul/>").css("list-style", "none").css("padding", "0px");
+            each(this.resourceList, function(resource) {
+                var resourceElem = $("<li/>");
+                var details = $("<ul/>").css("list-style", "none").css("padding-left", "25px");
+                resourceElem.append($("<a/>").attr("href", resource.url).text(resource.name));
+                details.append($("<li/>").append($("<span/>").css("font-weight", "bold").text($T("File name")+": ")).append($("<span/>").text(resource.file.fileName)));
+                details.append($("<li/>").append($("<span/>").css("font-weight", "bold").text($T("File size")+": ")).append($("<span/>").text(Math.floor(resource.file.fileSize/1024)+ "KB")));
+                details.append($("<li/>").append($("<span/>").css("font-weight", "bold").text($T("File creation date")+": ")).append($("<span/>").text(resource.file.creationDate)));
+                resourceElem.append(details);
+                paperList.append(resourceElem);
+            });
+            container.append(paperList);
+        } else{
+            container.append($("<div/>").css({textAlign:"center", padding: pixels(5)}).append($T("No paper uploaded")));
+        }
         return this.ExclusivePopup.prototype.draw.call(this, container);
     },
     postDraw: function(){
@@ -813,6 +870,144 @@ type("UploadedPaperPopup", ["ExclusivePopup"], {
          this.title = title;
          this.width = 400;
 
+         this.ExclusivePopup(this.title, null, true, true);
+     }
+    );
+
+type("ContributionsPopup", ["ExclusivePopup"], {
+
+    _generateUrl: function(contrib) {
+        var url = this.urlModif ? Indico.Urls.ContributionModification : Indico.Urls.ContributionDisplay;
+        var params = {
+            contribId: contrib.contributionId,
+            confId: contrib.conferenceId
+        };
+        if (contrib.sessionId) {
+            params.sessionId = contrib.sessionId;
+        }
+        return build_url(url, params);
+    },
+
+    draw: function() {
+        var self = this;
+        var table = Html.tbody({});
+        each(this.contributions, function(contrib) {
+            var time = Html.div({style: {paddingTop: pixels(7), marginRight: pixels(3), fontSize: '12px', fontWeight: 'bold'}}, self.isPoster || contrib.startDate == null ? '' : contrib.startDate.time.substr(0,5));
+            var link = Html.a({href: self._generateUrl(contrib)}, contrib.title);
+            var title = Html.div({style: {color: '#444444', width: pixels(self.width), padding: pixels(5), fontSize: '15px'}}, link);
+
+            var infoDiv = Html.div({style: {width: pixels(self.width), border: '1px solid rgb(234, 234, 234)', marginBottom: pixels(10), marginLeft: pixels(5), padding: pixels(5), backgroundColor: 'rgb(248, 248, 248)',color: '#444444', fontSize: '12px'}});
+
+            var showFullDescLink = Html.a({style: {cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', fontStyle: 'italic'}}, ' Show full description');
+            var hideFullDescLink = Html.a({style: {cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', fontStyle: 'italic'}}, ' Hide full description');
+            var shortDesc = Html.span({style: {display: 'block'}}, contrib.description.substr(0, 250) + '... ', showFullDescLink);
+            var longDesc = Html.span({style: {display: 'none'}}, contrib.description, hideFullDescLink);
+
+            if (contrib.description && contrib.description !== '') {
+                if (contrib.description.length <= 250) {
+                    longDesc.setStyle('display', 'block');
+                    hideFullDescLink.setStyle('display', 'none');
+                    infoDiv.append(longDesc);
+                } else {
+                    infoDiv.append(longDesc);
+                    infoDiv.append(shortDesc);
+                }
+            }
+
+            if (contrib.presenters.length > 0) {
+                var speakers = Html.span({style: {marginTop: pixels(5), display: 'block'}}, Html.strong({}, 'Presenter(s): '));
+
+                var i = 0;
+                each(contrib.presenters, function(p) {
+                    speakers.append((i++ > 0 ? ', ' : '') + p.name);
+                    if (p.affiliation && p.affiliation !== '') {
+                        speakers.append(Html.em({style: {fontSize: '12px'}}, ' (' + p.affiliation + ')'));
+                    }
+                });
+
+                infoDiv.append(speakers);
+            }
+
+            if (contrib.room && contrib.room !== '') {
+                var room = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, 'Room: '), contrib.room);
+                infoDiv.append(room);
+            }
+
+            if (contrib.location && contrib.location !== '') {
+                var location = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, 'Location: '), contrib.location);
+                infoDiv.append(location);
+            }
+
+            showFullDescLink.observeClick(function(e) {
+                shortDesc.setStyle('display', 'none');
+                longDesc.setStyle('display', 'block');
+            });
+            hideFullDescLink.observeClick(function(e) {
+                shortDesc.setStyle('display', 'block');
+                longDesc.setStyle('display', 'none');
+            });
+
+            // Hide the infoDiv if it's empty
+            if (infoDiv.dom.innerHTML === "") {
+                infoDiv.dom.style.display = 'none';
+            }
+
+            table.append(Html.tr({}, Html.td({style:{verticalAlign: 'top'}}, time), Html.td({}, title, infoDiv)));
+        });
+        this.innerHTML = Html.table({style: {marginBottom: pixels(10)}}, table).dom.innerHTML;
+        return this.ExclusivePopup.prototype.draw.call(this, Html.table({style: {marginBottom: pixels(10)}}, table), {},
+                                                       {overflowX: 'hidden', maxHeight: Math.min($(window).height() - 50, 700)});
+    },
+    postDraw: function(){
+        this.ExclusivePopup.prototype.postDraw.call(this);
+    }
+    },
+     function(title, contributions, isPoster, urlModif, closeHandler, sort) {
+
+         this.contributions = $L(contributions);
+         if(sort){
+             this.contributions.sort(IndicoSortCriteria.StartTime);
+         }
+         this.urlModif = urlModif;
+
+         this.isPoster = isPoster;
+         this.width = 500;
+
+         this.ExclusivePopup(title, closeHandler, true, true);
+     }
+    );
+
+type("ChildrenProtectionPopup", ["ExclusivePopup"], {
+
+    draw: function() {
+        var self = this;
+        var container = $("<table/>").attr("cellspacing", 0).css("margin-bottom", "5px");
+        each(this.elementList, function(element) {
+            var className = (self.elementList.length.get() != self.elementList.indexOf(element) + 1)?"CRLabstractDataCell":"CRLLastDataCell";
+            var row = $("<tr/>").css("color","#444444");
+            var link = $('<a/>').attr('href', element.protectionURL).html($T("Edit protection"));
+
+            // If it is a LocalFile, rename it to File.
+            var type = "LocalFile" == element._type?$T("File"):element._type;
+            type = element.resources?$T("Material"):type;
+
+            row.append($("<td/>").addClass(className).css({"font-weight": "bold", "width": "15%"}).html(type));
+            row.append($("<td/>").addClass(className).css("width","50%").html(_.contains(["Link", "File"], type)?element.name:element.title));
+            row.append($("<td/>").attr("nowrap", "nowrap").addClass(className).append(link));
+            container.append(row);
+        });
+        return this.ExclusivePopup.prototype.draw.call(this, container, {margin: pixels(5), minWidth: pixels(300), maxWidth: pixels(this.width),  maxHeight: pixels(this.height)});
+    },
+    postDraw: function(){
+        this.ExclusivePopup.prototype.postDraw.call(this);
+    }
+    },
+     function(title, elementList) {
+
+         this.elementList = $L(elementList);
+         this.title = title;
+         this.width = 450;
+         this.height = window.innerHeight*0.8;
          this.ExclusivePopup(this.title, null, true, true);
      }
     );

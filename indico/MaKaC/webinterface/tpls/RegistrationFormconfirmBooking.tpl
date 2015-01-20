@@ -88,12 +88,13 @@ IndicoUI.executeOnLoad(function() {
 });
 
 function payModOnChangefunction() {
-    if(selectFunctions[$('#selectPaymentSystem').attr('value')]){
-        selectFunctions[$('#selectPaymentSystem').attr('value')]('${registrant.getTotal()}');
+    var func = selectFunctions[$('#selectPaymentSystem').val()];
+    if(func){
+        func('${registrant.getTotal()}');
     }
     else {
         $('#inPlaceSelectPaymentMethod').hide();
-        $('#paySubmit').attr('disabled', true);
+        $('#paySubmit').prop('disabled', true);
         $('#totalAmount').text('${registrant.getTotal()}');
     }
 }
@@ -103,7 +104,7 @@ function submitPayment() {
     % if len(payMods) == 1:
         idSel = '${payMods[0].getId()}';
     % else:
-        idSel = $('#selectPaymentSystem').attr('value');
+        idSel = $('#selectPaymentSystem').val();
     % endif
     $('#'+idSel).submit();
 }

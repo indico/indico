@@ -1,35 +1,32 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2011 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import icalendar as ical
 from datetime import timedelta
 
-from indico.web.http_api import HTTPAPIHook, DataFetcher
-from indico.web.http_api.ical import ICalSerializer
+from indico.core.index import Catalog
+from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
+from indico.web.http_api.metadata.ical import ICalSerializer
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.responses import HTTPAPIError
-from indico.web.wsgi import webinterface_handler_config as apache
-from indico.util.fossilize import fossilize, IFossil
-from indico.util.fossilize.conversion import Conversion
 
-from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
+from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.RecordingManager.common import createIndicoLink
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
@@ -45,11 +42,11 @@ globalHTTPAPIHooks = ['CollaborationAPIHook', 'CollaborationExportHook', 'VideoE
 def serialize_collaboration_alarm(fossil, now):
     alarm = ical.Alarm()
     trigger = timedelta(minutes=-int(fossil['alarm']))
-    alarm.set('trigger', trigger)
-    alarm.set('action', 'DISPLAY')
-    alarm.set('summary', VideoExportUtilities.getCondensedPrefix(fossil['type'],
+    alarm.add('trigger', trigger)
+    alarm.add('action', 'DISPLAY')
+    alarm.add('summary', VideoExportUtilities.getCondensedPrefix(fossil['type'],
                                                                  fossil['status']) + fossil['title'].decode('utf-8'))
-    alarm.set('description', str(fossil['url']))
+    alarm.add('description', str(fossil['url']))
 
     return alarm
 
@@ -57,25 +54,25 @@ def serialize_collaboration_alarm(fossil, now):
 def serialize_collaboration(cal, fossil, now):
     event = ical.Event()
     url = str(fossil['url'])
-    event.set('uid', 'indico-collaboration-%s@cern.ch' % fossil['uniqueId'])
-    event.set('dtstamp', now)
-    event.set('dtstart', getAdjustedDate(fossil['startDate'], None, "UTC"))
-    event.set('dtend', getAdjustedDate(fossil['endDate'], None, "UTC"))
-    event.set('url', url)
-    event.set('categories', "VideoService - " + fossil['type'])
-    event.set('summary', VideoExportUtilities.getCondensedPrefix(fossil['type'],
+    event.add('uid', 'indico-collaboration-%s@cern.ch' % fossil['uniqueId'])
+    event.add('dtstamp', now)
+    event.add('dtstart', getAdjustedDate(fossil['startDate'], None, "UTC"))
+    event.add('dtend', getAdjustedDate(fossil['endDate'], None, "UTC"))
+    event.add('url', url)
+    event.add('categories', "VideoService - " + fossil['type'])
+    event.add('summary', VideoExportUtilities.getCondensedPrefix(fossil['type'],
                                                                  fossil['status']) + fossil['title'].decode('utf-8'))
     loc = fossil.get('location', '')
     if loc:
         loc = loc.decode('utf-8')
     if fossil.get('room',''):
         loc += ': ' + fossil['room'].decode('utf-8')
-    event.set('location', loc)
+    event.add('location', loc)
     description = "Event URL: " + url
     audience = fossil.get("audience", None)
     if audience:
         description = "Audience: %s\n"% audience + description
-    event.set('description', description)
+    event.add('description', description)
 
     # If there is an alarm required, add a subcomponent to the Event
     if fossil.has_key('alarm'):
@@ -133,7 +130,7 @@ class CollaborationAPIHook(HTTPAPIHook):
 
     def api_recordingManager(self, aw):
         if not self._indicoID or not self._cdsID:
-            raise HTTPAPIError('A required argument is missing.', apache.HTTP_BAD_REQUEST)
+            raise HTTPAPIError('A required argument is missing.', 400)
 
         success = createIndicoLink(self._indicoID, self._cdsID)
         return {'success': success}
@@ -152,10 +149,10 @@ class CollaborationExportHook(HTTPAPIHook):
         super(CollaborationExportHook, self)._getParams()
         self._conf = ConferenceHolder().getById(self._pathParams['confId'], True)
         if not self._conf:
-            raise HTTPAPIError('Conference does not exist.', apache.HTTP_BAD_REQUEST)
+            raise HTTPAPIError('Conference does not exist.', 400)
 
     def export_eAgreements(self, aw):
-        manager = self._conf.getCSBookingManager()
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
         requestType = CollaborationTools.getRequestTypeUserCanManage(self._conf, aw.getUser())
         contributions = manager.getContributionSpeakerByType(requestType)
         for cont, speakers in contributions.items():
@@ -204,10 +201,11 @@ class VideoEventHook(HTTPAPIHook):
     def _getParams(self):
         super(VideoEventHook, self)._getParams()
 
-        """ In this case, idlist refers to the different indicies which can
+        """ In this case, idlist refers to the different indices which can
             be called, e.g: vidyo, evo, mcu etc.
         """
         self._idList = self._pathParams['idlist'].split('-')
+        self._categ_id = get_query_parameter(self._queryParams, 'categ')
 
         if not self._queryParams.has_key('alarms'):
             self._alarms = None
@@ -216,10 +214,10 @@ class VideoEventHook(HTTPAPIHook):
 
     def export_video(self, aw):
         expInt = VideoEventFetcher(aw, self)
-        return expInt.video(self._idList, self._alarms)
+        return expInt.video(self._idList, self._alarms, self._categ_id)
 
 
-class VideoEventFetcher(DataFetcher):
+class VideoEventFetcher(IteratedDataFetcher):
     DETAIL_INTERFACES = {
         'all' : ICollaborationMetadataFossil
     }
@@ -229,7 +227,8 @@ class VideoEventFetcher(DataFetcher):
         'webcast' : 'WebcastRequest',
         'recording' : 'RecordingRequest',
         'mcu' : 'CERNMCU',
-        'evo' : 'EVO'
+        'evo' : 'EVO',
+        'webex' : 'WebEx'
     }
 
     def __init__(self, aw, hook):
@@ -242,54 +241,35 @@ class VideoEventFetcher(DataFetcher):
 
         return fossil
 
-    def video(self, idList, alarm = None):
+    def iter_bookings(self, idList, categ_id=None):
+        for vsid in idList:
+            if vsid not in self.ID_TO_IDX:
+                continue
 
-        idx = IndexesHolder().getById('collaboration');
+            if vsid in ['webcast', 'recording']:
+                idx = Catalog.getIdx('cs_booking_instance')[self.ID_TO_IDX[vsid]]
+                for __, bkw in idx.iter_bookings(self._fromDT, self._toDT):
+                    yield bkw
+            else:
+                idx = IndexesHolder().getById('collaboration');
+                dateFormat = '%d/%m/%Y'
+
+                tempBookings = idx.getBookings(self.ID_TO_IDX[vsid], "conferenceStartDate",
+                                               self._orderBy, self._fromDT, self._toDT,
+                                               'UTC', False, None, categ_id, False, dateFormat).getResults()
+
+                for evt, bks in tempBookings:
+                    for bk in bks:
+                        bk._conf = evt # Ensure all CSBookings are aware of their Conference
+                        yield bk
+
+
+    def video(self, idList, alarm=None, categ_id=None):
+
+        res = []
         bookings = []
-        dateFormat = '%d/%m/%Y'
         self._alarm = alarm
 
-        for vsid in idList:
-            tempBookings = idx.getBookings(self.ID_TO_IDX[vsid], "conferenceStartDate",
-                                           self._orderBy, self._fromDT, self._toDT,
-                                           'UTC', False, None, None, False, dateFormat)
-            bookings.extend(tempBookings.getResults())
-
-        def _iter_bookings(objs):
-            for obj in objs:
-                for bk in obj[1]:
-                    bk._conf = obj[0] # Ensure all CSBookings are aware of their Conference
-
-                    """ This is for plugins whose structure include 'talkSelected',
-                        examples of which in CERN Indico being WebcastRequest and
-                        RecordingRequest.
-                    """
-                    if bk.hasTalkSelection():
-                        ts = bk.getTalkSelectionList()
-                        contributions = []
-
-                        if ts is None: # No individual talks, therefore an event for every contribution
-                            contributions = bk._conf.getContributionList()
-                        else:
-                            for contribId in ts:
-                                tempContrib = bk._conf.getContributionById(contribId)
-                                contributions.append(tempContrib)
-
-                        if len(contributions) == 0 or self._detail == "event": # If we are here, no contributions but a request exists.
-                            bk.setStartDate(bk._conf.getStartDate())
-                            bk.setEndDate(bk._conf.getEndDate())
-                            yield bk
-                        else: # Contributions is the list of all to be exported now
-                            contributions = filter(lambda c: c.isScheduled(), contributions)
-                            for contrib in contributions:
-                                # Wrap the CSBooking object for export
-                                bkw = CSBookingContributionWrapper(bk, contrib)
-                                bkw.setStartDate(contrib.getStartDate())
-                                bkw.setEndDate(contrib.getEndDate())
-
-                                yield bkw
-                    else:
-                        yield bk
 
         """ Simple filter, as this method can return None for Pending and True
             for accepted, both are valid booking statuses for exporting.
@@ -299,60 +279,5 @@ class VideoEventFetcher(DataFetcher):
 
         iface = self.DETAIL_INTERFACES.get('all')
 
-        for booking in self._process(_iter_bookings(bookings), _filter, iface):
+        for booking in self._process(self.iter_bookings(idList, categ_id=categ_id), _filter, iface):
             yield booking
-
-
-class CSBookingContributionWrapper():
-    """ This wrapper is required in order to export each contribution through
-        the iCal interface, giving each object its own unique address and
-        allows for the construction of iCal specific unique identifiers.
-    """
-
-    def __init__(self, booking, contrib):
-        self._orig = booking
-        self._contrib = contrib
-        self._startDate = None
-        self._endDate = None
-
-    def __getattr__(self, name):
-        """ Checks for overridden method in this class, if not present then
-            delegates to original CSBooking object.
-        """
-
-        if name in self.__dict__:
-            return getattr(self, name)
-
-        return getattr(self._orig, name)
-
-    def _getShortTypeSuffix(self):
-        type = self._orig.getType()
-        return type.lower()[0:2]
-
-    def getUniqueId(self):
-        """ Each contribution will need a unique UID for each iCal event,
-            as RecordingRequests and WebcastRequests would share the same
-            UID per contribution, append a suffix denoting the type.
-        """
-        return self._contrib.getUniqueId() + self._getShortTypeSuffix()
-
-    def getTitle(self):
-        return self._orig._conf.getTitle() + ' - ' + self._contrib.getTitle()
-
-    def setStartDate(self, date):
-        self._startDate = date
-
-    def getStartDate(self):
-        return self._startDate
-
-    def setEndDate(self, date):
-        self._endDate = date
-
-    def getEndDate(self):
-        return self._endDate
-
-    def getLocation(self):
-        return self._contrib.getLocation().getName() if self._contrib.getLocation() else ""
-
-    def getRoom(self):
-        return self._contrib.getRoom().getName() if self._contrib.getRoom() else ""

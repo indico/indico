@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*
  * HTML Parser By John Resig (ejohn.org) which is based on Erik Arvidsson SimpleHtmlParser
  * extended and modified by Indico Team.
@@ -67,8 +84,8 @@ type("HTMLParser", [],
                 var self = this;
                 var index, chars, match, last = this.html;
 
-                parseStartTag = function ( tag, tagName, rest, unary ) {
-                    tagNameLower = tagName.toLowerCase();
+                var parseStartTag = function ( tag, tagName, rest, unary ) {
+                    var tagNameLower = tagName.toLowerCase();
                     if ( self.block[ tagNameLower ] ) {
                         while ( self.stack.last() && self.inline[ self.stack.last() ] ) {
                             parseEndTag( "", self.stack.last() );
@@ -104,19 +121,16 @@ type("HTMLParser", [],
                     }
                 };
 
-                parseEndTag = function( tag, tagName ) {
-                    if(tagName)
-                        tagNameLower = tagName.toLowerCase();
+                var parseEndTag = function( tag, tagName ) {
+                    var tagNameLower = tagName ? tagName.toLowerCase() : undefined;
+                    var pos = 0;
 
-                    // If no tag name is provided, clean shop
-                    if ( !tagName )
-                        var pos = 0;
-
-                    // Find the closest opened tag of the same type
-                    else
-                        for ( var pos = self.stack.length - 1; pos >= 0; pos-- )
+                    if ( tagName ) {
+                        // Find the closest opened tag of the same type
+                        for ( pos = self.stack.length - 1; pos >= 0; pos-- )
                             if ( self.stack[ pos ].toLowerCase() == tagNameLower )
                                 break;
+                    }
 
                     if ( pos >= 0 ) {
                         // Close all the open elements, up the stack
@@ -265,20 +279,20 @@ type("inlineCSSParser",[],
                 var errorList = [];
 
                 // disallow urls
-                this.css = this.css.replace(/url\s*\(\s*[^\s)]+?\s*\)\s*/, ' ')
+                this.css = this.css.replace(/url\s*\(\s*[^\s)]+?\s*\)\s*/, ' ');
                 // gauntlet
                 if (!(/^([\-:,;#%.\sa-zA-Z0-9!]|\w-\w|'[\s\w]+'|"[\s\w]+"|\([\d,\s]+\))*$/).test(this.css))
                     throw "Parse Error: " + this.css;
                 if (!(/^\s*([-\w]+\s*:[^:;]*(;\s*|$))*$/).test(this.css))
                     throw "Parse Error: " + this.css;
 
-                parts = this.css.split(/;/g);
-                for( i in parts)
+                var parts = this.css.split(/;/g);
+                for(var i in parts)
                     if( parts[i].replace(/\s/g,'') != ""){
-                        property = parts[i].split(/:/g)[0].replace(/\s/g,'');
-                        values = parts[i].split(/:/g)[1].split(/\s/g);
-                        value = ""
-                        for( j in values)
+                        var property = parts[i].split(/:/g)[0].replace(/\s/g,'');
+                        var values = parts[i].split(/:/g)[1].split(/\s/g);
+                        var value = "";
+                        for(var j in values)
                             value += " " + values[j].replace(/\s/g,'')
                         if (this.propertyWhitelist[property.toLowerCase()] && value)
                             result += property + ':' + value + ';';
@@ -310,7 +324,7 @@ var defaultAttribWhitelist = makeMap( Indico.Security.allowedAttributes );
 
 var defaultAllowedProtocols = makeMap( Indico.Security.allowedProtocols );
 
-var urlProperties = makeMap( Indico.Security.urlProperties )
+var urlProperties = makeMap(Indico.Security.urlProperties);
 
 /**Cleans text from scripts, styles and potentialy harmful html.
  * @param (String) html Text to be parsed.
@@ -347,10 +361,10 @@ function escapeHarmfulHTML( html, sanitizationLevel, params ) {
         var allowedProtocols = params && params.allowedProtocols ? params.allowedProtocols : defaultAllowedProtocols;
 
         var urlRegexpStr = "^(";
-        for (protocol in allowedProtocols)
+        for (var protocol in allowedProtocols)
             urlRegexpStr += "|" + protocol;
         urlRegexpStr += ")://[^<>.][^<>]*$";
-        var urlRegexp = new RegExp(urlRegexpStr)
+        var urlRegexp = new RegExp(urlRegexpStr);
 
         function isEmail(value) {
             return eMail.test(value);
@@ -364,7 +378,7 @@ function escapeHarmfulHTML( html, sanitizationLevel, params ) {
 
         var errorList = [];
 
-        parser = new HTMLParser(html, {
+        var parser = new HTMLParser(html, {
             start: function( tag, attrs, unary ) {
             if( tagWhitelist[tag.toLowerCase()] ) {
                 results += "<" + tag;
@@ -389,7 +403,7 @@ function escapeHarmfulHTML( html, sanitizationLevel, params ) {
                     else if(attribWhitelist[ attrs[i].name.toLowerCase() ] || unary && attrs[i].name == '/') {
                         if(urlProperties[attrs[i].name.toLowerCase()]){
                             attrs[i].escaped = attrs[i].escaped.replace(/[`\000-\040\177-\240\s]+/g, '');
-                            attrs[i].escaped = attrs[i].escaped.replace(/\ufffd/g, "")
+                            attrs[i].escaped = attrs[i].escaped.replace(/\ufffd/g, "");
                             if (/^[a-z0-9][-+.a-z0-9]*:/.test(attrs[i].escaped) && !allowedProtocols[attrs[i].escaped.split(':')[0].toLowerCase()]) {
                                 security = 1;
                                 errorList.push(attrs[i].escaped);
@@ -518,7 +532,7 @@ function HTMLtoDOM( html, doc ) {
     // the body element
     var curParentNode = one.body;
 
-    parser = new HTMLParser( html, {
+    var parser = new HTMLParser( html, {
         start: function( tagName, attrs, unary ) {
         // If it's a pre-built element, then we can ignore
         // its construction

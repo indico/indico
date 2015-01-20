@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from cStringIO import StringIO
 
 import MaKaC.webinterface.locators as locators
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -27,19 +27,22 @@ import MaKaC.user as user
 import MaKaC.domain as domain
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
+from MaKaC.common import log
 from MaKaC.common.xmlGen import XMLGen
 from MaKaC.common.utils import parseDateTime
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
-from MaKaC.webinterface.rh.base import RoomBookingDBMixin
-from MaKaC.PDFinterface.conference import ConfManagerContribToPDF
+from MaKaC.PDFinterface.conference import ContribToPDF
 from MaKaC.errors import FormValuesError
-from MaKaC.conference import SubContribParticipation
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.webinterface.rh.materialDisplay import RHMaterialDisplayCommon
-from MaKaC.user import AvatarHolder
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+
+from indico.web.flask.util import send_file
+from MaKaC.PDFinterface.base import LatexRunner
+
 
 class RHContribModifBase(RHModificationBaseProtected):
     """ Base RH for contribution modification.
@@ -344,11 +347,12 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
                 sc.newSpeaker(spk)
 
             logInfo = sc.getLogInfo()
-            logInfo["subject"] = "Create new subcontribution: %s"%sc.getTitle()
-            self._target.getConference().getLogHandler().logAction(logInfo, "Timetable/SubContribution", self._getUser())
-            self._redirect(urlHandlers.UHContribModifSubCont.getURL(sc))
+            logInfo["subject"] = "Created new subcontribution: %s" %sc.getTitle()
+            self._target.getConference().getLogHandler().logAction(logInfo,
+                                                       log.ModuleNames.TIMETABLE)
+            self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
         else:
-            self._redirect(urlHandlers.UHContribModifSubCont.getURL(sc))
+            self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
 
     def _newSpeaker(self, presenter):
         spk = conference.SubContribParticipation()
@@ -364,49 +368,6 @@ class RHContributionCreateSC(RHContribModifBaseSpecialSesCoordRights):
 
 #-------------------------------------------------------------------------------------
 
-
-#class RHContributionDeleteSC( RHContribModifBase ):
-#    _uh = urlHandlers.UHContriDeleteSubCont
-#
-#    def _checkParams( self, params ):
-#        RHContribModifBase._checkParams( self, params )
-#        self._confirm = params.has_key( "confirm" )
-#        self._cancel = params.has_key( "cancel" )
-#        self._scIds = self._normaliseListParam( params.get("selSubContribs", []) )
-
-#    def _process( self ):
-#        for id in self._scIds:
-#            sc = self._target.getSubContributionById( id )
-#            self._target.removeSubContribution( sc )
-#        self._redirect( urlHandlers.UHContribModifSubCont.getURL( self._target ) )
-
-
-class RHContributionUpSC(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContribUpSubCont
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        self._scId = params.get("subContId", "")
-
-    def _process(self):
-        sc = self._target.getSubContributionById(self._scId)
-        self._target.upSubContribution(sc)
-        self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
-
-
-class RHContributionDownSC(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContribDownSubCont
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        self._scId = params.get("subContId", "")
-
-    def _process(self):
-        sc = self._target.getSubContributionById(self._scId)
-        self._target.downSubContribution(sc)
-        self._redirect(urlHandlers.UHContribModifSubCont.getURL(self._target))
-
-
 class RHContributionTools(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContribModifTools
 
@@ -421,7 +382,7 @@ class RHContributionTools(RHContribModifBaseSpecialSesCoordRights):
         return p.display()
 
 
-class RHContributionData( RoomBookingDBMixin, RHContribModifBaseSpecialSesCoordRights ):
+class RHContributionData(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionDataModif
 
     def _checkParams( self, params ):
@@ -518,82 +479,8 @@ class RHContribModifMaterialBrowse( RHContribModifBase, RHMaterialDisplayCommon 
     def _process(self):
         return RHMaterialDisplayCommon._process(self)
 
-    def _processManyMaterials( self ):
-        self._redirect( urlHandlers.UHContribModifMaterials.getURL( self._material ))
-
-
-class RHContributionAddMaterial(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionAddMaterial
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        typeMat = params.get("typeMaterial", "notype")
-        if typeMat=="notype" or typeMat.strip()=="":
-            raise FormValuesError("Please choose a material type")
-        self._mf = materialFactories.ContribMFRegistry().getById(typeMat)
-
-    def _process(self):
-        if self._mf:
-            if not self._mf.needsCreationPage():
-                m = RHContributionPerformAddMaterial.create(self._target, self._mf, self._getRequestParams())
-                self._redirect(urlHandlers.UHMaterialModification.getURL(m))
-                return
-        p = contributions.WPContribAddMaterial(self, self._target, self._mf)
-        wf = self.getWebFactory()
-        if wf != None:
-            p = wf.getContribAddMaterial(self, self._target, self._mf)
-        return p.display()
-
-
-class RHContributionPerformAddMaterial(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionPerformAddMaterial
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        typeMat = params.get("typeMaterial", "")
-        self._mf = materialFactories.ContribMFRegistry.getById(typeMat)
-
-    @staticmethod
-    def create(contrib, matFactory, matData):
-        if matFactory:
-            m = matFactory.create(contrib)
-        else:
-            m = conference.Material()
-            contrib.addMaterial(m)
-            m.setValues(matData)
-        return m
-
-    def _process(self):
-        m = self.create(self._target, self._mf, self._getRequestParams())
-        self._redirect(urlHandlers.UHMaterialModification.getURL(m))
-
-
-class RHContributionRemoveMaterials(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionRemoveMaterials
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        #typeMat = params.get( "typeMaterial", "" )
-        #self._mf = materialFactories.ConfMFRegistry().getById( typeMat )
-        self._materialIds = self._normaliseListParam(params.get("deleteMaterial", []))
-        self._materialIds = self._normaliseListParam( params.get("materialId", []) )
-        self._returnURL = params.get("returnURL","")
-
-    def _process(self):
-        for id in self._materialIds:
-            #Performing the deletion of special material types
-            f = materialFactories.ContribMFRegistry().getById(id)
-            if f:
-                f.remove(self._target)
-            else:
-                #Performs the deletion of additional material types
-                mat = self._target.getMaterialById( id )
-                self._target.removeMaterial( mat )
-        if self._returnURL != "":
-            url = self._returnURL
-        else:
-            url = urlHandlers.UHContribModifMaterials.getURL( self._target )
-        self._redirect( url )
+    def _processManyMaterials(self):
+        self._redirect(urlHandlers.UHContribModifMaterials.getURL(self._material.getOwner()))
 
 
 class RHMaterialsAdd(RHSubmitMaterialBase, RHContribModifBaseSpecialSesCoordRights):
@@ -612,10 +499,20 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHContribModifBaseSpecialSesCoordRigh
         if self._target.canUserSubmit(self._aw.getUser()) \
             and (not material or material.getReviewingState() < 3):
             self._loggedIn = True
-        elif not (RCContributionPaperReviewingStaff.hasRights(self, includingContentReviewer=False) and self._target.getReviewManager().getLastReview().isAuthorSubmitted()):
+        # status = 3 means the paper is under review (submitted but not reviewed)
+        # status = 2 means that the author has not yet submitted the material
+        elif not (RCContributionPaperReviewingStaff.hasRights(self, includingContentReviewer=False)
+                  and self._target.getReviewing() and self._target.getReviewing().getReviewingState() in (2, 3)):
             RHSubmitMaterialBase._checkProtection(self)
         else:
             self._loggedIn = True
+
+    def _process(self):
+        result = RHSubmitMaterialBase._process(self)
+        # if a Paper Reviewer uploads a paper, when the status is 'To be corrected', we must change the status to 'Submitted' again.
+        if self._target.getReviewing() and self._target.getReviewing().getReviewingState() == 2 and RCContributionPaperReviewingStaff.hasRights(self, includingContentReviewer=False):
+            self._target.getReviewManager().getLastReview().setAuthorSubmitted(True)
+        return result
 
 
 class RHContributionSetVisibility(RHContribModifBaseSpecialSesCoordRights):
@@ -631,65 +528,6 @@ class RHContributionSetVisibility(RHContribModifBaseSpecialSesCoordRights):
             self._protect = -1
         self._target.setProtection(self._protect)
         self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-
-
-class RHContributionSelectAllowed(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionSelectAllowed
-
-    def _process(self):
-        p = contributions.WPContributionSelectAllowed(self, self._target)
-        return p.display(**self._getRequestParams())
-
-
-class RHContributionAddAllowed(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionAddAllowed
-
-    def _process(self):
-        params = self._getRequestParams()
-        if "selectedPrincipals" in params and not "cancel" in params:
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam(params["selectedPrincipals"]):
-                self._target.grantAccess(ph.getById(id))
-        self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-
-
-class RHContributionRemoveAllowed(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionRemoveAllowed
-
-    def _process(self):
-        params = self._getRequestParams()
-        if ("selectedPrincipals" in params) and \
-            (len(params["selectedPrincipals"])!=0):
-            ph = user.PrincipalHolder()
-            for id in self._normaliseListParam(params["selectedPrincipals"]):
-                self._target.revokeAccess(ph.getById(id))
-        self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-
-
-class RHContributionAddDomains(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionAddDomain
-
-    def _process(self):
-        params = self._getRequestParams()
-        if ("addDomain" in params) and (len(params["addDomain"])!=0):
-            dh = domain.DomainHolder()
-            for domId in self._normaliseListParam(params["addDomain"]):
-                self._target.requireDomain(dh.getById(domId))
-        self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-
-
-class RHContributionRemoveDomains(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionRemoveDomain
-
-    def _process(self):
-        params = self._getRequestParams()
-        if ("selectedDomain" in params) and (len(params["selectedDomain"])!=0):
-            dh = domain.DomainHolder()
-            for domId in self._normaliseListParam(params["selectedDomain"]):
-                self._target.freeDomain(dh.getById(domId))
-        #self._endRequest()
-        self._redirect(urlHandlers.UHContribModifAC.getURL(self._target))
-
 
 class RHContributionDeletion(RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContributionDelete
@@ -715,46 +553,13 @@ class RHContributionDeletion(RHContribModifBaseSpecialSesCoordRights):
             owner = self._target.getOwner()
             self._perform()
             if self._target.getSession():
-                self._redirect(urlHandlers.UHsessionModification.getURL(owner))
+                self._redirect(urlHandlers.UHSessionModification.getURL(owner))
             else:
                 self._redirect(urlHandlers.UHConferenceModification.getURL(owner))
         else:
             p = contributions.WPContributionDeletion(self, self._target)
             return p.display()
 
-
-class RHContributionMove(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionMove
-
-    def _process(self):
-        p = contributions.WPcontribMove(self, self._target)
-        return p.display(**self._getRequestParams())
-
-
-class RHContributionPerformMove(RHContribModifBaseSpecialSesCoordRights):
-    _uh = urlHandlers.UHContributionPerformMove
-
-    def _checkParams(self, params):
-        RHContribModifBaseSpecialSesCoordRights._checkParams(self, params)
-        self._dest = params["Destination"]
-        if self._dest == "--no-sessions--":
-            raise MaKaCError( _("Undefined destination for the contribution."))
-
-    def _process(self):
-        conf = self._target.getConference()
-        if self._dest == 'CONF':
-            newOwner = conf
-        else:
-            newOwner = conf.getSessionById(self._dest)
-        self._moveContrib(newOwner)
-        self._redirect(urlHandlers.UHContribModifTools.getURL(self._target))
-
-        return "done"
-
-    def _moveContrib(self, newOwner):
-        owner = self._target.getOwner()
-        owner.removeContribution(self._target)
-        newOwner.addContribution(self._target)
 
 class RHContributionToXML(RHContributionModification):
     _uh = urlHandlers.UHContribToXMLConfManager
@@ -769,8 +574,8 @@ class RHContributionToXML(RHContributionModification):
         afm = self._target.getConference().getAbstractMgr().getAbstractFieldsMgr()
         for f in afm.getFields():
             id = f.getId()
-            if f.isActive() and self._target.getField(id).strip() != "":
-                x.writeTag(f.getName().replace(" ","_"),self._target.getField(id))
+            if f.isActive() and str(self._target.getField(id)).strip() != "":
+                x.writeTag(f.getCaption().replace(" ", "_"), self._target.getField(id))
         x.writeTag("Conference", self._target.getConference().getTitle())
         session = self._target.getSession()
         if session!=None:
@@ -815,14 +620,7 @@ class RHContributionToXML(RHContributionModification):
 
         x.closeTag("contribution")
 
-        data = x.getXml()
-
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType("XML")
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
-        return data
+        return send_file(filename, StringIO(x.getXml()), 'XML')
 
 
 class RHContributionToPDF(RHContributionModification):
@@ -831,14 +629,8 @@ class RHContributionToPDF(RHContributionModification):
     def _process(self):
         tz = self._target.getConference().getTimezone()
         filename = "%s - Contribution.pdf"%self._target.getTitle()
-        pdf = ConfManagerContribToPDF(self._target.getConference(), self._target, tz=tz)
-        data = pdf.getPDFBin()
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType("PDF")
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
-        return data
+        pdf = ContribToPDF(self._target)
+        return send_file(filename, pdf.generate(), 'PDF')
 
 
 class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
@@ -871,47 +663,3 @@ class RHMaterials(RHContribModifBaseSpecialSesCoordAndReviewingStaffRights):
 
         p = contributions.WPContributionModifMaterials( self, self._target )
         return p.display(**self._getRequestParams())
-
-
-
-class RHContributionReportNumberEdit(RHContribModifBase):
-
-    def _checkParams(self, params):
-        RHContribModifBase._checkParams(self, params)
-        self._reportNumberSystem=params.get("reportNumberSystem","")
-
-    def _process(self):
-        if self._reportNumberSystem!="":
-            p=contributions.WPContributionReportNumberEdit(self,self._target, self._reportNumberSystem)
-            return p.display()
-        else:
-            self._redirect(urlHandlers.UHContributionModification.getURL( self._target ))
-
-class RHContributionReportNumberPerformEdit(RHContribModifBase):
-
-    def _checkParams(self, params):
-        RHContribModifBase._checkParams(self, params)
-        self._reportNumberSystem=params.get("reportNumberSystem","")
-        self._reportNumber=params.get("reportNumber","")
-
-    def _process(self):
-        if self._reportNumberSystem!="" and self._reportNumber!="":
-            self._target.getReportNumberHolder().addReportNumber(self._reportNumberSystem, self._reportNumber)
-        self._redirect("%s#reportNumber"%urlHandlers.UHContributionModification.getURL( self._target ))
-
-
-class RHContributionReportNumberRemove(RHContribModifBase):
-
-    def _checkParams(self, params):
-        RHContribModifBase._checkParams(self, params)
-        self._reportNumberIdsToBeDeleted=self._normaliseListParam( params.get("deleteReportNumber",[]))
-
-    def _process(self):
-        nbDeleted = 0
-        for id in self._reportNumberIdsToBeDeleted:
-            self._target.getReportNumberHolder().removeReportNumberById(int(id)-nbDeleted)
-            nbDeleted += 1
-        self._redirect("%s#reportNumber"%urlHandlers.UHContributionModification.getURL( self._target ))
-
-
-

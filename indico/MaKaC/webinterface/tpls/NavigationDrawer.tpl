@@ -43,25 +43,16 @@ arrowImage = systemIcon( "breadcrumb_arrow.png" )
 
 %>
 
-<div class="mainBreadcrumb" ${'style="background-color: '+ bgColor +';" ' if bgColor else ""}>
-<span class="path">
-    % for i in range (0, len(l)):
-        % if i > 0:
-            <img src="${ arrowImage }" />
-        % endif
-        <% name, url = l[i] %>
-        <a href="${ url }" itemscope itemtype="http://data-vocabulary.org/Breadcrumb" itemprop="url">
-            <span itemprop="title">${ truncateTitle(name, 40) }</span>
-        </a>
-    % endfor
-
-    % for i in range(0, len(appendPath)):
-        <% object = appendPath[i] %>
-
-        <img src="${ arrowImage }" />
-
-        <a href="${ object["url"] }">${ object["title"] }</a>
-    % endfor
-
-</span>
+<div class="main-breadcrumb" ${'style="background-color: '+ bgColor +';" ' if bgColor else ""}>
+    <span class="path">
+        % for i in range (0, len(l)):
+            % if i > 0:
+                <span class="sep">»</span>
+            % endif
+            <% name, url = l[i] %>
+            <a href="${ url }" itemscope itemtype="http://data-vocabulary.org/Breadcrumb" itemprop="url">
+                <span itemprop="title">${ truncateTitle(name, 40) | remove_tags }</span>
+            </a>
+        % endfor
+    </span>
 </div>

@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 function _revert_element(ui) {
     // make element assume previous size
     if (ui.originalSize) {
@@ -56,8 +73,6 @@ type("TimeDisplacementManager", [],
 
              // snapping blocks to tooltip "grid"
 
-             type = type || 'resize';
-
              var hourline = $('#hourLine_' + parseFloat(time[0]));
              var hourHeight = hourline.height();
 
@@ -79,15 +94,19 @@ type("TimeDisplacementManager", [],
 
              var self = this;
 
-             var startDT = (startHour === null) ? eventData.startDate :
-                 { 'date': eventData.startDate.date,
-                   'time': startHour + ":" + startMinute };
+             var startDT = (startHour === null || startHour === undefined) ? eventData.startDate : {
+                 'date': eventData.startDate.date,
+                 'time': startHour + ":" + startMinute
+             };
 
-             if (endHour === null) {
-                 var endDT = new Date(Util.dateTimeIndicoToJS(startDT).getTime() + eventData.duration*60000);
+             var endDT;
+             if (endHour === null || endHour === undefined) {
+                 endDT = new Date(Util.dateTimeIndicoToJS(startDT).getTime() + eventData.duration*60000);
              } else {
-                 var endDT = { 'date': eventData.endDate.date,
-                               'time': endHour + ":" + endMinute };
+                 endDT = {
+                     'date': eventData.endDate.date,
+                     'time': endHour + ":" + endMinute
+                 };
              }
 
              self.managementActions.editEntryStartEndDate(
@@ -169,7 +188,7 @@ type("TimeDisplacementManager", [],
 
              var height = elem.height();
              var newPos = elem.offset().top + (type == 'drag' ? 0 : height);
-             var otherTip = newPos + (type == 'drag' ? height : height)
+             var otherTip = newPos + (type == 'drag' ? height : height);
 
              var curBestDiff = Number.MAX_VALUE;
              var curHour = null;
@@ -185,9 +204,9 @@ type("TimeDisplacementManager", [],
                      this._cache_set('heightLimits'); // set as dirty
 
                      if (type == 'drag') {
-                         elem.data('draggable')._setContainment();
+                         elem.data('ui-draggable')._setContainment();
                      } else {
-                         elem.data('resizable').resetContainment();
+                         elem.data('ui-resizable').resetContainment();
                      }
 
                  }
@@ -310,7 +329,7 @@ type("DraggableBlockMixin", [],
                      ui.helper.animate({width: newWidth});
                      ui.helper.height(newHeight);
 
-                     $(this).data('draggable')._setContainment(newWidth, newHeight);
+                     $(this).data('ui-draggable')._setContainment(newWidth, newHeight);
 
                      self._initializeTooltip();
 
@@ -342,7 +361,7 @@ type("DraggableBlockMixin", [],
 
              draggable.data('eventData', this.eventData);
          }
-     })
+     });
 
 
 type("ResizableBlockMixin", [],
@@ -353,6 +372,7 @@ type("ResizableBlockMixin", [],
              this.resizable = this.element.reset_resizable({
 
                  // properties
+                 ignoreShift: true,
                  containment: $('#timetable_canvas'),
                  maxWidth: this.element.width(),
                  minWidth: this.element.width(),
@@ -434,14 +454,15 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
                  drop: function(event, ui) {
                      // execute making sure click events on blocks are disabled
                      self._withNoEvents(function() {
-                         self.release(hour, minute, null, null, ui.draggable.data("eventData"), ui.helper, "placementChange");
+                         self.release(hour, minute, null, null, $(ui.draggable.context).data("eventData"), ui.helper, "placementChange");
                      });
                  },
                  tolerance: 'touch',
                  accept: '.ui-draggable.timetableBlock',
                  over: function(event, ui) {
-                     $('.ui-draggable.timetableBlock').live(
+                     $('#timetableDiv').on(
                          thisDragSpaceName,
+                         '.ui-draggable.timetableBlock',
                          function(event, ui)
                          {
                              if (element.droppable("option", "disabled")) {
@@ -457,13 +478,15 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
                          });
                  },
                  out: function(event, ui) {
-                     $('.ui-draggable.timetableBlock').die(thisDragSpaceName);
+                     $('#timetableDiv').off(thisDragSpaceName, '.ui-draggable.timetableBlock');
                  }
              });
-       },
+       }
      }, function(timetable) {
-         this.TimeDisplacementManager(this.timetable)
-         this._shiftKeyListener();
+         this.TimeDisplacementManager(this.timetable);
+         if (this.managementMode) {
+             this._shiftKeyListener();
+         }
          this._grid = _(this.grid);
      });
 
@@ -484,7 +507,7 @@ type("DroppableBlockMixin", [],
 
              function isTouchingWall(ui) {
                  return $(ui.draggable).position().left == 0;
-             };
+             }
 
              function removeBottomMove(ui) {
                  $('#tt_bottom_move').fadeOut(500, function() {
@@ -535,7 +558,7 @@ type("DroppableBlockMixin", [],
                          ui.draggable.animate({width: newWidth});
                          ui.draggable.height({height: newHeight});
 
-                         ui.draggable.data('draggable')._setContainment(newWidth, newHeight);
+                         ui.draggable.data('ui-draggable')._setContainment(newWidth, newHeight);
 
                          $('.timetableBlock.ui-droppable').not(this).super_droppable('disable');
                          $('.hourLine.ui-droppable').droppable('disable');
@@ -565,7 +588,7 @@ type("DroppableBlockMixin", [],
                      $('.hourLine.ui-droppable').droppable('enable');
 
                      removeBottomMove();
-                 },
+                 }
              });
          }
      });
@@ -619,7 +642,7 @@ $(function() {
 
     $("body").one('timetable_ready', function() {
         var closeMenu = function() {
-            $('#tt_menu > ul').dropdown('close');
+            $('#tt_menu .group').dropdown('close');
         };
 
         // initialize sticky headers

@@ -10,8 +10,8 @@
         <td colspan="3">
             % if ConfReview.getEnablePRMEmailNotif():
                 <div style="padding:5px; color:gray;">
-                    <span class="collShowBookingsText">${_("An automatically generated e-mail will be sent to newly assigned Paper Review Managers.")}</span><br>
-                    <span class="collShowBookingsText">${ _("You  can  modify this from the Paper Reviewing ")}<a href="${ urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference()) }">${ _("Setup.")}</a></span>
+                    <span class="italic">${_("An automatically generated e-mail will be sent to newly assigned Paper Review Managers.")}</span><br>
+                    <span class="italic">${ _("You  can  modify this from the Paper Reviewing ")}<a href="${ urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference()) }">${ _("Setup.")}</a></span>
                 </div>
             % endif
         </td>
@@ -78,7 +78,7 @@
                                 ${ jsonEncode(fossilize(ConfReview.getPaperReviewManagersList())) },
                                 true,null,
                                 true, false, null, null,
-                                false, false, true,
+                                false, false, false, true,
                                 newPRMHandler, userListNothing, removePRMHandler);
                         $E('PRMList').set(uf.draw());
 </script>

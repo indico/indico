@@ -3,44 +3,18 @@
 * and show a a tooltip while it is disabled.
 */
 (function($, undefined) {
-    $.widget('cern.disabledButtonWithTooltip', {
+    $.widget('indico.disabledButtonWithTooltip',  $.extend({}, $.indico.disabledElementWithTooltip, {
         // Default options
         options: {
-            disabled: null,
-            tooltip: null,
-            tooltipClass: 'tooltipError'
+            elementClass: 'ui-dttbutton'
         },
 
         _create: function() {
-            var self = this;
             this.isUIButton = this.element.is('.ui-button');
             if(this.options.disabled === null) {
                 this.options.disabled = this.isUIButton ? this.element.button('option', 'disabled') : false;
             }
-            // Wrap the element in a span and create an overlay so we can get mouse events for the disabled button
-            this.element.addClass('ui-dttbutton').wrap('<span/>');
-            var wrapper = this.element.closest('span');
-            wrapper.css({
-                display: 'inline-block',
-                position: 'relative'
-            });
-            this.overlay = $('<div/>').css({
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                height: '100%',
-                width: '100%'
-            }).appendTo(wrapper);
-
-            this.overlay.qtip({
-                content: {
-                    text: self.options.tooltip
-                },
-                position: {
-                    target: this.element
-                }
-            });
-            this._update();
+            $.indico.disabledElementWithTooltip.prototype._create.apply(this, arguments);
         },
 
         _update: function() {
@@ -54,12 +28,7 @@
         },
 
         destroy: function() {
-            if(!this.element.hasClass('ui-dttbutton')) {
-                return;
-            }
-            this.overlay.remove();
-            this.element.removeClass('ui-dttbutton').unwrap();
-            $.Widget.prototype.destroy.apply(this, arguments);
+            $.indico.disabledElementWithTooltip.prototype.destroy.apply(this, arguments);
             // restore ui-state-disabled since super's destroy removed it
             if(this.isUIButton) {
                 this.element.button('option', 'disabled', this.options.disabled);
@@ -81,5 +50,5 @@
                 $.Widget.prototype._setOption.apply(this, arguments);
             }
         }
-    });
+    }));
 })(jQuery);

@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 function userListNothing(data, func) {
     each(data, function() {
         func(true);
@@ -65,7 +82,7 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
 
             if (this.showToggleFavouriteButtons && IndicoGlobalVars.isUserAuthenticated && peopleData.get('_type') == "Avatar") {
                 var favouritizeButton = new ToggleFavouriteButton(peopleData.getAll(), null, null, this.favouriteButtonObserver).draw();
-                var favouritizeButtonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingLeft: pixels(5), paddingTop: pixels(5)}}, favouritizeButton);
+                var favouritizeButtonDiv = Html.div({style: {cssFloat: "right"}}, favouritizeButton);
                 return [favouritizeButtonDiv, userName, userEmail];
             } else {
                 return [userName, userEmail];
@@ -174,7 +191,14 @@ type ("SimpleSearchPanel", ["IWidget"], {
 
        this.foundPeopleListDiv = Html.div("UISearchPeopleListDiv", this.foundPeopleList.draw());
 
-       this.container = Html.div({}, this.searchForm, this.searchButtonDiv, this.foundPeopleListDiv, this.extraDiv);
+       this.container = Html.div({}, this.searchForm.get(), this.searchButtonDiv, this.foundPeopleListDiv, this.extraDiv);
+
+        if (this.submissionRights) {
+            var checkbox = Html.checkbox({}, true);
+            $B(this.grantRights.accessor('submission'), checkbox);
+            var submissionDiv = Html.div({style: {marginTop: pixels(5), marginLeft: pixels(-4)}}, checkbox, $T("Grant all selected users submission rights"));
+            this.container.append(submissionDiv);
+        }
 
        return this.IWidget.prototype.draw.call(this, this.container);
    }
@@ -183,7 +207,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
     /**
      * Constructor for SimpleSearchPanel
      */
-    function(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv) {
+    function(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv) {
 
         this.IWidget();
         this.onlyOne = any(onlyOne, false);
@@ -199,6 +223,9 @@ type ("SimpleSearchPanel", ["IWidget"], {
         this.searchButtonDiv = null;
         this.foundPeopleListDiv = null;
         this.container = null;
+
+        this.submissionRights = submissionRights;
+        this.grantRights = grantRights;
    }
 );
 
@@ -293,7 +320,6 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
             }
         );
     },
-
     /**
      * Returns the panel's DOM
      */
@@ -305,8 +331,8 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
     /**
      * Constructor for UserSearchPanel
      */
-    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv){
-        this.SimpleSearchPanel(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv);
+    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv){
+        this.SimpleSearchPanel(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv);
         if(exists(conferenceId)) {
             this.criteria.set("conferenceId", conferenceId);
         }
@@ -460,7 +486,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
     /**
      * Constructor for UserAndGroupsSearchPanel
      */
-    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv){
+    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv){
         this.IWidget();
         this.onlyOne = any(onlyOne, false);
         this.parentSelectionObserver = selectionObserver;
@@ -469,7 +495,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
 
         this.userPanel = new UserSearchPanel(this.onlyOne, function(selectedList){
             self.__selectionObserver("users", selectedList);
-        }, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, extraDiv);
+        }, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv);
         this.groupPanel = new GroupSearchPanel(this.onlyOne, function(selectedList){
             self.__selectionObserver("groups", selectedList);
         }, showToggleFavouriteButtons);
@@ -506,7 +532,7 @@ type ("SuggestedUsersPanel", ["IWidget"], {
 
         if (this.suggestedUserList.isEmpty()) {
             var message = Html.span({}, $T("There are no suggested users for you at the moment. Why not add some "),
-                                        Html.a({href: Indico.Urls.Favourites}, $T("favourites")),
+                                        Html.a({href: build_url(Indico.Urls.Favourites)}, $T("favourites")),
                                         "?");
             this.suggestedUserList.setMessage(message);
         }
@@ -604,26 +630,21 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
 
     __buildSearchPanel: function(container) {
         var self = this;
-
         if (this.enableGroups) {
             this.searchPanel = new UserAndGroupsSearchPanel(this.onlyOne, function(selectedList){
                 self.__selectionObserver("searchUsers", selectedList);
             }, this.conferenceId, this.showToggleFavouriteButtons, function(avatar, action) {
                 self.__searchPanelFavouriteButtonObserver(avatar, action);
-            }, self.extraDiv);
-            var returnedDom = this.searchPanel.draw();
-            container.append(returnedDom);
+            }, this.submissionRights, this.grantRights, self.extraDiv);
         } else {
-            this.searchPanel = new UserSearchPanel(this.onlyOne, function(selectedList){
+            this.searchPanel = new UserSearchPanel(this.onlyOne, function(selectedList) {
                 self.__selectionObserver("searchUsers", selectedList);
             }, this.conferenceId, this.showToggleFavouriteButtons, function(avatar, action) {
                 self.__searchPanelFavouriteButtonObserver(avatar, action);
-            }, self.extraDiv);
-            var returnedDom = this.searchPanel.draw();
-            container.append(returnedDom);
+            }, this.submissionRights, this.grantRights, self.extraDiv);
         }
-
-
+        var returnedDom = this.searchPanel.draw();
+        container.append(returnedDom);
     },
 
     __buildSuggestedUsersPanel: function(container) {
@@ -671,6 +692,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
     },
 
     __save: function() {
+        var self = this;
         var totalSelected = $O({});
         if (this.allowSearch) {
             totalSelected.update(this.searchPanel.getSelectedList().getAll());
@@ -678,9 +700,11 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
         if (this.includeFavourites || exists(this.suggestedUsers)) {
             totalSelected.update(this.suggestedUsersPanel.getSelectedList().getAll());
         }
-
         var returnedList = new List();
         each(totalSelected, function(selectedItem) {
+            if (self.submissionRights) {
+                selectedItem.set('isSubmitter', self.grantRights.get('submission'));
+            }
             returnedList.append(selectedItem.getAll());
         });
         this.chooseProcess(returnedList.allItems());
@@ -762,7 +786,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
              conferenceId, enableGroups,
              includeFavourites, suggestedUsers,
              onlyOne, showToggleFavouriteButtons,
-             chooseProcess, extraDiv) {
+             submissionRights, chooseProcess, extraDiv) {
 
         var self = this;
 
@@ -785,6 +809,9 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
         this.buttonDiv = null;
         this.cellSearch = null;
         this.cellSuggested = null;
+
+        this.submissionRights = submissionRights;
+        this.grantRights = new WatchObject();
 
         // We build the dialog.
         this.PreLoadHandler(
@@ -864,7 +891,7 @@ type("SingleUserField", ["IWidget"], {
      * @param {Object} user a dictionary with the user info.
      */
     __userChosenObserver: function() {
-        user = this.user.getAll();
+        var user = this.user.getAll();
 
         this.variableButtonsDiv.clear();
         if (IndicoGlobalVars.isUserAuthenticated && this.userChosen && user._type === "Avatar") {
@@ -926,7 +953,7 @@ type("SingleUserField", ["IWidget"], {
                 var userChoosePopup = new ChooseUsersPopup("Choose user",
                                                            true, self.conferenceId, self.enableGroups,
                                                            self.includeFavourites, self.suggestedUsers,
-                                                           true, true,
+                                                           true, true, false,
                                                            chooseUserHandler);
                 userChoosePopup.execute();
             });
@@ -995,279 +1022,6 @@ type("SingleUserField", ["IWidget"], {
 );
 
 /**
- * Creates a user search pop-up dialog that queries the user
- * database.
- * @param {Function} process Callback method that is invoked
- *                   in order to process the users that are selected
- *                   from the list.
- * @param {Function} suicideHook A callback method that is passed by
- *                   the exclusivePopup method, and is called by the
- *                   function when the dialog needs to be destroyed.
- */
-/*
-type ("UserSearchPopup", ["ExclusivePopup"], {
-
-    _clickSearchAction: function(){
-        Dom.Event.dispatch( this.searchButton.dom, 'click');
-    },
-
-    _drawUsers: function() {
-        var self = this;
-        // Form to input user data
-        var criteria = this.criteria;
-
-        var famName = new EnterObserverTextBox("text",{}, function() {
-            self._clickSearchAction();
-            });
-        var firstName = new EnterObserverTextBox("text",{}, function() {
-            self._clickSearchAction();
-        });
-        var email = new EnterObserverTextBox("text",{}, function() {
-            self._clickSearchAction();
-        });
-        var org = new EnterObserverTextBox("text",{}, function() {
-            self._clickSearchAction();
-        });
-        var exactMatch = Html.checkbox({});
-
-        $B(famName, criteria.accessor('surName'));
-        $B(firstName, criteria.accessor('name'));
-        $B(org, criteria.accessor('organisation'));
-        $B(email, criteria.accessor('email'));
-        $B(exactMatch, criteria.accessor('exactMatch'));
-
-        return IndicoUtil.createFormFromMap([[$T("Family name"), famName.draw()], [$T("First name"), firstName.draw()], [$T("E-mail"), email.draw()], [$T("Organisation"), org.draw()], [$T("Exact Match"), exactMatch]]);
-    },
-
-    _drawGroups: function() {
-        var self = this;
-        var criteria = this.criteria;
-
-        return IndicoUtil.createFormFromMap([
-            ["Group name",
-             $B( new EnterObserverTextBox("text",{}, function() {
-                 self._clickSearchAction();
-             }).draw(), criteria.accessor('group'))]]);
-    },
-
-    _clearSelections: function(selectedList, selectedDiv) {
-        selectedList.clear();
-        each(selectedDiv, function(elem) {
-            elem.dom.className = 'unselectedUser';
-        });
-    },
-
-    draw: function () {
-
-        var selectedUserList = new WatchList();
-        var selectedGroupList = new WatchList();
-
-        selectedUserList.length.observe(function(){
-            if (selectedUserList.length.get() > 0) {
-                addButton.enable();
-            }else {
-                addButton.disable();
-            }
-        });
-
-        selectedGroupList.length.observe(function(){
-            if (selectedGroupList.length.get() > 0) {
-                addButton.enable();
-            }else {
-                addButton.disable();
-            }
-        });
-
-        var self = this;
-
-        var selectedDiv;
-
-
-        //
-        // if we want to allow the search in many DB we should do something like this
-        //
-        //var authList = [];
-        //each(Indico.Settings.ExtAuthenticators, function(auth) {
-        //        var searchExt = Html.checkbox({});
-        //        $B(searchExt, this.criteria.accessor('searchExt'));
-        //        authList.append(["Search "+auth, searchExt])
-        //});
-        //
-        var searchExtForm = null;
-        if (!empty(Indico.Settings.ExtAuthenticators)){
-            var searchExt = Html.checkbox({});
-            $B(searchExt, this.criteria.accessor('searchExt'));
-            //
-            // TODO: TO IMPROVE THIS (related with upper comment).
-            // Current search service does not support to search in specific authenticators. But you
-            // can search in all of them by activating the flag "searchExt".
-            // For CERN, we want to display NICE instead of "Search external authenticator", that's
-            // why we use Indico.Settings.ExtAuthenticators[0] because we suppose that there will be
-            // just one external authenticator.
-            //
-            searchExtForm = IndicoUtil.createFormFromMap([["Search "+Indico.Settings.ExtAuthenticators[0], searchExt]]);
-        }
-
-        var source = null;
-        this.searchButton = Html.input("button", {}, $T("Search"));
-        var parametersArea = this.searchGroups?
-        this.parametersWidget.draw():this.parametersWidget;
-
-        var formPart = Html.div({}, parametersArea, searchExtForm, Html.div({style:{textAlign:"center"}},this.searchButton));
-        this.searchButton.observeClick(function(){
-            if (!source) {
-                source = indicoSource('search.usersGroups', self.criteria);
-                bind.element(peopleList, $L($V(source, "people")), template('user'));
-                bind.element(groupList, $L($V(source, "groups")), template('group'));
-                source.state.observe(function(state) {
-                    if (state == SourceState.Loaded) {
-                        userList.set(selectedDiv);
-                        self.searchButton.dom.disabled = false;
-                        if ( (!self.searchGroups && empty($L($V(source, "people")))) ||
-                             (self.searchGroups && self.parametersWidget.selected.get() == 'Users' && empty($L($V(source, "people")))) ||
-                            (self.searchGroups && self.parametersWidget.selected.get() == 'Groups' && empty($L($V(source, "groups"))))) {
-                            userList.append(Html.br());
-                            userList.append(Html.em({style:{padding: pixels(10)}}, $T("No results for this search...") ));
-                        }
-                    }
-                });
-            }else {
-                source.refresh();
-            }
-            selectedUserList.clear();
-            selectedGroupList.clear();
-            userList.set(Html.div({style: {paddingTop: '20px'}}, progressIndicator(false, true)));
-            self.searchButton.dom.disabled = true;
-        });
-
-
-        // List of found users
-        var template = function(userOrGroup) {
-            return function(value){
-                var liElem = (value.isGroup || value._fossil === 'group') ? Html.li({}, value.name) :
-                Html.li({}, value.familyName.toUpperCase() + ', ' + value.firstName, Html.em({},' (' + value.email + ')'));
-                liElem.observeClick(function() {
-                    toggle(userOrGroup, value, liElem);
-                });
-                return liElem;
-            };
-        };
-
-        var toggle = function(userOrGroup, object, element){
-            var selectedList = userOrGroup=='user'?
-                selectedUserList:selectedGroupList;
-
-            if (!search(selectedList, match(object))) {
-                if (self.onlyOne) {
-                    self._clearSelections(selectedList, selectedDiv);
-                }
-                selectedList.insert(object);
-                element.dom.className = 'selectedUser';
-            }
-            else {
-                selectedList.remove(object);
-                element.dom.className = 'unselectedUser';
-            }
-        };
-
-        var peopleList = Html.ul("UIPeopleList");
-        var groupList = Html.ul("UIPeopleList");
-
-        var userList = Html.div({className:'UISearchPeopleListDiv'}, peopleList);
-        selectedDiv = peopleList;
-
-        var tooltipListEmpty = Html.em({style:{padding: pixels(10)}}, $T("Fill any of the upper fields and click search...") );
-        userList.append(Html.br());
-        userList.append(tooltipListEmpty);
-
-        if (this.searchGroups) {
-            this.parametersWidget.selected.observe(function(option) {
-                if (option == 'Users') {
-                    selectedDiv = peopleList;
-                } else {
-                    selectedDiv = groupList;
-                }
-                userList.set(selectedDiv);
-                if (!selectedDiv.get()) {
-                    userList.append(Html.br());
-                    userList.append(tooltipListEmpty);
-                }
-            });
-
-            this.parametersWidget.selected.set('Users');
-        }
-
-        var addButton = new DisabledButton(Html.input("button", {disabled:true},
-                this.onlyOne? $T("Choose") : $T("Add") ));
-        var cancelButton = Html.input("button", {style:{marginLeft: pixels(5)}}, $T("Cancel") );
-        var buttons = Html.div({ style: {textAlign: 'center'}}, addButton.draw(), cancelButton);
-
-        cancelButton.observeClick(function(){
-            self.close();
-        });
-
-        var tooltip;
-
-        addButton.observeEvent('mouseover', function(event){
-            if (!addButton.isEnabled()) {
-                tooltip = IndicoUI.Widgets.Generic.errorTooltip(event.clientX, event.clientY, $T("You must select at least one item from the list"), "tooltipError");
-            }
-        });
-
-        addButton.observeEvent('mouseout', function(event){
-            Dom.List.remove(document.body, tooltip);
-        });
-
-        addButton.observeClick(function(){
-            var mergedList = concat(
-                selectedUserList.allItems(),
-                selectedGroupList.allItems()
-            );
-            self.processFunction(mergedList);
-            self.close();
-        });
-
-        return this.ExclusivePopup.prototype.draw.call(
-            this,
-            Html.div({},
-                     Widget.block([
-                         formPart,
-                         userList,
-                         buttons
-                     ])));
-    }
-
-},
-      function(title, process, searchGroups, conferenceId, onlyOne) {
-          var self = this;
-
-          this.searchGroups = exists(searchGroups)?searchGroups:false;
-          this.onlyOne = any(onlyOne, false);
-
-          this.criteria = new WatchObject();
-
-          if (conferenceId) {
-              this.criteria.set('conferenceId', conferenceId);
-          }
-
-          if (this.searchGroups) {
-              this.parametersWidget = new TabWidget(
-                  [
-                      ["Users", self._drawUsers()],
-                      ["Groups", self._drawGroups()]
-                  ], "100%", 150, 1);
-          } else {
-              this.parametersWidget = self._drawUsers();
-          }
-
-          this.parametersWidget.options = $L(["Users", "Groups"]);
-          this.processFunction = process;
-          this.ExclusivePopup(title, function(){return true;});
-      }
-     );
-*/
-
-/**
  * Creates a data creation / edit pop-up dialog.
  * @param {String} title The title of the popup.
  * @param {Object} userData A WatchObject that has to have the following keys/attributes:
@@ -1288,7 +1042,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
             var grantCoordination = [];
             var warning = [];
             if (this.grantSubmission) {
-                grantSubmission = [$T('Grant submission rights'), $B(Html.checkbox({}), userData.accessor('submission'))];
+                grantSubmission = [$T('Grant submission rights'), $B(Html.checkbox({id: 'submissionCheckbox'}), userData.accessor('submission'))];
                 warning = [Html.span({}, Html.span({style:{fontWeight:'bold'}}, $T('Note:')), $T(' If this person does not already have an Indico account, '), Html.br(),
                         $T('he or she will be sent an email asking to register as a user.'), Html.br(),
                         $T(' After the registration the user will automatically be given'), Html.br(),
@@ -1321,7 +1075,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('familyName'))],
                [$T('First Name'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('firstName'))],
                [$T('Affiliation'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('affiliation'))],
-               [$T('Email'),  $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'email', this.allowEmptyEmail), userData.accessor('email'))],
+               [$T('Email'),  $B(self.parameterManager.add(Html.edit({id: "email",  style: {width: '300px'}}), 'email', this.allowEmptyEmail), userData.accessor('email'))],
                [$T('Address'), $B(Html.textarea({style:{width:'300px'}}), userData.accessor('address'))],
                [$T('Telephone'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('phone'))],
                [$T('Fax'), $B(Html.edit({style: {width: '300px'}}), userData.accessor('fax'))],
@@ -1330,20 +1084,24 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
              return this.ExclusivePopupWithButtons.prototype.draw.call(this, form);
          },
 
-         _getButtons: function() {
-             var self = this;
-             return [
-                 [$T('Save'), function() {
-                     self.action(self.userData, function() {
-                         self.close();
-                     });
-                 }],
-                 [$T('Cancel'), function() {
-                     self.close();
-                 }]
-             ];
-         }
-
+        _getButtons: function() {
+            var self = this;
+            return [
+                [$T('Save'), function() {
+                    if ($('#submissionCheckbox').is(':checked') && $('#email').val() == 0) {
+                        var popup = new WarningPopup($T('Warning'), $T("It is not possible to grant submission rights to a participant without an email address. Please set an email address."));
+                        popup.open();
+                        return;
+                    }
+                    self.action(self.userData, function() {
+                    self.close();
+                    });
+                }],
+                [$T('Cancel'), function() {
+                    self.close();
+                }]
+            ];
+        }
      },
      function(title, userData, action, grantSubmission, grantManagement, grantCoordination, allowEmptyEmail) {
          this.userData = userData;
@@ -1402,6 +1160,104 @@ type("AuthorDataPopup", ["ExclusivePopupWithButtons"],
      }
     );
 
+$(function() {
+    // This widget creates a clickable icon-shield that opens a qtip with the different rights that
+    // can be granted to a user.
+    $.widget("users.shield",{
+
+        options: {
+            userData: null,
+
+            // rights
+            submission: true
+        },
+
+        _qtip: function(rights) {
+
+         // qtip content
+
+            var rightsTooltipText = $("<div></div>")
+                                        .append($("<span></span>").text($T("User privileges")).css('fontSize', '13px'))
+                                        .append($("<div></div>")
+                                                    .css('marginTop', '8px'));
+            $.each(rights, function(index, value) {
+                rightsTooltipText.append(value.checkbox)
+                                 .append($("<span></span>")
+                                         .text(value.text)
+                                         .css('verticalAlign', 'middle'));
+            });
+
+            this.element.qtip({
+                style: {
+                    classes: 'qtip-rounded qtip-shadow qtip-popup',
+                    tip: {
+                        corner: true,
+                        width: 15,
+                        height: 10
+                    }
+                },
+                position: {
+                    my: 'top middle',
+                    at: 'bottom middle'
+                },
+                content: {
+                    text: rightsTooltipText
+                },
+                show: {
+                    event: 'click',
+                    solo: true
+                },
+                hide: {
+                    event: 'unfocus'
+                }
+                });
+
+        },
+
+        _create: function() {
+
+            var self = this;
+
+            this.element
+                // add class and attrs
+                .addClass('icon-shield user_list_icon_shield')
+                .attr('ariaHidden', true)
+                .attr('alt', $T('User rights')).attr('title', $T('User rights'))
+                .attr('data-id', 'author_'+this.options.userData.get('email'))
+                //css
+                .css('color', this.options.userData.get('isSubmitter') ? '#cc4646' : '#aaa');
+
+            // Create privelege checkboxes and events
+            var privelegeCheckboxes = [];
+
+            if (this.options.submission) {
+                var submissionCheckbox = $("<input type='checkbox'>")
+                                            .prop('checked', !!this.options.userData.get('isSubmitter'))
+                                            .css('marginRight', '8px').css('verticalAlign', 'middle');
+
+                submissionCheckbox.click(function(){
+                    $('.icon-shield[data-id="author_'+self.options.userData.get('email')+'"]').trigger('participantProctChange', [{isSubmitter: submissionCheckbox.is(':checked')}]);
+                });
+
+                privelegeCheckboxes.push({'checkbox': submissionCheckbox, 'text': $T("Submission rights")});
+            }
+
+            // Listen to protection changes
+            this.element.on('participantProctChange', function(event, args){
+                if (self.options.submission && 'isSubmitter' in args) {
+                    self.element.css('color', args.isSubmitter ? '#cc4646' : '#aaa');
+                    self.options.userData.set('isSubmitter', args.isSubmitter);
+                    submissionCheckbox.prop('checked',args.isSubmitter);
+                }
+            });
+
+            this._qtip(privelegeCheckboxes);
+
+        }
+
+    });
+});
+
 
 /**
  * Creates a list of users. Each user can be edited or removed.
@@ -1409,6 +1265,7 @@ type("AuthorDataPopup", ["ExclusivePopupWithButtons"],
  * can be used on it. For example 'set' can be used to initialize the list.
  * This means that the users are stored with their id's as keys.
  * @param {String} style The class of the ul that will contain the users.
+ * @param {Boolean} allowSetRights. If true, each user will have an edit button to change their rights.
  * @param {Boolean} allowEdit. If true, each user will have an edit button to change their data.
  * @param {Function} editProcess. A function that will be called when a user is edited. The function will
  *                                be passed the new data as a WatchObject.
@@ -1416,12 +1273,12 @@ type("AuthorDataPopup", ["ExclusivePopupWithButtons"],
  */
 type("UserListWidget", ["ListWidget"],
      {
-         _drawItem: function(user) {
-             var self = this;
-             var userData = user.get();
+        _drawItem: function(user) {
+            var self = this;
+            var userData = user.get();
 
-             var editButton = Widget.link(command(function() {
-                 editPopup = new UserDataPopup(
+            var editButton = Widget.link(command(function() {
+                 var editPopup = new UserDataPopup(
                      'Change user data',
                      userData.clone(),
                      function(newData, suicideHook) {
@@ -1430,10 +1287,10 @@ type("UserListWidget", ["ListWidget"],
                              self.editProcess(userData, function(result) {
                                  if (result) {
                                      userData.update(newData.getAll());
-                                     if (!startsWith('' + userData.get('id'),
-                                                     'newUser')) {
+                                     if (!startsWith('' + userData.get('id'), 'newUser')) {
                                          userData.set('id', 'edited' + userData.get('id'));
                                      }
+                                     self.userListField.inform();
                                  }
                              });
                              suicideHook();
@@ -1441,59 +1298,60 @@ type("UserListWidget", ["ListWidget"],
                      }
                  );
                  editPopup.open();
-             }, IndicoUI.Buttons.editButton()));
+            }, IndicoUI.Buttons.editButton()));
 
-             var removeButton =
-                 Widget.link(command(function() {
+            var removeButton = Widget.link(command(function() {
                              // removeProcess will be passed a WatchObject representing the user.
                              self.removeProcess(userData, function(result) {
                                      if (result) {
                                          self.set(user.key, null);
+                                         self.userListField.inform();
                                      }
                                  });
+                             }, IndicoUI.Buttons.removeButton()));
 
-             }, IndicoUI.Buttons.removeButton()));
-
-             if (userData.get('isGroup') || userData.get('_fossil') === 'group') {
-
-                 var removeButtonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}}, removeButton);
-                 var groupName = $B(Html.span(), userData.accessor('name'));
-                 return Html.span({}, removeButtonDiv, Html.span({style:{fontWeight:'bold'}}, 'Group: '), groupName);
-
-             } else {
-
-                 var buttonDiv = Html.div({style: {cssFloat: "right", paddingRight: pixels(10), paddingTop: pixels(5)}});
-
-                 if (IndicoGlobalVars.isUserAuthenticated && exists(IndicoGlobalVars['userData']['favorite-user-ids']) && this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
-                     var favouritizeButton = new ToggleFavouriteButton(userData.getAll(), {}, IndicoGlobalVars['userData']['favorite-user-ids'][userData.get('id')]).draw();
-                     buttonDiv.append(favouritizeButton);
-                 }
-                 if (this.allowEdit) {
+            if (userData.get('isGroup') || userData.get('_fossil') === 'group') {
+                var removeButtonDiv = Html.div({style: {cssFloat: "right", clear: "both", paddingRight: pixels(10)}}, removeButton);
+                var groupName = $B(Html.span(), userData.accessor('name'));
+                return Html.span({}, removeButtonDiv, Html.span({style:{fontWeight:'bold'}}, 'Group: '), groupName);
+            } else {
+                var buttonDiv = Html.div({style: {cssFloat: "right", clear: "both", paddingRight: pixels(10)}});
+                if (IndicoGlobalVars.isUserAuthenticated && exists(IndicoGlobalVars['userData']['favorite-user-ids']) && this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
+                    var favouritizeButton = new ToggleFavouriteButton(userData.getAll(), {}, IndicoGlobalVars['userData']['favorite-user-ids'][userData.get('id')]).draw();
+                    buttonDiv.append(favouritizeButton);
+                }
+                if (this.allowSetRights) {
+                    buttonDiv.append($("<span></span>").shield({userData: userData}).get(0));
+                }
+                if (this.allowEdit) {
                     buttonDiv.append(editButton) ;
-                 }
-                 buttonDiv.append(removeButton);
+                }
+                buttonDiv.append(removeButton);
 
-                 var userName = Html.span({},
-                         $B(Html.span(), userData.accessor('familyName'), function(name){return name.toUpperCase();}),
-                         ', ',
-                         $B(Html.span(), userData.accessor('firstName')));
+                var userName = Html.span({},
+                        $B(Html.span(), userData.accessor('familyName'), function(name){return name.toUpperCase();}),
+                        ', ',
+                        $B(Html.span(), userData.accessor('firstName')));
 
-                 return Html.span({}, buttonDiv, userName);
-             }
+                return Html.span({}, buttonDiv, userName);
+            }
          }
      },
 
-     function(style, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons) {
+     function(style, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons, userListField) {
 
          this.style = any(style, "UIPeopleList");
+         this.allowSetRights = allowSetRights;
          this.allowEdit = allowEdit;
          this.editProcess = any(editProcess, singleUserNothing);
          this.removeProcess = any(removeProcess, singleUserNothing);
          this.showToggleFavouriteButtons = any(showToggleFavouriteButtons, true);
-
+         this.userListField = userListField;
          this.ListWidget(style);
      }
     );
+
+
 
 
 /**
@@ -1521,19 +1379,98 @@ type("UserListField", ["IWidget"], {
         this.userList.clearList();
     },
 
+    privilegesOn: function() {
+        return $('#grant-manager').prop("checked") || $('#presenter-grant-submission').prop("checked");
+    },
+
+    bothPrivilegesOn: function() {
+        return $('#grant-manager').prop("checked") && $('#presenter-grant-submission').prop("checked");
+    },
+
+    setUpParameters: function() {
+        /* set up basic components : div containers for message , a checkbox list ,
+           a list of messages and a warning counter.*/
+
+        this.warning_no_indico = ($T("Please note that you have added a user that does not exist in Indico.\
+                                    Non existing users will be asked via email to create an account so\
+                                    that they will be able to use the privileges below."));
+        this.warning_no_email = ($T("Please note that you have added a user without an email address. Users without \
+                                    email will not be able to use the privileges below."));
+        this.messageDiv = $("<div/>", {css: {height: '58px',
+                                            maxWidth: '420px',
+                                            textAlign: 'left',
+                                            width: 'auto',
+                                            overflow: 'auto',
+                                            marginLeft: '5px'
+                                        }}).addClass("warningMessage");
+        this.messageContainer = $("<div/>", {css: {display: 'inline-block', position: 'absolute'}});
+        this.containerDiv = $("<div/>");
+        this.warning_flag = false;
+    },
+
+    appendMessage: function(message) {
+        this.messageDiv.html(message);
+        this.messageContainer.append(this.messageDiv);
+        this.containerDiv.append(this.messageContainer);
+        this.warning_flag = true;
+    },
+
+    clearMessages: function() {
+        this.messageContainer.html('');
+        this.containerDiv.append(this.messageContainer);
+        this.warning_flag = false;
+    },
+
+    checkList: function(list) {
+        var self = this;
+        self.clearMessages();
+        each(list, function(val,key){
+            self.check(self.userList.get(key));
+        });
+    },
+
+    check: function(user) {
+        var self = this;
+
+        if(keys(this.privileges).length>0) {
+            if(this.privilegesOn()) {
+            if(!user.get('email')) {
+                this.appendMessage(this.warning_no_email);
+            }
+            else {
+                indicoRequest('search.users', {email:user.get('email')}, function(result, error) {
+                if (!error) {
+                    if (result.length == 0) {
+                        self.appendMessage(self.warning_no_indico);
+                    }
+                }});
+            }
+        }}
+    },
+
+    inform: function() {
+        if(keys(this.privileges).length>0) {
+            if(!this.userList.isEmpty()) {
+                this.checkList(this.userList.getAll());
+            }
+            else{
+                this.clearMessages();
+            }
+        }
+    },
+
     getPrivileges: function() {
         return this.selectedPrivileges;
     },
 
     draw: function() {
         var self = this;
-
         var select;
         var buttonDiv = Html.div({style:{marginTop: pixels(10)}});
 
         if (this.allowSearch || this.includeFavourites || exists(this.suggestedUsers)) {
 
-            var chooseUserButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add Indico User'+(this.enableGroups?" / Group":"")));
+            var chooseUserButton = Html.input("button", {style:{marginRight: pixels(5)}, className: 'i-button'}, $T('Add Indico User'+(this.enableGroups?" / Group":"")));
 
             var title = "";
             if (this.includeFavourites || exists(this.suggestedUsers)) {
@@ -1548,14 +1485,12 @@ type("UserListField", ["IWidget"], {
                 self.newProcess(peopleList, function(value) {
                     if (value) {
                         each(peopleList, function(person){
-
                             var key;
                             if (person.isGroup || person._fossil === 'group') {
                                 key = person.id;
                             } else {
                                 key = (person._type === "Avatar") ? "existingAv" + person.id : person.id;
                             }
-
                             if (person._type === "Avatar" && self.userList.get(key)) {
                                 // it is an existing avatar, unchanged, and already exists: we do nothing
                             } else {
@@ -1563,8 +1498,8 @@ type("UserListField", ["IWidget"], {
                                     self.userList.set(key, null);
                                 }
                                 self.userList.set(key, $O(person));
+                                $('.icon-shield[data-id="author_'+person.email+'"]').trigger('participantProctChange', [{isSubmitter: person.isSubmitter}]);
                             }
-
                             //self._highlightNewUser(id);
                         });
                     }
@@ -1573,7 +1508,7 @@ type("UserListField", ["IWidget"], {
 
             chooseUserButton.observeClick(function() {
                 var chooseUsersPopup = new ChooseUsersPopup(title, self.allowSearch, self.conferenceId, self.enableGroups,
-                        self.includeFavourites, self.suggestedUsers, false, self.showToggleFavouriteButtons, peopleAddedHandler);
+                        self.includeFavourites, self.suggestedUsers, false, self.showToggleFavouriteButtons, self.allowSetRights, peopleAddedHandler);
                 chooseUsersPopup.execute();
             });
 
@@ -1582,29 +1517,27 @@ type("UserListField", ["IWidget"], {
 
 
         if (this.allowNew) {
-
             var addNewUserButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add New') );
-
             addNewUserButton.observeClick(function(){
-
                 var newUserId = 'newUser' + self.newUserCounter++;
                 var newUser = $O({'id': newUserId});
-
-                newUserPopup = new UserDataPopup(
+                var newUserPopup = new UserDataPopup(
                     $T('New user'),
                     newUser,
                     function(newData, suicideHook) {
                         if (newUserPopup.parameterManager.check()) {
-                            newUser.update(newData.getAll());
+                            newUser.set('isSubmitter', newUser.get('submission'));
                             self.newProcess([newUser], function(result) {
                                 if (result) {
                                     self.userList.set(newUserId, newUser);
+                                    self.check(newUser);
                                     //self._highlightNewUser(newUserId);
+                                    $('.icon-shield[data-id="author_'+newUser.get('email')+'"]').trigger('participantProctChange', [{isSubmitter: newUser.get('isSubmitter') || false}]);
                                 }
                             });
                             suicideHook();
                         }
-                    }
+                    }, self.allowSetRights
                 );
                 newUserPopup.open();
             });
@@ -1612,10 +1545,10 @@ type("UserListField", ["IWidget"], {
         }
 
         // User privileges (submission privilege, etc.)
-        var privilegesDiv = Html.span({style:{marginTop: pixels(10)}});
+        var privilegesDiv = $("<span/>").css("marginTop", "10px");
         var keysList = keys(this.privileges);
         if (keysList.length>0) {
-            privilegesDiv.append(Html.span({},$T("Grant all these users with privileges: ")));
+            privilegesDiv.append($("<span/>").html($T("Grant all these users with privileges: ")));
         }
         var comma = ", ";
         for (var i=0; i<keysList.length; i++) {
@@ -1624,13 +1557,25 @@ type("UserListField", ["IWidget"], {
             }
             var key = keysList[i];
             var value = this.privileges[key];
-            var checkbox = Html.checkbox({style:{verticalAlign:"middle"}}, value[1]? value[1] : null);
-            checkbox.dom.name = key;
+            var checkbox = $('<input>', {type:"checkbox" , id: key, name:key}).change(function(){
+                if(!self.privilegesOn()){
+                    self.clearMessages();
+                    return;
+                }
+                else{
+                    if(!self.warning_flag) {
+                        self.inform();
+                    }
+                }
+            });
             $B(this.selectedPrivileges.accessor(key), checkbox);
-            privilegesDiv.append(Html.span({},checkbox, value[0] + comma));
+            privilegesDiv.append($("<span/>").append(checkbox).append(value[0] + comma));
         }
 
-        return Widget.block([Html.div(this.userDivStyle,this.userList.draw()), privilegesDiv, buttonDiv]);
+        var containsUserListDiv = $("<div/>").css("display", "inline-block");
+        containsUserListDiv.append($("<div/>").addClass(this.userDivStyle).html(this.userList.draw().dom));
+        this.containerDiv.append(containsUserListDiv);
+        return Widget.block([this.containerDiv.get(0), privilegesDiv.get(0), buttonDiv]);
 
     }
 },
@@ -1646,6 +1591,7 @@ type("UserListField", ["IWidget"], {
      * @param {string} conferenceId for author list search
      * @param {list} privileges dictionary with the privileges that we can set for the users. There is a key and a tuple as vale: (label, default value for checked). E.g. {"grant-manager": ["event modification", false]}
      * @param {Boolean} allowNew If True, a 'New User' button will be present.
+     * @param {Boolean} allowSetRights. If True, rights for each user will be able to be edited.
      * @param {Boolean} allowEdit If True, users in the list will be able to be edited.
      * @param {Boolean} showToggleFavouriteButtons. false by default. If true, favouritize buttons will not be shown.
      * @param {Function} newProcess A function that will be called when new users (from new data, or from the search dialog, or from the suggested list) is added to the list.
@@ -1655,15 +1601,14 @@ type("UserListField", ["IWidget"], {
     function(userDivStyle, userListStyle,
              initialUsers, includeFavourites, suggestedUsers,
              allowSearch, enableGroups, conferenceId, privileges,
-             allowNew, allowEdit, showToggleFavouriteButtons,
+             allowNew, allowSetRights, allowEdit, showToggleFavouriteButtons,
              newProcess, editProcess, removeProcess) {
 
         var self = this;
-
-        this.userList = new UserListWidget(userListStyle, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons);
-        this.newUserCounter = 0;
-
+        this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons,this);
+        self.newUserCounter = 0;
         this.userDivStyle = any(userDivStyle, "UIPeopleListDiv");
+        this.setUpParameters();
 
         if (exists(initialUsers)) {
             each(initialUsers, function(user){
@@ -1694,6 +1639,7 @@ type("UserListField", ["IWidget"], {
         this.conferenceId = any(conferenceId, null);
         this.privileges = any(privileges, {});
         this.selectedPrivileges = new WatchObject();
+        this.allowSetRights = allowSetRights;
 
         this.allowNew = any(allowNew, true);
         this.showToggleFavouriteButtons = any(showToggleFavouriteButtons, true);
@@ -1819,7 +1765,7 @@ type("ToggleFavouriteButton", ["InlineWidget"], {
                 IndicoGlobalVars.userFavouritesWatchValues[avatar.id] = $V(IndicoGlobalVars['favorite-user-ids'][avatar.id] === true);
             } else {
                 if (!exists(IndicoGlobalVars['favorite-user-ids']) && !exists(initialState)) {
-                    alert("Warning: ToggleFavouriteButton used without IndicoGlobalVars['favorite-user-ids'] variable and without initialState");
+                    new AlertPopup($T("Warning"), $T("ToggleFavouriteButton used without IndicoGlobalVars['favorite-user-ids'] variable and without initialState")).open();
                 }
                 initialState = any(initialState, false);
                 IndicoGlobalVars.userFavouritesWatchValues[avatar.id] = $V(initialState);

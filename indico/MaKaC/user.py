@@ -1,63 +1,54 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from collections import OrderedDict
+import operator
+from BTrees.OOBTree import OOTreeSet, union
 
+from persistent import Persistent
+from accessControl import AdminList, AccessWrapper
+import MaKaC
+from MaKaC.common import filters, indexes
+from MaKaC.common.cache import GenericCache
+from MaKaC.common.Locators import Locator
+from MaKaC.common.ObjectHolders import ObjectHolder
+from MaKaC.errors import UserError, MaKaCError
+from MaKaC.trashCan import TrashCanManager
+import MaKaC.common.info as info
+from MaKaC.i18n import _
+from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
+
+from indico.core.logger import Logger
 from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
                             IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
 from MaKaC.common.fossilize import Fossilizable, fossilizes
-from random import random
-from indico.util.i18n import i18nformat
 
-import ZODB
-from persistent import Persistent
-from accessControl import AdminList
-import MaKaC,os
-from MaKaC.common import filters, indexes, logger
-from MaKaC.common.Configuration import Config
-from MaKaC.common.Locators import Locator
-from MaKaC.common.ObjectHolders import ObjectHolder, IndexHolder
-from MaKaC.errors import UserError, MaKaCError
-from MaKaC.authentication.LocalAuthentication import LocalIdentity
-from MaKaC.trashCan import TrashCanManager
-from MaKaC.externUsers import ExtUserHolder
-from MaKaC.common.db import DBMgr
-import MaKaC.common.info as info
-from MaKaC.i18n import _
-from MaKaC.authentication.LDAPAuthentication import LDAPAuthenticator, ldapFindGroups, ldapUserInGroup
-
-from datetime import datetime, timedelta
-
-from MaKaC.common.PickleJar import Updates
-from MaKaC.common.logger import Logger
-
-#import ldap
 from pytz import all_timezones
-import httplib
-import urllib
-import base64
-from xml.dom.minidom import parseString
-from copy import deepcopy
-from MaKaC.plugins.base import PluginsHolder
 
-from indico.util.contextManager import ContextManager
-from indico.util.caching import order_dict
+from indico.util.caching import memoize_request
+from indico.util.decorators import cached_classproperty
+from indico.util.event import truncate_path
+from indico.util.user import retrieve_principals
+from indico.util.redis import write_client as redis_write_client
+from indico.util.redis import avatar_links, suggestions
+from indico.util.string import safe_upper, safe_slice
+from flask import request
 
 """Contains the classes that implement the user management subsystem
 """
@@ -77,30 +68,39 @@ class Group(Persistent, Fossilizable):
         self.members = []
         self.obsolete = False
 
-    def setId( self, newId ):
+    def __cmp__(self, other):
+        if type(self) is not type(other):
+            # This is actually dangerous and the ZODB manual says not to do this
+            # because it relies on memory order. However, this branch should never
+            # be taken anyway since we do not store different types in the same set
+            # or use them as keys.
+            return cmp(hash(self), hash(other))
+        return cmp(self.getId(), other.getId())
+
+    def setId(self, newId):
         self.id = str(newId)
 
-    def getId( self ):
+    def getId(self):
         return self.id
 
-    def setName( self, newName ):
+    def setName(self, newName):
         self.name = newName.strip()
-        GroupHolder().notifyGroupNameChange( self )
+        GroupHolder().notifyGroupNameChange(self)
 
-    def getName( self ):
+    def getName(self):
         return self.name
     getFullName = getName
 
-    def setDescription( self, newDesc ):
+    def setDescription(self, newDesc):
         self.description = newDesc.strip()
 
-    def getDescription( self ):
+    def getDescription(self):
         return self.description
 
-    def setEmail( self, newEmail ):
+    def setEmail(self, newEmail):
         self.email = newEmail.strip()
 
-    def getEmail( self ):
+    def getEmail(self):
         try:
             return self.email
         except:
@@ -115,202 +115,84 @@ class Group(Persistent, Fossilizable):
     def setObsolete(self, obsolete):
         self.obsolete = obsolete
 
-    def addMember( self, newMember ):
+    def _cleanGroupMembershipCache(self, avatar):
+        group_membership = GenericCache('groupmembership')
+        key = "{0}-{1}".format(self.getId(), avatar.getId())
+        group_membership.delete(key)
+
+    def addMember(self, newMember):
         if newMember == self:
-            raise MaKaCError( _("It is not possible to add a group as member of itself"))
+            raise MaKaCError(_("It is not possible to add a group as member of itself"))
         if self.containsMember(newMember) or newMember.containsMember(self):
             return
-        self.members.append( newMember )
+        self.members.append(newMember)
         if isinstance(newMember, Avatar):
             newMember.linkTo(self, "member")
         self._p_changed = 1
 
-    def removeMember( self, member ):
-        if member == None or member not in self.members:
+        # We need to clean the gooup membership cache
+        self._cleanGroupMembershipCache(newMember)
+
+    def removeMember(self, member):
+        if member is None or member not in self.members:
             return
-        self.members.remove( member )
+        self.members.remove(member)
         if isinstance(member, Avatar):
             member.unlinkTo(self, "member")
         self._p_changed = 1
 
-    def getMemberList( self ):
+        # We need to clean the gooup membership cache
+        self._cleanGroupMembershipCache(member)
+
+    def getMemberList(self):
         return self.members
 
-    def containsUser( self, avatar ):
+    def _containsUser(self, avatar):
         if avatar == None:
             return 0
         for member in self.members:
-            if member.containsUser( avatar ):
+            if member.containsUser(avatar):
                 return 1
         return 0
 
-    def containsMember( self, member ):
+    def containsUser(self, avatar):
+        group_membership = GenericCache('groupmembership')
+        if avatar is None:
+            return False
+        key = "{0}-{1}".format(self.getId(), avatar.getId())
+        user_in_group = group_membership.get(key)
+        if user_in_group is None:
+            user_in_group = self._containsUser(avatar)
+            group_membership.set(key, user_in_group, time=1800)
+        return user_in_group
+
+    def containsMember(self, member):
         if member == None:
             return 0
         if member in self.members:
             return 1
         for m in self.members:
             try:
-                if m.containsMember( member ):
+                if m.containsMember(member):
                     return 1
             except AttributeError, e:
                 continue
         return 0
 
-    def canModify( self, aw ):
-        return self.canUserModify( aw.getUser() )
+    def canModify(self, aw):
+        return self.canUserModify(aw.getUser())
 
-    def canUserModify( self, user ):
+    def canUserModify(self, user):
         return self.containsMember(user) or \
                                 (user in AdminList.getInstance().getList())
 
-    def getLocator( self ):
+    def getLocator(self):
         d = Locator()
         d["groupId"] = self.getId()
         return d
 
-class NiceGroup(Group):
-
-    groupType = "Nice"
-
-    def addMember( self, newMember ):
-        pass
-
-    def removeMember( self, member ):
-        pass
-
-    def getMemberList( self ):
-        return []
-
-    def containsUser( self, avatar ):
-        if avatar == None:
-            return False
-        ids = avatar.getIdentityList()
-        for id in ids:
-            if id.getAuthenticatorTag() == "Nice":
-                return True
-        return False
-
-    def containsMember( self, member ):
-        return 0
-
-class CERNGroup(Group):
-
-    groupType = "CERN"
-
-    def addMember( self, newMember ):
-        pass
-
-    def removeMember( self, member ):
-        pass
-
-    def getMemberList( self ):
-        params = urllib.urlencode( { 'ListName': self.name } )
-        cred = base64.encodestring("%s:%s"%(Config.getInstance().getNiceLogin(), Config.getInstance().getNicePassword()))[:-1]
-        headers = {}
-        headers["Content-type"] = "application/x-www-form-urlencoded"
-        headers["Accept"] = "text/plain"
-        headers["Authorization"] = "Basic %s"%cred
-        conn = httplib.HTTPSConnection( "winservices-soap.web.cern.ch" )
-        try:
-            conn.request( "POST", "/winservices-soap/generic/Authentication.asmx/GetListMembers", params, headers )
-        except Exception, e:
-            raise MaKaCError(  _("Sorry, due to a temporary unavailability of the NICE service, we are unable to authenticate you. Please try later or use your local Indico account if you have one."))
-        response = conn.getresponse()
-        #print response.status, response.reason
-        data = response.read()
-        #print data
-        conn.close()
-
-        try:
-            doc = parseString( data )
-        except:
-            if "Logon failure" in data:
-                return False
-            raise MaKaCError( _("Nice authentication problem: %s")% data )
-
-        elements = doc.getElementsByTagName( "string" )
-        emailList = []
-        for element in elements:
-            emailList.append( element.childNodes[0].nodeValue.encode( "utf-8" ) )
-
-        avatarLists = []
-        for email in emailList:
-            # First, try localy (fast)
-            lst = AvatarHolder().match( { 'email': email }, exact = 1, forceWithoutExtAuth = True )
-            if not lst:
-                # If not found, try with NICE web service (can found anyone)
-                lst = AvatarHolder().match( { 'email': email }, exact =1 )
-            avatarLists.append( lst )
-        return [ avList[0] for avList in avatarLists if avList ]
-
-    def containsUser( self, avatar ):
-
-        if avatar == None:
-            return False
-        try:
-            if avatar in self._v_memberCache.keys():
-                if self._v_memberCache[avatar] + timedelta(0,600) > datetime.now():
-                    return True
-                else:
-                    del self._v_memberCache[avatar]
-        except:
-            self._v_memberCache = {}
-            self._v_nonMemberCache = {}
-        if avatar in self._v_nonMemberCache:
-            if self._v_nonMemberCache[avatar] + timedelta(0,600) > datetime.now():
-                return False
-            else:
-                del self._v_nonMemberCache[avatar]
-        ids = avatar.getIdentityList()
-        for id in ids:
-            if id.getAuthenticatorTag() == "Nice":
-                if self._checkNice( id.getLogin(), avatar ):
-                    self._v_memberCache[avatar] = datetime.now()
-                    return True
-        #check also with all emails contained in account
-        for email in avatar.getEmails():
-            if self._checkNice( email, avatar ):
-                self._v_memberCache[avatar] = datetime.now()
-                return True
-        self._v_nonMemberCache[avatar] = datetime.now()
-        return False
-
-    def _checkNice( self, id, avatar ):
-        params = urllib.urlencode({'UserName': id, 'GroupName': self.name})
-        #headers = {"Content-type": "application/x-www-form-urlencoded", "Accept": "text/plain"}
-        cred = base64.encodestring("%s:%s"%(Config.getInstance().getNiceLogin(), Config.getInstance().getNicePassword()))[:-1]
-        headers = {}
-        headers["Content-type"] = "application/x-www-form-urlencoded"
-        headers["Accept"] = "text/plain"
-        headers["Authorization"] = "Basic %s"%cred
-        conn = httplib.HTTPSConnection("winservices-soap.web.cern.ch")
-        try:
-            conn.request("POST", "/winservices-soap/generic/Authentication.asmx/UserIsMemberOfGroup", params, headers)
-        except Exception, e:
-            raise MaKaCError( _("Sorry, due to a temporary unavailability of the NICE service, we are unable to authenticate you. Please try later or use your local Indico account if you have one."))
-        try:
-            response = conn.getresponse()
-        except Exception, e:
-            logger.Logger.get("NICE").info("Error getting response from winservices: %s\nusername: %s\ngroupname: %s"%(e, id, self.name))
-            raise
-        data = response.read()
-        conn.close()
-        try:
-            doc = parseString(data)
-        except:
-            if "Logon failure" in data:
-                return False
-            raise MaKaCError( _("Nice authentication problem: %s")%data)
-        if doc.getElementsByTagName("boolean"):
-            if doc.getElementsByTagName("boolean")[0].childNodes[0].nodeValue.encode("utf-8") == "true":
-                self._v_memberCache[avatar] = datetime.now()
-                return True
-        return False
-
-    def containsMember( self, member ):
-        return 0
-
+    def exists(self):
+        return True
 
 
 class _GroupFFName(filters.FilterField):
@@ -333,110 +215,63 @@ class _GroupFilterCriteria(filters.FilterCriteria):
         filters.FilterCriteria.__init__(self,None,criteria)
 
 
-class LDAPGroup(Group):
-    groupType = "LDAP"
-
-    def __str__(self):
-        return "<LDAPGroup id: %s name: %s desc: %s>" % (self.getId(),
-                                                         self.getName(),
-                                                         self.getDescription())
-
-    def addMember(self, newMember):
-        pass
-
-    def removeMember(self, member):
-        pass
-
-    def getMemberList(self):
-        uidList = ldapFindGroupMemberUids(self.getName())
-        avatarLists = []
-        for uid in uidList:
-            # First, try locally (fast)
-            lst = AvatarHolder().match({'login': uid }, exact=1,
-                                       forceWithoutExtAuth=True)
-            if not lst:
-                # If not found, try external
-                lst = AvatarHolder().match({'login': uid}, exact=1)
-            avatarLists.append(lst)
-        return [avList[0] for avList in avatarLists if avList]
-
-    def containsUser(self, avatar):
-
-        # used when checking acces to private events restricted for certain groups
-        if not avatar:
-            return False
-        login = None
-        for aid in avatar.getIdentityList():
-            if aid.getAuthenticatorTag() == 'LDAP':
-                login = aid.getLogin()
-        if not login:
-            return False
-        return ldapUserInGroup(login, self.getName())
-
-    def containsMember(self, avatar):
-        return 0
-
-
 class GroupHolder(ObjectHolder):
     """
     """
     idxName = "groups"
     counterName = "PRINCIPAL"
 
-    def add( self, group ):
-        ObjectHolder.add( self, group )
-        self.getIndex().indexGroup( group )
+    def add(self, group):
+        ObjectHolder.add(self, group)
+        self.getIndex().indexGroup(group)
 
-    def remove( self, group ):
-        ObjectHolder.remove( self, group )
-        self.getIndex().unindexGroup( group )
+    def remove(self, group):
+        ObjectHolder.remove(self, group)
+        self.getIndex().unindexGroup(group)
 
-    def notifyGroupNameChange( self, group ):
-        self.getIndex().unindexGroup( group )
-        self.getIndex().indexGroup( group )
+    def notifyGroupNameChange(self, group):
+        self.getIndex().unindexGroup(group)
+        self.getIndex().indexGroup(group)
 
-    def getIndex( self ):
+    def getIndex(self):
         index = indexes.IndexesHolder().getById("group")
         if index.getLength() == 0:
             self._reIndex(index)
         return index
 
-    def _reIndex( self, index ):
+    def _reIndex(self, index):
         for group in self.getList():
-            index.indexGroup( group )
+            index.indexGroup(group)
 
-    def getBrowseIndex( self ):
+    def getBrowseIndex(self):
         return self.getIndex().getBrowseIndex()
 
-    def getLength( self ):
+    def getLength(self):
         return self.getIndex().getLength()
 
-    def matchFirstLetter( self, letter, forceWithoutExtAuth=False ):
+    def matchFirstLetter(self, letter, searchInAuthenticators=True):
         result = []
         index = self.getIndex()
-        match = index.matchFirstLetter( letter )
+        if searchInAuthenticators:
+            self._updateGroupMatchFirstLetter(letter)
+        match = index.matchFirstLetter(letter)
         if match != None:
             for groupid in match:
                 if groupid != "":
                     if self.getById(groupid) not in result:
                         gr=self.getById(groupid)
                         result.append(gr)
-        if not forceWithoutExtAuth:
-            #TODO: check all authenticators
-            pass
         return result
 
-    def match(self,criteria,forceWithoutExtAuth=False, exact=False):
+    def match(self, criteria, searchInAuthenticators=True, exact=False):
         crit={}
         result = []
         for f,v in criteria.items():
             crit[f]=[v]
         if crit.has_key("groupname"):
             crit["name"] = crit["groupname"]
-        if "Nice" in Config.getInstance().getAuthenticatorList() and not forceWithoutExtAuth:
-            self.updateCERNGroupMatch(crit["name"][0],exact)
-        if "LDAP" in Config.getInstance().getAuthenticatorList() and not forceWithoutExtAuth:
-            self.updateLDAPGroupMatch(crit["name"][0],exact)
+        if searchInAuthenticators:
+            self._updateGroupMatch(crit["name"][0],exact)
         match = self.getIndex().matchGroup(crit["name"][0], exact=exact)
 
         if match != None:
@@ -446,50 +281,26 @@ class GroupHolder(ObjectHolder):
                     result.append(gr)
         return result
 
-    def updateLDAPGroupMatch(self, name, exact=False):
-        logger.Logger.get('GroupHolder').debug(
-            "updateLDAPGroupMatch(name=" + name + ")")
+    def update(self, group):
+        if self.hasKey(group.getId()):
+            current_group = self.getById(group.getId())
+            current_group.setDescription(group.getDescription())
 
-        for grDict in ldapFindGroups(name, exact):
-            grName = grDict['cn']
-            if not self.hasKey(grName):
-                gr = LDAPGroup()
-                gr.setId(grName)
-                gr.setName(grName)
-                gr.setDescription('LDAP group: ' + grDict['description'])
-                self.add(gr)
-                logger.Logger.get('GroupHolder').debug(
-                    "updateLDAPGroupMatch() added" + str(gr))
+    def _updateGroupMatch(self, name, exact=False):
+        for auth in AuthenticatorMgr().getList():
+            for group in auth.matchGroup(name, exact):
+                if not self.hasKey(group.getId()):
+                    self.add(group)
+                else:
+                    self.update(group)
 
-    def updateCERNGroupMatch(self, name, exact=False):
-        if not exact:
-            name = "*%s*" % name
-        params = urllib.urlencode({'pattern': name})
-        cred = base64.encodestring("%s:%s"%(Config.getInstance().getNiceLogin(), Config.getInstance().getNicePassword()))[:-1]
-        headers = {}
-        headers["Content-type"] = "application/x-www-form-urlencoded"
-        headers["Accept"] = "text/plain"
-        headers["Authorization"] = "Basic %s"%cred
-        try:
-            conn = httplib.HTTPSConnection("winservices-soap.web.cern.ch")
-            conn.request("POST", "/winservices-soap/generic/Authentication.asmx/SearchGroups", params, headers)
-            response = conn.getresponse()
-            data = response.read()
-            conn.close()
-        except Exception:
-            raise MaKaCError( _("Sorry, due to a temporary unavailability of the NICE service, we are unable to authenticate you. Please try later or use your local Indico account if you have one."))
-        doc = parseString(data)
-        for elem in doc.getElementsByTagName("string"):
-            name = elem.childNodes[0].nodeValue.encode("utf-8")
-            if not self.hasKey(name):
-                gr = CERNGroup()
-                gr.setId(name)
-                gr.setName(name)
-                gr.setDescription("Mapping of the Nice group %s<br><br>\n"
-                                  "Members list: https://websvc02.cern.ch/WinServices/Services/GroupManager/GroupManager.aspx" %
-                                  name)
-                self.add(gr)
-
+    def _updateGroupMatchFirstLetter(self, letter):
+        for auth in AuthenticatorMgr().getList():
+            for group in auth.matchGroupFirstLetter(letter):
+                if not self.hasKey(group.getId()):
+                    self.add(group)
+                else:
+                    self.update(group)
 
 
 class Avatar(Persistent, Fossilizable):
@@ -499,40 +310,39 @@ class Avatar(Persistent, Fossilizable):
     """
     fossilizes(IAvatarFossil, IAvatarAllDetailsFossil, IAvatarMinimalFossil)
 
-    linkedToBase = {"category":{"creator":[],
-                                "manager":[],
-                                "access":[]},
-                    "conference":{"creator":[],
-                                "chair":[],
-                                "participant":[],
-                                "manager":[],
-                                "access":[],
-                                "registrar":[],
-                                "abstractSubmitter":[],
-                                "paperReviewManager":[],
-                                "abstractManager":[],
-                                "referee":[],
-                                "editor":[],
-                                "reviewer":[],
-                                "abstractReviewer":[]},
-                    "session":{"manager":[],
-                                "access":[],
-                                "coordinator":[]},
-                    "contribution":{"manager":[],
-                                "submission":[],
-                                "access":[],
-                                "referee":[],
-                                "editor":[],
-                                "reviewer":[]},
-                    "track":{"coordinator":[]},
-                    "material":{"access":[]},
-                    "resource":{"access":[]},
-                    "abstract":{"submitter":[]},
-                    "registration":{"registrant":[]},
-                    "alarm":{"to":[]},
-                    "group":{"member":[]},
-                    "evaluation":{"submitter":[]}
-                    }
+    # When this class is defined MaKaC.conference etc. are not available yet
+    @cached_classproperty
+    @classmethod
+    def linkedToMap(cls):
+        import MaKaC.conference
+        import MaKaC.registration
+        import MaKaC.evaluation
+        # Hey, when adding new roles don't forget to handle them in AvatarHolder.mergeAvatar, too!
+        return {
+            'category': {'cls': MaKaC.conference.Category,
+                         'roles': set(['access', 'creator', 'favorite', 'manager'])},
+            'conference': {'cls': MaKaC.conference.Conference,
+                           'roles': set(['abstractSubmitter', 'access', 'chair', 'creator', 'editor', 'manager',
+                                         'paperReviewManager', 'participant', 'referee', 'registrar', 'reviewer'])},
+            'session': {'cls': MaKaC.conference.Session,
+                        'roles': set(['access', 'coordinator', 'manager'])},
+            'contribution': {'cls': MaKaC.conference.Contribution,
+                             'roles': set(['access', 'editor', 'manager', 'referee', 'reviewer', 'submission'])},
+            'track': {'cls': MaKaC.conference.Track,
+                      'roles': set(['coordinator'])},
+            'material': {'cls': MaKaC.conference.Material,
+                         'roles': set(['access'])},
+            'resource': {'cls': MaKaC.conference.Resource,
+                         'roles': set(['access'])},
+            'abstract': {'cls': MaKaC.review.Abstract,
+                         'roles': set(['submitter'])},
+            'registration': {'cls': MaKaC.registration.Registrant,
+                             'roles': set(['registrant'])},
+            'group': {'cls': MaKaC.user.Group,
+                      'roles': set(['member'])},
+            'evaluation': {'cls': MaKaC.evaluation.Submission,
+                           'roles': set(['submitter'])}
+        }
 
     def __init__(self, userData=None):
         """Class constructor.
@@ -552,6 +362,7 @@ class Avatar(Persistent, Fossilizable):
         self.address = [""]
         self.email = ""
         self.secondaryEmails = []
+        self.pendingSecondaryEmails = []
         self.telephone = [""]
         self.fax = [""]
         self.identities = []
@@ -578,90 +389,48 @@ class Avatar(Persistent, Fossilizable):
         #################################
 
         self.resetLinkedTo()
-        self.resetTimedLinkedEvents()
 
         self.personalInfo = PersonalInfo()
         self.unlockedFields = [] # fields that are not synchronized with auth backends
         self.authenticatorPersonalData = {} # personal data from authenticator
 
-        if userData != None:
-            if userData.has_key( "name" ):
-                self.setName( userData["name"] )
-            if userData.has_key( "surName" ):
-                self.setSurName( userData["surName"] )
-            if userData.has_key( "title" ):
-                self.setTitle( userData["title"] )
-            if userData.has_key( "organisation" ):
-                if len(userData["organisation"])>0:
-                    for org in userData["organisation"]:
-                        if not self.getOrganisation():
-                            self.setOrganisation( org )
-                        else:
-                            self.addOrganisation( org )
-            if userData.has_key( "address" ):
-                if len(userData["address"])>0:
-                    for addr in userData["address"]:
-                        self.addAddress( addr )
-            if userData.has_key( "email" ):
-                if type(userData["email"]) == str:
-                    self.setEmail(userData["email"])
-                elif len(userData["email"])>0:
-                    for em in userData["email"]:
-                        self.setEmail( em )
-            if userData.has_key( "telephone" ):
-                if len(userData["telephone"])>0:
-                    for tel in userData["telephone"]:
-                        self.addTelephone( tel )
-            if userData.has_key( "fax" ):
-                if len(userData["fax"])>0:
-                    for fax in userData["fax"]:
-                        self.addTelephone( fax )
+        if userData is not None:
+            if 'name' in userData:
+                self.setName(userData["name"])
+            if 'surName' in userData:
+                self.setSurName(userData["surName"])
+            if 'title' in userData:
+                self.setTitle(userData["title"])
+            if 'organisation' in userData:
+                self.setOrganisation(self._flatten(userData['organisation']))
+            if 'address' in userData:
+                self.setAddress(self._flatten(userData["address"]))
+            if 'email' in userData:
+                self.setEmail(self._flatten(userData["email"]))
+            if 'phone' in userData:
+                self.setTelephone(userData["phone"])
+            if 'fax' in userData:
+                self.setFax(userData["fax"])
 
             ############################
             #Fermi timezone awareness  #
             ############################
 
-            if userData.has_key("timezone"):
+            if 'timezone' in userData:
                 self.setTimezone(userData["timezone"])
             else:
                 self.setTimezone(info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
 
-            if userData.has_key("displayTZMode"):
-                self.setDisplayTZMode(userData["displayTZMode"])
-            else:
-                self.setDisplayTZMode("Event Timezone")
+            self.setDisplayTZMode(userData.get("displayTZMode", "Event Timezone"))
 
-            ################################
-            #Fermi timezone awareness(end) #
-            ################################
+    def _flatten(self, data):
+        if isinstance(data, (list, set, tuple)):
+            return data[0]
+        else:
+            return data
 
-##    def __getattribute__(self, attr):
-##        if object.__getattribute__(self, '_p_getattr')(attr):
-##            return Persistent.__getattribute__(self, attr)
-##
-##        #attributs that always get from this instance
-##        if attr in ["_mergeTo", "getId", "id", "mergeTo", "_mergeFrom", "isMerged", "getMergeTo", "mergeFrom", \
-##                    "unmergeFrom", "getMergeFromList"]:
-##            return Persistent.__getattribute__(self,attr)
-##
-##        #if _mergeTo, get attributs from the _mergeTo
-##        elif hasattr(self,"_mergeTo") and Persistent.__getattribute__(self,"_mergeTo") != None:
-##            return Persistent.__getattribute__(self,"_mergeTo").__getattribute__(attr)
-##        else:
-##            return Persistent.__getattribute__(self,attr)
-##
-##    def __setattr__(self, attr, value):
-##        if self._p_setattr(attr, value):
-##            return Persistent.__setattr__(self, attr, value)
-##
-##        #attribute always set in this instance
-##        if attr in ["_mergeTo", "id", "_mergeFrom"]:
-##            Persistent.__setattr__(self, attr, value)
-##
-##        elif hasattr(self,"_mergeTo") and Persistent.__getattribute__(self,"_mergeTo") != None:
-##            Persistent.__getattribute__(self,"_mergeTo").__setattr__(attr, value)
-##        else:
-##            Persistent.__setattr__(self, attr, value)
+    def __repr__(self):
+        return '<Avatar({0}, {1})>'.format(self.getId(), self.getFullName())
 
     def mergeTo(self, av):
         if av:
@@ -699,7 +468,7 @@ class Avatar(Persistent, Fossilizable):
             self._mergeFrom = []
         return self._mergeFrom
 
-    def getKey( self ):
+    def getKey(self):
         return self.key
 
     def getAPIKey(self):
@@ -712,270 +481,136 @@ class Avatar(Persistent, Fossilizable):
     def setAPIKey(self, apiKey):
         self.apiKey = apiKey
 
+    def getRelatedCategories(self):
+        favorites = self.getLinkTo('category', 'favorite')
+        managed = self.getLinkTo('category', 'manager')
+        res = {}
+        for categ in union(favorites, managed):
+            res[(categ.getTitle(), categ.getId())] = {
+                'categ': categ,
+                'favorite': categ in favorites,
+                'managed': categ in managed,
+                'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
+            }
+        return OrderedDict(sorted(res.items(), key=operator.itemgetter(0)))
+
+    def getSuggestedCategories(self):
+        if not redis_write_client:
+            return []
+        related = union(self.getLinkTo('category', 'favorite'), self.getLinkTo('category', 'manager'))
+        res = []
+        for id, score in suggestions.get_suggestions(self, 'category').iteritems():
+            try:
+                categ = MaKaC.conference.CategoryManager().getById(id)
+            except KeyError:
+                suggestions.unsuggest(self, 'category', id)
+                continue
+            if not categ or categ.isSuggestionsDisabled() or categ in related:
+                continue
+            if any(p.isSuggestionsDisabled() for p in categ.iterParents()):
+                continue
+            aw = AccessWrapper()
+            aw.setUser(self)
+            if request:
+                aw.setIP(request.remote_addr)
+            if not categ.canAccess(aw):
+                continue
+            res.append({
+                'score': score,
+                'categ': categ,
+                'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
+            })
+        return res
+
     def resetLinkedTo(self):
-        self.linkedTo = deepcopy(self.linkedToBase)
+        self.linkedTo = {}
+        self.updateLinkedTo()
         self._p_changed = 1
 
     def getLinkedTo(self):
         try:
             return self.linkedTo
-        except:
+        except AttributeError:
             self.resetLinkedTo()
             return self.linkedTo
 
-    def getTimedLinkedEvents(self):
-        try:
-            return self.timedLinkedEvents
-        except:
-            self.resetTimedLinkedEvents()
-            return self.timedLinkedEvents
-
-    def resetTimedLinkedEvents(self):
-
-        ltt = self.getLinkedTo()
-
-        self.timedLinkedEvents = TimedLinkedEvents()
-
-        for registrantRole in ltt['registration']:
-            for registrant in ltt['registration'][registrantRole]:
-                self.timedLinkedEvents.addFuture(registrant.getConference(),registrantRole)
-
-        for confRole in ltt['conference']:
-            for conf in ltt['conference'][confRole]:
-                self.timedLinkedEvents.addFuture(conf,confRole)
-
-
     def updateLinkedTo(self):
-        self.getLinkedTo() #Create attribute if not exist
-        for type in self.linkedToBase.keys():
-            if type not in self.linkedTo.keys():
-                self.linkedTo[type] = {}
-            for role in self.linkedToBase[type].keys():
-                if role not in self.linkedTo[type].keys():
-                    self.linkedTo[type][role] = []
+        self.getLinkedTo()  # Create attribute if does not exist
+        for field, data in self.linkedToMap.iteritems():
+            self.linkedTo.setdefault(field, {})
+            for role in data['roles']:
+                self.linkedTo[field].setdefault(role, OOTreeSet())
 
     def linkTo(self, obj, role):
+        # to avoid issues with zombie avatars
+        if not AvatarHolder().hasKey(self.getId()):
+            return
         self.updateLinkedTo()
-        if isinstance(obj, MaKaC.conference.Category):
-            if not role in self.linkedTo["category"].keys():
-                    raise  _("""role "%s" not allowed for categories""")%role
-            else:
-                if not obj in self.linkedTo["category"][role]:
-                    self.linkedTo["category"][role].append(obj)
-                    self._p_changed = 1
+        for field, data in self.linkedToMap.iteritems():
+            if isinstance(obj, data['cls']):
+                if role not in data['roles']:
+                    raise ValueError('role %s is not allowed for %s objects' % (role, type(obj).__name__))
+                self.linkedTo[field][role].add(obj)
+                self._p_changed = 1
+                if redis_write_client:
+                    event = avatar_links.event_from_obj(obj)
+                    if event:
+                        avatar_links.add_link(self, event, field + '_' + role)
+                break
 
-        elif isinstance(obj, MaKaC.conference.Conference):
-            if not role in self.linkedTo["conference"].keys():
-                    raise  _("""role "%s" not allowed for conferences""")%role
-            else:
-                if not obj in self.linkedTo["conference"][role]:
-                    self.linkedTo["conference"][role].append(obj)
-
-                    # add directly to the time-ordered list
-                    self.getTimedLinkedEvents().addFuture(obj, role)
-
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Session):
-            if not role in self.linkedTo["session"].keys():
-                    raise  _("""role "%s" not allowed for sessions""")%role
-            else:
-                if not obj in self.linkedTo["session"][role]:
-                    self.linkedTo["session"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Contribution):
-            if not role in self.linkedTo["contribution"].keys():
-                    raise  _("""role "%s" not allowed for contributions""")%role
-            else:
-                if not obj in self.linkedTo["contribution"][role]:
-                    self.linkedTo["contribution"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Track):
-            if not role in self.linkedTo["track"].keys():
-                    raise  _("""role "%s" not allowed for tracks""")%role
-            else:
-                if not obj in self.linkedTo["track"][role]:
-                    self.linkedTo["track"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Material):
-            if not role in self.linkedTo["material"].keys():
-                    raise  _("""role "%s" not allowed for materials""")%role
-            else:
-                if not obj in self.linkedTo["material"][role]:
-                    self.linkedTo["material"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Resource):
-            if not role in self.linkedTo["resource"].keys():
-                    raise  _("""role "%s" not allowed for resources""")%role
-            else:
-                if not obj in self.linkedTo["resource"][role]:
-                    self.linkedTo["resource"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.review.Abstract):
-            if not role in self.linkedTo["abstract"].keys():
-                    raise  _("""role "%s" not allowed for abstracts""")%role
-            else:
-                if not obj in self.linkedTo["abstract"][role]:
-                    self.linkedTo["abstract"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.registration.Registrant):
-            if not role in self.linkedTo["registration"].keys():
-                    raise  _("""role "%s" not allowed for registrants""")%role
-            else:
-                if not obj in self.linkedTo["registration"][role]:
-                    self.linkedTo["registration"][role].append(obj)
-
-                     # add directly to the time-ordered list
-                    self.getTimedLinkedEvents().addFuture(obj.getConference(), role)
-
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.user.Group):
-            if not role in self.linkedTo["group"].keys():
-                    raise  _("""role "%s" not allowed for groups""")%role
-            else:
-                if not obj in self.linkedTo["group"][role]:
-                    self.linkedTo["group"][role].append(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.evaluation.Submission):
-            if not role in self.linkedTo["evaluation"].keys():
-                    raise  _("""role "%s" not allowed for submissions""")%role
-            else:
-                if not obj in self.linkedTo["evaluation"][role]:
-                    self.linkedTo["evaluation"][role].append(obj)
-                    self._p_changed = 1
-
-    def getLinkTo( self, type, role ):
+    def getLinkTo(self, field, role):
         self.updateLinkedTo()
-        if self.linkedTo.has_key(type):
-            if self.linkedTo[type].has_key(role):
-                return self.linkedTo[type][role]
-        return []
+        return self.linkedTo[field][role]
 
     def unlinkTo(self, obj, role):
+        # to avoid issues with zombie avatars
+        if not AvatarHolder().hasKey(self.getId()):
+            return
         self.updateLinkedTo()
-        if isinstance(obj, MaKaC.conference.Category):
-            if not role in self.linkedTo["category"].keys():
-                    raise  _("""role "%s" not allowed for categories""")%role
-            else:
-                if obj in self.linkedTo["category"][role]:
-                    self.linkedTo["category"][role].remove(obj)
+        for field, data in self.linkedToMap.iteritems():
+            if isinstance(obj, data['cls']):
+                if role not in data['roles']:
+                    raise ValueError('role %s is not allowed for %s objects' % (role, type(obj).__name__))
+                if obj in self.linkedTo[field][role]:
+                    self.linkedTo[field][role].remove(obj)
                     self._p_changed = 1
+                    if redis_write_client:
+                        event = avatar_links.event_from_obj(obj)
+                        if event:
+                            avatar_links.del_link(self, event, field + '_' + role)
+                break
 
-        elif isinstance(obj, MaKaC.conference.Conference):
-            if not role in self.linkedTo["conference"].keys():
-                    raise  _("""role "%s" not allowed for conferences""")%role
-            else:
-                if obj in self.linkedTo["conference"][role]:
-                    self.linkedTo["conference"][role].remove(obj)
-
-                    # remove from the time-ordered list
-                    self.getTimedLinkedEvents().delete(obj, role)
-
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Session):
-            if not role in self.linkedTo["session"].keys():
-                    raise  _("""role "%s" not allowed for sessions""")%role
-            else:
-                if obj in self.linkedTo["session"][role]:
-                    self.linkedTo["session"][role].remove(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Contribution):
-            if not role in self.linkedTo["contribution"].keys():
-                    raise  _("""role "%s" not allowed for contributions""")%role
-            else:
-                if obj in self.linkedTo["contribution"][role]:
-                    self.linkedTo["contribution"][role].remove(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Track):
-            if not role in self.linkedTo["track"].keys():
-                    raise  _("""role "%s" not allowed for tracks""")%role
-            else:
-                if obj in self.linkedTo["track"][role]:
-                    self.linkedTo["track"][role].remove(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.conference.Material):
-            if not role in self.linkedTo["material"].keys():
-                    raise  _("""role "%s" not allowed for materials""")%role
-            else:
-                if obj in self.linkedTo["material"][role]:
-                    self.linkedTo["material"][role].remove(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.review.Abstract):
-            if not role in self.linkedTo["abstract"].keys():
-                    raise  _("""role "%s" not allowed for abstracts""")%role
-            else:
-                if obj in self.linkedTo["abstract"][role]:
-                    self.linkedTo["abstract"][role].remove(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.registration.Registrant):
-            if not role in self.linkedTo["registration"].keys():
-                    raise  _("""role "%s" not allowed for registrations""")%role
-            else:
-                if obj in self.linkedTo["registration"][role]:
-                    self.linkedTo["registration"][role].remove(obj)
-
-                    # remove from the time-ordered list
-                    self.getTimedLinkedEvents().delete(obj.getConference(), role)
-
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.user.Group):
-            if not role in self.linkedTo["group"].keys():
-                    raise  _("""role "%s" not allowed for groups""")%role
-            else:
-                if obj in self.linkedTo["group"][role]:
-                    self.linkedTo["group"][role].remove(obj)
-                    self._p_changed = 1
-
-        elif isinstance(obj, MaKaC.evaluation.Submission):
-            if not role in self.linkedTo["evaluation"].keys():
-                    raise  _("""role "%s" not allowed for submissions""")%role
-            else:
-                if obj in self.linkedTo["evaluation"][role]:
-                    self.linkedTo["evaluation"][role].remove(obj)
-                    self._p_changed = 1
-
-    def getStatus( self ):
+    def getStatus(self):
         try:
             return self.status
         except AttributeError:
             self.status = "activated"
             return self.status
 
-    def setStatus( self, status ):
+    def setStatus(self, status):
         statIdx = indexes.IndexesHolder().getById("status")
-        statIdx.unindexUser( self )
+        statIdx.unindexUser(self)
         self.status = status
         self._p_changed = 1
-        statIdx.indexUser( self )
+        statIdx.indexUser(self)
 
-    def activateAccount( self ):
+    def activateAccount(self, checkPending=True):
         self.setStatus("activated")
+        if checkPending:
+            #----Grant rights if any
+            from MaKaC.common import pendingQueues
+            pendingQueues.PendingQueuesHolder().grantRights(self)
 
-    def disabledAccount( self ):
+    def disabledAccount(self):
         self.setStatus("disabled")
 
-    def isActivated( self ):
+    def isActivated(self):
         return self.status == "activated"
 
-    def isDisabled( self ):
+    def isDisabled(self):
         return self.status == "disabled"
 
-    def isNotConfirmed( self ):
+    def isNotConfirmed(self):
         return self.status == "Not confirmed"
 
     def setId(self, id):
@@ -1023,30 +658,29 @@ class Avatar(Persistent, Fossilizable):
 
     def getFullName(self):
         surName = ""
-        if self.getSurName() != "":
-            # accented letter capitalization requires all these encodes/decodes
-            surName = "%s, " % self.getSurName().decode('utf-8').upper().encode('utf-8')
-        return "%s%s"%(surName, self.getName())
+        if self.getSurName():
+            surName = "%s, " % safe_upper(self.getSurName())
+        return "%s%s" % (surName, self.getName())
 
-    def getStraightFullName(self):
-        name = ""
-        if self.getName() != "":
-            name = "%s "%self.getName()
-        return "%s%s"%(name, self.getSurName())
+    def getStraightFullName(self, upper=True):
+        lastName = safe_upper(self.getFamilyName()) if upper else self.getFamilyName()
+        return "{0} {1}".format(self.getFirstName(), lastName).strip()
+
+    getDirectFullNameNoTitle = getStraightFullName
 
     def getAbrName(self):
         res = self.getSurName()
-        if self.getName() != "":
-            if res != "":
-                res = "%s, "%res
-            res = "%s%s."%(res, self.getName()[0].upper())
+        if self.getName():
+            if res:
+                res = "%s, " % res
+            res = "%s%s." % (res, safe_upper(safe_slice(self.getName(), 0, 1)))
         return res
 
     def getStraightAbrName(self):
         name = ""
-        if self.getName() != "":
-            name = "%s. "%self.getName()[0].upper()
-        return "%s%s"%(name, self.getSurName())
+        if self.getName():
+            name = "%s. " % safe_upper(safe_slice(self.getName(), 0, 1))
+        return "%s%s" % (name, self.getSurName())
 
     def addOrganisation(self, newOrg, reindex=False):
         if reindex:
@@ -1073,7 +707,7 @@ class Avatar(Persistent, Fossilizable):
     def getOrganisations(self):
         return self.organisation
 
-    def getOrganisation( self ):
+    def getOrganisation(self):
         return self.organisation[0]
 
     getAffiliation = getOrganisation
@@ -1081,7 +715,7 @@ class Avatar(Persistent, Fossilizable):
     def setTitle(self, title):
         self.title = title
 
-    def getTitle( self ):
+    def getTitle(self):
         return self.title
 
     #################################
@@ -1122,7 +756,7 @@ class Avatar(Persistent, Fossilizable):
     def getAddresses(self):
         return self.address
 
-    def getAddress( self ):
+    def getAddress(self):
         return self.address[0]
 
     def setAddress(self, address, item=0):
@@ -1138,10 +772,10 @@ class Avatar(Persistent, Fossilizable):
         else:
             self.email = email.strip().lower()
 
-    def getEmails( self ):
+    def getEmails(self):
         return [self.email] + self.getSecondaryEmails()
 
-    def getEmail( self ):
+    def getEmail(self):
         return self.email
 
     def getSecondaryEmails(self):
@@ -1152,36 +786,65 @@ class Avatar(Persistent, Fossilizable):
             return self.secondaryEmails
 
     def addSecondaryEmail(self, email):
-        self.getSecondaryEmails() #create attribute if not exist
-
-        if not email in self.secondaryEmails:
+        email = email.strip().lower()
+        if not email in self.getSecondaryEmails():
             self.secondaryEmails.append(email)
             self._p_changed = 1
 
     def removeSecondaryEmail(self, email):
-        self.getSecondaryEmails() #create attribute if not exist
-
-        if email in self.secondaryEmails:
+        email = email.strip().lower()
+        if email in self.getSecondaryEmails():
             self.secondaryEmails.remove(email)
             self._p_changed = 1
 
-    def setSecondaryEmails(self, emailList):
-        self.secondaryEmails = emailList
+    def setSecondaryEmails(self, emailList, reindex=False):
+        emailList = map(lambda email: email.lower().strip(), emailList)
+        if reindex:
+            idx = indexes.IndexesHolder().getById('email')
+            idx.unindexUser(self)
+            self.secondaryEmails = emailList
+            idx.indexUser(self)
+        else:
+            self.secondaryEmails = emailList
 
     def hasEmail(self, email):
-        l=[self.email] + self.getSecondaryEmails()
+        l = [self.email] + self.getSecondaryEmails()
         return email.lower().strip() in l
 
+    def hasSecondaryEmail(self, email):
+        return email.lower().strip() in self.getSecondaryEmails()
 
-    def addTelephone(self, newTel ):
-        self.telephone.append( newTel )
+    def getPendingSecondaryEmails(self):
+        try:
+            return self.pendingSecondaryEmails
+        except:
+            self.pendingSecondaryEmails = []
+            return self.pendingSecondaryEmails
+
+    def addPendingSecondaryEmail(self, email):
+        email = email.lower().strip()
+        if not email in self.getPendingSecondaryEmails():  # create attribute if not exist
+            self.pendingSecondaryEmails.append(email)
+            self._p_changed = 1
+
+    def removePendingSecondaryEmail(self, email):
+        email = email.lower().strip()
+        if email in self.getPendingSecondaryEmails():  # create attribute if not exist
+            self.pendingSecondaryEmails.remove(email)
+            self._p_changed = 1
+
+    def setPendingSecondaryEmails(self, emailList):
+        self.pendingSecondaryEmails = emailList
+
+    def addTelephone(self, newTel):
+        self.telephone.append(newTel)
         self._p_changed = 1
 
-    def getTelephone( self ):
+    def getTelephone(self):
         return self.telephone[0]
     getPhone = getTelephone
 
-    def setTelephone(self, tel, item=0 ):
+    def setTelephone(self, tel, item=0):
         self.telephone[item] = tel
         self._p_changed = 1
     setPhone = setTelephone
@@ -1192,11 +855,11 @@ class Avatar(Persistent, Fossilizable):
     def getSecondaryTelephones(self):
         return self.telephone[1:]
 
-    def addFax(self, newFax ):
-        self.fax.append( newFax )
+    def addFax(self, newFax):
+        self.fax.append(newFax)
         self._p_changed = 1
 
-    def setFax(self, fax, item=0 ):
+    def setFax(self, fax, item=0):
         self.fax[item] = fax
         self._p_changed = 1
 
@@ -1212,7 +875,7 @@ class Avatar(Persistent, Fossilizable):
             :type newId: PIdentity
         """
         if newId != None and (newId not in self.identities):
-            self.identities.append( newId )
+            self.identities.append(newId)
             self._p_changed = 1
 
     def removeIdentity(self, Id):
@@ -1224,20 +887,29 @@ class Avatar(Persistent, Fossilizable):
             self.identities.remove(Id)
             self._p_changed = 1
 
-    def getIdentityList( self ):
+    def getIdentityList(self, create_identities=False):
         """ Returns a list of identities for this Avatar.
             Each identity will be a PIdentity or inheriting object
         """
+        if create_identities:
+            for authenticator in AuthenticatorMgr().getList():
+                identities = self.getIdentityByAuthenticatorId(authenticator.getId())
+                for identity in identities:
+                    self.addIdentity(identity)
         return self.identities
 
-    def getIdentityByAuthenticatorName(self, authenticatorName):
+    def getIdentityByAuthenticatorId(self, authenticatorId):
         """ Return a list of PIdentity objects given an authenticator name
-            :param authenticatorName: the name of an authenticator, e.g. 'Local', 'Nice', etc
-            :type authenticatorName: str
+            :param authenticatorId: the id of an authenticator, e.g. 'Local', 'LDAP', etc
+            :type authenticatorId: str
         """
         result = []
         for identity in self.identities:
-            if identity.getAuthenticatorTag() == authenticatorName:
+            if identity.getAuthenticatorTag() == authenticatorId:
+                result.append(identity)
+        if not result:
+            identity = AuthenticatorMgr().getById(authenticatorId).fetchIdentity(self)
+            if identity:
                 result.append(identity)
         return result
 
@@ -1246,7 +918,7 @@ class Avatar(Persistent, Fossilizable):
         """ Returns a PIdentity object given an authenticator name and the identity's login
             :param id: the login string for this identity
             :type id: str
-            :param tag: the name of an authenticator, e.g. 'Local', 'Nice', etc
+            :param tag: the name of an authenticator, e.g. 'Local', 'LDAP', etc
             :type tag: str
         """
 
@@ -1269,10 +941,10 @@ class Avatar(Persistent, Fossilizable):
             del self.getRegistrants()[r.getConference().getId()]
             self._p_changed = 1
 
-    def getRegistrantList( self ):
+    def getRegistrantList(self):
         return self.getRegistrants().values()
 
-    def getRegistrants( self ):
+    def getRegistrants(self):
         try:
             if self.registrants:
                 pass
@@ -1289,6 +961,12 @@ class Avatar(Persistent, Fossilizable):
     def isRegisteredInConf(self, conf):
         if conf.getId() in self.getRegistrants().keys():
             return True
+        for email in self.getEmails():
+            registrant = conf.getRegistrantsByEmail(email)
+            if registrant:
+                self.addRegistrant(registrant)
+                registrant.setAvatar(self)
+                return True
         return False
 
     def hasSubmittedEvaluation(self, evaluation):
@@ -1297,17 +975,17 @@ class Avatar(Persistent, Fossilizable):
                 return True
         return False
 
-    def containsUser( self, avatar ):
+    def containsUser(self, avatar):
         return avatar == self
     containsMember = containsUser
 
-    def canModify( self, aw ):
-        return self.canUserModify( aw.getUser() )
+    def canModify(self, aw):
+        return self.canUserModify(aw.getUser())
 
-    def canUserModify( self, user ):
+    def canUserModify(self, user):
         return user == self or (user in AdminList.getInstance().getList())
 
-    def getLocator( self ):
+    def getLocator(self):
         d = Locator()
         d["userId"] = self.getId()
         return d
@@ -1320,111 +998,66 @@ class Avatar(Persistent, Fossilizable):
 
     # Room booking related
 
-    def isMemberOfSimbaList( self, simbaListName ):
-
+    def is_member_of_group(self, group_name):
         # Try to get the result from the cache
         try:
-            if simbaListName in self._v_isMember.keys():
-                return self._v_isMember[simbaListName]
-        except:
+            if group_name in self._v_isMember.keys():
+                return self._v_isMember[group_name]
+        except Exception:
             self._v_isMember = {}
 
         groups = []
         try:
             # try to get the exact match first, which is what we expect since
             # there shouldn't be uppercase letters
-            groups.append(GroupHolder().getById(simbaListName))
+            groups.append(GroupHolder().getById(group_name))
         except KeyError:
-            groups = GroupHolder().match( { 'name': simbaListName }, forceWithoutExtAuth = True, exact=True)
+            groups = GroupHolder().match({'name': group_name}, searchInAuthenticators=False, exact=True)
             if not groups:
-                groups = GroupHolder().match( { 'name': simbaListName }, exact=True)
+                groups = GroupHolder().match({'name': group_name}, exact=True)
 
         if groups:
-            result = groups[0].containsUser( self )
-            self._v_isMember[simbaListName] = result
+            result = groups[0].containsUser(self)
+            self._v_isMember[group_name] = result
             return result
-        self._v_isMember[simbaListName] = False
+        self._v_isMember[group_name] = False
         return False
 
-    def isAdmin( self ):
+    def isAdmin(self):
         """
         Convenience method for checking whether this user is an admin.
         Returns bool.
         """
         al = AdminList.getInstance()
-        if al.isAdmin( self ):
+        if al.isAdmin(self):
             return True
         return False
 
+    @memoize_request
     def isRBAdmin(self):
         """
         Convenience method for checking whether this user is an admin for the RB module.
         Returns bool.
         """
+        from indico.modules.rb import settings
+
         if self.isAdmin():
             return True
-        for entity in PluginsHolder().getPluginType('RoomBooking').getOption('Managers').getValue():
-            if (isinstance(entity, Group) and entity.containsUser(self)) or \
-                (isinstance(entity, Avatar) and entity == self):
-                return True
-        return False
+        principals = retrieve_principals(settings.get('admin_principals'))
+        return any(principal.containsUser(self) for principal in principals)
 
-    def getRooms( self ):
-        """
-        Returns list of rooms (RoomBase derived objects) this
-        user is responsible for.
-        """
-        from MaKaC.plugins.RoomBooking.default.room import Room
-        from MaKaC.rb_location import RoomGUID
+    @property
+    @memoize_request
+    def has_rooms(self):
+        """Checks if the user has any rooms"""
+        from indico.modules.rb.models.rooms import Room  # avoid circular import
+        return Room.user_owns_rooms(self)
 
-        rooms = Room.getUserRooms(self)
-
-        roomList = [ RoomGUID.parse( str(rg) ).getRoom() for rg in rooms ] if rooms else []
-        return [room for room in roomList if room.isActive]
-
-    def getReservations(self):
-        """
-        Returns list of ALL reservations (ReservationBase
-        derived objects) this user has ever made.
-        """
-#        self._ensureRoomAndResv()
-#        resvs = [guid.getReservation() for guid in self.resvGuids]
-#        return resvs
-
-        from MaKaC.rb_location import CrossLocationQueries
-        from MaKaC.rb_reservation import ReservationBase
-
-        resvEx = ReservationBase()
-        resvEx.createdBy = str( self.id )
-        resvEx.isCancelled = None
-        resvEx.isRejected = None
-        resvEx.isArchival = None
-
-        myResvs = CrossLocationQueries.getReservations( resvExample = resvEx )
-        return myResvs
-
-    def getReservationsOfMyRooms( self ):
-        """
-        Returns list of ALL reservations (ReservationBase
-        derived objects) this user has ever made.
-        """
-#        self._ensureRoomAndResv()
-#        resvs = [guid.getReservation() for guid in self.resvGuids]
-#        return resvs
-
-        from MaKaC.rb_location import CrossLocationQueries
-        from MaKaC.rb_reservation import ReservationBase
-
-        myRooms = self.getRooms() # Just to speed up
-
-        resvEx = ReservationBase()
-        resvEx.isCancelled = None
-        resvEx.isRejected = None
-        resvEx.isArchival = None
-
-        myResvs = CrossLocationQueries.getReservations( resvExample = resvEx, rooms = myRooms )
-        return myResvs
-
+    @memoize_request
+    def get_rooms(self):
+        """Returns the rooms this user is responsible for"""
+        from indico.modules.rb.models.rooms import Room  # avoid circular import
+        return Room.get_owned_by(self)
 
     def getPersonalInfo(self):
         try:
@@ -1455,9 +1088,28 @@ class Avatar(Persistent, Fossilizable):
         return self.unlockedFields
 
     def setAuthenticatorPersonalData(self, field, value):
+        fields = {'phone': {'get': self.getPhone,
+                            'set': self.setPhone},
+                  'fax': {'get': self.getFax,
+                          'set': self.setFax},
+                  'address': {'get': self.getAddress,
+                              'set': self.setAddress},
+                  'surName': {'get': self.getSurName,
+                              'set': lambda x: self.setSurName(x, reindex=True)},
+                  'firstName': {'get': self.getFirstName,
+                                'set': lambda x: self.setFirstName(x, reindex=True)},
+                  'affiliation': {'get': self.getAffiliation,
+                                  'set': lambda x: self.setAffiliation(x, reindex=True)},
+                  'email': {'get': self.getEmail,
+                            'set': lambda x: self.setEmail(x, reindex=True)}}
+
         if not hasattr(self, 'authenticatorPersonalData'):
             self.authenticatorPersonalData = {}
-        self.authenticatorPersonalData[field] = value
+        self.authenticatorPersonalData[field] = value or ''
+
+        field_accessors = fields[field]
+        if value and value != field_accessors['get']() and self.isFieldSynced(field):
+            field_accessors['set'](value)
         self._p_changed = 1
 
     def getAuthenticatorPersonalData(self, field):
@@ -1480,7 +1132,7 @@ class Avatar(Persistent, Fossilizable):
         self._lang =lang
 
 
-class AvatarHolder( ObjectHolder ):
+class AvatarHolder(ObjectHolder):
     """Specialised ObjectHolder dealing with user (avatar) objects. Objects of
        this class represent an access point to Avatars of the application and
        provides different methods for accessing and retrieving them in several
@@ -1490,39 +1142,46 @@ class AvatarHolder( ObjectHolder ):
     counterName = "PRINCIPAL"
     _indexes = [ "email", "name", "surName","organisation", "status" ]
 
-    def matchFirstLetter( self, index, letter, onlyActivated=True, forceWithoutExtAuth=False ):
+    def matchFirstLetter(self, index, letter, onlyActivated=True, searchInAuthenticators=True):
         result = {}
         if index not in self._indexes:
             return None
-        match = indexes.IndexesHolder().getById(index).matchFirstLetter(letter)
-        if match != None:
+        if index in ["name", "surName", "organisation"]:
+            match = indexes.IndexesHolder().getById(index).matchFirstLetter(letter, accent_sensitive=False)
+        else:
+            match = indexes.IndexesHolder().getById(index).matchFirstLetter(letter)
+        if match is not None:
             for userid in match:
                 if self.getById(userid) not in result:
-                    av=self.getById(userid)
+                    av = self.getById(userid)
                     if not onlyActivated or av.isActivated():
-                        result[av.getEmail()]=av
-        if not forceWithoutExtAuth:
-            #TODO: check all authenticators
-            pass
+                        result[av.getEmail()] = av
+        if searchInAuthenticators:
+            for authenticator in AuthenticatorMgr().getList():
+                matches = authenticator.matchUserFirstLetter(index, letter)
+                if matches:
+                    for email, record in matches.iteritems():
+                        emailResultList = [av.getEmails() for av in result.values()]
+                        if email not in emailResultList:
+                            userMatched = self.match({'email': email}, exact=1, searchInAuthenticators=False)
+                            if not userMatched:
+                                av = Avatar(record)
+                                av.setId(record["id"])
+                                av.status = record["status"]
+                                result[email] = av
+                            else:
+                                av = userMatched[0]
+                                result[av.getEmail()] = av
         return result.values()
 
-    def match(self, criteria, exact=0, onlyActivated=True, forceWithoutExtAuth=False):
-        # for external requests, attemp caching
-        # this is a simple request-level cache that should be replaced
-        # by an appropriate one when the auth system is re-done
-        cache_result = not forceWithoutExtAuth
-        if not forceWithoutExtAuth:
-            cache = ContextManager.setdefault('external_user_cache', {})
-            key = order_dict(criteria)
-            if key in cache:
-                return cache[key]
-
+    def match(self, criteria, exact=0, onlyActivated=True, searchInAuthenticators=True):
         result = {}
         iset = set()
-        for f,v in criteria.items():
-            if str(v).strip()!="" and f in self._indexes:
-                match = indexes.IndexesHolder().getById(f).matchUser(v, exact=exact)
-                if match!= None:
+        for f, v in criteria.items():
+            v = str(v).strip()
+            if v and f in self._indexes:
+                match = indexes.IndexesHolder().getById(f).matchUser(v, exact=exact, accent_sensitive=False)
+                if match is not None:
                     if len(iset) == 0:
                         iset = set(match)
                     else:
@@ -1531,34 +1190,24 @@ class AvatarHolder( ObjectHolder ):
             av=self.getById(userid)
             if not onlyActivated or av.isActivated():
                 result[av.getEmail()]=av
-        if not forceWithoutExtAuth:
-            euh = ExtUserHolder()
-            from MaKaC.authentication import NiceAuthentication
-            from MaKaC.authentication import LDAPAuthentication
-            for authId in Config.getInstance().getAuthenticatorList():
-                if not authId == "Local":
-                    dict = euh.getById(authId).match(criteria, exact=exact)
-                    for email in dict.iterkeys():
-                        # TODO and TOSTUDY: result.keys should be replace it with
-                        # l=[]; for av in result.values(): l.append(av.getAllEmails())
-                        if not email in result.keys():
-                            if not self.match({'email': email}, exact=1, forceWithoutExtAuth=True):
-                                av = Avatar(dict[email])
-                                av.setId(dict[email]["id"])
-                                av.status = dict[email]["status"]
+        if searchInAuthenticators:
+            for authenticator in AuthenticatorMgr().getList():
+                matches = authenticator.matchUser(criteria, exact=exact)
+                if matches:
+                    for email, record in matches.iteritems():
+                        emailResultList = [av.getEmails() for av in result.values()]
+                        if not email in emailResultList:
+                            userMatched = self.match({'email': email}, exact=1, searchInAuthenticators=False)
+                            if not userMatched:
+                                av = Avatar(record)
+                                av.setId(record["id"])
+                                av.status = record["status"]
                                 if self._userMatchCriteria(av, criteria, exact):
-                                    # TODO: logins can be reused, hence the removal
-                                    # TODO: check if same can happen with emails
-                                    # if auth.hasKey(dict[email]["login"]):
-                                    #     av = auth.getById(dict[email]["login"]).getUser()
                                     result[email] = av
                             else:
-                                av = self.match({'email': email}, exact=1, forceWithoutExtAuth=True)[0]
+                                av = userMatched[0]
                                 if self._userMatchCriteria(av, criteria, exact):
                                     result[av.getEmail()] = av
-        if cache_result:
-            cache[key] = result.values()
-
         return result.values()
 
     def _userMatchCriteria(self, av, criteria, exact):
@@ -1616,24 +1265,18 @@ class AvatarHolder( ObjectHolder ):
         except:
             pass
         try:
-            authId, extId = id.split(":")
+            authId, extId, email = id.split(":")
         except:
             return None
-        av = self.match({"email":extId}, forceWithoutExtAuth=True)
+        av = self.match({"email": email}, searchInAuthenticators=False)
         if av:
             return av[0]
-        euh = ExtUserHolder()
-        dict = euh.getById(authId).getById(extId)
-        av = Avatar(dict)
-        identity = dict["identity"](dict["login"], av)
-        dict["authenticator"].add(identity)
+        user_data = AuthenticatorMgr().getById(authId).searchUserById(extId)
+        av = Avatar(user_data)
+        identity = user_data["identity"](user_data["login"], av)
+        user_data["authenticator"].add(identity)
         av.activateAccount()
-
-        #try:
         self.add(av)
-
-        #except:
-        #    av = self.match({'email': av.getEmail()}, exact=1, forceWithoutExtAuth=True)[0]
         return av
 
 
@@ -1642,10 +1285,10 @@ class AvatarHolder( ObjectHolder ):
             Before adding the user, check if the email address isn't used
         """
         if av.getEmail() is None or av.getEmail()=="":
-            raise UserError( _("User not created. You must enter an email address"))
-        emailmatch = self.match({'email': av.getEmail()}, exact=1, forceWithoutExtAuth=True)
+            raise UserError(_("User not created. You must enter an email address"))
+        emailmatch = self.match({'email': av.getEmail()}, exact=1, searchInAuthenticators=False)
         if emailmatch != None and len(emailmatch) > 0 and emailmatch[0] != '':
-            raise UserError( _("User not created. The email address %s is already used.")% av.getEmail())
+            raise UserError(_("User not created. The email address %s is already used.")% av.getEmail())
         id = ObjectHolder.add(self,av)
         for i in self._indexes:
             indexes.IndexesHolder().getById(i).indexUser(av)
@@ -1658,7 +1301,7 @@ class AvatarHolder( ObjectHolder ):
         for objType in links.keys():
             if objType == "category":
                 for role in links[objType].keys():
-                    for cat in links[objType][role]:
+                    for cat in set(links[objType][role]):
                         # if the category has been deleted
                         if cat.getOwner() == None and cat.getId() != '0':
                             Logger.get('user.merge').warning(
@@ -1674,12 +1317,15 @@ class AvatarHolder( ObjectHolder ):
                         elif role == "access":
                             cat.revokeAccess(merged)
                             cat.grantAccess(prin)
+                        elif role == "favorite":
+                            merged.unlinkTo(cat, 'favorite')
+                            prin.linkTo(cat, 'favorite')
 
             elif objType == "conference":
                 confHolderIdx = MaKaC.conference.ConferenceHolder()._getIdx()
 
                 for role in links[objType].keys():
-                    for conf in links[objType][role]:
+                    for conf in set(links[objType][role]):
                         # if the conference has been deleted
                         if conf.getId() not in confHolderIdx:
                             Logger.get('user.merge').warning(
@@ -1687,7 +1333,7 @@ class AvatarHolder( ObjectHolder ):
                                 (conf, prin.getId(), role))
                             continue
                         elif role == "creator":
-                            conf._setCreator(prin)
+                            conf.setCreator(prin)
                         elif role == "chair":
                             conf.removeChair(merged)
                             conf.addChair(prin)
@@ -1703,7 +1349,7 @@ class AvatarHolder( ObjectHolder ):
 
             if objType == "session":
                 for role in links[objType].keys():
-                    for ses in links[objType][role]:
+                    for ses in set(links[objType][role]):
                         owner = ses.getOwner()
                         # tricky, as conference containing it may have been deleted
                         if owner == None or owner.getOwner() == None:
@@ -1722,7 +1368,7 @@ class AvatarHolder( ObjectHolder ):
 
             if objType == "contribution":
                 for role in links[objType].keys():
-                    for contrib in links[objType][role]:
+                    for contrib in set(links[objType][role]):
                         if contrib.getOwner() == None:
                                 Logger.get('user.merge').warning(
                                     "Trying to remove %s from %s (%s) but it seems to have been deleted" % \
@@ -1740,54 +1386,48 @@ class AvatarHolder( ObjectHolder ):
             if objType == "track":
                 for role in links[objType].keys():
                     if role == "coordinator":
-                        for track in links[objType][role]:
+                        for track in set(links[objType][role]):
                             track.removeCoordinator(merged)
                             track.addCoordinator(prin)
 
             if objType == "material":
                 for role in links[objType].keys():
                     if role == "access":
-                        for mat in links[objType][role]:
+                        for mat in set(links[objType][role]):
                             mat.revokeAccess(merged)
                             mat.grantAccess(prin)
 
             if objType == "file":
                 for role in links[objType].keys():
                     if role == "access":
-                        for mat in links[objType][role]:
+                        for mat in set(links[objType][role]):
                             mat.revokeAccess(merged)
                             mat.grantAccess(prin)
 
             if objType == "abstract":
                 for role in links[objType].keys():
                     if role == "submitter":
-                        for abstract in links[objType][role]:
+                        for abstract in set(links[objType][role]):
                             abstract.setSubmitter(prin)
 
             if objType == "registration":
                 for role in links[objType].keys():
                     if role == "registrant":
-                        for reg in links[objType][role]:
+                        for reg in set(links[objType][role]):
                             reg.setAvatar(prin)
-
-            if objType == "alarm":
-                for role in links[objType].keys():
-                    if role == "to":
-                        for alarm in links[objType][role]:
-                            alarm.removeToUser(merged)
-                            alarm.addToUser(prin)
+                            prin.addRegistrant(reg)
 
             if objType == "group":
                 for role in links[objType].keys():
                     if role == "member":
-                        for group in links[objType][role]:
+                        for group in set(links[objType][role]):
                             group.removeMember(merged)
                             group.addMember(prin)
 
             if objType == "evaluation":
                 for role in links[objType].keys():
                     if role == "submitter":
-                        for submission in links[objType][role]:
+                        for submission in set(links[objType][role]):
                             if len([s for s in submission.getEvaluation().getSubmissions() if s.getSubmitter()==prin]) >0 :
                                 #prin has also answered to the same evaluation as merger's.
                                 submission.setSubmitter(None)
@@ -1795,14 +1435,45 @@ class AvatarHolder( ObjectHolder ):
                                 #prin ditn't answered to the same evaluation as merger's.
                                 submission.setSubmitter(prin)
 
+        # Merge avatars in redis
+        if redis_write_client:
+            avatar_links.merge_avatars(prin, merged)
+            suggestions.merge_avatars(prin, merged)
+
+        # Merge avatars in RB
+        from indico.modules.rb.utils import rb_merge_users
+        rb_merge_users(prin.getId(), merged.getId())
+
+        # Merge API keys
+        ak_prin = prin.getAPIKey()
+        ak_merged = merged.getAPIKey()
+        if ak_prin and ak_merged:
+            # Keep the more recent API key
+            if not ak_prin.getLastUsedDT() or (ak_merged.getLastUsedDT() and
+                                               ak_merged.getLastUsedDT() > ak_prin.getLastUsedDT()):
+                # Move the merged user's key to the principal
+                ak_prin.remove()
+                ak_merged.setUser(prin)
+                prin.setAPIKey(ak_merged)
+                merged.setAPIKey(None)
+            else:
+                # Just delete the merged user's key. This removes it from the Avatar, too!
+                ak_merged.remove()
+        elif ak_merged:
+            # Only the merged user has an API key => move it to the principal
+            ak_merged.setUser(prin)
+            prin.setAPIKey(ak_merged)
+            merged.setAPIKey(None)
+
+
         # remove merged from holder
         self.remove(merged)
         idxs = indexes.IndexesHolder()
-        org = idxs.getById( 'organisation' )
-        email = idxs.getById( 'email' )
-        name = idxs.getById( 'name' )
-        surName = idxs.getById( 'surName' )
-        status_index = idxs.getById( 'status' )
+        org = idxs.getById('organisation')
+        email = idxs.getById('email')
+        name = idxs.getById('name')
+        surName = idxs.getById('surName')
+        status_index = idxs.getById('status')
 
         org.unindexUser(merged)
         email.unindexUser(merged)
@@ -1813,7 +1484,7 @@ class AvatarHolder( ObjectHolder ):
         # add merged email and logins to prin and merge users
         for mail in merged.getEmails():
             prin.addSecondaryEmail(mail)
-        for id in merged.getIdentityList():
+        for id in merged.getIdentityList(create_identities=True):
             id.setUser(prin)
             prin.addIdentity(id)
 
@@ -1829,17 +1500,17 @@ class AvatarHolder( ObjectHolder ):
         merged.mergeTo(None)
 
         idxs = indexes.IndexesHolder()
-        org = idxs.getById( 'organisation' )
-        email = idxs.getById( 'email' )
-        name = idxs.getById( 'name' )
-        surName = idxs.getById( 'surName' )
+        org = idxs.getById('organisation')
+        email = idxs.getById('email')
+        name = idxs.getById('name')
+        surName = idxs.getById('surName')
 
 
         email.unindexUser(prin)
         for mail in merged.getEmails():
             prin.removeSecondaryEmail(mail)
 
-        for id in merged.getIdentityList():
+        for id in merged.getIdentityList(create_identities=True):
             prin.removeIdentity(id)
             id.setUser(merged)
 
@@ -1870,122 +1541,44 @@ class AvatarHolder( ObjectHolder ):
 # I'll keep the ObjectHolder interface so it will be easier afterwards to
 #   implement a more optimised solution (just this object needs to be modified)
 class PrincipalHolder:
-    def __init__( self ):
+    def __init__(self):
         self.__gh = GroupHolder()
         self.__ah = AvatarHolder()
 
-    def getById( self, id ):
+    def getById(self, id):
         try:
-            prin = self.__gh.getById( id )
+            prin = self.__gh.getById(id)
             return prin
         except KeyError, e:
             pass
-        prin = self.__ah.getById( id )
+        prin = self.__ah.getById(id)
         return prin
 
+    def match(self, element_id, exact=1, searchInAuthenticators=True):
+        prin = self.__gh.match({"name": element_id}, searchInAuthenticators=searchInAuthenticators, exact=exact)
+        if not prin:
+            prin = self.__ah.match({"login": element_id}, searchInAuthenticators=searchInAuthenticators, exact=exact)
+        return prin
 
 
 class LoginInfo:
 
     def __init__(self, login, password):
-        self.setLogin( login )
-        self.setPassword( password )
+        self.setLogin(login)
+        self.setPassword(password)
 
-    def setLogin( self, newLogin ):
+    def setLogin(self, newLogin):
         self.login = newLogin.strip()
 
-    def getLogin( self ):
+    def getLogin(self):
         return self.login
 
-    def setPassword( self, newPassword ):
+    def setPassword(self, newPassword):
         self.password = newPassword
 
-    def getPassword( self ):
+    def getPassword(self):
         return self.password
 
-
-## Personalization
-
-class TimedLinkedEvents(Persistent):
-
-    def __init__(self):
-        self._past = []
-        self._present = []
-        self._future = []
-
-    def addPast(self, event, relation):
-        self._past.append((event, relation))
-        self._p_changed = 1
-
-    def addPresent(self, event, relation):
-        self._present.append((event, relation))
-        self._p_changed = 1
-
-    def addFuture(self, event, relation):
-        self._future.append((event, relation))
-        self._p_changed = 1
-
-    def getPast(self):
-        return self._past
-
-    def getPresent(self):
-        return self._present
-
-    def getFuture(self):
-        return self._future
-
-    def sync(self):
-
-        now = datetime.now()
-
-        # Let's check past events
-
-        for elem in self._past:
-            if elem[0].getEndDate() > now:
-                self.addPresent(elem[0],elem[1])
-                self._past.remove(elem)
-                self._p_changed = 1
-
-        # pass "future" events to present and past
-        for elem in self._future[:]:
-            # play consistent, iterate over a copy
-            if elem[0].getStartDate() < now:
-                self.addPresent(elem[0],elem[1])
-                self._future.remove(elem)
-                self._p_changed = 1
-
-        # pass present events to past or future
-        for elem in self._present[:]:
-            # play consistent, iterate over a copy
-            if elem[0].getEndDate() < now:
-                self.addPast(elem[0],elem[1])
-                self._present.remove(elem)
-                self._p_changed = 1
-            elif elem[0].getStartDate() > now:
-                self.addFuture(elem[0],elem[1])
-                self._present.remove(elem)
-                self._p_changed = 1
-
-
-
-    def deleteFromList(self, list, elem, role):
-
-            for tuple in list[:]:
-                if (tuple == (elem, role)):
-                    list.remove(tuple)
-                    self._p_changed = 1
-                    return True
-            return False
-
-    def delete(self, elem, role):
-
-        if (self.deleteFromList(self._past, elem, role) or
-            self.deleteFromList(self._present, elem, role) or
-            self.deleteFromList(self._future, elem, role)):
-            self._p_changed = 1
-            return True
-
-        return False
 
 class PersonalInfo(Persistent, Fossilizable):
 
@@ -1994,6 +1587,7 @@ class PersonalInfo(Persistent, Fossilizable):
     def __init__(self):
         self._basket = PersonalBasket()
         self._showPastEvents = False #determines if past events in category overview will be shown
+
         self._p_changed = 1
 
     def getShowPastEvents(self):
@@ -2032,12 +1626,12 @@ class PersonalBasket(Persistent):
         elif (type(element) == MaKaC.rb_location.RoomGUID):
             return self._rooms
         else:
-            raise Exception( _("Unknown Element Type"))
+            raise Exception(_("Unknown Element Type"))
 
     def addElement(self, element):
-        dict = self.__findDict(element)
-        if (not dict.has_key(element.getId())):
-            dict[element.getId()] = element;
+        basket = self.__findDict(element)
+        if element.getId() not in basket:
+            basket[element.getId()] = element
             self._p_changed = 1
             return True
         return False

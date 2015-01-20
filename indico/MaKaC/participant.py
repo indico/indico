@@ -1,39 +1,42 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from persistent import Persistent
-from datetime import timedelta, datetime
+
+from MaKaC.common import log
+from MaKaC.plugins import Observable
 from MaKaC.common.timezoneUtils import nowutc
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.user import Avatar
-from MaKaC.negotiations import Negotiator
 from MaKaC.webinterface.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common import utils
-import MaKaC.common.info as info
 from MaKaC.i18n import _
-from MaKaC.common.Configuration import Config
+from indico.core import signals
+from indico.core.config import Config
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.participant import IParticipantMinimalFossil
 
-class Participation(Persistent):
+from indico.util.contextManager import ContextManager
+
+
+class Participation(Persistent, Observable):
 
     def __init__(self, conference):
         self._conference = conference
@@ -47,15 +50,16 @@ class Participation(Persistent):
         self._participantIdGenerator = 0
         self._pendingIdGenerator = 0
         self._declinedIdGenerator = 0
-        self._dateNegotiation = None
         self._displayParticipantList = True
         self._numMaxParticipants = 0
+        self._notifyMgrNewParticipant = False
 
     def clone(self, conference, options, eventManager=None):
         newParticipation = conference.getParticipation()
         newParticipation._obligatory = self._obligatory
         newParticipation._allowedForApplying = self._allowedForApplying
-        newParticipation._autoAccept = self._autoAccept
+        newParticipation._autoAccept = self.isAutoAccept()
+        newParticipation._notifyMgrNewParticipant = self.isNotifyMgrNewParticipant()
         newParticipation._displayParticipantList = self._displayParticipantList
         if options.get("addedInfo", False) :
             newParticipation._addedInfo = True
@@ -75,13 +79,15 @@ class Participation(Persistent):
         self._obligatory = True
         logData = {}
         logData["subject"] = "Event set to MANDATORY"
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
     def setInobligatory(self, responsibleUser = None):
         self._obligatory = False
         logData = {}
         logData["subject"] = "Event set to NON MANDATORY"
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
     def isAddedInfo(self):
         return self._addedInfo
@@ -90,13 +96,15 @@ class Participation(Persistent):
         self._addedInfo = True
         logData = {}
         logData["subject"] = "Info about adding WILL be sent to participants"
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
     def setNoAddedInfo(self, responsibleUser = None):
         self._addedInfo = False
         logData = {}
         logData["subject"] = "Info about adding WON'T be sent to participants"
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
     def isAllowedForApplying(self):
         try :
@@ -110,17 +118,19 @@ class Participation(Persistent):
         self._allowedForApplying = True
         logData = {}
         logData["subject"] = "Applying for participation is ALLOWED"
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
         self.notifyModification()
 
     def setNotAllowedForApplying(self, responsibleUser=None):
         self._allowedForApplying = False
         logData = {}
         logData["subject"] = "Applying for participation is NOT ALLOWED"
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
         self.notifyModification()
 
-    def autoAccept(self):
+    def isAutoAccept(self):
         try:
             return self._autoAccept
         except AttributeError :
@@ -133,7 +143,8 @@ class Participation(Persistent):
             "subject": "Auto accept of participation.",
             "value": str(value)
         }
-        self._conference.getLogHandler().logAction(logData, "participants", responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
         self.notifyModification()
 
     def getNumMaxParticipants(self):
@@ -149,7 +160,29 @@ class Participation(Persistent):
             "subject": "Num max of participants.",
             "value": str(value)
         }
-        self._conference.getLogHandler().logAction(logData, "participants", responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
+        self.notifyModification()
+
+    def isNotifyMgrNewParticipant(self):
+        try:
+            return self._notifyMgrNewParticipant
+        except AttributeError:
+            self._notifyMgrNewParticipant = False
+            return False
+
+    def setNotifyMgrNewParticipant(self, value):
+        currentUser = ContextManager.get('currentUser')
+        self._notifyMgrNewParticipant = value
+        logData = {}
+
+        if value:
+            logData["subject"] = _("Manager notification of participant application has been enabled")
+        else:
+            logData["subject"] = _("Manager notification of participant application has been disabled")
+
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
         self.notifyModification()
 
     def isFull(self):
@@ -192,27 +225,18 @@ class Participation(Persistent):
         participants.sort(utils.sortUsersByName)
         return participants
 
-    def getParticipantListText(self):
-        text = []
-        for p in self.getParticipantList():
-            part = p.getName()
-            if not p.isPresent() and nowutc() > self._conference.getEndDate():
-                part += " (absent)"
-            text.append(part)
-        return "; ".join(text)
-
     def getPresentParticipantListText(self):
         text = []
         for p in self.getParticipantList():
-            if p.isPresent() or nowutc() < self._conference.getEndDate():
+            if p.isPresent() and p.isConfirmed():
                 part = p.getName()
                 text.append(part)
         return "; ".join(text)
 
     def getParticipantById(self, participantId):
-        if participantId is not None :
+        if participantId is not None:
             return self._participantList.get(participantId, None)
-        else :
+        else:
             return None
 
     def getPendingParticipantList(self):
@@ -271,8 +295,8 @@ class Participation(Persistent):
             """)
 
         data["fromAddr"] = eventManager.getEmail()
-        data["subject"] = _("Invitation to %s")%self._conference.getTitle()
-        data["body"] = _("""
+        data["subject"] = "Invitation to '%s'" % self._conference.getTitle()
+        data["body"] = """
         Dear %s %s,
 
         you have been added to the list of '%s' participants.
@@ -281,11 +305,11 @@ class Participation(Persistent):
         Looking forward to meeting you at %s
         Your Indico
         on behalf of %s %s
-        """)%(title, familyName, \
-             self._conference.getTitle(), \
-             eventURL, refuse, \
-             self._conference.getTitle(), \
-             eventManager.getFirstName(), eventManager.getFamilyName())
+        """ % (title, familyName,
+               self._conference.getTitle(),
+               eventURL, refuse,
+               self._conference.getTitle(),
+               eventManager.getFirstName(), eventManager.getFamilyName())
 
         return data
 
@@ -303,7 +327,8 @@ class Participation(Persistent):
         self.getDeclinedParticipantList()["%d"%self._newDeclinedId()] = participant
         logData = participant.getParticipantData()
         logData["subject"] = _("Participant declined : %s")%participant.getWholeName()
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
         self.notifyModification()
 
 
@@ -314,7 +339,6 @@ class Participation(Persistent):
             return None
 
     def addParticipant(self, participant, eventManager = None):
-
         # check if it's worth to add the participant
         if participant.getConference().getId() != self._conference.getId() :
             return False
@@ -334,7 +358,8 @@ class Participation(Persistent):
 
         logData = participant.getParticipantData()
         logData["subject"] = _("New participant added : %s")%participant.getWholeName()
-        self._conference.getLogHandler().logAction(logData,"participants",eventManager)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
         participant.setStatusAdded()
 
@@ -344,14 +369,16 @@ class Participation(Persistent):
             if eventManager is None :
                 return False
             data = self.prepareAddedInfo(participant, eventManager)
-            GenericMailer.sendAndLog(GenericNotification(data),self._conference,"participants")
+            GenericMailer.sendAndLog(GenericNotification(data),
+                                     self._conference,
+                                     log.ModuleNames.PARTICIPANTS)
 
         avatar = participant.getAvatar()
 
         if avatar is None :
             # or to encourage him/her to register at Indico
             #self.sendEncouragementToCreateAccount(participant)
-			pass
+            pass
         else:
             # OK, if we have an avatar, let's keep things consistent
             avatar.linkTo(self._conference,"participant")
@@ -371,7 +398,8 @@ class Participation(Persistent):
         self._participantList["%d"%self._lastParticipantId()] = participant
         logData = participant.getParticipantData()
         logData["subject"] = _("New participant invited : %s")%participant.getWholeName()
-        self._conference.getLogHandler().logAction(logData,"participants",eventManager)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
         participant.setStatusInvited()
         if participant.getAvatar() is not None:
             if not participant.getAvatar().getEmail():
@@ -385,13 +413,13 @@ class Participation(Persistent):
     def removeParticipant(self, participant, responsibleUser=None):
         if participant is None:
             return False
-		# If 'participant' is an object from Participant
+        # If 'participant' is an object from Participant
         if isinstance(participant, Participant):
             # remove all entries with participant
             for key, value in self._participantList.items():
                 if value == participant:
                     del self._participantList[key]
-		# If 'participant' is a key
+        # If 'participant' is a key
         else:
             key = participant
             if key not in self._participantList:
@@ -401,30 +429,34 @@ class Participation(Persistent):
 
         logData = participant.getParticipantData()
         logData["subject"] = _("Removed participant %s %s (%s)")%(participant.getFirstName(),participant.getFamilyName(),participant.getEmail())
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
         avatar = participant.getAvatar()
         if avatar:
             avatar.unlinkTo(self._conference,"participant")
-
+        self._notify('participantRemoved', self._conference, participant)
+        if participant._status in {'added', 'accepted'}:
+            signals.event.participant_changed.send(self._conference, user=avatar, participant=participant,
+                                                   old_status=participant._status, action='removed')
         self.notifyModification()
         return True
 
-    def setParticipantRefused(self, participantId):
-        return self._participantList[participantId].setStatusRefused()
-        self.notifyModification()
-
-    def setParticipantExcused(self, participantId):
-        return self._participantList[participantId].setStatusExcused()
-        self.notifyModification()
-
     def setParticipantAccepted(self, participantId):
-        return self._participantList[participantId].setStatusAccepted()
-        self.notifyModification()
+        participant = self.getParticipantById(participantId)
+        if participant:
+            status = participant.setStatusAccepted()
+            self.notifyModification()
+            return status
+        return None
 
     def setParticipantRejected(self, participantId):
-        return self._participantList[participantId].setStatusRejected()
-        self.notifyModification()
+        participant = self.getParticipantById(participantId)
+        if participant:
+            status = participant.setStatusRejected()
+            self.notifyModification()
+            return status
+        return None
 
     def addPendingParticipant(self, participant):
         if participant.getConference().getId() != self._conference.getId() :
@@ -433,14 +465,15 @@ class Participation(Persistent):
             return False
         if self.alreadyParticipating(participant) != 0 :
             return False
-        if self.autoAccept():
+        if self.isAutoAccept():
             self.addParticipant(participant)
         else:
             self._pendingParticipantList["%d"%self._newPendingId()] = participant
 
             logData = participant.getParticipantData()
             logData["subject"] = _("New pending participant : %s")%participant.getWholeName()
-            self._conference.getLogHandler().logAction(logData,"participants")
+            self._conference.getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
             participant.setStatusPending()
 
@@ -458,7 +491,7 @@ class Participation(Persistent):
             data["toList"] = toList
             data["fromAddr"] = Config.getInstance().getSupportEmail()
             data["subject"] = _("New pending participant for %s")%self._conference.getTitle()
-            data["body"] = _("""
+            data["body"] = """
             Dear Event Manager,
 
             a new person is asking for participation in %s.
@@ -466,7 +499,7 @@ class Participation(Persistent):
             Please take this candidature into consideration and accept or reject it
 
             Your Indico
-            """)%(self._conference.getTitle(), profileURL)
+            """%(self._conference.getTitle(), profileURL)
 
             GenericMailer.send(GenericNotification(data))
             self.notifyModification()
@@ -489,7 +522,8 @@ class Participation(Persistent):
 
         logData = participant.getParticipantData()
         logData["subject"] = _("Pending participant removed : %s")%participant.getWholeName()
-        self._conference.getLogHandler().logAction(logData,"participants",responsibleUser)
+        self._conference.getLogHandler().logAction(logData,
+                                                   log.ModuleNames.PARTICIPANTS)
 
         self.notifyModification()
         return True
@@ -525,7 +559,7 @@ class Participation(Persistent):
         data["toList"] = toList
         data["fromAddr"] = eventManager.getEmail()
         data["subject"] = _("Please excuse your absence to %s")%self._conference.getTitle()
-        data["body"] = _("""
+        data["body"] = """
 Dear Participant,
 
 you were absent to %s, which was mandatory for you to attend.
@@ -535,18 +569,19 @@ this email.
 
 Your Indico
 on behalf of %s %s
-        """)%(self._conference.getTitle(), \
+        """%(self._conference.getTitle(), \
         eventManager.getFirstName(), eventManager.getFamilyName(), \
         eventManager.getFirstName(), eventManager.getFamilyName())
 
         return data
 
     def askForExcuse(self, eventManager, toIdList):
-        data = self.prepareAskForExcuse(eventManager,toIdList)
+        data = self.prepareAskForExcuse(eventManager, toIdList)
         if data is None :
             return False
 
-        GenericMailer.sendAndLog(GenericNotification(data),self._conference,"participants",eventManager)
+        GenericMailer.sendAndLog(GenericNotification(data), self._conference,
+                                 log.ModuleNames.PARTICIPANTS)
         return True
 
     def sendSpecialEmail(self, participantsIdList, eventManager, data):
@@ -556,141 +591,33 @@ on behalf of %s %s
             return False
         if len(participantsIdList) == 0:
             return True
-        if data.get("subject",None) is None :
+        if data.get("subject", None) is None :
             return False
-        if data.get("body",None) is None :
+        if data.get("body", None) is None :
             return False
         data["fromAddr"] = eventManager.getEmail()
 
         toList = []
-        for id in participantsIdList :
-            participant = self._participantList.get(id,None)
-            if Participant is not None :
-                toList.append(p.getEmail())
+        for userId in participantsIdList :
+            participant = self._participantList.get(userId, None)
+            if participant is not None :
+                toList.append(participant.getEmail())
         data["toList"] = toList
-        GenericMailer.sendAndLog(GenericNotification(data),self._conference,"participants",eventManager)
-        return True
-
-    def sendEncouragementToCreateAccount(self, participant):
-        if participant is None :
-            return False
-        if participant.getEmail() is None or participant.getEmail() == "" :
-            return None
-        data = {}
-        title = participant.getTitle()
-        if title is None or title == "" :
-            title = participant.getFirstName()
-
-        createURL = urlHandlers.UHUserCreation.getURL()
-        data["fromAddr"] = Config.getInstance().getNoReplyEmail()
-        toList = []
-        toList.append(participant.getEmail())
-        data["toList"] = toList
-        data["subject"] = _("Invitation to create an Indico account")
-        data["body"] = _("""
-        Dear %s %s,
-
-        You have been added as a participant to '%s' and you have started to use
-        the Indico system. Most probably you are going to use it in the future,
-        participating in other events supported by Indico.
-        Therefore we strongly recommend that you create your personal Indico Account -
-        storing your personal data it will make your work with Indico easier and
-        allow you access more sophisticated features of the system.
-
-        To proceed in creating your Indico Account simply click on the following
-        link : %s
-        Please use this email address when creating your account: %s
-
-        Your Indico
-        """)%(participant.getFirstName(), participant.getFamilyName(), \
-        self._conference.getTitle(), \
-        createURL, participant.getEmail())
-
-        GenericMailer.sendAndLog(GenericNotification(data),self._conference,"participants")
-        return True
-
-    def sendNegotiationInfo(self):
-        if self._dateNgotiation is None :
-            return False
-        if not self._dateNegotiation.isFinished() :
-            return False
-
-        data = {}
-        data["fromAddr"] = Config.getInstance().getNoReplyEmail()
-        if len(self._dateNegotiation.getSolutionList()) == 0:
-
-            """ TODO: Prepate URLs..!! """
-
-            settingURL = ">>must be prepared yet..!!<<"
-            data["subject"] = _("Negotiation algorithm finished - FAILED to find date")
-            toList = []
-            for manager in self._conference.getManagerList() :
-                if isinstance(manager, Avatar) :
-                    toList.append(manager.getEmail())
-            data["toList"] = toList
-            data["body"] = _("""
-            Dear Event Manager,
-
-            negotiation algorithm has finished its work on finding the date for %s,
-            yet it didn't managed to find any solution satisfying all (or almost all)
-            given restrictions.
-            Setting the event's date is now up to you at %s
-
-            Your Indico
-            """)%(self._conference.getTitle(), settingURL)
-
-        elif not self.dateNegotiation.isAutomatic :
-            """ TODO: Prepate URLs..!! """
-
-            choseURL = ">>must be prepared yet..!!<<"
-            data["subject"] = _("Negotiation algorithm finished - SUCCSEEDED")
-            toList = []
-            for manager in self._conference.getManagerList() :
-                if isinstance(manager, Avatar) :
-                    toList.append(manager.getEmail())
-            data["toList"] = toList
-            data["body"] = _("""
-            Dear Event Manager,
-
-            negotiation algorithm has finished its work on finding the date for %s,
-            now you are kindly requested to choose the most siutable date from
-            the list of solution which is avaliable at %s
-
-            Your Indico
-            """)%(self._conference.getTitle(), choseURL)
-
-        else :
-            data["subject"] = _("Date of the %s setteled")%self._conference.getTitle()
-            toList = []
-            for p in self._participantList.valuess() :
-                toList.append(p.getEmail())
-            data["toList"] = toList
-            data["body"] = _("""
-            Dear Participant,
-
-            negotiation algorithm has just set the date of the %s to :
-                start date : %s
-                end date   : %s
-
-            Wishing you a pleasent and interesting time -
-            Your Indico
-            """)%(self._conference.getTitle(), \
-            self._conference.getAdjustedStartDate(), self._conference.getAdjustedEndDate())
-
-        GenericMailer.send(GenericNotification(data))
+        GenericMailer.sendAndLog(GenericNotification(data), self._conference,
+                                 log.ModuleNames.PARTICIPANTS)
         return True
 
     def getPresentNumber(self):
         counter = 0
         for p in self._participantList.values() :
-            if p.isPresent() :
+            if p.isPresent() and p.isConfirmed():
                 counter += 1
         return counter
 
     def getAbsentNumber(self):
         counter = 0
         for p in self._participantList.values() :
-            if not p.isPresent() :
+            if not p.isPresent() and p.isConfirmed():
                 counter += 1
         return counter
 
@@ -792,15 +719,15 @@ on behalf of %s %s
 
 #---------------------------------------------------------------------------------
 
-class Participant (Persistent, Negotiator, Fossilizable):
+
+class Participant(Persistent, Fossilizable):
     """
         Class collecting data about person taking part in meeting / lecture
     """
     fossilizes(IParticipantMinimalFossil)
 
     def __init__(self, conference, avatar=None):
-        Negotiator(avatar)
-        if avatar is not None :
+        if avatar is not None:
             self._id = None
             self._avatar = avatar
             self._firstName = avatar.getFirstName()
@@ -819,8 +746,7 @@ class Participant (Persistent, Negotiator, Fossilizable):
             self._participation = None
             if conference is not None :
                 self._participation = conference.getParticipation()
-        else :
-            Negotiator(None)
+        else:
             self._id = None
             self._avatar = None
             self._firstName = ""
@@ -833,7 +759,7 @@ class Participant (Persistent, Negotiator, Fossilizable):
             self._email = ""
 
             self._status = None
-            self._present = None
+            self._present = True
             self._participation = None
             if conference is not None:
                 self._participation = conference.getParticipation()
@@ -894,9 +820,6 @@ class Participant (Persistent, Negotiator, Fossilizable):
     def getName(self):
         return "%s %s"%(self.getFirstName(),self.getFamilyName())
 
-    def getNegotiatorInfo(self):
-        return "%s %s %s"%(self._firstName,self._familyName,self._email)
-
     def getAddress(self):
         return self._address
 
@@ -944,15 +867,6 @@ class Participant (Persistent, Negotiator, Fossilizable):
     def isPresent(self):
         return self._present
 
-    def getPresenceText(self):
-        presence = "n/a"
-        if nowutc() > self.getConference().getStartDate():
-            if self.isPresent():
-                presence = "present"
-            else:
-                presence = "absent"
-        return presence
-
     def setPresent(self):
         self._present = True
 
@@ -968,7 +882,11 @@ class Participant (Persistent, Negotiator, Fossilizable):
     def getStatus(self):
         return self._status
 
+    def isConfirmed(self):
+        return self._status in ["accepted", "added"]
+
     def setStatusAdded(self, responsibleUser=None):
+        old_status = self._status
         self._status = "added"
         #if self._status is None or self._status == "pending" :
         #    self._status = "added"
@@ -977,31 +895,41 @@ class Participant (Persistent, Negotiator, Fossilizable):
         #    logData["subject"] = _("%s : status set to ADDED")%self.getWholeName()
         #    self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
 
+        self._participation._notify('participantAdded', self.getConference(), self)
+        signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
+                                               old_status=old_status, action='added')
         logData = self.getParticipantData()
         logData["subject"] = "%s : status set to ADDED"%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
     def setStatusRefused(self, responsibleUser=None):
-        if self._status != "added" :
+        if self._status != "added":
             return False
+        old_status = self._status
         self._status = "refused"
 
+        self._participation._notify('participantRemoved', self.getConference(), self)
+        signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
+                                               old_status=old_status, action='removed')
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to REFUSED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
     def setStatusExcused(self, responsibleUser=None):
-        if self._status != "added" or self._present :
+        if not self.isConfirmed() or self._present:
             return False
         self._status = "excused"
 
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to EXCUSED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
@@ -1012,29 +940,42 @@ class Participant (Persistent, Negotiator, Fossilizable):
 
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to INVITED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
     def setStatusAccepted(self, responsibleUser=None):
-        if self._status != "invited" :
+        if self._status not in ('invited', 'added'):
             return False
+        old_status = self._status
         self._status = "accepted"
 
+        self._participation._notify('participantAdded', self.getConference(), self)
+        if old_status != 'added':
+            signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
+                                                   old_status=old_status, action='added')
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to ACCEPTED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
     def setStatusRejected(self, responsibleUser=None):
-        if self._status != "invited" :
+        if self._status not in ('invited', 'added'):
             return False
+        old_status = self._status
         self._status = "rejected"
 
+        self._participation._notify('participantRemoved', self.getConference(), self)
+        if old_status == 'added':
+            signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
+                                                   old_status=old_status, action='removed')
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to REJECTED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
@@ -1045,7 +986,8 @@ class Participant (Persistent, Negotiator, Fossilizable):
 
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to PENDING")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 
@@ -1056,7 +998,8 @@ class Participant (Persistent, Negotiator, Fossilizable):
 
         logData = self.getParticipantData()
         logData["subject"] = _("%s : status set to DECLINED")%self.getWholeName()
-        self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
+        self.getConference().getLogHandler().logAction(logData,
+                                                       log.ModuleNames.PARTICIPANTS)
 
         return True
 

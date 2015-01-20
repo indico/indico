@@ -1,0 +1,51 @@
+.clearableinput {
+    position: relative;
+
+    .clearabletext {
+        padding-right: 1.7em !important;
+
+        &.actionabletext {
+            padding-right: 2.7em !important;
+            word-break: break-all;
+        }
+    }
+
+    .button-box {
+        position: absolute;
+        padding: 0 2px;
+        right: 0;
+        top: 1px;
+
+        a {
+            color: $gray;
+            font-size: 1.2em;
+            padding: 0 2px;
+            visibility: hidden;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+
+        .input-clear {
+            @extend %input-button;
+            &:hover {
+                color: $red;
+            }
+
+            &:active {
+                color: $dark-red;
+            }
+        }
+
+        .input-action {
+            @extend %input-button;
+            &:hover {
+                color: $green;
+            }
+            &:active {
+                color: $dark-green;
+            }
+        }
+    }
+}

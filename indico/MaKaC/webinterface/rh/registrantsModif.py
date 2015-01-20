@@ -1,69 +1,45 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from cStringIO import StringIO
 
+from flask import session, request
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrants as registrants
-import MaKaC.webinterface.rh.conferenceModif as conferenceModif
 from MaKaC.webinterface.rh.fileAccess import RHFileAccess
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.export.excel import RegistrantsListToExcel
 import MaKaC.webinterface.common.regFilters as regFilters
-from MaKaC.common import Config
 from MaKaC.errors import FormValuesError
 from MaKaC.common import utils
 from MaKaC.registration import SocialEvent, MiscellaneousInfoGroup
 from MaKaC.webinterface.common import registrantNotificator
-from MaKaC.errors import MaKaCError
+from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC import epayment
 from MaKaC.i18n import _
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC.webinterface.rh import registrationFormModif
 from MaKaC.webinterface.rh.registrationFormModif import RHRegistrationFormModifBase
-import re
-import os
+from indico.web.flask.util import send_file, url_for
 
 class RHRegistrantListModifBase( registrationFormModif.RHRegistrationFormModifBase ):
     pass
 
-class RHRegistrantListMenuClose(RHRegistrantListModifBase):
-
-    def _checkParams( self, params ):
-        RHRegistrantListModifBase._checkParams( self, params )
-        self._currentURL = params.get("currentURL","")
-
-    def _process( self ):
-        websession = self._getSession()
-        websession.setVar("RegistrantListMenuStatus", "close")
-        self._redirect(self._currentURL)
-
-
-class RHRegistrantListMenuOpen(RHRegistrantListModifBase):
-
-    def _checkParams( self, params ):
-        RHRegistrantListModifBase._checkParams( self, params )
-        self._currentURL = params.get("currentURL","")
-
-    def _process( self ):
-        websession = self._getSession()
-        websession.setVar("RegistrantListMenuStatus", "open")
-        self._redirect(self._currentURL)
 
 class RHRegistrantListModif( RHRegistrantListModifBase ):
     """
@@ -138,18 +114,18 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
         sessionCopy = sessionData.copy()
 
         # filtering criteria needs a proper "filter name"
-        del sessionCopy['session']
-        sessionCopy[self._sessionFilterName] = sessionData['session']
+        sessionCopy.pop('session', None)
+        sessionCopy[self._sessionFilterName] = sessionData.get('session')
 
         # Build the filtering criteria
         filterCrit = regFilters.RegFilterCrit(self._conf, sessionCopy)
-
-        filterCrit.getField("accomm").setShowNoValue(
-            sessionCopy.get("accommShowNoValue") )
-        filterCrit.getField(self._sessionFilterName).setShowNoValue(
-            sessionCopy.get("sessionShowNoValue") )
-        filterCrit.getField("event").setShowNoValue(
-            sessionCopy.get("eventShowNoValue") )
+        if sessionData.get('session'):
+            filterCrit.getField("accomm").setShowNoValue(
+                sessionCopy.get("accommShowNoValue") )
+            filterCrit.getField(self._sessionFilterName).setShowNoValue(
+                sessionCopy.get("sessionShowNoValue") )
+            filterCrit.getField("event").setShowNoValue(
+                sessionCopy.get("eventShowNoValue") )
 
         return filterCrit
 
@@ -194,7 +170,7 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
 
         return sessionData
 
-    def _checkParams( self, params ):
+    def _checkParams(self, params):
         """
         Main parameter checking routine
         """
@@ -204,26 +180,25 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
         operationType = params.get('operationType')
 
         # session data
-        websession = self._getSession()
-        sessionData = websession.getVar("registrantsFilterAndSortingConf%s"%self._conf.getId())
+        sessionData = session.get('registrantsFilterAndSortingConf%s' % self._conf.getId())
 
         # check if there is information already
         # set in the session variables
         if sessionData:
             # work on a copy
             sessionData = sessionData.copy()
-            filtersActive =  sessionData['filtersActive']
+            filtersActive = sessionData['filtersActive']
         else:
             # set a default, empty dict
             sessionData = {}
             filtersActive = False
 
-        if params.has_key("resetFilters"):
-            operation =  'resetFilters'
-        elif operationType ==  'filter':
-            operation =  'setFilters'
-        elif operationType ==  'display':
-            operation =  'setDisplay'
+        if 'resetFilters' in params:
+            operation = 'resetFilters'
+        elif operationType == 'filter':
+            operation = 'setFilters'
+        elif operationType == 'display':
+            operation = 'setDisplay'
         else:
             operation = None
 
@@ -231,39 +206,35 @@ class RHRegistrantListModif( RHRegistrantListModifBase ):
         # on whether only  the first choice for the session
         # is taken into account
 
-        if params.has_key("firstChoice"):
-            self._sessionFilterName="sessionfirstpriority"
+        if 'firstChoice' in params:
+            self._sessionFilterName = "sessionfirstpriority"
         else:
-            self._sessionFilterName="session"
+            self._sessionFilterName = "session"
 
-        isBookmark = params.has_key("isBookmark")
+        isBookmark = 'isBookmark' in params
         sessionData = self._checkAction(params, filtersActive, sessionData, operation, isBookmark)
 
         # Maintain the state abotu filter usage
-        sessionData['filtersActive'] = self._filterUsed;
+        sessionData['filtersActive'] = self._filterUsed
 
         # Save the web session
-        websession.setVar("registrantsFilterAndSortingConf%s"%self._conf.getId(), sessionData)
+        session['registrantsFilterAndSortingConf%s' % self._conf.getId()] = sessionData
 
         self._filterCrit = self._buildFilteringCriteria(sessionData)
+        self._sortingCrit = regFilters.SortingCriteria([sessionData.get("sortBy", "Name").strip()])
+        self._order = sessionData.get("order", "down")
+        self._display = utils.normalizeToList(sessionData.get("disp", []))
 
-        self._sortingCrit = regFilters.SortingCriteria( [sessionData.get( "sortBy", "Name" ).strip()] )
-
-        self._order = sessionData.get("order","down")
-
-        self._display = utils.normalizeToList(sessionData.get("disp",[]))
-
-
-    def _process( self ):
-        p = registrants.WPConfModifRegistrantList( self, self._conf, self._filterUsed )
-        return p.display(filterCrit = self._filterCrit, sortingCrit=self._sortingCrit, display = self._display, sessionFilterName = self._sessionFilterName, order=self._order )
+    def _process(self):
+        p = registrants.WPConfModifRegistrantList(self, self._conf, self._filterUsed)
+        return p.display(filterCrit=self._filterCrit, sortingCrit=self._sortingCrit, display=self._display,
+                         sessionFilterName=self._sessionFilterName, order=self._order)
 
 
 class RHRegistrantListModifAction( RHRegistrantListModifBase ):
     def _checkParams( self, params ):
         RHRegistrantListModifBase._checkParams(self, params)
-        agent = self._req.headers_in.get('User-Agent', '')
-        self._linuxAgent = re.match(r'(?i).*?\blinux[^a-zA-Z]*?\b', agent) is not None
+        self._windowsAgent = request.user_agent.platform == 'windows'
         self._selectedRegistrants = self._normaliseListParam(params.get("registrant",[]))
         self._addNew = params.has_key("newRegistrant")
         self._remove = params.has_key("removeRegistrants")
@@ -272,7 +243,7 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
         self._tablePDF = params.has_key("pdf.table")
         self._bookPDF = params.has_key("pdf.book")
         self._info = params.has_key("info.x")
-        self._excel = params.has_key("excel.x")
+        self._excel = params.has_key("excel")
         self._reglist = params.get("reglist","").split(",")
         self._display = self._normaliseListParam(params.get("disp",[]))
         self._printBadgesSelected = params.has_key("printBadgesSelected")
@@ -322,7 +293,7 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
             for reg in self._selectedRegistrants:
                 if self._conf.getRegistrantById(reg) != None:
                     regs.append(self._conf.getRegistrantById(reg))
-            r = RHRegistrantListExcel(self,self._conf,regs, self._display, not self._linuxAgent)
+            r = RHRegistrantListExcel(self,self._conf,regs, self._display, self._windowsAgent)
             return r.excel()
         elif self._printBadgesSelected:
             if len(self._selectedRegistrants) > 0:
@@ -341,7 +312,7 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
             self._redirect(urlHandlers.UHConfModifRegistrantList.getURL(self._conf))
 
 class RHRegistrantNewForm(RHRegistrantListModifBase):
-    _uh = urlHandlers.Derive(RHRegistrantListModif, "newRegistrant")
+    _uh = urlHandlers.UHConfModifRegistrantNew
 
     def _checkParams(self, params):
         RHRegistrantListModifBase._checkParams(self, params)
@@ -381,16 +352,10 @@ class RHRegistrantBookPDF:
         self._rh = rh
         self._display = disp
 
-    def pdf( self ):
-        filename = "RegistrantsBook.pdf"
-        pdf = RegistrantsListToBookPDF(self._conf,list=self._list, display=self._display)
-        data = pdf.getPDFBin()
-        self._rh._req.set_content_length(len(data))
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._rh._req.content_type = """%s"""%(mimetype)
-        self._rh._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+    def pdf(self):
+        pdf = RegistrantsListToBookPDF(self._conf, list=self._list, display=self._display)
+        return send_file('RegistrantsBook.pdf', StringIO(pdf.getPDFBin()), 'PDF')
+
 
 class RHRegistrantListPDF:
     def __init__( self, rh,conf,reglist, disp ):
@@ -399,20 +364,14 @@ class RHRegistrantListPDF:
         self._rh = rh
         self._display = disp
 
-
-    def pdf( self ):
-        filename = "RegistrantsList.pdf"
-        pdf = RegistrantsListToPDF(self._conf,list=self._list, display=self._display)
+    def pdf(self):
+        pdf = RegistrantsListToPDF(self._conf, list=self._list, display=self._display)
         try:
             data = pdf.getPDFBin()
         except:
             raise FormValuesError( _("""Text too large to generate a PDF with "Table Style". Please try again generating with "Book Style"."""))
-        self._rh._req.set_content_length(len(data))
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._rh._req.content_type = """%s"""%(mimetype)
-        self._rh._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+        return send_file('RegistrantsList.pdf', StringIO(data), 'PDF')
+
 
 class RHRegistrantListExcel:
     def __init__( self, rh,conf,reglist, disp, excelSpecific):
@@ -422,16 +381,11 @@ class RHRegistrantListExcel:
         self._display = disp
         self._excelSpecific = excelSpecific
 
-    def excel( self ):
-        filename = "RegistrantsList.csv"
-        excel = RegistrantsListToExcel(self._conf,list=self._list, display=self._display, excelSpecific=self._excelSpecific)
-        data = excel.getExcelFile()
-        self._rh._req.set_content_length(len(data))
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "CSV" )
-        self._rh._req.content_type = """%s"""%(mimetype)
-        self._rh._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+    def excel(self):
+        excel = RegistrantsListToExcel(self._conf, list=self._list, display=self._display,
+                                       excelSpecific=self._excelSpecific)
+        return send_file('RegistrantsList.csv', StringIO(excel.getExcelFile()), 'CSV')
+
 
 class RHRegistrantListEmail:
     def __init__(self, rh, conf, reglist):
@@ -450,22 +404,50 @@ class RHRegistrantListEmail:
         p=registrants.WPEMail(self._rh, self._conf, self._regList, self._from, self._cc, self._subject, self._body)
         return p.display()
 
-class RHRegistrantModifBase( conferenceModif.RHConferenceModifBase ):
+class RHRegistrantModifBase( RHRegistrationFormModifBase ):
 
     def _checkProtection( self ):
-        conferenceModif.RHConferenceModifBase._checkProtection(self)
+        RHRegistrationFormModifBase._checkProtection(self)
         if not self._conf.hasEnabledSection("regForm"):
             raise MaKaCError( _("The registrants' management was disabled by the conference managers"))
 
     def _checkParams( self, params ):
-        conferenceModif.RHConferenceModifBase._checkParams(self, params)
-        self._registrant = self._conf.getRegistrantById(params.get("registrantId",""))
+        RHRegistrationFormModifBase._checkParams(self, params)
+        regId=params.get("registrantId",None)
+        if regId is None:
+            raise MaKaCError(_("registrant id not set"))
+        self._registrant=self._conf.getRegistrantById(regId)
+        if self._registrant is None:
+            raise NotFoundError(_("The registrant with id %s does not exist or has been deleted")%regId)
 
 class RHRegistrantModification( RHRegistrantModifBase ):
 
     def _process( self ):
         p = registrants.WPRegistrantModification( self, self._registrant )
         return p.display()
+
+
+class RHRegistrantModificationEticket(RHRegistrantModifBase):
+
+    def _process(self):
+        p = registrants.WPRegistrantModifETicket(self, self._registrant)
+        return p.display()
+
+
+class RHRegistrantModificationEticketCheckIn(RHRegistrantModifBase):
+
+    def _checkParams(self, params):
+        RHRegistrantModifBase._checkParams(self, params)
+        self._newStatus = params["changeTo"]
+
+    def _process(self):
+        eticket = self._conf.getRegistrationForm().getETicket()
+        if self._newStatus == "True":
+            self._registrant.setCheckedIn(True)
+        else:
+            self._registrant.setCheckedIn(False)
+        self._redirect(url_for("event_mgmt.confModifRegistrants-modification-eticket", self._registrant))
+
 
 class RHRegistrantSendEmail( RHRegistrationFormModifBase ):
 
@@ -511,17 +493,12 @@ class RHRegistrantPackage:
         self._list = reglist
         self._rh = rh
 
-    def pack( self ):
-        from MaKaC.common.contribPacker import ZIPFileHandler,RegistrantPacker
-        p=RegistrantPacker(self._conf)
-        path=p.pack(self._list, ZIPFileHandler())
-        filename = "registrants.zip"
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "ZIP" )
-        self._rh._req.set_content_length(os.path.getsize(path))
-        self._rh._req.content_type = """%s"""%(mimetype)
-        self._rh._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        self._rh._req.sendfile(path)
+    def pack(self):
+        from MaKaC.common.contribPacker import ZIPFileHandler, RegistrantPacker
+        p = RegistrantPacker(self._conf)
+        path = p.pack(self._list, ZIPFileHandler())
+        return send_file('registrants.zip', path, 'ZIP', inline=False)
+
 
 class RHRegistrantPerformDataModification( RHRegistrantModifBase ):
 
@@ -654,7 +631,7 @@ class RHRegistrantAccommodationPerformModify( RHRegistrantModifBase ):
                 self._departureDate = utils.stringToDate(self._departureDate)
                 if self._arrivalDate > self._departureDate:
                     raise FormValuesError("Arrival date has to be earlier than departure date")
-            self._accoType = self._regForm.getAccommodationForm().getAccommodationTypeById(params.get("accommodationType", ""))
+            self._accoType = self._regForm.getAccommodationForm().getAccommodationTypeById(params.get("accommodation_type", ""))
             if self._regForm.getAccommodationForm().getAccommodationTypesList() !=[] and self._accoType is None:
                 raise FormValuesError("It is mandatory to choose an accommodation in order to register")
 

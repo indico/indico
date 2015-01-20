@@ -1,0 +1,9 @@
+<nd-table ng-if="formData.items.length"
+    config="config.editionTable"
+    form-data="formData.items">
+</nd-table>
+<div ng-if="!formData.items.length" class="info-message-box">
+    <div class="message-text">
+        {{ 'There are no available sessions' | i18n }}
+    </div>
+</div>

@@ -89,7 +89,7 @@ type("WatchObject", ["Dictionary", "Observable"], {
 		this.isEmpty = function() {
 			return !hasProperties(properties);
 		};
-		
+
 		// Dictionary
 		this.get = function(key) {
 			return properties[key];
@@ -101,7 +101,7 @@ type("WatchObject", ["Dictionary", "Observable"], {
 			return clone(properties);
 		};
 		this.update = function(values) {
-			return changeProperties(properties, values, notify);			
+			return changeProperties(properties, values, notify);
 		};
 		this.replace = function(values) {
 			return replaceProperties(properties, values, notify);
@@ -114,7 +114,6 @@ type("WatchObject", ["Dictionary", "Observable"], {
 			});
 			return old;
 		};
-		
 		// Observable
 		this.observe = function(observer, key) {
 			if (exists(key)) {
@@ -128,12 +127,10 @@ type("WatchObject", ["Dictionary", "Observable"], {
 				return objectObservers.attach(observer);
 			}
 		};
-		
 		// WatchObject
 		this.add = function(value) {
 			return addProperty(properties, value, notify);
 		};
-		
 		return mixWatchAccessors(this, arguments, this);
 	}
 );
@@ -175,7 +172,7 @@ watchType.init = function(target, values) {
 		});
 	});
 	return target;
-}
+};
 
 /**
  * 
@@ -200,7 +197,7 @@ watchType.load = function(target, object) {
 		});
 	}
 	return target;
-}
+};
 
 /**
  * Attaches watch getters created from the properties from the object to the target and returns the object.

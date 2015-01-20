@@ -6,9 +6,9 @@
 <% dueDateFormat = "%a %d %b %Y" %>
 <% color = '' %>
 % if not ConfReview.hasReviewing():
-<p style="padding-left: 25px; color:gray;">${ _("Type of reviewing has not been chosen yet. You can choose it from Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></p>
+<p style="padding-left: 25px; color:gray;">${ _("Type of reviewing has not yet been chosen. You can choose it from Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></p>
 % else:
-% if len(Conference.getContributionListSortedById()) == 0:
+% if len(Conference.getContributionListSorted()) == 0:
 <p style="padding-left: 25px;"><font color="gray">${ _("There are no papers to assign.")}</font></p>
 %else:
 <table style="margin-left:20px;">
@@ -28,7 +28,7 @@
            </div>
         </td>
         <td align="bottom" style="padding-top:27px;">
-            <div id="totalContributions" style="display:none;"><span>${_("  ( Total:  ")}</span><span style="font-size:15px; font-weight: bold;">${ len(Conference.getContributionListSortedById()) }</span>
+            <div id="totalContributions" style="display:none;"><span>${_("  ( Total:  ")}</span><span style="font-size:15px; font-weight: bold;">${ len(Conference.getContributionListSorted()) }</span>
             <span>${_(" )")}</span>
             </div>
         </td>
@@ -49,6 +49,9 @@
             </td>
             <td nowrap class="titleCellFormat" style="border-bottom:1px solid #BBBBBB;">
                 ${ _("assign status")}
+            </td>
+            <td nowrap class="titleCellFormat" style="border-bottom:1px solid #BBBBBB;">
+                ${ _("material submitted")}
             </td>
         </tr>
     </thead>
@@ -98,12 +101,19 @@
             </td>
             <td>
                 <table style="list-style-type:none">
+                    <tr><td><input type="checkbox" id="showWithoutTeam" checked/> ${ _("No reviewing team asigned")}</td></tr>
                     % if not IsOnlyReferee:
                         <tr><td><input type="checkbox" id="showWithReferee" checked/> ${ _("With Referee assigned")}</td></tr>
                     % endif
                     <tr><td><input type="checkbox" id="showWithEditor" checked/> ${ _("With Layout Reviewer assigned")}</td></tr>
                     <tr><td><input type="checkbox" id="showWithReviewer" checked/> ${ _("With at least 1 Content Reviewer assigned")}</td></tr>
 
+                </table>
+            </td>
+            <td>
+                <table style="list-style-type:none">
+                    <tr><td><input type="checkbox" id="showWithMaterial" checked/> ${ _("With material submitted")}</td></tr>
+                    <tr><td><input type="checkbox" id="showWithoutMaterial" checked/> ${ _("Without material submitted")}</td></tr>
                 </table>
             </td>
         </tr>
@@ -181,11 +191,6 @@
         </tr>
 </table>
 <table class="Revtab" width="95%" cellspacing="0" align="center" border="0" style="padding-left:20px; margin-bottom:1em">
-<!--
-    <tr>
-        <td nowrap class="groupTitle" colspan=4>Contributions to judge as Referee</td>
-    </tr>
--->
     <thead>
         <tr>
             <td></td>
@@ -205,6 +210,9 @@
                 ${ _("Session")}
             </td>
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
+                ${ _("Review #") }
+            </td>
+            <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
                 ${ _("Status") }
             </td>
             <td nowrap class="subGroupTitleAssignContribution" style="border-right:5px solid #FFFFFF;border-left:5px solid #FFFFFF;">
@@ -215,13 +223,13 @@
             </td>
         </tr>
         <tr>
-            <td colspan="9" style="border-bottom: 1px solid grey"></td>
+            <td colspan="10" style="border-bottom: 1px solid grey"></td>
         </tr>
         <tr>
             <td id="noFilteredContribution" colspan="8" style="padding:15px 0px 15px 15px; display:none;">
                 <span>${ _("There are no papers with the selected filters criteria.")}</span>
                 % if IsOnlyReferee:
-                    <span>${ _("It is also possible you do not have any assigned paper for the review yet.")}</span>
+                    <span>${ _("It is also possible that you do not yet have any assigned paper for the review.")}</span>
                 % endif
             </td>
         </tr>
@@ -475,7 +483,8 @@ var contributionTemplate = function(contribution) {
     var cell3 = Html.td({className:'contributionDataCell'});
     // Sadly this hack is necessary to get the link since getURL() needs a Contribution object (from Indico, not the local one from Javascript)
     // and contributions are loaded asynchronously...
-    linkString = "${ urlHandlers.UHContributionModifReviewing.getURL() }" + "?contribId=" + contribution.id + "&confId=${ Conference.getId()}"
+    var url_template = ${ url_rule_to_js('event_mgmt.contributionReviewing') | n,j };
+    var linkString = build_url(url_template, {contribId: contribution.id, confId: ${ Conference.getId() | n,j}});
     var link = Html.a({href: linkString});
     link.set(contribution.title);
     cell3.set(link);
@@ -496,8 +505,13 @@ var contributionTemplate = function(contribution) {
     cell6.set(contribution.session ? contribution.session : "")
     row.append(cell6);
 
-    // Cell7: contribution status
+    // Cell7: Review number
     var cell7 = Html.td({className:'contributionDataCell',style:{"marginLeft":"5px"}});
+    cell7.set($T("Review {0}").format(contribution.reviewManager.versioningLen))
+    row.append(cell7);
+
+    // Cell8: contribution status
+    var cell8 = Html.td({className:'contributionDataCell',style:{"marginLeft":"5px"}});
 
     if (contribution.reviewManager.lastReview.refereeJudgement.isSubmitted) {
         var span = Html.span();
@@ -507,34 +521,48 @@ var contributionTemplate = function(contribution) {
             span.dom.style.color = '#881122';
         else if (judgement == "Accept")
             span.dom.style.color = '#118822';
-        span.set($T("Judged") + ": " + judgement);
-        cell7.set(span);
+        span.set($T("Assessed") + ": " + judgement);
+        cell8.set(span);
 
+    } else if (!contribution.reviewManager.lastReview.isAuthorSubmitted) {
+        var span = Html.span();
+        if (contribution.reviewManager.versioningLen > 1){
+            span.dom.style.color = 'orange';
+            span.set($T("Author has yet to re-submit paper"));
+        }
+        else {
+            span.set($T("Paper not yet submitted"));
+        }
+        cell8.set(span);
     } else {
+        if (contribution.reviewManager.versioningLen > 1) {
+            var span = Html.span();
+            span.dom.style.color ='#D18700';
+            span.append($T("Author has re-submitted paper. "));
+            cell8.append(span);
+            cell8.append(Html.br());
+        }
+        var span = Html.span();
+        span.dom.style.fontWeight ='bold';
+        span.append($T("Referee has not yet given an assessment."));
+
         var ul = Html.ul();
-        ul.dom.style.color = '#3F4C6B';
-        ul.dom.style.listStyleType = 'none';
-        ul.dom.style.padding = 0;
-        ul.dom.style.marginLeft = '5px';
-
-        var li = Html.li();
-        li.set($T("Not judged yet:"));
-        ul.append(li);
-
+        ul.dom.style.paddingLeft = '30px';
+        ul.dom.style.margin = '0px';
         statusList = contribution.reviewManager.lastReview.reviewingStatus;
         for (j in statusList) {
             var li = Html.li();
             li.set(statusList[j])
             ul.append(li)
         }
-
-        cell7.set(ul);
+        cell8.append(span);
+        cell8.append(ul);
     }
 
-    row.append(cell7);
+    row.append(cell8);
 
-    // Cell8: reviewing team assigned to the contribution
-    var cell8 = Html.td({className:'contributionDataCell'});
+    // Cell9: reviewing team assigned to the contribution
+    var cell9 = Html.td({className:'contributionDataCell'});
 
     var ul = Html.ul();
     ul.dom.style.listStyleType = 'none';
@@ -582,20 +610,20 @@ var contributionTemplate = function(contribution) {
     ul.append(li3);
     % endif
 
-    cell8.set(ul);
-    row.append(cell8);
+    cell9.set(ul);
+    row.append(cell9);
 
-    // Cell9: due date of the contribution
-    var cell9 = Html.td({className:'contributionDataCell'});
+    // Cell10: due date of the contribution
+    var cell10 = Html.td({className:'contributionDataCell'});
     if (contribution.reviewManager.lastReview.refereeDueDate == null) {
-        cell9.set("");
+        cell10.set("");
     }
     else {
         var date = contribution.reviewManager.lastReview.refereeDueDate.date;
         var newDate = date.split('-')[2] + '-' + date.split('-')[1] + '-' + date.split('-')[0];
-        cell9.set(newDate);
+        cell10.set(newDate);
     }
-    row.append(cell9);
+    row.append(cell10);
 
     return row;
 }
@@ -791,21 +819,6 @@ var removeReviewersAlerts = function(contributions, role) {
         (new AlertPopup($T("Warning"),$T("There is no assigned Content Reviewer to remove."))).open();
         return false;
     }
-
-    /*contributionsWithoutEditor = []
-    for (i in contributions) {
-        contributionId = contributions[i]
-        contribution = getContribution(contributionId)
-        if (contribution.reviewManager.editor = null) {
-            contributionsWithoutEditor.push(contributionId)
-        }
-    }
-
-    if (contributionsWithoutEditor.length == contributions.length) {
-        alert($T("There is no assigned Layout Reviewer to remove.")
-        );
-        return false;
-    } */
 
     if (contributionsWithoutReviewers.length > 0) {
         title =$T('Contributions without reviewer');
@@ -1090,6 +1103,8 @@ var userSelected = function(user, contrPerAttribute){
  */
 var fetchContributions = function() {
 
+    var killProgress = IndicoUI.Dialogs.Util.progress("Loading papers...");
+
     if (appliedFilter) {
         $E('resetFilters').dom.style.display = '';
     } else {
@@ -1107,13 +1122,17 @@ var fetchContributions = function() {
             selTypes : getCheckedBoxes('selTypes'),
             selTracks : getCheckedBoxes('selTracks'),
             selSessions : getCheckedBoxes('selSessions'),
+            showWithoutTeam : $E('showWithoutTeam').dom.checked,
             % if not IsOnlyReferee:
             showWithReferee: $E('showWithReferee').dom.checked,
             % endif
             showWithEditor: $E('showWithEditor').dom.checked,
-            showWithReviewer: $E('showWithReviewer').dom.checked
+            showWithReviewer: $E('showWithReviewer').dom.checked,
+            showWithMaterial: $E('showWithMaterial').dom.checked,
+            showWithoutMaterial: $E('showWithoutMaterial').dom.checked
         },
         function(result, error){
+            killProgress();
             if (!error) {
                 for (i in result) {
                     c = result[i]

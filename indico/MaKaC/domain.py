@@ -1,24 +1,22 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import ZODB
 from persistent import Persistent
 
 from MaKaC.common.ObjectHolders import ObjectHolder
@@ -93,19 +91,11 @@ class Domain(Persistent):
             return
         self.filterList.remove(f)
 
-    def _passesFilter( self, IP, filter ):
-        fItems = filter.split(".")
-        iItems = IP.split(".")
-        for i in range(0, len(fItems)):
-            if iItems[i] != fItems[i]:
-                return False
-        return True
-
     def belongsTo( self, IP ):
         ip = IP.strip()
         #ToDo: check that the IP is in the correct format
-        for filter in self.getFilterList():
-            if self._passesFilter( ip, filter ):
+        for filt in self.getFilterList():
+            if ip.startswith(filt):
                 return True
         return False
 
@@ -113,7 +103,7 @@ class Domain(Persistent):
 class _DomainFFName(filters.FilterField):
     _id="name"
 
-    def satisfies(self,dom):  
+    def satisfies(self, dom):
         for value in self._values:
             if str(dom.getName()).lower().find((str(value).strip().lower()))!=-1:
                 return True
@@ -130,9 +120,9 @@ class _DomainFilterCriteria(filters.FilterCriteria):
 class DomainHolder(ObjectHolder):
     idxName = "domains"
     counterName = "DOMAINS"
-    
+
     def match( self, criteria):
-        """ 
+        """
         """
         crit={}
         for f,v in criteria.items():
@@ -142,7 +132,7 @@ class DomainHolder(ObjectHolder):
 
     def remove(self, item):
         # METHOD HAS TO BE IMPLEMENTED...
-        ObjectHolders.remove(self, item)
+        ObjectHolder.remove(self, item)
         TrashCanManager().add(item)
 
     def getLength( self ):
@@ -152,7 +142,7 @@ class DomainHolder(ObjectHolder):
         letters = []
         for domain in self.getList():
             name = domain.getName()
-            if not name[0].lower() in letters:
+            if name and not name[0].lower() in letters:
                 letters.append(name[0].lower())
         letters.sort()
         return letters
@@ -161,6 +151,6 @@ class DomainHolder(ObjectHolder):
         list = []
         for domain in self.getList():
             name = domain.getName()
-            if name[0].lower() == letter.lower():
+            if name and name[0].lower() == letter.lower():
                 list.append(domain)
         return list

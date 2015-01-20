@@ -1,6 +1,6 @@
 <%page args="id, pending, conference"/>
 <% from MaKaC.common.timezoneUtils import nowutc %>
-<tr id="pending${id}">
+<tr id="pending${id}" class="participant">
     <td width="3%" valign="top" align="right" class="CRLabstractDataCell">
     % if nowutc() < conference.getStartDate() :
         <input type="checkbox" id="checkPending${id}" value="${id}" />

@@ -6,16 +6,13 @@ newsModule = ModuleHolder().getById("news")
 newsList = newsModule.getNewsItemsList()
 %>
 
-<ul class="items">
+<ul id="news-list" class="main-page-list">
     % for newItem in newsList[:2]:
         <li>
-            <a href="${ urlHandlers.UHIndicoNews.getURL()}">
+            <a class="title" href="${ urlHandlers.UHIndicoNews.getURL()}">
                 ${ newItem.getTitle() }
             </a>
-            <em>${ _('Posted on') }&nbsp;${ formatDate(newItem.getAdjustedCreationDate(tz)) }</em>
+            <span class="timing">${ _('Posted on') }&nbsp;${ formatDate(newItem.getAdjustedCreationDate(tz)) }</span>
         </li>
     % endfor
 </ul>
-<div style="margin-top:10px; text-align: right;">
-    <a href="${ urlHandlers.UHIndicoNews.getURL()}" class="subLink">${ _("View news history") }</a>
-</div>

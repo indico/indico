@@ -1,98 +1,57 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2013 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+# stdlib imports
 import time, re, os
 from random import randint
 from datetime import datetime, date, timedelta
+
+# 3rd party imports
+from BTrees.OOBTree import OOBTree
+from indico.util.date_time import format_datetime, format_date, format_time
+
+# indico legacy imports
 from MaKaC.common.timezoneUtils import isSameDay, isToday, getAdjustedDate,\
     isTomorrow
 from MaKaC.common import info
-from MaKaC import user, errors
-from indico.util.i18n import currentLocale
-from babel.dates import format_datetime
-from MaKaC.webinterface.linking import RoomLinker
-from MaKaC.rb_location import CrossLocationQueries
+from MaKaC import errors
+
+# indico imports
+from indico.core.config import Config
+from indico.core.db import DBMgr
+# backward compatibility
+from indico.util.string import truncate
 
 # fcntl is only available for POSIX systems
 if os.name == 'posix':
     import fcntl
 
-
-
-###########
-#CONSTANTS#
-###########
 _KEY_DEFAULT_LENGTH = 20
 _FAKENAME_SIZEMIN = 5
 _FAKENAME_SIZEMAX = 10
 
 
-
-###########
-#functions#
-###########
-
-from MaKaC.common.db import DBMgr
-from BTrees.OOBTree import OOBTree
-
-
-def isWeekend( d ):
+def isWeekend(d):
     """
     Accepts date or datetime object.
     """
     return d.weekday() in [5, 6]
-
-
-HOLIDAYS_KEY = 'Holidays'
-class HolidaysHolder:
-
-    @classmethod
-    def isWorkingDay( cls, d ):
-        if isinstance( d, datetime ):
-            d = d.date()
-        if isWeekend( d ):
-            return False
-        return not cls.__getBranch().has_key( d )
-
-    @classmethod
-    def getHolidays( cls ):
-        """
-        Returns list of holidays
-        """
-        return cls.__getBranch().keys()
-
-    @classmethod
-    def insertHoliday( cls, d ):
-        cls.__getBranch()[d] = None
-
-    @classmethod
-    def clearHolidays( cls ):
-        root = DBMgr.getInstance().getDBConnection().root()
-        root[HOLIDAYS_KEY] = OOBTree()
-
-    @staticmethod
-    def __getBranch():
-        root = DBMgr.getInstance().getDBConnection().root()
-        if not root.has_key( HOLIDAYS_KEY ):
-            root[HOLIDAYS_KEY] = OOBTree()
-        return root[HOLIDAYS_KEY]
 
 
 def stringToDate( str ):
@@ -160,8 +119,8 @@ def sortDomainsByName(x,y):
 def sortFilesByName(x,y):
     return cmp(x.getName().lower(),y.getName().lower())
 
-def sortContributionByDate(x,y):
-    return cmp(x.getStartDate(),y.getStartDate())
+def sortContributionByDate(x, y):
+    return cmp(x.getStartDate(), y.getStartDate())
 
 def sortSlotByDate(x,y):
     return cmp(x.getStartDate(),y.getStartDate())
@@ -170,10 +129,12 @@ def sortCategoryByTitle(x,y):
     return cmp(x.getTitle().lower(),y.getTitle().lower())
 
 def sortPrincipalsByName(x,y):
+
+    from MaKaC.user import Group
     firstNamex, firstNamey = "", ""
     if x is None:
         namex = ""
-    elif isinstance(x, user.CERNGroup) or isinstance(x, user.Group):
+    elif isinstance(x, Group):
         namex = x.getName()
     else:
         namex = x.getFamilyName()
@@ -181,7 +142,7 @@ def sortPrincipalsByName(x,y):
 
     if y is None:
         namey = ""
-    elif isinstance(y, user.CERNGroup) or isinstance(y, user.Group):
+    elif isinstance(y, Group):
         namey = y.getName()
     else:
         namey = y.getFamilyName()
@@ -250,7 +211,7 @@ def validIP(ip):
 
 def isStringHTML(s):
     if type(s) == str:
-        tags = [ "<p>", "<p ", "<br>", "<li>" ]
+        tags = [ "<p>", "<p ", "<br", "<li>" ]
         for tag in tags:
             if s.lower().find(tag) != -1:
                 return True
@@ -404,44 +365,31 @@ def unicodeSlice(s, start, end, encoding = 'utf-8'):
     """
     return s.decode(encoding, 'replace')[start:end]
 
-def daysBetween(dtStart, dtEnd):
-    d = dtEnd - dtStart
-    days = [ dtStart + timedelta(n) for n in range(0, d.days + 1)]
-    if days[-1] != dtEnd:
-        # handles special case, when d.days is the
-        # actual span minus 2
-        # |----|----|----|----|
-        # (4 days)
-        #    |----|----|---
-        # (2 days and some hours)
-        days.append(dtEnd)
 
-    return days
+def formatDateTime(dateTime, showWeek=False, format=None, locale=None, server_tz=False):
+    week = "EEEE" if showWeek else ""
 
-
-def formatDateTime(dateTime, showWeek=False, format=None, locale=None):
-    week = ""
-    locale = str(locale or currentLocale())
-    if showWeek:
-        week = "EEEE "
     if not format:
-        return format_datetime(dateTime, week+'d/M/yyyy H:mm', locale=locale).encode('utf-8')
+        return format_datetime(dateTime, week+'d/M/yyyy H:mm', locale=locale, server_tz=server_tz)
     else:
-        return format_datetime(dateTime, format, locale=locale).encode('utf-8')
+        return format_datetime(dateTime, format, locale=locale, server_tz=server_tz)
 
 
-def formatDate(date, showWeek=False, format=None):
+def formatDate(date, showWeek=False, format=None, locale=None):
     week = ""
     if showWeek:
-        week = "%a "
+        week = "EEE "
     if not format:
-        return datetime.strftime(date, week+'%d/%m/%Y')
+        return format_date(date, week+'d/M/yyyy', locale=locale)
     else:
-        return datetime.strftime(date, format)
+        return format_date(date, format, locale=locale)
 
 
-def formatTime(time):
-    return time.strftime('%H:%M')
+def formatTime(tm, format=None, locale=None, server_tz=False):
+    if not format:
+        return format_time(tm, 'H:mm', locale=locale, server_tz=server_tz)
+    else:
+        return format_time(tm, format, locale=locale, server_tz=server_tz)
 
 
 def parseDate(dateStr, format='%d/%m/%Y'):
@@ -641,11 +589,6 @@ def resolveHierarchicalId(objId):
     except errors.MaKaCError:
         return None
 
-def truncate(text, maxSize):
-    if len(text) > maxSize:
-        return text[:maxSize]+'...'
-    else:
-        return text
 
 class OSSpecific(object):
     """
@@ -692,39 +635,29 @@ class OSSpecific(object):
             'LOCK_SH': None
             }
 
-def getLocationInfo(item, roomLink=True, fullName=False):
-    """Return a tuple (location, room, url) containing
-    information about the location of the item."""
-    minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-    location = item.getLocation().getName() if item.getLocation() else ""
-    customRoom = item.getRoom()
-    if not customRoom:
-        roomName = ''
-    elif fullName and location and minfo.getRoomBookingModuleActive():
-        # if we want the full name and we have a RB DB to search in
-        roomName = customRoom.getFullName()
-        if not roomName:
-            customRoom.retrieveFullName(location) # try to fetch the full name
-            roomName = customRoom.getFullName() or customRoom.getName()
-    else:
-        roomName = customRoom.getName()
-    # TODO check if the following if is required
-    if roomName in ['', '0--', 'Select:']:
-        roomName = ''
-    if roomLink:
-        url = RoomLinker().getURL(item.getRoom(), item.getLocation())
-    else:
-        url = ""
-    return (location, roomName, url)
 
 def getProtectionText(target):
     if target.hasAnyProtection():
         if target.isItselfProtected():
-            return _("protected")
+            return "protected_own", None
         elif target.hasProtectedOwner():
-            return _("protected by parent category")
+            return "protected_parent", None
         elif target.getDomainList() != []:
-            return _("%s domain only"%(", ".join(map(lambda x: x.getName(), target.getDomainList()))))
+            return "domain", list(x.getName() for x in target.getDomainList())
         else:
             return getProtectionText(target.getOwner())
-    return ""
+    return "", None
+
+
+def getReportNumberItems(obj):
+    rns = obj.getReportNumberHolder().listReportNumbers()
+    reportCodes = []
+
+    for rn in rns:
+        key = rn[0]
+        if key in Config.getInstance().getReportNumberSystems().keys():
+            number = rn[1]
+            reportNumberId="s%sr%s"%(key, number)
+            name = Config.getInstance().getReportNumberSystems()[key]["name"]
+            reportCodes.append({"id" : reportNumberId, "number": number, "system": key, "name": name})
+    return reportCodes

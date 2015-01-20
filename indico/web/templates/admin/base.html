@@ -1,0 +1,12 @@
+<div class="content-page-header">
+    <h1>{% block title %}{% endblock %}</h1>
+    {% if self.subtitle() -%}
+        <h2>{% block subtitle %}{% endblock %}</h2>
+    {% endif %}
+</div>
+
+{% if self.description() -%}
+    <p class="content-page-description">{% block description %}{% endblock %}</p>
+{% endif %}
+
+{% block content %}{% endblock %}

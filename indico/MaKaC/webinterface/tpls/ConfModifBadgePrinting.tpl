@@ -1,73 +1,58 @@
-<form action='${ NewTemplateURL }' method='post'>
-  <table class="groupTable" cellpadding="0">
-    <tbody>
-      <tr>
-        <td colspan="2" class="subgroupTitle"> ${ _("Badge Printing")}</td>
-      </tr>
+<h2>${ _("Create a New Template")}</h2>
 
-      <tr>
-        <td  colspan="2">
-          &nbsp;
-        </td>
-      </tr>
-      <tr>
-        <td  colspan="2" class="groupTitle">
-            ${ _("Create a new template")}
-        </td>
-      </tr>
-      <tr>
-          <td class="titleCellTD" NOWRAP>
-             ${ _("Based on")}:
-          </td>
-          <td>
-            <select name="baseTemplate">
-              ${ baseTemplates }
-            </select>
-          </td>
-
-    </tr>
-     <tr>
-         <td></td>
-        <td>
-          <input name="New Template Button" class="btn" value="${ _("New")}" type="submit">
-        </td>
-     </tr>
-
+<div>
+  ${ _("Based on")}:
+<form action='${ NewTemplateURL }' method='post' style="display:inline;">
+  <select name="baseTemplate">
+  % for template in baseTemplates:
+    <option value="${template['value']}">
+      ${template['label']}
+    </option>
+  % endfor
+  </select>
+  <input class="i-button" name="New Template Button" value="${ _('Create New Template')}" type="submit"/>
 </form>
-<form action='${ CreatePDFURL }' method='post' target='_blank'>
+</div>
 
-      <tr>
-        <td colspan="2" class="groupTitle">
-            ${ _("List of available templates")}
-        </td>
-      </tr>
+% if templateList:
+  <form action='${CreatePDFURL}' method='post' target='_blank' id="create_form">
+    <div id="config_data" style="display:none"></div>
+    <h2 style="margin-top: 2em;">${ _("Available Templates")}</h2>
 
-      <tr>
-        <td colspan="2">
-          <table class="gestiontable" width="50%">
-            <tbody>
-${ templateList }
-          </table>
-        </td>
-      </tr>
+    ${_("Select the required template below then you may click the download button to obtain the generated PDF.")}
 
-      <tr>
-        <td>
-          <input class="btn" value="${ _("Try Selected Template")}" type="submit" ${ TryTemplateDisabled }>
-        </td>
-      </tr>
+    <div class="template_list">
+      <ul>
+        % for template in templateList:
+          <li>
+            <input type="radio" name="templateId" value="${template['id']}" />
+            <span class="name">${template['name']}</span>
+            <div class="toolbar right thin inline">
+              <div class="group">
+                <a href="${template['urlEdit']}" class="i-button icon-edit icon-only" title="${_("Edit template")}"></a>
+                <a href="${template['urlCopy']}" class="i-button icon-copy icon-only" title="${_("Clone template")}"></a>
+                <a href="${template['urlDelete']}" class="i-button icon-remove icon-only" title="${_("Delete template")}"></a>
+              </div>
+            </div>
+          </li>
+        % endfor
+      </ul>
 
-    </tbody>
-  </table>
+      <a href="#" id="showPDFLayout" class="i-button icon-settings right">${_("Layout Settings")}</a>
 
-  <table width="100%" class="gestiontable" >
-    <tbody>
-      <tr>
-        <td class="groupTitle">
-          <span>${ _("PDF Options")}</span>
-        </td>
-      </tr>
-      ${ PDFOptions }
-    </tbody>
-  </table>
-</form>
+      <%block name="download_button">
+        <button class="i-button" id="downloadPDF" style="margin-left: 3em;">
+          <i class="icon-file-download" aria-hidden="true"></i>
+          ${('Download Badges PDF')}
+        </button>
+      </%block>
+    </div>
+  </form>
+
+<div id="badgePDFOptions" title="PDF Options">
+  ${PDFOptions}
+</div>
+
+% endif
+
+

@@ -1,33 +1,32 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 
-import logging, time, datetime
+import logging
+import os
+import socket
 
 from BTrees.IOBTree import IOBTree
 from BTrees.Length import Length
 
-from MaKaC.trashCan import TrashCanManager
-
 from indico.modules import Module
-from indico.modules.scheduler import base, tasks
+from indico.modules.scheduler import base
 from indico.util.struct.queue import PersistentWaitingQueue
 from indico.util.date_time import int_timestamp
 from indico.core.index import IOIndex, IIndexableByArbitraryDateTime
@@ -55,6 +54,8 @@ class SchedulerModule(Module):
 
         # Is the scheduler running
         self._schedulerStatus = False
+        self._hostname = None
+        self._pid = None
 
         # Temporary area where all the tasks stay before being
         # added to the waiting list
@@ -100,8 +101,11 @@ class SchedulerModule(Module):
         """
         Returns some basic info
         """
+
         return {
             'state': self._schedulerStatus,
+            'hostname': getattr(self, '_hostname', None),
+            'pid': getattr(self, '_pid', None),
             'waiting': len(self._waitingQueue),
             'running': len(self._runningList),
             'spooled': len(self._taskSpool),
@@ -202,15 +206,16 @@ class SchedulerModule(Module):
             self._indexTask(task)
 
         # get an int timestamp
-        timestamp = int_timestamp(task.getStartOn())
+        if task.getStartOn():
+            timestamp = int_timestamp(task.getStartOn())
 
-        self._waitingQueue.enqueue(timestamp, task)
+            self._waitingQueue.enqueue(timestamp, task)
 
-        # make it "officially" queued
-        task.setStatus(base.TASK_STATUS_QUEUED)
+            # make it "officially" queued
+            task.setStatus(base.TASK_STATUS_QUEUED)
 
-        logging.getLogger('scheduler').debug(
-            'Added %s to waitingQueue..' % task)
+            logging.getLogger('scheduler').debug(
+                'Added %s to waitingQueue..' % task)
 
     def popNextWaitingTask(self):
         return self._waitingQueue.pop()
@@ -238,6 +243,8 @@ class SchedulerModule(Module):
 
     def setSchedulerRunningStatus(self, status):
         self._schedulerStatus = status
+        self._hostname = socket.getfqdn() if status else None
+        self._pid = os.getpid() if status else None
 
     def addTaskToRunningList(self, task):
 

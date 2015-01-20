@@ -1,28 +1,29 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.registration import Registrant
 from conference import Conference
 from badge import BadgeTemplateItem
 from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.i18n import _
+from indico.util.date_time import format_date
+from indico.util.string import safe_upper
 
 
 class RegistrantBadge:
@@ -66,21 +67,24 @@ class RegistrantFullName5(RegistrantBadge):
     """
     FullName with Title, the FirstName first and uppercase in surname.
     """
+
     @classmethod
     def getValue(cls, reg):
-        res = "%s %s"%( reg.getFirstName(), reg.getFamilyName().upper())
+        res = "%s %s" % (reg.getFirstName(), safe_upper(reg.getFamilyName()))
         res = res.strip()
         if reg.getTitle() != "":
-            res = "%s %s"%( reg.getTitle(), res )
+            res = "%s %s" % (reg.getTitle(), res)
         return res
+
 
 class RegistrantFullName6(RegistrantBadge):
     """
     FullName without Title, the FirstName first and uppercase inthe surname.
     """
+
     @classmethod
     def getValue(cls, reg):
-        res = "%s %s"%( reg.getFirstName(), reg.getFamilyName().upper())
+        res = "%s %s" % (reg.getFirstName(), safe_upper(reg.getFamilyName()))
         res = res.strip()
         return res
 
@@ -94,12 +98,12 @@ class ConferenceDates:
     def getValue(cls, conf):
         adjusted_sDate = conf.getAdjustedStartDate()
         adjusted_eDate = conf.getAdjustedEndDate()
-        confDateInterval = "%s to %s"%(adjusted_sDate.strftime("%d %B %Y"), adjusted_eDate.strftime("%d %B %Y"))
+        confDateInterval = _("%s to %s") % (format_date(adjusted_sDate, format='long'), format_date(adjusted_eDate, format='long'))
         if adjusted_sDate.strftime("%d%B%Y") == \
                 adjusted_eDate.strftime("%d%B%Y"):
-            confDateInterval = adjusted_sDate.strftime("%d %B %Y")
+            confDateInterval = format_date(adjusted_sDate, format='long')
         elif adjusted_sDate.strftime("%B%Y") == adjusted_eDate.strftime("%B%Y"):
-            confDateInterval = "%s-%s %s"%(adjusted_sDate.day, adjusted_eDate.day, adjusted_sDate.strftime("%B %Y"))
+            confDateInterval = "%s-%s %s" % (adjusted_sDate.day, adjusted_eDate.day, format_date(adjusted_sDate, format='MMMM yyyy'))
         return confDateInterval
 
 

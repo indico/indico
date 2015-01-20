@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.plugins.base import ActionBase
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
@@ -24,6 +23,7 @@ from MaKaC.conference import ConferenceHolder
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.plugins.Collaboration.indexes import IndexInformation
 from MaKaC.plugins.Collaboration.base import CollaborationException
+from indico.core.index import Catalog
 
 pluginTypeActions = [
     ("indexPluginsPerEventType", {"visible": False,
@@ -92,6 +92,7 @@ class IndexPluginsPerIndexAction(ActionBase):
 
         result.append(itiAll)
         result.extend(pluginIndexes)
+        result.append(IndexInformation("requests"))
         result.extend([commonIndexes[k] for k in commonIndexNames])
 
         self._pluginType.getOption("pluginsPerIndex").setValue(result)
@@ -107,7 +108,7 @@ class DeleteAllBookingsAction(ActionBase):
     def call(self):
         cf = ConferenceHolder()
         for conf in cf.getValuesToList():
-            csbm = conf.getCSBookingManager()
+            csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
             csbm._bookings = {}
             csbm._bookingsByType = {}
         collaborationIndex = IndexesHolder().getById("collaboration")

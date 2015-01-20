@@ -37,6 +37,15 @@
     color: white;
 }
 
+.support_box {
+    background: #dfe7e7;
+    border: 1px solid #7e8383;
+}
+
+.support_box > h3 {
+    background: #fa6900;
+}
+
 .conf_leftMenu {
 	float:left;
 	width:200px;

@@ -1,4 +1,4 @@
-<form action=${ postURL } method="POST">
+<form id="abstractMergeForm" action=${ postURL } method="POST">
     <table width="60%" align="center" border="0" style="border-left: 1px solid #777777">
         <tr>
             <td class="groupTitle" colspan="2"> ${ _("Merging abstracts")}</td>
@@ -6,17 +6,16 @@
         <tr>
             <td bgcolor="white">
                 <table width="100%">
-                    ${ errorMsg }
                     <tr>
-                        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Abstract ids to be merged")}</span></td>
+                        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Abstract ids to be merged")}</span><span class="mandatoryField"> *</span></td>
                         <td>
-                            <input type="text" size="60" name="selAbstracts" value=${ selAbstracts }>
+                            <input type="text" size="60" name="selAbstracts" id="selAbstracts" value=${ selAbstracts }>
                         </td>
                     </tr>
                     <tr>
-                        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Target abstract id")}</span></td>
+                        <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Target abstract id")}</span><span class="mandatoryField"> *</span></td>
                         <td>
-                            <input type="text" name="targetAbstract" value=${ targetAbs }>
+                            <input type="text" name="targetAbstract" id="targetAbstract" value=${ targetAbs }>
                         </td>
                     </tr>
                     <tr>
@@ -46,9 +45,20 @@
         </tr>
         <tr>
             <td colspan="2" align="center">
-                <input type="submit" class="btn" name="OK" value="${ _("submit")}">
+                <input type="submit" class="btn" name="OK" value="${ _("submit")}" id="ok">
                 <input type="submit" class="btn" name="CANCEL" value="${ _("cancel")}">
             </td>
         </tr>
     </table>
 </form>
+
+<script type="text/javascript">
+    var parameterManager = new IndicoUtil.parameterManager();
+    parameterManager.add($E('selAbstracts'), 'text', false);
+    parameterManager.add($E('targetAbstract'), 'non_negative_int', false);
+
+    $("#ok").click(function() {
+        if (!parameterManager.check())
+            event.preventDefault();
+    });
+</script>

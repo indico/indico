@@ -10,53 +10,66 @@
             </div>
         </td>
     </tr>
-    <tr id="headPanel" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);" class="follow-scroll">
+    <tr id="headPanel" class="follow-scroll">
         <td valign="bottom" width="100%" align="left" style="padding-top:5px;" colspan="9">
             <table>
                 <tr >
                     <td valign="bottom" align="left">
-                        <ul id="button-menu" class="ui-list-menu">
-                          <li class="left arrow" id="addParticipant">
-                              <a href="#">${_("Add")}</a>
-                              <ul>
-                                <li><a href="#" id="add_existing_user">${_("Indico User")}</a></li>
-                                <li><a href="#" id="add_new_user">${_("New user")}</a></li>
-                                % if nowutc() < self_._conf.getStartDate() :
-                                    <li><a href="#" id="invite_users">${_("Invite")}</a></li>
-                                % endif
-                              </ul>
-                          </li>
-                          <li class="middle">
-                            <a href="#" id="remove_users">${_("Remove")}</a>
-                          </li>
+                        <div id="button-menu" class="toolbar">
+
+                          <div class="group left">
+                            <a class="icon-checkbox-checked i-button arrow" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+                            <ul class="dropdown">
+                              <li><a href="#" id="selectAll">All</a></li>
+                              <li><a href="#" id="deselectAll">None</a></li>
+                            </ul>
+                          </div>
+
+                          <div class="group left">
+                          <a class="left arrow i-button" id="addParticipant" href="#" data-toggle="dropdown">
+                              ${_("Add")}
+                          </a>
+
+                          <ul class="dropdown">
+                            <li><a href="#" id="add_existing_user">${_("Indico User")}</a></li>
+                            <li><a href="#" id="add_new_user">${_("New user")}</a></li>
+                            % if nowutc() < self_._conf.getStartDate() :
+                              <li><a href="#" id="invite_users">${_("Invite")}</a></li>
+                            % endif
+                          </ul>
+
+                          <a class="i-button" id="remove_users" href="#">
+                            ${_("Remove")}
+                          </a>
+
                           % if nowutc() > self_._conf.getStartDate():
-                            <li class="button middle arrow">
-                              <a href="#">${_("Manage attendance")}</a>
-                              <ul>
-                                <li><a href="#" id="set_present">${_("Set as present")}</a></li>
-                                <li><a href="#" id="set_absent">${_("Set as absent")}</a></li>
-                                <li><a href="#" id="excuse_absence">${_("Excuse absence")}</a></li>
-                              </ul>
-
-                            </li>
+                            <a class="i-button arrow" href="#" data-toggle="dropdown">
+                              ${_("Manage attendance")}
+                            </a>
+                            <ul class="dropdown">
+                              <li><a href="#" id="set_present">${_("Set as present")}</a></li>
+                              <li><a href="#" id="set_absent">${_("Set as absent")}</a></li>
+                              <li><a href="#" id="excuse_absence">${_("Excuse absence")}</a></li>
+                            </ul>
                           % endif
-                          <li class="right">
-                            <a href="#" id="send_email">${_("Email")}</a>
-                          </li>
-                        </ul>
 
-                    </td>
-                    <td style="margin-left: 10px;">Export to: </td>
-                    <td>
-                        <input border="0" type="image" src=${excelIconURL} name="excel" style="margin-top:3px;">
+                          <a class="i-button" href="#" id="send_email">
+                            ${_("Email")}
+                          </a>
+
+                          <a class="i-button arrow button" href="#" data-toggle="dropdown">
+                            ${_("Export")}
+                          </a>
+                          <ul class="dropdown">
+                            <li><a href="#" class="icon-file-excel" id="export_csv">${_("CSV")}</a></li>
+                          </ul>
+
+                          </div>
+
+                        </div>
                     </td>
                 </tr>
             </table>
-        </td>
-    </tr>
-    <tr id="selectBar" style="display:none">
-        <td colspan=10 style="padding: 5px 5px 10px;" nowrap>
-        Select: <a style="color: #0B63A5;" id="selectAll"> All</a>, <a style="color: #0B63A5;" id="deselectAll">None</a>
         </td>
     </tr>
     <tr id="headParticipants"  style="display:none">
@@ -88,7 +101,7 @@
     </tr>
     <tr id="noParticipantsInfo" style="display:none">
         <td colspan=10 style="font-style: italic; padding:15px 0px 15px 15px; border-bottom: 1px solid #DDDDDD;" nowrap>
-            <span class="collShowBookingsText">${_("There are no participants yet")}</span>
+            <span class="italic">${_("There are no participants yet")}</span>
         </td>
     </tr>
         % for p in self_._conf.getParticipation().getParticipantList():
@@ -103,36 +116,17 @@
 
 <script type="text/javascript">
 var actionParticipantRows = function(){
-    $("[id^=checkParticipant]").click(function(){
-        if(this.checked){
-            $(this).parents('tr[id^=participant]').css('background-color',"#CDEB8B");
-        }else{
-            $(this).parents('tr[id^=participant]').css('background-color',"transparent");
-        }
-    });
-
-    $("tr[id^=participant]").hover(function () {
-        if($(this).find('input:checkbox:checked[id^=checkParticipant]').size() == 0){
-            $(this).css({'background-color' : 'rgb(255, 246, 223)'});
-        }}
-        , function () {
-          if($(this).find('input:checkbox:checked[id^=checkParticipant]').size() > 0){
-              $(this).css('background-color',"#CDEB8B");
-          }else{
-              $(this).css('background-color',"transparent");
-          }
-    });
-    $('input:checkbox:checked[id^=checkParticipant]').parents('tr[id^=participant]').css('background-color',"#CDEB8B");
+    $("input:checkbox[id^=checkParticipant]").on('change', function(){
+        $(this).closest('tr').toggleClass('selected', this.checked);
+    }).trigger('change');
 };
 
 var selectAll = function () {
-    $('input:checkbox[id^=checkParticipant]').attr('checked', 'checked');
-    $('input:checkbox[id^=checkParticipant]').parents('tr[id^=participant]').css('background-color',"#CDEB8B");
+    $('input:checkbox[id^=checkParticipant]').prop('checked', true).trigger('change');
 };
 
 var deselectAll = function () {
-    $('input:checkbox[id^=checkParticipant]').removeAttr('checked');
-    $('input:checkbox[id^=checkParticipant]').parents('tr[id^=participant]').css('background-color',"transparent");
+    $('input:checkbox[id^=checkParticipant]').prop('checked', false).trigger('change');
 };
 
 var checkNumberParticipants = function(){
@@ -208,7 +202,7 @@ IndicoUI.executeOnLoad(function(){
 
     var searchUsers = function(title, handler) {
         var chooseUsersPopup = new ChooseUsersPopup(title, true, ${self_._conf.getId()}, false,
-                true, null, false, false, handler);
+                true, null, false, false, false, handler);
         chooseUsersPopup.execute();
         return false;
     };
@@ -242,9 +236,9 @@ IndicoUI.executeOnLoad(function(){
             $("input:checkbox:checked").each(function() {
                 participantsChecked[$(this).val()] = $(this).parent().siblings("[id^=nameParticipant]").children("[id^=participantEdit]").text();
             });
-            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()},
-                                                   method, participantsChecked, "${currentUser.getStraightFullName()}",
-                                                   null, null, legends, function() {
+            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"), ${conf.getTitle() | n,j}, ${conf.getId() | n,j},
+                                                   method, participantsChecked, "${currentUser.getStraightFullName() if currentUser else conf.getTitle()}",
+                                                   "", null, legends, function() {
                                                        (new AlertPopup($T("E-mail sent"), $T('An e-mail has been sent to: ') + \
                                                                        "<em>" + _.values(participantsChecked).join("</em>, <em>") + "</em>.")).open();
                                                        deselectAll();
@@ -298,15 +292,16 @@ IndicoUI.executeOnLoad(function(){
 
     $("#invite_users").bind('menu_select', function(){
         var inviteHandler = function(peopleList){
-            var text = 'Dear {name}, The event manager of {confTitle} would like to invite you to take part in the event, ' +
-            'which will take place on ${conf.getAdjustedStartDate()}. Further information about this event is available at {url}' +
+            var text = 'Dear {name}, the event manager of {confTitle} would like to invite you to take part in the event, ' +
+            'which will take place on ${conf.getAdjustedStartDate()}. Further information about this event is available <a href="{url}">in Indico</a>' +
             '<br/><br/>' +
-            'You are kindly requested to either accept or decline your participation in this event by clicking on the relevant link below :<br/>' +
-            '{urlInvitation}' +
+            'You are kindly requested to either accept or decline your participation in this event by clicking on the relevant link below:<br/>' +
+            '<br><a href="{urlInvitation}">Accept or decline the invitation</a><br/><br>' +
             'Looking forward to meeting you at {confTitle} <br/>' +
             'Kindest regards';
-            var subject = "Invitation to ${conf.getTitle()}";
-            var popup = new ParticipantsInvitePopup($T("Send an Email to Selected Participants"),"${conf.getTitle()}", ${conf.getId()}, "event.participation.inviteParticipants", peopleList, "${currentUser.getFullName()}" ,subject, text, legends, successAddParticipantsHandler);
+            var subject = ${"Invitation to {0}".format(conf.getTitle()) | n,j};
+            var popup = new ParticipantsInvitePopup($T("Send an Email to Selected Participants"), ${conf.getTitle() | n,j}, ${conf.getId() | n,j}, "event.participation.inviteParticipants", peopleList, ${currentUser.getFullName() if currentUser else conf.getTitle() | n,j}, 
+                subject, text, legends, successAddParticipantsHandler);
             popup.open();
         };
         return searchUsers("Invite Participant(s)", inviteHandler);
@@ -320,19 +315,21 @@ IndicoUI.executeOnLoad(function(){
     });
 
     $("#set_present").bind('menu_select', function () {
-        return manageAttendance('event.participation.markPresent', 'presence','present');
+        return manageAttendance('event.participation.markPresent', 'presence',$T('Attended'));
     });
 
     $("#set_absent").bind('menu_select', function () {
-        return manageAttendance('event.participation.markAbsence', 'presence','absent');
+        return manageAttendance('event.participation.markAbsence', 'presence',$T("Didn't attend"));
     });
 
     $("#excuse_absence").bind('menu_select', function () {
         return manageAttendance('event.participation.excuseAbsence', 'status','excused');
     });
 
-    $("[name=excel]").click(function(){
-        return atLeastOneParticipantSelected();
+    $("#export_csv").click(function(){
+        if(atLeastOneParticipantSelected()) {
+          $('#participantsForm').submit();
+        }
     });
 
     $(window).scroll(function(){

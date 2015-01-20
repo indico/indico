@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from MaKaC.common import log
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface import urlHandlers
@@ -27,7 +27,7 @@ from datetime import datetime
 from persistent import Persistent
 from MaKaC.errors import MaKaCError
 import tempfile
-from MaKaC.common import Config
+from indico.core.config import Config
 import conference
 from MaKaC.common.Counter import Counter
 from MaKaC.fossils.reviewing import IReviewingQuestionFossil, IReviewingStatusFossil
@@ -95,6 +95,8 @@ class ConferencePaperReview(Persistent):
         self._enableAuthorSubmittedMatRefereeEmailNotif = False
         self._enableAuthorSubmittedMatEditorEmailNotif = False
         self._enableAuthorSubmittedMatReviewerEmailNotif = False
+        self._enableEditorSubmittedRefereeEmailNotif = False
+        self._enableReviewerSubmittedRefereeEmailNotif = False
 
         self._statuses = [] # list of content reviewing and final judgement
         self._reviewingQuestions = [] #list of content reviewing and final judgement questions
@@ -264,6 +266,28 @@ class ConferencePaperReview(Persistent):
     def disableReviewerJudgementEmailNotif(self):
         self._enableReviewerJudgementEmailNotif = False
 
+    def getEnableEditorSubmittedRefereeEmailNotif(self):
+        if not hasattr(self, "_enableEditorSubmittedRefereeEmailNotif"):
+            self._enableEditorSubmittedRefereeEmailNotif = False
+        return self._enableEditorSubmittedRefereeEmailNotif
+
+    def enableEditorSubmittedRefereeEmailNotif(self):
+        self._enableEditorSubmittedRefereeEmailNotif = True
+
+    def disableEditorSubmittedRefereeEmailNotif(self):
+        self._enableEditorSubmittedRefereeEmailNotif = False
+
+    def getEnableReviewerSubmittedRefereeEmailNotif(self):
+        if not hasattr(self, "_enableReviewerSubmittedRefereeEmailNotif"):
+            self._enableReviewerSubmittedRefereeEmailNotif = False
+        return self._enableReviewerSubmittedRefereeEmailNotif
+
+    def enableReviewerSubmittedRefereeEmailNotif(self):
+        self._enableReviewerSubmittedRefereeEmailNotif = True
+
+    def disableReviewerSubmittedRefereeEmailNotif(self):
+        self._enableReviewerSubmittedRefereeEmailNotif = False
+
     #auto e-mails methods for authors' submittion materials notification
     def getEnableAuthorSubmittedMatRefereeEmailNotif(self):
         return self._enableAuthorSubmittedMatRefereeEmailNotif
@@ -291,7 +315,6 @@ class ConferencePaperReview(Persistent):
 
     def disableAuthorSubmittedMatReviewerEmailNotif(self):
         self._enableAuthorSubmittedMatReviewerEmailNotif = False
-
 
     #Reviewing mode methods
     def setChoice(self, choice):
@@ -559,7 +582,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enableRefereeEmailNotif == True:
                 notification = ConferenceReviewingNotification(newReferee, 'Referee', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newReferee)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
 
 
     def removeReferee(self, referee):
@@ -579,7 +603,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enableRefereeEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(referee, 'Referee', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", referee)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
         else:
             raise MaKaCError("Cannot remove a referee who is not yet referee")
 
@@ -644,7 +669,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enableEditorEmailNotif == True:
                 notification = ConferenceReviewingNotification(newEditor, 'Layout Reviewer', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newEditor)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
 
     def removeEditor(self, editor):
         """ Remove a editor from the conference.
@@ -663,7 +689,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enableEditorEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(editor, 'Layout Reviewer', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", editor)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
         else:
             raise MaKaCError("Cannot remove an editor who is not yet editor")
 
@@ -728,7 +755,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enableReviewerEmailNotif == True:
                 notification = ConferenceReviewingNotification(newReviewer, 'Content Reviewer', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newReviewer)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
 
     def removeReviewer(self, reviewer):
         """ Remove a reviewer from the conference.
@@ -747,7 +775,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enableReviewerEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(reviewer, 'Content Reviewer', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", reviewer)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
         else:
             raise MaKaCError("Cannot remove a reviewer who is not yet reviewer")
 
@@ -812,7 +841,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
         if self._enablePRMEmailNotif == True:
             notification = ConferenceReviewingNotification(newPaperReviewManager, 'Paper Review Manager', self._conference)
-            GenericMailer.sendAndLog(notification, self._conference, "Reviewing", newPaperReviewManager)
+            GenericMailer.sendAndLog(notification, self._conference,
+                                     log.ModuleNames.PAPER_REVIEWING)
 
     def removePaperReviewManager(self, paperReviewManager):
         """ Remove a paper review manager from the conference.
@@ -831,7 +861,8 @@ class ConferencePaperReview(Persistent):
             self.notifyModification()
             if self._enablePRMEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(paperReviewManager, 'Paper Review Manager', self._conference)
-                GenericMailer.sendAndLog(notification, self._conference, "Reviewing", paperReviewManager)
+                GenericMailer.sendAndLog(notification, self._conference,
+                                         log.ModuleNames.PAPER_REVIEWING)
         else:
             raise MaKaCError("Cannot remove a paper review manager who is not yet paper review manager")
 
@@ -1066,18 +1097,17 @@ class ConferenceReviewingNotification(GenericNotification):
         GenericNotification.__init__(self)
         self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
-        self.setSubject("""[Indico] You have been chosen as %s for the conference "%s" (id: %s)"""
-                        % (role, conference.getTitle(), str(conference.getId())))
-        self.setBody("""Dear Sir or Madam,
+        self.setSubject("""You have been chosen as a %s for the conference "%s" """
+                        % (role, conference.getTitle()))
+        self.setBody("""Dear %s,
 
-        You have been chosen as %s of the conference "%s" (id: %s), in order to help with the paper reviewing process.
-        You can go to the conference main page:
-        %s
-        After logging in, you will find a link under 'Paper reviewing' on which you can click to perform your new functions.
+You have been chosen as a %s for the conference entitled "%s" in order to help with the paper reviewing process. Please find the Paper Reviewing utilities here:
 
-        Best regards
-        """ % ( role, conference.getTitle(), str(conference.getId()), urlHandlers.UHConferenceDisplay.getURL(conference)
-        ))
+%s
+
+Kind regards,
+Indico on behalf of "%s"
+""" % ( user.getStraightFullName(), role, conference.getTitle(), urlHandlers.UHPaperReviewingDisplay.getURL(conference), conference.getTitle()))
 
 class ConferenceReviewingRemoveNotification(GenericNotification):
     """ Template to build an email notification to a removed PRM / Referee / Editor / Reviewer / Abstract Manager / Abstract Reviewer
@@ -1087,15 +1117,17 @@ class ConferenceReviewingRemoveNotification(GenericNotification):
         GenericNotification.__init__(self)
         self.setFromAddr("Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail())
         self.setToList([user.getEmail()])
-        self.setSubject("""[Indico] You have been removed as %s of the conference "%s" (id: %s)"""
-                        % (role, conference.getTitle(), str(conference.getId())))
-        self.setBody("""Dear Indico user,
+        self.setSubject("""You are no longer a %s of the conference "%s" """
+                        % (role, conference.getTitle()))
+        self.setBody("""Dear %s,
 
-        We are sorry to inform you that you have been removed as %s of the conference "%s" (id: %s).
+Please, be aware that you are no longer a %s of the conference "%s":
 
-        Thank you for using our system.
-        """ % ( role, conference.getTitle(), str(conference.getId())
-        ))
+%s
+
+Kind regards,
+Indico on behalf of "%s"
+"""% ( user.getStraightFullName(),  role, conference.getTitle(), urlHandlers.UHConferenceDisplay.getURL(conference), conference.getTitle()))
 
 
 class Question(Persistent, Fossilizable):

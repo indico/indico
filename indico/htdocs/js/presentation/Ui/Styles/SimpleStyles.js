@@ -21,9 +21,9 @@ extend(XElement.prototype, {
 	 */
 	scroll: function(height, width) {
 		var style = {
-			overflow: "auto",
-			height: height
-		}
+            overflow: "auto",
+            height: height
+        };
 		if (exists(width)) {
 			style.width = width;
 		}

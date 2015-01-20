@@ -1,0 +1,29 @@
+<div class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Default item' | i18n }}
+    </label>
+    <select name="defaultItem" ng-model="formData.defaultItem">
+        <option value="" ng-selected="field.values.defaultItem == null">
+            {{ 'None' | i18n }}
+        </option>
+        <option ng-repeat="el in field.values.radioitems"
+            ng-selected="field.values.defaultItem == el.caption"
+            value="{{ el.caption }}">
+            {{ el.caption }}
+        </option>
+    </select>
+</div>
+
+<div class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Input type' | i18n }}
+    </label>
+    <select name="inputType" ng-model="formData.inputType">
+        <option value="dropdown" ng-selected="field.values.inputType == 'dropdown'">
+            {{ 'Drop-down list' | i18n }}
+        </option>
+        <option value="radiogroup" ng-selected="field.values.inputType == 'radiogroup'">
+            {{ 'Radio group' | i18n }}
+        </option>
+    </select>
+</div>

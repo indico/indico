@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 This file contains functions used by both 'python setup.py install' and after-easy_install
@@ -103,41 +102,41 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
 
     for k in new_values:
         if new_values[k].__class__ == str:
-            regexp = re.compile('^(%s[ ]*=[ ]*[\'"]{1})([^\'"]*)([\'"]{1})' % k, re.MULTILINE)
+            regexp = re.compile('^(%s\s*=\s*[\'"]{1})([^\'"]*)([\'"]{1})' % k, re.MULTILINE)
             if regexp.search(new_contents):
                 new_contents = re.sub(regexp, "\\g<1>%s\\3" % result_values[k], new_contents)
             else:
                 new_contents = "%s\n%s = '%s'" % (new_contents, k, result_values[k])
         elif new_values[k].__class__ == int:
-            regexp = re.compile('^(%s[ ]*=[ ]*)([0-9]+)' % k, re.MULTILINE)
+            regexp = re.compile('^(%s\s*=\s*)([0-9]+)' % k, re.MULTILINE)
             if regexp.search(new_contents):
                 new_contents = re.sub(regexp, "\\g<1>%s" % result_values[k], new_contents)
             else:
                 new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
 
         elif new_values[k].__class__ == bool:
-            regexp = re.compile('^(%s[ ]*=[ ]*)(True|False)' % k, re.MULTILINE)
+            regexp = re.compile('^(%s\s*=\s*)(True|False)' % k, re.MULTILINE)
             if regexp.search(new_contents):
                 new_contents = re.sub(regexp, "\\g<1>%s" % result_values[k], new_contents)
             else:
                 new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
 
         elif new_values[k].__class__ == tuple:
-            regexp = re.compile('^(%s[ ]*=[ ]*)[\(]{1}([^\)]+)[\)]{1}' % k, re.MULTILINE)
+            regexp = re.compile('^(%s\s*=\s*)[\(]{1}([^\)]+)[\)]{1}' % k, re.MULTILINE)
             if regexp.search(new_contents):
                 new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
             else:
                 new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
 
         elif new_values[k].__class__ == dict:
-            regexp = re.compile('^(%s[ ]*=[ ]*)[\{](.+)[\}$]' % k, re.MULTILINE)
+            regexp = re.compile('^(%s\s*=\s*)[\{](.+)[\}$]' % k, re.MULTILINE)
             if regexp.search(new_contents):
                 new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
             else:
                 new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
 
         elif new_values[k].__class__ == list:
-            regexp = re.compile('^(%s[ ]*=[ ]*)[\[]{1}([^\]]+)[\]]{1}' % k, re.MULTILINE)
+            regexp = re.compile('^(%s\s*=\s*)[\[]{1}([^\]]+)[\]]{1}' % k, re.MULTILINE)
             if regexp.search(new_contents):
                 new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
             else:
@@ -158,7 +157,7 @@ def updateIndicoConfPathInsideMaKaCConfig(indico_conf_path, makacconfigpy_path):
     '''Modifies the location of indico.conf referenced inside makacconfigpy_path to
     point to indico_conf_path'''
     fdata = open(makacconfigpy_path).read()
-    fdata = re.sub('indico_conf[ ]*=[ ]*[\'"]{1}([^\'"]*)[\'"]{1}', "indico_conf = \"%s\"" % indico_conf_path, fdata)
+    fdata = re.sub(r'indico_conf\s*=\s*[\'"]([^\'"]*)[\'"]', "indico_conf = \"%s\"" % indico_conf_path, fdata)
     open(makacconfigpy_path, 'w').write(fdata)
 
 def _updateMaKaCEggCache(file, path):
@@ -286,7 +285,7 @@ def _checkDirPermissions(directories, dbInstalledBySetupPy=False, accessuser=Non
 
         for dir in dirs2check:
             stat_info = os.stat(dir)
-            if pwd.getpwuid(int(stat_info.st_uid)).pw_name != accessuser:
+            if pwd.getpwuid(int(stat_info.st_uid)).pw_name != accessuser or os.path.basename(dir) == 'htdocs':
                 print commands.getoutput("if test $(which sudo); then CMD=\"sudo\"; fi; $CMD chown -R %s:%s %s" % (accessuser, accessgroup, dir))
             elif grp.getgrgid(int(stat_info.st_gid)).gr_name != accessgroup:
                 os.chown(dir, pwd.getpwnam(accessuser).pw_uid, grp.getgrnam(accessgroup).gr_gid)
@@ -335,24 +334,26 @@ def _extractDirsFromConf(conf):
 
 def _replacePrefixInConf(filePath, prefix):
     fdata = open(filePath).read()
-    fdata = re.sub('\/opt\/indico', prefix, fdata)
+    fdata = re.sub(r'/opt/indico', prefix, fdata)
     open(filePath, 'w').write(fdata)
 
-def _updateDbConfigFiles(dbDir, logDir, cfgDir, tmpDir, uid):
-    filePath = os.path.join(cfgDir, 'zodb.conf')
-    fdata = open(filePath).read()
-    fdata = re.sub('\/opt\/indico\/db', dbDir, fdata)
-    fdata = re.sub('\/opt\/indico\/log', logDir, fdata)
-    open(filePath, 'w').write(fdata)
+def _updateDbConfigFiles(cfg_dir, uid=None, port=None, **kwargs):
+    """
+    Update parameters inside DB config files
+    """
+    kwargs['etc'] = cfg_dir
 
-    filePath = os.path.join(cfgDir, 'zdctl.conf')
-    fdata = open(filePath).read()
-    fdata = re.sub('\/opt\/indico\/db', dbDir, fdata)
-    fdata = re.sub('\/opt\/indico\/etc', cfgDir, fdata)
-    fdata = re.sub('\/opt\/indico\/tmp', tmpDir, fdata)
-    fdata = re.sub('(\s+user\s+)apache', '\g<1>%s' % uid, fdata)
-    open(filePath, 'w').write(fdata)
-
+    for fname in ['zodb.conf', 'zdctl.conf']:
+        with open(os.path.join(cfg_dir, fname), 'r+') as f:
+            fdata = f.read()
+            for dirname in ['db', 'log', 'tmp', 'etc']:
+                fdata = re.sub(r'\/opt\/indico\/{0}'.format(dirname), kwargs.get(dirname, dirname), fdata)
+            if uid:
+                fdata = re.compile(r'^(\s*user\s+)apache[^\S\n]*', re.MULTILINE).sub(r'\g<1>{0}'.format(uid), fdata)
+            if port is not None:
+                fdata = re.compile(r'^(\s*address\s+localhost:)\d+[^\S\n]*', re.MULTILINE).sub(r'\g<1>{0}'.format(port), fdata)
+            f.seek(0)
+            f.write(fdata)
 
 def indico_pre_install(defaultPrefix, force_upgrade=False, existingConfig=None):
     """
@@ -459,7 +460,7 @@ What do you want to do [c/a]? ''')
 
 
 def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, force_no_db = False, uid=None, gid=None, dbDir=LOCALDATABASEDIR):
-    from MaKaC.common.Configuration import Config
+    from indico.core.config import Config
 
     if 'db' in targetDirs:
         # we don't want that the db directory be created
@@ -547,16 +548,16 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
     # find the apache user/group
     user, group = _findApacheUserGroup(uid, gid)
 
-    # change indico.conf
-    modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheUser', user)
-    modifyOnDiskIndicoConfOption('%s/indico.conf' % targetDirs['etc'], 'ApacheGroup', group)
-
     # set the directory for the egg cache
     _updateMaKaCEggCache(os.path.join(package_dir, 'MaKaC', '__init__.py'), targetDirs['tmp'])
 
     if not force_no_db and dbpath:
         # change the db config files (paths + apache user/group)
-        _updateDbConfigFiles(dbpath, targetDirs['log'], targetDirs['etc'], targetDirs['tmp'], user)
+        _updateDbConfigFiles(targetDirs['etc'],
+                             log=targetDirs['log'],
+                             db=dbpath,
+                             tmp=targetDirs['tmp'],
+                             uid=user)
 
     # check permissions
     _checkDirPermissions(targetDirs, dbInstalledBySetupPy=dbParam, accessuser=user, accessgroup=group)

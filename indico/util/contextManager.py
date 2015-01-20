@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 Defines the ContextManager, which provides a global access namespace for
@@ -47,6 +46,9 @@ class DummyDict(object):
     def __setattr__(self, name, value):
         return None
 
+    def __nonzero__(self):
+        return False
+
     def __str__(self):
         return "<DummyDict>"
 
@@ -69,6 +71,9 @@ class Context(threading.local):
 
     def __setitem__(self, elem, value):
         self.__dict__[elem] = value
+
+    def __delitem__(self, elem):
+        del self.__dict__[elem]
 
     def clear(self):
         self.__dict__.clear()
@@ -101,7 +106,7 @@ class ContextManager(object):
         If no set has been done over the variable before,
         a dummy context will be returned.
         """
-        if elem == None:
+        if elem is None:
             return cls._context
         else:
             return cls._context.get(elem, default)
@@ -118,3 +123,11 @@ class ContextManager(object):
         a default value is *set* and *returned*
         """
         return cls._context.setdefault(name, default)
+
+    @classmethod
+    def delete(cls, name, silent=False):
+        try:
+            del cls._context[name]
+        except KeyError:
+            if not silent:
+                raise

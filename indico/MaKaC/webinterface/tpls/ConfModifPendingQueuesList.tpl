@@ -1,79 +1,112 @@
-<form action="${ postURL }" method="post">
-    <table width="90%" align="center" border="0">
-        <tr>
-            <td align="center" colspan="3">
-                <em>${ title }</em>
-            </td>
-        </tr>
-        <tr>
-            <td bgcolor="white">
-                <table width="100%" cellspacing="0" align="center" border="0">
-                    <tr>
-                        <td>
-                        </td>
-                        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF; \
-                                                    border-bottom: 1px solid #5294CC;">
-                        ${ _("Name/email")}
-                        </td>
-                        <td nowrap class="titleCellFormat" style="border-right:5px solid #FFFFFF;border-left:5px \
-                                                    solid #FFFFFF;border-bottom: 1px solid #5294CC;">
-                            ${ target }
-                        </td>
-                    </tr>
+% if list:
 
-            % if len(list) == 0:
-             <tr><td colspan="11"><br><center>${ _("No pending requests")}</center></td></tr>
+<form action="${ postURL }" method="post" id="action_form">
+
+<div id="list_options" class="toolbar" style="line-height: 3em;">
+  <input type="text" id="filterSpeakers" value="" placeholder="${_("Search Name, Email &amp; Contributions")}"/>
+
+  <input id="action" type="hidden"/>
+
+  <div id="actions" class="right group">
+    <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+    <ul class="dropdown">
+      <li><a href="#" id="selectAll">All</a></li>
+      <li><a href="#" id="selectNone">None</a></li>
+    </ul>
+    <a class="icon-mail i-button left icon-only" id="send_reminder" href="#" title="${_("Send reminder")}"></a>
+    <a class="icon-remove i-button left icon-only" id="remove_people" href="#" title="${_("Remove selected people")}"></a>
+  </div>
+</div>
+
+<ul class="speaker_list clear">
+    % for (key, pList) in list:
+    <li>
+        <input type="checkbox" name="pendingUsers" value="${str(key)}">
+            % if pList[0].getEmail():
+                <a href="mailto:${pList[0].getEmail()}" class="name">${pList[0].getFullName()}</a>
+            % else:
+                <span class="name">${pList[0].getFullName()}</span>
             % endif
-
-            % for (key, pList) in list:
-                    <tr>
-                      <td valign="top"><input type="checkbox" name="pendingSubmitters" value="${ str(key) }"></td>
-                      <td valign="top" nowrap class="abstractLeftDataCell">${ self_.htmlText("%s <%s>"%(pList[0].getAbrName() or "&nbsp;", pList[0].getEmail() or "&nbsp;")) }</td>
-                      <td width="100%" valign="top" align="left" class="abstractDataCell" style="padding-left:20px">
-            <% pList.sort(self_._cmpByContribName) %>
-            % for cp in pList:
-                        <% contrib=cp.getContribution() %>
-            <a href="${ str(urlHandlers.UHContributionModification.getURL(contrib)) }">${ self_.htmlText(contrib.getTitle()) }</a>
-             % if pType == _("Submitters"):
-              <small>
-               % if contrib.isPrimaryAuthor(cp):
-                ${ _("Primary Author")}
-               % elif contrib.isCoAuthor(cp):
-                ${ _("Co-Author")}
-               % elif contrib.isSpeaker(cp):
-                ${ _("Speaker")}
-               % else:
-                unkwon
-               % endif
-              </small>
-             % endif
+        <ul class="contributions">
+            % if pType == _("Submitters"):
+              <% pList.sort(self_._cmpByContribName) %>
+            % elif pType == _("ConfSubmitters"):
+              <% pList.sort(self_._cmpByConfName) %>
+            % endif
+            % for cp in sorted(pList):
+                <li>
+				% if pType == _("Submitters"):
+                    <% contrib = cp.getContribution() %>
+                    <a href="${str(urlHandlers.UHContributionModification.getURL(contrib))}">
+                        ${contrib.getTitle()}
+                    </a>
+                    % if contrib.isPrimaryAuthor(cp):
+                        ${_("Primary Author")}
+                    % elif contrib.isCoAuthor(cp):
+                        ${_("Co-Author")}
+                    % elif contrib.isSpeaker(cp):
+                        ${_("Speaker")}
+                    % endif
+				% elif pType == _("ConfSubmitters"):
+					<a href="${ str(urlHandlers.UHConferenceModification.getURL(cp.getConference())) }">
+						${cp.getConference().getTitle()}
+					</a>
+				% endif
+                </li>
             % endfor
-              </td>
-                    </tr>
-            % endfor
-
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                &nbsp;
-            </td>
-        </tr>
-        <tr>
-            <td colspan="11" style="border-top:2px solid #777777;padding-top:5px" valign="bottom" align="left">
-                &nbsp;
-            </td>
-        </tr>
-        <tr>
-            <td colspan="10" valign="bottom" align="left">
-                <input type="submit" class="btn" name="remove" value="${ _("remove selected")}">
-            </td>
-        </tr>
-        <tr>
-            <td colspan="10" valign="bottom" align="left">
-                <input type="submit" class="btn" name="reminder" value="${ _("send reminder")}">
-            </td>
-        </tr>
-    </table>
+        </ul>
+    </li>
+    % endfor
+</ul>
 </form>
+% else:
+<p>
+    ${_('There are no pending requests at this time.')}
+</p>
+% endif
+
+<script type="text/javascript">
+
+function verifyFilters() {
+    $(".speaker_list > li").hide();
+    var term = $("#filterSpeakers").val();
+    var items = $('ol.contributions li, .speaker_list li .name').textContains(term);
+    items.closest('.speaker_list > li').show();
+}
+
+$(document).ready(function() {
+    $('#actions').dropdown();
+
+    $('#selectAll').click(function() {
+        $('.speaker_list li:visible input').prop('checked', true);
+    });
+
+    $('#selectNone').click(function() {
+        $('.speaker_list li:visible input').prop('checked', false);
+    });
+
+    $("#filterSpeakers").keyup(function() {
+        verifyFilters();
+    });
+
+    $("#send_reminder").click(function() {
+        $('#action_form input#action').attr({
+            name: 'reminder',
+            value: 'reminder'
+        });
+        $('#action_form').submit();
+        return false;
+    })
+
+    $("#remove_people").click(function() {
+        $('#action_form input#action').attr({
+            name: 'remove',
+            value: 'remove'
+        });
+        $('#action_form').submit();
+        return false;
+    })
+
+});
+
+</script>

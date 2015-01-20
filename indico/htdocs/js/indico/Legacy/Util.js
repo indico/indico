@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 /**
  @namespace Utility functions for IndicoUI
@@ -94,17 +111,9 @@ var IndicoUtil = {
             if (isDom(component)) {
                 var node = component;
                 if (node.type == "checkbox") {
-                    if (node.name in values && exists($L(values[node.name]).indexOf(node.value))) {
-                        node.checked = true;
-                    } else {
-                        node.checked = false;
-                    }
+                    node.checked = node.name in values && exists($L(values[node.name]).indexOf(node.value));
                 } else if (node.type == "radio") {
-                    if (node.name in values && values[node.name] == node.value) {
-                        node.checked = true;
-                    } else {
-                        node.checked = false;
-                    }
+                    node.checked = node.name in values && values[node.name] == node.value;
                 } else {
                     node.value = values[node.name];
                 }
@@ -167,13 +176,14 @@ var IndicoUtil = {
         if (!document.styleSheets) {
             return;
         }
+        var css;
         if (document.styleSheets[0].cssRules) {
             css = document.styleSheets[0].cssRules;
         }
         else {
             css = document.styleSheets[0].rules;
         }
-        for (i = 0; i < css.length; i++) {
+        for (var i = 0; i < css.length; i++) {
             if (css[i].selectorText.toLowerCase() == cls.toLowerCase()) {
                 css[i].style.cssText = style;
             }
@@ -187,30 +197,31 @@ var IndicoUtil = {
     */
     createFormFromMap: function(map, expand) {
         expand = any(expand, false);
-        var labelStyle = {style:{textAlign:'right', verticalAlign: 'top'}};
-        var fieldStyle = {style:{verticalAlign: 'top'}};
+        var labelStyle = "style='text-align: right; vertical-align: top;'";
+        var fieldStyle = "style='vertical-align: top;'";
         if (expand) {
-            labelStyle.style.whiteSpace = "nowrap";
-            fieldStyle.style.width = "100%";
+            labelStyle = "style='white-space:nowrap;'";
+            fieldStyle = "style='width:100%;'";
         }
-        var list = [];
-        $L(map).each(function(item) {
+        var table = $("<table></table>");
+        $(map).each(function(key, item) {
             // if the key is an int, do not print the label
             if (item.length == 2) {
-                list.push(Html.tr({style:{marginTop:'10px'}},
-                                  Html.td(labelStyle, Html.label("popUpLabel",item[0])),
-                                  Html.td(fieldStyle, Html.div('popUpTdContent', item[1]))));
+                // TO REMOVE: when completed migration to jquery
+                if(!item[1].jquery && item[1].dom) item[1] = $(item[1].dom);
+
+                var row = $("<tr style='margin-top:10px;'></tr>");
+                row.append($("<td " + labelStyle + "><label class='popUpLabel'>" + item[0] +"</label></td>"));
+                row.append($("<td " + fieldStyle + "></td>").append($("<div class='popUpTdContent'></div>").append(item[1])));
+                table.append(row);
             } else {
-                list.push(Html.tr({style:{marginTop:'10px'}},
-                                  Html.td(),
-                                  Html.td(fieldStyle, item[0])));
+                // TO REMOVE: when completed migration to jquery
+                if(item[0]!== undefined && !item[0].jquery && item[0].dom) item[0] = $(item[0].dom);
+
+                table.append($("<tr style='margin-top:10px;'><td></td></tr>").append($("<td " + fieldStyle + "></td>").append(item[0])));
             }
         });
-        var tbody = Html.tbody();
-        each(list, function(row){
-            tbody.append(row);
-        });
-        return Html.table({}, tbody);
+        return table
 
     },
 
@@ -407,11 +418,19 @@ var IndicoUtil = {
     /**
      * Determines if a string contains invalid characters for short URLs
      * @param {String} s The input string
-     * @return {Booleab} true if the string is a valid string, false otherwise
+     * @return {Boolean} true if the string is a valid string, false otherwise
      */
     parseShortURL: function(s) {
-        var regExp = new RegExp("[^A-Za-z0-9\._-]");
-        return !regExp.test(s);
+        if (/^[0-9]+$/.test(s)) {
+            // Just a number
+            return false;
+        }
+        if (s.substr(0, 1) == '/' || s.substr(s.length - 1, 1) == '/' || ~s.indexOf('//')) {
+            // Leading/trailing/duplicate slash
+            return false;
+        }
+        // Restrict characters
+        return /^[a-zA-Z0-9/._-]*$/.test(s);
     },
 
     /**
@@ -599,13 +618,13 @@ var IndicoUtil = {
                     error = Html.span({}, $T("Time format is not valid. It should be hh:mm"));
                 }
                 else if (dataType == 'shortURL' && !IndicoUtil.parseShortURL(component.get())) {
-                    error = Html.span({}, $T("The short URL contains invalid characters. The allowed characters are alphanumeric, _, - and ."));
+                    error = Html.span({}, $T("The short URL contains invalid characters. The allowed characters are alphanumeric, /, _, - and ."));
                 }
                 else if (!allowEmpty && component.get() != null && (!isString(component.get()) || trim(component.get()) === '')) {
                     error = Html.span({}, $T("Field is mandatory"));
                 }
                 if (exists(extraCheckFunction)) {
-                    error = extraCheckFunction(component.get());
+                    error = error || extraCheckFunction(component.get());
                 }
                 //--------------------------------
 
@@ -715,6 +734,10 @@ var IndicoUtil = {
          *
          */
         this.add = function(component, dataType, allowEmpty, extraCheckFunction) {
+            if (component instanceof jQuery) {
+                component = $E(component[0]);
+            }
+
             // Add new entry
             entryList.append([component, dataType, allowEmpty, extraCheckFunction]);
 
@@ -726,12 +749,15 @@ var IndicoUtil = {
                 }
 
                 classList[component.dom.id] = component.dom.className;
-
             }
             return component;
         };
 
         this.remove = function(component) {
+            if (component instanceof jQuery) {
+                component = $E(component[0]);
+            }
+
             var removeEntry = null;
             each(entryList,
                  function(entry) {

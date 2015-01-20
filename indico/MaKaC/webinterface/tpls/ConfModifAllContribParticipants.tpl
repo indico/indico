@@ -1,61 +1,74 @@
+
+<form action=${participantSelectionAction} method="post" name="participantsForm" id="participantsForm">
+
+<div id="list_options" class="toolbar" style="line-height: 3em;">
+    <input type="text" id="filterSpeakers" value="" placeholder='${_("Search Name, Email &amp; Contributions")}' />
+
+    <span class="text-not-important" style="font-size: 1.2em;">
+      ${_('{0} speakers').format(participantNumber)}
+    </span>
+
+
+    <div id="actions" class="right group">
+      <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+      <ul class="dropdown">
+        <li><a href="#" id="selectAll">All</a></li>
+        <li><a href="#" id="selectNone">None</a></li>
+      </ul>
+      <a class="icon-mail i-button left icon-only" id="email_people" aria-hidden="true" href="#" title="${_("Email selected people")}"></a>
+    </div>
+</div>
+
+<ul class="speaker_list clear">
+    % for speaker in speakers:
+    <li>
+      <input type="checkbox" name="participants" value="${speaker['email']}" />
+
+      % if speaker['email']:
+        <a href="mailto:${speaker['email']}" class="name">${speaker['name']}</a>
+      % else:
+        <span class="name">${speaker['name']}</span>
+      % endif
+
+      <ul class="contributions">
+        % for contribution in speaker['contributions']:
+        <li><a href="${contribution['url']}">${contribution['title']}</a></li>
+        % endfor
+      </ul>
+    </li>
+    % endfor
+</div>
+
+</form>
+
 <script type="text/javascript">
-<!--
-function selectAll()
-{
-if (!document.participantsForm.participants.length)
-        {
-            document.participantsForm.participants.checked=true
-        }else{
-for (i = 0; i < document.participantsForm.participants.length; i++)
-    {
-    document.participantsForm.participants[i].checked=true
-    }
-}
+
+function filterEntries() {
+    $(".speaker_list > li").hide();
+    var term = $("#filterSpeakers").val();
+    var items = $('ul.contributions li, .speaker_list li .name').textContains(term);
+    items.add($('.speaker_list li input').valueContains(term));
+    items.closest('.speaker_list > li').show();
 }
 
-function unselectAll()
-{
-if (!document.participantsForm.participants.length)
-        {
-            document.participantsForm.participants.checked=false
-        }else{
-for (i = 0; i < document.participantsForm.participants.length; i++)
-    {
-    document.participantsForm.participants[i].checked=false
-    }
-}
-}
-//-->
+$(document).ready(function() {
+    $('#actions').dropdown();
+    $('#selectAll').click(function() {
+        $('.speaker_list li:visible input').prop('checked', true);
+    });
+
+    $('#selectNone').click(function() {
+        $('.speaker_list li:visible input').prop('checked', false);
+    });
+
+    $("#filterSpeakers").keyup(function() {
+        filterEntries();
+    });
+
+    $('#email_people').click(function() {
+        $('#participantsForm').submit();
+        return false;
+    });
+});
+
 </script>
-<table width="100%">
-    <tr>
-        <td>
-            <a name="results"></a>
-            <table align="center" width="100%" border="0" style="border-left: 1px solid #777777;" cellpadding="0" cellspacing="0">
-                <tr>
-                    <td colspan="9" style="background:#E5E5E5; color:gray">
-
-                        <table cellpadding="0" cellspacing="0" width="100%">
-                            <tr>
-                                <td colspan=2 class="groupTitle" width="100%">&nbsp;&nbsp;&nbsp;${ title } (${ participantNumber })</td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="9">&nbsp;</td>
-                </tr>
-                <form action=${ participantSelectionAction } method="post" name="participantsForm">
-                <tr>
-                    ${ columns }
-                    ${ participants }
-                </tr>
-                <tr><td colspan="9">&nbsp;</td></tr>
-                </form>
-                <tr>
-                    <td colspan="9">&nbsp;</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table>

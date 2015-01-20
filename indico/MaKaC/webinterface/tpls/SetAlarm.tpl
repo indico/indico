@@ -7,7 +7,6 @@
 <br>
 <TABLE border="0" align="center" width="100%">
 <form method="POST" name="alarmForm" id="alarmForm">
-<input type="hidden" name="alarmId" value="${ alarmId }">
     <tr>
       <td align="right">
       </td>
@@ -22,13 +21,13 @@
     <td>
         <input name="dateType" id="dateType" type="radio" value="1" ${ "checked" if dateType == 1 else "" }>  ${ _("At this date")}:
     </td>
-    <td nowrap class="contentCellTD">
+    <td class="contentCellTD" style="white-space: normal;">
                 <span id="datePlace"></span>
-                <input type="hidden" id="day" name="day" value="${ day }">
-                <input type="hidden" id="month"  name="month" value="${ month }">
-                <input type="hidden" id="year" name="year" value="${ year }">
-                <input type="hidden" id="hour" name="hour" value="${ hour }">
-                <input type="hidden" id="minute" name="minute" value="${ minute }">
+                <input type="hidden" id="day" name="day" value="${ alarm_date.day }">
+                <input type="hidden" id="month"  name="month" value="${ alarm_date.month }">
+                <input type="hidden" id="year" name="year" value="${ alarm_date.year }">
+                <input type="hidden" id="hour" name="hour" value="${ alarm_date.hour }">
+                <input type="hidden" id="minute" name="minute" value="${ alarm_date.minute }">
         (${ timezone })
     </td>
 </tr>
@@ -130,7 +129,7 @@ var sendTestAlarm = function ()
         confId: ${conference.getId()},
         fromAddr: $("#fromAddr").val(),
         note: $("#note").val(),
-        includeConf: $("#includeConf:checked").val(),
+        includeConf: $("#includeConf:checked").val()
     },
     function(result, error) {
         if(error) {
@@ -146,21 +145,16 @@ var sendTestAlarm = function ()
 
 IndicoUI.executeOnLoad(function()
 {
-    $("#defineRecipients").click(function ()
-    {
-        if ($("#email").is(":disabled")){
-            $("#email").removeAttr("disabled");
-        } else {
-            $("#email").attr("disabled",true);
-        }
+    $("#defineRecipients").on('change', function () {
+        $('#email').prop('disabled', !this.checked);
     });
     var dateAlarm = IndicoUI.Widgets.Generic.dateField(true,null,['day', 'month', 'year','hour', 'minute']);
     $('#datePlace').append($(dateAlarm.dom));
-    % if day != '':
-        dateAlarm.set('${ day }/${ month }/${ year } ${ hour }:${ minute }');
+    % if alarm_date != '':
+        dateAlarm.set('${alarm_date.strftime(date_format)}');
     % endif
     var checkRecipients = function(){
-        if(!$('#toAllParticipants').attr('checked') && (!$('#defineRecipients').attr('checked')||($('#defineRecipients').attr('checked') && $("#email").val()=="")) ){
+        if((!$('#toAllParticipants').prop('checked') && !$('#defineRecipients').prop('checked')) || ($('#defineRecipients').prop('checked') && !Util.Validation.isEmailList($("#email").val())) ){
             return Html.span({}, $T("Please select the checkbox 'Send to all participants' or 'Define recipients' with a list of emails."));
         }
         return null;
@@ -173,7 +167,7 @@ IndicoUI.executeOnLoad(function()
     parameterManager.add($E('defineRecipients'),'checkbox',true,checkRecipients);
     parameterManager.add($E('email'),'text',true,checkRecipients);
     parameterManager.add($E('timeBefore'),'int',true,function(){
-        if($('[name=dateType]:checked').val() == "2" && (!IndicoUtil.isInteger($('#timeBefore').attr("value")) || $('#timeBefore').attr("value")<=0)){
+        if($('[name=dateType]:checked').val() == "2" && (!IndicoUtil.isInteger($('#timeBefore').val()) || $('#timeBefore').val()<=0)){
             return Html.span({}, $T("The time before must be a positive number"));
         }
         return null;
@@ -186,12 +180,12 @@ IndicoUI.executeOnLoad(function()
     parameterManagerNow.add($E('email'),'text',true,checkRecipients);
 
     $('#save').click(function(){
-        this.form.action = '${ urlHandlers.UHSaveAlarm.getURL( conference ) }';
+        this.form.action = '${ urlHandlers.UHModifySaveAlarm.getURL(alarm) if alarm else urlHandlers.UHSaveAlarm().getURL(conference) }';
         return parameterManager.check();
     });
 
     $('#sendNow').click(function(){
-        this.form.action = '${urlHandlers.UHSendAlarmNow.getURL( conference )}';
+        this.form.action = '${urlHandlers.UHSendAlarmNow.getURL(alarm or conference)}';
         return parameterManagerNow.check();
     });
     $('#sendTest').click(function(){
@@ -200,8 +194,9 @@ IndicoUI.executeOnLoad(function()
         }
         return false;
     });
-    $('#cancel').click(function(){
-        this.form.action = '${urlHandlers.UHConfDisplayAlarm.getURL( conference )}';
+    $('#cancel').click(function(e){
+        e.preventDefault();
+        location.href = '${urlHandlers.UHConfDisplayAlarm.getURL(conference)}';
     });
 });
 </script>

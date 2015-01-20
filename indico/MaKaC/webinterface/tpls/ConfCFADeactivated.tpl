@@ -1,7 +1,11 @@
+<%inherit file="ConfDisplayBodyBase.tpl"/>
 
-<table width="90%" align="center">
-    <tr>
-        <td align="center"><font size="+2" color="red"> ${ _("Call for abstracts is DEACTIVATED for this conference")}</font>
-        </td>
-    </tr>
-</table>
+<%block name="title">
+    ${body_title}
+</%block>
+
+<%block name="content">
+    <div class="info-message-box">
+        <div class="message-text">${_("Sorry, abstract submission is disabled for this conference.")}</div>
+    </div>
+</%block>

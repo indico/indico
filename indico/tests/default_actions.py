@@ -1,27 +1,27 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN)
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software: you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation, either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.conference import CategoryManager, DefaultConference
-from MaKaC.user import Avatar, AvatarHolder, LoginInfo
+from MaKaC.user import Avatar, AvatarHolder, LoginInfo, Group, GroupHolder
 from MaKaC.authentication import AuthenticatorMgr
 
 
@@ -38,46 +38,66 @@ def initialize_new_db(root):
     cm = CategoryManager()
     cm.getRoot()
 
-    home = cm.getById('0')
-
-    # set debug mode on
-    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-    minfo.setDebugActive(True)
-
-    return home
+    return cm.getById('0')
 
 
-def create_dummy_user():
-    """
-    Creates a dummy user for testing purposes
-    """
+def create_user(name, login, authManager, set_password=False):
     avatar = Avatar()
-
-    avatar.setName("fake")
-    avatar.setSurName("fake")
+    avatar.setName(name)
+    avatar.setSurName(name)
     avatar.setOrganisation("fake")
     avatar.setLang("en_GB")
-    avatar.setEmail("fake@fake.fake")
-
-    # registering user
-    ah = AvatarHolder()
-    ah.add(avatar)
+    avatar.setEmail("%s@fake.fake" % name)
 
     # setting up the login info
-    li = LoginInfo("dummyuser", "dummyuser")
-    ih = AuthenticatorMgr()
-    userid = ih.createIdentity(li, avatar, "Local")
-    ih.add(userid)
-
+    li = LoginInfo(login, login if set_password else None)
+    userid = authManager.createIdentity(li, avatar, "Local")
+    authManager.add(userid)
     # activate the account
     avatar.activateAccount()
+    return avatar
 
-    # since the DB is empty, we have to add dummy user as admin
+
+def create_group(name, description, email):
+    group = Group()
+    group.setName(name)
+    group.setDescription(description)
+    group.setEmail(email)
+    return group
+
+
+def create_dummy_users(dummyuser_has_password=False):
+    """
+    Creates a dummy user for testing purposes.
+
+    If dummyuser_has_password is set, "dummyuser" and "fake-1" can be used for logging in.
+    """
     minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-
+    ah = AvatarHolder()
+    authManager = AuthenticatorMgr()
+    avatars = []
     al = minfo.getAdminList()
+
+    avatar = create_user("fake", "dummyuser", authManager, dummyuser_has_password)
+    ah.add(avatar)
+    avatars.append(avatar)
     al.grant(avatar)
 
-    dc = DefaultConference()
-    HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(dc)
-    return avatar
+    for i in xrange(1, 5):
+        avatar = create_user("fake-%d" % i, "fake-%d" % i, authManager, dummyuser_has_password and i == 1)
+        avatar.setId("fake-%d" % i)
+        ah.add(avatar)
+        avatars.append(avatar)
+
+    HelperMaKaCInfo.getMaKaCInfoInstance().setDefaultConference(DefaultConference())
+    return avatars
+
+
+def create_dummy_group():
+    """
+    Creates a dummy group for testing purposes.
+    """
+    gh = GroupHolder()
+    dummy_group = create_group("fake_group", "fake", "fake@fk.com")
+    gh.add(dummy_group)
+    return dummy_group

@@ -1,30 +1,30 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface                      import urlHandlers
 from MaKaC.webinterface.pages                import evaluations
-from MaKaC.common                            import Config
 from MaKaC.evaluation                        import Evaluation,Question,Submission
 from MaKaC.errors                            import FormValuesError
 from MaKaC.common.info import HelperMaKaCInfo
+
+from indico.core.config import Config
 
 
 class RHBaseEvaluation( RHConferenceBaseDisplay ):
@@ -76,62 +76,45 @@ class RHEvaluationSignIn( RHBaseEvaluation ):
     """Invite user to login/signin."""
     _uh = urlHandlers.UHConfEvaluationSignIn
     _tohttps = True
+    _isMobile = False
 
+    def _getLoginURL(self):
+        return RHConferenceBaseDisplay._getLoginURL(self, urlHandlers.UHConfEvaluationDisplay.getURL(self._conf))
 
-    def _processIfActive( self ):
-        return self._wpEvaluation("SignIn").display()
+    def _processIfActive(self):
+        if self._getUser():
+            self._redirect(urlHandlers.UHConfEvaluationDisplay.getURL(self._conf))
+        else:
+            return self._wpEvaluation("SignIn").display()
 
 
 class RHEvaluationDisplayBase( RHBaseEvaluation ):
     """Base for evaluation display."""
     _uh = urlHandlers.UHConfEvaluationDisplay
 
-    def _getLoginURL( self ):
-        url = self.getCurrentURL()
-        if url == "":
-            url = urlHandlers.UHWelcome.getURL()
-        urlLogin = str(urlHandlers.UHSignIn.getURL(urlHandlers.UHConfEvaluationDisplay.getURL(self._conf)))
-        if Config.getInstance().getLoginURL().startswith("https"):
-            urlLogin = urlLogin.replace("http://", "https://")
-        return urlLogin
-
     def _checkProtection( self ):
         RHBaseEvaluation._checkProtection(self)
-        if self._evaluation.inEvaluationPeriod() and self._evaluation.isMandatoryAccount() and self._getUser()==None:
-            self._redirect( self._getLoginURL() )
+        if self._evaluation.inEvaluationPeriod() and self._evaluation.isMandatoryAccount() and not self._getUser():
+            self._redirect(urlHandlers.UHConfEvaluationSignIn.getURL(self._conf))
             self._doProcess = False
 
 
-class RHEvaluationDisplay( RHEvaluationDisplayBase ):
+class RHEvaluationDisplay(RHEvaluationDisplayBase):
     """Evaluation display."""
 
-    def _processIfActive( self ):
-        if self._getUser()!=None and self._getUser().hasSubmittedEvaluation(self._evaluation):
-            return self._wpEvaluation("DisplayModif").display()
-        else:
-            return self._evaluationDisplay().display()
+    def _processIfActive(self):
+        return self._evaluationDisplay().display()
 
     def _evaluationDisplay(self):
         """What to display."""
         if not self._evaluation.inEvaluationPeriod():
             return self._wpEvaluation("Closed")
+        elif self._getUser() and self._getUser().hasSubmittedEvaluation(self._evaluation):
+            return self._wpEvaluation("DisplayModif")
         elif self._evaluation.isFull():
             return self._wpEvaluation("Full")
         else:
             return self._wpEvaluation("Display")
-
-
-class RHEvaluationModif( RHEvaluationDisplayBase ):
-    """Submitted evaluation modification."""
-    _uh = urlHandlers.UHConfEvaluationDisplayModif
-
-    def _processIfActive( self ):
-        if self._getUser()!=None and self._getUser().hasSubmittedEvaluation(self._conf.getEvaluation()):
-            if not self._evaluation.inEvaluationPeriod():
-                return self._wpEvaluation("Closed").display()
-            else:
-                return self._wpEvaluation("DisplayModif").display()
-        self._redirect(urlHandlers.UHConfEvaluationMainInformation.getURL(self._conf))
 
 
 class RHEvaluationSubmit (RHBaseEvaluation):
@@ -204,7 +187,7 @@ class RHEvaluationSubmit (RHBaseEvaluation):
             ###########
             elif self._submit and mode==Evaluation._EDIT:
                 submission = evaluation.getUserSubmission(user)
-                if submission!=None :    #should always be the case... but we never know!
+                if submission is not None:  # should always be the case... but we never know!
                     #for each question...
                     for question in evaluation.getQuestions():
                         questionFromForm = "q%s"%question.getPosition()
@@ -218,7 +201,7 @@ class RHEvaluationSubmit (RHBaseEvaluation):
                     submission.setModificationDate()
                     #notification
                     submission.notifySubmissionModified()
-                elif HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive() :
+                elif Config.getInstance().getDebug():
                     raise Exception("Evaluation - Strange error... the submission of this user was not found!")
 
             ##########

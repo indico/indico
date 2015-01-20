@@ -1,5 +1,5 @@
 <table class="groupTable">
-<form action="${ createDomainURL }" method="POST">
+<form action="${ createDomainURL }" method="GET">
 
 <tr>
   <td colspan="2"><div class="groupTitle">${ _("Domain tools") }</div></td>

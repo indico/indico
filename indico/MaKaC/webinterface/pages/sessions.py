@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from xml.sax.saxutils import quoteattr, escape
 from datetime import datetime,timedelta
@@ -28,9 +27,10 @@ import MaKaC.webinterface.navigation as navigation
 import MaKaC.schedule as schedule
 import MaKaC.conference as conference
 import MaKaC.webinterface.linking as linking
-from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConfModifScheduleGraphic, WPConferenceDefaultDisplayBase, WContribParticipantList, WContributionCreation, WPModScheduleNewContribBase, WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConfModifScheduleGraphic, \
+    WPConferenceDefaultDisplayBase, WContribParticipantList, WPConferenceModifBase
 from MaKaC.webinterface.pages.metadata import WICalExportBase
-from MaKaC.common import Config, info
+from MaKaC.common import info
 import MaKaC.webinterface.timetable as timetable
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 import MaKaC.common.filters as filters
@@ -44,484 +44,111 @@ from indico.util.i18n import i18nformat
 from pytz import timezone
 from MaKaC.common.timezoneUtils import DisplayTZ
 from indico.util import json
+from indico.util.date_time import format_date, format_datetime
 import pytz
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
 from MaKaC.user import Avatar
+from MaKaC.common.TemplateExec import render
+
+from indico.core.config import Config
 
 
-class WPSessionBase( WPConferenceBase ):
+class WPSessionBase(WPConferenceBase):
 
-    def __init__( self, rh, session):
+    def __init__(self, rh, session):
         self._session = session
-        WPConferenceBase.__init__( self, rh, self._session.getConference() )
+        WPConferenceBase.__init__(self, rh, self._session.getConference())
 
 
-class WPSessionDisplayBase( WPSessionBase ):
+class WPSessionDisplayBase(WPSessionBase):
     pass
 
-class WPSessionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPSessionDisplayBase ):
 
-    def __init__( self, rh, session ):
-        WPSessionDisplayBase.__init__( self, rh, session )
+class WPSessionDefaultDisplayBase(WPConferenceDefaultDisplayBase, WPSessionDisplayBase):
 
-class WContributionDisplayItemBase(wcomponents.WTemplated):
+    def __init__(self, rh, session):
+        WPSessionDisplayBase.__init__(self, rh, session)
 
-    def __init__(self,aw,contrib):
-        self._contrib=contrib
-        self._aw=aw
 
-    def getVars( self ):
-        vars=wcomponents.WTemplated.getVars( self )
-        tz = DisplayTZ(self._aw,self._contrib.getConference()).getDisplayTZ()
-        vars["id"]=self.htmlText(self._contrib.getId())
-        vars["title"]=self.htmlText(self._contrib.getTitle())
-        cType=""
-        if self._contrib.getType() is not None:
-            cType=self.htmlText(self._contrib.getType().getName())
-        vars["type"]=self.htmlText(cType)
-        vars["startDate"]="&nbsp;"
-        if self._contrib.isScheduled():
-            vars["startDate"]=self._contrib.getAdjustedStartDate(tz).strftime("%Y-%b-%d %H:%M")
-        vars["duration"] = "&nbsp;"
-        if self._contrib.getDuration() is not None:
-            if (datetime(1900,1,1)+self._contrib.getDuration()).minute>0:
-                vars["duration"]="%s"%(datetime(1900,1,1)+self._contrib.getDuration()).strftime("%M'")
-            if (datetime(1900,1,1)+self._contrib.getDuration()).hour>0:
-                vars["duration"]="%s"%(datetime(1900,1,1)+self._contrib.getDuration()).strftime("%Hh%M'")
-        lspk = []
-        for speaker in self._contrib.getSpeakerList():
-            lspk.append(self.htmlText(speaker.getFullName()))
-        vars["speakers"] = "<br>".join( lspk )
-        if vars["speakers"]=="":
-            vars["speakers"]="&nbsp;"
-        vars["displayURL"]=quoteattr(str(urlHandlers.UHContributionDisplay.getURL(self._contrib)))
-        vars["boardNumber"]=self.htmlText(self._contrib.getBoardNumber())
+class WContributionListDisplayTab(wcomponents.WTemplated):
+
+    def __init__(self, aw, session, tab=None):
+        self._aw = aw
+        self._session = session
+        self._activeTab = tab
+
+    def _getURL(self, sortByField):
+        url = urlHandlers.UHSessionDisplay.getURL(self._session)
+
+        if self._activeTab:
+            url.addParam("tab", self._activeTab)
+
+        return url
+
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        vars['contributions'] = self._session.getContributionList()
+        vars['accessWrapper'] = self._aw
+        vars['posterSession'] = (self._session.getScheduleType() == "poster")
         return vars
 
 
-class WContributionDisplayItemFull(WContributionDisplayItemBase):
-    pass
-
-
-class WContributionDisplayItemMin(WContributionDisplayItemBase):
-    pass
-
-
-class WContributionDisplayItem:
-
-    def __init__( self, aw, contrib ):
-        self._contribution = contrib
-        self._aw = aw
-
-    def getHTML( self, params={} ):
-        if self._contribution.canAccess( self._aw ):
-            c = WContributionDisplayItemFull( self._aw, self._contribution )
-            return c.getHTML( params )
-        if self._contribution.canView( self._aw ):
-            c = WContributionDisplayItemMin( self._aw, self._contribution )
-            return c.getHTML( params )
-        return ""
-
-
-class WContributionDisplayPosterItemFull(WContributionDisplayItemBase):
-    pass
-
-
-class WContributionDisplayPosterItemMin(WContributionDisplayItemBase):
-    pass
-
-
-class WContributionDisplayPosterItem:
-
-    def __init__( self, aw, contrib ):
-        self._contribution = contrib
-        self._aw = aw
-
-    def getHTML( self, params={} ):
-        if self._contribution.canAccess( self._aw ):
-            c = WContributionDisplayPosterItemFull( self._aw, self._contribution )
-            return c.getHTML( params )
-        if self._contribution.canView( self._aw ):
-            c = WContributionDisplayPosterItemMin( self._aw, self._contribution )
-            return c.getHTML( params )
-        return ""
-
-
 class _NoWitdhdrawFF(filters.FilterField):
-    _id="no_withdrawn"
+    _id = "no_withdrawn"
 
     def __init__(self):
         pass
 
-    def satisfies(self,contrib):
-        return not isinstance(contrib.getCurrentStatus(),conference.ContribStatusWithdrawn)
+    def satisfies(self, contrib):
+        return not isinstance(contrib.getCurrentStatus(), conference.ContribStatusWithdrawn)
 
 
 class _NoWithdrawnFilterCriteria(filters.FilterCriteria):
 
-    def __init__(self,conf):
-        self._fields={"no_withdrawn":_NoWitdhdrawFF()}
+    def __init__(self, conf):
+        self._fields = {"no_withdrawn": _NoWitdhdrawFF()}
 
 
 class WSessionDisplayBase(WICalExportBase):
 
-    def __init__(self,aw,session,activeTab="time_table",sortingCrit=None):
-        self._aw=aw
-        self._session=session
-        self._activeTab=activeTab
-        self._sortingCrit=sortingCrit
+    def __init__(self,aw,session):
+        self._aw = aw
+        self._session = session
         self._tz = timezoneUtils.DisplayTZ(self._aw,self._session.getConference()).getDisplayTZ()
 
-    def _getHTMLRow(self,title,body):
-        str = """
-                <tr>
-                    <td nowrap class="displayField" valign="top"><b>%s:</b></td>
-                    <td>%s</td>
-                </tr>"""%(title,body)
-        if body.strip() == "":
-            return ""
-        return str
-
-    def _createTabCtrl( self ):
-        self._tabCtrl=wcomponents.TabControl()
-        url=urlHandlers.UHSessionDisplay.getURL(self._session)
-        url.addParam("tab","contribs")
-        self._tabContribs=self._tabCtrl.newTab("contribs", \
-                                                _("Contribution List"),str(url))
-        url.addParam("tab","time_table")
-        self._tabTimeTable=self._tabCtrl.newTab("time_table", \
-                                                _("Time Table"),str(url))
-        if self._session.getScheduleType()=="poster":
-            self._tabTimeTable.setEnabled(False)
-            self._tabCtrl.getTabById("contribs").setActive()
+    def _getResourceName(self, resource):
+        if isinstance(resource, conference.Link):
+            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() else resource.getURL()
         else:
-            self._tabTimeTable.setEnabled(True)
-            tab=self._tabCtrl.getTabById(self._activeTab)
-            if tab is None:
-                tab=self._tabCtrl.getTabById("time_table")
-            tab.setActive()
-
-    def _getURL(self,sortByField):
-        url=urlHandlers.UHSessionDisplay.getURL(self._session)
-        url.addParam("tab",self._activeTab)
-        url.addParam("sortBy",sortByField)
-        return url
-
-    def _getContribListHTML(self):
-        cl = []
-        if self._sortingCrit is None:
-            self._sortingCrit=contribFilters.SortingCriteria(["number"])
-        fc=_NoWithdrawnFilterCriteria(self._session.getConference())
-        f=filters.SimpleFilter(fc,self._sortingCrit)
-        for contrib in f.apply(self._session.getContributionList()):
-            wc=WContributionDisplayItem(self._aw,contrib)
-            html=wc.getHTML()
-            cl.append("""<tr><td valign="top">%s</td></tr>"""%html)
-        idHTML="""id <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="number":
-            idHTML="""<a href=%s>id</a>"""%quoteattr(str(self._getURL("number")))
-        dateHTML="""date <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="date":
-            dateHTML="""<a href=%s>date</a>"""%quoteattr(str(self._getURL("date")))
-        typeHTML="""type <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="type":
-            typeHTML="""<a href=%s>type</a>"""%quoteattr(str(self._getURL("type")))
-        spkHTML="""presenters <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="speaker":
-            spkHTML="""<a href=%s>presenters</a>"""%quoteattr(str(self._getURL("speaker")))
-        return """
-            <table cellspacing="0" cellpadding="5" width="100%%">
-                <tr>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                    <td class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">dur.</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">title</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                </tr>
-                %s
-            </table>"""%(idHTML,dateHTML,typeHTML,spkHTML,"".join(cl))
-
-    def _getPosterContribListHTML(self):
-        cl = []
-        if self._sortingCrit is None:
-            self._sortingCrit=contribFilters.SortingCriteria(["number"])
-        fc=_NoWithdrawnFilterCriteria(self._session.getConference())
-        f=filters.SimpleFilter(fc,self._sortingCrit)
-        for contrib in f.apply(self._session.getContributionList()):
-            wc=WContributionDisplayPosterItem(self._aw,contrib)
-            html=wc.getHTML()
-            cl.append("""<tr><td valign="top">%s</td></tr>"""%html)
-        idHTML="""id <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="number":
-            idHTML="""<a href=%s>id</a>"""%quoteattr(str(self._getURL("number")))
-        #dateHTML="""date <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        #if self._sortingCrit.getField().getId()!="date":
-        #    dateHTML="""<a href=%s>date</a>"""%quoteattr(str(self._getURL("date")))
-        typeHTML="""type <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="type":
-            typeHTML="""<a href=%s>type</a>"""%quoteattr(str(self._getURL("type")))
-        spkHTML="""presenters <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="speaker":
-            spkHTML="""<a href=%s>presenters</a>"""%quoteattr(str(self._getURL("speaker")))
-        boardNumHTML="""board # <img src=%s border="0" alt="down">"""%quoteattr(str(Config.getInstance().getSystemIconURL("downArrow")))
-        if self._sortingCrit.getField().getId()!="board_number":
-            boardNumHTML="""<a href=%s>board #</a>"""%quoteattr(str(self._getURL("board_number")))
-        return """
-            <table cellspacing="0" cellpadding="5" width="100%%">
-                <tr>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">title</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                    <td nowrap class="titleCellFormat" style="border-bottom: 1px solid #5294CC; padding-right:10px;border-right:5px solid #FFFFFF">%s</td>
-                </tr>
-                %s
-            </table>"""%(idHTML,typeHTML,spkHTML,boardNumHTML,"".join(cl))
-
-    def _getColor(self,entry):
-        bgcolor = "white"
-        if isinstance(entry,schedule.LinkedTimeSchEntry):
-            if isinstance(entry.getOwner(),conference.Contribution):
-                bgcolor = entry.getOwner().getSession().getColor()
-        elif isinstance(entry,schedule.BreakTimeSchEntry):
-            bgcolor = entry.getColor()
-        return bgcolor
-
-    def _getMaterialHTML(self, contrib):
-        lm=[]
-        paper=contrib.getPaper()
-        if paper is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="paper"><small> %s</small></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(paper))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallPaper" ))),
-                self.htmlText("paper")))
-        slides=contrib.getSlides()
-        if slides is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="slides"><small> %s</small></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(slides))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallSlides" ))),
-                self.htmlText("slides")))
-        proceedings=None
-        for mat in contrib.getMaterialList():
-            if mat.getTitle().lower() == "proceedings":
-                proceedings=mat
-                break
-        if proceedings is not None:
-            lm.append("""<a href=%s><small> %s</small></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(proceedings))),
-                self.htmlText("proceedings")))
-        video=contrib.getVideo()
-        if video is None:
-            for mat in contrib.getMaterialList():
-               if mat.getTitle().lower().find("video") != -1:
-                   video = mat
-        if video is not None:
-            lm.append("""<a href=%s><img src=%s border="0" alt="video"><small> %s</small></a>"""%(
-                quoteattr(str(urlHandlers.UHMaterialDisplay.getURL(video))),
-                quoteattr(str(Config.getInstance().getSystemIconURL( "smallVideo" ))),
-                self.htmlText("video")))
-        return ", ".join(lm)
-
-    def _getContributionHTML(self,contrib):
-        URL=urlHandlers.UHContributionDisplay.getURL(contrib)
-        room = ""
-        if contrib.getRoom() != None:
-            room = "%s: "%contrib.getRoom().getName()
-        speakerList = []
-        for spk in contrib.getSpeakerList():
-            spkcapt=spk.getDirectFullName()
-            if spk.getAffiliation().strip() != "":
-                spkcapt="%s (%s)"%(spkcapt, spk.getAffiliation())
-            speakerList.append(spkcapt)
-        speakers =""
-        if speakerList != []:
-            speakers = i18nformat("""<br><small> _("by") %s</small>""")%"; ".join(speakerList)
-        linkColor=""
-        if contrib.getSession().isTextColorToLinks():
-            linkColor="color:%s"%contrib.getSession().getTextColor()
-        return """<table width="100%%">
-                        <tr>
-                            <td width="100%%" align="center" style="color:%s">
-                                [%s] <a href="%s" style="%s">%s</a>%s<br><small>(%s%s - %s)</small>
-                            </td>
-                            <td align="right" valign="top" nowrap style="color:%s">
-                                %s
-                            </td>
-                        </tr>
-                    </table>"""%(
-                contrib.getSession().getTextColor(),contrib.getId(),URL,\
-                linkColor, contrib.getTitle(),speakers,room,
-                contrib.getAdjustedStartDate(self._tz).strftime("%H:%M"),
-                contrib.getAdjustedEndDate(self._tz).strftime("%H:%M"),
-                contrib.getSession().getTextColor(),
-                self._getMaterialHTML(contrib))
-
-    def _getBreakHTML(self,breakEntry):
-        return """
-                <font color="%s">%s<br><small>(%s - %s)</small></font>
-                """%(\
-                    breakEntry.getTextColor(),\
-                    self.htmlText(breakEntry.getTitle()),\
-                    self.htmlText(breakEntry.getAdjustedStartDate(self._tz).strftime("%H:%M")),\
-                    self.htmlText(breakEntry.getAdjustedEndDate(self._tz).strftime("%H:%M")))
-
-    def _getSchEntries(self):
-        res=[]
-        for slot in self._session.getSlotList():
-            for entry in slot.getSchedule().getEntries():
-                res.append(entry)
-        return res
-
-    def _getEntryHTML(self,entry):
-        if isinstance(entry,schedule.LinkedTimeSchEntry):
-            if isinstance(entry.getOwner(),conference.Contribution):
-                return self._getContributionHTML(entry.getOwner())
-        elif isinstance(entry,schedule.BreakTimeSchEntry):
-            return self._getBreakHTML(entry)
-
-    def _getTimeTableHTML(self):
-
-        ttdata = json.dumps(schedule.ScheduleToJson.process(self._session.getSchedule(), self._tz,
-                                                                           None, days = None, mgmtMode = False))
-
-        eventInfo = fossilize(self._session.getConference(), IConferenceEventInfoFossil, tz=self._tz)
-        eventInfo['timetableSession'] = fossilize(self._session, ISessionFossil, tz=self._tz)
-        eventInfo = json.dumps(eventInfo)
-
-        return """
-            <div id="timetableDiv" style="position: relative;">
-
-            <div class="timetablePreLoading" style="width: 700px; height: 300px;">
-                <div class="text" style="padding-top: 200px;">&nbsp;&nbsp;&nbsp;%s</div>
-            </div>
-
-            <div class="clearfix"></div>
-
-            <script type="text/javascript">
-                var ttdata = %s;
-                var eventInfo = %s;
-
-                var historyBroker = new BrowserHistoryBroker();
-                var timetable = new SessionDisplayTimeTable(ttdata, eventInfo, 710, $E('timetableDiv'), historyBroker);
-
-                IndicoUI.executeOnLoad(function(){
-
-                  $E('timetableDiv').set(timetable.draw());
-                  timetable.postDraw();
-
-                });
-            </script>
-        """ %(_("Building timetable..."),
-              str(ttdata),
-              eventInfo)
-
-    def _getContribsHTML(self):
-        self._createTabCtrl()
-        if self._tabContribs.isActive():
-            if self._session.getScheduleType()=="poster":
-                html=self._getPosterContribListHTML()
-            else:
-                html=self._getContribListHTML()
-        else:
-            html=self._getTimeTableHTML()
-        return wcomponents.WTabControl(self._tabCtrl, self._aw).getHTML(html)
+            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getFileName() else resource.getFileName()
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars( self )
+        vars = wcomponents.WTemplated.getVars( self )
 
-        vars["title"]=self.htmlText(self._session.getTitle())
-
-        if self._session.getDescription():
-            desc = self._session.getDescription().strip()
-        else:
-            desc = ""
-
-        if desc!="":
-            vars["description"]="""
-                <tr>
-                    <td colspan="2"><table width="100%%" cellpadding="0" cellspacing="0" class="tablepre"><tr><td><pre>%s</pre></td></tr></table></td>
-                </tr>
-                                """%desc
-        else:
-            vars["description"]=""
-
-        tzUtil = timezoneUtils.DisplayTZ(self._aw,self._session.getOwner())
-        tz = tzUtil.getDisplayTZ()
-        sDate=self._session.getAdjustedStartDate(tz)
-        eDate=self._session.getAdjustedEndDate(tz)
-        if sDate.strftime("%d%b%Y")==eDate.strftime("%d%b%Y"):
-            vars["dateInterval"]=sDate.strftime("%A %d %B %Y %H:%M")
-        else:
-            vars["dateInterval"]= i18nformat(""" _("from") %s  _("to") %s""")%(
-                sDate.strftime("%A %d %B %Y %H:%M"),
-                eDate.strftime("%A %d %B %Y %H:%M"))
-        vars["location"]=""
-        loc=self._session.getLocation()
-        if loc is not None and loc.getName().strip()!="":
-            vars["location"]="""<i>%s</i>"""%self.htmlText(loc.getName())
-            if loc.getAddress() is not None and loc.getAddress().strip()!="":
-                vars["location"]="""%s<pre>%s</pre>"""%(vars["location"],
-                                                        loc.getAddress())
-        room = self._session.getRoom()
-        if room is not None:
-            roomLink=linking.RoomLinker().getHTMLLink(room,loc)
-            vars["location"]= i18nformat("""%s<br><small> _("Room"):</small> %s""")%(vars["location"],
-                                                            roomLink)
-        vars["location"]=self._getHTMLRow( _("Place"), vars["location"])
-        sessionConvs=[]
-        for convener in self._session.getConvenerList():
-            sessionConvs.append("""<a href="mailto:%s">%s</a>"""%(convener.getEmail(),
-                                        self.htmlText(convener.getFullName())))
-        slotConvsHTML=""
+        slotConveners = []
         for entry in self._session.getSchedule().getEntries():
-            slot=entry.getOwner()
-            l=[]
+            slot = entry.getOwner()
+            conveners = []
             for convener in slot.getOwnConvenerList():
-                l.append("""<a href="mailto:%s">%s</a>"""%(convener.getEmail(),
-                                        self.htmlText(convener.getFullName())))
-            if len(l)>0:
-                slotConvsHTML+="""
-                    <tr>
-                        <td valign="top">%s (<small>%s-%s</small>):</td>
-                        <td>%s</td>
-                    </tr>
-                      """%(self.htmlText(slot.getTitle()),
-                      slot.getAdjustedStartDate().strftime("%d-%b-%y %H:%M"),
-                      slot.getAdjustedEndDate().strftime("%d-%b-%y %H:%M"),
-                      "; ".join(l))
-        convs=""
-        if len(sessionConvs)>0 or slotConvsHTML.strip()!="":
-            convs="""
-                <table>
-                    <tr>
-                        <td valign="top" colspan="2">%s</td>
-                    </tr>
-                    %s
-                </table>"""%("<br>".join(sessionConvs),slotConvsHTML)
-        vars["conveners"]=self._getHTMLRow( _("Conveners"),convs)
-        lm = []
-        for material in self._session.getAllMaterialList():
-            url=urlHandlers.UHMaterialDisplay.getURL(material)
-            lm.append(wcomponents.WMaterialDisplayItem().getHTML(self._aw,material,url))
-        vars["material"] = self._getHTMLRow( _("Material"), "<br>".join( lm ) )
-        vars["contribs"]= ""
-        if self._session.getContributionList() != []:
-            vars["contribs"]=self._getContribsHTML()
-        vars["PDFIcon"]=quoteattr(str(Config.getInstance().getSystemIconURL("print")))
-        url=urlHandlers.UHConfTimeTablePDF.getURL(self._session.getConference())
-        url.addParam("showSessions",self._session.getId())
-        if self._session.getScheduleType()=="poster":
-            if self._sortingCrit is not None and \
-                    self._sortingCrit.getField() is not None:
-                url.addParam("sortBy",self._sortingCrit.getField().getId())
-        vars["PDFURL"]=quoteattr(str(url))
-        vars["target"] = vars["session"] = self._session
+                conveners.append({'fullName': convener.getFullName(), 'email': convener.getEmail() if self._aw.getUser() else "", 'affiliation' : convener.getAffiliation()})
+            if conveners:
+                slotConveners.append({'title': slot.getTitle(), 'startDate': slot.getAdjustedStartDate(self._tz), 'endDate': slot.getAdjustedEndDate(self._tz), 'conveners': conveners})
+        vars["slotConveners"] = slotConveners
+
+        eventInfo = fossilize(self._session.getConference(), IConferenceEventInfoFossil, tz = self._tz)
+        eventInfo['timetableSession'] = fossilize(self._session, ISessionFossil, tz = self._tz)
+        vars["ttdata"]= schedule.ScheduleToJson.process(self._session.getSchedule(), self._tz, None, days = None, mgmtMode = False)
+        vars["eventInfo"]= eventInfo
+
+        vars["getResourceName"] = lambda resource: self._getResourceName(resource)
+        vars["session"] = vars["target"] = self._session
         vars["urlICSFile"] = urlHandlers.UHSessionToiCal.getURL(self._session)
         vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/event/%s/session/%s.ics' % \
                                               (self._session.getConference().getId(), self._session.getId())))
+        vars["conf"] = self._session.getConference()
+        vars["contributions"] = sorted(self._session.getContributionList(), key=lambda contrib: contrib.getTitle())
         return vars
 
 
@@ -537,53 +164,25 @@ class WSessionDisplayMin(WSessionDisplayBase):
 
 class WSessionDisplay:
 
-    def __init__(self,aw,session):
+    def __init__(self, aw, session):
         self._aw = aw
         self._session = session
 
-    def getHTML(self,params={}):
-        if self._session.canAccess( self._aw ):
-            c=WSessionDisplayFull(self._aw,self._session,params["activeTab"],
-                    params.get("sortingCrit",None))
-            return c.getHTML( params )
-        if self._session.canView( self._aw ):
-            c = WSessionDisplayMin(self._aw,self._session,params["activeTab"],
-                    params.get("sortingCrit",None))
-            return c.getHTML( params )
-        return ""
+    def getHTML(self):
+        c = WSessionDisplayFull(self._aw, self._session)
+        return c.getHTML()
 
 
 class WPSessionDisplay( WPSessionDefaultDisplayBase ):
     navigationEntry = navigation.NESessionDisplay
 
-    def _getBody(self,params):
-        wc=WSessionDisplay(self._getAW(),self._session)
-        return wc.getHTML({"activeTab":params["activeTab"],
-                            "sortingCrit":params.get("sortingCrit",None)})
-
-    def _defineToolBar(self):
-        edit=wcomponents.WTBItem( _("manage this session"),
-            icon=Config.getInstance().getSystemIconURL("modify"),
-            actionURL=urlHandlers.UHSessionModification.getURL(self._session),
-            enabled=self._session.canModify(self._getAW()) or \
-                    self._session.canCoordinate(self._getAW()))
-        url=urlHandlers.UHConfTimeTablePDF.getURL(self._session.getConference())
-        url.addParam("showSessions",self._session.getId())
-        pdf=wcomponents.WTBItem( _("get PDF of this session"),
-            icon=Config.getInstance().getSystemIconURL("pdf"),
-            actionURL=url)
-        ical=wcomponents.WTBItem( _("get ICal of this session"),
-            icon=Config.getInstance().getSystemIconURL("ical"),
-            actionURL="#",
-            className="exportIcal",
-            id=self._session.getUniqueId(),
-            elementId="exportIcal%s"%self._session.getUniqueId())
-        self._toolBar.addItem(edit)
-        self._toolBar.addItem(pdf)
-        self._toolBar.addItem(ical)
+    def _getBody(self, params):
+        wc = WSessionDisplay(self._getAW(), self._session)
+        return wc.getHTML()
 
     def getJSFiles(self):
         return WPSessionDefaultDisplayBase.getJSFiles(self) + \
+               self._includeJSPackage('MaterialEditor') + \
                self._includeJSPackage('Timetable')
 
 class WPSessionModifBase( WPConferenceModifBase ):
@@ -635,19 +234,22 @@ class WPSessionModifBase( WPConferenceModifBase ):
         self._createTabCtrl()
 
         banner = wcomponents.WTimetableBannerModif(self._getAW(), self._session).getHTML()
-        body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
+        body = wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
         return banner + body
 
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + \
+            self._asset_env['contributions_js'].urls()
 
-class WSessionModifClosed(wcomponents.WTemplated):
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + \
+            self._asset_env['contributions_sass'].urls()
 
-    def __init__(self):
-        pass
+    def _getHeadContent(self):
+        return WPConferenceModifBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+            '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                       for url in self._asset_env['mathjax_js'].urls()])
 
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["closedIconURL"] = Config.getInstance().getSystemIconURL("closed")
-        return vars
 
 class WSessionModifMainType(wcomponents.WTemplated):
 
@@ -694,8 +296,6 @@ class WSessionModifMain(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["addMaterialURL"]=urlHandlers.UHSessionAddMaterial.getURL(self._session)
-        vars["removeMaterialsURL"]=urlHandlers.UHSessionRemoveMaterials.getURL()
 
         vars["dataModificationURL"]=quoteattr(str(urlHandlers.UHSessionDataModification.getURL(self._session)))
         vars["code"]=self.htmlText(self._session.getCode())
@@ -704,19 +304,6 @@ class WSessionModifMain(wcomponents.WTemplated):
             vars["description"] = self._session.getDescription()
         else:
             vars["description"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._session.getDescription()
-        vars["place"]=""
-        place=self._session.getLocation()
-        if place is not None:
-            vars["place"] = "%s<br><pre>%s</pre>"%(\
-                                            self.htmlText(place.getName()),
-                                            self.htmlText(place.getAddress()))
-        room=self._session.getRoom()
-        if room is not None:
-            vars["place"]+="<i>Room:</i> %s"%self.htmlText(room.getName())
-        vars["startDate"],vars["endDate"],vars["duration"]="","",""
-        if self._session.getAdjustedStartDate() is not None:
-            vars["startDate"]=self.htmlText(self._session.getAdjustedStartDate().strftime("%A %d %B %Y %H:%M"))
-            vars["endDate"]=self.htmlText(self._session.getAdjustedEndDate().strftime("%A %d %B %Y %H:%M"))
         vars["bgcolor"] = self._session.getColor()
         vars["textcolor"] = self._session.getTextColor()
         vars["entryDuration"]=self.htmlText((datetime(1900,1,1)+self._session.getContribDuration()).strftime("%Hh%M'"))
@@ -726,7 +313,7 @@ class WSessionModifMain(wcomponents.WTemplated):
             vars["Type"]=WSessionModifMainType().getHTML(vars)
             vars["Colors"]=WSessionModifMainColors().getHTML(vars)
             vars["Code"]=WSessionModifMainCode().getHTML(vars)
-            vars["Rowspan"]=7
+            vars["Rowspan"]=6
         else:
             vars["Type"]=""
             vars["Colors"]=""
@@ -751,8 +338,13 @@ class WPSessionModificationClosed( WPSessionModifBase ):
         self._setActiveTab()
 
     def _getTabContent( self, params ):
-        comp=WSessionModifClosed()
-        return comp.getHTML()
+        message = _("The session is currently locked and you cannot modify it in this status. ")
+        if self._session.getConference().canModify(self._rh.getAW()):
+            message += _("If you unlock the session, you will be able to modify its details again.")
+        return wcomponents.WClosed().getHTML({"message": message,
+                                             "postURL": urlHandlers.UHSessionOpen.getURL(self._session),
+                                             "showUnlockButton": self._session.getConference().canModify(self._rh.getAW()),
+                                             "unlockButtonCaption": _("Unlock session")})
 
 #------------------------------------------------------------------------------------
 
@@ -763,475 +355,31 @@ class WPSessionDataModification(WPSessionModification):
         p=wcomponents.WSessionModEditData(self._session.getConference(),self._getAW(),title)
         params["postURL"]=urlHandlers.UHSessionDataModification.getURL(self._session)
         params["colorChartIcon"]=Config.getInstance().getSystemIconURL("colorchart")
-        urlbg=urlHandlers.UHSimpleColorChart.getURL()
-        urlbg.addParam("colorCodeTarget", "backgroundColor")
-        urlbg.addParam("colorPreviewTarget", "backgroundColorpreview")
-        params["bgcolorChartURL"]=urlbg
         params["bgcolor"] = self._session.getColor()
-        urltext=urlHandlers.UHSimpleColorChart.getURL()
-        urltext.addParam("colorCodeTarget", "textColor")
-        urltext.addParam("colorPreviewTarget", "textColorpreview")
-        params["textcolorChartURL"]=urltext
         params["textcolor"] = self._session.getTextColor()
         params["textColorToLinks"]=""
         if self._session.isTextColorToLinks():
             params["textColorToLinks"]="checked=\"checked\""
 
-        #wconvener = wcomponents.WAddPersonModule("convener")
-        #params["convenerDefined"] = self._getDefinedDisplayList("convener")
-        #params["convenerOptions"] = ""
-        #params["convener"] = wconvener.getHTML(params)
         params["convener"] = ""
         return p.getHTML(params)
-
-    def _getDefinedDisplayList(self, typeName):
-         list = self._session.getConvenerList()
-         if list is None :
-             return ""
-         html = []
-         counter = 0
-         for person in list :
-             text = """
-                 <tr>
-                     <td width="5%%"><input type="checkbox" name="%ss" value="%s"></td>
-                     <td>&nbsp;%s</td>
-                 </tr>"""%(typeName,counter,person.getFullName())
-             html.append(text)
-             counter = counter + 1
-         return """
-             """.join(html)
 
 #---------------------------------------------------------------------------
 
 class WPModEditDataConfirmation(WPSessionModification):
 
     def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        msg= _("""You have selected to CHANGE THIS SESSION SCHEDULE TYPE from %s to %s, if you continue any contribution scheduled within any slot of the current session will be unscheduled, are you sure you want to continue?""")%(self._session.getScheduleType(),params["tt_type"])
+        wc = wcomponents.WConfirmation()
+
+        msg = {
+            'challenge': _("Are you sure you want to change the schedule of this session from '{0}' to '{1}'?").format(
+                self._session.getScheduleType(), params["tt_type"]),
+            'target': self._session.getTitle(),
+            'subtext': _("Note that if you continue any contribution scheduled within any slot of the current session will be unscheduled")
+            }
+
         url=urlHandlers.UHSessionDataModification.getURL(self._session)
         return wc.getHTML(msg,url,params)
-
-
-class WPSessionAddMaterial( WPSessionModification ):
-
-    def __init__( self, rh, session, mf ):
-        WPSessionModification.__init__( self, rh, session )
-        self._mf = mf
-
-    def _getTabContent( self, params ):
-        if self._mf:
-            comp = self._mf.getCreationWC( self._session )
-        else:
-            comp = wcomponents.WMaterialCreation( self._session )
-        pars = { "postURL": urlHandlers.UHSessionPerformAddMaterial.getURL() }
-        return comp.getHTML( pars )
-
-
-class WSessionModPlainTTDay(wcomponents.WTemplated):
-
-    def __init__(self,aw,day,session):
-        self._aw=aw
-        self._day=day
-        self._session=session
-
-    def _getContribHTML(self,contrib):
-        duration=(datetime(1900,1,1)+contrib.getDuration()).strftime("%Hh%M'")
-        speakers=[]
-        for spk in contrib.getSpeakerList():
-            speakers.append(self.htmlText("%s"%spk.getFullName()))
-        url=urlHandlers.UHContributionModification.getURL(contrib)
-        urlEdit=urlHandlers.UHSessionModSchEditContrib.getURL(contrib)
-        editIconURL=Config.getInstance().getSystemIconURL("modify")
-        return """
-            <tr>
-                <td valign="top" nowrap><input type="checkbox" name="schEntryId" value=%s></td>
-                <td valign="top" nowrap>%s</td>
-                <td valign="top" nowrap>(%s)</td>
-                <td valign="top" nowrap><a href=%s><img src=%s border="0" alt=""></a></td>
-                <td width="100%%" valign="top">
-                    <table width="100%%" cellpadding="0" cellspacing="0">
-                        <tr>
-                            <td width="100%%" valign="top">
-                                [%s] <a href=%s>%s</a>
-                            </td>
-                            <td nowrap align="right" valign="top">
-                                %s
-                            </td>
-                        </tr cellpadding="0" cellspacing="0">
-                    </table>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="5" nowrap valign="top" style="border-top: 1px solid">&nbsp;</td>
-            </tr>
-                """%( contrib.getSchEntry().getId(),
-                        contrib.getAdjustedStartDate().strftime("%H:%M"),
-                        duration,quoteattr(str(urlEdit)),
-                        quoteattr(str(editIconURL)),
-                        self.htmlText(contrib.getId()),
-                        quoteattr(str(url)),
-                        self.htmlText(contrib.getTitle()),
-                        "<br>".join(speakers))
-
-    def _getBreakHTML(self,breakEntry):
-        duration=(datetime(1900,1,1)+breakEntry.getDuration()).strftime("%Hh%M")
-        url=urlHandlers.UHSessionModifyBreak.getURL(breakEntry)
-        urlEdit=urlHandlers.UHSessionModifyBreak.getURL(breakEntry)
-        editIconURL=Config.getInstance().getSystemIconURL("modify")
-        return """
-            <tr>
-                <td valign="top" nowrap><input type="checkbox" name="schEntryId" value=%s></td>
-                <td valign="top" nowrap>%s</td>
-                <td valign="top" nowrap>(%s)</td>
-                <td valign="top" nowrap><a href=%s><img src=%s border="0" alt=""></a></td>
-                <td width="100%%" valign="top" align="center">
-                    <a href=%s>%s</a>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="5" nowrap valign="top" style="border-top: 1px solid">&nbsp;</td>
-            </tr>
-                """%(breakEntry.getId(),
-                        breakEntry.getAdjustedStartDate().strftime("%H:%M"),
-                        duration,quoteattr(str(urlEdit)),
-                        quoteattr(str(editIconURL)),
-                        quoteattr(str(url)),
-                        self.htmlText(breakEntry.getTitle()))
-
-    def _getSlotHTML(self,slot):
-        caption = ""
-        if slot.getRoom() is not None:
-            caption=slot.getRoom().getName()
-        if slot.getTitle().strip() != "":
-            caption = "%s (%s)"%(self.htmlText(slot.getTitle()),self.htmlText(caption))
-        duration=""
-        if (datetime(1900,1,1)+slot.getDuration()).minute>0:
-            duration="%s'"%(datetime(1900,1,1)+slot.getDuration()).minute
-        if (datetime(1900,1,1)+slot.getDuration()).hour>0:
-            duration="%sh%s"%((datetime(1900,1,1)+slot.getDuration()).hour,duration)
-        if duration!="":
-            duration="(%s)"%duration
-        entries=[]
-        at=timedelta(0,0,0)
-        for entry in slot.getSchedule().getEntries():
-            if isinstance(entry,schedule.LinkedTimeSchEntry) and \
-                    isinstance(entry.getOwner(),conference.Contribution):
-                entries.append(self._getContribHTML(entry.getOwner()))
-            elif isinstance(entry,schedule.BreakTimeSchEntry):
-                entries.append(self._getBreakHTML(entry))
-            at+=entry.getDuration()
-        addContribURL=urlHandlers.UHSessionModScheduleAddContrib.getURL(slot)
-
-        orginURL = urlHandlers.UHSessionModifSchedule.getURL(self._session.getOwner())
-        orginURL.addParam("sessionId", self._session.getId())
-        newContribURL = urlHandlers.UHConfModScheduleNewContrib.getURL(self._session.getOwner())
-        newContribURL.addParam("sessionId", self._session.getId())
-        newContribURL.addParam("slotId", slot.getId())
-        newContribURL.addParam("orginURL",orginURL)
-
-        addBreakURL=urlHandlers.UHSessionAddBreak.getURL(slot)
-        delSlotURL=urlHandlers.UHSessionModSlotRem.getURL(slot)
-        editSlotURL=urlHandlers.UHSessionModSlotEdit.getURL(slot)
-        delContribsURL=urlHandlers.UHSessionDelSchItems.getURL(slot)
-        urlCompSlot = urlHandlers.UHSessionModSlotCalc.getURL(slot)
-        if slot.getContribDuration() is None or slot.getContribDuration()==timedelta(0):
-            ded=slot.getSession().getContribDuration()
-        else:
-            ded=slot.getContribDuration()
-        nat=slot.getDuration()-at
-        numEntries=len(entries)
-        ree=0
-        if ded!=0 and ded.seconds != 0:
-            ree=int(nat.seconds/ded.seconds)
-        linkColor=""
-        if self._session.isTextColorToLinks():
-            linkColor="color:%s"%self._session.getTextColor()
-        editSlotLink,delSlotLink="",""
-        if self._session.canModify(self._aw) or self._session.canCoordinate(self._aw, "unrestrictedSessionTT"):
-            editSlotLink="""<input type="submit" value="delete" onClick="self.location.href='%s';return false;" class="smallbtn">"""%str(delSlotURL)
-            delSlotLink="""<input type="submit" value="edit" onClick="self.location.href='%s';return false;" class="smallbtn">"""%str(editSlotURL)
-
-        convs=""
-        l=[]
-        if slot.getConvenerList() == []:
-            for conv in self._session.getConvenerList():
-                l.append("""%s"""%(self.htmlText(conv.getFullName())))
-        else:
-            for conv in slot.getConvenerList():
-                l.append("""%s"""%(self.htmlText(conv.getFullName())))
-        if len(l)>0:
-            convs="Conveners: %s"%"; ".join(l)
-        return  i18nformat("""
-            <a name="slot%s"/>
-            <table width="90%%" align="center" border="0"
-                                        style="border-left: 1px solid #777777">
-                <tr>
-                    <td class="groupTitle" style="background: %s">
-                        <table>
-                            <tr>
-                                <td nowrap class="groupTitle" style="background:%s;color: %s">
-                                    %s-%s %s
-                                </td>
-                                <td width="100%%" align="center" class="groupTitle" style="background:%s;color: %s">
-                                    %s
-                                </td>
-                                <td align="right" nowrap style="letter-spacing: 0px">
-                                    <input type="submit" value="_("add contribution")" onClick="self.location.href='%s';return false;" class="smallbtn">
-                                    <input type="submit" value="_("new contribution")" onClick="self.location.href='%s';return false;" class="smallbtn">
-                                    <input type="submit" value="_("new break")" onClick="self.location.href='%s';return false;" class="smallbtn">
-                                    %s %s
-                                    <input type="submit" value="_("reschedule")" onClick="self.location.href='%s';return false;" class="smallbtn">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" style="letter-spacing: 0px;background:%s;color:%s">
-                                    <small>%s</small>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" style="letter-spacing: 0px; color:%s">
-                                    <small>NAT:%s - AT:%s - #E:%s - DED:%s - #REE:%s</small>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <form action=%s method="POST">
-                <tr>
-                    <td>
-                        <table width="100%%" align="center">
-                            %s
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <table>
-                            <tr>
-                                <td><input type="submit" class="btn" value="_("remove selected")"></td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                </form>
-            </table>
-                """)%( slot.getId(),self._session.getColor(), self._session.getColor(), self._session.getTextColor(), \
-                        slot.getAdjustedStartDate().strftime("%H:%M"), \
-                        slot.getAdjustedEndDate().strftime("%H:%M"), \
-                        duration,self._session.getColor(),self._session.getTextColor(),caption, \
-                        str(addContribURL), \
-                        str(newContribURL), \
-                        str(addBreakURL), \
-                        editSlotLink,delSlotLink, \
-                        quoteattr(str(urlCompSlot)), linkColor, \
-                        self._session.getTextColor(), convs,self._session.getTextColor(), \
-                        (datetime(1900,1,1)+nat).strftime("%Hh%M'"),(datetime(1900,1,1)+at).strftime("%Hh%M'"), \
-                        numEntries,(datetime(1900,1,1)+ded).strftime("%Hh%M'"), \
-                        ree, \
-                        quoteattr(str(delContribsURL)), \
-                        "".join(entries))
-
-    def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["day"]=self._day.strftime("%A, %d %B %Y")
-        tz = self._session.getTimezone()
-        sDate=timezone(tz).localize(datetime(self._day.year,self._day.month,self._day.day,0,0))
-        eDate=timezone(tz).localize(datetime(self._day.year,self._day.month,self._day.day,23,59))
-        res=[]
-        for slotEntry in self._session.getSchedule().getEntries():
-            if slotEntry.getAdjustedStartDate()>eDate:
-                break
-            if slotEntry.getAdjustedEndDate()>=sDate and \
-                                slotEntry.getAdjustedStartDate()<=eDate:
-                res.append(self._getSlotHTML(slotEntry.getOwner()))
-        vars["slots"]="<br>".join(res)
-        urlNewSlot=urlHandlers.UHSessionModSlotNew.getURL(self._session)
-        urlNewSlot.addParam("slotDate",self._day.strftime("%d-%m-%Y"))
-        vars["newSlotURL"]=quoteattr(str(urlNewSlot))
-        vars["newSlotBtn"]="&nbsp;"
-        if self._session.canModify(self._aw) or self._session.canCoordinate(self._aw, "unrestrictedSessionTT"):
-            if self._session.getConference().getEnableSessionSlots() :
-                vars["newSlotBtn"]= i18nformat("""<input type="submit" class="btn" value="_("new slot")">""")
-        vars["fitToInnerSlots"] = "&nbsp;"
-        if self._session.getConference().getEnableSessionSlots() :
-            vars["fitToInnerSlots"] = i18nformat("""<input type="submit" class="btn" value="_("fit to inner slots")">""")
-        vars["start_date"] = self._session.getAdjustedStartDate().strftime("%a %d %b %Y %H:%M")
-        vars["end_date"] = self._session.getAdjustedEndDate().strftime("%a %d %b %Y %H:%M")
-        vars["editURL"] = quoteattr(str(urlHandlers.UHSessionModFit.getURL(self._session)))
-        return vars
-
-
-class WSessionModPosterTTDay(wcomponents.WTemplated):
-
-    def __init__(self,aw,day,session):
-        self._aw=aw
-        self._day=day
-        self._session=session
-
-    def _getContribHTML(self,contrib):
-        #duration=(datetime(1900,1,1)+contrib.getDuration()).strftime("%Hh%M'")
-        speakers=[]
-        for spk in contrib.getSpeakerList():
-            speakers.append(self.htmlText("%s"%spk.getFullName()))
-        url=urlHandlers.UHContributionModification.getURL(contrib)
-        urlEdit=urlHandlers.UHSessionModSchEditContrib.getURL(contrib)
-        editIconURL=Config.getInstance().getSystemIconURL("modify")
-        return """
-            <tr>
-                <td valign="top" nowrap><input type="checkbox" name="schEntryId" value=%s></td>
-                <td valign="top" nowrap>%s</td>
-                <td valign="top" nowrap><a href=%s><img src=%s border="0" alt=""></a></td>
-                <td width="100%%" valign="top">
-                    <table width="100%%" cellpadding="0" cellspacing="0">
-                        <tr>
-                            <td width="100%%" valign="top">
-                                [%s] <a href=%s>%s</a>
-                            </td>
-                            <td nowrap align="right" valign="top">
-                                %s
-                            </td>
-                        </tr cellpadding="0" cellspacing="0">
-                    </table>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="5" nowrap valign="top" style="border-top: 1px solid">&nbsp;</td>
-            </tr>
-                """%( contrib.getSchEntry().getId(),
-                        self.htmlText(contrib.getBoardNumber()),
-                        quoteattr(str(urlEdit)),
-                        quoteattr(str(editIconURL)),
-                        self.htmlText(contrib.getId()),
-                        quoteattr(str(url)),
-                        self.htmlText(contrib.getTitle()),
-                        "<br>".join(speakers))
-
-    def _getSlotHTML(self,slot):
-        caption = ""
-        if slot.getRoom() is not None:
-            caption=slot.getRoom().getName()
-        if slot.getTitle().strip() != "":
-            caption = "%s (%s)"%(self.htmlText(slot.getTitle()),self.htmlText(caption))
-        duration=""
-        if (datetime(1900,1,1)+slot.getDuration()).minute>0:
-            duration="%s'"%(datetime(1900,1,1)+slot.getDuration()).minute
-        if (datetime(1900,1,1)+slot.getDuration()).hour>0:
-            duration="%sh%s"%((datetime(1900,1,1)+slot.getDuration()).hour,duration)
-        if duration!="":
-            duration="(%s)"%duration
-        entries=[]
-        for entry in slot.getSchedule().getEntries():
-            if isinstance(entry,schedule.LinkedTimeSchEntry) and \
-                    isinstance(entry.getOwner(),conference.Contribution):
-                entries.append(self._getContribHTML(entry.getOwner()))
-        addContribURL=urlHandlers.UHSessionModScheduleAddContrib.getURL(slot)
-
-        orginURL = urlHandlers.UHSessionModifSchedule.getURL(self._session.getOwner())
-        orginURL.addParam("sessionId", self._session.getId())
-        newContribURL = urlHandlers.UHConfModScheduleNewContrib.getURL(self._session.getOwner())
-        newContribURL.addParam("sessionId", self._session.getId())
-        newContribURL.addParam("slotId", slot.getId())
-        newContribURL.addParam("orginURL",orginURL)
-
-        delSlotURL=urlHandlers.UHSessionModSlotRem.getURL(slot)
-        editSlotURL=urlHandlers.UHSessionModSlotEdit.getURL(slot)
-        delContribsURL=urlHandlers.UHSessionDelSchItems.getURL(slot)
-        numEntries=len(entries)
-        linkColor=""
-        if self._session.isTextColorToLinks():
-            linkColor="color:%s"%self._session.getTextColor()
-        editSlotLink,delSlotLink="",""
-        if self._session.canModify(self._aw) or self._session.canCoordinate(self._aw, "unrestrictedSessionTT"):
-            editSlotLink="""<input type="submit" value="delete" onClick="self.location.href='%s';return false;" class="smallbtn">"""%str(delSlotURL)
-            delSlotLink="""<input type="submit" value="edit" onClick="self.location.href='%s';return false;" class="smallbtn">"""%str(editSlotURL)
-        convs=""
-        l=[]
-        if slot.getConvenerList() == []:
-            for conv in slot.getSession().getConvenerList():
-                l.append("""%s"""%(self.htmlText(conv.getFullName())))
-        else:
-            for conv in slot.getConvenerList():
-                l.append("""%s"""%(self.htmlText(conv.getFullName())))
-        if len(l)>0:
-            convs="""<span style="letter-spacing: 0px">Conveners: %s</span>"""%"; ".join(l)
-        return  i18nformat("""
-            <a name="slot%s"/>
-            <table width="90%%" align="center" border="0"
-                                        style="border-left: 1px solid #777777">
-                <tr>
-                    <td class="groupTitle" style="background-color: %s">
-                        <table>
-                            <tr>
-                                <td nowrap class="groupTitle" style="background-color: %s; color: %s">
-                                    %s-%s %s
-                                </td>
-                                <td width="100%%" align="center" class="groupTitle" style="background-color: %s; color: %s">
-                                    %s
-                                </td>
-                                <td align="right" nowrap style="letter-spacing: 0px">
-                                    <input type="submit" value="_("add contribution")" onClick="self.location.href='%s';return false;" class="smallbtn">
-                                    <input type="submit" value="_("new contribution")" onClick="self.location.href='%s';return false;" class="smallbtn">
-                                    %s %s
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" style="color:%s">%s</td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" style="color:%s">%s  _("entries")</td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <form action=%s method="POST">
-                <tr>
-                    <td>
-                        <table width="100%%" align="center">
-                            %s
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <table>
-                            <tr>
-                                <td><input type="submit" class="btn" value="_("remove selected")"></td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                </form>
-            </table>
-                """)%( slot.getId(),slot.getSession().getColor(), slot.getSession().getColor(),slot.getSession().getTextColor(), slot.getAdjustedStartDate().strftime("%H:%M"),
-                        slot.getAdjustedEndDate().strftime("%H:%M"),
-                        duration,slot.getSession().getColor(),slot.getSession().getTextColor(),caption,
-                        str(addContribURL),
-                       str(newContribURL),
-                        editSlotLink,delSlotLink,slot.getSession().getTextColor(),convs,slot.getSession().getTextColor(),numEntries,
-                        quoteattr(str(delContribsURL)),
-                        "".join(entries))
-
-    def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["day"]=self._day.strftime("%A, %d %B %Y")
-        tz = self._session.getTimezone()
-        sDate=timezone(tz).localize(datetime(self._day.year,self._day.month,self._day.day,0,0))
-        eDate=timezone(tz).localize(datetime(self._day.year,self._day.month,self._day.day,23,59))
-        res=[]
-        for slotEntry in self._session.getSchedule().getEntries():
-            if slotEntry.getAdjustedStartDate()>eDate:
-                break
-            if slotEntry.getAdjustedEndDate()>=sDate and \
-                                slotEntry.getAdjustedStartDate()<=eDate:
-                res.append(self._getSlotHTML(slotEntry.getOwner()))
-        vars["slots"]="<br>".join(res)
-        urlNewSlot=urlHandlers.UHSessionModSlotNew.getURL(self._session)
-        urlNewSlot.addParam("slotDate",self._day.strftime("%d-%m-%Y"))
-        vars["newSlotURL"]=quoteattr(str(urlNewSlot))
-        vars["newSlotBtn"]=""
-        if self._session.canModify(self._aw) or self._session.canCoordinate(self._aw, "unrestrictedSessionTT"):
-            vars["newSlotBtn"]= i18nformat("""<input type="submit" class="btn" value="_("new slot")">""")
-        return vars
 
 
 class WPSessionModifSchedule( WPSessionModifBase, WPConfModifScheduleGraphic  ):
@@ -1389,21 +537,6 @@ class ContainerIndex:
         return 0
 
 
-class WPSessionModifyBreak( WPSessionModifSchedule ):
-
-    def __init__(self,rh,conf,schBreak):
-        WPSessionModifSchedule.__init__(self,rh,conf)
-        self._break=schBreak
-
-    def _getScheduleContent(self,params):
-        sch=self._conf.getSchedule()
-        wc=wcomponents.WBreakDataModification(sch,self._break,conf=self._conf)
-        pars = { "postURL": urlHandlers.UHSessionPerformModifyBreak.getURL(self._break) }
-        params["body"] = wc.getHTML( pars )
-        return wcomponents.WBreakModifHeader( self._break, self._getAW() ).getHTML( params )
-
-
-
 class WPModSchEditContrib(WPSessionModifSchedule):
 
     def __init__(self,rh,contrib):
@@ -1417,429 +550,6 @@ class WPModSchEditContrib(WPSessionModifSchedule):
             wc=wcomponents.WSchEditContrib(self._contrib)
         pars={"postURL":urlHandlers.UHSessionModSchEditContrib.getURL(self._contrib)}
         return wc.getHTML(pars)
-
-class WSessionAddSlot(wcomponents.WTemplated):
-
-    def __init__(self, slotData , conf, errors=[]):
-        self._session = slotData.getSession()
-        self._slotData = slotData
-        self._errors=errors
-        self._conf = conf
-
-    def _getConvenersHTML(self):
-        res=[]
-        for conv in self._slotData.getConvenerList():
-            tmp= i18nformat("""
-                    <tr>
-                        <td style="border-top:1px solid #777777;border-left:1px solid #777777;" width="100%%">
-                            <input type="checkbox" name="sel_conv" value=%s>
-                            <input type="hidden" name="conv_id" value=%s>
-                        </td>
-                        <td style="border-top:1px solid #777777;padding-top:2px" width="100%%">
-                            <table border="0" width="95%%" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                    <td nowrap>
-                                         _("Title") <select name="conv_title">%s</select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td nowrap>
-                                         _("Family name") <input type="text" size="40" name="conv_family_name" value=%s>
-                                         _("First name") <input type="text" size="30" name="conv_first_name" value=%s>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td nowrap>
-                                         _("Affiliation") <input type="text" size="40" name="conv_affiliation" value=%s>
-                                        _("Email") <input type="text" size="39" name="conv_email" value=%s>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr><td colspan="3">&nbsp;</td></tr>
-                """)%(quoteattr(str(conv.getId())),\
-                    quoteattr(str(conv.getId())),\
-                    TitlesRegistry.getSelectItemsHTML(conv.getTitle()), \
-                    quoteattr(conv.getFamilyName()),\
-                    quoteattr(conv.getFirstName()), \
-                    quoteattr(conv.getAffiliation()), \
-                    quoteattr(conv.getEmail()) )
-            res.append(tmp)
-        return "".join(res)
-
-    def _getErrorHTML( self, msgList ):
-        if not msgList:
-            return ""
-        return """
-            <table align="center" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td>
-                        <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td><font color="red">%s</font></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-                """%"<br>".join( msgList )
-
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["calendarIconURL"]=Config.getInstance().getSystemIconURL( "calendar" )
-        vars["calendarSelectURL"]=urlHandlers.UHSimpleCalendar.getURL()
-        defaultDefinePlace = defaultDefineRoom = ""
-        defaultInheritPlace = defaultInheritRoom = "checked"
-        locationName, locationAddress, roomName,defaultExistRoom = "", "", "",""
-        slotSd = self._slotData.getStartDate()
-        slotEd = self._slotData.getEndDate()
-        vars["title"]=self._slotData.getTitle()
-        vars["sDay"] = slotSd.day
-        vars["sMonth"] = slotSd.month
-        vars["sYear"] = slotSd.year
-        vars["sHour"] = slotSd.hour
-        vars["sMinute"] = slotSd.minute
-        vars["eDay"] = slotEd.day
-        vars["eMonth"] = slotEd.month
-        vars["eYear"] = slotEd.year
-        vars["eHour"] = slotEd.hour
-        vars["eMinute"] = slotEd.minute
-        vars["contribDurHours"] = ""
-        vars["contribDurMins"] = ""
-        if self._slotData.getContribDuration() != None:
-            vars["contribDurHours"] = (datetime(1900,1,1)+self._slotData.getContribDuration()).hour
-            vars["contribDurMins"] = (datetime(1900,1,1)+self._slotData.getContribDuration()).minute
-        if self._slotData.getLocationName() !="":
-            defaultDefinePlace = "checked"
-            defaultInheritPlace = ""
-            locationName = self._slotData.getLocationName()
-            locationAddress = self._slotData.getLocationAddress()
-        if self._slotData.getRoomName() != "":
-            defaultDefineRoom= "checked"
-            defaultInheritRoom = ""
-            defaultExistRoom = ""
-            roomName = self._slotData.getRoomName()
-        vars["defaultInheritPlace"] = defaultInheritPlace
-        vars["defaultDefinePlace"] = defaultDefinePlace
-        vars["sesPlace"] = ""
-        sesLocation = self._slotData.getSession().getLocation()
-        if sesLocation:
-            vars["sesPlace"] = sesLocation.getName()
-        vars["locationName"] = locationName
-        vars["locationAddress"] = locationAddress
-        vars["defaultInheritRoom"] = defaultInheritRoom
-        vars["defaultDefineRoom"] = defaultDefineRoom
-        vars["defaultExistRoom"]= defaultExistRoom
-        vars["sesRoom"] = ""
-        sesRoom = self._slotData.getSession().getRoom()
-        if sesRoom:
-            vars["sesRoom"] = sesRoom.getName()
-        vars["roomName"] = roomName
-        vars["conveners"]=self._getConvenersHTML()
-        vars["postURL"]=quoteattr(str(urlHandlers.UHSessionModSlotNew.getURL(self._session)))
-        vars["errors"]=self._getErrorHTML(self._errors)
-        rx=[]
-        roomsexist = self._conf.getRoomList()
-        roomsexist.sort()
-        for room in roomsexist:
-            sel=""
-            rx.append("""<option value=%s%s>%s</option>"""%(quoteattr(str(room)),
-                        sel,self.htmlText(room)))
-        vars ["roomsexist"] = "".join(rx)
-        vars["autoUpdate"]=""
-        return vars
-
-
-class WPModSlotNew(WPSessionModifSchedule):
-
-    def __init__(self, rh, slotData, errors=[] ):
-        WPSessionModifSchedule.__init__(self, rh, slotData.getSession())
-        self._slotData = slotData
-        self._errors=errors
-
-
-    def _getTabContent( self, params ):
-        wc=WSessionAddSlot(self._slotData, self._conf, self._errors)
-        return wc.getHTML()
-
-class WSlotModifMainData(wcomponents.WTemplated):
-
-    def __init__(self, slot, conf, errors=[]):
-        self._slotData = slot
-        self._errors=errors
-        self._conf = conf
-
-    def _getConvenersHTML(self):
-        res=[]
-        for conv in self._slotData.getConvenerList():
-            tmp= i18nformat("""
-                    <tr>
-                        <td style="border-top:1px solid #777777;border-left:1px solid #777777;" width="100%%">
-                            <input type="checkbox" name="sel_conv" value=%s>
-                            <input type="hidden" name="conv_id" value=%s>
-                        </td>
-                        <td style="border-top:1px solid #777777;padding-top:2px" width="100%%">
-                            <table border="0" width="95%%" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                    <td nowrap>
-                                         _("Title") <select name="conv_title">%s</select>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td nowrap>
-                                         _("Family name") <input type="text" size="40" name="conv_family_name" value=%s>
-                                         _("First name") <input type="text" size="30" name="conv_first_name" value=%s>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td nowrap>
-                                         _("Affiliation") <input type="text" size="40" name="conv_affiliation" value=%s>
-                                         _("Email") <input type="text" size="39" name="conv_email" value=%s>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr><td colspan="3">&nbsp;</td></tr>
-                """)%(quoteattr(str(conv.getId())),\
-                    quoteattr(str(conv.getId())),\
-                    TitlesRegistry.getSelectItemsHTML(conv.getTitle()), \
-                    quoteattr(conv.getFamilyName()),\
-                    quoteattr(conv.getFirstName()), \
-                    quoteattr(conv.getAffiliation()), \
-                    quoteattr(conv.getEmail()) )
-            res.append(tmp)
-        return "".join(res)
-
-    def _getErrorHTML( self, msgList ):
-        if not msgList:
-            return ""
-        return """
-            <table align="center" cellspacing="0" cellpadding="0">
-                <tr>
-                    <td>
-                        <table align="center" valign="middle" style="padding:10px; border:1px solid #5294CC; background:#F6F6F6">
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                            <tr>
-                                <td>&nbsp;</td>
-                                <td><font color="red">%s</font></td>
-                                <td>&nbsp;</td>
-                            </tr>
-                            <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-                """%"<br>".join( msgList )
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["calendarIconURL"]=Config.getInstance().getSystemIconURL( "calendar" )
-        vars["calendarSelectURL"]=urlHandlers.UHSimpleCalendar.getURL()
-        defaultDefinePlace = defaultDefineRoom = ""
-        defaultInheritPlace = defaultInheritRoom = "checked"
-        locationName, locationAddress, roomName, defaultExistRoom = "", "", "",""
-        vars["conference"] = self._conf
-        vars["session"] = self._slotData.getSession()
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
-        vars["title"]=self._slotData.getTitle()
-        sd = self._slotData.getAdjustedStartDate()
-        ed = self._slotData.getAdjustedEndDate()
-        vars["sDay"] = sd.day
-        vars["sMonth"] = sd.month
-        vars["sYear"] = sd.year
-        vars["sHour"] = sd.hour
-        vars["sMinute"] = sd.minute
-        vars["eDay"] = ed.day
-        vars["eMonth"] = ed.month
-        vars["eYear"] = ed.year
-        vars["eHour"] = ed.hour
-        vars["eMinute"] = ed.minute
-        vars["contribDurHours"] = ""
-        vars["contribDurMins"] = ""
-        if self._slotData.getContribDuration() != None:
-            vars["contribDurHours"] = (datetime(1900,1,1)+self._slotData.getContribDuration()).hour
-            vars["contribDurMins"] = (datetime(1900,1,1)+self._slotData.getContribDuration()).minute
-        if self._slotData.getLocationName() !="":
-            defaultDefinePlace = "checked"
-            defaultInheritPlace = ""
-            locationName = self._slotData.getLocationName()
-            locationAddress = self._slotData.getLocationAddress()
-        if self._slotData.getRoomName() != "":
-            defaultDefineRoom= "checked"
-            defaultInheritRoom = ""
-            defaultExistRoom = ""
-            roomName = self._slotData.getRoomName()
-        vars["defaultInheritPlace"] = defaultInheritPlace
-        vars["defaultDefinePlace"] = defaultDefinePlace
-        vars["sesPlace"] = ""
-        sesLocation = self._slotData.getSession().getLocation()
-        if sesLocation:
-            vars["sesPlace"] = sesLocation.getName()
-        vars["locationName"] = locationName
-        vars["locationAddress"] = locationAddress
-        vars["defaultInheritRoom"] = defaultInheritRoom
-        vars["defaultDefineRoom"] = defaultDefineRoom
-        vars["defaultExistRoom"] = defaultExistRoom
-        vars["sesRoom"] = ""
-        sesRoom = self._slotData.getSession().getRoom()
-        if sesRoom:
-            vars["sesRoom"] = sesRoom.getName()
-        vars["roomName"] = roomName
-        rx=[]
-        roomsexist = self._conf.getRoomList()
-        roomsexist.sort()
-        for room in roomsexist:
-            rx.append("""<option value=%s>%s</option>"""%(quoteattr(str(room)),
-                        self.htmlText(room)))
-        vars ["roomsexist"] = "".join(rx)
-        vars["conveners"]=self._getConvenersHTML()
-        vars["errors"]=self._getErrorHTML(self._errors)
-        vars["locator"] = ""
-        slot = self._slotData.getSession().getSlotById(self._slotData.getId())
-        vars["locator"] = slot.getLocator().getWebForm()
-        vars["postURL"]=quoteattr(str(urlHandlers.UHSessionModSlotEdit.getURL(slot)))
-        vars["autoUpdate"]=""
-        return vars
-
-
-class WPModSlotEdit(WPConferenceModifBase):
-
-    def __init__(self,rh, slot, errors=[]):
-        WPConferenceModifBase.__init__(self,rh,slot.getSession().getConference())
-        self._slotData=slot
-        self._errors=errors
-
-    def _setActiveSideMenuItem(self):
-        self._timetableMenuItem.setActive()
-
-    def _getPageContent( self, params ):
-        wc=WSlotModifMainData(self._slotData,self._conf,self._errors)
-        return wc.getHTML()
-
-class WSchModifRecalculate(wcomponents.WTemplated):
-
-    def __init__(self, entry):
-        self._entry = entry
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["entryType"]="slot"
-        vars["title"]=""
-        if self._entry.getTitle().strip() != "":
-            vars["title"]= i18nformat("""
-                            <tr>
-                                <td nowrap class="titleCellTD"><span class="titleCellFormat"> _("Title")</span></td>
-                                <td bgcolor="white" width="100%%">&nbsp;%s</td>
-                            </tr>
-                            """)%self._entry.getTitle()
-        return vars
-
-class WPModSlotCalc(WPConferenceModifBase):
-
-    def __init__(self,rh, slot):
-        WPConferenceModifBase.__init__(self,rh,slot.getSession().getConference())
-        self._slot=slot
-
-    def _setActiveSideMenuItem(self):
-        self._timetableMenuItem.setActive()
-
-    def _getPageContent( self, params ):
-        wc=WSchModifRecalculate(self._slot)
-        p={"postURL":quoteattr(str(urlHandlers.UHSessionModSlotCalc.getURL(self._slot)))}
-        return wc.getHTML(p)
-
-class WPModSlotRemConfirmation(WPSessionModifSchedule):
-
-    def __init__(self,rh,slot):
-        WPSessionModifSchedule.__init__(self,rh,slot.getSession())
-        self._slot=slot
-
-    def _getTabContent(self,params):
-        wc=wcomponents.WConfirmation()
-        slotCaption="on %s %s-%s"%(
-            self._slot.getAdjustedStartDate().strftime("%A %d %B %Y"),
-            self._slot.getAdjustedStartDate().strftime("%H:%M"),
-            self._slot.getAdjustedEndDate().strftime("%H:%M"))
-        if self._slot.getTitle()!="":
-            slotCaption=""" "%s" (%s) """%(self._slot.getTitle(),slotCaption)
-
-        msg= _("""Are you sure you want to delete the slot %s
-        (note that any contribution scheduled
-        inside will be unscheduled)?""")%(slotCaption)
-        url=urlHandlers.UHSessionModSlotRem.getURL(self._slot)
-        return wc.getHTML(msg,url,{})
-
-
-class WPModScheduleAddContrib(WPSessionModifSchedule):
-
-    def _getTabContent( self, params ):
-        target=self._session
-        if params.get("slot",None) is not None:
-            target=params["slot"]
-        l=[]
-        for contrib in self._session.getContributionList():
-            if contrib.isScheduled() or isinstance(contrib.getCurrentStatus(),conference.ContribStatusWithdrawn):
-                continue
-            l.append(contrib)
-        p=wcomponents.WScheduleAddContributions(l)
-        pars={"postURL":urlHandlers.UHSessionModScheduleAddContrib.getURL(target)}
-        return p.getHTML(pars)
-
-class WPModScheduleNewContrib(WPModScheduleNewContribBase, WPSessionModifSchedule):
-
-    def __init__(self, rh, ses, targetDay):
-        WPSessionModifSchedule.__init__(self, rh, ses)
-        WPModScheduleNewContribBase.__init__(self, targetDay)
-
-class WSessionModifSchContribCreation(WContributionCreation):
-
-    def __init__(self, slot):
-        WContributionCreation.__init__(self, slot.getConference())
-        self._slot = slot
-
-    def getVars(self):
-        vars=WContributionCreation.getVars(self)
-        if self._slot is not None:
-            d=self._slot.getSchedule().calculateDayEndDate(self._slot.getAdjustedStartDate())
-            vars["day"]=d.day
-            vars["month"]=d.month
-            vars["year"]=d.year
-            vars["sHour"]=d.hour
-            vars["sMinute"]=d.minute
-            vars["durationHours"],vars["durationMinutes"]="0","20"
-            vars["poster"]=""
-            if self._slot.getSession().getScheduleType() == "poster":
-                vars["poster"]="disabled"
-        return vars
-
-
-class WPSessionAddBreak(WPSessionModifSchedule):
-
-    def __init__(self,rh,slot):
-        WPSessionModifSchedule.__init__(self,rh,slot.getSession())
-        self._slot=slot
-
-    def _getTabContent( self, params ):
-        s = self._slot.getSchedule()
-        day = self._slot.getAdjustedStartDate()
-        p=wcomponents.WBreakDataModification(self._slot.getSchedule(),conf=self._slot.getConference(),targetDay=day)
-        pars = {"postURL":urlHandlers.UHSessionAddBreak.getURL(self._slot)}
-        return p.getHTML(pars)
-
 
 
 class WSessionModifAC(wcomponents.WTemplated):
@@ -1875,14 +585,11 @@ class WSessionModifAC(wcomponents.WTemplated):
     def getVars(self):
         vars=wcomponents.WTemplated.getVars(self)
         wc=wcomponents.WAccessControlFrame()
-        vars["accessControlFrame"]=wc.getHTML(self._session,\
-                                urlHandlers.UHSessionSetVisibility.getURL(),
-                                "Session")
+        vars["accessControlFrame"] = wc.getHTML(self._session, urlHandlers.UHSessionSetVisibility.getURL(self._session),
+                                                "Session")
         if not self._session.isProtected():
             df=wcomponents.WDomainControlFrame(self._session)
-            vars["accessControlFrame"] += "<br>%s"%df.getHTML( \
-                                    urlHandlers.UHSessionAddDomains.getURL(),\
-                                    urlHandlers.UHSessionRemoveDomains.getURL())
+            vars["accessControlFrame"] += "<br>%s"%df.getHTML()
         wc=wcomponents.WModificationControlFrame()
         vars["modifyControlFrame"] = wc.getHTML(self._session)
 
@@ -1902,32 +609,8 @@ class WPSessionModifAC( WPSessionModifBase ):
         comp=WSessionModifAC(self._session)
         return comp.getHTML()
 
-
-class WPSessionSelectAllowed( WPSessionModifAC ):
-
-    def _getTabContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHSessionSelectAllowed.getURL(),forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHSessionAddAllowed.getURL()
-        return wc.getHTML( params )
-
-
 class WSessionModifTools(wcomponents.WTemplated):
-
-    def __init__( self, session ):
-        self.__session = session
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("delete")
-        vars["writeIconURL"] = Config.getInstance().getSystemIconURL("write_minutes")
-        vars["closeIconURL"] = Config.getInstance().getSystemIconURL("closeIcon")
-        vars["closeURL"] = urlHandlers.UHSessionClose.getURL(self.__session)
-        return vars
+    pass
 
 
 class WPSessionModifComm( WPSessionModifBase ):
@@ -1962,25 +645,42 @@ class WPSessionModifTools( WPSessionModifBase ):
         self._tabTools.setActive()
 
     def _getTabContent( self, params ):
-        comp = WSessionModifTools( self._session )
-        pars = {
-"deleteSessionURL": urlHandlers.UHSessionDeletion.getURL( self._session ) \
-               }
-        return comp.getHTML( pars )
+        return WSessionModifTools().getHTML( { "deleteSessionURL": urlHandlers.UHSessionDeletion.getURL(self._session),
+                                              "lockSessionURL": urlHandlers.UHSessionClose.getURL(self._session)} )
 
+class WPSessionClosing(WPSessionModifTools):
+
+    def _getTabContent(self, params):
+        msg = {'challenge': _("Are you sure that you want to lock this session?"),
+               'target': self._session.getTitle(),
+               'subtext': _("Note that if you lock this session, you will not be able to change its details any more. "
+                "Only the creator of the event or an administrator of the system / category can unlock a session."),
+               }
+
+        wc = wcomponents.WConfirmation()
+        return wc.getHTML(msg,
+                          urlHandlers.UHSessionClose.getURL(self._session),
+                          {},
+                          severity="warning",
+                          confirmButtonCaption=_("Yes, lock this session"),
+                          cancelButtonCaption=_("No"))
 
 class WPSessionDeletion( WPSessionModifTools ):
 
     def _getTabContent( self, params ):
-        msg = i18nformat("""
-        <font size="+2">_("Are you sure that you want to DELETE the session '%s'")?</font><br>(_("Note that if you delete the
-session, all the items below it will also be deleted"))
-              """)%(self._session.getTitle())
+
+        msg = {
+            'challenge': _("Are you sure that you want to delete this session?"),
+            'target': self._session.getTitle(),
+            'subtext': _("Note that if you delete this session all the items under it will also be deleted")
+            }
+
         wc = wcomponents.WConfirmation()
-        return wc.getHTML( msg, \
-                        urlHandlers.UHSessionDeletion.getURL( self._session ), \
-                        {}, \
-                        confirmButtonCaption= _("Yes"), cancelButtonCaption= _("No") )
+        return wc.getHTML(msg,
+                          urlHandlers.UHSessionDeletion.getURL( self._session ),
+                          {},
+                          severity="danger",
+                          confirmButtonCaption= _("Yes"), cancelButtonCaption= _("No"))
 
 class WSessionModContribList(wcomponents.WTemplated):
 
@@ -2538,19 +1238,6 @@ class WPModParticipantList( WPSessionModifBase ):
         params = {"urlDisplayGroup":urlHandlers.UHSessionModParticipantList.getURL(self._session)}
         return wc.getHTML(params)
 
-class WPSessionDisplayRemoveMaterialsConfirm( WPSessionDefaultDisplayBase ):
-
-    def __init__(self,rh, conf, mat):
-        WPSessionDefaultDisplayBase.__init__(self,rh,conf)
-        self._mat=mat
-
-    def _getBody(self,params):
-        wc=wcomponents.WDisplayConfirmation()
-        msg="""Are you sure you want to delete the following material?<br>
-        <b><i>%s</i></b>
-        <br>"""%self._mat.getTitle()
-        url=urlHandlers.UHSessionDisplayRemoveMaterial.getURL(self._mat.getOwner())
-        return wc.getHTML(msg,url,{"deleteMaterial":self._mat.getId()})
 
 class WPSessionModifRelocate(WPSessionModifBase):
 
@@ -2585,67 +1272,6 @@ class WPSessionModifMaterials( WPSessionModifBase ):
         wc=wcomponents.WShowExistingMaterial(self._target)
         return wc.getHTML( pars )
 
-class WPSessionDatesModification(WPSessionModifSchedule):
-
-    def _getTabContent(self,params):
-        p=WSessionModEditDates(self._session.getConference())
-        params["postURL"]=urlHandlers.UHSessionDatesModification.getURL(self._session)
-        return p.getHTML(params)
-
-class WSessionModEditDates(wcomponents.WTemplated):
-
-    def __init__(self,targetConf,targetDay=None):
-        self._conf=targetConf
-        self._targetDay=targetDay
-
-    def _getErrorHTML(self,l):
-        if len(l)>0:
-            return """
-                <tr>
-                    <td colspan="2" align="center">
-                        <br>
-                        <table bgcolor="red" cellpadding="6">
-                            <tr>
-                                <td bgcolor="white" style="color: red">%s</td>
-                            </tr>
-                        </table>
-                        <br>
-                    </td>
-                </tr>
-                    """%"<br>".join(l)
-        else:
-            return ""
-
-    def getVars( self ):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["errors"]=self._getErrorHTML(vars.get("errors",[]))
-        vars["postURL"]=quoteattr(str(vars["postURL"]))
-        vars["calendarIconURL"]=Config.getInstance().getSystemIconURL( "calendar" )
-        vars["calendarSelectURL"]=urlHandlers.UHSimpleCalendar.getURL()
-        refDate=self._conf.getSchedule().calculateDayEndDate(self._targetDay, self._conf.getTimezone())
-        endDate = None
-        if refDate.hour == 23:
-            refDate = refDate - timedelta(minutes=refDate.minute)
-            endDate = refDate + timedelta(minutes=59)
-        vars["sDay"]=quoteattr(str(vars.get("sDay",refDate.day)))
-        vars["sMonth"]=quoteattr(str(vars.get("sMonth",refDate.month)))
-        vars["sYear"]=quoteattr(str(vars.get("sYear",refDate.year)))
-        vars["sHour"]=quoteattr(str(vars.get("sHour",refDate.hour)))
-        vars["sMinute"]=quoteattr(str(vars.get("sMinute",refDate.minute)))
-        if not endDate:
-            endDate=refDate+timedelta(hours=1)
-        vars["eDay"]=quoteattr(str(vars.get("eDay",endDate.day)))
-        vars["eMonth"]=quoteattr(str(vars.get("eMonth",endDate.month)))
-        vars["eYear"]=quoteattr(str(vars.get("eYear",endDate.year)))
-        vars["eHour"]=quoteattr(str(vars.get("eHour",endDate.hour)))
-        vars["eMinute"]=quoteattr(str(vars.get("eMinute",endDate.minute)))
-        vars["autoUpdate"]=""
-        if not self._conf.getEnableSessionSlots():
-            vars["disabled"] = "disabled"
-        else:
-            vars["disabled"] = ""
-        vars["adjustSlots"]=""
-        return vars
 
 class WSessionICalExport(WICalExportBase):
 

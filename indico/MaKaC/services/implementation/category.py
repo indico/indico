@@ -1,44 +1,49 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 """
 Asynchronous request handlers for category-related services.
 """
 
 from datetime import datetime
+from flask import session
+from indico.util.redis import suggestions
 from itertools import islice
 from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
-from MaKaC.services.implementation.base import ProtectedDisplayService, ServiceBase
+from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import TextModificationBase
 from MaKaC.services.implementation.base import ExportToICalBase
+from MaKaC.services.implementation.base import LoggedOnlyService
 
 import MaKaC.conference as conference
-from MaKaC.common.logger import Logger
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 import MaKaC.webinterface.locators as locators
-from MaKaC.webinterface.wcomponents import WConferenceList, WConferenceListEvents, WConferenceListItem
+from MaKaC.webinterface.wcomponents import WConferenceListItem
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import PrincipalHolder, Avatar, Group
+from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
 from indico.core.index import Catalog
 from indico.web.http_api.util import generate_public_auth_request
+from indico.util.redis import write_client as redis_write_client
 import MaKaC.common.info as info
+from MaKaC import domain
+from indico.core.config import Config
+from MaKaC.webinterface.mail import GenericMailer, GenericNotification
+from MaKaC.webinterface.urlHandlers import UHCategModifAC
 
 class CategoryBase(object):
     """
@@ -187,22 +192,15 @@ class SetShowPastEventsForCateg(CategoryDisplayBase):
         CategoryDisplayBase._checkParams(self)
         self._showPastEvents = bool(self._params.get("showPastEvents",False))
 
-    def _getAnswer( self ):
-        session = self._aw.getSession()
-        if not session.getVar("fetchPastEventsFrom"):
-            session.setVar("fetchPastEventsFrom",set())
-
-        fpef = session.getVar("fetchPastEventsFrom")
+    def _getAnswer(self):
+        fpef = session.setdefault('fetchPastEventsFrom', set())
         cid = self._categ.getId()
 
         if self._showPastEvents:
-            # check to avoid unnecessary session write (and db write)
-            if cid not in fpef:
-                fpef.add(cid)
-                session.setVar("fetchPastEventsFrom", fpef)
+            fpef.add(cid)
         else:
             fpef.remove(cid)
-            session.setVar("fetchPastEventsFrom", fpef)
+        session.modified = True
 
 class CategoryProtectionUserList(CategoryModifBase):
     def _getAnswer(self):
@@ -282,13 +280,37 @@ class CategoryAddExistingControlUser(CategoryControlUserListBase):
         CategoryControlUserListBase._checkParams(self)
         pm = ParameterManager(self._params)
         self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+        self._sendEmailManagers = pm.extract("sendEmailManagers", pType=bool, allowEmpty=True, defaultValue = True)
+
+    def _sendMail(self, currentList, newManager):
+        if isinstance(newManager, Avatar):
+            managerName = newManager.getStraightFullName()
+        else:
+            managerName = newManager.getName()
+        text = _("""Dear managers,
+
+%s has been added as manager for the category '%s':
+
+%s
+
+Best regards,
+Indico Team
+        """) % (managerName, self._categ.getName(), UHCategModifAC.getURL(self._categ))
+        maildata = { "fromAddr": "%s" % Config.getInstance().getNoReplyEmail(), "toList": [manager.getEmail() for manager in currentList], "subject": "New category manager", "body": text }
+        GenericMailer.send(GenericNotification(maildata))
+
 
     def _getAnswer(self):
         ph = PrincipalHolder()
-        for user in self._userList:
-            if self._kindOfList == "modification":
-                self._categ.grantModification(ph.getById(user["id"]))
-            elif self._kindOfList == "confCreation":
+        if self._kindOfList == "modification":
+            currentList = self._categ.getManagerList()[:]
+            for user in self._userList:
+                newManager = ph.getById(user["id"])
+                self._categ.grantModification(newManager)
+                if self._sendEmailManagers and len(currentList) > 0:
+                    self._sendMail(currentList, newManager)
+        elif self._kindOfList == "confCreation":
+            for user in self._userList:
                 self._categ.grantConferenceCreation(ph.getById(user["id"]))
         return self._getControlUserList()
 
@@ -324,6 +346,93 @@ class CategoryExportURLs(CategoryDisplayBase, ExportToICalBase):
         result["authRequestURL"] =  urls["authRequestURL"]
         return result
 
+class CategoryProtectionToggleDomains(CategoryModifBase):
+
+    def _checkParams(self):
+        self._params['categId'] = self._params['targetId']
+        CategoryModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._domainId = pm.extract("domainId", pType=str)
+        self._add = pm.extract("add", pType=bool)
+
+    def _getAnswer(self):
+        dh = domain.DomainHolder()
+        d = dh.getById(self._domainId)
+        if self._add:
+            self._target.requireDomain(d)
+        elif not self._add:
+            self._target.freeDomain(d)
+
+
+class CategoryBasketBase(LoggedOnlyService, CategoryDisplayBase):
+
+    def _checkParams(self):
+        LoggedOnlyService._checkParams(self)
+        CategoryDisplayBase._checkParams(self)
+        userId = ParameterManager(self._params).extract('userId', pType=str, allowEmpty=True)
+        if userId is not None:
+            self._avatar = AvatarHolder().getById(userId)
+        else:
+            self._avatar = self._aw.getUser()
+
+    def _checkProtection(self):
+        LoggedOnlyService._checkProtection(self)
+        CategoryDisplayBase._checkProtection(self)
+        if not self._avatar.canUserModify(self._aw.getUser()):
+            raise ServiceAccessError('Access denied')
+
+
+class CategoryFavoriteAdd(CategoryBasketBase):
+
+    def _getAnswer(self):
+        if self._categ is conference.CategoryManager().getRoot():
+            raise ServiceError('ERR-U0', _('Cannot add root category as favorite'))
+        self._avatar.linkTo(self._categ, 'favorite')
+        if redis_write_client:
+            suggestions.unignore(self._avatar, 'category', self._categ.getId())
+            suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
+
+    def _checkParams(self):
+        CategoryDisplayBase._checkParams(self)
+        CategoryBasketBase._checkParams(self)
+
+    def _checkProtection(self):
+        LoggedOnlyService._checkProtection(self)
+        CategoryBasketBase._checkProtection(self)
+        CategoryDisplayBase._checkProtection(self)
+
+
+class CategoryFavoriteDel(CategoryBasketBase):
+
+    def _getAnswer(self):
+        self._avatar.unlinkTo(self._categ, 'favorite')
+        if redis_write_client:
+            suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
+
+    def _checkParams(self):
+        CategoryDisplayBase._checkParams(self)
+        CategoryBasketBase._checkParams(self)
+
+    def _checkProtection(self):
+        LoggedOnlyService._checkProtection(self)
+        CategoryBasketBase._checkProtection(self)
+        CategoryDisplayBase._checkProtection(self)
+
+
+class CategorySuggestionDel(CategoryBasketBase):
+    def _getAnswer(self):
+        suggestions.unsuggest(self._avatar, 'category', self._categ.getId(), True)
+
+    def _checkParams(self):
+        CategoryDisplayBase._checkParams(self)
+        CategoryBasketBase._checkParams(self)
+
+    def _checkProtection(self):
+        LoggedOnlyService._checkProtection(self)
+        CategoryBasketBase._checkProtection(self)
+        CategoryDisplayBase._checkProtection(self)
+
+
 methodMap = {
     "getCategoryList": GetCategoryList,
     "getPastEventsList": GetPastEventsList,
@@ -336,5 +445,9 @@ methodMap = {
     "protection.removeManager": CategoryRemoveControlUser,
     "protection.addExistingConfCreator": CategoryAddExistingControlUser,
     "protection.removeConfCreator": CategoryRemoveControlUser,
-    "api.getExportURLs": CategoryExportURLs
-    }
+    "protection.toggleDomains": CategoryProtectionToggleDomains,
+    "api.getExportURLs": CategoryExportURLs,
+    "favorites.addCategory": CategoryFavoriteAdd,
+    "favorites.delCategory": CategoryFavoriteDel,
+    "suggestions.delSuggestion": CategorySuggestionDel
+}

@@ -1,4 +1,25 @@
-	/*
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+/*
 		Default Styles and layout for Conf-pages
 		Do not custom this CSS
 	*/
@@ -35,7 +56,7 @@
 	text-align:left;
 	border-top: 3px solid #234173;
     border-bottom: 1px solid #0f4c80;
-    background: #1a64a0 url("../images/conf/sprites_blue.png") repeat-x scroll 0 -24px;
+    background: #1a64a0;
 }
 
 .confTitle {
@@ -57,7 +78,7 @@
 
 .confSubTitleBox {
     min-height: 45px;
-    background: #f5faff url("../images/conf/sprites_blue.png") repeat-x 0 -213px;
+    background: #f5faff;
     border-bottom: 1px solid #d5e4f1;
     border-top: 1px solid #d5e4f1;
 }
@@ -86,16 +107,6 @@
     margin-bottom: 5px;
 }
 
-.date {
-    display: inline;
-}
-
-.place {
-    display: inline;
-    font-style: italic;
-    padding-left: 5px;
-}
-
 div.datePlace > div.timezone {
     font-size: 10px;
     color: #777;
@@ -116,19 +127,19 @@ div.datePlace > div.timezone {
 /* Styles for all menu Items */
 
 #outer {
-    width:100%;
+    width: 100%;
     position:relative;
-    margin-top: 10px;
-    padding: 10px 0;
-    background: #f5eedb;
-    border: 1px solid #64615a;
-    -moz-border-radius: 5px;
-    -webkit-border-radius:5px;
-    behavior: url(border-radius.htc);
+    background: #f6f6f6;
+
+    border: 1px solid #ccc;
 
     list-style-image: none;
     list-style-position: outside;
     list-style-type: none;
+}
+
+#outer > li.menuConfTitle {
+    display: block;
 }
 
 #outer li a {
@@ -141,8 +152,7 @@ div.datePlace > div.timezone {
 }
 
 #outer li a:hover {
-    background: #989486;
-    color: white;
+    background: #e0e0e0;
 }
 
 .conf_leftMenu {
@@ -154,11 +164,10 @@ div.datePlace > div.timezone {
 
 .menuConfTitle {
 	text-align:left;
-	color:#0200C6;
 }
 
-.menuConfTitle a {
-    color: #4e4c46;
+.menuConfTitle > a {
+    color: #275C86;
     padding: 7px 12px;
 }
 
@@ -174,31 +183,22 @@ li.menuConfMiddleCell {
     font-weight: normal;
 }
 
+.sublink {
+        color: #777;
+}
+
 li.menuConfMiddleCell a {
     padding: 0px 0px 0px 30px;
 }
 
 	/* selected menu item */
 
-.menuConfSelected {
-    font-weight: bold;
+.menuConfSelected, .menuConfMiddleCellSelected {
+    color: #BD891A;
+    background: #dadada;
+    border-bottom: 1px solid #d0d0d0;
+    border-top: 1px solid #d0d0d0;
 }
-
-.subMenuConfSelected {
-    font-weight: bold;
-}
-
-.menuConfSelected a {
-    padding: 7px 12px;
-    color: #4e4c46;
-}
-
-
-.subMenuConfSelected a {
-    font-weight: bold;
-}
-
-	/* last menu item */
 
 .menuConfBottomCell {
 	border-bottom:0px;
@@ -208,13 +208,6 @@ li.menuConfMiddleCell a {
 }
 
 	/* Support link */
-
-.confSupportEmailBox{
-	margin: 20px 0;
-}
-
-a.confSupportEmail:link {
-}
 
 	/*For dynamic menu*/
 
@@ -234,12 +227,7 @@ a.confSupportEmail:link {
 .conf_leftMenu ul {
 	list-style:none;
 	margin: 0px;
-	margin-bottom: 5px;
 	padding: 0px;
-}
-
-.conf_leftMenu li {
-	border-top:none;
 }
 
 
@@ -292,8 +280,14 @@ li:hover ul, li.over ul { display: block; } /* For dynamic */
 
 }
 
+.conferenceDetails .description {
+    color: #777;
+    font-family: Georgia, Times, Serif;
+    font-size: 1.2em;
+    margin: 1em 0 2em 0;
+}
+
 table.conferenceDetails td {
-    font-family: Verdana, Arial;
     font-size: 11pt;
     color: #444;
 }
@@ -387,3 +381,149 @@ pre {
     background: #424242;
 }
 
+ul.chair_list {
+    padding: 0px;
+    margin: 0px;
+    list-style-type: none;
+}
+
+.conf_leftMenu .spacer {
+    height: 1em;
+}
+
+.support_box {
+    margin-top: 10px !important;
+    width: 100%;
+    color: #aaa;
+    background: #f6f6f6;
+    border: 1px solid #ccc;
+}
+
+.support_box > h3 {
+    margin: 10px;
+    color: #f3f3f3;
+    background: #1a64a0;
+    margin: 0 0 5px 0;
+    padding: 5px;
+    font-weight: normal;
+}
+
+.support_box > li {
+    white-space: nowrap;
+    margin: 0 5px 5px 10px;
+    vertical-align: middle;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.support_box > li .icon {
+    color: #777;
+    font-size: 1.5em;
+    vertical-align: middle;
+}
+
+.support_box > li > a {
+    margin-left: 5px;
+    line-height: 1.5em;
+    vertical-align: middle;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.programme {
+    font-size: 1.2em;
+    font-family: Georgia, Times, Serif;
+}
+
+ul.programme {
+    margin-top: 4em;
+    list-style-type: none;
+    padding-left: 10px;
+}
+
+ul.programme li {
+    color: #444;
+    margin-top: 2em;
+}
+
+ul.programme li .title {
+    display: block;
+    font-size: 1.3em;
+    margin-bottom: 0.6em;
+}
+
+ul.programme li .description {
+    color: #777;
+}
+
+
+.conferenceDetails .info_line {
+    color: #777;
+    margin-top: 1em;
+    overflow: auto;
+}
+
+.info_line, info_line:after, info_line:before {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.grid:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.info_line {
+    width: 50%;
+    float: left;
+    padding: 5px;
+}
+
+.info_line .text {
+    padding-left: 3rem;
+}
+
+.info_line.location .address {
+    margin-top: 0.5em;
+}
+
+.info_line.material ul {
+    margin: 0;
+    padding: 0 3rem 0 3rem;
+    list-style-type: none;
+}
+
+.info_line.location .place {
+    color: #444;
+    font-size: 1.1em;
+}
+
+.info_line.date .timezone {
+    color: #bbb;
+}
+
+.info_line.date {
+    font-size: 1.1em;
+}
+
+.info_line.date .datetime {
+    color: #444;
+}
+
+.info_line.info {
+    padding: 10px;
+    clear: both;
+    width: 100%;
+    font-family: Georgia, Times, Serif;
+    background: #f4f4f4;
+}
+
+.info_line .icon {
+    font-size: 2rem;
+    color: #aaa;
+    float: left;
+    padding-right: 0.5em;
+}

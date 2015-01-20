@@ -1,8 +1,27 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+##
+## Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 3 of the
+## License, or (at your option) any later version.
+##
+## Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 """
 Schedule-related services
 """
 
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError,NoReportError
 from MaKaC.services.implementation.base import \
      ParameterManager, ProtectedModificationService, ProtectedDisplayService
 
@@ -75,7 +94,10 @@ class MaterialBase:
 
 
         except Exception, e:
-            raise ServiceError("ERR-M0", str(e))
+            if self._target is None:
+                raise NoReportError(_("The material with does not exist anymore. Please refresh the page."))
+            else:
+                raise ServiceError("ERR-M0", str(e))
 
 class MaterialDisplayBase(ProtectedDisplayService, MaterialBase):
 
@@ -92,6 +114,10 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
     def _checkProtection(self):
         owner = self._material.getOwner()
 
+        # Conference submitters have access
+        if isinstance(owner, conference.Conference) and owner.getAccessController().canUserSubmit(self._aw.getUser()):
+            return
+
         # There are two exceptions to the normal permission scheme:
         # (sub-)contribution submitters and session coordinators
 
@@ -107,7 +133,8 @@ class MaterialModifBase(MaterialBase, ProtectedModificationService):
                 # Submitters have access
                 return
             # status = 3 means the paper is under review (submitted but not reviewed)
-            elif isinstance(owner, conference.Contribution) and RCContributionPaperReviewingStaff.hasRights(self, contribution = owner, includingContentReviewer=False) and reviewingState == 3:
+            # status = 2 means that the author has not yet submitted the material
+            elif isinstance(owner, conference.Contribution) and RCContributionPaperReviewingStaff.hasRights(self, contribution = owner, includingContentReviewer=False) and reviewingState in [2, 3]:
                 return
             elif owner.getSession() and \
                      owner.getSession().canCoordinate(self._aw, "modifContribs"):
@@ -162,7 +189,11 @@ class ResourceBase:
                 self._categ=self._target.getCategory()
 
         except Exception, e:
-            raise ServiceError("ERR-M0", str(e))
+            if self._target is None:
+                raise NoReportError(_("The resource with does not exist anymore. Please refresh the page."))
+
+            else:
+                raise ServiceError("ERR-M0", str(e))
 
 
 class ResourceDisplayBase(ProtectedDisplayService, ResourceBase):
@@ -179,8 +210,6 @@ class ResourceModifBase(ResourceBase, MaterialModifBase):
     def _checkParams(self):
         ResourceBase._checkParams(self)
 
-    #def _checkProtection(self):
-    #    MaterialModifBase._checkProtection(self)
 
 class GetMaterialClassesBase(MaterialDisplayBase):
     """
@@ -406,26 +435,34 @@ class GetResourceAllowedUsers(ResourceModifBase):
 
 class DeleteResourceBase(ResourceModifBase):
 
-    def _getAnswer(self):
-        resourceId = self._resource.getId()
-
+    def _deleteResource(self):
         # remove the resource
         self._material.removeResource(self._resource)
-        event = self._material.getOwner()
+        self._event = self._material.getOwner()
 
         # if there are no resources left inside the material,
         # just delete it
         if len(self._material.getResourceList()) == 0:
-            event.removeMaterial(self._material)
+            self._event.removeMaterial(self._material)
 
-        newMaterialTypes = event.getMaterialRegistry().getMaterialList(event)
 
+class DeleteResource(DeleteResourceBase):
+
+    def _getAnswer(self):
+        self._deleteResource()
         return {
-            'deletedResourceId': resourceId,
-            'newMaterialTypes': newMaterialTypes
+            'deletedResourceId': self._resource.getId(),
+            'newMaterialTypes': self._event.getMaterialRegistry().getMaterialList(self._event)
             }
 
+class DeleteResourceReviewing(DeleteResourceBase):
 
+    def _getAnswer(self):
+        self._deleteResource()
+        return {
+            'deletedResourceId': self._resource.getId(),
+            'newMaterialTypes': [["reviewing", "Reviewing"]]
+            }
 
 methodMap = {
 
@@ -445,6 +482,7 @@ methodMap = {
     "resources.listAllowedUsers": GetResourceAllowedUsers,
     "resources.list": GetResourcesBase,
     "resources.edit": EditResourceBase,
-    "resources.delete": DeleteResourceBase
+    "resources.delete": DeleteResource,
+    "reviewing.resources.delete": DeleteResourceReviewing
     }
 

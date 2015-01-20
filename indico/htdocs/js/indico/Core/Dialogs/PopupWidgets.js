@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*
  * A popup widget containing two DateSelectors where one can
  * specify a date range.
@@ -25,8 +42,7 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
     },
 
     _dateFromString: function(dateStr) {
-        var matches = /^(...) (\d+)\/(\d+)\/(\d+)$/.exec(dateStr);
-        return new Date(matches[4], matches[3] - 1, matches[2]);
+        return new Date(dateStr);
     },
 
     _verifyDates: function() {
@@ -74,8 +90,15 @@ type("DateRangeSelector", ["ExclusivePopupWithButtons"], {
     this.allowEqual = allowEqual || false;
     this.dateRangeWidget = null;
 
-    this.startDate = startDate ? this._dateFromString(startDate) : new Date();
-    this.endDate = endDate ? this._dateFromString(endDate) : new Date();
+    if (startDate && typeof startDate == 'string') {
+        startDate = this._dateFromString(startDate);
+    }
+    if (endDate && typeof endDate == 'string') {
+        endDate = this._dateFromString(endDate);
+    }
+
+    this.startDate = startDate || new Date();
+    this.endDate = endDate || new Date();
 
     this.ExclusivePopupWithButtons(title || 'Choose date range', function() {
         self.close();

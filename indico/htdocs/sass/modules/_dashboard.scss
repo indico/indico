@@ -1,0 +1,195 @@
+/*
+ * This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+.dashboard-tab {
+    margin-top: 20px;
+}
+
+.quick-access-pane {
+    width: 1000px;
+}
+
+.dashboard-col {
+    display: table-cell;
+    width: 1%;
+}
+
+.dashboard-col:last-child {
+    padding-left: 10px;
+}
+
+.dashboard-col:first-child {
+    padding-right: 10px;
+    padding-left: 0; /* overwrite :last-child value in case there is only one column */
+}
+
+.dashboard-box {
+    border: 1px solid #DDD;
+    border-radius: 0.3em;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    margin-bottom: 44px;
+    width: 490px;
+}
+
+.dashboard-box h3 {
+    background: #F7F7F7;
+    border-bottom: 1px solid #DDD;
+    border-top-left-radius: 0.3em;
+    border-top-right-radius: 0.3em;
+    font-size: 14px;
+    line-height: 100%;
+    margin: 0;
+    padding: 10px;
+}
+
+.dashboard-box.suggestions h3 {
+    background: #dcebf5;
+}
+
+.dashboard-box ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.dashboard-box ol li {
+    border-bottom: 1px solid #E5E5E5;
+    padding-bottom: 5px;
+    position: relative;
+}
+
+.dashboard-box ol li > a, .dashboard-box ol li.no-event span {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 18px;
+    padding: 10px 10px 5px 10px;
+    position: relative;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.dashboard-box.suggestions ol li > a {
+    margin-right: 35px;
+}
+
+.dashboard-box ol li .actions {
+    font-size: 10px;
+    padding: 0 0 5px 10px;
+}
+
+.dashboard-box ol li .actions a:hover span {
+    text-decoration: underline;
+}
+
+.dashboard-box.suggestions ol .item-legend {
+    display: none;
+}
+
+.dashboard-box ol li:last-child > a, .dashboard-box ol li.no-event:last-child span {
+    border-bottom: none;
+}
+
+.dashboard-box ol li > a:hover .event-title,
+.dashboard-box ol li > a:hover .category-name {
+    text-decoration: underline;
+}
+
+.dashboard-box ol .event-title,
+.dashboard-box ol .category-name {
+    vertical-align: middle;
+}
+
+.dashboard-box ol .event-date,
+.dashboard-box ol .event-category,
+.dashboard-box ol .category-path {
+    color: #666;
+    display: inline-block;
+    font-weight: normal;
+    vertical-align: middle;
+}
+
+.dashboard-box ol .event-date {
+    display: inline-block;
+    font-size: 12px;
+    width: 85px;
+}
+
+.dashboard-box ol .event-category,
+.dashboard-box ol .category-path {
+    display: block;
+    font-size: 11px;
+}
+
+.dashboard-box ol .event-category{
+    margin-left: 89px;
+}
+
+.dashboard-box ol .item-legend {
+    max-width: 150px;
+    position: relative;
+    float: right;
+}
+
+.dashboard-box ol li .close-box {
+    display: none;
+    font-size: 18px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 10px 10px 0 0;
+}
+
+.dashboard-box ol li:hover .close-box {
+    display: inline-block;
+}
+
+.truncate .truncate-target {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-box .event-title.truncate-target {
+    max-width: 300px;
+}
+
+.dashboard-box .category-name.truncate-target {
+    max-width: 445px;
+}
+
+#happeningCategories .event-title.truncate-target {
+    max-width: 375px;
+}
+
+.item-legend [class*=icon-] {
+    color: #DDD;
+    font-size: 18px;
+}
+
+.item-legend [class*=icon-].active {
+    color: #777;
+}

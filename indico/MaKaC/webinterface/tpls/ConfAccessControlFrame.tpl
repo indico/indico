@@ -8,44 +8,41 @@
     </tr>
     <%include file="AccessControlStatusFrame.tpl" args="parentName=parentName, privacy=privacy,
     parentPrivacy=parentPrivacy, statusColor = statusColor, parentStatusColor=parentStatusColor,
-    locator=locator, isFullyPublic=isFullyPublic"/>
-    % if privacy == 'PRIVATE' or (privacy == 'INHERITING' and parentPrivacy == 'PRIVATE'):
+    locator=locator"/>
+    % if privacy == 'RESTRICTED' or (privacy == 'INHERITING' and parentPrivacy == 'RESTRICTED'):
     <tr>
         <td class="titleCellTD"><span class="titleCellFormat">${ _("Access key")}</span></td>
         <td bgcolor="white" width="100%" valign="top" class="blacktext">
-            <form action="${ setAccessKeyURL }" id="setAccessKey" method="POST">
-                    ${ locator }
             <input name="accessKey" id="accessKey" type="password" autocomplete="off" size=25 value="${ accessKey }">
-            <input type="submit" class="btn" value="${ _("change")}"> <span id="accessKeyChanged" class="successText"></span>
+            <button id="setAccessKey" type="button" class="btn">${ _("change")}</button> <span id="accessKeyChanged" class="successText"></span>
             <div class="warningText">${_("Note: It is more secure to use make the event private instead of using an access key!")}</div>
             </form>
 
             <script type="text/javascript">
-                $E('setAccessKey').dom.onsubmit = function(e) {
-                    var accessKey = $E('accessKey').dom.value;
-                    if(accessKey && !confirm('${_("Please note that it is more secure to make the event private instead of using an access key.")}')) {
-                        return false;
-                    }
+                $('#setAccessKey').click(function(e) {
+                    var accessKey = $('#accessKey').val();
+                    new ConfirmPopup($T("Set access key"), $T("Please note that it is more secure to make the event private instead of using an access key."), function(confirmed){
+                        if(confirmed){
+                            indicoRequest('event.protection.setAccessKey', {
+                                confId: ${target.getId()},
+                                accessKey: accessKey
+                            },
+                            function(result, error) {
+                                if(error) {
+                                    IndicoUtil.errorReport(error);
+                                    return;
+                                }
 
-                    indicoRequest('event.protection.setAccessKey', {
-                            confId: ${target.getId()},
-                            accessKey: accessKey
-                        },
-                        function(result, error) {
-                            if(error) {
-                                IndicoUtil.errorReport(error);
-                                return;
+                                var elem = $E('accessKeyChanged');
+                                $("#accessKeyChanged").html(accessKey? $T("Access key saved") : $T("Access key removed"));
+                                setTimeout(function() {
+                                    $("#accessKeyChanged").html('');
+                                }, 3000);
                             }
-
-                            var elem = $E('accessKeyChanged');
-                            elem.dom.innerHTML = accessKey ? '${_("Access key saved")}' : '${_("Access key removed")}';
-                            window.setTimeout(function() {
-                                elem.dom.innerHTML = '';
-                            }, 3000);
+                        );
                         }
-                    );
-                    return false;
-                }
+                    }).open();
+                });
             </script>
         </td>
     </tr>

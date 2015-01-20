@@ -1,29 +1,29 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import os, simplejson
+import os
 from persistent import Persistent
 import tempfile
 
+from indico.util.json import loads
 from MaKaC.common.Counter import Counter
-from MaKaC.common import Config
+from indico.core.config import Config
 
 
 class BadgeTemplateManager(Persistent):
@@ -90,10 +90,10 @@ class BadgeTemplateManager(Persistent):
         If the template had any temporary backgrounds, they are archived.
         """
         if self.__templates.has_key(templateId):
-            self.__templates[templateId].setData(simplejson.loads(templateData))
+            self.__templates[templateId].setData(loads(templateData))
             self.__templates[templateId].archiveTempBackgrounds(self.__conf)
         else:
-            self.__templates[templateId] = BadgeTemplate(templateId, simplejson.loads(templateData))
+            self.__templates[templateId] = BadgeTemplate(templateId, loads(templateData))
 
         self.notifyModification()
 
@@ -152,11 +152,10 @@ class BadgeTemplate (Persistent):
     def __init__(self, id, templateData):
         """ Class Constructor
             templateData is the templateData string used in the method storeTemplate() of the class
-            BadgeTemplateManager, transformed to a Python object with the function simplejson.loads().
-            IMPORTANT NOTE: simplejson.loads() builds an objet with unicode objects inside.
+            BadgeTemplateManager, transformed to a Python object with the function loads().
+            IMPORTANT NOTE: loads() builds an objet with unicode objects inside.
                             if these objects are then concatenated to str objects (for example in an Indico HTML template),
                             this can give problems. In those cases transform the unicode object to str with .encode('utf-8').
-                            In this class, __cleanData() already does this by calling MaKaC.services.interface.rpc.json.unicodeToUtf8
             Thus, its structure is a list composed of:
                 -The name of the template
                 -A dictionary with 2 keys: width and height of the template, in pixels.
@@ -358,8 +357,6 @@ class BadgeTemplate (Persistent):
            We have to remove that 'px' at the end.
         """
         self.__templateData[4] = filter ( lambda item: item != False, self.__templateData[4]) # to remove items that have been deleted
-        from MaKaC.services.interface.rpc.json import unicodeToUtf8
-        unicodeToUtf8(self.__templateData)
         for item in self.__templateData[4]:
             if isinstance(item['x'],basestring) and item['x'][-2:] == 'px':
                 item['x'] = item['x'][0:-2]
@@ -485,6 +482,7 @@ class BadgePDFOptions(Persistent):
             self.__marginColumns = 1.0
             self.__marginRows = 0.0
             self._pageSize = "A4"
+            self._landscape = False
             self._drawDashedRectangles = True
         else:
             from MaKaC.conference import CategoryManager
@@ -496,6 +494,7 @@ class BadgePDFOptions(Persistent):
             self.__marginColumns = defaultConferencePDFOptions.getMarginColumns()
             self.__marginRows = defaultConferencePDFOptions.getMarginRows()
             self._pageSize = defaultConferencePDFOptions.getPagesize()
+            self._landscape = defaultConferencePDFOptions.getLandscape()
             self._drawDashedRectangles = defaultConferencePDFOptions.getDrawDashedRectangles()
 
 
@@ -531,6 +530,13 @@ class BadgePDFOptions(Persistent):
             self._drawDashedRectangles = True
         return self._drawDashedRectangles
 
+    def getLandscape(self):
+        try:
+            return self._landscape
+        except AttributeError:
+            self._landscape = False
+            return False
+
     def setTopMargin(self, value):
         self.__topMargin = value
 
@@ -557,3 +563,6 @@ class BadgePDFOptions(Persistent):
             value must be a Boolean
         """
         self._drawDashedRectangles = value
+
+    def setLandscape(self, value):
+        self._landscape = value

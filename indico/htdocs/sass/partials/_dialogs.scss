@@ -1,0 +1,117 @@
+/*
+ * This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+.message {
+    color: #555;
+    background: #f8f5f4;
+    border: 1px solid #e7e0dd;
+    padding: 1em;
+}
+
+.message.info {
+    background: #ebf2f3;
+    border: 1px solid #cfdee0;
+}
+
+.confirmation-dialog {
+    overflow: auto;
+    display: inline-block;
+}
+
+.confirmation-dialog .buttons {
+}
+
+.confirmation-dialog .body {
+    max-width: 600px;
+    padding: 8px 15px 8px 15px;
+    margin-bottom: 0.5em;
+    background-color: #eee;
+    border: 1px solid;
+    border-color: #dbdbdb #dbdbdb #c0c0c0 #dbdbdb;
+
+    color: #555;
+    float: left;
+    line-height: 1.8em;
+}
+
+.confirmation-dialog .body .target {
+    font-family: Georgia, Times, Serif;
+    padding-left: 10px;
+    color: #777;
+    margin: 1em 0 1em 0;
+    font-size: 1.2em;
+}
+
+.confirmation-dialog .body.element {
+   display: block;
+}
+
+.confirmation-dialog .body.bordered {
+    border-left: 1px solid #CACACA;
+}
+
+.confirmation-dialog .body h3 {
+    width: auto;
+    margin: 0 0 0.3em 0;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.confirmation-dialog .clearer {
+    clear: both;
+}
+
+.confirmation-dialog > h3 {
+    margin-bottom: 0.1em;
+    font-size: 1.7em;
+    font-weight: bold;
+    padding-bottom: 10px;
+}
+
+.confirmation-dialog > h3.warning {
+    color: #E99E18;
+}
+
+.confirmation-dialog > h3.danger {
+    color: #AF0000;
+}
+
+.confirmation-dialog > h3.accept {
+    color: #0B8D00;
+}
+
+.confirmation-dialog > h3.highlight {
+    color: #0B63A5;
+}
+
+
+.confirmation-dialog .body ul.categ-list {
+    padding-left: 13px;
+    margin: 0;
+}
+
+.confirmation-dialog ul.categ-list span.event-date {
+    padding-left: 10px;
+    color: #888888;
+    font-size: 0.9em;
+    margin: 0;
+}
+
+.confirmation-dialog ul.categ-list span.event-title {
+    font-style: italic;
+}

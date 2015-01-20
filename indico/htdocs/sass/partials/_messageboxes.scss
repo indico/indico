@@ -1,0 +1,201 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+%message-box {
+    @include border-radius();
+
+    color: #777;
+    padding: 0 0.5em;
+    margin-bottom: 18px;
+
+    &:before {
+        color: #BBB;
+        display: block;
+        float: left;
+        font-size: 1.5em;
+        padding-top: 0.3em;
+    }
+
+    .message-text {
+        font-size: 1.2em;
+        padding-left: 2em;
+        padding-top: 1px;
+        margin: 0.5em 0;
+
+        p:first-child {
+            margin-top: 0;
+        }
+    }
+
+    .message-box-footer {
+        @include single-box-shadow($light-gray, 0, 5px, 5px, -5px, inset);
+        display: block;
+        margin: 0 -0.5em;
+        padding: 0.5em 0.5em;
+    }
+
+    .content-page-header + & {
+        margin-top: 0.5em;
+    }
+}
+
+%message-tag {
+    @include border-radius();
+    padding: 0 4px;
+}
+
+.infoMessage {
+    color: #3A87AD;
+    background-color: #D9EDF7;
+    padding: 8px 14px 8px 14px;
+    margin-bottom: 18px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid #BCE8F1;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.errorMessage {
+    color: #A76766;
+    background-color: #F2DEDE;
+    padding: 8px 14px 8px 14px;
+    margin-bottom: 18px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid #A76766;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.warningMessage {
+    color: #BE9056;
+    background-color: #FFF3E2;
+    padding: 8px 14px 8px 14px;
+    margin-bottom: 18px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid #BE9056;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.successMessage {
+    color: #638864;
+    background-color: #DBEED3;
+    padding: 8px 14px 8px 14px;
+    margin-bottom: 18px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    border: 1px solid #638864;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.info-message-box, .message-message-box {
+    @extend %message-box;
+    @include icon-before('icon-info');
+
+    background-color: #FAFAFA;
+    border: 1px solid #DDD;
+
+    .message-box-footer {
+        background: darken(#FAFAFA, 5%);
+    }
+}
+
+.highlight-message-box {
+    @extend %message-box;
+    @include icon-before('icon-lamp');
+
+    background-color: $light-blue;
+    border: 1px solid $dark-blue;
+
+    &:before {
+        color: $dark-blue;
+    }
+
+    .message-box-footer {
+        background: darken($light-blue, 5%);
+    }
+}
+
+.success-message-box {
+    @extend %message-box;
+    @include icon-before('icon-checkmark');
+
+    background-color: #EEFAEE;
+    border: 1px solid #CDC;
+
+    &:before {
+        color: #CDC;
+    }
+
+    .message-box-footer {
+        background: darken(#EEFAEE, 5%);
+    }
+}
+
+.warning-message-box {
+    @extend %message-box;
+    @include icon-before('icon-warning');
+
+    background-color: #FFF3E2;
+    border: 1px solid #BE9056;
+
+    &:before {
+        color: #BE9056;
+    }
+
+    .message-box-footer {
+        background: darken(#FFF3E2, 5%);
+    }
+}
+
+.error-message-box {
+    @extend %message-box;
+    @include icon-before('icon-disable');
+
+    background-color: $light-red;
+    border: 1px solid $dark-red;
+
+    &:before {
+        color: $dark-red;
+    }
+
+    .message-box-footer {
+        background: darken($light-red, 5%);
+    }
+}
+
+.error-message-tag {
+    @extend %message-tag;
+    background-color: $red;
+    color: $light-gray;
+}
+
+.error-message-underline {
+    @include border-bottom($red);
+}

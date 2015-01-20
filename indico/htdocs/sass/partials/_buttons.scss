@@ -1,0 +1,374 @@
+/*
+ * This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+%button {
+    @include user-select(none);
+    @include border-radius();
+    @include border-all($gray);
+    @include box-sizing(border-box);
+    display: inline-block;
+    cursor: pointer;
+    color: $light-black !important;
+    outline: none;
+    text-align: center;
+    vertical-align: middle;
+}
+
+%button-disabled {
+    border-color: $gray;
+    background: #EAEAEA;
+    box-shadow: none;
+    color: $gray !important;
+    cursor: default;
+}
+
+@mixin i-button-custom($line-height: 1.6em, $font-size: 1.1em) {
+    @extend %button;
+    @include box-sizing(content-box);
+
+    border: none;
+    width: $line-height;
+    height: $line-height;
+
+    i {
+        line-height: $line-height;
+        font-size: $font-size;
+    }
+
+    &:hover i {
+        color: darken($light-black, $color-variation);
+    }
+}
+
+.i-button {
+    @extend %button;
+    @include transition();
+    @include transition-property(color);
+    background-color: #EAEAEA;
+    line-height: 1em;
+    margin: 0;
+    padding: 4px 10px 4px;
+
+    &:hover:not(.disabled):not(:disabled) {
+        @include gradient(#F7F7F7, #E2E2E2);
+        border-color: #999;
+        box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
+        color: $black !important;
+    }
+
+    &:active:not(.disabled):not(:disabled) {
+        @include gradient(#E2E2E2, #F7F7F7);
+        border-color: $gray;
+        box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+    }
+
+    &:disabled,
+    &.disabled {
+        @extend %button-disabled;
+    }
+
+    &[class*="icon-"] {
+        &:before {
+            font-size: 1.2em;
+            vertical-align: -15%;
+        }
+
+        &:not(:empty):before {
+            margin-right: 0.5em;
+        }
+    }
+
+    &.accept {
+        &:not(.disabled):not(:disabled) {
+            color: #FDFDFD !important;
+            background: $green;
+            border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
+        }
+
+        &:hover:not(.disabled):not(:disabled) {
+            @include gradient(#0DA500, #0B8D00);
+            border-color: #999;
+            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
+            color: #FDFDFD !important;
+        }
+    }
+
+    &.danger {
+        &:not(.disabled):not(:disabled) {
+            background: $red;
+            border-color: $dark-red;
+            color: #FDFDFD !important;
+        }
+
+        &:hover:not(.disabled):not(:disabled) {
+            @include gradient($red, darken($red, $color-variation));
+            border-color: $dark-red;
+            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
+            color: #FDFDFD !important;
+        }
+
+        &:active:not(.disabled):not(:disabled) {
+            @include gradient(darken($red, $color-variation), $red);
+            border-color: $dark-red;
+            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+        }
+    }
+
+    &.highlight {
+        &:not(.disabled):not(:disabled) {
+            background: $blue;
+            border-color: $dark-blue;
+            color: #FDFDFD !important;
+        }
+
+        &:hover:not(.disabled):not(:disabled) {
+            @include gradient($blue, darken($blue, $color-variation));
+            border-color: $dark-blue;
+            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
+            color: #FDFDFD !important;
+        }
+
+        &:active:not(.disabled):not(:disabled) {
+            @include gradient(darken($blue, $color-variation), $blue);
+            border-color: $dark-blue;
+            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1) inset;
+        }
+    }
+
+    &.warning {
+        &:not(.disabled):not(:disabled) {
+            background: $yellow;
+            border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25) rgba(0, 0, 0, 0.1);
+            color: #EFEFEF !important;
+            font-weight: normal !important;
+        }
+
+        &:hover:not(.disabled):not(:disabled) {
+            @include gradient(#F3BB08, #E99E18);
+            color: #FDFDFD !important;
+            border-color: #999;
+            box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
+        }
+    }
+
+    &.label,
+    &.label:hover:not(.disabled):not(:disabled),
+    &.label:active:not(.disabled):not(:disabled), {
+        background: white;
+        border-color: $gray !important;
+        box-shadow: none !important;
+        color: $black !important;
+        cursor: default;
+
+        &.heavy {
+            background: $light-gray;
+        }
+    }
+
+    &.arrow {
+        @include icon-after('icon-arrow-down');
+
+        &:after {
+            vertical-align: -10%;
+        }
+    }
+}
+
+a.i-big-button {
+    $size: 60px;
+    @extend %button;
+
+    background: #FFF;
+    width: $size;
+    height: $size;
+
+    i {
+        display: block;
+        font-size: 3em;
+        line-height: ($size/3)*2;
+    }
+
+    span {
+        font-weight: bold;
+        line-height: $size/3;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    &:hover {
+        background: $light-black;
+        transition: background .25s ease-out;
+
+        > i,
+        > span {
+            color: white;
+            transition: color .25s ease-out;
+        }
+    }
+
+    &.icon-only {
+        i {
+            line-height: $size;
+        }
+    }
+}
+
+.i-button.signin {
+    display: block;
+    text-align: left;
+    margin-top: 5px;
+
+    .auth-id {
+        font-weight: bold;
+    }
+
+    .login-arrow {
+        float: right;
+        @include icon-before('icon-arrow-right');
+    }
+}
+
+button::-moz-focus-inner {
+  border: 0;
+}
+
+
+.fav-button.enabled:hover {
+    color: #F5F1C5 !important;
+}
+
+.fav-button.enabled {
+    background-color: #FAD74C;
+    background-image: -ms-linear-gradient(top, #FAD74C, #DAC34A);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#FAD74C), to(#DAC34A));
+    background-image: -webkit-linear-gradient(top, #FAD74C, #DAC34A);
+    background-image: -o-linear-gradient(top, #FAD74C, #DAC34A);
+    background-image: -moz-linear-gradient(top, #FAD74C, #DAC34A);
+    background-image: linear-gradient(top, #FAD74C, #DAC34A);
+
+    border-color: #B6AD6F;
+    color: #E2E28B !important;
+    text-shadow: 0 0 1px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 6px #E6DB64;
+}
+
+/* ******************** */
+/* Button modifications */
+/* ******************** */
+.i-button.big[class*="icon-"]:before {
+    display: block;
+    font-size: 2em;
+    margin-right: 0;
+    margin-bottom: 0.2em;
+    text-align: center;
+}
+
+.i-button.big {
+    padding: 0.8em;
+    margin-right: 1em;
+}
+
+.i-button-small {
+    font-size: 11px;
+    line-height: 16px;
+    padding: 9px;
+}
+
+.i-button-mini {
+    font-size: 11px;
+    line-height: 14px;
+    padding: 2px 6px;
+}
+
+.i-button-fit {
+    width: 100%;
+}
+
+.i-button.right {
+    margin-left: 5px;
+    margin-top: 5px;
+}
+
+.i-button.bottom {
+    margin-top: 1em;
+}
+
+.i-button[class*="icon-"].icon-only:before {
+    margin-right: 0;
+}
+
+.i-button > [class*="icon-"]:before {
+    font-size: 1.2em;
+    vertical-align: -15%;
+}
+
+/* ************** */
+/* Dropdown menus */
+/* ************** */
+.dropdown {
+    box-shadow: 1px 1px 5px rgba(20, 20, 20, 0.1);
+    background: #FAFAFA;
+    border: solid 1px #DCDCDC;
+    margin-top: 0px;
+    padding: 0px;
+    position: absolute;
+    z-index: 0;
+}
+
+.dropdown > li {
+    cursor: pointer;
+    display: block;
+    float: none;
+    font-weight: normal;
+    height: 1.7rem;
+    list-style-type: none;
+    min-width: 1em;
+    padding: 0.1em 1em !important;
+    text-decoration: none;
+    text-shadow: 0 1px 0 #fff;
+}
+
+.dropdown > li a {
+    display: block;
+    line-height: 1.7rem;
+    padding-top: 0.1em;
+    width: 100%;
+}
+
+.dropdown > li a[class*="icon-"]:before {
+    color: #777;
+    font-size: 1.2rem;
+    margin-right: 0.3em;
+    vertical-align: -10%;
+}
+
+.dropdown > li:hover a {
+    color: #888;
+}
+
+.trusted, .trusted:hover {
+    color: #0B8D00 !important;
+}
+
+/* Remove special border added in Firefox */
+button::-moz-focus-inner,
+input[type="button"]::-moz-focus-inner,
+input[type="submit"]::-moz-focus-inner,
+input[type="reset"]::-moz-focus-inner {
+    border: 0 none !important;
+}

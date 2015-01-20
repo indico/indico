@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from datetime     import datetime, timedelta
 from persistent   import Persistent
@@ -32,7 +31,7 @@ from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from indico.modules.scheduler import Client
 from indico.modules.scheduler.tasks import AlarmTask
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 class Evaluation(Persistent):
@@ -332,10 +331,12 @@ class Evaluation(Persistent):
     def setSubmissions(self, submissions):
         """set the submissions of this evaluation."""
         self._submissions = submissions
-    def getSubmissions(self):
+    def getSubmissions(self, ids=None):
         """get the submissions of this evaluation."""
         if not hasattr(self, "_submissions"):
             self._submissions = []
+        if ids is not None:
+            return [s for s in self._submissions if s.getId() in ids]
         return self._submissions
 
     def getUserSubmission(self, user):
@@ -440,12 +441,11 @@ class Evaluation(Persistent):
 
     def removeAlarm(self, alarm):
         """Remove given Alarm."""
-        if alarm != None :
-            if self.getConference().getAlarmById(alarm.getConfRelativeId()) != None :
+        if alarm is not None:
+            if self.getConference().getAlarmById(alarm.getConfRelativeId()) is not None:
                 self.getConference().removeAlarm(alarm)
-            else :
-                self.getAlarms().pop(alarm.getNotificationKey(), None)
-                self.notifyModification()
+            self.getAlarms().pop(alarm.getNotificationKey(), None)
+            self.notifyModification()
 
     def removeAllAlarms(self):
         """remove all alarms."""
@@ -504,10 +504,9 @@ class EvaluationAlarm(AlarmTask):
 
     def delete(self):
         evaluation = self.getEvaluation()
-        if evaluation != None:
+        if evaluation is not None:
             evaluation.removeAlarm(self)
         self.setEvaluation(None)
-        Alarm.delete(self)
 
     def _prepare(self, check=True):
 
@@ -712,7 +711,7 @@ class Question(Persistent):
         answer.setQuestion(self)
         self.notifyModification()
 
-    def getAnswers(self, selectedSubmissions=[]):
+    def getAnswers(self, selectedSubmissions=None):
         """ get the answers for this question.
             This function is a shortcut for getting answers easily from this question.
             In fact, answers and questions are not directly bound.
@@ -723,16 +722,16 @@ class Question(Persistent):
         #check
         if not hasattr(self, "_answers"):
             self._answers = []
-        if not isinstance(selectedSubmissions, list) or len(selectedSubmissions)<1 :
+        if selectedSubmissions is None:
             return self._answers
         #do all the gestion for the answers of a question !
         tempAnswers = []
         for answer in self._answers:
-            if answer.getSubmission() in selectedSubmissions:
+            if answer.getSubmission().getId() in selectedSubmissions:
                 tempAnswers.append(answer)
         return tempAnswers
 
-    def getNbOfAnswers(self, selectedSubmissions=[]):
+    def getNbOfAnswers(self, selectedSubmissions=None):
         """ get the number of answers for this question.
             Params:
                 selectedSubmissions -- [list of Submission] Only answers whose submission belongs in this list are treated.
@@ -740,7 +739,7 @@ class Question(Persistent):
         """
         return len(self.getAnswers(selectedSubmissions))
 
-    def getNbOfFilledAnswers(self, selectedSubmissions=[]):
+    def getNbOfFilledAnswers(self, selectedSubmissions=None):
         """ returns the number of not empty answers.
             Params:
                 selectedSubmissions -- [list of Submission] Only answers whose submission belongs in this list are treated.
@@ -752,7 +751,7 @@ class Question(Persistent):
                 nb += 1
         return nb
 
-    def areAllAnswersFilled(self, selectedSubmissions=[]):
+    def areAllAnswersFilled(self, selectedSubmissions=None):
         """ returns True if all the answers are filled, False otherwise.
             Params:
                 selectedSubmissions -- [list of Submission] Only answers whose submission belongs in this list are treated.
@@ -760,7 +759,7 @@ class Question(Persistent):
         """
         return self.getNbOfFilledAnswers(selectedSubmissions) == self.getNbOfAnswers(selectedSubmissions)
 
-    def printAreAllAnswersFilled(self, selectedSubmissions=[]):
+    def printAreAllAnswersFilled(self, selectedSubmissions=None):
         return "%s %s"%(self.getNbOfFilledAnswers(selectedSubmissions), self.getNbOfAnswers(selectedSubmissions))
 
     def getUserAnswer(self, user):
@@ -832,8 +831,8 @@ class Choice(Question):
         """returns a new Question which is a copy of the current one (self).
         """
         q = Question.clone(self)
-        for itemText,isSelected in self.getChoiceItems().items():
-            q.insertChoiceItem(itemText, isSelected)
+        for key in self.getChoiceItemsOrderedKeys():
+            q.insertChoiceItem(key, self.getChoiceItemsCorrespondingValue(key))
         return q
 
     def exportXml(self, xmlGen):
@@ -1072,7 +1071,7 @@ class Select(Choice):
         selected = self.getUserAnswerValue(user)
         return WUtils.createSelect(True, options, selected, **attributes)
 
-    def getNbOfAnswersLike(self, answerValue, selectedSubmissions=[]):
+    def getNbOfAnswersLike(self, answerValue, selectedSubmissions=None):
         """ [Statistics] Give the number of answers which are the same as the given answer value.
             Params:
                 answerValue -- given answer value of type string.
@@ -1088,7 +1087,7 @@ class Select(Choice):
         except:
             return 0
 
-    def getPercentageAnswersLike(self, answerValue, selectedSubmissions=[]):
+    def getPercentageAnswersLike(self, answerValue, selectedSubmissions=None):
         """ [Statistics] Give the percentage of answers like given answer value.
             Params:
                 answerValue -- given answer value of type string.
@@ -1159,7 +1158,7 @@ class Radio(Choice):
             choiceItemsHTML += WUtils.appendNewLine(WUtils.createInput(itemText, **attributes))
         return choiceItemsHTML
 
-    def getNbOfAnswersLike(self, answerValue, selectedSubmissions=[]):
+    def getNbOfAnswersLike(self, answerValue, selectedSubmissions=None):
         """ [Statistics] Give the number of answers which are the same as the given answer value.
             Params:
                 answerValue -- given answer value of type string.
@@ -1175,7 +1174,7 @@ class Radio(Choice):
         except:
             return 0
 
-    def getPercentageAnswersLike(self, answerValue, selectedSubmissions=[]):
+    def getPercentageAnswersLike(self, answerValue, selectedSubmissions=None):
         """ [Statistics] Give the percentage of answers like given answer value.
             Params:
                 answerValue -- given answer value of type string.
@@ -1242,7 +1241,7 @@ class Checkbox(Choice):
             choiceItemsHTML += WUtils.appendNewLine(WUtils.createInput(itemText, **attributes))
         return choiceItemsHTML
 
-    def getNbOfAnswersLike(self, answerValue, selectedSubmissions=[]):
+    def getNbOfAnswersLike(self, answerValue, selectedSubmissions=None):
         """ [Statistics] Give the number of answers which are the same as the given answer value.
             Params:
                 answerValue -- given answer value of type string.
@@ -1256,7 +1255,7 @@ class Checkbox(Choice):
                     nb += 1
         return nb
 
-    def getNbOfAllSelectedChoiceItems(self, selectedSubmissions=[]):
+    def getNbOfAllSelectedChoiceItems(self, selectedSubmissions=None):
         """ [Statistics] Returns the number of all selected choice items for all answers for this question.
             Params:
                 selectedSubmissions -- [list of Submission] Only answers whose submission belongs in this list are treated.
@@ -1270,7 +1269,7 @@ class Checkbox(Choice):
         except:
             return 0
 
-    def getPercentageAnswersLike(self, answerValue, selectedSubmissions=[]):
+    def getPercentageAnswersLike(self, answerValue, selectedSubmissions=None):
         """ [Statistics] Give the percentage of answers like given answer value.
             Params:
                 answerValue -- given answer value of type string.
@@ -1401,13 +1400,24 @@ class Submission(Persistent):
                 submitter -- [Avatar/None] submitter who submitted this submission.
         """
         self._evaluation = evaluation
-        self._evaluation.insertSubmission(self)
         self.setSubmitter(submitter)
         self._id = str( evaluation._getSubmissionCounter().newCount() )
         self._answers = []
         self.submissionDate = nowutc()
         self.modificationDate = None
         self.anonymous = evaluation.isAnonymous()
+        self._evaluation.insertSubmission(self)
+
+    def __cmp__(self, other):
+        if type(self) is not type(other):
+            # This is actually dangerous and the ZODB manual says not to do this
+            # because it relies on memory order. However, this branch should never
+            # be taken anyway since we do not store different types in the same set
+            # or use them as keys.
+            return cmp(hash(self), hash(other))
+        if self.getConference() == other.getConference():
+            return cmp(self.getId(), other.getId())
+        return cmp(self.getConference(), other.getConference())
 
     def removeReferences(self):
         """remove all pointers to other objects."""
@@ -1417,9 +1427,10 @@ class Submission(Persistent):
 
     def setId(self, id):
         self._id = str(id)
+
     def getId(self):
         if not hasattr(self, "_id"):
-            self._id = str( evaluation._getSubmissionCounter().newCount() )
+            self._id = str( self._evaluation._getSubmissionCounter().newCount() )
         return self._id
 
     def notifyModification(self):
@@ -1434,6 +1445,12 @@ class Submission(Persistent):
         if not hasattr(self, "_evaluation"):
             self._evaluation = None
         return self._evaluation
+
+    def getConference(self):
+        """gets the conference to which this submission's evaluation is bound."""
+        evaluation = self.getEvaluation()
+        if evaluation:
+            return evaluation.getConference()
 
     def setAnonymous(self, anonymous):
         """if True, submission is anonymous."""
@@ -1480,7 +1497,7 @@ class Submission(Persistent):
                 if len(toList+ccList) > 0 :
                     subject = "Notification for evaluation '%s'"%evaluation.getTitle()
                     conf = evaluation.getConference()
-                    supportEmail = conf.getSupportEmail(returnNoReply=True, caption=True)
+                    supportEmail = conf.getSupportInfo().getEmail(returnNoReply=True, caption=True)
 
                     notification = GenericNotification({'fromAddr': supportEmail,
                                                         'toList': toList,
@@ -1489,9 +1506,9 @@ class Submission(Persistent):
                                                         'body': message})
 
                     GenericMailer.send(notification)
-        except Exception, e:
-            if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
-                raise Exception(e)
+        except Exception:
+            if Config.getInstance().getDebug():
+                raise
 
     def notifySubmissionSubmitted(self):
         """notification when a new submission arrive."""

@@ -1,34 +1,119 @@
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
+from zope.interface import implements
 from persistent import Persistent
 from BTrees.OOBTree import OOBTree
 from BTrees.IOBTree import IOBTree
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from MaKaC.common.timezoneUtils import unixTimeToDatetime,\
     datetimeToUnixTimeInt
-from MaKaC.conference import ConferenceHolder, CategoryManager
+from MaKaC.conference import ConferenceHolder, CategoryManager, Contribution
 from datetime import datetime
+from MaKaC.plugins.Collaboration.base import CSBookingManager
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.fossilize import fossilize, Fossilizable, fossilizes
 from MaKaC.plugins.Collaboration.fossils import IIndexInformationFossil,\
-    IQueryResultFossil
+    IQueryResultFossil, ICollaborationMetadataFossil
+
+from indico.core.index.base import IUniqueIdProvider
+from indico.core.index.adapter import IIndexableByStartDateTime
+from indico.core.index import Catalog
+
+
+class CSBookingInstanceWrapper(Persistent):
+    """ This wrapper is required in order to export each contribution through
+        the iCal interface, giving each object its own unique address and
+        allows for the construction of iCal specific unique identifiers.
+    """
+
+    implements(IUniqueIdProvider, IIndexableByStartDateTime, ICollaborationMetadataFossil)
+
+    def __init__(self, booking, obj, startDate=None, endDate=None):
+        self._orig = booking
+        self._obj = obj
+        self._startDate = startDate
+        self._endDate = endDate
+
+    def __getattr__(self, name):
+        """ Checks for overridden method in this class, if not present then
+            delegates to original CSBooking object.
+        """
+
+        if name in self.__dict__:
+            return getattr(self, name)
+
+        return getattr(self._orig, name)
+
+    def _getShortTypeSuffix(self):
+        type = self._orig.getType()
+        return type.lower()[0:2]
+
+    def getUniqueId(self):
+        """ Each contribution will need a unique UID for each iCal event,
+            as RecordingRequests and WebcastRequests would share the same
+            UID per contribution, append a suffix denoting the type.
+        """
+        return self._obj.getUniqueId() + self._getShortTypeSuffix() + "_" + self.getStartDate().isoformat().replace('-','').replace(':', '')
+
+    def getTitle(self):
+        return self._orig._conf.getTitle() + ' - ' + self._obj.getTitle()
+
+    def getObject(self):
+        return self._obj
+
+    def getTalk(self):
+        return self._obj if isinstance(self._obj, Contribution) else None
+
+    def getOriginalBooking(self):
+        return self._orig
+
+    def setStartDate(self, date):
+        self._startDate = date
+
+    def getStartDate(self):
+        return self._startDate or self._obj.getStartDate()
+
+    def setEndDate(self, date):
+        self._endDate = date
+
+    def getEndDate(self):
+        return self._endDate or self._obj.getEndDate()
+
+    def getLocation(self):
+        return self._obj.getLocation().getName() if self._obj.getLocation() else ""
+
+    def getRoom(self):
+        return self._obj.getRoom().getName() if self._obj.getRoom() else ""
+
+    def __conform__(self, proto):
+
+        if proto == IIndexableByStartDateTime:
+            return self.getStartDate()
+        else:
+            return None
+
+    def __cmp__(self, instance):
+        if instance is None:
+            return 1
+        else:
+            return cmp(self.getUniqueId(), instance.getUniqueId())
 
 
 class CollaborationIndex(Persistent):
@@ -46,6 +131,13 @@ class CollaborationIndex(Persistent):
             index = BookingsIndex(name)
             self._indexes[name] = index
             return index
+
+    def _getBookingInstancesByDate(self, index, dateFormat, fromDate=None, toDate=None):
+        bookings = defaultdict(list)
+        for dt, bkw in Catalog.getIdx('cs_booking_instance')[index].iter_bookings(fromDate, toDate):
+            bookings[dt].append(bkw)
+        return list((dt.strftime(dateFormat), bkws) for (dt, bkws) in sorted(bookings.iteritems())), len(bookings)
+
 
     def getBookings(self, indexName, viewBy, orderBy, minKey, maxKey,
                     tz = 'UTC', onlyPending=False, conferenceId=None, categoryId=None,
@@ -70,12 +162,13 @@ class CollaborationIndex(Persistent):
                 elif viewBy == "conferenceStartDate":
                     items, nBookings = index.getBookingsByConfDate(minKey, maxKey, conferenceId,
                                                                    categoryId, tz, dateFormat, grouped=grouped)
+                elif viewBy == "instanceDate":
+                    items, nBookings = self._getBookingInstancesByDate(indexName, dateFormat, minKey, maxKey)
                 else:
                     items, nBookings = index.getBookingsByDate(viewBy, minKey, maxKey, tz, conferenceId, categoryId, dateFormat)
 
                 if reverse:
                     items.reverse()
-
 
                 nGroups = len(items)
 
@@ -100,14 +193,15 @@ class CollaborationIndex(Persistent):
 
         except KeyError:
             Logger.get("VideoServ").warning("Tried to retrieve index with name " + indexName + " but the index did not exist. Maybe no bookings have been added to it yet")
-            finalResult = QueryResult([], 0, 0, 0)
+            finalResult = QueryResult([], 0, 0, 0, 0)
 
         if CollaborationTools.hasCollaborationOption("verifyIndexingResults") and CollaborationTools.getCollaborationOptionValue("verifyIndexingResults"):
             finalResult.purgeNonExistingBookings()
 
         if pickle:
+            # ATTENTION: this call silently changes the fossil map
             CollaborationTools.updateIndexingFossilsDict()
-            return fossilize(finalResult, IQueryResultFossil, tz = tz)
+            return fossilize(finalResult, IQueryResultFossil, tz=tz)
         else:
             return finalResult
 
@@ -121,23 +215,32 @@ class CollaborationIndex(Persistent):
         for pluginInfo in CollaborationTools.getCollaborationPluginType().getOption("pluginsPerIndex").getValue():
             self._indexes[pluginInfo.getName()] = BookingsIndex(pluginInfo.getName())
 
-    def indexAll(self):
+    def indexAll(self, index_names=None, dbi=None):
         """ Indexes all the bookings from all the conferences
             WARNING: obviously, this can potentially take a while
         """
-        for conf in ConferenceHolder().getList():
-            csbm = conf.getCSBookingManager()
+
+        i = 0
+
+        for cid, conf in ConferenceHolder()._getIdx().iteritems():
+            csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
+            if csbm is None: continue
             #note: probably not the most efficient implementation since _indexBooking is getting the list
             #      of indexes where each booking should be indexed on every iteration
             for booking in csbm.getBookingList():
-                csbm._indexBooking(booking)
+                csbm._indexBooking(booking, index_names=index_names)
+            i += 1
+            if dbi and i % 1000 == 999:
+                dbi.commit()
+        if dbi:
+            dbi.commit()
 
-    def reindexAll(self):
+    def reindexAll(self, dbi=None):
         """ Cleans the indexes, and then indexes all the bookings from all the conferences
             WARNING: obviously, this can potentially take a while
         """
         self.cleanAll()
-        self.indexAll()
+        self.indexAll(dbi=dbi)
 
 class BookingsIndex(Persistent):
 
@@ -393,12 +496,13 @@ class BookingConferenceIndex(Persistent):
     def unindexBooking(self, booking, key):
         if key in self._tree:
             try:
-                self._tree[key][1].remove(booking)
+                s = self._tree[key][1]
+                s.remove(booking)
+                self._tree[key] = (self._tree[key][0], s)
                 self._numberOfBookings = self._numberOfBookings - 1
-                if self._tree[key][1]:
-                    self._tree._p_changed = 1
-                else:
+                if not self._tree[key][1]:
                     del self._tree[key]
+                self._tree._p_changed = 1
             except KeyError, e:
                 Logger.get('VideoServ').warning("Tried to unindex booking: (confId=%s, id=%s) with key=%s from BookingConferenceIndex %s, but the booking was not present in the set of bookings with key %s. Exception: %s"%(booking.getConference().getId(), booking.getId(), str(key), self.getName(), str(key), str(e)))
                 self._deepUnindexBooking(booking, key)
@@ -508,6 +612,43 @@ class BookingConferenceIndex(Persistent):
     def dump(self):
         return [(k, [_bookingToDump(b) for b in s[1]]) for k, s in self._tree.iteritems()]
 
+
+class BookingManagerConferenceIndex(Persistent):
+
+    def __init__(self):
+        self._tree = OOBTree()
+        self._name = "bookingManagerByConf"
+
+    def initialize(self, dbi=None):
+        for i, conf in enumerate(ConferenceHolder()._getIdx().itervalues()):
+            # Store CSBookingManager in the index
+            csbm = getattr(conf, "_CSBookingManager", None)
+            if csbm is None:
+                csbm = CSBookingManager(conf)
+            self.index(conf.getId(), csbm)
+            if dbi and i % 1000 == 999:
+                dbi.commit()
+        if dbi:
+            dbi.commit()
+
+    def getName(self):
+        return self._name
+
+    def index(self, conf, csbm):
+        if not self._tree.has_key(conf):
+            self._tree[conf] = csbm
+            self._tree._p_changed = 1
+
+    def unindex(self, conf):
+        del self._tree[conf]
+        self._tree._p_changed = 1
+
+    def get(self, conf):
+        return self._tree.get(conf,None)
+
+    def dump(self):
+        return [(k, s) for k, s in self._tree.iteritems()]
+
 class CategoryChecker(object):
     """ Tries to check if a conference belongs to a category (recursively),
         while keeping a cache of previously visited categories to avoid DB requests
@@ -538,6 +679,9 @@ class CategoryChecker(object):
             return False
         else:
             category = conference.getOwner()
+            if category is None: # event/categ deleted (containing the booking)
+                self._badConfs.add(confId)
+                return False
             categoryId = category.getId()
             isGoodCateg = categoryId in self._goodCategs
             isBadCateg = categoryId in self._badCategs

@@ -50,11 +50,12 @@
       <tr>
         <td colspan="3" class="horizontalLine">&nbsp;</td>
       </tr>
+      % if Config.getInstance().getReportNumberSystems():
       <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Report numbers")}</span></td>
-        <td bgcolor="white" colspan="2"><i>${ reportNumbersTable }</i></td>
+        <td bgcolor="white" colspan="2">${ reportNumbersTable }</td>
       </tr>
-      <tr>
+      % endif
 </table>
 <br>
 

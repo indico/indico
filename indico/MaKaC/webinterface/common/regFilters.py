@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
 import MaKaC.common.filters as filters
@@ -345,9 +344,9 @@ class RegistrationDateSF( RegistrantSortingField ):
         rd2=r2.getRegistrationDate() or datetime(1995, 1, 1)
         return cmp( rd1, rd2 )
 
+
 class GeneralFieldSF( RegistrantSortingField ):
     _id = "groupID-fieldId"
-
 
     def compare( self, r1, r2 ):
         if self.getSpecialId() != self._id:
@@ -365,8 +364,9 @@ class GeneralFieldSF( RegistrantSortingField ):
                     i2=group2.getResponseItemById(ids[1])
                     if i2 is not None:
                         v2=i2.getValue()
-                return cmp( v1.lower().strip(), v2.lower().strip() )
+                return cmp(str(v1).lower().strip(), str(v2).lower().strip())
         return 0
+
 
 class StatusesSF( RegistrantSortingField ):
     _id = "s-statusId"
@@ -404,6 +404,31 @@ class IdPayment(RegistrantSortingField):
         return cmp( r1.getIdPay(), r2.getIdPay() )
 
 
+class IsCheckedInSF(RegistrantSortingField):
+    _id="checkedIn"
+
+    def compare(self, r1, r2):
+        """
+        """
+        return cmp(r1.isCheckedIn(), r2.isCheckedIn())
+
+
+class CheckInDateSF(RegistrantSortingField):
+    _id="checkInDate"
+
+    def compare(self, r1, r2):
+        """
+        """
+        if r2.getCheckInDate() is None and r1.getCheckInDate() is not None:
+            return 1
+        elif r1.getCheckInDate() is None and r2.getCheckInDate() is not None:
+            return -1
+        elif r1.getCheckInDate() is None and r2.getCheckInDate() is None:
+            return 0
+        else:
+            return cmp(r1.getCheckInDate(), r2.getCheckInDate())
+
+
 class SortingCriteria( filters.SortingCriteria ):
     """
     """
@@ -425,7 +450,9 @@ class SortingCriteria( filters.SortingCriteria ):
                         RegistrationDateSF.getId():RegistrationDateSF, \
                         CountrySF.getId():CountrySF, \
                         IsPayedSF.getId():IsPayedSF, \
-                        IdPayment.getId():IdPayment}
+                        IdPayment.getId():IdPayment, \
+                        IsCheckedInSF.getId():IsCheckedInSF, \
+                        CheckInDateSF.getId():CheckInDateSF}
 
 
     def __init__( self, crit = []):

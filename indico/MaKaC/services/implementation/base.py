@@ -1,42 +1,44 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.conference import Category
 
-import sys, traceback, time, os
-
-from pytz import timezone
+import distutils
+import os
+import sys
+import traceback
 from datetime import datetime, date
 
+from flask import request, session
+from pytz import timezone
+
+
+from MaKaC.conference import Category
 from MaKaC import conference
 from MaKaC.common.timezoneUtils import setAdjustedDate
-from MaKaC.common import security, Config
-from MaKaC.common.externalOperationsManager import ExternalOperationsManager
+from MaKaC.common import security
 from MaKaC.common.utils import parseDateTime
 
-from MaKaC.errors import MaKaCError, HtmlScriptError, HtmlForbiddenTag, TimingError
+from MaKaC.errors import MaKaCError, HtmlForbiddenTag, TimingError
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, HTMLSecurityError, Warning,\
     ResultWithWarning
 
 from MaKaC.webinterface.rh.base import RequestHandlerBase
-from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
 from MaKaC.accessControl import AccessWrapper
 
@@ -44,9 +46,11 @@ from MaKaC.i18n import _
 from MaKaC.common.contextManager import ContextManager
 import MaKaC.common.info as info
 
-"""
-base module for asynchronous server requests
-"""
+from indico.core.config import Config
+from indico.util.string import unicode_struct_to_utf8
+
+# base module for asynchronous server requests
+
 
 class ExpectedParameterException(ServiceError):
     """
@@ -64,6 +68,7 @@ class EmptyParameterException(ServiceError):
     """
     def __init__(self, paramName=""):
         ServiceError.__init__(self, "ERR-P3","Expected parameter '%s' is empty"%paramName)
+
 
 class DateTimeParameterException(ServiceError):
     """
@@ -91,66 +96,60 @@ class ParameterManager(object):
         """
 
         # "global" policy applies if allowEmpty not set
-        if (allowEmpty == None):
+        if allowEmpty is None:
             allowEmpty = self._allowEmpty
 
         value = self._paramList.get(paramName)
-
-        if (not allowEmpty) and (value == None):
-            raise EmptyParameterException(paramName)
-
-        if pType == str:
-            if value != None:
-                value = str(value)
-            else:
+        if value is None:
+            if allowEmpty:
                 value = defaultValue
-
-            if (value == '' or value == None) and not allowEmpty:
+            else:
                 raise EmptyParameterException(paramName)
-        elif pType == datetime:
-            # format will possibly be accomodated to different standards,
-            # in the future
 
-            try:
-                # both strings and objects are accepted
-                if type(value) == str:
-                    naiveDate = datetime.strptime(value, '%Y/%m/%d %H:%M')
-                elif value:
-                    naiveDate = datetime.strptime(value['date']+' '+value['time'][:5], '%Y/%m/%d %H:%M')
-                elif not allowEmpty:
-                    raise EmptyParameterException(paramName)
-                else:
-                    naiveDate = None
-            except ValueError:
-                raise DateTimeParameterException(paramName, value)
-
-            if self._timezone and naiveDate:
-                value = timezone(self._timezone).localize(naiveDate).astimezone(timezone('utc'))
-            else:
-                value = naiveDate
-        elif pType == date:
-            # format will possibly be accomodated to different standards,
-            # in the future
-            value = datetime.strptime(value,'%Y/%m/%d').date()
-        elif pType == int:
-            if value == None and allowEmpty:
-                value = None
-            else:
+        if value is not None:
+            if pType == str:
+                value = str(value)
+            elif pType == int:
                 value = int(value)
-        elif pType == float:
-            if value == None and allowEmpty:
-                value = None
-            else:
+            elif pType == float:
                 value = float(value)
-        elif pType == dict:
-            if not (type(value) == dict or (allowEmpty and value == None)):
-                raise ExpectedParameterException(paramName, dict, type(value))
-        elif pType == list:
-            if not (type(value) == list or (allowEmpty and value == None)):
-                raise ExpectedParameterException(paramName, list, type(value))
-        elif pType == bool:
-            if not (type(value) == bool or (allowEmpty and value == None)):
-                raise ExpectedParameterException(paramName, bool, type(value))
+            elif pType == bool:
+                if not type(value) == bool:
+                    try:
+                        value = distutils.util.strtobool(str(value))
+                    except ValueError:
+                        raise ExpectedParameterException(paramName, bool, type(value))
+            elif pType == dict:
+                if not type(value) == dict:
+                    raise ExpectedParameterException(paramName, dict, type(value))
+            elif pType == list:
+                if not type(value) == list:
+                    raise ExpectedParameterException(paramName, list, type(value))
+            elif pType == date:
+                # format will possibly be accomodated to different standards,
+                # in the future
+                value = datetime.strptime(value, '%Y/%m/%d').date()
+            elif pType == datetime:
+                # format will possibly be accomodated to different standards,
+                # in the future
+                try:
+                    # both strings and objects are accepted
+                    if isinstance(value, basestring):
+                        naiveDate = datetime.strptime(value, '%Y/%m/%d %H:%M')
+                    elif value:
+                        naiveDate = datetime.strptime(value['date']+' '+value['time'][:5], '%Y/%m/%d %H:%M')
+                    else:
+                        naiveDate = None
+                except ValueError:
+                    raise DateTimeParameterException(paramName, value)
+
+                if self._timezone and naiveDate:
+                    value = timezone(self._timezone).localize(naiveDate).astimezone(timezone('utc'))
+                else:
+                    value = naiveDate
+
+        if (value is None or value == "") and not allowEmpty:
+            EmptyParameterException(paramName)
 
         return value
 
@@ -163,37 +162,29 @@ class ServiceBase(RequestHandlerBase):
     The ServiceBase class is the basic class for services.
     """
 
-    def __init__(self, params, session, req):
-        """
-        Constructor.  Initializes provate variables
-        @param req: HTTP Request provided by the previous layer
-        """
-        RequestHandlerBase.__init__(self, req)
+    UNICODE_PARAMS = False
+
+    def __init__(self, params):
+        RequestHandlerBase.__init__(self)
+        if not self.UNICODE_PARAMS:
+            params = unicode_struct_to_utf8(params)
         self._reqParams = self._params = params
         self._requestStarted = False
-        self._websession = session
         # Fill in the aw instance with the current information
         self._aw = AccessWrapper()
-        self._aw.setIP(self.getHostIP())
-        self._aw.setSession(session)
-        self._aw.setUser(session.getUser())
+        self._aw.setIP(request.remote_addr)
+        self._aw.setUser(session.user)
         self._target = None
         self._startTime = None
-        self._tohttps = self._req.is_https()
+        self._tohttps = request.is_secure
         self._endTime = None
         self._doProcess = True  #Flag which indicates whether the RH process
                                 #   must be carried out; this is useful for
                                 #   the checkProtection methods
         self._tempFilesToDelete = []
+        self._redisPipeline = None
 
     # Methods =============================================================
-
-    def _getSession( self ):
-        """
-        Returns the web session associated to the received mod_python
-        request.
-        """
-        return self._websession
 
     def _checkParams(self):
         """
@@ -231,15 +222,12 @@ class ServiceBase(RequestHandlerBase):
 
         ContextManager.set('currentRH', self)
 
-        self._setLang()
         self._checkParams()
         self._checkProtection()
 
         try:
-            security.Sanitization.sanitizationCheck(self._target,
-                                   self._params,
-                                   self._aw)
-        except (HtmlScriptError, HtmlForbiddenTag), e:
+            security.Sanitization.sanitizationCheck(self._target, self._params, self._aw)
+        except HtmlForbiddenTag as e:
             raise HTMLSecurityError('ERR-X0','HTML Security problem. %s ' % str(e))
 
         if self._doProcess:
@@ -443,7 +431,7 @@ class DateTimeModificationBase( TextModificationBase ):
             self._pTime = setAdjustedDate(naiveDate, self._conf)
             return self._setParam()
         except TimingError,e:
-            raise ServiceError("ERR-E2", e.getMsg())
+            raise ServiceError("ERR-E2", e.getMessage())
 
 class ListModificationBase:
     """ Base class for a list modification.

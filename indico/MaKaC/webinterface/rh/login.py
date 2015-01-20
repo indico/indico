@@ -1,142 +1,166 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import os
-from MaKaC.common import Configuration, Config
+
+from flask import session, request
+
+from MaKaC.common.cache import GenericCache
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.mail as mail
 import MaKaC.webinterface.pages.signIn as signIn
-from MaKaC.common.general import *
 from MaKaC.user import LoginInfo
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.user import AvatarHolder
 from MaKaC.common import pendingQueues
 import MaKaC.common.timezoneUtils as timezoneUtils
-from MaKaC.errors import UserError
+from MaKaC.errors import UserError, MaKaCError, FormValuesError, NoReportError
 import MaKaC.common.info as info
 
-class RHSignIn( base.RH ):
+from indico.web.flask.util import send_file
+from indico.core.config import Config
+from indico.util.i18n import set_session_lang
+
+
+class RHSignInBase(base.RH):
 
     _tohttps = True
+    _isMobile = False
+
+    def _checkParams(self, params):
+        self._login = params.get("login", "").strip()
+        self._password = params.get("password", "")
+        self._doNotSanitizeFields.append("password")
+        self._returnURL = params.get("returnURL", "").strip()
+        if self._returnURL:
+            session['loginReturnURL'] = self._returnURL
+
+    def _setSessionVars(self, av):
+        if not self._returnURL:
+            self._returnURL = session.pop('loginReturnURL', urlHandlers.UHWelcome.getURL())
+        self._url = self._returnURL
+        tzUtil = timezoneUtils.SessionTZ(av)
+        tz = tzUtil.getSessionTZ()
+        session.timezone = tz
+        session.user = av
+        set_session_lang(av.getLang())
+        if Config.getInstance().getBaseSecureURL().startswith('https://'):
+            self._url = str(self._url).replace('http://', 'https://')
+
+    def _makeLoginProcess( self ):
+        #Check for automatic login
+        authManager = AuthenticatorMgr()
+        if (authManager.isSSOLoginActive() and len(authManager.getList()) == 1 and
+           not Config.getInstance().getDisplayLoginPage()):
+            self._redirect(urlHandlers.UHSignInSSO.getURL(authId=authManager.getDefaultAuthenticator().getId()))
+            return
+        if request.method != 'POST':
+            return self._signInPage.display(returnURL=self._returnURL)
+        else:
+            li = LoginInfo( self._login, self._password )
+            av = authManager.getAvatar(li)
+            if not av:
+                return self._signInPageFailed.display( returnURL = self._returnURL )
+            elif not av.isActivated():
+                if av.isDisabled():
+                    self._redirect(self._disabledAccountURL(av))
+                else:
+                    self._redirect(self._unactivatedAccountURL(av))
+                return _("Your account is not active\nPlease activate it and try again")
+            else:
+                self._setSessionVars(av)
+            self._addExtraParamsToURL()
+            self._redirect(self._url)
+
+
+class RHSignIn( RHSignInBase ):
 
     def _checkParams( self, params ):
-        self._signIn = params.get("signIn", "").strip()
-        self._login = params.get( "login", "" ).strip()
-        self._password = params.get( "password", "" )
-        self._returnURL = params.get( "returnURL", "").strip()
+        RHSignInBase._checkParams(self, params)
         if self._returnURL == "":
             self._returnURL = urlHandlers.UHWelcome.getURL()
         self._userId = params.get( "userId", "").strip()
-
-    def _process( self ):
         self._disableCaching()
-        #Check for automatic login
-        auth = AuthenticatorMgr()
-        av = auth.autoLogin(self)
-        if av:
-            url = self._returnURL
-            tzUtil = timezoneUtils.SessionTZ(av)
-            tz = tzUtil.getSessionTZ()
-            self._getSession().setVar("ActiveTimezone",tz)
-            self._getSession().setUser( av )
-            if Config.getInstance().getBaseSecureURL().startswith('https://'):
-                url = str(url).replace('http://', 'https://')
-            self._redirect( url, noCache = True )
-        if not self._signIn:
-            p = signIn.WPSignIn( self )
-            return p.display( returnURL = self._returnURL )
-        else:
-            li = LoginInfo( self._login, self._password )
-            av = auth.getAvatar(li)
-            if not av:
-                p = signIn.WPSignIn( self, login = self._login, msg = _("Wrong login or password") )
-                return p.display( returnURL = self._returnURL )
-            elif not av.isActivated():
-                if av.isDisabled():
-                    self._redirect(urlHandlers.UHDisabledAccount.getURL(av))
-                else:
-                    self._redirect(urlHandlers.UHUnactivatedAccount.getURL(av))
-                return _("your account is not activate\nPlease active it and retry")
+        self._disabledAccountURL = lambda av: urlHandlers.UHDisabledAccount.getURL(av)
+        self._unactivatedAccountURL = lambda av: urlHandlers.UHUnactivatedAccount.getURL(av)
+        self._signInPage = signIn.WPSignIn( self )
+        self._signInPageFailed = signIn.WPSignIn( self, login = self._login, msg = _("Wrong login or password") )
+
+    def _addExtraParamsToURL(self):
+        if self._userId != "":
+            if "?" in self._url:
+                self._url += "&userId=%s"%self._userId
             else:
-                url = self._returnURL
-                #raise(str(dir(av)))
-                self._getSession().setUser( av )
-                tzUtil = timezoneUtils.SessionTZ(av)
-                tz = tzUtil.getSessionTZ()
-                self._getSession().setVar("ActiveTimezone",tz)
-
-            if self._userId != "":
-                if "?" in url:
-                    url += "&userId=%s"%self._userId
-                else:
-                    url += "?userId=%s"%self._userId
-            if Config.getInstance().getBaseSecureURL().startswith('https://'):
-                url = str(url).replace('http://', 'https://')
-            self._redirect( url, noCache = True )
-
-
-class RHSignOut( base.RH ):
-
-    def _checkParams( self, params ):
-        self._returnURL = params.get( "returnURL", "").strip()
-        if self._returnURL == "":
-            self._returnURL = urlHandlers.UHWelcome.getURL()
-
-    def _process( self ):
-        autoLogoutRedirect = None
-        if self._getUser():
-            auth = AuthenticatorMgr()
-            autoLogoutRedirect = auth.autoLogout(self)
-            self._getSession().removeVar("ActiveTimezone")
-            self._getSession().setUser( None )
-            self._setUser( None )
-        if autoLogoutRedirect:
-            self._redirect(autoLogoutRedirect)
-        else:
-            self._redirect(self._returnURL)
-
-
-class RHLogoutSSOHook( base.RH):
+                self._url += "?userId=%s"%self._userId
 
     def _process(self):
-        """Script triggered by the display of the centralized SSO logout
-        dialog. It logouts the user from CDS Invenio and stream back the
-        expected picture."""
+        return self._makeLoginProcess()
+
+
+class RHSignInSSO(RHSignInBase):
+
+    _isMobile = False
+
+    def _checkParams(self, params):
+        self._authId = params.get('authId', '').strip()
+        self._returnURL = params.get('returnURL', '')
+
+    def _process(self):
+        authenticator = session.pop('Authenticator', None)
+        if authenticator is not None:
+            authManager = AuthenticatorMgr()
+            if not authManager.isSSOLoginActive():
+                raise MaKaCError(_("SSO Login is not active."))
+            av = authManager.SSOLogin(self, authenticator)
+            if not av:
+                raise MaKaCError(_("You could not login through SSO."))
+            self._setSessionVars(av)
+            self._redirect(self._url)
+        elif self._authId:
+            session['Authenticator'] = self._authId
+            if self._returnURL:
+                session['loginReturnURL'] = self._returnURL
+            self._redirect(str(urlHandlers.UHSignInSSO.getURL(authId=self._authId)))
+        else:
+            raise MaKaCError(_("You did not pass the authenticator"))
+
+
+class RHSignOut(base.RH):
+
+    _isMobile = False
+
+    def _checkParams(self, params):
+        self._returnURL = params.get("returnURL", str(urlHandlers.UHWelcome.getURL())).strip()
+
+    def _process(self):
         if self._getUser():
-            auth = AuthenticatorMgr()
-            autoLogoutRedirect = auth.autoLogout(self)
-            self._getSession().removeVar("ActiveTimezone")
-            self._getSession().setUser( None )
-            self._setUser( None )
-        self._req.content_type = 'image/gif'
-        self._req.encoding = None
-        self._req.filename = 'wsignout.gif'
-        self._req.headers_out["Content-Disposition"] = "inline; filename=wsignout.gif"
-        self._req.set_content_length(os.path.getsize("%s/wsignout.gif"%Configuration.Config.getInstance().getImagesDir()))
-        self._req.send_http_header()
-        self._req.sendfile("%s/wsignout.gif"%Configuration.Config.getInstance().getImagesDir())
+            self._returnURL = AuthenticatorMgr().getLogoutCallbackURL(self) or self._returnURL
+            self._setUser(None)
+        session.clear()
+        self._redirect(self._returnURL)
 
 
 class RHActive( base.RH ):
+
+    _isMobile = False
 
     def _checkParams( self, params ):
         base.RH._checkParams(self, params )
@@ -157,10 +181,6 @@ class RHActive( base.RH ):
             #return "your account is disabled. please, ask to enable it"
         elif self._key == av.getKey():
             av.activateAccount()
-            #----Grant any kind of rights if anything
-            ph=pendingQueues.PendingQueuesHolder()
-            ph.grantRights(av)
-            #-----
             p = signIn.WPAccountActivated( self, av )
             return p.display()
             #return "Your account is activate now"
@@ -171,6 +191,8 @@ class RHActive( base.RH ):
 
 class RHSendLogin( base.RH ):
 
+    _isMobile = False
+
     def _checkParams( self, params ):
         self._userId = params.get( "userId", "" ).strip()
         self._email = params.get("email", "").strip()
@@ -180,17 +202,58 @@ class RHSendLogin( base.RH ):
         if self._userId:
             av = AvatarHolder().getById(self._userId)
         elif self._email:
-            try:
-                av = AvatarHolder().match({"email":self._email})[0]
-            except:
-                pass
+            av_list = AvatarHolder().match({"email": self._email}, exact=1)
+            if not av_list:
+                raise NoReportError(_("We couldn't find any account with this email address"))
+            av = av_list[0]
         if av:
-            sm = mail.sendLoginInfo(av)
-            sm.send()
-        self._redirect(urlHandlers.UHSignIn.getURL() )
+            mail.send_login_info(av)
+        self._redirect(urlHandlers.UHSignIn.getURL())
+
+
+class RHResetPasswordBase:
+    _isMobile = False
+    _token_storage = GenericCache('resetpass')
+
+    def _checkParams(self, params):
+        self._token = request.view_args['token']
+        self._data = self._token_storage.get(self._token)
+        if not self._data:
+            raise NoReportError(_('Invalid token. It might have expired.'))
+        self._avatar = AuthenticatorMgr().getById(self._data['tag']).getAvatarByLogin(self._data['login'])
+        self._identity = self._avatar.getIdentityById(self._data['login'], self._data['tag'])
+        if not self._identity:
+            raise NoReportError(_('Invalid token (no login found)'))
+
+    def _checkParams_POST(self):
+        self._password = request.form['password'].strip()
+        if not self._password:
+            raise FormValuesError(_('Your password must not be empty.'))
+        if self._password != request.form['password_confirm'].strip():
+            raise FormValuesError(_('Your password confirmation is not correct.'))
+
+    def _process_GET(self):
+        return self._getWP().display()
+
+    def _process_POST(self):
+        self._identity.setPassword(self._password.encode('utf-8'))
+        self._token_storage.delete(self._token)
+        url = self._getRedirectURL()
+        url.addParam('passwordChanged', True)
+        self._redirect(url)
+
+
+class RHResetPassword(RHResetPasswordBase, base.RH):
+    def _getRedirectURL(self):
+        return urlHandlers.UHSignIn.getURL()
+
+    def _getWP(self):
+        return signIn.WPResetPassword(self)
 
 
 class RHSendActivation( base.RH ):
+
+    _isMobile = False
 
     def _checkProtection( self ):
         base.RH._checkProtection(self)
@@ -212,6 +275,8 @@ class RHSendActivation( base.RH ):
 
 class RHDisabledAccount( base.RH ):
 
+    _isMobile = False
+
     def _checkParams( self, params ):
         base.RH._checkParams(self, params )
         self._userId = params.get( "userId", "" ).strip()
@@ -222,6 +287,8 @@ class RHDisabledAccount( base.RH ):
         return p.display()
 
 class RHUnactivatedAccount( base.RH ):
+
+    _isMobile = False
 
     def _checkParams( self, params ):
         base.RH._checkParams(self, params )

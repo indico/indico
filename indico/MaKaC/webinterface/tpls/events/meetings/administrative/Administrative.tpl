@@ -1,10 +1,11 @@
-<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+<%page args="showOrder=True"/>
+<%namespace name="common" file="../${context['INCLUDE']}/Common.tpl"/>
 <%!
   allMaterial = False
   hideTime = True
   materialSession = False
   minutes = False
-  showOrder = True
+  print_mode = False
 %>
 <table class="eventWrapper">
     <tr>
@@ -30,7 +31,7 @@
         <br/>&nbsp;<br/>
 
         <div class="eventInfo">
-            <%include file="${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False"/>
+            <%include file="../${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=False, alignRight=False"/>
             ${conf.getTitle()}<br/>
             <%block name="locationAndTime">
                 % if getLocationInfo(conf) != ('', '', ''):
@@ -62,7 +63,7 @@
             % endif
         % endif
 
-        <%block name="printSchedule">
+        <%block name="printSchedule" args="showOrder=True">
             <table class="dayList">
                 <% order = 1 %>
                 % for index, item in enumerate(entries):
@@ -74,20 +75,27 @@
                     % if (not previousItem or date != getDate(previousItem.getAdjustedStartDate(timezone))):
                         <tr></tr>
                         <tr>
-                            <td class="itemHeaderDate" colspan="2">
-                                ${prettyDate(item.getAdjustedStartDate(timezone))}<br />
+                            <td class="itemHeaderDate" colspan="${ 4 if self.attr.print_mode else 2}">
+                                <span>
+                                    ${prettyDate(item.getAdjustedStartDate(timezone))}
+                                </span>
+                                <br />
                                 <br />
                             </td>
-                            <td class="itemHeaderDocuments" colspan="2">
-                                Documents<br /><br />
-                            </td>
-                            <td></td>
+                            % if not self.attr.print_mode:
+                                <td class="itemHeaderDocuments" colspan="2">
+                                    Documents<br /><br />
+                                </td>
+                                <td></td>
+                            % endif
                         </tr>
                     % endif
-                    <%include file="${INCLUDEADM}/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order, showOrder=self.attr.showOrder"/>
                     % if getItemType(item) == "Session":
-                        <% order += item.getSession().getNumberOfContributions(only_scheduled=True) %>
-                    % elif getItemType(item) == "Contribution":
+                        <%include file="include/Session.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, showOrder=showOrder, print_mode=self.attr.print_mode"/>
+                    % else:
+                        <%include file="include/${getItemType(item)}.tpl" args="item=item, parent=conf, hideTime=self.attr.hideTime, allMaterial=self.attr.allMaterial, materialSession=self.attr.materialSession, minutes=self.attr.minutes, order=order, showOrder=showOrder"/>
+                    % endif
+                    % if getItemType(item) != "Break":
                         <% order +=1 %>
                     % endif
                 % endfor

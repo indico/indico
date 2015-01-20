@@ -15,7 +15,7 @@
 
   function formSubmit(f) {
       if (!parameterManager.check()) {
-          alert($T("The form contains some errors. Please, correct them and submit again."));
+          new AlertPopup($T("Form Error"), $T("The form contains some errors. Please, correct them and submit again.")).open();
           return false;
       }
 
@@ -29,6 +29,7 @@
       enableAll(f);
       return true;
   }
+
 </script>
 
 <form action=${ postURL } method="POST" onSubmit="return formSubmit(this);" enctype="multipart/form-data">

@@ -1,19 +1,8 @@
-<table align="center" width="100%" class="toolsTab"><tr><td>
-<br>
-<table align="center">
-    <tr>
-        <td>
-            <a href="${ deleteContributionURL }"><img src="${ deleteIconURL }" alt="
-delete" border="0" align="middle"></a> <a href="${ deleteContributionURL }"><b>${ _("Delete this contribution")}</b></a>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <br>
-            <a href="${ MoveContributionURL }"><img src="${ moveIconURL }" alt="
-delete" border="0" align="middle"></a> <a href="${ MoveContributionURL }"><b>${ _("Move this contribution")}</b></a>
-        </td>
-    </tr>
-</table>
-<br>
-</td></tr></table>
+<div class="area overflow" style="max-width: 700px;">
+    <h2>${_("Delete this Contribution")}</h2>
+    <div>
+        ${ _("By deleting this contribution you will delete as well all the items contained within.")}
+
+        <a href="${deleteContributionURL}" class="right i-button danger icon-remove">${_("Delete")}</a>
+    </div>
+</div>

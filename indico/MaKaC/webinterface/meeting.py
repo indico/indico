@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import urllib
 from datetime import datetime, timedelta
@@ -35,9 +34,9 @@ import MaKaC.webinterface.timetable as timetable
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.webinterface.navigation as navigation
-from MaKaC.common import Config
+from MaKaC.conference import EventCloner
+from indico.core.config import Config
 from xml.sax.saxutils import quoteattr, escape
-from MaKaC.common.general import *
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.category import WPConferenceCreationMainData
 from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
@@ -45,7 +44,10 @@ from MaKaC.webinterface.materialFactories import ConfMFRegistry, ContribMFRegist
 from MaKaC.webinterface.pages import evaluations
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
+from indico.util.date_time import format_date
+from indico.util.string import safe_upper
 import MaKaC.common.timezoneUtils as timezoneUtils
+
 
 class WebFactory(WebFactory):
     ##Don't remove this commentary. Its purpose is to be sure that those words/sentences are in the dictionary after extraction. It also prevents the developper to create an init for this class and update the 283 Webfactory occurences...
@@ -83,8 +85,6 @@ class WebFactory(WebFactory):
     def customiseToolsTabCtrl( tabCtrl ):
         tabCtrl.getTabById("clone").enable()
         tabCtrl.getTabById("matPackage").enable()
-        tabCtrl.getTabById("offlineSite").enable()
-        tabCtrl.getTabById("close").enable()
         tabCtrl.getTabById("delete").enable()
         tabCtrl.getTabById("badges").disable()
         tabCtrl.getTabById("alarms").enable()
@@ -101,10 +101,6 @@ class WebFactory(WebFactory):
         return WPMConfModifAC(rh, conf)
 
     @staticmethod
-    def getConfModifBookings(rh, conf, bs):
-        return WPMConfModifBookings(rh, conf, bs)
-
-    @staticmethod
     def getConfModifListings(rh, conf):
         return WPMConfModifListings(rh, conf)
 
@@ -115,10 +111,6 @@ class WebFactory(WebFactory):
     @staticmethod
     def getConfModifSchedule (rh, conf):
         return WPMConfModifSchedule(rh, conf)
-
-    @staticmethod
-    def getConfAddContribution(rh, conf, targetday):
-        return WPMConfAddContribution(rh,conf, targetday)
 
     @staticmethod
     def getTimeTableCustomizePDF(rh, conf, view):
@@ -167,10 +159,6 @@ class WebFactory(WebFactory):
         return WPMContribEditData(rh, contrib)
     getContributionEditData = staticmethod (getContributionEditData)
 
-    def getContribAddMaterial(rh,contrib, mf):
-        return WPMContribAddMaterial (rh,contrib,mf)
-    getContribAddMaterial = staticmethod(getContribAddMaterial)
-
     def getContribAddSC(rh, contrib):
         return WPMContribAddSC(rh,contrib)
     getContribAddSC = staticmethod(getContribAddSC)
@@ -182,29 +170,10 @@ class WebFactory(WebFactory):
     getSessionDisplay = staticmethod(getSessionDisplay)
 
 ############Session Modificiations###########################################
-    def getModSlotEdit(rh, slotData):
-        return WPMModSlotEdit(rh, slotData)
-    getModSlotEdit = staticmethod(getModSlotEdit)
-
-    def getSessionAddBreak(rh, slot):
-        return WPMSessionAddBreak(rh,slot)
-    getSessionAddBreak = staticmethod(getSessionAddBreak)
 
     def getSessionDataModification(self, session):
         return WPMSessionDataModification (self,session)
     getSessionDataModification = staticmethod(getSessionDataModification)
-
-    def getSessionModifMaterials():
-        return WPMSessionModifMaterials
-    getSessionModifMaterials = staticmethod(getSessionModifMaterials)
-
-    def getModSlotRemConfirmation(self, slot):
-        return WPMModSlotRemConfirmation(self,slot)
-    getModSlotRemConfirmation = staticmethod(getModSlotRemConfirmation)
-
-    def getSessionAddMaterial(self,session,mf):
-        return WPMSessionAddMaterial(self,session,mf)
-    getSessionAddMaterial = staticmethod(getSessionAddMaterial)
 
     def getSessionModification(rh,session):
         return WPMSessionModification(rh,session)
@@ -455,21 +424,15 @@ class WPMSessionDisplay(sessions.WPSessionDisplay):
                         body)
         return frame.getHTML( body, frameParams)
 
-    def _getBody(self,params):
-        wc=WMSessionDisplay(self._getAW(),self._session)
-        return wc.getHTML({"activeTab":params["activeTab"],
-                            "sortingCrit":params.get("sortingCrit",None)})
+    def _getBody(self, params):
+        wc = WMSessionDisplay(self._getAW(), self._session)
+        return wc.getHTML()
 
 class WMSessionDisplay(sessions.WSessionDisplay):
-    def getHTML(self,params={}):
+    def getHTML(self):
         if self._session.canAccess( self._aw ):
-            c=WMSessionDisplayFull(self._aw,self._session,params["activeTab"],
-                    params.get("sortingCrit",None))
-            return c.getHTML( params )
-        if self._session.canView( self._aw ):
-            c = WMSessionDisplayMin(self._aw,self._session,params["activeTab"],
-                    params.get("sortingCrit",None))
-            return c.getHTML( params )
+            c = WMSessionDisplayFull(self._aw,self._session)
+            return c.getHTML()
         return ""
 
 
@@ -477,43 +440,11 @@ class WMSessionDisplay(sessions.WSessionDisplay):
 class WMSessionDisplayBase(sessions.WSessionDisplayBase):
     pass
 
-
-class WMSessionDisplayMin(WMSessionDisplayBase ):
+class WMSessionDisplayFull(WMSessionDisplayBase):
     pass
-
-class WMSessionDisplayFull(WMSessionDisplayBase ):
-    def _createTabCtrl( self ):
-        self._tabCtrl=wcomponents.TabControl()
-        url=urlHandlers.UHSessionDisplay.getURL(self._session)
-        url.addParam("tab","contribs")
-        self._tabContribs=self._tabCtrl.newTab("contribs", \
-                                                _("Contribution List"),str(url))
-        self._tabCtrl.getTabById("contribs").disable()
-        url.addParam("tab","time_table")
-        self._tabTimeTable=self._tabCtrl.newTab("time_table", \
-                                                _("Time Table"),str(url))
-        if self._session.getScheduleType()=="poster":
-            self._tabTimeTable.setEnabled(False)
-            self._tabCtrl.getTabById("contribs").setActive()
-        else:
-            self._tabTimeTable.setEnabled(True)
-            tab=self._tabCtrl.getTabById(self._activeTab)
-            if tab is None:
-                tab=self._tabCtrl.getTabById("time_table")
-            tab.setActive()
 
 #################Contribution Modification##############################
 
-##Taking subContribTabs out and changing link at top##
-#class ContribModifTabsFrame:
-#
-#    @staticmethod
-#    def _getBody( self, params ):
-#        self._createTabCtrl()
-#
-#        banner = wcomponents.WBannerModif().getHTML(self._target)
-#        body = wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-#        return banner + body
 
 class WPMContributionModification(contributions.WPContributionModification):
 
@@ -521,13 +452,6 @@ class WPMContributionModification(contributions.WPContributionModification):
         from MaKaC.webinterface.pages.contributions import WContribModifMain
         wc = WContribModifMain( self._contrib, ContribMFRegistry(), eventType = "meeting" )
         return wc.getHTML()
-
-
-class WPMContribAddMaterial(contributions.WPContribAddMaterial):
-    pass
-#    def _getBody( self, params ):
-#        return ContribModifTabsFrame._getBody(self, params)
-
 
 class WPMContribEditData(contributions.WPEditData):
     pass
@@ -575,8 +499,7 @@ class WPMMaterialDisplayBase( material.WPMaterialDisplayBase):
         body =  i18nformat("""
                 <td class="confBodyBox" %s %s>
                     %s
-                    <table border="0" cellpadding="0" cellspacing="0"
-                                align="center" valign="top" width="95%%">
+                    <table border="0" cellpadding="0" cellspacing="0" valign="top" width="720px">
                         <tr>
                             <td><div class="groupTitle">_("Added Material") - %s</div></td>
                         </tr>
@@ -610,18 +533,12 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
         #################################
         # Fermi timezone awareness      #
         #################################
-        #vars["confDateInterval"] = "from %s to %s"%(self._conf.getStartDate().strftime("%d %B %Y"), self._conf.getEndDate().strftime("%d %B %Y"))
-        #if self._conf.getStartDate().strftime("%d%B%Y") == \
-        #        self._conf.getEndDate().strftime("%d%B%Y"):
-        #    vars["confDateInterval"] = self._conf.getStartDate().strftime("%d %B %Y")
-        #elif self._conf.getStartDate().month == self._conf.getEndDate().month:
-        #    vars["confDateInterval"] = "%s-%s %s"%(self._conf.getStartDate().day, self._conf.getEndDate().day, self._conf.getStartDate().strftime("%B %Y"))
-        vars["confDateInterval"] = "from %s to %s"%(self._conf.getStartDate().strftime("%d %B %Y"), self._conf.getEndDate().strftime("%d %B %Y"))
+        vars["confDateInterval"] = i18nformat("""_("from") %s _("to") %s""")%(format_date(self._conf.getStartDate(), format='long'), format_date(self._conf.getEndDate(), format='long'))
         if self._conf.getStartDate().strftime("%d%B%Y") == \
                 self._conf.getEndDate().strftime("%d%B%Y"):
-            vars["confDateInterval"] = self._conf.getStartDate().strftime("%d %B %Y")
+            vars["confDateInterval"] = format_date(self._conf.getStartDate(), format='long')
         elif self._conf.getStartDate().month == self._conf.getEndDate().month:
-            vars["confDateInterval"] = "%s-%s %s"%(self._conf.getStartDate().day, self._conf.getEndDate().day, self._conf.getStartDate().strftime("%B %Y"))
+            vars["confDateInterval"] = "%s-%s %s"%(self._conf.getStartDate().day, self._conf.getEndDate().day, format_date(self._conf.getStartDate(), format='MMMM yyyy'))
         #################################
         # Fermi timezone awareness(end) #
         #################################
@@ -630,11 +547,11 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
         if self._conf.getLocationList():
             vars["confLocation"] =  self._conf.getLocationList()[0].getName()
             vars["supportEmail"] = ""
-        if self._conf.hasSupportEmail():
-            mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportEmail(), urllib.quote( self._conf.getTitle() ) ))
+        if self._conf.getSupportInfo().hasEmail():
+            mailto = quoteattr("""mailto:%s?subject=%s"""%(self._conf.getSupportInfo().getEmail(), urllib.quote( self._conf.getTitle() ) ))
             vars["supportEmail"] =  _("""<a href=%s class="confSupportEmail"><img src="%s" border="0" alt="email"> %s</a>""")%(mailto,
                                                         Config.getInstance().getSystemIconURL("mail"),
-                                                        displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getSupportEmailCaption())
+                                                        self._conf.getSupportInfo().getCaption())
         format = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf).getFormat()
         vars["bgColorCode"] = format.getFormatOption("titleBgColor")["code"]
         vars["textColorCode"] = format.getFormatOption("titleTextColor")["code"]
@@ -645,30 +562,14 @@ class WMConfDisplayFrame(conferences.WConfDisplayFrame):
         return wcomponents.WTemplated.getHTML( self, params )
 
 class WMMaterialDisplay(material.WMaterialDisplay):
-        def __init__(self, aw, material, modif):
-            self._material=material
-            self._aw=aw
-            self._modif = modif
-
-        def getVars( self ):
-            vars=material.WMaterialDisplay.getVars( self )
-            vars["modif"]=""
-            if self._modif==1:
-                vars["modif"] = """<a href="%s"><img class="imglink" src="%s" alt="Modify"></a>"""%(urlHandlers.UHMaterialModification.getURL(self._material),Config.getInstance().getSystemIconURL( "modify" ))
-            return vars
+    pass
 
 class WPMMaterialDisplay( WPMMaterialDisplayBase):
     navigationEntry = navigation.NEMeetingMaterialDisplay
-    def __init__(self, rh, material):
-        WPMMaterialDisplayBase.__init__(self, rh, material)
 
     def _getBody( self, params ):
-        self._modif=0
-        if self._target.canModify(self._getAW()):
-            self._modif = 1
-        wc = WMMaterialDisplay( self._getAW(), self._material, self._modif )
-        pars = { "fileAccessURLGen": urlHandlers.UHFileAccess.getURL }
-        return wc.getHTML( pars )
+        wc = WMMaterialDisplay( self._getAW(), self._material)
+        return wc.getHTML(  )
 
 #################Conference Modification#############################
 
@@ -679,14 +580,10 @@ class WPMConfModif(conferences.WPConferenceModification):
         pars = { "type": params.get("type",""), "conferenceId": self._conf.getId() }
         return wc.getHTML( pars )
 
+
 class WMConfModifMainData(conferences.WConfModifMainData):
-    def getVars(self):
-        vars = conferences.WConfModifMainData.getVars( self )
+    pass
 
-        #enable Evaluation by default
-        self._conf.enableSection('evaluation')
-
-        return vars
 
 ##Access Control ##
 class WPMConfModifAC(conferences.WPConfModifAC):
@@ -705,23 +602,8 @@ class WPMConfModifTools (conferences.WPConfModifToolsBase):
             "deleteConferenceURL": urlHandlers.UHConfDeletion.getURL( self._conf ), \
             "cloneConferenceURL": urlHandlers.UHConfClone.getURL( self._conf ), \
             "addAlarmURL": urlHandlers.UHConfAddAlarm.getURL( self._conf ), \
-            "deleteAlarmURL": urlHandlers.UHConfDeleteAlarm.getURL(), \
-            "modifyAlarmURL": urlHandlers.UHConfModifyAlarm.getURL(), \
             }
         return wc.getHTML( p )
-
-class WMConfModifTools (conferences.WConfModifTools):
-    pass
-
-#Bookings#
-
-class WPMConfModifBookings(conferences.WPConfModifBookings):
-    pass
-
-class WMConfModifBookings (conferences.WConfModifBookings):
-    pass
-
-##
 
 class WPMConfModifListings (conferences.WPConfModifListings):
 
@@ -729,84 +611,39 @@ class WPMConfModifListings (conferences.WPConfModifListings):
         wc = WMConfModifListings( self._conf )
         return wc.getHTML()
 
+
 class WMConfModifListings (conferences.WConfModifListings):
     pass
 
+
 class WPMConfClone(conferences.WPConfClone):
 
-    def _getTabContent( self, params ):
-        p = conferences.WConferenceClone( self._conf )
-        pars = { \
-"cancelURL": urlHandlers.UHConfModifTools.getURL( self._conf ), \
-"cloneOnce": urlHandlers.UHConfPerformCloneOnce.getURL( self._conf ), \
-"cloneInterval": urlHandlers.UHConfPerformCloneInterval.getURL( self._conf ), \
-"cloneday": urlHandlers.UHConfPerformCloneDays.getURL( self._conf ), \
-"cloning" : urlHandlers.UHConfPerformCloning.getURL( self._conf ),
-"cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" checked="checked" />_("Full timetable")</li>
+    def _getTabContent(self, params):
+        p = conferences.WConferenceClone(self._conf)
+        pars = {
+            "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
+            "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
+            "cloneOptions": i18nformat("""<li><input type="checkbox" name="cloneTimetable" id="cloneTimetable" value="1" checked="checked" />_("Full timetable")</li>
                      <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>
                      <li><input type="checkbox" name="cloneParticipants" id="cloneParticipants" value="1" checked="checked" />_("Participants")</li>
-                     <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneAddedInfo" id="cloneAddedInfo" value="1" />_("send email to the participants of the created event")</li></ul></li>
                      <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>
-               """) }
-        #let the plugins add their own elements
+               """)
+        }
+        # let the plugins add their own elements
         self._notify('addCheckBox2CloneConf', pars)
-        return p.getHTML( pars )
+
+        pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
+        return p.getHTML(pars)
+
 
 ##TimeTable view##
 class WPMConfModifSchedule(conferences.WPConfModifScheduleGraphic):
     pass
 
-## Add Contributions to main meeting ##
-class WPMConfAddContribution(conferences.WPModScheduleNewContrib):
-
-    def __init__(self, rh, conf, targetDay):
-        conferences.WPModScheduleNewContrib.__init__(self, rh, conf)
-        self._targetDay = targetDay
-
-
-    def _getTabContent( self, params ):
-        p = WMContributionCreation( self._conf, self._targetDay )
-        pars = {"postURL": urlHandlers.UHMConfPerformAddContribution.getURL(), \
-        "calendarIconURL": Config.getInstance().getSystemIconURL( "calendar" ), \
-        "calendarSelectURL":  urlHandlers.UHSimpleCalendar.getURL(), \
-        "targetDay": self._targetDay.strftime("%Y-%m-%d") \
-        }
-        return p.getHTML(pars)
-
-
-class WMContributionCreation(conferences.WContributionCreation):
-
-    def __init__( self, target, targetDay):
-        conferences.WContributionCreation.__init__(self, target)
-        self._targetDay=targetDay
-
-    def getVars( self ):
-        vars = conferences.WContributionCreation.getVars( self )
-        vars["sHour"]=self._targetDay.hour
-        vars["sMinute"]=self._targetDay.minute
-        vars["durationHours"],vars["durationMinutes"]="0","20"
-        return vars
-
 ######################### Session View #######################
 
 ##TabControl####
-class WPMSessionAddMaterial(sessions.WPSessionAddMaterial):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
-class WPMModSlotRemConfirmation(sessions.WPModSlotRemConfirmation):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
 class WPMSessionDataModification(sessions.WPSessionDataModification):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
-class WPMSessionAddBreak(sessions.WPSessionAddBreak):
-    def _setupTabCtrl(self):
-        self._tabContribs.disable()
-
-class WPMModSlotEdit(sessions.WPModSlotEdit):
     def _setupTabCtrl(self):
         self._tabContribs.disable()
 
@@ -836,305 +673,6 @@ class WPMSessionModifCommEdit(sessions.WPSessionCommEdit):
 
 class WPMSessionModifSchedule(sessions.WPSessionModifSchedule):
     pass
-
-################# Session Modification ###################################
-
-##Change slot options##
-class WMSessionModifSchedule(sessions.WSessionModifSchedule):
-
-    def _getFitSlotLink( self, container, linkColor ):
-        """
-        returns a link to the "fit slot" action if and only if
-        the time slot has a son and its limits are larger than its sons'
-        """
-        fitSlotLink = ""
-        entries = container.getSessionSlot().getSchedule().getEntries()
-        if len(entries) > 0:
-            if container.getStartDate()<entries[0].getStartDate() or container.getEndDate()>entries[-1].getEndDate():
-                fitSlotLink =  i18nformat("""<input type="submit" value="_("fit slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlHandlers.UHSessionFitSlot.getURL(container.getSessionSlot()))
-        return fitSlotLink
-
-    def _getCompactSlotLink( self, container, linkColor ):
-        """
-        returns a link to the "compact slot" action if and only if
-        the time slot has sons which have space between them
-        """
-        compactSlotLink = ""
-        sch = container.getSessionSlot().getSchedule()
-        if sch.hasGap():
-            compactSlotLink =  i18nformat("""<input type="submit" value="_("compact slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlHandlers.UHSessionModSlotCompact.getURL(container.getSessionSlot()))
-        return compactSlotLink
-
-    def _getAddContribLink( self, container, linkColor ):
-        """
-        returns a link to the "add contribution" action if and only if
-        contributions exists in the current session which are not yet scheduled
-        """
-        l=[]
-        for contrib in self._session.getContributionList():
-            if contrib.isScheduled() or \
-                isinstance(contrib.getCurrentStatus(),conference.ContribStatusWithdrawn):
-                continue
-            l.append(contrib)
-        if len(l)>0:
-            addContrib =  i18nformat("""<input type="submit" value="_("add contribution")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlHandlers.UHSessionAddContribution.getURL(container.getSessionSlot()))
-        else:
-            addContrib = ""
-        return addContrib
-
-    def _getContainerHeaderHTML(self, container, bgcolorSlot, colspan, width, eventType):
-        # header is displayed just in the first slot of a container:
-        room=""
-        if container.getRoom() is not None and container.getRoom().getName().strip()!="":
-            room="at %s"%container.getRoom().getName()
-
-        orginURL = urlHandlers.UHSessionModifSchedule.getURL(self._session.getOwner())
-        orginURL.addParam("sessionId", self._session.getId())
-        urlNewContrib = urlHandlers.UHConfModScheduleNewContrib.getURL(self._session.getOwner())
-        urlNewContrib.addParam("sessionId", self._session.getId())
-        urlNewContrib.addParam("slotId", container.getSessionSlot().getId())
-        urlNewContrib.addParam("orginURL",orginURL)
-        urlNewContrib.addParam("eventType",eventType)
-
-        urlAddBreak = urlHandlers.UHSessionAddBreak.getURL(container.getSessionSlot())
-        urlDelSlot = urlHandlers.UHSessionModSlotRem.getURL(container.getSessionSlot())
-        urlEditSlot = urlHandlers.UHSessionModSlotEdit.getURL(container.getSessionSlot())
-        urlCalSlot = urlHandlers.UHSessionModSlotCalc.getURL(container.getSessionSlot())
-        sdate = self.htmlText(container.getAdjustedStartDate().strftime("%Y-%b-%d %H:%M"))
-        edate = self.htmlText(container.getEndDate().strftime("%Y-%b-%d %H:%M"))
-        if container.getAdjustedStartDate().strftime("%Y-%b-%d") == container.getEndDate().strftime("%Y-%b-%d"):
-            sdate = self.htmlText(container.getAdjustedStartDate().strftime("%H:%M"))
-            edate = self.htmlText(container.getAdjustedEndDate().strftime("%H:%M"))
-        linkColor=""
-        if self._session.isTextColorToLinks():
-            linkColor="color:%s"%self._session.getTextColor()
-        addContrib = ""#self._getAddContribLink(container, linkColor)
-        fitSlotLink = self._getFitSlotLink(container, linkColor)
-        compactSlotLink = self._getCompactSlotLink(container, linkColor)
-        editSlotLink,delSlotLink="",""
-        if self._session.canModify(self._aw) or self._session.canCoordinate(self._aw, "unrestrictedSessionTT"):
-            if self._session.getConference().getEnableSessionSlots() :
-                editSlotLink= i18nformat("""<input type="submit" value="_("edit slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlEditSlot)
-                if len(self._session.getSlotList()) > 1:
-                    delSlotLink= i18nformat("""<input type="submit" value="_("delete slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlDelSlot)
-        title = self.htmlText(container.getTitle())
-        duration = container.getDuration()
-        conveners=""
-        convenerList=[]
-        if container.getConvenerList()!=[]:
-            for conv in container.getConvenerList():
-                convenerList.append(conv.getFullName())
-        elif container.getSessionSlot().getSession().getConvenerList()!=[]:
-            for conv in container.getSessionSlot().getSession().getConvenerList():
-                convenerList.append(conv.getFullName())
-        if convenerList != []:
-            conveners = i18nformat("""
-                        <tr>
-                            <td width="100%%" align="center" style="color:%s"><small> _("Conveners"): %s</small></td>
-                        </tr>
-                    """)%(self._session.getTextColor(), "; ".join(convenerList))
-        return  i18nformat("""
-        <td colspan="%s" bgcolor="%s" align="center" valign="middle" width="%s%%" style="color: black; border-top: 2px solid #E6E6E6; margin-left:1px;">
-                        <table width="100%%">
-                            <tr>
-                                <td align="right">
-                                    %s
-                                    <input type="submit" value="_("new contribution")" onClick="self.location.href='%s';return false;" class="smallbtn"><input type="submit" value="_("new break")" onClick="self.location.href='%s';return false;" class="smallbtn">%s%s%s%s<input type="submit" value="_("reschedule")" onClick="self.location.href='%s';return false;" class="smallbtn">
-                                </td>
-                            </tr>
-                            <tr>
-                                <td width="100%%" align="center" style="color:%s"><b>%s</b></td>
-                            </tr>
-                            %s
-                            <tr>
-                                <td width="100%%" align="center" style="color:%s"><b>%s-%s (%s) %s</b></td>
-                            </tr>
-                        </table>
-                    </td>
-                        """)%(colspan, \
-                             bgcolorSlot, \
-                             width, \
-                             addContrib, \
-                             str(urlNewContrib),\
-                             str(urlAddBreak),\
-                             editSlotLink,delSlotLink,fitSlotLink,compactSlotLink,str(urlCalSlot),\
-                             self._session.getTextColor(), title,\
-                             conveners,\
-                             self._session.getTextColor(), \
-                             sdate,\
-                             edate, \
-                             self.htmlText((datetime(1900,1,1)+duration).strftime("%Hh%M'")), \
-                             room or "&nbsp;")
-
-    def _getContainerFooterHTML(self, container, bgcolorSlot, colspan, width, eventType):
-        # footer is displayed just in the last slot of a container:
-
-        orginURL = urlHandlers.UHSessionModifSchedule.getURL(self._session.getOwner())
-        orginURL.addParam("sessionId", self._session.getId())
-        urlNewContrib = urlHandlers.UHConfModScheduleNewContrib.getURL(self._session.getOwner())
-        urlNewContrib.addParam("sessionId", self._session.getId())
-        urlNewContrib.addParam("slotId", container.getSessionSlot().getId())
-        urlNewContrib.addParam("orginURL",orginURL)
-        urlNewContrib.addParam("eventType",eventType)
-
-        urlAddBreak = urlHandlers.UHSessionAddBreak.getURL(container.getSessionSlot())
-        urlDelSlot = urlHandlers.UHSessionModSlotRem.getURL(container.getSessionSlot())
-        urlEditSlot = urlHandlers.UHSessionModSlotEdit.getURL(container.getSessionSlot())
-        urlCalSlot = urlHandlers.UHSessionModSlotCalc.getURL(container.getSessionSlot())
-        editSlotLink,delSlotLink="",""
-        linkColor=""
-        if self._session.isTextColorToLinks():
-            linkColor="color:%s"%self._session.getTextColor()
-        addContrib = ""#self._getAddContribLink(container, linkColor)
-        fitSlotLink = self._getFitSlotLink(container, linkColor)
-        compactSlotLink = self._getCompactSlotLink(container, linkColor)
-        if self._session.canModify(self._aw) or self._session.canCoordinate(self._aw, "unrestrictedSessionTT"):
-            if self._session.getConference().getEnableSessionSlots() :
-                editSlotLink= i18nformat("""<input type="submit" value="_("edit slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlEditSlot)
-                if len(self._session.getSlotList()) > 1:
-                    delSlotLink= i18nformat("""<input type="submit" value="_("delete slot")" onClick="self.location.href='%s';return false;" class="smallbtn">""")%str(urlDelSlot)
-
-        return  i18nformat("""
-        <td colspan="%s" bgcolor="%s" align="center" valign="middle" width="%s%%" style="color: black;">
-        <table width="100%%">
-                            <tr>
-                                <td align="right">
-                                    %s
-                                    <input type="submit" value="_("new contribution")" onClick="self.location.href='%s';return false;" class="smallbtn"><input type="submit" value="_("new break")" onClick="self.location.href='%s';return false;" class="smallbtn">%s%s%s%s<input type="submit" value="_("reschedule")" onClick="self.location.href='%s';return false;" class="smallbtn">
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                        """)%(colspan, \
-                             bgcolorSlot, \
-                             width, \
-                             addContrib, \
-                             str(urlNewContrib), \
-                             str(urlAddBreak), \
-                             editSlotLink,delSlotLink,fitSlotLink,compactSlotLink, str(urlCalSlot))
-
-
-    def _getSlotsDisabledScheduleHTML(self):
-        tz = self._session.getConference().getTimezone()
-        timeTable=timetable.TimeTable(self._session.getSlotList()[0].getSchedule(),tz)
-        sDate=self._session.getSlotList()[0].getSchedule().getAdjustedStartDate()
-        eDate=self._session.getSlotList()[0].getSchedule().getAdjustedEndDate()
-        conf = self._session.getConference()
-        tzUtil = timezoneUtils.DisplayTZ(self._aw,conf)
-        tz = tzUtil.getDisplayTZ()
-        timeTable.setStartDate(sDate)
-        timeTable.setEndDate(eDate)
-        timeTable.mapEntryList(self._session.getSlotList()[0].getSchedule().getEntries())
-        daySch = []
-        num_slots_in_hour=int(timedelta(hours=1).seconds/timeTable.getSlotLength().seconds)
-        for day in timeTable.getDayList():
-            slotList=[]
-            lastEntries=[]
-            maxOverlap=day.getNumMaxOverlaping()
-            width="100"
-            if maxOverlap!=0:
-                width=100/maxOverlap
-            else:
-                maxOverlap=1
-            for slot in day.getSlotList():
-                remColSpan=maxOverlap
-                temp=[]
-                for entry in slot.getEntryList():
-                    if len(slot.getEntryList()):
-                        remColSpan=0
-                    else:
-                        remColSpan-=1
-                    if entry in lastEntries:
-                        continue
-                    bgcolor=self._getColor(entry)
-                    colspan=""
-                    if not day.hasEntryOverlaps(entry):
-                        colspan=""" colspan="%s" """%maxOverlap
-                    temp.append("""<td valign="top" rowspan="%i" align="center" bgcolor="%s" width="%i%%"%s>%s</td>"""%(day.getNumSlots(entry),bgcolor,width,colspan,self._getEntryHTML(entry)))
-                    lastEntries.append(entry)
-                if remColSpan>0:
-                    temp.append("""<td width="100%%" colspan="%i"></td>"""%(remColSpan))
-                if slot.getStartDate().minute==0:
-                    temp="""
-                        <tr>
-                            <td valign="top" rowspan="%s" bgcolor="white" width="40"><font color="gray" size="-1">%s</font></td>
-                            %s
-                        </tr>
-                        """%(num_slots_in_hour,\
-                                slot.getAdjustedStartDate().strftime("%H:%M"),\
-                                "".join(temp))
-                else:
-                    temp="""<tr>%s</tr>"""%"".join(temp)
-                slotList.append(temp)
-            orginURL = urlHandlers.UHConfModifSchedule.getURL(self._session)
-            reducedScheduleActionURL = urlHandlers.UHReducedSessionScheduleAction.getURL(self._session)
-            reducedScheduleActionURL.addParam("slotId",0)
-            reducedScheduleActionURL.addParam("orginURL",orginURL)
-            res= i18nformat("""
-        <a href="" name="%s"></a>
-        <table align="center" width="100%%">
-            <tr>
-                <td width="60%%">
-                    <table align="center" border="0" width="100%%"
-                            celspacing="0" cellpadding="0" bgcolor="#E6E6E6">
-                        <tr>
-                            <td colspan="%i" align="center"
-                                                    bgcolor="white">
-                                <table cellspacing="0" cellpadding="0"
-                                        width="100%%">
-                                    <tr>
-                                        <td align="center" width="100%%">
-                                            <b>%s</b>
-                                        </td>
-                                        <td align="right">
-                                            &nbsp;
-                                        </td>
-                                        <td align="right">
-                                            &nbsp;
-                                        </td>
-                                        <form action=%s method="POST">
-                                        <td align="right">
-                                            <input type="submit" class="btn" name="newContrib" value="_("new contribution")">
-                                        </td>
-                                        <td align="right">
-                                            <input type="submit" class="btn" name="newBreak" value="_("new break")">
-                                        </td>
-                                        <td align="right">
-                                            <input type="submit" class="btn" name="reschedule" value="_("reschedule")">
-                                        </td>
-                                        </form>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                        %s
-                    </table>
-                </td>
-            </tr>
-        </table>
-                """)%(day.getDate().strftime("%Y-%m-%d"),maxOverlap+2,
-                        day.getDate().strftime("%A, %d %B %Y"),
-                        quoteattr(str(reducedScheduleActionURL)),
-                        "".join(slotList))
-            daySch.append(res)
-        return "<br>".join(daySch)
-
-
-    def _getScheduleHTML(self, eventType="conference"):
-        if self._session.getConference().getEnableSessionSlots() :
-            return sessions.WSessionModifSchedule._getScheduleHTML(self,"meeting")
-        else :
-            return self._getSlotsDisabledScheduleHTML()
-
-
-    def getVars( self ):
-        vars = sessions.WSessionModifSchedule.getVars(self)
-        if self._session.getConference().getEnableSessionSlots() :
-            vars["fitToInnerSlots"] =  i18nformat("""<input type="submit" class="btn" value="_("fit inner timetable")">""")
-        else :
-            editURL = urlHandlers.UHSessionDatesModification.getURL(self._session)
-            vars["fitToInnerSlots"] =  i18nformat("""<input type="submit" class="btn" value="_("fit inner timetable")"><input type="submit" class="btn" value="_("modify dates")" onClick="this.form.action='%s';">""") % editURL
-        return vars
 
 ######################################################################
 class WPMeetingDisplay( WPConferenceDisplayBase ):
@@ -1197,7 +735,7 @@ class WMeetingContribBaseDisplayItem(wcomponents.WTemplated):
         vars["place"] = ""
         location = self.__contrib.getOwnLocation()
         if location:
-            vars["place"] = "%s"%location.getName().upper()
+            vars["place"] = safe_upper(location.getName())
             if location.getAddress().strip() != "":
                 vars["place"] += "(%s)"%location.getAddress()
 
@@ -1216,7 +754,7 @@ class WMeetingContribBaseDisplayItem(wcomponents.WTemplated):
             if self.__contrib.getParent().getStartDate().strftime("%Y%B%d") ==\
                self.__contrib.getStartDate().strftime("%Y%B%d"):
                 vars["startDate"] = self.__contrib.getStartDate().strftime("%H:%M")
-        vars["endDate"] = self.__contrib.getEndDate().strftime("%A %d %B %Y")
+        vars["endDate"] = format_date(self.__contrib.getEndDate(), format='full')
         vars["endTime"] = self.__contrib.getEndDate().strftime("%H:%M")
         vars["duration"] = (datetime(1900,1,1)+self.__contrib.getDuration()).strftime("%M'")
         if self.__contrib.getDuration()>timedelta(seconds=3600):
@@ -1224,12 +762,10 @@ class WMeetingContribBaseDisplayItem(wcomponents.WTemplated):
         vars["modifyURL"] = self.__modifyURLGen( self.__contrib )
         ml = []
         for mat in self.__contrib.getAllMaterialList():
-            str = wcomponents.WMaterialDisplayItem().getHTML(\
-                                                self.__aw, mat, \
-                                                self.__materialsURLGen( mat ) )
-            if str == "":
+            s = wcomponents.WMaterialDisplayItem().getHTML(self.__aw, mat, self.__materialsURLGen(mat))
+            if not s:
                 continue
-            ml.append(str)
+            ml.append(s)
         if len(ml) == 0:
             vars["materials"] = ""
         else:
@@ -1238,10 +774,10 @@ class WMeetingContribBaseDisplayItem(wcomponents.WTemplated):
         vars["materialURLGen"] = self.__materialsURLGen
         scl = []
         for sc in self.__contrib.getSubContributionList():
-            str = WSubContributionMeetingDisplay(self.__aw, sc).getHTML({"modifyURL":self.__subContribModifyURLGen(sc), "materialURLGen":self.__materialsURLGen} )
-            if str == "":
+            s = WSubContributionMeetingDisplay(self.__aw, sc).getHTML({"modifyURL":self.__subContribModifyURLGen(sc), "materialURLGen":self.__materialsURLGen} )
+            if not s:
                 continue
-            scl.append(str)
+            scl.append(s)
         if len(scl) == 0:
             vars["subConts"] = ""
         else:
@@ -1350,9 +886,9 @@ class WMeetingSessionSlotBaseDisplayItem(wcomponents.WTemplated):
             location = self.__session.getLocation()
             roomLink = linking.RoomLinker().getHTMLLink( room, location )
             vars["room"] = self.__getHTMLRow( "Room", roomLink )
-        vars["startDate"] = self.__session.getStartDate().strftime("%A %d %B %Y")
+        vars["startDate"] = format_date(self.__session.getStartDate(), format='full')
         vars["startTime"] = self.__session.getStartDate().strftime("%H:%M")
-        vars["endDate"] = self.__session.getEndDate().strftime("%A %d %B %Y")
+        vars["endDate"] = format_date(self.__session.getEndDate(), format='full')
         vars["endTime"] = self.__session.getEndDate().strftime("%H:%M")
         if vars["startDate"] == vars["endDate"]:
             vars["dateInterval"] = "%s (%s -> %s)"%(vars["startDate"],\
@@ -1469,9 +1005,9 @@ class WMeetingBaseDisplay(wcomponents.WTemplated):
             roomLink = linking.RoomLinker().getHTMLLink( room, location )
             vars["room"] = self.__getHTMLRow( _("Room"), roomLink )
         sdate, edate = self.__conf.getStartDate(), self.__conf.getEndDate()
-        fsdate, fedate = sdate.strftime("%d %B %Y"), edate.strftime("%d %B %Y")
+        fsdate, fedate = format_date(sdate, format='long'), format_date(edate, format='long')
         fstime, fetime = sdate.strftime("%H:%M"), edate.strftime("%H:%M")
-        vars["dateInterval"] = "from %s %s to %s %s"%(fsdate, fstime, \
+        vars["dateInterval"] = i18nformat("""_("from") %s %s _("to") %s %s""")%(fsdate, fstime, \
                                                         fedate, fetime)
         if sdate.strftime("%d%B%Y") == edate.strftime("%d%B%Y"):
             timeInterval = fstime

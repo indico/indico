@@ -1,101 +1,165 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-# system lib imports
-import os
-import re
-import sys
-
-# stdlib imports
-from distutils.cmd import Command
 import ast
+import re
 
-# external lib imports
-import pkg_resources
+from babel.core import Locale
+from babel.support import Translations
+from babel import negotiate_locale
+from flask import session, request, has_request_context, current_app
+from flask_babelex import Babel, get_domain
+from speaklater import make_lazy_gettext
 
-try:
-    from babel.support import Translations
-    from translations import *
-
-    _ = gettext = lazyTranslations.gettext
-    ngettext = lazyTranslations.ngettext
-
-    L_ = gettext_lazy = forceLazyTranslations.gettext
-
-except ImportError:
-    # no Babel
-    pass
+from MaKaC.common.info import HelperMaKaCInfo
+from indico.core.db import DBMgr
 
 
-try:
-    INDICO_DIST = pkg_resources.get_distribution('indico')
-except pkg_resources.DistributionNotFound:
-    INDICO_DIST = None
-
-if INDICO_DIST:
-    LOCALE_DIR = INDICO_DIST.get_resource_filename('indico', 'indico/locale')
-
-LOCALE_DOMAIN = 'messages'
 RE_TR_FUNCTION = re.compile(r"_\(\"([^\"]*)\"\)|_\('([^']*)'\)", re.DOTALL | re.MULTILINE)
 
-
-defaultLocale = 'en_GB'
-
-
-def setLocale(locale):
-    """
-    Set the current locale in the current thread context
-    """
-    ContextManager.set('locale', locale)
-    ContextManager.set('translation', Translations.load(LOCALE_DIR, locale, LOCALE_DOMAIN))
+babel = Babel()
 
 
-def currentLocale():
-    return IndicoLocale.parse(ContextManager.get('locale', defaultLocale))
+def gettext_unicode(*args, **kwargs):
 
+    func_name = kwargs.pop('func_name', 'ugettext')
 
-def getAllLocales():
-    """
-    List all available locales/translations
-    """
-    if INDICO_DIST:
-        return [loc for loc in INDICO_DIST.resource_listdir('indico/locale') if '.' not in loc]
+    if not isinstance(args[0], unicode):
+        args = [(text.decode('utf-8') if isinstance(text, str) else text) for text in args]
+        using_unicode = False
     else:
-        return []
+        using_unicode = True
+
+    res = getattr(get_domain().get_translations(), func_name)(*args, **kwargs)
+
+    if using_unicode:
+        return res
+    else:
+        return res.encode('utf-8')
 
 
-availableLocales = getAllLocales()
+lazy_gettext = make_lazy_gettext(lambda: gettext_unicode)
 
 
-def getLocaleDisplayNames(using=None):
+def smart_func(func_name):
+    def _wrap(*args, **kwargs):
+        """
+        Returns either a translated string or a lazy-translatable object,
+        depending on whether there is a session language or not (respectively)
+        """
+
+        if (has_request_context() and session.lang) or func_name != 'ugettext':
+            # straight translation
+            return gettext_unicode(*args, func_name=func_name, **kwargs)
+
+        else:
+            # otherwise, defer translation to eval time
+            return lazy_gettext(*args)
+    return _wrap
+
+
+# Shortcuts
+_ = gettext = smart_func('ugettext')
+ngettext = smart_func('ungettext')
+L_ = lazy_gettext
+
+# Just a marker for message extraction
+N_ = lambda text: text
+
+
+class IndicoLocale(Locale):
     """
-    List of (locale_id, locale_name) tuples
+    Extends the Babel Locale class with some utility methods
+    """
+    def weekday(self, daynum, short=True):
+        """
+        Returns the week day given the index
+        """
+        return self.days['format']['abbreviated' if short else 'wide'][daynum].encode('utf-8')
+
+
+class IndicoTranslations(Translations):
+    """
+    Routes translations through the 'smart' translators defined above
     """
 
-    locales = [IndicoLocale.parse(loc) for loc in availableLocales if loc != using]
-    if using:
-        locales.insert(0, IndicoLocale.parse(using))
-    return list((str(loc), loc.languages[loc.language].encode('utf-8')) for loc in locales)
+    def ugettext(self, message):
+        return gettext(message)
+
+    def ungettext(self, msgid1, msgid2, n):
+        return ngettext(msgid1, msgid2, n)
 
 
-def parseLocale(locale):
+IndicoTranslations().install(unicode=True)
+
+
+@babel.localeselector
+def set_best_lang():
     """
+    Get the best language/locale for the current user. This means that first
+    the session will be checked, and then in the absence of an explicitly-set
+    language, we will try to guess it from the browser settings and only
+    after that fall back to the server's default.
+    """
+
+    if not has_request_context():
+        return 'en_GB' if current_app.config['TESTING'] else HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
+    elif session.lang is not None:
+        return session.lang
+
+    # try to use browser language
+    preferred = [x.replace('-', '_') for x in request.accept_languages.values()]
+    resolved_lang = negotiate_locale(preferred, get_all_locales())
+
+    if not resolved_lang:
+        with DBMgr.getInstance().global_connection():
+            # fall back to server default
+            minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+            resolved_lang = minfo.getLang()
+
+    session.lang = resolved_lang
+    return resolved_lang
+
+
+def get_current_locale():
+    return IndicoLocale.parse(set_best_lang())
+
+
+def get_all_locales():
+    """
+    List all available locales/names e.g. {'pt_PT': 'Portuguese'}
+    """
+    if babel.app is None:
+        return {}
+    else:
+        return {str(t): t.language_name.title() for t in babel.list_translations()}
+
+
+def set_session_lang(lang):
+    """
+    Set the current language in the current request context
+    """
+    session.lang = lang
+
+
+def parse_locale(locale):
+    """
+    Get a Locale object from a locale id
     """
     return IndicoLocale.parse(locale)
 
@@ -105,48 +169,12 @@ def i18nformat(text):
     ATTENTION: only used for backward-compatibility
     Parses old '_() inside strings hack', translating as needed
     """
-    return RE_TR_FUNCTION.sub(lambda x: _(filter(lambda y: y != None, x.groups())[0]), text)
 
+    # this is a bit of a dirty hack, but cannot risk emitting lazy proxies here
+    if not session.lang:
+        set_best_lang()
 
-class generate_messages_js(Command):
-    """
-    Translates *.po files to a JSON dict, with a little help of pojson
-    """
-
-    description = "generates JSON from po"
-    user_options = [('input-dir=', None, 'input dir'),
-                    ('output-dir=', None, 'output dir'),
-                    ('domain=', None, 'domain')]
-    boolean_options = []
-
-    def initialize_options(self):
-        self.input_dir = None
-        self.output_dir = None
-        self.domain = None
-
-    def finalize_options(self):
-        pass
-
-    def run(self):
-        try:
-            pkg_resources.require('pojson')
-        except pkg_resources.DistributionNotFound:
-            print """
-            pojson not found! pojson is needed for JS i18n file generation, if you're building Indico from source. Please install it.
-            i.e. try 'easy_install pojson'"""
-            sys.exit(-1)
-
-        from pojson import convert
-
-        localeDirs = [name for name in os.listdir(self.input_dir) if os.path.isdir(os.path.join(self.input_dir, name))]
-
-        for locale in localeDirs:
-            result = convert(self.domain, os.path.join(
-                self.input_dir, locale, "LC_MESSAGES", 'messages-js.po'), js=True, pretty_print=True)
-            fname = os.path.join(self.output_dir, '%s.js' % locale)
-            with open(fname, 'w') as f:
-                f.write(result.encode('utf-8'))
-            print 'wrote %s' % fname
+    return RE_TR_FUNCTION.sub(lambda x: _(next(y for y in x.groups() if y is not None)), text)
 
 
 def extract(fileobj, keywords, commentTags, options):
@@ -161,8 +189,9 @@ def extract_node(node, keywords, commentTags, options, parents=[None]):
     if isinstance(node, ast.Str) and isinstance(parents[-1], (ast.Assign, ast.Call)):
         matches = RE_TR_FUNCTION.findall(node.s)
         for m in matches:
-            yield (node.lineno, '', m[1].split('\n'), ['old style recursive strings'])
+            line = m[0] or m[1]
+            yield (node.lineno, '', line.split('\n'), ['old style recursive strings'])
     else:
         for cnode in ast.iter_child_nodes(node):
-            for rslt in  extract_node(cnode, keywords, commentTags, options, parents=(parents + [node])):
+            for rslt in extract_node(cnode, keywords, commentTags, options, parents=(parents + [node])):
                 yield rslt

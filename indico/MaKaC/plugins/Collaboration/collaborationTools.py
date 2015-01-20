@@ -1,35 +1,36 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import pkg_resources, sys
 from MaKaC.plugins import PluginsHolder, Plugin
 from MaKaC.webinterface import urlHandlers
-from MaKaC.common.utils import formatDateTime, formatTwoDates, formatTime, \
-    formatDuration
-from MaKaC.common.timezoneUtils import getAdjustedDate, isSameDay
-from MaKaC.common.Configuration import Config
+from MaKaC.webinterface.common.contribFilters import PosterFilterField
+from MaKaC.common.utils import formatDateTime, formatTwoDates, formatTime, formatDuration
+from MaKaC.common.timezoneUtils import getAdjustedDate, isSameDay, minDatetime
+from indico.core.config import Config
 from MaKaC.conference import Contribution, Conference
 from MaKaC.plugins.Collaboration.fossils import ICSBookingBaseIndexingFossil, \
-    IQueryResultFossil
+    IQueryResultFossil, ICSBookingInstanceIndexingFossil
 from MaKaC.fossils.conference import IConferenceFossil
 from MaKaC.common.contextManager import ContextManager
+from indico.core.index import Catalog
+
 
 class CollaborationTools(object):
     """ Class with utility classmethods for the Collaboration plugins core and plugins
@@ -75,8 +76,7 @@ class CollaborationTools(object):
             pluginName: a string with the name of the plugin
             optionName: a string with the name of the option
         """
-        ph = PluginsHolder()
-        return ph.getPluginType("Collaboration").getPlugin(pluginId).getOption(optionName).getValue()
+        return cls.getCollaborationPluginType().getPlugin(pluginId).getOption(optionName).getValue()
 
     @classmethod
     def getOptionValueRooms(cls, pluginId, optionName):
@@ -84,8 +84,11 @@ class CollaborationTools(object):
             pluginName: a string with the name of the plugin
             optionName: a string with the name of the option
         """
-        ph = PluginsHolder()
-        return ph.getPluginType("Collaboration").getPlugin(pluginId).getOption(optionName).getRooms()
+        return cls.getCollaborationPluginType().getPlugin(pluginId).getOption(optionName).getRooms()
+
+    @classmethod
+    def hasOption(cls, pluginId, optionName):
+        return cls.getCollaborationPluginType().getPlugin(pluginId).hasOption(optionName)
 
     @classmethod
     def hasCollaborationOption(cls, optionName):
@@ -159,18 +162,20 @@ class CollaborationTools(object):
             -The user is a Plugin Manager of a plugin in that tab and the plugin is not "admins only"
         """
         tabNamesSet = set()
-        csbm = conference.getCSBookingManager()
+
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conference.getId())
 
         # we get the list of Plugin objects allowed for this kind of event
-        allowedForThisEvent = csbm.getAllowedPlugins()
+        if csbm is not None:
+            allowedForThisEvent = csbm.getAllowedPlugins()
 
-        for plugin in allowedForThisEvent:
+            for plugin in allowedForThisEvent:
 
-            if cls.canUserManagePlugin(conference, plugin, user):
-                tabNamesSet.add(cls.getPluginTab(plugin))
-                EATab = cls.getEATab(plugin)
-                if EATab is not None:
-                    tabNamesSet.add(EATab)
+                if cls.canUserManagePlugin(conference, plugin, user):
+                    tabNamesSet.add(cls.getPluginTab(plugin))
+                    EATab = cls.getEATab(plugin)
+                    if EATab is not None:
+                        tabNamesSet.add(EATab)
 
         tabNames = list(tabNamesSet)
         return tabNames
@@ -207,10 +212,9 @@ class CollaborationTools(object):
             If a user is specified, only tabs with plugins that the user can see will be returned:
             -
         """
-
         if tabName:
 
-            csbm = conference.getCSBookingManager()
+            csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conference.getId())
 
             if conference:
                 allowedPlugins = csbm.getAllowedPlugins()
@@ -233,10 +237,11 @@ class CollaborationTools(object):
             depending on the plugin, the user, and the event where the user tries to see a plugin page
             or change a plugin object
         """
-        csbm = conference.getCSBookingManager()
 
-        from MaKaC.webinterface.rh.collaboration import RCCollaborationAdmin
-        isAdminUser = RCCollaborationAdmin.hasRights(user = user)
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conference.getId())
+
+        from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin
+        isAdminUser = RCCollaborationAdmin.hasRights(user)
 
         isAdminOnlyPlugin = cls.isAdminOnlyPlugin(plugin)
 
@@ -297,12 +302,12 @@ class CollaborationTools(object):
         return l
 
     @classmethod
-    def pluginsWithIndexing(cls):
+    def pluginsWithIndexing(cls, includeNonActive=False):
         """ Utility function that returns a list of strings with the names
             of the collaboration plugins that want to be indexed
         """
         l = []
-        for plugin in cls.getCollaborationPluginType().getPlugins().values():
+        for plugin in cls.getCollaborationPluginType().getPlugins(includeNonActive=includeNonActive).values():
             if plugin.getModule().collaboration.CSBooking._shouldBeIndexed:
                 l.append(plugin)
         return l
@@ -322,8 +327,9 @@ class CollaborationTools(object):
         """ Utility function that updates IQueryResultFossil's getResults method
             with the proper dict in order to fossilize bookings for the VS Overview page
         """
-        fossilDict = {"%s.%s" % (Conference.__module__, Conference.__name__): IConferenceFossil}
-        for pluginName in cls.getCollaborationPluginType().getPlugins():
+        fossilDict = {"%s.%s" % (Conference.__module__, Conference.__name__): IConferenceFossil,
+                      'MaKaC.plugins.Collaboration.indexes.CSBookingInstanceWrapper': ICSBookingInstanceIndexingFossil}
+        for pluginName in cls.getCollaborationPluginType().getPlugins(includeNonActive=True):
             classObject = cls.getCSBookingClass(pluginName)
             fossilClassObject = cls.getIndexingFossil(pluginName)
             fossilDict["%s.%s" % (classObject.__module__, classObject.__name__)] = fossilClassObject
@@ -408,8 +414,68 @@ class CollaborationTools(object):
         if booking.getBookingParams().has_key("audience"):
             audience = booking.getBookingParams().get("audience")
             if audience == "":
-                audience = "Public"
+                audience = "No restriction"
         return audience
+
+    @classmethod
+    def getCommonTalkInformation(cls, conference, plugin_name, plugin_option):
+        """
+        Returns a tuple of 3 lists:
+        - List of talks (Contribution objects which are not in a Poster session)
+        - List of webcast capable rooms, as a list of "locationName:roomName" strings
+        - List of webcast-able talks (list of Contribution objects who take place in a webcast capable room)
+        - List of not webcast-able talks (list of Contribution objects who do not take place in a webcast capable room)
+        """
+
+        #a talk is defined as a non-poster contribution
+        filter = PosterFilterField(conference, False, False)
+        talks = [cont for cont in conference.getContributionList() if filter.satisfies(cont)]
+
+        #list of "locationName:roomName" strings
+        capableRooms = CollaborationTools.getOptionValueRooms(plugin_name, plugin_option)
+
+        roomFullNames = [r.location_name + ':' + r.full_name for r in capableRooms]
+        roomNames = [r.location_name + ':' + r.name for r in capableRooms]
+
+        #a webcast-able talk is defined as a talk talking place in a webcast-able room
+        ableTalks = []
+        unableTalks = []
+        for t in talks:
+            location = t.getLocation()
+            room = t.getRoom()
+            if location and room and (location.getName() + ":" + room.getName() in roomNames) and t.isScheduled():
+                ableTalks.append(t)
+            else:
+                unableTalks.append(t)
+
+        return (talks, roomFullNames, roomNames, ableTalks, unableTalks)
+
+    @classmethod
+    def isAbleToBeWebcastOrRecorded(cls, obj, plugin_name):
+        plugin_option ='recordingCapableRooms' if plugin_name == 'RecordingRequest' else 'webcastCapableRooms'
+        capableRooms = CollaborationTools.getOptionValueRooms(plugin_name, plugin_option)
+        roomNames = [r.location_name + ':' + r.name for r in capableRooms]
+        location = obj.getLocation()
+        room = obj.getRoom()
+        isAble = location is not None and room is not None and (location.getName() + ":" + room.getName() in roomNames)
+        if isinstance(obj, Contribution):
+            isAble = isAble and obj.isScheduled()
+        return isAble
+
+    @classmethod
+    def getCollaborationParams(cls, conf):
+        params = {}
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
+        pluginNames = csbm.getEventDisplayPlugins()
+        bookingData = {}
+        for pluginName in pluginNames:
+            bookingData[pluginName] = CollaborationTools.getServiceInformation(pluginName)
+        bookings = csbm.getBookingList(filterByType=pluginNames, notify=True, onlyPublic=True)
+        bookings.sort(key=lambda b: b.getStartDate() or minDatetime())
+        params['bookings'] = bookings
+        params['bookingData'] = bookingData
+        return params
+
 
 class MailTools(object):
 
@@ -434,7 +500,6 @@ class MailTools(object):
             admins = plugin.getOption('admins').getValue()
             sendMail = plugin.getOption('sendMailNotifications').getValue()
             addEmails = plugin.getOption('additionalEmails').getValue()
-
         else:
             # get definitions from the Collaboration plugin type
             admins = CollaborationTools.getCollaborationOptionValue('collaborationAdmins')
@@ -471,7 +536,7 @@ class MailTools(object):
                 -If pluginName is not None, any Video Services Managers for that given system
             The emails in the list are not in any particular order and should be unique.
         """
-        csbm = conf.getCSBookingManager()
+        csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
         managersEmails = []
         managersEmails.append(conf.getCreator().getEmail())
         managersEmails.extend([u.getEmail() for u in conf.getManagerList()])

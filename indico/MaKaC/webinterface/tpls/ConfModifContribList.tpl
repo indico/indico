@@ -26,9 +26,9 @@ else:
 
     <%include file="ListJSHelpers.tpl"/>
 
-    window.onload = function(){
+    IndicoUI.executeOnLoad(function() {
         isSelected("contribsItems");
-    }
+    });
 
     function selectAll()
     {
@@ -80,7 +80,7 @@ else:
                 <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
                 <span style="padding: 0px 6px 0px 6px">|</span>
             % endif
-            <a id="index_filter" onclick="showFilters()" class="CAIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
+            <a id="index_filter" onclick="showFilters()" class="CRLIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
               % if filterUsed:
                 ${ _("Show filters")}
               % else:
@@ -88,7 +88,7 @@ else:
               % endif
             </a>
             <span style="padding: 0px 6px 0px 6px">|</span>
-            <a id="index_display" onclick="staticURLSwitch()" class="CAIndexUnselected" font-size="16">
+            <a id="index_display" onclick="staticURLSwitch()" class="CRLIndexUnselected" font-size="16">
                 ${ _("Static URL for this result")}
             </a>
         </div>
@@ -115,14 +115,11 @@ else:
             <table>
                 <tbody>
                         <td>
-                          <form action="${ newContribURL }" method="POST" style="padding:0px;margin:0px; display:inline">
-                            <input type="hidden" name="contributionCreatedFrom" value="contributionList"/>
-                            <input type="button" onclick="addContribution()" class="btn" name="" value="${ _("Add new")}">
-                          </form>
+                           <input type="button" onclick="addContribution();" class="btn" name="" value="${ _("Add new")}">
                         </td>
-                        <form action=${ contribSelectionAction } method="post" name="contribsForm" onsubmit="return atLeastOneContribSelected();">
+                        <form action=${ contribSelectionAction } method="post" name="contribsForm" id="contribsForm">
                         <td>
-                           <input type="submit" onclick="deleteContributions(); return false;" class="btn" name="" value="${ _("Delete")}">
+                           <input type="submit" class="btn" name="delete" value="${ _("Delete")}">
                         </td>
                         <td valign="bottom" align="left" class="eventModifButtonBar">
                            <input type="submit" class="btn" name="move" value="${ _("Move")}">
@@ -143,7 +140,10 @@ else:
                             <input type="image" src=${ pdfIconURL} class="btn" name="PDF" value="${ _("Create PDF")}" onclick='this.form.action=${ contributionsPDFURL };this.form.target="_blank";'>
                         </td>
                         <td valign="bottom" align="left">
-                            <input type="image" name="excel" src=${ excelIconURL} border="0">
+                            <input type="image" name="excel" src=${ excelIconURL} border="0" onclick='this.form.action=${ contribSelectionAction };this.form.target="";'>
+                        </td>
+                        <td valign="bottom" align="left">
+                            <input type="image" name="xml" src=${ xmlIconURL} border="0" onclick='this.form.action=${ contribSelectionAction };this.form.target="";'>
                         </td>
                 </tbody>
             </table>
@@ -185,7 +185,7 @@ else:
                     <table>
                         <tbody>
                                 <td>
-                                   <input type="submit" onclick="deleteContributions(); return false;" class="btn" name="" value="${ _("Delete")}">
+                                   <input type="submit" class="btn" name="delete" value="${ _("Delete")}">
                                 </td>
                                 <td valign="bottom" align="left" class="eventModifButtonBar">
                                     <input type="submit" class="btn" name="move" value="${ _("Move")}">
@@ -207,6 +207,9 @@ else:
                                 </td>
                                 <td valign="bottom" align="left">
                                     <input type="image" name="excel" src=${ excelIconURL} border="0">
+                                </td>
+                                <td valign="bottom" align="left">
+                                    <input type="image" name="xml" src=${ xmlIconURL} border="0">
                                 </td>
                         </tbody>
                     </table>
@@ -241,10 +244,7 @@ var addContribution = function() {
     var dialog = new AddNewContributionDialog(
                        'schedule.event.addContribution',
                        null,
-               ${ jsonEncode(dict(conference=self_._conf.id)) },
-               ${ jsonEncode(dict(location=locationName,
-                                   room=roomName,
-                                   address=address)) },
+                       $O(${ jsonEncode(dict(conference=self_._conf.id, roomInfo=roomInfo(self_._rh._target)))}),
                        parentEventRoomData,
                        '',
                        '',
@@ -256,37 +256,39 @@ var addContribution = function() {
                           window.location.reload();
                        },
                        ${ jsBoolean(self_._conf.getAbstractMgr().isActive()) },
-                       ${ bookings }
-                       );
+                       ${ bookings |n,j },
+                       false);
 
     dialog.execute();
 };
 
-var deleteContributions = function() {
-    if (atLeastOneContribSelected()) {
+$("input[name=delete]").click(function(event){
+    event.preventDefault();
+    if (atLeastOneSelected($E('contribsItems'), $T('No contribution selected! Please select at least one.'))) {
         var listContribsToDelete = $('input:checked[name=contributions]').map(function(){return this.value;}).toArray();
-        if (confirm('${ _("Are you sure you wish to delete the selected contributions?\\nNote that you cannot undo this action.")}')){
-            var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting the contributions..."));
-            indicoRequest('event.contributions.delete',
-                    { confId: ${self_._conf.id},
-                      contributions: listContribsToDelete },
-                      function(result, error){
-                          if (!error) {
-                              $('input:checked[name=contributions]').parents('tr[id^=contributions]').remove();
-                              killProgress();
-                          } else {
-                              killProgress();
-                              IndicoUtil.errorReport(error);
-                          }
-                        }
-                );
-        }
+        new ConfirmPopup($T("Delete style"), $T("Are you sure you wish to delete the selected contributions? Note that you cannot undo this action."), function(confirmed){
+            if(confirmed){
+                var killProgress = IndicoUI.Dialogs.Util.progress($T("Deleting the contributions..."));
+                indicoRequest('event.contributions.delete',
+                        { confId: ${self_._conf.id},
+                          contributions: listContribsToDelete },
+                          function(result, error){
+                              if (!error) {
+                                  $('input:checked[name=contributions]').parents('tr[id^=contributions]').remove();
+                                  killProgress();
+                              } else {
+                                  killProgress();
+                                  IndicoUtil.errorReport(error);
+                              }
+                            }
+                    );
+            }
+        }).open();
     }
-};
+});
 
-var atLeastOneContribSelected = function() {
+$("#contribsForm").submit(function(event){
     return atLeastOneSelected($E('contribsItems'), $T('No contribution selected! Please select at least one.'));
-};
-
+});
 
 </script>

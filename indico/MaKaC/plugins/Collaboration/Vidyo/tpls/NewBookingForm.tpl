@@ -1,3 +1,6 @@
+<div class="redWarningMessage" style="display:none">
+${_(" Please be aware that if you modify any sensitive data such as the room name, moderator or PIN that it will be reflected in other bookings which use the same Vidyo room.")}
+</div>
 <table style="margin-top: 10px;">
     <tr>
         <td class="bookingFormFieldName" nowrap>
@@ -13,7 +16,7 @@
             <span>${_("Description")}</span>
         </td>
         <td>
-            <textarea rows="3" cols="55" name="roomDescription">${ EventDescription }</textarea>
+            <textarea rows="3" cols="55" id="roomDescription" name="roomDescription">${ EventDescription }</textarea>
         </td>
     </tr>
 
@@ -43,11 +46,31 @@
 
     <tr>
         <td class="bookingFormFieldName" nowrap>
-            <span>${_("PIN")}</span>
+            <span>${_("Moderator PIN")}</span>
+        </td>
+        <td>
+            <span id="moderatorPINField"></span>
+            <img id="moderatorPINHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
+        </td>
+    </tr>
+
+    <tr>
+        <td class="bookingFormFieldName" nowrap>
+            <span>${_("Meeting PIN")}</span>
         </td>
         <td>
             <span id="PINField"></span>
             <img id="PINHelpImg" src="${ systemIcon('help')}" style="margin-left:5px; vertical-align:middle;" />
+        </td>
+    </tr>
+
+    <tr>
+        <td class="bookingFormFieldName" nowrap>
+            <span>${_("Auto-mute")}</span>
+        </td>
+        <td>
+            <span id="autoMuteField"></span>
+            <label for="autoMute" class="normal">${ _("The VidyoDesktop clients will join the meeting muted by default (audio and video)") }</label>
         </td>
     </tr>
 </table>

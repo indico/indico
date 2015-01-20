@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
      {
          /*
@@ -92,7 +109,6 @@ type("DateTimeSelector", ["RealtimeTextBox", "ErrorAware"],
 
          this.RealtimeTextBox(args);
 
-         this.input;
          this.trigger = Html.img({src: imageSrc("calendarWidget")});
          this.tab = Html.div("dateField", this.input, this.trigger);
          var self = this;
@@ -300,7 +316,7 @@ type("DateTimeDurationWidget", ["IWidget"],
 type("DateTimeSelectorWFields", ["DateTimeSelector"],
      {
          _setHiddenFields: function(value) {
-             var dtValue = Util.parseJSDateTime(value, IndicoDateTimeFormats.Server)
+             var dtValue = Util.parseJSDateTime(value, IndicoDateTimeFormats.Server);
 
              if (!dtValue) {
                  // in case the value can't be parsed, set it to empty
@@ -334,3 +350,81 @@ type("DateTimeSelectorWFields", ["DateTimeSelector"],
              self._setHiddenFields(value)
          });
      });
+
+
+type("DateWidget", ["InlineEditWidget"],
+        {
+            __verifyDate: function() {
+                this.date.askForErrorCheck();
+                this._setSave(!this.date.inError());
+            },
+            _handleEditMode: function(value) {
+
+                // create datefield
+                this.date = new DateTimeSelector();
+
+                // set them to the values that are passed
+                this.date.set(Util.formatDateTime(value, IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Default));
+
+                var self = this;
+
+                this.date.observe(function() {
+                    self.__verifyDate();
+                    return true;
+                });
+
+                return Html.span({}, this.date.draw());
+            },
+
+            _handleDisplayMode: function(value) {
+                if(value){
+                    return Util.formatDateTime(value, IndicoDateTimeFormats.Default, IndicoDateTimeFormats.Default);
+                }
+                else{
+                    return $T("Date has not been set yet.")
+                }
+            },
+
+            _getNewValue: function() {
+
+                return Util.formatDateTime(this.date.get(), IndicoDateTimeFormats.Default, IndicoDateTimeFormats.Server);
+            },
+
+            _verifyInput: function() {
+                return !!Util.parseDateTime(this.date.get());
+
+            }
+        },
+        function(method, attributes, initValue) {
+            this.InlineEditWidget(method, attributes, initValue);
+        });
+
+
+type("DateDeadlineWidget", ["DateWidget"],
+        {
+            _getNewValue: function() {
+                return { date: Util.formatDateTime(this.date.get(), IndicoDateTimeFormats.Server, IndicoDateTimeFormats.Server),
+                    applyToContributions: this.applyToContributions};
+            },
+
+            _handleSave: function() {
+                var self = this;
+                if(this.hasContributions){
+                    new SpecialRemovePopup($T("Changing deadline"), $T("Do you want to apply this deadline to all the papers and replace their previous deadlines?"),
+                            function(action) {
+                                if (action > 0) {
+                                    self.applyToContributions = action != 1;
+                                    self._save();
+                                }
+                           }, $T("Save deadline only"), $T("Save and apply")).open();
+                } else {
+                    self.applyToContributions = false;
+                    self._save();
+                }
+            }
+        },
+        function(method, attributes, initValue, hasContributions) {
+            this.applyToContributions = false;
+            this.hasContributions = hasContributions;
+            this.DateWidget(method, attributes, initValue);
+        });

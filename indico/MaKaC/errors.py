@@ -1,40 +1,47 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 Module containing the MaKaC exception class hierarchy
 """
 
-class MaKaCError(Exception):
+from MaKaC.common.fossilize import fossilizes, Fossilizable
+from indico.core.fossils.errors import IErrorReportFossil, IErrorNoReportFossil
+from indico.util.translations import ensure_str
 
-    def __init__( self, msg="",area="", explanation = None):
+
+class MaKaCError(Exception, Fossilizable):
+
+    fossilizes(IErrorReportFossil)
+
+    def __init__(self, msg="", area="", explanation=None):
         self._msg = msg
         self._area = area
         self._explanation = explanation
 
-    def getMsg( self ):
+    def getMessage(self):
         return self._msg
 
+    @ensure_str
     def __str__(self):
         if self._area != "":
-            return "%s - %s"%(self._area,self._msg)
+            return "%s - %s" % (self._area, self._msg)
         else:
             return self._msg
 
@@ -52,27 +59,33 @@ class MaKaCError(Exception):
 class AccessControlError(MaKaCError):
     """
     """
+
+    fossilizes(IErrorNoReportFossil)
+
     def __init__(self, objectType="object"):
+        MaKaCError.__init__(self)
         self.objType = objectType
 
-    def __str__( self ):
-        return _("you are not authorised to access this %s")%self.objType
+    @ensure_str
+    def __str__(self):
+        return _("you are not authorised to access this %s") % self.objType
+
+    def getMessage(self):
+        return str(self)
 
 
 class ConferenceClosedError(MaKaCError):
     """
     """
+    fossilizes(IErrorNoReportFossil)
+
     def __init__(self, conf):
+        MaKaCError.__init__(self)
         self._conf = conf
 
-    def __str__( self ):
+    @ensure_str
+    def __str__(self):
         return _("the event has been closed")
-
-
-class DomainNotAllowedError(AccessControlError):
-
-    def __str__( self ):
-        return _("your domain is not allowed to acces this %s")%self.objType
 
 
 class AccessError(AccessControlError):
@@ -87,31 +100,31 @@ class KeyAccessError(AccessControlError):
     pass
 
 
-class HostnameResolveError(MaKaCError):
-    """
-    Hostname resolution failed
-    """
-
-
 class ModificationError(AccessControlError):
     """
     """
-    def __str__( self ):
-        return _("you are not authorised to modify this %s")%self.objType
+
+    @ensure_str
+    def __str__(self):
+        return _("you are not authorised to modify this %s") % self.objType
 
 
 class AdminError(AccessControlError):
     """
     """
+
+    @ensure_str
     def __str__(self):
-        return _("only administrators can access this %s")%self.objType
+        return _("only administrators can access this %s") % self.objType
 
 
 class WebcastAdminError(AccessControlError):
     """
     """
+
+    @ensure_str
     def __str__(self):
-        return _("only webcast administrators can access this %s")%self.objType
+        return _("only webcast administrators can access this %s") % self.objType
 
 
 class TimingError(MaKaCError):
@@ -119,8 +132,7 @@ class TimingError(MaKaCError):
     Timetable problems
     """
 
-    def __init__(self, msg = "", area = "", explanation = None):
-        MaKaCError.__init__(self, msg, area, explanation)
+    fossilizes(IErrorNoReportFossil)
 
 
 class ParentTimingError(TimingError):
@@ -138,9 +150,8 @@ class EntryTimingError(TimingError):
 class UserError(MaKaCError):
     """
     """
-    def init(self, msg = ""):
-        self._msg = msg
 
+    @ensure_str
     def __str__(self):
         if self._msg:
             return self._msg
@@ -148,40 +159,46 @@ class UserError(MaKaCError):
             return _("Error creating user")
 
 
+class NotLoggedError(MaKaCError):
+    """
+    """
+    fossilizes(IErrorNoReportFossil)
+
+
 class FormValuesError(MaKaCError):
     """
     """
-    def __init__( self, msg="",area=""):
-        self._msg = msg
-        self._area = area
+    fossilizes(IErrorNoReportFossil)
 
 
 class NoReportError(MaKaCError):
     """
     """
-    def __init__( self, msg="", area=""):
-        self._msg = msg
-        self._area = area
+    fossilizes(IErrorNoReportFossil)
+
 
 class NotFoundError(MaKaCError):
     """
+    MaKaC's own NotFound version (just for legacy support)
     """
-    def __init__( self, msg="", area=""):
-        self._msg = msg
-        self._area = area
+    fossilizes(IErrorNoReportFossil)
+
+    def __init__(self, message, title=""):
+        if not title:
+            title = message
+            message = ''
+        super(NotFoundError, self).__init__(title, explanation=message)
 
 
 class PluginError(MaKaCError):
     pass
 
 
-class HtmlScriptError(MaKaCError):
+class HtmlForbiddenTag(MaKaCError):
     """
     """
     pass
 
 
-class HtmlForbiddenTag(MaKaCError):
-    """
-    """
+class BadRefererError(MaKaCError):
     pass

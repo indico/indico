@@ -1,6 +1,6 @@
 <%page args="item, allMaterial=False, minutes=False, order=1, suborder=1"/>
 
-<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
 
 <tr>
 
@@ -22,11 +22,12 @@
             </tr>
         </table>
     </td>
-    <td class="itemTopAlign itemRightAlign"">
+    <td class="itemTopAlign itemRightAlign">
         % if item.getSpeakerList() or item.getSpeakerText():
             ${common.renderUsers(item.getSpeakerList(), unformatted=item.getSpeakerText())}
             <br/>
         % endif
+        <span class="materialDisplayName">
         % if not allMaterial:
             <% materialDocuments = False %>
             % for material in item.getAllMaterialList():
@@ -64,9 +65,10 @@
                 % endfor
             % endif
         % endif
+        </span>
     </td>
 
     <td class="itemTopAlign">
-         <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+         <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
     </td>
 </tr>

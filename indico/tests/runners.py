@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 This module defines the TestRunners that are included by default by indico.tests:
@@ -46,10 +45,10 @@ from indico.tests.config import TestConfig
 from indico.tests.base import BaseTestRunner, Option
 from indico.tests.util import openBrowser, relpathto
 from indico.tests import default_actions
+from indico.core.db import DBMgr
 
 # legacy indico modules
-from MaKaC.common import Config, DBMgr
-
+from indico.core.config import Config
 
 __all__ = [
     'UnitTestRunner',
@@ -166,8 +165,7 @@ class XMLOutputOption(Option):
 class NoseTestRunner(BaseTestRunner):
 
     def _buildArgs(self):
-        args = ['nose', '--nologcapture', '--logging-clear-handlers', \
-                '--with-id', '-s']
+        args = ['nose', '--nologcapture', '--logging-clear-handlers', '--with-id', '-s']
 
         # will set args
         self._callOptions('use_xml_output', 'unit', args)
@@ -175,7 +173,7 @@ class NoseTestRunner(BaseTestRunner):
         specific = self.options.valueOf('specify')
 
         if specific:
-            args.append(specific)
+            args += specific.split(',')
         else:
             args.append(os.path.join(self.setupDir, self._defaultPath))
 
@@ -237,6 +235,7 @@ class FunctionalTestRunner(NoseTestRunner):
         """
         test_config = TestConfig.getInstance()
 
+
         mode = self.options.valueOf('mode', test_config.getRunMode())
 
         browser = self.options.valueOf('browser')
@@ -272,7 +271,7 @@ class FunctionalTestRunner(NoseTestRunner):
             conn = dbi.getDBConnection()
 
             default_actions.initialize_new_db(conn.root())
-            default_actions.create_dummy_user()
+            default_actions.create_dummy_users()
             dbi.endRequest()
 
             raw_input("Press [ENTER] to finish recording... ")
@@ -643,8 +642,7 @@ class JSLintTestRunner(BaseTestRunner):
 
         # Folders which are not going to be scanned.
         # Files are going to be find recursively in the other folders
-        import sets
-        blackList = sets.Set(['pack', 'Loader.js', 'Common', 'i18n'])
+        blackList = set(['pack', 'Loader.js', 'Common', 'i18n'])
 
         #checking if rhino is accessible
         statusOutput = commands.getstatusoutput("rhino -?")

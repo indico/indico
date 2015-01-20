@@ -416,7 +416,7 @@ type("ParticipantListField", ["IWidget"],
                         openNewPopup();
                     }
                 }
-                var popup = new ChooseUsersPopup($T("Add Indico User"), true, null, false, true, null, false, true, handler);
+                var popup = new ChooseUsersPopup($T("Add Indico User"), true, null, false, true, null, false, true, false, handler);
                 popup.execute();
             });
 
@@ -529,24 +529,22 @@ type("CERNMCUBuildParticipantsInfo", ["IWidget"], {
 
     draw: function(){
 
-        var participantList = Html.ul('CERNMCUParticipantsListDisplay');
-
         var self = this;
+
+        var participantList = $('<div/>');
 
         each(this.participants, function(participant) {
             // participant is a WatchObject
 
-            var participantLine = Html.li();
+            var participantLine = $('<div class="CERNMCUParticipantsListDisplay"/>');
 
             if (participant.get("type") === 'person') {
-                participantLine.append(Html.img({alt: "Person", title: "Person", src: imageSrc("user"),
-                                                 style: {verticalAlign: 'middle', marginRight: pixels(5)}}));
+                participantLine.append($('<div class="icon icon-user" aria-hidden="true"/>').prop("title", $T("User")));
             } else {
-                participantLine.append(Html.img({alt: "Room", title: "Room", src: imageSrc("room"),
-                                                 style: {verticalAlign: 'middle', marginRight: pixels(5)}}));
+                participantLine.append($('<div class="icon icon-location" aria-hidden="true"/>').prop("title", $T("Location")));
             }
 
-            participantText = Html.span();
+            participantText = $("<div/>");
             participantText.append(participant.get("displayName") + ' (IP: ' + participant.get("ip"));
             if (participant.get("participantType") === 'ad_hoc') {
                 participantText.append(', ' + $T('ad-hoc'));
@@ -554,36 +552,35 @@ type("CERNMCUBuildParticipantsInfo", ["IWidget"], {
                 participantText.append(', ' + $T('Pre-configured'));
             }
             participantText.append(', ');
-            participantText.append($B(Html.span(), participant.accessor("callState")));
+            participantText.append(participant.get("callState"));
             participantText.append(')');
 
             participantLine.append(participantText);
 
-            var playButton = $B(Html.span(), participant.accessor("callState"), function(state){
-                if (state === "connected" || !self.booking.canBeStarted ) {
-                    return IndicoUI.Buttons.playButton(true, true);
-                } else {
-                    return Widget.link(command(function(){
-                        self.__connectParticipant(participant);
-                    } , IndicoUI.Buttons.playButton(false, true)));
-                }
-            });
-            participantLine.append(playButton);
+            var toolbar = $('<div class="toolbar thinner"/>');
+            var group = $('<div class="group"/>');
 
-            var stopButton = $B(Html.span(), participant.accessor("callState"), function(state){
-                if (state === "disconnected" || state === "dormant" || !self.booking.canBeStopped) {
-                    return IndicoUI.Buttons.stopButton(true, true);
-                } else {
-                    return Widget.link(command(function(){
-                        self.__disconnectParticipant(participant);
-                    } , IndicoUI.Buttons.stopButton(false, true)));
-                }
-            });
-            participantLine.append(stopButton);
+            if (participant.get("callState") === "connected" || !self.booking.canBeStarted ) {
+                $('<a class="i-button icon-play disabled " href="#"/>').qtip({content:$T("This participant cannot be started")}).appendTo(group);
+            } else {
+                $('<a class="i-button icon-play" href="#"/>').prop("title", $T("Start")).on('click', function(){
+                    self.__connectParticipant(participant);
+                }).appendTo(group);
+            }
 
+            if (participant.get("callState") === "disconnected" || participant.get("callState") === "dormant" || !self.booking.canBeStopped) {
+                $('<a class="i-button icon-stop disabled" href="#"/>').qtip({content:$T("This participant cannot be stopped")}).appendTo(group);
+            } else {
+                $('<a class="i-button icon-stop" href="#"/>').prop("title", $T("Stop")).on('click', function(){
+                    self.__disconnectParticipant(participant);
+                }).appendTo(group);
+            }
+
+            toolbar.append(group);
+            participantLine.append(toolbar);
             participantList.append(participantLine);
         });
-        return this.IWidget.prototype.draw.call(this, participantList);
+        return this.IWidget.prototype.draw.call(this, participantList.get(0));
     }
 },
     function(booking){

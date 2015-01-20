@@ -1,0 +1,105 @@
+<h2>HTTP API URL generator</h2>
+
+<section>
+    <h3>Access data</h3>
+    <ul id="access-data">
+        <li>
+            <label for="server-url">Server URL:</label> <input id="server-url" placeholder="Server URL" type="text" />
+        </li>
+        <li>
+            <label for="api-key">API Key:</label> <input id="api-key" placeholder="API Key" type="text" />
+        </li>
+        <li>
+            <label for="secret-key">Secret Key:</label> <input id="secret-key" placeholder="Secret Key" type="text" />
+        </li>
+        <li>Persistent <input type="checkbox" id="persistent" /></li>
+    </ul>
+</section>
+
+<section>
+    <h2>Path</h2>
+    <div>
+    Path: <input id="path" placeholder="/export/event/1234.json" type="text" />
+    </div>
+</section>
+
+<section>
+    <h3>Fields</h3>
+    <ul id="fields">
+    </ul>
+    <button id="new-field">Add field</button>
+</section>
+
+<section>
+    <h2>Result</h2>
+    <button id="generate">Generate URL</button>
+    <input id="result" type="text" readonly />
+</section>
+
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="https://crypto-js.googlecode.com/svn/tags/3.1.2/build/rollups/hmac-sha1.js"></script>
+
+<script type="text/javascript">
+    // Copyright (c) 2010 "Cowboy" Ben Alman
+    // https://github.com/cowboy/jquery-bbq/blob/master/LICENSE-MIT
+    // (Properly beautified)
+
+    var params_sorted = function (a, traditional) {
+        var arr = [],
+            obj = {};
+
+        $.each($.param(a, traditional).split('&'), function (i, v) {
+            var key = v.replace(/(?:%5B|=).*$/, ''),
+                key_obj = obj[key];
+
+            if (!key_obj) {
+                key_obj = obj[key] = [];
+                arr.push(key);
+            }
+
+            key_obj.push(v);
+        });
+
+        return $.map(arr.sort(), function (v) {
+            return obj[v];
+        }).join('&');
+    };
+
+    // Start of Indico code
+
+    $(function() {
+        $('#new-field').click(function() {
+            $('#fields').append($('<li/>').append(
+                                    $('<input class="key" placeholder="Parameter name" type="text" />'),
+                                    $('<input class="value" placeholder="Value" type="text" />'))
+                                );
+        });
+
+        $('#generate').click(function() {
+            var persistent = $('#persistent').prop("checked"),
+                params = {},
+                path = $('#path').val();
+
+            $('#fields li').each(function() {
+                var key = $(this).find('.key').val(),
+                    value = $(this).find('.value').val();
+                if (key) { 
+                    params[key] = value.trim();
+                }
+            });
+            
+            if (!persistent) {
+                params['timestamp'] = Math.round(Date.now() / 1000);
+            }
+            
+            params['ak'] = $('#api-key').val();
+            var to_sign = path + '?' + params_sorted(params);
+
+            var hash = CryptoJS.enc.Hex.stringify(CryptoJS.HmacSHA1(to_sign, $('#secret-key').val()));
+            params['signature'] = hash;
+
+            $('#result').val($('#server-url').val() + path + '?' + $.param(params));
+        })
+    })  
+</script>

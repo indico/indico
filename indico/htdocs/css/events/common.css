@@ -2,22 +2,21 @@
 * -*- mode: text; coding: utf-8; -*-
 
 
-   This file is part of CDS Indico.
-   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+   This file is part of Indico.
+   Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 
-   CDS Indico is free software; you can redistribute it and/or
+   Indico is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
-   published by the Free Software Foundation; either version 2 of the
+   published by the Free Software Foundation; either version 3 of the
    License, or (at your option) any later version.
 
-   CDS Indico is distributed in the hope that it will be useful, but
+   Indico is distributed in the hope that it will be useful, but
    WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-   59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
 body {
@@ -236,9 +235,6 @@ a.normal:hover {
 	font-weight: normal;
 
 }
-.bold {
-	font-weight: bold;
-}
 .headerselected2 {
 	COLOR: #fff;
 	margin: 0px;
@@ -437,22 +433,6 @@ div.eventInfoBox {
 	padding: 10px;
 }
 
-h1 {
-	font-size: 20pt;
-	color: white;
-	font-weight: normal;
-	margin-top: 10px;
-	margin-bottom: 10px;
-}
-
-h2 {
-	font-size: 12pt;
-	color: white;
-	font-weight: normal;
-	font-style: italic;
-	margin-top: 5px;
-}
-
 div.meetingEventHeader {
     background: #1a64a0;
     color: white;
@@ -467,6 +447,11 @@ div.meetingEventHeader {
 
 div.meetingEventHeader h1 {
     text-shadow: 1px 1px 5px #000;
+    font-size: 20pt;
+    color: white;
+    font-weight: normal;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 div.meetingEventHeader a {
@@ -572,10 +557,6 @@ div.minutesTable > span {
     padding: 10px;
 }
 
-div.minutesTable > span h1 , h2{
-    font-size: 13px;
-    color: #444444;
-}
 
 li.meetingSession, li.meetingContrib, li.breakListItem {
     padding: 3px 0 3px 3px;
@@ -697,4 +678,8 @@ span.description pre, p {
     margin-top: 0;
     margin-left: 0;
     overflow: hidden;
+}
+
+.materialDisplayName {
+    font-size: 14px;
 }

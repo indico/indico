@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from ZODB.fstools import prev_txn, TxnHeader
 from ZODB.serialize import ObjectReader, get_refs
@@ -83,9 +82,9 @@ def run(path, ntxn, orderTransactions):
 
     for i in iterator:
         transactions.append({"tid": TimeStamp(i.tid), "user": i.user, "desc": i.description, "len": header.length, "objs": None})
-        
-        header = header.next_txn()   
-    
+
+        header = header.next_txn()
+
         object_types = {}
         for o in i:
             ot = reader.getIdentity(o.data)
@@ -97,14 +96,14 @@ def run(path, ntxn, orderTransactions):
 
         keys = object_types.keys()
         transactions[-1]["objs"] = object_types
-            
+
     f.close()
     if orderTransactions:
         transactions = sorted(transactions, key=lambda (d): d["len"], reverse=True)
     for tr in transactions:
         print "\n\nTRANSACTION: ", tr["tid"], tr["user"], tr["desc"], pretty_size(tr["len"])
-        object_types = tr["objs"]        
-        keys = object_types.keys()        
+        object_types = tr["objs"]
+        keys = object_types.keys()
         for k in sorted(keys, key=lambda (k): object_types[k][0], reverse=True):
             # count, class, size (aggregate)
             print " - ", object_types[k][1], k, pretty_size(object_types[k][0])
@@ -114,7 +113,7 @@ def main():
     parser = OptionParser(usage=usage)
     parser.add_option("-n", "--number", dest="num",
                   help="display the last 'n' transactions (Default 100)", default=100, type="int")
-    parser.add_option("-o", "--order", dest="order", action="store_false", 
+    parser.add_option("-o", "--order", dest="order", action="store_false",
                   help="order the transactions by size and not by date")
 
     (options, args) = parser.parse_args()

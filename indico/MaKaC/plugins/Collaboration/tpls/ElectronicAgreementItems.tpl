@@ -1,4 +1,4 @@
-<%page args="spkId, spkName, status, contribId, reqType, enabled"/>
+<%page args="spkId, spkName, status, contribId, reqType, enabled, canModify"/>
 <% spkWrapper = manager.getSpeakerWrapperByUniqueId("%s.%s" % (contribId, spkId))
 contribution = conf.getContributionById(contribId)  %>
 
@@ -39,7 +39,9 @@ contribution = conf.getContributionById(contribId)  %>
   </td>
   <td class="CRLabstractLeftDataCell">
 <%
-if isAdminUser or manager.isVideoServicesManager(user):
+if contribution is None:
+    contLink = urlHandlers.UHConferenceDisplay.getURL(conf)
+elif isAdminUser or manager.isVideoServicesManager(user):
     contLink = urlHandlers.UHContributionModification.getURL(contribution)
 else:
     contLink = urlHandlers.UHContributionDisplay.getURL(contribution)
@@ -49,8 +51,11 @@ else:
   </td>
 
   <td class="CRLabstractLeftDataCell" nowrap>
-    <a href="#" onclick="new UploadElectronicAgreementPopup('${conf.getId()}','${spkWrapper.getUniqueId()}','${collaborationUrlHandlers.UHCollaborationElectronicAgreement.getURL(conf)}').open();return false;" id="upload${spkWrapper.getUniqueId()}">Upload</a>
-
+    % if canModify:
+        <a href="#" onclick="new UploadElectronicAgreementPopup('${conf.getId()}','${spkWrapper.getUniqueId()}','${collaborationUrlHandlers.UHCollaborationUploadElectronicAgreement.getURL(conf)}').open();return false;" id="upload${spkWrapper.getUniqueId()}">${_("Upload")}</a>
+    % else:
+        <span class="noUploadRights">${_("Upload")}</span>
+    % endif
     % if spkWrapper.getLocalFile():
       <a href="${collaborationUrlHandlers.UHCollaborationElectronicAgreementGetFile.getURL(conf, spkWrapper.getUniqueId())}">
         <img style="cursor:pointer;margin-right:5px;" src="${systemIcon('pdf')}"

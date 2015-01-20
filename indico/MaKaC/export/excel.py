@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
@@ -25,7 +24,10 @@ from datetime import datetime
 from MaKaC.conference import Link
 from MaKaC.webinterface import urlHandlers
 from MaKaC.conference import LocalFile
-import csv
+from MaKaC.review import AbstractStatusAccepted, AbstractStatusProposedToAccept
+from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
+from indico.util.date_time import format_date
+import csv, codecs
 
 class ExcelGenerator:
     """It helps to create an Excel CSV file. The way to work with this class
@@ -78,13 +80,12 @@ class ExcelGenerator:
     def getExcelContent(self):
         if self._currentLine != []:
             self.newLine()
-        return ''.join(self._lines)
+        return codecs.BOM_UTF8 + ''.join(self._lines)
 
     def excelFormatting(text):
         if text is None:
             text = ""
         if text.strip() != "":
-            text = utils.utf8Tolatin1(text)
             text = text.replace('\x0d', '')
         return text
     excelFormatting=staticmethod(excelFormatting)
@@ -254,14 +255,14 @@ class RegistrantsListToExcel:
 
 class AbstractListToExcel:
 
-    def __init__(self, conf,list=None, display=["ID","Title","Primary Authors","Track Name","Contribution Type"], excelSpecific=True):
+    def __init__(self, conf, abstractList=None, display=["ID", "Title", "PrimaryAuthor", "Tracks", "Type", "Status", "Rating", "AccTrack", "AccType", "SubmissionDate", "ModificationDate"], excelSpecific=True):
         self._conf = conf
-        self._abstractList = list
+        self._abstractList = abstractList
         self._displayList = display
         self._excelSpecific = excelSpecific
 
     def getExcelFile(self):
-        excelGen=ExcelGenerator()
+        excelGen = ExcelGenerator()
         for key in self._displayList:
             excelGen.addValue(key)
 
@@ -270,28 +271,52 @@ class AbstractListToExcel:
         if self._abstractList is None:
             self._abstractList = self._conf.getAbstractMgr().getAbstractList()
 
-        for abstract in self._abstractList :
-            for key in self._displayList :
-                if key == "ID" :
+        for abstract in self._abstractList:
+            for key in self._displayList:
+                status = abstract.getCurrentStatus()
+                isStatusAccpeted = isinstance(status, (AbstractStatusAccepted, AbstractStatusProposedToAccept))
+                if key == "ID":
                     excelGen.addValue(abstract.getId())
-                elif key == "Title" :
+                elif key == "Title":
                     excelGen.addValue(abstract.getTitle())
-                elif key == "Primary Authors" :
+                elif key == "PrimaryAuthor":
                     paList = []
-                    for pa in abstract.getPrimaryAuthorList() :
+                    for pa in abstract.getPrimaryAuthorList():
                         paList.append(pa.getFullName())
                     excelGen.addValue("; ".join(paList))
-                elif key == "Track Name":
+                elif key == "Tracks":
                     trList = []
-                    for tr in abstract.getTrackList() :
+                    for tr in abstract.getTrackList():
                         trList.append(tr.getTitle())
                     excelGen.addValue("; ".join(trList))
-                elif key == "Contribution Type":
-                    contribType=abstract.getContribType()
-                    ctname=""
+                elif key == "Type":
+                    contribType = abstract.getContribType()
+                    ctname = ""
                     if contribType is not None:
-                        ctname=contribType.getName()
-                    excelGen.addNumberAsString(ctname, self._excelSpecific)
+                        ctname = contribType.getName()
+                    excelGen.addValue(ctname)
+                elif key == "Status":
+                    excelGen.addValue(AbstractStatusList.getInstance().getCaption(status.__class__))
+                elif key == "Rating":
+                    if abstract.getRating():
+                        excelGen.addValue("%.2f" % abstract.getRating())
+                    else:
+                        excelGen.addNumberAsString("-", self._excelSpecific)
+                elif key == "AccTrack":
+                    accTrack = ""
+                    if isStatusAccpeted and status.getTrack():
+                        accTrack = status.getTrack().getCode()
+                    excelGen.addValue(accTrack)
+                elif key == "AccType":
+                    accType = ""
+                    if isStatusAccpeted and status.getType():
+                        accType = status.getType().getName()
+                    excelGen.addValue(accType)
+                elif key == "SubmissionDate":
+                    excelGen.addValue(format_date(abstract.getSubmissionDate(), format="short"))
+                elif key == "ModificationDate":
+                    excelGen.addValue(format_date(abstract.getModificationDate(), format="short"))
+
             excelGen.newLine()
         return excelGen.getExcelContent()
 

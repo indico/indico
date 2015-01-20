@@ -19,7 +19,7 @@
         % if Booking.getHasPin():
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                ${ _('PIN')}
+                ${ _('Meeting PIN')}
             </td>
             % if Booking.getBookingParamByName("displayPin"):
             <td class="collaborationConfDisplayInfoRightCol">
@@ -58,7 +58,7 @@
         % if Booking.getBookingParamByName("displayPhoneNumbers") and PhoneNumbers:
         <tr>
             <td class="collaborationConfDisplayInfoLeftCol">
-                ${ _('VidyoVoice phone numbers')}
+                ${ _('Phone access numbers')}
             </td>
             <td class="collaborationConfDisplayInfoRightCol">
                 <ul style="margin: 0;">

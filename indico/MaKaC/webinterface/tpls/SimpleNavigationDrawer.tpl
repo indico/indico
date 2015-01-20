@@ -1,14 +1,14 @@
 <%from MaKaC.webinterface import urlHandlers %>
-<div class="mainBreadcrumb" ${'style="background-color: '+ bgColor +';" ' if bgColor else ""}>
-<span class="path">
-    <a href="${ urlHandlers.UHWelcome.getURL() }">
-        ${ _("Home") }
-    </a>
-   <img src="${ systemIcon( "breadcrumb_arrow.png" ) }" />
-</span>
+<div class="main-breadcrumb" ${'style="background-color: '+ bgColor +';" ' if bgColor else ""}>
+    <span class="path">
+        <a href="${ urlHandlers.UHWelcome.getURL() }">
+            ${ _("Home") }
+        </a>
+       <span class="sep">»</span>
 
-    <a href="${ urlHandler(**pars)  if urlHandler else "#"}">
-        ${ title }
-    </a>
+        <a href="${ urlHandler(**pars)  if urlHandler else "#"}">
+            ${ title }
+        </a>
+    </span>
 </span>
 </div>

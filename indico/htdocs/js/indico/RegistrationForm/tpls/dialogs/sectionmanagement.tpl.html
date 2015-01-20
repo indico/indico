@@ -1,0 +1,28 @@
+<div>
+    <div ng-repeat="section in disabled = (data | filter:{enabled:'false'})" class="regform-section">
+        <div class="toolbar" style="margin-bottom: 0">
+            <div class="regform-section-title left" ng-show="!section.enabled">
+            {{ section.title }}
+            </div>
+            <div class="group right">
+                <a ng-click="api.restoreSection(section)" class="i-button">
+                    {{ 'Restore' | i18n }}
+                </a>
+            </div>
+            <div class="group right" ng-show="section.id > 0" ng-init="state={remove: false}">
+                <a ng-if="state.remove==true" class="i-button danger"
+                    ng-click="api.removeSection(section)">
+                    {{ 'Yes' | i18n }}
+                </a>
+                <a ng-if="state.remove==true" class="i-button"
+                    ng-click="state.remove = false">
+                    {{ 'Cancel' | i18n }}
+                </a>
+                <a class="i-button" ng-class="{label: state.remove}"
+                    ng-click="state.remove = true">
+                    {{ 'Remove' | i18n }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -7,7 +7,7 @@
  */
 var Widget = {
 	view: function(properties) {
-		var context = new WidgetContext()
+		var context = new WidgetContext();
 		if (this instanceof WidgetContext) {
 			extend(context, this);
 			context.parent = this;
@@ -51,7 +51,7 @@ var Widget = {
 			} else {
 				data.value = item;
 			}
-			view = $.view(target, data)
+			view = $.view(target, data);
 			return view;
 		};
 	},

@@ -11,3 +11,16 @@
         % endif
     </div>
 </%block>
+<%block name="reportNumber">
+    % if SubContrib.getReportNumberHolder().listReportNumbers():
+        <div><span style="font-weight:bold">${_("Report Numbers")}:</span>
+        % for reportNumber in SubContrib.getReportNumberHolder().listReportNumbers():
+            % if reportNumberSystems[reportNumber[0]]["url"]:
+                <a href="${reportNumberSystems[reportNumber[0]]["url"] + reportNumber[1]}" target="_blank">${reportNumber[1]} </a>
+            % else:
+                ${reportNumber[1]}
+            % endif
+        % endfor
+        </div>
+    % endif
+</%block>

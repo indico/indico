@@ -1,0 +1,23 @@
+<form>
+    <div class="regFormDialogIntroText">
+        {{ 'Configure the amount of sessions a registrant may choose' | i18n }}. <br>
+        {{ 'Please note that billing is not available for \'2 choices\'' | i18n }}.
+    </div>
+    <div class="regFormDialogEditLine">
+        <label class="regFormDialogCaption" style="width : 180px">
+            {{ "Type of sessions' form" | i18n }}
+        </label>
+        <select ng-model="formData.type"
+            name="type">
+            <option value="2priorities" {{ "selected" if section.type == "2priorities" }}>
+                {{ '2 choices' | i18n }}
+            </option>
+            <option value="all" {{ "selected" if section.type == "all" }}>
+                {{ 'Multi-choice' | i18n }}
+            </option>
+        </select>
+        <span ng-if="formData.type == '2priorities'">
+            <span class="icon-info text-superfluous" title="{{ 'Sessions won\'t be billable' | i18n }}"></span>
+        </span>
+    </div>
+</form>

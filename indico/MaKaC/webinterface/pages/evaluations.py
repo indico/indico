@@ -1,29 +1,28 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from datetime                       import datetime
+from flask import session
 from MaKaC.webinterface             import wcomponents,urlHandlers
 from MaKaC.webinterface.wcomponents import WUtils
 from MaKaC.webinterface.pages       import conferences
 from xml.sax.saxutils               import quoteattr
-from MaKaC.common.Configuration     import Config
 from MaKaC.evaluation               import Evaluation,Question,Box,Choice,Textbox,Textarea,Password,Select,Radio,Checkbox,Submission
 from MaKaC.webinterface.navigation  import NEEvaluationMainInformation,NEEvaluationDisplay,NEEvaluationDisplayModif
 from MaKaC.errors                   import FormValuesError
@@ -33,8 +32,9 @@ from MaKaC.i18n                     import _
 from indico.util.i18n import i18nformat
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 
-
+from indico.core.config import Config
 
 ##############
 #Display Area#
@@ -49,93 +49,104 @@ class WPEvaluationMainInformation( WPEvaluationBase ):
     """[DisplayArea] display evaluation general information."""
     navigationEntry = NEEvaluationMainInformation
 
-    def _getBody( self, params ):
-        pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
-        return WEvaluationMainInformation(self._conf, self._getAW().getUser()).getHTML(pars)
+    def _getBody(self, params):
+        return WEvaluationMainInformation(self._conf, self._getAW().getUser()).getHTML()
 
     def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
-class WEvaluationMainInformation(wcomponents.WTemplated):
+
+class WEvaluationMainInformation(WConfDisplayBodyBase):
     """[DisplayArea] display evaluation general information."""
+
+    _linkname = "evaluation"
 
     def __init__(self, conf, user):
         self._conf = conf
         self._user = user
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
+        wvars = wcomponents.WTemplated.getVars(self)
         evaluation = self._conf.getEvaluation()
-        vars["startDate"] = evaluation.getStartDate().strftime("%d %B %Y")
-        vars["endDate"] = evaluation.getEndDate().strftime("%d %B %Y")
-        vars["announcement"] = evaluation.getAnnouncement()
-        vars["title"] = evaluation.getTitle()
-        vars["submissionsLimit"] = evaluation.getSubmissionsLimit()
-        vars["contactInfo"] = evaluation.getContactInfo()
+        wvars["body_title"] = self._getTitle()
+        wvars["startDate"] = evaluation.getStartDate().strftime("%d %B %Y")
+        wvars["endDate"] = evaluation.getEndDate().strftime("%d %B %Y")
+        wvars["announcement"] = evaluation.getAnnouncement()
+        wvars["title"] = evaluation.getTitle()
+        wvars["submissionsLimit"] = evaluation.getSubmissionsLimit()
+        wvars["contactInfo"] = evaluation.getContactInfo()
         #actions
-        vars["actionsShow"] = evaluation.inEvaluationPeriod() and vars["menuStatus"]=="close"
-        vars["actionsDisplayEval"] = None
-        vars["actionsModifyEval"]  = None
-        if vars["actionsShow"]:
-            if self._user!=None and self._user.hasSubmittedEvaluation(evaluation):
-                vars["actionsModifyEval"]  = urlHandlers.UHConfEvaluationDisplayModif.getURL(self._conf)
+        wvars["actionsShow"] = evaluation.inEvaluationPeriod()
+        wvars["actionsDisplayEval"] = None
+        wvars["actionsModifyEval"] = None
+        if wvars["actionsShow"]:
+            if self._user != None and self._user.hasSubmittedEvaluation(evaluation):
+                wvars["actionsModifyEval"] = urlHandlers.UHConfEvaluationDisplayModif.getURL(self._conf)
             else:
-                vars["actionsDisplayEval"] = urlHandlers.UHConfEvaluationDisplay.getURL(self._conf)
-        return vars
+                wvars["actionsDisplayEval"] = urlHandlers.UHConfEvaluationDisplay.getURL(self._conf)
+        return wvars
 
 
 class WPEvaluationDisplay( WPEvaluationBase ):
     """[DisplayArea] Evaluation default display."""
     navigationEntry = NEEvaluationDisplay
 
-    def _getBody( self, params ):
-        pars = {}
-        pars["menuStatus"] = self._rh._getSession().getVar("menuStatus") or "open"
-        pars["user"] = self._rh._getUser()
+    def _getBody(self, params):
+        pars = {
+            'user': self._rh._getUser()
+        }
         return WEvaluationDisplay(self._conf).getHTML(pars)
 
     def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._newEvaluationOpt)
 
-class WEvaluationDisplay(wcomponents.WTemplated):
+
+class WEvaluationDisplay(WConfDisplayBodyBase):
     """[DisplayArea] Evaluation default display."""
+
+    _linkname = "newEvaluation"
 
     def __init__(self, conf):
         self._conf = conf
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["evaluation"] = self._conf.getEvaluation()
-        user = vars["user"]
-        vars["hasSubmittedEvaluation"] = isinstance(user,Avatar) and user.hasSubmittedEvaluation(self._conf.getEvaluation())
-        vars["actionUrl"] = urlHandlers.UHConfEvaluationSubmit.getURL(self._conf, mode=Evaluation._SUBMIT)
-        return vars
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        wvars["evaluation"] = self._conf.getEvaluation()
+        user = wvars["user"]
+        wvars["hasSubmittedEvaluation"] = isinstance(user,Avatar) and user.hasSubmittedEvaluation(self._conf.getEvaluation())
+        wvars["actionUrl"] = urlHandlers.UHConfEvaluationSubmit.getURL(self._conf, mode=Evaluation._SUBMIT)
+        return wvars
 
 
 class WPEvaluationDisplayModif( WPEvaluationBase ):
     """[DisplayArea] The user modifies his already submitted evaluation."""
     navigationEntry = NEEvaluationDisplayModif
 
-    def _getBody( self, params ):
-        pars = {}
-        pars["menuStatus"] = self._rh._getSession().getVar("menuStatus") or "open"
-        pars["user"] = self._rh._getUser()
+    def _getBody(self, params):
+        pars = {
+            'user': self._rh._getUser()
+        }
         return WEvaluationDisplayModif(self._conf).getHTML(pars)
 
     def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._viewEvaluationOpt)
 
-class WEvaluationDisplayModif( WEvaluationDisplay ):
+
+class WEvaluationDisplayModif(WEvaluationDisplay):
     """[DisplayArea] The user modifies his already submitted evaluation."""
+
+    _linkname = "viewMyEvaluation"
 
     def __init__(self, conf):
         self._conf = conf
 
-    def getVars( self ):
+    def getVars(self):
         vars = WEvaluationDisplay.getVars(self)
+        vars["body_title"] = self._getTitle()
         vars["actionUrl"] = urlHandlers.UHConfEvaluationSubmit.getURL(self._conf, mode=Evaluation._EDIT)
         return vars
 
@@ -148,12 +159,12 @@ class WPEvaluationSubmitted( WPEvaluationBase ):
         self._mode = mode
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
 
-    def _getBody( self, params ):
-        pars = {"menuStatus":self._rh._getSession().getVar("menuStatus") or "open"}
-        #redirection
-        if self._rh.getWebFactory()!=None : #Event == Meeting/Lecture
+    def _getBody(self, params):
+        pars = {}
+        # redirection
+        if self._rh.getWebFactory() is not None:  #Event == Meeting/Lecture
             pars["redirection"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-        else : #Event == Conference
+        else:  #Event == Conference
             pars["redirection"] = None
         return WEvaluationSubmitted(self._conf, self._mode).getHTML(pars)
 
@@ -161,28 +172,32 @@ class WPEvaluationSubmitted( WPEvaluationBase ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
-class WEvaluationSubmitted( wcomponents.WTemplated ):
+
+class WEvaluationSubmitted(WEvaluationDisplay):
     """Submitted Evaluation."""
 
-    def __init__( self, conference, mode=Evaluation._SUBMIT ):
+    _linkname = "newEvaluation"
+
+    def __init__(self, conference, mode=Evaluation._SUBMIT):
         self._conf = conference
         self._mode = mode
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        if not vars.has_key("redirection"):
-            vars["redirection"] = None
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        if not wvars.has_key("redirection"):
+            wvars["redirection"] = None
         if self._mode == Evaluation._SUBMIT:
-            vars["status"] = _("submitted")
+            wvars["status"] = _("submitted")
         elif self._mode == Evaluation._EDIT:
-            vars["status"] = _("modified")
-        else: #should never be here...
-            if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive():
-                raise Exception( _("Evaluation - Possible modes are %s, given : %s.")%(
-                                        [Evaluation._SUBMIT,Evaluation._EDIT], self._mode))
+            wvars["status"] = _("modified")
+        else:  # should never be here...
+            if Config.getInstance().getDebug():
+                raise Exception(_("Evaluation - Possible modes are %s, given : %s.") % (
+                                [Evaluation._SUBMIT, Evaluation._EDIT], self._mode))
             else:
-                vars["status"] = _("submitted")
-        return vars
+                wvars["status"] = _("submitted")
+        return wvars
 
 
 class WPEvaluationFull( WPEvaluationBase ):
@@ -196,16 +211,20 @@ class WPEvaluationFull( WPEvaluationBase ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
-class WEvaluationFull( wcomponents.WTemplated ):
+
+class WEvaluationFull(WEvaluationDisplay):
     """[DisplayArea] Evaluation is full."""
+
+    _linkname = "evaluation"
 
     def __init__(self, conf):
         self._conf = conf
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["limit"] = self._conf.getEvaluation().getSubmissionsLimit()
-        return vars
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        wvars["limit"] = self._conf.getEvaluation().getSubmissionsLimit()
+        return wvars
 
 
 class WPEvaluationClosed( WPEvaluationBase ):
@@ -219,28 +238,30 @@ class WPEvaluationClosed( WPEvaluationBase ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
-class WEvaluationClosed( wcomponents.WTemplated ):
+
+class WEvaluationClosed(WEvaluationDisplay):
     """[DisplayArea] Evaluation is closed."""
+
+    _linkname = "evaluation"
 
     def __init__(self, conf):
         self._conf = conf
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        evaluation=self._conf.getEvaluation()
+        wvars = wcomponents.WTemplated.getVars(self)
+        evaluation = self._conf.getEvaluation()
         sDate = evaluation.getStartDate()
         eDate = evaluation.getEndDate()
-        vars["title"]= _("Impossible to do evaluation")
-        vars["msg"]= _("No period for evaluation:")
-        if nowutc()<sDate:
-            vars["title"]= _("Evaluation is not open yet")
-            vars["msg"]= _("Sorry but the evaluation will start later:")
-        elif nowutc()>eDate:
-            vars["title"]= _("Evaluation closed")
-            vars["msg"]= _("Sorry but the evaluation is now over:")
-        vars["startDate"] = sDate.strftime("%A %d %B %Y")
-        vars["endDate"] = eDate.strftime("%A %d %B %Y")
-        return vars
+
+        wvars["body_title"] = self._getTitle()
+        wvars["msg"] = _("No period for evaluation:")
+        if nowutc() < sDate:
+            wvars["msg"] = _("Sorry, but the evaluation is not open yet.")
+        elif nowutc() > eDate:
+            wvars["msg"] = _("Sorry, but the evaluation period has finished.")
+        wvars["startDate"] = sDate.strftime("%A %d %B %Y")
+        wvars["endDate"] = eDate.strftime("%A %d %B %Y")
+        return wvars
 
 
 class WPEvaluationSignIn( WPEvaluationBase ):
@@ -262,7 +283,7 @@ class WEvaluationSignIn(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["signInURL"] = urlHandlers.UHSignIn.getURL(urlHandlers.UHConfEvaluationDisplay.getURL(self._conf))
+        vars["signInURL"] = urlHandlers.UHConfSignIn.getURL(self._conf, urlHandlers.UHConfEvaluationDisplay.getURL(self._conf))
         return vars
 
 
@@ -270,16 +291,22 @@ class WPEvaluationInactive( WPEvaluationBase ):
     """[DisplayArea] Inactive evaluation."""
 
     def _getBody( self, params ):
-        return WEvaluationInactive().getHTML()
+        return WEvaluationInactive(self._conf).getHTML()
 
     def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._evaluationOpt)
 
-class WEvaluationInactive(wcomponents.WTemplated):
-    """[DisplayArea] Inactive evaluation."""
-    pass
 
+class WEvaluationInactive(WEvaluationDisplay):
+    """[DisplayArea] Inactive evaluation."""
+
+    _linkname = "evaluation"
+
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        return wvars
 
 
 #################
@@ -450,8 +477,6 @@ class WConfModifEvaluationSetupDataModif( WConfModifEvaluationSetup ):
         evaluationStartNotification = evaluation.getNotification(Evaluation._EVALUATION_START)
         newSubmissionNotification   = evaluation.getNotification(Evaluation._NEW_SUBMISSION)
         vars["postURL"]=urlHandlers.UHConfModifEvaluationPerformDataModif.getURL(self._conf)
-        vars["calendarSelectURL"]= urlHandlers.UHSimpleCalendar.getURL()
-        vars["calendarIconURL"]  = Config.getInstance().getSystemIconURL("calendar")
         vars["announcement"]     = evaluation.getAnnouncement()
         vars["contactInfo"]      = evaluation.getContactInfo()
         vars["submissionsLimit"] = evaluation.getSubmissionsLimit()
@@ -632,9 +657,9 @@ class WConfModifEvaluationEditQuestionView( wcomponents.WTemplated ):
         #remove question
         url = urlHandlers.UHConfModifEvaluationEditPerformChanges.getURL(conf, mode=Question._REMOVE, questionPos=questionPos)
         vars["removeQuestionUrl"] = url
-        vars["removeQuestionConfirm"] = i18nformat("""javascript:return confirm( _("Are you sure you want to remove this question?"));""")
         vars["removeQuestionInput"] = WUtils.createInput(type="image",
                                                          name="remove",
+                                                         id="questionRemove%s" % self._question.getPosition(),
                                                          alt="remove",
                                                          src=Config.getInstance().getSystemIconURL("remove"))
         #return
@@ -801,9 +826,9 @@ class WConfModifEvaluationEditQuestion( wcomponents.WTemplated ):
 class WPConfModifEvaluationPreview( WPConfModifEvaluationBase ):
     """[ManagementArea] Preview of an Evaluation."""
     def _getTabContent( self, params ):
-        pars = {}
-        pars["menuStatus"] = self._rh._getSession().getVar("menuStatus") or "open"
-        pars["user"] = self._rh._getUser()
+        pars = {
+            'user': self._rh._getUser()
+        }
         return WConfModifEvaluationPreview(self._conf).getHTML(pars)
     def _setActiveTab( self ):
         self._tabEvaluationPreview.setActive()
@@ -833,8 +858,8 @@ class WPConfModifEvaluationPreviewSubmitted( WPConfModifEvaluationBase ):
 class WPConfModifEvaluationResults( WPConfModifEvaluationBase ):
     """[ManagementArea] Results of an Evaluation."""
     def _getTabContent( self, params ):
-        sessionVarName = "selectedSubmissions_%s_%s"%(self._conf.getId(), self._conf.getEvaluation().getId())
-        pars = {"selectedSubmissions" : self._rh._getSession().getVar(sessionVarName) or []}
+        sessionVarName = "selectedSubmissions_%s_%s" % (self._conf.getId(), self._conf.getEvaluation().getId())
+        pars = {"selectedSubmissions": session.get(sessionVarName)}
         return WConfModifEvaluationResults(self._conf).getHTML(pars)
     def _setActiveTab( self ):
         self._tabEvaluationResults.setActive()
@@ -853,15 +878,12 @@ class WConfModifEvaluationResults( wcomponents.WTemplated ):
         vars["selectSubmitters"] = Evaluation._SELECT_SUBMITTERS
         vars["removeSubmitters"] = Evaluation._REMOVE_SUBMITTERS
         #submitters
-        if len(vars["selectedSubmissions"]) > 0 :
-            selectedSubmissions = vars["selectedSubmissions"]
-        else:
-            selectedSubmissions = evaluation.getSubmissions()
+        selectedSubmissions = evaluation.getSubmissions(vars["selectedSubmissions"])
         submitters = [sub.getSubmitterName() for sub in selectedSubmissions if isinstance(sub, Submission)]
         vars["submittersContext"] = "<br/> ".join(submitters)
-        if evaluation.getNbOfSubmissions() < 1 :
+        if not vars["selectedSubmissions"] and vars["selectedSubmissions"] is not None:
             vars["submittersVisible"] = _("NONE")
-        elif len(submitters) >= evaluation.getNbOfSubmissions() :
+        elif len(submitters) >= evaluation.getNbOfSubmissions():
             vars["submittersVisible"] = _("ALL")
         elif len(submitters) > 3 :
             del submitters[3:]
@@ -878,8 +900,8 @@ class WPConfModifEvaluationResultsSubmitters( WPConfModifEvaluationBase ):
         self._mode = mode
         WPConfModifEvaluationBase.__init__(self, rh, conf)
     def _getTabContent( self, params ):
-        sessionVarName = "selectedSubmissions_%s_%s"%(self._conf.getId(), self._conf.getEvaluation().getId())
-        pars = {"selectedSubmissions" : self._rh._getSession().getVar(sessionVarName) or []}
+        sessionVarName = "selectedSubmissions_%s_%s" % (self._conf.getId(), self._conf.getEvaluation().getId())
+        pars = {"selectedSubmissions": session.get(sessionVarName)}
         return WConfModifEvaluationResultsSubmitters(self._conf, self._mode).getHTML(pars)
     def _setActiveTab( self ):
         self._tabEvaluationResults.setActive()
@@ -905,7 +927,8 @@ class WConfModifEvaluationResultsSubmitters( wcomponents.WTemplated ):
             vars["inputSubmitStyle"] = ''
             vars["submitConfirm"] = ''
         else:
-            if HelperMaKaCInfo.getMaKaCInfoInstance().isDebugActive(): raise Exception("Evaluation - unknown mode (given: %s)"%self._mode)
+            if Config.getInstance().getDebug():
+                raise Exception("Evaluation - unknown mode (given: %s)" % self._mode)
             vars["inputCheckboxName"] = "unknownMode"
             vars["inputSubmitStyle"] = ''
             vars["submitConfirm"] = ''

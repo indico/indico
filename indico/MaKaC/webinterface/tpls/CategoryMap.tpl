@@ -4,7 +4,7 @@
             <li><a href="${ categDisplayURL }">${ _("Go back to category page") }</a></li>
         </ul>
         <h1 class="categoryTitle">
-            ${ categName }&nbsp;
+            ${ categName | remove_tags }&nbsp;
             <span style="font-style: italic; font-size: 0.8em;">(${ _("category map") })</span>
         </h1>
     </div>

@@ -1,0 +1,74 @@
+<div class="regform-dialog tabbable tabs-left">
+    <ul class="nav nav-tabs">
+        <li ng-class="{active: isTabSelected('tab-options')}" >
+            <a ng-click="setSelectedTab('tab-options')">
+                {{ 'Options' | i18n }}
+            </a>
+        </li>
+        <li ng-if="field.input == 'radio'" ng-class="{active: isTabSelected('tab-editItems')}">
+            <a ng-click="setSelectedTab('tab-editItems')">
+                {{ 'Edit items' | i18n }}
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content regFormDialogTabContent">
+        <div class="tab-pane" ng-class="{active: isTabSelected('tab-options')}">
+            <form name="optionsForm" novalidate>
+                <div class="regFormEditLine">
+                    <label class="regFormDialogCaption">
+                        <span>{{ 'Caption' | i18n }}</span>
+                        <span class="regFormMandatoryField">*</span>
+                    </label>
+
+                    <input type="text" name="caption" required
+                        ng-model="formData.caption"
+                        ng-class="{hasError: validationStarted && optionsForm.caption.$invalid}"
+                        nd-init-focus
+                        class="caption-input"/>
+                    <span ng-if="settings.mandatory">
+                        <span class="mandatory-check">
+                            <input type="checkbox" name="mandatory"
+                                ng-model="formData.mandatory"
+                                ng-disabled="field.lock.indexOf('mandatory') != -1">
+                            <span>
+                                {{ 'Mandatory' | i18n }}
+                            </span>
+                        </span>
+                    </span>
+                </div>
+
+                <div class="regFormEditLine">
+                    <label class="regFormDialogCaption">
+                        {{ 'Description' | i18n }}
+                    </label>
+                    <textarea name="description"
+                        ng-model="formData.description"
+                        class="description-input"
+                        rows="5">
+                    </textarea>
+                </div>
+
+                <div ng-if="settings.size"
+                    ng-include="getTpl('fields/dialogs/size.tpl.html')"></div>
+                <div ng-if="settings.rowsAndColumns"
+                    ng-include="getTpl('fields/dialogs/rowsandcolumns.tpl.html')"></div>
+                <div ng-if="settings.number"
+                    ng-include="getTpl('fields/dialogs/number.tpl.html')"></div>
+                <div ng-if="settings.placesLimit"
+                    ng-include="getTpl('fields/dialogs/placeslimit.tpl.html')"></div>
+                <div ng-if="settings.billable"
+                    ng-include="getTpl('fields/dialogs/billable.tpl.html')"></div>
+                <div ng-if="settings.defaultValue"
+                    ng-include="getTpl('fields/dialogs/defaultvalue.tpl.html')"></div>
+                <div ng-if="settings.date"
+                    ng-include="getTpl('fields/dialogs/date.tpl.html')"></div>
+            </form>
+        </div>
+
+        <div class="tab-pane"
+            ng-if="settings.itemtable"
+            ng-include="getTpl('fields/dialogs/itemtable.tpl.html')"
+            ng-class="{active: isTabSelected('tab-editItems')}"></div>
+    </div>
+</div>

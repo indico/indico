@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 var TimetableDefaults = {
     topMargin: 30,
     bottomMargin: 40,
@@ -93,7 +110,7 @@ type("TimeTable", ["HistoryListener"], {
             throw 'unrecognized id!';
         }
 
-        for (day in this.data) {
+        for (var day in this.data) {
             if (this.data[day][compositeId]) {
                 return this.data[day][compositeId];
             }
@@ -106,7 +123,7 @@ type("TimeTable", ["HistoryListener"], {
         $('body').one('timetable_ready', function() {
             dfr.resolve();
         });
-        this.JLookupTabWidget.prototype.setSelectedTab.call(this, val)
+        this.JLookupTabWidget.prototype.setSelectedTab.call(this, val);
         return dfr.promise();
     },
 
@@ -146,7 +163,7 @@ type("TimeTable", ["HistoryListener"], {
     //To be overloaded
     redrawLegend: function() {
         return;
-    },
+    }
 
 },
      function(data, width, wrappingElement, detailLevel, managementMode) {
@@ -200,85 +217,92 @@ type("DisplayTimeTable", ["TimeTable"], {
     print: function() {
         var self = this;
 
-        var bodyPadding = $E(document.body).dom.style.padding;
-        var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
-        var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
+        self.timetableDrawer.setPrintableVersion(true);
+        var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return value;});
 
-        var goBackLink = Html.a({href: window.location.hash, style: {fontSize: '17px'}}, $T('Go back'));
-        var printLink = Html.a({href: window.location.hash, style: {fontSize: '17px'}}, $T('Print'));
+        var goBackLink = $('<a/>').prop('href', window.location.hash).html($T('Go back')).css('font-size', '17px');
+        var separator = $('<a/>').html(' | ').css('fontSize', '17px');
+        var printLink = $('<a/>').prop('href', window.location.hash).html($T('Print')).css('font-size', '17px');
 
-        var links = Html.span({style: {cssFloat: 'right'}}, printLink, ' | ', goBackLink);
+        var links = $('<span/>').append(goBackLink, separator, printLink).css('float', 'right');
 
-        var headerStyle = {padding: '0px 5px 5px 5px',
-            borderBottom: '1px solid black',
-            textAlign: 'center',
-            width: pixels(self.timetableDrawer.width)};
-        var header = Html.div({className: 'timetableHeader clearfix', style: headerStyle}, links,
-            Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
+        var header = $('<div/>').addClass('timetableHeader clearfix').append(links).css({'padding': '0px 5px 5px 5px',
+                                                                                        'border-bottom': '1px solid black',
+                                                                                        'text-align': 'center',
+                                                                                        'width': self.timetableDrawer.width});
+        header.append($('<span/>').append(self._titleTemplate(self.timetableDrawer.day)).css('float', 'left'));
 
-        goBackLink.observeClick(function(e) {
-            $E(document.body).setStyle('padding', bodyPadding);
-            $E(document.body).set(elements);
-            self.timetableDrawer.setPrintableVersion(false);
+        goBackLink.click(function() {
+            location.reload();
         });
-        printLink.observeClick(function(e) {
+
+        printLink.click(function() {
             window.print();
         });
 
-        var timetableDiv = Html.div({style: {paddingTop: pixels(20), position: 'relative'}}, timetableElements);
-        $E(document.body).set(header, timetableDiv);
+        var timetableDiv = $('<div/>').append(timetableElements).css({'padding-top': '20px', 'position': 'relative'});
 
-        $E(document.body).setStyle('padding', pixels(30));
+        $("body").html(header.add(timetableDiv));
+        $("body").css("padding", "30px");
     },
 
     pdf: function() {
-        window.location = Indico.Urls.ConfTimeTableCustomPDF + '?confId=' + this.eventInfo.id + '&showDays=all&showSessions=all';
+        window.location = build_url(Indico.Urls.ConfTimeTableCustomPDF, {
+            confId: this.eventInfo.id,
+            showDays: 'all',
+            showSessions: 'all'
+        });
     },
 
     fullScreen: function() {
         var self = this;
 
-        //self.timetableDrawer.setPrintableVersion(true);
-
-        var bodyPadding = $E(document.body).dom.style.padding;
-        var elements = translate($E(document.body).dom.childNodes, function(value) {return $E(value);});
         IndicoUI.Dialogs.Util.progress($T("Switching to full screen mode..."));
-
-        var goBackLink = Html.a({href: window.location.hash, style: {fontSize: '17px'}}, $T('Go back'));
-
-        var links = Html.span({style: {cssFloat: 'right'}}, goBackLink);
-
-        self.previousWidth = self.timetableDrawer.width;
-
-        goBackLink.observeClick(function(e) {
-            IndicoUI.Dialogs.Util.progress($T("Switching to normal mode..."));
-            // This timeout is needed in order to give time to the progress indicator to be rendered
-            setTimeout(function(){
-                self.timetableDrawer.width = self.previousWidth;
-                self.timetableDrawer.setPrintableVersion(false);
-                $E(document.body).setStyle('padding', bodyPadding);
-                $E(document.body).set(elements);
-                self.timetableDrawer.redraw(self.currentDay);
-            }, 50);
-        });
-
-     // This timeout is needed in order to give time to the progress indicator to be rendered
+        // This timeout is needed in order to give time to the progress indicator to be rendered
         setTimeout(function(){
-            self.timetableDrawer.width = $E(document.body).dom.clientWidth - 50; // 50 is a width offset.
+            self.timetableDrawer.width = $(window).width() - 50; // 50 is a width offset.
 
-            var headerStyle = {padding: '0px 5px 5px 5px',
-                    borderBottom: '1px solid black',
-                    textAlign: 'center',
-                    width: pixels(self.timetableDrawer.width)};
-            var header = Html.div({className: 'timetableHeader clearfix', style: headerStyle}, links,
-                Html.span({style: {cssFloat: 'left'}}, self._titleTemplate(self.timetableDrawer.day)));
+            var header = $('<div/>').addClass('timetableFullScreenHeader clearfix').css('width', self.timetableDrawer.width);
+            header.append($('<span/>').append(self._titleTemplate(self.timetableDrawer.day)).css('float', 'left'));
 
+            var timetableCanvas = $('#timetable_canvas');
+            $('#timetable_canvas').width('width', self.timetableDrawer.width);
+            $("body").html(header);
+            $("body").css("padding", "30px");
+            $(".timetableFullScreenHeader").before(self._getExtraButtons());
+            $(".timetableFullScreenHeader").before(self.legend);
+            $(".timetableFullScreenHeader").after(timetableCanvas);
             self.timetableDrawer.redraw(self.currentDay);
-            var timetableElements = translate(self.timetableDrawer.canvas.dom.childNodes, function(value) {return $E(value);});
-            var timetableDiv = Html.div({style: {width:pixels(self.timetableDrawer.width), paddingTop: pixels(20), position: 'relative'}}, timetableElements);
-            $E(document.body).set(header, timetableDiv);
-            $E(document.body).setStyle('padding', pixels(30));
+
+            self._filterSetup();
+            if (self.timetableDrawer.detail.get() == 'contribution') {
+                var newDetailLevel = self.timetableDrawer.detail.get() == 'contribution' ? 'session' : 'contribution';
+                self.timetableDrawer.detail.set(newDetailLevel);
+                self.toggleDetailedView();
+            }
         }, 50);
+    },
+
+    _getExtraButtons: function() {
+        var self = this;
+        var container = $('<div class="tabExtraButtons"/>');
+        var goBackButton = {'btn': Html.div('buttonWhite', $T('Exit Full Screen')),
+            'onclick': function(btnContainer) {
+                location.reload();
+            }
+        };
+        var buttons = self._functionButtons();
+        buttons[2] = goBackButton;
+        $.each(buttons, function(i, btnData) {
+            var btn = $('<div class="buttonContainer"/>').append(btnData.btn.dom || btnData.btn).click(function() {
+                btnData.onclick(btn);
+            });
+            container.append(btn);
+        });
+        container.children(':first').addClass('buttonContainerLeft');
+        container.children(':last').addClass('buttonContainerRight');
+        goBackButton.btn.getParent().dom.style.background ="#9F883B";
+        return container;
     },
 
     _filterSetup: function() {
@@ -292,7 +316,7 @@ type("DisplayTimeTable", ["TimeTable"], {
     },
 
     toggleDetailedView: function() {
-        var self = this
+        var self = this;
         var detailLevel = this.timetableDrawer.detail.get();
         var newDetailLevel = detailLevel == 'contribution' ? 'session' : 'contribution';
         this.timetableDrawer.detail.set(newDetailLevel);
@@ -309,7 +333,7 @@ type("DisplayTimeTable", ["TimeTable"], {
             /* Draw legend or "undraw" legend (getLegend() returns an empty div)
                when toggling for detailed view. */
             legend = this._getLegend();
-            this.legend.replaceWith(legend)
+            this.legend.replaceWith(legend);
 
             if (this._legendActive) {
                 self._toggleLegend(true);
@@ -337,15 +361,15 @@ type("DisplayTimeTable", ["TimeTable"], {
         };
 
         this.pdfButton = {'btn': Html.div('buttonWhite', $T('PDF')),
-                'onclick': function(btnContainer) {
-                    self.pdf();
-                }
+            'onclick': function(btnContainer) {
+                self.pdf();
+            }
         };
 
         this.fullScreenButton = {'btn': Html.div('buttonWhite', $T('Full screen')),
-                'onclick': function(btnContainer) {
-                    self.fullScreen();
-                }
+            'onclick': function(btnContainer) {
+                self.fullScreen();
+            }
         };
 
         // TODO: Needs to be implemented
@@ -538,7 +562,7 @@ type("TopLevelTimeTableMixin", ["JLookupTabWidget"], {
 
              return [key, function() {
 
-                 detailed = self.inDetailedMode?'.detailed':'';
+                 var detailed = self.inDetailedMode?'.detailed':'';
 
                  self.currentDay = key;
                  // each time one tab is clicked,
@@ -777,6 +801,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         var type = Util.parseId(entry[2])[0];
 
+        var conference = null;
         var slot = null;
         var title = "";
 
@@ -853,24 +878,24 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         });
 
         var menu = {
-            '' : {
-                'Create a new session': function() { self.managementActions.addSession(); }
-            },
-            'Add another block to:': sessions
+            '' : {content: {'Create a new session': function() {
+                self.managementActions.addSession();
+                $('.button-menu').dropdown('close');
+            }}, description: ''},
+            'Add another block to:': {content: sessions, description: ''}
         };
 
         var te = new Html(triggerElement.find('a').get(0));
-        var sessMenu = new SessionSectionPopupMenu(menu, te, 'timetableSectionPopupList popupListChained', true, true);
+        var sessMenu = new SessionSectionPopupMenu(menu, [te], 'timetableSectionPopupList popupListChained', true, true);
 
-        var pos = triggerElement.position();
+        var pos = triggerElement.offset();
         sessMenu.open(pos.left, pos.top - 1);
-        parent.append($('.timetableSectionPopupList').parent());
     },
 
     _createAddMenu: function(elem) {
         var self = this;
         var menuItems = {};
-        var ul = $('<ul/>').appendTo(elem);
+        var ul = $('<ul class="dropdown"/>');
 
         if (this._allowCreateHere('Session')) {
             var sessionAdd = $('<a href="#"/>').text($T('Session')).appendTo(ul).wrap("<li/>");
@@ -898,6 +923,8 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
             }).appendTo(ul).wrap("<li/>");
         }
 
+        return ul;
+
     },
 
     _getHeader: function() {
@@ -909,7 +936,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         this.addMenuLink = this.contextInfo.isPoster ?
             $('<a href="#"/>').text($T('Add poster')).bind('menu_select', function() {
                 self.managementActions.addContribution();
-            }) : $('<a href="#"/>').text($T('Add new'));
+            }) : $('<a href="#" id="add_new" class="arrow" data-toggle="dropdown"/>').text($T('Add new'));
 
 
         this.rescheduleLink = $('<a href="#"/>').text($T('Reschedule')).bind('menu_select', function() {
@@ -931,23 +958,23 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
 
         var customLinks = $();
-        for(linkName in this.customLinks){
-            var link = $('<a href="#"/>').text(linkName).bind('menu_select', function(event) {
-                var elem = event.srcElement?event.srcElement:event.currentTarget;
-                var func = eval(self.customLinks[elem.innerHTML]);
-                func(self);
-            });
+        for(var linkName in this.customLinks){
+            var link = $('<a href="#">').text(linkName)
+                                         .addClass('js-{0}'.format(this.customLinks[linkName]))
+                                         .data('timetable', self);
             customLinks = customLinks.add(link);
         }
 
         this.warningArea = this._createInfoArea();
         this.warningArea.dom.style.display = 'none';
 
-        this.menu = $('<ul class="button-menu"/>').append(
-            this.addMenuLink);
+        this.menu = $('<div class="group right"/>');
 
         if (this.isSessionTimetable) {
-            this.menu.prepend(this.addIntervalLink)
+            this.menu.append(this.addIntervalLink)
+        }
+        else {
+            this.menu.append(this.addMenuLink);
         }
 
         if (!this.contextInfo.isPoster) {
@@ -959,31 +986,29 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         customLinks.appendTo(this.menu);
 
-        var tt_hour_tip = $('<div id="tt_hour_tip"/>').hide().append($('<img/>', {src: imageSrc(Indico.SystemIcons.tt_time),
-                                                                                  title:"Add one hour"}))
-        var tt_status_info = $('<div id="tt_status_info" class="tt_tmp_button"/>');
+        var tt_hour_tip = $('<div id="tt_hour_tip"/>').hide().append($('<img/>').prop('src', imageSrc(Indico.SystemIcons.tt_time)).prop('title', $T("Add one hour")));
+        var tt_status_info = $('<div id="tt_status_info" />');
 
-        this.menu.children('a').wrap('<li>');
-        this.menu.children('li').addClass('middle');
-        this.menu.children('li:first-child').removeClass('middle').addClass('left');
-        this.menu.children('li:last-child').removeClass('middle').addClass('right');
+        this.menu.children('a').addClass('i-button');
 
-        if (!this.contextInfo.isPoster) {
-            this._createAddMenu(this.addMenuLink.parent());
+        if (!this.contextInfo.isPoster && !this.isSessionTimetable) {
+            this.menu.find('#add_new').after(this._createAddMenu(this.addMenuLink.parent()));
         }
 
         var ret = $('<div/>').append(
-            this.warningArea.dom, $('<div class="clearfix ui-follow-scroll" id="tt_menu"/>').
-                append(this.menu.dropdown({effect_on: 'slideDown'}), tt_status_info, this.infoBox.dom),
+            this.warningArea.dom,
+            $('<div id="headPanel" class="ui-follow-scroll"></div>').append($('<div class="clearfix toolbar" id="tt_menu"/>').
+                append(this.menu.dropdown({effect_on: 'slideDown'}),
+                        tt_status_info, this.infoBox.dom)),
             tt_hour_tip);
 
         var extra = this.getTTMenu();
         if (extra) {
-            ret.find('#tt_menu > ul').after(extra);
+            ret.find('#tt_menu .group').after(extra);
         }
 
         return ret;
-    },
+    }
 
 },
      function(data, contextInfo, eventInfo, width, wrappingElement, detailLevel, customLinks) {
@@ -1063,12 +1088,12 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
         });
 
         var sessions = self.legendSessionInfo[this.currentDay];
-        var container = $('<div id="timeTableLegend" class="timeTableLegend ui-follow-scroll">').append(closeButton)
+        var container = $('<div id="timeTableLegend" class="timeTableLegend ui-follow-scroll">').append(closeButton);
 
         if (sessions.length) {
             // Returns a div with each color + session name element
             var legendElements = self._generateLegendDivItems(sessions);
-            container.append($('<div id="legendItemContainer"/>').append(legendElements))
+            container.append($('<div id="legendItemContainer"/>').append(legendElements));
             if (sessions.length > self._maxLegendItemsShownInitially) {
                 container.append(showMoreLink);
             }
@@ -1089,7 +1114,7 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
                 append($('<div class="timeTableItemColour" />').css('background', l[2]),
                        $('<span/>').text(l[1]));
 
-            container.append(div)
+            container.append(div);
 
             if (idx >= self._maxLegendItemsShownInitially){
                 div.hide();
@@ -1174,15 +1199,25 @@ type("TopLevelDisplayTimeTable", ["DisplayTimeTable", "TopLevelTimeTableMixin"],
         // get an a dictionary where the keys are days and the values are lists
         // of [id, title, color] tuples (sessions only)
         var days = {};
-        _(data).each(function(entries, day){
+
+        _(data).each(function(entries, day) {
             days[day] = _(entries).chain().
-                select(function(e){ return e.entryType == 'Session' }).
-                map(function(s){ return [s.id, s.title, s.color] }).
-                sortBy(function(l){return l[0]}).value();
+                select(function(e) { return e.entryType == 'Session'; }).
+                groupBy(function(e) { return e.sessionId; }).
+                reduce(function(l, s) { return l.concat(s[0]); }, []).
+                map(function(e){ return [e.id, e.title, e.color, e.sessionId]; }).
+                sortBy(function(e){ return e[1]; }).
+                value();
         });
+
         // for "all days", put it all together
-        days['all'] = _(days).chain().map(function(entries, day){ return entries }).
-            reduce(function(l, elem){ return l.concat(elem); }, []).uniq().value();
+        days['all'] = _(days).chain().
+            flatten(true).
+            groupBy(function(e) { return e[3]; }).
+            reduce(function(l, s) { return l.concat([s[0]]); }, []).
+            sortBy(function(e){ return e[1]; }).
+            value();
+
         return days;
     }
 },
@@ -1344,10 +1379,10 @@ type("TopLevelManagementTimeTable", ["ManagementTimeTable", "TopLevelTimeTableMi
 
         var data = this.getData();
 
-        for (day in data) {
-            for (entry in data[day]) {
+        for (var day in data) {
+            for (var entry in data[day]) {
                 if ( data[day][entry]["entryType"] == "Session" && data[day][entry]["sessionId"] == sessionId ) {
-                    for (i = 0 ; i < fields.length ; ++i) {
+                    for (var i = 0 ; i < fields.length ; ++i) {
                         data[day][entry][fields[i]] = newValues[i];
                     }
                 }
@@ -1494,8 +1529,7 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
 
     getTTMenu: function() {
         var self = this;
-        var goBackLink = $('<a class="go_back tt_tmp_button" href="#"/>').text($T('Up to timetable')).
-            prepend('<span class="arrow_up">▲</span>').
+        var goBackLink = $('<a class="icon-arrow-up i-button go_back" href="#"/>').text($T('Up to timetable')).
             click(function() {
                 self.parentTimetable.switchToTopLevel();
                 self._hideWarnings();
@@ -1503,7 +1537,7 @@ type("IntervalManagementTimeTable", ["ManagementTimeTable", "IntervalTimeTableMi
                 return false;
             });
 
-        return goBackLink;
+        return $('<div class="group right"/>').append(goBackLink);
     }
 
 },

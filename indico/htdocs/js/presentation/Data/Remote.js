@@ -3,7 +3,7 @@
  * @author Tom
  */
 
-var activeWebRequests = 0
+var activeWebRequests = 0;
 
 /**
  * Ready state enumeration.
@@ -233,11 +233,15 @@ function jsonRequest(url, value, handler) {
  * @return {XMLHttpRequest} request
  */
 function webRequest(url, contentType, body, handler) {
+        var token = $('#csrf-token').attr('content');
         var transport = Web.transport();
         try {
                 transport.open("POST", url, true);
                 transport.setRequestHeader("Accept", "text/javascript, text/html, application/xml, text/xml, application/json, */*");
                 transport.setRequestHeader("Content-Type", contentType);
+                if (token) {
+                        transport.setRequestHeader("X-CSRF-Token", token);
+                }
                 transport.onreadystatechange = function() {
                         if (transport.readyState != ReadyState.Complete) {
                                 return;
@@ -250,7 +254,7 @@ function webRequest(url, contentType, body, handler) {
                         } else {
                                 handler(transport.responseText, [status, transport.statusText]);
                         }
-                }
+                };
                 transport.send(body);
                 activeWebRequests++;
         } catch (e) {
@@ -307,4 +311,100 @@ if (exists(global.XMLHttpRequest)) {
                 function() { return new ActiveXObject('Microsoft.XMLHTTP'); }
         );
         };
+}
+
+
+function apiRequest(path, payload, opts) {
+    // We always use cookie authentication and copy the payload object
+    payload = $.extend({
+        cookieauth: true
+    }, payload || {});
+
+    // Additional options
+    opts = $.extend({
+        method: 'GET',
+        silentErrors: false // when true, no error dialog is shown for HTTPAPIErrors
+    }, opts);
+
+    // For convenience we map booleans to yes/no
+    $.each(payload, function(key, val) {
+        if(val === true || val === false) {
+            payload[key] = val ? 'yes' : 'no';
+        }
+    });
+
+    var dfd = $.Deferred();
+    var requestInfo = {
+        origin: 'unknown',
+        params: payload,
+        method: opts.method,
+        path: path
+    };
+
+    $.ajax({
+        url: (opts.method == 'POST' ? Indico.Urls.APIBase : Indico.Urls.ExportAPIBase) + path + '.json',
+        data: payload,
+        type: opts.method,
+        cache: false, // we really don't want caching for AJAX requests!
+        dataType: 'json',
+        headers: {
+            'X-CSRF-Token': $('#csrf-token').attr('content')
+        }
+    }).fail(function(xhr, status, error) {
+        var errorMessage = 'Unknown Error';
+        var resp, code = '';
+
+        try {
+            // Maybe we have JSON
+            resp = $.parseJSON(xhr.responseText);
+        }
+        catch(e) {
+            // We got HTML. Probably 404 or something like that.
+            if(~xhr.responseText.indexOf('errorBoxContent')) {
+                errorMessage = $(xhr.responseText).find('#errorBoxContent h1').text();
+            }
+            else {
+                errorMessage = error;
+            }
+            dfd.reject(errorMessage);
+            code = 'HTTP-' + error;
+        }
+
+        // Handle JSON error
+        if(resp) {
+            dfd.reject(resp.message);
+            if(resp._type == 'HTTPAPIError' && opts.silentErrors) {
+                return;
+            }
+            if(resp.message) {
+                errorMessage = resp.message;
+            }
+            code = 'APIError';
+        }
+
+        IndicoUtil.errorReport({
+            title: $T('Error'),
+            message: $T('API request failed:') + ' ' + errorMessage,
+            inner: [],
+            requestInfo: requestInfo,
+            code: code
+        });
+    }).done(function(resp) {
+        if (resp._type == 'HTTPAPIError') {
+            dfd.reject(resp.message);
+            if(!opts.silentErrors) {
+                IndicoUtil.errorReport({
+                    title: $T('Error'),
+                    message: $T('API request failed:') + ' ' + resp.message,
+                    inner: [],
+                    requestInfo: requestInfo,
+                    code: 'APIError'
+                });
+            }
+            return;
+        }
+        dfd.resolve(resp);
+    });
+
+    return dfd.promise();
 }

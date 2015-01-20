@@ -40,7 +40,7 @@
                         <input type="radio" id="inheritRadioButton" class="eventProtectionRadioButton" name="categProtection" value='inherit' onclick="hideUserList();" checked/><label for="inheritRadioButton"><span id="inheritRadioEntryKey" style="color:${ color };">${ _("Same as for parent category '") }<span id="radioCategTitle">${ categTitle }</span>'</span> : <span id="radioCategProtection" style="font-weight: bold;">${ categProtection }</span> ${ _("for the moment, but it may change") } </label>
                     </span>
                     <span id="privateRadioButtonWrapper" class='categProtectionRadioEntry'>
-                        <input type="radio" id="privateRadioButton" class="eventProtectionRadioButton" name="categProtection" value='private' onclick="showUserList();"/><label for="privateRadioButton"><span style="color: #B02B2C">${ _("Private") }</span>${ _(" : Can only be viewed by you and users/groups chosen by you from the list of users") }</label>
+                        <input type="radio" id="privateRadioButton" class="eventProtectionRadioButton" name="categProtection" value='private' onclick="showUserList();"/><label for="privateRadioButton"><span style="color: #B02B2C">${ _("Restricted") }</span>${ _(" : Can only be viewed by you and users/groups chosen by you from the list of users") }</label>
                     </span>
                     <span id="allowedUserListInfo" class="allowedUserListInfo" style="display: none;">
                         <em>${ _("Please fill in the list below with the users/groups that will be granted access to this category. You can always do so later, once the category is created, through the category protection settings.") }</em>
@@ -81,7 +81,7 @@
             'allowedUserListDiv', 'allowedUserList',
             null, true, null,
             true, true, null, null,
-            false, false, true,
+            false, false, false, true,
             userListNothing, userListNothing, userListNothing);
 
     // ---- When the private radio button is selected, display the list of users

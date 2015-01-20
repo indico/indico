@@ -5,13 +5,13 @@ var RR_confStartDate = IndicoUtil.parseJsonDate(${ jsonEncode(ConfStartDate) });
 var RR_confLocation = ${ jsonEncode(ConfLocation) }
 var RR_confRoom = ${ jsonEncode(ConfRoom) }
 
-var RRSpeakersTemplate = function(speakerList) {
+var RRSpeakersTemplate = function(presenters) {
     var speakers = ", by "
-    enumerate(speakerList, function(speaker, index) {
+    enumerate(presenters, function(speaker, index) {
         if (index > 0) {
             speakers += " and ";
         }
-        speakers += speaker.fullName;
+        speakers += speaker.name;
     });
     return speakers;
 }
@@ -55,8 +55,8 @@ var RRTalkTemplate = function(talk) {
     label.dom.htmlFor = "talk" + talk.id + "CB";
 
     // After the label, the speakers (optionally)
-    if (talk.speakerList.length > 0) {
-        label.append(Html.span("RRSpeakers", RRSpeakersTemplate(talk.speakerList)))
+    if (talk.presenters.length > 0) {
+        label.append(Html.span("RRSpeakers", RRSpeakersTemplate(talk.presenters)))
     }
 
     // And after the speakers, the location and room (optionally)
@@ -83,26 +83,27 @@ var RRTalkTemplate = function(talk) {
     // Finally, the id
     label.append(Html.span("RRContributionId", "(id: " + talk.id + ")"));
 
-    return Html.li('', checkBox, label);
+    return Html.li({"data-recordingCapable": talk.recordingCapable}, checkBox, label);
 
 };
 
-var RRUpdateContributionList = function () {
+var RRUpdateContributionList = function (targetId, isManager) {
     if (RR_contributions.length > 0) {
-        $E('contributionList').set('');
+        $E(targetId).set('');
         for (i in RR_contributions) {
             contribution = RR_contributions[i];
-            $E('contributionList').append(RRTalkTemplate(contribution));
+            $E(targetId).append(RRTalkTemplate(contribution));
         }
     } else {
-        if (exists($E('contributionList'))) { // we are not in a lecture
-            $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of recording.")));
+        if (exists($E(targetId))) { // we are not in a lecture
+            $E(targetId).set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of recording.")));
+            // Hack to send a empty list and not make the server crash
+            $E(targetId).append(Html.input('checkbox', {style:{display:"none", disabled:"disabled"},name: "talkSelection", id: "noTalks"}));
         }
     }
 }
 
-var RR_loadTalks = function () {
-
+var RR_loadTalks = function (isManager) {
     var fetchContributions = function() {
 
         var talkTemplate = function(talk) {
@@ -113,13 +114,13 @@ var RR_loadTalks = function () {
             var label = Html.label({}, talkId, talkName);
             label.dom.htmlFor = "talk" + talk.id + "CB";
 
-            if (talk.speakerList.length > 0) {
+            if (talk.presenters.length > 0) {
                 var speakers = ", by "
-                enumerate(talk.speakerList, function(speaker, index) {
+                enumerate(talk.presenters, function(speaker, index) {
                     if (index > 0) {
                         speakers += " and ";
                     }
-                    speakers += speaker.fullName;
+                    speakers += speaker.name;
                 });
                 label.append(Html.span("RRSpeakers", speakers))
             }
@@ -132,7 +133,6 @@ var RR_loadTalks = function () {
                 locationText += ')';
                 label.append(Html.span("RRSpeakers", locationText))
             }
-
             return Html.li('', checkBox, label);
         };
 
@@ -147,7 +147,7 @@ var RR_loadTalks = function () {
             function(result, error){
                 if (!error) {
                     RR_contributions = result;
-                    RRUpdateContributionList();
+                    RRUpdateContributionList('contributionList');
                     IndicoUI.Effect.appear($E('contributionsDiv'));
                     RR_contributionsLoaded = true;
                     killProgress();
@@ -160,7 +160,23 @@ var RR_loadTalks = function () {
     };
 
     if (RR_contributionsLoaded) {
+        // Hide talks that are not capable and not choosen by managers
+        if (!isManager) {
+            $("#contributionList li").each(function() {
+                if ($(this).attr('data-recordingCapable') == 'false') {
+                    $(this).find('input').attr('disabled', 'disabled');
+                    if (!$(this).find('input').is(':checked')) {
+                        $(this).hide();
+                    }
+                }
+            });
+        }
         IndicoUI.Effect.appear($E('contributionsDiv'));
+
+        //Hide list if there are no displayed talks
+        if ($("#contributionList li:not(:hidden)").size() == 0) {
+            RR_hideTalks();
+        }
 
     } else {
         fetchContributions();
@@ -173,12 +189,16 @@ var RR_hideTalks = function (){
 
 var RRSelectAllContributions = function() {
     each($N('talkSelection'), function(checkbox) {
-        checkbox.dom.checked = true;
+        if (!checkbox.dom.disabled) {
+            checkbox.dom.checked = true;
+        }
     });
 }
 
 var RRUnselectAllContributions = function() {
     each($N('talkSelection'), function(checkbox) {
-        checkbox.dom.checked = false;
+        if (!checkbox.dom.disabled) {
+            checkbox.dom.checked = false;
+        }
     });
 }

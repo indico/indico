@@ -1,28 +1,32 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from persistent import Persistent
 from BTrees import LOBTree, OOBTree
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt, unixTimeToDatetime
 from BTrees.Length import Length
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
+from MaKaC.conference import ConferenceHolder
+from zope.interface import Interface
+from indico.core.index import SIndex
+from indico.core.index import Catalog
 
+BOOKINGS_BY_VIDYO_ROOMS_INDEX = "BookingsByVidyoRoomIndex"
 
 class EventEndDateIndex(Persistent):
     """ List of bookings ordered by their event's ending date
@@ -111,15 +115,6 @@ class EventEndDateIndex(Persistent):
             for b in bookingList.iterbookings():
                 yield b
 
-    def iterBookingsPerConf(self, minDate = None, maxDate = None):
-        """ Will return an iterator over tuples (date, {Conference: nBookings}) for
-            events whose ending date is between minDate and maxDate
-        """
-        minKey = EventEndDateIndex._dateToKey(minDate)
-        maxKey = EventEndDateIndex._dateToKey(maxDate)
-        for key, bookingList in self._tree.iteritems(min = minKey, max = maxKey):
-            yield (key, bookingList.getBookingsPerConf())
-
     def deleteKeys(self, minDate = None, maxDate = None):
         """
         """
@@ -133,6 +128,22 @@ class EventEndDateIndex(Persistent):
         self._count.change(-self._tree[key].getCount())
         del self._tree[key]
 
+    def initialize(self, dbi=None):
+        """ Cleans the indexes, and then indexes all the vidyo bookings from all the conferences
+            WARNING: obviously, this can potentially take a while
+        """
+        i = 0
+        self.clear()
+        for conf in ConferenceHolder().getList():
+            csbm = Catalog.getIdx("cs_bookingmanager_conference").get(conf.getId())
+            for booking in csbm.getBookingList():
+                if booking.getType() == "Vidyo" and booking.isCreated():
+                    self.indexBooking(booking)
+            i += 1
+            if dbi and i % 100 == 0:
+                dbi.commit()
+        if dbi:
+            dbi.commit()
 
 class DateBookingList(Persistent):
     """ Simple set of booking objects with a count attribute.
@@ -158,12 +169,44 @@ class DateBookingList(Persistent):
         """
         return self._bookings.__iter__()
 
-    def getBookingsPerConf(self):
-        """ Returns a dictionary where the keys are Conference objects
-            and the values are the number of Vidyo bookings of that conference.
-        """
-        result = {}
-        for b in self._bookings:
-            result[b.getConference()] = result.setdefault(b.getConference(), 0) + 1
-        return result
+class IIndexableByVidyoRoom(Interface):
+    pass
 
+class BookingsByVidyoRoomIndex(SIndex):
+    _fwd_class = OOBTree.OOBTree
+    _fwd_set_class = OOBTree.OOTreeSet
+
+    def __init__(self):
+        super(BookingsByVidyoRoomIndex, self).__init__(IIndexableByVidyoRoom)
+
+    def getBookingList(self, key):
+        return list(self.get(key, self._fwd_set_class()))
+
+    def indexBooking(self, booking):
+        self.index_obj(booking)
+
+    def unindexBooking(self, booking):
+        self.unindex_obj(booking)
+
+    def initialize(self, dbi=None):
+        """ Cleans the indexes, and then indexes all the vidyo bookings from all the conferences
+            WARNING: obviously, this can potentially take a while
+        """
+        i = 0
+        self.clear()
+        for conf in ConferenceHolder().getList():
+            idx = Catalog.getIdx("cs_bookingmanager_conference")
+            if idx is None:
+                idx = Catalog.create_idx("cs_bookingmanager_conference")
+            csbm = idx.get(conf.getId())
+            for booking in csbm.getBookingList():
+                if booking.getType() == "Vidyo" and booking.isCreated():
+                    self.indexBooking(booking)
+            i += 1
+            if dbi and i % 100 == 0:
+                dbi.commit()
+        if dbi:
+            dbi.commit()
+
+    def dump(self):
+        return [(k, [b for b in self.get(k)]) for k in self.__iter__()]

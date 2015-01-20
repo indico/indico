@@ -1,0 +1,47 @@
+<table>
+    <td colspan="2">
+        <span class="section-group-title">
+            {{ 'Select the sessions you wish to attend to' | i18n }}:
+        </span>
+    </td>
+    <tr>
+        <td>
+            <span>{{ 'Preferred choice' | i18n }}</span>
+            <span class="regFormMandatoryField">*</span>
+        </td>
+        <td>
+            <ng-form name="nestedForm">
+                <select id="session1" name="session1" required
+                    ng-model="userdata.sessionList[0].id"
+                    ng-class="{hasError: validationStarted && nestedForm.$invalid}">
+                    <option value="">
+                        {{ '--Select a session--' | i18n }}
+                    </option>
+                    <option ng-repeat="item in section.items | filter: {enabled: true}"
+                        value="{{ item.id }}"
+                        ng-selected="item.id == userdata.sessionList[0].id">
+                        {{ item.caption }}
+                    </option>
+                </select>
+            </ng-form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <span>{{ 'Secondary choice' | i18n }}</span>
+            <span class="italic">(Optional)</span>
+        </td>
+        <td>
+            <select id="session2" name="session2">
+                <option value="">
+                    {{ '--Select a session--' | i18n }}
+                </option>
+                <option ng-repeat="item in section.items | filter: {enabled: true} | filter: {id: '!'+(userdata.sessionList[0].id||' ')}"
+                    value="{{ item.id }}"
+                    ng-selected="item.id == userdata.sessionList[1].id">
+                    {{ item.caption }}
+                </option>
+            </select>
+        </td>
+    </tr>
+</table>

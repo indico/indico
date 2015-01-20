@@ -1,33 +1,29 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import datetime
 import MaKaC.webinterface.pages.base as base
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.accessControl as accessControl
 from MaKaC.common import timezoneUtils
-from MaKaC.common.utils import formatTime, formatDateTime
 from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.conference import Category, Conference
-from indico.modules import ModuleHolder
 
 class WPMainBase(base.WPDecorated):
 
@@ -155,50 +151,21 @@ class WPMainBase(base.WPDecorated):
         self._showAdmin = self._isAdmin or self._isCategoryManager
 
         self._timezone = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ())
+        params = dict(params, **self._kwargs)
+        body = WMainBase(self._getBody(params), self._timezone, self._getNavigationDrawer(),
+                         isFrontPage=self._isFrontPage(),
+                         isRoomBooking=self._isRoomBooking(),
+                         sideMenu=sideMenu).getHTML({"subArea": self._getSiteArea()})
 
-        body = WMainBase(self._getBody( params ), self._timezone, self._getNavigationDrawer(),
-                         isFrontPage=self._isFrontPage(), isRoomBooking=self._isRoomBooking(), sideMenu = sideMenu).getHTML({"subArea": self._getSiteArea()})
+        return self._applyDecoration(body)
 
-        return self._applyDecoration( body )
-
-    def _getBody( self, params ):
+    def _getBody(self, params):
         return _("nothing yet")
 
-class WUpcomingEvents(wcomponents.WTemplated):
-
-    def formatDateTime(self, dateTime):
-        now = timezoneUtils.nowutc().astimezone(self._timezone)
-
-        if dateTime.date() == now.date():
-            return _("today") + " " + formatTime(dateTime.time())
-        elif dateTime.date() == (now + datetime.timedelta(days=1)).date():
-            return _("tomorrow") + " " + formatTime(dateTime.time())
-        elif dateTime < (now + datetime.timedelta(days=6)):
-            return formatDateTime(dateTime, format="EEEE H:mm")
-        elif dateTime.date().year == now.date().year:
-            return formatDateTime(dateTime, format="d MMM")
-        else:
-            return formatDateTime(dateTime, format="d MMM yyyy")
-
-    def _getUpcomingEvents(self):
-        # Just convert UTC to display timezone
-
-        return map(lambda x: (x[0], x[1].astimezone(self._timezone), x[2], x[3]),
-                   self._list)
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars['upcomingEvents'] = self._getUpcomingEvents()
-        return vars
-
-    def __init__(self, timezone, upcoming_list):
-        self._timezone = timezone
-        self._list = upcoming_list
-        wcomponents.WTemplated.__init__(self)
 
 class WMainBase(wcomponents.WTemplated):
 
-    def __init__(self, page, timezone, navigation=None, isFrontPage=False, isRoomBooking= False, sideMenu=None):
+    def __init__(self, page, timezone, navigation=None, isFrontPage=False, isRoomBooking=False, sideMenu=None):
         self._page = page
         self._navigation = navigation
         self._isFrontPage = isFrontPage
@@ -217,17 +184,6 @@ class WMainBase(wcomponents.WTemplated):
         if self._sideMenu:
             vars["sideMenu"] = self._sideMenu.getHTML()
 
-        upcoming = ModuleHolder().getById('upcoming_events')
-
-        # if this is the front page, include the
-        # upcoming event information (if there are any)
-        if self._isFrontPage:
-            upcoming_list = upcoming.getUpcomingEventList()
-            if upcoming_list:
-                vars["upcomingEvents"] = WUpcomingEvents(self._timezone, upcoming_list).getHTML(vars)
-            else:
-                vars["upcomingEvents"] = ''
-
         vars["navigation"] = ""
         if self._navigation:
             vars["navigation"] = self._navigation.getHTML(vars)
@@ -235,4 +191,3 @@ class WMainBase(wcomponents.WTemplated):
         vars["timezone"] = self._timezone
 
         return vars
-

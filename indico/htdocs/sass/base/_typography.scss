@@ -1,0 +1,272 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+%font-family-body {
+    font-family: verdana, arial, serif;
+}
+
+%font-family-title {
+    font-family: "Roboto", "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
+}
+
+%font-family-title-light {
+    font-family: "Roboto Light", "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
+}
+
+%font-family-description {
+    font-family: Georgia, Times, "Times New Roman", serif;
+}
+
+%font-family-monospace {
+    font-family: "Inconsolata", "Monaco", "Droid Sans Mono", "Profont", courier, monospace;
+}
+
+%font-family-serif {
+    font-family: "Georgia", "Garamond", "Droid serif", "Linux Libertine", "Palatino", serif;
+}
+
+%font-family-form {
+    font-family: "Helvetica Neue", Helvetica, Verdana, Arial, sans-serif;
+}
+
+%font-size-body {
+    font-size: 13px;
+}
+
+body {
+    @extend %font-family-body;
+    @extend %font-size-body;
+    background: #fff;
+    padding: 0px;
+    margin: 0px;
+}
+
+h1 {
+    @extend %font-family-title;
+    font-size: 1.7em;
+}
+
+h2, h3, h4 {
+    @extend %font-family-title-light;
+}
+
+h2 {
+    font-size: 1.5em;
+}
+
+h3 {
+    font-size: 1.3em;
+}
+
+sup, sub {
+    vertical-align: baseline;
+    position: relative;
+    top: -0.4em;
+}
+
+sub {
+    top: 0.4em;
+}
+
+/* Elements */
+
+.page-title {
+    margin-top: 0;
+    font-size: 2em;
+    font-weight: normal;
+    color: #B14300;
+}
+
+.group-title {
+    border-bottom: 2px solid #eaeaea;
+    display: block;
+    font-size: 2em;
+    font-weight: normal;
+
+    & > i {
+        font-size: 1.2em;
+        padding-right: 0.2em;
+        vertical-align: middle;
+    }
+}
+
+
+.groupTitle, .groupTitleNoBorder, .groupSubTitle {
+   display: block;
+   width: 100%;
+   font-family: "Helvetica Neue", Helvetica, Verdana, Arial, Sans-serif;
+   font-size: 24px;
+   font-weight: normal;
+   color: #4a4a4a;
+   padding: 3px 3px 5px 3px;
+   border-bottom: 1px solid #AAA;
+   margin-bottom: 1em;
+}
+
+td.groupTitle, td.groupTitleNoBorder, td.groupSubTitle {
+  display: table-cell;
+}
+
+.groupTitle > [class*="icon-"],
+.groupTitleNoBorder > [class*="icon-"],
+.groupSubTitle > [class*="icon-"] {
+    color: #CCC;
+    font-size: 1.2em;
+    vertical-align: middle;
+}
+
+.reviewingsubtitle {
+   font-family: "Times New Roman", Verdana, Arial;
+   font-size: 15pt;
+   color: #4E4C46;
+   letter-spacing: 1px;
+   padding: 3px;
+   margin: 10px 0;
+}
+
+.groupTitleNoBorder {
+   border-bottom: none;
+}
+
+.groupSubTitle {
+    font-size: 20px;
+}
+
+.groupTitleSmall, .groupTitleSmallNoBackground {
+   font-weight: bold;
+   font-size: 14px;
+   color: #777777;
+   background: #EBEBEB;
+   padding: 3px;
+}
+
+.groupTitleSmallNoBackground {
+   background: none;
+}
+
+
+.greyGroupTitle{
+    font-weight: bold;
+    font-size: 16px;
+    color: #FFFFFF;
+    background: #777777;
+    letter-spacing: 6px;
+    padding: 3px;
+    background: #EBEBEB none repeat scroll 0 0;
+    color: gray;
+    text-align:left;
+}
+
+
+.subgroupTitle, .subgroupTitleNoBorder {
+   font-weight: bold;
+   font-size: 18px;
+   color: #888888;
+   padding: 3px;
+   border-bottom: 2px solid #777777;
+   vertical-align: bottom;
+}
+
+.subgroupTitleNoBorder {
+   border-bottom: none;
+}
+
+
+.displayTitle {
+   font-size: 18px;
+   color: #5294CC;
+   padding: 3px;
+   vertical-align: bottom;
+}
+
+.formTitle {
+   font-weight: bold;
+   font-size: 18px;
+   color: #888888;
+   padding: 3px;
+   border-bottom: 2px solid #777777;
+   vertical-align: bottom;
+}
+
+.quotation {
+    margin: 10px;
+    padding-left: 10px;
+    color: #777;
+    border-left: 4px solid #ddd;
+    font-family: Georgia, Times, Serif;
+}
+
+/* Quick rules */
+
+.nohtml {
+    white-space: pre-line;
+}
+
+.overflow {
+    overflow: auto;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.italic {
+    font-style: italic;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-important {
+    color: #111;
+}
+
+.text-normal {
+    color: #444;
+}
+
+.text-error {
+    color: $red;
+}
+
+.text-not-important {
+    color: #777;
+}
+
+.text-superfluous {
+    color: #BBB;
+}
+
+a.small-link {
+    color: $light-black;
+    font-size: 11px;
+}
+
+.mono {
+  @extend %font-family-monospace;
+}
+
+textarea.log {
+  @extend .mono;
+  color: $dark-gray;
+  font-size: 0.7em;
+}

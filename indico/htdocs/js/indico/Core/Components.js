@@ -1,6 +1,24 @@
-include(ScriptRoot + "ckeditor/add_url.patch.js");
-include(ScriptRoot + "ckeditor/ckeditor.js");
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
 
+
+if(!window.indicoOfflineSite) {
+    include(ScriptRoot + "ckeditor/ckeditor.js");
+}
 
 var indicoSource = null;
 var indicoRequest = null;
@@ -19,6 +37,11 @@ function imageFunctionGenerator(url) {
 if (location.protocol == "https:") {
     function fixUrls(urls) {
         for(var key in urls) {
+            // flask router -> skip
+            if(urls[key].type == 'flask_rules') {
+                continue;
+            }
+
             // not a string -> assume object and recurse
             if(urls[key].replace === undefined) {
                 fixUrls(urls[key]);
@@ -123,7 +146,7 @@ var IndicoUI = {
 
 };
 
-window.onload = function() {
+$(function() {
     for (var f in IndicoUI.loadTimeFuncs) {
         IndicoUI.loadTimeFuncs[f]();
     }
@@ -152,7 +175,7 @@ window.onload = function() {
             IndicoUtil.onclickFunctions.removeAt(idx);
         });
     });
-};
+});
 
 window.onunload = function() {
     for (var f in IndicoUI.unloadTimeFuncs) {

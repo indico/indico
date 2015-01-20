@@ -1,45 +1,56 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """This file contains various indexes which will be used in the system in order
     to optimise some functionalities.
 """
+
+import itertools
+from datetime import datetime, timedelta
+from operator import itemgetter
+
+import pytz
 from persistent import Persistent
 from BTrees.IOBTree import IOBTree
 from BTrees.OOBTree import OOBTree, OOSet
-from MaKaC.common.ObjectHolders import ObjectHolder
-from MaKaC.common.Configuration import Config
-from MaKaC.common.timezoneUtils import nowutc, date2utctimestamp, datetimeToUnixTime
-from MaKaC.errors import MaKaCError
-from datetime import datetime, timedelta
-from pytz import timezone
-from MaKaC.common.logger import Logger
-from MaKaC.plugins.base import PluginsHolder
 from zope.index.text import textindex
-import pytz
-import itertools
+from sqlalchemy import func
+
+from indico.core.db.util import retry_request_on_conflict
+from indico.core.logger import Logger
+from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy.util.queries import preprocess_ts_string
+from indico.util.string import remove_accents
+from indico.modules.fulltextindexes.models.events import IndexedEvent
+from indico.modules.fulltextindexes.models.categories import IndexedCategory
+
+from MaKaC.common.ObjectHolders import ObjectHolder
+from MaKaC.common.timezoneUtils import date2utctimestamp, datetimeToUnixTime
+from MaKaC.errors import MaKaCError
+from MaKaC.plugins.base import extension_point
+
 
 # BTrees are 32 bit by default
 # TODO: make this configurable
 # 0111 111 .... max signed int
 BTREE_MAX_INT = 0x7FFFFFFF
+BTREE_MIN_INT = -0x80000000
 
 
 class Index(Persistent):
@@ -66,8 +77,9 @@ class Index(Persistent):
         letters = []
         words = self.getKeys()
         for word in words:
-            if not word[0].lower() in letters:
-                letters.append(word[0].lower())
+            uletter = remove_accents(word.decode('utf-8').lower()[0])
+            if not uletter in letters:
+                letters.append(uletter)
         letters.sort()
         return letters
 
@@ -88,47 +100,51 @@ class Index(Persistent):
                 words[value].remove(item)
                 self.setIndex(words)
 
-    def matchFirstLetter( self, letter ):
+    def matchFirstLetter(self, letter, accent_sensitive=True):
         result = []
+
+        cmpLetter = letter.lower()
+        if not accent_sensitive:
+            cmpLetter = remove_accents(cmpLetter)
+
         for key in self.getKeys():
-            if key[0].lower() == letter.lower():
+            uletter = key.decode('utf8')[0].lower()
+            if not accent_sensitive:
+                uletter = remove_accents(uletter)
+            if uletter == cmpLetter:
                 result += self._words[key]
+
         return result
 
-    def _match( self, value, cs=1, exact=1 ):
-
-        result = []
-        lowerCaseValue = value.lower()
-
-        if exact == 1 and cs == 1:
-            if self._words.has_key(value) and len(self._words[value]) != 0:
+    def _match(self, value, cs=1, exact=1, accent_sensitive=True):
+        # if match is exact, retrieve directly from index
+        if exact == 1 and cs == 1 and accent_sensitive:
+            if value in self._words and len(self._words[value]) != 0:
                 if '' in self._words[value]:
                     self._words[value].remove('')
                 return self._words[value]
             else:
                 return None
-        elif exact == 1 and cs == 0:
-            for key in self._words.keys():
-                if key.lower() == lowerCaseValue and len(self._words[key]) != 0:
-                    if '' in self._words[key]:
-                        self._words[key].remove('')
-                    result = result + self._words[key]
-            return result
-        elif exact == 0 and cs == 1:
-            for key in self._words.keys():
-                if key.find(value) != -1 and len(self._words[key]) != 0:
-                    if '' in self._words[key]:
-                        self._words[key].remove('')
-                    result = result + self._words[key]
-            return result
         else:
-            for key in self._words.keys():
-                if key.lower().find(lowerCaseValue) != -1 and len(self._words[key]) != 0:
-                    if '' in self._words[key]:
-                        self._words[key].remove('')
-                    result = result + self._words[key]
+            result = []
+            cmpValue = value
+            if not accent_sensitive:
+                cmpValue = remove_accents(cmpValue)
+            if cs == 0:
+                cmpValue = cmpValue.lower()
+
+            for key in self._words.iterkeys():
+                if len(self._words[key]) != 0:
+                    cmpKey = key
+                    if not accent_sensitive:
+                        cmpKey = remove_accents(cmpKey)
+                    if cs == 0:
+                        cmpKey = cmpKey.lower()
+                    if (exact == 0 and cmpKey.find(cmpValue) != -1) or (exact == 1 and cmpKey == cmpValue):
+                        if '' in self._words[key]:
+                            self._words[key].remove('')
+                        result = result + self._words[key]
             return result
-        return None
 
     def dump(self):
         return self._words
@@ -137,109 +153,111 @@ class Index(Persistent):
         self._words = words
 
     def notifyModification(self):
-        self._p_changed=1
+        self._p_changed = 1
 
-class EmailIndex( Index ):
+
+class EmailIndex(Index):
     _name = "email"
 
-    def indexUser( self, user ):
-        email = user.getEmail()
-        self._addItem( email, user.getId() )
-        for email in user.getSecondaryEmails():
-            self._addItem( email, user.getId() )
+    def indexUser(self, user):
+        for email in user.getEmails():
+            self._addItem(email, user.getId())
 
-    def unindexUser( self, user ):
-        email = user.getEmail()
-        self._withdrawItem( email, user.getId() )
-        for email in user.getSecondaryEmails():
-            self._withdrawItem( email, user.getId() )
+    def unindexUser(self, user):
+        for email in user.getEmails():
+            self._withdrawItem(email, user.getId())
 
-    def matchUser( self, email, cs=0, exact=0 ):
+    def matchUser(self, email, cs=0, exact=0, accent_sensitive=True):
         """this match is an approximative case insensitive match"""
-        return self._match(email,cs,exact)
+        return self._match(email, cs, exact)
 
-class NameIndex( Index ):
+
+class NameIndex(Index):
     _name = "name"
 
-    def indexUser( self, user ):
+    def indexUser(self, user):
         name = user.getName()
-        self._addItem( name, user.getId() )
+        self._addItem(name, user.getId())
 
-    def unindexUser( self, user ):
+    def unindexUser(self, user):
         name = user.getName()
-        self._withdrawItem( name, user.getId() )
+        self._withdrawItem(name, user.getId())
 
-    def matchUser( self, name, cs=0, exact=0 ):
+    def matchUser(self, name, cs=0, exact=0, accent_sensitive=False):
         """this match is an approximative case insensitive match"""
-        return self._match(name,cs,exact)
+        return self._match(name, cs, exact, accent_sensitive)
 
-class SurNameIndex( Index ):
+
+class SurNameIndex(Index):
     _name = "surName"
 
-    def indexUser( self, user ):
+    def indexUser(self, user):
         surName = user.getSurName()
-        self._addItem( surName, user.getId() )
+        self._addItem(surName, user.getId())
 
-    def unindexUser( self, user ):
+    def unindexUser(self, user):
         surName = user.getSurName()
-        self._withdrawItem( surName, user.getId() )
+        self._withdrawItem(surName, user.getId())
 
-    def matchUser( self, surName, cs=0, exact=0 ):
+    def matchUser(self, surName, cs=0, exact=0, accent_sensitive=False):
         """this match is an approximative case insensitive match"""
-        return self._match(surName,cs,exact)
+        return self._match(surName, cs, exact, accent_sensitive)
 
-class OrganisationIndex( Index ):
+
+class OrganisationIndex(Index):
     _name = "organisation"
 
-    def indexUser( self, user ):
+    def indexUser(self, user):
         org = user.getOrganisation()
-        self._addItem( org, user.getId() )
+        self._addItem(org, user.getId())
 
-    def unindexUser( self, user ):
+    def unindexUser(self, user):
         org = user.getOrganisation()
-        self._withdrawItem( org, user.getId() )
+        self._withdrawItem(org, user.getId())
 
-    def matchUser( self, org, cs=0, exact=0 ):
-        """this match is an approximative case insensitive match"""
-        return self._match(org,cs,exact)
+    def matchUser(self, org, cs=0, exact=0, accent_sensitive=False):
+        return self._match(org, cs, exact, accent_sensitive)
 
-class StatusIndex( Index ):
+
+class StatusIndex(Index):
     _name = "status"
 
-    def __init__( self ):
-        Index.__init__( self )
+    def __init__(self):
+        Index.__init__(self)
         from MaKaC.user import AvatarHolder
         ah = AvatarHolder()
         for av in ah.getList():
             self.indexUser(av)
 
-    def indexUser( self, user ):
+    def indexUser(self, user):
         status = user.getStatus()
-        self._addItem( status, user.getId() )
+        self._addItem(status, user.getId())
 
-    def unindexUser( self, user ):
+    def unindexUser(self, user):
         status = user.getStatus()
-        self._withdrawItem( status, user.getId() )
+        self._withdrawItem(status, user.getId())
 
-    def matchUser( self, status, cs=0, exact=1 ):
+    def matchUser(self, status, cs=0, exact=1, accent_sensitive=True):
         """this match is an approximative case insensitive match"""
-        return self._match(status,cs,exact)
+        return self._match(status, cs, exact)
 
-class GroupIndex( Index ):
+
+class GroupIndex(Index):
     _name = "group"
 
-    def indexGroup( self, group ):
+    def indexGroup(self, group):
         name = group.getName()
-        self._addItem( name, group.getId() )
+        self._addItem(name, group.getId())
 
-    def unindexGroup( self, group ):
+    def unindexGroup(self, group):
         name = group.getName()
-        self._withdrawItem( name, group.getId() )
+        self._withdrawItem(name, group.getId())
 
-    def matchGroup( self, name, cs=0, exact=0 ):
+    def matchGroup(self, name, cs=0, exact=0):
         if name == "":
             return []
-        return self._match(name,cs,exact)
+        return self._match(name, cs, exact)
+
 
 class CategoryIndex(Persistent):
 
@@ -777,6 +795,13 @@ class CalendarDayIndex(Persistent):
         sDay = int(datetimeToUnixTime(datetime(sDate.year, sDate.month, sDate.day))) if sDate else None
         eDay = int(datetimeToUnixTime(datetime(eDate.year, eDate.month, eDate.day))) if eDate else None
         res = set()
+        #checking if 2038 problem occurs
+        if sDay > BTREE_MAX_INT or eDay > BTREE_MAX_INT:
+            return res
+
+        #checking if 1901 problem ocurrs
+        if sDay < BTREE_MIN_INT or eDay < BTREE_MIN_INT:
+            return res
         for event in self._idxDay.values(sDay, eDay):
             res.update(event)
         return res
@@ -811,10 +836,20 @@ class CalendarDayIndex(Persistent):
             res = set([event for event in self._idxDay[int(datetimeToUnixTime(stDay))] if event.getStartDate() >= date])
         for day in self._idxDay.values(int(datetimeToUnixTime(nextDay))):
             res.update(set(day))
-        for day in self._idxDay.values(max = int(datetimeToUnixTime(previousDay))):
+        for day in self._idxDay.values(max=int(datetimeToUnixTime(previousDay))):
             res.difference_update(set(day))
-        res.difference_update(set([event for event in self._idxDay[int(datetimeToUnixTime(stDay))] if event.getStartDate() < date]))
+        res.difference_update(set([event for event in
+                              self._idxDay.get(int(datetimeToUnixTime(stDay)), []) if event.getStartDate() < date]))
         return res
+
+    def hasObjectsAfter(self, date):
+        stDay = datetime(date.year, date.month, date.day)
+        if self._idxDay:
+            lastDay = self._idxDay.keys()[-1]
+            return lastDay > int(datetimeToUnixTime(stDay))
+        else:
+            # Empty index? Then there's nothing after for sure
+            return False
 
     def iterateObjectsIn(self, sDate, eDate):
         sDay = datetime(sDate.year, sDate.month, sDate.day) if sDate else None
@@ -909,7 +944,7 @@ class CategoryDateIndex(Persistent):
         for conf in categ.getConferenceList():
             self.unindexConf(conf)
             self.indexConf(conf)
-#        from MaKaC.common import DBMgr
+#        from indico.core.db import DBMgr
 #        dbi = DBMgr.getInstance()
 #        for subcat in categ.getSubCategoryList():
 #            self.reindexCateg(subcat)
@@ -940,7 +975,7 @@ class CategoryDateIndex(Persistent):
 
     def _indexConf(self, categid, conf):
         # only the more restrictive setup is taken into account
-        if self._idxCategItem.has_key(categid):
+        if categid in self._idxCategItem:
             res = self._idxCategItem[categid]
         else:
             res = CalendarIndex()
@@ -955,31 +990,39 @@ class CategoryDateIndex(Persistent):
 
     def getObjectsIn(self, categid, sDate, eDate):
         categid = str(categid)
-        if self._idxCategItem.has_key(categid):
+        if categid in self._idxCategItem:
             return self._idxCategItem[categid].getObjectsIn(sDate, eDate)
         else:
             return []
 
-    def getObjectsStartingIn( self, categid, sDate, eDate):
+    def getObjectsStartingIn(self, categid, sDate, eDate):
         categid = str(categid)
-        if self._idxCategItem.has_key(categid):
+        if categid in self._idxCategItem:
             return self._idxCategItem[categid].getObjectsStartingIn(sDate, eDate)
         else:
             return []
 
-    def getObjectsInDay( self, categid, sDate):
+    def getObjectsInDay(self, categid, sDate):
         categid = str(categid)
-        if self._idxCategItem.has_key(categid):
+        if categid in self._idxCategItem:
             return self._idxCategItem[categid].getObjectsInDay(sDate)
         else:
             return []
 
-    def getObjectsEndingAfter( self, categid, sDate):
+    def hasObjectsAfter(self, categid, sDate):
         categid = str(categid)
-        if self._idxCategItem.has_key(categid):
+        if categid in self._idxCategItem:
+            return self._idxCategItem[categid].hasObjectsAfter(sDate)
+        else:
+            return False
+
+    def getObjectsEndingAfter(self, categid, sDate):
+        categid = str(categid)
+        if categid in self._idxCategItem:
             return self._idxCategItem[categid].getObjectsEndingAfter(sDate)
         else:
             return []
+
 
 class CategoryDateIndexLtd(CategoryDateIndex):
     """ Version of CategoryDateIndex whiself.ch indexing events
@@ -1103,6 +1146,22 @@ class PendingSubmittersIndex( PendingQueuesUsersIndex ):
     _name = "pendingSubmitters"
     pass
 
+class PendingConfSubmittersIndex( PendingQueuesUsersIndex ):
+    _name = "pendingConfSubmitters"
+    pass
+
+class PendingConfSubmittersTasksIndex( PendinQueuesTasksIndex ):
+    _name = "pendingConfSubmittersTasks"
+    pass
+
+class PendingConfManagersIndex( PendingQueuesUsersIndex ):
+    _name = "pendingConfManagers"
+    pass
+
+class PendingConfManagersTasksIndex( PendinQueuesTasksIndex ):
+    _name = "pendingConfManagersTasks"
+    pass
+
 class PendingSubmittersTasksIndex( PendinQueuesTasksIndex ):
     _name = "pendingSubmittersTasks"
     pass
@@ -1219,15 +1278,87 @@ class TextIndex(IntStringMappedIndex):
         return [(self.getString(record[0]), record[1]) for record in records]
 
 
-class IndexesHolder( ObjectHolder ):
+class CategoryTitleIndex(object):
+
+    def index(self, obj):
+        self.unindex(obj)
+        category = IndexedCategory(id=obj.getId(), title=obj.getTitle())
+        db.session.add(category)
+        with retry_request_on_conflict():
+            db.session.flush()
+
+    def unindex(self, obj):
+        IndexedCategory.find(id=obj.getId()).delete()
+        db.session.flush()
+
+    def search(self, search_string, limit=None, offset=None):
+        query = (db.session.query(IndexedCategory.id)
+                 .filter(IndexedCategory.title_vector.op('@@')(
+                     func.to_tsquery('simple', preprocess_ts_string(search_string))))
+                 .limit(limit)
+                 .offset(offset))
+        return map(itemgetter(0), query)
+
+    def initialize(self, items):
+        for i, categ in enumerate(items, 1):
+            cat = IndexedCategory(id=categ.getId(), title=categ.getTitle())
+            db.session.add(cat)
+            if i % 1000 == 0:
+                db.session.commit()
+        db.session.commit()
+
+    def clear(self):
+        IndexedCategory.query.delete()
+
+
+class ConferenceIndex(object):
+
+    def index(self, obj):
+        self.unindex(obj)
+        event = IndexedEvent(id=obj.getId(), title=obj.getTitle(), start_date=obj.getStartDate())
+        db.session.add(event)
+        with retry_request_on_conflict():
+            db.session.flush()
+
+    def unindex(self, obj):
+        IndexedEvent.find(id=obj.getId()).delete()
+        db.session.flush()
+
+    def search(self, search_string, order_by='start'):
+        if order_by == 'start':
+            order = IndexedEvent.start_date.desc()
+        elif order_by == 'id':
+            order = IndexedEvent.id
+        else:
+            order = None
+
+        return (db.session.query(IndexedEvent.id)
+                  .filter(IndexedEvent.title_vector.op('@@')(
+                      func.to_tsquery('simple', preprocess_ts_string(search_string))))
+                  .order_by(order))
+
+    def initialize(self, items):
+        for i, conf in enumerate(items, 1):
+            event = IndexedEvent(id=conf.getId(), title=conf.getTitle(), start_date=conf.getStartDate())
+            db.session.add(event)
+            if i % 20000 == 0:
+                db.session.commit()
+        db.session.commit()
+
+    def clear(self):
+        IndexedEvent.query.delete()
+
+
+class IndexesHolder(ObjectHolder):
 
     idxName = "indexes"
     counterName = None
     __allowedIdxs = [ "email", "name", "surName", "organisation", "group",
                     "status", "calendar", "category", "categoryDate",
-                    "categoryDateAll", "categoryName",
-                    "pendingSubmitters",
-                    "pendingSubmittersTasks", "pendingManagers",
+                    "categoryDateAll", "categoryName","conferenceTitle",
+                    "pendingSubmitters", "pendingConfSubmitters",
+                    "pendingConfSubmittersTasks", "pendingConfManagers",
+                    "pendingConfManagersTasks","pendingSubmittersTasks", "pendingManagers",
                     "pendingManagersTasks", "pendingCoordinators",
                     "pendingCoordinatorsTasks", "webcasts", "collaboration"]
 
@@ -1264,13 +1395,19 @@ class IndexesHolder( ObjectHolder ):
             elif id=="categoryDate":
                 Idx[str(id)] = CategoryDayIndex()
             elif id=="categoryDateAll":
-                Idx[str(id)] = CategoryDayIndex()
-            elif id=="categoryName":
-                Idx[str(id)] = TextIndex()
+                Idx[str(id)] = CategoryDayIndex(visibility=False)
             elif id=="pendingSubmitters":
                 Idx[str(id)] = PendingSubmittersIndex()
+            elif id=="pendingConfSubmitters":
+                Idx[str(id)] = PendingConfSubmittersIndex()
             elif id=="pendingSubmittersTasks":
                 Idx[str(id)] = PendingSubmittersTasksIndex()
+            elif id=="pendingConfSubmittersTasks":
+                Idx[str(id)] = PendingConfSubmittersTasksIndex()
+            elif id=="pendingConfManagers":
+                Idx[str(id)] = PendingConfManagersIndex()
+            elif id=="pendingConfManagersTasks":
+                Idx[str(id)] = PendingConfManagersTasksIndex()
             elif id=="pendingManagers":
                 Idx[str(id)] = PendingManagersIndex()
             elif id=="pendingManagersTasks":
@@ -1279,18 +1416,14 @@ class IndexesHolder( ObjectHolder ):
                 Idx[str(id)] = PendingManagersIndex()
             elif id=="pendingCoordinatorsTasks":
                 Idx[str(id)] = PendingManagersTasksIndex()
-            elif id=="collaboration":
-                if PluginsHolder().hasPluginType("Collaboration"):
-                    from MaKaC.plugins.Collaboration.indexes import CollaborationIndex
-                    Idx[str(id)] = CollaborationIndex()
-                else:
-                    raise MaKaCError(_("Tried to retrieve collaboration index, but Collaboration plugins are not present"))
-
+            elif id=="categoryName":
+                return CategoryTitleIndex()
+            elif id=="conferenceTitle":
+                return ConferenceIndex()
+            else:
+                extension_point("indexHolderProvider", Idx, id)
             return Idx[str(id)]
 
 
 if __name__ == "__main__":
     print _("done")
-
-
-

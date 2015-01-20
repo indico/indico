@@ -77,7 +77,7 @@
                 return true;
               }
               else {
-                alert("${ _("Please fill in all required fields.")}");
+                new AlertPopup($T("Warning"), $T("Please fill in all required fields.")).open();
                 return false;
               }
             }

@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 
 
@@ -305,11 +322,6 @@ IndicoUI.Widgets = {
             return button;
         },
 
-        switchOptionButton: function(method, attributes, caption, messageId) {
-            var button = new SwitchOptionButton(method, attributes, caption, messageId);
-            return button.draw();
-        },
-
         sourceSelectionField: function(elem, source, options){
             IndicoUI.Effect.mouseOver(elem.dom);
 
@@ -527,7 +539,7 @@ IndicoUI.Widgets = {
                     }
                 }
             } else { // if there is no initial value, we retrieve it from the server and set the appropiate radio button to checked
-                initialValueHandler = function(result,error) {
+                var initialValueHandler = function(result,error) {
                     if (!error) {
                         radioButtons[result].dom.checked = true;
                     }
@@ -578,7 +590,7 @@ IndicoUI.Widgets = {
                     row2.append(cell2);
                 }
 
-                cellMessage = Html.td();
+                var cellMessage = Html.td();
                 cellMessage.dom.style.verticalAlign = "middle";
                 cellMessage.dom.rowSpan = 2;
                 cellMessage.append(message);
@@ -594,7 +606,7 @@ IndicoUI.Widgets = {
                 return table;
             }
             else {
-                alert($T("developer error: kind of radioButtonField is not correct, should be 'vertical', 'horizontal1', 'horizontal2'"));
+                new AlertPopup($T("Developer error"), $T("Kind of radioButtonField is not correct, should be 'vertical', 'horizontal1', 'horizontal2'")).open();
             }
 
         },
@@ -923,7 +935,7 @@ IndicoUI.Widgets = {
          * @param {Dictionary} elemInfo Additional parameters attached to the input element (optional).
          * @return {XElement} The text input field with the calendar attached.
          */
-        dateField: function(showTime, attributes, hiddenFields, elemInfo, format){
+        dateField: function(showTime, attributes, hiddenFields, elemInfo, format, callback){
             attributes = attributes || {};
             elemInfo = elemInfo || {};
             extend(elemInfo, attributes);
@@ -951,6 +963,10 @@ IndicoUI.Widgets = {
                 if(typeof(elem.dom.onchange) === 'function') {
                     elem.dom.onchange();
                 }
+
+                if (callback !== undefined) {
+                    callback();
+                }
             };
             tab.processDate = elem.processDate;
 
@@ -967,8 +983,7 @@ IndicoUI.Widgets = {
 
         timeField: function(attributes, hiddenFields){
             attributes = attributes || {};
-            var elem = Html.input("text",attributes);
-            return elem;
+            return Html.input("text", attributes);
         },
 
         dateEditor: function(elem, method, attributes, cachedValue){
@@ -986,23 +1001,17 @@ IndicoUI.Widgets = {
             $B(elem, [editable(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, method, attributes, cachedValue), context), Widget.text(" "), IndicoUI.Aux.defaultEditMenu(context)]);
         },
 
-        dateStartEndTimeField: function(defaultStartTime, defaultEndTime, additional) {
+        dateStartEndTimeField: function(defaultStartTime, defaultEndTime, attributesStartTime, attributesEndTime, additional) {
 
             var obj = new WatchObject();
             obj.set('startTime', defaultStartTime);
             obj.set('endTime', defaultEndTime);
 
-            var attributes = {
-                style: {
-                    width: '50px'
-                }
-            };
-
             var dash = Html.span({style: {padding: '0 10px'}});
             dash.dom.innerHTML = '&ndash;';
 
-            var startTimeField = IndicoUI.Widgets.Generic.timeField(attributes);
-            var endTimeField =  IndicoUI.Widgets.Generic.timeField(attributes);
+            var startTimeField = IndicoUI.Widgets.Generic.timeField(attributesStartTime);
+            var endTimeField = IndicoUI.Widgets.Generic.timeField(attributesEndTime);
 
             var element = Widget.block([
                 $B(startTimeField, obj.accessor('startTime')), dash,

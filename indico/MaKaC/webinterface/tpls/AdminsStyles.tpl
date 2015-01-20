@@ -39,7 +39,10 @@
             % if style == "static":
             ${inlineContextHelp(_('This style cannot be deleted. This is the default style for conferences.'))}
             % else:
-            <a href="${urlHandlers.UHAdminsDeleteStyle.getURL(templatefile=style)}" onClick="if (!confirm('${ _("Are you sure you want to delete this style?")}')) { return false; }"><img border="0" src="${deleteIconURL}" alt="${ _("delete this style")}"></a>
+            <a href="${urlHandlers.UHAdminsDeleteStyle.getURL(templatefile=style)}"
+               data-confirm='${_("Are you sure you want to delete this style?")}' data-title='${_("Delete style")}'>
+              <img border="0" src="${deleteIconURL}" alt="${ _("delete this style")}"/>
+            </a>
             % endif
             </td>
           </tr>
