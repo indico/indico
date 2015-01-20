@@ -1,0 +1,102 @@
+/*
+ * This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Basic elements */
+
+.right {
+    float: right;
+}
+
+.right-must {
+    float: right !important;
+}
+
+.left {
+    float: left;
+}
+
+.center {
+    margin: 0px auto;
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.inline-vcentered {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.header-aligned {
+    margin-top: 0.35em;
+}
+
+.clear {
+    clear: both;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.weak-hidden {
+    display: none;
+}
+
+.icon-medium{
+    font-size:3em;
+}
+
+.icon-large{
+    font-size:5em;
+}
+
+.icon-background {
+    font-size: 10em;
+    color: #EEE;
+}
+
+.area {
+    color: #555;
+    margin-top: 1em;
+    padding: 1em;
+    background: #fafafa;
+}
+
+.area h2:first-of-type {
+    margin-top: 0;
+}
+
+.area h2 {
+    color: #aaa;
+}
+
+.highlighted-area:hover .i-button {
+    -webkit-transition: box-shadow .5s;
+    box-shadow: 0 0 1px 1px rgba(100, 100, 100, 0.2);
+}

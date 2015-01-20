@@ -13,10 +13,37 @@
                     <td style="background-color: #444; color: white; text-align: center" nowrap>${ nameDay2 }</td>
                     <td style="background-color: #444; color: white; text-align: center" nowrap>${ nameDay3 }</td>
                     <td style="background-color: #444; color: white; text-align: center" nowrap>${ nameDay4 }</td>
-                    <td style="background-color: #444; color: white; text-align: center" nowrap>${ nameDay5 }</td>
-                    <td style="background-color: #444; color: white; text-align: center" nowrap>${ nameDay6 }</td>
+                    % if not isWeekendFree:
+                        <td style="background-color: #444; color: white; text-align: center" nowrap>${ nameDay5 }</td>
+                        <td style="background-color: #444; color: white; text-align: center" nowrap>${ nameDay6 }</td>
+                    % endif
                 </tr>
-                ${ items }
+                % for week in month:
+                    <tr>
+                    <% weekday = 0 %>
+                    % for day in week:
+                        %if weekday < 5 or not isWeekendFree:
+                            % if day is None:
+                                <td></td>
+                             % else:
+                            <td valign="top" bgcolor="#ECECEC">
+                                <table width="100%%">
+                                    <tr>
+                                        <td align="center">
+                                            <strong style="font-size: 1.3em; color: #888;">${day.getDayNumber()}</strong>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td valign="top">${getDayCell(day)}</td>
+                                    </tr>
+                                </table>
+                            </td>
+                            % endif
+                        % endif
+                        <% weekday += 1 %>
+                    % endfor
+                    </tr>
+                % endfor
             </table>
         </td>
     </tr>

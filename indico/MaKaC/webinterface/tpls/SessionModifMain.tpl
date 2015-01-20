@@ -18,20 +18,6 @@ ${ Code }
   </td>
 </tr>
 <tr>
-  <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Default place")}</span></td>
-  <td bgcolor="white" class="blacktext">${ place }</td>
-</tr>
-<!--
-<tr>
-  <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Start date")}</span></td>
-  <td bgcolor="white" class="blacktext">${ startDate }</td>
-</tr>
-<tr>
-  <td class="dataCaptionTD"nowrap><span class="dataCaptionFormat"> ${ _("End date")}</span></td>
-  <td bgcolor="white" class="blacktext">${ endDate }</td>
-</tr>
--->
-<tr>
   <td class="dataCaptionTD"nowrap><span class="dataCaptionFormat"> ${ _("Default contribution duration")}</span></td>
   <td bgcolor="white" class="blacktext">${ entryDuration }</td>
 </tr>

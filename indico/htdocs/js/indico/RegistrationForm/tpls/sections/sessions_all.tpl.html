@@ -1,0 +1,32 @@
+<div ng-controller="BillableCtrl">
+    <table>
+        <tr>
+            <td>
+                <span class="section-group-title">
+                    {{ 'Select the sessions you wish to attend to' | i18n }}:
+                </span>
+            </td>
+        </tr>
+        <tr ng-if="!anySessionEnabled()">
+            <td class="section-placeholder">
+                {{ 'There are no sessions for this event' | i18n }}.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div ng-repeat="item in section.items | filter: {enabled: true}">
+                    <input type="checkbox"
+                        name="sessions"
+                        value="{{ item.id }}"
+                        ng-checked="isSelected(item.id)"
+                        ng-disabled="paymentBlocked(item, userdata)"/>
+                    {{ item.caption }}
+                    <span ng-show="isBillable(item)" class="regFormPrice">{{ item.price }}</span>
+                    <span ng-show="isBillable(item)">
+                        <nd-currency currency="currency"></nd-currency>
+                    </span>
+                </div>
+            <td>
+        </tr>
+    </table>
+</div>

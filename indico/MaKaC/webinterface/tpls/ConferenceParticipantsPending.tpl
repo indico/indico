@@ -7,28 +7,35 @@
         </td>
     </tr>
     % if not conferenceStarted:
-        <tr id="headPanel" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);" class="follow-scroll">
+        <tr id="headPanel" class="follow-scroll">
             <td valign="bottom" width="100%" align="left" style="padding-top:5px;" colspan="9">
                 <table>
                     <tr>
                         <td valign="bottom" align="left">
-                            <ul style="margin-top:0px;" id="button-menu">
-                              <li class="left"><a href="#" id="accept">${ _("Accept")}</a></li>
-                              <li class="right arrow" id="reject"><a href="#">${ _("Reject")}</a>
-                                <ul>
-                                  <li><a href="#" id="reject_with_mail">${ _("With email notification")}</a></li>
-                                  <li><a href="#" id="reject_no_mail">${ _("No email notification")}</a></li>
-                                </ul>
-                              </li>
+                        <div id="button-menu" class="toolbar">
+                          <div class="group left">
+                            <a class="icon-checkbox-checked i-button arrow" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+                            <ul class="dropdown">
+                              <li><a href="#" id="selectAll">All</a></li>
+                              <li><a href="#" id="deselectAll">None</a></li>
                             </ul>
+                          </div>
+                          <div class="group left">
+                              <a class="i-button" id="accept" href="#">
+                                ${_("Accept")}
+                              </a>
+                              <a class="left arrow i-button" id="reject" href="#" data-toggle="dropdown">
+                                  ${_("Reject")}
+                              </a>
+                              <ul class="dropdown">
+                                <li><a href="#" id="reject_with_mail">${_("With email notification")}</a></li>
+                                <li><a href="#" id="reject_no_mail">${_("No email notification")}</a></li>
+                              </ul>
+                          </div>
+                        </div>
                         </td>
                     </tr>
                 </table>
-            </td>
-        </tr>
-        <tr id="selectBar" style="display:none">
-            <td colspan=10 style="padding: 5px 0px 10px;" nowrap>
-            Select: <a style="color: #0B63A5;" id="selectAll"> All</a>, <a style="color: #0B63A5;" id="deselectAll">None</a>
             </td>
         </tr>
     % endif
@@ -55,7 +62,7 @@
     </tr>
     <tr id="noPendingInfo">
         <td colspan=10 style="font-style: italic; padding:15px 0px 15px 15px; border-bottom: 1px solid #DDDDDD;" nowrap>
-            <span class="collShowBookingsText">${_("There are no pending participants yet")}</span>
+            <span class="italic">${_("There are no pending participants yet")}</span>
         </td>
     </tr>
     % for key, p in pending:
@@ -70,25 +77,9 @@ $(function() {
 });
 
 var actionPendingRows = function(){
-    $("input:checkbox[id^=checkPending]").click(function(){
-        if(this.checked){
-            $(this).parents('tr[id^=pending]').css('background-color',"#CDEB8B");
-        }else{
-            $(this).parents('tr[id^=pending]').css('background-color',"transparent");
-        }
-    });
-
-    $("tr[id^=pending]").hover(function () {
-        if($(this).find('input:checkbox:checked[id^=checkPending]').size() == 0){
-            $(this).css({'background-color' : 'rgb(255, 246, 223)'});
-        }}
-        , function () {
-          if($(this).find('input:checkbox:checked[id^=checkPending]').size() > 0){
-              $(this).css('background-color',"#CDEB8B");
-          }else{
-              $(this).css('background-color',"transparent");
-          }
-    });
+    $("input:checkbox[id^=checkPending]").on('change', function(){
+        $(this).closest('tr[id^=pending]').toggleClass('selected', this.checked);
+    }).trigger('change');
 };
 
 var checkNumberPending = function(){
@@ -112,17 +103,6 @@ IndicoUI.executeOnLoad(function(){
 
     actionPendingRows();
     checkNumberPending();
-
-    $("#selectPending").click(function(){
-        if($(this).attr('checked')){
-            $('input:checkbox[id^=checkPending]').attr('checked', 'checked');
-            $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"#CDEB8B");
-        }else{
-            $('input:checkbox[id^=checkPending]').removeAttr('checked');
-            $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"transparent");
-        }
-    });
-
 
     var atLeastOneParticipantSelected = function(){
         if ($('input:checkbox:checked').length>0){
@@ -166,25 +146,23 @@ IndicoUI.executeOnLoad(function(){
             $("input:checkbox:checked").each(function() {
                 participantsChecked[$(this).val()] = $(this).parent().siblings("[id^=namePending]").children("[id^=pending]").text();
             });
-            var subject = 'Your application for attendance in \'${conf.getTitle()}\' declined';
+            var subject = 'Your application for attendance in \'{0}\' declined'.format(${conf.getTitle()| n,j});
             var body = 'Dear {name},<br/><br/>' +
                         'your request to attend the \'{confTitle}\' has been declined by the event manager.<br/>';
             var legends = {'confTitle':$T('field containing the conference title.'),
                            'name':$T('field containing the full name of the participant.')};
-            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"),"${conf.getTitle()}", ${conf.getId()}, 'event.participation.rejectPendingWithEmail', participantsChecked, '${currentUser.getStraightFullName()}' ,subject, body, legends, pendingHandler);
+            var popup = new ParticipantsEmailPopup($T("Send mail to the participants"), ${conf.getTitle() | n,j}, ${conf.getId() | n,j}, 'event.participation.rejectPendingWithEmail', participantsChecked, '${currentUser.getStraightFullName()}' ,subject, body, legends, pendingHandler);
             popup.open();
         }
         return false;
     };
 
     $('#selectAll').click(function () {
-        $('input:checkbox[id^=checkPending]').attr('checked', 'checked');
-        $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"#CDEB8B");
+        $('input:checkbox[id^=checkPending]').prop('checked', true).trigger('change');
     });
 
     $('#deselectAll').click(function () {
-        $('input:checkbox[id^=checkPending]').removeAttr('checked');
-        $('input:checkbox[id^=checkPending]').parents('tr[id^=pending]').css('background-color',"transparent");
+        $('input:checkbox[id^=checkPending]').prop('checked', false).trigger('change');
     });
 
     $('#accept').bind('menu_select', function(){

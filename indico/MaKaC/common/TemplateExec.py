@@ -1,65 +1,144 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-"""Template engine."""
-
+from flask import session, g, request, render_template
+from flask import current_app as app
+import pkg_resources
 import os.path
-from MaKaC.common import DBMgr
-from MaKaC.common.Configuration import Config
+import re
+import posixpath
+from indico.core.config import Config
 from MaKaC.common.utils import formatDateTime, formatDate, formatTime
 from MaKaC.user import Avatar
 from mako.lookup import TemplateLookup
+import mako.exceptions as exceptions
 import MaKaC
-import MaKaC.common.info as info
+from MaKaC.plugins.base import PluginsHolder
 import xml.sax.saxutils
 
-from indico.util.date_time import format_number
+from indico.util.date_time import format_number, format_datetime, format_date, format_time
 from indico.util.i18n import ngettext
+from indico.util.contextManager import ContextManager
+from indico.util.mdx_latex import latex_escape
+from indico.util.string import safe_upper
+from indico.web.flask.util import url_for, url_rule_to_js
+
 
 # The main template directory
 TEMPLATE_DIR = Config.getInstance().getTPLDir()
-FILTER_IMPORTS = ['from indico.util.json import dumps as j',
-                  'from indico.util.string import html_line_breaks as html_breaks']
+FILTER_IMPORTS = [
+    'from indico.util.json import dumps as j',
+    'from indico.util.string import encode_if_unicode',
+    'from indico.util.string import html_line_breaks as html_breaks',
+    'from indico.util.string import remove_tags',
+    'from indico.util.string import render_markdown as m'
+]
+
+
+class IndicoTemplateLookup(TemplateLookup):
+
+    def getPluginTPlDir(self, pTypeName, pluginName, tplName):
+        pType = PluginsHolder().getPluginType(pTypeName)
+        if pType == None:
+            raise Exception(_("The plugin type does not exist"))
+        if pluginName != None:
+            plugin = pType.getPlugin(pluginName)
+            if plugin == None:
+                raise Exception(_("The plugin does not exist"))
+            return posixpath.normpath(pkg_resources.resource_filename(plugin.getModule().__name__, 'tpls/{0}'.format(tplName)))
+        return posixpath.normpath(pkg_resources.resource_filename(pType.getModule().__name__, 'tpls/{0}'.format(tplName)))
+
+
+    def get_template(self, uri, module=None):
+        """Return a :class:`.Template` object corresponding to the given
+        URL.
+
+        Note the "relativeto" argument is not supported here at the moment.
+
+        """
+
+        try:
+            if self.filesystem_checks:
+                return self._check(uri, self._collection[uri])
+            else:
+                return self._collection[uri]
+        except KeyError:
+
+            if uri[0] == "/" and os.path.isfile(uri):
+                return self._load(uri, uri)
+
+            # Case 1: Used with Template.forModule
+            if module != None and hasattr(module,"_dir"):
+                srcfile = posixpath.normpath(posixpath.join(module._dir, uri))
+                if os.path.isfile(srcfile):
+                    return self._load(srcfile, srcfile)
+
+            # Case 2: We look through the dirs in the TemplateLookup
+            u = re.sub(r'^\/+', '', uri)
+            for dir in self.directories:
+                srcfile = posixpath.normpath(posixpath.join(dir, u))
+                if os.path.isfile(srcfile):
+                    return self._load(srcfile, uri)
+            else:
+            #Case 3: we look into the plugins
+                uri_split = u.split("/")
+                if len(uri_split) == 2:
+                    srcfile = self.getPluginTPlDir(uri_split[0],None, uri_split[1])
+                    if os.path.isfile(srcfile):
+                        return self._load(srcfile, uri)
+                if len(uri_split) == 3:
+                    srcfile = self.getPluginTPlDir(*uri_split)
+                    if os.path.isfile(srcfile):
+                        return self._load(srcfile, uri)
+
+                # We do not find anything, so we raise the Exception
+                raise exceptions.TopLevelLookupException('Can\'t locate template for uri {0!r}'.format(uri))
 
 
 def _define_lookup():
-    return TemplateLookup(directories=["/"],
-                          module_directory=os.path.join(Config.getInstance().getTempDir(), "mako_modules"),
-                          disable_unicode=True,
-                          filesystem_checks=True,
-                          imports=FILTER_IMPORTS)
+    # TODO: disable_unicode shouldn't be used
+    # since unicode is disabled, template waits for
+    # byte strings provided by default_filters
+    # i.e converting SQLAlchemy model unicode properties to byte strings
+    return IndicoTemplateLookup(directories=[TEMPLATE_DIR],
+                                module_directory=os.path.join(Config.getInstance().getTempDir(), "mako_modules"),
+                                disable_unicode=True,
+                                input_encoding='utf-8',
+                                default_filters=['encode_if_unicode', 'str'],
+                                filesystem_checks=True,
+                                imports=FILTER_IMPORTS,
+                                cache_enabled=not ContextManager.get('offlineMode'))
 
 
 mako = _define_lookup()
 
 
-def render(tplPath, params):
+def render(tplPath, params={}, module=None):
     """Render the template."""
-    template = mako.get_template(tplPath)
+    template = mako.get_template(tplPath, module)
     registerHelpers(params)
 
     # This parameter is needed when a template which is stored
     # outside of the main tpls directory (e.g. plugins) wants
     # to include another template from the main directory.
     # Usage example: <%include file="${TPLS}/SomeTemplate.tpl"/>
-    params["TPLS"] = TEMPLATE_DIR
+    params['TPLS'] = TEMPLATE_DIR
 
     return template.render(**params)
 
@@ -148,16 +227,6 @@ def quoteattr(s):
     return xml.sax.saxutils.quoteattr(s)
 
 
-def roomClass(room):
-    if room.isReservable:
-        roomCls = "basicRoom"
-    if not room.isReservable:
-        roomCls = "privateRoom"
-    if room.isReservable and room.resvsNeedConfirmation:
-        roomCls = "moderatedRoom"
-    return roomCls
-
-
 def dequote(s):
     """Remove surrounding quotes from a string (if there are any)."""
     if ((s.startswith('"') or s.startswith("'"))
@@ -243,14 +312,25 @@ def escapeHTMLForJS(s):
         (carriage return) -> \r
         (backspace) -> \b
         (form feed) -> \f
-
-        TODO: try to optimize this (or check if it's optimum already).
-        translate() doesn't work, because we are replacing characters by couples of characters.
-        explore use of regular expressions, or maybe split the string and then join it manually, or just replace them by
-        looping through the string and using an if...elif... etc.
     """
-    res = s.replace("\\", "\\\\").replace("\'", "\\\'").replace("\"", "\\\"").replace("&", "\\&").replace("/", "\\/").replace("\n", "\\n").replace("\t", "\\t").replace("\r", "\\r").replace("\b", "\\b").replace("\f", "\\f")
-    return res
+    return s.replace("\\", "\\\\")\
+            .replace("\'", "\\\'")\
+            .replace("\"", "\\\"")\
+            .replace("&", "\\&")\
+            .replace("/", "\\/")\
+            .replace("\n", "\\n")\
+            .replace("\t", "\\t")\
+            .replace("\r", "\\r")\
+            .replace("\b", "\\b")\
+            .replace("\f", "\\f")
+
+
+def mako_plugin_hook(*name, **kwargs):
+    from indico.core.plugins import plugin_hook
+    kwargs = {k: unicode(v, 'utf-8') if isinstance(v, str) else v for k, v in kwargs.iteritems()}
+    result = plugin_hook(*name, **kwargs)
+    return result.encode('utf-8')
+
 
 def registerHelpers(objDict):
     """
@@ -279,6 +359,12 @@ def registerHelpers(objDict):
         objDict['formatTime'] = formatTime
     if not 'formatDate' in objDict:
         objDict['formatDate'] = formatDate
+    if not 'format_datetime' in objDict:
+        objDict['format_datetime'] = format_datetime
+    if not 'format_date' in objDict:
+        objDict['format_date'] = format_date
+    if not 'format_time' in objDict:
+        objDict['format_time'] = format_time
     if not 'systemIcon' in objDict:
         objDict['systemIcon'] = systemIcon
     if not 'formatDateTime' in objDict:
@@ -293,9 +379,6 @@ def registerHelpers(objDict):
         objDict['Config'] = MaKaC.common.Configuration.Config
     if not 'jsBoolean' in objDict:
         objDict['jsBoolean'] = jsBoolean
-    if not 'offlineRequest' in objDict:
-        from MaKaC.services.interface.rpc.offline import offlineRequest
-        objDict['offlineRequest'] = offlineRequest
     if not 'jsonDescriptor' in objDict:
         from MaKaC.services.interface.rpc.offline import jsonDescriptor
         objDict['jsonDescriptor'] = jsonDescriptor
@@ -309,9 +392,7 @@ def registerHelpers(objDict):
         from MaKaC.services.interface.rpc.offline import roomInfo
         objDict['roomInfo'] = roomInfo
     if not 'roomBookingActive' in objDict:
-        if DBMgr.getInstance().isConnected():
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            objDict['roomBookingActive'] = minfo.getRoomBookingModuleActive()
+        objDict['roomBookingActive'] = Config.getInstance().getIsRoomBookingActive()
     if not 'user' in objDict:
         if not '__rh__' in objDict or not objDict['__rh__']:
             objDict['user'] = "ERROR: Assign self._rh = rh in your WTemplated.__init__( self, rh ) method."
@@ -319,8 +400,6 @@ def registerHelpers(objDict):
             objDict['user'] = objDict['__rh__']._getUser()  # The '__rh__' is set by framework
     if 'rh' not in objDict and '__rh__' in objDict:
         objDict['rh'] = objDict['__rh__']
-    if not roomClass in objDict:
-        objDict['roomClass'] = roomClass
     if not 'systemIcon' in objDict:
         objDict['systemIcon'] = systemIcon
     if not 'iconFileName' in objDict:
@@ -331,11 +410,24 @@ def registerHelpers(objDict):
         objDict['deepstr'] = deepstr
     if not 'beautify' in objDict:
         objDict['beautify'] = beautify
+    if not 'latex_escape' in objDict:
+        objDict['latex_escape'] = latex_escape
     # allow fossilization
     if not 'fossilize' in objDict:
         from MaKaC.common.fossilize import fossilize
         objDict['fossilize'] = fossilize
     if not 'N_' in objDict:
-        objDict['N_'] = ngettext
+        objDict['ngettext'] = ngettext
     if not 'format_number' in objDict:
         objDict['format_number'] = format_number
+    objDict.setdefault('safe_upper', safe_upper)
+    # flask proxies
+    objDict['_session'] = session
+    objDict['_request'] = request
+    objDict['_g'] = g
+    objDict['_app'] = app
+    # flask utils
+    objDict['url_for'] = url_for
+    objDict['url_rule_to_js'] = url_rule_to_js
+    objDict['render_template'] = render_template
+    objDict['plugin_hook'] = mako_plugin_hook

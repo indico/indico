@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.plugins.Collaboration.base import WCSPageTemplateBase, WJSBase, WCSCSSBase,\
     CollaborationTools
@@ -26,10 +25,11 @@ from MaKaC.conference import Contribution
 from MaKaC.common.timezoneUtils import isSameDay
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.Conversion import Conversion
-from MaKaC.fossils.contribution import IContributionWithSpeakersFossil
+from MaKaC.plugins.Collaboration.RecordingRequest.fossils import IContributionRRFossil
 from MaKaC.plugins.Collaboration import urlHandlers as collaborationUrlHandlers
 from MaKaC.plugins.Collaboration.RecordingRequest.common import getCommonTalkInformation
-
+from MaKaC.plugins.Collaboration.handlers import RCCollaborationAdmin, RCCollaborationPluginAdmin
+from indico.core.index import Catalog
 
 class WNewBookingForm(WCSPageTemplateBase):
 
@@ -43,26 +43,30 @@ class WNewBookingForm(WCSPageTemplateBase):
         vars["IsLecture"] = isLecture
 
         underTheLimit = self._conf.getNumberOfContributions() <= self._RecordingRequestOptions["contributionLoadLimit"].getValue()
-        booking = self._conf.getCSBookingManager().getSingleBooking('RecordingRequest')
+        manager = Catalog.getIdx("cs_bookingmanager_conference").get(self._conf.getId())
+        user = self._rh._getUser()
+        isManager = user.isAdmin() or RCCollaborationAdmin.hasRights(user) or \
+            RCCollaborationPluginAdmin.hasRights(user, plugins=['RecordingRequest'])
+        booking = manager.getSingleBooking('RecordingRequest')
         initialChoose = booking is not None and booking._bookingParams['talks'] == 'choose'
         initialDisplay = (self._conf.getNumberOfContributions() > 0 and underTheLimit) or (booking is not None and initialChoose)
 
+
         vars["InitialChoose"] = initialChoose
         vars["DisplayTalks"] = initialDisplay
+        vars["isManager"] = isManager
 
-        talks, rRoomFullNames, rRoomNames, recordingAbleTalks = getCommonTalkInformation(self._conf)
-        nTalks = len(talks)
+        talks, rRoomFullNames, rRoomNames, recordingAbleTalks, recordingUnableTalks = getCommonTalkInformation(self._conf)
         nRecordingCapable = len(recordingAbleTalks)
 
         vars["HasRecordingCapableTalks"] = nRecordingCapable > 0
-        vars["NTalks"] = nTalks
+        vars["NTalks"] = len(talks)
 
-        #list of "locationName:roomName" strings
+        # list of "locationName:roomName" strings
         vars["RecordingCapableRooms"] = rRoomFullNames
-
         vars["NRecordingCapableContributions"] = nRecordingCapable
 
-        #we see if the event itself is webcast capable (depends on event's room)
+        # we check if the event itself is recoring capable (depends on event's room)
         confLocation = self._conf.getLocation()
         confRoom = self._conf.getRoom()
         if confLocation and confRoom and (confLocation.getName() + ":" + confRoom.getName() in rRoomNames):
@@ -70,18 +74,21 @@ class WNewBookingForm(WCSPageTemplateBase):
         else:
             topLevelRecordingCapable = False
 
-        #Finally, this event is webcast capable if the event itself or one of its talks are
-        vars["RecordingCapable"] = topLevelRecordingCapable or nRecordingCapable > 0
+        # Finally, this event is recoring capable if the event itself
+        # or one of its talks are capable or user is admin, collaboration
+        # manager or recording plugin manager
+        vars["RecordingCapable"] = topLevelRecordingCapable or nRecordingCapable > 0 or isManager
 
-        if initialDisplay:
-            recordingAbleTalks.sort(key = Contribution.contributionStartDateForSort)
+        recordingAbleTalks.sort(key = Contribution.contributionStartDateForSort)
+        talks.sort(key = Contribution.contributionStartDateForSort)
 
-            vars["Contributions"] = fossilize(recordingAbleTalks, IContributionWithSpeakersFossil,
-                                          tz = self._conf.getTimezone(),
-                                          units = '(hours)_minutes',
-                                          truncate = True)
-        else:
-            vars["Contributions"] = []
+        fossil_args = dict(tz=self._conf.getTimezone(),
+                           units='(hours)_minutes',
+                           truncate=True)
+
+        vars["Contributions"] = fossilize(talks, IContributionRRFossil, **fossil_args)
+        vars["ContributionsAble"] = fossilize(recordingAbleTalks, IContributionRRFossil, **fossil_args)
+        vars["ContributionsUnable"] = fossilize(recordingUnableTalks, IContributionRRFossil, **fossil_args)
 
         vars["PostingUrgency"] = postingUrgency
         vars["linkToEA"] = collaborationUrlHandlers.UHCollaborationElectronicAgreement.getURL(self._conf)

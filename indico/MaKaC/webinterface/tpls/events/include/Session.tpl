@@ -18,11 +18,7 @@
             ${session.getTitle()}
         % endif
         </span>
-        % if conf.getCSBookingManager() and conf.getCSBookingManager().hasVideoService(item.getUniqueId()):
-            % for video in conf.getCSBookingManager().getVideoServicesById(item.getUniqueId()):
-                <%include file="VideoService.tpl" args="video=video"/>
-            % endfor
-        % endif
+        ${"".join(pluginDetailsSessionContribs.get(item.getUniqueId(),""))}
     </span>
 
     % if session.getDescription():
@@ -31,23 +27,23 @@
 
     <table class="sessionDetails">
         <tbody>
-        % if len(item.getConvenerList()) > 0 or session.getConvenerText():
+        % if len(item.getOwnConvenerList()) > 0 or session.getConvenerText():
             <tr>
-                <td class="leftCol">Convener${'s' if len(session.getConvenerList()) > 1 else ''}:</td>
-                <td>${common.renderUsers(item.getConvenerList(), unformatted=session.getConvenerText())}</td>
+                <td class="leftCol">${ _("Conveners") if len(item.getOwnConvenerList()) > 1 else _("Convener")}:</td>
+                <td>${common.renderUsers(item.getOwnConvenerList(), unformatted=session.getConvenerText())}</td>
             </tr>
         % endif
 
         % if getLocationInfo(item) != getLocationInfo(item.getConference()):
             <tr>
-                <td class="leftCol">Location:</td>
+                <td class="leftCol">${ _("Location")}:</td>
                 <td>${common.renderLocation(item, parent=item.getConference())}</td>
             </tr>
         % endif
 
         % if len(session.getAllMaterialList()) > 0:
         <tr>
-            <td class="leftCol">Material:</td>
+            <td class="leftCol">${ _("Material")}:</td>
             <td>
             % for material in session.getAllMaterialList():
                 % if material.canView(accessWrapper):

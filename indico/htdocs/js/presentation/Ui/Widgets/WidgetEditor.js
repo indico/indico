@@ -3,7 +3,7 @@
  */
 
 /**
- * 
+ *
  * @param {XElement, Function} target
  * @param {Function, String} [template]
  * @return {Function}
@@ -30,7 +30,7 @@ function WidgetEditor(target, template) {
 		}
 		return bind.accessor(element, source, templator);
 	};
-};
+}
 
 Widget.timeTemplate = {
 	toTarget: formatTime,
@@ -52,6 +52,5 @@ Widget.dateTemplate = {
 
 Widget.textEditor = WidgetEditor(Html.edit);
 Widget.timeEditor = WidgetEditor(Html.edit, Widget.timeTemplate);
-Widget.dateEditor = WidgetEditor(Html.edit, Widget.dateTemplate);
 Widget.multiLineEditor = WidgetEditor(Html.textarea);
 

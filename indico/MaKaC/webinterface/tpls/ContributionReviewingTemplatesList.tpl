@@ -24,7 +24,7 @@
                 ${ t.getDescription() }
             </td>
             <td class="content" style="text-align: right;">
-                <span class="link" onclick="window.location='${ urlHandlers.UHDownloadContributionTemplate.getURL(t) }';">${ _("Download") }</span>
+                <a href="${ urlHandlers.UHDownloadPRTemplate.getURL(t) }">${ _("Download") }</a>
             </td>
         </tr>
         % endfor

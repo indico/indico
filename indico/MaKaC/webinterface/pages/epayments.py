@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import string
 
@@ -27,7 +26,7 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface import navigation
 from MaKaC.webinterface import wcomponents
 from xml.sax.saxutils import quoteattr
-from MaKaC.common import Configuration
+from indico.core import config as Configuration
 from datetime import timedelta,datetime
 from MaKaC.webinterface.common.countries import CountryHolder
 from MaKaC.webinterface.pages import registrationForm
@@ -44,14 +43,14 @@ class WPConfModifEPaymentBase( registrationForm.WPConfModifRegFormBase ):
 class WPConfModifEPayment( WPConfModifEPaymentBase ):
 
     def _getTabContent( self, params ):
-        wc = WConfModifEPayment(self._conf, self._getAW().getUser())
+        wc = WConfModifEPayment(self._conf, self._getAW())
         return wc.getHTML()
 
 class WConfModifEPayment( wcomponents.WTemplated ):
 
-    def __init__( self, conference, user ):
+    def __init__( self, conference, aw ):
         self._conf = conference
-        self._user = user
+        self._aw = aw
 
     def _getSectionsHTML(self):
         modPay=self._conf.getModPay()
@@ -72,7 +71,7 @@ class WConfModifEPayment( wcomponents.WTemplated ):
                 img = notEnabledBulb
                 text = disabledText
 
-            pluginHTML = gs.getPluginSectionHTML(self._conf, self._user, urlStatus, urlModif, img, text)
+            pluginHTML = gs.getPluginSectionHTML(self._conf, self._aw, urlStatus, urlModif, img, text)
             html.append(pluginHTML)
 
         html.insert(0, """<a href="" name="sections"></a><input type="hidden" name="oldpos"><table align="left">""")
@@ -88,9 +87,8 @@ class WConfModifEPayment( wcomponents.WTemplated ):
         vars["enablePic"]=quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "enabledSection" )))
         vars["disablePic"]=quoteattr(str(Configuration.Config.getInstance().getSystemIconURL( "disabledSection" )))
         if modPay.isActivated():
+            vars["activated"] = True
             vars["changeTo"] = "False"
-            vars["status"] = _("ENABLED")
-            vars["changeStatus"] = _("DISABLE")
             vars["disabled"] = ""
             vars["detailPayment"] = self._conf.getModPay().getPaymentDetails()
             vars["conditionsPayment"] = self._conf.getModPay().getPaymentConditions()
@@ -102,9 +100,8 @@ class WConfModifEPayment( wcomponents.WTemplated ):
                 vars["conditionsEnabled"] = "ENABLED"
             vars["Currency"]=self._conf.getRegistrationForm().getCurrency() or _("not selected")
         else:
+            vars["activated"] = False
             vars["changeTo"] = "True"
-            vars["status"] = _("DISABLED")
-            vars["changeStatus"] = _("ENABLE")
             vars["disabled"] = "disabled"
             vars["detailPayment"] = ""
             vars["conditionsPayment"] = ""

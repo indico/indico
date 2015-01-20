@@ -59,7 +59,7 @@ type("XElement", ["List"], {
 					e = window.event;
 				}
  				return observers(e);
-			}
+			};
 			return observers;
 		}).attach(observer);
 	},

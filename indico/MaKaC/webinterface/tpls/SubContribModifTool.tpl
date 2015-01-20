@@ -1,12 +1,8 @@
-<table align="center" width="100%" class="toolsTab"><tr><td>
-<br>
-<table align="center">
-    <tr>
-        <td>
-            <a href="${ deleteSubContributionURL }"><img src="${ deleteIconURL }" alt="
-delete" border="0" align="middle"></a> <a href="${ deleteSubContributionURL }"><b> ${ _("Delete this sub contribution")}</b></a>
-        </td>
-    </tr>
-</table>
-<br>
-</td></tr></table>
+<div class="area overflow" style="max-width: 700px;">
+    <h2>${_("Delete this SubContribution")}</h2>
+    <div>
+        ${ _("By deleting this subcontribution you will delete as well all the items contained within.")}
+
+        <a href="${deleteSubContributionURL}" class="right i-button danger icon-remove">${_("Delete")}</a>
+    </div>
+</div>

@@ -1,7 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+-->
 <xsl:stylesheet version="1.0" xmlns:marc="http://www.loc.gov/MARC21/slim" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-  <xsl:output method="xml" indent="yes"/> 
+  <xsl:output method="xml" indent="yes"/>
 
   <xsl:template match="/">
     <xsl:apply-templates select="marc:collection"/>
@@ -25,14 +43,14 @@
       <xsl:apply-templates select="marc:datafield[@tag!=611 and @tag!=962]" />
       <parent>
 	<xsl:for-each select="marc:datafield[@tag=611]">
-	  <xsl:for-each select="marc:subfield[@code='a']">	  
+	  <xsl:for-each select="marc:subfield[@code='a']">
 	    <title>
 	      <xsl:value-of select="text()"/>
 	    </title>
 	  </xsl:for-each>
 	</xsl:for-each>
 	<xsl:for-each select="marc:datafield[@tag=962]">
-	  <xsl:for-each select="marc:subfield[@code='b']">	  
+	  <xsl:for-each select="marc:subfield[@code='b']">
 	    <code>
 	      <xsl:value-of select="text()"/>
 	    </code>
@@ -59,7 +77,7 @@
       </xsl:for-each>
     </xsl:if>
 
-    <xsl:if test="@tag=245">	
+    <xsl:if test="@tag=245">
       <xsl:for-each select="marc:subfield[@code='a']">
 	<title>
 	  <xsl:value-of select="text()"/>
@@ -85,12 +103,12 @@
 	<xsl:for-each select="marc:subfield[@code='u']">
 	  <url>
 	    <xsl:value-of select="text()"/>
-	  </url>	
+	  </url>
 	</xsl:for-each>
 	<xsl:for-each select="marc:subfield[@code='y']">
 	  <description>
 	    <xsl:value-of select="text()"/>
-	  </description>	
+	  </description>
 	</xsl:for-each>
       </material>
     </xsl:if>
@@ -100,12 +118,12 @@
 	<xsl:for-each select="marc:subfield[@code='a']">
 	  <name>
 	    <xsl:value-of select="text()"/>
-	  </name>	
+	  </name>
 	</xsl:for-each>
 	<xsl:for-each select="marc:subfield[@code='e']">
 	  <role>
 	    <xsl:value-of select="text()"/>
-	  </role>	
+	  </role>
 	</xsl:for-each>
 	<xsl:for-each select="marc:subfield[@code='u']">
 	  <affiliation>
@@ -116,7 +134,7 @@
     </xsl:if>
 
     <xsl:if test="@tag=520">
-      <xsl:for-each select="marc:subfield[@code='a']">	  
+      <xsl:for-each select="marc:subfield[@code='a']">
 	<description>
 	  <xsl:value-of select="text()"/>
 	</description>

@@ -69,7 +69,7 @@ var Json = {
 				throw "Invalid object: " + str(object);
 		}
 	}
-}
+};
 
 var $J = Json.write;
 

@@ -82,7 +82,7 @@ var videoServiceInfo = {};
     </ul>
 </div>
 <script type="text/javascript">
-    var slideSpeed = 'fast';
+
     var tooltipMsgs = {moreinfo : $T('Click here to show / hide detailed information'),
                        morebookings : $T('There are more bookings than is currently shown.<br /> ' +
                                          'Click here to show / hide more information.')};
@@ -94,22 +94,14 @@ var videoServiceInfo = {};
             at: 'top middle'
         },
         style: {
-            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-light'
+            classes: 'qtip-rounded qtip-shadow qtip-light'
         }
-    });
-
-    $('.collaborationDisplayMoreInfo').click(function() {
-        var newText = ($(this).text() == $T("More Info")) ? $T("Hide info") : $T("More Info");
-        var textNode = $(this);
-        $(this).closest('.videoServiceWrapper').next('.collabInfoInline').slideToggle(slideSpeed, function() {
-            textNode.text(newText);
-        });
     });
 
     $('#collShowBookings').click(function() {
         var newText = ($(this).text() == $T("Show")) ? $T("Hide additional bookings") : $T("Show");
         var textNode = $(this);
-        $('#collHiddenBookings').slideToggle(slideSpeed, function() {
+        $('#collHiddenBookings').slideToggle('fast', function() {
             textNode.text(newText);
         });
     });
@@ -133,7 +125,7 @@ var videoServiceInfo = {};
             }
         },
         style: {
-            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup'
+            classes: 'qtip-rounded qtip-shadow qtip-popup'
         }
     });
 
@@ -146,7 +138,7 @@ var videoServiceInfo = {};
             at: 'top middle'
         },
         style: {
-            classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-light'
+            classes: 'qtip-rounded qtip-shadow qtip-light'
         }
     });
 

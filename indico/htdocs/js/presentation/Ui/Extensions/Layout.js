@@ -276,4 +276,4 @@ var Layout = {
 //		}
 //		element.style(style);
 //	}
-}
+};

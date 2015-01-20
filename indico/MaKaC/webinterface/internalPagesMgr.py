@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 from BTrees import OOBTree
 from persistent import Persistent
 from MaKaC.common.Counter import Counter
@@ -28,10 +27,10 @@ class InternalPagesMgrRegistery:
     """
     Class to get the InternalPagesMgr for a conference
     """
-    
+
     def __init__(self):
         self._pagesMgrRegistery = None
-    
+
     def _getInternalPagesMgrRegistery( self ):
         #DBMgr.getInstance().commit()
         if not self._pagesMgrRegistery:
@@ -42,8 +41,8 @@ class InternalPagesMgrRegistery:
                 self._pagesMgrRegistery = OOBTree.OOBTree()
                 db_root["internalPagesRegistery"] = self._pagesMgrRegistery
         return self._pagesMgrRegistery
-    
-    
+
+
     def registerInternalPagesMgr( self, conference, intPagesMgr ):
         """Associates a given conference with a confDispplayMgr
         """
@@ -65,7 +64,7 @@ class InternalPagesMgr(Persistent):
     """
     base class for the InternalPagesMgr object
     """
-    
+
     def __init__(self, conf):
         self._conf=conf
         self._pages={}
@@ -87,7 +86,7 @@ class InternalPagesMgr(Persistent):
             page.setId(self._generateNewPageId())
         self._pages[page.getId()]=page
         self.notifyModification()
-        
+
     def removePage(self, page):
         if self._pages.has_key(page.getId()):
             self._pages.pop(page.getId())
@@ -126,7 +125,7 @@ class InternalPage(Persistent):
             return self._isHome
 
     def setHome(self, isHome=False):
-        self._isHome=isHome 
+        self._isHome=isHome
 
     def getConference(self):
         return self._conf
@@ -150,7 +149,7 @@ class InternalPage(Persistent):
         self._title=title
 
     def getLocator( self ):
-        """Gives back a globaly unique identification encapsulated in a Locator 
+        """Gives back a globaly unique identification encapsulated in a Locator
             object for the internal page instance
         """
         if self._conf == None:

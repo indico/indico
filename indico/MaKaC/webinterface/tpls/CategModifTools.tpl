@@ -9,7 +9,6 @@
         ${ deleteButton }
         <input type="hidden" name="selectedCateg" value="${ id }">
         </form>
-        ${ clearCache }
   </td>
 </tr>
 </table>

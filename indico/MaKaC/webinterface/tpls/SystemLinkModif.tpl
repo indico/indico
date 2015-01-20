@@ -25,4 +25,5 @@
             </td></tr></table>
         </td>
     </tr>
+    <%block name="additionalOptions" />
 </table>

@@ -1,39 +1,39 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+import re
+
+from persistent import Persistent
+
+from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.rooms import Room
+from indico.core.config import Config
 
 from MaKaC.plugins.Collaboration.base import CollaborationException, CSErrorBase
-from persistent import Persistent
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
 from MaKaC.common.fossilize import fossilizes, Fossilizable
-from MaKaC.plugins.Collaboration.Vidyo.fossils import IVidyoErrorFossil, \
-    IFakeAvatarOwnerFossil
+from MaKaC.plugins.Collaboration.Vidyo.fossils import IVidyoErrorFossil, IFakeAvatarOwnerFossil
 from MaKaC.i18n import _
-import re
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
-from MaKaC.plugins.Collaboration.Vidyo.indexes import EventEndDateIndex
+from MaKaC.plugins.Collaboration.Vidyo.indexes import EventEndDateIndex, BOOKINGS_BY_VIDYO_ROOMS_INDEX
 from MaKaC.common.timezoneUtils import nowutc
 from datetime import timedelta
-from MaKaC.common.logger import Logger
-from MaKaC.rb_location import CrossLocationQueries, CrossLocationDB
-from MaKaC.common import info
-
+from indico.core.index import Catalog
 
 
 def getVidyoOptionValue(optionName):
@@ -57,23 +57,22 @@ class VidyoTools(object):
         title = re.compile(ur"^[\W\d]$", re.UNICODE).sub('_', title)
         # Get rid of everything else that's not allowed
         title = re.compile(ur"[^\w._\- ]|'$", re.UNICODE).sub('_', title)
-        return cls.replaceSpacesInName(title)[:cls.maxRoomNameLength(conf)]
+        return cls.replaceSpacesInName(title)[:cls.maxRoomNameLength()]
 
     @classmethod
-    def maxRoomNameLength(cls, conf):
-        suffix = cls.roomNameForVidyo('', conf.getId())
+    def maxRoomNameLength(cls):
+        suffix = cls.roomNameForVidyo('')
         return 61 - len(suffix)
 
     @classmethod
-    def roomNameForVidyo(cls, roomName, confId):
+    def roomNameForVidyo(cls, roomName):
         """ We apply the _indico_ suffix
             and we turn the name into an unicode object, since suds
             works with either ascii-encoded str objects or unicode objects
             (not utf-8 encoded str objects), and the name may have unicode chars
         """
-        strName = roomName + '_indico_' + confId
         try:
-            return strName.decode('utf-8')
+            return roomName.decode('utf-8')
         except UnicodeDecodeError:
             return VidyoError("invalidName")
 
@@ -118,19 +117,13 @@ class VidyoTools(object):
             This function turns "Hello_Kitty_indico_5423" back into "Hello_Kitty" (note: the _ are not turned back into spaces).
             The value returned is always a utf-8 encoded str object.
         """
-        if not cls.__vidyoRecoverNameRE:
-            cls.__vidyoRecoverNameRE = re.compile("_indico_[\d]+$")
-
         try:
             name = str(name)
+            name = unicode(name)
+            name = name.encode('utf-8')
         except UnicodeEncodeError:
-            try:
-                name = unicode(name)
-                name = name.encode('utf-8')
-            except UnicodeEncodeError:
-                return None
-
-        return cls.__vidyoRecoverNameRE.sub("", name)
+            return None
+        return name
 
     @classmethod
     def recoverVidyoDescription(cls, description):
@@ -148,8 +141,8 @@ class VidyoTools(object):
     @classmethod
     def getAvatarLoginList(cls, avatar):
         loginList = []
-        for authenticatorName in getVidyoOptionValue("authenticatorList"):
-            loginList.extend([identity.getLogin() for identity in avatar.getIdentityByAuthenticatorName(authenticatorName)])
+        for authenticatorId in getVidyoOptionValue("authenticatorList"):
+            loginList.extend([identity.getLogin() for identity in avatar.getIdentityByAuthenticatorId(authenticatorId)])
         return loginList
 
     @classmethod
@@ -196,22 +189,31 @@ class VidyoTools(object):
         return nowutc() - timedelta(days = getVidyoOptionValue("maxDaysBeforeClean"))
 
     @classmethod
-    def getLinkRoomIp(cls, linkVideo):
-        if linkVideo is None:
+    def getLinkRoomAttribute(cls, linkVideo, attName='h323-ip'):
+        if linkVideo is None or not Config.getInstance().getIsRoomBookingActive():
             return ""
         location = linkVideo.getLocation()
         room = linkVideo.getRoom()
-        roomIp = ""
-        if location and room and location.getName() and room.getName() and location.getName().strip() and room.getName().strip():
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            if minfo.getRoomBookingModuleActive():
-                CrossLocationDB.connect()
-                try:
-                    roomInfo = CrossLocationQueries.getRooms( location = location.getName(), roomName = room.getName())
-                    roomIp = roomInfo.customAtts["H323 IP"]
-                except Exception, e:
-                    Logger.get("Vidyo").warning("Location: " + location.getName() + "Problem with CrossLocationQueries when retrieving the list of all rooms with a H323 IP: " + str(e))
-        return roomIp
+        if not location or not room:
+            return ""
+        location_name = location.getName()
+        room_name = room.getName()
+        if not location_name or not room_name:
+            return ''
+        rb_room = Room.find_first(Location.name == location_name.strip(), Room.name == room_name.strip(),
+                                  _join=Room.location)
+        return rb_room.get_attribute_value(attName, '') if rb_room else ''
+
+    @classmethod
+    def getContactSupportText(cls):
+        contactSupport = ""
+        if getVidyoOptionValue("contactSupport"):
+            contactSupport += _("""\nPlease contact %s for help.""") % getVidyoOptionValue("contactSupport")
+        return contactSupport
+
+    @classmethod
+    def getIndexByVidyoRoom(cls):
+        return Catalog.getIdx(BOOKINGS_BY_VIDYO_ROOMS_INDEX)
 
 
 class FakeAvatarOwner(Persistent, Fossilizable):
@@ -222,11 +224,14 @@ class FakeAvatarOwner(Persistent, Fossilizable):
 
     def __init__(self, accountName):
         self._accountName = accountName
+
     @classmethod
     def getId(cls):
         return None
+
     def getName(self):
         return self._accountName
+    getStraightFullName = getName
 
 
 class VidyoError(CSErrorBase):
@@ -258,6 +263,12 @@ class VidyoError(CSErrorBase):
             if self._errorType == "duplicated":
                 return _("This Public room could not be created or changed because Vidyo considers the resulting public room name as duplicated.")
 
+            elif self._errorType == "duplicatedWithOwner":
+                return _("""There is already a room with this name in the system. Would you like to attach it to this event?""")
+
+            elif self._errorType == "PINLength":
+                return _("""The PIN for the vidyo room has to be a 3-10 digit number.""")
+
             elif self._errorType == "badOwner":
                 return _("This Public room could not be created or changed because the specified moderator does not have a Vidyo account.")
 
@@ -284,6 +295,9 @@ class VidyoError(CSErrorBase):
 
             elif self._errorType == "userHasNoAccounts":
                 return _("The user selected as owner has no login information")
+
+            elif self._errorType == "notValidRoom" and self._operation == "attach":
+                return _("Either there is no room with this name or you are not its owner. Please select another one.")
 
             else:
                 return self._errorType

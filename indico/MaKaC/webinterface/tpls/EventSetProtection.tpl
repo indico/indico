@@ -7,7 +7,7 @@
             <input type="radio" id="inheritRadioButton" class="eventProtectionRadioButton" name="eventProtection" value='inherit' onclick="hideUserList();"/><label for="inheritRadioButton"><span id="inheritRadioEntryKey">${ _("Same as for Category '") }<span id="radioCategTitle">${ categ["title"] }</span>'</span> : <span id="radioCategProtection" style="font-weight: bold;">${ protection }</span> ${ _("for the moment, but it may change") }</label>
         </span>
         <span id="privateRadioButtonWrapper" class='eventProtectionRadioEntry'>
-            <input type="radio" id="privateRadioButton" class="eventProtectionRadioButton" name="eventProtection" value='private' onclick="showUserList();"/><label for="privateRadioButton"><span style="color: #B02B2C">${ _("Private") }</span>${ _(" : Can only be viewed by you and users/groups chosen by you from the list of users") }</label>
+            <input type="radio" id="privateRadioButton" class="eventProtectionRadioButton" name="eventProtection" value='private' onclick="showUserList();"/><label for="privateRadioButton"><span style="color: #B02B2C">${ _("Restricted") }</span>${ _(" : Can only be viewed by you and users/groups chosen by you from the list of users") }</label>
         </span>
         <span id="userListInfo" class="userListInfo" style="display: none;">
             <em>${ _("Please fill in the list below with the users/groups that will be granted access to this event. You can always do so later, once the event is created, through the event protection settings.") }</em>
@@ -85,7 +85,7 @@
                 'userListDiv', 'userList',
                 null, true, null,
                 true, true, null, null,
-                false, false, true,
+                false, false, false, true,
                 userListNothing, userListNothing, userListNothing);
 
         // ---- When the private radio button is selected, display the list of users

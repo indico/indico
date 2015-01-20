@@ -1,23 +1,17 @@
+<%inherit file="ConfDisplayBodyBase.tpl"/>
 
-  <table class="noticeMain" align="center">
-    <tr>
-      <td class="title">${ title }</td>
-    </tr>
-    <tr>
-      <td class="td">
+<%block name="title">
+    ${body_title}
+</%block>
 
-        <br><br>
-        <table class="noticeInside" align="center">
-          <tr>
-            <td>${ msg }<br>
-              <ul>
-                <li><b> ${ _("Evaluation start date")}:</b> ${ startDate }</li>
-                <li><b> ${ _("Evaluation end date")}:</b> ${ endDate }</li>
-              </ul>
-            </td>
-          </tr>
-        </table>
-
-      </td>
-    </tr>
-  </table>
+<%block name="content">
+    <div class="info-message-box">
+        <div class="message-text">
+            ${msg}
+            <ul>
+                <li>${_("Start date")}: ${startDate}</li>
+                <li>${_("End date")}: ${endDate}</li>
+            </ul>
+        </div>
+    </div>
+</%block>

@@ -15,7 +15,7 @@
             </table>
             <br><br>
              ${ _("If you are this person, please use your existing account.")}<br>
-             ${ _("If you can't remember your login and password, please use the button below to receive them by email.")}<br>
+             ${ _("If you can't remember your login and password, please use the button below to receive your account name and a link to reset your password by email.")}<br>
             <form action="${ postURL }" method="POST">
                 <input type="submit" class="btn" value="${ _("Send My Login Details")}">
             </form>

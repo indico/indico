@@ -1,57 +1,38 @@
-<%
-
-arrowImage = systemIcon( "breadcrumbArrow" )
-%>
-<div class="path" style="margin-bottom: 25px;">
-<table border="0">
-<tbody>
-    <tr>
-        <td align="left" valign="bottom">
-             <div class="groupTitleNoBorder" style="letter-spacing: normal; font-style: italic; font-size: 14pt; padding: 0 5px 3px 0; margin:0;">
-                ${ type +":" if type != "" else ""}
-            </div>
-        </td>
-        <td>
-            <div class="groupTitleNoBorder" style="letter-spacing: normal; padding: 0;  margin:0;">
-                ${ title }
-            </div>
-        </td>
-    </tr>
-
-
-
-% if len(path) > 0:
-
-    <tr>
-        <td align="right" valign="top"><span style="padding-right: 5px">${ _("Go back to:")}</td>
-        <td>
-        <div style="color: #444;">
-
-            % for i in range(0, len(path)):
-
-                <% object = path[i] %>
-
-                % if i > 0:
-                    <img src="${ arrowImage }" />
-                % endif
-
-                <a href="${ object["url"] }">${ object["title"] }</a>
-                %if object.has_key("type"):
-                <em>
-                    (${ object["type"] })
-                </em>
-                % endif
+<div class="path" style="margin-bottom: 10px">
+    <div class="groupTitleNoBorder" style="font-style: italic; font-size: 12pt; margin: 0; padding: 0">
+        ${type}
+    </div>
+    <div class="groupTitleNoBorder title" style="color: #B14300; margin: 0; padding: 0">
+        ${title}
+    </div>
+    <div class="horizontalLine" style="margin-top: 5px"></div>
+    % if path:
+        <div style="display: table; margin-top: 10px; margin-bottom: 15px; width: 100%">
+            % for elem in path:
+                <div style="display: table-row;">
+                    <div style="display: table-cell; vertical-align:middle">
+                        % if elem.has_key('type'):
+                            <div style="float: left;">${ _("in ")} ${elem['type']}:</div>
+                            <div style="display: table-cell; vertical-align:middle; padding-bottom: 5px">
+                                <div style="float: left; padding: 0px 5px 0px 5px;"><a class="title" href="${elem['url']}">${elem['title']}</a></div>
+                                % if elem['type'] == "Session":
+                                    <div title="${ _("Session contributions")}" class="iconContribGoTo icon-list" aria-hidden="true" onclick="window.location='${elem['sessionContributionsURL']}'"></div>
+                                    <div title="${ _("Session timetable")}" class="iconContribGoTo icon-grid" aria-hidden="true" onclick="window.location='${elem['sessionTimetableURL']}'"></div>
+                                % endif
+                            </div>
+                        % else:
+                            ${ _("Go back to:")}
+                            <a href="${elem['url'] }">${elem['title']}</a>
+                        % endif
+                    </div>
+                </div>
             % endfor
-
         </div>
-    </td>
-</tr>
-
-% endif
-
-</tbody>
-</table>
-
+    % endif
 </div>
 
-
+<script type="text/javascript">
+    $(function() {
+        $('.md-preview-wrapper.display, .title').mathJax();
+    })
+</script>

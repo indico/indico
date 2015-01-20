@@ -1,12 +1,8 @@
 
     <!-- CONTEXT HELP DIVS -->
     <div id="tooltipPool" style="display: none">
-        <!-- Where is key? -->
         <div id="features" class="tip">
-            ${ _("""<b>Click on one item to enable/disable the option.</b><br>
-            - <b>Cache</b>: will cache events standard display pages for faster access<br>
-            - <b>News</b>: will display "latest news" on Indico home page and menu<br>
-            - <b>Debug</b>: will display extensive debug information on error pages.""")}
+            ${ _("""Enabling "News Pages" will display "latest news" on the Indico home page and menu.""")}
         </div>
     </div>
     <!-- END OF CONTEXT HELP DIVS -->
@@ -22,7 +18,7 @@
       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("System title")}</span></td>
       <td bgcolor="white" width="100%" valign="top" class="blacktext">${title}</td>
       <td rowspan="4" valign="top">
-        <form action="${ GeneralInfoModifURL }" method="POST">
+        <form action="${ GeneralInfoModifURL }" method="GET">
         <input type="submit" class="btn" value="${ _("modify")}">
         </form>
       </td>
@@ -57,8 +53,14 @@
     </tr>
     <tr>
       <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Features")}</span></td>
-      <td bgcolor="white" width="100%" valign="top" class="blacktext"><table><tr><td>${features}</td><td valign="top">${contextHelp('features' )}</td></tr></table></td>
+      <td bgcolor="white" width="100%" valign="top" class="blacktext">${features} ${contextHelp('features' )}</td>
     </tr>
+    % if _app.debug:
+        <tr>
+          <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Debug mode")}</span></td>
+          <td bgcolor="white" width="100%" valign="top" class="blacktext" style="color: red;">${ _('Enabled') }</td>
+        </tr>
+    % endif
     </table>
   </td>
 </tr>

@@ -28,7 +28,7 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
 
     <a href="${ UHConferenceModification.getURL(conf) }">
         <span class="bannerTitle bannerTitle_0">
-            ${ conf.getTitle() } &nbsp;<span style="font-size: 0.8em; font-style: italic;">
+            ${ conf.getTitle() | remove_tags } &nbsp;<span style="font-size: 0.8em; font-style: italic;">
             % if startDate == endDate:
                 ${ startDate }
             % else:
@@ -39,9 +39,12 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
     </a>
     <div class="banner_creator">
         % if conf.getCreator():
-            ${ _("Created by %s") % (conf.getCreator().getStraightFullName().strip() or conf.getCreator().getEmail())}
+            ${ _("Created by ")}
+            % if conf.getCreator().getStraightFullName().strip():
+                ${ ("%s -") % conf.getCreator().getStraightFullName().strip()}
+            % endif
+            ${conf.getCreator().getEmail()}
         % endif
-
     </div>
 
 </div>
@@ -52,6 +55,7 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
             <td style="vertical-align: top; width:200px">${ sideMenu }</td>
             <td style="vertical-align: top">
                 <div class="body" style="padding:20px;">
+                    ${ render_template('flashed_messages.html') }
                     ${ body }
                 </div>
             </td>

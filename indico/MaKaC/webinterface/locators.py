@@ -1,24 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-import types
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.conference as conference
 import MaKaC.errors as errors
@@ -35,8 +32,8 @@ class CategoryWebLocator:
         if categIds == [] or params["categId"] == "":
             if mustExist:
                 raise errors.MaKaCError( _("category ids not set"))
-        if type(categIds) is types.StringType:
-            categIds = [ categIds ]
+        if isinstance(categIds, basestring):
+            categIds = [categIds]
         ch = conference.CategoryManager()
         for id in categIds:
             try:
@@ -98,7 +95,6 @@ class WebLocator:
         self.__contribTypeId = None
         self.__slotId = None
         self.__notifTplId = None
-        self.__resvID = None
         self.__location = None
         self.__roomID = None
         self.__registrantId = None
@@ -289,35 +285,13 @@ class WebLocator:
             self.setMaterial( params, 1 )
             self.__resId = params["resId"]
 
-    def setRoomBooking( self, params ):
-        if not params.has_key( 'resvID' ):
-            raise errors.MaKaCError( _("resvID not set"))
-        if not params.has_key( 'roomLocation' ):
-            raise errors.MaKaCError( _("roomLocation not set"))
-        self.__resvID = int( params['resvID'] )
-        self.__location = params['roomLocation']
-
-    def setRoom( self, params ):
-        if not params.has_key( 'roomID' ):
-            raise errors.MaKaCError( _("roomID not set"))
-        if not params.has_key( 'roomLocation' ):
-            raise errors.MaKaCError( _("roomLocation not set"))
-        self.__roomID = int( params['roomID'] )
-        self.__location = params['roomLocation']
-
     def getObject( self ):
         """
         """
-        if self.__resvID:
-            from MaKaC.rb_location import CrossLocationQueries, Location
-            obj = CrossLocationQueries.getReservations( resvID = self.__resvID, location = self.__location )
-            return obj
-        if self.__roomID:
-            from MaKaC.rb_location import CrossLocationQueries, Location
-            obj = CrossLocationQueries.getRooms( roomID = self.__roomID, location = self.__location )
-            return obj
         if self.__categId:
-            obj = conference.CategoryManager().getById( self.__categId )
+            if not conference.CategoryManager().hasKey(self.__categId):
+                raise errors.NoReportError(_("There is no category with id '%s', or it has been deleted") % self.__categId)
+            obj = conference.CategoryManager().getById(self.__categId)
             if self.__materialId:
                 obj=obj.getMaterialById(self.__materialId)
             if self.__resId:
@@ -326,7 +300,7 @@ class WebLocator:
         if not self.__confId:
             return None
         obj = conference.ConferenceHolder().getById( self.__confId )
-        if obj == None:
+        if obj is None:
             raise errors.NoReportError("The event you are trying to access does not exist or has been deleted")
         fr = materialFactories.ConfMFRegistry
         if self.__notifTplId:
@@ -373,7 +347,7 @@ class WebLocator:
             obj = obj.getReviewManager().getReviewById(self.__reviewId)
             if obj == None:
                 raise errors.NoReportError("The review you are tring to access does not exist or has been deleted")
-        if self.__subContribId:
+        if self.__subContribId and self.__contribId:
             obj = obj.getSubContributionById( self.__subContribId )
             fr = materialFactories.ContribMFRegistry
             if obj == None:

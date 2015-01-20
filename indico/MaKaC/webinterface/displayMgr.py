@@ -1,36 +1,42 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common import DBMgr
+import re
+
 from BTrees import OOBTree
 from persistent import Persistent
+from MaKaC.common.url import EndpointURL
+
+import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
+from indico.core import signals
+from indico.core.db import DBMgr
+from indico.util.contextManager import ContextManager
+from indico.util.i18n import _, N_
 from MaKaC.common.Counter import Counter
 from MaKaC.common.Locators import Locator
 from MaKaC.webinterface import urlHandlers
 from MaKaC.trashCan import TrashCanManager
-import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
 from MaKaC.errors import MaKaCError
 from MaKaC.conference import LocalFile
 from MaKaC.plugins.base import Observable
-import re
-from MaKaC.i18n import _
+from indico.util.signals import values_from_signal
+
 
 class ConfDisplayMgrRegistery:
     """
@@ -119,9 +125,6 @@ class ConfDisplayMgr(DisplayMgr):
         #Manager for CSS file rendering the main display page for the conference
         self._styleMngr = StyleManager(conf)
 
-        # Caption for the email support
-        self._supportEmailCaption = "Support"
-
         # Displaying navigation bar
         self._displayNavigationBar = True
 
@@ -188,8 +191,12 @@ class ConfDisplayMgr(DisplayMgr):
         self._displayNavigationBar = value
 
     def getMenu(self):
-        if self._menu.getParent() == None:
+        if self._menu.getParent() is None:
             self._menu.setParent(self)
+        plugin_items = frozenset(x.name for x in values_from_signal(signals.event.sidemenu.send()))
+        if getattr(self, 'plugin_items', frozenset()) != plugin_items:
+            self._menu.updateSystemLink()
+        self.plugin_items = plugin_items
         return self._menu
 
     def getConference(self):
@@ -204,7 +211,8 @@ class ConfDisplayMgr(DisplayMgr):
         return self._format
 
     def getSearchEnabled(self):
-        # check if _SearchEnabled exists in the db structure
+        if ContextManager.get('offlineMode', False):
+            return False
         try:
             return self._searchEnabled
         except AttributeError:
@@ -238,14 +246,37 @@ class ConfDisplayMgr(DisplayMgr):
             self._styleMngr = StyleManager(self._conf)
         return self._styleMngr
 
-    def getSupportEmailCaption(self):
-        # check if _supportEmailCaption exists in the db
-        if not hasattr(self, "_supportEmailCaption"):
-           self._supportEmailCaption = "Support"
-        return self._supportEmailCaption
 
-    def setSupportEmailCaption(self, value):
-        self._supportEmailCaption = value
+class EventMenuEntry(object):
+    """Defines an endpoint-based conference menu entry.
+
+    :param endpoint: Name of the endpoint for building the link's target URL
+    :param caption: Caption of the link
+    :param parent: Name of the parent link
+    :param name: Name of the link. Defaults to the endpoint.
+    :param plugin: True if the endpoint is in a plugin
+    :param visible: Callback to set the visibility of the link.
+                    Invoked with the event as its only argument,
+                    must return True or False.
+    """
+    def __init__(self, endpoint, caption, parent=None, name=None, plugin=False, visible=None):
+        if plugin:
+            endpoint = 'plugin_{}'.format(endpoint)
+        self.endpoint = endpoint
+        self.caption = caption
+        self.parent = parent or ''  # the code actually expects '' and not None for top-level items m(
+        self.name = name or endpoint
+        self.visible = visible
+
+    def __hash__(self):
+        return hash((self.endpoint, self.name))
+
+    def __eq__(self, other):
+        return (self.endpoint, self.name) == (other.endpoint, other.name)
+
+    def __repr__(self):
+        return '<EventMenuEntry({}, {}, {})>'.format(self.name, self.endpoint, self.caption)
+
 
 class Menu(Persistent):
     """
@@ -258,9 +289,13 @@ class Menu(Persistent):
         self._conf = conf
         self._indent = "&nbsp;&nbsp;&nbsp;&nbsp;"
         self._linkGenerator = Counter()
+        self._timetable_detailed_view = False
+        self._timetable_layout = 'normal'
 
-    def clone( self, cdm ):
+    def clone(self, cdm):
         newMenu = cdm.getMenu()
+        newMenu.set_timetable_detailed_view(self.is_timetable_detailed_view())
+        newMenu.set_timetable_layout(self.get_timetable_layout())
         newMenu._linkGenerator = self._linkGenerator.clone()
         newList = []
         for link in self.getLinkList():
@@ -318,7 +353,7 @@ class Menu(Persistent):
 
     def _createSystemLink(self, name, linksData):
         data = linksData.get(name, None)
-        if data == None:
+        if data is None:
             raise MaKaCError(_("error in the system link structure of the menu"))
         if data["parent"] == "":
             #create the link at the fisrt level
@@ -471,12 +506,39 @@ class Menu(Persistent):
     def getCurrentItem(self):
         return getattr(self, '_v_currentItem', None)
 
+    def set_timetable_layout(self, layout):
+        self._timetable_layout = layout
+
+    def toggle_timetable_layout(self):
+        if self._timetable_layout == 'normal':
+            self.set_timetable_layout('room')
+        else:
+            self.set_timetable_layout('normal')
+
+    def get_timetable_layout(self):
+        try:
+            return self._timetable_layout
+        except AttributeError:
+            self._timetable_layout = 'normal'
+            return self._timetable_layout
+
+    def set_timetable_detailed_view(self, view):
+        self._timetable_detailed_view = view
+
+    def is_timetable_detailed_view(self):
+        try:
+            return self._timetable_detailed_view
+        except AttributeError:
+            self._timetable_detailed_view = False
+            return self._timetable_detailed_view
+
     def __str__(self):
         str = ""
         for link in self._listLink:
             if link.isEnabled():
-                str += "%s\n"%link
+                str += "%s\n" % link
         return str
+
 
 class Spacer(Persistent):
     Type = "spacer"
@@ -729,7 +791,6 @@ class Link(Persistent):
         return ""
 
     def __str__(self, indent=""):
-
         str = """%s<a href="%s">%s</a><br>\n"""%(indent, self.getURL(), self.getName())
         for link in self._listLink:
             if link.isEnabled():
@@ -805,16 +866,34 @@ class SystemLink(Link):
             # left them
             return True
 
-    def getURL(self):
+    def _getURLObject(self):
         # TOREMOVE: fix events with "absolute" URL
         if not hasattr(self, '_URLHandler'):
             self.getMenu().updateSystemLink()
-        conf = self.getMenu().getConference()
         if isinstance(self._URLHandler, str):
-            handler = getattr(urlHandlers, self._URLHandler)
+            if self._URLHandler.startswith("http"):  # Fix for hardcoded URLs
+                self.getMenu().updateSystemLink()
+            if '.' in self._URLHandler:
+                return EndpointURL(self._URLHandler,
+                                   urlHandlers.URLHandler._want_secure_url(),
+                                   urlHandlers.URLHandler._getParams(self.getMenu().getConference(), {}))
+            else:
+                handler = getattr(urlHandlers, self._URLHandler)
         else:
             handler = self._URLHandler
-        return str(handler.getURL(conf))
+        return handler.getURL(self.getMenu().getConference())
+
+    def getURL(self):
+        url = str(self._getURLObject())
+        if self._name == 'timetable':
+            menu = self.getMenu()
+            if menu.get_timetable_layout() == 'room':
+                url += '?ttLyt=room'
+            if menu.is_timetable_detailed_view():
+                startDate = menu.getConference().getSchedule().getAdjustedStartDate()
+                url += startDate.strftime('#%Y%m%d')
+                url += '.detailed'
+        return url
 
     def getURLHandler(self):
         if not hasattr(self, '_URLHandler'):
@@ -835,143 +914,156 @@ class SystemLink(Link):
             # value get an update
             self._changed = True
 
+    def isVisible(self):
+        return self._getURLObject().valid and super(SystemLink, self).isVisible()
 
 class SystemLinkData(Observable):
 
     def __init__(self, conf=None):
+        plugin_entries = None
+        if not hasattr(self, '_linkData') or not hasattr(self, '_linkDataOrderedKeys'):
+            plugin_entries = values_from_signal(signals.event.sidemenu.send())
         #the following dict is used to update the system link of the menu. each new entry is added to the menu,
         #and all entries in the menu whiche are not is this dict are removed.
         if not hasattr(self, "_linkData"):
             self._linkData = {
-            "overview": {\
-                "caption": "Overview", \
-                "URL": 'UHConferenceOverview', \
-                "parent": ""}, \
-            "programme": { \
-                "caption": "Scientific Programme", \
-                "URL": 'UHConferenceProgram', \
-                "parent": ""}, \
-            "CFA": { \
-                "caption": "Call for Abstracts", \
-                "URL": 'UHConferenceCFA', \
-                "parent": ""}, \
-            "ViewAbstracts": { \
-                "caption": "View my abstracts", \
-                "URL": 'UHUserAbstracts', \
-                "parent": "CFA"}, \
-            "SubmitAbstract": { \
-                "caption": "Submit a new abstract", \
-                "URL": 'UHAbstractSubmission', \
-                "parent": "CFA"}, \
-            "manageTrack": { \
-                "caption": "Manage my tracks", \
-                "URL": 'UHConfMyStuffMyTracks', \
-                "parent": "programme"}, \
-            "timetable": { \
-                "caption": "Timetable", \
-                "URL": 'UHConferenceTimeTable', \
-                "parent": ""}, \
-            "contributionList": { \
-                "caption": "Contribution List", \
-                "URL": 'UHContributionList', \
-                "parent": ""}, \
-            "authorIndex": { \
-                "caption": "Author index", \
-                "URL": 'UHConfAuthorIndex', \
-                "parent": ""} ,\
-            "speakerIndex": { \
-                "caption": "Speaker index", \
-                "URL": 'UHConfSpeakerIndex', \
-                "parent": "", \
-                "visibilityByDefault": False}, \
-            "mystuff": { \
-                "caption": "My conference", \
-                "URL": 'UHConfMyStuff', \
-                "parent": ""}, \
-            "mytracks": { \
-                "caption": "My tracks", \
-                "URL": 'UHConfMyStuffMyTracks', \
-                "parent": "mystuff"}, \
-            "mysessions": { \
-                "caption": "My sessions", \
-                "URL": 'UHConfMyStuffMySessions', \
-                "parent": "mystuff"}, \
-            "mycontribs": { \
-                "caption": "My contributions", \
-                "URL": 'UHConfMyStuffMyContributions', \
-                "parent": "mystuff"}, \
-            "paperreviewing": { \
-                "caption": "Paper Reviewing", \
-                "URL": 'UHPaperReviewingDisplay', \
-                "parent": ""}, \
-            "managepaperreviewing": { \
-                "caption": "Manage Paper Reviewing", \
-                "URL": 'UHConfModifReviewingPaperSetup', \
-                "parent": "paperreviewing"}, \
-            "assigncontributions": { \
-                "caption": "Assign papers", \
-                "URL": 'UHConfModifReviewingAssignContributionsList', \
-                "parent": "paperreviewing"}, \
-            "judgelist": { \
-                "caption": "Referee Area", \
-                "URL": 'UHConfModifListContribToJudge', \
-                "parent": "paperreviewing"}, \
-            "judgelistreviewer": { \
-                "caption": "Content Reviewer Area", \
-                "URL": 'UHConfModifListContribToJudgeAsReviewer', \
-                "parent": "paperreviewing"}, \
-            "judgelisteditor": { \
-                "caption": "Layout Reviewer Area", \
-                "URL": 'UHConfModifListContribToJudgeAsEditor', \
-                "parent": "paperreviewing"}, \
-            "uploadpaper": { \
-                "caption": "Upload paper", \
-                "URL": 'UHUploadPaper', \
-                "parent": "paperreviewing"}, \
-            "downloadtemplate": { \
-                "caption": "Download template", \
-                "URL": 'UHDownloadPRTemplate', \
-                "parent": "paperreviewing"}, \
-            "abstractsBook": { \
-                "caption": "Book of abstracts", \
-                "URL": 'UHConfAbstractBook', \
-                "parent": "", \
-                "displayTarget": "_blank"}, \
-            "registrationForm": { \
-                "caption": "Registration", \
-                "URL": 'UHConfRegistrationForm', \
-                "parent": ""}, \
-            "ViewMyRegistration": { \
-                "caption": "Modify my registration", \
-                "URL": 'UHConfRegistrationFormModify', \
-                "parent": "registrationForm"}, \
-            "NewRegistration": { \
-                "caption": "Registration Form", \
-                "URL": 'UHConfRegistrationFormDisplay', \
-                "parent": "registrationForm"}, \
-            "registrants": { \
-                "caption": "List of registrants", \
-                "URL": 'UHConfRegistrantsList', \
-                "parent": "", \
-                "visibilityByDefault": False}, \
-            "evaluation": { \
-                "caption": "Evaluation", \
-                "URL": 'UHConfEvaluationMainInformation', \
-                "parent": ""}, \
-            "newEvaluation": { \
-                "caption": "Evaluation Form", \
-                "URL": 'UHConfEvaluationDisplay', \
-                "parent": "evaluation"}, \
-            "viewMyEvaluation": { \
-                "caption": "Modify my evaluation", \
-                "URL": 'UHConfEvaluationDisplayModif', \
-                "parent": "evaluation"},
-            "collaboration": { \
-                "caption": "Video Services", \
-                "URL": 'UHCollaborationDisplay', \
-                "parent": ""} \
+                "overview": {
+                    "caption": N_("Overview"),
+                    "URL": 'UHConferenceOverview',
+                    "parent": ""},
+                "programme": {
+                    "caption": N_("Scientific Programme"),
+                    "URL": 'UHConferenceProgram',
+                    "parent": ""},
+                "CFA": {
+                    "caption": N_("Call for Abstracts"),
+                    "URL": 'UHConferenceCFA',
+                    "parent": ""},
+                "ViewAbstracts": {
+                    "caption": N_("View my Abstracts"),
+                    "URL": 'UHUserAbstracts',
+                    "parent": "CFA"},
+                "SubmitAbstract": {
+                    "caption": N_("Submit Abstract"),
+                    "URL": 'UHAbstractSubmission',
+                    "parent": "CFA"},
+                "manageTrack": {
+                    "caption": N_("Manage my Tracks"),
+                    "URL": 'UHConfMyStuffMyTracks',
+                    "parent": "programme"},
+                "timetable": {
+                    "caption": N_("Timetable"),
+                    "URL": 'UHConferenceTimeTable',
+                    "parent": ""},
+                "contributionList": {
+                    "caption": N_("Contribution List"),
+                    "URL": 'UHContributionList',
+                    "parent": ""},
+                "authorIndex": {
+                    "caption": N_("Author List"),
+                    "URL": 'UHConfAuthorIndex',
+                    "parent": ""},
+                "speakerIndex": {
+                    "caption": N_("Speaker List"),
+                    "URL": 'UHConfSpeakerIndex',
+                    "parent": "",
+                    "visibilityByDefault": False},
+                "mystuff": {
+                    "caption": N_("My Conference"),
+                    "URL": 'UHConfMyStuff',
+                    "parent": ""},
+                "mytracks": {
+                    "caption": N_("My Tracks"),
+                    "URL": 'UHConfMyStuffMyTracks',
+                    "parent": "mystuff"},
+                "mysessions": {
+                    "caption": N_("My Sessions"),
+                    "URL": 'UHConfMyStuffMySessions',
+                    "parent": "mystuff"},
+                "mycontribs": {
+                    "caption": N_("My Contributions"),
+                    "URL": 'UHConfMyStuffMyContributions',
+                    "parent": "mystuff"},
+                "paperreviewing": {
+                    "caption": N_("Paper Reviewing"),
+                    "URL": 'UHPaperReviewingDisplay',
+                    "parent": ""},
+                "managepaperreviewing": {
+                    "caption": N_("Manage Paper Reviewing"),
+                    "URL": 'UHConfModifReviewingPaperSetup',
+                    "parent": "paperreviewing"},
+                "assigncontributions": {
+                    "caption": N_("Assign Papers"),
+                    "URL": 'UHConfModifReviewingAssignContributionsList',
+                    "parent": "paperreviewing"},
+                "judgelist": {
+                    "caption": N_("Referee Area"),
+                    "URL": 'UHConfModifListContribToJudge',
+                    "parent": "paperreviewing"},
+                "judgelistreviewer": {
+                    "caption": N_("Content Reviewer Area"),
+                    "URL": 'UHConfModifListContribToJudgeAsReviewer',
+                    "parent": "paperreviewing"},
+                "judgelisteditor": {
+                    "caption": N_("Layout Reviewer Area"),
+                    "URL": 'UHConfModifListContribToJudgeAsEditor',
+                    "parent": "paperreviewing"},
+                "uploadpaper": {
+                    "caption": N_("Upload Paper"),
+                    "URL": 'UHUploadPaper',
+                    "parent": "paperreviewing"},
+                "downloadtemplate": {
+                    "caption": N_("Download Template"),
+                    "URL": 'UHDownloadPRTemplate',
+                    "parent": "paperreviewing"},
+                "abstractsBook": {
+                    "caption": N_("Book of Abstracts"),
+                    "URL": 'UHConfAbstractBook',
+                    "parent": "",
+                    "displayTarget": "_blank"},
+                "registrationForm": {
+                    "caption": N_("Registration"),
+                    "URL": 'UHConfRegistrationForm',
+                    "parent": ""},
+                "ViewMyRegistration": {
+                    "caption": N_("Modify my Registration"),
+                    "URL": 'UHConfRegistrationFormModify',
+                    "parent": "registrationForm"},
+                "downloadETicket": {
+                    "caption": N_("Download e-ticket"),
+                    "URL": 'UHConferenceTicketPDF',
+                    "parent": "registrationForm"},
+                "NewRegistration": {
+                    "caption": N_("Registration Form"),
+                    "URL": 'UHConfRegistrationFormDisplay',
+                    "parent": "registrationForm"},
+                "registrants": {
+                    "caption": N_("Participant List"),
+                    "URL": 'UHConfRegistrantsList',
+                    "parent": "",
+                    "visibilityByDefault": False},
+                "evaluation": {
+                    "caption": N_("Evaluation"),
+                    "URL": 'UHConfEvaluationMainInformation',
+                    "parent": ""},
+                "newEvaluation": {
+                    "caption": N_("Evaluation Form"),
+                    "URL": 'UHConfEvaluationDisplay',
+                    "parent": "evaluation"},
+                "viewMyEvaluation": {
+                    "caption": N_("Modify my Evaluation"),
+                    "URL": 'UHConfEvaluationDisplayModif',
+                    "parent": "evaluation"}
             }
             self._notify('confDisplaySMFillDict', {'dict': self._linkData, 'conf': conf})
+            for entry in plugin_entries:
+                assert entry.name not in self._linkData
+                self._linkData[entry.name] = {
+                    'caption': entry.caption,
+                    'URL': entry.endpoint,
+                    'parent': entry.parent
+                }
+
         #this ordered list allow us to keep the order we want for the menu
         if not hasattr(self, "_linkDataOrderedKeys"):
             self._linkDataOrderedKeys = ["overview",
@@ -999,19 +1091,20 @@ class SystemLinkData(Observable):
                                         "abstractsBook",
                                         "registrationForm",
                                         "ViewMyRegistration",
+                                        "downloadETicket",
                                         "NewRegistration",
                                         "registrants",
                                         "evaluation",
                                         "newEvaluation",
-                                        "viewMyEvaluation",
-                                        "collaboration"]
+                                        "viewMyEvaluation"]
             self._notify('confDisplaySMFillOrderedKeys', self._linkDataOrderedKeys)
-
+            self._linkDataOrderedKeys += [x.name for x in plugin_entries]
 
     def getLinkData(self):
         return self._linkData
+
     def getLinkDataOrderedKeys(self):
-        self.__init__() #init self._linkDataOrderedKeys if it isn't defined.
+        self.__init__()  # init self._linkDataOrderedKeys if it isn't defined.
         return self._linkDataOrderedKeys
 
 
@@ -1130,6 +1223,9 @@ class Format(Persistent):
             return color
         return None
 
+    def clearColorCode(self,key):
+        self.setColorCode(key, "")
+
 class TickerTape(Persistent):
 
     def __init__(self):
@@ -1190,6 +1286,7 @@ class TickerTape(Persistent):
         return self._enabledSimpleText and self._active
 
     def setSimpleTextEnabled(self, v):
+        self._active = True
         self._enabledSimpleText=v
 
 class ImageWrapper(Persistent):
@@ -1210,11 +1307,12 @@ class ImageWrapper(Persistent):
     def getLocator(self):
         loc = self._localFile.getOwner().getLocator()
         loc["picId"] = self.getId()
+        loc["picExt"] = self._localFile.getFileType().lower()
         return loc
 
     def clone(self):
-        lf=self.getLocalFile().clone()
-        iw = ImageWraper(lf)
+        lf = self.getLocalFile().clone()
+        iw = ImageWrapper(lf)
         return iw
 
     def getLocalFile(self):
@@ -1371,6 +1469,9 @@ class CSSWrapper(Persistent):
         if not extension:
             fn = fn.lower().replace(".css","")
         return fn
+
+    def getFilePath(self):
+        return self._localFile.getFilePath()
 
     def getSize(self):
         return self._localFile.getSize()

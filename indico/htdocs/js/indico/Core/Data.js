@@ -1,5 +1,22 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 // Place where to put page-wide Indico-related global variables
-var IndicoGlobalVars = {}
+var IndicoGlobalVars = {};
 
 var Util = {
     parseId: function(id){
@@ -164,8 +181,8 @@ var Util = {
     },
 
     dateTimeIndicoToJS: function(obj) {
-        m1 = obj.date.match(/(\d+)[\-\/](\d+)[\-\/](\d+)/);
-        m2 = obj.time.match(/(\d+):(\d+)(?::(\d+))?/);
+        var m1 = obj.date.match(/(\d+)[\-\/](\d+)[\-\/](\d+)/);
+        var m2 = obj.time.match(/(\d+):(\d+)(?::(\d+))?/);
 
 
         var date = new Date(m1[1],m1[2] - 1,m1[3]||0);
@@ -181,7 +198,7 @@ var Util = {
 
     HTMLEscape: function(text) {
         // escape special HTML chars - kind of hacky but works
-        return $('<p/>').text(text).html();
+        return $('<p/>').text(text || '').html();
     }
 
 };
@@ -207,11 +224,7 @@ Util.Validation = {
     },
 
     isHtml: function(text) {
-        if (/<.*>[\s\S]*<\/.*>|<br\s*\/>/.exec(text)) {
-            return true;
-        } else {
-            return false;
-        }
+        return /<.*>[\s\S]*<\/.*>|<br\s*\/>/.exec(text);
     }
 
 };

@@ -1,5 +1,5 @@
 <a href="" name="results"></a>
-<table width="100%" cellspacing="0" align="center" border="0">
+<table style="margin-top: 1em; border-spacing: 0; border-collapse: collapse; width: 100%;">
         <tr>
            <td nowrap colspan="10">
                 <div class="CRLgroupTitleNoBorder">${ _("Displaying")}<strong> ${ filteredNumberRegistrants } </strong>
@@ -19,7 +19,7 @@
                         <input type="submit" class="btnRemove" name="resetFilters" value="Reset filters">
                         <span style="padding: 0px 6px 0px 6px">|</span>
                     % endif
-                    <a id="index_filter" onclick="showFilters()" class="CAIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
+                    <a id="index_filter" onclick="showFilters()" class="CRLIndexUnselected" font-size="16" font-weight="bold" font-family="Verdana">
                       % if filterUsed:
                         ${ _("Show filters")}
                       % else:
@@ -27,11 +27,11 @@
                       % endif
                     </a>
                     <span style="padding: 0px 6px 0px 6px">|</span>
-                    <a id="index_display" onclick="showDisplay()" class="CAIndexUnselected" font-size="16">
+                    <a id="index_display" onclick="showDisplay()" class="CRLIndexUnselected" font-size="16">
                         ${ _("Columns to display")}
                     </a>
                     <span style="padding: 0px 6px 0px 6px">|</span>
-                    <a id="index_display" onclick="staticURLSwitch()" class="CAIndexUnselected" font-size="16">
+                    <a id="index_display" onclick="staticURLSwitch()" class="CRLIndexUnselected" font-size="16">
                         ${ _("Static URL for this result")}
                     </a>
                 </div>
@@ -63,7 +63,8 @@
         <tr>
           <td colspan="40" valign="bottom" align="left">
             <form id="registrantsForm" action=${ actionPostURL } method="post" name="registrantsForm" onsubmit="return atLeastOneRegistrantSelected();">
-            <table width="100%" cellspacing="0" align="center" border="0">
+            <input id="pdfExportInputHidden" type="hidden" name="pdf">
+            <table>
                 <tr>
                   <td colspan="10">
                     <div>
@@ -72,41 +73,39 @@
                     </div>
                   </td>
                 </tr>
-                 <tr id="headPanel" class="follow-scroll" style="box-shadow: 0 4px 2px -2px rgba(0, 0, 0, 0.1);">
+                 <tr id="headPanel" class="follow-scroll">
                     <td valign="bottom" width="100%" align="left" colspan="1000">
-                        <table style="margin-left: -8px" >
+                        <table style="margin-left: -8px;">
                             <tr >
-                                <td valign="bottom" align="left">
-                                    <ul id="button-menu" class="ui-list-menu">
-                                      <li class="left" id="addRegistrant">
-                                        <a href="#" id="add_new_user">${_("Add new")}</a>
-                                      </li>
-                                      <li class="middle">
-                                        <a href="#" id="remove_users">${_("Remove")}</a>
-                                      </li>
-                                      <li class="middle">
-                                        <a href="#" id="send_email">${_("Email")}</a>
-                                      </li>
-                                      <li class="middle">
-                                        <a href="#" id="print_badges">${_("Print Badges")}</a>
-                                      </li>
-                                      <li class="middle">
-                                        <a href="#" id="attachments">${_("Attachments")}</a>
-                                      </li>
-                                      <li class="right">
-                                        <a href="#" id="show_stats">${_("Show stats")}</a>
-                                      </li>
-                                    </ul>
-                                </td>
+                                <td valign="bottom" align="left" id="button-menu" class="toolbar" style="padding-bottom: 1em;">
 
-                                <td>
-                                  Export to:
-                                </td>
-                                <td>
-                                    <a href="#" id="exportPDFSelectorLink1" name="pdf" class="iconDropDownMenu"> <img src=${ pdfIconURL} border="0"></a>
-                                    <input id="pdfExportInputHidden" type="hidden" name="pdf">
-                                    <span class="iconSeparator">  | </span>
-                                    <input type="image" style="margin-top:3px;" name="excel" src=${ excelIconURL } border="0">
+                                  <div class="group left">
+                                    <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#" title="${_("Select")}" data-toggle="dropdown"></a>
+                                    <ul class="dropdown">
+                                      <li><a href="#" id="selectAll">All</a></li>
+                                      <li><a href="#" id="selectNone">None</a></li>
+                                    </ul>
+                                  </div>
+
+                                  <div class="group left">
+                                    <a href="#" class="i-button" id="add_new_user">${_("Add new")}</a>
+                                    <a href="#" class="i-button" id="remove_users">${_("Remove")}</a>
+                                    % if eTicketEnabled:
+                                    <a href="#" class="i-button" id="check_in">${_("Check in")}</a>
+                                    % endif
+                                    <a href="#" class="i-button" id="send_email">${_("Email")}</a>
+                                    <a href="#" class="i-button" id="print_badges">${_("Print Badges")}</a>
+                                    <a href="#" class="i-button" id="attachments">${_("Attachments")}</a>
+                                    <a href="#" class="i-button" id="show_stats">${_("Show stats")}</a>
+                                    <a class="i-button arrow button" href="#" data-toggle="dropdown">
+                                      ${_("Export")}
+                                    </a>
+                                    <ul class="dropdown">
+                                      <li><a href="#" class="icon-file-pdf" id="export_pdf">${_("PDF")}</a></li>
+                                      <li><a href="#" class="icon-file-excel" id="export_csv">${_("CSV")}</a></li>
+                                    </ul>
+                                  </div>
+
                                 </td>
                             </tr>
                         </table>
@@ -119,13 +118,54 @@
             % if filteredNumberRegistrants == "0":
             <tr id="noRegistrantInfo">
                 <td colspan=10 style="font-style: italic; padding:15px 0px 15px 15px; border-bottom: 1px solid #DDDDDD;" nowrap>
-                    <span class="collShowBookingsText">${ _("There are no registrants yet") }</span>
+                    <span class="italic">${ _("There are no registrants yet") }</span>
                 </td>
             </tr>
             % else:
                 ${ columns }
+
                 <tbody id="registrantsItems">
-                ${ registrants }
+
+                  % for reg, regdict in registrants:
+
+                    <tr id="registrant${reg.getId()}" style="background-color: transparent;" onmouseout="javascript:onMouseOut('registrant${reg.getId()}')"
+                        onmouseover="javascript:onMouseOver('registrant${reg.getId()}')">
+                      <td style="width: 1.5em;">
+                        <input onchange="javascript:isSelected('registrant${reg.getId()}')" type="checkbox" name="registrant" value="${reg.getId()}"/>
+                      </td>
+                      % if "Id" in groups_order["PersonalData"]:
+                        <td class="CRLabstractLeftDataCell">${reg.getId()}</td>
+                      % endif
+
+                       <td nowrap class="CRLabstractDataCell"><a href="${urlHandlers.UHRegistrantModification.getURL(reg)}">${reg.getFullName()}</a></td>
+
+                      % for key in groups_order["PersonalData"]:
+                        % if key != "Name" and key != "Id":
+                          <td class="CRLabstractDataCell">${regdict[key]}</td>
+                        % endif
+                      % endfor
+
+                      % for group_key, group_data in groups_order.iteritems():
+                        % if group_key != "PersonalData":
+                          % for key in group_data:
+                            % if key == "checkedIn":
+                                <td class="CRLabstractDataCell checkedIn">
+                                    ${regdict[key]}
+                                </td>
+                            % elif key == "checkInDate":
+                                <td class="CRLabstractDataCell checkInDate">
+                                    ${regdict[key]}
+                                </td>
+                            % else:
+                                <td class="CRLabstractDataCell">
+                                    ${regdict[key]}
+                                </td>
+                            % endif
+                          % endfor
+                        % endif
+                      % endfor
+                    </tr>
+                  % endfor
                 </tbody>
             % endif
         </tr>
@@ -153,34 +193,6 @@ function unselectDisplay()
     {
         document.displayOptionForm.disp[i].checked=false;
     }
-}
-
-function selectAll()
-{
-    if (!document.registrantsForm.registrant.length)
-    {
-        document.registrantsForm.registrant.checked=true;
-    }else{
-        for (i = 0; i < document.registrantsForm.registrant.length; i++)
-        {
-            document.registrantsForm.registrant[i].checked=true;
-        }
-    }
-    isSelected("registrantsItems");
-}
-
-function deselectAll()
-{
-    if (!document.registrantsForm.registrant.length)
-    {
-        document.registrantsForm.registrant.checked=false;
-    }else{
-        for (i = 0; i < document.registrantsForm.registrant.length; i++)
-        {
-            document.registrantsForm.registrant[i].checked=false;
-        }
-    }
-    isSelected("registrantsItems");
 }
 
 
@@ -225,7 +237,7 @@ function deselectAll()
         }
     }
 
-var pdfLink1 = $E('exportPDFSelectorLink1');
+var pdfLink1 = $E('export_pdf');
 var pdfMenu = null;
 
 function createMenu(pdfLink) {
@@ -256,18 +268,21 @@ function submitForm(style) {
         form.dom.submit(); pdfMenu.close();
 }
 
-pdfLink1.observeClick(function(e) {
-    createMenu(pdfLink1);
-    return false;
-});
+function getSelectedRegistrants() {
+    var selected = new Array();
+    $("input[name='registrant']:checked").each(function() {
+        selected.push($(this).val());
+    });
+    return selected;
+}
 
 var atLeastOneRegistrantSelected = function(){
-    if (newUser || $("input:checkbox:checked[name^=registrant]").length>0){
-    return true;
-    } else{
-    var dialog = new WarningPopup($T("Warning"), $T("No registrant selected! Please select at least one."));
-    dialog.open();
-    return false;
+    if (newUser || getSelectedRegistrants().length > 0){
+        return true;
+    } else {
+        var dialog = new WarningPopup($T("Warning"), $T("No registrant selected! Please select at least one."));
+        dialog.open();
+        return false;
     }
 };
 
@@ -322,6 +337,60 @@ IndicoUI.executeOnLoad(function(){
         $('#registrantsForm').submit();
     });
 
+   $("#export_pdf").on("menu_select", function() {
+      createMenu(pdfLink1);
+      return true;
+   });
+
+   $("#export_csv").on("menu_select", function() {
+      submitForm('excel');
+   });
+
+    $("#check_in").bind('menu_select',function(){
+        if (atLeastOneRegistrantSelected()) {
+            var selectedRegistrants = getSelectedRegistrants();
+            var killProgress = IndicoUI.Dialogs.Util.progress($T("Checking in registrants..."));
+            indicoRequest("registration.eticket.checkin",
+                {
+                    registrants: selectedRegistrants,
+                    conference: "${ conferenceId }",
+                },
+                function(result, error){
+                    if (!error) {
+                        killProgress();
+                        dates = result["dates"]
+                        for(var id in dates){
+                            changedFieldCheckedIn = $("input[value=" + id + "]")
+                                                    .parents("td")
+                                                    .nextAll("td.checkedIn");
+                            changedFieldCheckedIn.effect("highlight", {}, 1500);
+                            changedFieldCheckedIn.html("${_('Yes')}");
+                            changedFieldCheckInDate = $("input[value=" + id + "]")
+                                                      .parents("td")
+                                                      .nextAll("td.checkInDate");
+                            changedFieldCheckInDate.effect("highlight", {}, 1500);
+                            changedFieldCheckInDate.html(dates[id]);
+                        }
+                    } else {
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                    }
+                }
+            );
+        }
+    });
+
+    $('#selectAll').click(function() {
+        $('#registrantsItems input:visible').prop('checked', true).trigger('change');
+    });
+
+    $('#selectNone').click(function() {
+        $('#registrantsItems input:visible').prop('checked', false).trigger('change');
+    });
+
+    $("#registrantsItems input:visible").on('change', function(){
+        $(this).closest('tr').toggleClass('selected', this.checked);
+    });
 });
 
 </script>

@@ -32,7 +32,7 @@ function WidgetControl(panelBuilder, itemTemplate, attributes) {
 	extend(controlBuilder, WidgetBuilder);
 	
 	return controlBuilder;
-};
+}
 
 
 Widget.link = WidgetControl(Html.a, Widget.clickable);

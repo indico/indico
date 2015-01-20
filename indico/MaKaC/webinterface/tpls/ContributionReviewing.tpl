@@ -31,8 +31,8 @@
             <tr>
             <td>&nbsp;</td>
             <td align="left" style="padding-top: 5px; padding-bottom: 15px;">
-                 <form id="removeReferee" action="${ removeAssignRefereeURL }" method="post" onsubmit="${removeRefereeConfirm}">
-                    <input type="submit" class=btn value="Remove">
+                 <form id="removeRefereeForm" action="${ removeAssignRefereeURL }" method="post">
+                    <input type="submit" id="removeReferee" class=btn value="Remove">
                 </form>
             </td>
             </tr>
@@ -349,32 +349,40 @@
 
 <script type="text/javascript">
 
+% if (ConferenceChoice == 2 or ConferenceChoice == 4) and CanAssignReferee and (ContributionReviewManager.hasEditor() or ContributionReviewManager.hasReviewers()):
+    $("#removeReferee").click(function(){
+        new ConfirmPopup($T("Remove referee"),$T("The reviewers already assigned to this contribution will be removed. Do you want to remove the referee anyway?"), function(confirmed) {
+            if(confirmed) {
+                $("#removeRefereeForm").submit();
+            }
+        }).open();
+        return false;
+    });
+% endif
+
 % if CanEditDueDates:
-    % if ContributionReviewManager.hasReferee():
-        new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditRefereeDueDate'),
-                           'reviewing.contribution.changeDueDate',
-                           {conference: '${ Conference.getId() }',
-                            contribution: '${ ContributionReviewManager.getContribution().getId() }',
-                            dueDateToChange: 'Referee'},
-                           null, true);
+    % if ContributionReviewManager.hasReferee() and ContributionReviewManager.getLastReview().getRefereeDueDate():
+        $('#inPlaceEditRefereeDueDate').html(new DateWidget('reviewing.contribution.changeDueDate',
+                {conference: '${ Conference.getId() }',
+                 contribution: '${ ContributionReviewManager.getContribution().getId() }',
+                 dueDateToChange: 'Referee'},
+                 ${formatDateTime(ContributionReviewManager.getLastReview().getAdjustedRefereeDueDate()) | h,j}).draw().dom);
     % endif
 
-    % if ContributionReviewManager.hasEditor():
-        new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditEditorDueDate'),
-                           'reviewing.contribution.changeDueDate',
-                           {conference: '${ Conference.getId() }',
-                            contribution: '${ ContributionReviewManager.getContribution().getId() }',
-                            dueDateToChange: 'Editor'},
-                           null, true);
+    % if ContributionReviewManager.hasEditor() and ContributionReviewManager.getLastReview().getRefereeDueDate():
+        $('#inPlaceEditEditorDueDate').html(new DateWidget('reviewing.contribution.changeDueDate',
+                {conference: '${ Conference.getId() }',
+                 contribution: '${ ContributionReviewManager.getContribution().getId() }',
+                 dueDateToChange: 'Editor'},
+                 ${formatDateTime(ContributionReviewManager.getLastReview().getAdjustedEditorDueDate()) | h,j}).draw().dom);
     % endif
 
-    % if ContributionReviewManager.hasReviewers():
-        new IndicoUI.Widgets.Generic.dateEditor($E('inPlaceEditReviewerDueDate'),
-                           'reviewing.contribution.changeDueDate',
-                           {conference: '${ Conference.getId() }',
-                            contribution: '${ ContributionReviewManager.getContribution().getId() }',
-                            dueDateToChange: 'Reviewer'},
-                           null, true);
+    % if ContributionReviewManager.hasReviewers() and ContributionReviewManager.getLastReview().getRefereeDueDate():
+        $('#inPlaceEditReviewerDueDate').html(new DateWidget('reviewing.contribution.changeDueDate',
+                {conference: '${ Conference.getId() }',
+                 contribution: '${ ContributionReviewManager.getContribution().getId() }',
+                 dueDateToChange: 'Reviewer'},
+                 ${formatDateTime(ContributionReviewManager.getLastReview().getAdjustedReviewerDueDate()) | h,j}).draw().dom);
     % endif
 
 % endif

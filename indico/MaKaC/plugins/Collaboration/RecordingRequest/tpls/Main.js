@@ -29,14 +29,22 @@
         var formNodes = IndicoUtil.findFormFields($E('RecordingRequestForm'));
         IndicoUtil.setFormValues(formNodes, {'numRemoteViewers':'', 'numAttendees':'', 'otherComments':''});
         if (!isLecture) {
-            $E('allTalksRB').dom.checked = true;
+            $('#allTalksRB').trigger('click');
             IndicoUI.Effect.disappear($E('contributionsDiv'));
         }
         $E('postingUrgency').dom.value = "withinWeek";
     },
 
     onLoad : function() {
-        RRUpdateContributionList();
+        RRUpdateContributionList('contributionList');
+
+        $('input[name=talks]:radio').change(function() {
+            if ($('#allTalksRB').attr('checked')) {
+                $('#not_capable_warning').show();
+            } else {
+                $('#not_capable_warning').hide();
+            }
+        });
 
         IndicoUtil.enableDisableForm($E("RRForm"), RRRecordingCapable);
 
@@ -48,6 +56,12 @@
 
         if(!singleBookings['RecordingRequest']) {
             callFunction('RecordingRequest', 'clearForm');
+        }
+    },
+
+    afterLoad : function() {
+        if ($("#chooseTalksRB").is(":checked")) {
+            $("#chooseTalksRB").trigger('change');
         }
     }
 }

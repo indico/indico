@@ -2,21 +2,30 @@
         <div class="groupTitle">Electronic Agreement</div>
 
     % if canShow:
-        <span class="RRNoteText" style="float:left;">
-            ${_("""Before any recording can be published, each speaker must sign the %s.<br/>
-                     To do so, two different ways are available:
-                     <ol>
-                        <li><span style="font-weight:bold;">Electronic signature:</span> Select the speakers who need to sign (from the list below) and click on the "Send Email" button.
-                        </li>
-                        <li>Ask the speaker to sign the """)%(agreementName)}
-
-            ${urlPaperAgreement}
-
-             ${_("""<br/>Then, <span style="font-weight:bold;">Upload</span> the corresponding line in the list below.
-                           </li>
-                        </ol>
-                """)}
-        </span>
+        <div>
+            <div class="optionsBlock">
+                <div>
+                    <img src="${emailIconURL}" style="vertical-align:middle; width:24px">
+                    <span style="vertical-align:middle" class="subtitle">Email notification</span>
+                </div>
+                <div id="inPlaceEditNotifyElectronicAgreement"></div>
+            </div>
+            <div class="RRNoteText">
+                ${_("""<p>Before any recording can be published, each speaker must sign the {0}.
+                         There are two ways of doing so:</p>
+                         <p>Either:</p>
+                         <ul>
+                            <li><span style="font-weight:bold;">Electronic signature (<strong>recommended</strong>):</span> Select the speakers who need to sign (from the list below) and click on the "Send Email" button.
+                            </li>
+                         </ul>
+                         <p><em>or</em></p>
+                         <ul>
+                            <li>
+                              Ask the speaker to sign the {1}. Then, <span style="font-weight:bold;">Upload</span> the corresponding line in the list below.
+                            </li>
+                         </ul>""").format(agreementName, urlPaperAgreement)}
+            </div>
+        </div>
 
         <!-- Decide if keep or not... (if T. notice or not) -->
         <!-- <div align="right">
@@ -26,9 +35,6 @@
                 <label style="background-color:red;">${_("Some contributions cannot be published")}</label>
             % endif
         </div> -->
-        <br/>
-        <br/>
-        <br/>
 
         <div id="tooltipPool1" style="display: none">
           <div id="requestType" class="tip">
@@ -102,7 +108,7 @@
                 <td>
                     <tbody id="items">
                       % for spkId, spkName, status, contribId, reqType, enabled in contributions:
-                          <%include file="ElectronicAgreementItems.tpl" args="spkId=spkId,spkName=spkName,status=status,contribId=contribId,reqType=reqType,enabled=enabled"/>
+                          <%include file="ElectronicAgreementItems.tpl" args="spkId=spkId, spkName=spkName, status=status, contribId=contribId, reqType=reqType, enabled=enabled, canModify=canModify"/>
                       % endfor
                     </tbody>
                 </td>
@@ -129,6 +135,8 @@
 <script type="text/javascript">
 
 $(function() {
+    $("#inPlaceEditNotifyElectronicAgreement").append($(new SwitchOptionButton("collaboration.toggleNotifyElectronicAgreementAnswer",{confId:${conf.getId()}}, $T("Notify managers when Electronic Agreement is accepted/rejected"),$T("Saved"), ${notifyElectronicAgreementAnswer | n,j} , ${not canModify | n,j}).draw()));
+
     $('.speakerLine input').change(function() {
         if (this.checked) {
             $(this).parents('.speakerLine').addClass('selected');
@@ -143,16 +151,16 @@ $(function() {
             var uniqueIdList = $('.speakerLine input:checked').map(function(){return this.id;}).toArray();
             var defaultText = "Dear {name},<br />" +
                             "<br />" +
-                            "The organiser asked to record the following event: <strong>"+self.confTitle+"</strong><br />" +
-                            "In order to allow us to publish the video recording of your talk <strong>{talkTitle}</strong>, please sign the agreement form at this page:" +
+                            'I have requested that your talk "<strong>{talkTitle}</strong>" during the event "<strong>' + ${conf.getTitle()| n,j} +'</strong>" be recorded and published.<br />' +
+                            'In order to allow the recording team to publish the video recording, we would need you to sign the speaker release form at this page:' +
                             "<br/><br/> {url} <br/>"+
                             "<br/>" +
                             "Best Regards,<br/><br />" +
-                            "Cern Recording Team";
+                            ${user.getStraightFullName(upper=False) | n,j};
             var legends = {'url':$T('field containing the url of the electronic agreement. (This field is mandatory)'),
                     'talkTitle':$T('field containing the talk title. (This field is mandatory)'),
                     'name':$T('field containing the full name of the speaker.')};
-            var popup = new SpeakersEmailPopup("${conf.getTitle()}", ${conf.getId()}, uniqueIdList, ${fromList} , ${user.getId()}, defaultText, legends);
+            var popup = new SpeakersEmailPopup(${conf.getTitle()| n,j}, ${conf.getId()}, uniqueIdList, ${fromList|n,j} , ${user.getId()}, defaultText, legends);
             popup.open();
         } else {
             var dialog = new WarningPopup($T("Warning"), $T("No entry selected! Please select at least one."));
@@ -186,7 +194,7 @@ $(function() {
                 '</li></ul>'
         );
     });
-
+    $('span.noUploadRights').qtip({content: $T("You do not have access to upload the Electronic Agreement"), position: {my: 'top middle', at: 'bottom middle'}});
 });
 
 </script>

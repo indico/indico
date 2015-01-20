@@ -1,0 +1,317 @@
+/*
+ * This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "base/utilities";
+@import "base/grid";
+@import "partials/icons";
+@import "compass/css3/user-interface";
+
+$box-bg-color: #fefefe;
+$box-border-color: lighten($gray, 10%);
+
+$line-gray: darken($light-gray, 10%);
+
+%ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
+@mixin padded-box($padding: 1em) {
+  @include single-box-shadow;
+  @include border-all($box-border-color);
+  padding: $padding;
+  background-color: $box-bg-color;
+}
+
+@mixin tag-like($fg_color, $bg_color) {
+    @include box-sizing(border-box);
+    @include border-radius(0.1em);
+    vertical-align: middle;
+    color: $fg_color;
+    line-height: 1.5em;
+    background: $bg_color;
+    display: inline-block;
+    padding: 0.5em;
+    max-width: 12em;
+
+    @extend %ellipsis;
+
+    &:before {
+      vertical-align: middle;
+    }
+
+    & * {
+      vertical-align: middle;
+    }
+}
+
+.contribution-display {
+  .layout-wrapper {
+    overflow: auto;
+    position: relative;
+
+    &> h1 {
+      &.page-title {
+        padding-bottom: 0.5em;
+        margin: 0;
+        border-bottom: 1px solid $box-border-color;
+
+        .type {
+          color: $gray;
+          margin-left: 0.5em;
+          font-size: 0.7em;
+        }
+      }
+
+      display: block;
+      font-size: 1.7em;
+      margin-top: 0.5em;
+    }
+
+    .aside {
+      @extend %font-family-sans;
+
+      margin-top: 0.5em;
+      float: right;
+      width: 200px;
+      padding: 0.5em 0 0.5em 0.5em;
+      text-align: right;
+
+      &.left-align {
+        text-align: left;
+      }
+
+
+      :after, :before {
+        color: $light-black;
+      }
+
+      :before {
+        margin-right: 0.5em;
+      }
+
+      :after {
+        margin-left: 0.5em;
+      }
+
+      time {
+        line-height: 1em;
+        display: inline-block;
+        font-size: 1em;
+        color: $gray;
+      }
+
+      .user {
+        display: block;
+        font-size: 1em;
+        color: $light-black;
+      }
+    }
+  }
+
+  .aside.assignments {
+    * {
+      text-align: left;
+    }
+
+    padding: 1em 0 1em 0;
+    width: 25em;
+  }
+
+  .track-assignment {
+    @include icon-before(icon-stack);
+    @include tag-like($light-gray, $dark-gray);
+  }
+
+  .session-assignment {
+    @include tag-like($light-black, darken($light-gray, 5%));
+    .square {
+      vertical-align: middle;
+      border: 1px solid $light-black;
+      display: inline-block;
+      height: 12px;
+      width: 12px;
+    }
+
+    :after, :before {
+      color: $light-black;
+    }
+  }
+
+  .schedule-info {
+    time {
+      @include icon-after(icon-time);
+    }
+
+    .place {
+     @include icon-after(icon-location);
+    }
+  }
+
+  .information {
+    @extend %font-family-sans;
+    @include padded-box(0);
+
+    overflow: auto;
+    position: relative;
+
+    .status {
+      color: #f8f8f8;
+      line-height: 2em;
+      text-align: center;
+    }
+
+    .trigger {
+      @include user-select(none);
+      @include single-transition(color);
+      position: absolute;
+      cursor: pointer;
+      right: 0.5em;
+      bottom: 0.5em;
+      color: $gray;
+
+      &:hover {
+        color: $dark-gray;
+      }
+    }
+
+    ul.extra-parameters {
+      border-top: 1px solid darken($light-gray, 10%);
+      @include box-shadow(rgba(200, 200, 200, 0.2) 0 1px 2px inset);
+      display: none;
+      color: $gray;
+      background: $light-gray;
+      font-size: 0.9em;
+      list-style-type: none;
+      padding: 2em 1em 1em 1em;
+      margin: 0;
+
+      .name {
+        color: $dark-gray;
+        font-weight: bold;
+      }
+    }
+  }
+
+  .section {
+    h2 {
+      margin: 1.2em 0 0.2em 0;
+    }
+
+    &> .content {
+      @include padded-box;
+    }
+  }
+
+  #contribution-field-table {
+      border-spacing: 1.5em;
+  }
+
+  .contribution-section {
+      &> h2 {
+          font-size: 1.1em;
+          color: $light-black;
+          border-bottom: 1px solid $light-black;
+      }
+  }
+
+  .row.files {
+    border-top: 1px solid $line-gray;
+    @include box-shadow(rgba(200, 200, 200, 0.2) 0 1px 2px inset);
+    background-color: $light-gray;
+    padding-bottom: 2em;
+
+    .column {
+      @include single-transition(background-color);
+      margin-right: -1em;
+
+      h2 {
+        padding-bottom: 0.5em;
+        border-bottom: 1px solid $line-gray;
+      }
+
+      #manageMaterial {
+        @include single-transition(box-shadow);
+        margin: 1em 0 0 0;
+      }
+    }
+  }
+
+  .column.files:nth-child(4) {
+    clear: both;
+  }
+
+  .column.reviewing-actions {
+    @include box-sizing(border-box);
+
+    clear: right;
+    background-color: $light-gray;
+    border-left: 1px solid $line-gray;
+    border-bottom: 1px solid $line-gray;
+
+    ul {
+      li#rev-submit {
+        height: 2.5em;
+      }
+    }
+  }
+}
+
+.layout-wrapper {
+  .row {
+    width: 100%;
+    clear: both;
+    overflow: auto;
+  }
+
+  .column {
+    @include grid-column(3);
+    @include box-sizing(border-box);
+    float: left;
+    padding: 0 1em 0 1em;
+
+    &> h2 {
+      font-size: 1.2em;
+    }
+
+    h3 {
+      margin-top: 0;
+      font-size: 1.1em;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+
+      li {
+        @extend %ellipsis;
+        min-height: 1.5em;
+        margin-bottom: 0.5em;
+
+        &:before {
+          margin-right: 0.5em;
+          color: $light-black;
+        }
+      }
+    }
+
+    font-size: 1em;
+  }
+}

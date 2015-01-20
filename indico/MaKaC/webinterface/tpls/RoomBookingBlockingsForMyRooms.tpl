@@ -1,19 +1,18 @@
-<% from MaKaC.rb_location import RoomGUID %>
-<span class="groupTitleNoBorder">
-    % if rh.filterState == 'pending':
+<h2 class="page-title">
+    % if rh.state == 'pending':
       Pending blockings
-    % elif rh.filterState == 'accepted':
+    % elif rh.state == 'accepted':
       Accepted blockings
-    % elif rh.filterState == 'rejected':
+    % elif rh.state == 'rejected':
       Rejected blockings
     % else:
       Blockings
     %endif
     for your rooms
-</span>
-<br />
-% if roomBlocks:
-    <br />
+</h2>
+<br>
+% if room_blocks:
+    <br>
     <table class="blockingTable">
         <thead>
             <tr>
@@ -27,31 +26,30 @@
 
         <tbody class="blockingForMyRoom">
         <% lastRoom = None %>
-        % for guid, roomBlockings in roomBlocks.iteritems():
-            <% room = RoomGUID.parse(guid).getRoom() %>
+        % for room, roomBlockings in room_blocks.iteritems():
             % for rb in roomBlockings:
-                % if lastRoom and lastRoom is not room:
+                % if lastRoom and lastRoom != room:
                     </tbody>
                     <tbody class="blockingSpacer"><tr><td></td></tr></tbody>
                     <tbody class="blockingForMyRoom">
                 % endif
-                <tr class="blockingHover" data-locator=${ quoteattr(rb.getLocator().getJSONForm()) }>
+                <tr class="blockingHover" data-id="${ rb.id }">
                     <td>
                         % if lastRoom is not room:
-                            <a href="${ urlHandlers.UHRoomBookingRoomDetails.getURL(room) }"><strong>${ room.getFullName() }</strong></a>
+                            <a href="${ urlHandlers.UHRoomBookingRoomDetails.getURL(room) }"><strong>${ room.full_name }</strong></a>
                         % endif
                     </td>
-                    <td>${ formatDate(rb.block.startDate) }&nbsp;&mdash;&nbsp;${ formatDate(rb.block.endDate) }</td>
-                    <td><span class="rb-active">${ rb.getActiveString() }</span></td>
+                    <td>${ formatDate(rb.blocking.start_date) }&nbsp;&mdash;&nbsp;${ formatDate(rb.blocking.end_date) }</td>
+                    <td><span class="js-state">${ rb.state_name }</span></td>
                     <td>
-                      <a href="${ urlHandlers.UHRoomBookingBlockingsBlockingDetails.getURL(rb.block) }">Details</a>
-                      <span class="rb-process">
-                        % if rb.active is None:
+                      <a href="${ url_for('rooms.blocking_details', blocking_id=str(rb.blocking.id)) }">Details</a>
+                      <span class="js-process">
+                        % if rb.state == rb.State.pending:
                           [<a href="#" class="processRoomBlocking" data-action="approve">Approve</a>, <a href="#" class="processRoomBlocking" data-action="reject">Reject</a>]
                         % endif
                       </span>
                     </td>
-                    <td>${ rb.block.message }</td>
+                    <td>${ rb.blocking.reason }</td>
                 </tr>
                 <% lastRoom = room %>
             % endfor
@@ -65,7 +63,9 @@
             var $this = $(this);
             var rbRow = $this.closest('tr');
             var action = $this.data('action'); // approve/reject
-            var args = rbRow.data('locator');
+            var args = {
+                blocked_room_id: rbRow.data('id')
+            };
 
             if(action == 'reject') {
                 args.reason = prompt('Please enter a rejection reason.');
@@ -81,8 +81,8 @@
                     IndicoUtil.errorReport(error);
                 }
                 else {
-                    rbRow.find('.rb-process').remove();
-                    rbRow.find('.rb-active').html(result.active);
+                    rbRow.find('.js-process').remove();
+                    rbRow.find('.js-state').html(result.state);
                 }
             });
         });
@@ -93,8 +93,7 @@
     <br />
 % endif
 <br />
-Filter by state:
-<a href="${ urlHandlers.UHRoomBookingBlockingsMyRooms.getURL() }" class="${ 'active' if not rh.filterState else '' }">all states</a> |
-<a href="${ urlHandlers.UHRoomBookingBlockingsMyRooms.getURL(filterState='pending') }" class="${ 'active' if rh.filterState == 'pending' else '' }">pending</a> |
-<a href="${ urlHandlers.UHRoomBookingBlockingsMyRooms.getURL(filterState='accepted') }" class="${ 'active' if rh.filterState == 'accepted' else '' }">active</a> |
-<a href="${ urlHandlers.UHRoomBookingBlockingsMyRooms.getURL(filterState='rejected') }" class="${ 'active' if rh.filterState == 'rejected' else '' }">rejected</a>
+<a href="${ url_for('rooms.blocking_my_rooms') }" class="${ 'active' if not rh.state else '' }">all states</a> |
+<a href="${ url_for('rooms.blocking_my_rooms', state='pending') }" class="${ 'active' if rh.state == 'pending' else '' }">pending</a> |
+<a href="${ url_for('rooms.blocking_my_rooms', state='accepted') }" class="${ 'active' if rh.state == 'accepted' else '' }">active</a> |
+<a href="${ url_for('rooms.blocking_my_rooms', state='rejected') }" class="${ 'active' if rh.state == 'rejected' else '' }">rejected</a>

@@ -1,54 +1,40 @@
-<table width="100%">
-    <tr>
-        <td>&nbsp;</td>
-    </tr>
-    <tr>
-        <td>
-            <form action=${ displayURL } method="POST">
-            <table width="100%" align="center" border="0"
-                    style="border-left: 1px solid #777777;border-top: 1px solid #777777;">
-                <tr>
-                    <td class="groupTitle"
-                            style="background:#E5E5E5; color:gray">
-                        &nbsp;&nbsp;&nbsp;${ _("Display options")}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span class="titleCellFormat">${ _("View mode")} </span>
-                            <select name="view">${ viewModes }</select>
+<%inherit file="ConfDisplayBodyBase.tpl"/>
 
-                    </td>
-                </tr>
-                <tr>
-                    <td align="center" style="border-top:1px solid #777777;padding:10px"><input type="submit" class="btn" name="OK" value="${ _("apply")}"></td>
-                </tr>
-            </table>
-            </form>
-        </td>
-    </tr>
-    <tr>
-        <td>&nbsp;</td>
-    </tr>
-    <tr>
-        <td>
-            <table width="100%" align="center" border="0"
-                    style="border-left: 1px solid #777777;border-top: 1px solid #777777;">
-                <tr>
-                    <td colspan="9" class="groupTitle" style="background:#E5E5E5; color:gray">
-                        &nbsp;&nbsp;&nbsp;${ _("Speakers")}
-                    </td>
-                </tr>
-                <tr>
-                    <td align="center" colspan="2">
-                        ${ letterIndex }
-                    </td>
-                </tr>
-                <tr>
-                    <td align="center" colspan="2">&nbsp;</td>
-                </tr>
-           ${ items }
-            </table>
-        </td>
-    </tr>
-</table>
+<%block name="title">
+    ${body_title}
+</%block>
+
+<%block name="content">
+    <div class="speakerIndexFiltersContainer">
+        <div>
+            <input type="text" id="filter_text" value="" placeholder="${ _('Search in speakers') }" />
+        </div>
+        <div class="speakerIndexFilteredText">
+            ${_("Displaying ")}<span style="font-weight:bold;" id="numberFiltered">${len(items)}</span>
+            <span id="numberFilteredText">${ _("speaker") if len(items) == 1 else _("speakers")}</span>
+            ${_("out of")}
+            <span style="font-weight:bold;">${len(items)}</span>
+        </div>
+    </div>
+    <div class="speakerIndex index">
+        % for key, item in items.iteritems():
+            <div class="speakerIndexItem item">
+                <div style="padding-bottom: 10px">
+                    <span class="speakerIndexItemText text">${item[0]['fullName']}</span>
+                    % if item[0]['affiliation']:
+                        <span style="color: #888">(${item[0]['affiliation']})</span>
+                    % endif
+                </div>
+                % for i in range(1, len(item)):
+                    <div class="contribItem">
+                        <a href="${item[i]['url']}">${item[i]['title']}</a>
+                        % if item[i]['materials']:
+                            <img class="material_icon" title="${_('materials')}" src="${Config.getInstance().getBaseURL()}/images/material_folder.png" width=12 height=12 style="cursor: pointer;"/>
+                            <%include file="MaterialListPopup.tpl" args="materials=item[i]['materials']"/>
+                        % endif
+                    </div>
+                % endfor
+            </div>
+        % endfor
+    </div>
+</%block>

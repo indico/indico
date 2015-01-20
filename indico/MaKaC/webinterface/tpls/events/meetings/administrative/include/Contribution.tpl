@@ -1,6 +1,6 @@
 <%page args="item, parent, hideTime=False, allMaterial=False, minutes=False, order=1, showOrder=True" />
 
-<%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
+<%namespace name="common" file="../../${context['INCLUDE']}/Common.tpl"/>
 
 <tr>
     <td colspan="4"></td>
@@ -9,7 +9,8 @@
     <td class="itemTopAlign itemLeftAlign ">
         % if showOrder:
             % if not hideTime:
-                <span class="itemTime">${getTime(item.getAdjustedStartDate(timezone))}</span>&nbsp;&nbsp;${order}.
+                <span class="itemTime">${getTime(item.getAdjustedStartDate(timezone))}</span>
+                <span class="itemIndex">&nbsp;&nbsp;${ order }.</span>
             % else:
                 ${order}.
             % endif
@@ -18,7 +19,7 @@
         % endif
 
     </td>
-    <td class="itemTopAlign itemLeftAlign">
+    <td class="itemTopAlign itemLeftAlign itemTitle">
         ${item.getTitle()}
         <br/>
         % if minutes:
@@ -40,6 +41,7 @@
             </span>
             <br/>
         % endif
+        <span class="materialDisplayName">
         % if not allMaterial:
             <% materialDocuments = False %>
             % for material in item.getAllMaterialList():
@@ -79,9 +81,10 @@
                 % endfor
             % endif
         % endif
+        </span>
     </td>
     <td class="itemTopAlign">
-        <%include file="${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
+        <%include file="../../${INCLUDE}/ManageButton.tpl" args="item=item, alignRight=True"/>
     </td>
 </tr>
 % if item.getSubContributionList():

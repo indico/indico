@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 function inject_facebook(appId) {
     $.getScript('//connect.facebook.net/en_US/all.js#xfbml=1', function() {
@@ -21,7 +38,7 @@ $(function() {
 
         style: {
             width: '420px',
-            classes: 'ui-tooltip-rounded ui-tooltip-shadow social_share_tooltip' + (theme=='dark'?' ui-tooltip-dark':' ui-tooltip-blue')
+            classes: 'qtip-rounded qtip-shadow social_share_tooltip' + (theme=='dark'?' qtip-dark':' qtip-blue')
         },
         position: {
             my: 'bottom right',

@@ -4,11 +4,11 @@ function showAbstracts()
 {
     var listOfAbstracts = ${ listOfAbstracts };
     var ul = Html.ul({id: '',style:{listStyle: 'circle', marginLeft:'-25px'}});
-    for (a in listOfAbstracts)
+    for (var i = 0; i < listOfAbstracts.length; i++)
     {
-        ul.append(Html.li('', listOfAbstracts[a]));
+        ul.append(Html.li('', listOfAbstracts[i]));
     }
-    var popup = new AlertPopup(Html.span('warningTitle', "List of abstracts"), ul);
+    var popup = new AlertPopup("List of abstracts", ul);
     popup.open();
 }
 

@@ -1,38 +1,42 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from flask import session
 
-import time
-
+import os
+from copy import copy
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.rh.conferenceBase import RHFileBase, RHLinkBase
-from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
+from MaKaC.webinterface.rh.base import RH, RHDisplayBaseProtected
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.pages import files
-from MaKaC.common import Config
 from MaKaC.errors import NotFoundError, AccessError
-
-from email.Utils import formatdate
-from MaKaC.conference import Reviewing
+from MaKaC.registration import Registrant
+from MaKaC.conference import Reviewing, Link
 from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
-from copy import copy
+from MaKaC.i18n import _
 
-class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
+from indico.core import signals
+from indico.web.flask.util import send_file
+from indico.modules import ModuleHolder
+
+
+class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
     _uh  = urlHandlers.UHFileAccess
 
     def _checkParams( self, params ):
@@ -49,54 +53,41 @@ class RHFileAccess( RHFileBase, RHDisplayBaseProtected ):
                 selfcopy._target.canUserSubmit(self.getAW().getUser()) or \
                 self._target.canModify( self.getAW() )):
                 raise AccessError()
+        elif isinstance(self._file.getOwner(), Registrant) and \
+             not self._file.getOwner().canUserModify(self.getAW().getUser()):
+            raise AccessError(_("The access to this resource is forbidden"))
+
         else:
             RHDisplayBaseProtected._checkProtection( self )
 
     def _process( self ):
-
-        if self._file.getId() != "minutes":
-            #self._req.headers_out["Accept-Ranges"] = "bytes"
-            self._req.headers_out["Content-Length"] = "%s"%self._file.getSize()
-            self._req.headers_out["Last-Modified"] = "%s"%formatdate(time.mktime(self._file.getCreationDate().timetuple()))
-            cfg = Config.getInstance()
-            mimetype = cfg.getFileTypeMimeType( self._file.getFileType() )
-            self._req.content_type = """%s"""%(mimetype)
-            dispos = "inline"
-            try:
-                if self._req.headers_in['User-Agent'].find('Android') != -1:
-                    dispos = "attachment"
-            except KeyError:
-                pass
-            self._req.headers_out["Content-Disposition"] = '%s; filename="%s"' % (dispos, self._file.getFileName())
-
-            if cfg.getUseXSendFile() and self._req.headers_in['User-Agent'].find('Android') == -1:
-                # X-Send-File support makes it easier, just let the web server
-                # do all the heavy lifting
-                return self._req.send_x_file(self._file.getFilePath())
-            else:
-                return self._file.readBin()
-        else:
+        signals.event.material_downloaded.send(self._conf, resource=self._file)
+        if isinstance(self._file, Link):
+            self._redirect(self._file.getURL())
+        elif self._file.getId() == "minutes":
             p = files.WPMinutesDisplay(self, self._file )
             return p.display()
+        else:
+            return send_file(self._file.getFileName(), self._file.getFilePath(), self._file.getFileType(),
+                             self._file.getCreationDate())
 
-class RHFileAccessStoreAccessKey( RHFileBase ):
+
+class RHFileAccessStoreAccessKey(RHFileBase):
     _uh = urlHandlers.UHFileEnterAccessKey
 
-    def _checkParams( self, params ):
-        RHFileBase._checkParams(self, params )
-        self._accesskey = params.get( "accessKey", "" ).strip()
+    def _checkParams(self, params):
+        RHFileBase._checkParams(self, params)
+        self._accesskey = params.get("accessKey", "").strip()
+        self._doNotSanitizeFields.append("accessKey")
 
-    def _checkProtection( self ):
+    def _checkProtection(self):
         pass
 
-    def _process( self ):
-        access_keys = self._getSession().getVar("accessKeys")
-        if access_keys == None:
-            access_keys = {}
+    def _process(self):
+        access_keys = session.setdefault('accessKeys', {})
         access_keys[self._target.getOwner().getUniqueId()] = self._accesskey
-        self._getSession().setVar("accessKeys",access_keys)
-        url = urlHandlers.UHFileAccess.getURL( self._target )
-        self._redirect( url )
+        session.modified = True
+        self._redirect(urlHandlers.UHFileAccess.getURL(self._target))
 
 
 class RHVideoWmvAccess( RHLinkBase, RHDisplayBaseProtected ):
@@ -132,3 +123,22 @@ class RHVideoFlashAccess( RHLinkBase, RHDisplayBaseProtected ):
     def _process( self ):
         p = files.WPVideoFlash(self, self._link )
         return p.display()
+
+
+class RHOfflineEventAccess(RHConferenceModifBase):
+    _uh = urlHandlers.UHOfflineEventAccess
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        if 'fileId' not in params:
+            raise NotFoundError(_("Missing 'fileId' argument."))
+        self._offlineEvent = ModuleHolder().getById("offlineEvents").getOfflineEventByFileId(params["confId"],
+                                                                                             params["fileId"])
+        if not self._offlineEvent or not self._offlineEvent.file or \
+           not os.path.isfile(self._offlineEvent.file.getFilePath()):
+            raise NotFoundError(_("The file you try to access does not exist anymore."))
+
+    def _process(self):
+        f = self._offlineEvent.file
+        return send_file('event-%s.zip' % self._conf.getId(), f.getFilePath(), f.getFileType(),
+                         last_modified=self._offlineEvent.creationTime, inline=False)

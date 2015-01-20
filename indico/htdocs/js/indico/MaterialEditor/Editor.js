@@ -1,3 +1,23 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+var CONVERSION_POLL_INTERVAL = 10000;
+
+
 function updateMaterialList(oldList, newList) {
     oldList.length = 0;
 
@@ -106,15 +126,29 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                     // setup Html.div() args with all file upload fields etc.
                     var args = [{}];
                     for(var i = 0; i < files.length; i++) {
-                        args.push(self.pm.add(files[i], 'text'));
+                        args.push(self.pm.add(files[i], 'text', i > 0));
                         if(i == 0 && files.length < MAX_MATERIAL_FIELDS) {
                             args.push(addInputLink);
                         }
                     }
-                    args.push(Html.div({style:{marginTop: '5px'}},
-                            toPDFCheckbox,
-                            Html.label({style: {verticalAlign: 'middle'}, className: 'emphasis'},
-                                    $T("Convert to PDF (when applicable)"))));
+                    if (Indico.PDFConversion.HasFileConverter){
+                        var pdfDivLabel = Html.label({style: {verticalAlign: 'middle'}, className: 'emphasis'},
+                                $T("Convert to PDF"));
+                        var pdfDiv = Html.div({style:{marginTop: '5px'}},
+                                toPDFCheckbox,
+                                pdfDivLabel
+                                );
+                        $(pdfDivLabel.dom).qtip({
+                            content: {
+                                text: $T("The only available file formats are: ") + Indico.PDFConversion.AvailablePDFConversions.toString().replace(/\./g,' ')
+                            },
+                            position: {
+                                target: 'mouse',
+                                adjust: { mouse: true, x: 11, y: 13 }
+                            }
+                        });
+                        args.push(pdfDiv);
+                    }
 
                     return Html.div.apply(null, args);
                 },
@@ -130,7 +164,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                         var divArgs = [
                             {},
                             Html.label('popUpLabel', $T("URL")),
-                            self.pm.add(urlBoxes[i], 'url')
+                            self.pm.add(urlBoxes[i], 'url', i > 0)
                         ];
                         if(i == 0 && urlBoxes.length < MAX_MATERIAL_FIELDS) {
                             divArgs.push(addInputLink);
@@ -260,7 +294,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
 
             selector = new RadioFieldWidget([
                 ['inherit', Html.span({className: protection == -1 ? 'strongProtPublic' : 'strongProtPrivate'}, $T("Inherit from parent material type ")+"\""+entry.get('title')+"\" ", inheritanceText)],
-                ['private', Html.span({className: 'protPrivate'}, $T("Private: Can only be viewed by you and users/groups chosen by you from the list of users"))],
+                ['private', Html.span({className: 'protPrivate'}, $T("Restricted: Can only be viewed by you and users/groups chosen by you from the list of users"))],
                 ['public', Html.span({className: 'protPublic'}, $T("Public: Can be viewed by everyone"))]
             ], 'nobulletsListWrapping');
 
@@ -273,7 +307,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
 
             selector = new RadioFieldWidget([
                 ['inherit', this._parentText(this.args)],
-                ['private', Html.span({className: 'protPrivate'}, $T("Private: Can only be viewed by you and users/groups chosen by you from the list of users"))],
+                ['private', Html.span({className: 'protPrivate'}, $T("Restricted: Can only be viewed by you and users/groups chosen by you from the list of users"))],
                 ['public', Html.span({className: 'protPublic'}, $T("Public: Can be viewed by everyone"))]
             ], 'nobulletsListWrapping');
         }
@@ -298,10 +332,10 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                 // visibility and access key
                 if (self.creationMode == 'material') {
                     self.visibility.enable();
-                    self.password.enable();
+                    self.password.dom.disabled = false;
                 } else {
                     self.visibility.disable();
-                    self.password.disable();
+                    self.password.dom.disabled = true;
                 }
 
                 // draw a little notification saying that
@@ -351,7 +385,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                 return self._drawProtectionPane(value);
             });
 
-        return Html.div({},
+        return $("<div></div>").append(
                         IndicoUtil.createFormFromMap(
                             [
                                 [
@@ -370,7 +404,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                                 ]
 
                             ]),
-                        protectionPane);
+                        $(protectionPane.dom));
 
    },
 
@@ -381,7 +415,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
        var description = Html.textarea({id:'description', name: 'description', style:{width:'220px', height: '60px'}});
        var displayName = Html.input("text",{'name':'displayName', style:{width:'220px'}});
 
-       return Html.div({},
+       return $("<div></div>").append(
                        IndicoUtil.createFormFromMap(
                            [
                                [
@@ -426,7 +460,9 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
 
             $(this.form.dom).submit();
 
+            return true;
         }
+        return false;
     },
 
     _drawWidget: function() {
@@ -438,7 +474,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
             {
                 method: 'post',
                 id: Html.generateId(),
-                action: this.uploadAction,
+                action: build_url(this.uploadAction, this.args),
                 enctype: 'multipart/form-data'
             },
             this.tabWidget.draw());
@@ -513,7 +549,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
             'ShortPeopleListDiv', 'PeopleList',
             null, true, null,
             true, true, null, null,
-            false, false, true,
+            false, false, false, true,
             userListNothing, userListNothing, userListNothing);
 
         // Bind fields to data structure
@@ -523,7 +559,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
         this.visibility.set(0);
         this.password.set('');
 
-        var privateInfoDiv = IndicoUtil.createFormFromMap(
+        return IndicoUtil.createFormFromMap(
                             [
                                 [
                                     $T('Allowed users and groups'),
@@ -538,8 +574,6 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
                                     this.password
                                 ]
                             ]);
-
-        return privateInfoDiv;
     },
 
     draw: function() {
@@ -558,7 +592,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
     }
 
 
-}, function(args, list, types, uploadAction, onUpload, forReviewing) {
+}, function(args, list, types, uploadAction, onUpload, forReviewing, addMaterialMode) {
     this.AddEditMaterialDialog();
     var self = this;
     this.list = list;
@@ -567,9 +601,8 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
     this.uploading = false;
     this.onUpload = onUpload;
     this.forReviewing = forReviewing;
-
+    this.addMaterialMode = addMaterialMode;
     this.args = clone(args);
-//    this.args.materialId = material;
 
     this.protectionStatus = $O();
     this.uploadType = new WatchValue();
@@ -580,13 +613,12 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
 
     this.pm = new IndicoUtil.parameterManager();
 
-    var typeSelector = new TypeSelector(this.types,
+    this.typeSelector = new TypeSelector(this.types,
                                         {style:{width: '150px'}},
                                         {style:{width: '150px'}, maxlength: '50'});
-    // make typeSelector available to the object
-    this.typeSelector = typeSelector;
-    this.typeSelector.plugParameterManager(this.pm);
-
+    if (!forReviewing) {
+        this.typeSelector.plugParameterManager(this.pm);
+    }
 });
 
 type("UploadTemplateDialog", ["ExclusivePopupWithButtons"], {
@@ -608,7 +640,7 @@ type("UploadTemplateDialog", ["ExclusivePopupWithButtons"], {
     },
 
     _fileUpload: function() {
-        var self = this
+        var self = this;
         var pm = self.pm = new IndicoUtil.parameterManager();
         var uploadType = Html.input('hidden', {name: 'uploadType'});
         var selector = this._showFormatChooser(pm);
@@ -626,7 +658,7 @@ type("UploadTemplateDialog", ["ExclusivePopupWithButtons"], {
         this.form = Html.form({
                             method: 'post',
                             id: Html.generateId(),
-                            action: this.uploadAction,
+                            action: build_url(this.uploadAction, this.args),
                             enctype: 'multipart/form-data',
                             encoding: 'multipart/form-data'
                         },
@@ -637,7 +669,7 @@ type("UploadTemplateDialog", ["ExclusivePopupWithButtons"], {
                                 [$T('Type'), selector],
                                 [$T('File'), file],
                                 [$T('Description'), description]
-                            ]),
+                            ]).get(),
                         uploadType);
 
         $(this.form.dom).ajaxForm({
@@ -684,7 +716,7 @@ type("UploadTemplateDialog", ["ExclusivePopupWithButtons"], {
             write: function() {
                 bind.detach(select);
                 pm.remove(select);
-                pm.add(text);
+                pm.add(text, 'text');
                 return Html.div({}, text,
                                 " ",
                                $T("or"),
@@ -726,11 +758,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
         var self = this;
 
         var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
-        if (IndicoGlobalVars.isUserAuthenticated && !exists(IndicoGlobalVars['favorite-user-ids'])) {
-            self.args.includeFavList = true;
-        } else {
-            self.args.includeFavList = false;
-        }
+        self.args.includeFavList = IndicoGlobalVars.isUserAuthenticated && !exists(IndicoGlobalVars['favorite-user-ids']);
         var users = indicoSource(method, self.args);
 
         users.state.observe(function(state) {
@@ -757,7 +785,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
                 'ShortPeopleListDiv', 'PeopleList',
                 this.allowedUsers, true, null,
                 true, true, null, null,
-                false, false, true,
+                false, false, false, true,
                 userListNothing, userListNothing, userListNothing);
 
 
@@ -770,7 +798,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
 
         return Html.div(
                 {style: {marginTop: pixels(5)}},
-                self.privateInfoDiv);
+                self.privateInfoDiv.get());
 
     },
 
@@ -780,11 +808,11 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
         var inheritanceText = Html.unescaped.span({className: 'strongRed', style: {fontStyle: 'italic'}},
                 Protection.ParentRestrictionMessages[self.protection]);
 
-        text = Html.span({}, $T("Please select who will be able to access "), " ",Html.span({style:{fontWeight: 'bold'}}, self.protectionName), " :");
+        var text = Html.span({}, $T("Please select who will be able to access "), " ",Html.span({style:{fontWeight: 'bold'}}, self.protectionName), " :");
 
         self.protectionSelector  = new RadioFieldWidget([
             [0, self._parentText(this.args)],
-            [1, Html.span({className: 'protPrivate'}, $T("Private: Can only be viewed by you and users/groups chosen by you from the list of users"))],
+            [1, Html.span({className: 'protPrivate'}, $T("Restricted: Can only be viewed by you and users/groups chosen by you from the list of users"))],
             [-1, Html.span({className: 'protPublic'}, $T("Public: Can be viewed by everyone"))]
             ], 'nobulletsListWrapping');
 
@@ -826,7 +854,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
         var protectionDiv = self._drawProtectionDiv();
 
         var infoDiv = Html.div({},
-                self._drawInfoPane(),
+                self._drawInfoPane().get(),
                 this.forReviewing?[]:self._drawProtectionPane() );
         var widget = [[$T("Information"), infoDiv]];
         if(!this.forReviewing) {
@@ -879,10 +907,13 @@ type("EditMaterialDialog", ["EditMaterialResourceBase"], {
             this.types.push([params.materialInfo.get('id'), params.materialInfo.get('title')]);
         }
 
-        this.request(params);
+        if (this.pm.check()) {
+            this.request(params);
+        }
     },
 
     _success: function(response) {
+
         this.list.set(this.materialId, null);
         this.list.set(this.materialId, watchize(response.material));
 
@@ -925,8 +956,11 @@ type("EditMaterialDialog", ["EditMaterialResourceBase"], {
         self.materialTitle = Html.input("text",{'name':'title', style:{width:'220px'}});
         self.description = Html.textarea({id:'description', name: 'description', style:{width:'220px', height: '60px'}});
 
+        self.pm = new IndicoUtil.parameterManager();
+        self.pm.add(self.materialTitle, 'text', false);
+
         if (self.material.get('isBuiltin')) {
-            $(self.materialTitle.dom).attr('readonly', 'readonly').css('color', '#888').qtip(
+            $(self.materialTitle.dom).prop('readonly', true).css('color', '#888').qtip(
                 {content: $T("This is a default material type and its name cannot be changed. You should create a new type instead."),
                  position: {my: 'bottom center', at: 'top center'}});
         }
@@ -992,7 +1026,9 @@ type("EditResourceDialog", ["EditMaterialResourceBase"], {
         var params = clone(this.args);
         params.resourceInfo = this.newResource;
         this.newResource.set('userList', this.userList.getUsers());
-        this.request(params);
+        if (this.pm.check()) {
+            this.request(params);
+        }
     },
 
     _success: function(response) {
@@ -1020,6 +1056,10 @@ type("EditResourceDialog", ["EditMaterialResourceBase"], {
         self.name = Html.input("text",{'name':'name', style:{width:'220px'}});
         self.url = Html.input("text",{'name':'url', style:{width:'220px'}});
         self.description = Html.textarea({id:'description', name: 'description', style:{width:'220px', height: '60px'}});
+
+        self.pm = new IndicoUtil.parameterManager();
+        self.pm.add(self.name, 'text', false);
+        self.pm.add(self.url, 'url', false);
 
         return IndicoUtil.createFormFromMap(
                 [
@@ -1144,29 +1184,31 @@ type("ResourceListWidget", ["ListWidget"], {
 
         var self = this;
 
-        var resourceNode;
         var resParams = clone(this.matParams);
         resParams.resourceId = resourceId;
-
         var deleteResource = function() {
-            if (confirm($T("Are you sure you want to delete")+" "+resource.get('name')+"?")) {
-                var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
-                jsonRpc(Indico.Urls.JsonRpcService,
-                        'material.resources.delete',
-                        resParams,
-                        function(response,error) {
-                            if (exists(error)) {
-                                killProgress();
-                                IndicoUtil.errorReport(error);
-                            } else {
-                                var parent = resourceNode.dom.parentNode;
-                                self.resources.remove(resource);
-                                self.set(resourceId, null);
-                                killProgress();
+            var confirmHandler = function(value){
+                if (value) {
+                    var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+
+                    jsonRpc(Indico.Urls.JsonRpcService,
+                            self.deleteResourceMethod,
+                            resParams,
+                            function(response,error) {
+                                if (exists(error)) {
+                                    killProgress();
+                                    IndicoUtil.errorReport(error);
+                                } else {
+                                    self.resources.remove(resource);
+                                    self.set(resourceId, null);
+                                    updateMaterialList(self.materialTypes, response.newMaterialTypes);
+                                    killProgress();
+                                }
                             }
-                        }
-                       );
-            }
+                           );
+                }
+            };
+            new ConfirmPopup($T("Delete Resource"), $T("Are you sure you want to delete") + " "+resource.get('name')+"?", confirmHandler).open();
         };
 
         var setMainResource = function() {
@@ -1182,7 +1224,7 @@ type("ResourceListWidget", ["ListWidget"], {
                         } else {
                             killProgress();
                             //Crude way to redraw widget
-                            temp = self.getAll();
+                            var temp = self.getAll();
                             self.clear();
                             self.update(temp);
                         }
@@ -1203,7 +1245,7 @@ type("ResourceListWidget", ["ListWidget"], {
                         } else {
                             killProgress();
                             //Crude way to redraw widget
-                            temp = self.getAll();
+                            var temp = self.getAll();
                             self.clear();
                             self.update(temp);
                         }
@@ -1232,11 +1274,18 @@ type("ResourceListWidget", ["ListWidget"], {
         var editButton;
         var setMain;
         var flag;
+        var protectionIcon;
 
         if (resource.get('reviewingState') < 3 || (resource.get('reviewingState') == 3 && self.canReviewModify)) {
-            if(resource.get('reviewingState') == 3){
-                flag = true;
-            } else { flag = false;}
+            flag = resource.get('reviewingState') == 3;
+            var protection = Protection.resolveProtection(resource.get('protection'),self.matParams.materialProtection);
+
+            protectionIcon = Html.span({}, protection==1?
+                                           Html.img({src: imageSrc('protected'),
+                                                     style: {verticalAlign: 'middle', paddingLeft:pixels(5)},
+                                                     alt: "protected",
+                                                     title: $T("This resource is protected")})
+                                           :'');
             removeButton = Widget.link(command(deleteResource,IndicoUI.Buttons.removeButton()));
             editButton = Widget.link(command(function() {
                 IndicoUI.Dialogs.Material.editResource(resParams, self.matParams, self.materialName, resource, resourceNode, function(resource) {
@@ -1257,38 +1306,99 @@ type("ResourceListWidget", ["ListWidget"], {
         } else {
             removeButton = IndicoUI.Buttons.removeButton(true);
             removeButton.dom.title = '';
-            removeButton.dom.onmouseover = modifyDisabledHelpPopup;
 
             editButton = IndicoUI.Buttons.editButton(true);
             editButton.dom.title = '';
-            editButton.dom.onmouseover = modifyDisabledHelpPopup;
 
-            setMain = IndicoUI.Buttons.starButton(true)
+            setMain = IndicoUI.Buttons.starButton(true);
             setMain.dom.title = '';
-            setMain.dom.onmouseover = modifyDisabledHelpPopup;
+
+            // show the helper popups only for real files (not for 'converting to PDF' file)
+            if (resource.get('type') != 'converting') {
+                removeButton.dom.onmouseover = modifyDisabledHelpPopup;
+                editButton.dom.onmouseover = modifyDisabledHelpPopup;
+                setMain.dom.onmouseover = modifyDisabledHelpPopup;
+            }
         }
 
+        var informationTitle;
+        if (resource.get('type') == 'converting') {
+            informationTitle = Html.span({style: {paddingLeft: '5px', color: 'gray'}}, resource.get('name'));
+        }
+        else {
+            informationTitle = Html.a({href: resource.get('url'), style: {paddingLeft: '5px'}}, resource.get('name'));
+        }
+
+
         var information = [
-            Html.a({href: resource.get('url'), style: {paddingLeft: '5px'}}, resource.get('name')),
-            resource.get('type') == 'stored'?"":[" (",Html.span({style:{fontStyle: 'italic', fontSize: '11px'}}, resource.get('url')),")"],
+            protectionIcon,
+            informationTitle,
+            resource.get('type') == 'stored' || 'converting' ? "" :[" (",Html.span({style:{fontStyle: 'italic', fontSize: '11px'}}, resource.get('url')),")"],
             removeButton,
             editButton,
             this.showMainResources ? setMain:Html.div({}),
             Html.div("descriptionLine", resource.get('description'))
         ];
 
+        var resourceNode;
         if (resource.get('type') == 'stored') {
             var fileData = storedDataInfo(resource.get('file'));
             resourceNode = Widget.block(concat([IndicoUI.Buttons.arrowExpandIcon(fileData)], information));
             resourceNode.append(fileData);
-        } else {
+        } else if (resource.get('type') == 'converting') {
+            resourceNode = Html.div({}, Html.img({src:imageSrc("collapsd.png")}), information);
+            $(resourceNode.dom).qtip({
+                    content: {
+                        text: $T('Indico is currently performing the conversion of the file to PDF. The conversion may take a few seconds.')
+                    },
+                    position: {
+                        target: 'mouse',
+                        adjust: { mouse: true, x: 11, y: 13 }
+                    }
+                });
+        } else { // it is a link
             resourceNode = Html.div({style:{paddingLeft: '12px'}}, information);
+        }
+
+        if (resource.get('pdfConversionStatus') == 'converting') {
+            var counter = 0;
+            (function conversionWorker() {
+                jsonRpc(Indico.Urls.JsonRpcService,
+                        'material.get',
+                        resParams,
+                        function(response,error) {
+                            if (response) {
+                                // We suppose that the PDF file is not converted yet and so we gray it out.
+                                if (counter == 0) {
+                                    var convertingResource = clone(resource);
+                                    convertingResource.url = '';
+                                    convertingResource.id = resourceId + 'converting';
+                                    convertingResource.name = resource.get('name').split('.')[0] + '.pdf';
+                                    convertingResource.type = 'converting';
+                                    self.resources.append(watchize(convertingResource));
+                                }
+                                // Now we check if the file is converted and if so, we show the PDF and stop the 'setTimetout'
+                                for (var value in response.resources) {
+                                    if (response.resources[value].name == resource.get('name').split('.')[0] + '.pdf') {
+                                        self.set(resourceId + 'converting', null);
+                                        self.set(response.resources[value].id, watchize(response.resources[value]));
+                                        return;
+                                    }
+                                }
+                                if (counter < 6) { // poll up to a maximum of 6 times if the PDF is already converted
+                                    setTimeout(conversionWorker, CONVERSION_POLL_INTERVAL);
+                                    counter++;
+                                }
+                             }
+                        }
+                       );
+                    })();
         }
 
         return resourceNode;
     }
 
-}, function(resources, matParams, materialTitle, materialTypes, showMainResources, canReviewModify) {
+}, function(resources, matParams, materialTitle, materialTypes, showMainResources, canReviewModify, deleteResourceMethod) {
     this.matParams = matParams;
     this.resources = resources;
     this.materialName = materialTitle;
@@ -1296,6 +1406,7 @@ type("ResourceListWidget", ["ListWidget"], {
     this.ListWidget("materialListResource");
     this.showMainResources = showMainResources || false;
     this.canReviewModify = canReviewModify || false;
+    this.deleteResourceMethod = deleteResourceMethod;
 
     var self = this;
 
@@ -1336,25 +1447,28 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         args.mainResourceId = material.get('mainResource')?material.get('mainResource').get('id'):null;
 
         var deleteMaterial = function() {
-            if (confirm("Are you sure you want to delete '"+material.get('title')+"'?")) {
-                var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
+            var confirmHandler = function(value){
+                if(value){
+                    var killProgress = IndicoUI.Dialogs.Util.progress($T('Removing...'));
 
-                jsonRpc(Indico.Urls.JsonRpcService,
-                        'material.delete',
-                        args,
-                        function(response,error) {
-                            if (exists(error)) {
-                                killProgress();
-                                IndicoUtil.errorReport(error);
-                            } else {
-                                self.set(materialId, null);
-                                killProgress();
+                    jsonRpc(Indico.Urls.JsonRpcService,
+                            'material.delete',
+                            args,
+                            function(response,error) {
+                                if (exists(error)) {
+                                    killProgress();
+                                    IndicoUtil.errorReport(error);
+                                } else {
+                                    self.set(materialId, null);
+                                    killProgress();
 
-                                updateMaterialList(self.types, response.newMaterialTypes);
+                                    updateMaterialList(self.types, response.newMaterialTypes);
+                                }
                             }
-                        }
-                       );
-            }
+                           );
+                }
+            };
+            new ConfirmPopup($T("Delete Material"), $T("Are you sure you want to delete '")+material.get('title')+"'?", confirmHandler).open();
         };
 
         var menu;
@@ -1378,7 +1492,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         );
 
         args.materialProtection = material.get('protection');
-        var matWidget = new ResourceListWidget(material.get('resources'), args, material.get('title'), self.types, self.showMainResources, self.canReviewModify);
+        var matWidget = new ResourceListWidget(material.get('resources'), args, material.get('title'), self.types, self.showMainResources, self.canReviewModify, self.deleteResourceMethod);
 
         // check whenever a material gets empty (no resources) and delete it
         material.get('resources').observe(
@@ -1510,14 +1624,20 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
             self.set(key, obj);
         });
 
-        var link = Widget.link(command(function(){
-
+        var openAddMaterialDialog = function(onUpdate) {
             IndicoUI.Dialogs.Material.add(self.args,
-                                          self,
-                                          self.types,
-                                          self.uploadAction,
-                                          self.makeMaterialLoadFunction());
-        }, $T("Add Material")));
+                    self,
+                    self.types,
+                    self.uploadAction,
+                    onUpdate,
+                    false,
+                    self.addMaterialMode);
+        };
+
+        if (self.addMaterialMode) {
+            openAddMaterialDialog(function(param) {window.location.reload(true);});
+        }
+        var link = Widget.link(command(function(){openAddMaterialDialog(self.makeMaterialLoadFunction());}, $T("Add Material")));
 
 
         return Html.div(
@@ -1529,7 +1649,7 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
     }
 },
 
-     function(args, types, uploadAction, width, height, showMainResources, listMethod, canReviewModify) {
+     function(args, types, uploadAction, width, height, showMainResources, listMethod, canReviewModify, addMaterialMode, deleteResourceMethod) {
          var self = this;
          this.width = width;
          this.height = height;
@@ -1540,8 +1660,10 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
          if (!exists(listMethod)) {
              listMethod = 'material.list';
          }
-         this.canReviewModify = any(canReviewModify, false);
+         this.deleteResourceMethod = any(deleteResourceMethod, "material.resources.delete");
 
+         this.canReviewModify = any(canReviewModify, false);
+         this.addMaterialMode = addMaterialMode;
          this.RemoteWidget(listMethod, args);
          this.args.materialIdsList = $O();
          this.showMainResources = showMainResources || false;
@@ -1568,7 +1690,8 @@ type("ReviewingMaterialListWidget", ["MaterialListWidget"], {
                                                   self.types,
                                                   self.uploadAction,
                                                   self.makeMaterialLoadFunction(),
-                                                  true);
+                                                  true,
+                                                  self.addMaterialMode);
                 }, $T("Upload paper")));
         var visibility = "hidden";
         if(self.canReviewModify){
@@ -1584,7 +1707,7 @@ type("ReviewingMaterialListWidget", ["MaterialListWidget"], {
 },
      function(args, types, uploadAction, width, height, canReviewModify, sendToReviewButton, textHasMaterials) {
          var self = this;
-         this.MaterialListWidget(args, types, uploadAction, width, height, false, 'material.reviewing.list', canReviewModify);
+         this.MaterialListWidget(args, types, uploadAction, width, height, false, 'material.reviewing.list', canReviewModify, false, 'material.reviewing.resources.delete');
          this.canReviewModify = canReviewModify;
          this.sendToReviewButton = sendToReviewButton;
          this.textHasMaterials = textHasMaterials;
@@ -1675,7 +1798,7 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
             }
         });
 
-        var mlist = new MaterialListWidget(args, this.types, this.uploadAction, this.width, this.height);
+        var mlist = new MaterialListWidget(args, this.types, this.uploadAction, this.width, this.height, null, null, null, this.addMaterialMode);
 
         return this.ExclusivePopupWithButtons.prototype.draw.call(
             this,
@@ -1686,7 +1809,8 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
     }
 },
 
-     function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, title, width, height, refresh) {
+     function(categId, confId, sessId, contId, subContId, parentProtected, types, uploadAction, title, width, height, refresh, addMaterialMode) {
+         this.categId = categId;
          this.confId = confId;
          this.sessId = sessId;
          this.contId = contId;
@@ -1696,14 +1820,60 @@ type("MaterialEditorDialog", ["ExclusivePopupWithButtons"], {
          this.width = width;
          this.height = height;
          this.refresh = refresh;
+         this.addMaterialMode = addMaterialMode;
          this.parentProtected = parentProtected;
          this.ExclusivePopupWithButtons(title);
      });
 
+type("MaterialConversionHelper", [], {
+
+    setQtip: function(file) {
+        $("img#"+file['id']).parent().qtip({
+            content: {
+                text: format($T('Indico is currently performing the conversion to PDF of the file:<br>{fileName}<br>The conversion may take a few seconds.'),
+                        {fileName: file['name']})
+            },
+            position: {
+                target: 'mouse',
+                adjust: { mouse: true, x: 11, y: 13 }
+            }
+        });
+    },
+
+    poll: function(file, params, pdfImgURL) {
+        var endTime = new Date();
+        endTime.setDate(endTime.getDate() + 60);
+        (function conversionWorker() {
+            jsonRpc(Indico.Urls.JsonRpcService,
+                    'material.resources.list',
+                    params,
+                    function(response,error) {
+                        if (response) {
+                            for (var value in response){
+                                if (response[value].name == file['name'].split('.')[0] + '.pdf') {
+                                    var convertedImg = $("img#"+file['id']);
+                                    $(convertedImg).parent().qtip('destroy');
+                                    $(convertedImg).parent().attr('href',response[value].url);
+                                    $(convertedImg).parent().attr('title',response[value].name);
+                                    $(convertedImg).attr('src', pdfImgURL);
+                                    return;
+                                }
+                            }
+                            if (new Date() < endTime) {
+                                setTimeout(conversionWorker, CONVERSION_POLL_INTERVAL);
+                            }
+                        }
+                    });
+            })();
+    }
+
+},
+function() {});
+
 IndicoUI.Dialogs.Material = {
 
-    add: function(args, list, types, uploadAction, onUpload, forReviewing) {
-        var dialog = new AddMaterialDialog(args, list, types, uploadAction, onUpload, forReviewing);
+    add: function(args, list, types, uploadAction, onUpload, forReviewing, addMaterialMode) {
+        var dialog = new AddMaterialDialog(args, list, types, uploadAction, onUpload, forReviewing, addMaterialMode);
         dialog.open();
     },
 
@@ -1718,8 +1888,11 @@ IndicoUI.Dialogs.Material = {
         dialog.execute();
     },
 
-    editor: function(confId, sessId, contId, subContId, parentProtected, types, uploadAction, refresh) {
-        var dialog = new MaterialEditorDialog(confId, sessId, contId, subContId, parentProtected, types, uploadAction, $T("Edit Materials"), 400, 300, refresh);
+    editor: function(categId, confId, sessId, contId, subContId, parentProtected, types, uploadAction, refresh, addMaterialMode) {
+        var dialog = new MaterialEditorDialog(categId, confId, sessId, contId, subContId, parentProtected, types, uploadAction, $T("Edit Materials"), 400, 300, refresh, addMaterialMode);
         dialog.open();
+        if (addMaterialMode) {
+            dialog.close();
+        }
     }
 };

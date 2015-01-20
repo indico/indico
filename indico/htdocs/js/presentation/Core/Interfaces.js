@@ -358,7 +358,7 @@ type("List", ["Enumerable"], {
 	 * @constructor
 	 */
 	function(array) {
-		array = getArray(array)
+		array = getArray(array);
 		var self = this;
 		this.length = new Getter(function() {
 			return array.length;

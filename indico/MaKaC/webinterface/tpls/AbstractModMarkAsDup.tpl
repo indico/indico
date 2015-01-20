@@ -1,13 +1,14 @@
+<div class="groupTitle">${ _("Marking an abstract as a duplicate")}</div>
 
-<table width="50%" align="center" border="0" style="border-left: 1px solid #777777">
+% if error:
+  <div class="errorMessage">${error}</div>
+% endif
+
+
+<table>
     <tr>
-        <td class="groupTitle" colspan="2"> ${ _("Marking an abstract as a duplicate")}</td>
-    </tr>
-    <tr>
-        <td bgcolor="white">
-            <br>
-            <table width="100%">
-                ${ error }
+        <td>
+            <table>
                 <tr>
                     <form action=${ duplicateURL } method="POST">
                     <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Comments")}</span></td>

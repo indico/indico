@@ -22,10 +22,12 @@ if dark is not UNDEFINED:
 else:
     dark_ = False;
 %>
-
+% if Config.getInstance().getMobileURL():
+    <%include file="MobileDetection.tpl" args="conf=conf"/>
+% endif
 <%include file="Announcement.tpl"/>
 
-<div class="pageHeader ${"pageHeaderDark" if dark_ else ""}">
+<div class="page-header ${"page-header-dark" if dark_ else ""}">
 
     <%include file="SessionBar.tpl" args="dark=dark_"/>
 
@@ -71,7 +73,10 @@ else:
             <%include file="MeetingFilter.tpl"/>
         % endif
         % if showExportToICal:
-            <a id="exportIcal${self_._conf.getUniqueId()}" href="#" class="exportIcal" data-id="${self_._conf.getUniqueId()}">${ _("iCal export") }</a>
+            <a id="exportIcal${self_._conf.getUniqueId()}" href="#" class="exportIcal" data-id="${self_._conf.getUniqueId()}">
+                ${ _("iCal export") }
+                <div class="leftCorner"></div>
+            </a>
                 <%include file="ConferenceICalExport.tpl" args="item=self_._conf"/>
         % endif
 
@@ -110,42 +115,28 @@ else:
 
 
 <script type="text/javascript">
-
-    function setMouseEvents(element, tooltipText) {
-        var tooltipText = "<span style='padding:3px'>" + tooltipText + "</span>";
-        element.dom.onmouseover = function(event) {
-            IndicoUI.Widgets.Generic.tooltip(element.dom, event, tooltipText);
-        }
+$(function() {
+    function createTooltip(element, tooltipText) {
+        element.qtip({
+            content: {
+                text: $("<span style='padding:3px' />").append(tooltipText)
+            }
+        });
     }
 
-    setMouseEvents($E('homeButton'), '${ _("Go to Indico Home Page")}');
+    createTooltip($('#homeButton'), '${ _("Go to Indico Home Page")}');
+    createTooltip($('#firstEventButton'), '${ _("Oldest event")}');
+    createTooltip($('#previousEventButton'), '${ _("Older event")}');
+    createTooltip($('#upToCategoryButton'), '${ _("Up to category")}');
+    createTooltip($('#nextEventButton'), '${ _("Newer event")}');
+    createTooltip($('#lastEventButton'), '${ _("Newest event")}');
+    createTooltip($('#printButton'), '${ _("Printable version")}');
+    createTooltip($('#manageEventButton'), '${ _("Switch to management area for this event")}');
 
-    if (exists($E('firstEventButton'))) {
-        setMouseEvents($E('firstEventButton'), '${ _("Oldest event")}');
-    }
+    $(".exportIcal").click(function(){
+        $(this).trigger('menu_select');
+    });
 
-    if (exists($E('previousEventButton'))) {
-        setMouseEvents($E('previousEventButton'), '${ _("Older event")}');
-    }
-
-    setMouseEvents($E('upToCategoryButton'), '${ _("Up to category")}');
-
-    if (exists($E('nextEventButton'))) {
-        setMouseEvents($E('nextEventButton'), '${ _("Newer event")}');
-    }
-
-    if (exists($E('lastEventButton'))) {
-        setMouseEvents($E('lastEventButton'), '${ _("Newest event")}');
-    }
-
-    if (exists($E('printButton'))) {
-        setMouseEvents($E('printButton'), '${ _("Printable version")}');
-    }
-
-    setMouseEvents($E('manageEventButton'), '${ _("Switch to management area for this event")}');
+});
 
 </script>
-
-${ errorMsg }
-${ infoMsg }
-

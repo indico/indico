@@ -1,29 +1,30 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import os
+import warnings
+from flask import current_app as app
 from persistent import Persistent
 from persistent.dict import PersistentDict
 from BTrees import OOBTree
-from db import DBMgr
-from Configuration import Config
+from indico.core.config import Config
+from indico.core import db
 
 DEFAULT_PERSISTENT_ENABLE_AGREEMENT = 'Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.'
 DEFAULT_PERSISTENT_DISABLE_AGREEMENT = 'When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!'
@@ -32,7 +33,7 @@ DEFAULT_PERSISTENT_USER_AGREEMENT = """In conjunction with a having a key associ
 DEFAULT_PROTECTION_DISCLAINER_RESTRICTED = 'Circulation to people other than the intended audience is not authorized. You are obliged to treat the information with the appropriate level of confidentiality.'
 DEFAULT_PROTECTION_DISCLAINER_PROTECTED = 'As such, this information is intended for an internal audience only. You are obliged to treat the information with the appropriate level of confidentiality.'
 
-#from MaKaC.common.logger import Logger
+#from indico.core.logger import Logger
 
 #the singleton pattern should be applied to this class to ensure that it is
 #   unique, but as Extended classes seem not to support classmethods it will
@@ -56,9 +57,6 @@ class MaKaCInfo(Persistent):
         self._moderateAccountCreation = False
         self._moderators = []
 
-        # Room booking related
-        self._roomBookingModuleActive = False
-
         # Global poster/badge templates
         self._defaultConference = None
 
@@ -66,7 +64,6 @@ class MaKaCInfo(Persistent):
         self._news = ""
 
         # special features
-        self._cacheActive = False
         self._newsActive = False
         self._debugActive = False
 
@@ -85,18 +82,14 @@ class MaKaCInfo(Persistent):
         # /afs/cern.ch/project/indico/2008/...
         self._archivingVolume = ""
 
-        # list of IPs that can access the private OAI gateway
-        self._oaiPrivateHarvesterList = []
+        self._ip_based_acl_mgr = IPBasedACLMgr()
 
         # http api
         self._apiHTTPSRequired = False
         self._apiPersistentAllowed = False
-        self._apiMode = False
+        self._apiMode = 0
         self._apiCacheTTL = 600
         self._apiSignatureTTL = 600
-        self._analyticsActive = False
-        self._analyticsCode = ""
-        self._analyticsCodeLocation = "head"
 
         # Event display style manager
         self._styleMgr = StyleManager()
@@ -122,16 +115,10 @@ class MaKaCInfo(Persistent):
             self._socialAppConfig = PersistentDict({'active': False, 'facebook': {}})
         return self._socialAppConfig
 
-    def isDebugActive( self ):
-        if hasattr( self, "_debugActive" ):
-            return self._debugActive
-        else:
-            self._debugActive = False
-            return False
-
-    def setDebugActive( self, bool=True ):
-        self._debugActive = bool
-
+    def isDebugActive(self):
+        msg = 'MaKaCinfo.isDebugActive() is deprecated; use app.debug or Config.getInstance().getDebug() instead'
+        warnings.warn(msg, DeprecationWarning, 2)
+        return app.debug
 
     def getNews( self ):
         try:
@@ -199,16 +186,6 @@ class MaKaCInfo(Persistent):
     def getTitle( self ):
         return self._title
 
-    def isCacheActive( self ):
-        if hasattr( self, "_cacheActive" ):
-            return self._cacheActive
-        else:
-            self._cacheActive = False
-            return False
-
-    def setCacheActive( self, bool=True ):
-        self._cacheActive = bool
-
     def isNewsActive( self ):
         if hasattr( self, "_newsActive" ):
             return self._newsActive
@@ -218,16 +195,6 @@ class MaKaCInfo(Persistent):
 
     def setNewsActive( self, bool=True ):
         self._newsActive = bool
-
-    def isHighlightActive ( self ):
-        if hasattr( self, "_highlightActive" ):
-            return self._highlightActive
-        else:
-            self._highlightActive = False
-            return False
-
-    def setHighlightActive (self, bool=True ):
-        self._highlightActive = bool
 
     def setTitle( self, newTitle ):
         self._title = newTitle.strip()
@@ -274,68 +241,6 @@ class MaKaCInfo(Persistent):
         for admin in self.getAdminList().getList():
             emails.append(admin.getEmail())
         return emails
-
-    # === ROOM BOOKING RELATED ===============================================
-
-    def getRoomBookingModuleActive( self ):
-        try:
-            return self._roomBookingModuleActive
-        except:
-            self.setRoomBookingModuleActive()
-            return self._roomBookingModuleActive
-
-    def setRoomBookingModuleActive( self, active = False ):
-        self._roomBookingModuleActive = active
-        from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
-        RHGetVarsJs.removeTmpVarsFile()
-
-    # Only for default Indico/ZODB plugin
-    def getRoomBookingDBConnectionParams( self ):
-        #self._roomBookingStorageParams = ('indicodev.cern.ch', 9676)
-        try:
-            return self._roomBookingStorageParams
-        except:
-            self.setRoomBookingDBConnectionParams()
-            return self._roomBookingStorageParams
-
-    def setRoomBookingDBConnectionParams( self, hostPortTuple = ('localhost', 9676) ):
-        self._roomBookingStorageParams = hostPortTuple
-
-    # Only for default Indico/ZODB plugin
-    def getRoomBookingDBUserName( self ):
-        try:
-            return self._roomBookingDBUserName
-        except:
-            self._roomBookingDBUserName = ""
-            return self._roomBookingDBUserName
-
-    # Only for default Indico/ZODB plugin
-    def setRoomBookingDBUserName( self, user = "" ):
-        self._roomBookingDBUserName = user
-
-    # Only for default Indico/ZODB plugin
-    def getRoomBookingDBPassword( self ):
-        try:
-            return self._roomBookingDBPassword
-        except:
-            self._roomBookingDBPassword = ""
-            return self._roomBookingDBPassword
-
-    # Only for default Indico/ZODB plugin
-    def setRoomBookingDBPassword( self, password = "" ):
-        self._roomBookingDBPassword = password
-
-    # Only for default Indico/ZODB plugin
-    def getRoomBookingDBRealm( self ):
-        try:
-            return self._roomBookingDBRealm
-        except:
-            self._roomBookingDBRealm = ""
-            return self._roomBookingDBRealm
-
-    # Only for default Indico/ZODB plugin
-    def setRoomBookingDBRealm( self, realm = "" ):
-        self._roomBookingDBRealm = realm
 
     def getDefaultConference( self ):
         try:
@@ -390,18 +295,8 @@ class MaKaCInfo(Persistent):
             self._archivingVolume = ""
         return self._archivingVolume
 
-    def getOAIPrivateHarvesterList(self):
-        """ Returns the list of allowed IPs of harvesters
-        for the private OAI gateway """
-
-        try:
-            self._oaiPrivateHarvesterList
-        except:
-            self._oaiPrivateHarvesterList = []
-        return self._oaiPrivateHarvesterList
-
-    def setOAIPrivateHarvesterList(self, harvList):
-        self._oaiPrivateHarvesterList = harvList
+    def getIPBasedACLMgr(self):
+        return self._ip_based_acl_mgr
 
     def isAPIHTTPSRequired(self):
         if hasattr(self, '_apiHTTPSRequired'):
@@ -452,37 +347,6 @@ class MaKaCInfo(Persistent):
 
     def setAPISignatureTTL(self, v):
         self._apiSignatureTTL = v
-
-    def isAnalyticsActive(self):
-        if hasattr(self, '_analyticsActive'):
-            return self._analyticsActive
-        else:
-            self._analyticsActive = False
-            return False
-
-    def setAnalyticsActive(self, v):
-        self._analyticsActive = v
-
-    def getAnalyticsCode(self):
-        if hasattr(self, '_analyticsCode'):
-            return self._analyticsCode
-        else:
-            self._analyticsCode = ""
-            return ""
-
-    def setAnalyticsCode(self, v):
-        self._analyticsCode = v
-
-
-    def getAnalyticsCodeLocation(self):
-        if hasattr(self, '_analyticsCodeLocation'):
-            return self._analyticsCodeLocation
-        else:
-            self._analyticsCodeLocation = ""
-            return ""
-
-    def setAnalyticsCodeLocation(self, v):
-        self._analyticsCodeLocation = v
 
     def getAPIPersistentEnableAgreement(self):
         if not hasattr(self, '_apiPersistentEnableAgreement'):
@@ -539,20 +403,17 @@ class HelperMaKaCInfo:
         ZODB4 is released and the Persistent classes are no longer Extension
         ones.
     """
-
+    @classmethod
     def getMaKaCInfoInstance(cls):
-        dbmgr = DBMgr.getInstance()
+        dbmgr = db.DBMgr.getInstance()
         root = dbmgr.getDBConnection().root()
         try:
-            minfo = root["MaKaCInfo"]["main"]
-        except KeyError, e:
+            minfo = root['MaKaCInfo']['main']
+        except KeyError:
             minfo = MaKaCInfo()
-            root["MaKaCInfo"] = OOBTree.OOBTree()
-            root["MaKaCInfo"]["main"] = minfo
-
+            root['MaKaCInfo'] = OOBTree.OOBTree()
+            root['MaKaCInfo']['main'] = minfo
         return minfo
-
-    getMaKaCInfoInstance = classmethod( getMaKaCInfoInstance )
 
 
 class StyleManager(Persistent):
@@ -759,5 +620,23 @@ class StyleManager(Persistent):
         else:
             return False
 
+class IPBasedACLMgr(Persistent):
 
+    def __init__(self):
+        self._full_access_acl = set()
+
+    def get_full_access_acl(self):
+        return self._full_access_acl
+
+    def grant_full_access(self, ip):
+        self._full_access_acl.add(ip)
+        self.notify_modification()
+
+    def revoke_full_access(self, ip):
+        if ip in self._full_access_acl:
+            self._full_access_acl.remove(ip)
+        self.notify_modification()
+
+    def notify_modification(self):
+        self._p_changed = 1
 

@@ -52,7 +52,7 @@
     <tr>
       <td nowrap class="titleCellTD"></td>
       <td align="left">
-            <input type="checkbox" id="cssCheckbox" name="useCss" value="use" checked="checked""/> Use CSS file for this style
+            <input type="checkbox" id="cssCheckbox" name="useCss" value="use" checked="checked"/> Use CSS file for this style
       </td>
     </tr>
     <tr>
@@ -77,20 +77,13 @@
 <script type="text/javascript">
 
     function enableTypeTemplate (type) {
-        if (type == 'xsl') {
-            $('#stylesheetfile').removeAttr('disabled');
-            $('#tplfile').attr('disabled', 'disabled');
-        }
-        else {
-            $('#stylesheetfile').attr('disabled', 'disabled');
-            $('#tplfile').removeAttr('disabled');
-        }
-        $('#new').removeAttr('disabled');
+        $('#stylesheetfile').prop('disabled', type != 'xsl');
+        $('#tplfile').prop('disabled', type == 'xsl');
+        $('#new').prop('disabled', false);
     }
 
     var cssFileList = $('#cssFileList');
-    $('#cssCheckbox').onclick = function(event) {
-        if (this.checked) cssFileList.enable();
-        else cssFileList.disable();
-    };
+    $('#cssCheckbox').on('change', function() {
+        cssFileList.prop('disabled', !this.checked);
+    });
 </script>

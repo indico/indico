@@ -1,11 +1,13 @@
-<%page args="Advice=None, ShowReviewer=None, format=None"/>
+<%page args="Advice=None, ShowReviewer=None, format=None, showTitle=True"/>
 
 <div class="historyReviewJudgment">
     <table>
         <tr>
+            % if showTitle:
             <td class="dataCaptionTD" style="white-space: nowrap; width: 50px">
                 <span class="titleCellFormat" style="font-size: 12px;">${ _("Content:")}</span>
             </td>
+            % endif
             <td>
                 <div class="contributionReviewingStatus ${getStatusClass(Advice.getJudgement())}" style="margin-top: 0;">
                     ${getStatusText(Advice.getJudgement())}

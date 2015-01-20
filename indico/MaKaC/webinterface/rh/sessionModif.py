@@ -1,22 +1,27 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
+import re
+from cStringIO import StringIO
+from datetime import timedelta
+
+from pytz import timezone
 
 import MaKaC.webinterface.pages.sessions as sessions
 import MaKaC.webinterface.pages.conferences as conferences
@@ -27,27 +32,27 @@ import MaKaC.user as user
 import MaKaC.conference as conference
 import MaKaC.schedule as schedule
 import MaKaC.domain as domain
-import re
-from MaKaC.webinterface.rh.base import RoomBookingDBMixin
+
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase
 from MaKaC.webinterface.rh.conferenceBase import RHSessionBase, RHSessionSlotBase, RHSubmitMaterialBase
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
-from MaKaC.errors import MaKaCError, FormValuesError
+from MaKaC.errors import MaKaCError, FormValuesError, NoReportError
 import MaKaC.webinterface.pages.errors as errors
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.webinterface.common.slotDataWrapper import Slot
-from MaKaC.PDFinterface.conference import ConfManagerContribsToPDF
-from MaKaC.common import Config
+from MaKaC.PDFinterface.conference import ContribsToPDF
+from indico.core.config import Config
 from BTrees.OOBTree import OOBTree
 from BTrees.IOBTree import IOBTree
-from sets import Set
-from datetime import datetime,timedelta,date
 from MaKaC.errors import FormValuesError
 from MaKaC.conference import SessionChair
-from MaKaC.i18n import _
-from pytz import timezone
+
+from indico.core.config import Config
+from indico.util.i18n import _
+from indico.web.flask.util import send_file
+
 
 class RHSessionModifBase( RHSessionBase, RHModificationBaseProtected ):
 
@@ -75,26 +80,28 @@ class RHSessionModifBase( RHSessionBase, RHModificationBaseProtected ):
 class RHSessionModCoordinationBase(RHSessionModifBase):
 
     def _checkProtection(self):
+        if self._target.isClosed():
+            raise NoReportError(_("""The modification of the session "%s" is not allowed because it is closed""")%self._target.getTitle())
         if self._target.canCoordinate(self.getAW()):
-            return
-        RHSessionModifBase._checkProtection( self )
-
-class RHSessionModUnrestrictedTTCoordinationBase(RHSessionModifBase):
-
-    def _checkProtection(self):
-        if self._target.canCoordinate(self.getAW(), "unrestrictedSessionTT"):
             return
         RHSessionModifBase._checkProtection( self )
 
 class RHSessionModUnrestrictedContribMngCoordBase(RHSessionModifBase):
 
     def _checkProtection(self):
+        if self._target.isClosed():
+            raise NoReportError(_("""The modification of the session "%s" is not allowed because it is closed""")%self._target.getTitle())
         if self._target.canCoordinate(self.getAW(), "modifContribs"):
             return
         RHSessionModifBase._checkProtection( self )
 
-class RHSessionModification(RHSessionModCoordinationBase):
+class RHSessionModification(RHSessionModifBase):
     _uh = urlHandlers.UHSessionModification
+
+    def _checkProtection(self):
+        if self._target.canCoordinate(self.getAW()):
+            return
+        RHSessionModifBase._checkProtection( self )
 
     def _process( self ):
         if self._session.isClosed():
@@ -108,167 +115,51 @@ class RHSessionModification(RHSessionModCoordinationBase):
 
 #--------------------------------------------------------------------------
 
-class RHSessionDatesModification(RHSessionModifBase):
-    _uh=urlHandlers.UHSessionDatesModification
+class RHSessionDataModification(RHSessionModifBase):
+    _uh = urlHandlers.UHSessionDataModification
 
-    def _checkParams(self,params):
-        self._check = int(params.get("check",1))
-        self._slmove = int(params.get("slmove",1))
-        RHSessionModifBase._checkParams(self,params)
-        self._confirmed=params.has_key("confirm")
-        self._action=""
-        if params.has_key("CANCEL") or params.has_key("cancel"):
-            self._action="CANCEL"
-        elif params.has_key("OK") or params.has_key("confirm"):
-            self._action="MODIFY"
-        elif params.has_key("performedAction") :
-            self._action=params["performedAction"]
+    def _checkParams(self, params):
+        RHSessionModifBase._checkParams(self, params)
+        self._confirmed = "confirm" in params
+        self._action = ""
+        if "CANCEL" in params or "cancel" in params:
+            self._action = "CANCEL"
+        elif "OK" in params or "confirm" in params:
+            self._action = "MODIFY"
+        elif "performedAction" in params:
+            self._action = params["performedAction"]
         else:
-            sd,ed=self._session.getAdjustedStartDate(),self._session.getAdjustedEndDate()
-            params["sYear"],params["sMonth"]=sd.year,sd.month
-            params["sDay"]=sd.day
-            params["sHour"],params["sMinute"]=sd.hour,sd.minute
-            params["eYear"],params["eMonth"]=ed.year,ed.month
-            params["eDay"]=ed.day
-            params["eHour"],params["eMinute"]=ed.hour,ed.minute
-
-    def _modify(self,params):
-        tz = self._session.getConference().getTimezone()
-        sd = timezone(tz).localize(datetime( int( params["sYear"] ), \
-                                             int( params["sMonth"] ), \
-                                             int( params["sDay"] ), \
-                                             int( params["sHour"] ), \
-                                             int( params["sMinute"] )))
-        params["sDate"]=sd.astimezone(timezone('UTC'))
-        if params.get("eYear","") == "":
-           ed = timezone(tz).localize(datetime( int( params["sYear"] ),
-                                                int( params["sMonth"] ), \
-                                                int( params["sDay"] ), \
-                                                int( params["eHour"] ), \
-                                                int( params["eMinute"] )))
-        else:
-           ed = timezone(tz).localize(datetime( int( params["eYear"] ),
-                                                int( params["eMonth"] ), \
-                                                int( params["eDay"] ), \
-                                                int( params["eHour"] ), \
-                                                int( params["eMinute"] )))
-        params["eDate"] = ed.astimezone(timezone('UTC'))
-        self._target.setDates(params["sDate"],params["eDate"],self._check,self._slmove)
-
-    def _getErrors(self,params):
-        l=[]
-        title=str(params.get("title",""))
-        if title.strip()=="":
-            l.append( _("session title cannot be empty"))
-        return l
-
-    def _process( self ):
-        url=urlHandlers.UHSessionModifSchedule.getURL(self._target)
-        params=self._getRequestParams()
-        errorList = []
-        if self._action=="CANCEL":
-            self._redirect(url)
-            return
-        elif self._action=="MODIFY":
-            self._modify(params)
-            self._redirect(url)
-            return
-        p=sessions.WPSessionDatesModification(self,self._target)
-        params=self._getRequestParams()
-        params["errors"]=errorList
-        return p.display(**params)
-
-    def _getPreservedParams(self):
-        params = self._websession.getVar("preservedParams")
-        if params is None :
-            return {}
-        return params
-
-    def _preserveParams(self, params):
-        self._websession.setVar("preservedParams",params)
-
-    def _removePreservedParams(self):
-        self._websession.setVar("preservedParams",None)
-
-class RHSessionDataModification( RoomBookingDBMixin, RHSessionModifBase ):
-    _uh=urlHandlers.UHSessionDataModification
-
-    def _checkParams(self,params):
-        self._check = int(params.get("check",1))
-        self._slmove = int(params.get("slmove",0))
-        RHSessionModifBase._checkParams(self,params)
-        self._confirmed=params.has_key("confirm")
-        self._action=""
-        if params.has_key("CANCEL") or params.has_key("cancel"):
-            self._action="CANCEL"
-        elif params.has_key("OK") or params.has_key("confirm"):
-            self._action="MODIFY"
-        elif params.has_key("performedAction") :
-            self._action=params["performedAction"]
-        else:
-            params["title"]=self._session.getTitle()
-            params["code"]=self._session.getCode()
-            params["description"]=self._session.getDescription()
-            tz = self._session.getConference().getTimezone()
-            sd=self._session.getStartDate().astimezone(timezone(tz))
-            ed=self._session.getEndDate().astimezone(timezone(tz))
-            params["sYear"],params["sMonth"]=sd.year,sd.month
-            params["sDay"]=sd.day
-            params["sHour"],params["sMinute"]=sd.hour,sd.minute
-            params["eYear"],params["eMonth"]=ed.year,ed.month
-            params["eDay"]=ed.day
-            params["eHour"],params["eMinute"]=ed.hour,ed.minute
-            cdur=self._session.getContribDuration()
-            params["durHour"],params["durMin"]=int(cdur.seconds/3600),int((cdur.seconds % 3600)/60)
-            params["tt_type"]=self._session.getScheduleType()
+            params["title"] = self._session.getTitle()
+            params["code"] = self._session.getCode()
+            params["description"] = self._session.getDescription()
+            cdur = self._session.getContribDuration()
+            params["durHour"], params["durMin"] = int(
+                cdur.seconds / 3600), int((cdur.seconds % 3600) / 60)
+            params["tt_type"] = self._session.getScheduleType()
 
         self._evt = self._session
 
-    def _getErrors(self,params):
-        l=[]
-        title=str(params.get("title",""))
-        if title.strip()=="":
-            l.append("session title cannot be empty")
-        return l
+    def _modify(self, params):
+        self._target.setValues(params, 1)
+        self._target.setScheduleType(
+            params.get("tt_type", self._target.getScheduleType()))
 
-    def _modify(self,params):
-        tz = self._conf.getTimezone()
-        sd = timezone(tz).localize(datetime( int( params["sYear"] ), \
-                                                        int( params["sMonth"] ), \
-                                                        int( params["sDay"] ), \
-                                                        int( params["sHour"] ), \
-                                                        int( params["sMinute"] )))
-        params["sDate"] = sd.astimezone(timezone('UTC'))
-        if params.get("eYear","") == "":
-            ed = timezone(tz).localize(datetime( int( params["sYear"] ), \
-                                    int( params["sMonth"] ), \
-                                    int( params["sDay"] ), \
-                                    int( params["eHour"] ), \
-                                    int( params["eMinute"] )))
-        else:
-            ed = timezone(tz).localize(datetime( int( params["eYear"] ), \
-                                    int( params["eMonth"] ), \
-                                    int( params["eDay"] ), \
-                                    int( params["eHour"] ), \
-                                    int( params["eMinute"] )))
-        params["eDate"] = ed.astimezone(timezone('UTC'))
-        self._target.setValues(params,self._check,self._slmove)
-        self._target.setScheduleType(params.get("tt_type",self._target.getScheduleType()))
-
-    def _process( self ):
-        errorList=[]
-        url=urlHandlers.UHSessionModification.getURL(self._target)
-        params=self._getRequestParams()
-        if self._action=="CANCEL":
+    def _process(self):
+        url = urlHandlers.UHSessionModification.getURL(self._target)
+        params = self._getRequestParams()
+        if self._action == "CANCEL":
             self._redirect(url)
             return
-        elif self._action=="MODIFY":
-            errorList=self._getErrors(self._getRequestParams())
-            if len(errorList)==0:
-                newSchType=params.get("tt_type",self._target.getScheduleType())
-                if self._target.getScheduleType()!=newSchType and\
+        elif self._action == "MODIFY":
+            title = str(params.get("title", ""))
+            if title.strip() == "":
+                raise NoReportError("session title cannot be empty")
+            else:
+                newSchType = params.get(
+                    "tt_type", self._target.getScheduleType())
+                if self._target.getScheduleType() != newSchType and\
                         not self._confirmed:
-                    p=sessions.WPModEditDataConfirmation(self,self._target)
+                    p = sessions.WPModEditDataConfirmation(self, self._target)
                     del params["confId"]
                     del params["sessionId"]
                     del params["OK"]
@@ -276,92 +167,48 @@ class RHSessionDataModification( RoomBookingDBMixin, RHSessionModifBase ):
                 self._modify(params)
                 self._redirect(url)
                 return
-        p=sessions.WPSessionDataModification(self,self._target)
+        p = sessions.WPSessionDataModification(self, self._target)
         wf = self.getWebFactory()
-        if wf != None:
-            p = wf.getSessionDataModification(self,self._target)
-        params=self._getRequestParams()
-        params["errors"]=errorList
+        if wf is not None:
+            p = wf.getSessionDataModification(self, self._target)
+        params = self._getRequestParams()
         return p.display(**params)
 
-
-    def _getDefinedDisplayList(self, typeName):
-         list = self._websession.getVar("%sList"%typeName)
-         if list is None :
-             return ""
-         html = []
-         counter = 0
-         for person in list :
-             text = """
-                 <tr>
-                     <td width="5%%"><input type="checkbox" name="%ss" value="%s"></td>
-                     <td>&nbsp;%s</td>
-                 </tr>"""%(typeName,counter,person[0].getFullName())
-             html.append(text)
-             counter = counter + 1
-         return """
-             """.join(html)
-
-    def _getDefinedList(self, typeName):
-        definedList = self._websession.getVar("%sList"%typeName)
-        if definedList is None :
-            return []
-        return definedList
-
-    def _setDefinedList(self, definedList, typeName):
-        self._websession.setVar("%sList"%typeName,definedList)
-
-    def _alreadyDefined(self, person, definedList):
-        if person is None :
-            return True
-        if definedList is None :
-            return False
-        fullName = person.getFullName()
-        for p in definedList :
-            if p[0].getFullName() == fullName :
-                return True
-        return False
-
-    def _removeDefinedList(self, typeName):
-        self._websession.setVar("%sList"%typeName,None)
-
-
-    def _getPreservedParams(self):
-        params = self._websession.getVar("preservedParams")
-        if params is None :
-            return {}
-        return params
-
-    def _preserveParams(self, params):
-        self._websession.setVar("preservedParams",params)
-
-    def _removePreservedParams(self):
-        self._websession.setVar("preservedParams",None)
-
     def _removePersons(self, params, typeName):
-        persons = self._normaliseListParam(params.get("%ss"%typeName,[]))
+        persons = self._normaliseListParam(params.get("%ss" % typeName, []))
         """
         List of persons is indexed by their ID in the apropriate
         list in session
         """
         list = None
-        if typeName == "convener" :
+        if typeName == "convener":
             list = self._session.getConvenerList()
 
-        for p in persons :
+        for p in persons:
             perspntoRemove = None
-            if typeName == "convener" :
+            if typeName == "convener":
                 personToRemove = self._session.getConvenerById(p)
             list.remove(personToRemove)
+
 
 #-------------------------------------------------------------------------------------
 
 class RHSessionClose( RHSessionModifBase ):
     _uh = urlHandlers.UHSessionClose
 
+    def _checkParams(self, params):
+        RHSessionModifBase._checkParams(self, params)
+        self._confirm = params.has_key("confirm")
+        self._cancel = params.has_key("cancel")
+
     def _process( self ):
-        self._target.setClosed(True)
-        self._redirect(urlHandlers.UHSessionModification.getURL(self._target))
+        if self._cancel:
+            self._redirect(urlHandlers.UHSessionModifTools.getURL(self._target))
+        elif self._confirm:
+            self._target.setClosed(True)
+            self._redirect(urlHandlers.UHSessionModification.getURL(self._target))
+        else:
+            return sessions.WPSessionClosing(self, self._target).display()
 
 class RHSessionOpen( RHSessionModifBase ):
     _uh = urlHandlers.UHSessionOpen
@@ -401,66 +248,13 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHSessionModCoordinationBase):
         RHSubmitMaterialBase._checkParams(self, params)
 
 
-class RHReducedSessionScheduleAction(RHSessionModCoordinationBase):
-    _uh = urlHandlers.UHReducedSessionScheduleAction
-
-    def _checkParams(self,params):
-        RHSessionModCoordinationBase._checkParams(self,params)
-        if "confId" not in params :
-            raise MaKaCError( _("confId parameter value not set - cannot procede"))
-        if "sessionId" not in params :
-            raise MaKaCError( _("sessionId parameter value not set - cannot procede"))
-        if "slotId" not in params :
-            raise MaKaCError( _("slotId parameter value not set - cannot procede"))
-
-    def _process( self ):
-        if self._session.isClosed():
-            p = sessions.WPSessionModificationClosed( self, self._session )
-        else:
-            params = self._getRequestParams()
-            url = ""
-            if "newContrib" in params :
-                orginURL = urlHandlers.UHSessionModifSchedule.getURL(self._session.getOwner())
-                orginURL.addParam("sessionId", self._session.getId())
-                url = urlHandlers.UHConfModScheduleNewContrib.getURL(self._session.getOwner())
-                url.addParam("sessionId", self._session.getId())
-                url.addParam("orginURL",orginURL)
-                url.addParam("eventType","meeting")
-                url.addParam("slotId",params["slotId"])
-                self._redirect(url)
-            elif "newBreak" in params :
-                url = urlHandlers.UHSessionAddBreak.getURL(self._session.getOwner())
-                url.addParam("sessionId",params["sessionId"])
-                url.addParam("slotId",params["slotId"])
-                self._redirect(url)
-            elif "reschedule" in params :
-                url = urlHandlers.UHSessionModSlotCalc.getURL(self._session.getOwner())
-                url.addParam("sessionId",params["sessionId"])
-                url.addParam("slotId",params["slotId"])
-                self._redirect(url)
-            else :
-                url = urlHandlers.UHSessionModifSchedule.getURL(self._session.getOwner())
-                url.addParam("sessionId", self._session.getId())
-                url.addParam("slotId",params["slotId"])
-                self._redirect(url)
-
-
-
-class RHSessionModifSchedule(RoomBookingDBMixin, RHSessionModCoordinationBase):
+class RHSessionModifSchedule(RHSessionModCoordinationBase):
     _uh = urlHandlers.UHSessionModifSchedule
 
     def _checkParams(self,params):
         RHSessionModCoordinationBase._checkParams(self,params)
-        if params.get("view","parallel").strip()!="":
-            self._getSession().ScheduleView = params.get("view","parallel").strip()
-        try:
-            if self._getSession().ScheduleView:
-                pass
-        except AttributeError:
-            self._getSession().ScheduleView=params.get("view","parallel")
-        self._view=self._getSession().ScheduleView
         params["days"] = params.get("day", "all")
-        if params.get("day", None) is not None :
+        if params.get("day", None) is not None:
             del params["day"]
 
     def _process( self ):
@@ -470,126 +264,10 @@ class RHSessionModifSchedule(RoomBookingDBMixin, RHSessionModCoordinationBase):
             p = sessions.WPSessionModifSchedule(self,self._session)
             wf = self.getWebFactory()
             if wf != None:
-                p = wf.getSessionModifSchedule(self,self._session)
+               p = wf.getSessionModifSchedule(self,self._session)
 
         params = self._getRequestParams()
-        params['view'] = self._view
-
         return p.display(**params)
-
-
-class RHScheduleAddContrib(RHSessionModCoordinationBase):
-    _uh = urlHandlers.UHSessionModScheduleAddContrib
-
-    def _checkParams(self,params):
-        RHSessionModCoordinationBase._checkParams(self,params)
-        self._slot=None
-        if params.has_key("slotId"):
-            self._slot=self._target.getSlotById(params["slotId"])
-        else:
-            raise MaKaCError( _("Slot ID is not specified"), _("Contribution Addition"))
-        self._action=""
-        if params.has_key("OK"):
-            self._action="ADD"
-            self._selContribIdList=params.get("selContribs","").split(",")
-            self._selContribIdList+=self._normaliseListParam(params.get("manSelContribs",[]))
-        elif params.has_key("CANCEL"):
-            self._action="CANCEL"
-
-    def _process( self ):
-        if self._action=="ADD":
-            for contribId in self._selContribIdList:
-                if contribId.strip()=="":
-                    continue
-                contrib=self._target.getConference().getContributionById(contribId)
-                if contrib is None:
-                    continue
-                if self._slot.getSession().getScheduleType() == "poster":
-                    contrib.setStartDate(self._slot.getStartDate())
-                schedule=self._slot.getSchedule()
-                schedule.addEntry(contrib.getSchEntry())
-            self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._target))
-        elif self._action=="CANCEL":
-            self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._target))
-        p=sessions.WPModScheduleAddContrib(self,self._target)
-        return p.display(slot=self._slot)
-
-
-#class RHSessionAddContribution( RHSessionModifBase ):
-#    pass
-
-
-#class RHSessionPerformAddContribution( RHSessionModifBase ):
-#    pass
-
-
-class RHSessionAddBreak( RoomBookingDBMixin, RHSessionModCoordinationBase ):
-    _uh = urlHandlers.UHSessionAddBreak
-
-    def _checkParams( self, params ):
-        self._check = int(params.get("check",1))
-        RHSessionModifBase._checkParams( self, params )
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._action=""
-        if params.has_key("CANCEL"):
-            self._action="CANCEL"
-        elif params.has_key("OK"):
-            self._action="ADD"
-
-        self._evt = None
-
-    def _process( self ):
-        if self._action=="CANCEL":
-            self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._target))
-        elif self._action=="ADD":
-            params = self._getRequestParams()
-            if params["locationAction"] == "inherit":
-                params["locationName"] = ""
-            if params["roomAction"] == "inherit":
-                params["roomName"] = ""
-            b=schedule.BreakTimeSchEntry()
-            b.setValues(self._getRequestParams(), tz = self._conf.getTimezone())
-            self._slot.getSchedule().addEntry(b,self._check)
-            self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._target))
-        else:
-            p=sessions.WPSessionAddBreak(self,self._slot)
-            wf = self.getWebFactory()
-            if wf != None:
-                p = wf.getSessionAddBreak(self,self._slot)
-            return p.display()
-
-
-
-
-
-class RHSessionDelSchItems(RHSessionModCoordinationBase):
-    _uh = urlHandlers.UHSessionDelSchItems
-
-    def _checkParams( self, params ):
-        RHSessionModCoordinationBase._checkParams( self, params )
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._entries=[]
-        for id in self._normaliseListParam(params.get("schEntryId",[])):
-            entry=self._slot.getSchedule().getEntryById(id)
-            if entry is not None:
-                self._entries.append(entry)
-
-    def _process( self ):
-        type = self._conf.getType()
-        for e in self._entries:
-            if type == "meeting":
-                logInfo = e.getOwner().getLogInfo()
-                logInfo["subject"] = "Deleted contribution: %s"%e.getOwner().getTitle()
-                self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
-                if not isinstance(e, schedule.BreakTimeSchEntry):
-                    e.getOwner().delete()
-                self._slot.getSchedule().removeEntry(e)
-            else:
-                logInfo = e.getOwner().getLogInfo()
-                logInfo["subject"] = "Unscheduled contribution: %s"%e.getOwner().getTitle()
-                self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
-                self._slot.getSchedule().removeEntry(e)
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
 
 
 class RHSessionModifAC( RHSessionModifBase ):
@@ -621,77 +299,6 @@ class RHSessionSetVisibility( RHSessionModifBase ):
     def _process( self ):
         self._session.setProtection( self._protect )
         self._redirect( urlHandlers.UHSessionModifAC.getURL( self._session ) )
-
-
-class RHSessionSelectAllowed( RHSessionModifBase ):
-    _uh = urlHandlers.UHSessionSelectAllowed
-
-    def _process( self ):
-        p = sessions.WPSessionSelectAllowed( self, self._session )
-        return p.display( **self._getRequestParams() )
-
-
-class RHSessionAddAllowed( RHSessionModifBase ):
-    _uh = urlHandlers.UHSessionAddAllowed
-
-    def _checkParams( self, params ):
-        RHSessionModifBase._checkParams( self, params )
-        selAllowedId = []
-        if "cancel" not in params:
-            selAllowedId = self._normaliseListParam( params.get( "selectedPrincipals", [] ) )
-        #ah = user.AvatarHolder()
-        ph = user.PrincipalHolder()
-        self._allowed = []
-        for id in selAllowedId:
-            self._allowed.append( ph.getById( id ) )
-
-    def _process( self ):
-        for av in self._allowed:
-            self._target.grantAccess( av )
-        self._redirect( urlHandlers.UHSessionModifAC.getURL( self._session ) )
-
-
-class RHSessionRemoveAllowed( RHSessionModifBase ):
-    _uh = urlHandlers.UHSessionRemoveAllowed
-
-    def _checkParams( self, params ):
-        RHSessionModifBase._checkParams( self, params )
-        selAllowedId = self._normaliseListParam( params.get( "selectedPrincipals", [] ) )
-        #ah = user.AvatarHolder()
-        ph = user.PrincipalHolder()
-        self._allowed = []
-        for id in selAllowedId:
-            self._allowed.append( ph.getById( id ) )
-
-    def _process( self ):
-        for av in self._allowed:
-            self._target.revokeAccess( av )
-        self._redirect( urlHandlers.UHSessionModifAC.getURL( self._session ) )
-
-
-class RHSessionAddDomains( RHSessionModifBase ):
-    _uh = urlHandlers.UHSessionAddDomains
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if ("addDomain" in params) and (len(params["addDomain"])!=0):
-            dh = domain.DomainHolder()
-            for domId in self._normaliseListParam( params["addDomain"] ):
-                self._target.requireDomain( dh.getById( domId ) )
-        self._redirect( urlHandlers.UHSessionModifAC.getURL( self._target ) )
-
-
-class RHSessionRemoveDomains( RHSessionModifBase ):
-    _uh = urlHandlers.UHSessionRemoveDomains
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if ("selectedDomain" in params) and (len(params["selectedDomain"])!=0):
-            dh = domain.DomainHolder()
-            for domId in self._normaliseListParam( params["selectedDomain"] ):
-                self._target.freeDomain( dh.getById( domId ) )
-        self._redirect( urlHandlers.UHSessionModifAC.getURL( self._target ) )
-
 
 class RHSessionModifComm( RHSessionModCoordinationBase ):
     _uh = urlHandlers.UHSessionModifComm
@@ -765,113 +372,19 @@ class RHSessionDeletion( RHSessionModifBase ):
         else:
             return sessions.WPSessionDeletion( self, self._session ).display()
 
-
-class RHFitSession(RHSessionModCoordinationBase):
+class RHFitSlot(RHSessionModCoordinationBase):
 
     def _checkParams(self, params):
         RHSessionModCoordinationBase._checkParams(self, params)
+        self._slotID = params.get("slotId","")
+        self._slot=self._target.getSlotById(self._slotID)
+        self._sessionID = params.get("sessionId","")
+        self._targetDay=params.get("day","")
 
     def _process(self):
-        if self._target is not None:
-            self._target.fit()
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._target))
-
-
-class RHSlotNew( RoomBookingDBMixin, RHSessionModUnrestrictedTTCoordinationBase ):
-
-    def _checkParams(self, params):
-        self._check = int(params.get("check",1))
-        RHSessionModifBase._checkParams(self, params)
-        self._slotDate = params.get("slotDate","")
-        self._action = ""
-        if params.get("cancel", None) is not None:
-            self._action = "cancel"
-        elif params.get("OK", None) is not None:
-            self._action = "submit"
-        elif params.get("addConvener", None) is not None:
-            self._action = "addConvener"
-        elif params.get("remConveners", None) is not None:
-            self._action = "remConveners"
-        toNorm=["conv_id","conv_title", "conv_first_name",
-            "conv_family_name","conv_affiliation",
-            "conv_email"]
-        for k in toNorm:
-            params[k]=self._normaliseListParam(params.get(k,[]))
-
-        self._evt = None
-
-
-    def _process(self):
-
-        self._slotData = Slot()
-        params = self._getRequestParams()
-        params["session"]=self._session
-        if self._action == "cancel":
-            self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
-        elif self._action == "submit":
-            self._slotData.setValues(params)
-            errors = self._slotData.getErrors()
-            if errors ==[]:
-                slot=conference.SessionSlot(self._session)
-                params["conveners"]=self._slotData.getConvenerList()
-                params["sDate"]=self._slotData.getStartDate()
-                params["eDate"]=self._slotData.getEndDate()
-                slot.setValues( params,self._check )
-                self._session.addSlot(slot)
-                logInfo = slot.getLogInfo()
-                logInfo["subject"] = "Create new slot: %s"%slot.getTitle()
-                self._conf.getLogHandler().logAction(logInfo,"Timetable/Contribution",self._getUser())
-
-                self._redirect( urlHandlers.UHSessionModifSchedule.getURL( slot ) )
-            else:
-                p = sessions.WPModSlotNew(self,self._slotData, errors)
-                return p.display()
-        elif self._action == "addConvener":
-            self._slotData.setValues(params)
-            self._slotData.newConvener()
-            p = sessions.WPModSlotNew(self, self._slotData)
-            return p.display()
-        elif self._action == "remConveners":
-            self._slotData.setValues(params)
-            idList = self._normaliseListParam( params.get("sel_conv", []) )
-            self._slotData.removeConveners( idList )
-            p = sessions.WPModSlotNew(self, self._slotData)
-            return p.display()
-        else:
-            dateTuple = re.compile("^(\d*)-(\d*)-(\d*)$").match(self._slotDate).groups()
-            auxdate = timezone(self._conf.getTimezone()).localize(datetime(int(dateTuple[2]), int(dateTuple[1]), int(dateTuple[0])))
-            sdate = self._session.getSchedule().getFirstFreeSlotOnDay(auxdate)
-            edate = sdate + timedelta(hours=1)
-            params["sDate"]=sdate
-            params["eDate"]=edate
-            if self._session.getContribDuration()!=None:
-                params["contribDuration"] = self._session.getContribDuration()
-            else:
-                params["contribDuration"] = timedelta(hours=0,minutes=20)
-            self._slotData.setValues(params)
-            p = sessions.WPModSlotNew(self, self._slotData )
-            return p.display()
-
-
-class RHSlotRem(RHSessionModUnrestrictedTTCoordinationBase):
-
-    def _checkParams(self, params):
-        RHSessionModUnrestrictedTTCoordinationBase._checkParams(self, params)
-        self._slotId=params.get("slotId","")
-        self._confirmed=params.has_key("confirm")
-        self._cancel=params.has_key("cancel")
-
-    def _process(self):
-        if not self._cancel:
-            slot=self._session.getSlotById(self._slotId)
-            if not self._confirmed:
-                p=sessions.WPModSlotRemConfirmation(self,slot)
-                wf = self.getWebFactory()
-                if wf != None:
-                    p = wf.getModSlotRemConfirmation(self,slot)
-                return p.display()
-            self._session.removeSlot(slot)
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
+        if self._slot is not None:
+            self._slot.fit()
+        self._redirect("%s#%s.s%sl%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay, self._sessionID, self._slotID))
 
 class RHSlotCalc(RHSessionModCoordinationBase):
 
@@ -898,7 +411,7 @@ class RHSlotCalc(RHSessionModCoordinationBase):
     def _formatRedirectURL(self, baseURL):
         target = "".join([str(baseURL),
                         "#",
-                        self._currentDay,
+                       self._currentDay,
                         ".s",
                         self._session.getId(),
                         "l",
@@ -920,172 +433,6 @@ class RHSlotCalc(RHSessionModCoordinationBase):
             self._redirect(self._formatRedirectURL(urlHandlers.UHSessionModifSchedule.getURL(self._session)))
         else:
             self._redirect(self._formatRedirectURL(urlHandlers.UHConfModifSchedule.getURL(self._conf)))
-
-class RHSlotEdit( RoomBookingDBMixin, RHSessionModUnrestrictedTTCoordinationBase ):
-
-    def _checkParams(self, params):
-        RHSessionModUnrestrictedTTCoordinationBase._checkParams(self, params)
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._check = int(params.get("check",1))
-        self._move = int(params.get("move",0))
-        self._action = ""
-        if params.get("cancel", None) is not None:
-            self._action = "cancel"
-        elif params.get("OK", None) is not None:
-            self._action = "submit"
-        elif params.get("addConvener", None) is not None:
-            self._action = "addConvener"
-        elif params.get("remConveners", None) is not None:
-            self._action = "remConveners"
-        if params.get( "bookedRoomName" ):
-            params["roomName"] = params["bookedRoomName"]
-        toNorm=["conv_id","conv_title", "conv_first_name",
-            "conv_family_name","conv_affiliation",
-            "conv_email"]
-        for k in toNorm:
-            params[k]=self._normaliseListParam(params.get(k,[]))
-
-        self._evt = self._slot
-
-    def _process(self):
-
-        self._slotData = Slot()
-        if self._action == "cancel":
-            self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._slot.getSession(), slotId=self._slot.getId()))
-        elif self._action == "submit":
-            params = self._getRequestParams()
-
-            params["id"]=self._slot.getId()
-            params["session"]=self._slot.getSession()
-            params["conf"]=self._slot.getConference()
-            params["move"]=self._move
-
-            self._slotData.setValues(params)
-            sloterrors = self._slotData.getErrors()
-            if sloterrors ==[]:
-                params["conveners"]=self._slotData.getConvenerList()
-                self._slot.setValues( params, self._check )
-                self._redirect( '%s#slot%s' % (urlHandlers.UHConfModifSchedule.getURL( self._conf, session=self._slot.getSession().getId() ), self._slot.getId()) )
-            else:
-                p = sessions.WPModSlotEdit(self, self._slotData, sloterrors)
-                return p.display()
-        elif self._action == "addConvener":
-            params = self._getRequestParams()
-            params["id"]=self._slot.getId()
-            params["session"]=self._slot.getSession()
-            self._slotData.setValues(params)
-            self._slotData.newConvener()
-            p = sessions.WPModSlotEdit(self, self._slotData)
-            return p.display()
-        elif self._action == "remConveners":
-            params = self._getRequestParams()
-            params["id"]=self._slot.getId()
-            params["session"]=self._slot.getSession()
-            self._slotData.setValues(params)
-            idList = self._normaliseListParam( params.get("sel_conv", []) )
-            self._slotData.removeConveners( idList )
-            p = sessions.WPModSlotEdit(self, self._slotData)
-            return p.display()
-        else:
-            self._slotData.mapSlot(self._slot)
-            wf = self.getWebFactory()
-            p = sessions.WPModSlotEdit(self, self._slotData)
-            if wf != None:
-                   p = wf.getModSlotEdit(self, self._slotData)
-            return p.display()
-
-
-class RHSlotCompact(RHSessionModCoordinationBase):
-
-    def _checkParams(self, params):
-        RHSessionModCoordinationBase._checkParams(self, params)
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-
-    def _process(self):
-        if self._slot is not None:
-            self._slot.getSchedule().compact()
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
-
-
-class RHFitSlot(RHSessionModCoordinationBase):
-
-    def _checkParams(self, params):
-        RHSessionModCoordinationBase._checkParams(self, params)
-        self._slotID = params.get("slotId","")
-        self._slot=self._target.getSlotById(self._slotID)
-        self._sessionID = params.get("sessionId","")
-        self._targetDay=params.get("day","")
-
-    def _process(self):
-        if self._slot is not None:
-            self._slot.fit()
-        self._redirect("%s#%s.s%sl%s"%(urlHandlers.UHConfModifSchedule.getURL(self._conf), self._targetDay, self._sessionID, self._slotID))
-
-
-class RHSlotMoveUpEntry(RHSessionModCoordinationBase):
-
-    def _checkParams(self, params):
-        RHSessionModCoordinationBase._checkParams(self, params)
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._entry=self._slot.getSchedule().getEntryById(params.get("schEntryId",""))
-
-    def _process(self):
-        if self._slot is not None and self._entry is not None:
-            self._slot.getSchedule().moveUpEntry(self._entry)
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
-
-
-class RHSlotMoveDownEntry(RHSessionModCoordinationBase):
-
-    def _checkParams(self, params):
-        RHSessionModCoordinationBase._checkParams(self, params)
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._entry=self._slot.getSchedule().getEntryById(params.get("schEntryId",""))
-
-    def _process(self):
-        if self._slot is not None and self._entry is not None:
-            self._slot.getSchedule().moveDownEntry(self._entry)
-        self._redirect(urlHandlers.UHSessionModifSchedule.getURL(self._session))
-
-
-class RHSessionModifyBreak( RoomBookingDBMixin, RHSessionModCoordinationBase ):
-    _uh=urlHandlers.UHSessionModifyBreak
-
-    def _checkParams(self,params):
-        RHSessionModCoordinationBase._checkParams(self,params)
-        if params.get("schEntryId","").strip()=="":
-           raise Exception("schedule entry order number not set")
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._break=self._slot.getSchedule().getEntryById(params.get("schEntryId",""))
-
-        self._evt = None
-
-        params["days"] = params.get("day", "all")
-        if params.get("day", None) is not None :
-            del params["day"]
-
-    def _process(self):
-        p=sessions.WPSessionModifyBreak(self,self._session,self._break)
-        return p.display(**self._getRequestParams())
-
-
-class RHSessionPerformModifyBreak(RHSessionModCoordinationBase):
-    _uh = urlHandlers.UHSessionPerformModifyBreak
-
-    def _checkParams( self, params ):
-        self._check = int(params.get("check",1))
-        self._moveEntries = int(params.get("moveEntries",0))
-        RHSessionModCoordinationBase._checkParams( self, params )
-        if params.get( "schEntryId", "" ).strip() == "":
-            raise Exception( _("schedule entry order number not set"))
-        self._slot=self._target.getSlotById(params.get("slotId",""))
-        self._break=self._slot.getSchedule().getEntryById(params.get("schEntryId",""))
-
-    def _process( self ):
-        params = self._getRequestParams()
-        if "CANCEL" not in params:
-            self._break.setValues( params, self._check, self._moveEntries, tz=self._conf.getTimezone() )
-        self._redirect( urlHandlers.UHSessionModifSchedule.getURL( self._session ) )
 
 
 class ContribFilterCrit(filters.FilterCriteria):
@@ -1295,15 +642,15 @@ class RHContribsActions:
     class to select the action to do with the selected contributions
     """
     def __init__(self, req):
-        self._req = req
+        assert req is None
 
     def process(self, params):
-        if params.has_key("REMOVE"):
-            return RHRemContribs(self._req).process(params)
-        elif params.has_key("PDF"):
-            return RHContribsToPDF(self._req).process(params)
-        elif params.has_key("AUTH"):
-            return RHContribsParticipantList(self._req).process(params)
+        if 'REMOVE' in params:
+            return RHRemContribs(None).process(params)
+        elif 'PDF' in params:
+            return RHContribsToPDF(None).process(params)
+        elif 'AUTH' in params:
+            return RHContribsParticipantList(None).process(params)
         return "no action to do"
 
 class RHRemContribs(RHSessionModUnrestrictedContribMngCoordBase):
@@ -1332,21 +679,12 @@ class RHContribsToPDF(RHSessionModUnrestrictedContribMngCoordBase):
         for id in self._contribIds:
             self._contribs.append(self._conf.getContributionById(id))
 
-    def _process( self ):
+    def _process(self):
         tz = self._conf.getTimezone()
-        filename = "Contributions.pdf"
         if not self._contribs:
             return "No contributions to print"
-        pdf = ConfManagerContribsToPDF(self._conf, self._contribs, tz=tz)
-        data = pdf.getPDFBin()
-        #self._req.headers_out["Accept-Ranges"] = "bytes"
-        self._req.set_content_length(len(data))
-        #self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename
-        return data
+        pdf = ContribsToPDF(self._conf, self._contribs)
+        return send_file('Contributions.pdf', pdf.generate(), 'PDF')
 
 
 class RHContribQuickAccess(RHSessionModCoordinationBase):
@@ -1388,9 +726,9 @@ class RHContribsParticipantList(RHSessionModUnrestrictedContribMngCoordBase):
         speakers = OOBTree()
         primaryAuthors = OOBTree()
         coAuthors = OOBTree()
-        speakerEmails = Set()
-        primaryAuthorEmails = Set()
-        coAuthorEmails = Set()
+        speakerEmails = set()
+        primaryAuthorEmails = set()
+        coAuthorEmails = set()
 
         self._setGroupsToDisplay()
         for contribId in self._contribIds:

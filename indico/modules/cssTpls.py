@@ -1,27 +1,26 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from persistent import Persistent
 from MaKaC.common.Counter import Counter
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 from indico.modules import Module
 
@@ -34,10 +33,7 @@ class CssTplsModule(Module):
 
     def __init__(self):
         self._cssTpls = {"template0.css": CSSItem("template0.css"), \
-                         "template1.css": CSSItem("template1.css"), \
-                         "template2.css": CSSItem("template2.css"),
                          "right_menu.css": CSSItem("right_menu.css"),
-                         "top_menu.css": CSSItem("top_menu.css"),
                          "orange.css": CSSItem("orange.css"),
                          "brown.css": CSSItem("brown.css"),
 

@@ -10,6 +10,21 @@
 </tr>
 % endif
 
+% if conf.getReportNumberHolder().listReportNumbers() and conf.getType() == "meeting":
+<tr id="eventReportNumbers">
+    <td class="leftCol">${_("Report Numbers")}</td>
+    <td>
+    % for reportNumber in conf.getReportNumberHolder().listReportNumbers():
+        % if reportNumberSystems[reportNumber[0]]["url"]:
+            <a href="${reportNumberSystems[reportNumber[0]]["url"] + reportNumber[1]}" target="_blank">${reportNumber[1]} </a>
+        % else:
+            ${reportNumber[1]}
+        % endif
+    % endfor
+    </td>
+</tr>
+% endif
+
 % if participants:
 <tr id="eventParticipants">
     <td class="leftCol">${_("Participants")}</td>
@@ -18,7 +33,7 @@
 % endif
 
 % if webcastOnAirURL or forthcomingWebcastURL:
-<tr id="webCastRow"">
+<tr id="webCastRow">
     <td class="leftCol">
     % if webcastOnAirURL:
         ${_("Live Webcast")}
@@ -39,7 +54,7 @@
 
 % if len(materials) > 0:
 <tr id="materialList">
-    <td class="leftCol">${_("Material")}</td>
+    <td class="leftCol">${_("Material")}:</td>
     <td>
         <div class="materialList clearfix">
         % for material in materials:
@@ -66,8 +81,8 @@
     <td class="leftCol">${_("Other occasions")}</td>
     <td>
     % for lecture in lectures:
-        <a href="materialDisplay.py?materialId=${lecture.getId()}&confId=${conf.getId()}">\
-<img src="images/${lecture.title}.png" alt="${lecture.title}"/></a>&nbsp;
+        <a href="${urlHandlers.UHMaterialDisplay.getURL(lecture)}">\
+<img src="${Config.getInstance().getBaseURL()}/images/${lecture.title}.png" alt="${lecture.title}"/></a>&nbsp;
     % endfor
     </td>
 </tr>
@@ -98,13 +113,22 @@
 % endif
 
 ${pluginDetails}
+${ plugin_hook('event-header', event=conf) }
 
-% if conf.getSupportEmail():
+% if conf.getSupportInfo().getEmail() or conf.getSupportInfo().getTelephone():
 <tr>
     <td class="leftCol">${supportEmailCaption}</td>
-    <td><a href="mailto:${conf.getSupportEmail()}">${conf.getSupportEmail()}</a></td>
+    <td>
+    % if conf.getSupportInfo().getEmail():
+        <span style="font-weight:bold; font-style:italic; color:#444">Email:</span> <a href="mailto:${conf.getSupportInfo().getEmail()}">${conf.getSupportInfo().getEmail()}</a>
+    % endif
+    % if conf.getSupportInfo().getTelephone():
+        <span style="font-weight:bold; font-style:italic; color:#444">Telephone:</span> ${conf.getSupportInfo().getTelephone()}
+    % endif
+    </td>
 </tr>
 % endif
+
 </tbody>
 </table>
 <%include file="ApplyParticipation.tpl"/>

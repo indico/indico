@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 type("ApplyForParticipationPopup", ["ServiceDialogWithButtons"], {
     _success: function(response) {
         this.onSuccess(response);
@@ -78,7 +95,6 @@ type("ApplyForParticipationPopup", ["ServiceDialogWithButtons"], {
     }
 );
 
-
 type("BasicEmailPopup", ["ExclusivePopupWithButtons"],{
 
     _getButtons: function(){
@@ -97,13 +113,13 @@ type("BasicEmailPopup", ["ExclusivePopupWithButtons"],{
 
         var self = this;
         // Text editor with default message
-        self.rtWidget = new ParsedRichTextEditor(700, 400, 'IndicoMinimal');
+        self.rtWidget = new ParsedRichTextEditor(700, 400);
         self.rtWidget.set(self.defaultText);
     },
 
     _drawTop: function(){
         var self = this;
-        return Html.div({}, self._drawFromAddress(), self._drawToAddress(), self._drawSubject());
+        return Html.div({}, self._drawFromAddress(), self._drawToAddress(), self._drawCCAddress(), self._drawSubject());
     },
 
     _drawWidget: function(){
@@ -118,7 +134,7 @@ type("BasicEmailPopup", ["ExclusivePopupWithButtons"],{
             return null;
         }
         var legendFields = [];
-        for(legend in self.legends){
+        for(var legend in self.legends){
             legendFields.push(Html.tr({}, Html.td({}, "{"+legend+"} :"), Html.td({}, self.legends[legend])));
         }
         return Html.div({style:{marginLeft: '20px',
@@ -173,6 +189,10 @@ type("ParticipantsEmailPopup", ["BasicEmailPopup"],{
         return Html.table({width:"688px"}, toField);
     },
 
+    _drawCCAddress: function(){
+        return null;
+    },
+
     _drawSubject: function(){
         var self = this;
         var subjectField = Html.tr({},
@@ -180,21 +200,6 @@ type("ParticipantsEmailPopup", ["BasicEmailPopup"],{
                 Html.td({width:"85%"}, $B(Html.edit({style: {width: '100%'}}), self.subject.accessor()))
         );
         return Html.table({width:"688px"}, subjectField);
-    },
-
-    _drawExtras: function(){
-        legendTable = Html.table(
-                {},
-                Html.tr({}, Html.td({}, "{url} :"), Html.td({}, $T("field containing the url of the electronic agreement. (This field is mandatory)"))),
-                Html.tr({}, Html.td({}, "{confTitle} :"), Html.td({}, $T("field containing the conference title."))),
-                Html.tr({}, Html.td({}, "{name} :"), Html.td({}, $T("field containing the full name of the participant.")))
-                );
-        return Html.div({style:{marginLeft: '20px',
-                         fontStyle:'italic',
-                         color:'gray'}
-                  },
-                  Html.div({style:{fontWeight:'bold'}}, $T("Legend:")),
-                  legendTable);
     }
 
 },
@@ -202,7 +207,7 @@ type("ParticipantsEmailPopup", ["BasicEmailPopup"],{
         var self = this;
         self.toParticipants = toParticipants;
         self.from = from;
-        self.toUserIds = any(self.toUserIds,_.keys(toParticipants))
+        self.toUserIds = any(self.toUserIds,_.keys(toParticipants));
         this.sendFunction=function(){
             var killProgress = IndicoUI.Dialogs.Util.progress($T("Sending email..."));
             jsonRpc(Indico.Urls.JsonRpcService, method,
@@ -216,7 +221,6 @@ type("ParticipantsEmailPopup", ["BasicEmailPopup"],{
                     if (error) {
                         killProgress();
                         IndicoUtil.errorReport(error);
-                        self.close();
                     } else {
                         killProgress();
                         successHandler(result);
@@ -235,7 +239,7 @@ type("ParticipantsInvitePopup", ["ParticipantsEmailPopup"],{
     _drawToAddress: function(){
         var self = this;
         var to = [];
-        for (p in self.toParticipants){
+        for (var p in self.toParticipants){
             to.push(self.toParticipants[p].name);
         }
         var toField = Html.tr({},

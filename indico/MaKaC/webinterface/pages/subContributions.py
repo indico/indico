@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 import urllib
+from MaKaC.common.TemplateExec import render
 
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -28,13 +28,14 @@ from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from xml.sax.saxutils import quoteattr
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceBase, WPConferenceModifBase
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from datetime import datetime
 from MaKaC.common.utils import isStringHTML
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
+
 
 class WPSubContributionBase( WPMainBase, WPConferenceBase ):
 
@@ -44,28 +45,26 @@ class WPSubContributionBase( WPMainBase, WPConferenceBase ):
         self._contrib = self._subContrib.getOwner()
         WPConferenceBase.__init__( self, rh, self._conf )
 
-#    def _createMenu( self ):
-#        main.WPMainBase._createMenu( self )
-#        c = self._target
-#        self._newContOpt.setActionURL( urlHandlers.UHSubContributionCreation.getURL(c) )
-#        if not c.canModify( self._getAW() ):
-#            self._modifyContOpt.disable()
-#        self._modifySubContOpt.setActionURL( urlHandlers.UHSubContributionModification.getURL( c ) )
-#        self._detailsSubContOpt.setActionURL( urlHandlers.UHSubContributionDisplay.getURL( c ) )
-#        self._currentSubContOpt.enable()
-#        self._calendarSubContOpt.setActionURL( urlHandlers.UHSubCalendar.getURL( [c] ) )
-#        self._overviewSubContOpt.setActionURL( urlHandlers.UHSubContributionOverview.getURL( c ) )
 
-
-class WPSubContributionDefaultDisplayBase( WPConferenceDefaultDisplayBase, WPSubContributionBase ):
+class WPSubContributionDefaultDisplayBase(WPConferenceDefaultDisplayBase, WPSubContributionBase):
+    def __init__(self, rh, contribution):
+        WPSubContributionBase.__init__(self, rh, contribution)
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
-            self._includeJSPackage('Management') + \
-               self._includeJSPackage('MaterialEditor')
+               self._includeJSPackage('Management') + \
+               self._includeJSPackage('MaterialEditor') + \
+               self._asset_env['contributions_js'].urls()
 
-    def __init__( self, rh, contribution ):
-        WPSubContributionBase.__init__( self, rh, contribution )
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + \
+               self._asset_env['contributions_sass'].urls()
+
+    def _getHeadContent(self):
+        return WPConferenceDefaultDisplayBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+               '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                          for url in self._asset_env['mathjax_js'].urls()])
+
 
 class WSubContributionDisplayBase(wcomponents.WTemplated):
     def __init__(self, aw, subContrib):
@@ -77,6 +76,8 @@ class WSubContributionDisplayBase(wcomponents.WTemplated):
         vars["duration"] =(datetime(1900,1,1)+self._subContrib.getDuration()).strftime("%H:%M")
         vars["SubContrib"] = self._subContrib
         vars["accessWrapper"] = self._aw
+        vars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
+
         return vars
 
 class WSubContributionDisplayFull(WSubContributionDisplayBase):
@@ -113,6 +114,19 @@ class WPSubContributionModifBase( WPConferenceModifBase ):
         self._subContrib = self._target = subContribution
         self._conf = self._target.getConference()
         self._contrib = self._subContrib.getOwner()
+
+    def getJSFiles(self):
+        return WPConferenceModifBase.getJSFiles(self) + \
+               self._asset_env['contributions_js'].urls()
+
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + \
+               self._asset_env['contributions_sass'].urls()
+
+    def _getHeadContent(self):
+        return WPConferenceModifBase._getHeadContent(self) + render('js/mathjax.config.js.tpl') + \
+               '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url)
+                          for url in self._asset_env['mathjax_js'].urls()])
 
     def _getNavigationDrawer(self):
         pars = {"target": self._subContrib, "isModif": True}
@@ -154,15 +168,7 @@ class WPSubContribModifMain( WPSubContributionModifBase ):
 
 
 class WSubContribModifTool(wcomponents.WTemplated):
-
-    def __init__( self, subContrib ):
-        self._subContrib = subContrib
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["deleteIconURL"] = Config.getInstance().getSystemIconURL("delete")
-        vars["writeIconURL"] = Config.getInstance().getSystemIconURL("write_minutes")
-        return vars
+    pass
 
 
 class WPSubContributionModifTools( WPSubContributionModifBase ):
@@ -171,10 +177,7 @@ class WPSubContributionModifTools( WPSubContributionModifBase ):
         self._tabTools.setActive()
 
     def _getTabContent( self, params ):
-        wc = WSubContribModifTool( self._target )
-        pars = { \
-"deleteSubContributionURL": urlHandlers.UHSubContributionDelete.getURL( self._target )}
-        return wc.getHTML( pars )
+        return WSubContribModifTool().getHTML({"deleteSubContributionURL": urlHandlers.UHSubContributionDelete.getURL( self._target )})
 
 
 class WPSubContributionModifMaterials( WPSubContributionModifBase ):
@@ -207,10 +210,7 @@ class WPSubContributionModification( WPSubContribModifMain ):
                 "duration": (datetime(1900,1,1)+self._target.getDuration()).strftime("%Hh%M'"), \
                 "confId": self._target.getConference().getId(), \
                 "contribId": self._target.getOwner().getId(), \
-                "subContribId": self._target.getId(), \
-                "addMaterialURL": str(urlHandlers.UHSubContributionAddMaterial.getURL( self._target )), \
-                "removeMaterialsURL": str(urlHandlers.UHSubContributionRemoveMaterials.getURL()), \
-                "modifyMaterialURLGen": urlHandlers.UHMaterialModification.getURL}
+                "subContribId": self._target.getId()}
         return wc.getHTML( pars )
 
 class WSubContributionDataModification(wcomponents.WTemplated):
@@ -235,23 +235,9 @@ class WPSubContribData( WPSubContribModifMain ):
 
     def _getTabContent( self, params ):
         wc = WSubContributionDataModification(self._target)
-        params["postURL"] = urlHandlers.UHSubContributionDataModif.getURL()
+        params["postURL"] = urlHandlers.UHSubContributionDataModif.getURL(self._subContrib)
         return wc.getHTML( params )
 
-
-class WPSubContribAddMaterial( WPSubContribModifMain ):
-
-    def __init__( self, rh, contrib, mf ):
-        WPSubContribModifMain.__init__( self, rh, contrib )
-        self._mf = mf
-
-    def _getTabContent( self, params ):
-        if self._mf:
-            comp = self._mf.getCreationWC( self._target )
-        else:
-            comp = wcomponents.WMaterialCreation( self._target )
-        pars = { "postURL": urlHandlers.UHSubContributionPerformAddMaterial.getURL() }
-        return comp.getHTML( pars )
 
 class WSubContributionDeletion(object):
 
@@ -259,19 +245,19 @@ class WSubContributionDeletion(object):
         self._subContribList = subContribList
 
     def getHTML( self, actionURL ):
-        l = []
-        for subContrib in self._subContribList:
-            l.append("""<li><i>%s</i></li>"""%subContrib.getTitle())
-        msg =  _("""
-        <font size="+2">Are you sure that you want to <font color="red"><b>DELETE</b></font> the following sub contributions:<ul>%s</ul>?</font><br>
-              """)%("".join(l))
+        subcontribs = ''.join(list("<li>{0}</li>".format(s.getTitle()) for s in self._subContribList))
+
+        msg = {'challenge': _("Are you sure that you want to delete the following subcontributions?"),
+               'target': "<ul>{0}</ul>".format(subcontribs)
+               }
+
         wc = wcomponents.WConfirmation()
-        subContribIdList = []
-        for subContrib in self._subContribList:
-            subContribIdList.append( subContrib.getId() )
-        return wc.getHTML( msg, actionURL, {"selectedCateg": subContribIdList}, \
-                                            confirmButtonCaption= _("Yes"), \
-                                            cancelButtonCaption= _("No") )
+
+        subContribIdList = list(sc.getId() for sc in self._subContribList)
+
+        return wc.getHTML(msg, actionURL, {"selectedCateg": subContribIdList},
+                          confirmButtonCaption= _("Yes"),
+                          cancelButtonCaption= _("No") )
 
 
 class WPSubContributionDeletion( WPSubContributionModifTools ):
@@ -280,6 +266,29 @@ class WPSubContributionDeletion( WPSubContributionModifTools ):
         wc = WSubContributionDeletion( [self._target] )
         return wc.getHTML( urlHandlers.UHSubContributionDelete.getURL( self._target ) )
 
+class WPSubContributionModificationClosed( WPSubContribModifMain ):
+
+    def _createTabCtrl( self ):
+        self._tabCtrl = wcomponents.TabControl()
+        self._tabMain = self._tabCtrl.newTab( "main", _("Main"), "")
+
+    def _getTabContent( self, params ):
+        if self._subContrib.getOwner().getSession() != None:
+            message = _("The session is currently locked and you cannot modify it in this status. ")
+            if self._subContrib.getOwner().getConference().canModify(self._rh.getAW()):
+                message += _("If you unlock the session, you will be able to modify its details again.")
+            url = urlHandlers.UHSessionOpen.getURL(self._subContrib.getOwner().getSession())
+            unlockButtonCaption = _("Unlock session")
+        else:
+            message = _("The event is currently locked and you cannot modify it in this status. ")
+            if self._subContrib.getOwner().getConference().canModify(self._rh.getAW()):
+                message += _("If you unlock the event, you will be able to modify its details again.")
+            url = urlHandlers.UHConferenceOpen.getURL(self._subContrib.getOwner().getConference())
+            unlockButtonCaption = _("Unlock event")
+        return wcomponents.WClosed().getHTML({"message": message,
+                                             "postURL":url,
+                                             "showUnlockButton": self._subContrib.getOwner().getConference().canModify(self._rh.getAW()),
+                                             "unlockButtonCaption": unlockButtonCaption})
 
 class WSubContribModifMain(wcomponents.WTemplated):
 
@@ -307,17 +316,4 @@ class WSubContribModifMain(wcomponents.WTemplated):
         vars["eventType"] = self._subContrib.getConference().getType()
         return vars
 
-class WPSubContributionReportNumberEdit(WPSubContributionModifBase):
 
-    def __init__(self, rh, subcontribution, reportNumberSystem):
-        WPSubContributionModifBase.__init__(self, rh, subcontribution)
-        self._reportNumberSystem=reportNumberSystem
-
-    def _setActiveTab( self ):
-        #self._innerTabMain.setActive()
-        pass
-
-
-    def _getTabContent( self, params):
-        wc=wcomponents.WModifReportNumberEdit(self._target, self._reportNumberSystem, "subcontribution")
-        return wc.getHTML(params)

@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from persistent import Persistent
 from MaKaC.common.Counter import Counter
@@ -44,6 +43,7 @@ class ConferenceAbstractReview(Persistent):
         self._rbTitles = ["0", "1.7", "3.3", "5", "6.7", "8.3", "10"]
         self._questionCounter = Counter(1)
         self._answerCounter = Counter(1)
+        self._canReviewerAccept = False # shows if the reviewers have rights to accept/reject abstracts
         self.notifyModification()
 
     def getConference(self):
@@ -105,6 +105,14 @@ class ConferenceAbstractReview(Persistent):
     def getNumberOfAnswers(self):
         """ Returns the number of possible answers """
         return self._numberOfAnswers
+
+    def canReviewerAccept(self):
+        if not hasattr(self, "_canReviewerAccept"):
+            self._canReviewerAccept = False
+        return self._canReviewerAccept
+
+    def setCanReviewerAccept(self, canReviewerAccept):
+        self._canReviewerAccept = canReviewerAccept
 
     def recalculateRBLabelsAndTitles(self):
         """ Recalculate the labels for the radio buttons """

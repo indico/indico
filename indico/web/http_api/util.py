@@ -1,51 +1,37 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-from indico.web.http_api.responses import HTTPAPIError
-from indico.web.wsgi import webinterface_handler_config as apache
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 import urllib, hmac, hashlib, time
-from indico.web.http_api.auth import APIKey
-from MaKaC.common.Configuration import Config
-
-"""
-Utility functions
-"""
+from indico.core.config import Config
 
 
 def get_query_parameter(queryParams, keys, default=None, integer=False):
-    if type(keys) != list:
-        keys = list(keys)
+    if not isinstance(keys, (list, tuple, set)):
+        keys = (keys,)
     for k in keys:
-        paramlist = queryParams.get(k)
-        if paramlist:
-            if len(paramlist) == 1:
-                val = paramlist[0]
-                if integer:
-                    val = int(val)
-                del queryParams[k]
-                return val
-            else:
-                raise HTTPAPIError("duplicate argument '%s'" % k, apache.HTTP_BAD_REQUEST)
+        if k not in queryParams:
+            continue
+        val = queryParams.pop(k)
+        if integer:
+            val = int(val)
+        return val
     return default
 
-def remove_lists(data):
-    return dict((k, v[0]) for (k, v) in data.iteritems() if v != None)
 
 def build_indico_request(path, params, api_key=None, secret_key=None, persistent=False):
     items = params.items() if hasattr(params, 'items') else list(params)
@@ -62,8 +48,10 @@ def build_indico_request(path, params, api_key=None, secret_key=None, persistent
         return path
     return '%s?%s' % (path, urllib.urlencode(items))
 
-def generate_public_auth_request(apiMode, apiKey, path, params= {}, persistent=False, https = True):
-    from indico.web.http_api import API_MODE_KEY, API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
+
+def generate_public_auth_request(apiMode, apiKey, path, params={}, persistent=False, https=True):
+    from indico.web.http_api import API_MODE_KEY, API_MODE_ONLYKEY, API_MODE_SIGNED, \
+        API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 
     key = apiKey.getKey() if apiKey else None
     secret_key = apiKey.getSignKey() if apiKey else None

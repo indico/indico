@@ -1,36 +1,37 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 Network-related utility functions
 """
 
-from MaKaC.common.info import HelperMaKaCInfo
+import socket
+from collections import defaultdict
 
 
-def _get_remote_ip(req):
-    hostIP = str(req.get_remote_ip())
+def resolve_host(host, per_family=False):
+    result = socket.getaddrinfo(host, None)
 
-    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-    if minfo.useProxy():
-        # if we're behind a proxy, use X-Forwarded-For
-        return req.headers_in.get("X-Forwarded-For", hostIP).split(", ")[-1]
+    if per_family:
+        families = defaultdict(list)
+        for tup in result:
+            families[tup[0]].append(tup[-1][0])
+        return families
     else:
-        return hostIP
+        return set(tup[-1][0] for tup in result)

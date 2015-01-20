@@ -20,8 +20,8 @@
         <td>
             % if ConfReview.getEnableRefereeEmailNotif() or ConfReview.getEnableEditorEmailNotif() or ConfReview.getEnableReviewerEmailNotif():
                 <div style="padding:5px; color:gray;">
-                    <span class="collShowBookingsText">${_("An automatically generated e-mail will be sent to newly assigned Reviewers.")}</span><br>
-                    <span class="collShowBookingsText">${ _("You  can  modify this from the Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></span>
+                    <span class="italic">${_("An automatically generated e-mail will be sent to newly assigned Reviewers.")}</span><br>
+                    <span class="italic">${ _("You  can  modify this from the Paper Reviewing ")}<a href="${urlHandlers.UHConfModifReviewingPaperSetup.getURL(ConfReview.getConference())}">${ _("Setup.")}</a></span>
                 </div>
             % endif
         </td>
@@ -40,7 +40,7 @@
     </tr>
     <tr>
         <td class="questionContent" style="padding-top:5px; padding-left:3px;">
-            <span>${ _("Responsibilities: Assign contributions to reviewers and give final judgement") }</span>
+            <span>${ _("Responsibilities: Assign contributions to reviewers and give referee assessment") }</span>
         </td>
     </tr>
     <tr>
@@ -70,39 +70,39 @@
                             var userId = user.get('id');
                             var del = true;
                             var contribsPerUser = [];
+                            var removeReferee = function(){
+                                indicoRequest('reviewing.conference.removeTeamReferee',
+                                        {
+                                            conference: '${ Conference }',
+                                            user: user.get('id')
+                                        },
+                                        function(result,error) {
+                                            if (!error) {
+                                                setResult(true);
+                                            } else {
+                                                IndicoUtil.errorReport(error);
+                                                setResult(false);
+                                            }
+                                        }
+                                    );
+                            };
                             % for r in ConfReview.getRefereesList():
                             contribsPerUser['${ r.getId()}'] = ${ len(ConfReview.getJudgedContributions(r))};
                             % endfor
-                            if(exists(contribsPerUser[userId])){
-                                if (contribsPerUser[userId] > 0){
-                                    if (!(confirm($T('This referee has been assigned ')+contribsPerUser[userId]+$T(' contributions. Do you want to remove the referee anyway?')))){
-                                        del = false;
+                            if(exists(contribsPerUser[userId]) && contribsPerUser[userId] > 0){
+                                new ConfirmPopup($T("Remove referee"),$T('This referee has been assigned {0} contributions. Do you want to remove the referee anyway?').format(contribsPerUser[userId]), function(confirmed) {
+                                    if(confirmed) {
+                                        removeReferee();
                                     }
-                                }
-                            }
-                            if (del) {
-                                indicoRequest('reviewing.conference.removeTeamReferee',
-                                            {
-                                                conference: '${ Conference }',
-                                                user: user.get('id')
-                                            },
-                                            function(result,error) {
-                                                if (!error) {
-                                                    setResult(true);
-                                                } else {
-                                                    IndicoUtil.errorReport(error);
-                                                    setResult(false);
-                                                }
-                                            }
-                                        );
-                            }
+                                }).open();
+                            }else removeReferee();
                         };
 
                         var uf = new UserListField('reviewersPRUserListDiv', 'userList',
                                 ${ jsonEncode(fossilize(ConfReview.getRefereesList())) },
                                 true,null,
                                 true, false, null, null,
-                                false, false, true,
+                                false, false, false, true,
                                 newRefereeHandler, userListNothing, removeRefereeHandler);
                         $E('RefereeList').set(uf.draw());
 </script>
@@ -111,7 +111,7 @@
     </tr>
     <tr>
         <td class="questionContent" style="padding-top:5px; padding-left:3px;">
-            <span>${ _("Responsibility: Judge content verification of contributions") }</span>
+            <span>${ _("Responsibility: Assess content verification of contributions") }</span>
         </td>
     </tr>
     <tr>
@@ -139,17 +139,7 @@
                             var userId = user.get('id');
                             var del = true;
                             var contribsPerUser = [];
-                            % for r in ConfReview.getReviewersList():
-                            contribsPerUser['${ r.getId()}'] = ${ len(ConfReview.getReviewedContributions(r))};
-                            % endfor
-                            if(exists(contribsPerUser[userId])){
-                                if (contribsPerUser[userId] > 0){
-                                    if (!(confirm($T('This content reviewer has been assigned ')+contribsPerUser[userId]+$T(' contributions. Do you want to remove the referee anyway?')))){
-                                        del = false;
-                                    }
-                                }
-                            }
-                            if (del) {
+                            var removeReviewer = function(){
                                 indicoRequest('reviewing.conference.removeTeamReviewer',
                                         {
                                             conference: '${ Conference }',
@@ -164,14 +154,27 @@
                                             }
                                         }
                                     );
-                            }
+                            };
+
+                            % for r in ConfReview.getReviewersList():
+                            contribsPerUser['${ r.getId()}'] = ${ len(ConfReview.getReviewedContributions(r))};
+                            % endfor
+
+                            if(exists(contribsPerUser[userId]) && contribsPerUser[userId] > 0){
+                                new ConfirmPopup($T("Remove content reviewer"),$T('This content reviewer has been assigned {0} contributions. Do you want to remove the content reviewer  anyway?').format(contribsPerUser[userId]), function(confirmed) {
+                                    if(confirmed) {
+                                        removeReviewer();
+                                    }
+                                }).open();
+                            }else removeReviewer();
+
                         };
 
                         var uf = new UserListField('reviewersPRUserListDiv', 'userList',
                                 ${ jsonEncode(fossilize(ConfReview.getReviewersList())) },
                                 true,null,
                                 true, false, null, null,
-                                false, false, true,
+                                false, false, false, true,
                                 newReviewerHandler, userListNothing, removeReviewerHandler);
                         $E('ReviewerList').set(uf.draw());
 </script>
@@ -185,7 +188,7 @@
     </tr>
     <tr>
         <td class="questionContent" style="padding-top:5px; padding-left:3px;">
-            <span>${ _("Responsibility: Judge form verification of contributions") }</span>
+            <span>${ _("Responsibility: Assess form verification of contributions") }</span>
         </td>
     </tr>
     <tr>
@@ -212,17 +215,7 @@
                             var userId = user.get('id');
                             var del = true;
                             var contribsPerUser = [];
-                            % for r in ConfReview.getEditorsList():
-                            contribsPerUser['${ r.getId()}'] = ${ len(ConfReview.getEditedContributions(r))};
-                            % endfor
-                            if(exists(contribsPerUser[userId])){
-                                if (contribsPerUser[userId] > 0){
-                                    if (!(confirm($T('This layout reviewer has been assigned ')+contribsPerUser[userId]+$T(' contributions. Do you want to remove the referee anyway?')))){
-                                        del = false;
-                                    }
-                                }
-                            }
-                            if (del) {
+                            var removeEditor = function(){
                                 indicoRequest('reviewing.conference.removeTeamEditor',
                                         {
                                             conference: '${ Conference }',
@@ -237,13 +230,23 @@
                                             }
                                         }
                                     );
-                            }
+                            };
+                            % for r in ConfReview.getEditorsList():
+                            contribsPerUser['${ r.getId()}'] = ${ len(ConfReview.getEditedContributions(r))};
+                            % endfor
+                            if(exists(contribsPerUser[userId]) && contribsPerUser[userId] > 0){
+                                new ConfirmPopup($T("Remove layout reviewer"),$T('This layout reviewer has been assigned {0} contributions. Do you want to remove the layout reviewer  anyway?').format(contribsPerUser[userId]), function(confirmed) {
+                                    if(confirmed) {
+                                        removeEditor();
+                                    }
+                                }).open();
+                            }else removeEditor();
                         };
                         var uf = new UserListField('reviewersPRUserListDiv', 'userList',
                                                    ${ jsonEncode(fossilize(ConfReview.getEditorsList())) },
                                                    true,null,
                                                    true, false, null, null,
-                                                   false, false, true,
+                                                   false, false, false, true,
                                                    newEditorHandler, userListNothing, removeEditorHandler);
                         $E('EditorList').set(uf.draw());
 </script>

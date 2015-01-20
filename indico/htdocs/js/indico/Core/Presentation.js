@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 // Extensions to Presentation
 // Candidates for integration?
 
@@ -188,13 +205,29 @@ var SortCriteria = {
         return e1 == e2?0:(e1 < e2?-1:1);
     },
     Integer: function(e1, e2) {
-
         if (isNaN(parseInt(e1,10)) ||
             isNaN(parseInt(e2,10))) {
             return SortCriteria.Default(e1, e2);
         } else {
             return parseInt(e1,10) == parseInt(e2,10)?0:(parseInt(e1,10) < parseInt(e2,10)?-1:1);
         }
+    },
+    DashSeparated: function(e1, e2) {
+        // sorting format: int-string-string-...
+        // for example 41-R2-020
+        var e1Array = e1.split('-');
+        var e2Array = e2.split('-');
+        for (var i = 0; i < e1Array.length; i++) {
+          if (i == 0) {
+              var result = SortCriteria.Integer(e1Array[i], e2Array[i]);
+          }
+          else {
+              var result = SortCriteria.Default(e1Array[i], e2Array[i]);
+          }
+          if (result != 0)
+              return result;
+        };
+        return 0;
     }
 };
 
@@ -256,11 +289,11 @@ type("WatchOrderedDict", ["WatchObject"],
          var self = this;
 
          this.each = function(iterator) {
-             self.order.each(function(val, i){
+             self.order.each(function(val, i) {
                  return iterator(self.get(val), val);
              });
              return iterator.result;
-         }
+         };
 
          this.set = function(key, value) {
              this.order.add(key);

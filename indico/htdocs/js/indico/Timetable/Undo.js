@@ -1,8 +1,25 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 type("UndoMixin", [], {
 
     updateUndoDiv: function(tt_status_info) {
         /* A "button" that appears after an action is performed */
-        var undo_contents =  $('<a href="#"/>').text($T('Undo last operation')).
+        var undo_contents =  $('<a href="#" class="i-button icon-undo warning"/>').text($T('Undo last operation')).
             click(function() {
                 // "Undo" should be executed over the _current_ timetable, not the original source of
                 // the event. Being so, we call a global event that will then invoke the correct TT
@@ -13,7 +30,7 @@ type("UndoMixin", [], {
             });
         var elem = tt_status_info || $('#tt_status_info');
         if ($(window).data('undo')) {
-            elem.show().html(undo_contents).prepend($('<span class="icon">↺</span>'));
+            elem.show().html($('<div class="group right"/>').append(undo_contents));
         } else {
             elem.hide();
         }
@@ -70,7 +87,7 @@ function undo_action() {
 
 
 function goto_slot(slotId) {
-    return activeTT.switchToInterval(slotId).pipe(function() {
+    return activeTT.switchToInterval(slotId).then(function() {
         return undo_action();
     });
 }
@@ -94,7 +111,7 @@ function goto_origin(data) {
 
         if (parentTT.currentDay != day) {
             // wrong day? change it.
-            return parentTT.setSelectedTab(day).pipe(next_step);
+            return parentTT.setSelectedTab(day).then(next_step);
         } else {
             return next_step();
         }
@@ -107,7 +124,7 @@ function goto_origin(data) {
         } else {
             // otherwise, we are still in a slot but we want to go somewhere else
             // first step, go up to top level
-            return parentTT.switchToTopLevel().pipe(function() {
+            return parentTT.switchToTopLevel().then(function() {
                 // then go to desired day
                 return goto_day(ordinalStartDate);
             });

@@ -1,25 +1,25 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.common.filters as filters
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
+from indico.util.string import natural_sort_key
 
 
 class TypeFilterField( filters.FilterField ):
@@ -30,7 +30,7 @@ class TypeFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if len(self._conf.getContribTypeList()) == len(self._values):
+        if len(self._conf.getContribTypeList()) == len(self._values) and contribution.getType():
             return True
         elif contribution.getType() is None:
             return self._showNoValue
@@ -53,7 +53,7 @@ class TrackFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if len(self._conf.getTrackList()) == len(self._values):
+        if len(self._conf.getTrackList()) == len(self._values) and contribution.getTrack():
             return True
         elif contribution.getTrack():
             if contribution.getTrack().getId() in self._values:
@@ -78,7 +78,7 @@ class SessionFilterField( filters.FilterField ):
     def satisfies( self, contribution ):
         """
         """
-        if len(self._conf.getSessionList()) == len(self._values):
+        if len(self._conf.getSessionList()) == len(self._values) and contribution.getSession():
             return True
         elif contribution.getSession():
             if contribution.getSession().getId() in self._values:
@@ -246,6 +246,58 @@ class ReviewerFilterField( filters.FilterField ):
             return self._showNoValue
 
 
+class ReviewingFilterField( filters.FilterField ):
+    """ Contains the filtering criteria for a Reviewing of a contribution.
+        Attributes:
+            _value -- (list) List of User objects with keys "referee", "editor" and "reviewer". Can also be the string "any",
+                      and then the contribution won't be filtered by reviewer.
+            _showNoValue -- (bool) Tells whether an contribution satisfies the
+                filter if it doesn't have reviewing team
+    """
+    _id = "reviewing"
+
+    def __init__( self, conf, values, showNoValue = True ):
+        filters.FilterField.__init__(self, conf, values, showNoValue)
+
+    def satisfies( self, contribution ):
+        rm = contribution.getReviewManager()
+        if rm.isReferee(self._values[0].get("referee", "")):
+            if (self._values[0].get("editor", "") == "any" and rm.hasEditor()) \
+                or (self._values[0].get("reviewer", "") == "any" and rm.hasReviewers()):
+                return True
+            elif not rm.hasEditor() and not rm.hasReviewers():
+                return self._showNoValue
+            else:
+                return False
+        elif self._values[0].get("referee", "") == "any" or self._values[0].get("referee", "") == "":
+            if ((self._values[0].get("referee", "") == "any") and rm.hasReferee()) \
+                or (self._values[0].get("editor", "") == "any" and rm.hasEditor()) \
+                or (self._values[0].get("reviewer", "") == "any" and rm.hasReviewers()):
+                return True
+            elif not rm.hasReferee() and not rm.hasEditor() and not rm.hasReviewers():
+                return self._showNoValue
+            else:
+                return False
+
+
+class MaterialSubmittedFilterField( filters.FilterField ):
+    """ Contains the filtering criteria for a Review material of a contribution.
+        Attributes:
+            _value -- (User object) a User object. Can also be the string "any",
+                      and then the contribution won't be filtered by reviewer.
+            _showNoValue -- (bool) Tells whether an contribution satisfies the
+                filter if it doesn't have any Reviewers
+    """
+    _id = "materialsubmitted"
+
+    def satisfies( self, contribution ):
+        review = contribution.getReviewManager().getLastReview()
+        if self._values[0] and review.isAuthorSubmitted():
+            return True
+        elif review.isAuthorSubmitted():
+            return False
+        else:
+            return self._showNoValue
 
 class TitleSF(filters.SortingField):
     _id="name"
@@ -259,24 +311,8 @@ class TitleSF(filters.SortingField):
             return +1
         if c2.getTitle() == None:
             return -1
-        return cmp( c1.getTitle().lower().strip(), c2.getTitle().lower().strip() )
-
-
-#class MaterialSF(filters.SortingField):
-#    _id="material"
-#
-#    def compare( self, c1, c2 ):
-#        """
-#        """
-#
-#        if c1.getFirstMaterial() == None and c2.getFirstMaterial() == None:
-#            return 0
-#        if c1.getFirstMaterial()== None:
-#            return +1
-#        if c2.getFirstMaterial() ==None:
-#            return -1
-#        raise "%s,%s"%(c1.getFirstMaterial(), c2.getFirstMaterial())
-#        return cmp( c1.getFirstMaterial().getId(), c2.getFirstMaterial().getId())
+        return cmp(natural_sort_key(c1.getTitle().lower().strip()),
+                   natural_sort_key(c2.getTitle().lower().strip()))
 
 
 class NumberSF( filters.SortingField ):
@@ -317,7 +353,8 @@ class ContribTypeSF( filters.SortingField ):
             return +1
         elif c2.getType() == None:
             return -1
-        return cmp( c1.getType().getName().lower().strip(), c2.getType().getName().lower().strip() )
+        return cmp(natural_sort_key(c1.getType().getName().lower().strip()),
+                   natural_sort_key(c2.getType().getName().lower().strip()))
 
 
 class SessionSF( filters.SortingField ):
@@ -346,7 +383,8 @@ class SessionTitleSF( filters.SortingField ):
             return +1
         elif c2.getSession() == None:
             return -1
-        return cmp( c1.getSession().getTitle().lower().strip(), c2.getSession().getTitle().lower().strip() )
+        return cmp(natural_sort_key(c1.getSession().getTitle().lower().strip()),
+                   natural_sort_key(c2.getSession().getTitle().lower().strip()))
 
 class TrackSF(filters.SortingField):
     _id = "track"

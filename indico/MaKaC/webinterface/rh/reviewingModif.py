@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import os
 
@@ -24,13 +23,12 @@ from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from MaKaC.webinterface.pages.reviewing import WPConfModifReviewingPaperSetup
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase,\
-    RHConferenceModifKey
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common import Config
 from MaKaC.i18n import _
 from indico.util import json
+from indico.web.flask.util import send_file
 
 
 class RCPaperReviewManager:
@@ -151,92 +149,6 @@ class RHConfModifReviewingPaperSetup( RHConfModifReviewingPRMBase ):
         return p.display()
 
 
-
-#################################### Start of old classes that are not used anymore ###############################
-class RHChooseReviewing(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHChooseReviewing
-
-    def _checkParams( self, params ):
-        RHConfModifReviewingPRMBase._checkParams( self, params )
-        self._reviewing = int(params.get("reviewing"))
-
-    def _process( self ):
-        self._conf.getConfPaperReview().setChoice( self._reviewing )
-        if self._reviewing == "No_reviewing":
-            self._redirect(urlHandlers.UHConferenceModification.getURL(self._conf))
-        else:
-            self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-
-class RHAddState(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHAddState
-
-    def _checkParams( self, params ):
-        RHConfModifReviewingPRMBase._checkParams( self, params )
-        self._state = params.get("state")
-
-    def _process( self ):
-        self._conf.getConfPaperReview().addState( self._state )
-        self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-
-class RHRemoveState(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHRemoveState
-
-    def _checkParams(self, params):
-        RHConfModifReviewingPRMBase._checkParams(self, params)
-        self._state = params.get("stateSelection")
-
-    def _process(self):
-        self._conf.getConfPaperReview().removeState(self._state)
-        self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-class RHAddQuestion(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHAddQuestion
-
-    def _checkParams( self, params ):
-        RHConfModifReviewingPRMBase._checkParams( self, params )
-        self._question = params.get("question")
-
-    def _process( self ):
-        self._conf.getConfPaperReview().addReviewingQuestion( self._question )
-        self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-class RHRemoveQuestion(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHRemoveQuestion
-
-    def _checkParams(self, params):
-        RHConfModifReviewingPRMBase._checkParams(self, params)
-        self._question = params.get("questionSelection")
-
-    def _process(self):
-        self._conf.getConfPaperReview().removeReviewingQuestion(self._question)
-        self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-class RHAddCriteria(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHAddCriteria
-
-    def _checkParams( self, params ):
-        RHConfModifReviewingPRMBase._checkParams( self, params )
-        self._criteria = params.get("criteria")
-
-    def _process( self ):
-        self._conf.getConfPaperReview().addLayoutCriteria( self._criteria )
-        self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-class RHRemoveCriteria(RHConfModifReviewingPRMBase):
-    _uh = urlHandlers.UHRemoveCriteria
-
-    def _checkParams(self, params):
-        RHConfModifReviewingPRMBase._checkParams(self, params)
-        self._criteria = params.get("criteriaSelection")
-
-    def _process(self):
-        self._conf.getConfPaperReview().removeLayoutCriteria(self._criteria)
-        self._redirect( urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ) )
-
-#################################### END of old classes that are not used anymore ###############################
-
 class RHSetTemplate(RHConfModifReviewingPRMBase):
     _uh = urlHandlers.UHSetTemplate
 
@@ -287,20 +199,5 @@ class RHDownloadTemplate(RHConferenceBaseDisplay):
         self._templateId = params.get("reviewingTemplateId")
 
     def _process(self):
-        template=self._target.getConfPaperReview().getTemplates()[self._templateId].getFile()
-        self._req.headers_out["Content-Length"]="%s"%template.getSize()
-        cfg=Config.getInstance()
-        mimetype=cfg.getFileTypeMimeType(template.getFileType())
-        self._req.content_type="""%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"]="""inline; filename="%s\""""%template.getFileName()
-        return template.readBin()
-
-class RHDeleteTemplate(RHConfModifReviewingPRMBase):
-
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams( self, params )
-        self._templateId = params.get("reviewingTemplateId")
-
-    def _process(self):
-        self._conf.getConfPaperReview().deleteTemplate(self._templateId)
-        self._redirect(urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf ))
+        template = self._target.getConfPaperReview().getTemplates()[self._templateId].getFile()
+        return send_file(template.getFileName(), template.getFilePath(), template.getFileType())

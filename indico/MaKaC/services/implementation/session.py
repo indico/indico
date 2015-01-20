@@ -1,3 +1,22 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+##
+## Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 3 of the
+## License, or (at your option) any later version.
+##
+## Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 """
 Session-related services
 """
@@ -5,14 +24,14 @@ Session-related services
 from MaKaC.services.implementation.base import ProtectedModificationService
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.services.implementation.roomBooking import GetBookingBase
-import MaKaC.conference as conference
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
 from MaKaC.services.implementation import conference as conferenceServices
 import MaKaC.webinterface.locators as locators
 from MaKaC.conference import SessionSlot, SessionChair
 from MaKaC.common.fossilize import fossilize
 from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
+import MaKaC.domain as domain
+
 
 class SessionBase(conferenceServices.ConferenceBase):
 
@@ -52,6 +71,8 @@ class SessionModifBase(SessionBase, ProtectedModificationService):
                 self._slot = self._schEntry.getOwner()
 
     def _checkProtection(self):
+        if self._session.isClosed():
+            raise ServiceAccessError(_(""""The modification of the session "%s" is not allowed because it is closed""")%self._session.getTitle())
         ProtectedModificationService._checkProtection(self)
 
     def _getCheckFlag(self):
@@ -70,7 +91,7 @@ class SessionModifCoordinationBase(SessionModifBase):
 
     def _checkProtection(self):
         # if the use is authorized to coordinate the session, (s)he won't go through the usual mechanisms
-        if self._session.canCoordinate(self.getAW()):
+        if not self._session.isClosed() and self._session.canCoordinate(self.getAW()):
             return
         SessionModifBase._checkProtection( self )
 
@@ -78,7 +99,7 @@ class SessionModifCoordinationBase(SessionModifBase):
 class SessionModifUnrestrictedTTCoordinationBase(SessionModifBase):
 
     def _checkProtection(self):
-        if self._session.canCoordinate(self.getAW(), "unrestrictedSessionTT"):
+        if not self._session.isClosed() and self._session.canCoordinate(self.getAW(), "unrestrictedSessionTT"):
             return
         SessionModifBase._checkProtection( self )
 
@@ -86,7 +107,7 @@ class SessionModifUnrestrictedTTCoordinationBase(SessionModifBase):
 class SessionModifUnrestrictedContribMngCoordBase(SessionModifBase):
 
     def _checkProtection(self):
-        if self._session.canCoordinate(self.getAW(), "modifContribs"):
+        if not self._session.isClosed() and self._session.canCoordinate(self.getAW(), "modifContribs"):
             return
         SessionModifBase._checkProtection( self )
 
@@ -151,9 +172,6 @@ class SessionSlotModifUnrestrictedContribMngCoordBase(SessionSlotModifBase, Sess
 
     def _checkProtection(self):
         SessionModifUnrestrictedContribMngCoordBase._checkProtection( self )
-
-class SessionGetBooking(SessionBase, GetBookingBase):
-    pass
 
 class SessionProtectionUserList(SessionModifBase):
     def _getAnswer(self):
@@ -241,10 +259,13 @@ class SessionAddExistingChair(SessionChairListBase):
     def _getAnswer(self):
         ph = PrincipalHolder()
         for user in self._userList:
+            person = ph.getById(user["id"])
+            if person is None:
+                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
             if self._kindOfList == "manager":
-                self._session.grantModification(ph.getById(user["id"]))
+                self._session.grantModification(person)
             elif self._kindOfList == "coordinator":
-                self._session.addCoordinator(ph.getById(user["id"]))
+                self._session.addCoordinator(person)
         return self._getSessionChairList()
 
 
@@ -316,187 +337,34 @@ class SessionRemoveAsConvener(SessionModifyAsConvener):
         return [managerResult, coordinatorResult]
 
 
-class SessionConvenersBase(SessionModifBase):
-
-    def _isEmailAlreadyUsed(self, email):
-        for conv in self._session.getConvenerList():
-            if email == conv.getEmail():
-                return True
-        return False
-
-    def _setConvenerData(self, conv):
-        conv.setTitle(self._userData.get("title", ""))
-        conv.setFirstName(self._userData.get("firstName", ""))
-        conv.setFamilyName(self._userData.get("familyName", ""))
-        conv.setAffiliation(self._userData.get("affiliation", ""))
-        conv.setEmail(self._userData.get("email", ""))
-        conv.setAddress(self._userData.get("address", ""))
-        conv.setPhone(self._userData.get("phone", ""))
-        conv.setFax(self._userData.get("fax", ""))
-
-
-    def _getConvenerList(self):
-        result = []
-        for convener in self._session.getConvenerList():
-            convFossil = fossilize(convener)
-            convFossil["isManager"] = convener.isSessionManager()
-            convFossil["isCoordinator"] = convener.isSessionCoordinator()
-            result.append(convFossil)
-        return result
-
-
-class SessionAddExistingConvener(SessionConvenersBase):
+class SessionProtectionToggleDomains(SessionModifBase):
 
     def _checkParams(self):
-        SessionConvenersBase._checkParams(self)
+        self._params['sessionId'] = self._params['targetId']
+        SessionModifBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
-        # Check if there is already a user with the same email
-        for user in self._userList:
-            if self._isEmailAlreadyUsed(user["email"]):
-                raise ServiceAccessError(_("The email address (%s) of a user you are trying to add is already used by another convener or the user is already added to the list. Convener(s) not added.") % user["email"])
+        self._domainId = pm.extract("domainId", pType=str)
+        self._add = pm.extract("add", pType=bool)
 
     def _getAnswer(self):
-        ah = AvatarHolder()
-        for user in self._userList:
-            convener = SessionChair()
-            convener.setDataFromAvatar(ah.getById(user["id"]))
-            self._session.addConvener(convener)
-        return self._getConvenerList()
+        dh = domain.DomainHolder()
+        d = dh.getById(self._domainId)
+        if self._add:
+            self._target.requireDomain(d)
+        elif not self._add:
+            self._target.freeDomain(d)
 
-
-class SessionAddNewConvener(SessionConvenersBase):
-
-    def _checkParams(self):
-        SessionConvenersBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._userData = pm.extract("userData", pType=dict, allowEmpty=False)
-        email = self._userData.get("email", "")
-        # check if the email is empty and the user wants to give any rights
-        if (email == "" and (self._userData.get("manager", False) or self._userData.get("coordinator", False))):
-            raise ServiceAccessError(_("It is not possible to grant any rights to a convener with an empty email address. Convener not added."))
-        if (email != "" and self._isEmailAlreadyUsed(email)):
-            raise ServiceAccessError(_("The email address (%s) is already used by another convener or the user is already added to the list. Convener not added.") % email)
+class SessionGetChildrenProtected(SessionModifBase):
 
     def _getAnswer(self):
-        conv = SessionChair()
-        self._setConvenerData(conv)
-        self._session.addConvener(conv)
-        if (self._userData.get("manager", False)):
-            # Add to pending managers list
-            self._session.grantModification(conv)
-        if (self._userData.get("coordinator", False)):
-            # Add to pending managers list
-            self._session.addCoordinator(conv)
-        return self._getConvenerList()
+        return fossilize(self._session.getAccessController().getProtectedChildren())
 
-
-class SessionConvenerActionBase(SessionConvenersBase):
-
-    def _checkParams(self):
-        SessionConvenersBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._convener = self._session.getConvenerById(pm.extract("userId", pType=str, allowEmpty=False))
-        if self._convener == None:
-            raise ServiceError("ERR-U0", _("User does not exist."))
-
-
-class SessionEditConvenerData(SessionConvenerActionBase):
-
-    def _checkParams(self):
-        SessionConvenerActionBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._userData = pm.extract("userData", pType=dict, allowEmpty=False)
-        email = self._userData.get("email", "")
-        if (email == "" and (self._userData.get("manager", False) or self._userData.get("coordinator", False))):
-            raise ServiceAccessError(_("It is not possible to grant any rights to a convener with an empty email address. Convener not edited."))
-        if (email != "" and self._isEmailUsedByOther()):
-            raise ServiceAccessError(_("The email address (%s) is already used by another convener. Convener data not edited.") % email)
-
-    def _isEmailUsedByOther(self):
-        for conv in self._session.getConvenerList():
-            if self._userData.get("email") == conv.getEmail() and self._convener.getId() != conv.getId():
-                return True
-        return False
+class SessionGetChildrenPublic(SessionModifBase):
 
     def _getAnswer(self):
-        prevEmail = self._convener.getEmail()
-        newEmail = self._userData.get("email", "")
-        isSessionCoordinator = self._convener.isSessionCoordinator()
-        isSessionManager = self._convener.isSessionManager()
-        self._setConvenerData(self._convener)
-        if prevEmail != newEmail:
-            if isSessionCoordinator:
-                # remove the previous email in queue
-                try:
-                    del self._session.getConference().getPendingQueuesMgr().getPendingCoordinators()[prevEmail]
-                    # add the new email to the list
-                    self._session.addCoordinator(self._convener)
-                except KeyError:
-                    self._session.addCoordinator(self._convener)
-            if isSessionManager:
-                self._session.getAccessController().revokeModificationEmail(prevEmail)
-                self._session.grantModification(self._convener)
-        if (self._userData.get("manager", False)):
-            # Add to pending managers list
-            self._session.grantModification(self._convener)
-        if (self._userData.get("coordinator", False)):
-            # Add to pending managers list
-            self._session.addCoordinator(self._convener)
-        return self._getConvenerList()
-
-
-class SessionRemoveConvener(SessionConvenerActionBase):
-
-    def _getAnswer(self):
-        self._session.removeConvener(self._convener)
-        return self._getConvenerList()
-
-
-class SessionModifyConvenerRights(SessionConvenerActionBase):
-
-    def _checkParams(self):
-        SessionConvenerActionBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._kindOfRights = pm.extract("kindOfRights", pType=str, allowEmpty=False)
-
-
-class SessionGrantRights(SessionModifyConvenerRights):
-
-    def _getAnswer(self):
-        if self._convener.getEmail() != "":
-            if self._kindOfRights == "management":
-                self._session.grantModification(self._convener)
-            elif self._kindOfRights == "coordination":
-                self._session.addCoordinator(self._convener)
-        else:
-            raise ServiceAccessError(_("It is not possible to grant any rights to a convener with an empty email address. Please, set an email address for this convener."))
-        return self._getConvenerList()
-
-
-class SessionRevokeRights(SessionModifyConvenerRights):
-
-    def _getAnswer(self):
-
-        av = AvatarHolder().match({"email": self._convener.getEmail()}, exact=1, forceWithoutExtAuth=True)
-        if self._kindOfRights == "management":
-            if not av:
-                self._session.getAccessController().revokeModificationEmail(self._convener.getEmail())
-            else:
-                self._session.revokeModification(av[0])
-        elif self._kindOfRights == "coordination":
-            if not av:
-                chairSession = self._session.getConference().getPendingQueuesMgr().getPendingCoordinators()[self._convener.getEmail()][0]
-                self._session.getConference().getPendingQueuesMgr().removePendingCoordinator(chairSession)
-            else:
-                self._session.removeCoordinator(av[0])
-        return self._getConvenerList()
-
-
-
+        return fossilize(self._session.getAccessController().getPublicChildren())
 
 methodMap = {
-    "getBooking": SessionGetBooking,
     "protection.getAllowedUsersList": SessionProtectionUserList,
     "protection.addAllowedUsers": SessionProtectionAddUsers,
     "protection.removeAllowedUser": SessionProtectionRemoveUser,
@@ -506,11 +374,7 @@ methodMap = {
     "protection.removeAsConvener": SessionRemoveAsConvener,
     "protection.addExistingCoordinator": SessionAddExistingChair,
     "protection.removeCoordinator": SessionRemoveChair,
-
-    "conveners.addExistingConvener": SessionAddExistingConvener,
-    "conveners.addNewConvener": SessionAddNewConvener,
-    "conveners.editConvenerData": SessionEditConvenerData,
-    "conveners.removeConvener": SessionRemoveConvener,
-    "conveners.grantRights": SessionGrantRights,
-    "conveners.revokeRights": SessionRevokeRights
+    "protection.toggleDomains": SessionProtectionToggleDomains,
+    "protection.getProtectedChildren": SessionGetChildrenProtected,
+    "protection.getPublicChildren": SessionGetChildrenPublic
 }

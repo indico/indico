@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 function nullRoomInfo(info) {
 
     return (!info) ||
@@ -9,24 +26,35 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
      {
         draw: function() {
             var self = this;
-
+            var lastSort = 'id';
             var selectAll = Html.span('fakeLink', $T('All'));
             var selectNone = Html.span('fakeLink', $T('None'));
-            var selectBar = Html.div({style: {textAlign:'right', margin: pixels(3)}}, $T('Select: '), selectAll, ', ', selectNone);
+            var sortById = Html.span({className: 'fakeLink', id: 'sortById', style: {fontWeight: 'bold'}}, $T('ID'));
+            var sortByTitle = Html.span({className: 'fakeLink', id: 'sortByTitle'}, $T('Title'));
+            var toolbar =  Html.div({className: 'toolbar', style: {margin: pixels(3)}},
+                                    $T('Sort by: '), sortById, ', ', sortByTitle, ' ',
+                                    $T('Select: '), selectAll, ', ', selectNone
+                                   );
+
+            sortById.observeClick(function(){
+                self._sortList('id', lastSort == 'id');
+                lastSort = 'id';
+            });
+
+            sortByTitle.observeClick(function(){
+                self._sortList('title', lastSort == 'title');
+                lastSort = 'title';
+            });
 
             selectAll.observeClick(function(){
                 self.selectAll();
             });
 
             selectNone.observeClick(function(){
-                self.clearSelection();
-
-                if (exists(self.selectedObserver)) {
-                    self.selectedObserver(self.selectedList);
-                }
+                self._clearSelection();
             });
 
-            return [selectBar, this.SelectableListWidget.prototype.draw.call(this)];
+            return [toolbar, this.SelectableListWidget.prototype.draw.call(this)];
         },
 
          _drawItem: function(pair) {
@@ -38,34 +66,78 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
              }).join(", ");
              var selected = false;
 
-             var id = Html.em({style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.get('id'));
-             var item = Html.div({},  elem.get('title') + ( speakers ? (' (' + speakers + ')') : ''), id);
+             var id = Html.em({'data-id': elem.get('id'), style: {paddingLeft: "5px", fontSize: '0.9em'}}, elem.get('id'));
+             return Html.div({}, id, " - ", elem.get('title') + ( speakers ? (' (' + speakers + ')') : ''));
+         },
 
-             return item;
+         _sortList: function(type, second_click){
+             var self = this;
+             var selected = _(this.getSelectedList().getAll()).map(function(item){return item.get('id');});
+             var initial = _(self.getAll());
+
+             $('#sortById').css('font-weight', (type == 'id') ? 'bold' : '');
+             $('#sortByTitle').css('font-weight', (type == 'title') ? 'bold' : '');
+
+             var sorted = initial.chain().map(function(value, key) {
+                 return {
+                     key: key,
+                     value: value.get(type)
+                 };
+             }).sortBy(
+                 function(item) {
+                     return item.value;
+                 });
+
+             // reverse order only if second click, else reset order
+             this.reverseState = second_click ? !this.reverseState : false;
+
+             if (this.reverseState) {
+                 sorted = sorted.reverse();
+             }
+
+             // Clear selection and elements
+             self._clearSelection();
+             self.clear();
+
+             // Add sorted items
+             sorted.each(function(item) {
+                 self.set(item.key, initial.value()[item.key]);
+             });
+
+             // Reselect items
+             each(self.domList, function(listItem) {
+                 if (selected.indexOf($(listItem.dom).find('em').data('id') + '') > -1) {
+                     listItem.eventObservers.click();
+                 }
+             });
          },
 
          getList: function() {
              return this.getSelectedList();
+         },
+
+         _clearSelection: function() {
+             var self = this;
+             self.clearSelection();
+             if (exists(self.selectedObserver)) {
+                 self.selectedObserver(self.selectedList);
+             }
          }
+
 
      }, function(existing, observer) {
          var self = this;
 
          this.selected = new WatchList();
-
+         this.reverseState = false;
          this.SelectableListWidget(observer, false, 'UnscheduledContribList');
 
-         // Sort by name and add to the list
-         var items = {};
-         each(existing, function(item) {
-             items[item.title + item.id] = item;
-         });
-         var ks = keys(items);
-         ks.sort();
 
-         for (k in ks) {
-             this.set(k, $O(items[ks[k]]));
-         }
+         // Sort by title and add to the list
+         each(existing, function(item, index) {
+             self.set(index, $O(item));
+         });
+         this._sortList('id');
      }
     );
 
@@ -76,7 +148,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
                  var self = this;
                  var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
                  var source = indicoSource(
-                     self.args.session?'schedule.session.getUnscheduledContributions':
+                     self.args.get('session')?'schedule.session.getUnscheduledContributions':
                          'schedule.event.getUnscheduledContributions',
                      self.args);
                  source.state.observe(function(state) {
@@ -121,6 +193,9 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
          },
 
          existingSelectionObserver: function(selectedList) {
+             if (typeof this.saveButton == 'undefined') {
+                 return;
+             }
              if(selectedList.isEmpty()){
                  this.saveButton.disabledButtonWithTooltip('disable');
              } else {
@@ -133,11 +208,11 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
              var killProgress = IndicoUI.Dialogs.Util.progress();
 
              var args = clone(this.args);
-             args.ids = contribs;
-             args.date = date;
+             args.set("ids", contribs);
+             args.set("date", date);
 
 
-             indicoRequest(self.args.session?'schedule.slot.scheduleContributions':
+             indicoRequest(self.args.get('session')?'schedule.slot.scheduleContributions':
                            'schedule.event.scheduleContributions', args, function(result, error){
                                killProgress();
                                if (error) {
@@ -195,12 +270,10 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"],
              return this.ExclusivePopupWithButtons.prototype.draw.call(this, content);
          }
      },
-     function(method, timeStartMethod, args, roomInfo, parentRoomData,
-              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms) {
+     function(method, timeStartMethod, args, parentRoomData,
+              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms, isEdit) {
          var self = this;
-
          this.newArgs = Array.prototype.slice.call(arguments, 0);
-
          this.args = args;
          this.selectedDay = dayStartDate;
          this.days = days;
@@ -220,7 +293,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
     _preload: [
         function(hook) {
             var self = this;
-            if (!self.timeStartMethod) {
+            if (!self.timeStartMethod || self.isEdit) {
                 hook.set(true);
             }else {
 
@@ -254,8 +327,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         function(hook) {
             var self = this;
 
-            var parameterManager = new IndicoUtil.parameterManager();
-            this.parameterManager = parameterManager;
+            this.parameterManager = new IndicoUtil.parameterManager();
             if (this.isConference) {
 
                 indicoRequest('event.getFieldsAndContribTypes', self.args ,
@@ -274,6 +346,23 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                 // if it's a meeting, don't bother getting the fields
                 hook.set(true);
             }
+        },
+
+        function(hook) {
+            var self = this;
+
+            this.parameterManager = new IndicoUtil.parameterManager();
+            indicoRequest('reportNumbers.get', {} ,
+                          function(result, error){
+                              if (error) {
+                                  IndicoUtil.errorReport(error);
+                              }
+                              else {
+                                  self.reportNumberSystems = result;
+                                  hook.set(true);
+                              }
+                          }
+                         );
         }
     ],
 
@@ -301,16 +390,20 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         // value is the new date
         conferenceDays.observe(function(value) {
             // it is neccesary to update the date in dateArgs with the new date
-            self.dateArgs.selectedDay = Util.formatDateTime(value, IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal);
+            self.dateArgs.set("selectedDay", Util.formatDateTime(value, IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal));
             // but we need to check if the contribution is inside a session and if the day changed, in order
             // to make the request for the session timetable or the top level timetable
-            if(exists(self.timetable.parentTimetable)){
-                if(self.previousDate.substr(0,10) != self.dateArgs.selectedDay) {
-                    self.timeStartMethod = self.timetable.managementActions.methods.Event.getDayEndDate;
-                } else {
-                    self.timeStartMethod = self.timetable.managementActions.methods.SessionSlot.getDayEndDate;
-                }
-            }
+
+            if(self.previousDate.substr(0,10) != self.dateArgs.get('selectedDay')){
+                /* if the date changes, the contribution will be always attached to the conference. Even
+                 * if we are inside a session, the contribution will be moved out.
+                 * In principle, this should never happen because it is disabled from the add/edit popup */
+                     self.timeStartMethod = self.timetable.managementActions.methods.Event.dayEndDate;
+             } else {
+                 if(exists(self.timetable.parentTimetable)) {
+                     self.timeStartMethod = self.timetable.managementActions.methods[self.originalArgs.parentType].dayEndDate;
+                 }
+             }
 
             // we make a timeStartMethod request specifying the date for the request
             // and we get the result of the request in result
@@ -326,7 +419,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                         startDate.setHours(23);
                         startDate.setMinutes(0);
                     }
-                    info.set('startDate', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
+                    self.info.set('startDate', Util.formatDateTime(startDate, IndicoDateTimeFormats.Server));
                }
             });
 
@@ -345,12 +438,10 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
     _drawMainTab: function(info, conferenceDays) {
         var self = this;
 
-        info.set('roomInfo', $O(self.roomInfo));
-
         if( self.timetable )
-            var ttdata = self.timetable.parentTimetable?self.timetable.parentTimetable.getData():self.timetable.getData()
+            var ttdata = self.timetable.parentTimetable?self.timetable.parentTimetable.getData():self.timetable.getData();
         else
-            var ttdata = null
+            var ttdata = null;
 
         var parentName = {
             Event: $T('event'),
@@ -360,22 +451,24 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             SessionSlot: $T('session')
         }[this.info.get('parentType')];
 
-        this.roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData, true, self.favoriteRooms, null, self.bookedRooms, ttdata, info, undefined, parentName);
+        this.roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations, info.get('roomInfo'), self.parentRoomData,
+                this.isEdit?nullRoomInfo(info.get('roomInfo')):true, self.favoriteRooms, null, self.bookedRooms, ttdata, info, undefined, parentName);
 
         var presListWidget = new UserListField(
-            'VeryShortPeopleListDiv', 'PeopleList',
-            null, true, null,
-            true, false, self.args.conference, {"presenter-grant-submission": [$T("submission rights"), true]},
-            true, true, true,
+            'LongPeopleListDiv', 'PeopleList',
+            self.isEdit?self.info.get("presenters"):null, true, null,
+            true, false, self.info.get("conference"), null,
+            true, true, true, true,
             userListNothing, userListNothing, userListNothing);
 
         $B(info.accessor('presenters'), presListWidget.getUsers());
-        info.set('privileges', presListWidget.getPrivileges());
+        info.set('presenter-privileges', presListWidget.getPrivileges());
+        info.set('updateRights', true);
 
         var startTimeLine, daySelect, datecomponent;
 
         // in case of poster sessions
-        if (exists(this.timetable) && this.args.session && this.timetable.isPoster) {
+        if (exists(this.timetable) && this.timetable.isPoster) {
             daySelect = [];
             startTimeLine = [];
             this.info.set('duration', self.timeField);
@@ -396,9 +489,13 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             startTimeLine = [$T('Start time'), Html.div({className: 'popUpLabel', style:{textAlign: 'left'}}, this.startTimeField,
                                                         $T(' Duration '), this.timeField, $T('min'))];
             daySelect = self._configureDaySelect(conferenceDays);
-
-            $B(info.accessor('startDate'), self.startTimeField, timeTranslation);
-            $B(info.accessor('duration'), self.timeField);
+            invertableBind(info.accessor('startDate'),
+                    this.startTimeField,
+                    this.isEdit,
+                    timeTranslation);
+            invertableBind(info.accessor('duration'),
+                            this.timeField,
+                            this.isEdit);
 
             self.parameterManager.add(self.startTimeField, 'time', false);
             self.parameterManager.add(self.timeField, 'unsigned_int', false);
@@ -413,7 +510,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             [
                 [
                     $T('Title'),
-                    $B(this.parameterManager.add(Html.edit({id:'addContributionFocusField'}), 'text', false),
+                    $B(this.parameterManager.add(Html.edit({id:'addContributionFocusField', autocomplete: 'off'}), 'text', false),
                        info.accessor('title'))
                 ],
                 [$T('Place'), Html.div({style: {marginBottom: '15px'}}, this.roomEditor.draw())],
@@ -421,10 +518,6 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                 startTimeLine,
                 [$T('Presenter(s)'), presListWidget.draw()]
             ]);
-
-
-
-
     },
 
     _drawAdvancedTab: function(info) {
@@ -432,17 +525,40 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var keywordField = IndicoUI.Widgets.keywordList('oneLineListItem');
         var fields = [];
 
+        if(self.isEdit){
+            each(info.get("keywords"), function(value) {
+                keywordField.accessor.append(value);
+            });
+        }
+
+        var template = function(value, key) {
+            var item;
+            var fid = value.id;
+
+            if (self.isEdit) {
+                info.set("field_" + fid, info.get("fields")[fid]);
+            }
+
+            if (value._type == "AbstractSelectionField") {
+                var options = [];
+                for (var i=0, len=value.options.length; i<len; i++) {
+                    options.push(Html.option({"value": value.options[i]["id"]}, value.options[i]["value"]));
+                }
+                item = Html.select({}, options);
+            } else {
+                item = Html.textarea({cols: 50,rows: 2});
+            }
+            return [value.caption, $B(item, info.accessor('field_' + fid))];
+        };
+
         if (!this.isConference || !this.isCFAEnabled) {
             // if it's a meeting, just add a description
+            if(self.isEdit) info.set("field_content", info.get("fields")["content"]);
             fields = [[$T('Description'),$B(Html.textarea({cols: 50,rows: 2}),
                                             info.accessor('field_content'))]];
         } else {
             // otherwise, add the abstract fields (conferences)
-            fields = translate(self.fields,
-                               function(value, key) {
-                                   return [value, $B(Html.textarea({cols: 50,rows: 2}),
-                                                     info.accessor('field_'+key))];
-                               });
+            fields = translate(self.fields, template);
         }
 
         fields.push([$T('Keywords'), keywordField.element]);
@@ -463,9 +579,11 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                 }
             );
             fields.push([$T('Type'), $B(typeSelect,
-                                        info.accessor('type'))]);
+                                        info.accessor('contributionType'))]);
+            var reportNumbersEditor = new ReportNumberEditorForForm(self.info.get("reportNumbers"), self.reportNumberSystems, {});
+            $B(info.accessor('reportNumbers'), reportNumbersEditor.getReportNumbers());
+            fields.push([$T('Report numbers'), reportNumbersEditor.draw()]);
         }
-
 
         return IndicoUtil.createFormFromMap(fields);
 
@@ -475,60 +593,64 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var self = this;
 
         var authorListWidget = new UserListField(
-            'VeryShortPeopleListDiv', 'PeopleList',
-            null, true, null,
-            true, false, this.args.conference, {"author-grant-submission": [$T("submission rights"), true]},
-            true, true, true,
+            'LongPeopleListDiv', 'PeopleList',
+            self.info.get("authors"), true, null,
+            true, false, this.args.get('conference'), null,
+            true, true, true, true,
             userListNothing, userListNothing, userListNothing);
 
         var coauthorListWidget = new UserListField(
-                'VeryShortPeopleListDiv', 'PeopleList',
-                null, true, null,
-                true, false, this.args.conference, {"coauthor-grant-submission": [$T("submission rights"), true]},
-                true, true, true,
+                'LongPeopleListDiv', 'PeopleList',
+                self.info.get("coauthors"), true, null,
+                true, false, this.args.get('conference'), null,
+                true, true, true, true,
                 userListNothing, userListNothing, userListNothing);
 
         $B(info.accessor('authors'), authorListWidget.getUsers());
         $B(info.accessor('coauthors'), coauthorListWidget.getUsers());
-
+        info.set('author-privileges', authorListWidget.getPrivileges());
+        info.set('coauthor-privileges', coauthorListWidget.getPrivileges());
         return IndicoUtil.createFormFromMap(
             [
                 [$T('Author(s)'), authorListWidget.draw()],
-                [Html.div({style:{paddingTop:pixels(30)}}, $T('Co-author(s)')),
-                 Html.div({style:{paddingTop:pixels(30)}}, coauthorListWidget.draw())]
+                [$T('Co-author(s)'), coauthorListWidget.draw()]
             ]);
     },
 
     _getButtons: function() {
         var self = this;
         return [
-            [$T('Add'), function() {
+            [self.isEdit ? $T('Save'):$T('Add'), function() {
                 // check if the day changed
                 if(self.timetable && !self.timetable.isPoster && Util.formatDateTime(self.conferenceDays.get(), IndicoDateTimeFormats.ServerHourless, IndicoDateTimeFormats.Ordinal) != self.previousDate.substr(0,10)){
                     self.dayChanged = true;
                     // if we are inside a session and the new contribution is set for a different day, we suppose that the contribution is not part of the session
-                    self.method = self.timetable.managementActions.methods.Contribution.add;
                 }
-
-            each(self.args, function(value, key) {
-                self.info.set(key, value);
-            });
-
-            if (self.parameterManager.check()) {
-                var killProgress = IndicoUI.Dialogs.Util.progress();
-                indicoRequest(self.method, self.info, function(result, error){
-                    killProgress();
-                    if (error) {
-                        IndicoUtil.errorReport(error);
+                if(!self.isEdit){
+                    if(self.dayChanged){
+                        self.method = self.timetable.managementActions.methods.Contribution.add;
                     }
-                    else {
-                        self.close();
-                        // Only one element is returned but put it in an array
-                        // since the successFunc expects arrays
-                        self.successFunc([result]);
+                    else{
+                        if(self.timetable && exists(self.timetable.parentTimetable)) {
+                            self.method = self.timetable.managementActions.methods.SessionContribution.add;
+                        }
                     }
-                });
-            }
+                }
+                if (self.parameterManager.check()) {
+                    var killProgress = IndicoUI.Dialogs.Util.progress();
+                    indicoRequest(self.method, self.info, function(result, error){
+                        killProgress();
+                        if (error) {
+                            IndicoUtil.errorReport(error);
+                        }
+                        else {
+                            self.close();
+                            // Only one element is returned but put it in an array
+                            // since the successFunc expects arrays
+                            self.successFunc([result]);
+                        }
+                    });
+                }
             }],
             [$T('Cancel'), function() {
             self.close();
@@ -556,13 +678,20 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
             tabs = [[$T("Basic"), self._drawMainTab(self.info)]];
         }
 
+        // We need to disable the select if we are inside a session.
+        if(self.isEdit && exists(self.timetable.parentTimetable)){
+            $(self.conferenceDays.dom).disabledElementWithTooltip({
+                disabled: true,
+                tooltip: $T("You cannot change the day because you are inside a session.")
+            });
+        }
+
         if (this.isConference) {
             tabs.push([$T("Authors"), self._drawAuthorsTab(self.info)]);
         }
 
         tabs.push([$T("Advanced"), self._drawAdvancedTab(self.info)]);
         var tabWidget = new JTabWidget(tabs, 600, 400);
-
         return tabWidget.draw();
     }
 },
@@ -570,15 +699,14 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
      /**
       * @param timeStartMethod rpc_method_name if this parameter is null, the date will not be shown in the form.
       */
-     function(method, timeStartMethod, args, roomInfo, parentRoomData,
-              confStartDate, dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms) {
-         this.args = clone(args);
+     function(method, timeStartMethod, args, parentRoomData, confStartDate,
+              dayStartDate, isConference, favoriteRooms, days, timetable, successFunc, isCFAEnabled, bookedRooms, isEdit) {
 
+         var self = this;
+         this.args = clone(args);
          this.dateArgs = clone(args);
-         this.dateArgs.selectedDay = dayStartDate;
+         this.dateArgs.selectedDay = confStartDate;
          this.timeStartMethod = timeStartMethod;
-         this.roomInfo = roomInfo;
-         this.confStartDate = confStartDate;
          this.dayStartDate = dayStartDate;
          this.parentRoomData = parentRoomData;
          this.existing = existing;
@@ -589,17 +717,31 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
          this.favoriteRooms = favoriteRooms;
          this.isCFAEnabled = isCFAEnabled;
          this.bookedRooms = bookedRooms;
-
-         this.previousDate = dayStartDate;
-         this.info = new WatchObject();
-         this.info.set('parentType', args.parentType);
+         this.isEdit = isEdit;
+         this.originalArgs = {};
+         each(keys(args), function(key) {
+             self.originalArgs[key] = args.get(key);
+         });
+         this.previousDate = args.get('startDate');
+         if(this.isEdit) {
+             this.info = args;
+             this.dateArgs = args;
+         } else{
+             this.info = clone(args);
+             this.info.set('roomInfo', $O({location: args.get('roomInfo').location, room: args.get('roomInfo').room}));
+             this.dateArgs = args;
+             var sargs = args.get('args');
+             each(sargs, function(value, key) {
+                 self.info.set(key,value);
+             });
+         }
 
          if (this.timeStartMethod === null) {
-             args.schedule = false;
+             self.info.set("schedule", false);
          }
          // if it is a poster, we do not need to query for the start date. We need this 'if' after
          // the previous 'if (this.timeStartMethod === null)' because the contribution needs to be scheduled anyways.
-         if (this.args.session && this.timetable.isPoster) {
+         if (this.args.get("session") && this.timetable.isPoster) {
              this.timeStartMethod = null;
          }
 
@@ -610,7 +752,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
              };
 
          this.startTimeField = IndicoUI.Widgets.Generic.timeField(attributes);
-         var durationDefault = this.args.session?(this.timetable.isPoster?this.timetable.contextInfo.duration:this.timetable.contextInfo.contribDuration):20;
+         var durationDefault = this.args.get("session")?(this.timetable.isPoster?this.timetable.contextInfo.duration:this.timetable.contextInfo.contribDuration):20;
          this.timeField = IndicoUI.Widgets.Generic.durationField(durationDefault);
 
          var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
@@ -623,7 +765,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                  self.open();
              });
 
-         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, method, args, $T("Add Contribution"),
+         this.ServiceDialogWithButtons(Indico.Urls.JsonRpcService, method, args, self.isEdit?$T("Edit Contribution"):$T("Add Contribution"),
                             function() {
                                 self.close();
                             });
@@ -897,7 +1039,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              var colorPickerComponent = ['Color', Html.div({style: {padding: '5px 0 10px 0'}}, colorPicker.getLink(null, 'Choose a color'))];
 
              var contentDiv = IndicoUtil.createFormFromMap([
-                 [$T('Title'), $B(self.parameterManager.add(Html.edit({ id: 'breakTitle'})), this.info.accessor('title'))],
+                 [$T('Title'), $B(self.parameterManager.add(Html.edit({id: 'breakTitle', autocomplete: 'off'})), this.info.accessor('title'))],
                  [$T('Description'), $B(Html.textarea({cols: 40, rows: 2}), this.info.accessor('description'))],
                  [$T('Place'), this.roomEditor.draw()],
                  [$T('Date'), this.conferenceDays],
@@ -959,8 +1101,7 @@ type("AddBreakDialog", ["ChangeEditDialog"],
              };
          this.startTimeField = IndicoUI.Widgets.Generic.timeField(attributes);
          this.timeField = IndicoUI.Widgets.Generic.durationField(20);
-         var parameterManager = new IndicoUtil.parameterManager();
-         this.parameterManager = parameterManager;
+         this.parameterManager = new IndicoUtil.parameterManager();
          this.originalArgs = {};
          //flag to know if the selected day changed
          this.dayChanged = false;
@@ -1094,6 +1235,7 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
 
                             }
                         });
+                    var slotTitle = value.slotTitle? " (" + Util.truncate(value.slotTitle, 20) + ")":"";
 
                     moveEntryTable.append(Html.li(
                         {}, colorSquare, rb,
@@ -1103,7 +1245,7 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                                 verticalAlign: 'middle',
                                 fontWeight: 'normal'
                             }
-                        }, Util.truncate(value.title, 40), Html.span(
+                        }, Util.truncate(value.title, 20) + slotTitle, Html.span(
                             {style: {
                                 fontSize: '10px',
                                 marginLeft: '5px',
@@ -1175,7 +1317,7 @@ type("MoveEntryDialog", ["ExclusivePopupWithButtons"],
                 }
 
                 // define if contrib is of type Contribution or Break (display purpose)
-                var span1 = Html.span({}, this.entryType == "Contribution"?
+                var span1 = Html.span({}, this.eventData.entryType == "Contribution"?
                                       $T("This contribution currently located at: "):
                                       $T("This break is currently located at: "),
                                       contribLocation);
@@ -1416,7 +1558,7 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
             var h = Math.floor(minutes / 60);
             var m = minutes % 60;
 
-            intervalExplanationText = $T("Entries will be separated by gaps of ");
+            var intervalExplanationText = $T("Entries will be separated by gaps of ");
             if (h === 1) {
                 intervalExplanationText += $T("1 hour ");
             } else if (h > 0) {
@@ -1495,12 +1637,15 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                     if (self.isTopLevelTimetable) {
                         // We are in a top level management timetable
 
+                        var postParams = {confId: self.tt.eventInfo.id};
+                        if (exists(self.tt.contextInfo.timetableSession)) {
+                            postParams['sessionId'] = self.tt.contextInfo.timetableSession.id;
+                        }
+
                         IndicoUI.Dialogs.Util.progress($T("Rescheduling day ") + self.__getCurrentDayText() + "...");
 
-                        Util.postRequest(Indico.Urls.Reschedule,
-                                {
-                                    confId: self.tt.eventInfo.id
-                                },
+                        Util.postRequest(build_url(Indico.Urls.Reschedule, postParams),
+                                null,
                                 {
                                     OK: "ok",
                                     action: self.rescheduleAction,
@@ -1521,20 +1666,18 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                             inSessionTimetable = "yes";
                         }
 
-                        Util.postRequest(Indico.Urls.SlotCalc,
-                                {
-                                    confId: self.tt.eventInfo.id,
-                                    sessionId: self.tt.contextInfo.sessionId,
-                                    slotId: self.tt.contextInfo.sessionSlotId
-                                },
-                                {
+                        Util.postRequest(build_url(Indico.Urls.SlotCalc, {
+                            confId: self.tt.eventInfo.id,
+                            sessionId: self.tt.contextInfo.sessionId,
+                            slotId: self.tt.contextInfo.sessionSlotId
+                        }), null, {
                                     OK: "ok",
                                     action: self.rescheduleAction,
                                     hour: "0",
                                     minute: self.minuteInput.get(),
                                     currentDay: self.tt.currentDay,
                                     inSessionTimetable: inSessionTimetable
-                                });
+                        });
                     }
                 }
             };
@@ -1626,13 +1769,12 @@ type("FitInnerTimetableDialog", ["ConfirmPopup"], {
     __getContent: function() {
         var type;
 
-        var content = Html.div("fitInnerTimetableDialog",
+        return Html.div("fitInnerTimetableDialog",
                 $T("This will change the starting and ending times of the Session "),
                 this.__getSessionTitle(),
                 $T(" so that it encompasses all entries defined in its timetable."),
                 Html.br(),
                 $T("Are you sure you want to proceed?"));
-        return content;
     },
 
     /**
@@ -1645,14 +1787,12 @@ type("FitInnerTimetableDialog", ["ConfirmPopup"], {
             if (this.tt.IntervalManagementTimeTable){
                 // Fit session slot according to its entries.
                 IndicoUI.Dialogs.Util.progress($T("Fitting session to content"));
-                Util.postRequest(Indico.Urls.FitSessionSlot,
-                        {
-                            confId: self.tt.contextInfo.conferenceId,
-                            sessionId: self.tt.contextInfo.sessionId,
-                            slotId: self.tt.contextInfo.sessionSlotId,
-                            day: self.tt.currentDay
-                        },
-                        {});
+                Util.postRequest(build_url(Indico.Urls.FitSessionSlot, {
+                    confId: self.tt.contextInfo.conferenceId,
+                    sessionId: self.tt.contextInfo.sessionId,
+                    slotId: self.tt.contextInfo.sessionSlotId,
+                    day: self.tt.currentDay
+                }), null, {});
             }
 //            else if (this.tt.isSessionTimetable) {
 //                // Fit session according to its session slots

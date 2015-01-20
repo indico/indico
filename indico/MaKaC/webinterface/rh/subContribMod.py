@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.locators as locators
@@ -27,7 +26,6 @@ import MaKaC.conference as conference
 import MaKaC.user as user
 import MaKaC.domain as domain
 import MaKaC.webinterface.webFactoryRegistry as webFactoryRegistry
-from MaKaC.common.general import *
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 from MaKaC.errors import FormValuesError
@@ -61,27 +59,20 @@ class RHSubContributionModification( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContributionModification
 
     def _process( self ):
-        p = subContributions.WPSubContributionModification( self, self._target )
+        if self._target.getOwner().getOwner().isClosed():
+            p = subContributions.WPSubContributionModificationClosed(self, self._target)
+        else:
+            p = subContributions.WPSubContributionModification( self, self._target )
         return p.display( **self._getRequestParams() )
-
-
-
-#class RHSubContributionPerformModification( RHSubContribModifBase ):
-#    _uh = urlHandlers.
-#
-#    def _process( self ):
-#        params = self._getRequestParams()
-#        if not ("cancel" in params):
-#            self._target.setName( params.get("name", "") )
-#            self._target.setDescription( params.get("description", "") )
-#        self._redirect( urlHandlers.UHCategoryModification.getURL( self._target ) )
-
 
 class RHSubContributionTools( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContribModifTools
 
     def _process( self ):
-        p = subContributions.WPSubContributionModifTools( self, self._target )
+        if self._target.getOwner().getOwner().isClosed():
+            p = subContributions.WPSubContributionModificationClosed(self, self._target)
+        else:
+            p = subContributions.WPSubContributionModifTools( self, self._target )
         return p.display( **self._getRequestParams() )
 
 
@@ -89,7 +80,10 @@ class RHSubContributionData( RHSubContribModifBase ):
     _uh = urlHandlers.UHSubContributionDataModification
 
     def _process( self ):
-        p = subContributions.WPSubContribData( self, self._target )
+        if self._target.getOwner().getOwner().isClosed():
+            p = subContributions.WPSubContributionModificationClosed(self, self._target)
+        else:
+            p = subContributions.WPSubContribData( self, self._target )
         return p.display( **self._getRequestParams() )
 
 
@@ -179,49 +173,4 @@ class RHMaterials(RHSubContribModifBase):
 
         p = subContributions.WPSubContributionModifMaterials( self, self._target )
         return p.display(**self._getRequestParams())
-
-
-class RHSubContributionReportNumberEdit(RHSubContribModifBase):
-
-    def _checkParams(self, params):
-        RHSubContribModifBase._checkParams(self, params)
-        self._reportNumberSystem=params.get("reportNumberSystem","")
-
-    def _process(self):
-        params = self._getRequestParams()
-        if self._reportNumberSystem!="":
-            p=subContributions.WPSubContributionReportNumberEdit(self,self._target, self._reportNumberSystem)
-            return p.display(**params)
-        else:
-            self._redirect(urlHandlers.UHSubContributionModification.getURL( self._target ))
-
-class RHSubContributionReportNumberPerformEdit(RHSubContribModifBase):
-
-    def _checkParams(self, params):
-        RHSubContribModifBase._checkParams(self, params)
-        self._reportNumberSystem=params.get("reportNumberSystem","")
-        self._reportNumber=params.get("reportNumber","")
-
-    def _process(self):
-        if self._reportNumberSystem!="" and self._reportNumber!="":
-            self._target.getReportNumberHolder().addReportNumber(self._reportNumberSystem, self._reportNumber)
-        self._redirect("%s#reportNumber"%urlHandlers.UHSubContributionModification.getURL( self._target ))
-
-
-class RHSubContributionReportNumberRemove(RHSubContribModifBase):
-
-    def _checkParams(self, params):
-        RHSubContribModifBase._checkParams(self, params)
-        self._reportNumberIdsToBeDeleted=self._normaliseListParam( params.get("deleteReportNumber",[]))
-
-    def _process(self):
-        nbDeleted = 0
-        for id in self._reportNumberIdsToBeDeleted:
-            self._target.getReportNumberHolder().removeReportNumberById(int(id)-nbDeleted)
-            nbDeleted += 1
-        self._redirect("%s#reportNumber"%urlHandlers.UHSubContributionModification.getURL( self._target ))
-
-
-
-
 

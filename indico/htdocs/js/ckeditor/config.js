@@ -1,53 +1,38 @@
-﻿/*
-Copyright (c) 2003-2011, CKSource - Frederico Knabben. All rights reserved.
-For licensing, see LICENSE.html or http://ckeditor.com/license
-*/
+/**
+ * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.html or http://ckeditor.com/license
+ */
 
-CKEDITOR.editorConfig = function( config )
-{
-    config.toolbar = 'IndicoMinimal';
+CKEDITOR.editorConfig = function( config ) {
+    // Define changes to default configuration here.
+    // For complete reference see:
+    // http://docs.ckeditor.com/#!/api/CKEDITOR.config
 
-    config.toolbar_IndicoFull =
-    [
-        ['Source','-','Preview','Templates'],
-        ['Cut','Copy','Paste','PasteText','PasteFromWord','-','Print'],
-        ['Undo','Redo','-','Find','Replace','-','SelectAll','RemoveFormat'],
-        ['Bold','Italic','Underline','Strike','-','Subscript','Superscript'],
-        ['NumberedList','BulletedList','-','Outdent','Indent','Blockquote','CreateDiv'],
-        ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-        ['Link','Unlink','Anchor'],
-        ['Image','Table','HorizontalRule','Smiley','SpecialChar','PageBreak'],
+    // The toolbar groups arrangement, optimized for two toolbar rows.
+    config.toolbarGroups = [
+        { name: 'clipboard',   groups: [ 'clipboard', 'undo' ] },
+        { name: 'editing',     groups: [ 'find', 'selection', 'spellchecker' ] },
+        { name: 'links' },
+        { name: 'insert' },
+        { name: 'forms' },
+        { name: 'document',    groups: [ 'mode', 'document', 'doctools' ] },
+        { name: 'others' },
         '/',
-        ['Styles','Format','Font','FontSize'],
-        ['TextColor','BGColor'],
-        ['Maximize', 'ShowBlocks','-','About']
+        { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
+        { name: 'paragraph',   groups: [ 'list', 'indent', 'blocks', 'align', 'bidi' ] },
+        { name: 'styles' },
+        { name: 'colors' },
+        { name: 'tools' }
     ];
 
-    config.toolbar_IndicoMinimal =
-     [
-        ['Source','-','Preview','Templates'],
-         ['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript','-'],
-         ['Outdent', 'Indent', '-', 'NumberedList','BulletedList','Blockquote','-','Link','Unlink','Anchor'],
-         ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-         ['SpecialChar','-','About']
-     ] ;
+    // Set the most common block elements.
+    config.format_tags = 'p;h1;h2;h3;pre';
 
-    config.contentsCss = CKEDITOR.basePath + '../../css/Default.css';
+    // Simplify the dialog windows.
+    config.removeDialogTabs = 'image:advanced;link:advanced';
 
-    config.resize_enabled = false;
-
-    config.toolbarStartupExpanded = true;
-
-    config.toolbarCanCollapse = false;
-
-    config.extraPlugins = 'onchange';
-
-    //url int angle brackets
-    config.protectedSource.push(/<[^<>\s]+:\/\/[^<>\s]+>/g);
-
-    //email address in angle brackets
-    config.protectedSource.push(/<[^<>=]+@[^<>]+>/g);
-
-    //done to avoid wrapping paragraphs with <p></p> tags
-    config.enterMode = CKEDITOR.ENTER_BR
+    config.blockedKeystrokes = [
+        9,                  // TAB
+        CKEDITOR.SHIFT + 9  // SHIFT + TAB
+    ];                      // Indenting and outdenting list items override this
 };

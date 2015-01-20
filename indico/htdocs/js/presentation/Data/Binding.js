@@ -248,7 +248,7 @@ bind.setter = function(target, source, setter, listenOnly) {
 		}
 	}
 	return bind.attach(target, gain(source, listenOnly));
-}
+};
 
 /**
  * Attaches the binding stop function to the target.
@@ -282,7 +282,7 @@ bind.detach = function(target) {
 		delete target["unbind"];
 	}
 	return target;
-}
+};
 
 // INTERNAL LEVEL
 
@@ -319,7 +319,7 @@ bind.internal.getter = function(gain, value, listenOnly) {
 		})));
 	}
 	return stop;
-}
+};
 
 bind.internal.list = function(target, list, template) {
 	template = obtainTemplate(template);

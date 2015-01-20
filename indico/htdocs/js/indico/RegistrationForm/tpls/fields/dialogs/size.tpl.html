@@ -1,0 +1,11 @@
+<div class="regFormEditLine">
+    <label class="regFormDialogCaption">
+        {{ 'Size in char' | i18n }}
+    </label>
+    <input type="number" name="length"
+        ng-model="formData.length"
+        ng-class="{hasError: validationStarted && optionsForm.length.$invalid}"
+        min="5"
+        max="60">
+    <i class="info-helper" title="{{ 'Must be between 5 and 60' | i18n }}"></i>
+</div>

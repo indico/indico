@@ -1,0 +1,12 @@
+[run]
+branch = true
+source = indico
+include =
+    indico/modules/rb/*.py
+    indico/util/string.py
+    indico/web/flask/templating.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__

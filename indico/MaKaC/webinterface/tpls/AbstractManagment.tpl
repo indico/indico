@@ -1,11 +1,19 @@
-
 <table border="0" width="90%" cellspacing="0" cellpadding="0" align="center">
+    % if abstractAccepted:
+    <tr>
+        <td align="center">
+            <div style="padding: 10px; margin: 10px; border: 1px solid #DDD; font-size: 14px; color: #881122">
+                ${ _("You cannot modify this abstract because it has already been accepted. In order to change the information that is displayed in the Book of Abstracts and timetable you should edit the corresponding contribution (%s) directly.") % contribution}
+            </div>
+        </td>
+    </tr>
+    % endif
     <tr>
         <td>
             <table width="100%">
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Abstract ID")}</span></td>
-                    <td bgcolor="white">${ abstractId }</td>
+                    <td bgcolor="white">${ abstract.getId() }</td>
                     <td align="right">
                         <table border="0" cellspacing="0" cellpadding="0">
                             <tr>
@@ -22,11 +30,20 @@
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Title")}</span></td>
                     <td bgcolor="white" width="100%">
-                        <b>${ title }</b>
+                        <b>${ abstract.getTitle() }</b>
                     </td>
                     <td>&nbsp;</td>
                 </tr>
-                ${ additionalFields }
+                % for f in additionalFields:
+                    <tr>
+                        <td class="dataCaptionTD" valign="top"><span class="dataCaptionFormat">${f.getCaption() | escape}</span></td>
+                        <td bgcolor="white" valign="top">
+                            <div class="md-preview-wrapper display">
+                                ${abstract.getField(f.getId()) | m}
+                            </div>
+                        </td>
+                    </tr>
+                % endfor
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Primary authors")}</span></td>
                     <td bgcolor="white" valign="top">${ primary_authors }</td>
@@ -56,7 +73,7 @@
                     </td>
                     <form action=${ modDataURL } method="POST">
                     <td align="right" valign="bottom">
-                        <input type="submit" class="btn" name="modify" value="${ _("modify") }">
+                        <input type="submit" class="btn" name="modify" value="${ _("modify") }" ${"disabled" if abstractAccepted else ""}>
                     </td>
                     </form>
                 </tr>
@@ -97,9 +114,11 @@
                 <tr>
                     <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Status")}</span></td>
                     <td bgcolor="white" valign="top">${ status }</td>
-                    <form action=${ backToSubmittedURL } method="POST">
-                    <td bgcolor="white" valign="bottom" align="right" colspan="2">${'<input type="submit" class="btn" value="'+ _("back to submitted")+'">' if showBackToSubmitted else ""}</td>
-                    </form>
+                    <td bgcolor="white" valign="bottom" align="right" colspan="2">
+                        % if showBackToSubmitted:
+                            <input type="submit" id="backToSubmitted" class="btn" value="${_("back to submitted")}">
+                        % endif
+                    </td>
                 </tr>
                 <tr>
                     <td class="dataCaptionTD" nowrap><span class="dataCaptionFormat">${ inlineContextHelp(_('Average of all the answers given by the reviewers for this abstract.')) }${ _("Average rating") }</span></td>
@@ -115,10 +134,10 @@
                     <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Submitted by")}</span></td>
                     <td>
                         <div id="submitterPlace">
-                            <a href="mailto:${ submitterEmail }?subject=[${ confTitle }] ${ _("Abstract") } ${ abstractId }: ${ title }">${ submitterFullName } (${ submitterAffiliation })</a>
+                            <a href="mailto:${ submitterEmail }?subject=[${ confTitle }] ${ _("Abstract") } ${ abstractId }: ${ abstract.getTitle() }">${ submitterFullName } (${ submitterAffiliation })</a>
                         </div>
                     </td>
-                    <td bgcolor="white" valign="bottom" align="right" colspan="2"><input type="button" value="${ _("change submitter")}" onclick="changeSubmitter();"></td>
+                    <td bgcolor="white" valign="bottom" align="right" colspan="2"><input type="button" value="${ _("change submitter")}" id="changeSubmitter" ${"disabled" if abstractAccepted else ""}></td>
                 </tr>
                 <tr>
                     <td colspan="4" class="horizontalLine">&nbsp;</td>
@@ -210,6 +229,26 @@
 
 <script>
 
+var status = '${ statusName }';
+
+$("#backToSubmitted").click(function(){
+    if (status=="ACCEPTED") {
+        var content = $("<div/>").css("width", "380px");
+        content.append($("<div/>").css("margin-bottom", "10px").append($T("The contribution associated with this abstract and all the existing sub-contributions within it will be ")).append($("<span/>").css("font-weight", "bold").append($T("deleted."))));
+        content.append($("<div/>").css("margin-bottom", "10px").append($T("The abstract will remain and its status will change to ")).append($("<span/>").css("font-weight", "bold").append($T("submitted."))));
+        content.append($T("Do you want to continue?"));
+        var popup = new ConfirmPopup($T("Back to submitted status"), content,
+                function(action) {
+                    if (action) {
+                        window.location = ${ backToSubmittedURL };
+                    }
+                }, $T("Confirm"));
+        popup.open();
+    } else {
+        window.location = ${ backToSubmittedURL };
+    }
+});
+
 var changeSubmitterHandler = function(user) {
 	indicoRequest(
             'abstracts.changeSubmitter',
@@ -221,7 +260,7 @@ var changeSubmitterHandler = function(user) {
             function(result,error) {
                 if (!error) {
                     // update the submitter
-                    var link = Html.a({href: 'mailto:'+result['email']+'?subject=['+'${ confTitle }'+'] '+$T("Abstract ")+'${ abstractId }'+': '+'${ title }'},
+                    var link = Html.a({href: 'mailto:'+result['email']+'?subject=['+'${escapeHTMLForJS(confTitle)}'+'] '+$T("Abstract ")+'${ abstractId }'+': '+'${escapeHTMLForJS(abstract.getTitle())}'},
                                       result['name']+' ('+result['affiliation']+')');
                     $E('submitterPlace').set(link);
                 } else {
@@ -231,12 +270,12 @@ var changeSubmitterHandler = function(user) {
     );
 };
 
-function changeSubmitter() {
+$("#changeSubmitter").click(function(){
     // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
     //         showToggleFavouriteButtons, chooseProcess)
     var chooseUsersPopup = new ChooseUsersPopup($T("Change submitter"), true, '${ confId }', false,
-            true, true, true, true, changeSubmitterHandler);
+            true, true, true, true, false, changeSubmitterHandler);
     chooseUsersPopup.execute();
-}
+});
 
 </script>

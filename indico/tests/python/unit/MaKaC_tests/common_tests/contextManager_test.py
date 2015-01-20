@@ -1,36 +1,37 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 # For now, disable Pylint
 # pylint: disable-all
 
 
-import unittest
 import threading, time
 
 from MaKaC.common.contextManager import ContextManager, DummyDict
+from indico.tests.python.unit.util import IndicoTestCase
 
-class TestInitializedContextManager(unittest.TestCase):
+
+class TestInitializedContextManager(IndicoTestCase):
     "Context Manager - Properly Initialized"
 
     def tearDown(self):
+        super(TestInitializedContextManager, self).tearDown()
         ContextManager.destroy()
 
     def testGetWorks(self):
@@ -51,6 +52,35 @@ class TestInitializedContextManager(unittest.TestCase):
         ContextManager.set('test2', 65)
         ContextManager.set('test2', 66)
         self.assertEquals(ContextManager.get('test2'), 66)
+
+    def testDelete(self):
+        """
+        Delete works OK
+        """
+        ContextManager.set('test', 123)
+        ContextManager.delete('test')
+        self.assertEqual(ContextManager.get('test', default=None), None)
+
+    def testDeleteWithDel(self):
+        """
+        Delete works OK
+        """
+        ContextManager.set('test', 123)
+        del ContextManager.get()['test']
+        self.assertEqual(ContextManager.get('test', default=None), None)
+
+    def testDeleteNonExisting(self):
+        """
+        Deleting non-existing key raises KeyError
+        """
+        self.assertRaises(KeyError, ContextManager.delete, 'test')
+
+    def testDeleteNonExistingSilent(self):
+        """
+        Deleting non-existing key doesn't raise KeyError if silent=True
+        """
+        ContextManager.delete('test', silent=True)
+        self.assertEqual(ContextManager.get('test', default=None), None)
 
     def thread1(self):
         ContextManager.set('samevariable', 'a')
@@ -77,7 +107,7 @@ class TestInitializedContextManager(unittest.TestCase):
         self.assertEquals(ContextManager.get('samevariable').__class__, DummyDict)
 
 
-class TestUninitializedContextManager(unittest.TestCase):
+class TestUninitializedContextManager(IndicoTestCase):
     "Context Manager - Uninitialized"
 
     def testReturnsDummyDict(self):

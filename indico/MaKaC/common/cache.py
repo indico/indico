@@ -1,114 +1,34 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from Configuration import Config
 from MaKaC.errors import MaKaCError
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from MaKaC.common import timezoneUtils
 from MaKaC.common.utils import OSSpecific
 from MaKaC.common.contextManager import ContextManager
+from indico.util.fs import silentremove
+from indico.util.redis import redis
 
 import hashlib, os, shutil, datetime, time
 import cPickle as pickle
 from itertools import izip
-
-
-class IndicoCache:
-    """
-    Used to cache some pages in Indico
-    """
-    _subDirName = ""
-
-    def __init__( self, vars ):
-        pass
-
-    def getFileName( self ):
-        return ""
-
-    def lockCache( self, file, flag=True):
-        global fp
-        if flag:
-            fp = open(file,"a")
-            OSSpecific.lockFile(fp, 'LOCK_EX')
-        else:
-            if not fp:
-                return
-            OSSpecific.lockFile(fp, 'LOCK_UN')
-            fp.close()
-            fp = None
-
-    def getCachePath( self ):
-        path = os.path.join(Config.getInstance().getXMLCacheDir(),self._subDirName)
-        if not os.path.exists(path):
-            try:
-                os.mkdir(path)
-            except:
-                pass
-        return path
-
-    def getFilePath( self ):
-        return os.path.join(self.getCachePath(), self.getFileName())
-
-    def cleanCache( self ):
-        self.lockCache( self.getFilePath(), True )
-        if os.path.exists( self.getFilePath() ):
-            os.remove( self.getFilePath() )
-        self.lockCache( self.getFilePath(), False )
-
-    def cleanUpAllFiles( self ):
-        """ removes an entire cache directory"""
-        path = self.getCachePath()
-        if os.path.exists(path):
-            shutil.rmtree(path)
-
-    def getCachePage( self ):
-        if os.path.isfile(self.getFilePath()):
-            fp = open(self.getFilePath(),"r")
-            OSSpecific.lockFile(fp, 'LOCK_SH')
-            page = fp.read()
-            return page
-        return ""
-
-    def saveCachePage( self, page ):
-        self.lockCache( self.getFilePath(), True )
-        open(self.getFilePath(),"w").write( page )
-        self.lockCache( self.getFilePath(), False )
-
-class CategoryCache( IndicoCache ):
-    _subDirName = "categories"
-
-    def __init__( self, vars={} ):
-        self._categId = vars.get("categId","")
-
-    def getFileName( self ):
-        return "cat-%s" % self._categId
-
-class EventCache( IndicoCache ):
-    _subDirName = "events"
-
-    def __init__( self, vars={} ):
-        self._eventId = vars.get("id","")
-        self._type = vars.get("type", "")
-
-    def getFileName( self ):
-        return "eve-%s-%s" % (self._eventId, self._type)
 
 class CacheStorage(object):
     __CACHE_STORAGE_LIST = {}
@@ -205,14 +125,54 @@ class MemcachedCacheStorage(CacheStorage):
         return hashlib.sha256(os.path.join(self._name, path, name)).hexdigest()
 
     def save(self, path, name, data):
-        self._connect().set(self._makeKey(path, name), data, self.getTTL())
+        self._connect().set(self._makeKey(path, name), pickle.dumps(data), self.getTTL())
 
     def load(self, path, name, default=None):
         obj = self._connect().get(self._makeKey(path, name))
+        if obj:
+            obj = pickle.loads(obj)
         return obj, None
 
     def remove(self, path, name):
         self._connect().delete(self._makeKey(path, name))
+
+
+@CacheStorage.register()
+class RedisCacheStorage(CacheStorage):
+    STORAGE_NAME = 'redis'
+
+    def __init__(self, cache):
+        super(RedisCacheStorage, self).__init__(cache)
+
+    def _connect(self):
+        client = redis.StrictRedis.from_url(Config.getInstance().getRedisCacheURL())
+        client.connection_pool.connection_kwargs['socket_timeout'] = 1
+        return client
+
+    def _makeKey(self, path, name):
+        return 'cache/ml/' + os.path.join(self._name, path, name)
+
+    def save(self, path, name, data):
+        try:
+            self._connect().setex(self._makeKey(path, name), self.getTTL(), pickle.dumps(data))
+        except redis.RedisError:
+            Logger.get('redisCache').exception('save failed')
+
+    def load(self, path, name, default=None):
+        try:
+            obj = self._connect().get(self._makeKey(path, name))
+        except redis.RedisError:
+            Logger.get('redisCache').exception('load failed')
+            return None, None
+        if obj:
+            obj = pickle.loads(obj)
+        return obj, None
+
+    def remove(self, path, name):
+        try:
+            self._connect().delete(self._makeKey(path, name))
+        except redis.RedisError:
+            Logger.get('redisCache').exception('remove failed')
 
 
 class MultiLevelCacheEntry(object):
@@ -333,7 +293,113 @@ class MultiLevelCache(object):
         return '%s_%s' % (entry.getId(), version)
 
 
-class FileCacheClient(object):
+# To cache `None` we need to actually store something else since memcached
+# does not distinguish between a None value and a cache miss...
+class _NoneValue(object):
+    @classmethod
+    def replace(cls, value):
+        """Replaces `None` with a `_NoneValue`"""
+        return cls() if value is None else value
+
+    @classmethod
+    def restore(cls, value):
+        """Replaces `_NoneValue` with `None`"""
+        return None if isinstance(value, cls) else value
+
+
+class CacheClient(object):
+    def set_multi(self, mapping, ttl=0):
+        for key, val in mapping.iteritems():
+            self.set(key, val, ttl)
+
+    def get_multi(self, keys):
+        values = {}
+        for key in keys:
+            val = self.get(key)
+            if val is not None:
+                values[key] = val
+        return values
+
+    def delete_multi(self, keys):
+        for key in keys:
+            self.delete(key)
+
+
+class NullCacheClient(CacheClient):
+    """Does nothing"""
+
+    def set(self, key, val, ttl=0):
+        pass
+
+    def get(self, key):
+        return None
+
+    def delete(self, key):
+        pass
+
+
+class RedisCacheClient(CacheClient):
+    """Redis-based cache client with a simple API"""
+
+    key_prefix = 'cache/gen/'
+
+    def __init__(self, url):
+        self._client = redis.StrictRedis.from_url(url)
+        self._client.connection_pool.connection_kwargs['socket_timeout'] = 1
+
+    def _unpickle(self, val):
+        if val is None:
+            return None
+        return pickle.loads(val)
+
+    def hash_key(self, key):
+        # Redis keys are even binary-safe, no need to hash anything
+        return key
+
+    def set_multi(self, mapping, ttl=0):
+        try:
+            self._client.mset(dict((k, pickle.dumps(v)) for k, v in mapping.iteritems()))
+            if ttl:
+                for key in mapping:
+                    self._client.expire(key, ttl)
+        except redis.RedisError:
+            Logger.get('redisCache').exception('set_multi failed')
+
+    def get_multi(self, keys):
+        try:
+            return dict(zip(keys, map(self._unpickle, self._client.mget(keys))))
+        except redis.RedisError:
+            Logger.get('redisCache').exception('get_multi failed')
+
+    def delete_multi(self, keys):
+        try:
+            self._client.delete(*keys)
+        except redis.RedisError:
+            Logger.get('redisCache').exception('delete_multi failed')
+
+    def set(self, key, val, ttl=0):
+        try:
+            if ttl:
+                self._client.setex(key, ttl, pickle.dumps(val))
+            else:
+                self._client.set(key, pickle.dumps(val))
+        except redis.RedisError:
+            Logger.get('redisCache').exception('set failed')
+
+    def get(self, key):
+        try:
+            return self._unpickle(self._client.get(key))
+        except redis.RedisError:
+            Logger.get('redisCache').exception('get failed')
+
+    def delete(self, key):
+        try:
+            self._client.delete(key)
+        except redis.RedisError:
+            Logger.get('redisCache').exception('delete failed')
+
+
+class FileCacheClient(CacheClient):
     """File-based cache with a memcached-like API.
 
     Contains only features needed by GenericCache.
@@ -351,61 +417,59 @@ class FileCacheClient(object):
             namespace, filename = parts
         dir = os.path.join(self._dir, namespace, filename[:4], filename[:8])
         if mkdir and not os.path.exists(dir):
-            os.makedirs(dir)
+            try:
+                os.makedirs(dir)
+            except OSError:
+                # Handle race condition
+                if not os.path.exists(dir):
+                    raise
         return os.path.join(dir, filename)
 
     def set(self, key, val, ttl=0):
-        f = open(self._getFilePath(key), 'wb')
-        OSSpecific.lockFile(f, 'LOCK_EX')
         try:
-            expiry = int(time.time()) + ttl if ttl else None
-            data = (expiry, val)
-            pickle.dump(data, f)
-        finally:
-            OSSpecific.lockFile(f, 'LOCK_UN')
-            f.close()
+            f = open(self._getFilePath(key), 'wb')
+            OSSpecific.lockFile(f, 'LOCK_EX')
+            try:
+                expiry = int(time.time()) + ttl if ttl else None
+                data = (expiry, val)
+                pickle.dump(data, f)
+            finally:
+                OSSpecific.lockFile(f, 'LOCK_UN')
+                f.close()
+        except (IOError, OSError):
+            Logger.get('FileCache').exception('Error setting value in cache')
+            return 0
         return 1
 
-    def set_multi(self, mapping, ttl=0):
-        notstored = []
-        for key, val in mapping.iteritems():
-            if self.set(key, val, ttl) == 0:
-                notstored.append(key)
-        return notstored
-
     def get(self, key):
-        path = self._getFilePath(key)
-        if not os.path.exists(path):
-            return None
-        f = open(path, 'rb')
-        OSSpecific.lockFile(f, 'LOCK_SH')
-        expiry = val = None
         try:
-            expiry, val = pickle.load(f)
-        finally:
-            OSSpecific.lockFile(f, 'LOCK_UN')
-            f.close()
-        if expiry and time.time() > expiry:
-            return None
-        return val
+            path = self._getFilePath(key, False)
+            if not os.path.exists(path):
+                return None
 
-    def get_multi(self, keys):
-        values = {}
-        for key in keys:
-            val = self.get(key)
-            if val is not None:
-                values[key] = val
-        return values
+            f = open(path, 'rb')
+            OSSpecific.lockFile(f, 'LOCK_SH')
+            expiry = val = None
+            try:
+                expiry, val = pickle.load(f)
+            finally:
+                OSSpecific.lockFile(f, 'LOCK_UN')
+                f.close()
+            if expiry and time.time() > expiry:
+                return None
+        except (IOError, OSError):
+            Logger.get('FileCache').exception('Error getting cached value')
+            return None
+        except (EOFError, pickle.UnpicklingError):
+            Logger.get('FileCache').exception('Cached information seems corrupted. Overwriting it.')
+            return None
+
+        return val
 
     def delete(self, key):
         path = self._getFilePath(key, False)
         if os.path.exists(path):
-            os.remove(path)
-        return 1
-
-    def delete_multi(self, keys):
-        for key in keys:
-            self.delete(key)
+            silentremove(path)
         return 1
 
 
@@ -423,19 +487,27 @@ class GenericCache(object):
             return
         # If not, we might have one from another instance
         self._client = ContextManager.get('GenericCacheClient', None)
+
         if self._client is not None:
             return
+
         # If not, create a new one
         backend = Config.getInstance().getCacheBackend()
         if backend == 'memcached':
             import memcache
             self._client = memcache.Client(Config.getInstance().getMemcachedServers())
-        else:
+        elif backend == 'redis':
+            self._client = RedisCacheClient(Config.getInstance().getRedisCacheURL())
+        elif backend == 'files':
             self._client = FileCacheClient(Config.getInstance().getXMLCacheDir())
+        else:
+            self._client = NullCacheClient()
 
         ContextManager.set('GenericCacheClient', self._client)
 
     def _hashKey(self, key):
+        if hasattr(self._client, 'hash_key'):
+            return self._client.hash_key(key)
         return hashlib.sha256(key).hexdigest()
 
     def _makeKey(self, key):
@@ -444,7 +516,7 @@ class GenericCache(object):
             key = repr(key)
         # Hashlib doesn't allow unicode so let's ensure it's not!
         key = key.encode('utf-8')
-        return '%s.%s' % (self._namespace, self._hashKey(key))
+        return '%s%s.%s' % (getattr(self._client, 'key_prefix', ''), self._namespace, self._hashKey(key))
 
     def _processTime(self, ts):
         if isinstance(ts, datetime.timedelta):
@@ -455,12 +527,12 @@ class GenericCache(object):
         self._connect()
         time = self._processTime(time)
         Logger.get('GenericCache/%s' % self._namespace).debug('SET %r (%d)' % (key, time))
-        self._client.set(self._makeKey(key), val, time)
+        self._client.set(self._makeKey(key), _NoneValue.replace(val), time)
 
     def set_multi(self, mapping, time=0):
         self._connect()
         time = self._processTime(time)
-        mapping = dict(((self._makeKey(key), val) for key, val in mapping.iteritems()))
+        mapping = dict(((self._makeKey(key), _NoneValue.replace(val)) for key, val in mapping.iteritems()))
         self._client.set_multi(mapping, time)
 
     def get(self, key, default=None):
@@ -469,7 +541,7 @@ class GenericCache(object):
         Logger.get('GenericCache/%s' % self._namespace).debug('GET %r -> %r' % (key, res is not None))
         if res is None:
             return default
-        return res
+        return _NoneValue.restore(res)
 
     def get_multi(self, keys, default=None, asdict=True):
         self._connect()
@@ -480,7 +552,7 @@ class GenericCache(object):
             if real_key not in data:
                 data[real_key] = default
         # Get data in the same order as our keys
-        sorted_data = (data[rk] for rk in real_keys)
+        sorted_data = (default if data[rk] is None else _NoneValue.restore(data[rk]) for rk in real_keys)
         if asdict:
             return dict(izip(keys, sorted_data))
         else:

@@ -1,30 +1,33 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import tempfile, os, base64, socket
-import mimetypes, urlparse, simplejson
+import mimetypes, urlparse
 import httplib
 
-from MaKaC.common.logger import Logger
-from MaKaC.common.Configuration import Config
+from indico.util.json import  loads
+from indico.core.config import Config
+from indico.core.logger import Logger
 from MaKaC import conference
+from MaKaC.conference import LocalFile
+
+from indico.util.network import resolve_host
 
 #URL_RESPONSE = "http://pcdh20.cern.ch/indico/getConvertedFile.py"
 #SERVER = 'http://pcdh20.cern.ch/getSegFile.py'#'http://pcuds01.cern.ch/getSegFile.py'
@@ -182,42 +185,46 @@ class CDSConvFileConverter(FileConverter):
     _getMaterialObj=staticmethod(_getMaterialObj)
 
     def _getMaterial(locator):
-        ch=conference.ConferenceHolder()
-        if locator.has_key("confId") and locator.has_key("materialId"):
-            c=ch.getById(locator["confId"])
-            # ---------- Conference ----------
-            if c is not None:
-                # ---------- Session ----------
-                if locator.has_key("sessionId"):
-                    s=c.getSessionById(locator["sessionId"])
-                    if s is not None:
-                        # ---------- Contribution ----------
-                        if locator.has_key("contribId"):
-                            contrib=c.getContributionById(locator["contribId"])
-                            if contrib is not None:
-                                # ---------- Subcontribution ----------
-                                if locator.has_key("subContId"):
-                                    subContrib=contrib.getSubContributionById(locator["subContId"])
-                                    if subContrib is not None:
-                                        return CDSConvFileConverter._getMaterialObj(subContrib, locator["materialId"])
-                                else:
-                                    return CDSConvFileConverter._getMaterialObj(contrib, locator["materialId"])
-                        else:
-                            return CDSConvFileConverter._getMaterialObj(s, locator["materialId"])
-                # ---------- Contribution ----------
-                elif locator.has_key("contribId"):
-                    contrib=c.getContributionById(locator["contribId"])
-                    if contrib is not None:
-                        # ---------- Subcontribution ----------
-                        if locator.has_key("subContId"):
-                            subContrib=contrib.getSubContributionById(locator["subContId"])
-                            if subContrib is not None:
-                                return CDSConvFileConverter._getMaterialObj(subContrib, locator["materialId"])
-                        else:
-                            return CDSConvFileConverter._getMaterialObj(contrib, locator["materialId"])
-                else:
-                    return CDSConvFileConverter._getMaterialObj(c, locator["materialId"])
-
+        ch = conference.ConferenceHolder()
+        if locator.has_key("materialId"):
+            if locator.has_key("categId"):
+                categ = conference.CategoryManager().getById(locator["categId"])
+                if categ is not None:
+                    return CDSConvFileConverter._getMaterialObj(categ, locator["materialId"])
+            elif locator.has_key("confId"):
+                c=ch.getById(locator["confId"])
+                # ---------- Conference ----------
+                if c is not None:
+                    # ---------- Session ----------
+                    if locator.has_key("sessionId"):
+                        s=c.getSessionById(locator["sessionId"])
+                        if s is not None:
+                            # ---------- Contribution ----------
+                            if locator.has_key("contribId"):
+                                contrib = c.getContributionById(locator["contribId"])
+                                if contrib is not None:
+                                    # ---------- Subcontribution ----------
+                                    if locator.has_key("subContId"):
+                                        subContrib = contrib.getSubContributionById(locator["subContId"])
+                                        if subContrib is not None:
+                                            return CDSConvFileConverter._getMaterialObj(subContrib, locator["materialId"])
+                                    else:
+                                        return CDSConvFileConverter._getMaterialObj(contrib, locator["materialId"])
+                            else:
+                                return CDSConvFileConverter._getMaterialObj(s, locator["materialId"])
+                    # ---------- Contribution ----------
+                    elif locator.has_key("contribId"):
+                        contrib = c.getContributionById(locator["contribId"])
+                        if contrib is not None:
+                            # ---------- Subcontribution ----------
+                            if locator.has_key("subContId"):
+                                subContrib = contrib.getSubContributionById(locator["subContId"])
+                                if subContrib is not None:
+                                    return CDSConvFileConverter._getMaterialObj(subContrib, locator["materialId"])
+                            else:
+                                return CDSConvFileConverter._getMaterialObj(contrib, locator["materialId"])
+                    else:
+                        return CDSConvFileConverter._getMaterialObj(c, locator["materialId"])
         return None
     _getMaterial=staticmethod(_getMaterial)
 
@@ -244,27 +251,31 @@ class CDSConvFileConverter(FileConverter):
         # extract the server name from the url
         serverURL = Config.getInstance().getFileConverterServerURL()
         up = urlparse.urlparse(serverURL)
+        ip_addrs = resolve_host(up[1])
 
         # check that the request comes from the conversion server
-        if socket.gethostbyname(up[1]) != requestIP:
+        if requestIP not in ip_addrs:
             return
 
         if params["status"] == '1':
             locator={}
             # python dicts come with ' instead of " by default
             # using a json encoder on the server side would help...
-            locator = simplejson.loads(params["directory"].replace('\'','"'))
+            locator = loads(params["directory"].replace('\'','"'))
 
             mat=CDSConvFileConverter._getMaterial(locator)
             if mat is not None:
                 filePath = CDSConvFileConverter._saveFileToTemp( params )
                 fileName = params["filename"]
-                if not mat.hasFile(fileName):
-                    f = conference.LocalFile()
-                    f.setName(fileName)
-                    f.setFileName( fileName )
-                    f.setFilePath( filePath )
-                    mat.addResource( f )
+                for resource in mat.getResourceList():
+                    # if the pdf name is the same as any of the resources, and the material does not have a PDF yet:
+                    if isinstance(resource, conference.LocalFile) and os.path.splitext(resource.fileName)[0] == os.path.splitext(fileName)[0] and not mat.hasFile(fileName):
+                        resource.setPDFConversionRequestDate(None)
+                        f = conference.LocalFile()
+                        f.setName(fileName)
+                        f.setFileName( fileName )
+                        f.setFilePath( filePath )
+                        mat.addResource( f )
                 return filePath
             else:
                 #writeLog("Locator does not exist for file \"%s\": \n-locator:%s\nmessage:%s"%(params["filename"], params["directory"], params["error_message"]))
@@ -280,3 +291,7 @@ class CDSConvFileConverter(FileConverter):
             return True
         return False
     hasAvailableConversionsFor=staticmethod(hasAvailableConversionsFor)
+
+    def getAvailableConversions():
+        return CDSConvFileConverter._availableExt
+    getAvailableConversions=staticmethod(getAvailableConversions)

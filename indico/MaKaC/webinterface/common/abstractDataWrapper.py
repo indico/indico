@@ -1,30 +1,30 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.abstracts import IAuthorFossil
-import indico.util.text as textUtils
 from MaKaC.webinterface.general import normaliseListParam
-from MaKaC.common import Config
+from indico.core.config import Config
+from MaKaC.review import AbstractFieldContent
 
 BYTES_1MB = 1024 * 1024
+
 
 class Author(Fossilizable):
 
@@ -80,28 +80,29 @@ class Author(Fossilizable):
         return self._speaker
 
     def __str__(self):
-        return "id:%s - nombre:%s"%(self._id, self._familyName)
+        return "id:%s - nombre:%s" % (self._id, self._familyName)
 
 
 class AbstractData(object):
 
-    def __init__( self, absMgr, params, headerSize, displayValues=False ):
+    def __init__(self, absMgr, params, headerSize, displayValues=False):
         self._absMgr = absMgr
         self._afm = absMgr.getAbstractFieldsMgr()
         if (headerSize):
-            self._headerSize = float(headerSize)  / BYTES_1MB
+            self._headerSize = float(headerSize) / BYTES_1MB
         self._displayValues = displayValues
         cparams = params.copy()
-        self._mapFromParams( cparams )
+        self._mapFromParams(cparams)
 
-    def _mapFromParams( self, params ):
-        self.title = params.get("title",  "").strip()
+    def _mapFromParams(self, params):
+        self.title = params.get("title", "").strip()
         self._otherFields = {}
         for f in self._afm.getFields():
-            id = f.getId()
-            self._otherFields[id] = params.get("f_%s"%id,"").strip()
+            fid = f.getId()
+            value = params.get("f_%s" % fid, "").strip()
+            self._otherFields[fid] = value
         self.type = params.get("type", None)
-        self.tracks = normaliseListParam( params.get("tracks", []) )
+        self.tracks = normaliseListParam(params.get("tracks", []))
 
         if self._displayValues:
             # the call comes from modifying an existing abstract, we want to display the current content in the abstract form
@@ -119,35 +120,34 @@ class AbstractData(object):
         self.files = normaliseListParam(params.get("file", []))
         self.existingFiles = normaliseListParam(params.get("existingFile", []))
 
-
     def setAbstractData(self, abstract):
         conf = abstract.getConference()
         cfaMgr = conf.getAbstractMgr()
         afm = cfaMgr.getAbstractFieldsMgr()
-        abstract.setTitle( self.title )
+        abstract.setTitle(self.title)
         for f in afm.getFields():
             fieldId = f.getId()
             abstract.setField(fieldId, self.getFieldValue(fieldId))
         # add primary authors
         for authData in self.getPrimaryAuthorList():
-            auth = abstract.newPrimaryAuthor(title = authData.getTitle(), \
-                                firstName = authData.getFirstName(), \
-                                surName = authData.getFamilyName(), \
-                                email = authData.getEmail(), \
-                                affiliation = authData.getAffiliation(), \
-                                address = "", \
-                                telephone = authData.getPhone())
+            auth = abstract.newPrimaryAuthor(title=authData.getTitle(),
+                                             firstName=authData.getFirstName(),
+                                             surName=authData.getFamilyName(),
+                                             email=authData.getEmail(),
+                                             affiliation=authData.getAffiliation(),
+                                             address="",
+                                             telephone=authData.getPhone())
             if authData.isSpeaker():
                 abstract.addSpeaker(auth)
         # add co-authors
         for authData in self.getCoAuthorList():
-            auth = abstract.newCoAuthor(title = authData.getTitle(), \
-                                firstName = authData.getFirstName(), \
-                                surName = authData.getFamilyName(), \
-                                email = authData.getEmail(), \
-                                affiliation = authData.getAffiliation(), \
-                                address = "", \
-                                telephone = authData.getPhone())
+            auth = abstract.newCoAuthor(title=authData.getTitle(),
+                                        firstName=authData.getFirstName(),
+                                        surName=authData.getFamilyName(),
+                                        email=authData.getEmail(),
+                                        affiliation=authData.getAffiliation(),
+                                        address="",
+                                        telephone=authData.getPhone())
             if authData.isSpeaker():
                 abstract.addSpeaker(auth)
         abstract.setContribType(self.type)
@@ -158,7 +158,6 @@ class AbstractData(object):
         abstract.setComments(self.comments)
         abstract.deleteFilesNotInList(self.existingFiles)
         abstract.saveFiles(self.files)
-
 
     def _setNewAuthors(self):
         self._prAuthors = []
@@ -219,13 +218,13 @@ class AbstractData(object):
             authId = len(self._prAuthors) + len(self._coAuthors)
             self._coAuthors.append(Author(authId, **values))
 
-    def getFieldNames( self ):
+    def getFieldNames(self):
         return ['f_%s' % id for id in self._otherFields.keys()]
 
-    def getFieldValue( self, id ):
+    def getFieldValue(self, id):
         return self._otherFields.get(id, "")
 
-    def setFieldValue( self, id, value ):
+    def setFieldValue(self, id, value):
         self._otherFields[id] = value
 
     def getPrimaryAuthorList(self):
@@ -234,31 +233,22 @@ class AbstractData(object):
     def getCoAuthorList(self):
         return self._coAuthors
 
-    def check( self ):
+    def check(self):
         errors = []
         if self.title.strip() == "":
-            errors.append( _("Abstract title cannot be empty") )
+            errors.append(_("Abstract title cannot be empty"))
         for f in self._afm.getFields():
-            id = f.getId()
-            caption = f.getCaption()
-            ml = f.getMaxLength()
-            limitation = f.getLimitation()
-            if f.isMandatory() and self._otherFields.get(id,"") == "":
-                errors.append(_("The field '%s' is mandatory") % caption)
-            if ml != 0:
-                if limitation == "words" and textUtils.wordsCounter(self._otherFields.get(id,"")) > ml:
-                    errors.append(_("The field '%s' cannot be more than %s words") % (caption,ml))
-                elif limitation == "chars" and len(self._otherFields.get(id,"")) > ml:
-                    errors.append(_("The field '%s' cannot be more than %s characters") % (caption,ml))
+            value = self._otherFields.get(f.getId(), "")
+            errors += f.check(value)
         if not self.origin == "management":
             if not self._prAuthorsListParam:
-                errors.append( _("No primary author has been specified. You must define at least one primary author") )
+                errors.append(_("No primary author has been specified. You must define at least one primary author"))
             if not self._checkSpeaker() and self._absMgr.showSelectAsSpeaker() and self._absMgr.isSelectSpeakerMandatory():
-                errors.append( _("At least one presenter must be specified") )
+                errors.append(_("At least one presenter must be specified"))
         if not self.tracks and self._absMgr.areTracksMandatory():
             # check if there are tracks, otherwise the user cannot select at least one
             if len(self._absMgr.getConference().getTrackList()) != 0:
-                errors.append( _("At least one track must be seleted") )
+                errors.append(_("At least one track must be seleted"))
         if self._hasExceededTotalSize():
             errors.append(_("The maximum size allowed for the attachments (%sMB) has been exceeded.") % Config.getInstance().getMaxUploadFilesTotalSize())
         return errors
@@ -276,43 +266,48 @@ class AbstractData(object):
         maxSize = float(Config.getInstance().getMaxUploadFilesTotalSize())
         return maxSize > 0 and self._headerSize > maxSize
 
-    def toDict( self ):
-        d = { "title": self.title, \
-              "type": self.type, \
-              "tracksSelectedList": self.tracks, \
-              "prAuthors": self._prAuthors, \
-              "coAuthors": self._coAuthors, \
-              "comments": self.comments, \
-              "attachments": self.files }
+    def toDict(self):
+        d = {"title": self.title,
+             "type": self.type,
+             "tracksSelectedList": self.tracks,
+             "prAuthors": self._prAuthors,
+             "coAuthors": self._coAuthors,
+             "comments": self.comments,
+             "attachments": self.files}
         for f in self._afm.getFields():
             id = f.getId()
-            d["f_"+id] = self._otherFields.get(id,"")
+            d["f_"+id] = self._otherFields.get(id, "")
         return d
 
 
 class AbstractParam:
 
+    def __init__(self):
+        self._abstract = None
+
     def _checkParams(self, params, conf, headerSize):
-        if params.has_key("abstractId"): # we are in modify
-            self._abstract = self._target =  conf.getAbstractMgr().getAbstractById(params["abstractId"])
+        if params.has_key("abstractId"):  # we are in modify
+            self._abstract = self._target = conf.getAbstractMgr().getAbstractById(params["abstractId"])
+
         self._action = ""
         if "cancel" in params:
             self._action = "CANCEL"
             return
+
         typeId = params.get("type", "")
+        display_values = False
+
         params["type"] = conf.getContribTypeById(typeId)
-        if not params.has_key("prAuthors") or not params.has_key("coAuthors"): # loading form (with or without values)
-            try: # if the the abstract exists, get the current values to show them
-                params["prAuthors"] = self._abstract.getPrimaryAuthorList()
-                params["coAuthors"] = self._abstract.getCoAuthorList()
-                params["file"] = self._abstract.getAttachments().values()
-                self._abstractData = AbstractData(conf.getAbstractMgr(), params, headerSize, displayValues=True)
-            except AttributeError: # first call to submit a new abstract
-                self._abstractData = AbstractData(self._conf.getAbstractMgr(), params, headerSize, displayValues=False)
-        else:
-            # we are submitting a new abstract or modifying
-            self._abstractData = AbstractData(conf.getAbstractMgr(), params, headerSize, displayValues=False)
-        self._doNotSanitizeFields = self._abstractData.getFieldNames()
-        self._doNotSanitizeFields.append('title')
+
+        if ("prAuthors" not in params or "coAuthors" not in params) and self._abstract:
+            params.update({
+                "prAuthors": self._abstract.getPrimaryAuthorList(),
+                "coAuthors": self._abstract.getCoAuthorList(),
+                "file": self._abstract.getAttachments().values()
+            })
+            display_values = True
+
+        self._abstractData = AbstractData(conf.getAbstractMgr(), params, headerSize, displayValues=display_values)
+
         if "validate" in params:
             self._action = "VALIDATE"

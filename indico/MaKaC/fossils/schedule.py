@@ -1,29 +1,31 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.common.fossilize import IFossil
+from MaKaC.common.fossilize import fossilize
 from MaKaC.common.Conversion import Conversion
+from MaKaC.webinterface import urlHandlers
 from MaKaC.fossils.conference import IMaterialMinimalFossil,\
         IConferenceParticipationFossil, IConferenceParticipationMinimalFossil
 from MaKaC.fossils.contribution import IContributionParticipationTTDisplayFossil,\
-    IContributionParticipationTTMgmtFossil
+    IContributionParticipationTTMgmtFossil, IContributionParticipationFossil
+from MaKaC.common.contextManager import ContextManager
 
 class ISchEntryFossil(IFossil):
 
@@ -119,7 +121,6 @@ class IBreakTimeSchEntryMgmtFossil(IBreakTimeSchEntryFossil):
     inheritRoom.name = "inheritRoom"
 
 
-
 class IContribSchEntryFossil(ISchEntryFossil):
 
     def getUniqueId(self):
@@ -171,9 +172,19 @@ class IContribSchEntryFossil(ISchEntryFossil):
 
 class IContribSchEntryDisplayFossil(IContribSchEntryFossil):
 
+    def getURL(self):
+        """ Entry Display URL """
+    getURL.produce = lambda s: str(urlHandlers.UHContributionDisplay.getURL(s.getOwner()))
+    getURL.name = "url"
+
+    def getPDF(self):
+        """ Entry PDF URL """
+    getPDF.produce = lambda s: str(urlHandlers.UHConfTimeTablePDF.getURL(s.getOwner()))
+    getPDF.name = "pdf"
+
     def getMaterial(self):
         """ Entry Material """
-    getMaterial.produce = lambda s: s.getOwner().getAllMaterialList()
+    getMaterial.produce = lambda s: s.getOwner().getAllViewableMaterialList()
     getMaterial.result = IMaterialMinimalFossil
 
     def getPresenters(self):
@@ -187,11 +198,26 @@ class IContribSchEntryMgmtFossil(IContribSchEntryFossil):
     def getPresenters(self):
         """ Entry Presenters """
     getPresenters.produce = lambda x: x.getOwner().getSpeakerList()
-    getPresenters.result = IContributionParticipationTTMgmtFossil
+    getPresenters.result = IContributionParticipationFossil
+
+    def getAuthors(self):
+        """ Entry Primary authors """
+    getAuthors.produce = lambda x: x.getOwner().getPrimaryAuthorList()
+    getAuthors.result = IContributionParticipationFossil
+
+    def getCoauthors(self):
+        """ Entry Co-Authors """
+    getCoauthors.produce = lambda x: x.getOwner().getCoAuthorList()
+    getCoauthors.result = IContributionParticipationFossil
 
     def getId(self):
         """ Default Id """
     getId.name = "scheduleEntryId"
+
+    def getAddress(self):
+        """ Entry Address """
+    getAddress.produce = lambda x: x.getLocation()
+    getAddress.convert = Conversion.locationAddress
 
     def getInheritLoc(self):
         """ Inherited Loc """
@@ -204,6 +230,26 @@ class IContribSchEntryMgmtFossil(IContribSchEntryFossil):
     def getDuration(self):
         """ Entry End Date """
     getDuration.convert = Conversion.duration
+
+    def getKeywords(self):
+        """ Entry Keywords """
+    getKeywords.produce = lambda x: x.getOwner().getKeywords().split("\n") if x.getOwner().getKeywords().strip() else []
+
+    def getBoardNumber(self):
+        """ Entry board number """
+    getBoardNumber.produce = lambda x: x.getOwner().getBoardNumber()
+
+    def getContributionType(self):
+        """ Entry type """
+    getContributionType.produce = lambda x: x.getOwner().getType().getId() if x.getOwner().getType() else None
+
+    def getFields(self):
+        """ Entry fields """
+    getFields.produce = lambda x: x.getOwner().getFields(valueonly=True)
+
+    def getReportNumbers(self):
+        """ Entry report numbers """
+    getReportNumbers.produce = lambda x: Conversion.getReportNumbers(x.getOwner())
 
 
 class ILinkedTimeSchEntryFossil(ISchEntryFossil):
@@ -272,7 +318,6 @@ class ILinkedTimeSchEntryFossil(ISchEntryFossil):
         """ Entry Conference id """
     getConferenceId.produce = lambda s: s.getOwner().getConference().getId()
 
-
     def getContribDuration(self):
         """ Default duration for contribs """
     getContribDuration.produce = lambda s: s.getOwner().getSession().getContribDuration()
@@ -290,7 +335,18 @@ class ILinkedTimeSchEntryFossil(ISchEntryFossil):
         """ Unique Id """
     getUniqueId.produce = lambda s: s.getOwner().getSession().getUniqueId()
 
+
 class ILinkedTimeSchEntryDisplayFossil(ILinkedTimeSchEntryFossil):
+
+    def getURL(self):
+        """ Entry Display URL """
+    getURL.produce = lambda s: str(urlHandlers.UHSessionDisplay.getURL(s.getOwner()))
+    getURL.name = "url"
+
+    def getPDF(self):
+        """ Entry PDF URL """
+    getPDF.produce = lambda s: str(urlHandlers.UHConfTimeTablePDF.getURL(s.getOwner()))
+    getPDF.name = "pdf"
 
     def getEntries(self):
         """ Entries contained inside the session """
@@ -334,6 +390,7 @@ class IConferenceScheduleDisplayFossil(IFossil):
     getEntries.result = {"LinkedTimeSchEntry": ILinkedTimeSchEntryDisplayFossil,
                          "BreakTimeSchEntry": IBreakTimeSchEntryFossil,
                          "ContribSchEntry": IContribSchEntryDisplayFossil}
+
 
 class IConferenceScheduleMgmtFossil(IFossil):
 

@@ -1,1 +1,0 @@
-include(ScriptRoot + "indico/Collaboration/Collaboration.js");

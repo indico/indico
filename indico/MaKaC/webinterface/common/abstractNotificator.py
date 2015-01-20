@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 """
@@ -84,6 +83,19 @@ class AbsTrackTplVar(TplVar):
         return i18nformat("""--_("not specified")--""")
     getValue=classmethod(getValue)
 
+class AbsSessionTplVar(TplVar):
+    _name="abstract_session"
+    _description=""
+
+    def getValue(cls,abstract):
+        status=abstract.getCurrentStatus()
+        if isinstance(status,review.AbstractStatusAccepted):
+            session = abstract.getContribution().getSession()
+            if session is not None:
+                return session.getTitle()
+        return i18nformat("""--_("not specified")--""")
+    getValue=classmethod(getValue)
+
 
 class AbsContribTypeTplVar(TplVar):
     _name="contribution_type"
@@ -131,6 +143,17 @@ class AbsURLTplVar(TplVar):
 
     def getValue(cls,abstract):
         return str(urlHandlers.UHAbstractDisplay.getURL(abstract))
+    getValue=classmethod(getValue)
+
+class ContribURLTplVar(TplVar):
+    _name="contribution_URL"
+    _description=""
+
+    def getValue(cls,abstract):
+        status=abstract.getCurrentStatus()
+        if isinstance(status,review.AbstractStatusAccepted):
+            contrib = abstract.getContribution()
+            return str(urlHandlers.UHContributionDisplay.getURL(contrib))
     getValue=classmethod(getValue)
 
 
@@ -202,10 +225,11 @@ class AbsPrimAuthTplVar(TplVar):
     getValue=classmethod(getValue)
 
 class Notificator:
-    _vars=[ConfTitleTplVar,ConfURLTplVar,AbsTitleTplVar,AbsTrackTplVar,
+    _vars=[ConfTitleTplVar,ConfURLTplVar,AbsTitleTplVar,AbsTrackTplVar, AbsSessionTplVar,
             AbsContribTypeTplVar,AbsSubFisrtNameTplVar,
-            AbsSubFamNameTplVar,AbsSubTitleTplVar,AbsURLTplVar,AbsIDTplVar,
-            MergedAbsIDTplVar,MergedAbsTitleTplVar,MergedAbsSubFamNameTplVar, MergedAbsSubFirstNameTplVar, AbsPrimAuthTplVar, AbsReviewCommentsTplVar]
+            AbsSubFamNameTplVar,AbsSubTitleTplVar,AbsURLTplVar, ContribURLTplVar, AbsIDTplVar,
+            MergedAbsIDTplVar,MergedAbsTitleTplVar,MergedAbsSubFamNameTplVar,
+            MergedAbsSubFirstNameTplVar, AbsPrimAuthTplVar, AbsReviewCommentsTplVar]
 
     def getVarList(cls):
         return cls._vars
@@ -244,7 +268,7 @@ class EmailNotificator(Notificator):
     def notify(self,abstract,tpl):
         #if no from address is specified we should put the default one
         if tpl.getFromAddr().strip() == "":
-            tpl.setFromAddr(tpl.getConference().getSupportEmail(returnNoReply=True))
+            tpl.setFromAddr(tpl.getConference().getSupportInfo().getEmail(returnNoReply=True))
 
         GenericMailer.send(self.apply(abstract,tpl))
 

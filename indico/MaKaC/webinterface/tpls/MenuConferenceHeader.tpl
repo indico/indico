@@ -38,8 +38,4 @@
            </tr>
         </table>
     </tr>
-    <tr>
-        ${ errorMsg }
-        ${ infoMsg }
-    </tr>
 </table>

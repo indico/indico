@@ -84,10 +84,10 @@ Migration to version 0.8
 INSTALLATION:
 
 1) run "rectifySubContArchiveHierarchy.py"
-2) run "indexes/reindex*.py" 
+2) run "indexes/reindex*.py"
 3) clean up the tasks (in order to launch the taskDaemon):
 
-from MaKaC.common import DBMgr
+from indico.core.db import DBMgr
 DBMgr.getInstance().startRequest()
 from MaKaC.common.timerExec import HelperTaskList
 taskList = HelperTaskList().getTaskListInstance()

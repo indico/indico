@@ -1,14 +1,31 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 // Class to manage every field limited by words
 type("WordsManager", [],
     {
 
     checkNumWords: function() {
-	    if (this.maxWords - this._numWords(this.element.dom.value) < 0) {
-	        this.maxWordsCounter.set(Html.span({className:'formError'}, $T('Over the limit')));
-	    } else {
-            this.maxWordsCounter.set(this.maxWords - this._numWords(this.element.dom.value) + $T(' words left'));
-	    }
+        if ((this.maxWords - this._numWords(this.element.val())) < 0) {
+            this.maxWordsCounter.set(Html.span({className:'formError'}, $T('Over the limit')));
+        } else {
+            this.maxWordsCounter.set(this.maxWords - this._numWords(this.element.val()) + $T(' words left'));
+        }
         this.pm.check();
     },
 
@@ -18,9 +35,9 @@ type("WordsManager", [],
 
     _addEvents: function() {
         var self = this;
-        this.element.observeEvent('change', function() {self.checkNumWords();});
-        this.element.observeEvent('keyup', function() {self.checkNumWords();});
-        this.element.observeEvent('blur', function() {self.checkNumWords();});
+        this.element.on('change', function() {self.checkNumWords();});
+        this.element.on('keyup', function() {self.checkNumWords();});
+        this.element.on('blur', function() {self.checkNumWords();});
     },
 
     checkPM: function() {
@@ -56,7 +73,7 @@ type("WordsManager", [],
                 return error;
             }
             else {
-                self.element.dom.className = '';
+                self.element.removeClass('invalid');
                 return null;
             }
         });
@@ -72,7 +89,6 @@ function(element, maxWords, maxWordsCounter, isMandatory) {
     this.pm = new IndicoUtil.parameterManager();
     this.initializePM();
     this._addEvents();
-    this.checkNumWords();
 });
 
 
@@ -81,10 +97,10 @@ type("CharsManager", [],
     {
 
     checkNumChars: function() {
-        if (this.maxChars - this._numChars(this.element.dom.value) < 0) {
+        if ((this.maxChars - this._numChars(this.element.val())) < 0) {
             this.maxCharsCounter.set(Html.span({className:'formError'}, $T('Over the limit')));
         } else {
-            this.maxCharsCounter.set(this.maxChars - this._numChars(this.element.dom.value) + $T(' chars left'));
+            this.maxCharsCounter.set(this.maxChars - this._numChars(this.element.val()) + $T(' chars left'));
         }
         this.pm.check();
     },
@@ -95,9 +111,9 @@ type("CharsManager", [],
 
     _addEvents: function() {
         var self = this;
-        this.element.observeEvent('change', function() {self.checkNumChars();});
-        this.element.observeEvent('keyup', function() {self.checkNumChars();});
-        this.element.observeEvent('blur', function() {self.checkNumChars();});
+        this.element.on('change', function() {self.checkNumChars();});
+        this.element.on('keyup', function() {self.checkNumChars();});
+        this.element.on('blur', function() {self.checkNumChars();});
     },
 
     checkPM: function() {
@@ -131,7 +147,7 @@ type("CharsManager", [],
                 }
                 return error;
             } else {
-                self.element.dom.className = '';
+                self.element.removeClass('invalid');
                 return null;
             }
         });
@@ -147,7 +163,6 @@ function(element, maxChars, maxCharsCounter, isMandatory) {
     this.pm = new IndicoUtil.parameterManager();
     this.initializePM();
     this._addEvents();
-    this.checkNumChars();
 });
 
 
@@ -282,7 +297,7 @@ type("AuthorListManager", [], {
         // params: (title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers, onlyOne,
         //          showToggleFavouriteButtons, chooseProcess)
         var chooseUsersPopup = new ChooseUsersPopup(title, allowSearch, conferenceId, enableGroups, includeFavourites, suggestedUsers,
-                                                    onlyOne, showToggleFavouriteButtons,
+                                                    onlyOne, showToggleFavouriteButtons, false,
                     function(userList) {
                         for (var i=0; i<userList.length; i++) {
                             if (!self.isAlreadyInList(userList[i]['email'], true)) {
@@ -776,3 +791,211 @@ function(inPlaceMaterial, inPlaceExistingMaterial, uploadLink, sizeError, initia
         this._drawExistingMaterial();
     }
 });
+
+
+type("AbstractFieldDialogFactory", [],
+    {
+        makeDialog: function(fieldType, conferenceId, fieldId) {
+            switch (fieldType) {
+                case "textarea":
+                    return new AddAbstractTextAreaFieldDialog(conferenceId, fieldId);
+                case "input":
+                    return new AddAbstractInputFieldDialog(conferenceId, fieldId);
+                case "selection":
+                    return new AddAbstractSelectionFieldDialog(conferenceId, fieldId);
+                default:
+                    return new AddAbstractTextAreaFieldDialog(conferenceId, fieldId);
+            }
+        }
+    }
+);
+
+type("AddAbstractFieldDialog", ["ExclusivePopupWithButtons"],
+    {
+        draw: function() {
+            this._generateForm();
+
+            var form = IndicoUtil.createFormFromMap(this._form);
+            return this.ExclusivePopupWithButtons.prototype.draw.call(this, $('<div></div>').append(form));
+        },
+
+        _finalizeForm: function() {
+            var mandatoryFlag = this._parameterManager.add(Html.checkbox({}), "checkBox", true);
+            this._form.push([$T("Mandatory"), $B(mandatoryFlag, this.info.accessor("isMandatory"))]);
+        },
+
+        _generateForm: function() {
+            this._initializeForm();
+            this._finalizeForm();
+
+            if (this.info.get("id") !== undefined) {
+                this.__fetch();
+            }
+        },
+
+        _initializeForm: function() {
+            var fieldCaption = this._parameterManager.add(new RealtimeTextBox(), "text", false);
+            this._form.push([$T("Caption"), $B(fieldCaption, this.info.accessor("caption")).draw()]);
+        },
+
+        _getButtons: function() {
+            var self = this;
+
+            var actionButton = [this.info.get("id") !== undefined? $T('Update') : $T('Add'), function() {
+                self.__submit();
+            }];
+
+            var cancelButton = [$T('Cancel'), function() {
+                self.close();
+            }];
+
+            return [actionButton, cancelButton];
+        },
+
+        __fetch: function(fieldType) {
+            var self = this;
+            var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading field..."));
+
+            indicoRequest("abstracts.fields.getField", self.info,
+                function(result, error) {
+                    if (!error) {
+                        self.__fillForm(result);
+                        killProgress();
+                    } else {
+                        killProgress();
+                        IndicoUtil.errorReport(error);
+                    }
+                }
+            );
+        },
+
+        __fillForm: function(field) {
+            this.info.set("name", field.name);
+            this.info.set("caption", field.caption);
+            this.info.set("isMandatory", field.isMandatory);
+        },
+
+        __preSubmit: function() {
+            // Override if preprocess befor submit is required
+        },
+
+        __submit: function() {
+            var self = this;
+            self.__preSubmit();
+
+            if (self._parameterManager.check()) {
+                var killProgress = IndicoUI.Dialogs.Util.progress($T("Saving field..."));
+                indicoRequest("abstracts.fields.setField", self.info,
+                    function(result, error) {
+                        if (!error) {
+                            killProgress();
+                            self.close();
+                            window.location.reload();
+                        } else {
+                            killProgress();
+                            IndicoUtil.errorReport(error);
+                        }
+                    }
+                );
+            }
+        }
+    },
+
+    function(conferenceId, fieldId, fieldTypeTitle) {
+        this.info = $O({"specific": $O()});
+        this.info.set("conference", conferenceId);
+        this.info.set("id", fieldId);
+
+        this._parameterManager = new IndicoUtil.parameterManager();
+        this._form = [];
+
+        var title = (fieldId !== undefined? $T("Edit Field: ") : $T("Add Field: ")) + fieldTypeTitle;
+        this.ExclusivePopupWithButtons(title);
+    }
+);
+
+type("AddAbstractTextFieldDialog", ["AddAbstractFieldDialog"],
+    {
+        _initializeForm: function() {
+            this.AddAbstractFieldDialog.prototype._initializeForm.call(this);
+
+            var selection = Html.select({},
+                Html.option({value: "chars"}, "Characters"),
+                Html.option({value: "words"}, "Words")
+            );
+
+            var fieldMaxLength = this._parameterManager.add(new RealtimeTextBox(), "int", true);
+            var fieldLimitation = this._parameterManager.add(selection, "text", false);
+            fieldMaxLength = $B(fieldMaxLength, this.info.accessor("maxLength")).draw();
+            fieldLimitation = $B(fieldLimitation, this.info.accessor("limitation"));
+
+            var widget = Html.div({},
+                Html.div({}, fieldMaxLength),
+                Html.div({}, fieldLimitation)
+            );
+
+            this._form.push([$T("Max length"), widget]);
+        },
+
+        __fillForm: function(field) {
+            this.AddAbstractFieldDialog.prototype.__fillForm.call(this, field);
+            this.info.set("maxLength", field.maxLength);
+            this.info.set("limitation", field.limitation);
+        },
+
+        __preSubmit: function() {
+            var self = this;
+            var maxLength = this.info.get("maxLength");
+
+            if (typeof maxLength === "string") {
+                if (maxLength.trim() === "") {
+                    self.info.set("maxLength", 0);
+                }
+            }
+        }
+    },
+
+    function(conferenceId, fieldId, fieldTypeTitle) {
+        this.AddAbstractFieldDialog(conferenceId, fieldId, fieldTypeTitle);
+    }
+);
+
+type("AddAbstractTextAreaFieldDialog", ["AddAbstractTextFieldDialog"], {},
+    function(conferenceId, fieldId) {
+        this.AddAbstractTextFieldDialog(conferenceId, fieldId, $T("Text"));
+        this.info.set("type", "textarea");
+    }
+);
+
+type("AddAbstractInputFieldDialog", ["AddAbstractTextFieldDialog"], {},
+    function(conferenceId, fieldId) {
+        this.AddAbstractTextFieldDialog(conferenceId, fieldId, $T("Input"));
+        this.info.set("type", "input");
+    }
+);
+
+type("AddAbstractSelectionFieldDialog", ["AddAbstractFieldDialog"],
+    {
+        _initializeForm: function() {
+            this.AddAbstractFieldDialog.prototype._initializeForm.call(this);
+            this.fieldOptions = $("<div></div>").fieldarea({fields_caption: $T("option"),
+                                                            parameter_manager: this._parameterManager,
+                                                            ui_sortable: true});
+            this._form.push([$T("Options"), this.fieldOptions]);
+        },
+
+        __fillForm: function(field) {
+            this.AddAbstractFieldDialog.prototype.__fillForm.call(this, field);
+            this.fieldOptions.fieldarea("setInfo", field["options"]);
+        },
+
+        __preSubmit: function() {
+            this.info.set("options", this.fieldOptions.fieldarea("getInfo"));
+        }
+    },
+
+    function(conferenceId, fieldId) {
+        this.AddAbstractFieldDialog(conferenceId, fieldId, $T("Selection"));
+        this.info.set("type", "selection");
+    }
+);

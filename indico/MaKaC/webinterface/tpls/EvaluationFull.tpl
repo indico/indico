@@ -1,20 +1,11 @@
+<%inherit file="ConfDisplayBodyBase.tpl"/>
 
-  <table class="noticeMain" align="center">
-    <tr>
-      <td class="title"> ${ _("Maximum submissions reached")}</td>
-    </tr>
-    <tr>
-      <td class="td">
+<%block name="title">
+    ${body_title}
+</%block>
 
-        <br><br>
-        <table class="noticeInside" align="center">
-          <tr>
-            <td>
-             ${ _("We are sorry but your evaluation cannot be completed<br/> because the limit of %s submissions for this event has already been reached.")%limit }
-            </td>
-          </tr>
-        </table>
-
-      </td>
-    </tr>
-  </table>
+<%block name="content">
+    <div class="info-message-box">
+        <div class="message-text">${_("Maximum number of submissions reached.")}</div>
+    </div>
+</%block>

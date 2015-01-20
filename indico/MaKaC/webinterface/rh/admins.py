@@ -1,36 +1,37 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-from persistent.dict import PersistentDict
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import string
+
+from flask import session
+from persistent.dict import PersistentDict
+
 import MaKaC.webinterface.pages.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.user as user
 import MaKaC.common.info as info
 from MaKaC.errors import AdminError, MaKaCError, PluginError, FormValuesError
 from MaKaC.common import HelperMaKaCInfo
-from MaKaC.webinterface.rh.base import RHProtected, RoomBookingDBMixin
-from MaKaC.common.cache import CategoryCache, EventCache
+from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.plugins import PluginsHolder
-from MaKaC.i18n import _
+from indico.util.i18n import _
+
 
 class RCAdmin(object):
     @staticmethod
@@ -51,19 +52,22 @@ class RCAdmin(object):
         serverAdmins = minfo.getAdminList()
         return serverAdmins.isAdmin(user)
 
-class RHAdminBase( RHProtected ):
 
-    def _checkParams( self, params ):
-        RHProtected._checkParams( self, params )
+class RHAdminBase(RHProtected):
+    def _checkParams(self, params):
+        RHProtected._checkParams(self, params)
         self._minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
 
-    def _checkProtection( self ):
-        RHProtected._checkProtection( self )
-        self._al = self._minfo.getAdminList()
-        if not self._al.isAdmin( self._getUser() ):
-            if self._getUser() != None and len( self._al.getList() )==0:
+    def _checkProtection(self):
+        RHProtected._checkProtection(self)
+        if not session.user and not self._doProcess:
+            return
+        self._al = HelperMaKaCInfo.getMaKaCInfoInstance().getAdminList()
+        if not session.user.isAdmin():
+            if not self._al.getList():  # XXX can we just fail here instead of pretending the user is an admin?!
                 return
             raise AdminError("area")
+
 
 class RHAdminArea( RHAdminBase ):
     _uh = urlHandlers.UHAdminArea
@@ -105,14 +109,6 @@ class RHGeneralInfoModification( RHAdminBase ):
         p = admins.WPGenInfoModification( self )
         return p.display()
 
-class RHAdminSwitchCacheActive( RHAdminBase ):
-    _uh = urlHandlers.UHAdminSwitchCacheActive
-
-    def _process( self ):
-        CategoryCache().cleanUpAllFiles()
-        EventCache().cleanUpAllFiles()
-        self._minfo.setCacheActive( not self._minfo.isCacheActive() )
-        self._redirect( urlHandlers.UHAdminArea.getURL() )
 
 class RHAdminSwitchNewsActive( RHAdminBase ):
     _uh = urlHandlers.UHAdminSwitchNewsActive
@@ -121,19 +117,6 @@ class RHAdminSwitchNewsActive( RHAdminBase ):
         self._minfo.setNewsActive( not self._minfo.isNewsActive() )
         self._redirect( urlHandlers.UHAdminArea.getURL() )
 
-class RHAdminSwitchDebugActive( RHAdminBase ):
-    _uh = urlHandlers.UHAdminSwitchDebugActive
-
-    def _process( self ):
-        self._minfo.setDebugActive( not self._minfo.isDebugActive() )
-        self._redirect( urlHandlers.UHAdminArea.getURL() )
-
-class RHAdminSwitchHighlightActive( RHAdminBase ):
-    _uh = urlHandlers.UHAdminSwitchHighlightActive
-
-    def _process( self ):
-        self._minfo.setHighlightActive( not self._minfo.isHighlightActive() )
-        self._redirect( urlHandlers.UHAdminArea.getURL() )
 
 class RHGeneralInfoPerformModification( RHAdminBase ):
     _uh = urlHandlers.UHGeneralInfoPerformModification
@@ -282,8 +265,7 @@ class RHAdminLayoutSaveSocial(RHAdminBase):
         self._redirect( urlHandlers.UHAdminLayoutGeneral.getURL() )
 
 
-#Plugin admin start
-class RHAdminPluginsBase(RoomBookingDBMixin, RHAdminBase):
+class RHAdminPluginsBase(RHAdminBase):
     """ Base RH class for all plugin management requests.
         It will store 2 string parameters: pluginType and pluginId.
         Example: pluginType = "COllaboration" & pluginId = "EVO"
@@ -304,6 +286,7 @@ class RHAdminPluginsBase(RoomBookingDBMixin, RHAdminBase):
             raise PluginError("The plugin type " + self._pluginType + " does not exist or is not visible")
         elif self._pluginType and self._pluginId and not self._ph.getPluginType(self._pluginType).hasPlugin(self._pluginId):
             raise PluginError("The plugin " + self._pluginId + " does not exist")
+
 
 class RHAdminPlugins(RHAdminPluginsBase):
     """ Displays information about a given plugin type.

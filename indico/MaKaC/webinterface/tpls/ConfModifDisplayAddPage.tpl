@@ -38,7 +38,7 @@
 </table>
 <br>
 <script type="text/javascript">
-    var editor = new ParsedRichTextWidget(500, 200,"", "rich", "IndicoFull");
+    var editor = new ParsedRichTextWidget(600, 400, "", "rich");
     editor.set("${ content }", true);
     $E('contentField').set(editor.draw());
 

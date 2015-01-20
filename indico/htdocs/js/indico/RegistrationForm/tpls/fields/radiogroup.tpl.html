@@ -1,0 +1,34 @@
+<ng-form name="nestedForm">
+    <ul>
+        <li ng-repeat="item in field.values.radioitems">
+            <input type="radio"
+                id="field-{{ section.id }}-{{ field.id }}-{{ item.id }}"
+                name="{{ fieldName }}"
+                value="{{ item.id }}"
+                ng-model="radioValue.id"
+                ng-required="field.mandatory && radioValue.id === undefined"
+                ng-disabled="isDisabled(item, getValue(fieldName), field.input) || paymentBlocked(item, userdata) || anyBillableItemPayed(userdata)"/>
+            <label ng-class="{'text-error': validationStarted && nestedForm.$invalid}" for="field-{{ section.id }}-{{ field.id }}-{{ item.id }}">
+                {{ item.caption }}
+            </label>
+
+            <span ng-if="isBillable(item)" class="regFormPrice">{{ item.price }}</span>
+            <span ng-if="isBillable(item)">
+                <nd-currency currency="currency"></nd-currency>
+            </span>
+
+            <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item, getValue(fieldName), field.input)">
+                <font ng-switch-when="false" color="red" style="margin-left:25px;">
+                    ({{ "no places left" | i18n }})
+                </font>
+                <font ng-switch-when="true" color="green" style="margin-left:25px;">
+                    [{{ getNoPlacesLeft(item, radioValue.id, field.input) }} {{ 'place(s) left' | i18n }}]
+                </font>
+            </span>
+        </li>
+    </ul>
+    <input type="hidden"
+        ng-if="anyBillableItemPayed(userdata)"
+        name="{{ fieldName }}"
+        value="{{ getId(getValue(fieldName)) }}">
+</ng-form>

@@ -116,9 +116,10 @@
         </tr>
         <tr>
           <td>
-            <form action="${specialActionURL}" method="post" onsubmit="return confirm('${ _("Are you sure you want to remove all submissions?")}');">
+            <form action="${specialActionURL}" method="post">
                     <div>
-                          <input type="submit" class="btn" name="removeSubmissions" value="${ _("remove submissions")}"
+                          <input type="hidden" name="removeSubmissions" value="removeSubmissions"/>
+                          <input type="submit" class="btn" name="submitbtn" id="removeSubmissions" value="${ _("remove submissions")}"
                   onmouseover="this.style.color='red'" onmouseout="this.style.color='#234173'"/>
                      </div>
             </form>
@@ -127,9 +128,10 @@
         </tr>
         <tr>
           <td>
-            <form action="${specialActionURL}" method="post" onsubmit="return confirm('${ _("Are you sure you want to remove all questions? Be aware that the submissions will also be deleted!")}');">
+            <form action="${specialActionURL}" method="post">
                   <div>
-                    <input type="submit" class="btn" name="removeQuestions" value="${ _("remove questions")}"
+                    <input type="hidden" name="removeQuestions" value="removeQuestions"/>
+                    <input type="submit" class="btn" name="submitbtn" id="removeQuestions" value="${ _("remove questions")}"
                   onmouseover="this.style.color='red'" onmouseout="this.style.color='#234173'"/>
                 </div>
             </form>
@@ -140,9 +142,10 @@
         </tr>
         <tr>
           <td>
-            <form action="${specialActionURL}" method="post" onsubmit="return confirm( _("Are you sure you want to reset the evaluation?"));">
+            <form action="${specialActionURL}" method="post">
                 <div>
-                      <input type="submit" class="btn" name="reinit" value="${ _("reinit evaluation")}"
+                      <input type="hidden" name="reinit" value="reinit"/>
+                      <input type="submit" class="btn" name="submitbtn" id="reinit" value="${ _("reinit evaluation")}"
                   onmouseover="this.style.color='red'" onmouseout="this.style.color='#234173'"/>
                 </div>
             </form>
@@ -157,3 +160,32 @@
   </tr>
 </table>
 <br/>
+<script type="text/javascript">
+    $("#removeSubmissions").click(function(){
+        var self = this;
+        new ConfirmPopup($T("Remove Submissions"),$T("Are you sure you want to remove all submissions?"), function(confirmed) {
+            if(confirmed) {
+                $(self).closest("form").submit();
+            }
+        }).open();
+        return false;
+    });
+    $("#removeQuestions").click(function(){
+        var self = this;
+        new ConfirmPopup($T("Remove Questions"),$T("Are you sure you want to remove all questions? Be aware that the submissions will also be deleted!"), function(confirmed) {
+            if(confirmed) {
+                $(self).closest("form").submit();
+            }
+        }).open();
+        return false;
+    });
+    $("#reinit").click(function(){
+        var self = this;
+        new ConfirmPopup($T("Reset evaluation"),$T("Are you sure you want to reset the evaluation?"), function(confirmed) {
+            if(confirmed) {
+                $(self).closest("form").submit();
+            }
+        }).open();
+        return false;
+    });
+</script>

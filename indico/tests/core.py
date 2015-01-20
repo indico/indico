@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 # pylint: disable-msg=W0401
 
@@ -26,23 +25,28 @@ to the outside world.
 """
 
 # System modules
-import os, sys, shutil, signal, commands, tempfile, pkg_resources
+import os
+import pkg_resources
+import shutil
+import tempfile
 import threading
 
 # Database
 import transaction
-from MaKaC.common.db import DBMgr
 
 # Indico
 import indico
 from indico.util.console import colored
-from indico.util.shell import RefServer
+from indico.cli.server import WerkzeugServer
+from indico.util.contextManager import ContextManager
+from indico.web.flask.app import make_app
+from indico.web.assets import core_env
 from indico.tests.config import TestConfig
 from indico.tests.base import TestOptionException, FakeMailThread
 from indico.tests.runners import *
 
 # Indico legacy
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 TEST_RUNNERS = {'unit': UnitTestRunner,
@@ -102,12 +106,14 @@ class TestManager(object):
         Spawn a new refserver-based thread using the test db
         """
         config = TestConfig.getInstance()
-        refserver = RefServer(config.getWebServerHost(), int(config.getWebServerPort()))
+        server = WerkzeugServer(make_app(), config.getWebServerHost(), int(config.getWebServerPort()),
+                                use_debugger=False)
+        server.make_server()
 
-        t = threading.Thread(target=refserver.run)
+        t = threading.Thread(target=server.run)
         t.setDaemon(True)
         t.start()
-        return refserver.addr
+        return server.addr
 
     def main(self, testsToRun, options):
         """
@@ -123,18 +129,18 @@ class TestManager(object):
 
         # the SMTP server will choose a free port
         smtpAddr = self._startSMTPServer()
+        self._startManageDB()
+
+        self._setFakeConfig({"SmtpServer": smtpAddr})
+
         if 'functional' in testsToRun:
             serverAddr = self._runFakeWebServer()
-            baseURL = "http://{0}:{1}/indico".format(*serverAddr)
+            baseURL = "http://{0}:{1}".format(*serverAddr)
         else:
-            baseURL = "http://localhost:8000/indico"
+            baseURL = "http://localhost:8000"
 
-        self._setFakeConfig({
-                "SmtpServer": smtpAddr,
-                "BaseURL": baseURL
-                })
-
-        self._startManageDB()
+        self._cfg._configVars.update({"BaseURL": baseURL})
+        ContextManager.set('test_env', True)
 
         try:
             for test in testsToRun:
@@ -167,7 +173,6 @@ class TestManager(object):
         Sets a fake configuration for the current process, using a temporary directory
         """
         config = Config.getInstance()
-        test_config = TestConfig.getInstance()
 
         temp = tempfile.mkdtemp(prefix="indico_")
         self._info('Using %s as temporary dir' % temp)
@@ -181,20 +186,20 @@ class TestManager(object):
 
         # minimal defaults
         defaults = {
-            'BaseURL': 'http://localhost:8000/indico',
+            'Debug': True,
+            'BaseURL': 'http://localhost:8000',
             'BaseSecureURL': '',
-            'UseXSendFile': False,
-            'AuthenticatorList': ['Local'],
+            'AuthenticatorList': [('Local', {})],
             'SmtpServer': ('localhost', 58025),
             'SmtpUseTLS': 'no',
-            'DBConnectionParams': ('localhost', TestConfig.getInstance().getFakeDBPort()),
+            'DBConnectionParams': ('127.0.0.1', TestConfig.getInstance().getFakeDBPort()),
             'LogDir': os.path.join(temp, 'log'),
             'XMLCacheDir': os.path.join(temp, 'cache'),
             'HtdocsDir': htdocsDir,
             'ArchiveDir': os.path.join(temp, 'archive'),
             'UploadedFilesTempDir': os.path.join(temp, 'tmp'),
             'ConfigurationDir': etcDir
-            }
+        }
 
         defaults.update(custom)
 
@@ -203,6 +208,14 @@ class TestManager(object):
 
         Config.setInstance(config)
         self._cfg = config
+
+        # Update assets environment
+        core_env.directory = core_env.directory.replace('/opt/indico/htdocs', config.getHtdocsDir())
+        core_env.load_path = [path.replace('/opt/indico/htdocs', config.getHtdocsDir()) for path in core_env.load_path]
+        core_env.url_mapping = {path.replace('/opt/indico/htdocs', config.getHtdocsDir()): url for path, url in
+                                core_env.url_mapping.iteritems()}
+        core_env.config['PYSCSS_LOAD_PATHS'] = [x.replace('/opt/indico/htdocs', config.getHtdocsDir()) for x in
+                                                core_env.config['PYSCSS_LOAD_PATHS']]
 
         # re-configure logging and template generator, so that paths are updated
         from MaKaC.common import TemplateExec
@@ -216,7 +229,7 @@ class TestManager(object):
         port = TestConfig.getInstance().getFakeDBPort()
 
         self._info("Starting fake DB in port %s" % port)
-        self._startFakeDB('localhost', port)
+        self._startFakeDB('127.0.0.1', port)
 
     def _stopManageDB(self, killself=False):
         """

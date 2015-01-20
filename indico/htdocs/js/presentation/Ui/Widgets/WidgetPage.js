@@ -12,7 +12,7 @@ function WidgetPage(name, render) {
 		context.page = name;
 		return render(context);
 	};
-};
+}
 
 WidgetPage.pages = {};
 

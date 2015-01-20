@@ -1,4 +1,14 @@
 <script type="text/javascript">
+
+    <%block name="defaults">
+        TPL_DEFAULT_SIZE = [425, 270];
+
+        // "Zoom factor" - ratio between font
+        // size on screen and on paper
+        var zoom_factor = 1;
+        var numeric_mode = false;
+    </%block>
+
     var snapToGrid = false;
 
     // Dimensions of the template space, in pixels
@@ -8,10 +18,11 @@
     var previousTemplateDimensions;
 
     // Number of pixels per cm
-    var pixelsPerCm = 50;
+    var pixelsPerCm = 50 * zoom_factor;
 
     // Id of the background used
     var backgroundId = -1;
+    var backgroundPos;
 
     // Number of pixels, both horizontal and vertical, that are between the top left corner
     // and the position where items are inserted
@@ -30,8 +41,11 @@
     // Translation dictionary from key to name in current language.
     var translate = ${translateName};
 
-    // List of badge template items
+    // List of template items
     var items = [];
+
+    // Pointer for the jQuery-UI tabs later.
+    var controlTabs = null;
 
     // Item class
     function Item(itemId, key) {
@@ -44,9 +58,9 @@
         this.italic = false;
         this.textAlign = "Center";
         this.color = "black";
-        this.fontSize = "medium";
+        this.fontSize = "25pt";
         this.width = 400;
-        this.text = "(Type your text)" // Only for fixed text items
+        this.text = $T("Fixed text");
 
         // The following attributes have no meaning to the server
         this.selected = false;
@@ -54,7 +68,7 @@
         this.styleIndex = 0;
         this.textAlignIndex = 2; //Center
         this.colorIndex = 0;
-        this.fontSizeIndex = 3; //Medium
+        this.fontSizeIndex = 11; //Medium
     }
 
     Item.prototype.toHTML = function () {
@@ -110,7 +124,7 @@
         return newDiv;
     }
 
-    // This function inserts the selected element in the blank space where badge template designing takes place
+    // This function inserts the selected element in the blank space where template designing takes place
     function insertElement() {
         var newDiv = createDiv();
         // We set the inner html of the div depending on the type of item inserted
@@ -131,7 +145,10 @@
             lastSelectedDiv.remove();
             $('#selection_text').html('');
             lastSelectedDiv = null;
-            $('#removeButton').prop('disabled', true);
+            $('#modify_panel').hide();
+            $('#tab_format').hide();
+            controlTabs.tabs('option', 'active', 0);
+
         }
     }
 
@@ -139,6 +156,9 @@
         // Change the text that says which item is selected
         var id = newSelectedDiv.attr('id');
         $('#selection_text').html(translate[items[id].key]);
+
+        // Bring highlight to the element modification tab.
+        if (controlTabs) controlTabs.tabs('option', 'active', 1);
 
         // TODO: add check to see if there's a table inside and not an image
 
@@ -153,8 +173,9 @@
         newSelectedItem.selected = true;
         newSelectedDiv.find('> table').css('backgroundColor', '#ccf');
         lastSelectedDiv = newSelectedDiv;
-        $('#removeButton').prop('disabled', false);
 
+        $('#modify_panel').show();
+        $('#tab_format').show();
         // Change the selectors so that they match the properties of the item
         $('#alignment_selector').prop('selectedIndex', newSelectedItem.textAlignIndex);
         $('#font_selector').prop('selectedIndex', newSelectedItem.fontFamilyIndex);
@@ -162,12 +183,30 @@
         $('#style_selector').prop('selectedIndex', newSelectedItem.styleIndex);
         $('#color_selector').prop('selectedIndex', newSelectedItem.colorIndex);
         $('#width_field').val(newSelectedItem.width / pixelsPerCm);
+
         if (newSelectedItem.key == "Fixed Text") {
-            $('#fixed_text_field').val(newSelectedItem.text).prop('disabled', false);
-            $('#changeText').prop('disabled', false);
+            $('#fixedTextContainer').fadeIn();
+            $('#fixed_text_field').val(newSelectedItem.text);
         } else {
-            $('#fixed_text_field').val("").prop('disabled', true);
-            $('#changeText').prop('disabled', true);
+            $('#fixedTextContainer').fadeOut();
+            $('#fixed_text_field').val("");
+        }
+    }
+
+    function inlineEdit(div) {
+        var id = div.attr('id');
+        var selectedItem = items[id];
+
+        // Handle the individual cases as required.
+        if (selectedItem.key == "Fixed Text") {
+            var text = prompt("Enter fixed-text value", selectedItem.text);
+
+            if (text) {
+                selectedItem.text = text;
+                div.html(selectedItem.toHTML());
+
+                markSelected(div); // Update the fixed-text field
+            }
         }
     }
 
@@ -175,28 +214,38 @@
         if (templateDimensions.width > previousTemplateDimensions.width) {
             var hRuler = $('#horizontal_ruler');
             for (var i = Math.ceil(previousTemplateDimensions.width / pixelsPerCm); i < Math.ceil(templateDimensions.width / pixelsPerCm); i++) {
-                $('<td/>', {
-                    id: 'rulerh' + i
-                }).html('<img src="${ baseURL }/images/ruler/rulerh' + i + '.png" align="center"/>').appendTo(hRuler);
+
+                $('<div class="marking"/>', {
+                     id: 'rulerh' + i
+                }).css({
+                    width: pixelsPerCm + 'px',
+                    left: (i * pixelsPerCm) + 'px',
+                    top: 0
+                }).html(i + 1).appendTo(hRuler);
             }
         }
         else if (templateDimensions.width < previousTemplateDimensions.width) {
             for (var i = Math.ceil(previousTemplateDimensions.width / pixelsPerCm); i > Math.ceil(templateDimensions.width / pixelsPerCm); i--) {
-                $('#rulerh' + (i - 1)).remove();
+                $('#horizontal_ruler' + (i - 1)).remove();
             }
         }
 
         if (templateDimensions.height > previousTemplateDimensions.height) {
             var vRuler = $('#vertical_ruler');
             for (var i = Math.ceil(previousTemplateDimensions.height / pixelsPerCm); i < Math.ceil(templateDimensions.height / pixelsPerCm); i++) {
-                $('<tr/>', {
+                $('<div class="marking"/>', {
                     id: 'rulerv' + i
-                }).append('<td><img src="${ baseURL }/images/ruler/rulerv' + i + '.png" align="center"/></td>').appendTo(vRuler);
+                }).css({
+                    'line-height': pixelsPerCm/2.0 + 'px',
+                    height: pixelsPerCm  + 'px',
+                    left: 0,
+                    top: (i * pixelsPerCm) + 'px'
+                }).html(i + 1).appendTo(vRuler);
             }
         }
         else if (templateDimensions.height < previousTemplateDimensions.height) {
             for (i = Math.ceil(previousTemplateDimensions.height / pixelsPerCm); i > Math.ceil(templateDimensions.height / pixelsPerCm); i--) {
-                $('#rulerv' + (i - 1)).remove();
+                $('#vertical_ruler > #rulerv' + (i - 1)).remove();
             }
         }
     }
@@ -210,6 +259,7 @@
                 left: item.x + 'px',
                 top: item.y + 'px'
             });
+            item.fontSize = zoom_font(zoom_factor, item.fontSize);
             newDiv.html(item.toHTML());
             if (item.selected) {
                 markSelected(newDiv);
@@ -296,7 +346,7 @@
         size: function() {
             if (lastSelectedDiv) {
                 var item = items[lastSelectedDiv.attr('id')];
-                item.fontSize = $('#size_selector').val();
+                item.fontSize = zoom_font(zoom_factor, $('#size_selector').val());
                 item.fontSizeIndex = $('#size_selector').prop('selectedIndex');
                 lastSelectedDiv.html(item.toHTML());
             }
@@ -346,10 +396,19 @@
         }
     };
 
+    function zoom_font(zfact, fontSize) {
+        if (numeric_mode) {
+            var pattern = /([0-9.]+)pt/g
+            var ftsize = pattern.exec(fontSize)[1];
+            return (ftsize * zfact) + 'pt';
+        } else {
+            return fontSize;
+        }
+    }
 
     function save() {
         if ($('#template_name').val() == '') {
-            alert("Please choose a name for the template");
+            new AlertPopup($T("Warning"), $T("Please choose a name for the template")).open();
             return;
         }
         var template = [];
@@ -357,10 +416,72 @@
         template.push(templateDimensions, pixelsPerCm);
         template.push(backgroundId);
 
+        $.each(items, function(i, item) {
+            if (item != false) {
+                item.fontSize = zoom_font(1/zoom_factor, item.fontSize);
+            }
+        });
+
         template.push(items);
         $('#templateData').val(Json.write(template));
         $('#saveForm').submit();
     }
+
+    function setBackgroundPos(mode) {
+        var background = $('#background');
+        var hiddenField = $('#bgPosition');
+        var bgPosStretch = $('#bgPosStretch');
+        var bgPosCenter = $('#bgPosCenter');
+
+        if (mode == 'Stretch') {
+            background.css({
+                left: 0,
+                top: 0
+            });
+            background.height(templateDimensions.height);
+            background.width(templateDimensions.width);
+            bgPosStretch.prop('checked', true);
+            bgPosCenter.prop('checked', false);
+        }
+        else if (mode == 'Center') {
+            background.height(background.prop('naturalHeight'));
+            background.width(background.prop('naturalWidth'));
+
+            if (background.width() > templateDimensions.width || background.height() > templateDimensions.height) {
+                if (background.width() > templateDimensions.width) {
+                    var ratio = templateDimensions.width / background.width();
+
+                    background.width(templateDimensions.width);
+                    background.height(background.height() * ratio);
+                    background.css({
+                        left: 0,
+                        top: (templateDimensions.height/2.0 - background.height()/2.0) + 'px'
+                    });
+                }
+
+                if (background.height() > templateDimensions.height) {
+                    var ratio = templateDimensions.height / background.height();
+
+                    background.width(background.width() * ratio);
+                    background.height(templateDimensions.height);
+
+                    background.css({
+                        left: (templateDimensions.width/2.0 - background.width()/2.0) + 'px',
+                        top: 0
+                    });
+                }
+            }
+            else {
+                background.css({
+                    left: (templateDimensions.width/2 - background.prop('naturalWidth')/2) + 'px',
+                    top: (templateDimensions.height/2 - background.prop('naturalHeight')/2) + 'px'
+                });
+            }
+
+            bgPosStretch.prop('checked', false);
+            bgPosCenter.prop('checked', true);
+        }
+     }
 
     function displayBackground(backgroundURL) {
         $('<img/>', {
@@ -373,8 +494,10 @@
             height: templateDimensions.height + 'px',
             width: templateDimensions.width + 'px',
             zIndex: 5
-        }).load(function() {
+        }).on('load', function() {
             $('#loadingIcon').hide();
+            $('#removeBackground').removeClass('hidden');
+            setBackgroundPos(backgroundPos);
         }).appendTo('#templateDiv');
     }
 
@@ -382,6 +505,7 @@
         if (backgroundId != -1) {
             backgroundId = -1;
             $('#background').remove();
+            $('#removeBackground').addClass('hidden');
         }
     }
 
@@ -391,9 +515,32 @@
     }
 
     $(document).ready(function() {
-        // select items on mousedown
-        $('#templateDiv > div').live('mousedown', function() {
+
+        $('#bgForm input[type="file"]').on('change', function() {
+          var $this = $(this);
+          if ($this.val()) {
+            $('#uploadBackground').removeClass('hidden');
+          } else {
+            $('#uploadBackground').addClass('hidden');
+          }
+
+        });
+
+
+        if (backgroundId != -1) {
+            $('#removeBackground').removeClass('hidden');
+        }
+
+        // select and inline edit
+        $('#templateDiv').on('mousedown', 'div', function() {
             markSelected($(this));
+        }).on('dblclick', 'div', function() {
+            inlineEdit($(this));
+        });
+
+        $('#uploadBackground').click(function() {
+            $('#bgForm').submit();
+            return false;
         });
 
         // toggle grid/snap mode
@@ -406,7 +553,7 @@
             iframe: true,
             success: function(data) {
                 if(data.status != 'OK') {
-                    alert($T('An error occurred.'));
+                    new AlertPopup($T("Error"), $T("An error occurred")).open();
                     $('#loadingIcon').hide();
                     return;
                 }
@@ -414,6 +561,7 @@
                     $('#background').remove();
                 }
                 backgroundId = data.id;
+                backgroundPos = data.pos;
                 displayBackground(data.url);
             },
             beforeSubmit: function() {
@@ -462,6 +610,8 @@
             e.preventDefault();
             save();
         });
+
+        controlTabs = $('#controlTabs').tabs();
     });
 </script>
 
@@ -478,140 +628,213 @@
 </div>
 <!-- END OF CONTEXT HELP DIVS -->
 
-
 <div style="width:100%">
-  <br/>
+    <div class="groupTitle">
+        ${titleMessage}
+    </div>
 
-  <table class="groupTable" cellpadding="0">
-    <tbody>
-      <tr>
-        <td class="groupTitle" colspan="6">${titleMessage}</td>
-      </tr>
-      <tr>
-        <td class="titleCellTD">
-          <span class="titleCellFormat"> ${ _("Name")}</span>
-        </td>
-        <td colspan="5">
-          <input id="template_name" size="50" name="Template Name">
-        </td>
-      </tr>
-      <tr>
-        <td class="titleCellTD">
-          <span class="titleCellFormat"> ${ _("Background")}<br><small>(${ _("picture file in jpeg, png or gif")})</small></span>
-        </td>
-        <form id="bgForm" action="${ saveBackgroundURL }" method="POST" enctype="multipart/form-data">
-        <td height="20px" NOWRAP align="left" colspan="3">
-          <input name="file" size="58" type="file">
-          <input class="btn" value="${ _("Send File")}" type="submit">
-          <input class="btn" type="button" value="${ _("Remove background")}" id="removeBackground">
-        </td>
-        </form>
-        <td width="100%" align="left" colspan="4">
-          <img id="loadingIcon" src=${loadingIconURL} width="20px" height="20px" style="display:none;">
-        </td>
-      </tr>
-      <tr>
-        <td class="titleCellTD" NOWRAP>
-          <span class="titleCellFormat">Badge Width (cm, decimals ok)&nbsp;</span>
-        </td>
-        <td>
-           <input id="badge_width" name="Badge Width" size="5">
-        </td>
-        <td class="titleCellTD" NOWRAP>
-          <span class="titleCellFormat">Badge Height (cm, decimals ok)&nbsp;</span>
-        </td>
-        <td>
-          <input id="badge_height" name="Badge Height" size="5">
-          <input class="btn" value="${ _("Change")}" type="button" id="changeTemplateSize">
-        </td>
-      </tr>
-    </tbody>
-  </table>
+    <!-- Save Document Options -->
+    <div class="overflow">
+      ${_('Once you have finished designing, you may either save or discard your changes here.')}
+      <div style="float:right;">
+          <input class="i-button accept" name="Save Template Button" value="${ _("Save Template")}" type="button" id="saveButton" />
+          <input class="i-button" name="Cancel Button" value="${ _("Cancel")}" type="button" onclick="location.href='${cancelURL}'" />
 
-  <br/>
+          <form id="saveForm" action="${saveTemplateURL}" method="POST">
+              <input name="templateId" value="${templateId}" type="hidden">
+              <input id="templateData" name="templateData" type="hidden">
+          </form>
+      </div>
+      <div class="toolbar-clearer"></div>
+    </div>
+
+    <!-- Tabulated controls -->
+    <div id="controlTabs">
+        <ul>
+            <li><a href="#tabsGeneral">${_('General Settings &amp; Layout')}</a></li>
+            <li id="tab_format"><a href="#tabsFormatting">${_('Element Formatting')}</a></li>
+        </ul>
+
+        <!-- Tab for badge paramaters -->
+        <div id="tabsGeneral" class="tab">
+            <div class="left panel">
+                <i class="icon-wrench left" title="${_("Template settings")}"></i>
+                <div class="content">
+                  <h4>${_('Template Name')}</h4>
+                  <input id="template_name" size="30" name="Template Name" />
+                </div>
+            </div>
+            <div class="left panel">
+              <i class="icon-rulers left" title="${_("Template dimensions")}"></i>
+                <div class="content">
+                  <div class="left">${_('Width')} <input id="badge_width" name="Badge Width" size="5" style="margin-left: 0.5em;"></div>
+                  <div class="left clear">${_('Height')}<input id="badge_height" name="Badge Height" size="5" style="margin-left: 0.5em;"></div>
+                  <div class="clear"></div>
+                  <div class="text-not-important" style="margin-top: 1em;">${_("Dimensions are in cm, decimals are allowed.")}</div>
+                  <div style="margin-top: 1em;"><input id="snap_checkbox" type="checkbox"/><label for="snap_checkbox">${ _("Snap to grid")}</label></div>
+                </div>
+            </div>
+
+            <div class="left panel">
+              <i class="icon-pictures left" title="${_("Background")}"></i>
+              <form id="bgForm" action="${ saveBackgroundURL }" method="POST" enctype="multipart/form-data" class="left">
+                <input name="file" type="file" style="margin-bottom: 1em;" />
+                <%block name="background_options">
+                </%block>
+                <div class="toolbar">
+                  <div class="group">
+                    <a class="i-button icon-upload icon-only hidden" id="uploadBackground" title="${_("Upload file")}"></a>
+                    <a class="i-button icon-remove icon-only hidden" id="removeBackground" title="${_("Remove background")}"></a>
+                      </div>
+                </div>
+              </form>
+              <img id="loadingIcon" src=${loadingIconURL} style="display:none; width: 20px; height: 20px;" />
+            </div>
+
+        </div>
+        <!-- Tab for element formatting -->
+        <div id="tabsFormatting" class="tab">
+            <div class="left panel">
+                <i class="icon-font-size left" title="${_("Font definitions")}"></i>
+                <!-- Font Face -->
+                <div class="content">
+                    <select id='font_selector' name="Template Element Font" class="attrSelect" data-attr="font">
+                      <optgroup label="${ _('Normal Fonts') }">
+                        <option>Times New Roman</option>
+                        <option>Courier</option>
+                        <option>Sans</option>
+                      </optgroup>
+                      <optgroup label="${ _('Special Character Fonts') }">
+                        <option>LinuxLibertine</option>
+                        <option>Kochi-Mincho</option>
+                        <option>Kochi-Gothic</option>
+                        <option>Uming-CN</option>
+                      </optgroup>
+                    </select>
+                    <!-- Font Colour -->
+                    <select id='color_selector' name="Template Element Color" class="attrSelect" data-attr="color">
+                      <option value="black"> ${ _("black")}</option>
+                      <option value="red"> ${ _("red")}</option>
+                      <option value="blue"> ${ _("blue")}</option>
+                      <option value="green"> ${ _("green")}</option>
+                      <option value="yellow"> ${ _("yellow")}</option>
+                      <option value="brown"> ${ _("brown")}</option>
+                      <option value="gold"> ${ _("gold")}</option>
+                      <option value="pink"> ${ _("pink")}</option>
+                      <option value="gray"> ${ _("gray")}</option>
+                      <option value="white"> ${ _("white")}</option>
+                    </select>
+                    <!-- Font Style -->
+                    <select id='style_selector' name="Template Element Style" class="attrSelect" data-attr="style">
+                      <option value="normal"> ${ _("Normal")}</option>
+                      <option value="bold"> ${ _("Bold")}</option>
+                      <option value="italic"> ${ _("Italic")}</option>
+                      <option value="bold_italic"> ${ _("Bold &amp; Italic")}</option>
+                    </select>
+                    <!-- Font Size -->
+                    <select id='size_selector' name="Template Element Size" class="attrSelect" data-attr="size">
+                        <%block name="font_sizes">
+                            <option value="xx-small"> ${ _("xx-small")}</option>
+                            <option value="x-small"> ${ _("x-small")}</option>
+                            <option value="small"> ${ _("small")}</option>
+                            <option value="medium" SELECTED> ${ _("medium")}</option>
+                            <option value="large"> ${ _("large")}</option>
+                            <option value="x-large"> ${ _("x-large")}</option>
+                            <option value="xx-large"> ${ _("xx-large")}</option>
+                        </%block>
+                </select>
+                <!-- Font Alignment -->
+                <select id='alignment_selector' name="Template Element Alignment" class="attrSelect" data-attr="alignment">
+                    <!-- Note: the value of the options is used directly in the style attribute of the items -->
+                    <option value="Left"> ${ _("Left")}</option>
+                    <option value="Right"> ${ _("Right")}</option>
+                    <option value="Center"> ${ _("Center")}</option>
+                    <option value="Justified"> ${ _("Justified")}</option>
+                </select>
+            </div>
+        </div>
+
+            <div class="left panel">
+              <i class="icon-rulers left" title="${_("Element dimensions")}"></i>
+              <div class="content">
+              Width <input id="width_field" size="5" name="Element Size" />
+              <h4>${ _("Positioning")}</h4>
+              <table width="90%">
+                <tbody>
+                  <tr>
+                    <td></td>
+                    <td align="center">
+                      <input name="Move Template Element Top Button" class="btn moveButton" value="${ _("Top")}" type="button" data-direction="top" />
+                    </td>
+                    <td></td>
+                  </tr>
+                  <tr>
+                    <td align="center">
+                      <input name="Move Template Element Left Button" class="btn moveButton" value="${ _("Left")}" type="button" data-direction="left"/>
+                    </td>
+                    <td align="center">
+                      <input name="Move Template Element Center Button" class="btn moveButton" value="${ _("Center")}" type="button" data-direction="center"/>
+                    </td>
+                    <td align="center">
+                      <input name="Move Template Element Right Button" class="btn moveButton" value="${ _("Right")}" type="button" data-direction="right"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td align="center">
+                      <input name="Move Template Element Bottom Button" class="btn moveButton" value="${ _("Bottom")}" type="button" data-direction="bottom"/>
+                    </td>
+                   <td></td>
+                  </tr>
+                </tbody>
+              </table>
+              </div>
+            </div>
+
+            <div class="left panel" id="fixedTextContainer" style="display:none; margin-left: 1em;">
+              <i class="icon-type left" title="${_("Text")}"></i>
+              <input id="fixed_text_field" size="30" name="Element Text" placeholder="${_("Insert your text here")}"/>
+            </div>
+          </div>
+          <!-- End of formatting tab -->
+        </div>
 
   <table class="groupTable" border="0" cellpadding="0" cellspacing="0">
-
     <tbody>
-
       <tr>
+        <td rowspan="2" id="controls"> <!-- Width attribute necessary so that the template design space doesn't move depending on selection text-->
 
-        <td width="220px" rowspan="2" valign="top"> <!-- Width attribute necessary so that the template design space doesn't move depending on selection text-->
-          <span class="titleCellFormat">${ _("Elements")}</span>
+        <!-- Insert Elements -->
+        <div class="panel">
+            <h3>${_('Insert Elements')}</h3>
+              <select name="Template Elements List" id="elementList">
+                ${selectOptions}
+              </select>
+            <a id="insertButton" class="i-button icon-plus right icon-only" title="${ _("Insert")}"></a>
+        </div>
+        <!-- Modify Selected Element -->
+        <div id="modify_panel" class="panel overflow clear" style="display: none;">
 
-          <br/><br/>
-
-          <input name="insertButton" id="insertButton" class="btn" value="${ _("Insert")}" type="button">
-          <input name="removeButton" id="removeButton" class="btn" value="${ _("Remove")}" type="button" disabled="disabled">
-
-          <br/><br/>
-
-          <select name="Template Elements List" id="elementList">
-            ${selectOptions}
-          </select>${contextHelp('features' )}
-
-          <br/>
-          <br/>
-
-           ${ _("Selection")}: <span id="selection_text"></span>
-          <br/><br/>
-
-           ${ _("Position")}:
-          <br/>
-
-          <table>
-            <tbody>
-              <tr>
-                <td></td>
-                <td align="center">
-                  <input name="Move Template Element Top Button" class="btn moveButton" value="${ _("Top")}" type="button" data-direction="top">
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-                <td align="center">
-                  <input name="Move Template Element Left Button" class="btn moveButton" value="${ _("Left")}" type="button" data-direction="left">
-                </td>
-                <td align="center">
-                  <input name="Move Template Element Center Button" class="btn moveButton" value="${ _("Center")}" type="button" data-direction="center">
-                </td>
-                <td align="center">
-                  <input name="Move Template Element Right Button" class="btn moveButton" value="${ _("Right")}" type="button" data-direction="right">
-                </td>
-              </tr>
-              <tr>
-                <td></td>
-                <td align="center">
-                  <input name="Move Template Element Bottom Button" class="btn moveButton" value="${ _("Bottom")}" type="button" data-direction="bottom">
-                </td>
-                <td></td>
-              </tr>
-              <tr>
-            </tbody>
-          </table>
-
-          <input id="snap_checkbox" type="checkbox"/><label for="snap_checkbox">${ _("Snap to grid")}</label>
-
+          <div class="overflow">
+            <h3>${_('Selected Element')}</h3>
+            <div id="selection_text" class="left">
+            </div>
+            <a id="removeButton" class="right i-button icon-remove icon-only" title="${ _("Remove Element")}"></a>
+          </div>
         </td>
 
         <td></td>
 
         <td align="left" valign="bottom" height="22px"> <!-- height of the horizontal ruler images -->
-          <table border="0" cellpadding="0" cellspacing="0">
-            <tbody>
-              <tr id="horizontal_ruler">
-              </tr>
-            </tbody>
-          </table>
+            <div id="horizontal_ruler" class="ruler">
+            </div>
         </td>
       </tr>
 
       <tr>
         <td valign="top" align="right" width="22px"> <!-- width of the vertical ruler image -->
-          <table border="0" cellpadding="0" cellspacing="0" align="right">
-            <tbody id="vertical_ruler">
-            </tbody>
-          </table>
+            <div id="vertical_ruler" class="ruler">
+            </div>
         </td>
 
         <td align="left" valign="top">
@@ -622,155 +845,13 @@
               </tbody>
             </table>
           </div>
+
+        </div>
+
         </td>
       </tr>
     </tbody>
   </table>
-
-  <br/>
-
-  <table class="groupTable" cellpadding="0" cellspacing="0">
-
-    <tbody>
-
-      <tr>
-        <td colspan="3" rowspan="1" class="titleCellFormat"> ${ _("Attributes")}</td>
-        <td></td>
-        <td></td>
-      </tr>
-
-      <tr>
-
-       <td class="titleCellTD">
-          <span class="titleCellFormat"> ${ _("Font")}&nbsp;</span>
-       </td>
-
-        <td colspan="2">
-          <select id='font_selector' name="Template Element Font" class="attrSelect" data-attr="font">
-            <optgroup label="${ _('Normal Fonts') }">
-              <option>Times New Roman</option>
-              <option>Courier</option>
-              <option>Sans</option>
-            </optgroup>
-            <optgroup label="${ _('Special Character Fonts') }">
-              <option>LinuxLibertine</option>
-              <option>Kochi-Mincho</option>
-              <option>Kochi-Gothic</option>
-              <option>Uming-CN</option>
-              <!--
-              <option>Bitstream Cyberbit</option>
-              <option>Free Serif</option>
-              -->
-            </optgroup>
-          </select>
-        </td>
-
-        <td class="titleCellTD">
-          <span class="titleCellFormat"> ${ _("Color")}&nbsp;</span>
-        </td>
-
-        <td width="100%">
-          <select id='color_selector' name="Template Element Color" class="attrSelect" data-attr="color">
-            <option value="black"> ${ _("black")}</option>
-            <option value="red"> ${ _("red")}</option>
-            <option value="blue"> ${ _("blue")}</option>
-            <option value="green"> ${ _("green")}</option>
-            <option value="yellow"> ${ _("yellow")}</option>
-            <option value="brown"> ${ _("brown")}</option>
-            <option value="gold"> ${ _("gold")}</option>
-            <option value="pink"> ${ _("pink")}</option>
-            <option value="gray"> ${ _("gray")}</option>
-            <option value="white"> ${ _("white")}</option>
-          </select>
-        </td>
-
-      </tr>
-
-      <tr>
-
-        <td class="titleCellTD">
-          <span class="titleCellFormat"> ${ _("Style")}&nbsp;</span>
-        </td>
-
-        <td colspan="2">
-          <select id='style_selector' name="Template Element Style" class="attrSelect" data-attr="style">
-            <option value="normal"> ${ _("Normal")}</option>
-            <option value="bold"> ${ _("Bold")}</option>
-            <option value="italic"> ${ _("Italic")}</option>
-            <option value="bold_italic"> ${ _("Bold &amp; Italic")}</option>
-          </select>
-        </td>
-
-        <td class="titleCellTD">
-          <span class="titleCellFormat"> ${ _("Size")}&nbsp;</span>
-        </td>
-
-        <td width="100%">
-          <select id='size_selector' name="Template Element Size" class="attrSelect" data-attr="size">
-            <option value="xx-small"> ${ _("xx-small")}</option>
-            <option value="x-small"> ${ _("x-small")}</option>
-            <option value="small"> ${ _("small")}</option>
-            <option value="medium" SELECTED> ${ _("medium")}</option>
-            <option value="large"> ${ _("large")}</option>
-            <option value="x-large"> ${ _("x-large")}</option>
-            <option value="xx-large"> ${ _("xx-large")}</option>
-          </select>
-        </td>
-      </tr>
-
-      <tr>
-        <td class="titleCellTD">
-          <span class="titleCellFormat"> ${ _("Alignment")}&nbsp;</span>
-        </td>
-        <td colspan="2">
-          <select id='alignment_selector' name="Template Element Alignment" class="attrSelect" data-attr="alignment">
-            <!-- Note: the value of the options is used directly in the style attribute of the items -->
-            <option value="Left"> ${ _("Left")}</option>
-            <option value="Right"> ${ _("Right")}</option>
-            <option value="Center"> ${ _("Center")}</option>
-            <option value="Justified"> ${ _("Justified")}</option>
-          </select>
-        </td>
-        <td class="titleCellTD">
-          <span class="titleCellFormat"> ${ _("Width (cm)")}&nbsp;</span>
-        </td>
-        <td width="100%">
-          <input id="width_field" size="5" name="Element Size">
-          <input class="btn attrButton" value="${ _("Change")}" type="button" data-attr="width">
-        </td>
-      </tr>
-      <tr>
-        <td class="titleCellTD" NOWRAP>
-          <span class="titleCellFormat"> ${ _("Text (for Fixed Text)")}&nbsp;</span>
-        </td>
-        <td>
-          <input id="fixed_text_field" size="30" name="Element Size" disabled="disabled">
-        </td>
-        <td>
-          <input class="btn attrButton" value="${ _("Change")}" type="button" data-attr="text" id="changeText" disabled="disabled">
-        </td>
-        <td></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <br/>
-  <table class="groupTable">
-    <tbody>
-      <tr>
-        <td colspan="4" align="center" width="100%">
-          <input class="btn" name="Save Template Button" value="${ _("Save")}" type="button" id="saveButton">
-          <input class="btn" name="Cancel Button" value="${ _("Cancel")}" type="button" onclick="location.href='${cancelURL}'">
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <form id="saveForm" action="${saveTemplateURL}" method="POST">
-      <input name="templateId" value="${templateId}" type="hidden">
-      <input id="templateData" name="templateData" type="hidden">
-  </form>
-
 
   <script type="text/javascript">
     // We load the template if we are editing a template
@@ -785,13 +866,25 @@
         });
         templateDimensions = new Dimensions(template[1].width, template[1].height);
     } else {
-        templateDimensions = new Dimensions(425, 270); //put here the initial dimensions of templateDiv
+        templateDimensions = new Dimensions(TPL_DEFAULT_SIZE[0], TPL_DEFAULT_SIZE[1]);
     }
 
     previousTemplateDimensions = new Dimensions(0,0);
 
     $('#badge_width').val(templateDimensions.width / pixelsPerCm);
     $('#badge_height').val(templateDimensions.height / pixelsPerCm);
+
+    $('#badge_width, #badge_height').on('keyup', function() {
+        changeTemplateSize();
+    });
+
+    $('#width_field').on('keyup', function() {
+        attrFuncs['width']();
+    });
+
+    $('#fixed_text_field').on('keyup', function() {
+        attrFuncs['text']();
+    });
 
     updateRulers(); // creates the initial rulers
     changeTemplateSize();
@@ -801,6 +894,7 @@
 
     if (${ editingTemplate } && ${ hasBackground }) {
         backgroundId = ${ backgroundId };
+        backgroundPos = '${ backgroundPos }';
         displayBackground("${ backgroundURL }");
     }
 

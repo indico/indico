@@ -67,13 +67,13 @@ type("Html", ["XElement", "WatchAccessor", "CanGet"], {
                 } else {
                         var self = this;
                         var notify = function(evt) {
-                                observer(self.get());
-                        }
+                            observer(self.get());
+                        };
                         if (!exists(this.observers)) {
                                 this.observers = commands();
                                 var notify = function(evt) {
-                                        self.observers(self.get());
-                                }
+                                    self.observers(self.get());
+                                };
                                 if (checkField) {
                                         this.observeClick(notify);
                                 } else {
@@ -97,18 +97,7 @@ type("Html", ["XElement", "WatchAccessor", "CanGet"], {
                 return this.isField();
         }
 },
-        Browser.IE
-        ? function(source, attributes) {
-                if (isString(source)) {
-                        if (!empty(attributes.name)) {
-                                // fix for IE
-                                source = '<' + source + ' name="' + attributes.name + '">';
-                                delete attributes.name;
-                        }
-                }
-                this.XElement(source, attributes, $A(arguments, 2));
-        }
-        : function(source, attributes) {
+        function(source, attributes) {
                 this.XElement(source, attributes, $A(arguments, 2));
         }
 );
@@ -156,7 +145,7 @@ extend(Html, {
                 } else {
                         attribs = exists(other) ? other : {};
                 }
-                for (key in attribs) {
+                for (var key in attribs) {
                         if (attribs[key] === undefined) {
                                         delete attribs[key];
                         }
@@ -209,17 +198,12 @@ extend(Html, {
          * @return {XElement} element
          */
         checkbox: function(attributes, checked) {
-            if (Browser.IE) {
-                var checkedText = checked?" checked":"";
-                return new Html("<input type=\"checkbox\""+checkedText+">", attributes);
-            } else {
-                var elem = new Html("input", Html.makeAttributes(attributes, {
-                    type: "checkbox"
-                }));
+            var elem = new Html("input", Html.makeAttributes(attributes, {
+                type: "checkbox"
+            }));
 
-                elem.set(checked);
-                return elem;
-            }
+            elem.set(checked);
+            return elem;
 
         },
 

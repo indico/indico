@@ -1,10 +1,29 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+##
+## Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 3 of the
+## License, or (at your option) any later version.
+##
+## Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 from MaKaC.services.implementation.base import ProtectedModificationService
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.services.implementation.roomBooking import GetBookingBase
 
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
 
+from MaKaC.common import log
 from MaKaC.common.PickleJar import DictPickler
 
 import MaKaC.conference as conference
@@ -15,7 +34,8 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
 from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
 import MaKaC.webinterface.pages.contributionReviewing as contributionReviewing
-import MaKaC.webinterface.wcomponents as wcomponents
+import MaKaC.domain as domain
+
 
 class ContributionBase(object):
 
@@ -133,8 +153,9 @@ class ContributionAddSubContribution(ContributionModifBase):
 
         # log the event
         logInfo = sc.getLogInfo()
-        logInfo["subject"] = "Create new subcontribution: %s"%sc.getTitle()
-        self._target.getConference().getLogHandler().logAction(logInfo, "Timetable/SubContribution", self._getUser())
+        logInfo["subject"] = "Created new subcontribution: %s"%sc.getTitle()
+        self._target.getConference().getLogHandler().logAction(logInfo,
+                                                       log.ModuleNames.TIMETABLE)
 
 class ContributionDeleteSubContribution(ContributionModifBase):
 
@@ -158,8 +179,6 @@ class ContributionDeleteSubContribution(ContributionModifBase):
     def _getAnswer(self):
         self._subContribution.getOwner().removeSubContribution(self._subContribution)
 
-class ContributionGetBooking(ContributionDisplayBase, GetBookingBase):
-    pass
 
 class ContributionProtectionUserList(ContributionModifBase):
 
@@ -204,6 +223,15 @@ class ContributionProtectionRemoveUser(ContributionModifBase):
         elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
             self._contribution.revokeAccess(userToRemove)
 
+class ContributionGetChildrenProtected(ContributionModifBase):
+
+    def _getAnswer(self):
+        return fossilize(self._contribution.getAccessController().getProtectedChildren())
+
+class ContributionGetChildrenPublic(ContributionModifBase):
+
+    def _getAnswer(self):
+        return fossilize(self._contribution.getAccessController().getPublicChildren())
 
 class ContributionParticipantsBase(ContributionModifBase):
 
@@ -230,7 +258,7 @@ class ContributionParticipantsBase(ContributionModifBase):
             partFossil = fossilize(part)
             # var to control if we have to show the entry in the author menu to allow add submission rights
             isSubmitter = False
-            av = AvatarHolder().match({"email": part.getEmail()}, forceWithoutExtAuth=True, exact=True)
+            av = AvatarHolder().match({"email": part.getEmail()}, searchInAuthenticators=False, exact=True)
             if not av:
                 if part.getEmail() in self._contribution.getSubmitterEmailList():
                     isSubmitter = True
@@ -291,6 +319,8 @@ class ContributionAddExistingParticipant(ContributionParticipantsBase):
             if user["_type"] == "Avatar": # new speaker
                 ah = AvatarHolder()
                 av = ah.getById(user["id"])
+                if av is None:
+                    raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
                 part = self._newParticipant(av)
             elif user["_type"] == "ContributionParticipation": # adding existing author to speaker
                 part = self._contribution.getAuthorById(user["id"])
@@ -459,7 +489,7 @@ class ContributionChangeSubmissionRights(ContributionParticipantsUserBase):
         if self._action == "grant":
             self._contribution.grantSubmission(self._participant)
         elif self._action == "remove":
-            av = AvatarHolder().match({"email": self._participant.getEmail()}, exact=True, forceWithoutExtAuth=True)
+            av = AvatarHolder().match({"email": self._participant.getEmail()}, exact=True, searchInAuthenticators=False)
             if not av:
                 self._contribution.revokeSubmissionEmail(self._participant.getEmail())
             else:
@@ -669,6 +699,13 @@ class ContributionSubmittersBase(ContributionModifBase):
         ContributionModifBase._checkParams(self)
         self._pm = ParameterManager(self._params)
 
+    def _removeUserFromSubmitterList(self, submitterId):
+        for submitter in self._contribution.getSubmitterList():
+            if submitter.getId() == submitterId:
+                self._contribution.revokeSubmission(submitter)
+                return True
+        return False
+
     def _getSubmittersList(self):
         result = []
         for submitter in self._contribution.getSubmitterList():
@@ -707,6 +744,8 @@ class ContributionAddExistingSubmitter(ContributionSubmittersBase):
         ah = PrincipalHolder()
         for user in self._userList:
             av = ah.getById(user["id"])
+            if av is None:
+                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
             self._contribution.grantSubmission(av)
         return self._getSubmittersList()
 
@@ -729,7 +768,7 @@ class ContributionRemoveSubmitter(ContributionSubmittersBase):
                 # remove submitter
                 self._contribution.revokeSubmission(av)
             else:
-                raise ServiceError("ERR-U0", _("User does not exist."))
+                self._removeUserFromSubmitterList(self._submitterId)
         return self._getSubmittersList()
 
 
@@ -761,8 +800,9 @@ class ContributionSumissionControlAddAsAuthor(ContributionSumissionControlModify
             self._contribution.newSpeaker(part)
 
     def _getAnswer(self):
-        ah = AvatarHolder()
-        av = ah.getById(self._submitterId)
+        av = AvatarHolder().getById(self._submitterId)
+        if av is None:
+            raise NoReportError(_("It seems this user has been removed from the database or has been merged into another. Please remove it and add it again."))
         self._newParticipant(av)
         return self._getSubmittersList()
 
@@ -789,16 +829,17 @@ class ContributionSumissionControlRemoveAsAuthor(ContributionSumissionControlMod
 
 
     def _getAnswer(self):
-        ah = AvatarHolder()
-        av = ah.getById(self._submitterId)
+        av = AvatarHolder().getById(self._submitterId)
+        if av is None:
+            raise NoReportError(_("It seems this user has been removed from the database or has been merged into another. Please remove it and add it again."))
         participant = self._getParticipantByEmail(av.getEmail())
-
         if self._kindOfList == "prAuthor":
             self._contribution.removePrimaryAuthor(participant, removeSpeaker=0)
         elif self._kindOfList == "coAuthor":
             self._contribution.removeCoAuthor(participant, removeSpeaker=0)
         elif self._kindOfList == "speaker":
             self._contribution.removeSpeaker(participant)
+
         return self._getSubmittersList()
 
 
@@ -824,6 +865,9 @@ class ContributionAddExistingManager(ContributionManagerListBase):
     def _getAnswer(self):
         ph = PrincipalHolder()
         for user in self._userList:
+            principal = ph.getById(user["id"])
+            if principal is None and user["_type"] == "Avatar":
+                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
             self._contribution.grantModification(ph.getById(user["id"]))
         return self._getManagersList()
 
@@ -845,13 +889,33 @@ class ContributionReviewHistory(ContributionDisplayBase):
     def _getAnswer(self):
         return contributionReviewing.WContributionReviewingHistory(self._contribution).getHTML({"ShowReviewingTeam" : False})
 
+
+class ContributionProtectionToggleDomains(ContributionModifBase):
+
+    def _checkParams(self):
+        self._params['contribId'] = self._params['targetId']
+        ContributionModifBase._checkParams(self)
+        pm = ParameterManager(self._params)
+        self._domainId = pm.extract("domainId", pType=str)
+        self._add = pm.extract("add", pType=bool)
+
+    def _getAnswer(self):
+        dh = domain.DomainHolder()
+        d = dh.getById(self._domainId)
+        if self._add:
+            self._target.requireDomain(d)
+        elif not self._add:
+            self._target.freeDomain(d)
+
+
 methodMap = {
     "addSubContribution": ContributionAddSubContribution,
     "deleteSubContribution": ContributionDeleteSubContribution,
-    "getBooking": ContributionGetBooking,
     "protection.getAllowedUsersList": ContributionProtectionUserList,
     "protection.addAllowedUsers": ContributionProtectionAddUsers,
     "protection.removeAllowedUser": ContributionProtectionRemoveUser,
+    "protection.getProtectedChildren": ContributionGetChildrenProtected,
+    "protection.getPublicChildren": ContributionGetChildrenPublic,
 
     "participants.addNewParticipant": ContributionAddNewParticipant,
     "participants.addExistingParticipant": ContributionAddExistingParticipant,
@@ -873,6 +937,7 @@ methodMap = {
     "protection.submissionControl.addAsAuthor": ContributionSumissionControlAddAsAuthor,
     "protection.submissionControl.removeAsAuthor": ContributionSumissionControlRemoveAsAuthor,
 
+    "protection.toggleDomains": ContributionProtectionToggleDomains,
     "protection.addExistingManager": ContributionAddExistingManager,
     "protection.removeManager": ContributionRemoveManager,
     "review.getReviewHistory": ContributionReviewHistory

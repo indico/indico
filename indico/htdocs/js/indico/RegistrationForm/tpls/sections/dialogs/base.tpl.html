@@ -1,0 +1,24 @@
+<form name="sectionForm" novalidate>
+    <div class="tabbable tabs-left">
+        <ul class="nav nav-tabs">
+            <li ng-repeat="tab in config.tabs" ng-class="{active: isTabSelected(tab.id)}">
+                <a ng-click="setSelectedTab(tab.id)"
+                    data-toggle="tab"
+                    id="tab-{{ tab.id }}"
+                    ref="#div-{{ tab.id }}">
+                    {{ tab.name }}
+                </a>
+            </li>
+        </ul>
+        <div class="tab-content regFormDialogTabContent"
+            style="width: {{ config.contentWidth }}px; overflow: hidden; white-space: nowrap;">
+            <div ng-repeat="tab in config.tabs"
+                class="tab-pane"
+                ng-class="{active: isTabSelected(tab.id)}" id="div-{{ tab.id }}">
+                    <ng-form name="form-{{ tab.id }}">
+                        <div ng-include="getTabTpl(data.id, tab.type)"></div>
+                    </ng-form>
+            </div>
+        </div>
+    </div>
+</form>

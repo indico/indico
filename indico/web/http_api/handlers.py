@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 HTTP API - Handlers
@@ -25,31 +24,37 @@ HTTP API - Handlers
 # python stdlib imports
 import hashlib
 import hmac
+import posixpath
 import re
 import time
 import urllib
+from flask import request, session
 from urlparse import parse_qs
 from ZODB.POSException import ConflictError
 
 # indico imports
+from werkzeug.exceptions import NotFound
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.auth import APIKeyHolder
-from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
-from indico.web.http_api.util import remove_lists, get_query_parameter
+from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api import API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
-from indico.web.wsgi import webinterface_handler_config as apache
-from indico.util.metadata.serializer import Serializer
-from indico.util.network import _get_remote_ip
+from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
+from indico.web.http_api.metadata.serializer import Serializer
+from indico.web.flask.util import ResponseUtil
 from indico.util.contextManager import ContextManager
+from indico.modules.oauth.errors import OAuthError
+from indico.modules.oauth.components import OAuthUtils
 
 # indico legacy imports
-from MaKaC.common import DBMgr
-from MaKaC.common.logger import Logger
-from MaKaC.common.fossilize import fossilize
+from indico.core.db import DBMgr
+from indico.core.config import Config
+from indico.core.logger import Logger
+from MaKaC.common.fossilize import fossilize, clearCache
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.cache import GenericCache
+from MaKaC.authentication.LDAPAuthentication import LDAPConnector
 
 
 # Remove the extension at the end or before the querystring
@@ -62,15 +67,19 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
     Returns a string consisting of path and sorted query string.
     Dynamic arguments like signature and timestamp are removed from the query string.
     """
-    queryParams = remove_lists(parse_qs(query))
-    if remove:
-        for key in remove:
-            queryParams.pop(key, None)
-    sortedQuery = sorted(queryParams.items(), key=lambda x: x[0].lower())
+    qparams = parse_qs(query)
+    sorted_params = []
+
+    for key, values in sorted(qparams.items(), key=lambda x: x[0].lower()):
+        key = key.lower()
+        if key not in remove:
+            for v in sorted(values):
+                sorted_params.append((key, v))
+
     if separate:
-        return path, sortedQuery and urllib.urlencode(sortedQuery)
-    elif sortedQuery:
-        return '%s?%s' % (path, urllib.urlencode(sortedQuery))
+        return path, sorted_params and urllib.urlencode(sorted_params)
+    elif sorted_params:
+        return '%s?%s' % (path, urllib.urlencode(sorted_params))
     else:
         return path
 
@@ -78,12 +87,12 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
 def validateSignature(ak, minfo, signature, timestamp, path, query):
     ttl = HelperMaKaCInfo.getMaKaCInfoInstance().getAPISignatureTTL()
     if not timestamp and not (ak.isPersistentAllowed() and minfo.isAPIPersistentAllowed()):
-        raise HTTPAPIError('Signature invalid (no timestamp)', apache.HTTP_FORBIDDEN)
+        raise HTTPAPIError('Signature invalid (no timestamp)', 403)
     elif timestamp and abs(timestamp - int(time.time())) > ttl:
-        raise HTTPAPIError('Signature invalid (bad timestamp)', apache.HTTP_FORBIDDEN)
+        raise HTTPAPIError('Signature invalid (bad timestamp)', 403)
     digest = hmac.new(ak.getSignKey(), normalizeQuery(path, query), hashlib.sha1).hexdigest()
     if signature != digest:
-        raise HTTPAPIError('Signature invalid', apache.HTTP_FORBIDDEN)
+        raise HTTPAPIError('Signature invalid', 403)
 
 
 def checkAK(apiKey, signature, timestamp, path, query):
@@ -91,131 +100,173 @@ def checkAK(apiKey, signature, timestamp, path, query):
     apiMode = minfo.getAPIMode()
     if not apiKey:
         if apiMode in (API_MODE_ONLYKEY, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED):
-            raise HTTPAPIError('API key is missing', apache.HTTP_FORBIDDEN)
+            raise HTTPAPIError('API key is missing', 403)
         return None, True
     akh = APIKeyHolder()
     if not akh.hasKey(apiKey):
-        raise HTTPAPIError('Invalid API key', apache.HTTP_FORBIDDEN)
+        raise HTTPAPIError('Invalid API key', 403)
     ak = akh.getById(apiKey)
     if ak.isBlocked():
-        raise HTTPAPIError('API key is blocked', apache.HTTP_FORBIDDEN)
+        raise HTTPAPIError('API key is blocked', 403)
     # Signature validation
     onlyPublic = False
     if signature:
         validateSignature(ak, minfo, signature, timestamp, path, query)
-    elif apiMode in (API_MODE_SIGNED, API_MODE_ALL_SIGNED):
-        raise HTTPAPIError('Signature missing', apache.HTTP_FORBIDDEN)
-    elif apiMode == API_MODE_ONLYKEY_SIGNED:
+    elif apiMode == API_MODE_ALL_SIGNED:
+        raise HTTPAPIError('Signature missing', 403)
+    elif apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED):
         onlyPublic = True
     return ak, onlyPublic
 
 
-def buildAW(ak, req, onlyPublic=False):
+def buildAW(ak, onlyPublic=False):
     aw = AccessWrapper()
+    aw.setIP(str(request.remote_addr))
     if ak and not onlyPublic:
         # If we have an authenticated request, require HTTPS
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         # Dirty hack: Google calendar converts HTTP API requests from https to http
         # Therefore, not working with Indico setup (requiring https for HTTP API authenticated)
-        if not req.is_https() and minfo.isAPIHTTPSRequired() and req.get_user_agent().find("Googlebot") == -1:
-            raise HTTPAPIError('HTTPS is required', apache.HTTP_FORBIDDEN)
+        if not request.is_secure and minfo.isAPIHTTPSRequired() and request.user_agent.browser != 'google':
+            raise HTTPAPIError('HTTPS is required', 403)
         aw.setUser(ak.getUser())
     return aw
 
-def handler(req, **params):
+
+def handler(prefix, path):
+    path = posixpath.join('/', prefix, path)
     ContextManager.destroy()
+    clearCache()  # init fossil cache
     logger = Logger.get('httpapi')
-    path, query = req.URLFields['PATH_INFO'], req.URLFields['QUERY_STRING']
-    if req.method == 'POST':
+    if request.method == 'POST':
         # Convert POST data to a query string
-        queryParams = dict(req.form)
-        for key, value in queryParams.iteritems():
-            queryParams[key] = [str(value)]
-        query = urllib.urlencode(remove_lists(queryParams))
+        queryParams = dict((key, value.encode('utf-8')) for key, value in request.form.iteritems())
+        query = urllib.urlencode(queryParams)
     else:
         # Parse the actual query string
-        queryParams = parse_qs(query)
+        queryParams = dict((key, value.encode('utf-8')) for key, value in request.args.iteritems())
+        query = request.query_string
 
     dbi = DBMgr.getInstance()
     dbi.startRequest()
 
-    mode = path.split('/')[1]
-
     apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)
+    cookieAuth = get_query_parameter(queryParams, ['ca', 'cookieauth'], 'no') == 'yes'
     signature = get_query_parameter(queryParams, ['signature'])
     timestamp = get_query_parameter(queryParams, ['timestamp'], 0, integer=True)
-    no_cache = get_query_parameter(queryParams, ['nc', 'nocache'], 'no') == 'yes'
+    noCache = get_query_parameter(queryParams, ['nc', 'nocache'], 'no') == 'yes'
     pretty = get_query_parameter(queryParams, ['p', 'pretty'], 'no') == 'yes'
     onlyPublic = get_query_parameter(queryParams, ['op', 'onlypublic'], 'no') == 'yes'
-
-    # Disable caching if we are not exporting
-    if mode != 'export':
-        no_cache = True
+    onlyAuthed = get_query_parameter(queryParams, ['oa', 'onlyauthed'], 'no') == 'yes'
+    oauthToken = 'oauth_token' in queryParams
+    # Check if OAuth data is supplied in the Authorization header
+    if not oauthToken and request.headers.get('Authorization') is not None:
+        oauthToken = 'oauth_token' in request.headers.get('Authorization')
 
     # Get our handler function and its argument and response type
-    func, dformat = HTTPAPIHook.parseRequest(path, queryParams)
-    if func is None or dformat is None:
-        raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+    hook, dformat = HTTPAPIHook.parseRequest(path, queryParams)
+    if hook is None or dformat is None:
+        raise NotFound
+
+    # Disable caching if we are not just retrieving data (or the hook requires it)
+    if request.method == 'POST' or hook.NO_CACHE:
+        noCache = True
 
     ak = error = result = None
     ts = int(time.time())
     typeMap = {}
+    responseUtil = ResponseUtil()
     try:
-        # Validate the API key (and its signature)
-        ak, enforceOnlyPublic = checkAK(apiKey, signature, timestamp, path, query)
-        if enforceOnlyPublic:
-            onlyPublic = True
-        # Create an access wrapper for the API key's user
-        aw = buildAW(ak, req, onlyPublic)
-        # Get rid of API key in cache key if we did not impersonate a user
-        if ak and aw.getUser() is None:
-            cache_key = normalizeQuery(path, query, remove=('ak', 'apiKey', 'signature', 'timestamp', 'nc', 'nocache'))
-        else:
-            cache_key = normalizeQuery(path, query, remove=('signature', 'timestamp', 'nc', 'nocache'))
-            if signature:
-                # in case the request was signed, store the result under a different key
-                cache_key = 'signed_' + cache_key
+        used_session = None
+        if cookieAuth:
+            used_session = session
+            if not used_session.user:  # ignore guest sessions
+                used_session = None
 
-        obj = None
-        addToCache = True
+        if apiKey or oauthToken or not used_session:
+            if not oauthToken:
+                # Validate the API key (and its signature)
+                ak, enforceOnlyPublic = checkAK(apiKey, signature, timestamp, path, query)
+                if enforceOnlyPublic:
+                    onlyPublic = True
+                # Create an access wrapper for the API key's user
+                aw = buildAW(ak, onlyPublic)
+            else:  # Access Token (OAuth)
+                at = OAuthUtils.OAuthCheckAccessResource()
+                aw = buildAW(at, onlyPublic)
+            # Get rid of API key in cache key if we did not impersonate a user
+            if ak and aw.getUser() is None:
+                cacheKey = normalizeQuery(path, query,
+                                          remove=('_', 'ak', 'apiKey', 'signature', 'timestamp', 'nc', 'nocache',
+                                                  'oa', 'onlyauthed'))
+            else:
+                cacheKey = normalizeQuery(path, query,
+                                          remove=('_', 'signature', 'timestamp', 'nc', 'nocache', 'oa', 'onlyauthed'))
+                if signature:
+                    # in case the request was signed, store the result under a different key
+                    cacheKey = 'signed_' + cacheKey
+        else:
+            # We authenticated using a session cookie.
+            if Config.getInstance().getCSRFLevel() >= 2:
+                token = request.headers.get('X-CSRF-Token', get_query_parameter(queryParams, ['csrftoken']))
+                if used_session.csrf_protected and used_session.csrf_token != token:
+                    raise HTTPAPIError('Invalid CSRF token', 403)
+            aw = AccessWrapper()
+            if not onlyPublic:
+                aw.setUser(used_session.user)
+            userPrefix = 'user-' + used_session.user.getId() + '_'
+            cacheKey = userPrefix + normalizeQuery(path, query,
+                                                   remove=('_', 'nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed',
+                                                           'csrftoken'))
+
+        # Bail out if the user requires authentication but is not authenticated
+        if onlyAuthed and not aw.getUser():
+            raise HTTPAPIError('Not authenticated', 403)
+
+        addToCache = not hook.NO_CACHE
         cache = GenericCache('HTTPAPI')
-        cache_key = RE_REMOVE_EXTENSION.sub('', cache_key)
-        if not no_cache:
-            obj = cache.get(cache_key)
+        cacheKey = RE_REMOVE_EXTENSION.sub('', cacheKey)
+        if not noCache:
+            obj = cache.get(cacheKey)
             if obj is not None:
                 result, extra, ts, complete, typeMap = obj
                 addToCache = False
         if result is None:
+            ContextManager.set("currentAW", aw)
             # Perform the actual exporting
-            res = func(aw, req)
+            res = hook(aw)
             if isinstance(res, tuple) and len(res) == 4:
                 result, extra, complete, typeMap = res
             else:
                 result, extra, complete, typeMap = res, {}, True, {}
         if result is not None and addToCache:
             ttl = HelperMaKaCInfo.getMaKaCInfoInstance().getAPICacheTTL()
-            cache.set(cache_key, (result, extra, ts, complete, typeMap), ttl)
+            cache.set(cacheKey, (result, extra, ts, complete, typeMap), ttl)
     except HTTPAPIError, e:
         error = e
         if e.getCode():
-            req.status = e.getCode()
-            if req.status == apache.HTTP_METHOD_NOT_ALLOWED:
-                req.headers_out['Allow'] = 'GET' if req.method == 'POST' else 'POST'
+            responseUtil.status = e.getCode()
+            if responseUtil.status == 405:
+                responseUtil.headers['Allow'] = 'GET' if request.method == 'POST' else 'POST'
+    except OAuthError, e:
+        error = e
+        if e.getCode():
+            responseUtil.status = e.getCode()
 
     if result is None and error is None:
         # TODO: usage page
-        raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+        raise NotFound
     else:
         if ak and error is None:
             # Commit only if there was an API key and no error
             for _retry in xrange(10):
                 dbi.sync()
                 normPath, normQuery = normalizeQuery(path, query, remove=('signature', 'timestamp'), separate=True)
-                ak.used(_get_remote_ip(req), normPath, normQuery, not onlyPublic)
+                ak.used(request.remote_addr, normPath, normQuery, not onlyPublic)
                 try:
                     dbi.endRequest(True)
                 except ConflictError:
-                    pass # retry
+                    pass  # retry
                 else:
                     break
         else:
@@ -223,34 +274,30 @@ def handler(req, **params):
             # (nothing was written)
             dbi.endRequest(False)
 
+        LDAPConnector.destroy()
+
         # Log successful POST api requests
-        if error is None and req.method == 'POST':
+        if error is None and request.method == 'POST':
             logger.info('API request: %s?%s' % (path, query))
 
-        serializer = Serializer.create(dformat, pretty=pretty, typeMap=typeMap,
-                                       **remove_lists(queryParams))
-
+        serializer = Serializer.create(dformat, query_params=queryParams, pretty=pretty, typeMap=typeMap,
+                                       **hook.serializer_args)
         if error:
-            resultFossil = fossilize(error)
-        else:
-            iface = None
-            if mode == 'export':
-                iface = IHTTPAPIExportResultFossil
-            resultFossil = fossilize(HTTPAPIResult(result, path, query, ts, complete, extra), iface)
-
-        del resultFossil['_fossil']
-
-        try:
-
-            if error and not serializer.schemaless:
+            if not serializer.schemaless:
                 # if our serializer has a specific schema (HTML, ICAL, etc...)
                 # use JSON, since it is universal
                 serializer = Serializer.create('json')
-                # set text/plain, so that it is visible in all browsers
-                req.headers_out['Content-Type'] = 'text/plain'
-            else:
-                req.headers_out['Content-Type'] = serializer.getMIMEType()
-            return serializer(resultFossil)
+
+            result = fossilize(error)
+        else:
+            if serializer.encapsulate:
+                result = fossilize(HTTPAPIResult(result, path, query, ts, complete, extra), IHTTPAPIExportResultFossil)
+                del result['_fossil']
+
+        try:
+            data = serializer(result)
+            serializer.set_headers(responseUtil)
+            return responseUtil.make_response(data)
         except:
             logger.exception('Serialization error in request %s?%s' % (path, query))
             raise

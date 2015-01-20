@@ -1,3 +1,24 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
 .ui-button {
     background: #DDDDDD !important;
 }
@@ -34,7 +55,7 @@
 }
 
 .ui-widget-content a {
-    color: #4C6A83 !important;
+    color: #4C6A83;
 }
 
 .ui-state-active a {
@@ -85,18 +106,23 @@
 
 .ui-dialog-titlebar {
     border-bottom: 1px solid #CCCCCC !important;
-    border-radius: 0px !important;
     font-weight: normal;
     font-size: 17px;
     background-color: #FCFCFC !important;
+}
+
+.ui-dialog-titlebar-close:not(.ui-state-hover) {
+    border: none !important;
+    background: none !important;
 }
 
 .ui-tabs a {
     outline: none;
 }
 
-.ui-tabs .ui-tabs-nav {
+.ui-tabs .ui-tabs-nav li {
     padding: 0;
+    outline: none;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-disabled {
@@ -113,11 +139,11 @@
     border-bottom: 1px solid #AAAAAA;
 }
 
-.ui-tabs .ui-state-default {
+.ui-tabs li.ui-state-default {
     background: #FFFFFF !important;
 }
 
-.ui-tabs .ui-corner-top, .ui-tabs .ui-corner-all {
+.ui-tabs li.ui-corner-top, .ui-tabs li.ui-corner-all {
     -moz-border-radius-topleft: 0px;
     -webkit-border-top-left-radius: 0px;
     border-top-left-radius: 0px;
@@ -168,66 +194,3 @@
     opacity: .50;
     filter:Alpha(Opacity=50);
 }
-
-/* Indico styled tooltips USED WITH qTip2 */
-
-.ui-tooltip-default .ui-tooltip-content, .ui-tooltip-default .ui-tooltip-titlebar {
-    border: solid 1px #888;
-    color: #222;
-    background-color: #F0F0F0;
-    font-size: 11px;
-}
-
-.ui-tooltip-popup .ui-tooltip-content {
-    border: solid 1px #E2E2E2;
-    color: #454545;
-    background-color: white;
-    font-size: 10.5px;
-    padding: 5px 9px;
-}
-.ui-tooltip-balloon .ui-tooltip-content {
-    border: solid 1px #C0C0C0;
-    background-color: #FFED92;
-    font-size: 13px;
-    padding: 5px 6px 12px;
-    width: 120px;
-}
-
-.ui-tooltip-timezone {
-    min-width: 300px;
-}
-
-.ui-tooltip-timezone .ui-tooltip-content{
-    min-width: 300px;
-    font-size: 13px;
-}
-
- /* Indico styled multiselect */
-
-.ui-multiselect-widget {
-    background: none repeat scroll 0 0 #FAFAFA;
-    border: 1px solid #DADADA;
-}
-.ui-multiselect { padding:2px 0 2px 4px; text-align:left }
-.ui-multiselect span.ui-icon { float:right }
-.ui-multiselect-single .ui-multiselect-checkboxes input { position:absolute !important; top: auto !important; left:-9999px; }
-.ui-multiselect-single .ui-multiselect-checkboxes label { padding:5px !important }
-
-.ui-multiselect-header { margin-bottom:3px; padding:3px 0 3px 4px }
-.ui-multiselect-header ul { font-size:0.9em }
-.ui-multiselect-header ul li { float:left; padding:0 10px 0 0 }
-.ui-multiselect-header a { text-decoration:none }
-.ui-multiselect-header a:hover { text-decoration:underline }
-.ui-multiselect-header span.ui-icon { float:left }
-.ui-multiselect-header li.ui-multiselect-close { float:right; text-align:right; padding-right:0 }
-
-.ui-multiselect-menu { display:none; padding:3px; position:absolute; z-index:10000 }
-.ui-multiselect-checkboxes { position:relative /* fixes bug in IE6/7 */; overflow-y:scroll }
-.ui-multiselect-checkboxes label { cursor:default; display:block; border:1px solid transparent; padding:3px 1px }
-.ui-multiselect-checkboxes label input { position:relative; top:1px }
-.ui-multiselect-checkboxes li { clear:both; font-size:0.9em; padding-right:3px }
-.ui-multiselect-checkboxes li.ui-multiselect-optgroup-label { text-align:center; font-weight:bold; border-bottom:1px solid }
-.ui-multiselect-checkboxes li.ui-multiselect-optgroup-label a { display:block; padding:3px; margin:1px 0; text-decoration:none }
-
-/* remove label borders in IE6 because IE6 does not support transparency */
-* html .ui-multiselect-checkboxes label { border:none }

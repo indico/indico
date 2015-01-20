@@ -2,30 +2,41 @@
 * -*- mode: text; coding: utf-8; -*-
 
 
-   This file is part of CDS Indico.
-   Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+   This file is part of Indico.
+   Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 
-   CDS Indico is free software; you can redistribute it and/or
+   Indico is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License as
-   published by the Free Software Foundation; either version 2 of the
+   published by the Free Software Foundation; either version 3 of the
    License, or (at your option) any later version.
 
-   CDS Indico is distributed in the hope that it will be useful, but
+   Indico is distributed in the hope that it will be useful, but
    WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
    General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-   59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
 */
 
 @import url("IndicoMeeting.css");
 
 div.meetingEventHeader {
-    background: #006699;
+    text-shadow: none !important;
+    background: #fff url('../../../images/Logo-EndoTOFPET.jpg') left top no-repeat;
     padding-top: 15px;
-    padding-left: 300px;
+    padding-left: 180px;
+}
+
+div.meetingEventHeader .details{
+    text-shadow: none !important;
+    color: #222 !important;
+}
+
+div.meetingEventHeader h1 {
+    font-weight: bold;
+    text-shadow: none;
+    color: #555588;
 }
 
 a.logo {
@@ -33,7 +44,4 @@ a.logo {
     left: 26px;
     top: 26px;
     display: block;
-    width: 250px;
-    height: 96px;
-    background: #006699 url('../../../images/Logo-EndoTOFPET.jpg') left top no-repeat;
 }

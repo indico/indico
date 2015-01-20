@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from MaKaC.paperReviewing import ConferencePaperReview
 from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
 from MaKaC.services.implementation.contribution import ContributionBase
@@ -32,7 +31,7 @@ from MaKaC.webinterface.rh.contribMod import RCContributionReviewer
 from MaKaC.webinterface.user import UserModificationBase, UserListModificationBase
 from MaKaC.services.implementation.base import ListModificationBase
 from MaKaC import user
-from MaKaC.services.interface.rpc.common import ServiceError
+from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 from MaKaC.i18n import _
 from MaKaC.errors import MaKaCError
 import datetime
@@ -153,34 +152,45 @@ class ConferenceReviewingDeleteTemplate(ConferenceReviewingBase):
             self._confPaperReview.deleteTemplate(templateId)
             return True
 
-class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingDateTimeModificationBase):
+class ConferenceReviewingDefaultDueDateModification(ConferenceReviewingPRMBase):
 
     def _checkParams(self):
-        ConferenceReviewingDateTimeModificationBase._checkParams(self)
+        ConferenceReviewingPRMBase._checkParams(self)
         self._dueDateToChange = self._params.get("dueDateToChange")
+        pm = ParameterManager(self._params.get('value'), timezone=self._conf.getTimezone())
+        self._date = pm.extract('date', pType=datetime.datetime)
+        self._apply = pm.extract('applyToContributions', pType=bool)
 
     def _setParam(self):
         if self._dueDateToChange == "Referee":
-            self._conf.getConfPaperReview().setDefaultRefereeDueDate(self._pTime)
+            self._conf.getConfPaperReview().setDefaultRefereeDueDate(self._date)
+            return self._conf.getConfPaperReview().getAdjustedDefaultRefereeDueDate()
         elif self._dueDateToChange == "Editor":
-            self._conf.getConfPaperReview().setDefaultEditorDueDate(self._pTime)
+            self._conf.getConfPaperReview().setDefaultEditorDueDate(self._date)
+            return self._conf.getConfPaperReview().getAdjustedDefaultEditorDueDate()
         elif self._dueDateToChange == "Reviewer":
-            self._conf.getConfPaperReview().setDefaultReviewerDueDate(self._pTime)
+            self._conf.getConfPaperReview().setDefaultReviewerDueDate(self._date)
+            return self._conf.getConfPaperReview().getAdjustedDefaultReviewerDueDate()
         else:
             raise ServiceError("ERR-REV3a",_("Kind of deadline to change not set"))
 
-    def _handleGet(self):
-        if self._dueDateToChange == "Referee":
-            date = self._conf.getConfPaperReview().getAdjustedDefaultRefereeDueDate()
-        elif self._dueDateToChange == "Editor":
-            date = self._conf.getConfPaperReview().getAdjustedDefaultEditorDueDate()
-        elif self._dueDateToChange == "Reviewer":
-            date = self._conf.getConfPaperReview().getAdjustedDefaultReviewerDueDate()
-        else:
-            raise ServiceError("ERR-REV3b",_("Kind of deadline to change not set"))
-
+    def _getAnswer(self):
+        date = self._setParam()
+        if self._apply:
+            for contrib in self._conf.getContributionList():
+                lastReview = contrib.getReviewManager().getLastReview()
+                if self._dueDateToChange == "Referee":
+                    lastReview.setRefereeDueDate(date)
+                elif self._dueDateToChange == "Editor":
+                    lastReview.setEditorDueDate(date)
+                elif self._dueDateToChange == "Reviewer":
+                    lastReview.setReviewerDueDate(date)
+                else:
+                    raise ServiceError("ERR-REV3c",_("Kind of deadline to change not set"))
         if date:
             return datetime.datetime.strftime(date,'%d/%m/%Y %H:%M')
+        else:
+            return _("Date has not been set yet.")
 
 
 class ConferenceReviewingAutoEmailsModificationPRM(ConferenceReviewingSetupTextModificationBase ):
@@ -325,6 +335,30 @@ class ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReviewer(Confer
 
     def _handleGet(self):
         return self._confPaperReview.getEnableAuthorSubmittedMatReviewerEmailNotif()
+
+
+class ConferenceReviewingAutoEmailsModificationEditorSubmittedReferee(ConferenceReviewingSetupTextModificationBase):
+
+    def _handleSet(self):
+        if self._value:
+            self._confPaperReview.enableEditorSubmittedRefereeEmailNotif()
+        else:
+            self._confPaperReview.disableEditorSubmittedRefereeEmailNotif()
+
+    def _handleGet(self):
+        return self._confPaperReview.getEnableEditorSubmittedRefereeEmailNotif()
+
+
+class ConferenceReviewingAutoEmailsModificationReviewerSubmittedReferee(ConferenceReviewingSetupTextModificationBase):
+
+    def _handleSet(self):
+        if self._value:
+            self._confPaperReview.enableReviewerSubmittedRefereeEmailNotif()
+        else:
+            self._confPaperReview.disableReviewerSubmittedRefereeEmailNotif()
+
+    def _handleGet(self):
+        return self._confPaperReview.getEnableReviewerSubmittedRefereeEmailNotif()
 
 
 class ConferenceReviewingCompetenceModification(ListModificationBase, ConferenceReviewingPRMBase):
@@ -732,7 +766,7 @@ class ContributionReviewingBase(ProtectedModificationService, ContributionBase):
         elif self._current == 'reviewerJudgement':
             return lastReview.getReviewerJudgement(self._getUser())
         else:
-            raise ServiceError("ERR-REV7",_("Current kind of judgement not specified"))
+            raise ServiceError("ERR-REV7",_("Current kind of assessment not specified"))
 
 class ContributionReviewingTextModificationBase (TextModificationBase, ContributionReviewingBase):
     #Note: don't change the order of the inheritance here!
@@ -782,7 +816,7 @@ class ContributionReviewingJudgementModification(ContributionReviewingTextModifi
 
     def _handleSet(self):
         if self.getJudgementObject().isSubmitted():
-            raise ServiceError("ERR-REV8a",_("You cannot modify a judgement marked as submitted"))
+            raise ServiceError("ERR-REV8a",_("You cannot modify an assessment marked as submitted"))
         self.getJudgementObject().setJudgement(self._value)
 
     def _handleGet(self):
@@ -796,7 +830,7 @@ class ContributionReviewingCommentsModification(ContributionReviewingHTMLModific
 
     def _handleSet(self):
         if self.getJudgementObject().isSubmitted():
-            raise ServiceError("ERR-REV8b",_("You cannot modify a judgement marked as submitted"))
+            raise ServiceError("ERR-REV8b",_("You cannot modify an assessment marked as submitted"))
         self.getJudgementObject().setComments(self._value)
 
     def _handleGet(self):
@@ -810,7 +844,7 @@ class ContributionReviewingCriteriaModification(ContributionReviewingTextModific
 
     def _handleSet(self):
         if self.getJudgementObject().isSubmitted():
-            raise ServiceError("ERR-REV8c",_("You cannot modify a judgement marked as submitted"))
+            raise ServiceError("ERR-REV8c",_("You cannot modify an assessment marked as submitted"))
         self.getJudgementObject().setAnswer(self._criterion, int(self._value), self._conf.getConfPaperReview().getNumberOfAnswers())
 
     def _handleGet(self):
@@ -827,13 +861,25 @@ class ContributionReviewingSetSubmitted(ContributionReviewingBase):
         if self._params.has_key('value'):
             judgementObject = self.getJudgementObject()
             try:
-                judgementObject.setSubmitted(not self.getJudgementObject().isSubmitted())
+                judgementObject.setSubmitted(not judgementObject.isSubmitted())
             except MaKaCError, e:
-                raise ServiceError("ERR-REV9", e.getMsg())
+                raise ServiceError("ERR-REV9", e.getMessage())
 
             judgementObject.setAuthor(self._getUser())
-            judgementObject.sendNotificationEmail(widthdrawn = not self.getJudgementObject().isSubmitted())
+            judgementObject.sendNotificationEmail(withdrawn = not judgementObject.isSubmitted())
         return self.getJudgementObject().isSubmitted()
+
+class ContributionReviewingSubmitPaper(ContributionReviewingBase):
+
+    def _checkProtection(self):
+        if not self._target.canUserSubmit(self.getAW().getUser()):
+            ContributionReviewingBase._checkProtection(self)
+
+    def _getAnswer( self ):
+        if len(self._target.getReviewing().getResourceList()) == 0:
+            raise NoReportError(_("You need to attach a paper before submitting a revision."))
+        self._target.getReviewManager().getLastReview().setAuthorSubmitted(True)
+        return True
 
 class ContributionReviewingCriteriaDisplay(ContributionReviewingBase):
 
@@ -1047,6 +1093,8 @@ methodMap = {
     "conference.AuthorSubmittedMatRefereeNotif" : ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReferee,
     "conference.AuthorSubmittedMatEditorNotif" : ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatEditor,
     "conference.AuthorSubmittedMatReviewerNotif" : ConferenceReviewingAutoEmailsModificationAuthorSubmittedMatReviewer,
+    "conference.EditorSubmittedRefereeNotif" : ConferenceReviewingAutoEmailsModificationEditorSubmittedReferee,
+    "conference.ReviewerSubmittedRefereeNotif" : ConferenceReviewingAutoEmailsModificationReviewerSubmittedReferee,
 
 
     "conference.assignTeamPRM" : ConferenceReviewingAssignTeamPRM,
@@ -1064,6 +1112,7 @@ methodMap = {
     "contribution.changeCriteria": ContributionReviewingCriteriaModification,
     "contribution.getCriteria": ContributionReviewingCriteriaDisplay,
     "contribution.setSubmitted": ContributionReviewingSetSubmitted,
+    "contribution.submitPaper": ContributionReviewingSubmitPaper,
 
     "paperReviewing.getContentQuestions": PaperReviewingGetContentQuestions,
     "paperReviewing.addContentQuestion": PaperReviewingAddContentQuestion,

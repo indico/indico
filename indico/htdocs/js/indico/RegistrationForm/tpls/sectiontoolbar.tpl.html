@@ -1,0 +1,27 @@
+<div class="toolbar right">
+    <div class="group">
+        <a nd-field-picker
+            ng-if="buttons.newfield"
+            class="buttonAddField i-button icon-plus"
+            title="{{ 'Click to add a field to this section' | i18n }}"></a>
+
+        <a ng-if="buttons.config"
+            ng-click="openConfig()"
+            class="i-button icon-wrench"
+            title="{{ 'Edit this section' | i18n }}"></a>
+
+        <a ng-if="buttons.disable"
+            ng-click="sectionApi.disableSection(section)"
+            class="i-button icon-disable"
+            title="{{ 'Click to disable this section' | i18n }}"></a>
+    </div>
+
+    <div class="group">
+        <a ng-open-dialog
+            ng-click="toggleCollapse()"
+            ng-class="{'icon-prev': state.collapsed,
+                       'icon-expand': !state.collapsed}"
+            class="i-button"
+            title="{{ 'Click to toggle collapse status' | i18n }}"></a>
+    </div>
+</div>

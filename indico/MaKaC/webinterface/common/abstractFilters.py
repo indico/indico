@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.common.filters as filters
 import MaKaC.review as review
@@ -49,6 +48,15 @@ class SubmissionDateSortingField(filters.SortingField):
         """
         return cmp( a2.getSubmissionDate(), a1.getSubmissionDate() )
 
+class ModificationDateSortingField(filters.SortingField):
+    """
+    """
+    _id = "modifDate"
+
+    def compare( self, a1, a2 ):
+        """
+        """
+        return cmp( a2.getModificationDate(), a1.getModificationDate() )
 
 class TrackFilterField(filters.FilterField):
     """Contains the filtering criteria for the track of an abstract.
@@ -130,11 +138,11 @@ class ContribTypeFilterField(filters.FilterField):
         elif not abstract.getContribType():
             return self._showNoValue
         else:
-            return abstract.getContribType() in self._values
+            return abstract.getContribType().getId() in self._values
 
     def needsToBeApplied(self):
         for ct in self._conf.getContribTypeList():
-            if ct not in self._values:
+            if ct.getId() not in self._values:
                 return True
         return not self._showNoValue
 
@@ -153,13 +161,13 @@ class AccContribTypeFilterField(filters.FilterField):
                                 review.AbstractStatusProposedToAccept]:
                 if s.getType() is None or s.getType()=="":
                     return self._showNoValue
-                return s.getType() in self._values
+                return s.getType().getId() in self._values
             else:
                 return self._showNoValue
 
     def needsToBeApplied(self):
         for ct in self._conf.getContribTypeList():
-            if ct not in self._values:
+            if ct.getId() not in self._values:
                 return True
         return not self._showNoValue
 

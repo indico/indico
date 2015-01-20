@@ -50,7 +50,6 @@
                     </td>
                     <!--  This column shows whether all the speaker of a contribution agreed or not -->
                     <td width="40px" valign="top" style="vertical-align:middle;">
-                        <% manager = Conference.getCSBookingManager() %>
                         % if talk["contId"] != "":
                             % if manager.isContributionReadyToBePublished(talk["contId"]):
                                 <div class="RMcolumnStatusAgreedDone">
@@ -151,7 +150,7 @@
 </table>
 
 <div id="RMlowerPane" class="RMHolderPaneDefaultVisible" style="margin-left: 150px;">
-    <span>
+    <div>
         <br />
         <strong>4. ${ _("Select language(s) in which the talk was given") }</strong>
         <br />
@@ -182,8 +181,8 @@
         <!--  Javascript button here -->
         </span>
         % endif
-    </span>
-    <span>
+    </div>
+    <div>
         <br />
         <strong>5. ${ _("Create CDS record (and update micala database)") }</strong>
         <br />
@@ -192,7 +191,7 @@
         </span>
         <span id="RMMatchSummaryMessage">
         </span>
-    </span>
+    </div>
     <br />
     <br />
     <br />
@@ -223,7 +222,7 @@
     // (even though it's called RMTalkList, which is confusing)
     var RMTalkList = {
     % for talk in Talks:
-    "${ talk["IndicoID"] }": ${ jsonEncode(talk) },
+    "${ talk["IndicoID"] }": ${talk | n,j},
     % endfor
     };
 

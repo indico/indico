@@ -15,7 +15,7 @@
                 % if icon:
                     <div style="float: right; padding-left: 5px;">${ icon }</div>
                 % endif
-                <a href="${ url }" style="font-size: 1.0em;">${ title }</a>
+                <a href="${ url }" style="font-size: 1.0em;">${ title | remove_tags }</a>
                 <span style="font-size: 0.8em;">
                     ${ chairs }
                     ${ location }

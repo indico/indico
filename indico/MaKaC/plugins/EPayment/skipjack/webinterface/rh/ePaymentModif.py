@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh.ePaymentModif import RHEPaymentModifBase, RHConferenceBaseDisplay, RHRegistrationFormDisplayBase
 import MaKaC.webinterface.urlHandlers as urlHandlers
@@ -28,6 +27,7 @@ from MaKaC.plugins.EPayment.skipjack.webinterface import urlHandlers as localUrl
 from MaKaC.plugins.EPayment.skipjack import MODULE_ID, epayment as ePayment
 
 from MaKaC.errors import AccessError
+from MaKaC.webinterface.pages import registrationForm
 
 
 ### classes for Skipjack integration
@@ -35,7 +35,7 @@ from MaKaC.errors import AccessError
 # Skipjack information page
 class RHEPaymentmodifSkipjack( RHEPaymentModifBase ):
     _requestTag = "modifSkipjack"
-    
+
     def _process( self ):
         p = ePayments.WPConfModifEPaymentSkipjack( self, self._conf)
         return p.display()
@@ -44,7 +44,7 @@ class RHEPaymentmodifSkipjack( RHEPaymentModifBase ):
 # skipjack modification page
 class RHEPaymentmodifSkipjackDataModif( RHEPaymentModifBase ):
     _requestTag = "modifSkipjackData"
-    
+
     def _process( self ):
         p = ePayments.WPConfModifEPaymentSkipjackDataModif( self, self._conf)
         return p.display()
@@ -53,7 +53,7 @@ class RHEPaymentmodifSkipjackDataModif( RHEPaymentModifBase ):
 # submission page for configuration modifications
 class RHEPaymentmodifSkipjackPerformDataModif( RHEPaymentModifBase ):
     _requestTag = "modifSkipjackPerformDataModif"
-    
+
     def _checkParams( self, params ):
         RHEPaymentModifBase._checkParams( self, params)
         self._params = params
@@ -184,14 +184,14 @@ class RHEPaymentConfirmSkipjack( RHConferenceBaseDisplay ):
 
 class RHEPaymentCancelSkipjack( RHRegistrationFormDisplayBase ):
     _requestTag = "cancel"
-    
+
     def _checkParams( self, params ):
         RHRegistrationFormDisplayBase._checkParams( self, params )
         self._registrant=None
         regId=params.get("registrantId","")
         if regId is not None:
-            self._registrant=self._conf.getRegistrantById(regId)                
-        
+            self._registrant=self._conf.getRegistrantById(regId)
+
     def _processIfActive( self ):
         if self._registrant is not None:
             p = ePayments.WPCancelEPaymentSkipjack(self, self._conf ,self._registrant)
@@ -202,9 +202,9 @@ class RHEPaymentDisplayInfoSkipjack( RHConferenceBaseDisplay ):
 
     def _checkProtection( self ):
         if self._getUser() is None or self._registrant is None or (self._registrant.getAvatar().getId() != self._getUser().getId()):
-           raise AccessError("Indico cannot display epayment information without being logged in")
+            raise AccessError("Indico cannot display epayment information without being logged in")
 
-    
+
     def _checkParams( self, params ):
         #
         #skipjack does not allow for the sending of arbitrary variables.  We are
@@ -229,5 +229,5 @@ class RHEPaymentDisplayInfoSkipjack( RHConferenceBaseDisplay ):
             p = registrationForm.WPRegFormInactive( self, self._conf )
             return p.display()
         else:
-	    p = ePayments.WPEPaymentSkipjackDisplayInfo(self, self._conf, self._registrant )
+            p = ePayments.WPEPaymentSkipjackDisplayInfo(self, self._conf, self._registrant )
             return p.display()

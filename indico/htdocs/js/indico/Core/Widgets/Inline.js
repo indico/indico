@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 type("InlineWidget", ["IWidget"],
      {
@@ -82,82 +99,60 @@ type("InlineRemoteWidget", ["InlineWidget"],
          this.source = indicoSource(method, attributes, null, !loadOnStartup, callback);
      });
 
-type("InlineRemoteWidgetForOptionButton", ["InlineWidget"],
+type("SwitchOptionButton", ["InlineWidget"],
      {
          draw: function() {
              var self = this;
-             var canvas = Html.span({}, 'loading...');
-             canvas.set(self.drawContent());
-             var message = Html.span({style: {marginLeft:'10px'}},'\u00A0');
-             message.dom.id = this.messageId;
+             var checkbox = $("<input/>").attr("type","checkbox").css("vertical-align", "middle");
+             var message = $("<span/>").css({"color":"green", "margin-left":"10px", "vertical-align":"middle", "display": "none"}).append(self.savedMessage);
+             var tbody = $("<tbody/>");
+             tbody.append($("<tr/>").append($("<td/>").append(checkbox).append($("<span/>").css("vertical-align", "middle").append(this.caption))).append($("<td/>").append(message)));
 
-             var table = Html.table();
-             var tbody = Html.tbody();
-             var row1 = Html.tr();
-             var cell2 = Html.td();
+             var request = function(args, showSavedMessage) {
+                 indicoRequest(self.method,
+                         args, function(response, error){
+                       if (exists(error)) {
+                           self._error(error);
+                       }
+                       else {
+                           checkbox.prop("checked", response);
+                           if(showSavedMessage){
+                               message.show();
+                               setTimeout(function(){message.hide();}, 1000);
+                           }
+                       }
+                   });
+             };
 
-             table.dom.style.display = 'inline';
-             table.set(tbody);
 
-             cell2.append(canvas);
-             row1.append(cell2);
+             checkbox.prop('disabled', this.disabled);
 
-             cellMessage = Html.td();
-             cellMessage.dom.style.verticalAlign = "middle";
-             cellMessage.dom.rowSpan = 2;
-             cellMessage.append(message);
-             row1.append(cellMessage);
+             if(this.initState !== null){
+                 checkbox.prop("checked", this.initState);
+             } else{
+                 request(self.attributes, false);
+             }
 
-             tbody.append(row1);
+             if(this.disabled) {
+                 $(tbody).qtip({content: $T("You do not have access to modify the value of this checkbox"), position: {my: 'top middle', at: 'bottom middle'}});
+             }
 
-             this.source.state.observe(function(state) {
-                 var to = 0;
-                 if (state == SourceState.Error) {
-                     self.ready.set(true);
-                     self._error(self.source.error.get());
-                 } else if (state == SourceState.Committing) {
-                     self.ready.set(true);
-                     message.set('Saved');
-                     message.dom.style.color='green';
-                     to = setTimeout("$E(\""+self.messageId + "\").set(\'\u00A0\')", 2000);
-                 } else if (state == SourceState.Loaded) {
-                     clearTimeout(to);
-                 } else {
-                     message.set(' ');
-                 }
+             checkbox.click(function(){
+                 self.attributes.set('value', checkbox.is(":checked"));
+                 request(self.attributes, true);
              });
 
-             return table;
+             return $("<table/>").css("display","inline").append(tbody).get(0);
          }
 
      },
-     function(method, attributes) {
-         this.ready = new WatchValue();
-         this.ready.set(false);
-         this.source = indicoSource(method, attributes);
-     });
-
-type("SwitchOptionButton", ["InlineRemoteWidgetForOptionButton"],
-     {
-         error: function(error) {
-             this.checkbox.set(true);
-             alert(error.message);
-         },
-
-         drawContent: function() {
-             return Html.div({},
-                             this.checkbox,
-                             this.caption);
-
-         }
-     },
-     function(method, attributes, caption, messageId) {
-         this.InlineRemoteWidgetForOptionButton(method, attributes);
+     function(method, attributes, caption, savedMessage, initState, disabled) {
+         this.method = method;
+         this.attributes = $O(attributes);
          this.caption = caption;
-         this.checkbox = Html.checkbox({});
-         this.messageId = messageId;
-
-         $B(this.checkbox, this.source);
+         this.savedMessage = savedMessage;
+         this.initState = initState;
+         this.disabled = disabled;
      });
 
 
@@ -188,7 +183,9 @@ type("RemoteSwitchButton", ["InlineWidget"],
                                    else {
                                        chooser.set(targetState);
                                    }
-
+                                   if (exists(self.postRequest)) {
+                                       self.postRequest(response, error);
+                                   }
                                });
              };
 
@@ -231,12 +228,13 @@ type("RemoteSwitchButton", ["InlineWidget"],
       * disableMethod - remote method to be called in order to pass to "disabled state"
       * args - extra args to be passed to either method
       */
-     function(initState, imgEnabled, imgDisabled, enableMethod, disableMethod, args) {
+     function(initState, imgEnabled, imgDisabled, enableMethod, disableMethod, args, postRequest) {
          this.initState = initState;
          this.imgEnabled = imgEnabled;
          this.imgDisabled = imgDisabled;
          this.enableMethod = enableMethod;
          this.disableMethod = disableMethod;
+         this.postRequest = any(postRequest, null);
          this.args = args;
      });
 
@@ -449,7 +447,7 @@ type("RadioFieldWidget", ["InlineWidget", "WatchAccessor"],
                   // add some extra stuff, since we're in the loop
                   self.visibility.set(key, true);
                   self.options.set(key, false);
-                  self.radioDict[key] = Html.radio({'name': this.name,
+                  self.radioDict[key] = Html.radio({'name': self.name,
                                                     style: {verticalAlign: 'middle'}});
               });
 
@@ -492,18 +490,23 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor", "ErrorAware"]
              var options = this.source.get();
 
              if(_.size(self.source.get()) > 0){
-
-             return bind.element(this.select,
-                                 this.source,
-                                 function(item) {
-                                     if ($.isArray(item)) {
-                                         item = new WatchPair(item[0], item[1]);
-                                     }
-                                     return self._drawItem(item);
-                                 });
-             }
-             else{
-                 self.select = Html.select({'name':name});
+                 bind.element(this.select,
+                                     this.source,
+                                     function(item) {
+                                         if ($.isArray(item)) {
+                                             item = new WatchPair(item[0], item[1]);
+                                         } else if(!item.key) {
+                                             item = new WatchPair(item, item);
+                                         }
+                                         return self._drawItem(item);
+                                     });
+                 if(self.select.dom.value != self.selected.get() && self.showNoValue){
+                     var option  = Widget.option(new WatchPair("", ""));
+                     self.select.append(option);
+                     option.accessor('selected').set("selected");
+                 }
+                 return self.select;
+             } else{
                  self.select.append(self._drawNoItems());
                  return self.select;
 
@@ -536,14 +539,18 @@ type("SelectRemoteWidget", ["InlineRemoteWidget", "WatchAccessor", "ErrorAware"]
          }
 
      },
-     function(method, args, callback, name, noOptionsText) {
+     function(method, args, callback, name, noOptionsText, defaultSelected, showNoValue) {
          this.select = Html.select({'name':name});
          this.selected = new WatchValue();
+         if(defaultSelected !== undefined){
+             this.set(defaultSelected);
+         }
          this.noOptionsText = any(noOptionsText,$T("No options"));
          // Load data source on startup
          this.InlineRemoteWidget(method, args, true, callback);
          this.loadOnStartup = false;
          this.name = name;
+         this.showNoValue = any(showNoValue, true);
      });
 
 
@@ -647,6 +654,9 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor", "ErrorAware"],
 
 type("RealtimeTextArea", ["RealtimeTextBox"],
      {
+         onChange: function(callback){
+             this.input.observeEvent('change',callback);
+         }
      },
      function(args) {
 
@@ -1277,7 +1287,7 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
 
          setMode: function(mode) {
              if(mode == 'edit' && isFunction(this.beforeEdit)) {
-                 if(this.beforeEdit() === false) {
+                 if(this.beforeEdit(this) === false) {
                      return;
                  }
              }
@@ -1296,6 +1306,16 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
              this._error(error);
          },
 
+         /* By default, any check before save is accepted */
+         _handleSave: function() {
+             this._save();
+         },
+
+         _save: function() {
+             this._savedValue = this._getNewValue();
+             this.source.set(this._savedValue);
+         },
+
          _handleContentEdit: function() {
 
              var self = this;
@@ -1303,8 +1323,7 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
              this.saveButton = Widget.button(command(function() {
                      if (self._verifyInput()){
                          // save it, in case we need to come back to edit mode;
-                         self._savedValue = self._getNewValue();
-                         self.source.set(self._savedValue);
+                         self._handleSave();
                      }
              }, 'Save'));
 
@@ -1389,16 +1408,19 @@ type("SupportEditWidget", ["InlineEditWidget"],
         {
             /* builds the basic structure for both display and
                edit modes */
-            __buildStructure: function(captionValue, emailValue) {
+            __buildStructure: function(captionValue, emailValue, phoneValue) {
                 // keep everything in separate lines
                  return Html.table({},
                          Html.tbody({},
                                  Html.tr("support",
                                          Html.td("supportEntry", "Caption :"),
                                          Html.td({}, captionValue)),
-                                 Html.tr("support",
-                                         Html.td("supportEntry", "Email :"),
-                                         Html.td({}, emailValue))));
+                                         Html.tr("support",
+                                                 Html.td("supportEntry", "Email :"),
+                                                 Html.td({}, emailValue)),
+                                         Html.tr("support",
+                                                 Html.td("supportEntry", "Telephone :"),
+                                                 Html.td({}, phoneValue))));
             },
 
             _handleEditMode: function(value) {
@@ -1406,19 +1428,21 @@ type("SupportEditWidget", ["InlineEditWidget"],
                 // create support fields and set them to the values transmitted
                 this.caption = Html.edit({}, value.caption);
                 this.email = Html.edit({}, value.email);
+                this.phone = Html.edit({}, value.telephone);
 
 
                 // add the fields to the parameter manager
                 this.__parameterManager.add(this.caption, 'text', false);
                 this.__parameterManager.add(this.email, 'emaillist', true);
+                this.__parameterManager.add(this.phone, 'phone', true);
 
                 // call buildStructure with modification widgets
-                return this.__buildStructure(this.caption, this.email);
+                return this.__buildStructure(this.caption, this.email, this.phone);
             },
 
             _handleDisplayMode: function(value) {
                 // call buildStructure with spans
-                return this.__buildStructure(value.caption, value.email);
+                return this.__buildStructure(value.caption, value.email, value.telephone);
             },
 
             _getNewValue: function() {
@@ -1426,19 +1450,17 @@ type("SupportEditWidget", ["InlineEditWidget"],
                 // for formatting the list when saving support emails asynchronously
 
                 // removes separators at the beginning and at the end
-                emaillist = this.email.get().replace(/(^[ ,;]+)|([ ,;]+$)/g, '');
+                var emaillist = this.email.get().replace(/(^[ ,;]+)|([ ,;]+$)/g, '');
                 // replaces all the other groups of separators by commas
                 emaillist = emaillist.replace(/[ ,;]+/g, ',');
 
                 return {caption: this.caption.get(),
-                        email: emaillist};
+                        email: emaillist,
+                        telephone: this.phone.get()};
             },
 
             _verifyInput: function() {
-                if (!this.__parameterManager.check()) {
-                    return false;
-                }
-                return true;
+                return this.__parameterManager.check();
             }
         },
         function(method, attributes, initValue) {
@@ -1456,8 +1478,8 @@ type("SessionRenameWidget", ["InlineWidget"],
                 this.modeChooser.set(mode);
                 // Adjust the height of the parent container (which is a popup) and
                 // prevent the appearance of a scroll bar.
-                var contentHeight = this.parentContainer.content.dom.offsetHeight;
-                this.parentContainer.contentWrapper.setStyle('height', pixels(contentHeight));
+                //var contentHeight = this.parentContainer.content.dom.offsetHeight;
+                //this.parentContainer.contentWrapper.setStyle('height', pixels(contentHeight));
             },
 
             _buildFrame: function(modeChooser, switchChooser) {
@@ -1484,9 +1506,7 @@ type("SessionRenameWidget", ["InlineWidget"],
 
                 // if the widget is set to load on startup,
                 // the content will be a 'loading' message
-                var wcanvas = Html.div({}, content);
-
-                return wcanvas;
+                return Html.div({}, content);
             },
 
             _handleContent: function(mode) {
@@ -1580,6 +1600,12 @@ type("TextAreaEditWidget", ["InlineEditWidget"],
                 }
             },
 
+            _handleSuccess: function() {
+                if (this.successHandler) {
+                    return this.successHandler();
+                }
+            },
+
             _getNewValue: function() {
                 return this.textarea.get();
             },
@@ -1588,9 +1614,10 @@ type("TextAreaEditWidget", ["InlineEditWidget"],
                 return this.__parameterManager.check();
             }
         },
-        function(method, attributes, initValue) {
-            this.InlineEditWidget(method, attributes, initValue);
+        function(method, attributes, initValue, successHandler, beforeEdit) {
+            this.InlineEditWidget(method, attributes, initValue, beforeEdit);
             this.frameAttrs = {'display': 'block', 'marginTop': '5px'};
+            this.successHandler = successHandler;
             this.__parameterManager = new IndicoUtil.parameterManager();
         });
 
@@ -1615,7 +1642,7 @@ type("SelectEditWidget", ["InlineEditWidget"],
                 else{
                     jQuery.each(this.options, functionDict);
                 }
-                content.append(this.select)
+                content.append(this.select);
                 return content;
             },
 

@@ -113,7 +113,7 @@ Important: It is quite advisable to make a copy of the current MaKaC package
     doing this you must copy (having root privileges) the directories 
     /soft/httpd/host/indico/htdocs/ and 
     /soft/python/lib/python2.3/site-packages/MaKaC to a local place and restore
-    them inmediately if something goes wrong after the new installation so the 
+    them immediately if something goes wrong after the new installation so the 
     problem can be investigated in other machine without interrupting the 
     production system.
            

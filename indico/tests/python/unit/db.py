@@ -1,31 +1,31 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 # ZODB imports
 import ZODB
 from ZODB import ConflictResolution, MappingStorage
+from indico.tests.python.functional.seleniumTestCase import SeleniumTestCase
 import transaction
 from ZODB.POSException import ConflictError
 
 # legacy imports
-from MaKaC.common.db import DBMgr
+from indico.core.db import DBMgr
 
 
 # indico imports
@@ -118,5 +118,30 @@ class DummyUser_Feature(IndicoTestFeature):
     def start(self, obj):
         super(DummyUser_Feature, self).start(obj)
 
+        use_password = isinstance(obj, SeleniumTestCase)
+
         with obj._context('database', sync=True):
-            obj._dummy = default_actions.create_dummy_user()
+            obj._avatars = default_actions.create_dummy_users(use_password)
+            for i in xrange(1, 5):
+                setattr(obj, '_avatar%d' % i, obj._avatars[i])
+            setattr(obj, '_dummy', obj._avatars[0])
+
+
+class DummyGroup_Feature(IndicoTestFeature):
+
+    """
+    Creates a dummy group - needs database
+    """
+
+    _requires = ['db.Database']
+
+    def start(self, obj):
+        super(DummyGroup_Feature, self).start(obj)
+
+        with obj._context('database', sync=True):
+            obj._group_with_users = default_actions.create_dummy_group()
+            for usr in obj._avatars:
+                obj._group_with_users.addMember(usr)
+            obj._empty_group = default_actions.create_dummy_group()
+            setattr(obj, '_dummy_group_with_users', obj._group_with_users)
+            setattr(obj, '_dummy_empty_group', obj._empty_group)

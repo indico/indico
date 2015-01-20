@@ -1,0 +1,94 @@
+/*
+* -*- mode: text; coding: utf-8; -*-
+
+
+   This file is part of Indico.
+   Copyright (C) 2002 - 2012 European Organization for Nuclear Research (CERN).
+
+   Indico is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 3 of the
+   License, or (at your option) any later version.
+
+   Indico is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with Indico; if not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+// -----------------------------------------------------------------------------
+// Compass/Custom mixins default variables
+// -----------------------------------------------------------------------------
+
+$default-border-radius: 0.2em;
+$default-transition-duration: 0.25s;
+$default-transition-function: ease-out;
+
+$default-border-color: $gray;
+$default-border-style: solid;
+
+$color-variation: 15%;
+
+$default-box-shadow-color: lighten($gray, $color-variation);
+$default-box-shadow-blur: 1px;
+$default-box-shadow-h-offset: 1px;
+$default-box-shadow-v-offset: 1px;
+
+%font-family-body {
+    font-family: verdana, arial, serif;
+}
+
+%font-family-monospace {
+    font-family: "Inconsolata", "Monaco", "Droid Sans Mono", "Profont", courier, monospace;
+}
+
+%font-family-serif {
+    font-family: "Georgia", "Garamond", "Droid serif", "Linux Libertine", "Palatino", serif;
+}
+
+%font-family-sans {
+    font-family: "Roboto", "Helvetica", sans;
+}
+
+%font-size-body {
+    font-size: 13px;
+}
+
+
+// -----------------------------------------------------------------------------
+// Custom mixins
+// -----------------------------------------------------------------------------
+
+@mixin border-top($color: $default-border-color, $style: $default-border-style) {
+    border-top: 1px $style $color;
+}
+@mixin border-right($color: $default-border-color, $style: $default-border-style) {
+    border-right: 1px $style $color;
+}
+@mixin border-bottom($color: $default-border-color, $style: $default-border-style) {
+    border-bottom: 1px $style $color;
+}
+@mixin border-left($color: $default-border-color, $style: $default-border-style) {
+    border-left: 1px $style $color;
+}
+@mixin border-vert($color: $default-border-color, $style: $default-border-style) {
+    @include border-top($color, $style);
+    @include border-bottom($color, $style);
+}
+@mixin border-horz($color: $default-border-color, $style: $default-border-style) {
+    @include border-right($color, $style);
+    @include border-left($color, $style);
+}
+@mixin border-all($color: $default-border-color, $style: $default-border-style) {
+    @include border-vert($color, $style);
+    @include border-horz($color, $style);
+}
+
+@mixin gradient($start-color, $end-color) {
+    background: $start-color;
+    @include background-image(linear-gradient(top, $start-color, $end-color));
+}

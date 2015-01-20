@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 AJAX Services for Scheduler (admin)
@@ -27,7 +26,6 @@ from MaKaC.services.interface.rpc.common import ServiceError
 
 from indico.modules import ModuleHolder
 from indico.modules.scheduler import Client
-from indico.modules.scheduler.tasks import OneShotTask, PeriodicTask
 from indico.util import fossilize, date_time
 
 
@@ -53,8 +51,7 @@ class GetWaitingTaskList(SchedulerModuleAdminService):
     """
 
     def _getAnswer(self):
-        return fossilize.fossilize(list(v for (k,v) in
-                                        self.schedModule.getWaitingQueue()))
+        return fossilize.fossilize([v for k, v in self.schedModule.getWaitingQueue()])
 
 
 class GetRunningTaskList(SchedulerModuleAdminService):
@@ -72,7 +69,7 @@ class GetFailedTaskList(SchedulerModuleAdminService):
     """
 
     def _getAnswer(self):
-        return fossilize.fossilize(self.schedModule.getFailedIndex().values())
+        return fossilize.fossilize(list(reversed(self.schedModule.getFailedIndex().values())))
 
 
 class GetFinishedTaskList(SchedulerModuleAdminService):

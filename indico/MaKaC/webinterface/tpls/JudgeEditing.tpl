@@ -27,14 +27,16 @@
 <table width="90%" align="center" border="0" style="padding-top: 15px;">
     <tr>
         <td colspan="5" class="groupTitle" style="border: none">${ _("Give opinion on the layout of a contribution")}
-            ${inlineContextHelp(_('Here is displayed the judgement given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.'))}
+            ${inlineContextHelp(_('Here is displayed the assessment given by the Layout Reviewer.<br/>Only the Layout Reviewer of this contribution can change this.'))}
         </td>
     </tr>
+     % if len (ConfReview.getLayoutQuestions()) > 0 :
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Reviewing questions")}:</span></td>
         <td width="60%" id="criteriaListDisplay">
         </td>
     </tr>
+    % endif
     <tr>
         <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Comments")}:</span></td>
         <td>
@@ -42,14 +44,14 @@
         </td>
     </tr>
     <tr>
-        <td nowrap class="titleCellTD"><span class="titleCellFormat"><strong>${ _("Judgement")}:</strong></span></td>
+        <td nowrap class="titleCellTD"><span class="titleCellFormat"><strong>${ _("Assessment")}:</strong></span></td>
         <td>
             <div id="statusDiv">
                 <div id="initialStatus" style="display:inline">${ Editing.getJudgement() }</div>
                 <div id="inPlaceEditJudgement" style="display:inline"></div>
             </div>
             <div id="commentsMessage" style="padding-top:5px;">
-                ${ _("The comments and your judgement, will be sent by e-mail to the author(s)")}
+                ${ _("The comments and your assessment, will be sent by e-mail to the author(s)")}
             </div>
         </td>
     </tr>
@@ -65,7 +67,7 @@
         </td>
     </tr>
 </table>
-% endif
+
 <script type="text/javascript">
 
 var observer = function(value) {
@@ -96,9 +98,7 @@ var showWidgets = function(firstLoad) {
              current: 'editorJudgement'},initialValue).draw());
 
 
-    % if len (ConfReview.getLayoutQuestions()) == 0 :
-        $E('criteriaListDisplay').set("No form criteria proposed for this conference.");
-    % else:
+    % if len (ConfReview.getLayoutQuestions()) > 0 :
         $E("criteriaListDisplay").set('');
 
         % for c in ConfReview.getLayoutQuestions():
@@ -176,9 +176,7 @@ var showValues = function() {
             },
             function(result, error){
                 if (!error) {
-                    if (result.length == 0) {
-                        $E('criteriaListDisplay').set('No form criteria proposed for this conference.');
-                    } else {
+                    if (result.length > 0) {
                         $E('criteriaListDisplay').set('');
                         for (var i = 0; i<result.length; i++) {
                             $E('criteriaListDisplay').append(result[i]);
@@ -205,15 +203,15 @@ var updatePage = function (firstLoad){
         if($E('initialStatus')) {
             $E('statusDiv').remove($E('initialStatus'));
         }
-        submitButton.set('Modify judgement');
-        $E('submittedmessage').set('Judgement has been submitted');
+        submitButton.set('Modify assessment');
+        $E('submittedmessage').set('Assessment has been submitted');
         showValues();
     } else {
         if ("${ Editing.getJudgement() }" == "None") {
             submitButton.dom.disabled = true;
         }
         submitButton.set('Submit');
-        $E('submittedmessage').set('Judgement not submitted yet');
+        $E('submittedmessage').set('Assessment not yet submitted');
         showWidgets(firstLoad);
     }
 }
@@ -232,7 +230,7 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
                location.href = "${ urlHandlers.UHContributionModifReviewing.getURL(Contribution) }";
                location.reload(true);
             } else {
-                alert (error.message);
+                new AlertPopup($T("Error"), error.message).open();
                 //IndicoUtil.errorReport(error);
             }
         },
@@ -242,3 +240,4 @@ var submitButton = new IndicoUI.Widgets.Generic.simpleButton($E('submitbutton'),
 updatePage(true);
 
 </script>
+% endif

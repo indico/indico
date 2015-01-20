@@ -19,6 +19,11 @@
         return true;
     },
 
+    checkDisconnect : function(booking) {
+        booking.permissionToDisconnect = true;
+        return true;
+    },
+
     checkParams: function() {
         var self = this;
         return {
@@ -28,20 +33,30 @@
                 if (name.length > maxNameLength) {
                     errors.push($T("The room name cannot be longer than ") + maxNameLength + $T(" characters."));
                 }
+                if (name.length == 0) {
+                    errors.push($T("The room name has not been defined"));
+                }
                 return errors;
             }],
             'roomDescription' : ['text', false],
             'pin': ['non_negative_int', true],
-            'videoLinkSession': ['text', false, function(option, values){
+            'moderatorPin': ['non_negative_int', true, function(pin, values) {
                 var errors = [];
-                if(self.vidyoComponents["link"].get()=="session" && option == "None"){
+                if (pin.length != 0 && (pin.length < 3 || pin.length > 10 )) {
+                    errors.push($T("The PIN for the vidyo room has to be a 3-10 digit number."));
+                }
+                return errors;
+            }],
+            'videoLinkSession': ['text', true, function(option, values){
+                var errors = [];
+                if(self.vidyoComponents["link"].get()=="session" && ["","None"].indexOf(option)!=-1){
                     errors.push($T("No session has been defined."));
                 }
                 return errors;
             }],
-            'videoLinkContribution': ['text', false, function(option, values){
+            'videoLinkContribution': ['text', true, function(option, values){
                 var errors = [];
-                if(self.vidyoComponents["link"].get()=="contribution" && option == "None"){
+                if(self.vidyoComponents["link"].get()=="contribution" && ["","None"].indexOf(option)!=-1){
                     errors.push($T("No contribution has been defined."));
                 }
                 return errors;
@@ -49,7 +64,7 @@
         };
     },
 
-    errorHandler: function(event, error, booking) {
+    errorHandler: function(event, error, booking, popup) {
         if (event === 'create' || event === 'edit') {
             if (error.errorType === 'invalidName') {
                 var message = $T("That room name is not valid. Please write a new name that starts " +
@@ -70,11 +85,29 @@
 
             if (error.errorType === 'duplicated') {
                 // the name is duplicated
-                var message = $T("There is already a Vidyo Public Room in this event with the same name. Please give a different name to the room.");
+                var message = $T("There is already a Vidyo Room in the system with the same name. Please give a different name to the room.");
                 IndicoUtil.markInvalidField($E('roomName'), message);
-
             }
 
+            if (error.errorType === 'PINLength') {
+                var message = $T("The PIN for the vidyo room has to be a 3-10 digit number.");
+                IndicoUtil.markInvalidField($E('moderatorPin'), message);
+            }
+
+            if (error.errorType === 'duplicatedWithOwner') {
+                var conferenceId = this.vidyoComponents.params.conference;
+                var handler = function(confirm) {
+                    if (confirm) {
+                        attachBooking(booking, "Vidyo", conferenceId);
+                        popup.close();
+                    }
+                };
+                var container = $('<div/>').css("max-width", "550px");
+                var warningMessage = $('<div/>').addClass("warningMessage").css("text-align", "justify").append($T('Please be aware that if you attach the room, the data you may have filled in the form (Meeting PIN, Moderator PIN, description, owner, etc) will not be taken into account. Instead, the data from the original attached room will be used.'));
+                container.append(warningMessage);
+                container.append(error.userMessage);
+                new ConfirmPopup($T('Attach room'), container.get(0), handler, $T("Attach room")).open();
+            }
             if (error.errorType === 'badOwner') {
                 CSErrorPopup($T("Invalid owner"), [$T("The user ") + this.vidyoComponents["ownerField"].get().name + $T(" does not have a Vidyo account.")]);
             }
@@ -91,35 +124,49 @@
 
         }
 
-        if (event === 'edit' && error.errorType === 'unknownRoom') {
-            vidyoMarkBookingNotPresent(booking);
-            CSErrorPopup($T("Public room removed in Vidyo"),
-                    [$T("This public room seems to have been deleted in Vidyo."),
-                     $T("Please delete it and try to create it again.")]);
+        if (event === 'attach' && error.errorType === 'notValidRoom') {
+            CSErrorPopup($T("Duplicate room name"), [error.userMessage]);
         }
 
-        if (event === 'checkStatus' && error.errorType === 'unknownRoom') {
+        if (event === 'attach' && error.errorType === 'duplicated') {
+            CSErrorPopup($T("Public room duplicated name"),
+                    [$T("There is already a Vidyo Public Room linked to this event with the same name."),
+                     $T("Please give a different name to the room.")]);
+        }
+
+        if ((event === 'edit' || event === 'checkStatus' || event === 'connect') && error.errorType === 'unknownRoom') {
             vidyoMarkBookingNotPresent(booking);
             CSErrorPopup($T("Public room removed in Vidyo"),
                     [$T("This public room seems to have been deleted in Vidyo."),
                      $T("Please delete it and try to create it again.")]);
-
         }
 
         if (event === 'connect' && error.errorType === 'noValidConferenceRoom') {
             CSErrorPopup($T("Not valid conference room"),
                     [$T("The conference room is not a valid Vidyo capable room."),
                      $T("Please select one that is Vidyo capable.")]);
-
         }
 
-        if (event === 'connect' && error.errorType === 'unknownRoom') {
-            CSErrorPopup($T("Public room removed from Vidyo"),
-                    [$T("This public room seems to have been deleted from Vidyo."),
-                     $T("Please delete it and try to create it again.")]);
+        if (event === 'connect' && error.errorType === 'noExistsRoom') {
+            CSErrorPopup($T("Connect room failed"),[error.userMessage]);
         }
+
         if (event === 'connect' && error.errorType === 'connectFailed') {
             CSErrorPopup($T("Connect room failed"),[error.userMessage]);
+        }
+
+        if (event === 'connect' && error.errorType === 'alreadyConnected') {
+            CSErrorPopup($T("Already connected"),[error.userMessage]);
+        }
+
+        if (event === 'disconnect' && error.errorType === 'disconnectFailed') {
+            CSErrorPopup($T("Disconnect room failed"),[error.userMessage]);
+        }
+        if (event === 'disconnect' && error.errorType === 'alreadyDisconnected') {
+            CSErrorPopup($T("Already disconnected"),[error.userMessage]);
+        }
+        if (event === 'roomConnected' && error.errorType === 'roomCheckFailed') {
+            CSErrorPopup($T("Room connection status failed"),[error.userMessage]);
         }
     },
 
@@ -152,16 +199,27 @@
             Html.td("collaborationInfoLeftCol", $T('Room moderator:')),
             Html.td({}, booking.bookingParams.owner.name)));
 
-        var pinInfo;
-        if (booking.bookingParams.hasPin) {
-            pinInfo = new HiddenText(booking.bookingParams.pin, Html.span("VidyoHiddenPIN", "********"), false).draw();
+        var moderatorPinInfo;
+        if (booking.bookingParams.hasModeratorPin) {
+            moderatorPinInfo = new HiddenText(booking.bookingParams.moderatorPin, Html.span("VidyoHiddenModeratorPIN", "********"), false).draw();
         } else {
-            pinInfo = $T("No PIN was defined");
+            moderatorPinInfo = $T("No moderator PIN was defined");
         }
 
         infoTbody.append(Html.tr({},
-            Html.td("collaborationInfoLeftCol", $T('PIN:')),
-            Html.td({}, pinInfo)));
+                Html.td("collaborationInfoLeftCol", $T('Moderator PIN:')),
+                Html.td({}, moderatorPinInfo)));
+
+        var pinInfo;
+        if (booking.bookingParams.hasPin) {
+            pinInfo = new HiddenText(booking.bookingParams.pin, Html.span("HiddenPIN", "********"), false).draw();
+        } else {
+            pinInfo = $T("No meeting PIN was defined");
+        }
+
+        infoTbody.append(Html.tr({},
+                Html.td("collaborationInfoLeftCol", $T('Meeting PIN:')),
+                Html.td({}, pinInfo)));
 
         infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Description:')),
@@ -174,6 +232,10 @@
         infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Visibility:')),
             Html.td({}, booking.bookingParams.hidden? $T("Hidden") : $T("Visible"))));
+
+        infoTbody.append(Html.tr({},
+                Html.td("collaborationInfoLeftCol", $T('Auto-Mute:')),
+                Html.td({}, booking.bookingParams.autoMute? $T("Enabled") : $T("Disabled"))));
 
         infoTbody.append(Html.tr({},
             Html.td("collaborationInfoLeftCol", $T('Created on:')),
@@ -240,7 +302,8 @@
                 null, false,
                 false, false,
                 singleUserNothing, singleUserNothing),
-            pinField : new ShowablePasswordField('pin', '', false),
+            pinField : new ShowablePasswordField('pin', '', false, 'pin'),
+            moderatorPinField : new ShowablePasswordField('moderatorPin', '', false, 'moderatorPin'),
             link : new RadioFieldWidget([
                  ['event', $T("Leave default Vidyo association")],
                  ['contribution', $T("Link to a contribution")],
@@ -254,6 +317,7 @@
                 params, function() {
                         ajaxPending["contribution"].resolve();
                 }, 'videoLinkContribution', "No contributions"),
+            autoMuteField : $("<input/>").attr({type:"checkbox",name:"autoMute", id:"autoMute", value:"yes", "checked":true}).css("vertical-align", "middle")[0],
             dummy : "",
             changed : false
         };
@@ -274,10 +338,14 @@
 
         $E('owner').set(vidyoComponents["ownerField"].draw());
         $E('PINField').set(vidyoComponents["pinField"].draw());
+        $E('moderatorPINField').set(vidyoComponents["moderatorPinField"].draw());
         $E('videoEventLinkType').set(vidyoComponents["link"].draw());
+        $E('autoMuteField').set(vidyoComponents["autoMuteField"]);
 
         bookingPopup.addComponent(vidyoComponents["ownerField"]);
         bookingPopup.addComponent(vidyoComponents["pinField"]);
+        bookingPopup.addComponent(vidyoComponents["moderatorPinField"]);
+        bookingPopup.addComponent(vidyoComponents["autoMuteField"]);
         bookingPopup.addComponent(vidyoComponents["session"]);
         bookingPopup.addComponent(vidyoComponents["contribution"]);
         bookingPopup.addComponent(vidyoComponents["link"]); /* This must be the last component added. */
@@ -299,6 +367,10 @@
 
         self.observeRadioButtons(vidyoComponents);
 
+        if(bookingPopup.booking !== undefined){
+            if(bookingPopup.booking.isRoomInMultipleBookings) $(".redWarningMessage").show();
+            else $(".redWarningMessage").hide();
+        }
         return vidyoComponents;
     },
 

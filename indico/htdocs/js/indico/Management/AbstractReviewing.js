@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 //Widget to change the scale in abstract reviewing
 type("ScaleEditWidget", ["InlineEditWidget"],
@@ -8,7 +25,7 @@ type("ScaleEditWidget", ["InlineEditWidget"],
             __buildStructure: function(minValue, maxValue, warning) {
 
                 var div = Html.div({style:{paddingLeft:'2px'}});
-                var spanTitle = Html.span({className:'dataCaptionFormat'},"Scale for each answer: ")
+                var spanTitle = Html.span({className:'dataCaptionFormat'},"Scale for each answer: ");
                 var structure = Html.table({},
                                     Html.tbody({},
                                         Html.tr({},Html.td("supportEntry", "From :"),
@@ -16,7 +33,7 @@ type("ScaleEditWidget", ["InlineEditWidget"],
                                         Html.tr({},Html.td("supportEntry", "To :"),
                                             Html.td({}, maxValue))));
                 div.append(spanTitle);
-                div.append(structure)
+                div.append(structure);
                 if (warning) { // edit mode
                     div.append(warning);
                 }
@@ -50,10 +67,10 @@ type("ScaleEditWidget", ["InlineEditWidget"],
                     return false;
                 }
                 if (parseInt(this.min.dom.value) >= parseInt(this.max.dom.value)) {
-                    alert("The \"From\" value must be lower than \"To\" value.");
+                    new AlertPopup($T("Warning"), $T("The \"From\" value must be lower than \"To\" value.")).open();
                     return false;
                 } else if ((parseInt(this.max.dom.value) - parseInt(this.min.dom.value)) > 100) {
-                    alert("The maximun difference between limits is 100 units.");
+                    new AlertPopup($T("Warning"), $T("The maximun difference between limits is 100 units.")).open();
                     return false;
                 }
                 return true;
@@ -92,8 +109,7 @@ type("NumberAnswersEditWidget", ["InlineEditWidget"],
                 this.__parameterManager.add(this.num, 'unsigned_int', false, function(value){
 
                     if (value > 20 || value < 2) {
-                        var error = Html.span({}, "Number must be in a range between 2 and 20");
-                        return error;
+                        return Html.span({}, "Number must be in a range between 2 and 20");
                     } else {
                         return null;
                     }
@@ -113,10 +129,7 @@ type("NumberAnswersEditWidget", ["InlineEditWidget"],
             },
 
             _verifyInput: function() {
-                if (!this.__parameterManager.check()) {
-                    return false;
-                }
-                return true;
+                return this.__parameterManager.check();
             },
 
             _handleSuccess: function() {
@@ -254,7 +267,7 @@ type("RadioButtonSimpleField", ["ErrorAware"],
                     row2.append(cell2);
                 }
 
-                cellMessage = Html.td();
+                var cellMessage = Html.td();
                 cellMessage.dom.style.verticalAlign = "middle";
                 cellMessage.dom.rowSpan = 2;
 
@@ -328,7 +341,7 @@ type("ManageListOfElements", [],
 
                 var self = this;
 
-                var popup = new ConfirmPopup(title, popupContent,
+                return new ConfirmPopup(title, popupContent,
                         function(action) {
                             if (action) {
                                 var attr = self.attributes;
@@ -339,19 +352,15 @@ type("ManageListOfElements", [],
                                 self._buildStructure(method, attr);
                             }
                         }, buttonText);
-                return popup;
             },
 
             _createSpecialRemovePopup: function(method, spanId, popupContent, title, button1, button2) {
 
                 var self = this;
 
-                var popup = new SpecialRemovePopup(title, popupContent,
+                return new SpecialRemovePopup(title, popupContent,
                         function(option) {
-                            if (option == 0) {
-                                // close popup option
-                                null;
-                            } else {
+                            if (option != 0) { // == 0 means close popup
                                 var attr = self.attributes;
                                 attr['id'] = spanId;
 
@@ -366,8 +375,6 @@ type("ManageListOfElements", [],
                                 self._buildStructure(method, attr);
                             }
                         }, button1, button2);
-
-                return popup;
             },
 
 
@@ -397,24 +404,24 @@ type("ManageListOfElements", [],
 
                     for (var i=0; i < result.length; i++) {
                         tr = Html.tr({className: 'infoTR'});
-                        tdElement = Html.td({className: 'questionContent'}, result[i].text);
-                        tdElement.dom.id = "TEID_"+result[i].id;
+                        var tdElement = Html.td({className: 'questionContent'}, result[i].text);
+                        tdElement.dom.id = "TEID_"+this.divsIdRoot+"_"+result[i].id;
 
                         // 'Edit' elements and functionality
                         tdEdit = Html.td({className: 'content'});
                         var spanEdit = Html.span({className: 'link'},'Edit');
-                        spanEdit.dom.id = "QEID_"+result[i].id; // Set the span id with the question id included
+                        spanEdit.dom.id = "QEID_"+this.divsIdRoot+"_"+result[i].id; // Set the span id with the question id included
                         spanEdit.dom.name = result[i].text;
                         spanEditList.push(spanEdit);
                         tdEdit.append(spanEdit);
 
                         spanEditList[i].observeClick(function(event) {
                             if (event.target) { // Firefox
-                                var spanId = event.target.id.split('_')[1];
+                                var spanId = event.target.id.split('_')[2];
                             } else { // IE
-                                var spanId = event.srcElement.id.split('_')[1];
+                                var spanId = event.srcElement.id.split('_')[2];
                             }
-                            var previousText = $E('TEID_'+spanId).dom.innerHTML;
+                            var previousText = $E('TEID_'+self.divsIdRoot+"_"+spanId).dom.innerHTML;
                             var popupContent = Html.textarea({id:'modifyArea', cols:'40', rows:'7'}, previousText);
                             var popup = self._createConfirmPopup(self.methods.edit, spanId, previousText, popupContent, 'Edit '+self.kindOfElement, 'Save');
                             popup.open();
@@ -423,15 +430,15 @@ type("ManageListOfElements", [],
                         // 'Remove' elements and functionality
                         tdRemove = Html.td({className: 'content'});
                         var spanRemove = Html.span({className: 'link'},'Remove');
-                        spanRemove.dom.id = "QRID_"+result[i].id; // Set the span id with the question id included
+                        spanRemove.dom.id = "QRID_"+this.divsIdRoot+"_"+result[i].id; // Set the span id with the question id included
                         spanRemoveList.push(spanRemove);
                         tdRemove.append(spanRemove);
 
                         spanRemoveList[i].observeClick(function(event){
                             if (event.target) { // Firefox
-                                var spanId = event.target.id.split('_')[1];
+                                var spanId = event.target.id.split('_')[2];
                             } else { // IE
-                                var spanId = event.srcElement.id.split('_')[1];
+                                var spanId = event.srcElement.id.split('_')[2];
                             }
                             var attr = self.attributes;
                             attr['value'] = spanId;
@@ -536,7 +543,7 @@ type("QuestionsManager", [],
                 if(this.questionPM.check()) {
                     return true;
                 }
-                alert($T('Please answer all questions.'));
+                new AlertPopup($T("Warning"), $T("Please answer all questions.")).open();
                 return false;
             }
         },

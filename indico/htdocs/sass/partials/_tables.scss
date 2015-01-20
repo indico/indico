@@ -1,0 +1,281 @@
+/*
+ * This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+table.i-table {
+    border-collapse: collapse;
+    margin-top: 1.6em;
+    table-layout: fixed;
+    width: 100%;
+
+    &.no-margin {
+        margin-top: 0em;
+    }
+
+    thead th {
+        padding: 5px;
+        font-weight: bold;
+        text-align: left;
+        background-color: #EAEAEA;
+    }
+}
+
+tr.i-table {
+    border-bottom: 1px solid #E5E5E5;
+    border-top: 1px solid #E5E5E5;
+}
+
+td.i-table {
+    @include box-sizing(border-box);
+    border-left: 2px solid transparent;
+    overflow: hidden;
+    padding: 5px 3px 5px 3px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+
+    &.empty {
+        color: $dark-gray;
+        font-style: italic;
+    }
+
+    &[class*="icon-"] {
+         width: 30px;
+
+         &:before {
+            color: $black !important;
+            font-size: 1.2em;
+         }
+    }
+
+    & ~ td.i-table {
+        border-left: none !important;
+    }
+}
+
+h3.i-table {
+    color: $light-black;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 0em;
+    margin-top: 1em;
+    padding: 3px 3px 5px 3px;
+
+    &.emphasis {
+        font-style: italic;
+    }
+
+    &.border {
+        border-bottom: 1px solid #E5E5E5;
+    }
+
+    & + table.i-table {
+        margin-top: 0em;
+    }
+}
+
+
+// ============================================================================
+// Interactive rows
+// ============================================================================
+
+tr.i-table.interactive {
+    &.active {
+        @include single-transition(background-color);
+        background-color: #F4F4F4;
+
+        > td.i-table {
+            border-left-color: lighten($gray, $color-variation);
+        }
+    }
+
+    &.no-border-bottom {
+        border-bottom: none !important;
+    }
+
+    > td.i-table {
+        @include user-select(none);
+        cursor: pointer;
+    }
+
+    &:hover {
+        > td.i-table,
+        + tr.i-table.content-wrapper > td.i-table {
+            border-left-color: $blue;
+        }
+    }
+
+}
+
+tr.i-table.content-wrapper {
+    border-top: none;
+
+    > td.i-table {
+        border-left-color: lighten($gray, $color-variation);
+        padding: 0px;
+    }
+}
+
+tr.i-table.content {
+    border: none;
+
+    > td.i-table.caption,
+    > td.i-table.value {
+        padding: 3px 5px 3px 5px;
+    }
+
+    > td.i-table.caption {
+        @include border-bottom(lighten($gray, $color-variation), dashed);
+        @include border-right(lighten($gray, $color-variation), dashed);
+        font-weight: bold;
+        text-align: right;
+        vertical-align: top;
+    }
+
+    > td.i-table.value {
+        border-bottom: 1px solid transparent;
+        color: $light-black;
+
+        &.plain-text-email {
+            white-space: pre-line;
+        }
+    }
+
+    &:last-of-type {
+        > td.i-table.caption,
+        > td.i-table.value {
+            border-bottom: none;
+        }
+    }
+}
+
+
+// ============================================================================
+// View specifics
+// ============================================================================
+
+td.i-table {
+    &.log-caption {
+        width: 175px;
+    }
+
+    &.log-module {
+        font-weight: bold;
+        width: 150px;
+    }
+
+    &.log-subject {
+        width: auto;
+    }
+
+    &.log-stamp {
+        text-align: right;
+        text-overflow: clip;
+        width: 230px;
+
+        span.user-name {
+           display: inline-block;
+           max-width: 120px;
+           overflow: hidden;
+           text-overflow: ellipsis;
+           vertical-align: bottom;
+        }
+    }
+}
+
+
+// ============================================================================
+// Widget table
+// ============================================================================
+
+.i-table-widget {
+    @include border-radius();
+    width: 100%;
+    max-width: 100%;
+    border-spacing: 0;
+    border: 1px solid $gray;
+    text-align: left;
+
+    tr > td, tr > th {
+        padding: 8px;
+        line-height: 1.5;
+        vertical-align: top;
+    }
+
+    tr > th {
+        background-color: $light-gray;
+    }
+
+    tr > td {
+        border-top: 1px solid $gray;
+        vertical-align: middle;
+    }
+
+    th.small-column, th.action-column {
+        white-space: nowrap;
+        width: 1px;
+    }
+
+    .col-50 {
+        width: 50%;
+    }
+
+    a.action-icon {
+        margin: 0 0.5em;
+    }
+
+    .toolbar {
+        margin: 0;
+    }
+
+    // Collapsable rows
+    .toggle-details {
+        color: $light-black;
+    }
+
+    .details-row {
+        padding: 0;
+        border: none;
+    }
+
+    dl.details-container {
+        text-align: left;
+        padding: 8px;
+        overflow: hidden;
+        display: none;
+
+        dt, dd {
+            display: inline-block;
+            float: left;
+            padding: 0.4em;
+            box-sizing: border-box;
+            border-top: 1px dashed #e1e1e1;
+        }
+
+        dt {
+            width: 20%;
+            font-weight: bold;
+            text-align: right;
+            border-right: 1px dashed #e1e1e1;
+        }
+
+        dd {
+            width: 80%;
+            margin: 0;
+        }
+    }
+}

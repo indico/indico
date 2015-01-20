@@ -6,13 +6,13 @@ var WR_confLocation = ${ jsonEncode(ConfLocation) }
 var WR_confRoom = ${ jsonEncode(ConfRoom) }
 
 
-var WRSpeakersTemplate = function(speakerList) {
+var WRSpeakersTemplate = function(presenters) {
     var speakers = ", by "
-    enumerate(speakerList, function(speaker, index) {
+    enumerate(presenters, function(speaker, index) {
         if (index > 0) {
             speakers += " and ";
         }
-        speakers += speaker.fullName;
+        speakers += speaker.name;
     });
     return speakers;
 }
@@ -56,8 +56,8 @@ var WRTalkTemplate = function(talk) {
     label.dom.htmlFor = "talk" + talk.id + "CB";
 
     // After the label, the speakers (optionally)
-    if (talk.speakerList.length > 0) {
-        label.append(Html.span("WRSpeakers", WRSpeakersTemplate(talk.speakerList)))
+    if (talk.presenters.length > 0) {
+        label.append(Html.span("WRSpeakers", WRSpeakersTemplate(talk.presenters)))
     }
 
     // And after the speakers, the location and room (optionally)
@@ -84,25 +84,27 @@ var WRTalkTemplate = function(talk) {
     // Finally, the id
     label.append(Html.span("WRContributionId", "(id: " + talk.id + ")"));
 
-    return Html.li('', checkBox, label);
+    return Html.li({"data-webcastCapable": talk.webcastCapable}, checkBox, label);
 
 };
 
-var WRUpdateContributionList = function () {
+var WRUpdateContributionList = function (targetId) {
     if (WR_contributions.length > 0) {
-        $E('contributionList').set('');
+        $E(targetId).set('');
         for (i in WR_contributions) {
             contribution = WR_contributions[i];
-            $E('contributionList').append(WRTalkTemplate(contribution));
+            $E(targetId).append(WRTalkTemplate(contribution));
         }
     } else {
-        if (exists($E('contributionList'))) { // we are not in a lecture
-            $E('contributionList').set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of webcasting.")));
+        if (exists($E(targetId))) { // we are not in a lecture
+            $E(targetId).set(Html.span({style:{paddingLeft: pixels(20)}}, $T("This event has no talks, or none of the talks take place in a room capable of webcasting.")));
+            // Hack to send a empty list and not make the server crash
+            $E(targetId).append(Html.input('checkbox', {style: {display:"none", disabled:"disabled"},name: "talkSelection", id: "noTalks"}));
         }
     }
 }
 
-var WR_loadTalks = function () {
+var WR_loadTalks = function (isManager) {
 
     var fetchContributions = function() {
 
@@ -114,13 +116,13 @@ var WR_loadTalks = function () {
             var label = Html.label({}, talkId, talkName);
             label.dom.htmlFor = "talk" + talk.id + "CB";
 
-            if (talk.speakerList.length > 0) {
+            if (talk.presenters.length > 0) {
                 var speakers = ", by "
-                enumerate(talk.speakerList, function(speaker, index) {
+                enumerate(talk.presenters, function(speaker, index) {
                     if (index > 0) {
                         speakers += " and ";
                     }
-                    speakers += speaker.fullName;
+                    speakers += speaker.name;
                 });
                 label.append(Html.span("WRSpeakers", speakers))
             }
@@ -150,7 +152,7 @@ var WR_loadTalks = function () {
             function(result, error){
                 if (!error) {
                     WR_contributions = result;
-                    WRUpdateContributionList();
+                    WRUpdateContributionList('contributionList');
                     IndicoUI.Effect.appear($E('contributionsDiv'));
                     WR_contributionsLoaded = true;
                     killProgress();
@@ -163,7 +165,24 @@ var WR_loadTalks = function () {
     };
 
     if (WR_contributionsLoaded) {
+        // Hide talks that are not capable and not choosen by managers
+        if (!isManager) {
+            $("#contributionList li").each(function() {
+                if ($(this).attr('data-webcastCapable') == 'false') {
+                    $(this).find('input').attr('disabled', 'disabled');
+                    if (!$(this).find('input').is(':checked')) {
+                        $(this).hide();
+                    }
+                }
+            });
+        }
         IndicoUI.Effect.appear($E('contributionsDiv'));
+        //Hide list if there are no displayed talks
+        if ($("#contributionList li:not(:hidden)").size() == 0) {
+            WR_hideTalks();
+        }
+
+
     } else {
         fetchContributions();
     }
@@ -178,11 +197,15 @@ var WR_hideTalks = function () {
 
 var WRSelectAllContributions = function() {
     each($N('talkSelection'), function(checkbox) {
-        checkbox.dom.checked = true;
+        if (!checkbox.dom.disabled) {
+            checkbox.dom.checked = true;
+        }
     });
 }
 var WRUnselectAllContributions = function() {
     each($N('talkSelection'), function(checkbox) {
-        checkbox.dom.checked = false;
+        if (!checkbox.dom.disabled) {
+            checkbox.dom.checked = false;
+        }
     });
 }

@@ -1,0 +1,135 @@
+h3 {
+    font-size: 1.3em;
+    margin-bottom: 0.5em;
+    margin-top: 2em;
+}
+
+h4 {
+    color: #777;
+    margin-bottom: 0.5em;
+}
+
+#changeTemplateSize {
+    margin-left: 1em;
+}
+
+.tab {
+    overflow: auto;
+}
+
+.tab > .left:not(:first-of-type) {
+  margin-left: 2em;
+}
+
+.tab > .panel {
+    min-height: 11em;
+    padding-right: 2em;
+}
+
+.tab > .panel:not(:last-of-type) {
+    border-right: 1px solid #ddd;
+}
+
+.panel > i[class*="icon-"] {
+    margin-left: 0 !important;
+}
+
+.panel > i[class*="icon-"]:before {
+    color: #ddd;
+    font-size: 2.5em;
+    margin-right: 0.2em;
+}
+
+#controlTabs {
+    min-height: 16em;
+}
+
+.panel .content {
+    margin-left: 4em;
+}
+
+#controlTabs .panel .content h4:first-child {
+    margin-top: 0;
+}
+
+#controlTabs label[for="snap_checkbox"] {
+    font-weight: normal;
+    margin-left: 0.5em;
+}
+
+#selection_text {
+    margin: 0.2em 0.5em 0.2em 0.2em;
+    font-size: 1.2em;
+    color: #888;
+}
+
+#controls {
+    vertical-align: top;
+    width: 230px;
+    padding-right: 2em;
+}
+
+#font_selector, #color_selector, #style_selector, #size_selector, #alignment_selector {
+    display: block;
+    width: 10em;
+}
+
+#bgForm input[type="file"] {
+    max-width: 250px;
+}
+
+.template_list {
+    max-width: 500px;
+}
+
+.template_list ul {
+    list-style-type:  none;
+}
+
+.template_list ul li {
+    display: block;
+    line-height: 2.5em;
+}
+
+.template_list ul li .name {
+    font-size: 1.2em;
+    vertical-align: middle;
+    margin-left: 0.5em;
+}
+
+.ruler {
+    position: relative;
+}
+
+.ruler#horizontal_ruler {
+    height: 10px;
+    top: -6px;
+}
+
+.ruler#vertical_ruler {
+    width: 10px;
+    left: -6px;
+}
+
+.ruler .marking {
+    box-sizing: border-box;
+    position: absolute;
+    border: 1px solid #aaa;
+    color: #aaa;
+    background: #eee;
+    vertical-align: middle;
+    font-size: 0.7em;
+}
+
+.ruler#vertical_ruler .marking {
+    border-width: 1px 0 0 0;
+    text-align: center;
+    width: 15px;
+}
+
+.ruler#horizontal_ruler .marking {
+    border-width: 0 0 0 1px;
+    padding-left: 5px;
+    line-height: 15px;
+    height: 15px;
+}

@@ -1,29 +1,28 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import re
+from indico.core.config import Config
 from MaKaC.common import filters, info
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
 from persistent import Persistent
-from MaKaC.rb_location import CrossLocationQueries
 
 class RoomMapperHolder(ObjectHolder):
     """
@@ -110,63 +109,90 @@ class RoomMapper(Persistent):
         self._regexps=[]
 
     def applyRegularExpressions(self, roomName):
-        """Returns the attribute we have to pass to the Map URL or None if no matching"""
+        """Returns the groupdict of attributes we have to pass to the Map URL or None if no matching"""
         for regexp in self.getRegularExpressions():
             p = re.compile(regexp)
-            m=p.match(roomName)
-            if m is not None:
-                if len(m.groups()) == 1:
-                    return m.group(1)
-                elif len(m.groups()) == 0 and m.group() != "":
-                    return m.group()
+            m = p.match(roomName)
+            if m:
+                return m.groupdict()
         return None
 
     def getMapURL(self, roomName):
-        if re.match("[0-9]+-([0-9]+|R)-[0-9]+", roomName):
-            return "%s%s"%(self.getBaseMapURL(), roomName[:roomName.find('-')])
-        else:
-            minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-            if minfo.getRoomBookingModuleActive():
-                rooms = CrossLocationQueries.getRooms(roomName = roomName)
-                rooms = [r for r in rooms if r is not None]
-                if rooms and rooms[0]:
-                    return "%s%s"%(self.getBaseMapURL(), str(rooms[0].building))
+        groupdict = self.applyRegularExpressions(roomName)
+        if groupdict:
+            return self.getBaseMapURL().format(**groupdict)
+        if not roomName:
+            return ''
+        if Config.getInstance().getIsRoomBookingActive():
+            from indico.modules.rb.models.rooms import Room
+            room = Room.find_first(name=roomName)
+            if room:
+                if all(field in self.getBaseMapURL() for field in ['{building}','{floor}','{roomNr}']):
+                    return self.getBaseMapURL().format(**{'building': str(room.building),
+                                                          'floor': room.floor,
+                                                          'roomNr': room.number})
         return ""
-    getCompleteMapURL=getMapURL
+    getCompleteMapURL = getMapURL
 
     def getLocator( self ):
         d = Locator()
         d["roomMapperId"] = self.getId()
         return d
 
-class _RoomMapperFFName(filters.FilterField):
-    _id="name"
 
-    def satisfies(self,roomMapper, exact=False):
+class _RoomMapperFFBasicName(filters.FilterField):
+    """
+    Use when the filter is comparing basic strings
+    """
+
+    def _getBasicNameFunc(self, room_mapper):
+        """
+        returns the method that will provide the string value to use in the comparison
+        """
+        pass
+
+    def satisfies(self, room_mapper, exact=False):
         for value in self._values:
             if value is not None and value.strip() != "":
                 if value.strip() == "*":
                     return True
                 if exact:
-                    if roomMapper.getName().lower().strip() == value.lower().strip():
+                    if self._getBasicNameFunc(room_mapper)().lower().strip() == value.lower().strip():
                         return True
                 else:
-                    if str(roomMapper.getName()).lower().find((str(value).strip().lower()))!=-1:
+                    if str(self._getBasicNameFunc(room_mapper)()).lower().find((str(value).strip().lower())) != -1:
                         return True
         return False
 
 
+class _RoomMapperFFName(_RoomMapperFFBasicName):
+    _id = "name"
+
+    def _getBasicNameFunc(self, room_mapper):
+        return room_mapper.getName
+
+
+class _RoomMapperFFPlaceName(_RoomMapperFFBasicName):
+    _id = "placename"
+
+    def _getBasicNameFunc(self, room_mapper):
+        return room_mapper.getPlaceName
+
+
 class _RoomMapperFilterCriteria(filters.FilterCriteria):
-    _availableFields={"name":_RoomMapperFFName}
 
-    def __init__(self,criteria={}):
-        filters.FilterCriteria.__init__(self,None,criteria)
+    _availableFields = {"name": _RoomMapperFFName,
+                        "placename": _RoomMapperFFPlaceName}
 
-    def satisfies( self, value, exact=False):
+    def __init__(self, criteria={}):
+        filters.FilterCriteria.__init__(self, None, criteria)
+
+    def satisfies(self, value, exact=False):
         for field in self._fields.values():
-            if not field.satisfies( value, exact ):
+            if not field.satisfies(value, exact):
                 return False
         return True
+
 
 class RoomMapperFilter(filters.SimpleFilter):
     """Performs filtering and sorting over a list of abstracts.

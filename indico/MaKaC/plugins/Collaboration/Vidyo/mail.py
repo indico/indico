@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is par{t of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is par{t of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 from MaKaC.webinterface.mail import GenericNotification
 
 from MaKaC.common.info import HelperMaKaCInfo
@@ -28,9 +27,9 @@ from MaKaC.common import info
 from MaKaC.common.utils import formatDateTime
 from MaKaC.common.timezoneUtils import getAdjustedDate
 from MaKaC.common.mail import GenericMailer
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from MaKaC.common.TemplateExec import escape
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 
 
@@ -225,33 +224,6 @@ Click <a href="%s">here</a> to see it in Indico.<br />
        self._getBookingDetails('new')
        ))
 
-#class NewVidyoPublicRoomNotificationManager(VidyoEventManagerNotificationBase):
-#    """ Template to build an email notification to the conference manager
-#    """
-#
-#    def __init__(self, booking):
-#        VidyoEventManagerNotificationBase.__init__(self, booking)
-#
-#        self.setSubject("""[Indico] New Vidyo meeting: %s (event id: %s)"""
-#                        % (self._conference.getTitle(), str(self._conference.getId())))
-#
-#        self.setBody("""Dear Conference Manager,<br />
-#<br />
-#There is a <strong>new Vidyo meeting</strong> in your conference.<br />
-#Click <a href="%s">here</a> to see it in Indico.<br />
-#<br />
-#%s
-#<br />
-#<br />
-#%s
-#<br />
-#Please note that the auto-join URL will not work until the Vidyo meeting time arrives.
-#""" % (self._modifLink,
-#        MailTools.eventDetails(self._conference),
-#        self._getBookingDetails('new')
-#        ))
-
-
 
 class VidyoPublicRoomModifiedNotificationAdmin(VidyoAdminNotificationBase):
     """ Template to build an email notification to the responsible
@@ -283,34 +255,6 @@ Click <a href="%s">here</a> to see it in Indico.<br />
        ))
 
 
-#class VidyoPublicRoomModifiedNotificationManager(VidyoEventManagerNotificationBase):
-#    """ Template to build an email notification to the event manager
-#    """
-#
-#    def __init__(self, booking):
-#        VidyoEventManagerNotificationBase.__init__(self, booking)
-#
-#        self.setSubject("""[Indico] Vidyo meeting modified: %s (event id: %s)"""
-#                        % (self._conference.getTitle(), str(self._conference.getId())))
-#
-#        self.setBody("""Dear Conference Manager,<br />
-#<br />
-#An Vidyo meeting <strong>was modified</strong> in your conference.<br />
-#Click <a href="%s">here</a> to see it in Indico.<br />
-#<br />
-#%s
-#<br />
-#<br />
-#%s
-#<br />
-#Please note that the auto-join URL will not work until the Vidyo meeting time arrives.
-#""" % (self._modifLink,
-#        MailTools.eventDetails(self._conference),
-#        self._getBookingDetails('modify')
-#        ))
-
-
-
 class VidyoPublicRoomRemovalNotificationAdmin(VidyoAdminNotificationBase):
     """ Template to build an email notification to the responsible
     """
@@ -337,30 +281,6 @@ A Vidyo public room <strong>was deleted</strong> in <a href="%s">%s</a><br />
        MailTools.organizerDetails(self._conference),
        self._getBookingDetails('remove')
        ))
-
-#class VidyoPublicRoomRemovalNotificationManager(VidyoEventManagerNotificationBase):
-#    """ Template to build an email notification to the responsible
-#    """
-#
-#    def __init__(self, booking):
-#        VidyoEventManagerNotificationBase.__init__(self, booking)
-#
-#        self.setSubject("""[Indico] Vidyo public room deleted %s (event id: %s)"""
-#                        % (self._conference.getTitle(), str(self._conference.getId())))
-#
-#        self.setBody("""Dear Conference Manager,<br />
-#<br />
-#An Vidyo meeting <strong>was deleted</strong> in your conference.<br />
-#<br />
-#%s
-#<br />
-#You also can see a list of all the Vidyo meetings here: (not implemented yet).<br />
-#<br />
-#<br />
-#%s
-#""" % (MailTools.eventDetails(self._conference),
-#        self._getBookingDetails('remove')
-#        ))
 
 
 class VidyoCleaningNotification(VidyoAdminNotificationBase):

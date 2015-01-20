@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.webinterface.pages.registrants as registrants
 import MaKaC.webinterface.rh.conferenceDisplay as conferenceDisplay
@@ -34,9 +33,21 @@ class RHRegistrantsDisplayBase( conferenceDisplay.RHConferenceBaseDisplay):
 
 class RHRegistrantsList( RHRegistrantsDisplayBase ):
 
+    @staticmethod
+    def create_filter(conf, params, filterUsed=False, sessionFilterName="session"):
+        regForm = conf.getRegistrationForm()
+        newFilter = {}
+        sessform =regForm.getSessionsForm()
+        sesstypes = sessform.getSessionList()
+        lsessions = []
+        if not filterUsed:
+            for sess in sesstypes:
+                lsessions.append( sess.getId() )
+        newFilter[sessionFilterName]=params.get("session",lsessions)
+        return regFilters.RegFilterCrit(conf,newFilter)
+
     def _checkParams(self, params):
         RHRegistrantsDisplayBase._checkParams(self, params)
-        regForm = self._conf.getRegistrationForm()
 
         # ---- FILTERING ----
         if params.has_key("firstChoice"):
@@ -45,17 +56,8 @@ class RHRegistrantsList( RHRegistrantsDisplayBase ):
             self._sessionFilterName="session"
 
         filterUsed=params.has_key("OK")
-        filter = {}
+        self._filterCrit=self.create_filter(self._conf, params, filterUsed, self._sessionFilterName)
 
-        sessform =regForm.getSessionsForm()
-        sesstypes = sessform.getSessionList()
-        lsessions = []
-        if not filterUsed:
-            for sess in sesstypes:
-                lsessions.append( sess.getId() )
-        filter[self._sessionFilterName]=self._normaliseListParam(params.get("session",lsessions))
-
-        self._filterCrit=regFilters.RegFilterCrit(self._conf,filter)
         sessionShowNoValue=True
         if filterUsed:
             sessionShowNoValue =  params.has_key("sessionShowNoValue")

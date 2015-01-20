@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.plugins.base import ActionBase
 from MaKaC.i18n import _
@@ -26,29 +25,29 @@ from MaKaC.plugins.Collaboration.Vidyo.pages import WShowOldRoomIndexActionResul
     WDeleteOldRoomsActionResult
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.common.mail import GenericMailer
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 from MaKaC.plugins.Collaboration.Vidyo.mail import VidyoCleaningDoneNotification
 from MaKaC.conference import CategoryManager, ConferenceHolder
+from indico.core.index import Catalog
 from MaKaC.user import AvatarHolder
 from MaKaC.common.timezoneUtils import nowutc
 from datetime import timedelta
-from MaKaC.plugins.Collaboration.Vidyo.api.client import AdminClient
 
 pluginActions = [
-    ("deleteOldRooms", {"buttonText": _("Delete old Vidyo rooms"),
+    ("deleteOldRooms", {"buttonText": "Delete old Vidyo rooms",
                         "associatedOption": "cleanWarningAmount"}),
-    ("showOldRoomIndex", {"buttonText": _("Preview the cleanup operation"),
+    ("showOldRoomIndex", {"buttonText": "Preview the cleanup operation",
                           "associatedOption": "cleanWarningAmount"}),
-    ("cleanOldRoomIndex", {"buttonText": _("Clean the old room index"),
+    ("cleanOldRoomIndex", {"buttonText": "Clean the old room index",
                           "associatedOption": "cleanWarningAmount",
                           "visible": False}),
-    ("testCreateLotsOfBookings", {"buttonText": _("Create lots of bookings"),
+    ("testCreateLotsOfBookings", {"buttonText": "Create lots of bookings",
                           "associatedOption": "cleanWarningAmount",
                           "visible": False}),
-    ("testDeleteLotsOfBookings", {"buttonText": _("Delete lots of bookings"),
+    ("testDeleteLotsOfBookings", {"buttonText": "Delete lots of bookings",
                           "associatedOption": "cleanWarningAmount",
                           "visible": False}),
-    ("clearWSDLCache", {"buttonText": _("Clear WSDL Cache. Use when WSDL has changed"),
+    ("clearWSDLCache", {"buttonText": "Clear WSDL Cache. Use when WSDL has changed",
                         "associatedOption": "sudsCacheLocation"})
 ]
 
@@ -64,8 +63,8 @@ class DeleteOldRoomsAction(ActionBase):
         error = False
         attainedDate = None
         try:
-            for booking in VidyoTools.getEventEndDateIndex().iterbookings(maxDate = maxDate):
-                result = booking._delete(fromDeleteOld = True)
+            for booking in list(VidyoTools.getEventEndDateIndex().iterbookings(maxDate = maxDate)):
+                result = booking._delete(fromDeleteOld = True, maxDate = maxDate)
                 if isinstance(result, VidyoError):
                     error = result
                     attainedDate = booking.getConference().getAdjustedEndDate(tz = 'UTC')
@@ -94,11 +93,6 @@ class DeleteOldRoomsAction(ActionBase):
             previousTotal = VidyoTools.getEventEndDateIndex().getCount()
 
             error, attainedDate = DeleteOldRoomsAction._deleteRemoteRooms(maxDate)
-
-            if error:
-                VidyoTools.getEventEndDateIndex().deleteKeys(maxDate = attainedDate - timedelta(seconds = 1))
-            else:
-                VidyoTools.getEventEndDateIndex().deleteKeys(maxDate = maxDate)
 
             newTotal = VidyoTools.getEventEndDateIndex().getCount()
 
@@ -170,7 +164,7 @@ class TestCreateLotsOfBookingsAction(ActionBase):
             c.setTimezone('UTC')
             c.setDates(nowutc() - timedelta(hours = i), nowutc() - timedelta(hours = i - 1))
             for j in xrange(1, 0+1): #number of bookings per event
-                c.getCSBookingManager().createBooking("Vidyo", {"roomName":"room_"+str(i)+"_"+str(j),
+                Catalog.getIdx("cs_bookingmanager_conference").get(c.getId()).createBooking("Vidyo", {"roomName":"room_"+str(i)+"_"+str(j),
                                                                 "roomDescription": "test",
                                                                 "owner":{"_type": "Avatar", "id":"1"}})
 

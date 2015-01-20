@@ -1,6 +1,25 @@
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+##
+## Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 3 of the
+## License, or (at your option) any later version.
+##
+## Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 from MaKaC.plugins.Collaboration.RecordingManager.exceptions import RecordingManagerException
 from MaKaC.plugins.Collaboration.collaborationTools import CollaborationTools
-from MaKaC.common.logger import Logger
+from indico.core.logger import Logger
 import re
 
 try:
@@ -32,7 +51,7 @@ class MicalaCommunication(object):
 
         cursor = connection.cursor()
         # believe it or not, the comma following machine_name is supposed to be there for MySQLdb's sake
-        cursor.execute("""SELECT idMachine,Hostname FROM Machines WHERE Hostname = %s""",
+        cursor.execute("""SELECT idMachine, hostname FROM machines WHERE hostname = %s""",
             (machine_name,))
         connection.commit()
 
@@ -65,7 +84,7 @@ class MicalaCommunication(object):
             raise RecordingManagerException(_("MySQL database error %d: %s") % (e.args[0], e.args[1]))
 
         cursor = connection.cursor()
-        cursor.execute("""SELECT idTask,Name FROM Tasks WHERE Name = %s""",
+        cursor.execute("""SELECT idTask, name FROM tasks WHERE name = %s""",
             (task_name,))
         connection.commit()
 
@@ -99,7 +118,7 @@ class MicalaCommunication(object):
 
         # Depending on style of lecture ID, search under Michigan style column or CERN style column
         cursor = connection.cursor()
-        cursor.execute("""SELECT idLecture,LOID,IndicoID FROM Lectures WHERE LOID = %s OR IndicoID = %s""",
+        cursor.execute("""SELECT idLecture, LOID, IndicoID FROM lectures WHERE LOID = %s OR IndicoID = %s""",
             (lecture_name, lecture_name))
         connection.commit()
 
@@ -136,12 +155,12 @@ class MicalaCommunication(object):
         # If not then an empty set will be returned.
         cursor = connection.cursor()
         cursor.execute("""SELECT L.LOID
-        FROM Lectures L, LectureLatestStatus LS, Status S
+        FROM lectures L, lectureLatestStatus LS, status S
            WHERE L.idLecture = %s
            AND L.idLecture = LS.idLecture
            AND LS.idTask = %s
            AND LS.idStatus = S.idStatus
-           AND S.Status = 'COMPLETE'""",
+           AND S.status = 'COMPLETE'""",
             (idLecture, idTask))
         connection.commit()
 
@@ -176,12 +195,12 @@ class MicalaCommunication(object):
 
         if contentType == "plain_video":
             micalaContentType = "PLAINVIDEO"
-#            Logger.get('RecMan').debug("""INSERT INTO Lectures (IndicoID, contentType, DateCreated) VALUES(%s, %s, NOW());""" % (lecture_name, micalaContentType))
-            cursor.execute("""INSERT INTO Lectures (IndicoID, contentType, DateCreated) VALUES(%s, %s, NOW());""", (lecture_name, micalaContentType))
+#            Logger.get('RecMan').debug("""INSERT INTO Lectures (IndicoID, contentType, dateCreated) VALUES(%s, %s, NOW());""" % (lecture_name, micalaContentType))
+            cursor.execute("""INSERT INTO lectures (IndicoID, contentType, dateCreated) VALUES(%s, %s, NOW());""", (lecture_name, micalaContentType))
         elif contentType == "web_lecture":
             micalaContentType = "WEBLECTURE"
-#            Logger.get('RecMan').debug("""INSERT INTO Lectures (LOID, contentType, DateCreated) VALUES(%s, %s, NOW());""" % (lecture_name, micalaContentType))
-            cursor.execute("""INSERT INTO Lectures (LOID, contentType, DateCreated) VALUES(%s, %s, NOW());""", (lecture_name, micalaContentType))
+#            Logger.get('RecMan').debug("""INSERT INTO Lectures (LOID, contentType, dateCreated) VALUES(%s, %s, NOW());""" % (lecture_name, micalaContentType))
+            cursor.execute("""INSERT INTO lectures (LOID, contentType, dateCreated) VALUES(%s, %s, NOW());""", (lecture_name, micalaContentType))
 
         connection.commit()
 
@@ -207,9 +226,9 @@ class MicalaCommunication(object):
         cleanedLectureTitle    = cls.cleanSQLData(lectureTitle)
         cleanedLectureSpeakers = cls.cleanSQLData(lectureSpeakers)
 
-        Logger.get('RecMan').info("""UPDATE Lectures SET Title = %s, Creator = %s WHERE idLecture = %s""" % (cleanedLectureTitle, cleanedLectureSpeakers, idLecture))
+        Logger.get('RecMan').info("""UPDATE lectures SET title = %s, creator = %s WHERE idLecture = %s""" % (cleanedLectureTitle, cleanedLectureSpeakers, idLecture))
 
-        cursor.execute("""UPDATE Lectures SET Title = %s, Creator = %s WHERE idLecture = %s""", \
+        cursor.execute("""UPDATE lectures SET title = %s, creator = %s WHERE idLecture = %s""", \
                        (cleanedLectureTitle, cleanedLectureSpeakers, idLecture))
 
         connection.commit()
@@ -232,7 +251,7 @@ class MicalaCommunication(object):
             raise RecordingManagerException(_("MySQL database error %d: %s") % (e.args[0], e.args[1]))
 
         cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
-        cursor.execute('''SELECT IndicoID, LOID, ContentType FROM Lectures WHERE IndicoID LIKE "%s%%"''' % confID)
+        cursor.execute('''SELECT IndicoID, LOID, contentType FROM lectures WHERE IndicoID LIKE "%s%%"''' % confID)
         connection.commit()
         rows = cursor.fetchall()
         cursor.close()
@@ -246,7 +265,7 @@ class MicalaCommunication(object):
             # Also, it shouldn't ever happen, but ignore records in the micala DB with ContentType WEBLECTURE
             # that don't have a LOID.
             # LOID = NULL in the MySQL database translates in Python to being None.
-            if row["ContentType"] == 'WEBLECTURE' and row["LOID"] is not None:
+            if row["contentType"] == 'WEBLECTURE' and row["LOID"] is not None:
                 match_array[row["IndicoID"]] = row["LOID"]
 
         return (match_array)
@@ -270,8 +289,8 @@ class MicalaCommunication(object):
             raise RecordingManagerException(_("MySQL database error %d: %s") % (e.args[0], e.args[1]))
 
         cursor = connection.cursor()
-        cursor.execute("""INSERT INTO Status
-            (idMachine, idTask, idLecture, Status, Message, DateReported)
+        cursor.execute("""INSERT INTO status
+            (idMachine, idTask, idLecture, status, message, dateReported)
             VALUES(%s, %s, %s, %s, %s, NOW());""", \
                        (idMachine, idTask, idLecture, status, message))
         cursor.close()
@@ -304,10 +323,10 @@ class MicalaCommunication(object):
 
         cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
-        Logger.get('RecMan').info("UPDATE Lectures SET IndicoID=%s, contentType=%s WHERE idLecture=%s" % (IndicoID, "WEBLECTURE", LODBID))
+        Logger.get('RecMan').info("UPDATE lectures SET IndicoID=%s, contentType=%s WHERE idLecture=%s" % (IndicoID, "WEBLECTURE", LODBID))
 
         try:
-            cursor.execute("UPDATE Lectures SET IndicoID=%s, contentType=%s WHERE idLecture=%s",
+            cursor.execute("UPDATE lectures SET IndicoID=%s, contentType=%s WHERE idLecture=%s",
                            (IndicoID, "WEBLECTURE", LODBID))
             connection.commit()
         except MySQLdb.Error, e:
@@ -352,7 +371,7 @@ class MicalaCommunication(object):
         cursor = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
         try:
-            cursor.execute("UPDATE Lectures SET CDSRecord=%s WHERE idLecture=%s",
+            cursor.execute("UPDATE lectures SET CDSRecord=%s WHERE idLecture=%s",
                            (CDSID, LODBID))
             connection.commit()
         except MySQLdb.Error, e:
@@ -386,9 +405,9 @@ class MicalaCommunication(object):
 
         # The following query returns the IndicoID's for which the metadata export task was started.
         # Whether it was finished we will find out separately by querying CDS to see what records have been created.
-        cursorTaskStarted.execute('''SELECT IndicoID, LOID, Name, Status FROM ViewStatusComprehensive
-                        WHERE Status = 'START'
-                        AND Name = "%s"
+        cursorTaskStarted.execute('''SELECT IndicoID, LOID, name, status FROM viewStatusComprehensive
+                        WHERE status = 'START'
+                        AND name = "%s"
                         AND IndicoID LIKE "%s%%"'''  % \
                        (CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"),
                        confId))
@@ -401,9 +420,9 @@ class MicalaCommunication(object):
         cursorTaskComplete = connection.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
         # The following query returns the IndicoID's for which the metadata export task is COMPLETE.
-        cursorTaskComplete.execute('''SELECT IndicoID, LOID, Name, Status FROM ViewStatusComprehensive
-                        WHERE Status = 'COMPLETE'
-                        AND Name = "%s"
+        cursorTaskComplete.execute('''SELECT IndicoID, LOID, name, status FROM viewStatusComprehensive
+                        WHERE status = 'COMPLETE'
+                        AND name = "%s"
                         AND IndicoID LIKE "%s%%"'''  % \
                        (CollaborationTools.getOptionValue("RecordingManager", "micalaDBStatusExportCDS"),
                        confId))

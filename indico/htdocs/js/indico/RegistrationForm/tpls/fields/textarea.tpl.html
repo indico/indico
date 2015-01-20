@@ -1,0 +1,11 @@
+<ng-form name="nestedForm">
+    <textarea
+        id="field-{{ section.id }}-{{ field.id }}"
+        name="{{ fieldName }}"
+        cols="{{ field.values.numberOfColumns || 60 }}"
+        rows="{{ field.values.numberOfRows || 2 }}"
+        ng-model="userdata[fieldName]"
+        ng-required="field.mandatory"
+        ng-class="{hasError: validationStarted && nestedForm.$invalid}">
+    </textarea>
+</ng-form>

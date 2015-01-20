@@ -1,33 +1,30 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import os, shutil, re, time
 from os.path import isdir, getsize, join, isfile
-from MaKaC.webinterface.session.sessionManagement import getSessionManager
 from MaKaC.i18n import _
 
 class MaintenanceMng:
     dirMatch = ""
     fileMatch = "((^Indico.*)|(.*\.tmp$))"
     tmpDelay = 3*3600
-    websessionDelay = float(24 * 3600)
 
     def humanReadableSize(bytes, units="b"):
             if units == 'k':
@@ -69,19 +66,3 @@ class MaintenanceMng:
                         cls.fileMatch != "" and cls._match(cls.fileMatch, filename):
                     os.remove(file)
     cleanupTmp = classmethod(cleanupTmp)
-
-    def getWebsessionNum():
-        return len(getSessionManager().keys())
-    getWebsessionNum = staticmethod(getWebsessionNum)
-
-    def cleanupWebsession( cls ):
-        sm = getSessionManager()
-        aux = {}
-        for key in sm.keys():
-            aux[key] = sm[key]
-        for key in aux.keys():
-            value = sm[key]
-            if value.get_creation_age() > cls.websessionDelay:
-                sm.delete_session(key)
-    cleanupWebsession = classmethod(cleanupWebsession)
-

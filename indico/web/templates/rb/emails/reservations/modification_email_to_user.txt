@@ -1,0 +1,7 @@
+{% extends 'rb/emails/reservations/base_email_to_user.txt' %}
+
+{% block body -%}
+Your booking has been MODIFIED.
+
+{% include 'rb/emails/reservations/reservation_info.txt' %}
+{%- endblock %}

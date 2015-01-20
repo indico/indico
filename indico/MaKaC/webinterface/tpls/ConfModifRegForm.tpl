@@ -1,15 +1,17 @@
-<br/>
 <table>
   <tr>
-    <td class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Current status")}</span></td>
+    <td class="dataCaptionTD" style="vertical-align: middle">
+        <span class="dataCaptionFormat">${ _("Current status")}</span>
+    </td>
     <td class="blacktext" colspan="2">
-      <form action="${ setStatusURL }" method="POST">
-    <div>
-      <input name="changeTo" type="hidden" value="${ changeTo }" />
-      <b>${ status }</b>
-      <small><input type="submit" class="btn" value="${ changeStatus }" /></small>
-    </div>
-      </form>
+        <form action="${setStatusURL}" id="activateForm" method="POST">
+            <label class="switch">
+                <input type="checkbox" class="switch-input" id="enableRegForm" ${"checked" if activated else ""}>
+                <span class="switch-label" data-on="On" data-off="Off"></span>
+                <span class="switch-handle"></span>
+            </label>
+            <input name="changeTo" type="hidden" value="${changeTo}" />
+        </form>
     </td>
   </tr>
   <tr>
@@ -108,29 +110,6 @@
   </tr>
   <tr>
     <td class="dataCaptionTD">
-      <a name="sections"></a>
-      <span class="dataCaptionFormat">${ _("Sections of the form")}</span>
-      <br/>
-      <br/>
-      <img src=${ enablePic } alt="${ _("Click to disable")}"> <small> ${ _("Enabled section")}</small>
-      <br/>
-      <img src=${ disablePic } alt="${ _("Click to enable")}"> <small> ${ _("Disabled section")}</small>
-    </td>
-    <form action=${ actionSectionURL } method="POST">
-      <td class="blacktext" style="padding-left:20px">
-    ${ sections }
-      </td>
-      <td>
-    <input type="submit" class="btn" name="removeSection" value="${ _("remove sect.")}" />
-    <input type="submit" class="btn" name="newSection" value="${ _("new sect.")}" />
-      </td>
-    </form>
-  </tr>
-  <tr>
-    <td colspan="3" class="horizontalLine">&nbsp;</td>
-  </tr>
-  <tr>
-    <td class="dataCaptionTD">
       <span class="dataCaptionFormat"> ${ _("Custom statuses")}</span>
     </td>
     <td colspan="2">
@@ -156,4 +135,10 @@
     <td colspan="3" class="horizontalLine">&nbsp;</td>
   </tr>
 </table>
-<br/>
+<script type="text/javascript">
+    $(function() {
+        $('#enableRegForm').on("click", function(){
+            $('#activateForm').submit();
+        });
+});
+</script>

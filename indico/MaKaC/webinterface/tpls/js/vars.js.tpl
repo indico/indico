@@ -1,30 +1,16 @@
 <% from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry %>
 <% from MaKaC.common import Config %>
 <% from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr %>
-<% import MaKaC.common.info as info %>
-<% from MaKaC.rb_location import Location %>
-<% import simplejson %>
+<% from indico.modules.rb.models.locations import Location %>
+<% from indico.util import json %>
 <% import MaKaC.webinterface.common.tools as securityTools %>
+<% from MaKaC.export import fileConverter %>
 <%
 config = Config.getInstance()
 authenticators = filter(lambda x: x.id != 'Local', AuthenticatorMgr().getList())
 extAuths = list((auth.id, auth.name) for auth in authenticators)
 
-rbActive = info.HelperMaKaCInfo.getMaKaCInfoInstance().getRoomBookingModuleActive()
-if rbActive:
-    locationList = {}
-    locationNames = map(lambda l: l.friendlyName, Location.allLocations)
-
-    for name in locationNames:
-        locationList[name] = name;
-
-    if Location.getDefaultLocation():
-        defaultLocation = Location.getDefaultLocation().friendlyName
-    else:
-        defaultLocation = ""
-else:
-    locationList = None
-    defaultLocation = ""
+locations = Location.find_all() if config.getIsRoomBookingActive() else []
 %>
 
 var Indico = {
@@ -59,17 +45,9 @@ var Indico = {
         disabledSection: "${ iconFileName("disabledSection") }",
         timezone: "${ iconFileName("timezone") }",
         basket: "${ iconFileName("basket") }",
-        play: "${ iconFileName("play") }",
-        stop: "${ iconFileName("stop") }",
-        play_small: "${ iconFileName("play_small") }",
-        stop_small: "${ iconFileName("stop_small") }",
         reload: "${ iconFileName("reload") }",
         reload_faded: "${ iconFileName("reload_faded") }",
         mail_big: "${ iconFileName("mail_big") }",
-        play_faded: "${ iconFileName("play_faded") }",
-        stop_faded: "${ iconFileName("stop_faded") }",
-        play_faded_small: "${ iconFileName("play_faded_small") }",
-        stop_faded_small: "${ iconFileName("stop_faded_small") }",
         info: "${ iconFileName("info") }",
         accept: "${ iconFileName("accept") }",
         reject:"${ iconFileName("reject") }",
@@ -86,68 +64,71 @@ var Indico = {
         indico_small: "${ iconFileName("indico_small")}",
         protected: "${ iconFileName("protected")}",
         calendarWidget: "${ iconFileName("calendarWidget") }",
+        regform_buttons: "${ iconFileName("regform_buttons") }",
         tt_time: "${ iconFileName("tt_time") }"
     },
     FileTypeIcons:
-        ${ simplejson.dumps(dict((k.lower(),v[2]) for k,v in config.getFileTypes().iteritems())) }
+        ${ json.dumps(dict((k.lower(),v[2]) for k,v in config.getFileTypes().iteritems())) }
     ,
     Urls: {
         JsonRpcService: window.location.protocol == "https:"?"${ urlHandlers.UHJsonRpcService.getURL(secure=True) }":"${ urlHandlers.UHJsonRpcService.getURL() }",
 
+        Base: (window.location.protocol == "https:" ? "${ Config.getInstance().getBaseSecureURL() }" : "${ Config.getInstance().getBaseURL() }"),
+
         ImagesBase: "${ Config.getInstance().getImagesBaseURL() }",
         SecureImagesBase: "${ Config.getInstance().getImagesBaseSecureURL() }",
 
-        Login: "${ urlHandlers.UHSignIn.getURL() }",
+        ExportAPIBase: (window.location.protocol == "https:" ? "${ urlHandlers.UHAPIExport.getURL(secure=True) }" : "${ urlHandlers.UHAPIExport.getURL() }"),
+        APIBase: (window.location.protocol == "https:" ? "${ urlHandlers.UHAPIAPI.getURL(secure=True) }" : "${ urlHandlers.UHAPIAPI.getURL() }"),
 
-        Favourites: "${ urlHandlers.UHUserBaskets.getURL() }",
+        Login: ${ urlHandlers.UHSignIn.getURL().js_router | j,n },
+        Favourites: ${ urlHandlers.UHUserBaskets.getURL(_ignore_static=True).js_router | j,n },
 
-        ConferenceDisplay: "${ urlHandlers.UHConferenceDisplay.getURL() }",
-        ContributionDisplay: "${ urlHandlers.UHContributionDisplay.getURL() }",
-        SessionDisplay: "${ urlHandlers.UHSessionDisplay.getURL() }",
-        ConfCollaborationDisplay: "${ urlHandlers.UHCollaborationDisplay.getURL() }",
+        ConferenceDisplay: ${ urlHandlers.UHConferenceDisplay.getURL(_ignore_static=True).js_router | j,n },
+        ContributionDisplay: ${ urlHandlers.UHContributionDisplay.getURL(_ignore_static=True).js_router | j,n },
+        SessionDisplay: ${ urlHandlers.UHSessionDisplay.getURL(_ignore_static=True).js_router | j,n },
 
-        ContribToXML: "${ urlHandlers.UHContribToXML.getURL() }",
-        ContribToPDF: "${ urlHandlers.UHContribToPDF.getURL() }",
-        ContribToiCal: "${ urlHandlers.UHContribToiCal.getURL() }",
+        ContribToXML: ${ urlHandlers.UHContribToXML.getURL(_ignore_static=True).js_router | j,n },
+        ContribToPDF: ${ urlHandlers.UHContribToPDF.getURL(_ignore_static=True).js_router | j,n },
 
-        SessionToiCal:  "${ urlHandlers.UHSessionToiCal.getURL() }",
-        ConfTimeTablePDF: "${ urlHandlers.UHConfTimeTablePDF.getURL() }",
-        ConfTimeTableCustomPDF: "${ urlHandlers.UHConfTimeTableCustomizePDF.getURL() }",
+        ConfTimeTablePDF: ${ urlHandlers.UHConfTimeTablePDF.getURL(_ignore_static=True).js_router | j,n },
+        ConfTimeTableCustomPDF: ${ urlHandlers.UHConfTimeTableCustomizePDF.getURL(_ignore_static=True).js_router | j,n },
 
-        SessionModification: "${ urlHandlers.UHSessionModification.getURL() }",
-        ContributionModification: "${ urlHandlers.UHContributionModification.getURL() }",
-        BreakModification: "${ urlHandlers.UHConfModifyBreak.getURL() }",
-        SessionProtection: "${ urlHandlers.UHSessionModifAC.getURL() }",
-        ContributionProtection: "${ urlHandlers.UHContribModifAC.getURL() }",
+        SessionModification: ${ urlHandlers.UHSessionModification.getURL(_ignore_static=True).js_router | j,n },
+        ContributionModification: ${ urlHandlers.UHContributionModification.getURL(_ignore_static=True).js_router | j,n },
+        SessionProtection: ${ urlHandlers.UHSessionModifAC.getURL(_ignore_static=True).js_router | j,n },
+        ContributionProtection: ${ urlHandlers.UHContribModifAC.getURL(_ignore_static=True).js_router | j,n },
 
-        Reschedule: "${ urlHandlers.UHConfModifReschedule.getURL() }",
-        SlotCalc: "${ urlHandlers.UHSessionModSlotCalc.getURL() }",
-        FitSessionSlot: "${ urlHandlers.UHSessionFitSlot.getURL() }",
+        Reschedule: ${ urlHandlers.UHConfModifReschedule.getURL(_ignore_static=True).js_router | j,n },
+        SlotCalc: ${ urlHandlers.UHSessionModSlotCalc.getURL(_ignore_static=True).js_router | j,n },
+        FitSessionSlot: ${ urlHandlers.UHSessionFitSlot.getURL(_ignore_static=True).js_router | j,n },
 
         UploadAction: {
-            subcontribution: '${ str(urlHandlers.UHSubContribModifAddMaterials.getURL()) }',
-            contribution: '${ str(urlHandlers.UHContribModifAddMaterials.getURL()) }',
-            session: '${ str(urlHandlers.UHSessionModifAddMaterials.getURL()) }',
-            conference: '${ str(urlHandlers.UHConfModifAddMaterials.getURL()) }',
-            category: '${ str(urlHandlers.UHCategoryAddMaterial.getURL()) }'
+            subcontribution: ${ urlHandlers.UHSubContribModifAddMaterials.getURL(_ignore_static=True).js_router | j,n },
+            contribution: ${ urlHandlers.UHContribModifAddMaterials.getURL(_ignore_static=True).js_router | j,n },
+            session: ${ urlHandlers.UHSessionModifAddMaterials.getURL(_ignore_static=True).js_router | j,n },
+            conference: ${ urlHandlers.UHConfModifAddMaterials.getURL(_ignore_static=True).js_router | j,n },
+            category: ${ urlHandlers.UHCategoryAddMaterial.getURL(_ignore_static=True).js_router | j,n }
         },
 
-        RoomBookingForm: "${ urlHandlers.UHRoomBookingBookingForm.getURL() }",
-        RoomBookingDetails: "${ urlHandlers.UHRoomBookingRoomDetails.getURL() }",
-        ConfModifSchedule: "${ urlHandlers.UHConfModifSchedule.getURL() }",
-        SubcontrModif: "${ urlHandlers.UHContribModifSubCont.getURL() }",
-        AuthorDisplay: "${ urlHandlers.UHContribAuthorDisplay.getURL() }",
-        AuthorEmail: "${ urlHandlers.UHConferenceEmail.getURL() }"
+        RoomBookingBookRoom: ${ url_rule_to_js('rooms.room_book') | j,n },
+        RoomBookingBook: ${ url_rule_to_js('rooms.book') | j,n },
+        RoomBookingDetails: ${ urlHandlers.UHRoomBookingRoomDetails.getURL(_ignore_static=True).js_router | j,n },
+        RoomBookingCloneBooking: ${ url_rule_to_js('rooms.roomBooking-cloneBooking')  | j,n },
+        ConfModifSchedule: ${ urlHandlers.UHConfModifSchedule.getURL(_ignore_static=True).js_router | j,n },
+        SubcontrModif: ${ urlHandlers.UHContribModifSubCont.getURL(_ignore_static=True).js_router | j,n },
+        AuthorDisplay: ${ urlHandlers.UHContribAuthorDisplay.getURL(_ignore_static=True).js_router | j,n },
+        AuthorEmail: ${ urlHandlers.UHConferenceEmail.getURL(_ignore_static=True).js_router | j,n }
     },
 
     Data: {
-        MaterialTypes: { meeting : ${ simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['meeting'])) },
-        simple_event: ${ simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['simple_event'])) },
-        conference: ${ simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['conference'])) },
-        category: ${ simplejson.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['category'])) }},
+        MaterialTypes: { meeting : ${ json.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['meeting'])) },
+        simple_event: ${ json.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['simple_event'])) },
+        conference: ${ json.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['conference'])) },
+        category: ${ json.dumps(list((k,k.title()) for k in MaterialFactoryRegistry._allowedMaterials['category'])) }},
         WeekDays: ${ [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ] },
-        DefaultLocation: '${ str(defaultLocation) }',
-        Locations: ${ jsonEncode(locationList) }
+        DefaultLocation: ${ next((loc.name for loc in locations if loc.is_default), None) | j,n },
+        Locations: ${ {loc.name: loc.name for loc in locations} | j,n }
     },
 
     Security:{
@@ -161,11 +142,19 @@ var Indico = {
 
     Settings: {
         ExtAuthenticators: ${ jsonEncode(extAuths) },
-        RoomBookingModuleActive: ${ jsBoolean(rbActive) }
+        RoomBookingModuleActive: ${ config.getIsRoomBookingActive() | j,n }
     },
 
     FileRestrictions: {
         MaxUploadFilesTotalSize: ${ config.getMaxUploadFilesTotalSize() },
         MaxUploadFileSize: ${ config.getMaxUploadFileSize() }
+    },
+
+    PDFConversion: {
+        AvailablePDFConversions: ${fileConverter.CDSConvFileConverter.getAvailableConversions()},
+        HasFileConverter: ${jsonEncode(Config.getInstance().hasFileConverter())}
     }
+
 };
+
+${ plugin_hook('vars-js') }

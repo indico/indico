@@ -19,10 +19,7 @@
     </div>
 </div>
 
-<li id="protectionBar" class="protectionBar protectionBar${protection[0]}">
-    <img src=${ shieldIconURL} border="0" style="float:left; padding-right:5px">
-    <a id="protectionLink">${protection[1]}</a>
-</li>
+<a id="protectionLink" class="icon-shield arrow i-button protection-${protection[0].lower()}">${protection[1]}</a>
 
 
 <script type="text/javascript">
@@ -30,7 +27,7 @@ $("#protectionLink").qtip({
 
     style: {
         width: '280px',
-        classes: 'ui-tooltip-rounded ui-tooltip-shadow ui-tooltip-popup',
+        classes: 'qtip-rounded qtip-shadow qtip-popup',
         tip: {
             corner: true,
             width: 20,

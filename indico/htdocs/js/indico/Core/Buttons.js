@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
      @namespace Generic icons/buttons that are used all throughout
     *           the interface
@@ -56,51 +73,6 @@ IndicoUI.Buttons = {
             src: faded ? imageSrc("starGrey") : imageSrc("star"),
             style: {
                 'marginLeft': '5px',
-                'verticalAlign': 'middle'
-            }
-        });
-    },
-    /**
-     * Returns an image with an 'play' icon
-     */
-    playButton: function(faded, small){
-        var caption = faded ? 'Start (blocked)' : 'Start';
-        var imageName = "play";
-        if (faded) { imageName += "_faded"; }
-        if (small) { imageName += "_small"; }
-        return Html.img({
-            alt: caption,
-            title: caption,
-            src: imageSrc(imageName),
-            style: {
-                'marginLeft': '3px',
-                'marginRight': '3px',
-                'verticalAlign': 'middle'
-            }
-        });
-    },
-
-    /**
-     * Returns a text with a 'play' icon
-     */
-    playButtonText: function(text, position){
-        return Html.div({className: 'buttonWithPlay ' + position + 'ButtonWithPlay' }, text);
-    },
-    /**
-     * Returns an image with an 'stop' icon
-     */
-    stopButton: function(faded, small){
-        var caption = faded ? 'Stop (blocked)' : 'Stop';
-        var imageName = "stop";
-        if (faded) { imageName += "_faded"; }
-        if (small) { imageName += "_small"; }
-        return Html.img({
-            alt: caption,
-            title: caption,
-            src: imageSrc(imageName),
-            style: {
-                'marginLeft': '3px',
-                'marginRight': '3px',
                 'verticalAlign': 'middle'
             }
         });
@@ -289,26 +261,26 @@ IndicoUI.Buttons = {
         // val - if true, show the "expand" option, else show "hide"
 
         var showTabs = function(){
-            tabs = document.getElementById('tabList').childNodes;
-            for (i in tabs) {
-                tab = tabs[i];
+            var tabs = document.getElementById('tabList').childNodes;
+            for (var i in tabs) {
+                var tab = tabs[i];
                 if (tab.tagName == 'LI') {
                     if (contains(tab.className, 'hiddenTab')) {
                         tab.style.display = 'inline';
                     }
                 }
             }
-        }
+        };
 
         var hideTabs = function() {
-            tabs = document.getElementById('tabList').childNodes;
-            for (i in tabs) {
-                tab = tabs[i];
+            var tabs = document.getElementById('tabList').childNodes;
+            for (var i in tabs) {
+                var tab = tabs[i];
                 if (tab.tagName == 'LI' && contains(tab.className, 'hiddenTab')) {
                     tab.style.display = 'none';
                 }
             }
-        }
+        };
 
         var option = new Chooser({
             showLink: command(function(){
@@ -335,5 +307,4 @@ IndicoUI.Buttons = {
 
         return Widget.link(option);
     }
-
 };

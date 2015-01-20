@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from copy import copy
+from flask import session
 from xml.sax.saxutils import quoteattr
 from datetime import timedelta, datetime
 import time
@@ -30,13 +30,12 @@ import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.wcalendar import Overview
 import MaKaC.conference as conference
 from MaKaC.conference import CategoryManager
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 import MaKaC.webinterface.wcalendar as wcalendar
 import MaKaC.webinterface.linking as linking
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC import schedule
 import MaKaC.common.info as info
-from MaKaC.common.cache import CategoryCache
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 
@@ -46,18 +45,18 @@ from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
 from pytz import timezone
 from MaKaC.common.TemplateExec import truncateTitle
 
-from indico.core.index import Catalog
 from MaKaC.common.fossilize import fossilize
+from MaKaC.user import Avatar
 
-from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
-from indico.web.http_api.auth import APIKey
-from indico.web.http_api.util import generate_public_auth_request
-from MaKaC.user import CERNGroup
+from indico.core.index import Catalog
+from indico.modules import ModuleHolder
+from indico.modules.upcoming import WUpcomingEvents
+from MaKaC.user import Group
 
-class WPCategoryBase ( main.WPMainBase ):
 
-    def __init__( self, rh, categ ):
-        main.WPMainBase.__init__( self, rh )
+class WPCategoryBase (main.WPMainBase):
+    def __init__(self, rh, categ, **kwargs):
+        main.WPMainBase.__init__(self, rh, **kwargs)
         self._target = categ
         title = "Indico"
         if self._target:
@@ -65,159 +64,132 @@ class WPCategoryBase ( main.WPMainBase ):
         self._setTitle(title)
         self._conf = None
 
-#    def _createMenu( self ):
-#        main.WPMainBase._createMenu( self )
-#        c = self._target
-#
-#        # enable event creation
-#        if c and c.canCreateConference(self._getAW().getUser()):
-#            if not c.hasSubcategories():
-#                self._lectureOpt.setEnabled(True)
-#                self._meetingOpt.setEnabled(True)
-#                self._conferenceOpt.setEnabled(True)
-#
-#                urlConference = urlHandlers.UHConferenceCreation.getURL(c)
-#                urlConference.addParam("event_type","default")
-#
-#                urlLecture = urlHandlers.UHConferenceCreation.getURL(c)
-#                urlLecture.addParam("event_type","simple_event")
-#
-#                urlMeeting = urlHandlers.UHConferenceCreation.getURL(c)
-#                urlMeeting.addParam("event_type","meeting")
-#
-#
-#                self._conferenceOpt.setURL( urlConference )
-#                self._lectureOpt.setURL( urlLecture )
-#                self._meetingOpt.setURL( urlMeeting )
-#            else:
-#                self._lectureOpt.setErrorMessage("msgNotFinalCategory")
-#                self._meetingOpt.setErrorMessage("msgNotFinalCategory")
-#                self._conferenceOpt.setErrorMessage("msgNotFinalCategory")
-
+    def getCSSFiles(self):
+        return main.WPMainBase.getCSSFiles(self) + self._asset_env['category_sass'].urls()
 
     def _currentCategory(self):
         return self._target
 
-class WPCategoryDisplayBase( WPCategoryBase ):
+
+class WPCategoryDisplayBase(WPCategoryBase):
     pass
 
-## TODO: TO REMOVE ????
-#    def _getFooter( self ):
-#        """
-#        """
-#        wc = wcomponents.WFooter(isFrontPage=self._isFrontPage())
-#        p = {}
-#        if Config.getInstance().getShortCategURL():
-#            if self._target.getId() != "0":
-#                p["shortURL"] =  Config.getInstance().getShortCategURL() + self._target.getId()
-#            else:
-#                p["shortURL"] =  Config.getInstance().getBaseURL()
-#        p["subArea"] = self._getSiteArea()
-#        return wc.getHTML(p)
 
 class WCategoryDisplay(WICalExportBase):
 
-    def __init__( self, target, wfReg ):
+    def __init__(self, target, wfReg, tz):
         self._target = target
         self._wfReg = wfReg
+        self._timezone = timezone(tz)
 
-    def _getMaterialHTML( self ):
+    def _getMaterials(self):
         l = []
-        temp = wcomponents.WMaterialDisplayItem()
-        for mat in self._target.getAllMaterialList():
-            url = urlHandlers.UHMaterialDisplay.getURL( mat )
-            l.append( temp.getHTML( self._aw, mat, url ) )
-        res = ""
-        if l:
-            res =   i18nformat("""
-                        <span style="color:#444"> _("Material"): %s</span>
-                    """)%", ".join( l )
-        return res
+        for mat in sorted(self._target.getAllMaterialList()):
+            if mat.canView(self._aw):
+                l.append(mat)
+        return l
 
-    def getHTML( self, aw, params ):
+    def _getResourceName(self, resource):
+        if isinstance(resource, conference.Link):
+            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getURL() \
+                else resource.getURL()
+        else:
+            return resource.getName() if resource.getName() != "" and resource.getName() != resource.getFileName() \
+                else resource.getFileName()
+
+    def getHTML(self, aw, params):
         self._aw = aw
-        return wcomponents.WTemplated.getHTML( self, params )
+        return wcomponents.WTemplated.getHTML(self, params)
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
+        isRootCategory = self._target.getId() == "0"
+
         vars["name"] = self._target.getName()
         vars["description"] = self._target.getDescription()
         vars["img"] = self._target.getIconURL()
         vars["categ"] = vars["target"] = self._target;
         vars["urlICSFile"] = urlHandlers.UHCategoryToiCal.getURL(self._target)
+        vars["isRootCategory"] = isRootCategory
+        vars["timezone"] = self._timezone
+        vars["materials"] = self._getMaterials()
+        vars["getMaterialURL"] = lambda mat: urlHandlers.UHMaterialDisplay.getURL(mat)
+        vars["getResourceName"] = lambda resource: self._getResourceName(resource)
         subcats = self._target.subcategories
 
         confs = self._target.conferences
         if subcats:
-            cl=wcomponents.WCategoryList( self._target )
-            params = {"categoryDisplayURLGen": vars["categDisplayURLGen"], "material": self._getMaterialHTML()}
+            cl = wcomponents.WCategoryList(self._target)
+            params = {"categoryDisplayURLGen": vars["categDisplayURLGen"]}
             vars["contents"] = cl.getHTML( self._aw, params )
         elif confs:
-            pastEvents = self._aw.getSession().getVar("fetchPastEventsFrom")
-            showPastEvents = pastEvents and self._target.getId() in pastEvents or self._aw.getUser() and self._aw.getUser().getPersonalInfo().getShowPastEvents()
-            cl = wcomponents.WConferenceList( self._target, self._wfReg, showPastEvents)
-            params = {"conferenceDisplayURLGen": vars["confDisplayURLGen"], "material": self._getMaterialHTML()}
+            pastEvents = session.get('fetchPastEventsFrom', set())
+            showPastEvents = (self._target.getId() in pastEvents or
+                             (self._aw.getUser() and self._aw.getUser().getPersonalInfo().getShowPastEvents()))
+            cl = wcomponents.WConferenceList(self._target, self._wfReg, showPastEvents)
+            params = {"conferenceDisplayURLGen": vars["confDisplayURLGen"]}
             vars["contents"] = cl.getHTML( self._aw, params )
         else:
-            cl = wcomponents.WEmptyCategory( self._getMaterialHTML() )
+            cl = wcomponents.WEmptyCategory()
             vars["contents"] = cl.getHTML( self._aw )
-        mgrs=[]
-        from MaKaC.user import Avatar
+
+        mgrs = []
         for mgr in self._target.getManagerList():
             if isinstance(mgr, Avatar):
-                mgrs.append(mgr.getAbrName())
-            elif isinstance(mgr, CERNGroup):
-                mgrs.append(mgr.getName() + " (e-group)")
+                mgrs.append(("avatar", mgr.getAbrName()))
+            elif isinstance(mgr, Group) and mgr.groupType != "Default":
+                mgrs.append(("group", mgr.getName()))
 
-        vars["managers"]=""
-        if mgrs != []:
-            vars["managers"]= "; ".join(mgrs)
-
-        # TODO: Should be added to submenu
-        if self._target.tasksAllowed() :
-            vars["taskList"] = i18nformat("""<a href="%s"> _("Task List")</a>""")%urlHandlers.UHTaskList.getURL(self._target)
-        else :
-            vars["taskList"] = ""
+        vars["managers"] = sorted(mgrs)
 
         # Export ICS
         if self._target.conferences:
             vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/categ/%s.ics' % self._target.getId(), {'from':"-7d"}))
+
+        vars["isLoggedIn"] = self._aw.getUser() is not None
+        vars["favoriteCategs"] = self._aw.getUser().getLinkTo('category', 'favorite') if self._aw.getUser() else []
+
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        vars["isNewsActive"] = minfo.isNewsActive()
+
+        # if this is the front page, include the
+        # upcoming event information (if there are any)
+        if isRootCategory:
+            upcoming = ModuleHolder().getById('upcoming_events')
+            upcoming_list = upcoming.getUpcomingEventList()
+            if upcoming_list:
+                vars["upcomingEvents"] = WUpcomingEvents(self._timezone, upcoming_list).getHTML(vars)
+            else:
+                vars["upcomingEvents"] = ''
 
         return vars
 
 
 class WPCategoryDisplay(WPCategoryDisplayBase):
 
-    def __init__( self, rh, target, wfReg ):
-        WPCategoryDisplayBase.__init__( self, rh, target )
+    def __init__(self, rh, target, wfReg):
+        WPCategoryDisplayBase.__init__(self, rh, target)
         self._wfReg = wfReg
-        if len(self._target.getSubCategoryList())==0:
-            tzUtil = DisplayTZ(self._getAW(),target)#None,useServerTZ=1)
-            self._locTZ = tzUtil.getDisplayTZ()
+        tzUtil = DisplayTZ(self._getAW(), target)  # None,useServerTZ=1)
+        self._locTZ = tzUtil.getDisplayTZ()
 
-    def _getHeadContent( self ):
+    def getJSFiles(self):
+        return WPCategoryDisplayBase.getJSFiles(self) + self._includeJSPackage('MaterialEditor')
+
+    def _getHeadContent(self):
         # add RSS feed
         url = urlHandlers.UHCategoryToAtom.getURL(self._target)
 
         return WPCategoryDisplayBase._getHeadContent( self ) + \
-        i18nformat("""<link rel="alternate" type="application/atom+xml" title= _("Indico Atom Feed") href="%s">""") % url
+        i18nformat("""<link rel="alternate" type="application/atom+xml" title="_('Indico Atom Feed')" href="%s">""") % url
 
     def _getBody( self, params ):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        tz = DisplayTZ(self._getAW(),self._target).getDisplayTZ()
-        if minfo.isCacheActive() and tz == self._target.getTimezone():
-            cache = CategoryCache({"categId":self._target.getId()})
-            page = cache.getCachePage()
-            if page != "":
-                return page
-        wc = WCategoryDisplay( self._target, self._wfReg )
+        wc = WCategoryDisplay(self._target, self._wfReg, self._locTZ)
         pars = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
                 "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL, \
                 "allowUserModif": self._target.canModify( self._getAW() ), \
                 "allowCreateEvent": self._target.canCreateConference(self._getAW().getUser()) }
         page = wc.getHTML( self._getAW(), pars )
-        if minfo.isCacheActive() and tz == self._target.getTimezone():
-            cache.saveCachePage(page)
         return page
 
     def _getNavigationDrawer(self):
@@ -647,6 +619,7 @@ class WWeekOverview(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
+        isWeekendFree = True
         prevOW = self._ow.getOverviewPrevPeriod()
         prevsel = urlHandlers.UHCategoryOverview.getURLFromOverview( prevOW )
         nextOW = self._ow.getOverviewNextPeriod()
@@ -660,73 +633,28 @@ class WWeekOverview(wcomponents.WTemplated):
                 nextsel)
         vars["dates"] = """%s &nbsp;&ndash;&nbsp; %s"""%(startDate, endDate)
 
-        inc = timedelta( 1 )
+        inc = timedelta(1)
         sd = self._ow.getStartDate()
         idx = 0
         while sd <= self._ow.getEndDate():
-            vars["date%i"%idx] = sd.strftime( "%a %d/%m" )
+            weekend = sd.weekday() >= 5
+            vars["date%i" % idx] = sd.strftime("%a %d/%m")
             res = []
-            confs = self._ow.getConferencesWithStartTime( sd )
-            for tuple in confs:
-                conf = tuple[0]
-                stTime = tuple[1]
-                wc = WOverviewConferenceItem( self._ow.getAW(), \
-                                            conf, \
-                                            sd, \
-                                            vars["displayConfURLGen"]( conf ),\
-                                            self._ow._cal.getIcons(), \
-                                            self._ow.getDetailLevel(),
-                                            stTime )
-                res.append( wc.getHTML( {} ) )
-
-            if res==[]:
+            confs = self._ow.getConferencesWithStartTime(sd)
+            for conf, stTime in confs:
+                if weekend and not conf.hasSomethingOnWeekend(sd.date()):
+                    continue
+                wc = WOverviewConferenceItem(self._ow.getAW(), conf, sd, vars["displayConfURLGen"](conf),
+                                             self._ow._cal.getIcons(), self._ow.getDetailLevel(), stTime)
+                res.append(wc.getHTML({}))
+            if not res:
                 res.append("<tr><td></td></tr>")
-            vars["item%i"%idx] = "".join( res )
+            elif weekend:
+                isWeekendFree = False
+            vars["item%i" % idx] = "".join(res)
             sd += inc
             idx += 1
-        vars["items"] = ""
-        return vars
-
-# This class is currently not used since the list of conference that we
-# iterate over is always zero for some reason. Remove the class in the future
-# or fix it?
-class WNextWeekOverview(wcomponents.WTemplated):
-
-    def __init__( self, ow ):
-        self._ow = ow
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-
-        startDate = """%s""" % self._ow.getStartDate().strftime("%A %d %B %Y")
-        endDate = """%s""" % self._ow.getEndDate().strftime("%A %d %B %Y")
-        vars["dates"] = """%s &nbsp;&ndash;&nbsp; %s"""%(startDate, endDate)
-
-        inc = timedelta( 1 )
-        sd = self._ow.getStartDate()
-        idx = 0
-        while sd <= self._ow.getEndDate():
-            vars["date%i"%idx] = sd.strftime( "%a %d/%m" )
-            res = []
-            confs = self._ow.getConferencesWithStartTime( sd )
-            for tuple in confs:
-                conf = tuple[0]
-                stTime = tuple[1]
-                wc = WOverviewConferenceItem( self._ow.getAW(), \
-                                            conf, \
-                                            sd, \
-                                            vars["displayConfURLGen"]( conf ),\
-                                            self._ow._cal.getIcons(), \
-                                            self._ow.getDetailLevel(),
-                                            stTime )
-                res.append( wc.getHTML( {} ) )
-                raise wc
-            if res==[]:
-                res.append("<tr><td></td></tr>")
-            vars["item%i"%idx] = "".join( res )
-            sd += inc
-            idx += 1
-        vars["items"] = ""
+        vars["isWeekendFree"] = isWeekendFree
         return vars
 
 
@@ -734,13 +662,12 @@ class WMonthOverview(wcomponents.WTemplated):
 
     def __init__( self, ow ):
         self._ow = ow
+        self._isWeekendFree = True
 
-    def _getDayCell( self, day=None ):
-        if day == None:
-            return """<td>&nbsp;</td>"""
-        else:
-            res = []
-            confs = day.getConferencesWithStartTime()
+    def _getDayCell( self, day ):
+        res = []
+        confs = day.getConferencesWithStartTime()
+        if confs:
             for tuple in confs:
                 conf = tuple[0]
                 stTime = tuple[1]
@@ -752,35 +679,26 @@ class WMonthOverview(wcomponents.WTemplated):
                                             self._ow.getDetailLevel(),
                                             stTime )
                 res.append( wc.getHTML( {} ) )
-            return """
-                <td valign="top" bgcolor="#ECECEC">
-                    <table width="100%%">
-                        <tr>
-                            <td align="center">
-                                <strong style="font-size: 1.3em; color: #888;">%s</strong>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td valign="top">%s</td>
-                        </tr>
-                    </table>
-                </td>"""%(day.getDayNumber(), "".join(res))
+        return "".join(res)
 
     def _getMonth( self ):
+        dayList = [[]]
+        numWeek=0
         dl = self._ow.getDayList()
-        month = ""
-        week = ""
         for i in range( dl[0].getWeekDay() ):
-            week = "%s%s"%(week, self._getDayCell())
+            dayList[numWeek].append(None)
         for day in self._ow.getDayList():
-            week = "%s%s"%(week, self._getDayCell( day ))
-            if day.getWeekDay() == 6:
-                month = """%s<tr>%s</tr>"""%(month, week)
-                week = ""
+            dayList[numWeek].append(day)
+            if day.getWeekDay() >= 5:
+                if day.getConferencesWithStartTime():
+                    self._isWeekendFree = False
+                if day.getWeekDay() == 6:
+                    numWeek +=1
+                    dayList.append([])
 
         for i in range( 6-dl[-1].getWeekDay() ):
-            week = "%s%s"%(week, self._getDayCell())
-        return """%s<tr>%s</tr>"""%(month, week)
+            dayList[numWeek].append(None)
+        return dayList
 
 
     def getVars( self ):
@@ -811,7 +729,9 @@ class WMonthOverview(wcomponents.WTemplated):
         for name in dayNames:
             vars["nameDay%i"%dayNames.index(name)] = name
         self._displayConfURLGen = vars["displayConfURLGen"]
-        vars["items"] = self._getMonth()
+        vars["month"] = self._getMonth()
+        vars["isWeekendFree"] = self._isWeekendFree
+        vars["getDayCell"] = lambda day: self._getDayCell(day)
         return vars
 
 
@@ -863,7 +783,6 @@ class WCategoryOverview(wcomponents.WTemplated):
 
         vars["selDay"] = ""
         vars["selWeek"] = ""
-        vars["selNextWeek"] = ""
         vars["selMonth"] = ""
         vars["selYear"] = ""
 
@@ -875,13 +794,6 @@ class WCategoryOverview(wcomponents.WTemplated):
         elif isinstance( self._ow, wcalendar.WeekOverview ):
             displayOW = WWeekOverview( self._ow )
             vars["selWeek"] = "selected"
-
-        #  This will not happen since the option in the selection
-        #  box in the user interface has been removed. Can be readded
-        #  in the future if needed.
-        elif isinstance( self._ow, wcalendar.NextWeekOverview ):
-            displayOW = WNextWeekOverview( self._ow )
-            vars["selNextWeek"] = "selected"
         else:
             displayOW = WDayOverview( self._ow )
             vars["selDay"] = "selected"
@@ -912,40 +824,6 @@ class WCategoryOverview(wcomponents.WTemplated):
         for i in range(7):
             res.append((str(date.day)+"-"+str(date.month)+"-"+str(date.year)))
             date += delta
-
-        #if daynumber == 0:
-        #    res = [(str(day)+"-"+str(month)+"-"+str(year))]
-        #    i=1
-        #    while i <= 6:
-        #        if (day+i)<32 and (month==8 or month==1 or month==3 or month==5 or month==7 or month==10):
-        #            res+=[(str(day+i)+"-"+str(month)+"-"+str(year))]
-        #        if (day+i)<31 and (month==4 or month==6 or month==9 or month==11):
-        #            res+=[(str(day+i)+"-"+str(month)+"-"+str(year))]
-        #        if (day+i)<29 and month==2 and (year %4!=0 or (year %4 ==0 and year %100==0)):
-        #            res+=[(str(day+i)+"-"+str(month)+"-"+str(year))]
-        #        if (day+i)<30 and month==2 and ((year%4==0 and year%100!=0) or year%400==0):
-        #            res+=[(str(day+i)+"-"+str(month)+"-"+str(year))]
-        #
-        #        i+=1
-        #else:
-        #    res = [(str(day)+"-"+str(month)+"-"+str(year))]
-        #    i=1
-        #    while i <= 7:
-        #        j = day+7-daynumber-i          #day+i-(daynumber+1)
-        #        if j>0 and j <32 and (month==8 or month==1 or month==3 or month==5 or month==7 or month==10):
-        #
-        #            res+=[(str(j)+"-"+str(month)+"-"+str(year))]
-        #
-        #        if j>0 and j<31 and (month==4 or month==6 or month==9 or month==11):
-        #            res+=[(str(j)+"-"+str(month)+"-"+str(year))]
-        #
-        #        if j>0 and j<29 and month==2 and ((year %4!=0) or (year %4 ==0 and year %100==0)):
-        #            res+=[(str(j)+"-"+str(month)+"-"+str(year))]
-        #
-        #        if j>0 and j<30 and month==2 and ((year%4==0 and year%100!=0) or year%400==0):
-        #            res+=[(str(j)+"-"+str(month)+"-"+str(year))]
-        #
-        #        i+=1
 
         return res
 
@@ -982,16 +860,12 @@ class WCategoryOverview(wcomponents.WTemplated):
 
         return res
 
-    def _whichPeriod(self,vars):
-
-
-        if vars["selDay"]=="selected":
+    def _whichPeriod(self, vars):
+        if vars["selDay"] == "selected":
             return "day"
-        if vars["selWeek"]=="selected":
+        if vars["selWeek"] == "selected":
             return "week"
-        if vars["selNextWeek"]=="selected":
-            return "nextweek"
-        if vars["selMonth"]=="selected":
+        if vars["selMonth"] == "selected":
             return "month"
 
     def _getMonthDays(self):
@@ -1253,7 +1127,7 @@ class WConferenceCreation( wcomponents.WTemplated ):
 
         vars["chairpersonDefined"] = vars.get("chairpersonDefined", [])
 
-        vars["useRoomBookingModule"] = minfo.getRoomBookingModuleActive()
+        vars["useRoomBookingModule"] = Config.getInstance().getIsRoomBookingActive()
 
         return vars
 
@@ -1281,7 +1155,6 @@ class WPConferenceCreationMainData( WPCategoryDisplayBase ):
         else:
             pars = {"target": self._target, "isModif": False}
             return wcomponents.WNavigationDrawer( pars )
-        return wcomponents.WNavigationDrawer( pars )
 
     def _getWComponent( self ):
         return WConferenceCreation( self._target, self._rh._event_type, self._rh )
@@ -1301,13 +1174,13 @@ class WPCategoryModifBase( WPCategoryBase ):
         return WPCategoryBase.getJSFiles(self) + \
                self._includeJSPackage('Management')
 
-    def _getHeader( self ):
-        """
-        """
-        wc = wcomponents.WHeader( self._getAW() )
-        return wc.getHTML( { "subArea": self._getSiteArea(), \
-                             "loginURL": self._escapeChars(str(self.getLoginURL())),\
-                             "logoutURL": self._escapeChars(str(self.getLogoutURL())) } )
+    def _getHeader(self):
+        wc = wcomponents.WHeader(self._getAW(), currentCategory=self._currentCategory())
+        return wc.getHTML({
+            'subArea': self._getSiteArea(),
+            'loginURL': self._escapeChars(str(self.getLoginURL())),
+            'logoutURL': self._escapeChars(str(self.getLogoutURL()))
+        })
 
     def _getNavigationDrawer(self):
         pars = {"target": self._target , "isModif" : True}
@@ -1549,13 +1422,13 @@ class WPCategoryModification( WPCategModifMain ):
         wc = WCategModifMain( self._target )
         pars = { \
 "dataModificationURL": urlHandlers.UHCategoryDataModif.getURL( self._target ), \
-"addSubCategoryURL": urlHandlers.UHCategoryCreation.getURL(), \
+"addSubCategoryURL": urlHandlers.UHCategoryCreation.getURL(self._target),
 "addConferenceURL": urlHandlers.UHConferenceCreation.getURL( self._target ), \
 "confModifyURLGen": urlHandlers.UHConferenceModification.getURL, \
 "confModifyURLOpen": urlHandlers.UHConferenceOpen.getURL, \
 "categModifyURLGen": urlHandlers.UHCategoryModification.getURL, \
-"actionSubCategsURL": urlHandlers.UHCategoryActionSubCategs.getURL(), \
-"actionConferencesURL": urlHandlers.UHCategoryActionConferences.getURL()}
+"actionSubCategsURL": urlHandlers.UHCategoryActionSubCategs.getURL(self._target),
+"actionConferencesURL": urlHandlers.UHCategoryActionConferences.getURL(self._target)}
         return wc.getHTML( pars )
 
 
@@ -1589,7 +1462,6 @@ class WCategoryDataModification(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["locator"] = self._categ.getLocator().getWebForm()
         vars["name"] = self._categ.getName()
         vars["description"] = self._categ.getDescription()
         vars["visibility"] = self._getVisibilityHTML()
@@ -1613,134 +1485,134 @@ class WCategoryDataModification(wcomponents.WTemplated):
                 styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId,selected,styleMgr.getStyleName(styleId))
             vars["%sStyleOptions" % type] = styleoptions
 
-
         return vars
 
 
-class WPCategoryDataModification( WPCategModifMain ):
+class WPCategoryDataModification(WPCategModifMain):
 
-    def _getPageContent( self, params ):
-        wc = WCategoryDataModification( self._target )
-        pars = {"postURL": urlHandlers.UHCategoryPerformModification.getURL() }
-        return wc.getHTML( pars )
+    def _getPageContent(self, params):
+        wc = WCategoryDataModification(self._target)
+        pars = {"postURL": urlHandlers.UHCategoryPerformModification.getURL(self._target)}
+        return wc.getHTML(pars)
 
 
 class WCategoryCreation(wcomponents.WTemplated):
 
-    def __init__( self, target ):
+    def __init__(self, target):
         self.__target = target
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = wcomponents.WTemplated.getVars(self)
         vars["locator"] = self.__target.getLocator().getWebForm()
-        for type in [ "simple_event", "meeting" ]:
+
+        for type in ["simple_event", "meeting"]:
             styleMgr = info.HelperMaKaCInfo.getMaKaCInfoInstance().getStyleManager()
             styles = styleMgr.getExistingStylesForEventType(type)
             styleoptions = ""
+
             for styleId in styles:
                 defStyle = self.__target.getDefaultStyle(type)
+
                 if defStyle == "":
                     defStyle = styleMgr.getDefaultStyleForEventType(type)
                 if styleId == defStyle:
                     selected = "selected"
                 else:
                     selected = ""
-                styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId,selected,styleMgr.getStyleName(styleId))
+
+                styleoptions += "<option value=\"%s\" %s>%s</option>" % (styleId, selected, styleMgr.getStyleName(styleId))
             vars["%sStyleOptions" % type] = styleoptions
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+
         try:
            default_tz = minfo.getTimezone()
         except:
            default_tz = 'UTC'
+
         vars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(default_tz)
         vars["categTitle"] = self.__target.getTitle()
-        if self.__target.isProtected() :
+        if self.__target.isProtected():
             vars["categProtection"] = "private"
-        else :
+        else:
             vars["categProtection"] = "public"
         vars["numConferences"] = len(self.__target.conferences)
 
         return vars
 
 
-class WPCategoryCreation( WPCategModifMain ):
+class WPCategoryCreation(WPCategModifMain):
 
-    def _getPageContent( self, params ):
-        wc = WCategoryCreation( self._target )
-        pars = { "categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
-                "postURL": urlHandlers.UHCategoryPerformCreation.getURL() }
-        return wc.getHTML( pars )
+    def _getPageContent(self, params):
+        wc = WCategoryCreation(self._target)
+        pars = {"categDisplayURLGen": urlHandlers.UHCategoryDisplay.getURL, \
+                "postURL": urlHandlers.UHCategoryPerformCreation.getURL(self._target)}
+        return wc.getHTML(pars)
 
 
 class WCategoryDeletion(object):
 
-    def __init__( self, categoryList ):
+    def __init__(self, categoryList):
         self._categList = categoryList
 
-    def getHTML( self, actionURL ):
-        l = []
+    def getHTML(self, actionURL):
+        categories = []
+
         for categ in self._categList:
-            l.append("""<li><i>%s</i></li>"""%categ.getName())
-        msg = i18nformat("""
-        <font size="+2"> _("Are you sure that you want to DELETE the following categories"):<ul>%s</ul>?</font><br>( _("Note that ALL the existing sub-categories below will also be deleted"))
-              """)%("".join(l))
+            categories.append("""<li><i>%s</i></li>""" % categ.getName())
+
+        msg = {'challenge': _("Are you sure that you want to delete the following categories?"),
+               'target': "".join(categories),
+               'important': True,
+               'subtext': _("Note that all the existing sub-categories below will also be deleted")
+               }
+
         wc = wcomponents.WConfirmation()
         categIdList = []
+
         for categ in self._categList:
-            categIdList.append( categ.getId() )
-        return wc.getHTML( msg, actionURL, {"selectedCateg": categIdList}, \
-                                            confirmButtonCaption= _("Yes"), \
-                                            cancelButtonCaption= _("No") )
+            categIdList.append(categ.getId())
+
+        return wc.getHTML(msg, actionURL, {"selectedCateg": categIdList},
+                          confirmButtonCaption=_("Yes"),
+                          cancelButtonCaption=_("No"),
+                          severity='danger')
 
 
-class WConferenceDeletion(object):
-
-    def __init__( self, conferenceList ):
-        self._confList = conferenceList
-
-    def getHTML( self, actionURL ):
-        l = []
-        for event in self._confList:
-            l.append("""<li><i>%s</i></li>"""%event.getTitle())
-        msg = _("""<font size="+2">Are you sure that you want to <font color="red"><b>DELETE</b></font> the following events:<ul>%s</ul>?</font><br>(Note that ALL the existing sub-categories below will also be deleted)""")%("".join(l))
-        wc = wcomponents.WConfirmation()
-        eventIdList = []
-        for event in self._confList:
-            eventIdList.append( event.getId() )
-        return wc.getHTML( msg, actionURL, {"selectedConf": eventIdList}, \
-                                            confirmButtonCaption= _("Yes"), \
-                                            cancelButtonCaption= _("No") )
+class WConferenceDeletion(wcomponents.WTemplated):
+    pass
 
 
-class WPSubCategoryDeletion( WPCategModifMain ):
+class WPSubCategoryDeletion(WPCategModifMain):
 
-    def _getPageContent( self, params ):
+    def _getPageContent(self, params):
         selCategs = params["subCategs"]
-        wc = WCategoryDeletion( selCategs )
-        return wc.getHTML( urlHandlers.UHCategoryActionSubCategs.getURL( self._target ) )
-
-class WPConferenceDeletion(WPCategModifMain ):
-
-    def _getPageContent( self, params ):
-        #raise '%s'%params
-        selConfs = params["events"]
-        wc = WConferenceDeletion( selConfs )
-        return wc.getHTML( urlHandlers.UHCategoryActionConferences.getURL( self._target ) )
+        wc = WCategoryDeletion(selCategs)
+        return wc.getHTML(urlHandlers.UHCategoryActionSubCategs.getURL(self._target))
 
 
-class WItemReallocation( wcomponents.WTemplated ):
+class WPConferenceDeletion(WPCategModifMain):
 
-    def __init__( self, itemList ):
+    def _getPageContent(self, params):
+        wc = WConferenceDeletion()
+        return wc.getHTML({'eventList': params["events"],
+                           'postURL': urlHandlers.UHCategoryActionConferences.getURL(self._target),
+                           'cancelButtonCaption': _("No"),
+                           'confirmButtonCaption': _("Yes")})
+
+
+class WItemReallocation(wcomponents.WTemplated):
+
+    def __init__(self, itemList):
         self._itemList = itemList
 
-    def getHTML( self, selectTree, params):
+    def getHTML(self, selectTree, params):
         self._sTree = selectTree
-        return wcomponents.WTemplated.getHTML( self, params )
+        return wcomponents.WTemplated.getHTML(self, params)
 
-    def _getItemDescription( self, item ):
+    def _getItemDescription(self, item):
         return ""
 
-    def getVars( self ):
+    def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         l = []
         for item in self._itemList:
@@ -1924,9 +1796,7 @@ class WCategModifAC(wcomponents.WTemplated):
                                                     type)
         if not self._categ.isProtected():
             df =  wcomponents.WDomainControlFrame( self._categ )
-            vars["accessControlFrame"] += "<br>%s"%df.getHTML( \
-                                                    vars["addDomainURL"], \
-                                                    vars["removeDomainURL"] )
+            vars["accessControlFrame"] += "<br>%s"%df.getHTML()
         vars["confCreationControlFrame"] = ""
         vars["categoryId"] = self._categ.getId()
         if not self._categ.getSubCategoryList():
@@ -1941,30 +1811,13 @@ class WPCategModifAC( WPCategoryModifBase ):
     def _setActiveSideMenuItem( self ):
         self._ACMenuItem.setActive()
 
-    def _getPageContent( self, params ):
-        wc = WCategModifAC( self._target )
-        pars = { \
-"setVisibilityURL": urlHandlers.UHCategorySetVisibility.getURL(), \
-"addAllowedURL": urlHandlers.UHCategorySelectAllowed.getURL(), \
-"removeAllowedURL": urlHandlers.UHCategoryRemoveAllowed.getURL(), \
-"addDomainURL": urlHandlers.UHCategoryAddDomain.getURL(), \
-"removeDomainURL": urlHandlers.UHCategoryRemoveDomain.getURL(),\
-"setConferenceCreationControlURL": urlHandlers.UHCategorySetConfCreationControl.getURL() }
-        return wc.getHTML( pars )
-
-
-
-class WPCategorySelectAllowed( WPCategModifAC ):
-
-    def _getPageContent( self, params ):
-        searchExt = params.get("searchExt","")
-        if searchExt != "":
-            searchLocal = False
-        else:
-            searchLocal = True
-        wc = wcomponents.WPrincipalSelection( urlHandlers.UHCategorySelectAllowed.getURL(),forceWithoutExtAuth=searchLocal )
-        params["addURL"] = urlHandlers.UHCategoryAddAllowed.getURL()
-        return wc.getHTML( params )
+    def _getPageContent(self, params):
+        wc = WCategModifAC(self._target)
+        pars = {
+            "setVisibilityURL": urlHandlers.UHCategorySetVisibility.getURL(self._target),
+            "setConferenceCreationControlURL": urlHandlers.UHCategorySetConfCreationControl.getURL(self._target)
+        }
+        return wc.getHTML(pars)
 
 #---------------------------------------------------------------------------------
 
@@ -1979,11 +1832,6 @@ class WCategModifTools(wcomponents.WTemplated):
         vars["id"] = self._categ.getId()
         if not self._categ.isRoot():
             vars["deleteButton"] = i18nformat("""<input type="submit" class="btn" value="_("delete this category")">""")
-        vars["clearCache"] = ""
-        if info.HelperMaKaCInfo.getMaKaCInfoInstance().isCacheActive():
-            vars["clearCache"] = i18nformat("""<form action="%s" method="POST"><input type="submit" class="btn" value="_("clear category cache")"></form>""") % urlHandlers.UHCategoryClearCache.getURL(self._categ)
-            if self._categ.conferences:
-                vars["clearCache"] += i18nformat("""<form action="%s" method="POST"><input type="submit" class="btn" value="_("clear conference caches")"></form>""") % urlHandlers.UHCategoryClearConferenceCaches.getURL(self._categ)
         return vars
 
 

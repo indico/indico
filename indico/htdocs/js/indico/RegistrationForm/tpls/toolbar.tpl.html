@@ -1,0 +1,22 @@
+<div class="toolbar follow-scroll">
+    <div class="group">
+        <a ng-click="actions.openAddSection()"
+            class="i-button icon-plus"
+            title="{{ 'Create section' | i18n }}">
+            {{ 'Add section' | i18n }}
+        </a>
+        <a ng-click="actions.openManagement()"
+            ng-if="(sections | filter:{enabled:'false'}).length > 0"
+            ng-animate="animations.recoverSectionButton"
+            class="i-button icon-settings highlightable"
+            title="{{ 'Recover/Discard sections' | i18n }}">
+            {{ 'Recover sections' | i18n }}
+        </a>
+    </div>
+    <div class="group">
+        <a ng-click="actions.expandAll()"
+            class="i-button icon-stack-plus" title="{{ 'Expand All' | i18n }}"></a>
+        <a ng-click="actions.collapseAll()"
+            class="i-button icon-stack-minus" title="{{ 'Collapse All' | i18n }}"></a>
+    </div>
+</div>

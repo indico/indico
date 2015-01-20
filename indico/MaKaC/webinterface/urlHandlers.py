@@ -1,40 +1,51 @@
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.common.url import URL
-from MaKaC.common.Configuration import Config
+import re
+import os
 import string
+import urlparse
+
+from flask import request, session, url_for, has_request_context
+
 import MaKaC.user as user
-from new import classobj
+from MaKaC.common.url import URL, EndpointURL
 from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
 
-"""
-This file contains classes representing url handlers which are objects which
-contain information about every request handler of the application and which are
-responsible for generating the correct url for a given request handler given
-certain parameters. This file is a kind URL database so other web interface
-modules will use the classes instead of using harcoded urls; this makes possible
-to eassily change the urls or the parameter names without affecting the rest of
-the system.
-"""
+from indico.core.config import Config
+
+
+class BooleanMixin:
+    """Mixin to convert True to 'y' and remove False altogether."""
+    _true = 'y'
+
+    @classmethod
+    def _translateParams(cls, params):
+        return dict((key, cls._true if value is True else value)
+                    for key, value in params.iteritems()
+                    if value is not False)
+
+
+class BooleanTrueMixin(BooleanMixin):
+    _true = 'True'
+
 
 class URLHandler(object):
     """This is the generic URLHandler class. It contains information about the
@@ -48,34 +59,81 @@ class URLHandler(object):
         _relativeURL - (string) Contains the relative (the part which is
             variable from the root) URL pointing to the corresponding request
             handler.
+        _endpoint - (string) Contains the name of a Flask endpoint.
+        _defaultParams - (dict) Default params (overwritten by kwargs)
+        _fragment - (string) URL fragment to set
     """
-    _relativeURL = "broken link"
+    _relativeURL = None
+    _endpoint = None
+    _defaultParams = {}
+    _fragment = False
 
     @classmethod
-    def getRelativeURL( cls ):
+    def getRelativeURL(cls):
         """Gives the relative URL (URL part which is carachteristic) for the
             corresponding request handler.
         """
         return cls._relativeURL
 
     @classmethod
-    def _getURL( cls, **params ):
+    def getStaticURL(cls, target=None, **params):
+        if cls._relativeURL:
+            return cls._relativeURL.replace('.py', '.html')
+        else:
+            # yay, super ugly, but it works...
+            return re.sub(r'^event\.', '', cls._endpoint) + '.html'
+
+    @classmethod
+    def _want_secure_url(cls, force_secure=None):
+        if not Config.getInstance().getBaseSecureURL():
+            return False
+        elif force_secure is not None:
+            return force_secure
+        elif not has_request_context():
+            return False
+        else:
+            return request.is_secure
+
+    @classmethod
+    def _getURL(cls, _force_secure=None, **params):
         """ Gives the full URL for the corresponding request handler.
 
             Parameters:
-                params - (Dict) parameters to be added to the URL.
+                _force_secure - (bool) create a secure url if possible
+                params - (dict) parameters to be added to the URL.
         """
-        rh = ContextManager.get('currentRH', None)
 
-        if rh and rh._req.is_https() and Config.getInstance().getBaseSecureURL():
-            baseURL = Config.getInstance().getBaseSecureURL()
+        secure = cls._want_secure_url(_force_secure)
+        if not cls._endpoint:
+            # Legacy UH containing a relativeURL
+            cfg = Config.getInstance()
+            baseURL = cfg.getBaseSecureURL() if secure else cfg.getBaseURL()
+            url = URL('%s/%s' % (baseURL, cls.getRelativeURL()), **params)
         else:
-            baseURL = Config.getInstance().getBaseURL()
+            assert not cls.getRelativeURL()
+            url = EndpointURL(cls._endpoint, secure, params)
 
-        return URL('%s/%s' % (baseURL, cls.getRelativeURL()), **params)
+        if cls._fragment:
+            url.fragment = cls._fragment
+
+        return url
 
     @classmethod
-    def getURL( cls, target=None, **params ):
+    def _translateParams(cls, params):
+        # When overriding this you may return a new dict or modify the existing one in-place.
+        # But in any case, you must return the final dict.
+        return params
+
+    @classmethod
+    def _getParams(cls, target, params):
+        params = dict(cls._defaultParams, **params)
+        if target is not None:
+            params.update(target.getLocator())
+        params = cls._translateParams(params)
+        return params
+
+    @classmethod
+    def getURL(cls, target=None, _ignore_static=False, **params):
         """Gives the full URL for the corresponding request handler. In case
             the target parameter is specified it will append to the URL the
             the necessary parameters to make the target be specified in the url.
@@ -86,230 +144,257 @@ class URLHandler(object):
                     is able to retrieve it.
                 params - (Dict) parameters to be added to the URL.
         """
-        url = cls._getURL(**params)
-        if target is not None:
-            url.addParams( target.getLocator() )
-        return url
+        if not _ignore_static and ContextManager.get('offlineMode', False):
+            return URL(cls.getStaticURL(target, **params))
+        return cls._getURL(**cls._getParams(target, params))
+
 
 class SecureURLHandler(URLHandler):
-
     @classmethod
-    def _getURL(cls, **params):
-        if Config.getInstance().getBaseSecureURL():
-            return URL( "%s/%s"%(Config.getInstance().getBaseSecureURL(), cls.getRelativeURL()) , **params )
-        else:
-            return super(SecureURLHandler, cls)._getURL(**params)
+    def getURL(cls, target=None, **params):
+        return cls._getURL(_force_secure=True, **cls._getParams(target, params))
+
 
 class OptionallySecureURLHandler(URLHandler):
+    @classmethod
+    def getURL(cls, target=None, secure=False, **params):
+        return cls._getURL(_force_secure=secure, **cls._getParams(target, params))
+
+
+class UserURLHandler(URLHandler):
+    """Strips the userId param if it's the current user"""
 
     @classmethod
-    def getURL( cls, target=None, secure = False, **params ):
-        if secure:
-            url = URL( "%s/%s"%(Config.getInstance().getBaseSecureURL(), cls.getRelativeURL()) , **params )
-        else:
-            url = URL( "%s/%s"%(Config.getInstance().getBaseURL(),cls.getRelativeURL()) , **params )
-        if target is not None:
-            url.addParams( target.getLocator() )
-        return url
+    def _translateParams(cls, params):
+        if 'userId' in params and session.get('_avatarId') == params['userId']:
+            del params['userId']
+        return params
 
-__URLHandlerClassCounter = 0;
-
-def Build(relativeURL):
-    global __URLHandlerClassCounter
-    __URLHandlerClassCounter += 1
-    return classobj("__UHGenerated" + str(__URLHandlerClassCounter), (URLHandler,), {"_relativeURL": relativeURL})
-
-def Derive(handler, relativeURL):
-    if not issubclass(handler, URLHandler):
-        handler = handler._uh;
-    return Build(handler._relativeURL + "/" + relativeURL)
 
 # Hack to allow secure Indico on non-80 ports
-def setSSLPort( url ):
+def setSSLPort(url):
     """
     Returns url with port changed to SSL one.
     If url has no port specified, it returns the same url.
     SSL port is extracted from loginURL (MaKaCConfig)
     """
     # Set proper PORT for images requested via SSL
-    loginURL = Config.getInstance().getLoginURL()
-    try:
-        colonIx = loginURL.index( ':', 6 )     # Colon after https:// means port
-        slashIx = loginURL.index( '/', colonIx )
-        if slashIx <= colonIx:
-            slashIx = len( loginURL )
-        sslPort = loginURL[colonIx+1:slashIx]  # like "8443"
-    except ValueError:
-        sslPort = "443"
-
-    sslPort = ':' + sslPort     # like ":8443/"
+    sslURL = Config.getInstance().getLoginURL() or Config.getInstance().getBaseSecureURL()
+    sslPort = ':%d' % (urlparse.urlsplit(sslURL).port or 443)
 
     # If there is NO port, nothing will happen (production indico)
-    # If there IS port, it will be replaced with proper SSL one, taken from loginURL
-    import re
+    # If there IS a port, it will be replaced with proper SSL one, taken from loginURL
     regexp = ':\d{2,5}'   # Examples:   :8080   :80   :65535
-    return re.sub( regexp, sslPort, url )
+    return re.sub(regexp, sslPort, url)
 
 
-class UHWelcome( URLHandler ):
-    _relativeURL = "index.py"
+class UHWelcome(URLHandler):
+    _endpoint = 'misc.index'
 
 
-class UHSignIn( URLHandler ):
-    _relativeURL = "signIn.py"
+class UHSignIn(URLHandler):
+    _endpoint = 'user.signIn'
 
-    def getURL( cls, returnURL="" ):
-        if Config.getInstance().getLoginURL() != "":
+    @classmethod
+    def getURL(cls, returnURL=''):
+        if Config.getInstance().getLoginURL():
             url = URL(Config.getInstance().getLoginURL())
         else:
             url = cls._getURL()
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
+        if returnURL:
+            url.addParam('returnURL', returnURL)
         return url
-    getURL = classmethod( getURL )
 
 
-class UHActiveAccount( URLHandler ):
-    _relativeURL = "signIn.py/active"
+class UHSignInSSO(SecureURLHandler):
+    _endpoint = "user.signIn-sso"
 
 
-class UHSendActivation( URLHandler ):
-    _relativeURL = "signIn.py/sendActivation"
+class UHActiveAccount(URLHandler):
+    _endpoint = 'user.signIn-active'
 
 
-class UHDisabledAccount( URLHandler ):
-    _relativeURL = "signIn.py/disabledAccount"
+class UHSendActivation(URLHandler):
+    _endpoint = 'user.signIn-sendActivation'
 
 
-class UHSendLogin( URLHandler ):
-    _relativeURL = "signIn.py/sendLogin"
+class UHDisabledAccount(URLHandler):
+    _endpoint = 'user.signIn-disabledAccount'
 
 
-class UHUnactivatedAccount( URLHandler ):
-    _relativeURL = "signIn.py/unactivatedAccount"
+class UHSendLogin(URLHandler):
+    _endpoint = 'user.signIn-sendLogin'
 
-class UHSignOut( URLHandler ):
-    _relativeURL = "logOut.py"
 
-    def getURL( cls, returnURL="" ):
+class UHUnactivatedAccount(URLHandler):
+    _endpoint = 'user.signIn-unactivatedAccount'
+
+
+class UHSignOut(URLHandler):
+    _endpoint = 'user.logOut'
+
+    @classmethod
+    def getURL(cls, returnURL=''):
         url = cls._getURL()
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
+        if returnURL:
+            url.addParam('returnURL', returnURL)
         return url
-    getURL = classmethod( getURL )
 
-class UHIndicoNews( URLHandler ):
-    _relativeURL = "news.py"
+
+class UHOAuthRequestToken(URLHandler):
+    _endpoint = 'oauth.oauth-request_token'
+
+
+class UHOAuthAuthorization(URLHandler):
+    _endpoint = 'oauth.oauth-authorize'
+
+
+class UHOAuthAccessTokenURL(URLHandler):
+    _endpoint = 'oauth.oauth-access_token'
+
+
+class UHOAuthAuthorizeConsumer(UserURLHandler):
+    _endpoint = 'oauth.oauth-authorize_consumer'
+
+
+class UHOAuthThirdPartyAuth(UserURLHandler):
+    _endpoint = 'oauth.oauth-thirdPartyAuth'
+
+
+class UHOAuthUserThirdPartyAuth(UserURLHandler):
+    _endpoint = 'oauth.oauth-userThirdPartyAuth'
+
+
+class UHIndicoNews(URLHandler):
+    _endpoint = 'misc.news'
+
 
 class UHConferenceHelp(URLHandler):
-    _relativeURL ="help.py"
+    _endpoint = 'misc.help'
 
-class UHSearch(URLHandler):
-    _relativeURL ="search.py"
 
-class UHCalendar( URLHandler ):
-    _relativeURL = "wcalendar.py"
+class UHCalendar(URLHandler):
+    _endpoint = 'category.wcalendar'
 
-    def getURL( cls, categList = None ):
+    @classmethod
+    def getURL(cls, categList=None):
         url = cls._getURL()
         if not categList:
             categList = []
-        l = []
-        for categ in categList:
-            l.append( categ.getId() )
-        url.addParam( "selCateg", l )
+        lst = [categ.getId() for categ in categList]
+        url.addParam('selCateg', lst)
         return url
-    getURL = classmethod( getURL )
 
 
-class UHCalendarSelectCategories( URLHandler ):
-    _relativeURL = "wcalendar.py/select"
+class UHCalendarSelectCategories(URLHandler):
+    _endpoint = 'category.wcalendar-select'
 
 
-class UHSimpleCalendar( URLHandler ):
-    _relativeURL = "calendarSelect.py"
+class UHConferenceCreation(URLHandler):
+    _endpoint = 'event_creation.conferenceCreation'
 
-class UHSimpleColorChart( URLHandler ):
-    _relativeURL = "colorSelect.py"
-
-class UHConferenceCreation( URLHandler ):
-    _relativeURL = "conferenceCreation.py"
     @classmethod
-    def getURL( cls, target):
+    def getURL(cls, target):
         url = cls._getURL()
         if target is not None:
-            url.addParams( target.getLocator() )
+            url.addParams(target.getLocator())
         return url
 
-class UHConferencePerformCreation( URLHandler ):
-    _relativeURL = "conferenceCreation.py/createConference"
 
-class UHConferenceDisplay( URLHandler ):
-    _relativeURL = "conferenceDisplay.py"
+class UHConferencePerformCreation(URLHandler):
+    _endpoint = 'event_creation.conferenceCreation-createConference'
+
+
+class UHConferenceDisplay(URLHandler):
+    _endpoint = 'event.conferenceDisplay'
+
 
 class UHNextEvent(URLHandler):
-    _relativeURL = "conferenceDisplay.py/next"
+    _endpoint = 'event.conferenceDisplay-next'
+
 
 class UHPreviousEvent(URLHandler):
-    _relativeURL = "conferenceDisplay.py/prev"
+    _endpoint = 'event.conferenceDisplay-prev'
 
-class UHConferenceOverview( URLHandler ):
-    _relativeURL = "conferenceDisplay.py"
+
+class UHConferenceOverview(URLHandler):
+    _endpoint = 'event.conferenceDisplay-overview'
 
     @classmethod
-    def getURL( cls, target ):
-        url = cls._getURL()
-        if target is not None:
-            url.addParams( target.getLocator() )
-        url.addParam( 'ovw', True )
-        return url
+    def getURL(cls, target):
+        if ContextManager.get('offlineMode', False):
+            return URL(UHConferenceDisplay.getStaticURL(target))
+        return super(UHConferenceOverview, cls).getURL(target)
+
 
 class UHConferenceEmail(URLHandler):
-    _relativeURL = "EMail.py"
+    _endpoint = 'event.EMail'
+
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        if target is not None:
+            return "mailto:%s" % str(target.getEmail())
+        return cls.getURL(target)
+
 
 class UHConferenceSendEmail(URLHandler):
-    _relativeURL = "EMail.py/send"
+    _endpoint = 'event.EMail-send'
+
 
 class UHRegistrantsSendEmail(URLHandler):
-    _relativeURL = "EMail.py/sendreg"
+    _endpoint = 'event_mgmt.EMail-sendreg'
+
 
 class UHConvenersSendEmail(URLHandler):
-    _relativeURL = "EMail.py/sendconvener"
+    _endpoint = 'event_mgmt.EMail-sendconvener'
 
-class UHAuthorSendEmail(URLHandler):
-    _relativeURL = "EMail.py/authsend"
 
 class UHContribParticipantsSendEmail(URLHandler):
-    _relativeURL = "EMail.py/sendcontribparticipants"
-
-class UHConferenceOtherViews( URLHandler ):
-    _relativeURL = "conferenceOtherViews.py"
+    _endpoint = 'event_mgmt.EMail-sendcontribparticipants'
 
 
-class UHConferenceLogo( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/getLogo"
+class UHConferenceOtherViews(URLHandler):
+    _endpoint = 'event.conferenceOtherViews'
 
 
-class UHConferenceCSS( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/getCSS"
+class UHConferenceLogo(URLHandler):
+    _endpoint = 'event.conferenceDisplay-getLogo'
 
-class UHConferencePic( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/getPic"
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        return os.path.join(Config.getInstance().getImagesBaseURL(), "logo", str(target.getLogo()))
+
+
+class UHConferenceCSS(URLHandler):
+    _endpoint = 'event.conferenceDisplay-getCSS'
+
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        return cls.getURL(target, _ignore_static=True, **params)
+
+
+class UHConferencePic(URLHandler):
+    _endpoint = 'event.conferenceDisplay-getPic'
+
 
 class UHConfModifPreviewCSS(URLHandler):
-    _relativeURL = "confModifDisplay.py/previewCSS"
+    _endpoint = 'event_mgmt.confModifDisplay-previewCSS'
 
-class UHCategoryIcon( URLHandler ):
-    _relativeURL = "categoryDisplay.py/getIcon"
 
-class UHConferenceModification( URLHandler ):
-    _relativeURL = "conferenceModification.py"
+class UHCategoryIcon(URLHandler):
+    _endpoint = 'category.categoryDisplay-getIcon'
 
-class UHConfModifShowMaterials( URLHandler ):
-    _relativeURL = "conferenceModification.py/materialsShow"
 
-class UHConfModifAddMaterials( URLHandler ):
-    _relativeURL = "conferenceModification.py/materialsAdd"
+class UHConferenceModification(URLHandler):
+    _endpoint = 'event_mgmt.conferenceModification'
+
+
+class UHConfModifShowMaterials(URLHandler):
+    _endpoint = 'event_mgmt.conferenceModification-materialsShow'
+
+
+class UHConfModifAddMaterials(URLHandler):
+    _endpoint = 'event_mgmt.conferenceModification-materialsAdd'
 
 # ============================================================================
 # ROOM BOOKING ===============================================================
@@ -317,1649 +402,1058 @@ class UHConfModifAddMaterials( URLHandler ):
 
 # Free standing ==============================================================
 
-class UHRoomBookingMapOfRooms( URLHandler ):
-    _relativeURL = "roomBooking.py/mapOfRooms"
 
-class UHRoomBookingMapOfRoomsWidget( URLHandler ):
-    _relativeURL = "roomBooking.py/mapOfRoomsWidget"
+class UHRoomBookingMapOfRooms(URLHandler):
+    _endpoint = 'rooms.roomBooking-mapOfRooms'
 
-class UHRoomBookingWelcome( URLHandler ):
-    _relativeURL = "roomBooking.py"
 
-class UHRoomBookingSearch4Rooms( URLHandler ):
-    _relativeURL = "roomBooking.py/search4Rooms"
-    @classmethod
-    def getURL( cls, forNewBooking = False ):
-        url = cls._getURL()
-        if forNewBooking:
-            url.addParam( 'forNewBooking', True )
-        else:
-            url.addParam( 'forNewBooking', False )
-        return url
+class UHRoomBookingMapOfRoomsWidget(URLHandler):
+    _endpoint = 'rooms.roomBooking-mapOfRoomsWidget'
 
-class UHRoomBookingSearch4Bookings( URLHandler ):
-    _relativeURL = "roomBooking.py/search4Bookings"
 
-class UHRoomBookingRoomList( URLHandler ):
-    _relativeURL = "roomBooking.py/roomList"
-    @classmethod
-    def getURL( cls, onlyMy = False ):
-        url = cls._getURL()
-        if onlyMy:
-            url.addParam( 'onlyMy', 'on' )
-        return url
-class UHRoomBookingBookingList( URLHandler ):
-    _relativeURL = "roomBooking.py/bookingList"
-    @classmethod
-    def getURL( cls, onlyMy = False, ofMyRooms = False, onlyPrebookings = False, autoCriteria = False, newParams = None, today = False, allRooms = False ):
-        """
-        onlyMy - only bookings of the current user
-        ofMyRooms - only bookings for rooms managed by the current user
-        autoCriteria - some reasonable constraints, like "only one month ahead"
-        """
-        url = cls._getURL()
-        if onlyMy:
-            url.addParam( 'onlyMy', 'on' )
-        if ofMyRooms:
-            url.addParam( 'ofMyRooms', 'on' )
-        if onlyPrebookings:
-            url.addParam( 'onlyPrebookings', 'on' )
-        if autoCriteria:
-            url.addParam( 'autoCriteria', 'True' )
-        if today:
-            url.addParam( 'day', 'today' )
-        if allRooms:
-            url.addParam( 'roomGUID', 'allRooms' )
-        if newParams:
-            url.setParams( newParams )
-        return url
+class UHRoomBookingWelcome(URLHandler):
+    _endpoint = 'rooms.roomBooking'
 
-class UHRoomBookingRoomDetails( URLHandler ):
-    _relativeURL = "roomBooking.py/roomDetails"
+
+class UHRoomBookingSearch4Bookings(URLHandler):
+    _endpoint = 'rooms.roomBooking-search4Bookings'
+
+
+class UHRoomBookingRoomDetails(BooleanTrueMixin, URLHandler):
+    _endpoint = 'rooms.roomBooking-roomDetails'
+
+
+class UHRoomBookingRoomStats(URLHandler):
+    _endpoint = 'rooms.roomBooking-roomStats'
+
+
+class UHRoomBookingBookingDetails(URLHandler):
+    _endpoint = 'rooms.roomBooking-bookingDetails'
 
     @classmethod
-    def getURL( cls, target = None, calendarMonths = None ):
-        """
-        onlyMy - only bookings of the current user
-        ofMyRooms - only bookings for rooms managed by the current user
-        autoCriteria - some reasonable constraints, like "only one month ahead"
-        """
-        url = cls._getURL()
-        if target:
-            url.setParams( target.getLocator() )
-        if calendarMonths:
-            url.addParam( 'calendarMonths', 'True' )
-        return url
-
-class UHRoomBookingRoomStats( URLHandler ):
-    _relativeURL = "roomBooking.py/roomStats"
-
-class UHRoomBookingBookingDetails( URLHandler ):
-    _relativeURL = "roomBooking.py/bookingDetails"
-
-class UHRoomBookingRoomForm( URLHandler ):
-    _relativeURL = "roomBooking.py/roomForm"
-class UHRoomBookingSaveRoom( URLHandler ):
-    _relativeURL = "roomBooking.py/saveRoom"
-class UHRoomBookingDeleteRoom( URLHandler ):
-    _relativeURL = "roomBooking.py/deleteRoom"
-
-class UHRoomBookingBookingForm( URLHandler ):
-    _relativeURL = "roomBooking.py/bookingForm"
-class UHRoomBookingSaveBooking( URLHandler ):
-    _relativeURL = "roomBooking.py/saveBooking"
-class UHRoomBookingDeleteBooking( URLHandler ):
-    _relativeURL = "roomBooking.py/deleteBooking"
-class UHRoomBookingCloneBooking( URLHandler ):
-    _relativeURL = "roomBooking.py/cloneBooking"
-class UHRoomBookingCancelBooking( URLHandler ):
-    _relativeURL = "roomBooking.py/cancelBooking"
-class UHRoomBookingAcceptBooking( URLHandler ):
-    _relativeURL = "roomBooking.py/acceptBooking"
-class UHRoomBookingRejectBooking( URLHandler ):
-    _relativeURL = "roomBooking.py/rejectBooking"
-class UHRoomBookingRejectAllConflicting( URLHandler):
-    _relativeURL = "roomBooking.py/rejectAllConflicting"
-class UHRoomBookingRejectBookingOccurrence( URLHandler ):
-    _relativeURL = "roomBooking.py/rejectBookingOccurrence"
-
-    @classmethod
-    def getURL( cls, target, date ):
-        url = cls._getURL()
-        if target:
-            url.setParams( target.getLocator() )
-        if date:
-            url.addParam( 'date', date )
-        return url
-
-class UHRoomBookingCancelBookingOccurrence( URLHandler ):
-    _relativeURL = "roomBooking.py/cancelBookingOccurrence"
-
-    @classmethod
-    def getURL( cls, target, date ):
-        url = cls._getURL()
-        if target:
-            url.setParams( target.getLocator() )
-        if date:
-            url.addParam( 'date', date )
-        return url
+    def _translateParams(cls, params):
+        # confId is apparently unused and thus just ugly
+        params.pop('confId', None)
+        return params
 
 
-class UHRoomBookingStatement( URLHandler ):
-    _relativeURL = "roomBooking.py/statement"
+class UHRoomBookingModifyBookingForm(URLHandler):
+    _endpoint = 'rooms.roomBooking-modifyBookingForm'
+
+
+class UHRoomBookingDeleteBooking(URLHandler):
+    _endpoint = 'rooms.roomBooking-deleteBooking'
+
+
+class UHRoomBookingCloneBooking(URLHandler):
+    _endpoint = 'rooms.roomBooking-cloneBooking'
+
+
+class UHRoomBookingCancelBooking(URLHandler):
+    _endpoint = 'rooms.roomBooking-cancelBooking'
+
+
+class UHRoomBookingAcceptBooking(URLHandler):
+    _endpoint = 'rooms.roomBooking-acceptBooking'
+
+
+class UHRoomBookingRejectBooking(URLHandler):
+    _endpoint = 'rooms.roomBooking-rejectBooking'
+
+
+class UHRoomBookingCancelBookingOccurrence(URLHandler):
+    _endpoint = 'rooms.roomBooking-cancelBookingOccurrence'
+
 
 # RB Administration
-
-class UHRoomBookingPluginAdmin( URLHandler ):
-    _relativeURL = "roomBookingPluginAdmin.py"
-
-class UHRoomBookingModuleActive( URLHandler ):
-    _relativeURL = "roomBookingPluginAdmin.py/switchRoomBookingModuleActive"
-
-class UHRoomBookingPlugAdminZODBSave( URLHandler ):
-    _relativeURL = "roomBookingPluginAdmin.py/zodbSave"
-
-class UHRoomBookingAdmin( URLHandler ):
-    _relativeURL = "roomBooking.py/admin"
-
-class UHRoomBookingAdminLocation( URLHandler ):
-    _relativeURL = "roomBooking.py/adminLocation"
-
-class UHRoomBookingSetDefaultLocation( URLHandler ):
-    _relativeURL = "roomBooking.py/setDefaultLocation"
-class UHRoomBookingSaveLocation( URLHandler ):
-    _relativeURL = "roomBooking.py/saveLocation"
-class UHRoomBookingDeleteLocation( URLHandler ):
-    _relativeURL = "roomBooking.py/deleteLocation"
-class UHRoomBookingSaveEquipment( URLHandler ):
-    _relativeURL = "roomBooking.py/saveEquipment"
-class UHRoomBookingDeleteEquipment( URLHandler ):
-    _relativeURL = "roomBooking.py/deleteEquipment"
-
-class UHRoomBookingSaveCustomAttributes( URLHandler ):
-    _relativeURL = "roomBooking.py/saveCustomAttributes"
-class UHRoomBookingDeleteCustomAttribute( URLHandler ):
-    _relativeURL = "roomBooking.py/deleteCustomAttribute"
-
-class UHRoomBookingGetRoomSelectList( URLHandler ):
-    _relativeURL = "roomBooking.py/getRoomSelectList"
-
-class UHRoomBookingGetRoomSelectList4SubEvents( URLHandler ):
-    _relativeURL = "roomBooking.py/getRoomSelectList4SubEvents"
-
-class UHRoomBookingBlockingsMyRooms( URLHandler ):
-    _relativeURL = "roomBooking.py/blockingsForMyRooms"
-    @classmethod
-    def getURL(cls, filterState=None):
-        """
-        filterState - only show requests which have the given state
-        """
-        url = cls._getURL()
-        if filterState:
-            url.addParam( 'filterState', filterState )
-        return url
-
-class UHRoomBookingBlockingsBlockingDetails( URLHandler ):
-    _relativeURL = "roomBooking.py/blockingDetails"
-
-class UHRoomBookingBlockingList( URLHandler ):
-    _relativeURL = "roomBooking.py/blockingList"
-    @classmethod
-    def getURL(cls, onlyMine=False, onlyRecent=False, onlyThisYear=True):
-        """
-        onlyMine - only show own blockings
-        onlyRecent - only show bookings ending in the future
-        """
-        url = cls._getURL()
-        if onlyMine:
-            url.addParam( 'onlyMine', 'on' )
-        if onlyRecent:
-            url.addParam( 'onlyRecent', 'on' )
-        if onlyThisYear:
-            url.addParam( 'onlyThisYear', 'on' )
-        return url
-
-class UHRoomBookingBlockingForm( URLHandler ):
-    _relativeURL = "roomBooking.py/blockingForm"
-
-class UHRoomBookingDeleteBlocking( URLHandler ):
-    _relativeURL = "roomBooking.py/deleteBlocking"
-
-# For the event ==============================================================
+class UHRoomBookingPluginAdmin(URLHandler):
+    _endpoint = 'rooms_admin.roomBookingPluginAdmin'
 
 
-class UHConfModifRoomBookingChooseEvent( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingChooseEvent"
-
-class UHConfModifRoomBookingSearch4Rooms( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingSearch4Rooms"
-
-    @classmethod
-    def getURL( cls, target = None, dontAssign = False  ):
-        url = cls._getURL()
-        if target:
-            url.setParams( target.getLocator() )
-        if dontAssign:
-            url.addParam( "dontAssign", True )
-        return url
-
-class UHConfModifRoomBookingList( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingList"
-class UHConfModifRoomBookingRoomList( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingRoomList"
-
-class UHConfModifRoomBookingDetails( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingDetails"
-class UHConfModifRoomBookingRoomDetails( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingRoomDetails"
-
-class UHConfModifRoomBookingBookingForm( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingBookingForm"
-
-class UHConfModifRoomBookingCloneBooking( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingCloneBooking"
-
-    @classmethod
-    def getURL(cls, target=None, conf=None, **params):
-        url = cls._getURL(**params)
-        if target is not None:
-            url.addParams(target.getLocator())
-        if conf is not None:
-            url.addParams(conf.getLocator())
-        return url
-
-class UHConfModifRoomBookingSaveBooking( URLHandler ):
-    _relativeURL = "conferenceModification.py/roomBookingSaveBooking"
+class UHRoomBookingAdmin(URLHandler):
+    _endpoint = 'rooms_admin.roomBooking-admin'
 
 
-class UHRoomPhoto( URLHandler ):
-    _relativeTemplate = "images/rooms/large_photos/%s.jpg"
-
-    @classmethod
-    def getURL( cls, target = None ):
-        cls._relativeURL = cls._relativeTemplate % str( target )
-        return cls._getURL()
-
-class UHRoomPhotoSmall( URLHandler ):
-    _relativeTemplate = "images/rooms/small_photos/%s.jpg"
-
-    @classmethod
-    def getURL( cls, target = None ):
-        cls._relativeURL = cls._relativeTemplate % str( target )
-        return cls._getURL()
-
-# Used (?) to send room photos via Python script
-#class UHSendRoomPhoto( URLHandler ):
-#    _relativeURL = "roomBooking.py/sendRoomPhoto"
-#
-#    @classmethod
-#    def getURL( cls, photoId, small ):
-#        url = cls._getURL()
-#        url.addParam( "photoId", photoId )
-#        url.addParam( "small", small )
-#        return url
-
-class UHConferenceAddMaterial( URLHandler ):
-    _relativeURL = "conferenceModification.py/addMaterial"
+class UHRoomBookingAdminLocation(URLHandler):
+    _endpoint = 'rooms_admin.roomBooking-adminLocation'
 
 
-class UHConferencePerformAddMaterial( URLHandler ):
-    _relativeURL = "conferenceModification.py/performAddMaterial"
+class UHRoomBookingSetDefaultLocation(URLHandler):
+    _endpoint = 'rooms_admin.roomBooking-setDefaultLocation'
 
 
-class UHConferenceRemoveMaterials( URLHandler ):
-    _relativeURL = "conferenceModification.py/removeMaterials"
+class UHRoomBookingSaveLocation(URLHandler):
+    _endpoint = 'rooms_admin.roomBooking-saveLocation'
 
 
-class UHConfModSessionSlots( URLHandler ):
-    _relativeURL = "conferenceModification.py/sessionSlots"
-
-class UHConferenceClose( URLHandler ):
-    _relativeURL = "conferenceModification.py/close"
-
-class UHConferenceDeleteSocialEvent( URLHandler ):
-    _relativeURL = "conferenceModification.py/deleteSocialEvent"
-
-class UHConferenceModificationClosed( URLHandler ):
-    _relativeURL = "conferenceModification.py/modificationClosed"
-
-class UHConferenceOpen( URLHandler ):
-    _relativeURL = "conferenceModification.py/open"
-
-class UHConfDataModif( URLHandler ):
-    _relativeURL = "conferenceModification.py/data"
-    @classmethod
-    def getURL( cls, target):
-        url = cls._getURL()
-        if target is not None:
-            url.addParams( target.getLocator() )
-        return url
-
-class UHConfScreenDatesEdit( URLHandler ):
-    _relativeURL = "conferenceModification.py/screenDates"
-
-class UHConfPerformDataModif( URLHandler ):
-    _relativeURL = "conferenceModification.py/dataPerform"
+class UHRoomBookingDeleteLocation(URLHandler):
+    _endpoint = 'rooms_admin.roomBooking-deleteLocation'
 
 
-class UHConfAddContribType( URLHandler ):
-    _relativeURL = "conferenceModification.py/addContribType"
+class UHRoomBookingSaveEquipment(URLHandler):
+    _endpoint = 'rooms_admin.roomBooking-saveEquipment'
 
 
-class UHConfRemoveContribType( URLHandler ):
-    _relativeURL = "conferenceModification.py/removeContribType"
+class UHRoomBookingDeleteEquipment(URLHandler):
+    _endpoint = 'rooms_admin.roomBooking-deleteEquipment'
 
 
-class UHConfEditContribType( URLHandler ):
-    _relativeURL = "conferenceModification.py/editContribType"
+class UHRoomBookingSaveCustomAttributes(URLHandler):
+    _endpoint = 'rooms_admin.roomBooking-saveCustomAttributes'
 
-class UHConfSectionsSettings( URLHandler ):
-    _relativeURL = "conferenceModification.py/sectionsSettings"
 
-class UHConfModifCFAOptFld( URLHandler ):
-    _relativeURL = "confModifCFA.py/abstractFields"
+class UHRoomBookingDeleteCustomAttribute(URLHandler):
+    _endpoint = 'rooms_admin.roomBooking-deleteCustomAttribute'
 
-class UHConfModifCFAAddOptFld( URLHandler ):
-    _relativeURL = "confModifCFA.py/addAbstractField"
 
-class UHConfModifCFAPerformAddOptFld( URLHandler ):
-    _relativeURL = "confModifCFA.py/performAddAbstractField"
+class UHConferenceClose(URLHandler):
+    _endpoint = 'event_mgmt.conferenceModification-close'
 
-class UHConfModifCFAEditOptFld( URLHandler ):
-    _relativeURL = "confModifCFA.py/editAbstractField"
 
-class UHConfModifCFARemoveOptFld( URLHandler ):
-    _relativeURL = "confModifCFA.py/removeAbstractField"
+class UHConferenceOpen(URLHandler):
+    _endpoint = 'event_mgmt.conferenceModification-open'
+
+
+class UHConfDataModif(URLHandler):
+    _endpoint = 'event_mgmt.conferenceModification-data'
+
+
+class UHConfScreenDatesEdit(URLHandler):
+    _endpoint = 'event_mgmt.conferenceModification-screenDates'
+
+
+class UHConfPerformDataModif(URLHandler):
+    _endpoint = 'event_mgmt.conferenceModification-dataPerform'
+
+
+class UHConfAddContribType(URLHandler):
+    _endpoint = 'event_mgmt.conferenceModification-addContribType'
+
+
+class UHConfRemoveContribType(URLHandler):
+    _endpoint = 'event_mgmt.conferenceModification-removeContribType'
+
+
+class UHConfEditContribType(URLHandler):
+    _endpoint = 'event_mgmt.conferenceModification-editContribType'
+
+
+class UHConfModifCFAOptFld(URLHandler):
+    _endpoint = 'event_mgmt.confModifCFA-abstractFields'
+
+
+class UHConfModifCFARemoveOptFld(URLHandler):
+    _endpoint = 'event_mgmt.confModifCFA-removeAbstractField'
+
 
 class UHConfModifCFAAbsFieldUp(URLHandler):
-    _relativeURL = "confModifCFA.py/absFieldUp"
+    _endpoint = 'event_mgmt.confModifCFA-absFieldUp'
+
 
 class UHConfModifCFAAbsFieldDown(URLHandler):
-    _relativeURL = "confModifCFA.py/absFieldDown"
+    _endpoint = 'event_mgmt.confModifCFA-absFieldDown'
 
-class UHConfModifReportNumberEdit( URLHandler ):
-    _relativeURL = "conferenceModification.py/editReportNumber"
 
-class UHConfModifReportNumberPerformEdit( URLHandler ):
-    _relativeURL = "conferenceModification.py/performEditReportNumber"
+class UHConfModifProgram(URLHandler):
+    _endpoint = 'event_mgmt.confModifProgram'
 
-class UHConfModifReportNumberRemove( URLHandler ):
-    _relativeURL = "conferenceModification.py/removeReportNumber"
 
-class UHConfModifProgram( URLHandler ):
-    _relativeURL = "confModifProgram.py"
+class UHConfModifCFA(URLHandler):
+    _endpoint = 'event_mgmt.confModifCFA'
 
-class UHConfModifProgramDescription( URLHandler ):
-    _relativeURL = "confModifProgram.py/modifyDescription"
 
-class UHConfModifCFA( URLHandler ):
-    _relativeURL = "confModifCFA.py"
+class UHConfModifCFAPreview(URLHandler):
+    _endpoint = 'event_mgmt.confModifCFA-preview'
 
-class UHConfModifCFAPreview( URLHandler ):
-    _relativeURL = "confModifCFA.py/preview"
 
-class UHConfCFAChangeStatus( URLHandler ):
-    _relativeURL = "confModifCFA.py/changeStatus"
+class UHConfCFAChangeStatus(URLHandler):
+    _endpoint = 'event_mgmt.confModifCFA-changeStatus'
 
-class UHConfCFASwitchMultipleTracks( URLHandler ):
-    _relativeURL = "confModifCFA.py/switchMultipleTracks"
 
-class UHConfCFAMakeTracksMandatory( URLHandler ):
-    _relativeURL = "confModifCFA.py/makeTracksMandatory"
+class UHConfCFASwitchMultipleTracks(URLHandler):
+    _endpoint = 'event_mgmt.confModifCFA-switchMultipleTracks'
 
-class UHConfCFAAllowAttachFiles( URLHandler ):
-    _relativeURL = "confModifCFA.py/switchAttachFiles"
+
+class UHConfCFAMakeTracksMandatory(URLHandler):
+    _endpoint = 'event_mgmt.confModifCFA-makeTracksMandatory'
+
+
+class UHConfCFAAllowAttachFiles(URLHandler):
+    _endpoint = 'event_mgmt.confModifCFA-switchAttachFiles'
+
 
 class UHAbstractAttachmentFileAccess(URLHandler):
-    _relativeURL = "abstractDisplay.py/getAttachedFile"
-
-class UHConfCFAShowSelectAsSpeaker( URLHandler ):
-    _relativeURL = "confModifCFA.py/switchShowSelectSpeaker"
-
-class UHConfCFASelectSpeakerMandatory( URLHandler ):
-    _relativeURL = "confModifCFA.py/switchSelectSpeakerMandatory"
-
-class UHConfCFAAttachedFilesContribList( URLHandler ):
-    _relativeURL = "confModifCFA.py/switchShowAttachedFiles"
-
-class UHCFAManagementAddType( URLHandler ):
-    _relativeURL = "confModifCFA.py/addType"
+    _endpoint = 'event.abstractDisplay-getAttachedFile'
 
 
-class UHCFAManagementRemoveType( URLHandler ):
-    _relativeURL = "confModifCFA.py/removeType"
+class UHConfCFAShowSelectAsSpeaker(URLHandler):
+    _endpoint = 'event_mgmt.confModifCFA-switchShowSelectSpeaker'
 
 
-class UHCFADataModification( URLHandler ):
-    _relativeURL = "confModifCFA.py/modifyData"
+class UHConfCFASelectSpeakerMandatory(URLHandler):
+    _endpoint = 'event_mgmt.confModifCFA-switchSelectSpeakerMandatory'
 
 
-class UHCFAPerformDataModification( URLHandler ):
-    _relativeURL = "confModifCFA.py/performModifyData"
+class UHConfCFAAttachedFilesContribList(URLHandler):
+    _endpoint = 'event_mgmt.confModifCFA-switchShowAttachedFiles'
 
 
-class UHCFAModifTemplate( URLHandler ):
-    _relativeURL = "CFAModification.py/template"
+class UHCFADataModification(URLHandler):
+    _endpoint = 'event_mgmt.confModifCFA-modifyData'
 
 
-class UHCFAModifReferee( URLHandler ):
-    _relativeURL = "CFAModification.py/referee"
+class UHCFAPerformDataModification(URLHandler):
+    _endpoint = 'event_mgmt.confModifCFA-performModifyData'
 
 
-class UHCFASelectReferee( URLHandler ):
-    _relativeURL = "CFAModification.py/selectReferee"
+class UHConfAbstractManagment(URLHandler):
+    _endpoint = 'event_mgmt.abstractsManagment'
 
-
-class UHCFAAddReferees( URLHandler ):
-    _relativeURL = "CFAModification.py/addReferees"
-
-
-class UHCFARemoveReferee( URLHandler ):
-    _relativeURL = "CFAModification.py/deleteReferees"
-
-
-class UHConfAbstractManagment( URLHandler ):
-    _relativeURL = "abstractsManagment.py"
 
 class UHConfAbstractList(URLHandler):
-    _relativeURL = "abstractsManagment.py"
+    _endpoint = 'event_mgmt.abstractsManagment'
 
 
-class UHAbstractSubmission( URLHandler ):
-    _relativeURL = "abstractSubmission.py"
+class UHAbstractSubmission(URLHandler):
+    _endpoint = 'event.abstractSubmission'
 
-    def getURL( cls, target=None ):
+
+class UHAbstractSubmissionConfirmation(URLHandler):
+    _endpoint = 'event.abstractSubmission-confirmation'
+
+
+class UHAbstractDisplay(URLHandler):
+    _endpoint = 'event.abstractDisplay'
+
+
+class UHAbstractDisplayPDF(URLHandler):
+    _endpoint = 'event.abstractDisplay-pdf'
+
+
+class UHAbstractConfManagerDisplayPDF(URLHandler):
+    _endpoint = 'event_mgmt.abstractManagment-abstractToPDF'
+
+
+class UHAbstractConfSelectionAction(URLHandler):
+    _endpoint = 'event_mgmt.abstractsManagment-abstractsActions'
+
+
+class UHAbstractsConfManagerDisplayParticipantList(URLHandler):
+    _endpoint = 'event_mgmt.abstractsManagment-participantList'
+
+
+class UHUserAbstracts(URLHandler):
+    _endpoint = 'event.userAbstracts'
+
+
+class UHUserAbstractsPDF(URLHandler):
+    _endpoint = 'event.userAbstracts-pdf'
+
+
+class UHAbstractModify(URLHandler):
+    _endpoint = 'event.abstractModify'
+
+
+class UHCFAAbstractManagment(URLHandler):
+    _endpoint = 'event_mgmt.abstractManagment'
+
+
+class UHAbstractManagment(URLHandler):
+    _endpoint = 'event_mgmt.abstractManagment'
+
+
+class UHAbstractManagmentAccept(URLHandler):
+    _endpoint = 'event_mgmt.abstractManagment-accept'
+
+
+class UHAbstractManagmentAcceptMultiple(URLHandler):
+    _endpoint = 'event_mgmt.abstractManagment-acceptMultiple'
+
+
+class UHAbstractManagmentRejectMultiple(URLHandler):
+    _endpoint = 'event_mgmt.abstractManagment-rejectMultiple'
+
+
+class UHAbstractManagmentReject(URLHandler):
+    _endpoint = 'event_mgmt.abstractManagment-reject'
+
+
+class UHAbstractManagmentChangeTrack(URLHandler):
+    _endpoint = 'event_mgmt.abstractManagment-changeTrack'
+
+
+class UHAbstractTrackProposalManagment(URLHandler):
+    _endpoint = 'event_mgmt.abstractManagment-trackProposal'
+
+
+class UHAbstractTrackOrderByRating(URLHandler):
+    _endpoint = 'event_mgmt.abstractManagment-orderByRating'
+
+
+class UHAbstractDirectAccess(URLHandler):
+    _endpoint = 'event_mgmt.abstractManagment-directAccess'
+
+
+class UHAbstractToXML(URLHandler):
+    _endpoint = 'event_mgmt.abstractManagment-xml'
+
+
+class UHAbstractSubmissionDisplay(URLHandler):
+    _endpoint = 'event.abstractSubmission'
+
+
+class UHConfAddTrack(URLHandler):
+    _endpoint = 'event_mgmt.confModifProgram-addTrack'
+
+
+class UHConfDelTracks(URLHandler):
+    _endpoint = 'event_mgmt.confModifProgram-deleteTracks'
+
+
+class UHConfPerformAddTrack(URLHandler):
+    _endpoint = 'event_mgmt.confModifProgram-performAddTrack'
+
+
+class UHTrackModification(URLHandler):
+    _endpoint = 'event_mgmt.trackModification'
+
+
+class UHTrackModifAbstracts(URLHandler):
+    _endpoint = 'event_mgmt.trackModifAbstracts'
+
+
+class UHTrackAbstractBase(URLHandler):
+    @classmethod
+    def getURL(cls, track, abstract):
         url = cls._getURL()
-        if target:
-            url.setParams( target.getLocator() )
-        url.setSegment("interest")
+        url.setParams(track.getLocator())
+        url.addParam('abstractId', abstract.getId())
         return url
-    getURL = classmethod( getURL )
 
 
-class UHAbstractSubmissionConfirmation( URLHandler ):
-    _relativeURL = "abstractSubmission.py/confirmation"
+class UHTrackAbstractModif(UHTrackAbstractBase):
+    _endpoint = 'event_mgmt.trackAbstractModif'
 
 
-class UHAbstractDisplay( URLHandler ):
-    _relativeURL = "abstractDisplay.py"
+class UHAbstractTrackManagerDisplayPDF(UHTrackAbstractBase):
+    _endpoint = 'event_mgmt.trackAbstractModif-abstractToPDF'
 
-class UHAbstractDisplayMaterial( URLHandler ):
-    _relativeURL = "abstractDisplay.py/material"
 
-class UHAbstractDisplayAddMaterial( URLHandler ):
-    _relativeURL = "abstractDisplay.py/addMaterial"
+class UHAbstractsTrackManagerAction(URLHandler):
+    _endpoint = 'event_mgmt.trackAbstractModif-abstractAction'
 
-class UHAbstractDisplayPerformAddMaterial( URLHandler ):
-    _relativeURL = "abstractDisplay.py/performAddMaterial"
 
-class UHAbstractDisplayRemoveMaterials( URLHandler ):
-    _relativeURL = "abstractDisplay.py/removeMaterials"
+class UHTrackAbstractPropToAcc(UHTrackAbstractBase):
+    _endpoint = 'event_mgmt.trackAbstractModif-proposeToBeAcc'
 
-class UHAbstractDisplayPDF( URLHandler ):
-    _relativeURL = "abstractDisplay.py/pdf"
 
-class UHAbstractConfManagerDisplayPDF( URLHandler ):
-    _relativeURL = "abstractManagment.py/abstractToPDF"
+class UHTrackAbstractPropToRej(UHTrackAbstractBase):
+    _endpoint = 'event_mgmt.trackAbstractModif-proposeToBeRej'
 
 
-class UHAbstractsConfManagerDisplayPDF( URLHandler ):
-    _relativeURL = "abstractsManagment.py/abstractsToPDF"
+class UHTrackAbstractAccept(UHTrackAbstractBase):
+    _endpoint = 'event_mgmt.trackAbstractModif-accept'
 
 
-class UHAbstractConfSelectionAction( URLHandler ):
-    _relativeURL = "abstractsManagment.py/abstractsActions"
+class UHTrackAbstractReject(UHTrackAbstractBase):
+    _endpoint = 'event_mgmt.trackAbstractModif-reject'
 
 
-class UHAbstractsConfManagerDisplayParticipantList( URLHandler ):
-    _relativeURL = "abstractsManagment.py/participantList"
+class UHTrackAbstractDirectAccess(URLHandler):
+    _endpoint = 'event_mgmt.trackAbstractModif-directAccess'
 
 
-class UHAbstractsConfManagerDisplayXML( URLHandler ):
-    _relativeURL = "abstractsManagment.py/abstractsToXML"
+class UHTrackAbstractPropForOtherTrack(UHTrackAbstractBase):
+    _endpoint = 'event_mgmt.trackAbstractModif-proposeForOtherTracks'
 
 
-class UHAbstractsConfManagerDisplayExcel( URLHandler ):
-    _relativeURL = "abstractsManagment.py/abstractsListToExcel"
+class UHTrackModifCoordination(URLHandler):
+    _endpoint = 'event_mgmt.trackModifCoordination'
 
 
-class UHAbstractsTrackManagerParticipantList( URLHandler ):
-    _relativeURL = "trackModifAbstracts.py/participantList"
+class UHTrackDataModif(URLHandler):
+    _endpoint = 'event_mgmt.trackModification-modify'
 
 
-class UHAbstractsTrackManagerDisplayPDF( URLHandler ):
-    _relativeURL = "trackModifAbstracts.py/abstractsToPDF"
-
-
-class UHAbstractstrackManagerDisplayPDF( URLHandler ):
-    _relativeURL = "trackModifAbstracts.py/abstractsToPDF"
-
-
-class UHUserAbstracts( URLHandler ):
-    _relativeURL = "userAbstracts.py"
-
-class UHUserAbstractsPDF( URLHandler ):
-    _relativeURL = "userAbstracts.py/pdf"
-
-class UHAbstractModify( URLHandler ):
-    _relativeURL = "abstractModify.py"
-
-    def getURL( cls, target=None ):
-        url = cls._getURL()
-        if target:
-            url.setParams( target.getLocator() )
-        url.setSegment("interest")
-        return url
-    getURL = classmethod( getURL )
-
-
-class UHCFAModifAbstracts( URLHandler ):
-    _relativeURL = "CFAModification.py/abstracts"
-
-
-class UHCFAAbstractManagment( URLHandler ):
-    _relativeURL = "abstractManagment.py"
-
-
-class UHAbstractManagment( URLHandler ):
-    _relativeURL = "abstractManagment.py"
-
-
-class UHAbstractManagmentAccept( URLHandler ):
-    _relativeURL = "abstractManagment.py/accept"
-
-
-class UHAbstractManagmentAcceptMultiple( URLHandler ):
-    _relativeURL = "abstractManagment.py/acceptMultiple"
-
-
-class UHAbstractManagmentRejectMultiple( URLHandler ):
-    _relativeURL = "abstractManagment.py/rejectMultiple"
-
-
-class UHAbstractManagmentReject( URLHandler ):
-    _relativeURL = "abstractManagment.py/reject"
-
-
-class UHAbstractManagmentChangeTrack( URLHandler ):
-    _relativeURL = "abstractManagment.py/changeTrack"
-
-
-class UHAbstractTrackProposalManagment( URLHandler ):
-    _relativeURL = "abstractManagment.py/trackProposal"
-
-class UHAbstractTrackOrderByRating( URLHandler ):
-    _relativeURL = "abstractManagment.py/orderByRating"
-
-
-class UHCFAAbstractDeletion( URLHandler ):
-    _relativeURL = "abstractManagment.py/deleteAbstract"
-
-
-class UHAbstractDirectAccess( URLHandler ):
-    _relativeURL = "abstractManagment.py/directAccess"
-
-
-class UHAbstractToXML( URLHandler ):
-    _relativeURL = "abstractManagment.py/xml"
-
-
-class UHAbstractSubmissionDisplay( URLHandler ):
-    _relativeURL = "abstractSubmission.py"
-
-
-class UHAbstractCheckUser( URLHandler ):
-    _relativeURL = "abstractSubmission.py/checkUser"
-
-
-class UHAbstractAuthenticateUser( URLHandler ):
-    _relativeURL = "abstractSubmission.py/authenticateUser"
-
-
-class UHAbstractSubmissionSendLogin( URLHandler ):
-    _relativeURL = "abstractSubmission.py/sendLogin"
-
-
-class UHAbstractSubmissionAbstract( URLHandler ):
-    _relativeURL = "abstractSubmission.py/submitAbstract"
-
-
-class UHAbstractSubmitAuthors( URLHandler ):
-    _relativeURL = "abstractSubmission.py/submitAuthors"
-
-
-class UHAbstractSubmissionSelectAuthors( URLHandler ):
-    _relativeURL = "abstractSubmission.py/selectAuthors"
-
-
-class UHAbstractSubmissionAddAuthors( URLHandler ):
-    _relativeURL = "abstractSubmission.py/addAuthors"
-
-
-class UHAbstractSubmissionRemoveAuthors( URLHandler ):
-    _relativeURL = "abstractSubmission.py/removeAuthors"
-
-
-class UHAbstractSubmissionSelectPrimAuthor( URLHandler ):
-    _relativeURL = "abstractSubmission.py/selectPrimAuthor"
-
-
-class UHAbstractSubmissionSetPrimAuthor( URLHandler ):
-    _relativeURL = "abstractSubmission.py/setPrimAuthor"
-
-
-class UHAbstractSubmissionSelectSpeakers( URLHandler ):
-    _relativeURL = "abstractSubmission.py/selectSpeakers"
-
-
-class UHAbstractSubmissionAddSpeakers( URLHandler ):
-    _relativeURL = "abstractSubmission.py/addSpeakers"
-
-
-class UHAbstractSubmissionRemoveSpeakers( URLHandler ):
-    _relativeURL = "abstractSubmission.py/removeSpeakers"
-
-
-class UHAbstractSubmissionFinal( URLHandler ):
-    _relativeURL = "abstractSubmission.py/final"
-
-
-class UHAbstractCheckAbstract( URLHandler ):
-    _relativeURL = "abstractSubmission.py/checkAbstract"
-
-
-class UHAbstractModification( URLHandler ):
-    _relativeURL = "abstractModification.py"
-
-
-class UHAbstractModificationModify( URLHandler ):
-    _relativeURL = "abstractModification.py/modify"
-
-
-class UHAbstractModificationPerformModify( URLHandler ):
-    _relativeURL = "abstractModification.py/performModify"
-
-
-class UHAbstractModificationSelectAuthors( URLHandler ):
-    _relativeURL = "abstractModification.py/selectAuthors"
-
-
-class UHAbstractModificationAddAuthors( URLHandler ):
-    _relativeURL = "abstractModification.py/addAuthors"
-
-
-class UHAbstractModificationRemoveAuthors( URLHandler ):
-    _relativeURL = "abstractModification.py/removeAuthors"
-
-
-class UHAbstractModificationSelectSpeakers( URLHandler ):
-    _relativeURL = "abstractModification.py/selectSpeakers"
-
-
-class UHAbstractModificationAddSpeakers( URLHandler ):
-    _relativeURL = "abstractModification.py/addSpeakers"
-
-
-class UHAbstractModificationRemoveSpeakers( URLHandler ):
-    _relativeURL = "abstractModification.py/removeSpeakers"
-
-
-class UHConfAddTrack( URLHandler ):
-    _relativeURL = "confModifProgram.py/addTrack"
-
-
-class UHConfDelTracks( URLHandler ):
-    _relativeURL = "confModifProgram.py/deleteTracks"
-
-
-class UHConfPerformAddTrack( URLHandler ):
-    _relativeURL = "confModifProgram.py/performAddTrack"
-
-
-class UHTrackModification( URLHandler ):
-    _relativeURL = "trackModification.py"
-
-
-class UHTrackModifAbstracts( URLHandler ):
-    _relativeURL = "trackModifAbstracts.py"
-
-
-
-class UHTrackAbstractBase( URLHandler ):
-
-    def getURL( cls, track, abstract ):
-        url = cls._getURL()
-        url.setParams( track.getLocator() )
-        url.addParam( "abstractId", abstract.getId() )
-        return url
-    getURL = classmethod( getURL )
-
-
-class UHTrackAbstractModif( UHTrackAbstractBase ):
-    _relativeURL = "trackAbstractModif.py"
-
-
-class UHAbstractTrackManagerDisplayPDF( UHTrackAbstractBase ):
-    _relativeURL = "trackAbstractModif.py/abstractToPDF"
-
-
-class UHAbstractsTrackManagerAction( URLHandler ):
-    _relativeURL = "trackAbstractModif.py/abstractAction"
-
-
-class UHTrackAbstractPropToAcc( UHTrackAbstractBase ):
-    _relativeURL = "trackAbstractModif.py/proposeToBeAcc"
-
-
-class UHTrackAbstractPropToRej( UHTrackAbstractBase ):
-    _relativeURL = "trackAbstractModif.py/proposeToBeRej"
-
-
-class UHTrackAbstractDirectAccess( URLHandler ):
-    _relativeURL = "trackAbstractModif.py/directAccess"
-
-
-class UHTrackAbstractPropForOtherTrack( UHTrackAbstractBase ):
-    _relativeURL = "trackAbstractModif.py/proposeForOtherTracks"
-
-
-class UHTrackModifCoordination( URLHandler ):
-    _relativeURL = "trackModifCoordination.py"
-
-
-class UHTrackModifSubTrack( URLHandler ):
-    _relativeURL = "trackModification.py/subTrack"
-
-
-class UHSubTrackPerformDataModification( URLHandler ):
-    _relativeURL = "trackModification.py/subTrackPerformModify"
-
-
-class UHSubTrackDataModif( URLHandler ):
-    _relativeURL = "trackModification.py/modifySubTrack"
-
-class UHTrackDataModif( URLHandler ):
-    _relativeURL = "trackModification.py/modify"
-
-
-class UHTrackPerformDataModification( URLHandler ):
-    _relativeURL = "trackModification.py/performModify"
-
-
-class UHTrackDeleteSubTracks( URLHandler ):
-    _relativeURL = "trackModification.py/deleteSubTracks"
-
-
-class UHTrackAddSubTracks( URLHandler ):
-    _relativeURL = "trackModification.py/addSubTrack"
-
-
-class UHTrackPerformAddSubTrack( URLHandler ):
-    _relativeURL = "trackModification.py/performAddSubTrack"
+class UHTrackPerformDataModification(URLHandler):
+    _endpoint = 'event_mgmt.trackModification-performModify'
 
 
 class UHTrackAbstractModIntComments(UHTrackAbstractBase):
-    _relativeURL = "trackAbstractModif.py/comments"
+    _endpoint = 'event_mgmt.trackAbstractModif-comments'
 
 
-class UHConfModifSchedule( URLHandler ):
-    _relativeURL = "confModifSchedule.py"
+class UHConfModifSchedule(URLHandler):
+    _endpoint = 'event_mgmt.confModifSchedule'
 
-class UHConfModifScheduleCustomizePDF( URLHandler ):
-    _relativeURL = "confModifSchedule.py/customizePdf"
 
+class UHContribConfSelectionAction(URLHandler):
+    _endpoint = 'event_mgmt.confModifContribList-contribsActions'
 
-##class UHConfModifScheduleGraphic( URLHandler ):
-##    _relativeURL = "confModifSchedule.py/graphic"
 
+class UHContribsConfManagerDisplayMenuPDF(URLHandler):
+    _endpoint = 'event_mgmt.confModifContribList-contribsToPDFMenu'
 
-class UHConfModifScheduleEntries( URLHandler ):
-    _relativeURL = "confModifSchedule.py/entries"
 
+class UHContribsConfManagerDisplayParticipantList(URLHandler):
+    _endpoint = 'event_mgmt.confModifContribList-participantList'
 
-class UHConfModifScheduleEntriesRemove( URLHandler ):
-    _relativeURL = "confModifSchedule.py/removeEntries"
 
+class UHSessionClose(URLHandler):
+    _endpoint = 'event_mgmt.sessionModification-close'
 
-class UHConfModifScheduleRelocate( URLHandler ):
-    _relativeURL = "confModifSchedule.py/relocate"
 
+class UHSessionOpen(URLHandler):
+    _endpoint = 'event_mgmt.sessionModification-open'
 
-class UHConfDelSchItems( URLHandler ):
-    _relativeURL = "confModifSchedule.py/deleteItems"
 
+class UHSessionCreation(URLHandler):
+    _endpoint = 'event_mgmt.confModifSchedule'
 
-#class UHConfModSchEditBreak( URLHandler ):
-#    _relativeURL = "confModifSchedule.py/editBreak"
 
+class UHContribCreation(URLHandler):
+    _endpoint = 'event_mgmt.confModifSchedule'
 
-class UHConfModSchEditContrib(URLHandler):
-    _relativeURL = "confModifSchedule.py/editContrib"
 
+class UHContribToXMLConfManager(URLHandler):
+    _endpoint = 'event_mgmt.contributionModification-xml'
 
-class UHConfModSchEditSlot(URLHandler):
-    _relativeURL = "confModifSchedule.py/editSlot"
 
+class UHContribToXML(URLHandler):
+    _endpoint = 'event.contributionDisplay-xml'
 
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        return ""
 
-class UHConfAddSession( URLHandler ):
-    _relativeURL = "confModifSchedule.py/addSession"
 
-class UHConfPerformAddSession( URLHandler ):
-    _relativeURL = "confModifSchedule.py/performAddSession"
+class UHContribToiCal(URLHandler):
+    _endpoint = 'event.contributionDisplay-ical'
 
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        return ""
 
-class UHConfAddContribution( URLHandler ):
-    _relativeURL = "confModifContribList.py/addContribution"
 
-class UHConfPerformAddContribution( URLHandler ):
-    _relativeURL = "confModifContribList.py/performAddContribution"
+class UHContribToPDFConfManager(URLHandler):
+    _endpoint = 'event_mgmt.contributionModification-pdf'
 
-class UHMConfPerformAddContribution( URLHandler ):
-    _relativeURL = "confModifContribList.py/performAddContributionM"
 
+class UHContribToPDF(URLHandler):
+    _endpoint = 'event.contributionDisplay-pdf'
 
-class UHContribConfSelectionAction( URLHandler ):
-    _relativeURL = "confModifContribList.py/contribsActions"
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        if target is not None:
+            return "files/generatedPdf/%s-Contribution.pdf" % target.getId()
 
-class UHContribsConfManagerDisplayPDF( URLHandler ):
-    _relativeURL = "confModifContribList.py/contribsToPDF"
 
-class UHContribsConfManagerDisplayMenuPDF( URLHandler ):
-    _relativeURL = "confModifContribList.py/contribsToPDFMenu"
+class UHContribModifAC(URLHandler):
+    _endpoint = 'event_mgmt.contributionAC'
 
 
-class UHContribsConfManagerDisplayParticipantList( URLHandler ):
-    _relativeURL = "confModifContribList.py/participantList"
+class UHContributionSetVisibility(URLHandler):
+    _endpoint = 'event_mgmt.contributionAC-setVisibility'
 
-#class UHContribsConfManagerDisplayXML( URLHandler ):
-#    _relativeURL = "abstractsManagment.py/abstractsToXML"
 
-class UHConfAddBreak( URLHandler ):
-    _relativeURL = "confModifSchedule.py/addBreak"
+class UHContribModifMaterialMgmt(URLHandler):
+    _endpoint = 'event_mgmt.contributionModification-materials'
 
 
-class UHConfPerformAddBreak( URLHandler ):
-    _relativeURL = "confModifSchedule.py/performAddBreak"
+class UHContribModifAddMaterials(URLHandler):
+    _endpoint = 'event_mgmt.contributionModification-materialsAdd'
 
 
-class UHConfModifyBreak( URLHandler ):
-    _relativeURL = "confModifSchedule.py/modifyBreak"
+class UHContribModifSubCont(URLHandler):
+    _endpoint = 'event_mgmt.contributionModifSubCont'
 
-class UHSessionModifyBreak( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/modifyBreak"
 
+class UHContribAddSubCont(URLHandler):
+    _endpoint = 'event_mgmt.contributionModifSubCont-add'
 
-class UHConfPerformModifyBreak( URLHandler ):
-    _relativeURL = "confModifSchedule.py/performModifyBreak"
 
-class UHSessionPerformModifyBreak( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/performModifyBreak"
+class UHContribCreateSubCont(URLHandler):
+    _endpoint = 'event_mgmt.contributionModifSubCont-create'
 
-
-class UHSessionClose( URLHandler ):
-    _relativeURL = "sessionModification.py/close"
-
-
-class UHSessionOpen( URLHandler ):
-    _relativeURL = "sessionModification.py/open"
-
-
-class UHSessionCreation( URLHandler ):
-    _relativeURL = "confModifSchedule.py"
-
-
-class UHContribCreation( URLHandler ):
-    _relativeURL = "confModifSchedule.py"
-
-
-class UHContribToXMLConfManager( URLHandler ):
-    _relativeURL = "contributionModification.py/xml"
-
-
-class UHContribToXML( URLHandler ):
-    _relativeURL = "contributionDisplay.py/xml"
-
-
-class UHContribToiCal( URLHandler ):
-    _relativeURL = "contributionDisplay.py/ical"
-
-
-class UHContribToPDFConfManager( URLHandler ):
-    _relativeURL = "contributionModification.py/pdf"
-
-
-class UHContribToPDF( URLHandler ):
-    _relativeURL = "contributionDisplay.py/pdf"
-
-
-class UHContribModifAC( URLHandler ):
-    _relativeURL = "contributionAC.py"
-
-
-class UHContributionSetVisibility( URLHandler ):
-    _relativeURL = "contributionAC.py/setVisibility"
-
-
-class UHContributionSelectAllowed( URLHandler ):
-    _relativeURL = "contributionAC.py/selectAllowedToAccess"
-
-
-class UHContributionAddAllowed( URLHandler ):
-    _relativeURL = "contributionAC.py/addAllowedToAccess"
-
-
-class UHContributionRemoveAllowed( URLHandler ):
-    _relativeURL = "contributionAC.py/removeAllowedToAccess"
-
-class UHContribModifMaterialMgmt( URLHandler ):
-    _relativeURL = "contributionModification.py/materials"
-
-class UHContribModifAddMaterials( URLHandler ):
-    _relativeURL = "contributionModification.py/materialsAdd"
-
-class UHContributionRemoveMaterials( URLHandler ):
-    _relativeURL = "contributionModification.py/removeMaterials"
-
-# <Deprecated>
-class UHContributionAddMaterial( URLHandler ):
-    _relativeURL = "contributionModification.py/addMaterial"
-
-class UHContributionPerformAddMaterial( URLHandler ):
-    _relativeURL = "contributionModification.py/performAddMaterial"
-# </Deprecated>
-
-class UHContributionAddDomain( URLHandler ):
-    _relativeURL = "contributionAC.py/addDomains"
-
-
-class UHContributionRemoveDomain( URLHandler ):
-    _relativeURL = "contributionAC.py/removeDomains"
-
-
-class UHContribModifSubCont( URLHandler ):
-    _relativeURL = "contributionModifSubCont.py"
-
-
-class UHContribDeleteSubCont( URLHandler ):
-    _relativeURL = "contributionModifSubCont.py/delete"
-
-
-class UHContribAddSubCont( URLHandler ):
-    _relativeURL = "contributionModifSubCont.py/add"
-
-
-class UHContribCreateSubCont( URLHandler ):
-    _relativeURL = "contributionModifSubCont.py/create"
-
-
-class UHContribUpSubCont( URLHandler ):
-    _relativeURL = "contributionModifSubCont.py/up"
-
-
-class UHContribDownSubCont( URLHandler ):
-    _relativeURL = "contributionModifSubCont.py/Down"
 
 class UHSubContribActions(URLHandler):
-    _relativeURL ="contributionModifSubCont.py/actionSubContribs"
+    _endpoint = 'event_mgmt.contributionModifSubCont-actionSubContribs'
 
 
-class UHContribModifTools( URLHandler ):
-    _relativeURL = "contributionTools.py"
+class UHContribModifTools(URLHandler):
+    _endpoint = 'event_mgmt.contributionTools'
 
 
-class UHContributionDataModif( URLHandler ):
-    _relativeURL = "contributionModification.py/modifData"
+class UHContributionDataModif(URLHandler):
+    _endpoint = 'event_mgmt.contributionModification-modifData'
 
 
-class UHContributionDataModification( URLHandler ):
-    _relativeURL = "contributionModification.py/data"
+class UHContributionDataModification(URLHandler):
+    _endpoint = 'event_mgmt.contributionModification-data'
 
 
-class UHContributionCreation( URLHandler ):
-    _relativeURL = "contributionCreation.py"
+class UHConfModifAC(URLHandler):
+    _endpoint = 'event_mgmt.confModifAC'
 
 
-class UHContributionReportNumberEdit( URLHandler ):
-    _relativeURL = "contributionModification.py/editReportNumber"
-
-class UHContributionReportNumberPerformEdit( URLHandler ):
-    _relativeURL = "contributionModification.py/performEditReportNumber"
-
-class UHContributionReportNumberRemove( URLHandler ):
-    _relativeURL = "contributionModification.py/removeReportNumber"
+class UHConfSetVisibility(URLHandler):
+    _endpoint = 'event_mgmt.confModifAC-setVisibility'
 
 
-class UHSubContributionCreation( URLHandler ):
-    _relativeURL = "subContributionCreation.py"
+class UHConfGrantSubmissionToAllSpeakers(URLHandler):
+    _endpoint = 'event_mgmt.confModifAC-grantSubmissionToAllSpeakers'
 
 
-class UHBreakCreation( URLHandler ):
-    _relativeURL = "confModifSchedule.py"
+class UHConfRemoveAllSubmissionRights(URLHandler):
+    _endpoint = 'event_mgmt.confModifAC-removeAllSubmissionRights'
 
 
-class UHConfModifAC( URLHandler ):
-    _relativeURL = "confModifAC.py"
+class UHConfGrantModificationToAllConveners(URLHandler):
+    _endpoint = 'event_mgmt.confModifAC-grantModificationToAllConveners'
 
-class UHConfSetVisibility( URLHandler ):
-    _relativeURL = "confModifAC.py/setVisibility"
-
-
-class UHConfSetAccessKey( URLHandler ):
-    _relativeURL = "confModifAC.py/setAccessKey"
-
-
-class UHConfSetModifKey( URLHandler ):
-    _relativeURL = "confModifAC.py/setModifKey"
-
-
-class UHConfSelectAllowed( URLHandler ):
-    _relativeURL = "confModifAC.py/selectAllowed"
-
-
-class UHConfAddAllowed( URLHandler ):
-    _relativeURL = "confModifAC.py/addAllowed"
-
-
-class UHConfRemoveAllowed( URLHandler ):
-    _relativeURL = "confModifAC.py/removeAllowed"
-
-
-class UHConfAddDomain( URLHandler ):
-    _relativeURL = "confModifAC.py/addDomains"
-
-
-class UHConfRemoveDomain( URLHandler ):
-    _relativeURL = "confModifAC.py/removeDomains"
-
-class UHConfGrantSubmissionToAllSpeakers( URLHandler ):
-    _relativeURL = "confModifAC.py/grantSubmissionToAllSpeakers"
-
-class UHConfRemoveAllSubmissionRights( URLHandler ):
-    _relativeURL = "confModifAC.py/removeAllSubmissionRights"
-
-class UHConfGrantModificationToAllConveners( URLHandler ):
-    _relativeURL = "confModifAC.py/grantModificationToAllConveners"
 
 class UHConfModifCoordinatorRights(URLHandler):
-    _relativeURL = "confModifAC.py/modifySessionCoordRights"
+    _endpoint = 'event_mgmt.confModifAC-modifySessionCoordRights'
 
-## Old Videoconference related
-class UHBookingsVRVS( URLHandler ):
-    _relativeURL = "confModifBookings.py/createBookingVRVS"
 
+class UHConfModifTools(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools'
 
-class UHPerformBookingsVRVS( URLHandler ):
-    _relativeURL = "confModifBookings.py/performBookingVRVS"
 
+class UHConfModifParticipants(URLHandler):
+    _endpoint = 'event_mgmt.confModifParticipants'
 
-class UHBookingDetail(URLHandler):
-    _relativeURL = "confModifBookings.py/BookingDetail"
 
+class UHConfModifLog(URLHandler):
+    _endpoint = 'event_mgmt.confModifLog'
 
-class UHConfModifBookings( URLHandler ):
-    _relativeURL = "confModifBookings.py"
 
+class UHInternalPageDisplay(URLHandler):
+    _endpoint = 'event.internalPage'
 
-class UHConfModifBookingList( URLHandler ):
-    _relativeURL = "confModifBookings.py/index"
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        params = target.getLocator()
+        url = os.path.join("internalPage-%s.html" % params["pageId"])
+        return url
 
 
-class UHConfModifBookingAction( URLHandler ):
-    _relativeURL = "confModifBookings.py/performBookingAction"
+class UHConfModifDisplay(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay'
 
 
-class UHConfModifBookingPerformDeletion( URLHandler ):
-    _relativeURL = "confModifBookings.py/performBookingDeletion"
+class UHConfModifDisplayCustomization(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-custom'
 
 
-class UHConfModifBookingModification(URLHandler):
-    _relativeURL = "confModifBookings.py/performBookingModification"
-## End of old Videoconference related
+class UHConfModifDisplayMenu(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-menu'
 
 
-## New Collaboration related
-class UHAdminCollaboration(URLHandler):
-    _relativeURL = "adminCollaboration.py"
+class UHConfModifDisplayResources(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-resources'
 
-class UHConfModifCollaboration(OptionallySecureURLHandler):
-    _relativeURL = "confModifCollaboration.py"
 
-class UHConfModifCollaborationManagers(URLHandler):
-    _relativeURL = "confModifCollaboration.py/managers"
+class UHConfModifDisplayConfHeader(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-confHeader'
 
-class UHCollaborationDisplay(URLHandler):
-    _relativeURL = "collaborationDisplay.py"
 
-## End of new Collaboration related
+class UHConfModifDisplayAddLink(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-addLink'
 
-class UHConfModifTools( URLHandler ):
-    _relativeURL = "confModifTools.py"
 
-class UHConfModifListings( URLHandler ):
-    _relativeURL = "confModifListings.py"
+class UHConfModifDisplayAddPage(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-addPage'
 
-class UHConfModifParticipants( URLHandler ):
-    _relativeURL = "confModifParticipants.py"
 
-class UHConfModifLog( URLHandler ):
-    _relativeURL = "confModifLog.py"
+class UHConfModifDisplayModifyData(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-modifyData'
 
-class UHConfModifLogItem( URLHandler ):
-    _relativeURL = "confModifLog.py/logItem"
 
-class UHInternalPageDisplay( URLHandler ):
-    _relativeURL = "internalPage.py"
+class UHConfModifDisplayModifySystemData(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-modifySystemData'
 
-class UHConfModifDisplay( URLHandler ):
-    _relativeURL = "confModifDisplay.py"
 
-class UHConfModifDisplayCustomization( URLHandler ):
-    _relativeURL = "confModifDisplay.py/custom"
+class UHConfModifDisplayAddSpacer(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-addSpacer'
 
-class UHConfModifDisplayMenu( URLHandler ):
-    _relativeURL = "confModifDisplay.py/menu"
 
-class UHConfModifDisplayResources( URLHandler ):
-    _relativeURL = "confModifDisplay.py/resources"
+class UHConfModifDisplayRemoveLink(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-removeLink'
 
-class UHConfModifDisplayConfHeader( URLHandler ):
-    _relativeURL = "confModifDisplay.py/confHeader"
 
-class UHConfModifDisplayLink( URLHandler ):
-    _relativeURL = "confModifDisplay.py/modifyLink"
+class UHConfModifDisplayToggleLinkStatus(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-toggleLinkStatus'
 
 
-class UHConfModifDisplayAddLink( URLHandler ):
-    _relativeURL = "confModifDisplay.py/addLink"
+class UHConfModifDisplayToggleHomePage(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-toggleHomePage'
 
-class UHConfModifDisplayAddPage( URLHandler ):
-    _relativeURL = "confModifDisplay.py/addPage"
 
-class UHConfModifDisplayAddPageFile( URLHandler ):
-    _relativeURL = "confModifDisplay.py/addPageFile"
+class UHConfModifDisplayUpLink(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-upLink'
 
-class UHConfModifDisplayAddPageFileBrowser( URLHandler ):
-    _relativeURL = "confModifDisplay.py/addPageFileBrowser"
 
-class UHConfModifDisplayModifyData( URLHandler ):
-    _relativeURL = "confModifDisplay.py/modifyData"
+class UHConfModifDisplayDownLink(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-downLink'
 
-class UHConfModifDisplayModifySystemData( URLHandler ):
-    _relativeURL = "confModifDisplay.py/modifySystemData"
 
-class UHConfModifDisplayAddSpacer( URLHandler ):
-    _relativeURL = "confModifDisplay.py/addSpacer"
+class UHConfModifDisplayToggleTimetableView(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-toggleTimetableView'
 
 
-class UHConfModifDisplayRemoveLink( URLHandler ):
-    _relativeURL = "confModifDisplay.py/removeLink"
+class UHConfModifDisplayToggleTTDefaultLayout(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-toggleTTDefaultLayout'
 
 
-class UHConfModifDisplayToggleLinkStatus( URLHandler ):
-    _relativeURL = "confModifDisplay.py/toggleLinkStatus"
+class UHConfModifFormatTitleBgColor(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-formatTitleBgColor'
 
-class UHConfModifDisplayToggleHomePage( URLHandler ):
-    _relativeURL = "confModifDisplay.py/toggleHomePage"
 
-class UHConfModifDisplayUpLink( URLHandler ):
-    _relativeURL = "confModifDisplay.py/upLink"
+class UHConfModifFormatTitleTextColor(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-formatTitleTextColor'
 
 
-class UHConfModifDisplayDownLink( URLHandler ):
-    _relativeURL = "confModifDisplay.py/downLink"
+class UHConfDeletion(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-delete'
 
-class UHConfModifFormatTitleBgColor( URLHandler ):
-    _relativeURL = "confModifDisplay.py/formatTitleBgColor"
 
-class UHConfModifFormatTitleTextColor( URLHandler ):
-    _relativeURL = "confModifDisplay.py/formatTitleTextColor"
+class UHConfClone(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-clone'
 
-class UHConfDeletion( URLHandler ):
-    _relativeURL = "confModifTools.py/delete"
 
+class UHConfPerformCloning(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-performCloning'
 
-class UHConfClone( URLHandler ):
-    _relativeURL = "confModifTools.py/clone"
 
-class UHConfPerformCloning( URLHandler ):
-    _relativeURL = "confModifTools.py/performCloning"
+class UHConfAllSessionsConveners(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-allSessionsConveners'
 
-class UHConfPerformCloneOnce( URLHandler ):
-    _relativeURL = "confModifTools.py/performCloneOnce"
 
+class UHConfAllSessionsConvenersAction(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-allSessionsConvenersAction'
 
-class UHConfPerformCloneInterval( URLHandler ):
-    _relativeURL = "confModifTools.py/performCloneInterval"
 
+class UHConfAllSpeakers(URLHandler):
+    _endpoint = 'event_mgmt.confModifListings-allSpeakers'
 
-class UHConfPerformCloneDays( URLHandler ):
-    _relativeURL = "confModifTools.py/performCloneDays"
 
-class UHConfAllSessionsConveners( URLHandler ):
-    _relativeURL = "confModifTools.py/allSessionsConveners"
+class UHConfAllSpeakersAction(URLHandler):
+    _endpoint = 'event_mgmt.confModifListings-allSpeakersAction'
 
-class UHConfAllSessionsConvenersAction( URLHandler ):
-    _relativeURL = "confModifTools.py/allSessionsConvenersAction"
 
-class UHConfAllSpeakers( URLHandler ):
-    _relativeURL = "confModifListings.py/allSpeakers"
+class UHConfDisplayAlarm(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-displayAlarm'
 
-class UHConfAllSpeakersAction( URLHandler ):
-    _relativeURL = "confModifListings.py/allSpeakersAction"
 
-class UHConfAllPrimaryAuthors( URLHandler ):
-    _relativeURL = "confModifListings.py/allPrimaryAuthors"
+class UHConfAddAlarm(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-addAlarm'
 
-class UHConfAllPrimaryAuthorsAction( URLHandler ):
-    _relativeURL = "confModifListings.py/allPrimaryAuthorsAction"
 
-class UHConfAllCoAuthors( URLHandler ):
-    _relativeURL = "confModifListings.py/allCoAuthors"
+class UHSaveAlarm(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-saveAlarm'
 
-class UHConfAllCoAuthorsAction( URLHandler ):
-    _relativeURL = "confModifListings.py/allCoAuthorsAction"
 
-class UHConfDisplayAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/displayAlarm"
+class UHModifySaveAlarm(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-modifySaveAlarm'
 
-class UHConfAddAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/addAlarm"
 
+class UHSendAlarmNow(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-sendAlarmNow'
 
-class UHSaveAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/saveAlarm"
 
+class UHConfDeleteAlarm(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-deleteAlarm'
 
-class UHTestSendAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/testSendAlarm"
 
+class UHConfModifyAlarm(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-modifyAlarm'
 
-class UHSendAlarmNow( URLHandler ):
-    _relativeURL = "confModifTools.py/sendAlarmNow"
 
+class UHSaveLogo(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-saveLogo'
 
-class UHConfDeleteAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/deleteAlarm"
 
+class UHRemoveLogo(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-removeLogo'
 
-class UHConfModifyAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/modifyAlarm"
 
+class UHSaveCSS(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-saveCSS'
 
-class UHConfSaveAlarm( URLHandler ):
-    _relativeURL = "confModifTools.py/saveAlarm"
 
+class UHUseCSS(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-useCSS'
 
-class UHSaveLogo( URLHandler ):
-    _relativeURL = "confModifDisplay.py/saveLogo"
 
+class UHRemoveCSS(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-removeCSS'
 
-class UHRemoveLogo( URLHandler ):
-    _relativeURL = "confModifDisplay.py/removeLogo"
 
-class UHSaveCSS( URLHandler ):
-    _relativeURL = "confModifDisplay.py/saveCSS"
+class UHSavePic(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-savePic'
 
-class UHUseCSS( URLHandler ):
-    _relativeURL = "confModifDisplay.py/useCSS"
 
-class UHRemoveCSS( URLHandler ):
-    _relativeURL = "confModifDisplay.py/removeCSS"
+class UHConfModifParticipantsSetup(URLHandler):
+    _endpoint = 'event_mgmt.confModifParticipants-setup'
 
-class UHSavePic( URLHandler ):
-    _relativeURL = "confModifDisplay.py/savePic"
 
-class UHConfModifParticipantsSetup( URLHandler ):
-    _relativeURL = "confModifParticipants.py/setup"
+class UHConfModifParticipantsPending(URLHandler):
+    _endpoint = 'event_mgmt.confModifParticipants-pendingParticipants'
 
-class UHConfModifParticipantsPending( URLHandler ):
-    _relativeURL = "confModifParticipants.py/pendingParticipants"
 
-class UHConfModifParticipantsDeclined( URLHandler ):
-    _relativeURL = "confModifParticipants.py/declinedParticipants"
+class UHConfModifParticipantsDeclined(URLHandler):
+    _endpoint = 'event_mgmt.confModifParticipants-declinedParticipants'
 
-class UHConfModifParticipantsAction( URLHandler ):
-    _relativeURL = "confModifParticipants.py/action"
 
-class UHConfModifParticipantsStatistics( URLHandler ):
-    _relativeURL = "confModifParticipants.py/statistics"
+class UHConfModifParticipantsAction(URLHandler):
+    _endpoint = 'event_mgmt.confModifParticipants-action'
 
-class UHConfParticipantsInvitation( URLHandler ):
-    _relativeURL = "confModifParticipants.py/invitation"
 
-class UHConfParticipantsRefusal( URLHandler ):
-    _relativeURL = "confModifParticipants.py/refusal"
+class UHConfModifParticipantsStatistics(URLHandler):
+    _endpoint = 'event_mgmt.confModifParticipants-statistics'
 
-class UHConfModifToggleSearch( URLHandler ):
-    _relativeURL = "confModifDisplay.py/toggleSearch"
 
-class UHConfModifToggleNavigationBar( URLHandler ):
-    _relativeURL = "confModifDisplay.py/toggleNavigationBar"
+class UHConfParticipantsInvitation(URLHandler):
+    _endpoint = 'event.confModifParticipants-invitation'
 
-class UHTickerTapeAction( URLHandler ):
-    _relativeURL = "confModifDisplay.py/tickerTapeAction"
 
-class UHUserManagement( URLHandler ):
-    _relativeURL = "userManagement.py"
+class UHConfParticipantsRefusal(URLHandler):
+    _endpoint = 'event.confModifParticipants-refusal'
 
-class UHUserManagementSwitchAuthorisedAccountCreation( URLHandler ):
-    _relativeURL = "userManagement.py/switchAuthorisedAccountCreation"
 
-class UHUserManagementSwitchNotifyAccountCreation( URLHandler ):
-    _relativeURL = "userManagement.py/switchNotifyAccountCreation"
+class UHConfModifToggleSearch(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-toggleSearch'
 
-class UHUserManagementSwitchModerateAccountCreation( URLHandler ):
-    _relativeURL = "userManagement.py/switchModerateAccountCreation"
 
-class UHUsers( URLHandler ):
-    _relativeURL = "userList.py"
+class UHConfModifToggleNavigationBar(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-toggleNavigationBar'
 
-class UHUserCreation( URLHandler ):
-    _relativeURL = "userRegistration.py"
 
-    def getURL( cls, returnURL="" ):
-        if Config.getInstance().getRegistrationURL() != "":
+class UHTickerTapeAction(URLHandler):
+    _endpoint = 'event_mgmt.confModifDisplay-tickerTapeAction'
+
+
+class UHUserManagement(URLHandler):
+    _endpoint = 'admin.userManagement'
+
+
+class UHUserManagementSwitchAuthorisedAccountCreation(URLHandler):
+    _endpoint = 'admin.userManagement-switchAuthorisedAccountCreation'
+
+
+class UHUserManagementSwitchNotifyAccountCreation(URLHandler):
+    _endpoint = 'admin.userManagement-switchNotifyAccountCreation'
+
+
+class UHUserManagementSwitchModerateAccountCreation(URLHandler):
+    _endpoint = 'admin.userManagement-switchModerateAccountCreation'
+
+
+class UHUsers(URLHandler):
+    _endpoint = 'admin.userList'
+
+
+class UHUserCreation(URLHandler):
+    _endpoint = 'user.userRegistration'
+
+    @classmethod
+    def getURL(cls, returnURL=''):
+        if Config.getInstance().getRegistrationURL():
             url = URL(Config.getInstance().getRegistrationURL())
         else:
             url = cls._getURL()
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
+        if returnURL:
+            url.addParam('returnURL', returnURL)
         return url
-    getURL = classmethod( getURL )
-
-class UHUserPerformCreation( URLHandler ):
-    _relativeURL = "userRegistration.py/update"
-
-class UHUserMerge( URLHandler ):
-    _relativeURL = "userMerge.py"
 
 
-class UHConfSignIn( SecureURLHandler ):
-    _relativeURL = "confLogin.py"
-
-    def getURL( cls, conf, returnURL="" ):
-        if Config.getInstance().getLoginURL().strip() != "":
-            url = URL(Config.getInstance().getLoginURL())
-        else:
-            url = cls._getURL()
-        url.setParams( conf.getLocator() )
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
-        return url
-    getURL = classmethod( getURL )
+class UHUserMerge(URLHandler):
+    _endpoint = 'admin.userMerge'
 
 
-class UHConfSignInAuthenticate( UHConfSignIn ):
-    _relativeURL = "confLogin.py/signIn"
+class UHConfSignIn(SecureURLHandler):
+    _endpoint = 'event.confLogin'
 
-
-#class UHConfSignOut( URLHandler ):
-#    _relativeURL = "confLogin.py/signOut"
-
-class UHConfUserCreation( URLHandler ):
-    _relativeURL = "confUser.py"
-
-    def getURL( cls, conf, returnURL="" ):
-        if Config.getInstance().getRegistrationURL().strip() != "":
-            url = URL(Config.getInstance().getRegistrationURL())
-        else:
-            url = cls._getURL()
-        url.setParams( conf.getLocator() )
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
-        return url
-    getURL = classmethod( getURL )
-
-class UHConfUser( URLHandler ):
-
-    def getURL( cls, conference, av=None ):
+    @classmethod
+    def getURL(cls, conf, returnURL=""):
         url = cls._getURL()
-        loc = conference.getLocator().copy()
-        if av:
-            for i in av.getLocator().keys():
-                loc[i] = av.getLocator()[i]
-        url.setParams( loc )
+        if conf is not None:
+            url.setParams(conf.getLocator())
+        if returnURL:
+            url.addParam('returnURL', returnURL)
         return url
-    getURL = classmethod( getURL )
 
 
-class UHConfDisabledAccount( UHConfUser ):
-    _relativeURL = "confLogin.py/disabledAccount"
+class UHConfUserCreation(URLHandler):
+    _endpoint = 'event.confUser'
+
+    @classmethod
+    def getURL(cls, conf, returnURL=''):
+        if Config.getInstance().getRegistrationURL():
+            url = URL(Config.getInstance().getRegistrationURL())
+        else:
+            url = cls._getURL()
+        if conf is not None:
+            url.setParams(conf.getLocator())
+        if returnURL:
+            url.addParam('returnURL', returnURL)
+        return url
 
 
-class UHConfUnactivatedAccount( UHConfUser ):
-    _relativeURL = "confLogin.py/unactivatedAccount"
+class UHConfUser(URLHandler):
+    @classmethod
+    def getURL(cls, conference, av=None):
+        url = cls._getURL()
+        if conference is not None:
+            loc = conference.getLocator().copy()
+            if av:
+                loc.update(av.getLocator())
+            url.setParams(loc)
+        return url
 
 
-class UHConfUserCreated( UHConfUser ):
-    _relativeURL = "confUser.py/created"
+class UHConfDisabledAccount(UHConfUser):
+    _endpoint = 'event.confLogin-disabledAccount'
 
 
-class UHConfSendLogin( UHConfUser ):
-    _relativeURL = "confLogin.py/sendLogin"
+class UHConfUnactivatedAccount(UHConfUser):
+    _endpoint = 'event.confLogin-unactivatedAccount'
 
 
-class UHConfSendActivation( UHConfUser ):
-    _relativeURL = "confLogin.py/sendActivation"
+class UHConfUserCreated(UHConfUser):
+    _endpoint = 'event.confUser-created'
 
 
-class UHConfUserExistWithIdentity( UHConfUser ):
-    _relativeURL = "confUser.py/userExists"
+class UHConfSendLogin(UHConfUser):
+    _endpoint = 'event.confLogin-sendLogin'
 
 
-class UHConfActiveAccount( UHConfUser ):
-    _relativeURL = "confLogin.py/active"
+class UHConfSendActivation(UHConfUser):
+    _endpoint = 'event.confLogin-sendActivation'
 
 
-class UHConfEnterAccessKey( UHConfUser ):
-    _relativeURL = "conferenceDisplay.py/accessKey"
+class UHConfUserExistWithIdentity(UHConfUser):
+    _endpoint = 'event.confUser-userExists'
 
-class UHConfForceEnterAccessKey( UHConfUser ):
-    _relativeURL = "conferenceDisplay.py/forceAccessKey"
+
+class UHConfActiveAccount(UHConfUser):
+    _endpoint = 'event.confLogin-active'
+
+
+class UHConfEnterAccessKey(UHConfUser):
+    _endpoint = 'event.conferenceDisplay-accessKey'
+
 
 class UHConfManagementAccess(UHConfUser):
-    _relativeURL = "conferenceModification.py/managementAccess"
-
-class UHConfEnterModifKey( UHConfUser ):
-    _relativeURL = "conferenceModification.py/modifKey"
-
-class UHConfCloseModifKey( UHConfUser ):
-    _relativeURL = "conferenceModification.py/closeModifKey"
-
-class UHUserCreated( UHConfUser ):
-    _relativeURL = "userRegistration.py/created"
-
-class UHUserActive( URLHandler ):
-    _relativeURL = "userRegistration.py/active"
+    _endpoint = 'event_mgmt.conferenceModification-managementAccess'
 
 
-
-class UHUserDetails( URLHandler ):
-    _relativeURL = "userDetails.py"
-
-class UHUserBaskets( URLHandler ):
-    _relativeURL = "userBaskets.py"
-
-class UHUserPreferences( URLHandler ):
-    _relativeURL = "userPreferences.py"
-
-class UHUserAPI( URLHandler ):
-    _relativeURL = "userAPI.py"
-
-class UHUserAPICreate( URLHandler ):
-    _relativeURL = "userAPI.py/create"
-
-class UHUserAPIBlock( URLHandler ):
-    _relativeURL = "userAPI.py/block"
-
-class UHUserAPIDelete( URLHandler ):
-    _relativeURL = "userAPI.py/delete"
-
-class UHUserRegistration( URLHandler ):
-    _relativeURL = "userRegistration.py"
+class UHConfEnterModifKey(UHConfUser):
+    _endpoint = 'event_mgmt.conferenceModification-modifKey'
 
 
-class UHUserModification( URLHandler ):
-    _relativeURL = "userRegistration.py/modify"
+class UHConfCloseModifKey(UHConfUser):
+    _endpoint = 'event_mgmt.conferenceModification-closeModifKey'
 
 
-#class UHUserPerformModification( URLHandler ):
-#    _relativeURL = "userRegistration.py/update"
+class UHUserCreated(UHConfUser):
+    _endpoint = 'user.userRegistration-created'
 
 
-class UHUserIdentityCreation( URLHandler ):
-    _relativeURL = "identityCreation.py"
+class UHUserActive(UserURLHandler):
+    _endpoint = 'user.userRegistration-active'
 
 
-class UHUserRemoveIdentity( URLHandler ):
-    _relativeURL = "identityCreation.py/remove"
+class UHUserDisable(UserURLHandler):
+    _endpoint = 'user.userRegistration-disable'
 
 
-class UHUserExistWithIdentity( UHConfUser ):
-    _relativeURL = "userRegistration.py/UserExist"
-
-class UHUserIdPerformCreation( URLHandler ):
-    _relativeURL = "identityCreation.py/create"
-
-class UHUserIdentityChangePassword( URLHandler ):
-    _relativeURL = "identityCreation.py/changePassword"
+class UHUserDashboard(UserURLHandler):
+    _endpoint = 'user.userDashboard'
 
 
-
-class UHGroups( URLHandler ):
-    _relativeURL = "groupList.py"
-
-
-class UHNewGroup( URLHandler ):
-    _relativeURL = "groupRegistration.py"
-
-class UHNewLDAPGroup( URLHandler ):
-    _relativeURL = "groupRegistration.py/LDAPGroup"
+class UHUserDetails(UserURLHandler):
+    _endpoint = 'user.userDetails'
 
 
-class UHGroupPerformRegistration( URLHandler ):
-    _relativeURL = "groupRegistration.py/update"
-
-class UHLDAPGroupPerformRegistration( URLHandler ):
-    _relativeURL = "groupRegistration.py/updateLDAPGroup"
+class UHUserBaskets(UserURLHandler):
+    _endpoint = 'user.userBaskets'
 
 
-class UHGroupDetails( URLHandler ):
-    _relativeURL = "groupDetails.py"
+class UHUserPreferences(UserURLHandler):
+    _endpoint = 'user.userPreferences'
 
 
-class UHGroupModification( URLHandler ):
-    _relativeURL = "groupModification.py"
+class UHUserAPI(UserURLHandler):
+    _endpoint = 'user.userAPI'
 
 
-class UHGroupPerformModification( URLHandler ):
-    _relativeURL = "groupModification.py/update"
+class UHUserAPICreate(UserURLHandler):
+    _endpoint = 'user.userAPI-create'
+
+
+class UHUserAPIBlock(UserURLHandler):
+    _endpoint = 'user.userAPI-block'
+
+
+class UHUserAPIDelete(UserURLHandler):
+    _endpoint = 'user.userAPI-delete'
+
+
+class UHUserRegistration(URLHandler):
+    _endpoint = 'user.userRegistration'
+
+
+class UHUserIdentityCreation(UserURLHandler):
+    _endpoint = 'user.identityCreation'
+
+
+class UHUserRemoveIdentity(UserURLHandler):
+    _endpoint = 'user.identityCreation-remove'
+
+
+class UHUserExistWithIdentity(UHConfUser):
+    _endpoint = 'user.userRegistration-UserExist'
+
+
+class UHUserIdPerformCreation(UserURLHandler):
+    _endpoint = 'user.identityCreation-create'
+
+
+class UHUserIdentityChangePassword(UserURLHandler):
+    _endpoint = 'user.identityCreation-changePassword'
+
+
+class UHGroups(URLHandler):
+    _endpoint = 'admin.groupList'
+
+
+class UHNewGroup(URLHandler):
+    _endpoint = 'admin.groupRegistration'
+
+
+class UHGroupPerformRegistration(URLHandler):
+    _endpoint = 'admin.groupRegistration-update'
+
+
+class UHGroupDetails(URLHandler):
+    _endpoint = 'admin.groupDetails'
+
+
+class UHGroupModification(URLHandler):
+    _endpoint = 'admin.groupModification'
+
+
+class UHGroupPerformModification(URLHandler):
+    _endpoint = 'admin.groupModification-update'
 
 
 class UHPrincipalDetails:
-
-    def getURL( cls, member ):
-        if isinstance( member, user.Group ):
-            return UHGroupDetails.getURL( member )
-        elif isinstance( member, user.Avatar ):
-            return UHUserDetails.getURL( member )
-        else:
-            return ""
-    getURL = classmethod( getURL )
-
-
-class UHDomains( URLHandler ):
-    _relativeURL = "domainList.py"
-
-
-class UHNewDomain( URLHandler ):
-    _relativeURL = "domainCreation.py"
-
-
-class UHDomainPerformCreation( URLHandler ):
-    _relativeURL = "domainCreation.py/create"
-
-
-class UHDomainDetails( URLHandler ):
-    _relativeURL = "domainDetails.py"
-
-
-class UHDomainModification( URLHandler ):
-    _relativeURL = "domainDataModification.py"
-
-
-class UHDomainPerformModification( URLHandler ):
-    _relativeURL = "domainDataModification.py/modify"
-
-class UHRoomMappers( URLHandler ):
-    _relativeURL = "roomMapper.py"
-
-
-class UHNewRoomMapper( URLHandler ):
-    _relativeURL = "roomMapper.py/creation"
-
-class UHRoomMapperPerformCreation( URLHandler ):
-    _relativeURL = "roomMapper.py/performCreation"
-
-
-class UHRoomMapperDetails( URLHandler ):
-    _relativeURL = "roomMapper.py/details"
-
-
-class UHRoomMapperModification( URLHandler ):
-    _relativeURL = "roomMapper.py/modify"
-
-
-class UHRoomMapperPerformModification( URLHandler ):
-    _relativeURL = "roomMapper.py/performModify"
-
-class UHAdminArea( URLHandler ):
-    _relativeURL = "adminList.py"
-
-class UHAdminSwitchCacheActive( URLHandler ):
-    _relativeURL = "adminList.py/switchCacheActive"
-
-class UHAdminSwitchDebugActive( URLHandler ):
-    _relativeURL = "adminList.py/switchDebugActive"
-
-class UHAdminSwitchNewsActive( URLHandler ):
-    _relativeURL = "adminList.py/switchNewsActive"
-
-class UHAdminSwitchHighlightActive( URLHandler ):
-    _relativeURL = "adminList.py/switchHighlightActive"
-
-class UHAdminsStyles( URLHandler ):
-    _relativeURL = "adminLayout.py/styles"
-
-class UHAdminsConferenceStyles( URLHandler ):
-    _relativeURL = "adminConferenceStyles.py"
-
-class UHAdminsAddStyle( URLHandler ):
-    _relativeURL = "adminLayout.py/addStyle"
-
-class UHAdminsDeleteStyle( URLHandler ):
-    _relativeURL = "adminLayout.py/deleteStyle"
-
-class UHAdminsSystem( URLHandler ):
-    _relativeURL = "adminSystem.py"
-
-class UHAdminsSystemModif( URLHandler ):
-    _relativeURL = "adminSystem.py/modify"
-
-class UHAdminsProtection( URLHandler ):
-    _relativeURL = "adminProtection.py"
-
-class UHMaterialModification( URLHandler ):
-
     @classmethod
-    def getURL( cls, material, returnURL="" ):
+    def getURL(cls, member):
+        if isinstance(member, user.Group):
+            return UHGroupDetails.getURL(member)
+        elif isinstance(member, user.Avatar):
+            return UHUserDetails.getURL(member)
+        else:
+            return ''
+
+
+class UHDomains(URLHandler):
+    _endpoint = 'admin.domainList'
+
+
+class UHNewDomain(URLHandler):
+    _endpoint = 'admin.domainCreation'
+
+
+class UHDomainPerformCreation(URLHandler):
+    _endpoint = 'admin.domainCreation-create'
+
+
+class UHDomainDetails(URLHandler):
+    _endpoint = 'admin.domainDetails'
+
+
+class UHDomainModification(URLHandler):
+    _endpoint = 'admin.domainDataModification'
+
+
+class UHDomainPerformModification(URLHandler):
+    _endpoint = 'admin.domainDataModification-modify'
+
+
+class UHRoomMappers(URLHandler):
+    _endpoint = 'rooms_admin.roomMapper'
+
+
+class UHNewRoomMapper(URLHandler):
+    _endpoint = 'rooms_admin.roomMapper-creation'
+
+
+class UHRoomMapperPerformCreation(URLHandler):
+    _endpoint = 'rooms_admin.roomMapper-performCreation'
+
+
+class UHRoomMapperDetails(URLHandler):
+    _endpoint = 'rooms_admin.roomMapper-details'
+
+
+class UHRoomMapperModification(URLHandler):
+    _endpoint = 'rooms_admin.roomMapper-modify'
+
+
+class UHRoomMapperPerformModification(URLHandler):
+    _endpoint = 'rooms_admin.roomMapper-performModify'
+
+
+class UHAdminArea(URLHandler):
+    _endpoint = 'admin.adminList'
+
+
+class UHAdminSwitchNewsActive(URLHandler):
+    _endpoint = 'admin.adminList-switchNewsActive'
+
+
+class UHAdminsStyles(URLHandler):
+    _endpoint = 'admin.adminLayout-styles'
+
+
+class UHAdminsConferenceStyles(URLHandler):
+    _endpoint = 'admin.adminConferenceStyles'
+
+
+class UHAdminsAddStyle(URLHandler):
+    _endpoint = 'admin.adminLayout-addStyle'
+
+
+class UHAdminsDeleteStyle(URLHandler):
+    _endpoint = 'admin.adminLayout-deleteStyle'
+
+
+class UHAdminsSystem(URLHandler):
+    _endpoint = 'admin.adminSystem'
+
+
+class UHAdminsSystemModif(URLHandler):
+    _endpoint = 'admin.adminSystem-modify'
+
+
+class UHAdminsProtection(URLHandler):
+    _endpoint = 'admin.adminProtection'
+
+
+class UHMaterialModification(URLHandler):
+    @classmethod
+    def getURL(cls, material, returnURL=""):
         from MaKaC import conference
 
         owner = material.getOwner()
-
         # return handler depending on parent type
-        if isinstance(owner, conference.Conference):
+        if isinstance(owner, conference.Category):
+            handler = UHCategModifFiles
+        elif isinstance(owner, conference.Conference):
             handler = UHConfModifShowMaterials
         elif isinstance(owner, conference.Session):
             handler = UHSessionModifMaterials
@@ -1973,1165 +1467,940 @@ class UHMaterialModification( URLHandler ):
         return handler.getURL(owner, returnURL=returnURL)
 
 
-class UHMaterialModifyData( URLHandler ):
-    _relativeURL = "materialModification.py/modify"
+class UHMaterialEnterAccessKey(URLHandler):
+    _endpoint = 'files.materialDisplay-accessKey'
 
-class UHMaterialPerformModifyData( URLHandler ):
-    _relativeURL = "materialModification.py/performModify"
 
+class UHFileEnterAccessKey(URLHandler):
+    _endpoint = 'files.getFile-accessKey'
 
-class UHMaterialRemoveResources( URLHandler ):
-    _relativeURL = "materialModification.py/removeResources"
 
+class UHCategoryModification(URLHandler):
+    _endpoint = 'category_mgmt.categoryModification'
 
-class UHMaterialLinkCreation( URLHandler ):
-    _relativeURL = "materialModification.py/addLink"
+    @classmethod
+    def getActionURL(cls):
+        return ''
 
 
-class UHMaterialPerformLinkCreation( URLHandler ):
-    _relativeURL = "materialModification.py/performAddLink"
+class UHCategoryAddMaterial(URLHandler):
+    _endpoint = 'category_mgmt.categoryFiles-addMaterial'
 
 
-class UHMaterialFileCreation( URLHandler ):
-    _relativeURL = "materialModification.py/addFile"
+class UHCategoryActionSubCategs(URLHandler):
+    _endpoint = 'category_mgmt.categoryModification-actionSubCategs'
 
 
-class UHMaterialPerformFileCreation( URLHandler ):
-    _relativeURL = "materialModification.py/performAddFile"
+class UHCategoryActionConferences(URLHandler):
+    _endpoint = 'category_mgmt.categoryModification-actionConferences'
 
 
-class UHMaterialModifAC( URLHandler ):
-    _relativeURL = "materialModifAC.py"
+class UHCategModifAC(URLHandler):
+    _endpoint = 'category_mgmt.categoryAC'
 
 
-class UHMaterialSetPrivacy( URLHandler ):
-    _relativeURL = "materialModifAC.py/setPrivacy"
+class UHCategorySetConfCreationControl(URLHandler):
+    _endpoint = 'category_mgmt.categoryConfCreationControl-setCreateConferenceControl'
 
-class UHMaterialSetVisibility( URLHandler ):
-    _relativeURL = "materialModifAC.py/setVisibility"
 
+class UHCategorySetNotifyCreation(URLHandler):
+    _endpoint = 'category_mgmt.categoryConfCreationControl-setNotifyCreation'
 
-class UHMaterialEnterAccessKey( URLHandler ):
-    _relativeURL = "materialDisplay.py/accessKey"
 
-class UHFileEnterAccessKey( URLHandler ):
-    _relativeURL = "getFile.py/accessKey"
+class UHCategModifTools(URLHandler):
+    _endpoint = 'category_mgmt.categoryTools'
 
-class UHMaterialSetAccessKey( URLHandler ):
-    _relativeURL = "materialModifAC.py/setAccessKey"
 
+class UHCategoryDeletion(URLHandler):
+    _endpoint = 'category_mgmt.categoryTools-delete'
 
-class UHMaterialSelectAllowed( URLHandler ):
-    _relativeURL = "materialModifAC.py/selectAllowed"
 
+class UHCategModifTasks(URLHandler):
+    _endpoint = 'category_mgmt.categoryTasks'
 
-class UHMaterialAddAllowed( URLHandler ):
-    _relativeURL = "materialModifAC.py/addAllowed"
 
+class UHCategModifFiles(URLHandler):
+    _endpoint = 'category_mgmt.categoryFiles'
 
-class UHMaterialRemoveAllowed( URLHandler ):
-    _relativeURL = "materialModifAC.py/removeAllowed"
 
+class UHCategModifTasksAction(URLHandler):
+    _endpoint = 'category_mgmt.categoryTasks-taskAction'
 
-class UHMaterialAddDomains( URLHandler ):
-    _relativeURL = "materialModifAC.py/addDomains"
 
+class UHCategoryDataModif(URLHandler):
+    _endpoint = 'category_mgmt.categoryDataModification'
 
-class UHMaterialRemoveDomains( URLHandler ):
-    _relativeURL = "materialModifAC.py/removeDomains"
 
+class UHCategoryPerformModification(URLHandler):
+    _endpoint = 'category_mgmt.categoryDataModification-modify'
 
-class UHFileModification( URLHandler ):
-    _relativeURL = "fileModification.py"
 
+class UHCategoryTasksOption(URLHandler):
+    _endpoint = 'category_mgmt.categoryDataModification-tasksOption'
 
-class UHFileModifyData( URLHandler ):
-    _relativeURL = "fileModification.py/modifyData"
 
+class UHCategorySetVisibility(URLHandler):
+    _endpoint = 'category_mgmt.categoryAC-setVisibility'
 
-class UHFilePerformModifyData( URLHandler ):
-    _relativeURL = "fileModification.py/performModifyData"
 
+class UHCategoryCreation(URLHandler):
+    _endpoint = 'category_mgmt.categoryCreation'
 
-class UHFileModifAC( URLHandler ):
-    _relativeURL = "fileModifAC.py"
 
+class UHCategoryPerformCreation(URLHandler):
+    _endpoint = 'category_mgmt.categoryCreation-create'
 
-class UHFileSetVisibility( URLHandler ):
-    _relativeURL = "fileModifAC.py/setVisibility"
 
+class UHCategoryDisplay(URLHandler):
+    _endpoint = 'category.categoryDisplay'
 
-class UHFileSelectAllowed( URLHandler ):
-    _relativeURL = "fileModifAC.py/selectAllowed"
-
-
-class UHFileAddAllowed( URLHandler ):
-    _relativeURL = "fileModifAC.py/addAllowed"
-
-
-class UHFileRemoveAllowed( URLHandler ):
-    _relativeURL = "fileModifAC.py/removeAllowed"
-
-
-class UHLinkModification( URLHandler ):
-    _relativeURL = "linkModification.py"
-
-
-class UHLinkModifyData( URLHandler ):
-    _relativeURL = "linkModification.py/modifyData"
-
-
-class UHLinkPerformModifyData( URLHandler ):
-    _relativeURL = "linkModification.py/performModifyData"
-
-
-class UHLinkModifAC( URLHandler ):
-    _relativeURL = "linkModifAC.py"
-
-
-class UHLinkSetVisibility( URLHandler ):
-    _relativeURL = "linkModifAC.py/setVisibility"
-
-
-class UHLinkSelectAllowed( URLHandler ):
-    _relativeURL = "linkModifAC.py/selectAllowed"
-
-
-class UHLinkAddAllowed( URLHandler ):
-    _relativeURL = "linkModifAC.py/addAllowed"
-
-
-class UHLinkRemoveAllowed( URLHandler ):
-    _relativeURL = "linkModifAC.py/removeAllowed"
-
-
-class UHCategoryModification( URLHandler ):
-    _relativeURL = "categoryModification.py"
-
-    def getActionURL( cls ):
-        return ""
-    getActionURL = classmethod( getActionURL )
-
-
-class UHCategoryAddMaterial( URLHandler ):
-    _relativeURL = "categoryFiles.py/addMaterial"
-
-class UHCategoryActionSubCategs( URLHandler ):
-    _relativeURL = "categoryModification.py/actionSubCategs"
-
-class UHCategoryActionConferences( URLHandler ):
-    _relativeURL = "categoryModification.py/actionConferences"
-
-class UHCategoryClearCache( URLHandler ):
-    _relativeURL = "categoryModification.py/clearCache"
-
-class UHCategoryClearConferenceCaches( URLHandler ):
-    _relativeURL = "categoryModification.py/clearConferenceCaches"
-
-class UHCategModifAC( URLHandler ):
-    _relativeURL = "categoryAC.py"
-
-class UHCategorySetConfCreationControl( URLHandler ):
-    _relativeURL = "categoryConfCreationControl.py/setCreateConferenceControl"
-
-class UHCategorySetNotifyCreation( URLHandler ):
-    _relativeURL = "categoryConfCreationControl.py/setNotifyCreation"
-
-
-class UHCategModifTools( URLHandler ):
-    _relativeURL = "categoryTools.py"
-
-class UHCategoryDeletion( URLHandler ):
-    _relativeURL = "categoryTools.py/delete"
-
-
-class UHCategModifTasks( URLHandler ):
-    _relativeURL = "categoryTasks.py"
-
-class UHCategModifFiles( URLHandler ):
-    _relativeURL = "categoryFiles.py"
-
-class UHCategModifTasksAction( URLHandler ):
-    _relativeURL = "categoryTasks.py/taskAction"
-
-class UHCategoryDataModif( URLHandler ):
-    _relativeURL = "categoryDataModification.py"
-
-
-class UHCategoryPerformModification( URLHandler ):
-    _relativeURL = "categoryDataModification.py/modify"
-
-
-class UHCategoryTasksOption( URLHandler ):
-    _relativeURL = "categoryDataModification.py/tasksOption"
-
-
-class UHCategorySetVisibility( URLHandler ):
-    _relativeURL = "categoryAC.py/setVisibility"
-
-
-class UHCategorySelectAllowed( URLHandler ):
-    _relativeURL = "categoryAC.py/selectAllowedToAccess"
-
-
-class UHCategoryAddAllowed( URLHandler ):
-    _relativeURL = "categoryAC.py/addAllowedToAccess"
-
-
-class UHCategoryRemoveAllowed( URLHandler ):
-    _relativeURL = "categoryAC.py/removeAllowedToAccess"
-
-
-class UHCategoryAddDomain( URLHandler ):
-    _relativeURL = "categoryAC.py/addDomains"
-
-
-class UHCategoryRemoveDomain( URLHandler ):
-    _relativeURL = "categoryAC.py/removeDomains"
-
-
-class UHCategoryCreation( URLHandler ):
-    _relativeURL = "categoryCreation.py"
-
-
-class UHCategoryPerformCreation( URLHandler ):
-    _relativeURL = "categoryCreation.py/create"
-
-
-class UHCategoryDisplay( URLHandler ):
-    _relativeURL = "categoryDisplay.py"
-
-    def getURL( cls, target=None ):
-        url = cls._getURL()
+    @classmethod
+    def getURL(cls, target=None, **params):
+        url = cls._getURL(**params)
         if target:
             if target.isRoot():
                 return UHWelcome.getURL()
-            url.setParams( target.getLocator() )
+            url.setParams(target.getLocator())
         return url
-    getURL = classmethod( getURL )
 
 
-class UHCategoryMap( URLHandler ):
-    _relativeURL = "categoryMap.py"
+class UHCategoryMap(URLHandler):
+    _endpoint = 'category.categoryMap'
 
-class UHCategoryOverview( URLHandler ):
-    _relativeURL = "categOverview.py"
 
-    def getURLFromOverview( cls, ow ):
+class UHCategoryOverview(URLHandler):
+    _endpoint = 'category.categOverview'
+
+    @classmethod
+    def getURLFromOverview(cls, ow):
         url = cls.getURL()
-        url.setParams( ow.getLocator() )
+        url.setParams(ow.getLocator())
         return url
-    getURLFromOverview = classmethod( getURLFromOverview )
 
     @classmethod
     def getWeekOverviewUrl(cls, categ):
         url = cls.getURL(categ)
-        p = {"day" : nowutc().day,
-             "month" : nowutc().month,
-             "year" : nowutc().year,
-             "period" : "week",
-             "detail" : "conference"}
+        p = {"day": nowutc().day,
+             "month": nowutc().month,
+             "year": nowutc().year,
+             "period": "week",
+             "detail": "conference"}
         url.addParams(p)
         return url
 
     @classmethod
     def getMonthOverviewUrl(cls, categ):
         url = cls.getURL(categ)
-        p = {"day" : nowutc().day,
-             "month" : nowutc().month,
-             "year" : nowutc().year,
-             "period" : "month",
-             "detail" : "conference"}
+        p = {"day": nowutc().day,
+             "month": nowutc().month,
+             "year": nowutc().year,
+             "period": "month",
+             "detail": "conference"}
         url.addParams(p)
         return url
 
-class UHTaskList( URLHandler ):
-    _relativeURL = "taskList.py"
 
-class UHTaskListAction( URLHandler ):
-    _relativeURL = "taskList.py/taskListAction"
+class UHGeneralInfoModification(URLHandler):
+    _endpoint = 'admin.generalInfoModification'
 
-class UHTaskNew( URLHandler ):
-    _relativeURL = "taskList.py/newTask"
 
-class UHTaskNewAdd( URLHandler ):
-    _relativeURL = "taskList.py/addNewTask"
+class UHGeneralInfoPerformModification(URLHandler):
+    _endpoint = 'admin.generalInfoModification-update'
 
-class UHTaskNewResponsibleSearch( URLHandler ):
-    _relativeURL = "taskList.py/searchResponsible"
 
-class UHTaskNewResponsibleNew( URLHandler ):
-    _relativeURL = "taskList.py/newResponsible"
+class UHContributionDelete(URLHandler):
+    _endpoint = 'event_mgmt.contributionTools-delete'
 
-class UHTaskNewPersonAdd( URLHandler ):
-    _relativeURL = "taskList.py/personAdd"
 
-class UHTaskDetails( URLHandler ):
-    _relativeURL = "taskList.py/taskDetails"
+class UHSubContributionDataModification(URLHandler):
+    _endpoint = 'event_mgmt.subContributionModification-data'
 
-class UHTaskDetailsAction( URLHandler ):
-    _relativeURL = "taskList.py/taskDetailsAction"
 
-class UHTaskDetailsResponsibleSearch( URLHandler ):
-    _relativeURL = "taskList.py/detailSearchResponsible"
+class UHSubContributionDataModif(URLHandler):
+    _endpoint = 'event_mgmt.subContributionModification-modifData'
 
-class UHTaskDetailsResponsibleNew( URLHandler ):
-    _relativeURL = "taskList.py/detailNewResponsible"
 
-class UHTaskDetailsPersonAdd( URLHandler ):
-    _relativeURL = "taskList.py/detailPersonAdd"
+class UHSubContributionDelete(URLHandler):
+    _endpoint = 'event_mgmt.subContributionTools-delete'
 
 
-class UHTaskCommentNew( URLHandler ):
-    _relativeURL = "taskList.py/commentNew"
+class UHSubContribModifAddMaterials(URLHandler):
+    _endpoint = 'event_mgmt.subContributionModification-materialsAdd'
 
-class UHTaskCommentNewAction( URLHandler ):
-    _relativeURL = "taskList.py/commentNewAction"
 
-class UHGeneralInfoModification( URLHandler ):
-    _relativeURL = "generalInfoModification.py"
+class UHSubContribModifTools(URLHandler):
+    _endpoint = 'event_mgmt.subContributionTools'
 
 
-class UHGeneralInfoPerformModification( URLHandler ):
-    _relativeURL = "generalInfoModification.py/update"
+class UHSessionModification(URLHandler):
+    _endpoint = 'event_mgmt.sessionModification'
 
 
-class UHContributionDelete( URLHandler ):
-    _relativeURL = "contributionTools.py/delete"
+class UHSessionModifMaterials(URLHandler):
+    _endpoint = 'event_mgmt.sessionModification-materials'
 
-class UHSubContributionDataModification( URLHandler ):
-    _relativeURL = "subContributionModification.py/data"
 
-class UHSubContributionReportNumberEdit( URLHandler ):
-    _relativeURL = "subContributionModification.py/editReportNumber"
+class UHSessionDataModification(URLHandler):
+    _endpoint = 'event_mgmt.sessionModification-modify'
 
-class UHSubContributionReportNumberPerformEdit( URLHandler ):
-    _relativeURL = "subContributionModification.py/performEditReportNumber"
 
-class UHSubContributionReportNumberRemove( URLHandler ):
-    _relativeURL = "subContributionModification.py/removeReportNumber"
+class UHSessionFitSlot(URLHandler):
+    _endpoint = 'event_mgmt.sessionModifSchedule-fitSlot'
 
-class UHSubContributionDataModif( URLHandler ):
-    _relativeURL = "subContributionModification.py/modifData"
 
-class UHSubContributionDelete( URLHandler ):
-    _relativeURL = "subContributionTools.py/delete"
+class UHSessionModifAddMaterials(URLHandler):
+    _endpoint = 'event_mgmt.sessionModification-materialsAdd'
 
 
-class UHSubContributionAddMaterial( URLHandler ):
-    _relativeURL = "subContributionModification.py/addMaterial"
+class UHSessionModifSchedule(URLHandler):
+    _endpoint = 'event_mgmt.sessionModifSchedule'
 
 
-class UHSubContributionPerformAddMaterial( URLHandler ):
-    _relativeURL = "subContributionModification.py/performAddMaterial"
+class UHSessionModSlotCalc(URLHandler):
+    _endpoint = 'event_mgmt.sessionModifSchedule-slotCalc'
 
 
-class UHSubContributionRemoveMaterials( URLHandler ):
-    _relativeURL = "subContributionModification.py/removeMaterials"
+class UHSessionModifAC(URLHandler):
+    _endpoint = 'event_mgmt.sessionModifAC'
 
-class UHSubContribModifAddMaterials( URLHandler ):
-    _relativeURL = "subContributionModification.py/materialsAdd"
 
-class UHSubContribModifTools( URLHandler ):
-    _relativeURL = "subContributionTools.py"
+class UHSessionSetVisibility(URLHandler):
+    _endpoint = 'event_mgmt.sessionModifAC-setVisibility'
 
-class UHSessionModification( URLHandler ):
-    _relativeURL = "sessionModification.py"
 
-class UHSessionModifMaterials( URLHandler ):
-    _relativeURL = "sessionModification.py/materials"
+class UHSessionModifTools(URLHandler):
+    _endpoint = 'event_mgmt.sessionModifTools'
 
-class UHSessionDataModification( URLHandler ):
-    _relativeURL = "sessionModification.py/modify"
 
-class UHSessionDatesModification( URLHandler ):
-    _relativeURL = "sessionModification.py/modifyDates"
+class UHSessionModifComm(URLHandler):
+    _endpoint = 'event_mgmt.sessionModifComm'
 
-class UHSessionModSlotConvenerNew( URLHandler ):
-    _relativeURL = "sessionModification.py/newSlotConvener"
 
+class UHSessionModifCommEdit(URLHandler):
+    _endpoint = 'event_mgmt.sessionModifComm-edit'
 
-class UHSessionModSlotConvenersRem( URLHandler ):
-    _relativeURL = "sessionModification.py/remSlotConveners"
 
+class UHSessionDeletion(URLHandler):
+    _endpoint = 'event_mgmt.sessionModifTools-delete'
 
-class UHSessionModSlotConvenerEdit( URLHandler ):
-    _relativeURL = "sessionModification.py/editSlotConvener"
 
+class UHContributionModification(URLHandler):
+    _endpoint = 'event_mgmt.contributionModification'
 
-class UHSessionFitSlot( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/fitSlot"
 
+class UHContribModifMaterials(URLHandler):
+    _endpoint = 'event_mgmt.contributionModification-materials'
 
-class UHReducedSessionScheduleAction( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/reducedScheduleAction"
 
+class UHSubContribModification(URLHandler):
+    _endpoint = 'event_mgmt.subContributionModification'
 
-class UHSessionModifScheduleRelocate( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/relocate"
 
-# <Deprecated>
-class UHSessionAddMaterial( URLHandler ):
-    _relativeURL = "sessionModification.py/addMaterial"
+class UHSubContribModifMaterials(URLHandler):
+    _endpoint = 'event_mgmt.subContributionModification-materials'
 
 
-class UHSessionPerformAddMaterial( URLHandler ):
-    _relativeURL = "sessionModification.py/performAddMaterial"
-# </Deprecated>
+class UHMaterialDisplay(URLHandler):
+    _endpoint = 'files.materialDisplay'
 
-class UHSessionRemoveMaterials( URLHandler ):
-    _relativeURL = "sessionModification.py/removeMaterials"
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        if target is not None:
+            params = target.getLocator()
+            resources = target.getOwner().getMaterialById(params["materialId"]).getResourceList()
+            if len(resources) == 1:
+                return UHFileAccess.getStaticURL(resources[0])
+            return "materialDisplay-%s.html" % params["materialId"]
+        return cls._getURL()
 
-class UHSessionModifAddMaterials( URLHandler ):
-    _relativeURL = "sessionModification.py/materialsAdd"
 
+class UHConferenceProgram(URLHandler):
+    _endpoint = 'event.conferenceProgram'
 
-class UHSessionImportContrib( URLHandler ):
-    _relativeURL = "sessionModification.py/importContrib"
 
+class UHConferenceProgramPDF(URLHandler):
+    _endpoint = 'event.conferenceProgram-pdf'
 
-class UHSessionModifSchedule( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py"
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        return "files/generatedPdf/Programme.pdf"
 
 
-class UHSessionModFit( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/fitSession"
+class UHConferenceTimeTable(URLHandler):
+    _endpoint = 'event.conferenceTimeTable'
 
 
-class UHSessionModSchEditContrib(URLHandler):
-    _relativeURL = "sessionModifSchedule.py/editContrib"
+class UHConfTimeTablePDF(URLHandler):
+    _endpoint = 'event.conferenceTimeTable-pdf'
 
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        if target is not None:
+            params = target.getLocator()
+            from MaKaC import conference
 
-class UHSessionModSlotEdit( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/slotEdit"
+            if isinstance(target, conference.Conference):
+                return "files/generatedPdf/Conference.pdf"
+            if isinstance(target, conference.Contribution):
+                return "files/generatedPdf/%s-Contribution.pdf" % (params["contribId"])
+            elif isinstance(target, conference.Session) or isinstance(target, conference.SessionSlot):
+                return "files/generatedPdf/%s-Session.pdf" % (params["sessionId"])
+        return cls._getURL()
 
 
-class UHSessionModSlotNew( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/slotNew"
+class UHConferenceCFA(URLHandler):
+    _endpoint = 'event.conferenceCFA'
 
 
-class UHSessionModSlotRem( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/slotRem"
+class UHSessionDisplay(URLHandler):
+    _endpoint = 'event.sessionDisplay'
 
-class UHSessionModSlotCalc( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/slotCalc"
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        if target is not None:
+            params.update(target.getLocator())
+        return "%s-session.html" % params["sessionId"]
 
-class UHSessionModSlotCompact( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/slotCompact"
 
+class UHSessionToiCal(URLHandler):
+    _endpoint = 'event.sessionDisplay-ical'
 
-class UHSessionModSlotMoveUpEntry( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/moveUpEntry"
 
+class UHContributionDisplay(URLHandler):
+    _endpoint = 'event.contributionDisplay'
 
-class UHSessionModSlotMoveDownEntry( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/moveDownEntry"
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        if target is not None:
+            params = target.getLocator()
+            return "%s-contrib.html" % (params["contribId"])
+        return cls.getURL(target, _ignore_static=True, **params)
 
 
-class UHSessionModScheduleDataEdit( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/editData"
+class UHSubContributionDisplay(URLHandler):
+    _endpoint = 'event.subContributionDisplay'
 
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        if target is not None:
+            params = target.getLocator()
+            return "%s-subcontrib.html" % (params["subContId"])
+        return cls.getURL(target, _ignore_static=True, **params)
 
-class UHSessionModScheduleAddContrib( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/addContrib"
 
-class UHSessionModScheduleNewContrib( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/newContrib"
+class UHSubContributionModification(URLHandler):
+    _endpoint = 'event_mgmt.subContributionModification'
 
-class UHSessionAddContribution( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/addContrib"
 
+class UHFileAccess(URLHandler):
+    _endpoint = 'files.getFile-access'
 
-class UHSessionPerformAddContribution( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/performAddContrib"
+    @staticmethod
+    def generateFileStaticLink(target):
+        from MaKaC import conference
 
+        params = target.getLocator()
+        owner = target.getOwner().getOwner()
 
-class UHSessionAddBreak( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/addBreak"
+        if isinstance(owner, conference.Conference):
+            path = "events/conference"
+        elif isinstance(owner, conference.Session):
+            path = "agenda/%s-session" % owner.getId()
+        elif isinstance(owner, conference.Contribution):
+            path = "agenda/%s-contribution" % owner.getId()
+        elif isinstance(owner, conference.SubContribution):
+            path = "agenda/%s-subcontribution" % owner.getId()
+        else:
+            return None
+        url = os.path.join("files", path, params["materialId"], params["resId"] + "-" + target.getName())
+        return url
 
-class UHSessionDelSchItems( URLHandler ):
-    _relativeURL = "sessionModifSchedule.py/delItems"
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        return cls.generateFileStaticLink(target) or cls.getURL(target, _ignore_static=True, **params)
 
 
-class UHSessionModifAC( URLHandler ):
-    _relativeURL = "sessionModifAC.py"
+class UHVideoWmvAccess(URLHandler):
+    _endpoint = 'files.getFile-wmv'
 
 
-class UHSessionSetVisibility( URLHandler ):
-    _relativeURL = "sessionModifAC.py/setVisibility"
+class UHVideoFlashAccess(URLHandler):
+    _endpoint = 'files.getFile-flash'
 
 
-class UHSessionSelectAllowed( URLHandler ):
-    _relativeURL = "sessionModifAC.py/selectAllowed"
+class UHErrorReporting(URLHandler):
+    _endpoint = 'misc.errors'
 
 
-class UHSessionAddAllowed( URLHandler ):
-    _relativeURL = "sessionModifAC.py/addAllowed"
+class UHAbstractWithdraw(URLHandler):
+    _endpoint = 'event.abstractWithdraw'
 
 
-class UHSessionRemoveAllowed( URLHandler ):
-    _relativeURL = "sessionModifAC.py/removeAllowed"
+class UHAbstractRecovery(URLHandler):
+    _endpoint = 'event.abstractWithdraw-recover'
 
 
-class UHSessionAddDomains( URLHandler ):
-    _relativeURL = "sessionModifAC.py/addDomains"
+class UHConfModifContribList(URLHandler):
+    _endpoint = 'event_mgmt.confModifContribList'
 
 
-class UHSessionRemoveDomains( URLHandler ):
-    _relativeURL = "sessionModifAC.py/removeDomains"
+class UHContribModifMaterialBrowse(URLHandler):
+    _endpoint = 'event_mgmt.contributionModification-browseMaterial'
 
-class UHSessionModifTools( URLHandler ):
-    _relativeURL = "sessionModifTools.py"
 
-class UHSessionModifComm( URLHandler ):
-    _relativeURL = "sessionModifComm.py"
+class UHContribModSetTrack(URLHandler):
+    _endpoint = 'event_mgmt.contributionModification-setTrack'
 
-class UHSessionModifCommEdit( URLHandler ):
-    _relativeURL = "sessionModifComm.py/edit"
 
+class UHContribModSetSession(URLHandler):
+    _endpoint = 'event_mgmt.contributionModification-setSession'
 
-class UHSessionDeletion( URLHandler ):
-    _relativeURL = "sessionModifTools.py/delete"
 
-class UHContributionModification( URLHandler ):
-    _relativeURL = "contributionModification.py"
+class UHTrackModMoveUp(URLHandler):
+    _endpoint = 'event_mgmt.confModifProgram-moveTrackUp'
 
 
-class UHContribModifMaterials( URLHandler ):
-    _relativeURL = "contributionModification.py/materials"
-
-class UHContribModifSchedule( URLHandler ):
-    _relativeURL = "contributionModification.py/schedule"
-
-
-class UHContributionMove( URLHandler ):
-    _relativeURL = "contributionModification.py/move"
-
-
-class UHContributionPerformMove( URLHandler ):
-    _relativeURL = "contributionModification.py/performMove"
-
-
-class UHSubContribModification( URLHandler ):
-    _relativeURL = "subContributionModification.py"
-
-class UHSubContribModifMaterials( URLHandler ):
-    _relativeURL = "subContributionModification.py/materials"
-
-class UHMaterialDisplay( URLHandler ):
-    _relativeURL = "materialDisplay.py"
-
-class UHConferenceProgram( URLHandler ):
-    _relativeURL = "conferenceProgram.py"
-
-
-class UHConferenceProgramPDF( URLHandler ):
-    _relativeURL = "conferenceProgram.py/pdf"
-
-
-class UHConferenceTimeTable( URLHandler ):
-    _relativeURL = "conferenceTimeTable.py"
-
-class UHConfTimeTablePDF( URLHandler ):
-    _relativeURL = "conferenceTimeTable.py/pdf"
-
-
-class UHConferenceCFA( URLHandler ):
-    _relativeURL = "conferenceCFA.py"
-
-
-class UHSessionDisplay( URLHandler ):
-    _relativeURL = "sessionDisplay.py"
-
-class UHSessionToiCal( URLHandler ):
-    _relativeURL = "sessionDisplay.py/ical"
-
-class UHContributionDisplay( URLHandler ):
-    _relativeURL = "contributionDisplay.py"
-
-class UHContributionDisplayRemoveMaterial( URLHandler ):
-    _relativeURL = "contributionDisplay.py/removeMaterial"
-
-class UHSubContributionDisplay( URLHandler ):
-    _relativeURL = "subContributionDisplay.py"
-
-class UHSubContributionModification( URLHandler ):
-    _relativeURL = "subContributionModification.py"
-
-class UHFileAccess( URLHandler ):
-    _relativeURL = "getFile.py/access"
-
-class UHVideoWmvAccess( URLHandler ):
-    _relativeURL = "getFile.py/wmv"
-
-class UHVideoFlashAccess( URLHandler ):
-    _relativeURL = "getFile.py/flash"
-
-class UHErrorReporting( URLHandler ):
-    _relativeURL = "errors.py"
-
-class UHErrorSendReport( URLHandler ):
-    _relativeURL = "error.py/sendReport"
-
-class UHAbstractWithdraw( URLHandler ):
-    _relativeURL = "abstractWithdraw.py"
-
-
-class UHAbstractRecovery( URLHandler ):
-    _relativeURL = "abstractWithdraw.py/recover"
-
-
-class UHConfModifContribList( URLHandler ):
-    _relativeURL = "confModifContribList.py"
-
-class UHConfModifContribListOpenMenu( URLHandler ):
-    _relativeURL = "confModifContribList.py/openMenu"
-
-class UHConfModifContribListCloseMenu( URLHandler ):
-    _relativeURL = "confModifContribList.py/closeMenu"
-
-class UHContribModifMaterialBrowse( URLHandler ):
-    _relativeURL = "contributionModification.py/browseMaterial"
-
-
-class UHContribModSetTrack( URLHandler ):
-    _relativeURL = "contributionModification.py/setTrack"
-
-
-class UHContribModSetSession( URLHandler ):
-    _relativeURL = "contributionModification.py/setSession"
-
-
-class UHTrackModMoveUp( URLHandler ):
-    _relativeURL = "confModifProgram.py/moveTrackUp"
-
-
-class UHTrackModMoveDown( URLHandler ):
-    _relativeURL = "confModifProgram.py/moveTrackDown"
-
-
-class UHAbstractModAC( URLHandler ):
-    _relativeURL = "abstractManagment.py/ac"
+class UHTrackModMoveDown(URLHandler):
+    _endpoint = 'event_mgmt.confModifProgram-moveTrackDown'
 
 
 class UHAbstractModEditData(URLHandler):
-    _relativeURL = "abstractManagment.py/editData"
+    _endpoint = 'event_mgmt.abstractManagment-editData'
 
 
 class UHAbstractModIntComments(URLHandler):
-    _relativeURL = "abstractManagment.py/comments"
+    _endpoint = 'event_mgmt.abstractManagment-comments'
 
 
 class UHAbstractModNewIntComment(URLHandler):
-    _relativeURL = "abstractManagment.py/newComment"
+    _endpoint = 'event_mgmt.abstractManagment-newComment'
 
 
 class UHAbstractModIntCommentEdit(URLHandler):
-    _relativeURL = "abstractManagment.py/editComment"
+    _endpoint = 'event_mgmt.abstractManagment-editComment'
 
 
 class UHAbstractModIntCommentRem(URLHandler):
-    _relativeURL = "abstractManagment.py/remComment"
+    _endpoint = 'event_mgmt.abstractManagment-remComment'
 
 
 class UHTrackAbstractModIntCommentNew(UHTrackAbstractBase):
-    _relativeURL = "trackAbstractModif.py/commentNew"
+    _endpoint = 'event_mgmt.trackAbstractModif-commentNew'
 
 
-class UHTrackAbstractModCommentBase( URLHandler ):
-
-    def getURL( cls, track, comment):
+class UHTrackAbstractModCommentBase(URLHandler):
+    @classmethod
+    def getURL(cls, track, comment):
         url = cls._getURL()
-        url.setParams( comment.getLocator() )
-        url.addParam( "trackId", track.getId() )
+        url.setParams(comment.getLocator())
+        url.addParam("trackId", track.getId())
         return url
-    getURL = classmethod( getURL )
 
 
 class UHTrackAbstractModIntCommentEdit(UHTrackAbstractModCommentBase):
-    _relativeURL = "trackAbstractModif.py/commentEdit"
+    _endpoint = 'event_mgmt.trackAbstractModif-commentEdit'
 
 
 class UHTrackAbstractModIntCommentRem(UHTrackAbstractModCommentBase):
-    _relativeURL = "trackAbstractModif.py/commentRem"
+    _endpoint = 'event_mgmt.trackAbstractModif-commentRem'
 
 
 class UHAbstractReviewingNotifTpl(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTpl"
+    _endpoint = 'event_mgmt.abstractReviewing-notifTpl'
+
 
 class UHAbstractModNotifTplNew(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplNew"
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplNew'
 
 
 class UHAbstractModNotifTplRem(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplRem"
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplRem'
 
 
 class UHAbstractModNotifTplEdit(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplEdit"
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplEdit'
 
 
 class UHAbstractModNotifTplDisplay(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplDisplay"
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplDisplay'
 
 
 class UHAbstractModNotifTplPreview(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplPreview"
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplPreview'
 
 
 class UHTrackAbstractModMarkAsDup(UHTrackAbstractBase):
-    _relativeURL = "trackAbstractModif.py/markAsDup"
+    _endpoint = 'event_mgmt.trackAbstractModif-markAsDup'
 
 
 class UHTrackAbstractModUnMarkAsDup(UHTrackAbstractBase):
-    _relativeURL = "trackAbstractModif.py/unMarkAsDup"
+    _endpoint = 'event_mgmt.trackAbstractModif-unMarkAsDup'
 
 
 class UHAbstractModMarkAsDup(URLHandler):
-    _relativeURL = "abstractManagment.py/markAsDup"
+    _endpoint = 'event_mgmt.abstractManagment-markAsDup'
 
 
 class UHAbstractModUnMarkAsDup(URLHandler):
-    _relativeURL = "abstractManagment.py/unMarkAsDup"
+    _endpoint = 'event_mgmt.abstractManagment-unMarkAsDup'
 
 
 class UHAbstractModMergeInto(URLHandler):
-    _relativeURL = "abstractManagment.py/mergeInto"
+    _endpoint = 'event_mgmt.abstractManagment-mergeInto'
 
 
 class UHAbstractModUnMerge(URLHandler):
-    _relativeURL = "abstractManagment.py/unmerge"
+    _endpoint = 'event_mgmt.abstractManagment-unmerge'
 
 
 class UHConfModNewAbstract(URLHandler):
-    _relativeURL = "abstractsManagment.py/newAbstract"
+    _endpoint = 'event_mgmt.abstractsManagment-newAbstract'
 
 
 class UHConfModNotifTplConditionNew(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplCondNew"
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplCondNew'
 
 
 class UHConfModNotifTplConditionRem(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplCondRem"
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplCondRem'
 
 
-class UHConfModAbstractsMerge( URLHandler ):
-    _relativeURL = "abstractsManagment.py/mergeAbstracts"
+class UHConfModAbstractsMerge(URLHandler):
+    _endpoint = 'event_mgmt.abstractsManagment-mergeAbstracts'
 
 
-class UHAbstractModNotifLog( URLHandler ):
-    _relativeURL = "abstractManagment.py/notifLog"
-
-class UHAbstractModTools( URLHandler ):
-    _relativeURL = "abstractTools.py"
-
-class UHAbstractDelete( URLHandler ):
-    _relativeURL = "abstractTools.py/delete"
+class UHAbstractModNotifLog(URLHandler):
+    _endpoint = 'event_mgmt.abstractManagment-notifLog'
 
 
-class UHSessionModContribList( URLHandler ):
-    _relativeURL = "sessionModification.py/contribList"
+class UHAbstractModTools(URLHandler):
+    _endpoint = 'event_mgmt.abstractTools'
 
 
-class UHSessionModContribListEditContrib( URLHandler ):
-    _relativeURL = "sessionModification.py/editContrib"
+class UHAbstractDelete(URLHandler):
+    _endpoint = 'event_mgmt.abstractTools-delete'
 
 
-class UHConfModScheduleAddContrib(URLHandler):
-    _relativeURL = "confModifSchedule.py/addContrib"
+class UHSessionModContribList(URLHandler):
+    _endpoint = 'event_mgmt.sessionModification-contribList'
 
-class UHConfModScheduleNewContrib(URLHandler):
-    _relativeURL = "confModifSchedule.py/newContrib"
 
-class UHConfModSchedulePerformNewContrib(URLHandler):
-    _relativeURL = "confModifSchedule.py/performNewContrib"
+class UHSessionModContribListEditContrib(URLHandler):
+    _endpoint = 'event_mgmt.sessionModification-editContrib'
 
-class UHConfModSchedulePresenterSearch(URLHandler):
-    _relativeURL = "contributionCreation.py/presenterSearch"
 
-class UHConfModSchedulePresenterNew(URLHandler):
-    _relativeURL = "contributionCreation.py/presenterNew"
+class UHConfModifReschedule(URLHandler):
+    _endpoint = 'event_mgmt.confModifSchedule-reschedule'
 
-class UHConfModSchedulePersonAdd(URLHandler):
-    _relativeURL = "contributionCreation.py/personAdd"
 
-class UHConfModScheduleAuthorSearch(URLHandler):
-    _relativeURL = "contributionCreation.py/authorSearch"
+class UHContributionList(URLHandler):
+    _endpoint = 'event.contributionListDisplay'
 
-class UHConfModScheduleAuthorNew(URLHandler):
-    _relativeURL = "contributionCreation.py/authorNew"
 
-class UHConfModScheduleCoauthorSearch(URLHandler):
-    _relativeURL = "contributionCreation.py/coauthorSearch"
+class UHContributionListToPDF(URLHandler):
+    _endpoint = 'event.contributionListDisplay-contributionsToPDF'
 
-class UHConfModScheduleCoauthorNew(URLHandler):
-    _relativeURL = "contributionCreation.py/coauthorNew"
+    @classmethod
+    def getStaticURL(cls, target=None, **params):
+        return "files/generatedPdf/Contributions.pdf"
 
-class UHConfModScheduleMoveEntryUp( URLHandler ):
-    _relativeURL = "confModifSchedule.py/moveEntryUp"
-
-class UHConfModScheduleMoveEntryDown( URLHandler ):
-    _relativeURL = "confModifSchedule.py/moveEntryDown"
-
-class UHConfModifReschedule( URLHandler ):
-    _relativeURL = "confModifSchedule.py/reschedule"
-
-class UHContributionList( URLHandler ):
-    _relativeURL = "contributionListDisplay.py"
-
-class UHContributionListToPDF( URLHandler ):
-    _relativeURL = "contributionListDisplay.py/contributionsToPDF"
 
 class UHConfModAbstractPropToAcc(URLHandler):
-    _relativeURL="abstractManagment.py/propToAcc"
+    _endpoint = 'event_mgmt.abstractManagment-propToAcc'
+
 
 class UHAbstractManagmentBackToSubmitted(URLHandler):
-    _relativeURL="abstractManagment.py/backToSubmitted"
+    _endpoint = 'event_mgmt.abstractManagment-backToSubmitted'
+
 
 class UHConfModAbstractPropToRej(URLHandler):
-    _relativeURL="abstractManagment.py/propToRej"
+    _endpoint = 'event_mgmt.abstractManagment-propToRej'
 
 
 class UHConfModAbstractWithdraw(URLHandler):
-    _relativeURL="abstractManagment.py/withdraw"
+    _endpoint = 'event_mgmt.abstractManagment-withdraw'
 
 
-class UHSessionModAddContribs( URLHandler ):
-    _relativeURL = "sessionModification.py/addContribs"
+class UHSessionModAddContribs(URLHandler):
+    _endpoint = 'event_mgmt.sessionModification-addContribs'
 
 
-class UHSessionModContributionAction( URLHandler ):
-    _relativeURL = "sessionModification.py/contribAction"
+class UHSessionModContributionAction(URLHandler):
+    _endpoint = 'event_mgmt.sessionModification-contribAction'
 
-class UHSessionModParticipantList( URLHandler ):
-    _relativeURL = "sessionModification.py/participantList"
 
-class UHSessionModToPDF( URLHandler ):
-    _relativeURL = "sessionModification.py/contribsToPDF"
+class UHSessionModParticipantList(URLHandler):
+    _endpoint = 'event_mgmt.sessionModification-participantList'
+
+
+class UHSessionModToPDF(URLHandler):
+    _endpoint = 'event_mgmt.sessionModification-contribsToPDF'
+
 
 class UHConfModCFANotifTplUp(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplUp"
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplUp'
+
 
 class UHConfModCFANotifTplDown(URLHandler):
-    _relativeURL = "abstractReviewing.py/notifTplDown"
+    _endpoint = 'event_mgmt.abstractReviewing-notifTplDown'
+
 
 class UHConfAuthorIndex(URLHandler):
-    _relativeURL = "confAuthorIndex.py"
+    _endpoint = 'event.confAuthorIndex'
+
 
 class UHConfSpeakerIndex(URLHandler):
-    _relativeURL = "confSpeakerIndex.py"
+    _endpoint = 'event.confSpeakerIndex'
 
-class UHContribModWithdraw( URLHandler ):
-    _relativeURL = "contributionModification.py/withdraw"
+
+class UHContribModWithdraw(URLHandler):
+    _endpoint = 'event_mgmt.contributionModification-withdraw'
+
 
 class UHTrackModContribList(URLHandler):
-    _relativeURL="trackModContribList.py"
+    _endpoint = 'event_mgmt.trackModContribList'
 
-class UHTrackModContributionAction( URLHandler ):
-    _relativeURL = "trackModContribList.py/contribAction"
 
-class UHTrackModParticipantList( URLHandler ):
-    _relativeURL = "trackModContribList.py/participantList"
+class UHTrackModContributionAction(URLHandler):
+    _endpoint = 'event_mgmt.trackModContribList-contribAction'
 
-class UHTrackModToPDF( URLHandler ):
-    _relativeURL = "trackModContribList.py/contribsToPDF"
+
+class UHTrackModParticipantList(URLHandler):
+    _endpoint = 'event_mgmt.trackModContribList-participantList'
+
+
+class UHTrackModToPDF(URLHandler):
+    _endpoint = 'event_mgmt.trackModContribList-contribsToPDF'
+
 
 class UHConfModContribQuickAccess(URLHandler):
-    _relativeURL="confModifContribList.py/contribQuickAccess"
+    _endpoint = 'event_mgmt.confModifContribList-contribQuickAccess'
 
 
 class UHSessionModContribQuickAccess(URLHandler):
-    _relativeURL="sessionModification.py/contribQuickAccess"
+    _endpoint = 'event_mgmt.sessionModification-contribQuickAccess'
 
 
 class UHTrackModContribQuickAccess(URLHandler):
-    _relativeURL="trackModContribList.py/contribQuickAccess"
+    _endpoint = 'event_mgmt.trackModContribList-contribQuickAccess'
 
 
 class UHConfMyStuff(URLHandler):
-    _relativeURL="myconference.py"
+    _endpoint = 'event.myconference'
 
 
 class UHConfMyStuffMySessions(URLHandler):
-    _relativeURL="myconference.py/mySessions"
+    _endpoint = 'event.myconference-mySessions'
 
 
 class UHConfMyStuffMyTracks(URLHandler):
-    _relativeURL="myconference.py/myTracks"
+    _endpoint = 'event.myconference-myTracks'
 
 
 class UHConfMyStuffMyContributions(URLHandler):
-    _relativeURL="myconference.py/myContributions"
+    _endpoint = 'event.myconference-myContributions'
 
 
-class UHConfModSlotRem(URLHandler):
-    _relativeURL="confModifSchedule.py/remSlot"
-
-class UHConfModSessionMove(URLHandler):
-    _relativeURL="confModifSchedule.py/moveSession"
-
-class UHConfModSessionMoveConfirmation(URLHandler):
-    _relativeURL="confModifSchedule.py/moveSession"
+class UHConfModMoveContribsToSession(URLHandler):
+    _endpoint = 'event_mgmt.confModifContribList-moveToSession'
 
 
-class UHConfModSessionRem(URLHandler):
-    _relativeURL="confModifSchedule.py/remSession"
+class UHConferenceDisplayMaterialPackage(URLHandler):
+    _endpoint = 'event.conferenceDisplay-matPkg'
 
 
-class UHConfModMoveContribsToSession( URLHandler ):
-    _relativeURL = "confModifContribList.py/moveToSession"
+class UHConferenceDisplayMaterialPackagePerform(URLHandler):
+    _endpoint = 'event.conferenceDisplay-performMatPkg'
 
-class UHConferenceDisplayMaterialPackage( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/matPkg"
 
-class UHConferenceDisplayMaterialPackagePerform( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/performMatPkg"
+class UHConfAbstractBook(URLHandler):
+    _endpoint = 'event.conferenceDisplay-abstractBook'
 
-class UHConferenceDisplayMenuClose( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/closeMenu"
+    @classmethod
+    def getStaticURL(cls, target=None, **params):
+        return "files/generatedPdf/BookOfAbstracts.pdf"
 
-class UHConferenceDisplayMenuOpen( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/openMenu"
 
-class UHSessionDisplayRemoveMaterial( URLHandler ):
-    _relativeURL = "sessionDisplay.py/removeMaterial"
+class UHConfAbstractBookLatex(URLHandler):
+    _endpoint = 'event.conferenceDisplay-abstractBookLatex'
 
-class UHConfAbstractBook( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/abstractBook"
 
-class UHConfAbstractBookLatex( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/abstractBookLatex"
+class UHConferenceToiCal(URLHandler):
+    _endpoint = 'event.conferenceDisplay-ical'
 
-class UHConferenceToiCal( URLHandler ):
-    _relativeURL = "conferenceDisplay.py/ical"
 
-class UHConfModAbstractBook( URLHandler ):
-    _relativeURL = "confModBOA.py"
+class UHConfModAbstractBook(URLHandler):
+    _endpoint = 'event_mgmt.confModBOA'
 
-class UHConfModAbstractBookEdit( URLHandler ):
-    _relativeURL = "confModBOA.py/edit"
 
-class UHConfModAbstractBookToogleShowIds( URLHandler ):
-    _relativeURL = "confModBOA.py/toogleShowIds"
+class UHConfModAbstractBookToogleShowIds(URLHandler):
+    _endpoint = 'event_mgmt.confModBOA-toogleShowIds'
+
 
 class UHAbstractReviewingSetup(URLHandler):
-    _relativeURL = "abstractReviewing.py/reviewingSetup"
+    _endpoint = 'event_mgmt.abstractReviewing-reviewingSetup'
 
-class UHAbstractReviewingTeam (URLHandler):
-    _relativeURL = "abstractReviewing.py/reviewingTeam"
 
-class UHConfModScheduleDataEdit( URLHandler ):
-    _relativeURL = "confModifSchedule.py/edit"
+class UHAbstractReviewingTeam(URLHandler):
+    _endpoint = 'event_mgmt.abstractReviewing-reviewingTeam'
 
-class UHConfModMaterialPackage( URLHandler ):
-    _relativeURL = "confModifContribList.py/matPkg"
 
-class UHConfModProceedings( URLHandler ):
-    _relativeURL = "confModifContribList.py/proceedings"
+class UHConfModScheduleDataEdit(URLHandler):
+    _endpoint = 'event_mgmt.confModifSchedule-edit'
 
-class UHConfModFullMaterialPackage( URLHandler ):
-    _relativeURL = "confModifTools.py/matPkg"
 
-class UHConfModFullMaterialPackagePerform( URLHandler ):
-    _relativeURL = "confModifTools.py/performMatPkg"
+class UHConfModMaterialPackage(URLHandler):
+    _endpoint = 'event_mgmt.confModifContribList-matPkg'
 
-class UHTaskManager( URLHandler ):
-    _relativeURL = "taskManager.py"
 
-class UHRemoveTask( URLHandler ):
-    _relativeURL = "taskManager.py/removeTask"
+class UHConfModProceedings(URLHandler):
+    _endpoint = 'event_mgmt.confModifContribList-proceedings'
 
-class UHUpdateNews( URLHandler ):
-    _relativeURL = "updateNews.py"
+
+class UHConfModFullMaterialPackage(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-matPkg'
+
+
+class UHConfModFullMaterialPackagePerform(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-performMatPkg'
+
+
+class UHConfOffline(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-offline'
+
+
+class UHOfflineEventAccess(URLHandler):
+    _endpoint = 'event_mgmt.getFile-offlineEvent'
+
+
+class UHTaskManager(URLHandler):
+    _endpoint = 'admin.taskManager'
+
+
+class UHUpdateNews(URLHandler):
+    _endpoint = 'admin.updateNews'
+
 
 # Server Admin, plugin management related
-class UHAdminPlugins( URLHandler ):
-    _relativeURL = "adminPlugins.py"
+class UHAdminPlugins(URLHandler):
+    _endpoint = 'admin.adminPlugins'
 
-class UHAdminPluginsSaveOptionReloadAll( URLHandler ):
-    _relativeURL = "adminPlugins.py/saveOptionReloadAll"
 
-class UHAdminPluginsReloadAll( URLHandler ):
-    _relativeURL = "adminPlugins.py/reloadAll"
+class UHAdminPluginsSaveOptionReloadAll(URLHandler):
+    _endpoint = 'admin.adminPlugins-saveOptionReloadAll'
 
-class UHAdminPluginsClearAllInfo( URLHandler ):
-    _relativeURL = "adminPlugins.py/clearAllInfo"
 
-class UHAdminReloadPlugins( URLHandler ):
-    _relativeURL = "adminPlugins.py/reload"
+class UHAdminPluginsReloadAll(URLHandler):
+    _endpoint = 'admin.adminPlugins-reloadAll'
 
-class UHAdminTogglePluginType( URLHandler ):
-    _relativeURL = "adminPlugins.py/toggleActivePluginType"
 
-class UHAdminTogglePlugin( URLHandler ):
-    _relativeURL = "adminPlugins.py/toggleActive"
+class UHAdminPluginsClearAllInfo(URLHandler):
+    _endpoint = 'admin.adminPlugins-clearAllInfo'
 
-class UHAdminPluginsTypeSaveOptions ( URLHandler ):
-    _relativeURL = "adminPlugins.py/savePluginTypeOptions"
 
-class UHAdminPluginsSaveOptions ( URLHandler ):
-    _relativeURL = "adminPlugins.py/savePluginOptions"
+class UHAdminReloadPlugins(URLHandler):
+    _endpoint = 'admin.adminPlugins-reload'
+
+
+class UHAdminTogglePluginType(URLHandler):
+    _endpoint = 'admin.adminPlugins-toggleActivePluginType'
+
+
+class UHAdminTogglePlugin(URLHandler):
+    _endpoint = 'admin.adminPlugins-toggleActive'
+
+
+class UHAdminPluginsTypeSaveOptions(URLHandler):
+    _endpoint = 'admin.adminPlugins-savePluginTypeOptions'
+
+
+class UHAdminPluginsSaveOptions(URLHandler):
+    _endpoint = 'admin.adminPlugins-savePluginOptions'
+
 # End of Server Admin, plugin management related
 
 
-class UHMaintenance( URLHandler ):
-    _relativeURL = "adminMaintenance.py"
+class UHMaintenance(URLHandler):
+    _endpoint = 'admin.adminMaintenance'
 
-class UHMaintenanceTmpCleanup( URLHandler ):
-    _relativeURL = "adminMaintenance.py/tmpCleanup"
 
-class UHMaintenancePerformTmpCleanup( URLHandler ):
-    _relativeURL = "adminMaintenance.py/performTmpCleanup"
+class UHMaintenanceTmpCleanup(URLHandler):
+    _endpoint = 'admin.adminMaintenance-tmpCleanup'
 
-class UHMaintenancePack( URLHandler ):
-    _relativeURL = "adminMaintenance.py/pack"
 
-class UHMaintenancePerformPack( URLHandler ):
-    _relativeURL = "adminMaintenance.py/performPack"
+class UHMaintenancePerformTmpCleanup(URLHandler):
+    _endpoint = 'admin.adminMaintenance-performTmpCleanup'
 
-class UHMaintenanceWebsessionCleanup( URLHandler ):
-    _relativeURL = "adminMaintenance.py/websessionCleanup"
 
-class UHMaintenancePerformWebsessionCleanup( URLHandler ):
-    _relativeURL = "adminMaintenance.py/performWebsessionCleanup"
+class UHMaintenancePack(URLHandler):
+    _endpoint = 'admin.adminMaintenance-pack'
 
-class UHAdminLayoutGeneral( URLHandler ):
-    _relativeURL = "adminLayout.py"
 
-class UHAdminLayoutSaveTemplateSet( URLHandler ):
-    _relativeURL = "adminLayout.py/saveTemplateSet"
+class UHMaintenancePerformPack(URLHandler):
+    _endpoint = 'admin.adminMaintenance-performPack'
 
-class UHAdminLayoutSaveSocial( URLHandler ):
-    _relativeURL = "adminLayout.py/saveSocial"
 
-class UHTemplatesSetDefaultPDFOptions( URLHandler ):
-    _relativeURL = "adminLayout.py/setDefaultPDFOptions"
+class UHAdminLayoutGeneral(URLHandler):
+    _endpoint = 'admin.adminLayout'
 
-class UHServices( URLHandler ):
-    _relativeURL = "adminServices.py"
 
-class UHRecording( URLHandler ):
-    _relativeURL = "adminServices.py/recording"
+class UHAdminLayoutSaveTemplateSet(URLHandler):
+    _endpoint = 'admin.adminLayout-saveTemplateSet'
 
-class UHWebcast( URLHandler ):
-    _relativeURL = "adminServices.py/webcast"
 
-class UHWebcastArchive( URLHandler ):
-    _relativeURL = "adminServices.py/webcastArchive"
+class UHAdminLayoutSaveSocial(URLHandler):
+    _endpoint = 'admin.adminLayout-saveSocial'
 
-class UHWebcastSetup( URLHandler ):
-    _relativeURL = "adminServices.py/webcastSetup"
 
-class UHWebcastAddWebcast( URLHandler ):
-    _relativeURL = "adminServices.py/webcastAddWebcast"
+class UHTemplatesSetDefaultPDFOptions(URLHandler):
+    _endpoint = 'admin.adminLayout-setDefaultPDFOptions'
 
-class UHWebcastRemoveWebcast( URLHandler ):
-    _relativeURL = "adminServices.py/webcastRemoveWebcast"
 
-class UHWebcastArchiveWebcast( URLHandler ):
-    _relativeURL = "adminServices.py/webcastArchiveWebcast"
+class UHWebcast(URLHandler):
+    _endpoint = 'admin.adminServices-webcast'
 
-class UHWebcastUnArchiveWebcast( URLHandler ):
-    _relativeURL = "adminServices.py/webcastUnArchiveWebcast"
 
-class UHWebcastModifyChannel( URLHandler ):
-    _relativeURL = "adminServices.py/webcastModifyChannel"
+class UHWebcastArchive(URLHandler):
+    _endpoint = 'admin.adminServices-webcastArchive'
 
-class UHWebcastAddChannel( URLHandler ):
-    _relativeURL = "adminServices.py/webcastAddChannel"
 
-class UHWebcastRemoveChannel( URLHandler ):
-    _relativeURL = "adminServices.py/webcastRemoveChannel"
+class UHWebcastSetup(URLHandler):
+    _endpoint = 'admin.adminServices-webcastSetup'
 
-class UHWebcastSwitchChannel( URLHandler ):
-    _relativeURL = "adminServices.py/webcastSwitchChannel"
 
-class UHWebcastMoveChannelUp( URLHandler ):
-    _relativeURL = "adminServices.py/webcastMoveChannelUp"
+class UHWebcastAddWebcast(URLHandler):
+    _endpoint = 'admin.adminServices-webcastAddWebcast'
 
-class UHWebcastMoveChannelDown( URLHandler ):
-    _relativeURL = "adminServices.py/webcastMoveChannelDown"
 
-class UHWebcastSaveWebcastSynchronizationURL( URLHandler ):
-    _relativeURL = "adminServices.py/webcastSaveWebcastSynchronizationURL"
+class UHWebcastRemoveWebcast(URLHandler):
+    _endpoint = 'admin.adminServices-webcastRemoveWebcast'
 
-class UHWebcastManualSynchronization( URLHandler ):
-    _relativeURL = "adminServices.py/webcastManualSynchronization"
 
-class UHWebcastAddStream( URLHandler ):
-    _relativeURL = "adminServices.py/webcastAddStream"
+class UHWebcastArchiveWebcast(URLHandler):
+    _endpoint = 'admin.adminServices-webcastArchiveWebcast'
 
-class UHWebcastRemoveStream( URLHandler ):
-    _relativeURL = "adminServices.py/webcastRemoveStream"
 
-class UHWebcastAddOnAir( URLHandler ):
-    _relativeURL = "adminServices.py/webcastAddOnAir"
+class UHWebcastUnArchiveWebcast(URLHandler):
+    _endpoint = 'admin.adminServices-webcastUnArchiveWebcast'
 
-class UHWebcastRemoveFromAir( URLHandler ):
-    _relativeURL = "adminServices.py/webcastRemoveFromAir"
 
-class UHOAIPrivateConfig( URLHandler ):
-    _relativeURL = "adminServices.py/oaiPrivateConfig"
+class UHWebcastModifyChannel(URLHandler):
+    _endpoint = 'admin.adminServices-webcastModifyChannel'
 
-class UHOAIPrivateConfigAddIP( URLHandler ):
-    _relativeURL = "adminServices.py/oaiPrivateConfigAddIP"
 
-class UHOAIPrivateConfigRemoveIP( URLHandler ):
-    _relativeURL = "adminServices.py/oaiPrivateConfigRemoveIP"
+class UHWebcastAddChannel(URLHandler):
+    _endpoint = 'admin.adminServices-webcastAddChannel'
 
-class UHAdminAPIOptions( URLHandler ):
-    _relativeURL = "adminServices.py/apiOptions"
 
-class UHAdminAPIOptionsSet( URLHandler ):
-    _relativeURL = "adminServices.py/apiOptionsSet"
+class UHWebcastRemoveChannel(URLHandler):
+    _endpoint = 'admin.adminServices-webcastRemoveChannel'
 
-class UHAdminAPIKeys( URLHandler ):
-    _relativeURL = "adminServices.py/apiKeys"
 
-class UHAnalytics( URLHandler ):
-    _relativeURL = "adminServices.py/analytics"
+class UHWebcastSwitchChannel(URLHandler):
+    _endpoint = 'admin.adminServices-webcastSwitchChannel'
 
-class UHSaveAnalytics( URLHandler ):
-    _relativeURL = "adminServices.py/saveAnalytics"
 
-class UHBadgeTemplates( URLHandler ):
-    _relativeURL = "badgeTemplates.py"
+class UHWebcastMoveChannelUp(URLHandler):
+    _endpoint = 'admin.adminServices-webcastMoveChannelUp'
 
-class UHPosterTemplates( URLHandler ):
-    _relativeURL = "posterTemplates.py"
 
-class UHAnnouncement( URLHandler ):
-    _relativeURL = "adminAnnouncement.py"
+class UHWebcastMoveChannelDown(URLHandler):
+    _endpoint = 'admin.adminServices-webcastMoveChannelDown'
 
-class UHAnnouncementSave( URLHandler ):
-    _relativeURL = "adminAnnouncement.py/save"
 
-class UHConfigUpcomingEvents( URLHandler ):
-    _relativeURL = "adminUpcomingEvents.py"
+class UHWebcastSaveWebcastSynchronizationURL(URLHandler):
+    _endpoint = 'admin.adminServices-webcastSaveWebcastSynchronizationURL'
 
-class UHMaterialMainResourceSelect( URLHandler ):
-    _relativeURL = "materialModification.py/selectMainResource"
 
-class UHMaterialMainResourcePerformSelect( URLHandler ):
-    _relativeURL = "materialModification.py/performSelectMainResource"
+class UHWebcastManualSynchronization(URLHandler):
+    _endpoint = 'admin.adminServices-webcastManualSynchronization'
 
-# ------- DVD creation and static webpages ------
 
-class UHConfDVDCreation( URLHandler ):
-    _relativeURL = "confModifTools.py/dvdCreation"
+class UHWebcastAddStream(URLHandler):
+    _endpoint = 'admin.adminServices-webcastAddStream'
 
-class UHStaticConferenceDisplay( URLHandler ):
+
+class UHWebcastRemoveStream(URLHandler):
+    _endpoint = 'admin.adminServices-webcastRemoveStream'
+
+
+class UHWebcastAddOnAir(URLHandler):
+    _endpoint = 'admin.adminServices-webcastAddOnAir'
+
+
+class UHWebcastRemoveFromAir(URLHandler):
+    _endpoint = 'admin.adminServices-webcastRemoveFromAir'
+
+
+class UHIPBasedACL(URLHandler):
+    _endpoint = 'admin.adminServices-ipbasedacl'
+
+
+class UHIPBasedACLFullAccessGrant(URLHandler):
+    _endpoint = 'admin.adminServices-ipbasedacl_fagrant'
+
+
+class UHIPBasedACLFullAccessRevoke(URLHandler):
+    _endpoint = 'admin.adminServices-ipbasedacl_farevoke'
+
+
+class UHAdminAPIOptions(URLHandler):
+    _endpoint = 'admin.adminServices-apiOptions'
+
+
+class UHAdminAPIOptionsSet(URLHandler):
+    _endpoint = 'admin.adminServices-apiOptionsSet'
+
+
+class UHAdminAPIKeys(URLHandler):
+    _endpoint = 'admin.adminServices-apiKeys'
+
+
+class UHAdminOAuthConsumers(URLHandler):
+    _endpoint = 'admin.adminServices-oauthConsumers'
+
+
+class UHAdminOAuthAuthorized(URLHandler):
+    _endpoint = 'admin.adminServices-oauthAuthorized'
+
+
+class UHBadgeTemplates(URLHandler):
+    _endpoint = 'admin.badgeTemplates'
+
+
+class UHPosterTemplates(URLHandler):
+    _endpoint = 'admin.posterTemplates'
+
+
+class UHAnnouncement(URLHandler):
+    _endpoint = 'admin.adminAnnouncement'
+
+
+class UHAnnouncementSave(URLHandler):
+    _endpoint = 'admin.adminAnnouncement-save'
+
+
+class UHConfigUpcomingEvents(URLHandler):
+    _endpoint = 'admin.adminUpcomingEvents'
+
+
+# ------- Static webpages ------
+
+class UHStaticConferenceDisplay(URLHandler):
     _relativeURL = "./index.html"
 
-class UHStaticMaterialDisplay( URLHandler ):
+
+class UHStaticMaterialDisplay(URLHandler):
     _relativeURL = "none-page-material.html"
 
-    def _normalisePathItem(cls,name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"","___________"))
-    _normalisePathItem = classmethod( _normalisePathItem )
+    @classmethod
+    def _normalisePathItem(cls, name):
+        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
 
-    def getRelativeURL(cls, target=None, escape = True):
+    @classmethod
+    def getRelativeURL(cls, target=None, escape=True):
         from MaKaC.conference import Contribution, Conference, Link, Video, Session
+
         if target is not None:
             if len(target.getResourceList()) == 1:
                 res = target.getResourceList()[0]
@@ -3142,126 +2411,137 @@ class UHStaticMaterialDisplay( URLHandler ):
                     return UHStaticResourceDisplay.getRelativeURL(res)
             else:
                 contrib = target.getOwner()
+                relativeURL = None
                 if isinstance(contrib, Contribution):
-                    spk=""
-                    if len(contrib.getSpeakerList())>0:
-                        spk=contrib.getSpeakerList()[0].getFamilyName().lower()
-                    contribDirName="%s-%s"%(contrib.getId(),spk)
-                    relativeURL = "./%s-material-%s.html"%(contribDirName, cls._normalisePathItem(target.getId()))
-
+                    spk = ""
+                    if len(contrib.getSpeakerList()) > 0:
+                        spk = contrib.getSpeakerList()[0].getFamilyName().lower()
+                    contribDirName = "%s-%s" % (contrib.getId(), spk)
+                    relativeURL = "./%s-material-%s.html" % (contribDirName, cls._normalisePathItem(target.getId()))
                 elif isinstance(contrib, Conference):
-                    relativeURL = "./material-%s.html"%(cls._normalisePathItem(target.getId()))
+                    relativeURL = "./material-%s.html" % cls._normalisePathItem(target.getId())
                 elif isinstance(contrib, Session):
-                    relativeURL = "./material-s%s-%s.html"%(contrib.getId(), cls._normalisePathItem(target.getId()))
+                    relativeURL = "./material-s%s-%s.html" % (contrib.getId(), cls._normalisePathItem(target.getId()))
 
                 if escape:
                     relativeURL = utf8rep(relativeURL)
 
                 return relativeURL
         return cls._relativeURL
-    getRelativeURL = classmethod( getRelativeURL )
 
-class UHStaticConfAbstractBook( URLHandler ):
+
+class UHStaticConfAbstractBook(URLHandler):
     _relativeURL = "./abstractBook.pdf"
 
-class UHStaticConferenceProgram( URLHandler ):
+
+class UHStaticConferenceProgram(URLHandler):
     _relativeURL = "./programme.html"
 
-class UHStaticConferenceTimeTable( URLHandler ):
+
+class UHStaticConferenceTimeTable(URLHandler):
     _relativeURL = "./timetable.html"
 
-class UHStaticContributionList( URLHandler ):
+
+class UHStaticContributionList(URLHandler):
     _relativeURL = "./contributionList.html"
 
-class UHStaticConfAuthorIndex( URLHandler ):
+
+class UHStaticConfAuthorIndex(URLHandler):
     _relativeURL = "./authorIndex.html"
 
-class UHStaticContributionDisplay( URLHandler ):
+
+class UHStaticContributionDisplay(URLHandler):
     _relativeURL = ""
 
+    @classmethod
     def getRelativeURL(cls, target=None, prevPath=".", escape=True):
         url = cls._relativeURL
         if target is not None:
-            spk=""
-            if len(target.getSpeakerList())>0:
-                spk=target.getSpeakerList()[0].getFamilyName().lower()
-            contribDirName="%s-%s"%(target.getId(),spk)
+            spk = ""
+            if len(target.getSpeakerList()) > 0:
+                spk = target.getSpeakerList()[0].getFamilyName().lower()
+            contribDirName = "%s-%s" % (target.getId(), spk)
             track = target.getTrack()
             if track is not None:
-                url = "./%s/%s/%s.html"%(prevPath, track.getTitle().replace(" ","_"), contribDirName)
+                url = "./%s/%s/%s.html" % (prevPath, track.getTitle().replace(" ", "_"), contribDirName)
             else:
-                url = "./%s/other_contributions/%s.html"%(prevPath, contribDirName)
+                url = "./%s/other_contributions/%s.html" % (prevPath, contribDirName)
 
         if escape:
             url = utf8rep(url)
 
         return url
-    getRelativeURL = classmethod( getRelativeURL )
 
-class UHStaticSessionDisplay( URLHandler ):
+
+class UHStaticSessionDisplay(URLHandler):
     _relativeURL = ""
 
+    @classmethod
     def getRelativeURL(cls, target=None):
-        return "./sessions/s%s.html"%target.getId()
-    getRelativeURL = classmethod( getRelativeURL )
+        return "./sessions/s%s.html" % target.getId()
 
-class UHStaticResourceDisplay( URLHandler ):
+
+class UHStaticResourceDisplay(URLHandler):
     _relativeURL = "none-page-resource.html"
 
-    def _normalisePathItem(cls,name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"","___________"))
-    _normalisePathItem = classmethod( _normalisePathItem )
+    @classmethod
+    def _normalisePathItem(cls, name):
+        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
 
+    @classmethod
     def getRelativeURL(cls, target=None, escape=True):
         from MaKaC.conference import Contribution, Conference, Video, Link, Session
+
         relativeURL = cls._relativeURL
         if target is not None:
             mat = target.getOwner()
             contrib = mat.getOwner()
-            # TODO: Remove the first if...cos it's just for CHEP. Remove as well, in pages.conferences.WMaterialStaticDisplay
+            # TODO: Remove the first if...cos it's just for CHEP.
+            # Remove as well in pages.conferences.WMaterialStaticDisplay
             #if isinstance(mat, Video) and isinstance(target, Link):
             #    relativeURL = "./%s.rm"%os.path.splitext(os.path.basename(target.getURL()))[0]
             #    return relativeURL
             if isinstance(contrib, Contribution):
-                relativeURL = "./%s-%s-%s-%s"%(cls._normalisePathItem(contrib.getId()), target.getOwner().getId(), target.getId(), cls._normalisePathItem(target.getFileName()))
+                relativeURL = "./%s-%s-%s-%s" % (cls._normalisePathItem(contrib.getId()), target.getOwner().getId(),
+                                                 target.getId(), cls._normalisePathItem(target.getFileName()))
             elif isinstance(contrib, Conference):
-                relativeURL = "./resource-%s-%s-%s"%(target.getOwner().getId(), target.getId(), cls._normalisePathItem(target.getFileName()))
+                relativeURL = "./resource-%s-%s-%s" % (target.getOwner().getId(), target.getId(),
+                                                       cls._normalisePathItem(target.getFileName()))
             elif isinstance(contrib, Session):
-                relativeURL = "./resource-s%s-%s-%s"%(contrib.getId(), target.getId(), cls._normalisePathItem(target.getFileName()))
+                relativeURL = "./resource-s%s-%s-%s" % (contrib.getId(), target.getId(),
+                                                        cls._normalisePathItem(target.getFileName()))
 
             if escape:
                 relativeURL = utf8rep(relativeURL)
 
             return relativeURL
-    getRelativeURL = classmethod( getRelativeURL )
 
-class UHStaticTrackContribList( URLHandler ):
+
+class UHStaticTrackContribList(URLHandler):
     _relativeURL = ""
 
+    @classmethod
     def getRelativeURL(cls, target=None, escape=True):
         url = cls._relativeURL
         if target is not None:
-            url = "%s.html"%(target.getTitle().replace(" ","_"))
+            url = "%s.html" % (target.getTitle().replace(" ", "_"))
 
         if escape:
             url = utf8rep(url)
         return url
 
-    getRelativeURL = classmethod( getRelativeURL )
 
-class UHDVDDone( URLHandler ):
-    _relativeURL = "confModifTools.py/dvdDone"
-
-
-class UHMStaticMaterialDisplay( URLHandler ):
+class UHMStaticMaterialDisplay(URLHandler):
     _relativeURL = "none-page.html"
 
-    def _normalisePathItem(cls,name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"","___________"))
-    _normalisePathItem = classmethod( _normalisePathItem )
+    @classmethod
+    def _normalisePathItem(cls, name):
+        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
 
+    @classmethod
     def getRelativeURL(cls, target=None, escape=True):
         from MaKaC.conference import Contribution, Link, Session, SubContribution
+
         if target is not None:
             if len(target.getResourceList()) == 1:
                 res = target.getResourceList()[0]
@@ -3271,421 +2551,386 @@ class UHMStaticMaterialDisplay( URLHandler ):
                     return UHMStaticResourceDisplay.getRelativeURL(res)
             else:
                 owner = target.getOwner()
-                parents="./material"
+                parents = "./material"
                 if isinstance(owner, Session):
-                    parents="%s/session-%s-%s"%(parents,owner.getId(), cls._normalisePathItem(owner.getTitle()))
+                    parents = "%s/session-%s-%s" % (parents, owner.getId(), cls._normalisePathItem(owner.getTitle()))
                 elif isinstance(owner, Contribution):
                     if isinstance(owner.getOwner(), Session):
-                        parents="%s/session-%s-%s"%(parents, owner.getOwner().getId(), cls._normalisePathItem(owner.getOwner().getTitle()))
-                    spk=""
-                    if len(owner.getSpeakerList())>0:
-                        spk=owner.getSpeakerList()[0].getFamilyName().lower()
-                    contribDirName="%s-%s"%(owner.getId(),spk)
-                    parents="%s/contrib-%s"%(parents, contribDirName)
+                        parents = "%s/session-%s-%s" % (parents, owner.getOwner().getId(),
+                                                        cls._normalisePathItem(owner.getOwner().getTitle()))
+                    spk = ""
+                    if len(owner.getSpeakerList()) > 0:
+                        spk = owner.getSpeakerList()[0].getFamilyName().lower()
+                    contribDirName = "%s-%s" % (owner.getId(), spk)
+                    parents = "%s/contrib-%s" % (parents, contribDirName)
                 elif isinstance(owner, SubContribution):
-                    contrib=owner.getContribution()
+                    contrib = owner.getContribution()
                     if isinstance(contrib.getOwner(), Session):
-                        parents="%s/session-%s-%s"%(parents, contrib.getOwner().getId(), cls._normalisePathItem(contrib.getOwner().getTitle()))
-                    contribspk=""
-                    if len(contrib.getSpeakerList())>0:
-                        contribspk=contrib.getSpeakerList()[0].getFamilyName().lower()
-                    contribDirName="%s-%s"%(contrib.getId(),contribspk)
-                    subcontspk=""
-                    if len(owner.getSpeakerList())>0:
-                        subcontspk=owner.getSpeakerList()[0].getFamilyName().lower()
-                    subcontribDirName="%s-%s"%(owner.getId(),subcontspk)
-                    parents="%s/contrib-%s/subcontrib-%s"%(parents, contribDirName, subcontribDirName)
-                relativeURL = "%s/material-%s.html"%(parents, cls._normalisePathItem(target.getId()))
+                        parents = "%s/session-%s-%s" % (parents, contrib.getOwner().getId(),
+                                                        cls._normalisePathItem(contrib.getOwner().getTitle()))
+                    contribspk = ""
+                    if len(contrib.getSpeakerList()) > 0:
+                        contribspk = contrib.getSpeakerList()[0].getFamilyName().lower()
+                    contribDirName = "%s-%s" % (contrib.getId(), contribspk)
+                    subcontspk = ""
+                    if len(owner.getSpeakerList()) > 0:
+                        subcontspk = owner.getSpeakerList()[0].getFamilyName().lower()
+                    subcontribDirName = "%s-%s" % (owner.getId(), subcontspk)
+                    parents = "%s/contrib-%s/subcontrib-%s" % (parents, contribDirName, subcontribDirName)
+                relativeURL = "%s/material-%s.html" % (parents, cls._normalisePathItem(target.getId()))
 
                 if escape:
                     relativeURL = utf8rep(relativeURL)
                 return relativeURL
         return cls._relativeURL
-    getRelativeURL = classmethod( getRelativeURL )
 
-class UHMStaticResourceDisplay( URLHandler ):
+
+class UHMStaticResourceDisplay(URLHandler):
     _relativeURL = "none-page.html"
 
-    def _normalisePathItem(cls,name):
-        return str(name).translate(string.maketrans(" /:()*?<>|\"","___________"))
-    _normalisePathItem = classmethod( _normalisePathItem )
+    @classmethod
+    def _normalisePathItem(cls, name):
+        return str(name).translate(string.maketrans(" /:()*?<>|\"", "___________"))
 
+    @classmethod
     def getRelativeURL(cls, target=None, escape=True):
         from MaKaC.conference import Contribution, Session, SubContribution
+
         if target is not None:
 
             mat = target.getOwner()
             owner = mat.getOwner()
-            parents="./material"
+            parents = "./material"
             if isinstance(owner, Session):
-                parents="%s/session-%s-%s"%(parents,owner.getId(), cls._normalisePathItem(owner.getTitle()))
+                parents = "%s/session-%s-%s" % (parents, owner.getId(), cls._normalisePathItem(owner.getTitle()))
             elif isinstance(owner, Contribution):
                 if isinstance(owner.getOwner(), Session):
-                    parents="%s/session-%s-%s"%(parents, owner.getOwner().getId(), cls._normalisePathItem(owner.getOwner().getTitle()))
-                spk=""
-                if len(owner.getSpeakerList())>0:
-                    spk=owner.getSpeakerList()[0].getFamilyName().lower()
-                contribDirName="%s-%s"%(owner.getId(),spk)
-                parents="%s/contrib-%s"%(parents, contribDirName)
+                    parents = "%s/session-%s-%s" % (parents, owner.getOwner().getId(),
+                                                    cls._normalisePathItem(owner.getOwner().getTitle()))
+                spk = ""
+                if len(owner.getSpeakerList()) > 0:
+                    spk = owner.getSpeakerList()[0].getFamilyName().lower()
+                contribDirName = "%s-%s" % (owner.getId(), spk)
+                parents = "%s/contrib-%s" % (parents, contribDirName)
             elif isinstance(owner, SubContribution):
-                contrib=owner.getContribution()
+                contrib = owner.getContribution()
                 if isinstance(contrib.getOwner(), Session):
-                    parents="%s/session-%s-%s"%(parents, contrib.getOwner().getId(), cls._normalisePathItem(contrib.getOwner().getTitle()))
-                contribspk=""
-                if len(contrib.getSpeakerList())>0:
-                    contribspk=contrib.getSpeakerList()[0].getFamilyName().lower()
-                contribDirName="%s-%s"%(contrib.getId(),contribspk)
-                subcontspk=""
-                if len(owner.getSpeakerList())>0:
-                    subcontspk=owner.getSpeakerList()[0].getFamilyName().lower()
-                subcontribDirName="%s-%s"%(owner.getId(),subcontspk)
-                parents="%s/contrib-%s/subcontrib-%s"%(parents, contribDirName, subcontribDirName)
+                    parents = "%s/session-%s-%s" % (parents, contrib.getOwner().getId(),
+                                                    cls._normalisePathItem(contrib.getOwner().getTitle()))
+                contribspk = ""
+                if len(contrib.getSpeakerList()) > 0:
+                    contribspk = contrib.getSpeakerList()[0].getFamilyName().lower()
+                contribDirName = "%s-%s" % (contrib.getId(), contribspk)
+                subcontspk = ""
+                if len(owner.getSpeakerList()) > 0:
+                    subcontspk = owner.getSpeakerList()[0].getFamilyName().lower()
+                subcontribDirName = "%s-%s" % (owner.getId(), subcontspk)
+                parents = "%s/contrib-%s/subcontrib-%s" % (parents, contribDirName, subcontribDirName)
 
-            relativeURL = "%s/resource-%s-%s-%s"%(parents, cls._normalisePathItem(target.getOwner().getTitle()), target.getId(), cls._normalisePathItem(target.getFileName()))
+            relativeURL = "%s/resource-%s-%s-%s" % (parents, cls._normalisePathItem(target.getOwner().getTitle()),
+                                                    target.getId(), cls._normalisePathItem(target.getFileName()))
             if escape:
                 relativeURL = utf8rep(relativeURL)
             return relativeURL
         return cls._relativeURL
-    getRelativeURL = classmethod( getRelativeURL )
 
 
-# ------- END: DVD creation and static webpages ------
+# ------- END: Static webpages ------
 
-class UHContribAuthorDisplay( URLHandler ):
-    _relativeURL = "contribAuthorDisplay.py"
+class UHContribAuthorDisplay(URLHandler):
+    _endpoint = 'event.contribAuthorDisplay'
 
-class UHConfTimeTableCustomizePDF( URLHandler ):
-    _relativeURL = "conferenceTimeTable.py/customizePdf"
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        if target is not None:
+            return "contribs-%s-authorDisplay-%s.html" % (target.getId(), params.get("authorId", ""))
+        return cls._getURL()
 
-class UHConfRegistrationForm( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py"
 
-class UHConfRegistrationFormDisplay( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/display"
+class UHConfTimeTableCustomizePDF(URLHandler):
+    _endpoint = 'event.conferenceTimeTable-customizePdf'
 
-class UHConfRegistrationFormCreation( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/creation"
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        return "files/generatedPdf/Conference.pdf"
 
-class UHConfRegistrationFormConditions( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/conditions"
 
-class UHConfRegistrationFormSignIn( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/signIn"
+class UHConfRegistrationForm(URLHandler):
+    _endpoint = 'event.confRegistrationFormDisplay'
 
-    def getURL( cls, conf, returnURL="" ):
+
+class UHConfRegistrationFormDisplay(URLHandler):
+    _endpoint = 'event.confRegistrationFormDisplay-display'
+
+
+class UHConfRegistrationFormCreation(URLHandler):
+    _endpoint = 'event.confRegistrationFormDisplay-creation'
+
+
+class UHConfRegistrationFormConditions(URLHandler):
+    _endpoint = 'event.confRegistrationFormDisplay-conditions'
+
+
+class UHConfRegistrationFormSignIn(URLHandler):
+    _endpoint = 'event.confRegistrationFormDisplay-signIn'
+
+    @classmethod
+    def getURL(cls, conf, returnURL=''):
         url = cls._getURL()
         url.setParams(conf.getLocator())
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
+        if returnURL:
+            url.addParam("returnURL", returnURL)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfRegistrationFormCreationDone( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/creationDone"
 
-    def getURL( cls, registrant):
+class UHConfRegistrationFormCreationDone(URLHandler):
+    _endpoint = 'event.confRegistrationFormDisplay-creationDone'
+
+    @classmethod
+    def getURL(cls, registrant):
         url = cls._getURL()
         url.setParams(registrant.getLocator())
-        url.addParam( "authkey", registrant.getRandomId() )
+        url.addParam('authkey', registrant.getRandomId())
         return url
-    getURL = classmethod( getURL )
 
-class UHConfRegistrationFormconfirmBooking( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/confirmBooking"
 
-class UHConfRegistrationFormconfirmBookingDone( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/confirmBookingDone"
+class UHConferenceTicketPDF(URLHandler):
+    _endpoint = 'event.e-ticket-pdf'
 
-class UHConfRegistrationFormModify( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/modify"
+    @classmethod
+    def getURL(cls, conf):
+        url = cls._getURL()
+        user = ContextManager.get("currentUser")
+        if user:
+            registrant = user.getRegistrantById(conf.getId())
+            if registrant:
+                url.setParams(registrant.getLocator())
+                url.addParam('authkey', registrant.getRandomId())
+        return url
 
-class UHConfRegistrationFormPerformModify( URLHandler ):
-    _relativeURL = "confRegistrationFormDisplay.py/performModify"
+
+class UHConfRegistrationFormconfirmBooking(URLHandler):
+    _endpoint = 'event.confRegistrationFormDisplay-confirmBooking'
+
+
+class UHConfRegistrationFormconfirmBookingDone(URLHandler):
+    _endpoint = 'event.confRegistrationFormDisplay-confirmBookingDone'
+
+
+class UHConfRegistrationFormModify(URLHandler):
+    _endpoint = 'event.confRegistrationFormDisplay-modify'
+
+
+class UHConfRegistrationFormPerformModify(URLHandler):
+    _endpoint = 'event.confRegistrationFormDisplay-performModify'
+
 
 ###################################################################################
 ## epayment url
-class UHConfModifEPayment( URLHandler ):
-    _relativeURL = "confModifEpayment.py"
+class UHConfModifEPayment(URLHandler):
+    _endpoint = 'event_mgmt.confModifEpayment'
 
-class UHConfModifEPaymentEnableSection( URLHandler ):
-    _relativeURL = "confModifEpayment.py/enableSection"
-class UHConfModifEPaymentChangeStatus( URLHandler ):
-    _relativeURL = "confModifEpayment.py/changeStatus"
-#class UHConfModifEPaymentDataModification( URLHandler ):
-class UHConfModifEPaymentdetailPaymentModification( URLHandler ):
-    _relativeURL = "confModifEpayment.py/dataModif"
-class UHConfModifEPaymentPerformdetailPaymentModification( URLHandler ):
-    _relativeURL = "confModifEpayment.py/performDataModif"
+
+class UHConfModifEPaymentEnableSection(URLHandler):
+    _endpoint = 'event_mgmt.confModifEpayment-enableSection'
+
+
+class UHConfModifEPaymentChangeStatus(URLHandler):
+    _endpoint = 'event_mgmt.confModifEpayment-changeStatus'
+
+
+class UHConfModifEPaymentdetailPaymentModification(URLHandler):
+    _endpoint = 'event_mgmt.confModifEpayment-dataModif'
+
+
+class UHConfModifEPaymentPerformdetailPaymentModification(URLHandler):
+    _endpoint = 'event_mgmt.confModifEpayment-performDataModif'
 
 ###################################################################################
 
 
-class UHConfModifRegForm( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py"
+class UHConfModifRegForm(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationForm'
 
-class UHConfModifRegFormChangeStatus( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/changeStatus"
 
-class UHConfModifRegFormDataModification( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/dataModif"
+class UHConfModifRegFormChangeStatus(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationForm-changeStatus'
 
-class UHConfModifRegFormPerformDataModification( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performDataModif"
 
-class UHConfModifRegFormSessions( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifSessions"
+class UHConfModifRegFormDataModification(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationForm-dataModif'
 
-class UHConfModifRegFormSessionsDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifSessionsData"
 
-class UHConfModifRegFormSessionsPerformDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifSessionsData"
+class UHConfModifRegFormPerformDataModification(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performDataModif'
 
-class UHConfModifRegFormSessionsAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/addSession"
 
-class UHConfModifRegFormSessionsPerformAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performAddSession"
+class UHConfModifRegFormActionStatuses(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationForm-actionStatuses'
 
-class UHConfModifRegFormSessionsRemove( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/removeSession"
 
-class UHConfModifRegFormSessionItemModify( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifySessionItem"
+class UHConfModifRegFormStatusModif(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationForm-modifStatus'
 
-class UHConfModifRegFormSessionItemPerformModify( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifySessionItem"
 
-class UHConfModifRegFormAccommodation( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifAccommodation"
+class UHConfModifRegFormStatusPerformModif(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationForm-performModifStatus'
 
-class UHConfModifRegFormAccommodationDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifAccommodationData"
 
-class UHConfModifRegFormAccommodationPerformDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifAccommodationData"
+class UHConfModifRegistrationModification(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationModification'
 
-class UHConfModifRegFormAccommodationTypeRemove( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/removeAccommodationType"
 
-class UHConfModifRegFormAccommodationTypeAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/addAccommodationType"
+class UHConfModifRegistrationModificationSectionQuery(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrationModificationSection-query'
 
-class UHConfModifRegFormAccommodationTypePerformAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performAddAccommodationType"
 
-class UHConfModifRegFormAccommodationTypeModify( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifyAccommodationType"
+class UHConfModifRegistrantList(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants'
 
-class UHConfModifRegFormAccommodationTypePerformModify( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifyAccommodationType"
 
-class UHConfModifRegFormReasonParticipation( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifReasonParticipation"
+class UHConfModifRegistrantNew(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-newRegistrant'
 
-class UHConfModifRegFormReasonParticipationDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifReasonParticipationData"
 
-class UHConfModifRegFormReasonParticipationPerformDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifReasonParticipationData"
+class UHConfModifRegistrantListAction(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-action'
 
-class UHConfModifRegFormFurtherInformation( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifFurtherInformation"
 
-class UHConfModifRegFormFurtherInformationDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifFurtherInformationData"
+class UHConfModifRegistrantPerformRemove(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-remove'
 
-class UHConfModifRegFormFurtherInformationPerformDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifFurtherInformationData"
 
-class UHConfModifRegFormSocialEvent( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifSocialEvent"
+class UHRegistrantModification(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-modification'
 
-class UHConfModifRegFormSocialEventDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifSocialEventData"
-
-class UHConfModifRegFormSocialEventPerformDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifSocialEventData"
-
-class UHConfModifRegFormSocialEventRemove( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/removeSocialEvent"
-
-class UHConfModifRegFormSocialEventAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/addSocialEvent"
-
-class UHConfModifRegFormSocialEventPerformAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performAddSocialEvent"
-
-class UHConfModifRegFormSocialEventItemModify( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifySocialEventItem"
-
-class UHConfModifRegFormSocialEventItemPerformModify( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifySocialEventItem"
-
-class UHConfModifRegFormActionStatuses( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/actionStatuses"
-
-class UHConfModifRegFormStatusModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifStatus"
-
-class UHConfModifRegFormStatusPerformModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifStatus"
-
-class UHConfModifRegFormActionSection( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/actionSection"
-
-class UHConfModifRegFormGeneralSection( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifGeneralSection"
-
-class UHConfModifRegFormGeneralSectionDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifGeneralSectionData"
-
-class UHConfModifRegFormGeneralSectionPerformDataModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifGeneralSectionData"
-
-class UHConfModifRegFormGeneralSectionFieldAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/addGeneralField"
-
-class UHConfModifRegFormGeneralSectionFieldPerformAdd( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performAddGeneralField"
-
-class UHConfModifRegFormGeneralSectionFieldRemove( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/removeGeneralField"
-
-class UHConfModifRegFormGeneralSectionFieldModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/modifGeneralField"
-
-class UHConfModifRegFormGeneralSectionFieldPerformModif( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/performModifGeneralField"
-
-class UHConfModifRegistrationPreview( URLHandler ):
-    _relativeURL = "confModifRegistrationPreview.py"
-
-class UHConfModifRegistrantList( URLHandler ):
-    _relativeURL = "confModifRegistrants.py"
-
-class UHConfModifRegistrantsOpenMenu( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/openMenu"
-
-class UHConfModifRegistrantsCloseMenu( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/closeMenu"
-
-class UHConfModifRegistrantListAction( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/action"
-
-class UHConfModifRegistrantPerformRemove( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/remove"
-
-class UHRegistrantModification( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modification"
-
-class UHRegistrantDataModification( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/dataModification"
-
-class UHRegistrantPerformDataModification( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performDataModification"
 
 class UHRegistrantAttachmentFileAccess(URLHandler):
-    _relativeURL = "confModifRegistrants.py/getAttachedFile"
-
-class UHConfModifRegFormEnableSection( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/enableSection"
-
-class UHConfModifRegFormEnablePersonalField( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/enablePersonalField"
-
-class UHConfModifRegFormSwitchPersonalField( URLHandler ):
-    _relativeURL = "confModifRegistrationForm.py/switchPersonalField"
-
-class UHCategoryStatistics( URLHandler ):
-    _relativeURL = "categoryStatistics.py"
-
-class UHCategoryToiCal( URLHandler ):
-    _relativeURL = "categoryDisplay.py/ical"
-
-class UHCategoryToRSS( URLHandler ):
-    _relativeURL = "categoryDisplay.py/rss"
-
-class UHCategoryToAtom( URLHandler ):
-    _relativeURL = "categoryDisplay.py/atom"
-
-class UHCategOverviewToRSS( URLHandler ):
-    _relativeURL = "categOverview.py/rss"
-
-class UHConfRegistrantsList( URLHandler ):
-    _relativeURL = "confRegistrantsDisplay.py/list"
-
-class UHConfModifRegistrantSessionModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifySessions"
-
-class UHConfModifRegistrantSessionPeformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performModifySessions"
-
-class UHConfModifRegistrantTransactionModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifyTransaction"
-
-class UHConfModifRegistrantTransactionPeformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/peformModifyTransaction"
-
-class UHConfModifRegistrantAccoModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifyAccommodation"
-
-class UHConfModifRegistrantAccoPeformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performModifyAccommodation"
-
-class UHConfModifRegistrantSocialEventsModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifySocialEvents"
-
-class UHConfModifRegistrantSocialEventsPeformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performModifySocialEvents"
-
-class UHConfModifRegistrantReasonPartModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifyReasonParticipation"
-
-class UHConfModifRegistrantReasonPartPeformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performModifyReasonParticipation"
-
-class UHConfModifPendingQueues( URLHandler ):
-    _relativeURL = "confModifPendingQueues.py"
-
-class UHConfModifPendingQueuesActionSubm( URLHandler ):
-    _relativeURL = "confModifPendingQueues.py/actionSubmitters"
-
-class UHConfModifPendingQueuesActionMgr( URLHandler ):
-    _relativeURL = "confModifPendingQueues.py/actionManagers"
-
-class UHConfModifPendingQueuesActionCoord( URLHandler ):
-    _relativeURL = "confModifPendingQueues.py/actionCoordinators"
-
-class UHConfModifRegistrantMiscInfoModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifyMiscInfo"
-
-class UHConfModifRegistrantMiscInfoPerformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performModifyMiscInfo"
-
-class UHUserSearchCreateExternalUser( URLHandler ):
-    _relativeURL = "userSelection.py/createExternalUsers"
-
-class UHConfModifRegistrantStatusesModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/modifyStatuses"
-
-class UHConfModifRegistrantStatusesPerformModify( URLHandler ):
-    _relativeURL = "confModifRegistrants.py/performModifyStatuses"
-
-class UHGetCalendarOverview( URLHandler ):
-    _relativeURL ="categOverview.py"
-
-class UHCategoryCalendarOverview( URLHandler ):
-    _relativeURL ="wcalendar.py"
+    _endpoint = 'event_mgmt.confModifRegistrants-getAttachedFile'
 
 
-"""
-URL Handlers for  Printing and Design
-"""
-class UHConfModifBadgePrinting ( URLHandler ):
-    _relativeURL = "confModifTools.py/badgePrinting"
+class UHCategoryStatistics(URLHandler):
+    _endpoint = 'category.categoryStatistics'
 
-    def getURL( cls, target=None, templateId=None, deleteTemplateId=None, cancel=False, new=False, copyTemplateId=None ):
+
+class UHCategoryToiCal(URLHandler):
+    _endpoint = 'category.categoryDisplay-ical'
+
+
+class UHCategoryToRSS(URLHandler):
+    _endpoint = 'category.categoryDisplay-rss'
+
+
+class UHCategoryToAtom(URLHandler):
+    _endpoint = 'category.categoryDisplay-atom'
+
+
+class UHCategOverviewToRSS(URLHandler):
+    _endpoint = 'category.categOverview-rss'
+
+
+class UHConfRegistrantsList(URLHandler):
+    _endpoint = 'event.confRegistrantsDisplay-list'
+
+    @classmethod
+    def getStaticURL(cls, target, **params):
+        return "confRegistrantsDisplay.html"
+
+
+class UHConfModifRegistrantSessionModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-modifySessions'
+
+
+class UHConfModifRegistrantSessionPeformModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-performModifySessions'
+
+
+class UHConfModifRegistrantTransactionModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-modifyTransaction'
+
+
+class UHConfModifRegistrantTransactionPeformModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-peformModifyTransaction'
+
+
+class UHConfModifRegistrantAccoModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-modifyAccommodation'
+
+
+class UHConfModifRegistrantAccoPeformModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-performModifyAccommodation'
+
+
+class UHConfModifRegistrantSocialEventsModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-modifySocialEvents'
+
+
+class UHConfModifRegistrantSocialEventsPeformModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-performModifySocialEvents'
+
+
+class UHConfModifRegistrantReasonPartModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-modifyReasonParticipation'
+
+
+class UHConfModifRegistrantReasonPartPeformModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-performModifyReasonParticipation'
+
+
+class UHConfModifPendingQueues(URLHandler):
+    _endpoint = 'event_mgmt.confModifPendingQueues'
+
+
+class UHConfModifPendingQueuesActionConfSubm(URLHandler):
+    _endpoint = 'event_mgmt.confModifPendingQueues-actionConfSubmitters'
+
+
+class UHConfModifPendingQueuesActionConfMgr(URLHandler):
+    _endpoint = 'event_mgmt.confModifPendingQueues-actionConfManagers'
+
+
+class UHConfModifPendingQueuesActionSubm(URLHandler):
+    _endpoint = 'event_mgmt.confModifPendingQueues-actionSubmitters'
+
+
+class UHConfModifPendingQueuesActionMgr(URLHandler):
+    _endpoint = 'event_mgmt.confModifPendingQueues-actionManagers'
+
+
+class UHConfModifPendingQueuesActionCoord(URLHandler):
+    _endpoint = 'event_mgmt.confModifPendingQueues-actionCoordinators'
+
+
+class UHConfModifRegistrantMiscInfoModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-modifyMiscInfo'
+
+
+class UHConfModifRegistrantMiscInfoPerformModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-performModifyMiscInfo'
+
+
+class UHConfModifRegistrantStatusesModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-modifyStatuses'
+
+
+class UHConfModifRegistrantStatusesPerformModify(URLHandler):
+    _endpoint = 'event_mgmt.confModifRegistrants-performModifyStatuses'
+
+
+class UHGetCalendarOverview(URLHandler):
+    _endpoint = 'category.categOverview'
+
+
+class UHCategoryCalendarOverview(URLHandler):
+    _endpoint = 'category.wcalendar'
+
+
+# URL Handlers for Printing and Design
+class UHConfModifBadgePrinting(URLHandler):
+    _endpoint = "event_mgmt.confModifTools-badgePrinting"
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, deleteTemplateId=None, cancel=False, new=False, copyTemplateId=None):
         """
           -The deleteTemplateId param should be set if we want to erase a template.
           -The copyTemplateId param should be set if we want to duplicate a template
@@ -3697,6 +2942,8 @@ class UHConfModifBadgePrinting ( URLHandler ):
         """
         url = cls._getURL()
         if target is not None:
+            if target.getId() == 'default':
+                url = UHBadgeTemplatePrinting._getURL()
             url.setParams(target.getLocator())
             if templateId is not None:
                 url.addParam("templateId", templateId)
@@ -3709,12 +2956,40 @@ class UHConfModifBadgePrinting ( URLHandler ):
             if new:
                 url.addParam("new", True)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfModifBadgeDesign ( URLHandler ):
-    _relativeURL = "confModifTools.py/badgeDesign"
 
-    def getURL( cls, target=None, templateId=None, new=False):
+class UHBadgeTemplatePrinting(URLHandler):
+    _endpoint = 'admin.badgeTemplates-badgePrinting'
+
+
+class UHConfModifBadgeDesign(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-badgeDesign'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, new=False):
+        """
+          -The templateId param should always be set:
+           *if we are editing a template, it's the id of the template edited.
+           *if we are creating a template, it's the id that the template will
+           have after being stored for the first time.
+          -The new param should be set to True if we are creating a new template.
+        """
+        url = cls._getURL()
+        if target is not None:
+            if target.getId() == 'default':
+                url = UHModifDefTemplateBadge._getURL()
+            url.setParams(target.getLocator())
+            if templateId is not None:
+                url.addParam("templateId", templateId)
+            url.addParam("new", new)
+        return url
+
+
+class UHModifDefTemplateBadge(URLHandler):
+    _endpoint = 'admin.badgeTemplates-badgeDesign'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, new=False):
         """
           -The templateId param should always be set:
            *if we are editing a template, it's the id of the template edited.
@@ -3729,61 +3004,43 @@ class UHConfModifBadgeDesign ( URLHandler ):
                 url.addParam("templateId", templateId)
             url.addParam("new", new)
         return url
-    getURL = classmethod( getURL )
 
-class UHModifDefTemplateBadge ( URLHandler ):
-    _relativeURL = "badgeTemplates.py/badgeDesign"
 
-    def getURL( cls, target=None, templateId=None, new=False):
-        """
-          -The templateId param should always be set:
-           *if we are editing a template, it's the id of the template edited.
-           *if we are creating a template, it's the id that the template will
-           have after being stored for the first time.
-          -The new param should be set to True if we are creating a new template.
-        """
-        url = cls._getURL()
-        if target is not None:
-            url.setParams(target.getLocator())
-            if templateId is not None:
-                url.addParam("templateId", templateId)
-            url.addParam("new", new)
-        return url
-    getURL = classmethod( getURL )
+class UHConfModifBadgeSaveBackground(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-badgeSaveBackground'
 
-class UHConfModifBadgeSaveBackground ( URLHandler ):
-    _relativeURL = "confModifTools.py/badgeSaveBackground"
-
-    def getURL( cls, target=None, templateId=None ):
+    @classmethod
+    def getURL(cls, target=None, templateId=None):
         url = cls._getURL()
         if target is not None and templateId is not None:
             url.setParams(target.getLocator())
             url.addParam("templateId", templateId)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfModifBadgeGetBackground ( URLHandler ):
-    _relativeURL = "confModifTools.py/badgeGetBackground"
 
-    def getURL( cls, target=None, templateId=None, backgroundId=None):
+class UHConfModifBadgeGetBackground(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-badgeGetBackground'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, backgroundId=None):
         url = cls._getURL()
         if target is not None and templateId is not None:
             url.setParams(target.getLocator())
             url.addParam("templateId", templateId)
             url.addParam("backgroundId", backgroundId)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfModifBadgePrintingPDF ( URLHandler ):
-    _relativeURL = "confModifTools.py/badgePrintingPDF"
 
-"""
-URL Handlers for Poster Printing and Design
-"""
-class UHConfModifPosterPrinting ( URLHandler ):
-    _relativeURL = "confModifTools.py/posterPrinting"
+class UHConfModifBadgePrintingPDF(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-badgePrintingPDF'
 
-    def getURL( cls, target=None, templateId=None, deleteTemplateId=None, cancel=False, new=False, copyTemplateId=None ):
+
+# URL Handlers for Poster Printing and Design
+class UHConfModifPosterPrinting(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-posterPrinting'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, deleteTemplateId=None, cancel=False, new=False, copyTemplateId=None):
         """
           -The deleteTemplateId param should be set if we want to erase a template.
           -The copyTemplateId param should be set if we want to duplicate a template
@@ -3796,7 +3053,8 @@ class UHConfModifPosterPrinting ( URLHandler ):
         url = cls._getURL()
 
         if target is not None:
-
+            if target.getId() == 'default':
+                url = UHPosterTemplatePrinting._getURL()
             url.setParams(target.getLocator())
             if templateId is not None:
                 url.addParam("templateId", templateId)
@@ -3809,12 +3067,40 @@ class UHConfModifPosterPrinting ( URLHandler ):
             if new:
                 url.addParam("new", True)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfModifPosterDesign ( URLHandler ):
-    _relativeURL = "confModifTools.py/posterDesign"
 
-    def getURL( cls, target=None, templateId=None, new=False):
+class UHPosterTemplatePrinting(URLHandler):
+    _endpoint = 'admin.posterTemplates-posterPrinting'
+
+
+class UHConfModifPosterDesign(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-posterDesign'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, new=False):
+        """
+          -The templateId param should always be set:
+           *if we are editing a template, it's the id of the template edited.
+           *if we are creating a template, it's the id that the template will
+           have after being stored for the first time.
+          -The new param should be set to True if we are creating a new template.
+        """
+        url = cls._getURL()
+        if target is not None:
+            if target.getId() == 'default':
+                url = UHModifDefTemplatePoster._getURL()
+            url.setParams(target.getLocator())
+            if templateId is not None:
+                url.addParam("templateId", templateId)
+            url.addParam("new", new)
+        return url
+
+
+class UHModifDefTemplatePoster(URLHandler):
+    _endpoint = 'admin.posterTemplates-posterDesign'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, new=False):
         """
           -The templateId param should always be set:
            *if we are editing a template, it's the id of the template edited.
@@ -3829,375 +3115,303 @@ class UHConfModifPosterDesign ( URLHandler ):
                 url.addParam("templateId", templateId)
             url.addParam("new", new)
         return url
-    getURL = classmethod( getURL )
 
-class UHModifDefTemplatePoster ( URLHandler ):
-    _relativeURL = "posterTemplates.py/posterDesign"
 
-    def getURL( cls, target=None, templateId=None, new=False):
-        """
-          -The templateId param should always be set:
-           *if we are editing a template, it's the id of the template edited.
-           *if we are creating a template, it's the id that the template will
-           have after being stored for the first time.
-          -The new param should be set to True if we are creating a new template.
-        """
-        url = cls._getURL()
-        if target is not None:
-            url.setParams(target.getLocator())
-            if templateId is not None:
-                url.addParam("templateId", templateId)
-            url.addParam("new", new)
-        return url
-    getURL = classmethod( getURL )
+class UHConfModifPosterSaveBackground(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-posterSaveBackground'
 
-class UHConfModifPosterSaveBackground ( URLHandler ):
-    _relativeURL = "confModifTools.py/posterSaveBackground"
-
-    def getURL( cls, target=None, templateId=None ):
+    @classmethod
+    def getURL(cls, target=None, templateId=None):
         url = cls._getURL()
         if target is not None and templateId is not None:
             url.setParams(target.getLocator())
             url.addParam("templateId", templateId)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfModifPosterGetBackground ( URLHandler ):
-    _relativeURL = "confModifTools.py/posterGetBackground"
 
-    def getURL( cls, target=None, templateId=None, backgroundId=None):
+class UHConfModifPosterGetBackground(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-posterGetBackground'
+
+    @classmethod
+    def getURL(cls, target=None, templateId=None, backgroundId=None):
         url = cls._getURL()
         if target is not None and templateId is not None:
             url.setParams(target.getLocator())
             url.addParam("templateId", templateId)
             url.addParam("backgroundId", backgroundId)
         return url
-    getURL = classmethod( getURL )
-
-class UHConfModifPosterPrintingPDF ( URLHandler ):
-    _relativeURL = "confModifTools.py/posterPrintingPDF"
 
 
-"""
-URL Handlers for Javascript Packages
-"""
-class UHJsonRpcService (OptionallySecureURLHandler):
-    _relativeURL = "services/json-rpc"
+class UHConfModifPosterPrintingPDF(URLHandler):
+    _endpoint = 'event_mgmt.confModifTools-posterPrintingPDF'
 
-class UHJavascriptCalendar (URLHandler):
-    _relativeURL = "js/calendar/calendar.js"
 
-class UHJavascriptCalendarSetup (URLHandler):
-    _relativeURL = "js/calendar/calendar-setup.js"
+class UHJsonRpcService(OptionallySecureURLHandler):
+    _endpoint = 'api.jsonrpc'
+
+    @classmethod
+    def getStaticURL(cls, target=None, **params):
+        return ""
+
+
+class UHAPIExport(OptionallySecureURLHandler):
+    _endpoint = 'api.httpapi'
+    _defaultParams = dict(prefix='export')
+
+
+class UHAPIAPI(OptionallySecureURLHandler):
+    _endpoint = 'api.httpapi'
+    _defaultParams = dict(prefix='api')
+
 
 ############
 #Evaluation# DISPLAY AREA
 ############
 
-class UHConfEvaluationMainInformation( URLHandler ):
-    _relativeURL = "confDisplayEvaluation.py"
+class UHConfEvaluationMainInformation(URLHandler):
+    _endpoint = 'event.confDisplayEvaluation'
 
-class UHConfEvaluationDisplay( URLHandler ):
-    _relativeURL = "confDisplayEvaluation.py/display"
 
-class UHConfEvaluationDisplayModif( URLHandler ):
-    _relativeURL = "confDisplayEvaluation.py/modif"
+class UHConfEvaluationDisplay(URLHandler):
+    _endpoint = 'event.confDisplayEvaluation-display'
 
-class UHConfEvaluationSignIn( URLHandler ):
-    _relativeURL = "confDisplayEvaluation.py/signIn"
 
-    def getURL( cls, conf, returnURL="" ):
+class UHConfEvaluationDisplayModif(URLHandler):
+    _endpoint = 'event.confDisplayEvaluation-modif'
+
+
+class UHConfEvaluationSignIn(URLHandler):
+    _endpoint = 'event.confDisplayEvaluation-signIn'
+
+    @classmethod
+    def getURL(cls, conf, returnURL=''):
         url = cls._getURL()
         url.setParams(conf.getLocator())
-        if str(returnURL).strip() != "":
-            url.addParam( "returnURL", returnURL )
+        if returnURL:
+            url.addParam('returnURL', returnURL)
         return url
-    getURL = classmethod( getURL )
 
-class UHConfEvaluationSubmit( URLHandler ):
-    _relativeURL = "confDisplayEvaluation.py/submit"
 
-class UHConfEvaluationSubmitted( URLHandler ):
-    _relativeURL = "confDisplayEvaluation.py/submitted"
+class UHConfEvaluationSubmit(URLHandler):
+    _endpoint = 'event.confDisplayEvaluation-submit'
+
+
+class UHConfEvaluationSubmitted(URLHandler):
+    _endpoint = 'event.confDisplayEvaluation-submitted'
+
 
 ############
 #Evaluation# MANAGEMENT AREA
 ############
-class UHConfModifEvaluation( URLHandler ):
-    _relativeURL = "confModifEvaluation.py"
+class UHConfModifEvaluation(URLHandler):
+    _endpoint = 'event_mgmt.confModifEvaluation'
 
-class UHConfModifEvaluationSetup( URLHandler ):
+
+class UHConfModifEvaluationSetup(URLHandler):
     """same result as UHConfModifEvaluation."""
-    _relativeURL = "confModifEvaluation.py/setup"
+    _endpoint = 'event_mgmt.confModifEvaluation-setup'
 
-class UHConfModifEvaluationSetupChangeStatus( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/changeStatus"
 
-class UHConfModifEvaluationSetupSpecialAction( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/specialAction"
+class UHConfModifEvaluationSetupChangeStatus(URLHandler):
+    _endpoint = 'event_mgmt.confModifEvaluation-changeStatus'
 
-class UHConfModifEvaluationDataModif( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/dataModif"
 
-class UHConfModifEvaluationPerformDataModif( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/performDataModif"
+class UHConfModifEvaluationSetupSpecialAction(URLHandler):
+    _endpoint = 'event_mgmt.confModifEvaluation-specialAction'
 
-class UHConfModifEvaluationEdit( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/edit"
 
-class UHConfModifEvaluationEditPerformChanges( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/editPerformChanges"
+class UHConfModifEvaluationDataModif(URLHandler):
+    _endpoint = 'event_mgmt.confModifEvaluation-dataModif'
 
-class UHConfModifEvaluationPreview( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/preview"
 
-class UHConfModifEvaluationResults( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/results"
+class UHConfModifEvaluationPerformDataModif(URLHandler):
+    _endpoint = 'event_mgmt.confModifEvaluation-performDataModif'
 
-class UHConfModifEvaluationResultsOptions( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/resultsOptions"
 
-class UHConfModifEvaluationResultsSubmittersActions( URLHandler ):
-    _relativeURL = "confModifEvaluation.py/resultsSubmittersActions"
+class UHConfModifEvaluationEdit(URLHandler):
+    _endpoint = 'event_mgmt.confModifEvaluation-edit'
 
-############
-# Personalization
-############
 
-# "My Events"
+class UHConfModifEvaluationEditPerformChanges(URLHandler):
+    _endpoint = 'event_mgmt.confModifEvaluation-editPerformChanges'
 
-class UHGetUserEventPage( URLHandler ):
-    _relativeURL = "userDetails.py/getEvents"
 
-    @classmethod
-    def getURL( cls, target=None ):
-        url = cls._getURL()
+class UHConfModifEvaluationPreview(URLHandler):
+    _endpoint = 'event_mgmt.confModifEvaluation-preview'
 
-        if (target != None):
-            url.setParams( target.getLocator() )
 
-        return url
+class UHConfModifEvaluationResults(URLHandler):
+    _endpoint = 'event_mgmt.confModifEvaluation-results'
 
-class UHResetSession (URLHandler):
-    _relativeURL = "resetSessionTZ.py"
+
+class UHConfModifEvaluationResultsOptions(URLHandler):
+    _endpoint = 'event_mgmt.confModifEvaluation-resultsOptions'
+
+
+class UHConfModifEvaluationResultsSubmittersActions(URLHandler):
+    _endpoint = 'event_mgmt.confModifEvaluation-resultsSubmittersActions'
+
+
+class UHResetSession(URLHandler):
+    _endpoint = 'misc.resetSessionTZ'
+
 
 ##############
 # Reviewing
 #############
-class UHConfModifReviewingAccess ( URLHandler ):
-    _relativeURL = "confModifReviewing.py/access"
+class UHConfModifReviewingAccess(URLHandler):
+    _endpoint = 'event_mgmt.confModifReviewing-access'
 
-class UHConfModifReviewingPaperSetup( URLHandler ):
-    _relativeURL = "confModifReviewing.py/paperSetup"
 
-class UHChooseReviewing( URLHandler ):
-    _relativeURL = "confModifReviewing.py/chooseReviewing"
+class UHConfModifReviewingPaperSetup(URLHandler):
+    _endpoint = 'event_mgmt.confModifReviewing-paperSetup'
 
-class UHAddState( URLHandler ):
-    _relativeURL = "confModifReviewing.py/addState"
 
-class UHRemoveState( URLHandler ):
-    _relativeURL = "confModifReviewing.py/removeState"
+class UHSetTemplate(URLHandler):
+    _endpoint = 'event_mgmt.confModifReviewing-setTemplate'
 
-class UHAddQuestion( URLHandler ):
-    _relativeURL = "confModifReviewing.py/addQuestion"
 
-class UHRemoveQuestion( URLHandler ):
-    _relativeURL = "confModifReviewing.py/removeQuestion"
+class UHDownloadContributionTemplate(URLHandler):
+    _endpoint = 'event_mgmt.confModifReviewing-downloadTemplate'
 
-class UHSetTemplate( URLHandler ):
-    _relativeURL = "confModifReviewing.py/setTemplate"
 
-class UHAddCriteria( URLHandler ):
-    _relativeURL = "confModifReviewing.py/addCriteria"
+class UHConfModifReviewingControl(URLHandler):
+    _endpoint = 'event_mgmt.confModifReviewingControl'
 
-class UHRemoveCriteria( URLHandler ):
-    _relativeURL = "confModifReviewing.py/removeCriteria"
 
-class UHDownloadContributionTemplate( URLHandler ):
-    _relativeURL = "confModifReviewing.py/downloadTemplate"
+class UHConfModifUserCompetences(URLHandler):
+    _endpoint = 'event_mgmt.confModifUserCompetences'
 
-class UHDeleteContributionTemplate( URLHandler ):
-    _relativeURL = "confModifReviewing.py/deleteTemplate"
 
-class UHConfModifReviewingControl ( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py"
+class UHConfModifListContribToJudge(URLHandler):
+    _endpoint = 'event_mgmt.confListContribToJudge'
 
-class UHConfModifReviewingAbstractsControl ( URLHandler ):
-    _relativeURL = "confModifAbstractsReviewingControl.py"
 
-class UHConfModifUserCompetences ( URLHandler ):
-    _relativeURL = "confModifUserCompetences.py"
+class UHConfModifListContribToJudgeAsReviewer(URLHandler):
+    _endpoint = 'event_mgmt.confListContribToJudge-asReviewer'
 
-class UHConfModifUserCompetencesAbstracts ( URLHandler ):
-    _relativeURL = "confModifUserCompetences.py/Abstracts"
 
-class UHConfModifModifyUserCompetences ( URLHandler ):
-    _relativeURL = "confModifUserCompetences.py/modifyCompetences"
+class UHConfModifListContribToJudgeAsEditor(URLHandler):
+    _endpoint = 'event_mgmt.confListContribToJudge-asEditor'
 
-class UHConfSelectPaperReviewManager( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/selectPaperReviewManager"
 
-class UHConfAddPaperReviewManager( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/addPaperReviewManager"
+class UHConfModifReviewingAssignContributionsList(URLHandler):
+    _endpoint = 'event_mgmt.assignContributions'
 
-class UHConfRemovePaperReviewManager( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/removePaperReviewManager"
 
-class UHConfSelectEditor( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/selectEditor"
-
-class UHConfAddEditor( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/addEditor"
-
-class UHConfRemoveEditor( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/removeEditor"
-
-class UHConfSelectReviewer( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/selectReviewer"
-
-class UHConfAddReviewer( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/addReviewer"
-
-class UHConfRemoveReviewer( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/removeReviewer"
-
-class UHConfSelectReferee( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/selectReferee"
-
-class UHConfAddReferee( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/addReferee"
-
-class UHConfRemoveReferee( URLHandler ):
-    _relativeURL = "confModifReviewingControl.py/removeReferee"
-
-class UHConfModifListContribToJudge( URLHandler ):
-    _relativeURL = "confListContribToJudge.py"
-
-class UHConfModifListContribToJudgeAsReviewer( URLHandler ):
-    _relativeURL = "confListContribToJudge.py/asReviewer"
-
-class UHConfModifListContribToJudgeAsEditor( URLHandler ):
-    _relativeURL = "confListContribToJudge.py/asEditor"
-
-class UHConfModifReviewingAssignContributionsList( URLHandler ):
-    _relativeURL = "assignContributions.py"
-
-class UHConfModifReviewingAssignContributionsAssign( URLHandler ):
-    _relativeURL = "assignContributions.py/assign"
-
-class UHConfModifReviewingDownloadAcceptedPapers( URLHandler ):
-    _relativeURL = "assignContributions.py/downloadAcceptedPapers"
+class UHConfModifReviewingDownloadAcceptedPapers(URLHandler):
+    _endpoint = 'event_mgmt.assignContributions-downloadAcceptedPapers'
 
 
 #Contribution reviewing
-class UHContributionModifReviewing( URLHandler ):
-    _relativeURL = "contributionReviewing.py"
+class UHContributionModifReviewing(URLHandler):
+    _endpoint = 'event_mgmt.contributionReviewing'
 
-class UHContribModifReviewingMaterials ( URLHandler ):
-    _relativeURL = "contributionReviewing.py/contributionReviewingMaterials"
 
-class UHContributionReviewingJudgements ( URLHandler ):
-    _relativeURL = "contributionReviewing.py/contributionReviewingJudgements"
+class UHContribModifReviewingMaterials(URLHandler):
+    _endpoint = 'event_mgmt.contributionReviewing-contributionReviewingMaterials'
 
-class UHContributionSubmitForRewiewing( URLHandler ):
-    _relativeURL = "contributionReviewing.py/submitForReviewing"
 
-class UHContributionRemoveSubmittedMarkForReviewing( URLHandler ):
-    _relativeURL = "contributionReviewing.py/removeSubmittedMarkForReviewing"
+class UHContributionReviewingJudgements(URLHandler):
+    _endpoint = 'event_mgmt.contributionReviewing-contributionReviewingJudgements'
+
 
 class UHAssignReferee(URLHandler):
-    _relativeURL = "contributionReviewing.py/assignReferee"
+    _endpoint = 'event_mgmt.contributionReviewing-assignReferee'
+
 
 class UHRemoveAssignReferee(URLHandler):
-    _relativeURL = "contributionReviewing.py/removeAssignReferee"
+    _endpoint = 'event_mgmt.contributionReviewing-removeAssignReferee'
 
-class UHAssignEditing( URLHandler ):
-    _relativeURL = "contributionReviewing.py/assignEditing"
 
-class UHRemoveAssignEditing( URLHandler ):
-    _relativeURL = "contributionReviewing.py/removeAssignEditing"
+class UHAssignEditing(URLHandler):
+    _endpoint = 'event_mgmt.contributionReviewing-assignEditing'
 
-class UHAssignReviewing( URLHandler ):
-    _relativeURL = "contributionReviewing.py/assignReviewing"
 
-class UHRemoveAssignReviewing( URLHandler ):
-    _relativeURL = "contributionReviewing.py/removeAssignReviewing"
+class UHRemoveAssignEditing(URLHandler):
+    _endpoint = 'event_mgmt.contributionReviewing-removeAssignEditing'
 
-class UHFinalJudge( URLHandler ):
-    _relativeURL = "contributionReviewing.py/finalJudge"
 
-class UHContributionModifReviewingHistory( URLHandler ):
-    _relativeURL = "contributionReviewing.py/reviewingHistory"
+class UHAssignReviewing(URLHandler):
+    _endpoint = 'event_mgmt.contributionReviewing-assignReviewing'
 
-class UHContributionEditingJudgement( URLHandler ):
-    _relativeURL = "contributionEditingJudgement.py"
 
-class UHJudgeEditing( URLHandler ):
-    _relativeURL = "contributionEditingJudgement.py/judgeEditing"
+class UHRemoveAssignReviewing(URLHandler):
+    _endpoint = 'event_mgmt.contributionReviewing-removeAssignReviewing'
 
-class UHContributionGiveAdvice( URLHandler ):
-    _relativeURL = "contributionGiveAdvice.py"
 
-class UHGiveAdvice( URLHandler ):
-    _relativeURL = "contributionGiveAdvice.py/giveAdvice"
+class UHContributionModifReviewingHistory(URLHandler):
+    _endpoint = 'event_mgmt.contributionReviewing-reviewingHistory'
 
-class UHRefereeDueDate (URLHandler):
-    _relativeURL = "contributionReviewing.py/refereeDueDate"
 
-class UHEditorDueDate (URLHandler):
-    _relativeURL = "contributionReviewing.py/editorDueDate"
+class UHContributionEditingJudgement(URLHandler):
+    _endpoint = 'event_mgmt.contributionEditingJudgement'
 
-class UHReviewerDueDate (URLHandler):
-    _relativeURL = "contributionReviewing.py/reviewerDueDate"
+
+class UHContributionGiveAdvice(URLHandler):
+    _endpoint = 'event_mgmt.contributionGiveAdvice'
+
 
 class UHDownloadPRTemplate(URLHandler):
-    _relativeURL = "paperReviewingDisplay.py/downloadTemplate"
+    _endpoint = 'event.paperReviewingDisplay-downloadTemplate'
+
 
 class UHUploadPaper(URLHandler):
-    _relativeURL = "paperReviewingDisplay.py/uploadPaper"
+    _endpoint = 'event.paperReviewingDisplay-uploadPaper'
+
 
 class UHPaperReviewingDisplay(URLHandler):
-    _relativeURL = "paperReviewingDisplay.py"
+    _endpoint = 'event.paperReviewingDisplay'
+
 
 #### End of reviewing
+class UHChangeLang(URLHandler):
+    _endpoint = 'misc.changeLang'
 
-class UHChangeLang( URLHandler ):
-    _relativeURL = "changeLang.py"
 
-class UHAbout( URLHandler ):
-    _relativeURL = "about.py"
+class UHAbout(URLHandler):
+    _endpoint = 'misc.about'
 
-class UHContact( URLHandler ):
-    _relativeURL = "contact.py"
+
+class UHContact(URLHandler):
+    _endpoint = 'misc.contact'
+
+
+class UHJSVars(URLHandler):
+    _endpoint = 'misc.JSContent-getVars'
+
+    @classmethod
+    def getStaticURL(cls, target=None, **params):
+        # We want a relative URL here, so just use url_for directly...
+        return url_for(cls._endpoint)
+
 
 class UHHelper(object):
     """ Returns the display or modif UH for an object of a given class
     """
 
     modifUHs = {
-        "Category" : UHCategoryModification,
-        "Conference" : UHConferenceModification,
-        "DefaultConference" : UHConferenceModification,
+        "Category": UHCategoryModification,
+        "Conference": UHConferenceModification,
+        "DefaultConference": UHConferenceModification,
         "Contribution": UHContributionModification,
         "AcceptedContribution": UHContributionModification,
-        "Session" : UHSessionModification,
-        "SubContribution" : UHSubContributionModification,
-        "Abstract": UHAbstractModification,
-        "Track" : UHTrackModification,
-        "SubTrack" : UHTrackModifSubTrack
+        "Session": UHSessionModification,
+        "SubContribution": UHSubContributionModification,
+        "Track": UHTrackModification,
+        "Abstract": UHAbstractModify
     }
 
     displayUHs = {
-        "Category" : UHCategoryDisplay,
-        "CategoryMap" : UHCategoryMap,
-        "CategoryOverview" : UHCategoryOverview,
-        "CategoryStatistics" : UHCategoryStatistics,
-        "CategoryCalendar" : UHCategoryCalendarOverview,
-        "Conference" : UHConferenceDisplay,
+        "Category": UHCategoryDisplay,
+        "CategoryMap": UHCategoryMap,
+        "CategoryOverview": UHCategoryOverview,
+        "CategoryStatistics": UHCategoryStatistics,
+        "CategoryCalendar": UHCategoryCalendarOverview,
+        "Conference": UHConferenceDisplay,
         "Contribution": UHContributionDisplay,
         "AcceptedContribution": UHContributionDisplay,
-        "Session" : UHSessionDisplay,
+        "Session": UHSessionDisplay,
         "Abstract": UHAbstractDisplay
     }
 
@@ -4207,15 +3421,4 @@ class UHHelper(object):
 
     @classmethod
     def getDisplayUH(cls, klazz, type=""):
-        return cls.displayUHs.get("%s%s"%(klazz.__name__, type), None)
-
-# Testing helloworld
-class UHHelloWorld(URLHandler):
-    _relativeURL = "helloWorld.py"
-
-    @classmethod
-    def getURL( cls, name=None ):
-        url = cls._getURL()
-        if name != None:
-            url.addParam("name", name)
-        return url
+        return cls.displayUHs.get("%s%s" % (klazz.__name__, type), None)

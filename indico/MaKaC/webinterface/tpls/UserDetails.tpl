@@ -11,7 +11,7 @@
     <tr>
         <td colspan="2">
             <div class="groupTitle">${ _("Details for") } <span id="titleHeader">${ title }</span>
-                <span id="surNameHeader">${ surName.upper() },</span>
+                <span id="surNameHeader">${ safe_upper(surName) },</span>
                 <span id="firstNameHeader">${ name }</span>
             </div>
         </td>
@@ -77,35 +77,18 @@
             <span class="dataCaptionFormat">${ _("Account status")}</span>
         </td>
         <td bgcolor="white" nowrap valign="top" class="blacktext">
-            ${ status }
-            ${ activeButton }
+            ${ user.getStatus() }
+            % if currentUserIsAdmin:
+                <form action="${activeURL if not user.isActivated() else disableURL}" method="POST" style="display: inline;">
+                    <input type="submit" class="btn" value="${_('activate the account') if not user.isActivated() else _('disable the account')}">
+                </form>
+            % endif
         </td>
     </tr>
     <tr>
         <td>&nbsp;</td>
         <td class="blacktext">
             ${ identities }
-        </td>
-    </tr>
-    <tr>
-        <td colspan="2" >
-            <div class="groupTitle">${ _("Special Rights")}</div>
-        </td>
-   </tr>
-   <tr>
-        <td nowrap class="dataCaptionTD">
-            <span class="dataCaptionFormat">${ _("Category Manager")}</span>
-        </td>
-        <td class="blacktext">
-            ${ categoryManager }
-        </td>
-    </tr>
-    <tr>
-        <td nowrap class="dataCaptionTD">
-            <span class="dataCaptionFormat">${ _("Event Manager")}</span>
-        </td>
-        <td class="blacktext">
-            ${ eventManager }
         </td>
     </tr>
 </table>
@@ -149,7 +132,7 @@ var unlockField = function(field) {
             }
             lockField(field);
             if(!result.val) {
-                alert($T('Synchronization has been re-enabled for this field. To update the data with the {0} database, you need to log out and then login again.').format(authenticatorName));
+                new AlertPopup($T("Error"), $T('Synchronization has been re-enabled for this field. To update the data with the {0} database, you need to log out and then login again.').format(authenticatorName)).open();
             }
             else {
                self.value = result.val;
@@ -192,15 +175,17 @@ var requestTitle = function() {
     $E('titleHeader').set(this.value);
 };
 
-var beforeEdit = function(field) {
+var beforeEdit = function(field, widget) {
     if(!canSynchronize) {
         return;
     }
-    if(!_.contains(unlockedFields, field) && !confirm($T('This field is currently synchronized with the {0} database. If you change it, synchronization will be disabled.').format(authenticatorName))) {
-        return false;
-    }
+    new ConfirmPopup($T("Change field"), $T('This field is currently synchronized with the {0} database. If you change it, synchronization will be disabled.').format(authenticatorName), function(confirmed){
+        if(confirmed || _.contains(unlockedFields, field)){
+            widget.modeChooser.set("edit");
+        }
+    }).open();
+    return false;
 }
-
 
 $E('inPlaceEditTitle').set(new SelectEditWidget('user.setPersonalData',
         {'userId':'${ userId }', 'dataType':'title'}, ${ titleList }, ${ jsonEncode(title) }, requestTitle).draw());
@@ -224,8 +209,12 @@ $E('inPlaceEditEmail').set(new InputEditWidget('user.setPersonalData',
         {'userId':'${ userId }', 'dataType':'email'}, ${ jsonEncode(onlyEmail) }, false, null, Util.Validation.isEmailAddress,
         $T("Invalid e-mail address")).draw());
 
-$E('inPlaceEditAddress').set(new TextAreaEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'address'}, $E('inPlaceEditAddress').dom.innerHTML, true).draw());
+var editAddress = new TextAreaEditWidget('user.setPersonalData',
+                                         {'userId': '${ userId }', 'dataType':'address'},
+                                         ${ jsonEncode(address) },
+                                         curry(unlockField, 'address'),
+                                         curry(beforeEdit, 'address'));
+$E('inPlaceEditAddress').set(editAddress.draw());
 
 var editTelephone = new InputEditWidget('user.setPersonalData',
         {'userId':'${ userId }', 'dataType':'telephone'}, ${ jsonEncode(telephon) }, true, curry(unlockField, 'phone'), null, null, null,
@@ -249,7 +238,8 @@ $.each({
     firstName: editFirstName,
     affiliation: editOrganisation,
     phone: editTelephone,
-    fax: editFax
+    fax: editFax,
+    address: editAddress
 }, function(field, editor) {
     if(_.contains(unlockedFields, field)) {
         unlockField.call(editor, field);

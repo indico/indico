@@ -42,4 +42,4 @@ File.append = function(name, content) {
 
 File.exists = function(name) {
 	return File.getSystem().FileExists(name);
-}
+};

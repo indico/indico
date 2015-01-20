@@ -64,7 +64,7 @@
                         <p>Default statuses are
                         <strong>Accepted</strong>, <strong>Rejected</strong>, and <strong>To Be Corrected</strong>.</p>
                         <p>The <strong>Referees</strong> and the <strong>Content Reviewers</strong> will be able to
-                        choose these custom statuses when they give their judgements / advice on a contribution.</p>
+                        choose these custom statuses when they give their assesments / advice on a contribution.</p>
                         <p>When a custom status is selected by a <strong>Referee</strong>, the effect is the same
                         as when selecting the <strong>To Be Corrected</strong> status: the state of the contribution
                         gets <strong>versioned</strong> (Saved) and the author has to submit his / her materials again.</p>
@@ -98,9 +98,10 @@
         <tooltip name="defaultDates" target="//*[@id='defaultDatesHelp']">
             <translation language="en">
                 <text>
-                        <p>For each contribution, you can set a deadline for the judgement/opinion of
+                        <p>For each paper, you can set a deadline for the assesment of
                         Referees, Layout Reviewers, and Content Reviewers independently. The deadline will
-                        be used for new contributions.</p>
+                        be used for new papers, but if you wish, you can apply it to the existing
+                        papers.</p>
                 </text>
             </translation>
         </tooltip>

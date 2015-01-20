@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 type("TimetableBlockBase", [],
      {
         truncateTitle: function(numChars, title) {
@@ -48,48 +65,72 @@ type("TimetableBlockBase", [],
 
          createMaterialMenu: function(material, triggerElement, closeHandler) {
              var sections = {};
-
              each(material, function(value) {
                  var section = value.title;
                  var menuItems = {};
-                 sections[section] = menuItems;
+                 sections[section] = {content: menuItems, description: value.description };
                  each(value.resources, function(item) {
                      var name = item.name;
                      // set the URL instead of the title, if there's no title
-                     menuItems["material"+item.url] = {action: item.url, display: name ? name : item.url};
+                     menuItems["material" + item.url] = {
+                         action: item.url,
+                         display: name ? name : item.url,
+                         description: item.description};
                  });
              });
-
-             var menu = new SectionPopupMenu(sections, [triggerElement], null, null, true, closeHandler);
-
-             return menu;
+             return new SectionPopupMenu(sections, [triggerElement], null, null, true, closeHandler);
          },
+
+         getMaterialMenu: function (materials) {
+             var root = $('<ul class="material_list"/>');
+             each(materials, function(material) {
+                 var resources = $('<ul class="resource_list"/>');
+                 each(material.resources, function(resource) {
+                     var resource_html = $('<li/>').append(
+                         $('<a/>').attr('href', resource.url).text(
+                             resource.name ? resource.name : resource.url));
+                     resources.append(resource_html);
+                 });
+                 var material_html = $('<li/>').append($('<h3/>').append(material.title), resources);
+                 root.append(material_html);
+             });
+             return root;
+         },
+
          createMaterialButton: function(material) {
              var self = this;
 
-            this.materialMenuOpen = false;
-
              var button = Html.div('timetableBlockMaterial');
              button.observeClick(function(e) {
-
-                 e.stopPropagation();
-
-                 self.materialMenuOpen = true;
-
+                 stopPropagation(e);
                  self.closePopup();
-
                  // use this style as long as the menu is open
                  button.dom.className = "timetableBlockMaterial timetableBlockMaterialActive";
-
-                 var menu = self.createMaterialMenu(material, button, function () {
-                     // Restores the button style when menu is closed
-                     button.dom.className = "timetableBlockMaterial";
-                     self.materialMenuOpen = false;
-                     return true;
+                 $(".timetableBlockMaterialActive").qtip({
+                         content: {
+                             text: self.getMaterialMenu(material)
+                         },
+                         show: {
+                             event: 'click'
+                         },
+                         hide: {
+                             event: 'unfocus'
+                         },
+                         position: {
+                             my: 'top right',
+                             at: 'bottom left'
+                         },
+                         events: {
+                             hide: function(event, api) {
+                                 // Restores the button style when menu is closed
+                                 button.dom.className = "timetableBlockMaterial";
+                             }
+                         },
+                         style: {
+                             classes: 'material_tip'
+                         }
                  });
-
-                 var pos = button.getAbsolutePosition();
-                 menu.open(pos.x + 20, pos.y + 18);
+                 $(".timetableBlockMaterialActive").qtip().show();
              });
 
              return button;
@@ -104,8 +145,7 @@ type("TimetableBlockBase", [],
                  return translate(
                      conveners,
                      function(conv) {
-                         return conv.firstName + ' ' +
-                             conv.familyName;
+                         return conv.name;
                      }).join(', ');
              } else {
                  return '';
@@ -223,9 +263,8 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                     position: 'absolute',
                     top: pixels(this.topPos),
                     height: pixels(this.height),
-                    'background-color': this.printableVersion ? 'white' : this.eventData.color,
-                    color: this.printableVersion ? 'black' : this.eventData.textColor,
-                    'border-color': this.printableVersion ? 'black' : '',
+                    'background-color': this.eventData.color,
+                    color: this.eventData.textColor,
                     left: pixels(this.leftPos),
                     width: pixels(this.width-3),
                     'border-bottom-style': this.blockData.unfinished?'dashed':''
@@ -282,8 +321,8 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                 var contentHeight = function() {
                     var h = 0;
                     if (!self.compactMode) {
-                        locationHeight = self.locationDiv.dom.style.display != 'none' ? self.locationDiv.dom.offsetHeight : 0;
-                        timeHeight = self.timeDiv.dom.style.display != 'none' ? self.timeDiv.dom.offsetHeight : 0;
+                        var locationHeight = self.locationDiv.dom.style.display != 'none' ? self.locationDiv.dom.offsetHeight : 0;
+                        var timeHeight = self.timeDiv.dom.style.display != 'none' ? self.timeDiv.dom.offsetHeight : 0;
 
                         h = Math.max(locationHeight, timeHeight);
                     }
@@ -368,9 +407,9 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                             if(self.presentersDiv)
                                 width += self.presentersDiv.dom.offsetWidth;
 
-                            self._postDraw()
+                            self._postDraw();
                             return width;
-                        }
+                        };
 
                         // Truncate title based on a ratio: div height / content height
                         title = this.truncateTitle(Math.ceil(title.length * ((parentDivHeight) / contentHeight())), title);
@@ -462,10 +501,9 @@ type("TimetableBlockWholeDayBase", ["TimetableBlockBase"],
                     'Break': 'timetableBreak '
                 };
 
-                block = Html.div({style: {
-                            backgroundColor: this.printableVersion ? 'white' : this.eventData.color,
-                            color: this.printableVersion ? 'black' : this.eventData.textColor,
-                            borderColor: this.printableVersion ? 'black' : '',
+                var block = Html.div({style: {
+                            backgroundColor: this.eventData.color,
+                            color: this.eventData.textColor,
                             maxHeight : '30px',
                             margin : '2px 0',
                             overflow : 'hidden'
@@ -573,10 +611,13 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
                  return false;
              });
 
+         var startDate = parseInt(this.eventData.startDate.time.substring(0, 2)) * 60 + parseInt(this.eventData.startDate.time.substring(3, 5));
+         var endDate = parseInt(this.eventData.endDate.time.substring(0, 2)) * 60 + parseInt(this.eventData.endDate.time.substring(3, 5));
+         var shifted = (endDate - startDate < 20) ? " ttentryArrowsShifted" : "";
 
          this.arrows = Html.div({},
-                             Html.div({className: "ttentryArrowsBackground"}),
-                             Html.div({className: "ttentryArrows"}, arrowUp, arrowDown));
+                             Html.div({className: "ttentryArrowsBackground" + shifted}),
+                             Html.div({className: "ttentryArrows" + shifted}, arrowUp, arrowDown));
          this.DragAndDropBlockMixin();
      });
 
@@ -704,15 +745,17 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         if(self.eventData.conveners &&
            self.eventData.conveners.length > 0)
         {
+            var convenersDiv = Html.div({className: 'timeLocationDiv'});
             //Using plural if there are multiple conveners
-            infoContentDiv.append(
+            convenersDiv.append(
                 Html.div('roomPopupTitle',
                             (self.eventData.conveners.length > 1)?
                             $T('Conveners'):
                             $T('Convener'), ': '));
 
-            infoContentDiv.append(self._formatConveners(this.eventData.conveners));
-            infoContentDiv.append(Html.br());
+            convenersDiv.append(self._formatConveners(this.eventData.conveners));
+            convenersDiv.append(Html.br());
+            infoContentDiv.append(convenersDiv);
         }
 
         // If it's a contribtion add speaker information
@@ -750,7 +793,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
     _getExportPopup: function(method, params){
         var self = this;
         var killProgress = IndicoUI.Dialogs.Util.progress();
-        jsonRpc(Indico.Urls.JsonRpcService, method,
+           jsonRpc(Indico.Urls.JsonRpcService, method,
                 params,
                 function(result, error){
                     killProgress();
@@ -767,7 +810,9 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
                         };
                         popup.open();
                     }
-                });
+            });
+        // Ensure that progress popup is closed for offline conference generation
+        killProgress();
     },
 
     _getMenuBar: function() {
@@ -779,17 +824,9 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         }
 
         var bar = Html.div({});
-
-        var url = "#";
-        if (self.eventData.entryType == 'Contribution') {
-            url = Indico.Urls.ContributionDisplay + '?contribId=' + self.eventData.contributionId + '&confId=' + self.eventData.conferenceId;
-        } else if (self.eventData.entryType == 'Session') {
-            url = Indico.Urls.SessionDisplay + '?sessionId=' + self.eventData.sessionId +
-                    '&confId=' + self.eventData.conferenceId + '#' + self.timetable.currentDay;
-        }
+        var url = self.eventData.url;
         var viewLink = Html.a({'href': url}, "View details");
         bar.append(viewLink);
-
 
         if (self.eventData.material && self.eventData.material.length > 0) {
             var materialLink = Html.a('dropDownMenu fakeLink', "Material");
@@ -809,20 +846,32 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
             var menuItems = {};
             var urlParams;
             if (self.eventData.entryType == 'Contribution') {
-                urlParams = '?contribId=' + self.eventData.contributionId + '&confId=' + self.eventData.conferenceId;
-                menuItems["PDF"] = {action: Indico.Urls.ContribToPDF + urlParams, display: $T('PDF')};
-                menuItems["Calendar"+ self.eventData.uniqueId] = {action: function(){
-                    self._getExportPopup("schedule.api.getContribExportPopup",{ confId: self.eventData.conferenceId,
-                        contribId: self.eventData.contributionId });
-                    }, display: $T('Calendar')};
-                menuItems["XML"] = {action: Indico.Urls.ContribToXML + urlParams, display: $T('XML')};
+                urlParams = {
+                    contribId: self.eventData.contributionId,
+                    confId: self.eventData.conferenceId
+                };
+                menuItems["PDF"] = {action: self.eventData.pdf, display: $T('PDF')};
+                menuItems["Calendar" + self.eventData.uniqueId] = {
+                    action: function() {
+                        self._getExportPopup("schedule.api.getContribExportPopup", {
+                            confId: self.eventData.conferenceId,
+                            contribId: self.eventData.contributionId
+                        });
+                    },
+                    display: $T('Calendar')
+                };
+                menuItems["XML"] = {action: build_url(Indico.Urls.ContribToXML, urlParams), display: $T('XML')};
             } else if (self.eventData.entryType == 'Session') {
-                urlParams = '?showSessions=' + self.eventData.sessionId + '&confId=' + self.eventData.conferenceId;
-                menuItems["PDFtimetable"] = {action: Indico.Urls.ConfTimeTablePDF + urlParams, display:$T('PDF timetable')};
-                menuItems["Calendar"+ self.eventData.uniqueId] = {action: function(){
-                    self._getExportPopup("schedule.api.getSessionExportPopup",{ confId: self.eventData.conferenceId,
-                        sessionId: self.eventData.sessionId });
-                    }, display: $T('Calendar')};
+                menuItems["PDFtimetable"] = {action: self.eventData.pdf, display: $T('PDF timetable')};
+                menuItems["Calendar" + self.eventData.uniqueId] = {
+                    action: function() {
+                        self._getExportPopup("schedule.api.getSessionExportPopup", {
+                            confId: self.eventData.conferenceId,
+                            sessionId: self.eventData.sessionId
+                        });
+                    },
+                    display: $T('Calendar')
+                };
             }
 
             this.exportMenu = new PopupMenu(menuItems, [exportLink], null, true, true);
@@ -855,7 +904,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
                     contribs.push(value);
                 }
             });
-            var popup = new ContributionsPopup(self.eventData, contribs, function() {self.popupAllowClose = true; return true;});
+            var popup = new ContributionsPopup(("Contribution details"),contribs, self.eventData.isPoster, false, function() {self.popupAllowClose = true; return true;}, true);
             popup.open();
         });
 
@@ -907,7 +956,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         each(contribs, function(value) {
             if (++i <= maxNumContribs) {
                 var element = links ? Html.a({
-                    href: Indico.Urls.ContributionDisplay + '?sessionId=' + value.sessionId + '&contribId=' + value.contributionId + '&confId=' + value.conferenceId,
+                    href: value.url,
                     style: {fontWeight: 'normal'}},
                     value.title) :
                     Html.span({}, value.title);
@@ -947,7 +996,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             var buttonsDiv = Html.div({style:{textAlign:'center', display:'none', padding:'5px'}}, saveButton, cancelButton);
 
             saveButton.observeClick(function(){
-                self.saveRoomLocationFunction()
+                self.saveRoomLocationFunction();
                 if (self.saveTimeFunction()) {
                     self.close();
                 }
@@ -987,7 +1036,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
 
             this.startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
                     this.eventData.startDate.time.substring(0,5),
-                    this.eventData.endDate.time.substring(0,5));
+                    this.eventData.endDate.time.substring(0,5), {style: {width: '50px'}}, {style: {width: '50px'}});
 
             this.startEndTimeField.accessor.set('date', this.eventData.startDate.date);
 
@@ -1070,17 +1119,13 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                 editLink = Html.a({className: 'dropDownMenu', style: {fontWeght: 'bold'}}, $T('Edit'));
                 var menuItems = {};
 
-                menuItems["blockTimetable"] = { action: function() {
-                    self.managementActions.switchToIntervalTimetable(self.eventData.id);
-                    self.close();
-                }, display: $T('Block timetable')};
                 menuItems["blockProperties"] = { action: function() {
                     self.managementActions.editSessionSlot(self.eventData);
                     self.close();
-                }, display: $T('Block properties')};
+                }, display: $T('Basic edit')};
                 if (!self.managementActions.isSessionTimetable) {
-                    menuItems["sessionProperties"] = {action: self.managementActions.editEntry(self.eventData), display: $T('Session properties')};
-                    menuItems["sessionProtection"] = {action: self.managementActions.editEntryProtection(self.eventData), display: $T('Session protection')};
+                    menuItems["sessionProperties"] = {action: self.managementActions.editEntry(self.eventData), display: $T('Full session edit')};
+                    menuItems["sessionProtection"] = {action: self.managementActions.editEntryProtection(self.eventData), display: $T('Edit protection')};
                 }
 
                 editLink.observeClick(function() {
@@ -1100,8 +1145,12 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             } else if (self.eventData.entryType == 'Contribution') {
                 editLink = Html.a({className: 'dropDownMenu', style: {fontWeght: 'bold'}}, $T('Edit'));
                 var menuItems = {};
-                menuItems['contributionProperties'] = {action: self.managementActions.editEntry(self.eventData), display: $T('Contribution properties')};
-                menuItems["contributionProtection"] = {action: self.managementActions.editEntryProtection(self.eventData), display: $T('Contribution protection')};
+                menuItems['contributionProperties'] = {action: function() {
+                    self.managementActions.editContribution(self.eventData);
+                    self.close();
+                }, display: $T('Basic edit')};
+                menuItems["contributionFullEdition"] = {action: self.managementActions.editEntry(self.eventData), display: $T('Full edit')};
+                menuItems["contributionProtection"] = {action: self.managementActions.editEntryProtection(self.eventData), display: $T('Edit protection')};
                 editLink.observeClick(function() {
                     var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);
                     var pos = editLink.getAbsolutePosition();
@@ -1118,6 +1167,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
 
                 editLink.observeClick(function() {
                     self.managementActions.editEntry(self.eventData);
+                    self.close();
                     return false;
                 });
             }
@@ -1128,7 +1178,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             if (self.eventData.entryType != 'Session') {
                 menu.insert(" | ");
 
-                moveEntryLink = Html.a('fakeLink', Html.span({}, $T("Move")));
+                var moveEntryLink = Html.a('fakeLink', Html.span({}, $T("Move")));
                 moveEntryLink.observeClick(function(){
                   self.close();
                   self.managementActions.moveEntry(self.eventData);
@@ -1185,9 +1235,9 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
             this._setInfo();
             this._setParentInfo();
 
-            roomLocationDiv = Html.div({},Html.div('roomPopupTitle', 'Room: '),
-                    self.eventData.room, Html.br(), Html.div('roomPopupTitle', 'Location: '),
-                    self.eventData.location, Html.img({src: imageSrc("edit_16.png")}));
+            var roomLocationDiv = Html.div({},Html.div('roomPopupTitle', 'Location: '),
+                    self.eventData.location, Html.br(), Html.div('roomPopupTitle', 'Room: '),
+                    self.eventData.room, Html.img({src: imageSrc("edit_16.png")}), Html.br());
 
             this.editRoomLocationFunction = function(e){
                 roomLocationDiv.dom.style.display = 'none';
@@ -1274,93 +1324,6 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
          this.TimetableBlockPopup(timetable, eventData, blockDiv, closeHandler);
      });
 
-type("ContributionsPopup", ["ExclusivePopup"], {
-
-    draw: function() {
-        var self = this;
-        var table = Html.tbody({});
-        each(this.contributions, function(contrib) {
-            var time = Html.div({style: {paddingTop: pixels(7), marginRight: pixels(3), fontSize: '12px', fontWeight: 'bold'}}, self.eventData.isPoster ? '' : contrib.startDate.time.substr(0,5));
-            var link = Html.a({href: Indico.Urls.ContributionDisplay + '?sessionId=' + contrib.sessionId + '&contribId=' + contrib.contributionId + '&confId=' + contrib.conferenceId}, contrib.title);
-            var title = Html.div({style: {color: '#444444', width: pixels(self.width), padding: pixels(5), fontSize: '15px'}}, link);
-
-            var infoDiv = Html.div({style: {width: pixels(self.width), border: '1px solid rgb(234, 234, 234)', marginBottom: pixels(10), marginLeft: pixels(5), padding: pixels(5), backgroundColor: 'rgb(248, 248, 248)',color: '#444444', fontSize: '12px'}});
-
-            var showFullDescLink = Html.a({style: {cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', fontStyle: 'italic'}}, ' Show full description');
-            var hideFullDescLink = Html.a({style: {cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', fontStyle: 'italic'}}, ' Hide full description');
-            var shortDesc = Html.span({style: {display: 'block'}}, contrib.description.substr(0, 250) + '... ', showFullDescLink);
-            var longDesc = Html.span({style: {display: 'none'}}, contrib.description, hideFullDescLink);
-
-            if (contrib.description && contrib.description !== '') {
-                if (contrib.description.length <= 250) {
-                    longDesc.setStyle('display', 'block');
-                    hideFullDescLink.setStyle('display', 'none');
-                    infoDiv.append(longDesc);
-                } else {
-                    infoDiv.append(longDesc);
-                    infoDiv.append(shortDesc);
-                }
-            }
-
-            if (contrib.presenters.length > 0) {
-                var speakers = Html.span({style: {marginTop: pixels(5), display: 'block'}}, Html.strong({}, 'Presenter(s): '));
-
-                var i = 0;
-                each(contrib.presenters, function(p) {
-                    speakers.append(i++ > 0 ? ', ' : '' + p.name);
-                    if (p.affiliation && p.affiliation !== '') {
-                        speakers.append(Html.em({style: {fontSize: '12px'}}, ' (' + p.affiliation + ')'));
-                    }
-                });
-
-                infoDiv.append(speakers);
-            }
-
-            if (contrib.room && contrib.room !== '') {
-                var room = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, 'Room: '), contrib.room);
-                infoDiv.append(room);
-            }
-
-            if (contrib.location && contrib.location !== '') {
-                var location = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, 'Location: '), contrib.location);
-                infoDiv.append(location);
-            }
-
-            showFullDescLink.observeClick(function(e) {
-                shortDesc.setStyle('display', 'none');
-                longDesc.setStyle('display', 'block');
-            });
-            hideFullDescLink.observeClick(function(e) {
-                shortDesc.setStyle('display', 'block');
-                longDesc.setStyle('display', 'none');
-            });
-
-            // Hide the infoDiv if it's empty
-            if (infoDiv.dom.innerHTML === "") {
-                infoDiv.dom.style.display = 'none';
-            }
-
-            table.append(Html.tr({}, Html.td({style:{verticalAlign: 'top'}}, time), Html.td({}, title, infoDiv)));
-        });
-        this.innerHTML = Html.table({style: {marginBottom: pixels(10)}}, table).dom.innerHTML;
-        return this.ExclusivePopup.prototype.draw.call(this, Html.table({style: {marginBottom: pixels(10)}}, table));
-    },
-    postDraw: function(){
-        this.ExclusivePopup.prototype.postDraw.call(this);
-    }
-    },
-     function(eventData, contributions, closeHandler) {
-
-         this.contributions = $L(contributions);
-         this.contributions.sort(IndicoSortCriteria.StartTime);
-
-         this.eventData = eventData;
-         this.width = 500;
-
-         this.ExclusivePopup('Contribution details', closeHandler, true, true);
-     }
-    );
-
 /*
  * An exclusive popup for showing the timetable of a session.
  * Is functional but needs more work in order to be useful.
@@ -1404,14 +1367,14 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
                id: 'timetable_grid',
                style: {
                    position:'relative',
-                   top: pixels(TimetableDefaults.topMargin),
+                   top: pixels(TimetableDefaults.topMargin)
                }});
 
-             last = scale[scale.length-1][0];
+             var last = scale[scale.length-1][0];
 
              for (var n=0; n < scale.length; ++n){
-                 hour = scale[n][0];
-                 px = scale[n][1];
+                 var hour = scale[n][0];
+                 var px = scale[n][1];
 
                  if (scale[n].length > 2) {
                    scaleDiv.append(Html.div({style:
@@ -1481,8 +1444,8 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
                                           top: pixels(TimetableDefaults.topMargin)
                                       }
                                      });
-             this.blocks = []
-             this._blockMap = {}
+             this.blocks = [];
+             this._blockMap = {};
 
              each(blocks, function(blockData) {
 
@@ -1503,16 +1466,8 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
                  }
 
                  var eventData = data[blockData.id];
-
                  var block;
-
-                 var empty = true;
-
-                 for (b in eventData.entries) {
-                     empty = false;
-                     break;
-                 }
-                 compactMode = false;
+                 var compactMode = false;
                  // For now don't use the compact mode. Activating it makes short entries displaying less
                  // information in the block (only time and title).
                  //if (blockData.collapsed || (blockData.end - blockData.start < TimetableDefaults.layouts.proportional.values.pxPerHour))
@@ -1558,11 +1513,11 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
              }
 
              var dayData = this.layoutChooser.get().drawDay(dayFiltered, 'session', this.startTime, this.endTime, this.managementMode);
-             var height = dayData[0]+TimetableDefaults.topMargin+TimetableDefaults.bottomMargin;
+             var height = dayData[0] + TimetableDefaults.topMargin + TimetableDefaults.bottomMargin;
              this.wrappingElement.setStyle('height', pixels(height + (this.printableVersion ? 0 : 100))); // +100 to have margin for the tabs
 
              this.grid.length = 0;
-             $.merge(this.grid, dayData[1])
+             $.merge(this.grid, dayData[1]);
 
              var gridElems = this._drawGrid(this.grid);
              var blocks = this._drawBlocks(dayFiltered, dayData[2], dayData[3]);
@@ -1603,7 +1558,7 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
                      each(entry.entries, function(subentry, subkey) {
                          result[subkey] = clone(subentry);
                          result[subkey].color = subentry.entryType == 'Break' ? subentry.color:entry.color;
-                         result[subkey].textColor = entry.textColor;
+                         result[subkey].textColor = subentry.entryType == 'Break' ? subentry.textColor:entry.textColor;
                      });
                  } else {
                      result[key] = entry;
@@ -1895,9 +1850,15 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
             var topPx = 0;
             each(data, function(blockData, id) {
 
-                var editLink = Html.a('fakeLink', "Edit");
+                var editLink = Html.a({className: 'dropDownMenu', style: {fontWeight: 'bold'}}, $T('Edit'));
+                var menuItems = {};
+                menuItems["blockProperties"] = { action: function() {self.managementActions.editContribution(blockData);}, display: $T('Basic edit')};
+                menuItems["contributionFullEdition"] = {action: self.managementActions.editEntry(blockData), display: $T('Full edit')};
+                menuItems["contributionProtection"] = {action: self.managementActions.editEntryProtection(blockData), display: $T('Edit protection')};
                 editLink.observeClick(function() {
-                    window.location = self.managementActions.editEntry(blockData);
+                    var menu = new PopupMenu(menuItems, [editLink], 'timetableManagementPopupList', true, true);
+                    var pos = editLink.getAbsolutePosition();
+                    menu.open(pos.x + editLink.dom.offsetWidth + 2, pos.y + editLink.dom.offsetHeight + 2);
                 });
 
                 var deleteLink = Html.a('fakeLink', "Delete");

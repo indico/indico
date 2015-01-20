@@ -1,127 +1,124 @@
 
-<div class="container" style="width: 100%; margin: 50px auto; max-width: 800px">
+<div class="container" style="width: 100%; margin: 50px auto; max-width: 420px">
 
-<div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt;    ">${ _("Log in to Indico")}</div>
+<div class="groupTitle" style="margin-bottom: 30px; font-size: 25pt; white-space: nowrap;">
+    ${ _("Log in to Indico")}
+</div>
+<div id="cookiesEnabled" style="display:none; text-align:center; color:#881122; font-size:large; padding-bottom:15px" colspan="2">
+    ${_("Please enable cookies in your browser!")}
+</div>
 
-<form name="signInForm" action=${ postURL } method="POST">
-<input type="hidden" name="returnURL" value=${ returnURL }>
-
-<table class="groupTable">
-    <tr>
-
-        <script type="text/javascript">
-        //Free JavaScripts on http://www.ScriptBreaker.com
-        var cookiesEnabled = false;
-
-
-        // Check whether cookies enabled
-        document.cookie = "Enabled=true";
-        var cookieValid = document.cookie;
-
-        // if retrieving the VALUE we just set actually works
-        // then we know cookies enabled
-        if (cookieValid.indexOf("Enabled=true") != -1)
-        {
-           cookiesEnabled = true;
-        }
-        else
-        {
-           cookiesEnabled = false;
-        }
-
-        if(cookiesEnabled == false) document.write('<td colspan="2"><br><center><font size=+1 color=red>Please enable cookies in your browser!</font></center><br></td></tr><tr>');
-        </SCRIPT>
-        <td class="titleCellTD">
-            <span class="titleCellFormat">${ _("User Name")}</span>
-        </td>
-        <td class="contentCellTD" id="usernameInput">
-            <input type="text" name="login" size="40" value=${ login }>
-        </td>
-    </tr>
-    <tr>
-        <td class="titleCellTD">
-            <span class="titleCellFormat">${ _("Password")}</span>
-        </td>
-        <td class="contentCellTD" id="passwordInput">
-            <input type="password" name="password" size="40">
-        </td>
-    </tr>
-
-    % if NiceMsg:
-    <tr>
-        <td class="titleCellTD">&nbsp;</td>
-        <td class="contentCellTD">
-            <em>${ NiceMsg }</em>
-        </td>
-    </tr>
-    % endif
-
-    % if msg:
-        <tr>
-            <td class="titleCellTD">&nbsp;</td>
-            <td class="contentCellTD">
-                <span style="color: darkred">${ msg }</span>
-            </td>
-        </tr>
-    % endif
-
-    <tr>
-        <td class="titleCellTD">&nbsp;</td>
-        <td class="contentCellTD">
-            <div class="yellowButton loginButton">
-                <input type="submit" id="loginButton" value="${ _("Login")}" name="signIn">
-            </div>
-        </td>
-    </tr>
-</table>
+% if isSSOLoginActive:
+<form id="signInSSOForm" action="${ ssoURL }" method="POST">
+    <input id="authId" type="hidden" name="authId" value="">
+    % for auth in authenticators:
+        % if auth.isSSOLoginActive():
+            <a href="#" data-id="${ auth.getId() }" class="i-button highlight signin js-sso-submit">
+                <span class="auth-id">${ _('Login with Single SignOn') }</span>
+                <i class="login-arrow"></i>
+            </a>
+        % endif
+    % endfor
 </form>
 
+<div class="titled-rule">
+    ${_('Or')}
+</div>
+% endif
+
+<div class="i-box titled">
+    <div class="i-box-header">
+        <div class="i-box-title">
+            ${ _('Login') }
+        </div>
+    </div>
+    <div class="i-box-content">
+        <form name="signInForm" action=${ postURL } method="POST">
+            <input type="hidden" name="returnURL" value=${ returnURL }>
+            <table>
+                % if 'passwordChanged' in _request.args:
+                <tr>
+                    <td class="titleCellTD">&nbsp;</td>
+                    <td class="contentCellTD">
+                        <em>${ _("You may now log in using your new password") }</em>
+                    </td>
+                </tr>
+                % endif
+                <tr>
+                    <td class="titleCellTD">
+                        <span class="titleCellFormat">${ _('Username') }</span>
+                    </td>
+                    <td class="contentCellTD" id="usernameInput">
+                        <input type="text" name="login" style="width: 100%;" value=${ login }>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="titleCellTD">
+                        <span class="titleCellFormat">${ _('Password') }</span>
+                    </td>
+                    <td class="contentCellTD" id="passwordInput">
+                        <input type="password" name="password" style="width: 100%;">
+                    </td>
+                </tr>
+                % if hasExternalAuthentication:
+                <tr>
+                    <td class="titleCellTD">&nbsp;</td>
+                    <td class="contentCellTD">
+                        <em>${_("Please note you can use your external") + " (%s) "%", ".join(externalAuthenticators)  + _("account")}</em>
+                    </td>
+                </tr>
+                % endif
+                % if msg:
+                    <tr>
+                        <td class="titleCellTD">&nbsp;</td>
+                        <td class="contentCellTD">
+                            <span style="color: darkred">${ msg }</span>
+                        </td>
+                    </tr>
+                % endif
+                <tr>
+                    <td colspan="2">
+                        <input type="submit"
+                            id="loginButton"
+                            value="${ _('Login') }"
+                            class="i-button highlight right"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+
+<div style="margin-top: 20px;">
+    <div style="padding: 5px 0; color: #444">
+        % if isAuthorisedAccountCreation:
+            ${_("If you don't have an account, you can create one")} <a href="${createAccountURL}">${_("here")}</a>
+        % endif
+    </div>
+    <div style="color: #444">
+        ${ _("Forgot your password?") } <span class="fakeLink" onclick="$('#reset_password').show(); $(this).hide();">${ ("Click here") }</span>
+    </div>
+    <div id="reset_password" style="padding: 5px 0; display:none">
+        <form action=${ forgotPasswordURL } method="POST">
+            <input type="text" name="email" placeholder="${_('enter your email address')}" style="width: 50%">
+            <input type="submit" class="btn" value="${ _("Reset my password")}">
+        </form>
+    </div>
+</div>
+
+</div>
 <script type="text/javascript">
+    // Check whether cookies enabled
+    document.cookie = "Enabled=true";
+    // if retrieving the VALUE we just set actually works
+    // then we know cookies enabled
+    if (document.cookie.indexOf("Enabled=true") == -1) $("#cookiesEnabled").show();
+
     document.signInForm.login.focus();
+
+    $('.js-sso-submit').on('click', function(e) {
+        e.preventDefault();
+        $('#authId').val($(this).data('id'));
+        $('#signInSSOForm').submit();
+    });
 </script>
-
-<div style="margin: 20px 30px 0 30px;">
-
-    <table width="100%" cellspacing="5" cellpadding="0"><tbody>
-        <tr>
-            <td align="left"><img src="${ itemIcon }" alt="o" style="padding-right: 10px;"></td>
-            <td align="left" width="100%">
-                <div style="padding: 5px 0; color: #444">
-                    ${ createAccount }
-                </div>
-            </td>
-        </tr>
-
-        <tr>
-            <td align="left"><img src="${ itemIcon }" alt="o" style="padding-right: 10px;"></td>
-            <td align="left" width="100%">
-                <div style="color: #444">
-                    ${ _("Forgot your password?") } <span class="fakeLink" onclick="$E('forgotPasswordInfo').dom.style.display = ''; this.style.display = 'none';">${ ("Click here") }</span>
-                </div>
-            </td>
-        </tr>
-        <tr style="display: none;" id="forgotPasswordInfo">
-            <td>&nbsp;</td>
-            <td width="100%">
-                <div style="padding: 5px 0;">
-                    <div style="padding-bottom: 10px;">${ _("Please enter your e-mail address in the field below and your password will be sent to you") }</div>
-                    <form action=${ forgotPasswordURL } method="POST">
-                        <input type="text" name="email"> <input type="submit" class="btn" value="${ _("Send me my password") }">
-                    </form>
-                </div>
-                <div style="padding: 5px 0; color: #444;">
-                      <% from MaKaC.common.Configuration import Config    %>
-                      % if "Local" not in Config.getInstance().getAuthenticatorList():
-                           <em>${ _("If you <b>can't remember your password</b>, please click") } <a href="https://cernaccount.web.cern.ch/cernaccount/ResetPassword.aspx">${ ("here") }</a></em>
-                      % else:
-                           <em>${ _("<b>Note:</b> this works only with Indico local accounts, not with CERN NICE/External accounts; for these click") } <a href="https://cernaccount.web.cern.ch/cernaccount/ResetPassword.aspx">${ _("here") }</a></em>.
-                      % endif
-                </div>
-            </td>
-        </tr>
-    </tbody></table>
-
-
-</div>
-
-</div>

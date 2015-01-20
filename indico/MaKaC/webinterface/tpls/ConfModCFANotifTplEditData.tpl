@@ -2,16 +2,6 @@
 
 <form action=${ postURL } method="POST" onsubmit="return notifTplManager.checkFields();">
 <table width="90%" cellspacing="0" align="center" border="0">
-    % if len(errors) != 0:
-        % for error in errors:
-            <tr align="left">
-                <td></td>
-                <td bgcolor="white" nowrap colspan="3" style="font-weight: bold; color: #881122; padding-bottom:10px; padding-top:10px; padding-left:10px;">
-                    ${ error }
-                </td>
-            </tr>
-        % endfor
-    % endif
     <tr>
         <td colspan="3">
             <span class="groupTitle" style="border:0px;">${ _("Step 1 - Assign a name to the template")}</span>

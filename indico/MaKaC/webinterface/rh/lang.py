@@ -1,16 +1,45 @@
-#import syslog
+# -*- coding: utf-8 -*-
+##
+##
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+##
+## Indico is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 3 of the
+## License, or (at your option) any later version.
+##
+## Indico is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+
 import re
-from MaKaC.common import DBMgr
+from flask import request
+
 import MaKaC.webinterface.rh.base as base
-from indico.web.wsgi import indico_wsgi_handler_utils
-import MaKaC.common.info as info
+from indico.core.config import Config
+from indico.util.i18n import set_session_lang
+
 
 class RHChangeLang(base.RH):
 
+    def _checkParams_POST(self):
+        self._language = request.form['lang']
+
     def _process(self):
-        params = self._getRequestParams()
-        # No need to do any processing here. The language change is processed in RH base
+
+        if self._getUser():
+            self._getUser().setLang(self._language)
+
+        set_session_lang(self._language)
+
+        # No need to do any more processing here. The language change is processed in RH base
         # Remove lang param from referer
-        referer = re.sub(r'(?<=[&?])lang=[^&]*&?', '', params['REFERER_URL'])
+        referer = request.referrer or Config.getInstance().getBaseURL()
+        referer = re.sub(r'(?<=[&?])lang=[^&]*&?', '', referer)
         referer = re.sub(r'[?&]$', '', referer)
-        self._redirect(referer, noCache=True)
+        self._redirect(referer)

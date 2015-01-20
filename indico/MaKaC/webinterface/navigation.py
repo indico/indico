@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC import conference
@@ -27,23 +26,22 @@ class NavigationEntry:
     _url = None
     _parent = None
 
+    @classmethod
     def getTitle(cls):
         return cls._title
-    getTitle = classmethod( getTitle)
 
+    @classmethod
     def getURL(cls, *arg):
         if cls._url is not None:
             return cls._url.getURL(*arg)
         return cls._url
-    getURL = classmethod( getURL)
 
+    @classmethod
     def getParent(cls, *arg):
         if cls._parent:
             return cls._parent()
         return None
-    getParent = classmethod( getParent)
 
-    
 class NEConferenceProgramme( NavigationEntry ):
     _url = urlHandlers.UHConferenceProgram
     _title = "Scientific Programme"
@@ -83,6 +81,7 @@ class NESpeakerIndex( NavigationEntry ):
 class NEConferenceTimeTable( NavigationEntry ):
     _url = urlHandlers.UHConferenceTimeTable
     _title = "Timetable"
+
 
 class NESessionDisplay( NavigationEntry ):
     _url = urlHandlers.UHSessionDisplay
@@ -132,7 +131,7 @@ class NEAbstractRecovery( NavigationEntry ):
 class NEMeetingSessionDisplay(NavigationEntry):
     _url = urlHandlers.UHSessionDisplay
     _title = "Session details"
-    
+
 class NEMeetingMaterialDisplay(NavigationEntry):
     _url = urlHandlers.UHMaterialDisplay
     _parent = {"session": NEMeetingSessionDisplay, \
@@ -174,30 +173,6 @@ class NEAbstractSubmissionConfirmation( NavigationEntry ):
     _parent = NEConferenceCFA
     _title = "Abstract submission confirmation"
 
-class NEAbstractDisplayMaterial( NavigationEntry ):
-    _url = urlHandlers.UHAbstractDisplayMaterial
-    _parent = NEAbstractDisplay
-    _title = "Material"
-
-class NEAbstractDisplayAddMaterial( NavigationEntry ):
-    _url = urlHandlers.UHAbstractDisplayAddMaterial
-    _parent = NEAbstractDisplayMaterial
-    _title = "Creation"
-
-#class NEMaterialDisplayModification( NavigationEntry ):
-#    _title = "Resources"
-#    _url = urlHandlers.UHMaterialDisplayModification
-#    _parent = NEAbstractDisplayMaterial
-
-#class NELinkDisplayModification( NavigationEntry ):
-#    _title = "Link"
-#    _url = urlHandlers.UHLinkDisplayModification
-#    _parent = NEMaterialDisplayModification
-
-#class NEFileDisplayModification( NavigationEntry ):
-#    _title = "File"
-#    _url = urlHandlers.UHFileDisplayModification
-#    _parent = NEMaterialDisplayModification
 
 class NERegistrationForm( NavigationEntry ):
     _url = urlHandlers.UHConfRegistrationForm

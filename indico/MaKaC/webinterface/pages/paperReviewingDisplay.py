@@ -1,23 +1,23 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
+from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 import MaKaC.webinterface.wcomponents as wcomponents
 
@@ -60,26 +60,39 @@ class WPUploadPaper(WPConferenceDefaultDisplayBase):
         self._sectionMenu.setCurrentItem(self._uploadPaperOpt)
 
 
-class WPaperReviewingDisplay(wcomponents.WTemplated):
+class WPaperReviewingDisplay(WConfDisplayBodyBase):
 
-    def __init__(self, conference):
-        self._conf = conference
-
-
-class WDownloadPRTemplate(wcomponents.WTemplated):
+    _linkname = "paperreviewing"
 
     def __init__(self, conference):
         self._conf = conference
 
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        return wvars
+
+
+class WDownloadPRTemplate(WConfDisplayBodyBase):
+
+    _linkname = "downloadtemplate"
+
+    def __init__(self, conference):
+        self._conf = conference
+
+    def getVars(self):
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+
         from MaKaC.webinterface.pages import reviewing
-        vars["hasPaperReviewing"] = self._conf.getConfPaperReview().hasReviewing()
-        vars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete" : False})
-        return vars
+        wvars["hasPaperReviewing"] = self._conf.getConfPaperReview().hasReviewing()
+        wvars["ContributionReviewingTemplatesList"] = reviewing.WContributionReviewingTemplatesList(self._conf).getHTML({"CanDelete": False})
+        return wvars
 
 
-class WUploadPaper(wcomponents.WTemplated):
+class WUploadPaper(WConfDisplayBodyBase):
+
+    _linkname = "uploadpaper"
 
     def __init__(self, aw, conf):
         self._aw = aw
@@ -89,9 +102,10 @@ class WUploadPaper(wcomponents.WTemplated):
         return WConfPaperMyContributions(self._aw, self._conf).getHTML({})
 
     def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["items"]=self._getContribsHTML()
-        return vars
+        wvars = wcomponents.WTemplated.getVars(self)
+        wvars["body_title"] = self._getTitle()
+        wvars["items"] = self._getContribsHTML()
+        return wvars
 
 
 class WConfPaperMyContributions(wcomponents.WTemplated):
@@ -109,4 +123,3 @@ class WConfPaperMyContributions(wcomponents.WTemplated):
         vars["Conference"] = self._conf
         vars["ConfReviewingChoice"] = self._conf.getConfPaperReview().getChoice()
         return vars
-

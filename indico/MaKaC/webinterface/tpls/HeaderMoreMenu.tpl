@@ -3,7 +3,6 @@
 <a><div id="moreMenu" class="dropDownMenuGrey" href="#">${ _("More") }</div><div class="leftCorner"></div></a>
 
 <form id="layoutForm" action="${ displayURL }" style="margin: 0px; display: inline">
-    <input type="hidden" name="confId" value="${ confId }" />
     <input id="layoutFormInput" type="hidden" name="view" value="standard" />
 </form>
 

@@ -1,0 +1,250 @@
+/*
+ * This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+@import 'base';
+@import 'compass';
+@import 'partials/icons'
+
+/* Styles for the main menu */
+
+.toolbar.global-menu {
+    @extend %font-family-title-light;
+
+    height: 3em;
+    line-height: 3em;
+
+    padding: 0 0 0 20px;
+    background: $black;
+    border: none;
+    margin-bottom: 0;
+
+    border-color: darken($black, 10%);
+    border-style: solid;
+    border-width: 1px 0 1px 0;
+
+    > a {
+        @include transition-property(background-color);
+
+        display: inline-block;
+        height: 3em;
+        line-height: 3em;
+
+        color: white;
+        padding: 0 20px 0 20px;
+
+        &:first-child, &.arrow:last-of-type {
+            border-radius: 0;
+        }
+
+        &:hover, &.open {
+            background: $light-black !important;
+        }
+
+        &.arrow {
+            @include icon-after('icon-arrow-down');
+
+            &:after {
+                vertical-align: middle;
+            }
+        }
+    }
+}
+
+/* Header */
+
+div.page-header {
+    position: relative;
+    border-top: 1px solid lighten($dark-blue, 10%);
+    background-color: $dark-blue;
+    position: relative;
+    width: 100%;
+
+    img.header-logo {
+        margin: 10px 0px 10px 40px;
+        border: none;
+        height: 60px;
+    }
+
+}
+
+div.page-header-dark {
+    background: #424242;
+}
+
+/* Announcements */
+
+.icon-announcement {
+  float: right;
+  color: $dark-yellow;
+  font-size: 1.5em;
+  line-height: 1em;
+  cursor:pointer;
+}
+
+/* Breadcrumbs */
+
+div.main-breadcrumb {
+    @extend %font-family-title;
+
+    background-color: darken($light-gray, 5%);
+    border-bottom: 1px solid $gray;
+    padding: 0.6em 0 0.6em 40px;
+
+    .path {
+        .sep {
+            color: $dark-gray;
+            padding: 0 0.5em;
+        }
+    }
+
+    a {
+        color: $light-black;
+
+        &:hover {
+            color: $dark-blue;
+        }
+    }
+}
+
+/* Styles for the session bar at the top right corner */
+
+div.session-bar {
+    @extend %font-family-title;
+
+    margin: 0.5em 0.5em;
+
+    .toolbar {
+        padding: 0;
+        margin: 0;
+    }
+
+    .i-button {
+        font-weight: normal;
+    }
+
+    .icon-shield {
+        vertical-align: middle;
+    }
+
+    .i-button {
+        &.protection-restricted {
+            background: $red;
+            border-color: $red;
+            color: #fff !important;
+
+            &:hover {
+                color: #fafafa !important;
+                background: lighten($red, 5%);
+            }
+        }
+
+        &.protection-domainprotected {
+            background: $yellow;
+            border-color: $yellow;
+            color: #fff !important;
+
+            &:hover {
+                color: #fafafa !important;
+                background: lighten($yellow, 5%);
+            }
+        }
+    }
+
+    &.scrolling {
+        background-color: transparent;
+        box-shadow: none;
+        right: 0;
+        margin-top: 0;
+        padding: 0 0 5px 5px;
+        z-index:999;
+    }
+
+}
+
+.loginHighlighted {
+    background: transparent url(../images/sprites.png) repeat-x scroll 0 -150px;
+    height: 16px;
+}
+
+/* Impersonation header */
+
+div.impersonation-header {
+    padding: 0.5em;
+    background-color: #DB610F;
+    color: #ECCCB6;
+    font-family: Verdana;
+    font-size: 12px;
+
+    .text {
+        display: inline-block;
+        float: left;
+
+        .logged-user-name {
+          font-weight: bold;
+          color: #eee;
+          margin: 0.1em;
+          line-height: 1em;
+          max-width: 200px;
+        }
+
+        &:before {
+          margin-right: 0.4em;
+          font-size: 1.5em;
+          line-height: 1em;
+          vertical-align: middle;
+        }
+
+    }
+
+    .undo-login-as {
+        float: right;
+        margin-right: 2px;
+        vertical-align: middle;
+        cursor: pointer;
+        font-size: 1.5em;
+        line-height: 1em;
+        font-family: 'icomoon-ultimate';
+        content: "\3b";
+    }
+}
+
+
+/* Header for new pages */
+.content-page-header {
+    border-bottom: 1px solid $separator-color;
+
+    h1, h2 {
+        display: inline-block;
+        vertical-align: baseline;
+    }
+
+    h2 {
+        color: $light-black;
+        margin-left: 1em;
+        font-size: 1.2em;
+    }
+}
+
+.content-page-description {
+    @extend %font-family-title;
+    max-width: 800px;
+    color: $dark-gray;
+    font-size: 1.2em;
+    margin-bottom: 2em;
+}

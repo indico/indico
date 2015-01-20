@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 import datetime
 import uuid
 from persistent import Persistent
@@ -48,8 +47,14 @@ class APIKey(Persistent):
         self._oldKeys = PersistentList()
         self._persistentAllowed = False
 
+    def __repr__(self):
+        return '<APIKey({0}, {1!r}, {2})>'.format(self._key, self._user, self._lastUsedDT)
+
     def getUser(self):
         return self._user
+
+    def setUser(self, user):
+        self._user = user
 
     def getKey(self):
         return self._key
@@ -57,7 +62,8 @@ class APIKey(Persistent):
 
     def setKey(self, key):
         akh = APIKeyHolder()
-        akh.remove(self)
+        if self.getId() is not None:
+            akh.remove(self)
         if self.getKey():
             self._oldKeys.append(self.getKey())
         self._key = key

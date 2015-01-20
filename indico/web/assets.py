@@ -1,189 +1,439 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN)
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software: you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation, either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico.  If not, see <http://www.gnu.org/licenses/>.
 
 
 """
 This file declares all core JS/CSS assets used by Indico
 """
 
-from webassets import Bundle
+# stdlib imports
+import os
+from urlparse import urlparse
+
+# 3rd party libs
+from markupsafe import Markup
+from webassets import Bundle, Environment
+
+# legacy imports
+from indico.core.config import Config
 
 
-indico_core = Bundle('js/indico/Core/Presentation.js',
-                     'js/indico/Core/Data.js',
-                     'js/indico/Core/Components.js',
-                     'js/indico/Core/Auxiliar.js',
-                     'js/indico/Core/Buttons.js',
-                     'js/indico/Core/Effects.js',
-                     'js/indico/Core/Interaction/Base.js',
-                     'js/indico/Core/Widgets/Base.js',
-                     'js/indico/Core/Widgets/Inline.js',
-                     'js/indico/Core/Widgets/DateTime.js',
-                     'js/indico/Core/Widgets/Menu.js',
-                     'js/indico/Core/Widgets/RichText.js',
-                     'js/indico/Core/Widgets/Navigation.js',
-                     'js/indico/Core/Widgets/UserList.js',
-                     'js/indico/Core/Dialogs/Popup.js',
-                     'js/indico/Core/Dialogs/Base.js',
-                     'js/indico/Core/Dialogs/Util.js',
-                     'js/indico/Core/Dialogs/Users.js',
-                     'js/indico/Core/Browser.js',
-                     'js/indico/Core/Services.js',
-                     'js/indico/Core/Util.js',
-                     'js/indico/Core/Login.js',
-                     filters='jsmin', output='indico_core_%(version)s.min.js')
+def configure_pyscss(environment):
+    config = Config.getInstance()
+    base_url_path = urlparse(config.getBaseURL()).path
+    environment.config['PYSCSS_DEBUG_INFO'] = environment.debug and config.getSCSSDebugInfo()
+    environment.config['PYSCSS_STATIC_URL'] = '{0}/static/'.format(base_url_path)
+    environment.config['PYSCSS_LOAD_PATHS'] = [
+        os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass'),
+        os.path.join(config.getHtdocsDir(), 'sass')
+    ]
 
-indico_management = Bundle('js/indico/Management/ConfModifDisplay.js',
-                           'js/indico/Management/RoomBooking.js',
-                           'js/indico/Management/eventCreation.js',
-                           'js/indico/Management/Timetable.js',
-                           'js/indico/Management/AbstractReviewing.js',
-                           'js/indico/Management/NotificationTPL.js',
-                           'js/indico/Management/Registration.js',
-                           'js/indico/Management/CFA.js',
-                           filters='jsmin', output='indico_management_%(version)s.min.js')
 
-indico_room_booking = Bundle('js/indico/RoomBooking/MapOfRooms.js',
-                             filters='jsmin', output='indico_room_booking_%(version)s.min.js')
+class IndicoEnvironment(Environment):
+    def __init__(self):
+        config = Config.getInstance()
+        url_path = urlparse(config.getBaseURL()).path
+        output_dir = os.path.join(config.getHtdocsDir(), 'static', 'assets')
+        url = '{0}/static/assets/'.format(url_path)
 
-indico_admin = Bundle('js/indico/Admin/News.js',
-                      'js/indico/Admin/Upcoming.js',
-                      filters='jsmin', output='indico_admin_%(version)s.min.js')
+        super(IndicoEnvironment, self).__init__(output_dir, url)
+        self.debug = config.getDebug()
+        configure_pyscss(self)
 
-indico_timetable = Bundle('js/indico/Timetable/Filter.js',
-                          'js/indico/Timetable/Layout.js',
-                          'js/indico/Timetable/Undo.js',
-                          'js/indico/Timetable/Base.js',
-                          'js/indico/Timetable/DragAndDrop.js',
-                          'js/indico/Timetable/Draw.js',
-                          'js/indico/Timetable/Management.js',
-                          filters='jsmin', output='indico_timetable_%(version)s.min.js')
+        self.append_path(config.getHtdocsDir(), '/')
+        self.append_path(os.path.join(config.getHtdocsDir(), 'css'), '{0}/css'.format(url_path))
+        self.append_path(os.path.join(config.getHtdocsDir(), 'js'), '{0}/js'.format(url_path))
 
-indico_collaboration = Bundle('js/indico/Collaboration/Collaboration.js',
-                              filters='jsmin', output='indico_collaboration_%(version)s.min.js')
 
-indico_legacy = Bundle('js/indico/Legacy/Widgets.js',
-                       'js/indico/Legacy/Dialogs.js',
-                       'js/indico/Legacy/Util.js',
-                       filters='jsmin', output='indico_legacy_%(version)s.min.js')
+class PluginEnvironment(Environment):
+    def __init__(self, plugin_name, plugin_dir, url_path):
+        config = Config.getInstance()
+        url_base_path = urlparse(config.getBaseURL()).path
+        output_dir = os.path.join(config.getHtdocsDir(), 'static', 'assets', 'plugins', plugin_name)
+        url = '{0}/static/assets/plugins/{1}'.format(url_base_path, url_path)
 
-indico_common = Bundle('js/indico/Common/TimezoneSelector.js',
-                       'js/indico/Common/IntelligentSearchBox.js',
-                       'js/indico/Common/Social.js',
-                       'js/indico/Common/Export.js',
-                       'js/indico/Common/htmlparser.js',
-                       filters='jsmin', output='indico_common_%(version)s.min.js')
+        super(PluginEnvironment, self).__init__(output_dir, url)
+        self.debug = Config.getInstance().getDebug()
+        self.append_path(os.path.join(plugin_dir, 'htdocs'), url=os.path.join(url_base_path, url_path))
+
+
+def namespace(dir_ns, *list_files):
+    return [os.path.join(dir_ns, f) for f in list_files]
+
+
+def include_js_assets(bundle_name):
+    """Jinja template function to generate HTML tags for a JS asset bundle."""
+    return Markup('\n'.join('<script src="{}"></script>'.format(url) for url in core_env[bundle_name].urls()))
+
+
+def include_css_assets(bundle_name):
+    """Jinja template function to generate HTML tags for a CSS asset bundle."""
+    return Markup('\n'.join('<link rel="stylesheet" type="text/css" href="{}">'.format(url)
+                            for url in core_env[bundle_name].urls()))
+
+
+indico_core = Bundle(
+    *namespace('js/indico/Core',
+
+               'Presentation.js',
+               'Data.js',
+               'Components.js',
+               'Auxiliar.js',
+               'Buttons.js',
+               'Effects.js',
+               'Interaction/Base.js',
+               'Widgets/Base.js',
+               'Widgets/Inline.js',
+               'Widgets/DateTime.js',
+               'Widgets/Menu.js',
+               'Widgets/RichText.js',
+               'Widgets/Navigation.js',
+               'Widgets/UserList.js',
+               'Dialogs/Popup.js',
+               'Dialogs/PopupWidgets.js',
+               'Dialogs/Base.js',
+               'Dialogs/Util.js',
+               'Dialogs/Users.js',
+               'Dialogs/PopupWidgets.js',
+               'Browser.js',
+               'Services.js',
+               'Util.js',
+               'Login.js',
+               'Dragndrop.js',
+               'keymap.js'),
+    filters='rjsmin', output='js/indico_core_%(version)s.min.js')
+
+indico_management = Bundle(
+    *namespace('js/indico/Management',
+
+               'ConfModifDisplay.js',
+               'RoomBooking.js',
+               'eventCreation.js',
+               'Timetable.js',
+               'AbstractReviewing.js',
+               'NotificationTPL.js',
+               'Registration.js',
+               'Contributions.js',
+               'Sessions.js',
+               'CFA.js',
+               'RoomBookingMapOfRooms.js',
+               'EventUsers.js'),
+    filters='rjsmin', output='js/indico_management_%(version)s.min.js')
+
+indico_room_booking = Bundle(
+    *namespace('js/indico/RoomBooking',
+
+               'util.js',
+               'MapOfRooms.js',
+               'BookingForm.js',
+               'RoomBookingCalendar.js',
+               'roomselector.js',
+               'validation.js'),
+    filters='rjsmin', output='js/indico_room_booking_%(version)s.min.js')
+
+indico_admin = Bundle(
+    *namespace('js/indico/Admin',
+
+               'News.js',
+               'Scheduler.js',
+               'Upcoming.js'),
+    filters='rjsmin', output='js/indico_admin_%(version)s.min.js')
+
+indico_timetable = Bundle(
+    *namespace('js/indico/Timetable',
+
+               'Filter.js',
+               'Layout.js',
+               'Undo.js',
+               'Base.js',
+               'DragAndDrop.js',
+               'Draw.js',
+               'Management.js'),
+    filters='rjsmin', output='js/indico_timetable_%(version)s.min.js')
+
+indico_legacy = Bundle(
+    *namespace('js/indico/Legacy',
+
+               'Widgets.js',
+               'Dialogs.js',
+               'Util.js'),
+    filters='rjsmin', output='js/indico_legacy_%(version)s.min.js')
+
+indico_common = Bundle(
+    *namespace('js/indico/Common',
+               'Export.js',
+               'TimezoneSelector.js',
+               'Social.js',
+               'htmlparser.js'),
+    filters='rjsmin', output='js/indico_common_%(version)s.min.js')
 
 indico_materialeditor = Bundle('js/indico/MaterialEditor/Editor.js',
-                               filters='jsmin', output='indico_materialeditor_%(version)s.min.js')
+                               filters='rjsmin', output='js/indico_materialeditor_%(version)s.min.js')
 
 indico_display = Bundle('js/indico/Display/Dialogs.js',
-                        filters='jsmin', output='indico_display_%(version)s.min.js')
+                        filters='rjsmin', output='js/indico_display_%(version)s.min.js')
 
-indico_jquery = Bundle('js/indico/jquery/defaults.js',
-                       'js/indico/jquery/global.js',
-                        filters='jsmin', output='indico_jquery_%(version)s.min.js')
+indico_jquery = Bundle(
+    *namespace('js/indico/jquery',
+               'defaults.js',
+               'global.js',
+               'errors.js',
+               'clearableinput.js',
+               'actioninput.js',
+               'fieldarea.js',
+               'multiselect.js',
+               'realtimefilter.js',
+               'scrollblocker.js',
+               'timerange.js',
+               'tooltips.js'),
+    filters='rjsmin', output='js/indico_jquery_%(version)s.min.js')
 
-jquery = Bundle('js/jquery/underscore.js',
-                'js/jquery/jquery.js',
-                'js/jquery/jquery-ui.js',
-                'js/jquery/jquery.form.js',
-                'js/jquery/jquery.custom.js',
-                'js/jquery/jquery.daterange.js',
-                'js/jquery/jquery.form.js',
-                'js/jquery/jquery.qtip.js',
-                'js/jquery/jquery.dttbutton.js',
-                'js/jquery/jquery.colorbox.js',
-                'js/jquery/jquery.menu.js',
-                'js/jquery/date.js',
-                'js/jquery/jquery.multiselect.js',
-                filters='jsmin', output='jquery_code_%(version)s.min.js')
+indico_jquery_authors = Bundle('js/indico/jquery/authors.js',
+                               filters='rjsmin', output='js/indico_jquery_authors_%(version)s.min.js')
 
-presentation = Bundle('js/jquery/underscore.js',
-                      'js/presentation/Core/Primitives.js',
-                      'js/presentation/Core/Iterators.js',
-                      'js/presentation/Core/Tools.js',
-                      'js/presentation/Core/String.js',
-                      'js/presentation/Core/Type.js',
-                      'js/presentation/Core/Interfaces.js',
-                      'js/presentation/Core/Commands.js',
-                      'js/presentation/Core/MathEx.js',
-                      'js/presentation/Data/Bag.js',
-                      'js/presentation/Data/Watch.js',
-                      'js/presentation/Data/WatchValue.js',
-                      'js/presentation/Data/WatchList.js',
-                      'js/presentation/Data/WatchObject.js',
-                      'js/presentation/Data/Binding.js',
-                      'js/presentation/Data/Logic.js',
-                      'js/presentation/Data/Json.js',
-                      'js/presentation/Data/Remote.js',
-                      'js/presentation/Data/DateTime.js',
-                      'js/presentation/Ui/MimeTypes.js',
-                      'js/presentation/Ui/XElement.js',
-                      'js/presentation/Ui/Html.js',
-                      'js/presentation/Ui/Dom.js',
-                      'js/presentation/Ui/Style.js',
-                      'js/presentation/Ui/Extensions/Lookup.js',
-                      'js/presentation/Ui/Extensions/Layout.js',
-                      'js/presentation/Ui/Text.js',
-                      'js/presentation/Ui/Styles/SimpleStyles.js',
-                      'js/presentation/Ui/Widgets/WidgetBase.js',
-                      'js/presentation/Ui/Widgets/WidgetPage.js',
-                      'js/presentation/Ui/Widgets/WidgetComponents.js',
-                      'js/presentation/Ui/Widgets/WidgetControl.js',
-                      'js/presentation/Ui/Widgets/WidgetEditor.js',
-                      'js/presentation/Ui/Widgets/WidgetTable.js',
-                      'js/presentation/Ui/Widgets/WidgetField.js',
-                      'js/presentation/Ui/Widgets/WidgetEditable.js',
-                      'js/presentation/Ui/Widgets/WidgetMenu.js',
-                      'js/presentation/Ui/Widgets/WidgetGrid.js',
-                      filters='jsmin', output='presentation_%(version)s.min.js')
+indico_badges_js = Bundle('js/indico/Management/ConfModifBadgePosterPrinting.js',
+                          filters='rjsmin', output='js/indico_badges_%(version)s.min.js')
+
+indico_badges_css = Bundle('css/badges.css',
+                           filters='cssmin', output='css/indico_badges_%(version)s.min.css')
+
+indico_regform = Bundle(
+    *namespace('js/indico/RegistrationForm',
+               'registrationform.js',
+               'section.js',
+               'field.js',
+               'sectiontoolbar.js',
+               'table.js'),
+    filters='rjsmin',
+    output='js/indico_regform_%(version)s.min.js')
 
 
-base_js = Bundle(jquery, presentation, indico_core,
-                 indico_legacy, indico_common, indico_jquery)
+angular = Bundle(
+    'js/lib/angular.js',
+    'js/lib/angular-resource.js',
+    'js/lib/angular-sanitize.js',
+    'js/lib/sortable.js',
+    'js/indico/angular/app.js',
+    'js/indico/angular/directives.js',
+    'js/indico/angular/filters.js',
+    'js/indico/angular/services.js',
+    filters='rjsmin',
+    output='js/angular_%(version)s.min.js'
+)
+
+jquery = Bundle(*filter(None, [
+    'js/lib/underscore.js',
+    'js/lib/jquery.js',
+    'js/lib/jquery.qtip.js',
+    'js/jquery/jquery-ui.js',
+    'js/lib/jquery.multiselect.js',
+    'js/lib/jquery.multiselect.filter.js',
+    'js/jquery/jquery-migrate-silencer.js' if not Config.getInstance().getDebug() else None] +
+    namespace('js/jquery',
+
+               'jquery-migrate.js',
+               'jquery.form.js',
+               'jquery.custom.js',
+               'jquery.daterange.js',
+               'jquery.dttbutton.js',
+               'jquery.colorbox.js',
+               'jquery.menu.js',
+               'date.js',
+               'jquery.colorpicker.js',
+               'jquery-extra-selectors.js',
+               'jquery.typewatch.js',
+               'jstorage.js',
+               'jquery.watermark.js',
+               'jquery.placeholder.js')),
+    filters='rjsmin', output='js/jquery_code_%(version)s.min.js')
+
+utils = Bundle('js/utils/routing.js', filters='rjsmin', output='js/utils_%(version)s.min.js')
+
+calendar = Bundle(
+    *namespace('js/calendar', 'calendar.js', 'calendar-setup.js'),
+    filters='rjsmin', output='js/calendar_%(version)s.min.js')
+
+presentation = Bundle(
+    *namespace('js/presentation',
+
+               'Core/Primitives.js',
+               'Core/Iterators.js',
+               'Core/Tools.js',
+               'Core/String.js',
+               'Core/Type.js',
+               'Core/Interfaces.js',
+               'Core/Commands.js',
+               'Core/MathEx.js',
+               'Data/Bag.js',
+               'Data/Watch.js',
+               'Data/WatchValue.js',
+               'Data/WatchList.js',
+               'Data/WatchObject.js',
+               'Data/Binding.js',
+               'Data/Logic.js',
+               'Data/Json.js',
+               'Data/Remote.js',
+               'Data/DateTime.js',
+               'Ui/MimeTypes.js',
+               'Ui/XElement.js',
+               'Ui/Html.js',
+               'Ui/Dom.js',
+               'Ui/Style.js',
+               'Ui/Extensions/Lookup.js',
+               'Ui/Extensions/Layout.js',
+               'Ui/Text.js',
+               'Ui/Styles/SimpleStyles.js',
+               'Ui/Widgets/WidgetBase.js',
+               'Ui/Widgets/WidgetPage.js',
+               'Ui/Widgets/WidgetComponents.js',
+               'Ui/Widgets/WidgetControl.js',
+               'Ui/Widgets/WidgetEditor.js',
+               'Ui/Widgets/WidgetTable.js',
+               'Ui/Widgets/WidgetField.js',
+               'Ui/Widgets/WidgetEditable.js',
+               'Ui/Widgets/WidgetMenu.js',
+               'Ui/Widgets/WidgetGrid.js'),
+    filters='rjsmin', output='js/presentation_%(version)s.min.js')
+
+ie_compatibility = Bundle('js/selectivizr.js',
+                          filters='rjsmin', output='js/ie_compatibility_%(version)s.min.js')
+
+moment = Bundle(
+    *namespace('js/moment',
+               'moment.js',
+               'lang/es.js',
+               'lang/fr.js'),
+    filters='rjsmin', output='js/moment_%(version)s.min.js')
+
+jqplot_js = Bundle(
+    'js/lib/jqplot/core/jquery.jqplot.js',
+    'js/lib/jqplot/plugins/*/*.js',
+    filters='rjsmin', output='js/jqplot_%(version)s.min.js'
+)
+
+jqplot_css = Bundle(
+    'css/lib/jquery.jqplot.css',
+    filters='cssmin', output='css/jqplot_%(version)s.min.css'
+)
+
+mathjax_js = Bundle(
+    'js/lib/mathjax/MathJax.js',
+    'js/custom/pagedown_mathjax.js',
+    filters='rjsmin', output='js/mathjax_%(version)s.min.js')
+
+contributions_js = Bundle('js/indico/Display/contributions.js',
+                          filters='rjsmin',
+                          output="js/contributions_%(version)s.min.js")
+
+abstracts_js = Bundle(
+    contributions_js,
+    'js/indico/Management/abstracts.js',
+    *namespace('js/lib/pagedown',
+               'Markdown.Converter.js',
+               'Markdown.Editor.js',
+               'Markdown.Sanitizer.js'),
+    filters='rjsmin',
+    output='js/abstracts_%(version)s.min.js')
+
+base_js = Bundle(jquery, angular, utils, presentation, calendar, indico_jquery, moment, indico_core,
+                 indico_legacy, indico_common)
+
+SASS_BASE_MODULES = ["sass/*.scss",
+                     "sass/base/*.scss",
+                     "sass/custom/*.scss",
+                     "sass/partials/*.scss"]
+
+
+def sass_module_bundle(module_name, depends=[]):
+    return Bundle('sass/modules/_{0}.scss'.format(module_name),
+                  filters=("pyscss", "cssrewrite", "cssmin"),
+                  output="sass/{0}_%(version)s.min.css".format(module_name),
+                  depends = SASS_BASE_MODULES + ['sass/modules/{0}/*.scss'.format(module_name)] + depends)
+
+contributions_sass = sass_module_bundle('contributions')
+registrationform_sass = sass_module_bundle('registrationform')
+roombooking_sass = sass_module_bundle('roombooking')
+dashboard_sass = sass_module_bundle('dashboard')
+category_sass = sass_module_bundle('category')
+admin_sass = sass_module_bundle('admin')
+
+screen_sass = Bundle('sass/screen.scss',
+                     filters=("pyscss", "cssrewrite", "cssmin"),
+                     output="sass/screen_sass_%(version)s.css",
+                     depends=SASS_BASE_MODULES)
 
 
 def register_all_js(env):
     env.register('jquery', jquery)
+    env.register('utils', utils)
     env.register('presentation', presentation)
     env.register('indico_core', indico_core)
     env.register('indico_management', indico_management)
-    env.register('indico_room_booking', indico_room_booking)
+    env.register('indico_roombooking', indico_room_booking)
     env.register('indico_admin', indico_admin)
     env.register('indico_timetable', indico_timetable)
     env.register('indico_legacy', indico_legacy)
     env.register('indico_common', indico_common)
-    env.register('indico_collaboration', indico_collaboration)
-    env.register('indico_materialeditor', indico_legacy)
+    env.register('indico_materialeditor', indico_materialeditor)
     env.register('indico_display', indico_display)
     env.register('indico_jquery', indico_jquery)
+    env.register('indico_authors', indico_jquery_authors)
+    env.register('indico_badges_js', indico_badges_js)
+    env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
+    env.register('ie_compatibility', ie_compatibility)
+    env.register('abstracts_js', abstracts_js)
+    env.register('contributions_js', contributions_js)
+    env.register('mathjax_js', mathjax_js)
+    env.register('jqplot_js', jqplot_js)
 
 
 def register_all_css(env, main_css_file):
-    env.register('base_css', Bundle(main_css_file,
-                                    'calendar-blue.css',
-                                    'jquery-ui.css',
-                                    'jquery.qtip.css',
-                                    'jquery.colorbox.css',
-                                    'jquery-ui-custom.css',
-                                    filters=('cssmin'),
-                                    output='base_%(version)s.min.css'))
+
+    base_css = Bundle(
+        *namespace('css',
+                   main_css_file,
+                   'calendar-blue.css',
+                   'jquery-ui.css',
+                   'lib/angular.css',
+                   'lib/jquery.qtip.css',
+                   'lib/jquery.multiselect.css',
+                   'lib/jquery.multiselect.filter.css',
+                   'jquery.colorbox.css',
+                   'jquery-ui-custom.css',
+                   'jquery.qtip-custom.css',
+                   'jquery.colorpicker.css'),
+        filters=("cssmin", "cssrewrite"),
+        output='css/base_%(version)s.min.css')
+
+    env.register('base_css', base_css)
+    env.register('indico_badges_css', indico_badges_css)
+    env.register('jqplot_css', jqplot_css)
+
+    # SASS/SCSS
+    env.register('registrationform_sass', registrationform_sass)
+    env.register('roombooking_sass', roombooking_sass)
+    env.register('contributions_sass', contributions_sass)
+    env.register('dashboard_sass', dashboard_sass)
+    env.register('category_sass', category_sass)
+    env.register('admin_sass', admin_sass)
+    env.register('screen_sass', screen_sass)
+
+
+core_env = IndicoEnvironment()

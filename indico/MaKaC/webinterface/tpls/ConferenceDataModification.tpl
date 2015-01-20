@@ -1,5 +1,4 @@
 <form id="eventModificationForm" action="${ postURL }" method="POST">
-    ${ locator }
     <input type="hidden" name="event_type" value="${ event_type }">
     <table class="groupTable">
         <tr>

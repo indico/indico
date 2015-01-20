@@ -1,7 +1,23 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 type("ChainedPopupWidget", ["PopupWidget"],
      {
          clickTriggersClose: function(target) {
-
              var result = true;
 
              // check chain
@@ -26,13 +42,11 @@ type("ChainedPopupWidget", ["PopupWidget"],
 
              this.PopupWidget.prototype.open.call(this, x, y);
 
-             // define a handler for onclick events
-             $('body').on('click.chained_menu', function(event) {
+             var handler = function(event) {
                  if (self.clickTriggersClose($E(eventTarget(event)))) {
-                     // if the click should be followeb by a
+                     // if the click should be followed by a
                      // closing action (out of the chain)
                      self.close();
-
                      // call close() over the whole chain
                      each(self.chainElements, function(element) {
                          if (element.ChainedPopupWidget) {
@@ -40,7 +54,11 @@ type("ChainedPopupWidget", ["PopupWidget"],
                          }
                      });
                  }
-             });
+             };
+
+             // define a handler for onclick events
+             $('html').on('click.chained_menu', handler);
+             this.handler = handler;
          },
 
          postDraw: function () {
@@ -65,7 +83,7 @@ type("ChainedPopupWidget", ["PopupWidget"],
          close: function() {
              // close() cleans up the onclick handler too
              this.active = false;
-             $('body').off('click.chained_menu');
+             $('html').off('click.chained_menu', this.handler);
              this.PopupWidget.prototype.close.call(this);
          }
      },
@@ -83,6 +101,7 @@ type("PopupMenu", ["ChainedPopupWidget"],
             var value = pair.get();
             var link = Html.a('fakeLink', value.display);
             link.setAttribute("id", pair.key);
+            link.setAttribute("title", value.description);
 
             if(typeof value.action == "string" ) {
                 link.setAttribute('href', value.action);
@@ -186,10 +205,11 @@ type("SectionPopupMenu", ["PopupMenu"], {
                 var section = null;
                 if (key !== ""){
                     section = Html.li('section', Html.div('line', Html.div('name', key)));
+                    section.setAttribute('title', item['description']);
                 }
 
                 // add the menu items
-                var tmp = $B(Html.ul('subPopupList'), item, _.bind(self._processItem, self));
+                var tmp = $B(Html.ul('subPopupList'), item['content'], _.bind(self._processItem, self));
                 sectionContent.append(Html.li({}, section, tmp));
             });
 
@@ -262,8 +282,7 @@ type("SessionSectionPopupMenu", ["SectionPopupMenu"], {
                                   });
 
                                   IndicoUtil.onclickHandlerRemove(self.handler);
-                                  var target = value;
-                                  target.open(pos.x + (target.alignRight ? 0 : link.dom.offsetWidth), pos.y - 1);
+                                  value.open(pos.x + (value.alignRight ? 0 : link.dom.offsetWidth), pos.y - 1);
 
                                   return false;
                               }:
@@ -537,7 +556,7 @@ type("ColorPicker", ["WatchValue", "ChainedPopupWidget"], {
         var currentColors = this.get();
         var showCustom = true;
         for (var i in this.defaultColors) {
-            colors = this.defaultColors[i];
+            var colors = this.defaultColors[i];
             if (colors.textColor == currentColors.textColor &&
                 colors.bgColor == currentColors.bgColor) {
                 showCustom = false;

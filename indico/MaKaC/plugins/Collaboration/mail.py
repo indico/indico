@@ -1,28 +1,27 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is par{t of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is par{t of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.plugins.Collaboration.collaborationTools import MailTools
 from MaKaC.common.TemplateExec import beautify
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 
 class CollaborationNotificationBase(GenericNotification):
     """ Base class to build an email notification for the Recording request plugin.
@@ -180,18 +179,29 @@ A booking / request was deleted in <a href="%s">%s</a>
 class SpeakersNotificationBase(GenericNotification):
     """ Base class to build an email notification to Speakers
     """
-    def __init__(self, sendToList, fromEmail):
+    def __init__(self, sendToList, fromEmail, fromName ="Indico Mailer"):
         GenericNotification.__init__(self)
 
         self.setContentType("text/html")
-        self.setFromAddr("Indico Mailer<%s>"%fromEmail)
+        self.setFromAddr("%s<%s>"%(fromName, fromEmail))
         self.setToList(sendToList)
 
-class ElectroniAgreementNotification(SpeakersNotificationBase):
+class ElectronicAgreementNotification(SpeakersNotificationBase):
     """ Template to build an email notification to the speakers
         to sign the electronic agreement.
     """
 
+    def __init__(self, sendToList, sendToCCList, fromEmail, fromName, content, subject):
+        SpeakersNotificationBase.__init__(self, sendToList, fromEmail, fromName)
+        self.setCCList(sendToCCList)
+        self.setSubject(subject)
+        self.setBody(content)
+
+
+class ElectronicAgreementOrganiserNotification(SpeakersNotificationBase):
+    """ Template to build an email notification to the speakers
+        to sign the electronic agreement.
+    """
     def __init__(self, sendToList, fromEmail, content, subject):
         SpeakersNotificationBase.__init__(self, sendToList, fromEmail)
         self.setSubject(subject)

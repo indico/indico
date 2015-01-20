@@ -41,7 +41,7 @@
                 and upload it. An example stylesheet can be downloaded") } <a href="${ Config().getBaseURL() }/css/confTemplates/standard.css">${_("here") }</a>.
             </em>
             <form action="${ saveCSS }" method="POST" ENCTYPE="multipart/form-data" style="margin:0;">
-                <input name="file" type="file" onchange="$E('uploadCSSButton').dom.disabled = false;">
+                <input name="file" type="file" id="fileUpload">
                 <input id="uploadCSSButton" disabled type="submit" value="${ _("Upload stylesheet")}">
             </form>
         </td>
@@ -134,5 +134,8 @@ $(function() {
                                         'event.social.toggle', 'event.social.toggle',
                                         {conference: ${conf.getId()|n,j}});
     $E('social_bookmarks').set(button.draw());
+    $("#fileUpload").change(function(){
+        $("#uploadCSSButton").prop("disabled", this.value=="");
+    });
 });
 </script>

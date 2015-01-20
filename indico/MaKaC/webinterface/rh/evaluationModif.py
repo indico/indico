@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from cStringIO import StringIO
+from flask import session
 
 from MaKaC.webinterface       import urlHandlers
 from MaKaC.webinterface.rh    import conferenceModif
@@ -28,8 +29,10 @@ from MaKaC.common             import utils
 from MaKaC.errors             import FormValuesError, MaKaCError
 from MaKaC.export.excel       import ExcelGenerator
 from xml.dom.minidom          import parseString,Element
-from MaKaC.common.Configuration import Config
+from indico.core.config import Config
 from MaKaC.i18n import _
+from indico.web.flask.util import send_file
+
 
 class RHEvaluationBase(conferenceModif.RHConferenceModifBase):
     """Basis of an Evaluation"""
@@ -67,20 +70,20 @@ class RHEvaluationSetupSpecialAction( RHEvaluationBase ):
         params = self.getRequestParams()
         evaluation = self._conf.getEvaluation()
         sessionVarName = "selectedSubmissions_%s_%s"%(self._conf.getId(), evaluation.getId())
-        if params.has_key("exportXML") :
+        if 'exportXML' in params:
             return self._exportXml(evaluation, params)
-        elif params.has_key("importXML") :
+        elif 'importXML' in params:
             return evaluations.WPConfModifEvaluationSetupImportXml( self, self._conf ).display()
-        elif params.has_key("importedXML") :
+        elif 'importedXML' in params:
             self._importedXml(evaluation, params)
-        elif params.has_key("removeSubmissions") :
-            self._getSession().setVar(sessionVarName, []) #Don't forget to clear session vars!
+        elif 'removeSubmissions' in params:
+            session.pop(sessionVarName, None)
             evaluation.removeAllSubmissions()
-        elif params.has_key("removeQuestions") :
-            self._getSession().setVar(sessionVarName, []) #Don't forget to clear session vars!
+        elif 'removeQuestions' in params:
+            session.pop(sessionVarName, None)
             evaluation.removeAllQuestions()
-        elif params.has_key("reinit") :
-            self._getSession().setVar(sessionVarName, []) #Don't forget to clear session vars!
+        elif 'reinit' in params:
+            session.pop(sessionVarName, None)
             evaluation.reinit()
         self._redirect(urlHandlers.UHConfModifEvaluationSetup.getURL(self._conf))
 
@@ -89,13 +92,7 @@ class RHEvaluationSetupSpecialAction( RHEvaluationBase ):
         from MaKaC.common.xmlGen import XMLGen
         xmlGen = XMLGen()
         evaluation.exportXml(xmlGen)
-        xmlFile = xmlGen.getXml()
-        self._req.set_content_length(len(xmlFile))
-        #I should use XML MimeType, but I want webbrowser to ask where to save the file...
-        #self._req.content_type = str(Config.getInstance().getFileTypeMimeType("XML"))
-        self._req.content_type = "application/octet-stream"
-        self._req.headers_out["Content-Disposition"] = 'inline; filename="%s"'%Evaluation._XML_FILENAME
-        return xmlFile
+        return send_file(Evaluation._XML_FILENAME, StringIO(xmlGen.getXml()), 'XML', inline=False)
 
     def _importedXml(self, evaluation, params):
         """ Importation of an evaluation.
@@ -484,11 +481,7 @@ class RHEvaluationResultsOptions(RHEvaluationBase):
                                     excelGen.addValue(utils.putbackQuotes(ci))
                                 else :
                                     excelGen.addValue("")
-            excelFile = excelGen.getExcelContent()
-            self._req.set_content_length(len(excelFile))
-            self._req.content_type = str(Config.getInstance().getFileTypeMimeType("CSV"))
-            self._req.headers_out["Content-Disposition"] = 'inline; filename="%s"'%Evaluation._CSV_FILENAME
-            return excelFile
+            return send_file(Evaluation._CSV_FILENAME, StringIO(excelGen.getExcelContent()), 'CSV')
 
         ########
         #remove#
@@ -522,30 +515,33 @@ class RHEvaluationResultsSubmittersActions(RHEvaluationBase):
         #remove#
         ########
         if remove:
-            removedSubmitters  = params.get("removedSubmitters", [])
-            if len(removedSubmitters)>0:
+            removedSubmitters = set(params.get("removedSubmitters", []))
+            if removedSubmitters:
                 #remove submissions in session variable
-                selectedSubmissions = self._getSession().getVar(sessionVarName) or []
-                selectedSubmissions = [s for s in selectedSubmissions if s.getId() not in removedSubmitters]
-                self._getSession().setVar(sessionVarName, selectedSubmissions)
+                if sessionVarName in session:
+                    selectedSubmissions = session.setdefault(sessionVarName, set())
+                    selectedSubmissions -= removedSubmitters
+                    session.modified = True
                 #remove submissions in database
-                removedSubmissions = [s for s in evaluation.getSubmissions() if s.getId() in removedSubmitters]
+                removedSubmissions = set(s for s in evaluation.getSubmissions() if s.getId() in removedSubmitters)
                 for submission in removedSubmissions:
                     evaluation.removeSubmission(submission)
 
         ##########
         #selected#
         ##########
-        elif select :
+        elif select:
             selectedSubmitters = params.get("selectedSubmitters", [])
             if isinstance(selectedSubmitters, str):
                 selectedSubmitters = [selectedSubmitters]
             #insert selected submissions list in a session variable
-            if len(selectedSubmitters)>=evaluation.getNbOfSubmissions() or len(selectedSubmitters)<1:
-                self._getSession().setVar(sessionVarName, [])
-            else :
-                selectedSubmissions = [sub for sub in evaluation.getSubmissions() if sub.getId() in selectedSubmitters]
-                self._getSession().setVar(sessionVarName, selectedSubmissions)
+            selected = set(s.getId() for s in evaluation.getSubmissions() if s.getId() in selectedSubmitters)
+            if len(selected) != len(evaluation.getSubmissions()):
+                session[sessionVarName] = selected
+            else:
+                # Everything selected => DELETE session var since that means "everything" and will stay that way when
+                # a new evaluation is submitted.
+                session.pop(sessionVarName, None)
 
         #redirecting...
         self._redirect(urlHandlers.UHConfModifEvaluationResults.getURL(self._conf))

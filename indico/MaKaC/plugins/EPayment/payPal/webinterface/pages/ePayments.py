@@ -1,28 +1,27 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC.webinterface import wcomponents
 from xml.sax.saxutils import quoteattr
-from MaKaC.common import Configuration
+from indico.core import config as Configuration
 from MaKaC.webinterface import urlHandlers
 import MaKaC
 from MaKaC.i18n import _
@@ -61,7 +60,7 @@ class WPConfModifEPaymentPayPalBase(registrationForm.WPConfModifRegFormBase):
         return "nothing"
 
 class WPConfModifEPaymentPayPal( WPConfModifEPaymentPayPalBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifEPaymentPayPal(self._conf)
         p = {
@@ -70,7 +69,7 @@ class WPConfModifEPaymentPayPal( WPConfModifEPaymentPayPalBase ):
         return wc.getHTML(p)
 
 class WConfModifEPaymentPayPal( WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -83,7 +82,7 @@ class WConfModifEPaymentPayPal( WTemplated ):
         return vars
 
 class WPConfModifEPaymentPayPalDataModif( WPConfModifEPaymentPayPalBase ):
-    
+
     def _getTabContent( self, params ):
         wc = WConfModifEPaymentPayPalDataModif(self._conf)
         p = {'postURL': quoteattr(str(localUrlHandlers.UHConfModifEPaymentPayPalPerformDataModif.getURL( self._conf )))
@@ -91,7 +90,7 @@ class WPConfModifEPaymentPayPalDataModif( WPConfModifEPaymentPayPalBase ):
         return wc.getHTML(p)
 
 class WConfModifEPaymentPayPalDataModif( WTemplated ):
-    
+
     def __init__( self, conference ):
         self._conf = conference
 
@@ -109,43 +108,43 @@ class WPconfirmEPaymentPayPal( conferences.WPConferenceDefaultDisplayBase ):
     def __init__(self, rh, conf, reg):
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
         self._registrant=reg
-        
-        
+
+
     def _getBody( self, params ):
         wc = WconfirmEPaymentPayPal(self._conf, self._registrant)
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._regFormOpt)
-        
-        
+
+
 class WconfirmEPaymentPayPal( WTemplated ):
     def __init__( self,configuration, registrant):
         self._registrant = registrant
         self._conf = configuration
-        
+
     def getVars( self ):
         vars = WTemplated.getVars(self)
         vars["message"] = "Thank you for the payment!<br/> You have used PayPal"
         vars["trinfo"]="%s:%s"%(self._registrant.getFirstName(),self._registrant.getSurName())
         return vars
- 
+
 class WPCancelEPaymentPayPal( conferences.WPConferenceDefaultDisplayBase ):
     #navigationEntry = navigation.NERegistrationFormDisplay
 
     def __init__(self, rh, conf, reg):
         conferences.WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
         self._registrant=reg
-        
+
     def _getBody( self, params ):
         wc = WCancelEPaymentPayPal( self._conf,self._registrant )
         return wc.getHTML()
 
-    def _defineSectionMenu( self ): 
+    def _defineSectionMenu( self ):
         conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._regFormOpt)    
-        
+        self._sectionMenu.setCurrentItem(self._regFormOpt)
+
 class WCancelEPaymentPayPal( WTemplated ):
     def __init__( self, conference,reg ):
         self._conf = conference
@@ -155,4 +154,4 @@ class WCancelEPaymentPayPal( WTemplated ):
         vars = WTemplated.getVars(self)
         vars["message"] = "You have cancelled your transaction.\nPlease check your email in order to complete your PayPal transaction."
         vars["messagedetailPayment"]="%s:%s"%(self._registrant.getFirstName(),self._registrant.getSurName())
-        return vars 
+        return vars

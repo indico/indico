@@ -1,141 +1,167 @@
-    <table cellpadding="0" cellspacing="0" border="0" width="80%">
-        % if standalone:
-            <tr>
-            <td class="intermediateleftvtab" style="border-left: 2px solid #777777; border-right: 2px solid #777777; font-size: xx-small;" width="100%">&nbsp;</td> <!-- lastvtabtitle -->
-            </tr>
-        % endif
-        <tr>
-            <td class="bottomvtab" width="100%">
-                <table width="100%" cellpadding="0" cellspacing="0" class="htab" border="0">
-                    <tr>
-                        <td class="maincell">
-                            <span class="formTitle" style="border-bottom-width: 0px">Room</span><br />
-                            <br />
-                            <table width="96%" align="left" border="0">
-                              <!-- LOCATION -->
-                              <tr>
-                                <td width="24%" class="titleUpCellTD"><span class="titleCellFormat">Location</span></td>
-                                <td width="76%">
-                                    <table width="100%">
-                                        <tr>
-                                            <td class="subFieldWidth" align="right" valign="top"><small>Location&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ room.locationName }</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="subFieldWidth" align="right" valign="top"><small>Name&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ room.name }</td>
-                                        </tr>
-                                        <tr>
-                                            <td align="right" valign="top"><small>Site&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ room.site }</td>
-                                        </tr>
-                                        <tr>
-                                            <td align="right" valign="top"><small>Building&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext"><a href="http://building.web.cern.ch/map/building?bno=${ room.building }" title="Show on map">${ room.building }</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td align="right" valign="top"><small>Floor&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ room.floor }</td>
-                                        </tr>
-                                        <tr>
-                                            <td align="right" valign="top"><small>Room&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ room.roomNr }</td>
-                                        </tr>
-                                 </table>
-                                </td>
-                                <td width="20%" align="right" class="thumbnail">
-                                % if room.photoId != None:
-                                    <a href="${ room.getPhotoURL() }" rel="lightbox" title="${ room.photoId }">
-                                        <img border="1px" height="100" src="${ room.getPhotoURL() }" alt="${ str( room.photoId ) }"/>
-                                    </a>
-                                % endif
-                                </td>
-                              </tr>
-                              <tr><td>&nbsp;</td></tr>
-                              <tr>
-                                <td width="24%" class="titleUpCellTD"><span class="titleCellFormat">Stats</span></td>
-                                <td width="76%">
-<!-- ============== Key Performance Indicators ================= -->
-<!-- =========================================================== -->
-    <a name="kpi"></a>
-    <table width="80%" align="center" border="0" style="border-left: 1px solid #777777">
+<h2 class="page-title">
+    ${ _('Room statistics') }
+</h2>
+
+<table>
     <tr>
-      <td colspan="5" class="groupTitle">Key Performance Indicators</td>
-    </tr>
-        <tr>
-          <td class="titleUpCellTD" style="width: 100px;"><span class="titleCellFormat">Average occupation</span></td>
-          <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
-            <table>
-            <tr>
-          <form action=${ statsURL }>
-          <input type="hidden" name="roomLocation" value=${ room.locationName }>
-          <input type="hidden" name="roomID" value=${ room.id }>
-          <td bgcolor="white" valign="top" style="padding-left: 12px;">
-            <select name="period" onChange="this.form.submit();">
-            % if period=="pastmonth":
-              <option value="pastmonth" selected> past 30 days
-              <option value="thisyear"> from beginning of this year
+        <td>
+            % if room.has_photo:
+                <a href="${ room.large_photo_url }" nofollow="lightbox">
+                    <img border="1px" height="100" src="${ room.small_photo_url }"/>
+                </a>
             % endif
-            % if period=="thisyear":
-              <option value="pastmonth"> past 30 days
-              <option value="thisyear" selected> from beginning of this year
-            % endif
-            </select>
-          </td>
-          </form>
-            </tr>
-            <tr>
-                <td><span style="background-color: #C9FFC9; font-weight: bold;">${ kpiAverageOccupation }</span> ${inlineContextHelp('Average room occupation over the selected period during working hours (8H30-17H30, Monday-Friday including holidays).' )}</td>
-            </tr>
-            </table>
-          </td>
-        </tr>
-        <tr><td>&nbsp;</td></tr>
-        <tr>
-          <td class="titleUpCellTD" style="width: 100px;"><span class="titleCellFormat">Bookings</span></td>
-          <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
-            <table>
-            <tr>
-                <td>Total:</td>
-                <td>${kbiTotalBookings} ${inlineContextHelp('Total number of bookings including archival, cancelled and rejected.' )}</td>
-            </tr>
-            </table>
-            <br />
+        </td>
+        <td>
             <table>
                 <tr>
-                    <td style="width: 70px;"></td>
-                    <td style="width: 70px;">Valid</td>
-                    <td style="width: 70px;">Cancelled</td>
-                    <td style="width: 70px;">Rejected</td>
+                    <td align="right" valign="top">
+                        ${ ('Location') }
+                    </td>
+                    <td align="left" class="blacktext">
+                        ${ room.location_name }
+                    </td>
                 </tr>
                 <tr>
-                    <td>Live</td>
-                    <td><span style="background-color: #C9FFC9; font-weight: bold;">${ stats['liveValid'] }</span></td>
-                    <td>${ stats['liveCancelled'] }</td>
-                    <td>${ stats['liveRejected'] }</td>
+                    <td align="right" valign="top">${ _('Name') }</td>
+                    <td align="left" class="blacktext">${ room.name }</td>
                 </tr>
                 <tr>
-                    <td>Archival</td>
-                    <td>${ stats['archivalValid'] }</td>
-                    <td>${ stats['archivalCancelled'] }</td>
-                    <td>${ stats['archivalRejected'] }</td>
+                    <td align="right" valign="top">${ _('Site') }</td>
+                    <td align="left" class="blacktext">${ room.site }</td>
                 </tr>
                 <tr>
-                    <td>Total</td>
-                    <td>${ stats['liveValid'] + stats['archivalValid'] }</td>
-                    <td>${ stats['liveCancelled'] + stats['archivalCancelled'] }</td>
-                    <td>${ stats['liveRejected'] + stats['archivalRejected'] }</td>
+                    <td align="right" valign="top">${ _('Building') }</td>
+                    <td align="left" class="blacktext">
+                        <a href="https://maps.cern.ch/mapsearch/mapsearch.htm?no=[${ room.building }]" title="Show on map">
+                            ${ room.building }
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right" valign="top">${ _('Floor') }</td>
+                    <td align="left" class="blacktext">${ room.floor }</td>
+                </tr>
+                <tr>
+                    <td align="right" valign="top">${ _('Room') }</td>
+                    <td align="left" class="blacktext">${ room.number }</td>
                 </tr>
             </table>
-          </td>
-        </tr>
-   </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-      </td>
+        </td>
     </tr>
-  </table>
+</table>
+
+
+<h2 class="group-title">
+    ${ _('Key Performance Indicators') }
+</h2>
+
+<div class="i-box-group horz">
+    <div class="i-box titled">
+        <div class="i-box-header">
+            <div class="i-box-title">
+                ${ _('Booking stats') }
+            </div>
+        </div>
+        <div class="i-box-content">
+            <table class="booking-stats" cellspacing="0">
+                <tr>
+                    <td></td>
+                    <td>${ _('Valid') }</td>
+                    <td>${ _('Pending') }</td>
+                    <td>${ _('Cancelled') }</td>
+                    <td>${ _('Rejected') }</td>
+                    <td>${ _('Total') }</td>
+                </tr>
+                <tr>
+                    <td>${ _('Active') }</td>
+                    <td class="active-valid">
+                        ${ stats['active']['valid'] }
+                    </td>
+                    <td>${ stats['active']['pending'] }</td>
+                    <td>${ stats['active']['cancelled'] }</td>
+                    <td>${ stats['active']['rejected'] }</td>
+                    <td>
+                        ${ stats['active']['valid'] + \
+                           stats['active']['cancelled'] + \
+                           stats['active']['rejected'] }
+                    </td>
+                </tr>
+                <tr>
+                    <td>${ _('Archived') }</td>
+                    <td>${ stats['archived']['valid'] }</td>
+                    <td>${ stats['archived']['pending'] }</td>
+                    <td>${ stats['archived']['cancelled'] }</td>
+                    <td>${ stats['archived']['rejected'] }</td>
+                    <td>
+                        ${ stats['archived']['valid'] + \
+                           stats['archived']['cancelled'] + \
+                           stats['archived']['rejected'] }
+                    </td>
+                </tr>
+                <tr>
+                    <td>${ _('Total') }</td>
+                    <td>${ stats['active']['valid'] + stats['archived']['valid'] }</td>
+                    <td>${ stats['active']['pending'] + stats['archived']['pending'] }</td>
+                    <td>${ stats['active']['cancelled'] + stats['archived']['cancelled'] }</td>
+                    <td>${ stats['active']['rejected'] + stats['archived']['rejected'] }</td>
+                    <td class="total-bookings">
+                        ${ stats['active']['valid'] + stats['archived']['valid'] + \
+                           stats['active']['pending'] + stats['archived']['pending'] + \
+                           stats['active']['cancelled'] + stats['archived']['cancelled'] + \
+                           stats['active']['rejected'] + stats['archived']['rejected'] }
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="i-box titled occupancy-stats">
+        <div class="i-box-header">
+            <div class="i-box-header-text">
+                <div class="i-box-title">
+                    ${ _('Occupancy') }
+                </div>
+            </div>
+            <div class="i-box-buttons toolbar thin">
+                <div class="group i-selection">
+                    % for key, text in period_options:
+                        <% checked = 'checked' if period == key else '' %>
+                        <input type="radio" id="${ key }" name="period" value="${ key }" ${ checked }>
+                        <label for="${ key }" class="i-button">${ text }</label>
+                    % endfor
+                </div>
+            </div>
+        </div>
+        <div class="i-box-content">
+            <table cellspacing="0">
+                <tr>
+                    <td class="occupancy-period">
+                        ${ _('Average room occupancy in weekdays from 8:30 to 17:30') }
+                        % if period == 'pastmonth':
+                            ${ _('over the past 30 days') }.
+                        % elif period == 'thisyear':
+                            ${ _('since the beginning of this year') }.
+                        % else:
+                            ${ _('since the first booking ever registered') }.
+                        % endif
+                    </td>
+                    <td class="occupancy-value">
+                        ${ '{0:.02f}'.format(occupancy * 100) }<small>%</small>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function(){
+        $('input[name=period]').on('change', function(e) {
+            var url_template = ${ url_rule_to_js('rooms.roomBooking-roomStats') | n,j };
+            location.href = build_url(url_template, {
+                roomLocation: ${ room.location_name | n, j},
+                roomID: ${ room.id | n, j },
+                period: this.value
+            });
+        });
+    });
+</script>

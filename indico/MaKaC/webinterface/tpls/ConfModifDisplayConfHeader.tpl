@@ -9,15 +9,6 @@
         </tr>
 
         <tr>
-            <td nowrap class="dataCaptionTD"><span class="titleCellFormat"> ${ _("Status")}</span></td>
-            <td bgcolor="white" width="65%" class="blacktext">
-                <form action=${ simpleTextURL } method="POST">
-                    <b>${ status }</b>
-                    <input type="submit"  id="toggleSimpleTextButton" class="btn" value="${ statusBtn }">
-                </form>
-            </td>
-        </tr>
-        <tr>
             <td nowrap class="dataCaptionTD"><span class="titleCellFormat">${ _("Text announcement")}</span></td>
             <td bgcolor="white" width="65%" class="blacktext">
                 <form action=${ tickertapeURL } method="POST" style="margin:0;">
@@ -30,6 +21,15 @@
         </tr>
 
         <tr>
+            <td nowrap class="dataCaptionTD"><span class="titleCellFormat"> ${ _("Status")}</span></td>
+            <td bgcolor="white" width="65%" class="blacktext">
+                <form action=${ simpleTextURL } method="POST">
+                    <b>${ status }</b>
+                    <input type="submit"  id="toggleSimpleTextButton" class="btn" value="${ statusBtn }">
+                </form>
+            </td>
+        </tr>
+        <tr>
             <td colspan="2">
                 <a name="headerFeatures"></a>
                 <div class="groupTitle"> ${ _("Conference header features")}</div>
@@ -40,9 +40,9 @@
             <td nowrap class="dataCaptionTD"><span class="titleCellFormat"> ${ _("Show in header")}</span>
               <br>
               <br>
-              <img src=${ enablePic } alt="${ _("Click to disable")}"> <small> ${ _("Enabled announ.")}</small>
+              <img src=${ enablePic } alt="${ _("Click to disable")}"> <small> ${ _("Enabled")}</small>
               <br>
-              <img src=${ disablePic } alt="${ _("Click to enable")}"> <small> ${ _("Disabled announ.")}</small>
+              <img src=${ disablePic } alt="${ _("Click to enable")}"> <small> ${ _("Disabled")}</small>
             </td>
             <td bgcolor="white" width="65%" class="blacktext">
               <table align="left">

@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 import os
 import sys
@@ -24,11 +23,11 @@ import shutil
 from distutils import sysconfig
 from datetime import datetime
 import time
-from MaKaC.common.db import MaKaCDB
+from indico.core.db import MigratedDB
 from ZODB.FileStorage import FileStorage
 import transaction
-from MaKaC.common import DBMgr
-from MaKaC.common import Config
+from indico.core.db import DBMgr
+from indico.core.config import Config
 from MaKaC.review import Abstract, AbstractStatusSubmitted, AbstractStatusAccepted,\
 AbstractStatusRejected, AbstractStatusUnderReview, AbstractStatusProposedToAccept,\
 AbstractStatusProposedToReject, AbstractStatusInConflict, AbstractStatusWithdrawn,\
@@ -1332,7 +1331,7 @@ class ConferenceRecovery:
                 roomName = recoveredC.getRoom().getName()
             self._conf.setValues({"visibility": recoveredC.getVisibility(),\
             "title": recoveredC.getTitle(), "description": recoveredC.getDescription(),\
-            "supportEmail": recoveredC.getSupportEmail(), "contactInfo": recoveredC.getContactInfo(),\
+            "supportEmail": recoveredC.getSupportInfo().getEmail(), "contactInfo": recoveredC.getContactInfo(),\
             "locationName": locationName, "locationAddress": locationAddress,\
             "roomName": roomName})
             self._conf.setClosed(recoveredC.isClosed())
@@ -1676,10 +1675,6 @@ class ConferenceRecovery:
             self._conf._submissionDate = recoveredC.getSubmittedDate()
             self._conf._archivingRequestDate = recoveredC.getRequestedToArchiveDate()
             self._conf.getBOAConfig().setText(recoveredC.getBOAConfig().getText())
-            for s in self._conf.getSections():
-                self._conf.disableSection(s)
-            for s in recoveredC.getSections():
-                self._conf.enableSection(s)
             for r in self._conf.getSessionCoordinatorRights()[:]:
                 self._conf.removeSessionCoordinatorRight(r)
             for r in recoveredC.getSessionCoordinatorRights():
@@ -1836,7 +1831,7 @@ class TmpDBMgr:
         log("%sSetting temporary database..."%pp)
         if self._createDBFile(dt, incPrintPrefix(pp)):
             self._storage = FileStorage(os.path.join(tmpPath, dataFile))
-            self._db = MaKaCDB(self._storage)
+            self._db = MigratedDB(self._storage)
             if self._dr.proceed(dt, incPrintPrefix(pp)):
                 self._dbDatetime = dt
                 log("%sTemporary database set in %s."%(pp, datetime.now()-now))

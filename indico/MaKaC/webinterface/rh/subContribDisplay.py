@@ -1,31 +1,31 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from cStringIO import StringIO
 
 import MaKaC.webinterface.pages.subContributions as subContributions
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.webinterface.rh.base import RHDisplayBaseProtected,\
-    RoomBookingDBMixin
+from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHSubContributionBase
-from MaKaC.common import Config
-from MaKaC.errors import ModificationError
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
+from indico.core.config import Config
+from indico.web.flask.util import send_file
 
 
 class RHSubContributionDisplayBase( RHSubContributionBase, RHDisplayBaseProtected ):
@@ -37,7 +37,7 @@ class RHSubContributionDisplayBase( RHSubContributionBase, RHDisplayBaseProtecte
         RHDisplayBaseProtected._checkProtection( self )
 
 
-class RHSubContributionDisplay( RoomBookingDBMixin, RHSubContributionDisplayBase ):
+class RHSubContributionDisplay(RHSubContributionDisplayBase):
     _uh = urlHandlers.UHSubContributionDisplay
 
     def _process( self ):
@@ -49,8 +49,8 @@ class RHSubContributionDisplay( RoomBookingDBMixin, RHSubContributionDisplayBase
 
 class RHSubContributionToMarcXML(RHSubContributionDisplayBase):
 
-    def _process( self ):
-        filename = "%s - Subcontribution.xml"%self._subContrib.getTitle().replace("/","")
+    def _process(self):
+        filename = "%s - Subcontribution.xml" % self._subContrib.getTitle().replace("/","")
         from MaKaC.common.xmlGen import XMLGen
         from MaKaC.common.output import outputGenerator
         xmlgen = XMLGen()
@@ -59,10 +59,4 @@ class RHSubContributionToMarcXML(RHSubContributionDisplayBase):
         xmlgen.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
         outgen.subContribToXMLMarc21(self._subContrib, xmlgen)
         xmlgen.closeTag("marc:record")
-        data = xmlgen.getXml()
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "XML" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
-        return data
+        return send_file(filename, StringIO(xmlgen.getXml()), 'XML')

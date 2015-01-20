@@ -1,0 +1,32 @@
+<div ng-controller="BillableCtrl">
+    <ng-form name="nestedForm">
+        <select
+            id="field-{{ section.id }}-{{ field.id }}"
+            name="{{ fieldName }}"
+            ng-model="userdata[fieldName]"
+            ng-required="field.mandatory || paymentBlocked(field, userdata) == false"
+            ng-disabled="paymentBlocked(field, userdata)"
+            ng-class="{hasError: validationStarted && nestedForm.$invalid}">
+            <option value="">-- {{ 'Choose a value' | i18n }} --</option>
+            <option value="yes"
+                ng-disabled="!hasPlacesLeft(field, userdata[fieldName], 'checkbox')"
+                ng-selected="userdata[fieldName] === 'yes'">
+                {{ 'yes' | i18n }}
+                {{ getBillableStr(field, userdata[fieldName], 'checkbox') }}
+            </option>
+            <option value="no"
+                ng-selected="userdata[fieldName] === 'no'">
+                {{ 'no' | i18n }}
+            </option>
+        </select>
+
+        <span ng-if="isBillable(field) && userdata[fieldName] == 'yes'">
+            <span class="regFormPrice">{{ field.price }}</span>
+            <span class="regFormCurrency">{{ currency }}</span>
+        </span>
+
+        <span class="error-message-tag" ng-if="validationStarted && nestedForm.$invalid">
+            {{ "You must chose an option" | i18n }}
+        </span>
+    </ng-form>
+</div>

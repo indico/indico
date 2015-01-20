@@ -1,25 +1,29 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
-import os, math
+import os
+import math
+import cgi
+import shutil
 import xml.sax.saxutils as saxutils
+import uuid
+
 from HTMLParser import HTMLParser
 from reportlab.platypus import SimpleDocTemplate, PageTemplate, Table
 from reportlab.platypus.tableofcontents import TableOfContents
@@ -36,15 +40,19 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.fonts import addMapping
 from MaKaC.i18n import _
 from MaKaC.common.utils import isStringHTML
+from MaKaC.common.TemplateExec import render as tpl_render
+import subprocess
+import os
+import tempfile
+from MaKaC.common.logger import Logger
 
-# PIL is the library used by reportlab to work with images.
-# If it isn't available, we must NOT put images in the PDF.
-# Then before add an image, we must check the HAVE_PIL global variable
-try :
-    from PIL import Image as PILImage
-    HAVE_PIL = True
-except ImportError, e:
-    HAVE_PIL = False
+from mako.template import Template
+
+from indico.core.config import Config
+from indico.util import mdx_latex
+import markdown
+from PIL import Image as PILImage
+from indico.util.string import sanitize_for_platypus
 
 ratio = math.sqrt(math.sqrt(2.0))
 
@@ -62,63 +70,22 @@ class PDFSizes:
 
         self.PDFfontsizes = [_("xxx-small"), _("xx-small"), _("x-small"), _("smaller"), _("small"), _("normal"), _("large"), _("larger")]
 
-class PDFHTMLParser(HTMLParser):
-    _removedTags = ["a", "font"]
-
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.text = []
-
-    def parse(self, s):
-        "Parse the given string 's'."
-        self.feed(s)
-        self.close()
-        return "".join(self.text)
-
-    def handle_data(self, data):
-        self.text.append( saxutils.escape(data) )
-
-    def filterAttrs(self, attrs):
-        filteredAttrs = []
-        for x, y in attrs:
-            if x not in ["target"]:
-                filteredAttrs.append((x,y))
-        return filteredAttrs
-
-    def handle_entityref(self, name):
-        self.text.append( "&%s;"%name )
-
-    def handle_starttag(self, tag, attrs):
-        if tag == "br":
-            self.text.append( "<br/>" )
-        elif tag in self._removedTags:
-            return
-        else:
-            self.text.append( "<%s%s>" % (tag, " ".join([ ' %s="%s"' % (x,y) for x,y in self.filterAttrs(attrs)])) )
-
-    def handle_startendtag(self, tag, attrs):
-        if tag =="a":
-            self.text.append( "</a>" )
-        else:
-            self.text.append( "<%s%s/>" % (tag, " ".join([ ' %s="%s"' % (x,y) for x,y in self.filterAttrs(attrs)])) )
-
-    def handle_endtag(self, tag):
-        if tag in self._removedTags:
-            return
-        self.text.append( "</%s>" % tag )
 
 def escape(text):
     if text is None:
         text = ""
     try:
-        text = PDFHTMLParser().parse(text)
-        if not isStringHTML(text):
-            text = text.replace("\r\n"," <br/>")
-            text = text.replace("\n"," <br/>")
-            text = text.replace("\r"," <br/>")
+        if isStringHTML(text):
+            text = sanitize_for_platypus(text)
+        else:
+            text = cgi.escape(text)
+            text = text.replace("\r\n", " <br/>")
+            text = text.replace("\n", " <br/>")
+            text = text.replace("\r", " <br/>")
         return text
     except Exception:
         return saxutils.escape(text)
+
 
 def modifiedFontSize(fontsize, lowerNormalHigher):
 
@@ -415,6 +382,7 @@ pagesizeNameToCanvas = {'A4': Canvas,
                         'Letter': Canvas,
                         }
 
+
 class PDFBase:
 
     def __init__(self, doc=None, story=None, pagesize = 'A4', printLandscape=False):
@@ -508,31 +476,64 @@ class PDFBase:
         return height
 
     def _drawLogo(self, c, drawTitle = True):
-        if HAVE_PIL:
-            logo = self._conf.getLogo()
-            imagePath = ""
-            if logo:
-                imagePath = logo.getFilePath()
-            if imagePath:
+        logo = self._conf.getLogo()
+        imagePath = ""
+        if logo:
+            imagePath = logo.getFilePath()
+        if imagePath:
+            try:
+                img = PILImage.open(imagePath)
+                width, height = img.size
+
+                # resize in case too big for page
+                if width > self._PAGE_WIDTH / 2:
+                    ratio =  float(height)/width
+                    width = self._PAGE_WIDTH / 2
+                    height = width * ratio
+                startHeight = self._PAGE_HEIGHT
+
+                if drawTitle:
+                    startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
+
+                # lower edge of the image
+                startHeight = startHeight - inch / 2 - height
+
+                # draw horizontally centered, with recalculated width and height
+                c.drawImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height, mask="auto")
+                return startHeight
+            except IOError:
+                if drawTitle:
+                    self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
+        return 0
+
+    def _getLogo(self, c, drawTitle = True):
+        logo = self._conf.getLogo()
+        if logo:
+            img_path = logo.getFilePath()
+            if img_path:
                 try:
                     img = PILImage.open(imagePath)
                     width, height = img.size
-                    if width > self._PAGE_WIDTH:
+
+                    # resize in case too big for page
+                    if width > self._PAGE_WIDTH / 2:
                         ratio =  float(height)/width
-                        width = self._PAGE_WIDTH
-                        height = self._PAGE_WIDTH * ratio
-                        img = img.resize((int(width), int(height)))
+                        width = self._PAGE_WIDTH / 2
+                        height = width * ratio
                     startHeight = self._PAGE_HEIGHT
+
                     if drawTitle:
                         startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
-                        height = 0
-                    c.drawInlineImage(img, self._PAGE_WIDTH/2.0 - width/2, startHeight - 1.5 * inch - height)
+
+                    # lower edge of the image
+                    startHeight = startHeight - inch / 2 - height
+
+                    # draw horizontally centered, with recalculated width and height
+                    c.drawImage(imagePath, self._PAGE_WIDTH/2.0 - width/2, startHeight, width, height, mask="auto")
+                    return startHeight
                 except IOError:
                     if drawTitle:
                         self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
-                return True
-        return False
-
 
 
 def _doNothing(canvas, doc):
@@ -646,29 +647,25 @@ class PDFWithTOC(PDFBase):
 
     """
 
-    def __init__(self, story=None, pagesize = 'A4', fontsize = 'normal', firstPageNumber = 1 ):
-
+    def __init__(self, story=None, pagesize='A4', fontsize='normal', firstPageNumber=1):
 
         self._fontsize = fontsize
-        #self._indexedFlowable = [] #indexedFlowable
-        #self._toc = TableOfContents()
-        self._story=story
+        self._story = story
         if story is None:
             self._story = []
-            self._story.append( Spacer(inch, 0*cm) ) #without this blank spacer first abstract isn't displayed. why?
+            # without this blank spacer first abstract isn't displayed. why?
+            self._story.append(Spacer(inch, 0*cm))
 
-        #self._toc = TableOfContents()
-        #self._processTOCPage()
         self._indexedFlowable = {}
         self._fileDummy = FileDummy()
 
-        self._doc = DocTemplateWithTOC(self._indexedFlowable, self._fileDummy, firstPageNumber = firstPageNumber, pagesize=PDFSizes().PDFpagesizes[pagesize])
+        self._doc = DocTemplateWithTOC(self._indexedFlowable, self._fileDummy, firstPageNumber=firstPageNumber,
+                                       pagesize=PDFSizes().PDFpagesizes[pagesize])
 
         self._PAGE_HEIGHT = PDFSizes().PDFpagesizes[pagesize][1]
         self._PAGE_WIDTH = PDFSizes().PDFpagesizes[pagesize][0]
 
         setTTFonts()
-
 
     def _processTOCPage(self):
         """ Generates page with table of contents.
@@ -680,7 +677,7 @@ class PDFWithTOC(PDFBase):
         style1.fontSize = modifiedFontSize(18, self._fontsize)
         style1.leading = modifiedFontSize(22, self._fontsize)
         style1.alignment = TA_CENTER
-        p = Paragraph( _("Table of contents"), style1)
+        p = Paragraph(_("Table of contents"), style1)
         self._story.append(Spacer(inch, 1*cm))
         self._story.append(p)
         self._story.append(Spacer(inch, 2*cm))
@@ -698,5 +695,118 @@ class PDFWithTOC(PDFBase):
 
     def getPDFBin(self):
         self.getBody()
-        self._doc.multiBuild( self._story, onFirstPage=self.firstPage, onLaterPages=self.laterPages)
+        self._doc.multiBuild(self._story, onFirstPage=self.firstPage, onLaterPages=self.laterPages)
         return self._fileDummy.getData()
+
+
+class PDFLaTeXBase(object):
+
+    _table_of_contents = False
+
+    def __init__(self):
+
+        # Markdown -> LaTeX renderer
+        # safe_mode - strip out all HTML
+        md = markdown.Markdown(safe_mode='remove')
+        latex_mdx = mdx_latex.LaTeXExtension()
+        latex_mdx.extendMarkdown(md, markdown.__dict__)
+
+        self._args = {
+            'md_convert': md.convert
+        }
+
+    def generate(self):
+        latex = LatexRunner(has_toc=self._table_of_contents)
+        pdffile = latex.run(self._tpl_filename, **self._args)
+        return pdffile
+
+
+class LaTeXRuntimeException(Exception):
+    def __init__(self, source_file, log_file, report_id, params):
+
+        super(LaTeXRuntimeException, self).__init__("{} -> {} ({}) [{}]".format(
+            source_file, log_file, report_id, params))
+
+        self.report_id = report_id
+        self.source_file = source_file
+        self.log_file = log_file
+        self.params = params
+
+    @property
+    def message(self):
+        return "Impossible to compile '{0}'. Read '{1}' for details".format(self.source_file, self.log_file)
+
+
+class LatexRunner(object):
+    """
+    Handles the PDF generation from a chosen LaTeX template
+    """
+
+    def __init__(self, has_toc=False):
+        self.has_toc = has_toc
+
+    def run_latex(self, source_file, log_file=None):
+        pdflatex_cmd = [Config.getInstance().getPDFLatexProgram(),
+                        '-interaction', 'nonstopmode',
+                        '-output-directory', self._dir,
+                        source_file]
+
+        try:
+            subprocess.check_call(pdflatex_cmd, stdout=log_file)
+            Logger.get('pdflatex').debug("PDF created successfully!")
+
+        except subprocess.CalledProcessError:
+            Logger.get('pdflatex').warning('PDF creation possibly failed (non-zero exit code)!')
+            # Only fail if we are in strict mode
+            if Config.getInstance().getStrictLatex():
+                # flush log, go to beginning and read it
+                if log_file:
+                    log_file.flush()
+                raise
+
+    def _save_error_report(self, source_filename, log_filename):
+        config = Config.getInstance()
+
+        # create a unique report identifier
+        report_id = uuid.uuid4().hex
+        target_dir = os.path.join(config.getSharedTempDir(), 'reports', report_id)
+
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+
+        shutil.copy(source_filename, os.path.join(target_dir, 'source.tex'))
+        shutil.copy(log_filename, os.path.join(target_dir, 'pdflatex.log'))
+
+        Logger.get('pdflatex').info("Error report saved under {0}".format(target_dir))
+
+        return report_id
+
+    def run(self, template_name, **kwargs):
+        template_dir = os.path.join(Config.getInstance().getTPLDir(), 'latex')
+        template = tpl_render(os.path.join(template_dir, template_name), kwargs)
+
+        self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=Config.getInstance().getTempDir())
+        source_filename = os.path.join(self._dir, template_name + '.tex')
+        target_filename = os.path.join(self._dir, template_name + '.pdf')
+        log_filename = os.path.join(self._dir, 'output.log')
+        log_file = open(log_filename, 'a+')
+
+        with open(source_filename, 'w') as f:
+            f.write(template)
+
+        try:
+            self.run_latex(source_filename, log_file)
+            if self.has_toc:
+                self.run_latex(source_filename, log_file)
+        finally:
+            log_file.close()
+
+            if not os.path.exists(target_filename):
+                report_no = self._save_error_report(source_filename, log_filename)
+                # something went terribly wrong, no LaTeX file was produced
+                raise LaTeXRuntimeException(source_filename, log_filename, report_no, kwargs)
+
+        return target_filename
+
+    def cleanup(self):
+        shutil.rmtree(self._dir)

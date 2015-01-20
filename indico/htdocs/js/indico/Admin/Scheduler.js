@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 type('TaskActions', [],
      {
          _request: function(method, args, success) {
@@ -6,7 +23,7 @@ type('TaskActions', [],
 
              indicoRequest(method, args,
                            function(result,error){
-                               killProgress()
+                               killProgress();
                                if(error) {
                                    IndicoUtil.errorReport(error);
                                } else {
@@ -20,7 +37,7 @@ type('TaskActions', [],
                            {id: task.id},
                            function(result) {
                                // add some kind of decent notification bar?
-                               alert('done!');
+                               new AlertPopup($T("Success"), $T("Task deleted.")).open();
                                this._table.refresh();
                            });
          },
@@ -30,7 +47,7 @@ type('TaskActions', [],
                            {id: task.id},
                            function(result) {
                                // add some kind of decent notification bar?
-                               alert('done!');
+                               new AlertPopup($T("Success"), $T("Task failed ran.")).open();
                                this._table.refresh();
                            });
          }
@@ -247,6 +264,14 @@ type('SchedulerSummaryWidget', ['RemoteWidget'],
                                          Html.span({}, $T('Enabled')) :
                                          Html.span({}, $T('Disabled'))));
 
+             var hostname = Html.tr({},
+                                 Html.td({}, $T('Hostname')),
+                                 Html.td({}, Html.span({}, data.state ? data.hostname : 'n/a')));
+             var pid = Html.tr({},
+                                 Html.td({}, $T('PID')),
+                                 Html.td({}, Html.span({}, data.state ? data.pid : 'n/a')));
+
+
              var spool = Html.tr({}, Html.td({}, $T('Spooled commands')),
                                  Html.td({}, data.spooled));
              var queue = Html.tr({}, Html.td({}, $T('Queued tasks')),
@@ -259,8 +284,7 @@ type('SchedulerSummaryWidget', ['RemoteWidget'],
                                   Html.td({}, data.finished));
 
              return Html.table({},
-                               Html.tbody({}, state, spool, queue,
-                                          running, failed, finished));
+                               Html.tbody({}, state, hostname, pid, spool, queue, running, failed, finished));
          }
      },
      function(method) {

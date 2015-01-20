@@ -1,5 +1,5 @@
 (function($, undefined) {
-    $.widget('cern.daterange', {
+    $.widget('indico.daterange', {
         // Default options
         options: {
             disabled: false,
@@ -16,7 +16,7 @@
                 firstDay: 1,
                 showOtherMonths: true,
                 selectOtherMonths: true,
-                unifyNumRows: true,
+                unifyNumRows: true, // non-standard. see jquery-ui-changes.diff and http://bugs.jqueryui.com/ticket/7210
                 yearRange: '-0:+2'
             },
             startPickerOptions: {},
@@ -44,7 +44,7 @@
             }
 
             // Create the markup for the inline widget
-            self.container = $('<div/>', { style: 'display: table; width: 100%;' });
+            self.container = $('<div/>', { style: 'display: inline-block; width: 100%;' });
             self.startDateContainer = $('<div/>', { style: 'float: left', align: 'center' }).appendTo(self.container);
             self.endDateContainer = $('<div/>', { style: 'float: left; margin-left: 10px;', align: 'center' }).appendTo(self.container);
             $('<span/>', self.options.labelAttrs).html(self.options.labels[0]).appendTo(self.startDateContainer);
@@ -71,7 +71,7 @@
             }));
             self.pickers = self.startPicker.add(self.endPicker);
 
-            // Prevent nonsense ranges
+            // Prevent invalid ranges
             self.pickers.datepicker('option', 'onSelect', function() {
                 if(self.startPicker.datepicker('getDate') > self.endPicker.datepicker('getDate')) {
                     if(this == self.startPicker[0]) {
@@ -84,6 +84,9 @@
                 self.options.startDate = self.startPicker.datepicker('getDate');
                 self.options.endDate = self.endPicker.datepicker('getDate');
             });
+
+            self.pickers.siblings('button.ui-datepicker-trigger').remove();
+
             // Copy current date in case it was not set before
             self.options.startDate = self.startPicker.datepicker('getDate');
             self.options.endDate = self.endPicker.datepicker('getDate');
@@ -94,7 +97,7 @@
         },
 
         destroy: function() {
-            this.element.removeClass('ui-daterange')
+            this.element.removeClass('ui-daterange');
             if(this.startDateField) {
                 this.startDateField.remove();
             }

@@ -12,7 +12,7 @@
         <tr>
             <td class="time">${ startTime }</td>
             <td class="title">
-                <a href="${ url }" style="font-size: 1.0em;">${ title }</a>
+                <a href="${ url }" style="font-size: 1.0em;">${ title | remove_tags }</a>
             </td>
         </tr>
         ${ details }

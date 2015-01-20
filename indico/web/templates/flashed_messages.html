@@ -1,0 +1,9 @@
+{% with messages = get_flashed_messages(with_categories=True) %}
+    {% for category, message in messages %}
+        <div class="{{ category }}-message-box">
+            <div class="message-text">
+                {{ message }}
+            </div>
+        </div>
+    {% endfor %}
+{% endwith %}

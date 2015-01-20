@@ -1,40 +1,41 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+from cStringIO import StringIO
+from flask import request
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.abstracts as abstracts
 import MaKaC.review as review
-import MaKaC.user as user
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHAbstractBase, RHConferenceBase
-from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF, ConfManagerAbstractsToPDF
+from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF
 from MaKaC.common.xmlGen import XMLGen
-from MaKaC.errors import MaKaCError,ModificationError, FormValuesError
+from MaKaC.errors import MaKaCError, ModificationError, FormValuesError, NoReportError
 from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
-from MaKaC.common import Config
+from indico.core.config import Config
 from MaKaC.webinterface.common.abstractDataWrapper import AbstractParam
 from MaKaC.i18n import _
 from MaKaC.webinterface.rh.conferenceModif import CFAEnabled
-from MaKaC.abstractReviewing import ConferenceAbstractReview
 from MaKaC.paperReviewing import Answer
-
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+from indico.web.flask.util import send_file
+from MaKaC.PDFinterface.base import LatexRunner
 
 
 class RHAbstractModifBase( RHAbstractBase, RHModificationBaseProtected ):
@@ -46,7 +47,12 @@ class RHAbstractModifBase( RHAbstractBase, RHModificationBaseProtected ):
         RHAbstractBase._checkParams( self, params )
 
     def _checkProtection( self ):
-        RHModificationBaseProtected._checkProtection( self )
+        target = self._target
+        try:
+            self._target = self._conf
+            RHModificationBaseProtected._checkProtection(self)
+        finally:
+            self._target = target
         CFAEnabled.checkEnabled(self)
 
     def _displayCustomPage( self, wf ):
@@ -84,10 +90,6 @@ class RHAbstractDelete(RHAbstractModifBase):
 
 
 class RHAbstractManagment(RHAbstractModifBase):
-
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
 
     def _process( self ):
         p = abstracts.WPAbstractManagment( self, self._target )
@@ -127,22 +129,12 @@ class RHAbstractToPDF(RHAbstractModifBase):
 
     def _process( self ):
         tz = self._conf.getTimezone()
-        filename = "%s - Abstract.pdf"%self._target.getTitle()
-        pdf = ConfManagerAbstractToPDF(self._conf, self._target, tz=tz)
-        data = pdf.getPDFBin()
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "PDF" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
-        return data
+        filename = "%s - Abstract.pdf" % self._target.getTitle()
+        pdf = ConfManagerAbstractToPDF(self._target, tz=tz)
+        return send_file(filename, pdf.generate(), 'PDF')
 
 
 class RHAbstractToXML(RHAbstractModifBase):
-
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
 
     def _process( self ):
         filename = "%s - Abstract.xml"%self._target.getTitle()
@@ -154,7 +146,7 @@ class RHAbstractToXML(RHAbstractModifBase):
         afm = self._target.getConference().getAbstractMgr().getAbstractFieldsMgr()
         for f in afm.getFields():
             id = f.getId()
-            if f.isActive() and self._target.getField(id).strip() != "":
+            if f.isActive() and str(self._target.getField(id)).strip() != "":
                 x.writeTag("field",self._target.getField(id),[("id",id)])
         x.writeTag("Conference", self._target.getConference().getTitle())
         l = []
@@ -194,14 +186,7 @@ class RHAbstractToXML(RHAbstractModifBase):
 
         x.closeTag("abstract")
 
-        data = x.getXml()
-
-        self._req.headers_out["Content-Length"] = "%s"%len(data)
-        cfg = Config.getInstance()
-        mimetype = cfg.getFileTypeMimeType( "XML" )
-        self._req.content_type = """%s"""%(mimetype)
-        self._req.headers_out["Content-Disposition"] = """inline; filename="%s\""""%filename.replace("\r\n"," ")
-        return data
+        return send_file(filename, StringIO(x.getXml()), 'XML')
 
 
 class _AbstractWrapper:
@@ -277,92 +262,95 @@ class RHAbstractManagmentReject(RHAbstractModifBase):
 
 class RHMarkAsDup(RHAbstractModifBase):
 
-    def _checkParams( self, params ):
-        RHAbstractModifBase._checkParams( self, params )
-        self._action,self._comments,self._original="","",None
-        self._originalId=""
-        if params.has_key("OK"):
-            self._action="MARK"
-            self._comments=params.get("comments","")
-            self._originalId=params.get("id","")
-            self._original=self._target.getOwner().getAbstractById(self._originalId)
+    def _checkParams(self, params):
+        RHAbstractModifBase._checkParams(self, params)
+        self._action, self._comments, self._original = "", "", None
+        self._originalId = ""
+        if "OK" in params:
+            self._action = "MARK"
+            self._comments = params.get("comments", "")
+            self._originalId = params.get("id", "")
+            self._original = self._target.getOwner().getAbstractById(self._originalId)
 
     def _getErrorsInData(self):
-        res=[]
-        if self._original==None or self._target==self._original:
-            res.append( _("invalid original abstract id"))
+        res = []
+        if self._original is None or self._target == self._original:
+            res.append(_("invalid original abstract id"))
         return res
 
-    def _process( self ):
-        errMsg=""
-        if self._action=="MARK":
-            errorList=self._getErrorsInData()
-            if len(errorList)==0:
-                self._target.markAsDuplicated(self._getUser(),self._original,self._comments)
-                self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
+    def _process(self):
+        errMsg = ""
+        if self._action == "MARK":
+            errorList = self._getErrorsInData()
+            if len(errorList) == 0:
+                self._target.markAsDuplicated(
+                    self._getUser(), self._original, self._comments)
+                self._redirect(
+                    urlHandlers.UHAbstractManagment.getURL(self._target))
                 return
             else:
-                errMsg="<br>".join(errorList)
-        p=abstracts.WPModMarkAsDup(self,self._target)
-        return p.display(comments=self._comments,originalId=self._originalId,errorMsg=errMsg)
+                errMsg = "<br>".join(errorList)
+        p = abstracts.WPModMarkAsDup(self, self._target)
+        return p.display(comments=self._comments, originalId=self._originalId, errorMsg=errMsg)
 
 
 class RHUnMarkAsDup(RHAbstractModifBase):
 
-    def _checkParams( self, params ):
-        RHAbstractModifBase._checkParams( self, params )
-        self._action,self._comments,self._original="","",None
-        self._originalId=""
-        if params.has_key("OK"):
-            self._action="UNMARK"
-            self._comments=params.get("comments","")
+    def _checkParams(self, params):
+        RHAbstractModifBase._checkParams(self, params)
+        self._action, self._comments, self._original = "", "", None
+        self._originalId = ""
+        if "OK" in params:
+            self._action = "UNMARK"
+            self._comments = params.get("comments", "")
 
-
-    def _process( self ):
-        errMsg=""
-        if self._action=="UNMARK":
-            self._target.unMarkAsDuplicated(self._getUser(),self._comments)
-            self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
+    def _process(self):
+        errMsg = ""
+        if self._action == "UNMARK":
+            self._target.unMarkAsDuplicated(self._getUser(), self._comments)
+            self._redirect(
+                urlHandlers.UHAbstractManagment.getURL(self._target))
             return
-        p=abstracts.WPModUnMarkAsDup(self,self._target)
-        return p.display(comments=self._comments,originalId=self._originalId,errorMsg=errMsg)
+        p = abstracts.WPModUnMarkAsDup(self, self._target)
+        return p.display(comments=self._comments, originalId=self._originalId, errorMsg=errMsg)
 
 
 class RHMergeInto(RHAbstractModifBase):
 
-    def _checkParams( self, params ):
-        RHAbstractModifBase._checkParams( self, params )
-        self._action,self._comments,self._targetAbs="","",None
-        self._targetAbsId,self._includeAuthors,self._doNotify="",False,True
-        if params.has_key("OK"):
-            self._action="MERGE"
-            self._comments=params.get("comments","")
-            self._targetAbsId=params.get("id","")
-            self._includeAuthors=params.has_key("includeAuthors")
-            self._doNotify=params.has_key("notify")
-            self._targetAbs=self._target.getOwner().getAbstractById(self._targetAbsId)
+    def _checkParams(self, params):
+        RHAbstractModifBase._checkParams(self, params)
+        self._action, self._comments, self._targetAbs = "", "", None
+        self._targetAbsId, self._includeAuthors, self._doNotify = "", False, True
+        if "OK" in params:
+            self._action = "MERGE"
+            self._comments = params.get("comments", "")
+            self._targetAbsId = params.get("id", "")
+            self._includeAuthors = "includeAuthors" in params
+            self._doNotify = "notify" in params
+            self._targetAbs = self._target.getOwner(
+            ).getAbstractById(self._targetAbsId)
 
     def _getErrorsInData(self):
-        res=[]
-        if self._targetAbs==None or self._target==self._targetAbs:
+        res = []
+        if self._targetAbs is None or self._target == self._targetAbs:
             res.append("invalid target abstract id")
         return res
 
-    def _process( self ):
-        errMsg=""
-        if self._action=="MERGE":
-            errorList=self._getErrorsInData()
-            if len(errorList)==0:
-                self._target.mergeInto(self._getUser(),self._targetAbs,comments=self._comments,mergeAuthors=self._includeAuthors)
+    def _process(self):
+        errMsg = ""
+        if self._action == "MERGE":
+            errorList = self._getErrorsInData()
+            if len(errorList) == 0:
+                self._target.mergeInto(self._getUser(), self._targetAbs, comments=self._comments, mergeAuthors=self._includeAuthors)
                 if self._doNotify:
-                    self._target.notify(EmailNotificator(),self._getUser())
-                self._redirect(urlHandlers.UHAbstractManagment.getURL(self._target))
+                    self._target.notify(EmailNotificator(), self._getUser())
+                self._redirect(
+                    urlHandlers.UHAbstractManagment.getURL(self._target))
                 return
             else:
-                errMsg="<br>".join(errorList)
-        p=abstracts.WPModMergeInto(self,self._target)
-        return p.display(comments=self._comments,targetId=self._targetAbsId,errorMsg=errMsg,includeAuthors=self._includeAuthors,notify=self._doNotify)
-
+                errMsg = "<br>".join(errorList)
+        p = abstracts.WPModMergeInto(self, self._target)
+        return p.display(comments=self._comments, targetId=self._targetAbsId, errorMsg=errMsg, includeAuthors=self._includeAuthors, notify=self._doNotify)
 
 class RHUnMerge(RHAbstractModifBase):
 
@@ -479,9 +467,19 @@ class RHWithdraw(RHAbstractModifBase):
 
 class RHBackToSubmitted(RHAbstractModifBase):
 
+    def _removeAssociatedContribution(self):
+        contribution = self._abstract.getContribution()
+        contribution.getOwner().getSchedule().removeEntry(contribution.getSchEntry())
+        contribution.delete()
+
     def _process( self ):
         url=urlHandlers.UHAbstractManagment.getURL(self._target)
-        if isinstance(self._abstract.getCurrentStatus(), review.AbstractStatusWithdrawn):
+        if isinstance(self._abstract.getCurrentStatus(), (review.AbstractStatusWithdrawn, review.AbstractStatusRejected)):
+            self._abstract.setCurrentStatus(review.AbstractStatusSubmitted(self._abstract))
+        elif isinstance(self._abstract.getCurrentStatus(), review.AbstractStatusAccepted):
+            # remove the associated contribution
+            self._removeAssociatedContribution()
+            # set submittted status
             self._abstract.setCurrentStatus(review.AbstractStatusSubmitted(self._abstract))
         self._redirect(url)
 
@@ -510,10 +508,6 @@ class RHAbstractManagmentChangeTrack(RHAbstractModifBase):
 
 class RHAbstractTrackManagment(RHAbstractModifBase):
 
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
-
     def _process( self ):
         p = abstracts.WPAbstractTrackManagment( self, self._target )
         return p.display( **self._getRequestParams() )
@@ -525,25 +519,17 @@ class RHAbstractTrackOrderByRating(RHAbstractModifBase):
         return p.display( **self._getRequestParams() )
 
 
-class RHAC(RHAbstractModifBase):
-
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
-
-    def _process( self ):
-        p = abstracts.WPModAC(self,self._target)
-        return p.display()
-
-
 class RHEditData(RHAbstractModifBase, AbstractParam):
+
+    def __init__(self, req):
+        RHAbstractModifBase.__init__(self, req)
+        AbstractParam.__init__(self)
 
     def _checkParams(self, params):
         RHAbstractModifBase._checkParams(self,params)
-        if self._getUser() == None:
+        if self._getUser() is None:
             return
-        headerSize = self._req.headers_in["content-length"]
-        AbstractParam._checkParams(self, params, self._conf, headerSize)
+        AbstractParam._checkParams(self, params, self._conf, request.content_length)
         if self._action == "":#First call
             #TODO: remove this code, this should be handle by AbstractData (not method available
             # because setAbstractData(abstract) is used when saving, so there are specific actions.
@@ -581,16 +567,14 @@ class RHEditData(RHAbstractModifBase, AbstractParam):
         elif self._action == "VALIDATE":
             return self._doValidate()
         else:
+            if isinstance( self._abstract.getCurrentStatus(), review.AbstractStatusAccepted ):
+                raise NoReportError(_("The abstract with id '%s' cannot be edited because it has already been accepted.") % self._abstract.getId())
             p = abstracts.WPModEditData(self, self._target, self._abstractData)
             pars = self._abstractData.toDict()
             return p.display(**pars)
 
 
 class RHIntComments(RHAbstractModifBase):
-
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
 
     def _process( self ):
         p = abstracts.WPModIntComments(self,self._target)
@@ -666,19 +650,11 @@ class RHIntCommentEdit(RHIntCommentBase):
 
 class RHNotifLog(RHAbstractModifBase):
 
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
-
     def _process( self ):
         p = abstracts.WPModNotifLog(self,self._target)
         return p.display()
 
 class RHTools(RHAbstractModifBase):
-
-    #def _checkProtection( self ):
-    #    if len( self._conf.getCoordinatedTracks( self._getUser() ) ) == 0:
-    #        RHAbstractModifBase._checkProtection( self )
 
     def _process( self ):
         p = abstracts.WPModTools(self,self._target)

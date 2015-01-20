@@ -1,64 +1,67 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 from functools import wraps
-from indico.util.contextManager import ContextManager
+
+from flask import has_request_context, g, current_app
 
 
-def request_cached(f):
+def make_hashable(obj):
+    if isinstance(obj, list):
+        return tuple(obj)
+    elif isinstance(obj, dict):
+        return frozenset((k, make_hashable(v)) for k, v in obj.iteritems())
+    elif hasattr(obj, 'getId'):
+        return obj.__class__.__name__, obj.getId()
+    return obj
+
+
+# http://wiki.python.org/moin/PythonDecoratorLibrary#Alternate_memoize_as_nested_functions
+# Not thread-safe. Don't use it in places where thread-safety is important!
+def memoize(obj):
+    cache = {}
+
+    @wraps(obj)
+    def memoizer(*args, **kwargs):
+        key = (make_hashable(args), make_hashable(kwargs))
+        if key not in cache:
+            cache[key] = obj(*args, **kwargs)
+        return cache[key]
+    return memoizer
+
+
+def memoize_request(f):
+    """Memoizes a function during the current request"""
     @wraps(f)
-    def _wrapper(*args, **kwargs):
-        # if there are kwargs, skip caching
-        if kwargs:
+    def memoizer(*args, **kwargs):
+        if not has_request_context() or current_app.config['TESTING']:
+            # No memoization outside request context
             return f(*args, **kwargs)
-        else:
-            # create a unique key
-            k = (f, args)
-            cache = ContextManager.setdefault('request_cache', {})
-            if k not in cache:
-                cache[k] = f(*args)
-            return cache[k]
-    return _wrapper
 
-
-def order_dict(dict):
-    """
-    Very simple method that returns an sorted tuple of (k, v) tuples
-    This is supposed to be used for converting shallow dicts into "hashable"
-    values.
-    """
-    return tuple(sorted(dict.iteritems()))
-
-
-# http://code.activestate.com/recipes/576563-cached-property/
-# Modified to use a volatile dict so it doesn't go to the DB under any circumstances
-def cached_property(f):
-    """returns a cached property that is calculated by function f"""
-    def get(self):
         try:
-            return self._v_property_cache[f]
+            cache = g.memoize_cache
         except AttributeError:
-            self._v_property_cache = {}
-            x = self._v_property_cache[f] = f(self)
-            return x
-        except KeyError:
-            x = self._v_property_cache[f] = f(self)
-            return x
-    return property(get)
+            g.memoize_cache = cache = {}
+
+        key = (f.__name__, make_hashable(args), make_hashable(kwargs))
+        if key not in cache:
+            cache[key] = f(*args, **kwargs)
+        return cache[key]
+
+    return memoizer

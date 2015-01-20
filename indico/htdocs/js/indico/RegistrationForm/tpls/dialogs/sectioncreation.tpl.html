@@ -1,0 +1,18 @@
+<div class="regFormSectionNewSection">
+    <form novalidate name="sectionCreationForm">
+        <input type="text" ng-model="newsection.title"
+            ng-class="{hasError: validationStarted && sectionCreationForm.title.$invalid}"
+            name="title"
+            size="50px"
+            class="regFormTitleInputMgmt"
+            placeholder="{{ 'New section title' | i18n }}"
+            required>
+        <textarea ng-model="newsection.description"
+            name="description"
+            rows="4"
+            cols="50px"
+            class="regFormDescriptionInputMgmt"
+            placeholder="{{ 'Description' | i18n }}">
+        </textarea>
+    </form>
+</div>

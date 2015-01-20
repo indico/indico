@@ -1,22 +1,21 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """ This purpose of this file is high-level handling of plugins.
     It has functions to store and retrieve information from the plugins that is stored in the database;
@@ -24,22 +23,25 @@
     The functions can be used through methods of the "PluginsHolder" class. See its description for more details.
 """
 
-from MaKaC.common.Counter import Counter
+import types
+import pkg_resources
+import zope.interface
 from BTrees.OOBTree import OOBTree
+from persistent import Persistent
+from flask import Blueprint
+
+from MaKaC.common.Counter import Counter
 from MaKaC.common.Locators import Locator
 from MaKaC.errors import PluginError
-from MaKaC.common import DBMgr
-from MaKaC.common.logger import Logger
-import zope.interface, types
-from persistent import Persistent
-import pkg_resources, types, inspect, re
-
+from indico.core.db import DBMgr
+from indico.core.logger import Logger
 from MaKaC.plugins.loader import PluginLoader, GlobalPluginOptions
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.plugins.util import processPluginMetadata
 
 from indico.core.extpoint import Component, IListener, IContributor
-from indico.web import rh as newrh
+from indico.util.caching import memoize_request
+from indico.util.importlib import import_module
 
 
 def pluginId(mod):
@@ -96,7 +98,7 @@ class ComponentsManager(Persistent):
             self.__components.append(component)
         self._notifyModification()
 
-    def registerAllComponents(self, pluginType = None):
+    def registerAllComponents(self):
         '''We register all the components, but if a plugintype is passed we should just register the changes
         in the part referred to that plugintype'''
 
@@ -105,7 +107,13 @@ class ComponentsManager(Persistent):
 
             #it's a plugin
             if possiblePluginName:
-                isActive = PluginsHolder().getPluginType(pluginTypeName).getPlugin(possiblePluginName).isActive()
+                try:
+                    isActive = PluginsHolder().getPluginType(pluginTypeName).getPlugin(possiblePluginName).isActive()
+                except KeyError, e:
+                    Logger.get('components.register').warning(
+                        "Skipped {0} ({1}:{2}) - Plugin doesn't exist or disabled?".format(
+                            component, pluginTypeName, possiblePluginName))
+
                 #if the pluginType that the plugin belongs to is not active we won't register the components for the plugin
                 if not PluginsHolder().getPluginType(pluginTypeName).isActive():
                     isActive = False
@@ -127,7 +135,7 @@ class ComponentsManager(Persistent):
             for met in list(interface):
                 #if the method is implemented in the component, then we register it
                 if met in dir(component):
-                    self.registerNewEvent(met , component)
+                    self.registerNewEvent(met, component)
 
     def registerNewEvent(self, event, componentClass):
         changed = False
@@ -155,9 +163,8 @@ class ComponentsManager(Persistent):
         subscribers = self.getAllSubscribers(event)
 
         for subscriber in subscribers:
-
-            f = getattr(subscriber,event)
             try:
+                f = getattr(subscriber,event)
                 results.append(f(obj, *params))
             except Exception, e:
                 Logger.get('ext.notification').exception("Exception while calling subscriber %s" % str(subscriber.__class__))
@@ -259,38 +266,41 @@ class RHMap(Persistent):
     """ This class is the representation in the DB of the RHMap """
     def __init__(self):
         self.__id = "RHMap"
-        self.__map = {}
-
-    def hasURL(self, rh):
-        if hasattr(rh, '_url') and rh._url != None:
-            return True
-        else:
-            return False
-
-    def has_key(self, key):
-        return self.__map.has_key(key)
-
-    def copy(self):
-        return self.__map.copy()
+        self.__blueprints = set()
 
     def _notifyModification(self):
         self._p_changed = 1
 
-    def get(self):
-        return self.__map
+    def getBlueprints(self):
+        try:
+            blueprints = self.__blueprints
+        except AttributeError:
+            blueprints = self.__blueprints = set()
+        for module, name in blueprints:
+            try:
+                yield getattr(import_module(module), name)
+            except ImportError:
+                Logger.get('plugins.rhmap').exception('Could not import {0}'.format(module))
+
+    def hasBlueprint(self, module, name):
+        return (module.__name__, name) in self.__blueprints
 
     def getId(self):
         return self.__id
 
-    def addRH(self, rh):
-        if self.hasURL(rh):
-            self.__map[re.compile(rh._url)] = rh
-            self._notifyModification()
+    def addBlueprint(self, module, attr):
+        self.__blueprints.add((module.__name__, attr))
+        self._notifyModification()
 
     def cleanRHDict(self):
         """ Attributes in this class are persistent, so when we want to erase them we'll need to explicitely invoke this method
         """
-        self.__map.clear()
+        try:
+            if hasattr(self, '_RHMap__map'):
+                delattr(self, '_RHMap__map')
+            self.__blueprints.clear()
+        except AttributeError:
+            self.__blueprints = set()
         self._notifyModification()
 
 
@@ -340,7 +350,7 @@ class PluginsHolder (ObjectHolder):
         PluginLoader.loadPlugins()
         self.updateAllPluginInfo()
 
-    def reloadAllPlugins(self):
+    def reloadAllPlugins(self, disable_if_broken=True):
         """ Reloads all plugins and updates their information
         """
 
@@ -348,7 +358,7 @@ class PluginsHolder (ObjectHolder):
         self.getById("ajaxMethodMap").cleanAJAXDict()
         self.getById("RHMap").cleanRHDict()
         PluginLoader.reloadPlugins()
-        self.updateAllPluginInfo()
+        self.updateAllPluginInfo(disable_if_broken)
         self.getComponentsManager().registerAllComponents()
 
     def reloadPluginType(self, pluginTypeName):
@@ -361,7 +371,7 @@ class PluginsHolder (ObjectHolder):
         else:
             raise PluginError("Error while trying to reload plugins of the type: " + pluginTypeName + ". Plugins of the type " + pluginTypeName + "do not exist")
 
-    def updateAllPluginInfo(self):
+    def updateAllPluginInfo(self, disable_if_broken=True):
         """ Updates the info about plugins in the DB
             We must keep if plugins are active or not even between reloads
             and even if plugins are removed from the file system (they may
@@ -385,15 +395,14 @@ class PluginsHolder (ObjectHolder):
             missingDeps = ptype.getModule().__missing_deps__
 
             # if there are dependencies missing, set as not usable
-            if len(missingDeps) > 0:
-                ptype.setUsable(False, reason = "Dependencies missing: %s " % \
-                                missingDeps)
-                if ptype.isActive():
+            if missingDeps:
+                ptype.setUsable(False, reason="Dependencies missing: {0}".format(', '.join(missingDeps)))
+                if disable_if_broken and ptype.isActive():
                     ptype.setActive(False)
             else:
                 ptype.setUsable(True)
 
-            ptype.updateInfo()
+            ptype.updateInfo(disable_if_broken)
 
     def clearPluginInfo(self):
         """ Removes all the plugin information from the DB
@@ -446,13 +455,9 @@ class RHMapMemory:
     #  @todo Add all variables, and methods needed for the Singleton class below
     class Singleton:
         def __init__(self):
-            if not hasattr(self, '_map'):
-                if DBMgr.getInstance().isConnected():
-                    self._map=PluginsHolder().getRHMap().copy()
-                else:
-                    DBMgr.getInstance().startRequest()
-                    self._map=PluginsHolder().getRHMap().copy()
-                    DBMgr.getInstance().endRequest()
+            if not hasattr(self, '_blueprints'):
+                with DBMgr.getInstance().global_connection():
+                    self._blueprints = set(PluginsHolder().getRHMap().getBlueprints())
 
     ## The constructor
     #  @param self The object pointer.
@@ -522,7 +527,8 @@ class PluginBase(Persistent):
                 "defaultValue": attributes.get("defaultValue", None),
                 "editable": attributes.get("editable", True),
                 "visible": attributes.get("visible", True),
-                "mustReload": attributes.get("mustReload", False)
+                "mustReload": attributes.get("mustReload", False),
+                "options": attributes.get("options", [])
                 }
 
 
@@ -591,7 +597,8 @@ class PluginBase(Persistent):
         """
         self.__options[name] = PluginOption(name, attributes["description"], attributes["type"],
                                             attributes["defaultValue"], attributes["editable"], attributes["visible"],
-                                            attributes["mustReload"], True, order, attributes["subType"], attributes["note"])
+                                            attributes["mustReload"], True, order, attributes["subType"], attributes["note"],
+                                            attributes["options"])
         self._notifyModification()
 
     def updateOption(self, name, attributes, order):
@@ -612,6 +619,7 @@ class PluginBase(Persistent):
         if option.isMustReload():
             option.setValue(attributes["defaultValue"])
         option.setOrder(order)
+        option.setOptions(attributes["options"])
 
     def hasOption(self, name):
         """ Returns if this Plugin / PluginType object has an option given this name
@@ -773,7 +781,7 @@ class PluginType (PluginBase):
     def configureFromMetadata(self, metadata):
         self.__name = metadata['name']
 
-    def _updatePluginInfo(self, pid, pluginModule, metadata):
+    def _updatePluginInfo(self, pid, pluginModule, metadata, disable_if_broken=True):
 
         if self.hasPlugin(pid):
             p = self.getPlugin(pid)
@@ -793,12 +801,10 @@ class PluginType (PluginBase):
 
         missingDeps = p.getModule().__missing_deps__
 
-        if len(missingDeps) > 0:
-            p.setUsable(False, reason = "Dependencies missing: %s " % missingDeps)
-
-            if p.isActive():
+        if missingDeps:
+            p.setUsable(False, reason="Dependencies missing: {0}".format(missingDeps))
+            if disable_if_broken:
                 p.setActive(False)
-
         else:
             p.setUsable(True)
 
@@ -818,7 +824,7 @@ class PluginType (PluginBase):
         self._updateHandlerInfo(p, pluginModule)
         self._updateRHMapInfo(p, pluginModule)
 
-    def updateInfo(self):
+    def updateInfo(self, disable_if_broken=True):
         """
         Will update the information in the DB about this plugin type.
         """
@@ -839,9 +845,7 @@ class PluginType (PluginBase):
             if metadata['ignore']:
                 continue
             else:
-                self._updatePluginInfo(pluginModule.__plugin_id__,
-                                       pluginModule,
-                                       metadata)
+                self._updatePluginInfo(pluginModule.__plugin_id__, pluginModule, metadata, disable_if_broken=disable_if_broken)
 
         ptypeModule = self.getModule()
         ptypeMetadata = processPluginMetadata(ptypeModule)
@@ -878,7 +882,6 @@ class PluginType (PluginBase):
     def _updateComponentInfo(self, plugin, module):
         Logger.get('plugins.holder').info("Updating component info for '%s'" % \
                                           plugin.getFullId())
-
         for smodule in self._getAllSubmodules(module):
             for obj in smodule.__dict__.values():
                 if type(obj) == type and Component in obj.mro() and \
@@ -888,15 +891,26 @@ class PluginType (PluginBase):
                     PluginsHolder().getComponentsManager().addComponent(obj)
 
     def _updateRHMapInfo(self, plugin, module):
-        from MaKaC.webinterface.rh.base import RH
+        rh_map = PluginsHolder().getRHMap()
         for smodule in self._getAllSubmodules(module):
-            Logger.get('plugins.holder.rhmap').debug(
-                "Analyzing %s" % smodule)
-            for obj in smodule.__dict__.values():
-                # account for old style and new style class/rh
-                if (type(obj) == types.ClassType and RH in inspect.getmro(obj)) or \
-                   (type(obj) == type and newrh.RH in obj.mro()):
-                    PluginsHolder().getRHMap().addRH(obj)
+            Logger.get('plugins.holder.rhmap').debug('Analyzing %s' % smodule)
+            for name, obj in smodule.__dict__.iteritems():
+                if not isinstance(obj, Blueprint):
+                    continue
+                if rh_map.hasBlueprint(smodule, name):
+                    # If a submodule defines a blueprint it is also seen when this method runs for the parent
+                    # plugin type. However, since submodules are always checked first we can simply skip
+                    # already-registered blueprints!
+                    continue
+                # For a plugin type the blueprint is named 'foo', for a subplugin 'foo-bar'
+                if isinstance(plugin, PluginType):
+                    expected_name = plugin.getId().lower()
+                else:
+                    expected_name = '%s-%s' % (plugin.getOwner().getId().lower(), plugin.getId().lower())
+                if obj.name not in (expected_name, 'compat_' + expected_name):
+                    raise PluginError('Blueprint in plugin %s must be named %s, not %s' % (
+                                      plugin.getName(), expected_name, obj.name))
+                rh_map.addBlueprint(smodule, name)
 
     def _updateHandlerInfo(self, plugin, module):
 
@@ -1163,6 +1177,7 @@ class PluginOption(Persistent):
                     this is the only way to change values of a non-editable option without accessing the DB directly
         present: this will be false if the option is still in the DB, but not anymore in the __init__.py file of the plugin
         order: an integer so that the options can be displayed in a given order (ascending order)
+        options: a list of options when the type is select
     """
     _extraTypes = {
         'users': list,
@@ -1173,11 +1188,13 @@ class PluginOption(Persistent):
         'textarea': str,
         'list_multiline': list,
         'links': list,
-        'paymentmethods': list
+        'currency': list,
+        'paymentmethods': list,
+        'select': str,
 
     }
 
-    def __init__(self, name, description, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0, subType=None, note=None):
+    def __init__(self, name, description, valueType, value=None, editable=True, visible=True, mustReload=False, present=True, order=0, subType=None, note=None, options=[]):
         self.__name = name
         self.__description = description
         self.__note = note
@@ -1193,6 +1210,7 @@ class PluginOption(Persistent):
             self.setValue(value)
         self.__associatedActions = []
         self.__order = order
+        self.__options = options
 
     def getName(self):
         return self.__name
@@ -1212,16 +1230,12 @@ class PluginOption(Persistent):
     def getValue(self):
         return self.__value
 
+    @memoize_request
     def getRooms(self):
-        from MaKaC.rb_location import RoomGUID
+        from indico.modules.rb.models.rooms import Room
         if self.getType() != 'rooms':
             raise PluginError('getRooms() called on non-rooms option')
-        rooms = []
-        for guid in self.getValue():
-            room = RoomGUID.parse(guid).getRoom()
-            if room:
-                rooms.append(room)
-        return rooms
+        return Room.find_all(Room.id.in_(self.getValue()))
 
     def setName(self, value):
         self.__name = value
@@ -1293,6 +1307,14 @@ class PluginOption(Persistent):
 
     def setOrder(self, order):
         self.__order = order
+
+    def getOptions(self):
+        if not hasattr(self, "_PluginOption__options"): #TODO: remove when safe
+            self.__options = []
+        return self.__options
+
+    def setOptions(self, options):
+        self.__options = options
 
     def _notifyModification(self):
         self._p_changed = 1
@@ -1402,4 +1424,3 @@ class ActionBase(object):
         """ To be implemented by inheriting classes
         """
         raise PluginError("Action of class " + str(self.__class__.__name__) + " has not implemented the method call()")
-

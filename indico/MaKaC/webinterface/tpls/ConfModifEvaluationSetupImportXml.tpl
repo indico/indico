@@ -8,7 +8,7 @@
 </div>
 
 <br/><br/>
-<form action="${actionUrl}" name="ResultsSubmitters" method="POST" enctype="multipart/form-data" onsubmit="return confirmation();">
+<form action="${actionUrl}" id="ResultsSubmitters" method="POST" enctype="multipart/form-data">
   <table width="50%" align="center" class="evalationSetupImportXml">
     <tr>
       <td class="groupTitle"> ${ _("Evaluation importation")}</td>
@@ -42,29 +42,33 @@
         </ul>
         <input type="file" name="xmlFile" size="80"/>
         <br/><br/><br/>
-        <input class="btn" type="submit" name="importedXML" value="${ _("import")}" onclick="importIsClicked(true);"/>
-        <input class="btn" type="submit" name="cancel" value="${ _("cancel")}" onclick="importIsClicked(false);"/>
+        <input class="btn" type="submit" name="importedXML" id="importedXML" value="${ _("import")}"/>
+        <input class="btn" type="submit" name="cancel" value="${ _("cancel")}"/>
       </td>
     </tr>
   </table>
 </form>
 <script type="text/javascript">
-  <!--to know which submit button ("submit"/"cancel") has been pressed.-->
-  var isImportClicked = false;
-  function importIsClicked(val){ isImportClicked = val; }
-  <!--when removing, ask to confirm.-->
-  function confirmation(){
-    if (isImportClicked){
-      if (document.ResultsSubmitters.xmlFile.value==""){
-        alert("Please select a file before importing...");
-        return false;
-      }
-      importedConfig = document.ResultsSubmitters.configOption[1];
-      importedQuestions = document.ResultsSubmitters.questionsOption[1];
-      if (importedConfig.checked || importedQuestions.checked)
-        return confirm('${ _("You will lose some data from your current evaluation! Are you sure you want to proceed?")}');
+$("#importedXML").on('click', function (e){
+    if (!$('input[name="xmlFile"]').val()){
+        new AlertPopup($T("Warning"), $T("Please select a file before importing.")).open();
+        e.preventDefault();
+        return;
     }
-    return true;
-  }
+    if ($('input[name="configOption"]:checked').val() == 'imported' || $('input[name="questionsOption:checked"]').val() == 'imported' ){
+        e.preventDefault();
+        new ConfirmPopup($T("Import evaluation"), $T("You will lose some data from your current evaluation! Are you sure you want to proceed?"), function(confirmed) {
+            if(confirmed) {
+                var form = $('#ResultsSubmitters');
+                $('<input/>', {
+                    type: 'hidden',
+                    name: 'importedXML',
+                    value: 'import'
+                }).appendTo(form);
+                form.submit();
+            }
+        }).open();
+    }
+});
 </script>
 <br/><br/>

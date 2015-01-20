@@ -94,7 +94,7 @@ function builder(construct, build) {
         var result = construct();
         var iterator = function(value, key) {
                 build(result, key, value);
-        }
+        };
         iterator.result = result;
         return iterator;
 }
@@ -216,11 +216,11 @@ function processing(action, template) {
         }
         iterator.result = action.result;
         return iterator;
-};
+}
 
 function keyGetter(value, key) {
         return key;
-};
+}
 
 /**
  * Specifies that item was found.

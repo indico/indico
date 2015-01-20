@@ -1,1 +1,0 @@
-include(ScriptRoot + "indico/Plugins/InstantMessaging.js");

@@ -1,31 +1,33 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
 Basic fossils for data export
 """
 
-from indico.util.fossilize import IFossil, fossilize
+from hashlib import md5
+
+from indico.util.fossilize import IFossil
 from indico.util.fossilize.conversion import Conversion
 from MaKaC.webinterface import urlHandlers
-from MaKaC.fossils.conference import ISessionFossil
+from MaKaC.webinterface.linking import RoomLinker
+from MaKaC.fossils.conference import ISessionSlotFossil
 
 
 class IHTTPAPIErrorFossil(IFossil):
@@ -50,8 +52,9 @@ class IHTTPAPIExportResultFossil(IHTTPAPIResultFossil):
     def getCount(self):
         pass
 
-    def getComplete(self):
-        pass
+    # New SQL-based hooks do not use it anymore, so we deprecate it for everything.
+    # def getComplete(self):
+    #     pass
 
     def getAdditionalInfo(self):
         pass
@@ -79,6 +82,7 @@ class ICategoryMetadataFossil(IFossil):
     getLocator.convert = Conversion.url(urlHandlers.UHCategoryDisplay)
     getLocator.name = 'url'
 
+
 class ICategoryProtectedMetadataFossil(ICategoryMetadataFossil):
     def getName(self):
         pass
@@ -95,11 +99,97 @@ class IConferenceChairMetadataFossil(IFossil):
 
     def getEmail(self):
         pass
+    getEmail.onlyIf = 'canModify'
+
+    def getEmailHash(self):
+        pass
+    getEmailHash.produce = lambda s: md5(s.getEmail()).hexdigest()
 
     def getAffiliation(self):
         pass
 
-class IConferenceMetadataFossil(IFossil):
+
+class IContributionParticipationMetadataFossil(IFossil):
+
+    def getId(self):
+        pass
+
+    def getFullName(self):
+        pass
+
+    def getEmail(self):
+        pass
+    getEmail.onlyIf = 'canModify'
+
+    def getEmailHash(self):
+        pass
+    getEmailHash.produce = lambda s: md5(s.getEmail()).hexdigest()
+
+    def getAffiliation(self):
+        pass
+
+
+class IResourceMetadataFossil(IFossil):
+
+    def getName(self):
+        pass
+
+
+class ILocalFileMetadataFossil(IResourceMetadataFossil):
+
+    def getId(self):
+        pass
+
+    def getURL(self):
+        pass
+    getURL.produce = lambda s: str(urlHandlers.UHFileAccess.getURL(s))
+    getURL.name = 'url'
+
+    def getFileName(self):
+        pass
+
+
+class ILinkMetadataFossil(IResourceMetadataFossil):
+
+    def getURL(self):
+        pass
+    getURL.name = 'url'
+
+
+class IMaterialMetadataFossil(IFossil):
+
+    def getId(self):
+        pass
+
+    def getTitle( self ):
+        pass
+
+    def getResourceList(self):
+        pass
+    getResourceList.result = {'MaKaC.conference.Link': ILinkMetadataFossil, 'MaKaC.conference.LocalFile': ILocalFileMetadataFossil}
+    getResourceList.name = 'resources'
+    getResourceList.filterBy = 'access'
+
+
+class _IncludeMaterialFossil(IFossil):
+
+    def getAllMaterialList(self):
+        pass
+    getAllMaterialList.name = 'material'
+    getAllMaterialList.result = IMaterialMetadataFossil
+    getAllMaterialList.filterBy = 'access'
+
+
+class _IncludeACLFossil(IFossil):
+
+    def getRecursiveAllowedToAccessList(self):
+        pass
+    getRecursiveAllowedToAccessList.produce = Conversion.allowedList
+    getRecursiveAllowedToAccessList.name = 'allowed'
+    getRecursiveAllowedToAccessList.onlyIf = 'canModify'
+
+
+class IConferenceMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFossil):
 
     def getId(self):
         pass
@@ -151,70 +241,39 @@ class IConferenceMetadataFossil(IFossil):
         """ Room (inside location) """
     getRoom.convert = lambda r: r and r.getName()
 
+    def getRoomFullName(self):
+        """ Conference Room """
+    getRoomFullName.produce = lambda c: c.getRoom()
+    getRoomFullName.convert = Conversion.roomFullName
+    getRoomFullName.name = 'roomFullname'
+
     def getVisibility(self):
         pass
     getVisibility.name = 'visibility'
     getVisibility.produce = lambda x: Conversion.visibility(x)
 
-
-class IContributionParticipationMetadataFossil(IFossil):
-
-    def getId(self):
+    def hasAnyProtection(self):
         pass
 
-    def getFullName(self):
+    def getAddress(self):
         pass
 
-    def getEmail(self):
+    def getCreator(self):
+        pass
+    getCreator.result = IConferenceChairMetadataFossil
+
+    def getCreationDate(self):
         pass
 
-    def getAffiliation(self):
+    def getModificationDate(self):
         pass
 
-
-class IResourceMetadataFossil(IFossil):
-
-    def getName(self):
+    def getRoomMapURL(self):
         pass
+    getRoomMapURL.produce = lambda x: RoomLinker().getURL(x.getRoom(), x.getLocation())
 
 
-class ILocalFileMetadataFossil(IResourceMetadataFossil):
-
-    def getURL(self):
-        pass
-    getURL.produce = lambda s: str(urlHandlers.UHFileAccess.getURL(s))
-    getURL.name = 'url'
-
-
-class ILinkMetadataFossil(IResourceMetadataFossil):
-
-    def getURL(self):
-        pass
-    getURL.name = 'url'
-
-class IMaterialMetadataFossil(IFossil):
-
-    def getId(self):
-        pass
-
-    def getTitle( self ):
-        pass
-
-    def getResourceList(self):
-        pass
-    getResourceList.result = {'MaKaC.conference.Link': ILinkMetadataFossil, 'MaKaC.conference.LocalFile': ILocalFileMetadataFossil}
-    getResourceList.name = 'resources'
-
-
-class _IncludeMaterialFossil(IFossil):
-
-    def getAllMaterialList(self):
-        pass
-    getAllMaterialList.name = 'material'
-    getAllMaterialList.result = IMaterialMetadataFossil
-
-
-class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):
+class IContributionMetadataFossil(_IncludeMaterialFossil, _IncludeACLFossil, IFossil):
 
     def getId(self):
         pass
@@ -229,6 +288,12 @@ class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):
     def getRoom(self):
         pass
     getRoom.convert = lambda r: r and r.getName()
+
+    def getRoomFullName(self):
+        """ Contribution Room """
+    getRoomFullName.produce = lambda c: c.getRoom()
+    getRoomFullName.convert = Conversion.roomFullName
+    getRoomFullName.name = 'roomFullname'
 
     def getStartDate(self):
         pass
@@ -250,6 +315,16 @@ class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):
     getSpeakerList.name = 'speakers'
     getSpeakerList.result = IContributionParticipationMetadataFossil
 
+    def getPrimaryAuthorList(self):
+        pass
+    getPrimaryAuthorList.name = 'primaryauthors'
+    getPrimaryAuthorList.result = IContributionParticipationMetadataFossil
+
+    def getCoAuthorList(self):
+        pass
+    getCoAuthorList.name = 'coauthors'
+    getCoAuthorList.result = IContributionParticipationMetadataFossil
+
     def getTrack( self ):
         pass
     getTrack.convert = lambda t: t and t.getTitle()
@@ -267,8 +342,12 @@ class IContributionMetadataFossil(_IncludeMaterialFossil, IFossil):
     getLocator.convert = Conversion.url(urlHandlers.UHContributionDisplay)
     getLocator.name = 'url'
 
+    def getKeywords(self):
+        pass
+    getKeywords.produce = lambda x: x.getKeywords().splitlines() if x.getKeywords().strip() else []
 
-class ISubContributionMetadataFossil(IFossil):
+
+class ISubContributionMetadataFossil(IFossil, _IncludeACLFossil):
 
     def getId(self):
         pass
@@ -312,7 +391,26 @@ class IConferenceMetadataWithSubContribsFossil(_IncludeMaterialFossil, IConferen
     getContributionList.filterBy = 'access'
 
 
-class ISessionMetadataFossil(ISessionFossil):
+class ISessionMetadataBaseFossil(ISessionSlotFossil,  _IncludeACLFossil):
+
+    def getId(self):
+        pass
+    getId.produce = lambda ss: "{0}-{1}".format(ss.getSession().getId(), ss.getId())
+
+    def getLocator(self):
+        pass
+    getLocator.convert = Conversion.url(urlHandlers.UHSessionDisplay)
+    getLocator.name = 'url'
+
+    def getFullTitle(self):
+        pass
+    getFullTitle.name = 'title'
+
+    def getDescription(self):
+        pass
+
+
+class ISessionMetadataFossil(ISessionMetadataBaseFossil):
 
     def getContributionList(self):
         pass
@@ -321,7 +419,7 @@ class ISessionMetadataFossil(ISessionFossil):
     getContributionList.filterBy = 'access'
 
 
-class ISessionMetadataWithContributionsFossil(ISessionFossil):
+class ISessionMetadataWithContributionsFossil(ISessionMetadataBaseFossil):
 
     def getContributionList(self):
         pass
@@ -329,7 +427,8 @@ class ISessionMetadataWithContributionsFossil(ISessionFossil):
     getContributionList.name = 'contributions'
     getContributionList.filterBy = 'access'
 
-class ISessionMetadataWithSubContribsFossil(ISessionFossil):
+
+class ISessionMetadataWithSubContribsFossil(ISessionMetadataBaseFossil):
 
     def getContributionList(self):
         pass
@@ -337,16 +436,51 @@ class ISessionMetadataWithSubContribsFossil(ISessionFossil):
     getContributionList.name = 'subcontributions'
     getContributionList.filterBy = 'access'
 
+
 class IConferenceMetadataWithSessionsFossil(_IncludeMaterialFossil, IConferenceMetadataFossil):
 
-    def getSessionList(self):
+    def getSessionSlotList(self):
         pass
-    getSessionList.result = ISessionMetadataFossil
-    getSessionList.name = 'sessions'
-    getSessionList.filterBy = 'access'
+    getSessionSlotList.result = ISessionMetadataFossil
+    getSessionSlotList.name = 'sessions'
+    getSessionSlotList.filterBy = 'access'
 
     def getContributionListWithoutSessions(self):
         pass
     getContributionListWithoutSessions.result = IContributionMetadataWithSubContribsFossil
     getContributionListWithoutSessions.name = 'contributions'
     getContributionListWithoutSessions.filterBy = 'access'
+
+
+class IBasicConferenceMetadataFossil(IFossil):
+
+    def getId(self):
+        pass
+
+    def getStartDate(self):
+        pass
+    getStartDate.convert = Conversion.datetime
+
+    def getEndDate(self):
+        pass
+    getEndDate.convert = Conversion.datetime
+
+    def getTitle(self):
+        pass
+
+    def getType(self):
+        pass
+
+    def getOwner(self):
+        pass
+    getOwner.convert = lambda x: x.getTitle()
+    getOwner.name = 'category'
+
+    def getCategoryId(self):
+        pass
+    getCategoryId.produce = lambda x: x.getOwner().getId()
+
+    def getLocator(self):
+        pass
+    getLocator.convert = Conversion.url(urlHandlers.UHConferenceDisplay)
+    getLocator.name = 'url'

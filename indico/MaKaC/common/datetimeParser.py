@@ -1,34 +1,33 @@
 # -*- coding: utf-8 -*-
 ##
 ##
-## This file is part of CDS Indico.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## This file is part of Indico.
+## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
 ##
-## CDS Indico is free software; you can redistribute it and/or
+## Indico is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
+## published by the Free Software Foundation; either version 3 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Indico is distributed in the hope that it will be useful, but
+## Indico is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Indico; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with Indico;if not, see <http://www.gnu.org/licenses/>.
 
 """
     Simple robust time and date parsing.
-    
+
     Note: Follows the Australian standard, dd/mm/yyyy.
           Americans should replace '%d %m %Y' with '%m %d %Y' and '%d %m %y' with '%m %d %y' below.
-    
+
     Routines will either
      - return a date or time
      - return None if the string is empty
      - throw a ValueError
-     
+
     TODO: Handle 1st 2nd 3rd etc
 
     This file is placed in the public domain by Paul Harrison, 2006
@@ -52,23 +51,23 @@ date_formats_without_year = ['%d %B', '%B %d',
 def parse_time(string):
     string = string.strip()
     if not string: return None
-    
+
     for format in time_formats:
         try:
             result = time.strptime(string, format)
             return datetime.time(result.tm_hour, result.tm_min)
         except ValueError:
             pass
-            
+
     raise ValueError()
 
-    
+
 def parse_date(string):
     string = string.strip()
     if not string: return None
-    
+
     string = string.replace('/',' ').replace('-',' ').replace(',',' ')
-    
+
     for format in date_formats_with_year:
         try:
             result = time.strptime(string, format)
@@ -83,7 +82,7 @@ def parse_date(string):
             return datetime.date(year, result.tm_mon, result.tm_mday)
         except ValueError:
             pass
-            
+
     raise ValueError()
 
 

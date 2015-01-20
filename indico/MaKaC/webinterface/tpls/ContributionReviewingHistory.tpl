@@ -20,7 +20,7 @@
              % endfor
         </ul>
         <div>
-        <h2>${_("Judgements")}</h2>
+        <h2>${_("Assessments")}</h2>
             <%include file="ContributionReviewingDisplay.tpl" args="Editing = review.getEditorJudgement(), AdviceList = review.getReviewerJudgements(), Review = review,
                             ConferenceChoice = ConferenceChoice"/>
         </div>
