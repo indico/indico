@@ -500,7 +500,7 @@ def _check_request_error(r):
     if r.status_code >= 400:
         j = r.json()
         msg = j.get('message', DEFAULT_REQUEST_ERROR_MSG)
-        print red("ERROR: {0}".format(msg))
+        print red("ERROR: {0} ({1})".format(msg, r.status_code))
         sys.exit(-2)
 
 
@@ -519,12 +519,12 @@ def _release_exists(tag_name, auth):
     r = requests.get(url, auth=(env.github['user'], auth))
     _check_request_error(r)
     parsed = r.json()
-    for j in parsed:
-        if j.get('tag_name') == tag_name:
-            rel_id = j.get('id')
-            return (True, rel_id)
+    for release in parsed:
+        if release.get('tag_name') == tag_name:
+            rel_id = release.get('id')
+            return (True, rel_id, release)
 
-    return (False, 0)
+    return (False, 0, None)
 
 
 def _asset_exists(rel_id, name, auth):
@@ -566,7 +566,8 @@ def upload_github(build_dir=None, tag_name=None, auth_token=None,
         'draft': True
     }
 
-    (exists, rel_id) = _release_exists(tag_name, auth_token)
+    (exists, rel_id, release_data) = _release_exists(tag_name, auth_token)
+
     if exists:
         if overwrite is None:
             overwrite = _yes_no_input('Release already exists, do you want to overwrite', 'n')
@@ -578,14 +579,21 @@ def upload_github(build_dir=None, tag_name=None, auth_token=None,
         # We will need to get a new release id from github
         r = requests.post(url, auth=auth_creds, data=json.dumps(payload))
         _check_request_error(r)
-        release_id = r.json().get('id')
+        release_data = r.json()
+        release_id = release_data.get('id')
 
     # Upload binaries to the new release
     binaries_dir = os.path.join(build_dir, 'indico', 'dist')
-    url = "https://uploads.github.com/repos/{0}/{1}/releases/{2}/assets" \
-          .format(env.github['org'], env.github['repo'], release_id)
+
+    # awful way to handle this, but a regex seems like too much
+    url = release_data['upload_url'][:-7]
 
     for f in os.listdir(binaries_dir):
+
+        # jump over hidden/system files
+        if f.startswith('.'):
+            continue
+
         if os.path.isfile(os.path.join(binaries_dir, f)):
             (exists, asset_id) = _asset_exists(release_id, f, auth_token)
 
@@ -600,6 +608,7 @@ def upload_github(build_dir=None, tag_name=None, auth_token=None,
                 data = ff.read()
                 extension = os.path.splitext(f)[1]
 
+                # upload eggs using zip mime type
                 if extension == '.gz':
                     headers = {'Content-Type': 'application/x-gzip'}
                 elif extension == '.egg':
@@ -610,7 +619,7 @@ def upload_github(build_dir=None, tag_name=None, auth_token=None,
                 params = {'name': f}
 
                 print green("Uploading \'{0}\' to Github".format(f))
-                r = requests.post(url, auth=auth_creds, headers=headers, data=data, params=params)
+                r = requests.post(url, auth=auth_creds, headers=headers, data=data, params=params, verify=False)
                 _check_request_error(r)
 
 
@@ -694,7 +703,7 @@ def package_release(py_versions=None, build_dir=None, system_node=False,
                 local('git clone {0}'.format(upstream))
             with lcd('indico'):
                 print green("Checking out branch \'{0}\'".format(indico_version))
-                local('git checkout origin/{0}'.format(indico_version))
+                local('git checkout {0}'.format(indico_version))
 
                 _package_release(os.path.join(build_dir, 'indico'), py_versions, system_node)
 
