@@ -48,7 +48,7 @@
         <div id="countriesPlot" style="width:500px; height:{{height}}px;"></div>
         <script>
             $(document).ready(function generateBasicStats() {
-                var countries = {{ data.countries|tojson }}
+                var countries = {{ data.countries|tojson }};
                 var countriesPlot = $.jqplot('countriesPlot', [countries], {
                     animate: !$.jqplot.use_excanvas,
                     animateReplot: !$.jqplot.use_excanvas,
@@ -64,7 +64,7 @@
                         rendererOptions: {
                             animation: { speed: 1000 },
                             barDirection: 'horizontal',
-                            barWidth: 18,
+                            barWidth: 18
                         },
                         pointLabels: {
                             show: true,
@@ -72,7 +72,7 @@
                             xpadding: 4,
                             edgeTolerance: -2
                         },
-                        shadow: false,
+                        shadow: false
                     },
                     axes: {
                         yaxis: {
@@ -84,7 +84,7 @@
                                 showGridline: false,
                                 markSize: 0,
                                 tickSpacing: 24,
-                                showLabel: true,
+                                showLabel: true
                             }
                         },
                         xaxis: {
