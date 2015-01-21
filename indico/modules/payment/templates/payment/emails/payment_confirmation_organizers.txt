@@ -4,9 +4,9 @@
 Payment confirmation for {{ event.getTitle() }}: {{ registrant.getFirstName() }} {{ registrant.getFamilyName() }}
 {%- endblock -%}
 
-{% block header %}Dear organizers of the event {{ event.getTitle() }}{% endblock %}
+{% block header_recipient %}organizers of the event '{{ event.getTitle() }}'{% endblock %}
 
-{% block body %}
+{% block body -%}
 A registrant has successfully completed a payment.
 
 Payment details:
