@@ -176,15 +176,6 @@ class SettingsProxyBase(object):
 class SettingsProxy(SettingsProxyBase):
     """Proxy class to access settings for a certain module"""
 
-    def get_setting(self, name):
-        """Retrieves a single setting.
-
-        :param name: Setting name
-        :return: The setting
-        """
-        self._check_strict(name)
-        return Setting.get_setting(self.module, name)
-
     def get_all(self, no_defaults=False):
         """Retrieves all settings
 
@@ -252,17 +243,6 @@ def event_or_id(f):
 
 class EventSettingsProxy(SettingsProxyBase):
     """Proxy class to access event-specific settings for a certain module"""
-
-    @event_or_id
-    def get_setting(self, event, name):
-        """Retrieves a single setting.
-
-        :param event: Event (or its ID)
-        :param name: Setting name
-        :return: The setting
-        """
-        self._check_strict(name)
-        return EventSetting.get_setting(self.module, name, event_id=event)
 
     @event_or_id
     def get_all(self, event, no_defaults=False):
