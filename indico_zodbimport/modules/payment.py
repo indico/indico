@@ -79,16 +79,25 @@ class PaymentImporter(Importer):
             default_conditions = global_settings.get('conditions')
             default_register_email = global_settings.get('register_email')
             default_success_email = global_settings.get('success_email')
-
+            register_email = getattr(old_payment, 'receiptMsg', default_register_email)
+            success_email = getattr(old_payment, 'successMsg', default_success_email)
+            conditions = (getattr(old_payment, 'paymentConditions', default_conditions)
+                          if (getattr(old_payment, 'paymentConditionsEnabled', False) and
+                              getattr(old_payment, 'specificPaymentConditions', '').strip() == '')
+                          else getattr(old_payment, 'specificPaymentConditions', ''))
+            # The new messages are shown in an "additional info" section, so the old defaults can always go away
+            if register_email == 'Please, see the summary of your order:':
+                register_email = ''
+            if success_email == 'Congratulations, your payment was successful.':
+                success_email = ''
+            # Get rid of the most terrible part of the old default conditions
+            conditions = conditions.replace('CANCELLATION :', 'CANCELLATION:')
             settings = {
                 'enabled': getattr(old_payment, 'activated', False),
                 'currency': event._registrationForm._currency,
-                'conditions': (getattr(old_payment, 'paymentConditions', default_conditions)
-                               if (getattr(old_payment, 'paymentConditionsEnabled', False) and
-                                   getattr(old_payment, 'specificPaymentConditions', '').strip() == '')
-                               else getattr(old_payment, 'specificPaymentConditions', '')),
-                'register_email': getattr(old_payment, 'receiptMsg', default_register_email),
-                'success_email': getattr(old_payment, 'successMsg', default_success_email),
+                'conditions': conditions,
+                'register_email': register_email,
+                'success_email': success_email,
             }
             payment_event_settings.set_multi(event, settings)
 
