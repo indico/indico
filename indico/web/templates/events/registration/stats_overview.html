@@ -49,7 +49,7 @@
         <script>
             $(document).ready(function generateBasicStats() {
                 var countries = {{ data.countries|tojson }};
-                countriesPlot = $.jqplot('countriesPlot', [countries], {
+                var countriesPlot = $.jqplot('countriesPlot', [countries], {
                     animate: !$.jqplot.use_excanvas,
                     animateReplot: !$.jqplot.use_excanvas,
                     grid: { shadow: false },
@@ -70,13 +70,13 @@
                             location: 'w',
                             xpadding: 4,
                             edgeTolerance: -2
-                        },
+                        }
                     },
                     seriesColors: ['#007CAC'],  // indico blue
                     highlighter: {
                         show: true,
                         showMarker: false,
-                        showTooltip: false,
+                        showTooltip: false
                     },
                     axes: {
                         yaxis: {
