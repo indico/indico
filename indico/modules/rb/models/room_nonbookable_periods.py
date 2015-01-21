@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from sqlalchemy.ext.hybrid import hybrid_method
+
 from indico.core.db import db
 from indico.util.string import return_ascii
 
@@ -50,5 +52,6 @@ class NonBookablePeriod(db.Model):
             self.end_dt
         )
 
+    @hybrid_method
     def overlaps(self, st, et):
-        return self.start_dt < et and self.end_dt > st
+        return (self.start_dt < et) & (self.end_dt > st)
