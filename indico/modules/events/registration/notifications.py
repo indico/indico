@@ -51,15 +51,15 @@ def notify_registration_confirmation(event, registrant):
                                   registration_email_msg=registration_email_msg)
 
         ticket = reg_form.getETicket()
-        attachment = {}
+        attachments = []
         if ticket.isEnabled() and ticket.isAttachedToEmail():
-            attachment = {
+            attachments.append({
                 'name': 'Ticket.pdf',
                 'binary': TicketToPDF(event, registrant).getPDFBin()
-            }
+            })
 
         yield make_email(registrant.getEmail(), from_address=from_address, subject=tpl.get_subject(),
-                         body=tpl.get_body(), attachments=[attachment])
+                         body=tpl.get_body(), attachments=attachments)
 
 
 @email_sender
