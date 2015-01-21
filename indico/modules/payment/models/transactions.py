@@ -247,8 +247,8 @@ class PaymentTransaction(db.Model):
         new_transaction = PaymentTransaction(event_id=event.getId(), registrant_id=registrant.getId(), amount=amount,
                                              currency=currency, provider=provider, data=data)
         double_payment = False
+        previous_transaction = cls.find_latest_for_registrant(registrant)
         try:
-            previous_transaction = cls.find_latest_for_registrant(registrant)
             next_status = TransactionStatusTransition.next(previous_transaction, action, provider)
         except InvalidTransactionStatus as e:
             Logger.get('payment').exception("{}\nData received: {}".format(e, data))
