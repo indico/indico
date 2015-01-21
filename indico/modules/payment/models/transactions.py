@@ -225,8 +225,8 @@ class PaymentTransaction(db.Model):
     @return_ascii
     def __repr__(self):
         # in case of a new object we might not have the default status set
-        return '<PaymentTransaction({}, {}, {}, {}, {} {}, {})>'.format(self.event_id, self.registrant_id,
-                                                                        TransactionStatus(self.status).name,
+        status = TransactionStatus(self.status).name if self.status is not None else None
+        return '<PaymentTransaction({}, {}, {}, {}, {} {}, {})>'.format(self.event_id, self.registrant_id, status,
                                                                         self.provider, self.amount, self.currency,
                                                                         self.timestamp)
 
