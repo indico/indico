@@ -43,7 +43,17 @@ Or, you can also do it fetching a tarball or egg file from our `releases on Gith
 From our Git repository
 -----------------------
 
-You can find the source code in our `Github repository <https://github.com/indico/indico/>`_
+First of all, you will need to install our development dependencies:
+
+.. code-block:: console
+
+    $ pip install -r requirements.dev.txt
+
+You can find the source code in our `Github repository <https://github.com/indico/indico/>`_. Cloning it is as easy as:
+
+.. code-block:: console
+
+   $ git clone https://github.com/indico/indico/
 
 You should have checked out an ``indico`` directory. ``cd`` into it and simply do (as root):
 
