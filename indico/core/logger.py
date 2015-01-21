@@ -280,12 +280,12 @@ class Logger:
     def _log_path(cls, fname):
         config = Config.getInstance()
         configDir = config.getLogDir()
-        fpath = os.path.join(configDir, fname)
 
-        if not os.access(os.path.dirname(fpath), os.W_OK):
-            raise IOError("Logfile can't be writen")
-
-        return fpath.replace('\\', '\\\\')
+        for fpath in (os.path.join(configDir, fname), os.path.join(os.getcwd(), '.indico.log')):
+            if os.access(os.path.dirname(fpath), os.W_OK):
+                return fpath.replace('\\', '\\\\')
+        else:
+            raise IOError("Log file can't be written")
 
 
 Logger.initialize()
