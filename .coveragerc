@@ -2,6 +2,7 @@
 branch = true
 source = indico
 include =
+    indico/core/models/*.py
     indico/modules/rb/*.py
     indico/util/string.py
     indico/web/flask/templating.py
