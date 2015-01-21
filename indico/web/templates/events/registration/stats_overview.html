@@ -49,22 +49,21 @@
         <script>
             $(document).ready(function generateBasicStats() {
                 var countries = {{ data.countries|tojson }};
-                var countriesPlot = $.jqplot('countriesPlot', [countries], {
+                countriesPlot = $.jqplot('countriesPlot', [countries], {
                     animate: !$.jqplot.use_excanvas,
                     animateReplot: !$.jqplot.use_excanvas,
                     grid: { shadow: false },
                     height: {{ height }},
-                    highlighter: {
-                        show: true,
-                        sizeAdjust: 7.5
-                    },
-                    seriesColors: ['#007CAC'],  // indico blue
                     seriesDefaults: {
                         renderer: $.jqplot.BarRenderer,
                         rendererOptions: {
                             animation: { speed: 1000 },
                             barDirection: 'horizontal',
-                            barWidth: 18
+                            barWidth: 18,
+                            shadow: true,
+                            shadowOffset: 1,
+                            shadowDepth: 3,
+                            highlightColors: '#0085B9'
                         },
                         pointLabels: {
                             show: true,
@@ -72,7 +71,12 @@
                             xpadding: 4,
                             edgeTolerance: -2
                         },
-                        shadow: false
+                    },
+                    seriesColors: ['#007CAC'],  // indico blue
+                    highlighter: {
+                        show: true,
+                        showMarker: false,
+                        showTooltip: false,
                     },
                     axes: {
                         yaxis: {

@@ -19,6 +19,7 @@
 @import 'base';
 @import 'compass';
 @import 'compass/css3/user-interface';
+@import 'compass/support';
 @import 'partials/icons';
 
 // ============================================================================
@@ -1082,7 +1083,10 @@ textarea.regFormDescriptionInputMgmt {
 
         &> .i-badges-list > .i-badge > .i-badge-content { height: 6.5em; }
 
-        .jqplot-point-label { color: white; }
+        .jqplot-point-label {
+            color: white;
+            z-index: 100;
+        }
         .jqplot-yaxis-tick {
             right: 0;
             margin-right: 0.5em;
@@ -1091,6 +1095,8 @@ textarea.regFormDescriptionInputMgmt {
     }
 
     #countriesPlot {
+        @include user-select(none);
+
         margin-top: -1.2em;
     }
 }
