@@ -24,9 +24,10 @@ from sqlalchemy.orm import defaultload
 from werkzeug.datastructures import MultiDict
 
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
-from indico.util.date_time import iterdays, overlaps
+from indico.util.date_time import iterdays, overlaps, format_date
 from indico.util.i18n import _
 from indico.util.serializer import Serializer
 from indico.util.string import natural_sort_key
@@ -66,11 +67,18 @@ class RoomBookingCalendarWidget(object):
             user_strategy = defaultload('blocking').defaultload('created_by_user')
             user_strategy.noload('*')
             user_strategy.load_only('first_name', 'last_name')
-            self.blocked_rooms = (BlockedRoom.find_with_filters({'room_ids': [r.id for r in self.rooms],
-                                                                 'state': BlockedRoom.State.accepted,
-                                                                 'start_date': self.start_dt.date(),
-                                                                 'end_date': self.end_dt.date()})
-                                  .options(user_strategy))
+            room_ids = [r.id for r in self.rooms]
+            filters = {
+                'room_ids': room_ids,
+                'state': BlockedRoom.State.accepted,
+                'start_date': self.start_dt.date(),
+                'end_date': self.end_dt.date()
+            }
+            self.blocked_rooms = BlockedRoom.find_with_filters(filters).options(user_strategy)
+            self.nonbookable_periods = NonBookablePeriod.find(
+                NonBookablePeriod.room_id.in_(room_ids),
+                NonBookablePeriod.overlaps(self.start_dt, self.end_dt)
+            ).all()
         else:
             self.blocked_rooms = []
 
@@ -236,6 +244,11 @@ class RoomBookingCalendarWidget(object):
                              for day in self.iter_days()
                              if blocking.start_date <= day <= blocking.end_date)
 
+        self.bars.extend(Bar.from_nonbookable_period(nbp, day)
+                         for nbp in self.nonbookable_periods
+                         for day in self.iter_days()
+                         if nbp.start_dt.date() <= day <= nbp.end_dt.date())
+
     def _produce_out_of_range_bars(self):
         for room in self.rooms:
             self.bars.extend(
@@ -264,14 +277,16 @@ class Bar(Serializer):
         OUT_OF_RANGE: 'out_of_range'        # A period out of the booking range
     }
 
-    def __init__(self, start, end, kind=None, reservation=None, overlapping=False, blocking=None, room_id=None):
+    def __init__(self, start, end, kind=None, reservation=None, overlapping=False, blocking=None, room_id=None,
+                 nb_period=None):
         self.start = start
         self.end = end
         self.reservation = reservation
         self.reservation_start = None
         self.reservation_end = None
         self.room_id = room_id
-        self.blocking = None
+        self.blocking = blocking
+        self.nb_period = nb_period
 
         if reservation is not None:
             self.reservation_start = reservation.start_dt
@@ -282,10 +297,6 @@ class Bar(Serializer):
                     kind = Bar.UNAVAILABLE if reservation.is_accepted else Bar.PREBOOKED
                 else:
                     kind = Bar.CONFLICT if reservation.is_accepted else Bar.PRECONFLICT
-
-        if blocking is not None:
-            self.blocking = blocking
-
         self.kind = kind
 
     def __cmp__(self, other):
@@ -316,6 +327,11 @@ class Bar(Serializer):
         return cls(datetime.combine(day, time()), datetime.combine(day, time(23, 59)), Bar.BLOCKED,
                    blocking=blocked_room.blocking, room_id=blocked_room.room_id)
 
+    @classmethod
+    def from_nonbookable_period(cls, nb_period, day):
+        return cls(datetime.combine(day, time()), datetime.combine(day, time(23, 59)), Bar.BLOCKED,
+                   nb_period=nb_period, room_id=nb_period.room_id)
+
     @property
     def date(self):
         return self.start.date()
@@ -335,12 +351,24 @@ class Bar(Serializer):
     def blocking_data(self):
         if not self.blocking:
             return None
-        return {
-            'id': self.blocking.id,
-            'creator': self.blocking.created_by_user.full_name,
-            'reason': self.blocking.reason,
-            'blocking_url': url_for('rooms.blocking_details', blocking_id=self.blocking.id)
-        }
+        elif self.blocking:
+            return {
+                'id': self.blocking.id,
+                'creator': self.blocking.created_by_user.full_name,
+                'reason': self.blocking.reason,
+                'blocking_url': url_for('rooms.blocking_details', blocking_id=self.blocking.id),
+                'type': 'blocking'
+            }
+        elif self.nb_period:
+            return {
+                'id': None,
+                'creator': None,
+                'reason': 'Unavailable from {0} until {1}.'.format(format_date(self.nb_period.start_dt),
+                                                                   format_date(self.nb_period.end_dt)),
+                'blocking_url': None,
+                'type': 'nonbookable'
+            }
+        return None
 
     @property
     def importance(self):

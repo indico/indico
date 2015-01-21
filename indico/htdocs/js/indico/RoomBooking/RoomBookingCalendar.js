@@ -114,9 +114,11 @@ type ("RoomBookingCalendarBar", [],
                 this.owner = barInfo.forReservation.bookedForName;
                 this.url = barInfo.forReservation.bookingUrl;
                 this.inDB = barInfo.forReservation.id !== null;
-            } else if (barInfo.type == 0) {
+            } else if (barInfo.type == 0 && barInfo.blocking_data == 'blocking') {
                 this.url = barInfo.blocking_data.blocking_url;
                 this.inDB = true
+            } else if (barInfo.type == 0 && barInfo.blocking_data == 'nonbookable') {
+                this.inDB = false
             } else {
                 this.inDB = false;
             }
@@ -258,9 +260,13 @@ type ("RoomBookingCalendarDrawer", [],
                         resvInfo = $T('This bar indicates the time which will be booked.');
                     }
                 } else if (bar.type == "barBlocked") {
-                    resvInfo = $T("Room blocked by") + ":<br/>" +
-                                  bar.blocking.creator + "<br/>" +
-                                  $T('Reason') + ': ' + bar.blocking.reason;
+                    resvInfo = (bar.blocking.type == 'nonbookable') ? [] : [
+                        $T("Room blocked by"),
+                        ':<br/>',
+                        bar.blocking.creator,
+                        '<br/>'
+                    ];
+                    resvInfo = [].concat.apply([], [resvInfo, [$T('Reason'), ': ', bar.blocking.reason]]);
                 } else if (bar.type == 'barOutOfRange') {
                     resvInfo = $T('Booking not allowed for this period.<br>This room can only be booked {0} days in advance.').format(bar.room.max_advance_days)
                 } else {
@@ -368,7 +374,9 @@ type ("RoomBookingCalendarDrawer", [],
 
                 indicoRequest("roomBooking.room.bookingPermission", {
                     room_id: room_id,
-                    blocking_id: blocking_id
+                    blocking_id: blocking_id,
+                    start_dt: bar.resvStartDT.print('%H:%M %Y-%m-%d'),
+                    end_dt: bar.resvEndDT.print('%H:%M %Y-%m-%d')
                 }, function(result, error) {
                     if (!error && !exists(result.error)) {
                         if (!result.can_book) {
@@ -388,7 +396,9 @@ type ("RoomBookingCalendarDrawer", [],
                             $('.barDefault.barCand' + flexibility).addClass('barConf');
                             self._setDialog("search-again");
                             $('#booking-dialog-content').html(
-                                $T("This room is blocked on this date and you don't have permissions to book it.")
+                                (result.blocking_type === 'blocking')
+                                    ? $T("This room is blocked on this date and you don't have permissions to book it.")
+                                    : $T("This room is not available on this date.")
                             );
                             $('#booking-dialog').dialog("open");
                         }
