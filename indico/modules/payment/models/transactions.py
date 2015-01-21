@@ -226,9 +226,9 @@ class PaymentTransaction(db.Model):
     def __repr__(self):
         # in case of a new object we might not have the default status set
         status = TransactionStatus(self.status).name if self.status is not None else None
-        return '<PaymentTransaction({}, {}, {}, {}, {} {}, {})>'.format(self.event_id, self.registrant_id, status,
-                                                                        self.provider, self.amount, self.currency,
-                                                                        self.timestamp)
+        return '<PaymentTransaction({}, {}, {}, {}, {}, {} {}, {})>'.format(self.id, self.event_id, self.registrant_id,
+                                                                            status, self.provider, self.amount,
+                                                                            self.currency, self.timestamp)
 
     def render_details(self):
         """Renders the transaction details for the registrant details in event management"""
