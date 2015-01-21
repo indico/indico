@@ -51,7 +51,7 @@ def register_transaction(registrant, amount, currency, action, provider=None, da
         if double_payment:
             notify_double_payment(registrant)
         if new_transaction.status == TransactionStatus.successful:
-            notify_payment_confirmation(event_id, registrant_id, amount)
+            notify_payment_confirmation(registrant, amount)
         return new_transaction
 
 

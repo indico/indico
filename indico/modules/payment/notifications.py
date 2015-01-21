@@ -42,11 +42,8 @@ def notify_amount_inconsistency(registrant, amount):
 
 
 @email_sender
-def notify_payment_confirmation(event_id, registrant_id, amount):
-    event = ConferenceHolder().getById(event_id)
-    registrant = event.getRegistrantById(registrant_id)
-    if not registrant:
-        return
+def notify_payment_confirmation(registrant, amount):
+    event = registrant.getConference()
     reg_form = registrant.getRegistrationForm()
     from_address = reg_form.getNotificationSender()
     currency = payment_event_settings.get(event, 'currency')
@@ -66,7 +63,7 @@ def notify_payment_confirmation(event_id, registrant_id, amount):
         success_email_msg = payment_event_settings.get(event, 'success_email')
         params = {}
         if not registrant.getAvatar():
-            params = {'registrant_id': registrant_id, 'authkey': registrant.getRandomId()}
+            params = {'registrant_id': registrant.getId(), 'authkey': registrant.getRandomId()}
         reg_page = url_for('event.confRegistrationFormDisplay', event, _external=True, _secure=True, **params)
         tpl = get_template_module('payment/emails/payment_confirmation_registrant.txt', event=event,
                                   registrant=registrant, amount=amount, currency=currency,
