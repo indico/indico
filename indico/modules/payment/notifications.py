@@ -20,7 +20,6 @@ from indico.core.notifications import email_sender, make_email
 from indico.modules.payment import event_settings as payment_event_settings
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
-from MaKaC.conference import ConferenceHolder
 
 
 @email_sender
