@@ -16,6 +16,8 @@
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with Indico;if not, see <http://www.gnu.org/licenses/>.
+import re
+
 from flask import request
 
 from persistent import Persistent
@@ -287,25 +289,30 @@ class SSOHandler:
             if personId == '-1':
                 personId = None
             ah = AvatarHolder()
-            av = ah.match({"email": email}, exact=1, onlyActivated=False, searchInAuthenticators=False)
-            if av:
-                av = av[0]
-                # don't allow disabled accounts
-                if av.isDisabled():
-                    return None
-                elif not av.isActivated():
-                    av.activateAccount()
+            for mail in re.split(";|,", email):
+                av = ah.match({"email": mail}, exact=1, onlyActivated=False, searchInAuthenticators=False)
+                if av:
+                    av = av[0]
+                    # don't allow disabled accounts
+                    if av.isDisabled():
+                        return None
+                    elif not av.isActivated():
+                        av.activateAccount()
 
-                av.clearAuthenticatorPersonalData()
-                av.setAuthenticatorPersonalData('phone', phone)
-                av.setAuthenticatorPersonalData('fax', fax)
-                av.setAuthenticatorPersonalData('surName', lastname)
-                av.setAuthenticatorPersonalData('firstName', firstname)
-                av.setAuthenticatorPersonalData('affiliation', institute)
-                if personId != None and personId != av.getPersonId():
-                    av.setPersonId(personId)
-            else:
-                avDict = {"email": email,
+                    av.clearAuthenticatorPersonalData()
+                    av.setAuthenticatorPersonalData('phone', phone)
+                    av.setAuthenticatorPersonalData('fax', fax)
+                    av.setAuthenticatorPersonalData('surName', lastname)
+                    av.setAuthenticatorPersonalData('firstName', firstname)
+                    av.setAuthenticatorPersonalData('affiliation', institute)
+                    if personId != None and personId != av.getPersonId():
+                        av.setPersonId(personId)
+
+                    self._postLogin(login, av, True)
+                    return av
+
+            if not av:
+                avDict = {"email": re.split(";|,",email),
                           "name": firstname,
                           "surName": lastname,
                           "organisation": institute,
@@ -317,8 +324,8 @@ class SSOHandler:
                 av.setPersonId(personId)
                 av.activateAccount()
 
-            self._postLogin(login, av, True)
-            return av
+                self._postLogin(login, av, True)
+                return av
         return None
 
     def getLogoutCallbackURL(self):
