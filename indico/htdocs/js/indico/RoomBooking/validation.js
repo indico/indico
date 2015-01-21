@@ -28,34 +28,31 @@
 
         var position = Math.ceil(startDate.getDate() / 7);
         if (position === 5) {
+            // count 5th week as 'last' instead
             position = -1;
         }
-        var rules = {};
-        rules[RRule.DAILY] = {
-            freq:    RRule.DAILY,
-            dtstart: startDate,
-            until:   endDate,
-        };
-        rules[RRule.WEEKLY] = {
-            freq:     RRule.WEEKLY,
-            dtstart:  startDate,
-            until:    endDate,
-            interval: 1
-        };
-        rules[RRule.MONTHLY] = {
-            freq:      RRule.MONTHLY,
-            dtstart:   startDate,
-            until:     endDate,
-            byweekday: RRule[startDate.getDayName().slice(0,2).toUpperCase()],
-            bysetpos:  position
-        };
 
-        var rule = new RRule(rules[frequency]);
-        return $.map(rule.all(), function resetTime(d) {
-            if (d <= startDate) { // the start date is not valid as an
+        var rule_data = {
+            freq: frequency,
+            dtstart: startDate,
+            until: endDate
+        }
+
+        // if monthly, preserve the week day/number
+        if (frequency == RRule.MONTHLY) {
+            _.extend(rule_data, {
+                byweekday: RRule[startDate.getDayName().slice(0, 2).toUpperCase()],
+                bysetpos:  position
+            });
+        }
+
+        var rule = new RRule(rule_data);
+
+        return _.map(rule.all(), function(dt) {
+            if (dt <= startDate) { // the start date is not valid as an
                 return null;       // end date for repetitive bookings.
             }
-            return d.setHours(0, 0, 0, 0);
+            return dt.setHours(0, 0, 0, 0);
         });
 
     };

@@ -101,11 +101,11 @@ $(document).ready(function(){
 
     /* Time formatting */
     if (currentLanguage === "fr_FR") {
-        moment.locale('fr')
+        moment.locale('fr');
     } else if (currentLanguage === "es_ES") {
-        moment.locale('es')
+        moment.locale('es');
     } else {
-        moment.locale('en')
+        moment.locale('en');
     }
 
     /* AJAX query */

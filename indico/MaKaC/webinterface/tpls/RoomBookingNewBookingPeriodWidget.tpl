@@ -193,6 +193,7 @@ ${ form.repeat_interval(type='hidden') }
             repetition[RRule.DAILY] = 'days';
             repetition[RRule.WEEKLY] = 'weeks';
             repetition[RRule.MONTHLY] = 'months';
+
             var startDate = $('#sDatePlace').datepicker('getDate');
             var selectedEndDate = $('#eDatePlace').datepicker('getDate');
             var frequency = frequencies[$('#repeatability input:radio[name=repeat_frequency]:checked').val()];
