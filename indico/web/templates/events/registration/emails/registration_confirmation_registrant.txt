@@ -1,0 +1,24 @@
+{% extends 'emails/base.txt' %}
+
+{%- block subject -%}
+Registration confirmation for {{ event.getTitle() }}: {{ registrant.getFirstName() }} {{ registrant.getFamilyName() }}
+{%- endblock -%}
+
+{% block header_recipient %}{{ registrant.getFirstName() }} {{ registrant.getFamilyName() }}{% endblock %}
+
+{% block body -%}
+This is a confirmation message for your registration in the event '{{ event.getTitle() }}'
+{%- if needs_to_pay %}
+Please, do not forget to proceed with your payment in case you haven't done it yet.
+{%- endif %}
+
+Registrant ID: {{ registrant.getId() }}
+You can manage your registration on this page:
+{{ reg_page }}
+
+{%- if registration_email_msg %}
+
+Additional information:
+{{ registration_email_msg }}
+{%- endif %}
+{% endblock %}
