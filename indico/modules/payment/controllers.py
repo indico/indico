@@ -92,7 +92,7 @@ class RHPaymentEventToggle(RHConferenceModifBase):
             flash(_('There are no payment methods available. Please contact your Indico administrator.'), 'error')
             return redirect(url_for('.event_settings', event))
         if event_settings.get(event, 'enabled', None) is None:
-            copy_settings = {'currency', 'conditions', 'summary_email', 'success_email'}
+            copy_settings = {'currency', 'conditions', 'register_email', 'success_email'}
             data = {k: v for k, v in settings.get_all().iteritems() if k in copy_settings}
             event_settings.set_multi(event, data)
         event_settings.set(event, 'enabled', enabled)

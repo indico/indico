@@ -121,10 +121,6 @@
         <label for="sendRegEmail"><strong>${ _("...after registration")}</strong></label>
         <br>
 
-        <input type="checkbox" size="50" name="sendReceiptEmail" id="sendReceiptEmail" ${ sendReceiptEmail }>
-        <label for="sendReceiptEmail"><strong>${ _("...with a payment summary")}</strong></label>
-        <br>
-
         <input type="checkbox" size="50" name="sendPaidEmail" id="sendPaidEmail" ${ sendPaidEmail }>
         <label for="sendPaidEmail"><strong>${ _("...after successful payment")}</strong></label>
       </td>

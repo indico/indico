@@ -77,7 +77,7 @@ class PaymentImporter(Importer):
         for event in committing_iterator(self._iter_events()):
             old_payment = event._modPay
             default_conditions = global_settings.get('conditions')
-            default_summary_email = global_settings.get('summary_email')
+            default_register_email = global_settings.get('register_email')
             default_success_email = global_settings.get('success_email')
 
             settings = {
@@ -87,7 +87,7 @@ class PaymentImporter(Importer):
                                if (getattr(old_payment, 'paymentConditionsEnabled', False) and
                                    getattr(old_payment, 'specificPaymentConditions', '').strip() == '')
                                else getattr(old_payment, 'specificPaymentConditions', '')),
-                'summary_email': getattr(old_payment, 'receiptMsg', default_summary_email),
+                'register_email': getattr(old_payment, 'receiptMsg', default_register_email),
                 'success_email': getattr(old_payment, 'successMsg', default_success_email),
             }
             payment_event_settings.set_multi(event, settings)

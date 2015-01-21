@@ -157,7 +157,6 @@ class RegistrationForm(Persistent):
         form.setMandatoryAccount(self.isMandatoryAccount())
         form.setNotificationSender(self.getNotificationSender())
         form.setSendRegEmail(self.isSendRegEmail())
-        form.setSendReceiptEmail(self.isSendReceiptEmail())
         form.setSendPaidEmail(self.isSendPaidEmail())
         form.setAllSessions()
         form.notification = self.getNotification().clone()
@@ -248,15 +247,11 @@ class RegistrationForm(Persistent):
         return self._notificationSender
 
     def isSendRegEmail(self):
-        try:
-            if self._sendRegEmail:
-                pass
-        except AttributeError, e:
-            self._sendRegEmail = True
-        return self._sendRegEmail
+        return getattr(self, '_sendRegEmail', True) or getattr(self, '_sendReceiptEmail', False)
 
     def setSendRegEmail(self, v=True):
         self._sendRegEmail = v
+        self._sendReceiptEmail = v
 
     def isSendReceiptEmail(self):
         try:
@@ -265,9 +260,6 @@ class RegistrationForm(Persistent):
         except AttributeError, e:
             self._sendReceiptEmail = False
         return self._sendReceiptEmail
-
-    def setSendReceiptEmail(self, v=True):
-        self._sendReceiptEmail = v
 
     def isSendPaidEmail(self):
         try:
@@ -899,7 +891,7 @@ Please use this information for your payment (except for e-payment):\n
         paymentMsg = _("If you haven't paid for your registration yet, you can do it at %s") % urlHandlers.UHConfRegistrationFormCreationDone.getURL(registrant)
         if registrant.getEmail().strip() != "":
             event = registrant.getConference()
-            bodyReg = "{}\n\n{}\n\n{}\n\n{}".format(payment_event_settings.get(event, 'summary_email').encode('utf-8'),
+            bodyReg = "{}\n\n{}\n\n{}\n\n{}".format(payment_event_settings.get(event, 'register_email').encode('utf-8'),
                                                     '\n'.join(booking), body, paymentMsg)
             to = registrant.getEmail().strip()
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }

@@ -31,7 +31,7 @@ from indico.web.forms.fields import MultipleItemsField
 CURRENCY_CODE_LINK = 'http://en.wikipedia.org/wiki/ISO_4217#Active_codes'
 CONDITIONS_DESC = _('The registrant must agree to these conditions before paying. When left empty, no confirmation '
                     'prompt is shown to the user.')
-SUMMARY_EMAIL_DESC = _('Custom message included in the payment summary email.')
+REGISTER_EMAIL_DESC = _('Custom message included in the registration email.')
 SUCCESS_EMAIL_DESC = _('Custom message included in the email after successful payment.')
 EMAIL_DISABLED_MSG = _('This email is currently <strong>disabled</strong>. You can enable it in the '
                        '<a href="{0}">registration form setup</a>.')
@@ -54,7 +54,7 @@ class AdminSettingsForm(IndicoForm):
                            description=_('The default currency for new events. If you add a new currency, you need to '
                                          'save the settings first for it to show up here.'))
     conditions = TextAreaField(_('Conditions'), description=CONDITIONS_DESC)
-    summary_email = TextAreaField(_('Summary email message'), description=SUMMARY_EMAIL_DESC)
+    register_email = TextAreaField(_('Register email message'), description=REGISTER_EMAIL_DESC)
     success_email = TextAreaField(_('Success email message'), description=SUCCESS_EMAIL_DESC)
     checkout_session_timeout = IntegerField('Checkout session timeout', validators=[DataRequired(), NumberRange(min=0)],
                                             description=CHECKOUT_SESSION_TIMEOUT_MSG)
@@ -75,7 +75,7 @@ class AdminSettingsForm(IndicoForm):
 class EventSettingsForm(IndicoForm):
     currency = SelectField(_('Currency'), [DataRequired()])
     conditions = TextAreaField(_('Conditions'), description=CONDITIONS_DESC)
-    summary_email = TextAreaField(_('Summary email message'), description=SUMMARY_EMAIL_DESC)
+    register_email = TextAreaField(_('Register email message'), description=REGISTER_EMAIL_DESC)
     success_email = TextAreaField(_('Success email message'), description=SUCCESS_EMAIL_DESC)
 
     def __init__(self, *args, **kwargs):
@@ -87,11 +87,11 @@ class EventSettingsForm(IndicoForm):
     def _include_email_status(self):
         regform = self._event.getRegistrationForm()
         regform_setup_url = url_for('event_mgmt.confModifRegistrationForm-dataModif', self._event)
-        summary_status = (EMAIL_ENABLED_MSG if regform.isSendReceiptEmail()
-                          else EMAIL_DISABLED_MSG).format(regform_setup_url)
+        register_status = (EMAIL_ENABLED_MSG if regform.isSendRegEmail()
+                           else EMAIL_DISABLED_MSG).format(regform_setup_url)
         success_status = (EMAIL_ENABLED_MSG if regform.isSendPaidEmail()
                           else EMAIL_DISABLED_MSG).format(regform_setup_url)
-        self.summary_email.description += '<br>' + summary_status
+        self.register_email.description += '<br>' + register_status
         self.success_email.description += '<br>' + success_status
 
     def _set_currencies(self):

@@ -180,8 +180,6 @@ class WConfModifRegForm(wcomponents.WTemplated):
             if not regForm.isSendRegEmail():
                 wvars["sendRegEmail"] = _("No")
             wvars["sendReceiptEmail"] = _("Yes")
-            if not regForm.isSendReceiptEmail():
-                wvars["sendReceiptEmail"] = _("No")
             wvars["sendPaidEmail"] = _("Yes")
             if not regForm.isSendPaidEmail():
                 wvars["sendPaidEmail"] = _("No")
@@ -260,12 +258,9 @@ class WConfModifRegFormDataModification(wcomponents.WTemplated):
             wvars["mandatoryAccount"] = "CHECKED"
         wvars["notificationSender"] = regForm.getNotificationSender()
         wvars["sendRegEmail"] = ""
-        wvars["sendReceiptEmail"] = ""
         wvars["sendPaidEmail"] = ""
         if regForm.isSendRegEmail():
             wvars["sendRegEmail"] = "CHECKED"
-        if regForm.isSendReceiptEmail():
-            wvars["sendReceiptEmail"] = "CHECKED"
         if regForm.isSendPaidEmail():
             wvars["sendPaidEmail"] = "CHECKED"
         wvars["extraTimeAmount"] = regForm.getEndExtraTimeAmount()
