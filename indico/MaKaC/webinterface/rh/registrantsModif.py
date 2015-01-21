@@ -530,8 +530,7 @@ class RHRegistrantTransactionPerformModify(RHRegistrantModifBase):
 
     def _process(self):
         action = TransactionAction.complete if self._isPayed == '1' else TransactionAction.cancel
-        register_transaction(event_id=self._conf.getId(),
-                             registrant_id=self._registrant.getId(),
+        register_transaction(registrant=self._registrant,
                              amount=self._registrant.getTotal(),
                              currency=self._registrant.getCurrency(),
                              action=action,

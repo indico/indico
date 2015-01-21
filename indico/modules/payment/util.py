@@ -41,15 +41,15 @@ def get_active_payment_plugins(event):
             if plugin.event_settings.get(event, 'enabled')}
 
 
-def register_transaction(event_id, registrant_id, amount, currency, action, provider=None, data=None):
-    new_transaction, double_payment = PaymentTransaction.create_next(event_id=event_id, registrant_id=registrant_id,
-                                                                     amount=amount, currency=currency, action=action,
+def register_transaction(registrant, amount, currency, action, provider=None, data=None):
+    new_transaction, double_payment = PaymentTransaction.create_next(registrant=registrant, amount=amount,
+                                                                     currency=currency, action=action,
                                                                      provider=provider, data=data)
     if new_transaction:
         db.session.add(new_transaction)
         db.session.flush()
         if double_payment:
-            notify_double_payment(event_id, registrant_id)
+            notify_double_payment(registrant)
         if new_transaction.status == TransactionStatus.successful:
             rf = new_transaction.event.getRegistrationForm()
             rf.getNotification().sendEmailNewRegistrantConfirmPay(rf, new_transaction.registrant)
