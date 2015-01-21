@@ -31,6 +31,7 @@ from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.utils import validMail
 from MaKaC.PDFinterface.conference import TicketToPDF
+from indico.modules.events.registration.notifications import notify_registration_confirmation
 from indico.modules.payment import event_settings as payment_event_settings
 from indico.web.flask.util import send_file, url_for
 
@@ -159,18 +160,7 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBase):
             user.addRegistrant(rp)
             rp.setAvatar(user)
 
-        # This creates the email to the new registrant and SENDS the email to the organizers if necessary... WTF.
-        email = self._regForm.getNotification().createEmailNewRegistrant(self._regForm, rp)
-        if self._regForm.isSendRegEmail() and rp.getEmail().strip():
-            modEticket = self._conf.getRegistrationForm().getETicket()
-
-            if modEticket.isEnabled() and modEticket.isAttachedToEmail():
-                attachment = {
-                    'name': "{0}-Ticket.pdf".format(self._target.getTitle()),
-                    'binary': TicketToPDF(self._target, rp).getPDFBin(),
-                }
-                email["attachments"] = [attachment]
-            GenericMailer.send(email)
+        notify_registration_confirmation(self._conf, rp)
 
         if canManageRegistration and user != self._getUser():
             self._redirect(RHRegistrantListModif._uh.getURL(self._conf))
