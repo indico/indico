@@ -60,3 +60,33 @@ def notify_registration_confirmation(event, registrant):
 
         yield make_email(registrant.getEmail(), from_address=from_address, subject=tpl.get_subject(),
                          body=tpl.get_body(), attachments=[attachment])
+
+
+@email_sender
+def notify_registration_modification(event, registrant):
+    reg_form = registrant.getRegistrationForm()
+    from_address = reg_form.getNotificationSender()
+
+    # Send email to organizers
+    notification = reg_form.getNotification()
+    to_list = notification.getToList()
+    cc_list = notification.getCCList()
+    if to_list or cc_list:
+        reg_page = url_for('event_mgmt.confModifRegistrants-modification', registrant, _external=True, _secure=True)
+        tpl = get_template_module('events/registration/emails/registration_modification_organizers.txt', event=event,
+                                  registrant=registrant, reg_page=reg_page)
+        yield make_email(to_list, cc_list, from_address=from_address, subject=tpl.get_subject(), body=tpl.get_body())
+
+    # Send email to the registrant
+    if reg_form.isSendRegEmail():
+        needs_to_pay = registrant.doPay() and payment_event_settings.get(event, 'enabled')
+        params = {}
+        if not registrant.getAvatar():
+            params = {'registrant_id': registrant.getId(), 'authkey': registrant.getRandomId()}
+        reg_page = url_for('event.confRegistrationFormDisplay', event, _external=True, _secure=True, **params)
+        tpl = get_template_module('events/registration/emails/registration_modification_registrant.txt', event=event,
+                                  registrant=registrant, payment_enabled=payment_event_settings.get(event, 'enabled'),
+                                  reg_page=reg_page, needs_to_pay=needs_to_pay)
+
+        yield make_email(registrant.getEmail(), from_address=from_address, subject=tpl.get_subject(),
+                         body=tpl.get_body())

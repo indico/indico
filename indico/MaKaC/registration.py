@@ -963,48 +963,6 @@ Please use this information for your payment (except for e-payment):\n
             maildata = { "fromAddr": fromAddr, "toList": [to], "subject": subject, "body": bodyReg }
             GenericMailer.send(GenericNotification(maildata))
 
-    def sendEmailModificationRegistrant(self, regForm, rp):
-        fromAddr = regForm.getNotificationSender()
-        subject = _("""Registration modified for '%s': %s""") % (strip_ml_tags(regForm.getConference().getTitle()), rp.getFullName())
-        body = i18nformat("""
-_("Registrant Id"): %s
-_("Title"): %s
-_("Family Name"): %s
-_("First Name"): %s
-_("Position"): %s
-_("Institution"): %s
-_("Address"): %s
-_("City"): %s
-_("Country"): %s
-_("Phone"): %s
-_("Fax"): %s
-_("Email"): %s
-_("Personal Homepage"): %s
-%s
-""") % (rp.getId(), \
-                     rp.getTitle(), \
-                     rp.getFamilyName(), \
-                     rp.getFirstName(), \
-                     rp.getPosition(), \
-                     rp.getInstitution(), \
-                     rp.getAddress(), \
-                     rp.getCity(), \
-                     rp.getCountry(), \
-                     rp.getPhone(), \
-                     rp.getFax(), \
-                     rp.getEmail(), \
-                     rp.getPersonalHomepage(), \
-                     self._printAllSections(regForm, rp))
-        if self.getToList() != [] or self.getCCList() != []:
-            bodyOrg = _("""
-A registrant (%s) has modified his/her registration for '%s'. See information below:
-
-%s
-""") % (rp.getFullName(), strip_ml_tags(regForm.getConference().getTitle()), body)
-            bodyOrg = self._cleanBody(bodyOrg)
-            maildata = { "fromAddr": fromAddr, "toList": self.getToList(), "ccList": self.getCCList(), "subject": subject, "body": bodyOrg }
-            GenericMailer.send(GenericNotification(maildata))
-
     def exportXml(self, xmlGen):
         """Write xml tags about this object in the given xml generator of type XMLGen."""
         xmlGen.openTag("notification")

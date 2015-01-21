@@ -1,0 +1,18 @@
+{% extends 'emails/base.txt' %}
+
+{%- block subject -%}
+Registration modification for {{ event.getTitle() }}: {{ registrant.getFirstName() }} {{ registrant.getFamilyName() }}
+{%- endblock -%}
+
+{% block header_recipient %}{{ registrant.getFirstName() }} {{ registrant.getFamilyName() }}{% endblock %}
+
+{% block body -%}
+Your registration for the event '{{ event.getTitle() }}' has been successfully modified.
+{%- if needs_to_pay %}
+Please, do not forget to proceed with your payment in case you haven't done it yet.
+{%- endif %}
+
+Registrant ID: {{ registrant.getId() }}
+You can manage your registration on this page:
+{{ reg_page }}
+{% endblock %}

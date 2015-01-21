@@ -28,10 +28,10 @@ from indico.core.config import Config
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
 
-from MaKaC.common.mail import GenericMailer
 from MaKaC.common.utils import validMail
 from MaKaC.PDFinterface.conference import TicketToPDF
-from indico.modules.events.registration.notifications import notify_registration_confirmation
+from indico.modules.events.registration.notifications import (notify_registration_confirmation,
+                                                              notify_registration_modification)
 from indico.modules.payment import event_settings as payment_event_settings
 from indico.web.flask.util import send_file, url_for
 
@@ -244,8 +244,13 @@ class RHRegistrationFormPerformModify(RHRegistrationFormCreation):
                 # check if the email is being changed by another one that already exists
                 if self._getRequestParams().get("email", "") != rp.getEmail() and self._conf.hasRegistrantByEmail(self._getRequestParams().get("email", "")):
                     raise FormValuesError(_("There is already a user with the email \"%s\". Please choose another one") % self._getRequestParams().get("email", "--no email--"))
+                had_to_pay = rp.doPay()
                 rp.setValues(self._getRequestParams(), self._getUser())
-                self._regForm.getNotification().sendEmailModificationRegistrant(self._regForm, rp)
+                has_to_pay = rp.doPay()
+
+                # Send email only when the payment status changes
+                if had_to_pay != has_to_pay:
+                    notify_registration_modification(self._conf, rp)
                 flash(_(u"Your registration has been modified successfully."), 'success')
                 if rp.doPay():
                     self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(rp))
