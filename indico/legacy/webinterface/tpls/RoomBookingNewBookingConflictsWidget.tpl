@@ -12,7 +12,7 @@
         <div class="message-text">
             ${ _('Some of your days will not be booked as they overlap with other existing bookings.') }
             <ul>
-                % for occurrence, overlap in conflicts.iteritems():
+                % for occurrence, overlap in sorted(conflicts.iteritems(), key=lambda k: k[0].start_dt):
                 <li>
                     ${ format_date(occurrence.start_dt, format='full') }:
                     <ul>
@@ -61,7 +61,7 @@
                 </div>
             % endif
             <ul>
-                % for occurrence, overlap in pre_conflicts.iteritems():
+                % for occurrence, overlap in sorted(pre_conflicts.iteritems(), key=lambda k: k[0].start_dt):
                 <li>
                     ${ format_date(occurrence.start_dt, format='full') }:
                     <ul>
