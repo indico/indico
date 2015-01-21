@@ -37,7 +37,7 @@ def email_sender(fn):
     return wrapper
 
 
-def make_email(to_list, cc_list=None, subject=None, body=None, from_address=None):
+def make_email(to_list, cc_list=None, subject=None, body=None, from_address=None, attachments=None):
     if cc_list is None:
         cc_list = []
     to_list = [to_list] if isinstance(to_list, str) else to_list
@@ -49,5 +49,6 @@ def make_email(to_list, cc_list=None, subject=None, body=None, from_address=None
         'ccList': cc_list,
         'subject': subject,
         'body': body,
-        'fromAddr': from_address
+        'fromAddr': from_address,
+        'attachments': attachments
     }
