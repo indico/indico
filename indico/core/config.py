@@ -525,7 +525,7 @@ class Config:
         'EmbeddedWebserverBaseURL'  : None,
         'OAuthAccessTokenTTL'       : 10000,
         'MobileURL'                 : '',
-        'CheckinURL'                : 'http://indico-software.org/wiki/apps/check-in',
+        'CheckinURL'                : 'http://old.indico-software.org/wiki/apps/check-in',
         'SCSSDebugInfo'             : True,
         'SessionLifetime'           : 86400 * 31,
         'RouteOldUrls'              : False,
