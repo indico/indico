@@ -18,8 +18,7 @@
 ## along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import re
-from hashlib import md5
-from flask import flash, request, session
+from flask import request, session
 
 import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.admins as admins
@@ -521,13 +520,9 @@ class RHUserRemoveIdentity(RHUserIdentityBase):
 
 
 class RHConfirmEmail(RHProtected):
-    # docstring
+    """Confirms a newly set email address"""
 
     def _process(self):
-        # retrieve data from the cache
-        # compare the avatar form the cache and the logged user
-        # if ok set the email
-        # else error message
         avatar = session.user
         token = request.view_args['token']
         token_storage = GenericCache('confirm-email')
@@ -538,23 +533,18 @@ class RHConfirmEmail(RHProtected):
                   "You might have already validated the email address related to this link.\n"
                   "Otherwise, make sure you have copy-pasted the URL correctly and try again.").replace('\n', '<br>')
             )
-        if avatar.getId() != data.get('uid'):
+        if avatar.getId() != data['uid']:
             raise NoReportError(
-                _("You are connected with the wrong account.\n"
-                  "Please connect with the correct account or add the address to this account "
+                _("You are logged in to the wrong account.\n"
+                  "Please log in to the correct account or add the address to this account "
                   "and try again.").replace('\n', '<br>')
             )
 
-        email_type = data.get('data_type')
-        if email_type not in {'email', 'secondaryEmails'}:
-            # Invalid email type
-            raise MaKaCError(_("Something went wrong while setting your email address: "
-                               "Invalid email type '{0}'.").format(email_type))
-        email = data.get('email')
+        email_type = data['data_type']
+        email = data['email']
         existing = AvatarHolder().match({'email': email}, searchInAuthenticators=False)
         if existing:
-            existing = [av for av in existing if av != avatar]
-            if existing:
+            if any(av for av in existing if av != avatar):
                 raise NoReportError(_("The email address {0} is already used by another user.").format(email))
             else:
                 raise NoReportError(_("It appears you are already using the email address {0}.").format(email))
@@ -565,6 +555,8 @@ class RHConfirmEmail(RHProtected):
         elif email_type == 'secondaryEmails':
             avatar.addSecondaryEmail(email, reindex=True)
             flash_msg = _("{0} has been added to your secondary email addresses.").format(email)
+        else:
+            raise ValueError(email_type)
 
         delay = 10
         url = url_for('user.userDetails', None)

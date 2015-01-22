@@ -235,14 +235,17 @@ $E('inPlaceEditEmail').set(new InputEditWidget('user.setPersonalData',
         {'userId':'${ userId }', 'dataType':'email'}, ${ jsonEncode(onlyEmail) }, false,
         function removeEmailFromSecondary() {
             var emails = secondaryEmailsInputWidget.value;
-            if (!emails) { return; }
+            if (!emails) {
+                return;
+            }
 
             emails = emails.split(', ');
-            var index = emails.indexOf(this.input.get())
-            if (~index) { emails.splice(index, 1); }
-            emails = emails.join(', ');
+            var index = emails.indexOf(this.input.get());
+            if (~index) {
+                emails.splice(index, 1);
+            }
 
-            secondaryEmailsInputWidget.value = emails;
+            secondaryEmailsInputWidget.value = emails.join(', ');
             secondaryEmailsInputWidget.setMode('display');
 
         }, Util.Validation.isEmailAddress,

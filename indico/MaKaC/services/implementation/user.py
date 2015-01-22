@@ -387,9 +387,9 @@ class UserSetPersonalData(UserPersonalDataBase):
         else:
             self._value = self._pm.extract("value", pType=str, allowEmpty=True)
 
-    def _generate_emails_list(self):
-        self._value = self._value.replace(' ', ',').replace(';', ',')  # replace to have only one separator
-        return [email for email in self._value.split(',') if email]
+    def _generate_emails_list(self, value):
+        value = value.replace(' ', ',').replace(';', ',')  # replace to have only one separator
+        return [email for email in value.split(',') if email]
 
     def _confirm_email_address(self, email, data_type):
         email = email.strip().lower()
@@ -412,8 +412,7 @@ class UserSetPersonalData(UserPersonalDataBase):
 
         existing = AvatarHolder().match({'email': email}, searchInAuthenticators=False)
         if existing:
-            existing = [av for av in existing if av != self._avatar]
-            if existing:
+            if any(av for av in existing if av != self._avatar):
                 raise NoReportError(_("The email address {0} is already used by another user.").format(email))
             else:  # The email is already set correctly for the user: Do nothing
                 return False
@@ -428,31 +427,29 @@ class UserSetPersonalData(UserPersonalDataBase):
         url = url_for('user.confirm_email', token=token, _external=True, _secure=True)
 
         if data_type == 'email':
-            confirmation_body = _(
+            body_format = _(
                 "Dear {0},\n"
                 "You requested to change your account's primary email address.\n"
-                "Please click on (or paste in your browser) the link below within 24 hours\n"
-                "to confirm and activate this email address:"
-                "\n\n{1}\n\n"
-                "Best regards,\n"
-                "The Indico Team"
-            ).format(self._avatar.getStraightFullName(), url)
+                "Please open the link below within 24 hours to confirm and activate this email address:\n"
+                "\n{1}\n\n"
+                "--\n"
+                "Indico"
+            )
         else:
-            confirmation_body = _(
+            body_format = _(
                 "Dear {0},\n"
                 "You added this email address to your account's secondary emails list.\n"
-                "Please click on (or paste in your browser) the link below within 24 hours\n"
-                "to confirm and activate this email address:"
-                "\n\n{1}\n\n"
-                "Best regards,\n"
-                "The Indico Team"
-            ).format(self._avatar.getStraightFullName(), url)
+                "Please open the link below within 24 hours to confirm and activate this email address:\n"
+                "\n{1}\n\n"
+                "--\n"
+                "Indico"
+            )
 
         confirmation = {
             'toList': [email],
             'fromAddr': Config.getInstance().getSupportEmail(),
             'subject': _("[Indico] Verify your email address"),
-            'body': confirmation_body
+            'body': body_format.format(self._avatar.getFirstName(), url)
         }
 
         # Send mail with template message and link
@@ -460,17 +457,17 @@ class UserSetPersonalData(UserPersonalDataBase):
         return True
 
     def _getAnswer(self):
-        if self._user:
-            funcGet = "get%s%s" % (self._dataType[0].upper(), self._dataType[1:])
-            funcSet = "set%s%s" % (self._dataType[0].upper(), self._dataType[1:])
-
-            ret_val = self.process_data.get(self._dataType, getattr(self._user, funcSet))(self._value)
-            if ret_val is not None:
-                return ret_val
-            return getattr(self._user, funcGet)()
-
-        else:
+        if not self._user:
             raise ServiceError("ERR-U5", _("User id not specified"))
+
+        getter_name = "get%s%s" % (self._dataType[0].upper(), self._dataType[1:])
+        setter_name = "set%s%s" % (self._dataType[0].upper(), self._dataType[1:])
+        setter = self.process_data.get(self._dataType, getattr(self._user, setter_name))
+
+        ret_val = setter(self._value)
+        if ret_val is not None:
+            return ret_val
+        return getattr(self._user, getter_name)()
 
     def _process_title(self, new_title):
         if self._value in TitlesRegistry().getList():
@@ -492,10 +489,7 @@ class UserSetPersonalData(UserPersonalDataBase):
 
     def _process_email(self, new_email):
         # Check if there is any user with this email address
-        try:
-            confirmation_sent = self._confirm_email_address(new_email, 'email')
-        except NoReportError as e:
-            raise e
+        confirmation_sent = self._confirm_email_address(new_email, 'email')
 
         if confirmation_sent:
             warning = Warning(
@@ -513,7 +507,7 @@ class UserSetPersonalData(UserPersonalDataBase):
         emails_to_confirm = []
         emails_to_set = []
         invalid_email_errors = []
-        secondary_emails = self._generate_emails_list()
+        secondary_emails = self._generate_emails_list(value)
         for email in secondary_emails:
             try:
                 if self._confirm_email_address(email, 'secondaryEmails'):
@@ -560,15 +554,15 @@ class UserSetPersonalData(UserPersonalDataBase):
 
     def _process_telephone(self, value):
         self._user.setFieldSynced('phone', False)
-        self._user.setTelephone(self._value)
+        self._user.setTelephone(value)
 
     def _process_fax(self, value):
         self._user.setFieldSynced('fax', False)
-        self._user.setFax(self._value)
+        self._user.setFax(value)
 
     def _process_address(self, value):
         self._user.setFieldSynced('address', False)
-        self._user.setAddress(self._value)
+        self._user.setAddress(value)
 
 
 class UserSyncPersonalData(UserPersonalDataBase):
