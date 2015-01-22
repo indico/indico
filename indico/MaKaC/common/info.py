@@ -16,25 +16,49 @@
 
 import os
 import warnings
+
 from flask import current_app as app
 from persistent import Persistent
 from persistent.dict import PersistentDict
 from BTrees import OOBTree
+
 from indico.core.config import Config
 from indico.core import db
 
-DEFAULT_PERSISTENT_ENABLE_AGREEMENT = 'Enabling persistent signatures will allow signed requests without a timestamp. This means that the same link can be used forever to access private information. This introduces the risk that if somebody finds out about the link, he/she can access the same private information as yourself. By enabling this you agree to keep those links private and ensure that no unauthorized people will use them.'
-DEFAULT_PERSISTENT_DISABLE_AGREEMENT = 'When disabling persistent signatures, all signed requests need a valid timestamp again. If you enable them again, old persistent links will start working again - if you need to to invalidate them, you need to create a new API key!'
-DEFAULT_API_USER_AGREEMENT = """In order to enable an iCal export link, your account needs to have a key created. This key enables other applications to access data from within Indico even when you are neither using nor logged into the Indico system yourself with the link provided. Once created, you can manage your key at any time by going to 'My Profile' and looking under the tab entitled 'HTTP API'. Further information about HTTP API keys can be found in the Indico documentation."""
-DEFAULT_PERSISTENT_USER_AGREEMENT = """In conjunction with a having a key associated with your account, to have the possibility of exporting private event information necessitates the creation of a persistent key.  This new key is also associated with your account and whilst it is active the data which can be obtained through using this key can be obtained by anyone in possession of the link provided. Due to this reason, it is extremely important that you keep links generated with this key private and for your use only. If you think someone else may have acquired access to a link using this key in the future, you must immediately remove it from 'My Profile' under the 'HTTP API' tab and generate a new key before regenerating iCalendar links."""
-DEFAULT_PROTECTION_DISCLAINER_RESTRICTED = 'Circulation to people other than the intended audience is not authorized. You are obliged to treat the information with the appropriate level of confidentiality.'
-DEFAULT_PROTECTION_DISCLAINER_PROTECTED = 'As such, this information is intended for an internal audience only. You are obliged to treat the information with the appropriate level of confidentiality.'
+DEFAULT_PERSISTENT_ENABLE_AGREEMENT = ("Enabling persistent signatures will allow signed requests without a timestamp. "
+                                       "This means that the same link can be used forever to access private "
+                                       "information. This introduces the risk that if somebody finds out about the "
+                                       "link, they can access the same private information as yourself. By enabling "
+                                       "this you agree to keep those links private and ensure that no unauthorized "
+                                       "people will use them.")
+DEFAULT_PERSISTENT_DISABLE_AGREEMENT = ("When disabling persistent signatures, all signed requests need a valid "
+                                        "timestamp again. If you enable them again, old persistent links will start "
+                                        "working again - if you need to to invalidate them, you need to create a new "
+                                        "API key!")
+DEFAULT_API_USER_AGREEMENT = ("In order to enable an iCal export link, your account needs to have a key created. This "
+                              "key enables other applications to access data from within Indico even when you are "
+                              "neither using nor logged into the Indico system yourself with the link provided. Once "
+                              "created, you can manage your key at any time by going to 'My Profile' and looking under "
+                              "the tab entitled 'HTTP API'. Further information about HTTP API keys can be found in "
+                              "the Indico documentation.")
+DEFAULT_PERSISTENT_USER_AGREEMENT = ("In conjunction with a having a key associated with your account, to have the "
+                                     "possibility of exporting private event information necessitates the creation of "
+                                     "a persistent key. This new key is also associated with your account and whilst "
+                                     "it is active the data which can be obtained through using this key can be "
+                                     "obtained by anyone in possession of the link provided. Due to this reason, it is "
+                                     "extremely important that you keep links generated with this key private and for "
+                                     "your use only. If you think someone else may have acquired access to a link "
+                                     "using this key in the future, you must immediately remove it from 'My Profile' "
+                                     "under the 'HTTP API' tab and generate a new key before regenerating iCalendar "
+                                     "links.")
+DEFAULT_PROTECTION_DISCLAINER_RESTRICTED = ("Circulation to people other than the intended audience is not authorized. "
+                                            "You are obliged to treat the information with the appropriate level of "
+                                            "confidentiality.")
+DEFAULT_PROTECTION_DISCLAINER_PROTECTED = ("As such, this information is intended for an internal audience only. "
+                                           "You are obliged to treat the information with the appropriate level of "
+                                           "confidentiality.")
 
-#from indico.core.logger import Logger
 
-#the singleton pattern should be applied to this class to ensure that it is
-#   unique, but as Extended classes seem not to support classmethods it will
-#   be done by a helper class. To be migrated when the ZODB4 is released
 class MaKaCInfo(Persistent):
     """Holds and manages general information and data concerning each system
     """

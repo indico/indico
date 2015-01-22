@@ -242,11 +242,14 @@ def dictionaryToString(dico):
 def dictionaryToTupleList(dic):
     return [(k,v) for (k,v) in dic.iteritems()]
 
+
 def removeQuotes(myString):
     """encode/replace problematics quotes."""
-    #Note: Use &rsquo; because &apos; can be problematic with context help!!!
-    #Note: \xe2\x80\x99 = ďż˝
-    return str(myString).strip().replace('"', "&quot;").replace("'", "&rsquo;").replace("$-1������", "&rsquo;").replace("\xe2\x80\x99", "&rsquo;")
+    # XXX: why are we handling this one in a special way? there are more non-ascii quotes!
+    # http://en.wikipedia.org/wiki/Quotation_mark#Unicode_code_point_table
+    unicode_quote = u'\N{RIGHT SINGLE QUOTATION MARK}'.encode('utf-8')
+    return str(myString).strip().replace('"', '&quot;').replace("'", '&rsquo;').replace(unicode_quote, '&rsquo;')
+
 
 def putbackQuotes(myString):
     """cancel (almost all) effects of function removeQuotes()."""
@@ -348,18 +351,14 @@ def encodeUnicode(text, sourceEncoding = "utf-8"):
             return ""
     return tmp.encode('utf-8')
 
-def unicodeLength(s, encoding = 'utf-8'):
-    """ Returns the length of the string s as an unicode object.
-        The conversion is done in the encoding supplied.
-        Example: the word 'niño' has a length of 4 as a unicode object, but 5 as a strig in utf-8
-        because the 'ñ' character uses 2 bytes.
-    """
+
+def unicodeLength(s, encoding='utf-8'):
+    """Returns the length of the string s as an unicode object."""
     return len(s.decode(encoding, 'replace'))
 
-def unicodeSlice(s, start, end, encoding = 'utf-8'):
-    """ Returns a slice of the string s, based on its encoding.
-        Example: trimAsUnicode('ññññ', 'utf-8', 0, 2) will return 'ññ' instead of 'ñ' even if each 'ñ' occupies 2 bytes.
-    """
+
+def unicodeSlice(s, start, end, encoding='utf-8'):
+    """Returns a slice of the string s, based on its encoding."""
     return s.decode(encoding, 'replace')[start:end]
 
 

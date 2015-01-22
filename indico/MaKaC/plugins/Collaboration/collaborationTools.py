@@ -753,8 +753,10 @@ Event details:
             else:
                 datesText = formatDateTime(contribution.getAdjustedStartDate(), showWeek = True) + ' (' + formatDuration(contribution.getDuration(), "hours_minutes") + ')'
 
-            #4. returned result
-            contributionLine = """•%s : <a href="%s">%s</a>%s (id: %s)%s""" % (
+            # 4. returned result
+            bullet = u'\N{BULLET}'.encode('utf-8')
+            contributionLine = """%s%s : <a href="%s">%s</a>%s (id: %s)%s""" % (
+                bullet,
                 datesText,
                 urlHandlers.UHContributionDisplay.getURL(contribution),
                 contribution.getTitle(),
@@ -777,7 +779,3 @@ Event details:
             return ''
         else:
             return object.getName().strip()
-
-    @classmethod
-    def listToStr(cls, list):
-        return "<br />".join([("•" + item) for item in list])
