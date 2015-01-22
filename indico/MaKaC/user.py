@@ -787,8 +787,8 @@ class Avatar(Persistent, Fossilizable):
     def addSecondaryEmail(self, email, reindex=False):
         email = email.strip().lower()
         if email not in self.getSecondaryEmails():
-            idx = indexes.IndexesHolder().getById('email') if reindex else None
             if reindex:
+                idx = indexes.IndexesHolder().getById('email')
                 idx.unindexUser(self)
                 self.secondaryEmails.append(email)
                 idx.indexUser(self)
@@ -800,7 +800,7 @@ class Avatar(Persistent, Fossilizable):
         email = email.strip().lower()
         if email in self.getSecondaryEmails():
             if reindex:
-                idx = indexes.IndexesHolder().getById('email') if reindex else None
+                idx = indexes.IndexesHolder().getById('email')
                 idx.unindexUser(self)
                 self.secondaryEmails.remove(email)
                 idx.indexUser(self)
@@ -809,7 +809,7 @@ class Avatar(Persistent, Fossilizable):
             self._p_changed = 1
 
     def setSecondaryEmails(self, emailList, reindex=False):
-        emailList = map(lambda email: email.lower().strip(), emailList)
+        emailList = [email.lower().strip() for email in emailList]
         if reindex:
             idx = indexes.IndexesHolder().getById('email')
             idx.unindexUser(self)
