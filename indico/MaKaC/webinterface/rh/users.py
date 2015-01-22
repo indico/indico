@@ -542,14 +542,17 @@ class RHConfirmEmail(RHProtected):
 
         email_type = data['data_type']
         email = data['email']
+        already_set = False
         existing = AvatarHolder().match({'email': email}, searchInAuthenticators=False)
         if existing:
             if any(av for av in existing if av != avatar):
                 raise NoReportError(_("The email address {0} is already used by another user.").format(email))
             else:
-                raise NoReportError(_("It appears you are already using the email address {0}.").format(email))
+                already_set = True
 
-        if email_type == 'email':
+        if already_set:
+            flash_msg = _("It appears you are already using the email address {0}.").format(email)
+        elif email_type == 'email':
             avatar.setEmail(email, reindex=True)
             flash_msg = _("{0} has been set as your primary email address.").format(email)
         elif email_type == 'secondaryEmails':
