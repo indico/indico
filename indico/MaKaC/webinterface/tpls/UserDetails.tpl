@@ -176,14 +176,24 @@ var requestTitle = function() {
 };
 
 var beforeEdit = function(field, widget) {
-    if(!canSynchronize) {
-        return;
-    }
-    new ConfirmPopup($T("Change field"), $T('This field is currently synchronized with the {0} database. If you change it, synchronization will be disabled.').format(authenticatorName), function(confirmed){
-        if(confirmed || _.contains(unlockedFields, field)){
-            widget.modeChooser.set("edit");
+    if(!canSynchronize) { return; }
+
+    syncPopup = new ConfirmPopup(
+        $T("Change field"),
+        $T('This field is currently synchronized with the {0} database. If you change it, synchronization will be disabled.')
+            .format(authenticatorName),
+        function(confirmed){
+            if(confirmed || _.contains(unlockedFields, field)){
+                widget.modeChooser.set("edit");
         }
-    }).open();
+    });
+
+    if (!_.contains(unlockedFields, field)) {
+        syncPopup.open();
+    } else {
+        widget.modeChooser.set("edit");
+    }
+
     return false;
 }
 
