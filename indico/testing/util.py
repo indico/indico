@@ -117,14 +117,21 @@ def bool_matrix(template, mask=None, expect=None):
     return matrix
 
 
-def extract_emails(smtp, required=True, count=None, regex=False, **kwargs):
+def extract_emails(smtp, required=True, count=None, one=False, regex=False, **kwargs):
     """Extracts emails from an smtp outbox.
 
     :param smtp: The `smtp` fixture from the testcase
     :param required: Fail if no matching emails were found
     :param count: Require exactly `count` emails to be found
+    :param one: Require exactly one email to be found
     :param kwargs: Header values to match against
+    :return: list of emails, unless `one` is true in which
+             case the matching email or `None` is returned
     """
+    if one:
+        if count is not None:
+            raise ValueError('Cannot specify both `count` and `one`')
+        count = 1
     compare = re.search if regex else operator.eq
     found = []
     for mail in smtp.outbox:
@@ -140,4 +147,41 @@ def extract_emails(smtp, required=True, count=None, regex=False, **kwargs):
         assert found, 'No matching emails found'
     if count is not None:
         assert len(found) == count, 'Expected {} emails, got {}'.format(count, len(found))
+    if one:
+        return found[0] if found else None
+    return found
+
+
+def extract_logs(caplog, required=True, count=None, one=False, regex=False, **kwargs):
+    """Extracts log records from python's logging system.
+
+    :param caplog: The `caplog` fixture from the testcase
+    :param required: Fail if no matching records were found
+    :param count: Require exactly `count` records to be found
+    :param one: Require exactly one record to be found
+    :param kwargs: LogRecord attribute values to match against
+    :return: list of log records, unless `one` is true in which
+             case the matching record or `None` is returned
+    """
+    if one:
+        if count is not None:
+            raise ValueError('Cannot specify both `count` and `one`')
+        count = 1
+    compare = re.search if regex else operator.eq
+    found = []
+    for record in caplog.handler.records:
+        for key, value in kwargs.iteritems():
+            if not compare(value, getattr(record, key)):
+                break
+        else:  # everything matched
+            found.append(record)
+    found_set = set(found)
+    caplog.handler.records = [record for record in caplog.handler.records if record not in found_set]
+    __tracebackhide__ = True
+    if required:
+        assert found, 'No matching records found'
+    if count is not None:
+        assert len(found) == count, 'Expected {} records, got {}'.format(count, len(found))
+    if one:
+        return found[0] if found else None
     return found
