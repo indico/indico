@@ -41,7 +41,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Indico'
-copyright = u'2014, Indico Team'
+copyright = u'2015, Indico Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
