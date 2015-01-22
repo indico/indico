@@ -22,7 +22,11 @@ from MaKaC.services.implementation.base import LoggedOnlyService, AdminService
 from MaKaC.services.implementation.base import ServiceBase
 
 import MaKaC.user as user
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError, Warning, ResultWithWarning
+from MaKaC.services.interface.rpc.common import (HTMLSecurityError,
+                                                 NoReportError,
+                                                 ResultWithWarning,
+                                                 ServiceAccessError,
+                                                 ServiceError, Warning)
 
 from MaKaC.common import info
 from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
@@ -365,6 +369,12 @@ class UserSetPersonalData(UserPersonalDataBase):
                 raise ServiceAccessError(_("The email address is not valid. Please, review it."))
         else:
             self._value = self._pm.extract("value", pType=str, allowEmpty=True)
+
+    def process(self):
+        try:
+            return UserPersonalDataBase.process(self)
+        except HTMLSecurityError as e:
+            raise NoReportError(e.message)
 
     def _buildEmailList(self):
         emailList = []

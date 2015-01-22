@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # This file is part of Indico.
 # Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
 #
@@ -14,99 +13,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from MaKaC.paperReviewing import ConferencePaperReview
-from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
-from MaKaC.services.implementation.contribution import ContributionBase
-from MaKaC.services.implementation.base import TextModificationBase
-from MaKaC.services.implementation.base import HTMLModificationBase
-from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager,\
-    RCReferee
-from MaKaC.services.implementation.conference import ConferenceModifBase
-from MaKaC.services.implementation.base import DateTimeModificationBase
-from MaKaC.webinterface.rh.contribMod import RCContributionReferee
-from MaKaC.webinterface.rh.contribMod import RCContributionEditor
-from MaKaC.webinterface.rh.contribMod import RCContributionReviewer
-from MaKaC.webinterface.user import UserModificationBase, UserListModificationBase
-from MaKaC.services.implementation.base import ListModificationBase
-from MaKaC import user
-from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
-from MaKaC.i18n import _
-from MaKaC.errors import MaKaCError
-||||||| merged common ancestors
-# -*- coding: utf-8 -*-
-##
-##
-## This file is part of Indico.
-## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
-##
-## Indico is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 3 of the
-## License, or (at your option) any later version.
-##
-## Indico is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Indico;if not, see <http://www.gnu.org/licenses/>.
-from MaKaC.paperReviewing import ConferencePaperReview
-from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
-from MaKaC.services.implementation.contribution import ContributionBase
-from MaKaC.services.implementation.base import TextModificationBase
-from MaKaC.services.implementation.base import HTMLModificationBase
-from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager,\
-    RCReferee
-from MaKaC.services.implementation.conference import ConferenceModifBase
-from MaKaC.services.implementation.base import DateTimeModificationBase
-from MaKaC.webinterface.rh.contribMod import RCContributionReferee
-from MaKaC.webinterface.rh.contribMod import RCContributionEditor
-from MaKaC.webinterface.rh.contribMod import RCContributionReviewer
-from MaKaC.webinterface.user import UserModificationBase, UserListModificationBase
-from MaKaC.services.implementation.base import ListModificationBase
-from MaKaC import user
-from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
-from MaKaC.i18n import _
-from MaKaC.errors import MaKaCError
-=======
-# -*- coding: utf-8 -*-
-##
-##
-## This file is part of Indico.
-## Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
-##
-## Indico is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 3 of the
-## License, or (at your option) any later version.
-##
-## Indico is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Indico;if not, see <http://www.gnu.org/licenses/>.
->>>>>>> keep the input after an HTML security error in PR
+
 import datetime
 
 from MaKaC import user
 from MaKaC.common.fossilize import fossilize
-from MaKaC.common.mail import GenericMailer
-from MaKaC.contributionReviewing import ReviewManager
 from MaKaC.errors import MaKaCError
-from MaKaC.fossils.reviewing import IReviewingQuestionFossil
 from MaKaC.i18n import _
 from MaKaC.paperReviewing import ConferencePaperReview
 from MaKaC.services.implementation.base import (DateTimeModificationBase, HTMLModificationBase, ListModificationBase,
                                                 ParameterManager, ProtectedModificationService, TextModificationBase)
 from MaKaC.services.implementation.conference import ConferenceModifBase
 from MaKaC.services.implementation.contribution import ContributionBase
-from MaKaC.services.interface.rpc.common import (HTMLSecurityError, NoReportError, ServiceError)
-from MaKaC.webinterface.rh.contribMod import (RCContributionEditor, RCContributionReferee, RCContributionReviewer)
+from MaKaC.services.interface.rpc.common import HTMLSecurityError, NoReportError, ServiceError
+from MaKaC.webinterface.rh.contribMod import RCContributionEditor, RCContributionReferee, RCContributionReviewer
 from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReferee
-from MaKaC.webinterface.user import (UserListModificationBase, UserModificationBase)
+from MaKaC.webinterface.user import UserListModificationBase, UserModificationBase
 
 """
 Asynchronous request handlers for conference and contribution reviewing related data
