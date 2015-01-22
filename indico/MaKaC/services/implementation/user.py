@@ -519,17 +519,18 @@ class UserSetPersonalData(UserPersonalDataBase):
 
         self._avatar.setSecondaryEmails(emails_to_set, reindex=True)
         # Generate confirmation message
-        if len(emails_to_confirm) == 1:
+        if not emails_to_confirm:
+            confirmation_msg = None
+        elif len(emails_to_confirm) == 1:
+            email = emails_to_confirm[0]
             confirmation_title = _("New secondary email address")
             confirmation_msg = _("We have sent a verification email to: {0}. "
                                  "Once the address is verified, it will be shown on your profile.").format(email)
-        elif emails_to_confirm:
-            confirmation_title = _("New secondary email address")
+        else:
+            confirmation_title = _("New secondary email addresses")
             confirmation_msg = _(
                 "We have sent verification emails to: {0}. "
                 "Once an address is verified, it will be shown on your profile.").format(', '.join(emails_to_confirm))
-        else:
-            confirmation_msg = None
 
         # Generate error message
         if len(invalid_email_errors) == 1:
