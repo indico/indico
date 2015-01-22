@@ -94,7 +94,7 @@ class VidyoTools(object):
             Returns True or False
         """
         if not cls.__vidyoRoomNameRE:
-            cls.__vidyoRoomNameRE = re.compile(ur"^[^\W\d][\w._\- ]*$", re.UNICODE) #re.UNICODE to accept é, ñ, 漢字 ...
+            cls.__vidyoRoomNameRE = re.compile(ur"^[^\W\d][\w._\- ]*$", re.UNICODE)
 
         try:
             unicodeName = name.decode('utf-8') #unicodeName will be a unicode object

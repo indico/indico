@@ -137,10 +137,6 @@ Request details:<br />
      self._getAutoJoinURL(typeOfMail)
      )
 
-    @classmethod
-    def listToStr(cls, list):
-        return "<br />".join([("•" + item) for item in list])
-
     def _getHasAccessPassword(self):
         if self._booking.getHasAccessPassword():
             return 'Yes (see booking in Indico)'

@@ -124,9 +124,6 @@ Request details:<br />
        }
      )
 
-    @classmethod
-    def listToStr(cls, li):
-        return "<br />".join([("•" + item) for item in li])
 
 class WebExParticipantNotification(WebExNotificationBase):
     def __init__(self, booking, emailList, typeOfMail, additionalText=""):

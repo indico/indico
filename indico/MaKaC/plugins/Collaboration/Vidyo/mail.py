@@ -140,10 +140,6 @@ Public room details:<br />
      self._getVisibility(),
      )
 
-    @classmethod
-    def listToStr(cls, list):
-        return "<br />".join([("•" + item) for item in list])
-
     def _getOwnerText(self):
         owner = self._booking.getOwnerObject()
         if isinstance(owner, Avatar):
