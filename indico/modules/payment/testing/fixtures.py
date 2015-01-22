@@ -38,6 +38,6 @@ def create_transaction(db, dummy_event, dummy_registrant):
 
 
 @pytest.fixture
-def dummy_transaction(db, create_transaction):
+def dummy_transaction(create_transaction):
     """Gives you a dummy successful transaction"""
     return create_transaction(status=TransactionStatus.successful)

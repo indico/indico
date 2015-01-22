@@ -20,5 +20,5 @@ from indico.core.logger import Logger
 
 
 @pytest.fixture
-def mock_logger(mocker):
-    mocker.patch.object(Logger, 'get')
+def mock_get_logger(mocker):
+    return mocker.patch.object(Logger, 'get')

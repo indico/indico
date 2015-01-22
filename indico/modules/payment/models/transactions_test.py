@@ -16,7 +16,6 @@
 
 import pytest
 
-from indico.core.logger import Logger
 from indico.modules.payment.models.transactions import (PaymentTransaction, TransactionAction, TransactionStatus,
                                                         TransactionStatusTransition, IgnoredTransactionAction,
                                                         InvalidManualTransactionAction, InvalidTransactionAction,
@@ -172,27 +171,25 @@ def test_create_next(creation_params):
     assert not double_payment
 
 
-@pytest.mark.usefixtures('mock_logger')
-@pytest.mark.parametrize(('exception'), (
-    (InvalidTransactionStatus),
-    (InvalidManualTransactionAction),
-    (InvalidTransactionAction),
-    (IgnoredTransactionAction),
+@pytest.mark.parametrize('exception', (
+    InvalidTransactionStatus,
+    InvalidManualTransactionAction,
+    InvalidTransactionAction,
+    IgnoredTransactionAction,
 ))
-def test_create_next_with_exception(mocker, creation_params, exception):
+def test_create_next_with_exception(mock_get_logger, mocker, creation_params, exception):
     mocker.patch.object(TransactionStatusTransition, 'next')
     TransactionStatusTransition.next.side_effect = exception()
     transaction, double_payment = PaymentTransaction.create_next(**creation_params)
     assert transaction is None
     assert double_payment is None
-    Logger.get.assert_called_once_with('payment')
+    mock_get_logger.assert_called_once_with('payment')
 
 
-@pytest.mark.usefixtures('mock_logger')
-def test_create_next_double_payment(mocker, create_transaction, creation_params):
+def test_create_next_double_payment(mock_get_logger, create_transaction, creation_params):
     create_transaction(TransactionStatus.successful)
     _, double_payment = PaymentTransaction.create_next(**creation_params)
-    Logger.get.assert_called_once_with('payment')
+    mock_get_logger.assert_called_once_with('payment')
     assert double_payment
 
 
