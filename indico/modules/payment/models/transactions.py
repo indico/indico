@@ -21,7 +21,6 @@ from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
-from indico.core.errors import NotFoundError
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
@@ -258,7 +257,7 @@ class PaymentTransaction(db.Model):
                                             "Data received: {}".format(e, data))
             return None, None
         except InvalidTransactionAction as e:
-            Logger.get('payment').exception("Invalid manual action code '{}' on initial status\n"
+            Logger.get('payment').exception("Invalid action code '{}' on initial status\n"
                                             "Data received: {}".format(e, data))
             return None, None
         except IgnoredTransactionAction as e:
