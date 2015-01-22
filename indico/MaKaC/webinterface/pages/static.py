@@ -1,8 +1,5 @@
-# -*- coding: utf-8 -*-
-#
-#
 # This file is part of Indico.
-# Copyright (C) 2002 - 2014 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -15,7 +12,7 @@
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Indico;if not, see <http://www.gnu.org/licenses/>.
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 
 from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay, WPConferenceDisplay, WPConferenceTimeTable, WPConferenceProgram, WPContributionList, WPInternalPageDisplay, WPAuthorIndex, WPSpeakerIndex
