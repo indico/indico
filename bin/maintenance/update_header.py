@@ -78,7 +78,7 @@ SUPPORTED_FILES = {
 
 
 # The substring which must be part of a comment block in order for the comment to be updated by the header.
-SUBSTRING = 'Indico is free software;'
+SUBSTRING = 'Indico is free software'
 
 
 USAGE = """
