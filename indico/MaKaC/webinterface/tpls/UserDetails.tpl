@@ -205,10 +205,6 @@ var editOrganisation = new InputEditWidget('user.setPersonalData',
         curry(beforeEdit, 'affiliation'));
 $E('inPlaceEditOrganisation').set(editOrganisation.draw());
 
-$E('inPlaceEditEmail').set(new InputEditWidget('user.setPersonalData',
-        {'userId':'${ userId }', 'dataType':'email'}, ${ jsonEncode(onlyEmail) }, false, null, Util.Validation.isEmailAddress,
-        $T("Invalid e-mail address")).draw());
-
 var editAddress = new TextAreaEditWidget('user.setPersonalData',
                                          {'userId': '${ userId }', 'dataType':'address'},
                                          ${ jsonEncode(address) },
@@ -226,12 +222,31 @@ var editFax = new InputEditWidget('user.setPersonalData',
         curry(beforeEdit, 'fax'));
 $E('inPlaceEditFax').set(editFax.draw());
 
-$E('inPlaceEditSecondaryEmails').set(new InputEditWidget('user.setPersonalData',
+var secondaryEmailsInputWidget = new InputEditWidget('user.setPersonalData',
         {'userId':'${ userId }', 'dataType':'secondaryEmails'}, ${ jsonEncode(secEmails) }, true, null, function(val) {
             return !val || Util.Validation.isEmailList(val);
         },
         $T("List contains invalid e-mail address or invalid separator"),
-        $T("You can specify more than one email address separated by commas, semicolons or whitespaces.")).draw());
+        $T("You can specify more than one email address separated by commas, semicolons or whitespaces."));
+
+$E('inPlaceEditSecondaryEmails').set(secondaryEmailsInputWidget.draw());
+
+$E('inPlaceEditEmail').set(new InputEditWidget('user.setPersonalData',
+        {'userId':'${ userId }', 'dataType':'email'}, ${ jsonEncode(onlyEmail) }, false,
+        function removeEmailFromSecondary() {
+            var emails = secondaryEmailsInputWidget.value;
+            if (!emails) { return; }
+
+            emails = emails.split(', ');
+            var index = emails.indexOf(this.input.get())
+            if (~index) { emails.splice(index, 1); }
+            emails = emails.join(', ');
+
+            secondaryEmailsInputWidget.value = emails;
+            secondaryEmailsInputWidget.setMode('display');
+
+        }, Util.Validation.isEmailAddress,
+        $T("Invalid e-mail address")).draw());
 
 $.each({
     surName: editSurName,
