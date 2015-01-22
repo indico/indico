@@ -41,6 +41,11 @@ def creation_params(dummy_registrant):
             'provider': 'le-provider'}
 
 
+@pytest.fixture
+def mock_find_latest_for_registrant(mocker):
+    mocker.patch.object(PaymentTransaction, 'find_latest_for_registrant', return_value=None)
+
+
 # ======================================================================================================================
 # TransactionStatusTransition tests
 # ======================================================================================================================
@@ -71,7 +76,7 @@ def test_next(create_transaction, status, expected_transition):
     ('manual',    False),
     ('whatever',  False),
 ))
-def test_next_providers(mocker, create_transaction, provider, manual):
+def test_next_providers(create_transaction, provider, manual):
     action = TransactionAction.complete
     initial_transaction = create_transaction(TransactionStatus.cancelled)
     successful_transaction = create_transaction(TransactionStatus.successful)
@@ -165,12 +170,14 @@ def test_manual(dummy_transaction, provider, expected):
     assert dummy_transaction.manual == expected
 
 
+@pytest.mark.usefixtures('mock_find_latest_for_registrant')
 def test_create_next(creation_params):
     transaction, double_payment = PaymentTransaction.create_next(**creation_params)
     assert isinstance(transaction, PaymentTransaction)
     assert not double_payment
 
 
+@pytest.mark.usefixtures('mock_find_latest_for_registrant')
 @pytest.mark.parametrize('exception', (
     InvalidTransactionStatus,
     InvalidManualTransactionAction,
