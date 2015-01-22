@@ -273,6 +273,11 @@ class PaymentTransaction(db.Model):
 
     @staticmethod
     def find_latest_for_registrant(registrant):
+        """Returns the newest transaction for a given registrant.
+
+        :param registrant: the registrant to find the transaction for
+        :return: a :class:`PaymentTransaction` or `None`
+        """
         return (PaymentTransaction.find(event_id=registrant.getConference().getId(), registrant_id=registrant.getId())
                                   .order_by(PaymentTransaction.timestamp.desc())
                                   .first())

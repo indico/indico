@@ -42,6 +42,17 @@ def get_active_payment_plugins(event):
 
 
 def register_transaction(registrant, amount, currency, action, provider=None, data=None):
+    """Creates a new transaction for a certain transaction action.
+
+    :param registrant: the `Registrant` of the transaction
+    :param amount: the (strictly positive) amount of the transaction
+    :param currency: the currency used for the transaction
+    :param action: the `TransactionAction` of the transaction
+    :param provider: the payment method name of the transaction,
+                     or '_manual' if no payment method has been used
+    :param data: arbitrary JSON-serializable data specific to the
+                 transaction's provider
+    """
     new_transaction, double_payment = PaymentTransaction.create_next(registrant=registrant, amount=amount,
                                                                      currency=currency, action=action,
                                                                      provider=provider, data=data)
