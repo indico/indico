@@ -113,7 +113,7 @@ def _versionInit():
     return v
 
 
-###  Commands ###########################################################
+# Commands
 class sdist_indico(sdist.sdist):
     user_options = (sdist.sdist.user_options +
                     [('version=', None, 'version to distribute')])
@@ -413,7 +413,7 @@ if __name__ == '__main__':
     #if not os.path.exists(PWD_INDICO_CONF):
     #    shutil.copy('etc/indico.conf.sample', PWD_INDICO_CONF)
 
-    from MaKaC.consoleScripts.installBase import *
+    from MaKaC.consoleScripts.installBase import setIndicoInstallMode, upgrade_indico_conf
 
     #Dirty trick: For running tests, we need to load all the modules and get rid of unnecessary outputs
     tempLoggingDir = None

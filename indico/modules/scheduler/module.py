@@ -245,53 +245,6 @@ class SchedulerModule(Module):
 
     def addTaskToRunningList(self, task):
 
-        logging.getLogger('scheduler').debug(
-             'Added task %s to runningList..' % task.id)
+        logging.getLogger('scheduler').debug('Added task %s to runningList..' % task.id)
         self._runningList.append(task)
         self._p_changed = True
-
-    ## def removeTaskFromQueue(self, task):
-    ##     """
-    ##     """
-
-    ##     index = None
-
-    ##     self._waitingQueue.dequeue(task)
-
-    ## def removeTask(self, task):
-    ##     """
-    ##     Remove a task, no matter what is its current state
-    ##     """
-
-    ##     # TODO - implement this using task code?
-
-    ##     # Task still running - throw exception
-    ##     if task.state  == base.TASK_STATUS_RUNNING:
-    ##         raise base.TaskStillRunningException(task)
-
-    ##     # task has failed - remove it from 'failed' index
-    ##     elif task.state == base.TASK_STATUS_FAILED:
-    ##         self._failedIndex.unindex_doc(task.id)
-
-    ##     # task has finished - remove it from 'finished' index
-    ##     elif task.state == base.TASK_STATUS_FINISHED:
-    ##         self._finishedIndex.unindex_doc(task.id)
-
-    ##     # task is queued - removed it from queue
-    ##     elif task.state == base.TASK_STATUS_QUEUED:
-    ##         self.removeTaskFromQueue(task)
-
-
-    ##     # task not found - throw exception
-    ##     else:
-    ##         raise base.TaskInconsistentStatusException()
-
-    ## def deleteTask(self, task):
-    ##     """
-    ##     Add a task to the TrashCanManager.
-    ##     No unindexing is done by this method
-    ##     """
-
-    ##     self.removeTask(task)
-
-    ##     TrashCanManager().add(task)

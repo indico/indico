@@ -1,5 +1,5 @@
-## Based on https://groups.google.com/d/topic/sqlalchemy/cQ9e9IVOykE/discussion
-## By David Gardner (dgardner@creatureshop.com)
+# Based on https://groups.google.com/d/topic/sqlalchemy/cQ9e9IVOykE/discussion
+# By David Gardner (dgardner@creatureshop.com)
 
 """
 StaticArray class and functions that SQLAlchemy can process instead of non hashable lists
