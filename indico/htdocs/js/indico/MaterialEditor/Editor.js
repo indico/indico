@@ -20,7 +20,6 @@ var CONVERSION_POLL_INTERVAL = 10000;
 
 function updateMaterialList(oldList, newList) {
     oldList.length = 0;
-
     for (var i in newList) if (newList[i]) {
         oldList.push(newList[i]);
     }
@@ -34,14 +33,12 @@ type("AddEditMaterialDialog", [],{
         //If we are editing a resource
         if (args.resourceId) {
             var isFatherProtected;
-            if(self.material.materialProtection == -1){
+            if (self.material.materialProtection == -1) {
                 isFatherProtected = false;
-            }
-            else if(self.material.materialProtection == 1){
+            } else if(self.material.materialProtection == 1) {
                 isFatherProtected = true;
-            }
-            //then its value is 0
-            else{
+            // then its value is 0
+            } else {
                 //check the value of the material's parent
                 isFatherProtected = self.material.parentProtected;
             }
@@ -234,7 +231,6 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
 
     _parentText: function(args) {
         var text = null;
-
         if (args.subContId) {
             text = $T("Inherit from parent Subcontribution");
         } else if (args.contribId) {
@@ -284,9 +280,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
 
             // if the material is set to inherit from the parent, display it properly
             // and set the inherited protection accordingly
-            var protection = Protection.resolveProtection(
-                entry.get('protection'),
-                entry.get('protectedOwner')?1:-1);
+            var protection = Protection.resolveProtection(entry.get('protection'), entry.get('hasProtectedOwner') ? 1 : -1);
 
             var inheritanceText = Html.unescaped.span({className: 'strongRed', style: {fontStyle: 'italic'}},
                 Protection.ParentRestrictionMessages[protection]);
@@ -300,11 +294,9 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
 
 
         } else {
-
             this.creationMode = 'material';
 
             text = Html.span({}, $T("This will be the first resource of type")," ", Html.span({style:{fontWeight: 'bold'}}, this._findTypeName(value)), ". ", $T("Please select who will be able to access this material type:"));
-
             selector = new RadioFieldWidget([
                 ['inherit', this._parentText(this.args)],
                 ['private', Html.span({className: 'protPrivate'}, $T("Restricted: Can only be viewed by you and users/groups chosen by you from the list of users"))],
@@ -804,7 +796,6 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
 
     _drawProtectionPane: function() {
         var self = this;
-
         var inheritanceText = Html.unescaped.span({className: 'strongRed', style: {fontStyle: 'italic'}},
                 Protection.ParentRestrictionMessages[self.protection]);
 
@@ -817,11 +808,13 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
             ], 'nobulletsListWrapping');
 
         self.protectionSelector.observe(function(value) {
-
             // if 'private' is chosen or 'inherit' was chosen
-            // and the parent resource is protected
-            if (value == 0 && self.item.get('protectedOwner') ||
-                    value == 1) {
+            // and the parent resource is protected or inherit and the event is protected or the event inherit from a
+            // protected category
+            var isProtected = value === 1 || (value == 0 && (self.material.materialProtection === 1 ||
+                ((self.material.materialProtection === 0 ||  typeof self.material.materialProtection === 'undefined') &&
+                    self.args.parentProtected)));
+            if (isProtected) {
                 self.tabWidget.enableTab(1);
                 // draw a little notification saying that
                 // the added tab can be used
@@ -913,7 +906,6 @@ type("EditMaterialDialog", ["EditMaterialResourceBase"], {
     },
 
     _success: function(response) {
-
         this.list.set(this.materialId, null);
         this.list.set(this.materialId, watchize(response.material));
 
@@ -1278,7 +1270,15 @@ type("ResourceListWidget", ["ListWidget"], {
 
         if (resource.get('reviewingState') < 3 || (resource.get('reviewingState') == 3 && self.canReviewModify)) {
             flag = resource.get('reviewingState') == 3;
-            var protection = Protection.resolveProtection(resource.get('protection'),self.matParams.materialProtection);
+            // Compute the protection of a resource
+            // Here self.matParams.parentProtected refers to the event itself, not the actual parent (for some reason)
+            // It is only checked if the resource or self.matParams.materialProtection, the parent (material) both
+            // inherit their protection.
+            // Because the material hierarchy only has a depth of 2, it works but it will break if a deeper hierarchy is
+            // implemented as there is no way to access the protection levels of grand-parents and above.
+            var protection = Protection.resolveProtection(resource.get('protection'),
+                                                          (self.matParams.materialProtection ||
+                                                           (self.matParams.parentProtected ? 1 : -1)));
 
             protectionIcon = Html.span({}, protection==1?
                                            Html.img({src: imageSrc('protected'),
@@ -1508,9 +1508,9 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
         if(material.get('reviewingState') == 1 || material.get('reviewingState') == 0){
             var protection =
                 Protection.resolveProtection(material.get('protection'),
-                                             material.get('protectedOwner')?1:-1);
+                                             material.get('hasProtectedOwner') ? 1 : -1);
 
-            var protectionIcon = Html.span({}, protection==1?
+            var protectionIcon = Html.span({}, protection == 1 ?
                                            Html.img({src: imageSrc('protected'),
                                                      style: {verticalAlign: 'middle'},
                                                      alt: "protected",
@@ -1589,7 +1589,6 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
                 material.set('resources', obj);
                 self.set(id,
                          material);
-
                 self._updateMaterialList(material);
 
             }
@@ -1638,7 +1637,6 @@ type("MaterialListWidget", ["RemoteWidget", "ListWidget"], {
             openAddMaterialDialog(function(param) {window.location.reload(true);});
         }
         var link = Widget.link(command(function(){openAddMaterialDialog(self.makeMaterialLoadFunction());}, $T("Add Material")));
-
 
         return Html.div(
             {},
