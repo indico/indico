@@ -101,7 +101,6 @@ def test_is_valid(db, dummy_occurrence, is_rejected, is_cancelled, expected):
 
 
 def test_create_series_for_reservation(dummy_reservation):
-    ReservationOccurrence.create_series_for_reservation(dummy_reservation)
     occurrences = ReservationOccurrence.iter_create_occurrences(start=dummy_reservation.start_dt,
                                                                 end=dummy_reservation.end_dt,
                                                                 repetition=dummy_reservation.repetition)
