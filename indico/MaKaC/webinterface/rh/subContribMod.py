@@ -119,8 +119,8 @@ class RHMaterialsAdd(RHSubmitMaterialBase, RHSubContribModifBase):
             return
         RHSubmitMaterialBase._checkProtection(self)
 
-    def __init__(self, req):
-        RHSubContribModifBase.__init__(self, req)
+    def __init__(self):
+        RHSubContribModifBase.__init__(self)
         RHSubmitMaterialBase.__init__(self)
 
     def _checkParams(self, params):

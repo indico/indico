@@ -43,7 +43,7 @@ def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
                 params['confId'] = confId
                 if ovw:
                     params['ovw'] = 'True'
-                func = lambda: conferenceDisplay.RHConferenceDisplay(None).process(params)
+                func = lambda: conferenceDisplay.RHConferenceDisplay().process(params)
         elif (shorturl_namespace or app.config['INDICO_COMPAT_ROUTES']) and su.hasKey(confId):
             if shorturl_namespace:
                 # Correct namespace => redirect to the event

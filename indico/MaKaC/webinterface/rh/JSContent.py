@@ -30,8 +30,8 @@ from indico.web.flask.util import send_file
 class RHGetVarsJs(base.RH):
     _tplName = 'vars.js'
 
-    def __init__(self, req):
-        base.RH.__init__(self, req)
+    def __init__(self):
+        base.RH.__init__(self)
         self._dict = {}
 
     def process(self, params):

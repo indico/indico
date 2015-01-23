@@ -200,8 +200,8 @@ _("The following email has been sent to %s"):
 
 class RHAbstractModificationAction(RHAbstractSubmissionBase, AbstractParam):
 
-    def __init__(self, req):
-        RHAbstractSubmissionBase.__init__(self, req)
+    def __init__(self):
+        RHAbstractSubmissionBase.__init__(self)
         AbstractParam.__init__(self)
 
     def _checkParams( self, params ):

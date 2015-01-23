@@ -518,8 +518,8 @@ class RHAbstractTrackOrderByRating(RHAbstractModifBase):
 
 class RHEditData(RHAbstractModifBase, AbstractParam):
 
-    def __init__(self, req):
-        RHAbstractModifBase.__init__(self, req)
+    def __init__(self):
+        RHAbstractModifBase.__init__(self)
         AbstractParam.__init__(self)
 
     def _checkParams(self, params):

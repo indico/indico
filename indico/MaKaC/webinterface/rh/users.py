@@ -279,9 +279,6 @@ class RHUserBase(RHProtected):
 class RHUserDashboard(RHUserBase):
     _uh = urlHandlers.UHUserDashboard
 
-    def __init__(self, req):
-        RHUserBase.__init__(self, req)
-
     def _process(self):
         p = adminPages.WPUserDashboard(self, self._avatar)
         if redis_write_client:

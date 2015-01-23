@@ -236,8 +236,8 @@ class RHMaterials(RHSessionModCoordinationBase):
 class RHMaterialsAdd(RHSubmitMaterialBase, RHSessionModCoordinationBase):
     _uh = urlHandlers.UHSessionModifMaterials
 
-    def __init__(self, req):
-        RHSessionModCoordinationBase.__init__(self, req)
+    def __init__(self):
+        RHSessionModCoordinationBase.__init__(self)
         RHSubmitMaterialBase.__init__(self)
 
     def _checkParams(self, params):
@@ -638,16 +638,13 @@ class RHContribsActions:
     """
     class to select the action to do with the selected contributions
     """
-    def __init__(self, req):
-        assert req is None
-
     def process(self, params):
         if 'REMOVE' in params:
-            return RHRemContribs(None).process(params)
+            return RHRemContribs().process(params)
         elif 'PDF' in params:
-            return RHContribsToPDF(None).process(params)
+            return RHContribsToPDF().process(params)
         elif 'AUTH' in params:
-            return RHContribsParticipantList(None).process(params)
+            return RHContribsParticipantList().process(params)
         return "no action to do"
 
 class RHRemContribs(RHSessionModUnrestrictedContribMngCoordBase):

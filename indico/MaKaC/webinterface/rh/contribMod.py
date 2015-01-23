@@ -483,8 +483,8 @@ class RHContribModifMaterialBrowse( RHContribModifBase, RHMaterialDisplayCommon 
 class RHMaterialsAdd(RHSubmitMaterialBase, RHContribModifBaseSpecialSesCoordRights):
     _uh = urlHandlers.UHContribModifAddMaterials
 
-    def __init__(self, req):
-        RHContribModifBaseSpecialSesCoordRights.__init__(self, req)
+    def __init__(self):
+        RHContribModifBaseSpecialSesCoordRights.__init__(self)
         RHSubmitMaterialBase.__init__(self)
 
     def _checkParams(self, params):

@@ -41,7 +41,7 @@ BYTES_1MB = 1024 * 1024
 
 class RHCustomizable(RH):
 
-    def __init__(self, req=None):
+    def __init__(self):
         RH.__init__(self)
         self._wf = ""
 

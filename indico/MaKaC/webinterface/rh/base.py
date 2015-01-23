@@ -70,10 +70,6 @@ class RequestHandlerBase(OldObservable):
 
     _uh = None
 
-    def __init__(self, req=None):
-        if req is not None:
-            raise Exception("Received request object")
-
     def _checkProtection(self):
         """This method is called after _checkParams and is a good place
         to check if the user is permitted to perform some actions.
@@ -178,14 +174,7 @@ class RH(RequestHandlerBase):
 
     HTTP_VERBS = frozenset(('GET', 'POST', 'PUT', 'DELETE'))
 
-    def __init__(self, req=None):
-        """Constructor. Initialises the rh setting up basic attributes so it is
-            able to process the request.
-
-            Parameters:
-                req - OBSOLETE, MUST BE NONE
-        """
-        RequestHandlerBase.__init__(self, req)
+    def __init__(self):
         self._responseUtil = ResponseUtil()
         self._requestStarted = False
         self._aw = AccessWrapper()  # Fill in the aw instance with the current information
@@ -242,7 +231,7 @@ class RH(RequestHandlerBase):
 
     def _changeRH(self, rh, params):
         """Calls the specified RH after processing this one"""
-        self._responseUtil.call = lambda: rh(None).process(params)
+        self._responseUtil.call = lambda: rh().process(params)
 
     def _checkHttpsRedirect(self):
         """If HTTPS must be used but it is not, redirect!"""

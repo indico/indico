@@ -579,9 +579,6 @@ class RHAbstractsActions:
     """
     class to select the action to do with the selected abstracts
     """
-    def __init__(self, req):
-        assert req is None
-
     def _checkParams( self, params ):
         self._pdf = params.get("PDF.x", None)
         self._mail = params.get("mail", None)
@@ -589,16 +586,15 @@ class RHAbstractsActions:
         self._tplPreview = params.get("tplPreview", None)
         self._params = params
 
-
-    def _process( self ):
+    def _process(self):
         if self._pdf:
-            return RHAbstractsToPDF(None).process( self._params )
+            return RHAbstractsToPDF().process(self._params)
         elif self._mail:
-            return RHAbstractSendNotificationMail(None).process( self._params )
+            return RHAbstractSendNotificationMail().process(self._params)
         elif self._tplPreview:
-            return RHAbstractTPLPreview(None).process( self._params )
+            return RHAbstractTPLPreview().process(self._params)
         elif self._participant:
-            return RHAbstractsParticipantList(None).process( self._params )
+            return RHAbstractsParticipantList().process(self._params)
         else:
             return "no action to do"
 
@@ -889,14 +885,11 @@ class RHContribsActions:
     """
     class to select the action to do with the selected contributions
     """
-    def __init__(self, req):
-        assert req is None
-
     def process(self, params):
         if 'PDF' in params:
-            return RHContribsToPDF(None).process(params)
+            return RHContribsToPDF().process(params)
         elif 'AUTH' in params:
-            return RHContribsParticipantList(None).process(params)
+            return RHContribsParticipantList().process(params)
         return "no action to do"
 
 class RHContribsToPDF(RHTrackAbstractsBase):

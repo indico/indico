@@ -186,8 +186,8 @@ class RHCategoryFiles( RHCategModifBase ):
 class RHAddMaterial(RHSubmitMaterialBase, RHCategModifBase):
     _uh = urlHandlers.UHCategoryAddMaterial
 
-    def __init__(self, req):
-        RHCategModifBase.__init__(self, req)
+    def __init__(self):
+        RHCategModifBase.__init__(self)
         RHSubmitMaterialBase.__init__(self)
 
     def _checkParams(self, params):

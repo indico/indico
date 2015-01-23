@@ -1707,28 +1707,25 @@ class RHAbstractsActions:
     """
     class to select the action to do with the selected abstracts
     """
-    def __init__(self, req):
-        assert req is None
-
     def process(self, params):
         if params.has_key("newAbstract"):
-            return RHNewAbstract(None).process(params)
+            return RHNewAbstract().process(params)
         elif params.has_key("pdf"):
-            return RHAbstractsToPDF(None).process(params)
+            return RHAbstractsToPDF().process(params)
         elif params.has_key("excel"):
-            return RHAbstractsListToExcel(None).process(params)
+            return RHAbstractsListToExcel().process(params)
         elif params.has_key("xml"):
-            return RHAbstractsToXML(None).process(params)
+            return RHAbstractsToXML().process(params)
         elif params.has_key("auth"):
-            return RHAbstractsParticipantList(None).process(params)
+            return RHAbstractsParticipantList().process(params)
         elif params.has_key("merge"):
-            return RHAbstractsMerge(None).process(params)
+            return RHAbstractsMerge().process(params)
         elif params.has_key("acceptMultiple"):
-            return RHAbstractManagmentAcceptMultiple(None).process(params)
+            return RHAbstractManagmentAcceptMultiple().process(params)
         elif params.has_key("rejectMultiple"):
-            return RHAbstractManagmentRejectMultiple(None).process(params)
+            return RHAbstractManagmentRejectMultiple().process(params)
         elif params.has_key("PKGA"):
-            return RHMaterialPackageAbstract(None).process(params)
+            return RHMaterialPackageAbstract().process(params)
         return "no action to do"
 
 
@@ -2555,8 +2552,8 @@ class RHConfUseCSS( RHConferenceModifBase ):
 
 class RHConfSavePic( RHConferenceModifBase ):
 
-    def __init__(self, req):
-        RHConferenceModifBase.__init__(self, req)
+    def __init__(self):
+        RHConferenceModifBase.__init__(self)
         self._tempFiles = {}
 
     def _getNewTempFile( self ):
@@ -2992,8 +2989,8 @@ class RHAbstractsParticipantList(RHConfModifCFABase):
 
 class RHNewAbstract(RHConfModifCFABase, AbstractParam):
 
-    def __init__(self, req):
-        RHConfModifCFABase.__init__(self, req)
+    def __init__(self):
+        RHConfModifCFABase.__init__(self)
         AbstractParam.__init__(self)
 
     def _checkParams(self, params):
@@ -3041,24 +3038,21 @@ class RHContribsActions:
     """
     class to select the action to do with the selected abstracts
     """
-    def __init__(self, req):
-        assert req is None
-
     def process(self, params):
         if params.has_key("PDF"):
-            return RHContribsToPDF(None).process(params)
+            return RHContribsToPDF().process(params)
         elif params.has_key("excel.x"):
-            return  RHContribsToExcel(None).process(params)
+            return RHContribsToExcel().process(params)
         elif params.has_key("xml.x"):
-            return  RHContribsToXML(None).process(params)
+            return RHContribsToXML().process(params)
         elif params.has_key("AUTH"):
-            return RHContribsParticipantList(None).process(params)
+            return RHContribsParticipantList().process(params)
         elif params.has_key("move"):
-            return RHMoveContribsToSession(None).process(params)
+            return RHMoveContribsToSession().process(params)
         elif params.has_key("PKG"):
-            return RHMaterialPackage(None).process(params)
+            return RHMaterialPackage().process(params)
         elif params.has_key("PROC"):
-            return RHProceedings(None).process(params)
+            return RHProceedings().process(params)
         return "no action to do"
 
 
@@ -3406,14 +3400,11 @@ class RHConfModifPendingQueuesActionConfMgr:
 
     _uh = urlHandlers.UHConfModifPendingQueuesActionConfMgr
 
-    def __init__(self, req):
-        assert req is None
-
     def process(self, params):
         if 'remove' in params:
-            return RHConfModifPendingQueuesRemoveConfMgr(None).process(params)
+            return RHConfModifPendingQueuesRemoveConfMgr().process(params)
         elif 'reminder' in params:
-            return RHConfModifPendingQueuesReminderConfMgr(None).process(params)
+            return RHConfModifPendingQueuesReminderConfMgr().process(params)
         return "no action to do"
 
 class RHConfModifPendingQueuesRemoveConfMgr( RHConferenceModifBase ):
@@ -3475,14 +3466,11 @@ class RHConfModifPendingQueuesActionConfSubm:
 
     _uh = urlHandlers.UHConfModifPendingQueuesActionConfSubm
 
-    def __init__(self, req):
-        assert req is None
-
     def process(self, params):
         if 'remove' in params:
-            return RHConfModifPendingQueuesRemoveConfSubm(None).process(params)
+            return RHConfModifPendingQueuesRemoveConfSubm().process(params)
         elif 'reminder' in params:
-            return RHConfModifPendingQueuesReminderConfSubm(None).process(params)
+            return RHConfModifPendingQueuesReminderConfSubm().process(params)
         return "no action to do"
 
 class RHConfModifPendingQueuesRemoveConfSubm( RHConferenceModifBase ):
@@ -3544,14 +3532,11 @@ class RHConfModifPendingQueuesActionSubm:
 
     _uh = urlHandlers.UHConfModifPendingQueuesActionSubm
 
-    def __init__(self, req):
-        assert req is None
-
     def process(self, params):
         if 'remove' in params:
-            return RHConfModifPendingQueuesRemoveSubm(None).process(params)
+            return RHConfModifPendingQueuesRemoveSubm().process(params)
         elif 'reminder' in params:
-            return RHConfModifPendingQueuesReminderSubm(None).process(params)
+            return RHConfModifPendingQueuesReminderSubm().process(params)
         return "no action to do"
 
 class RHConfModifPendingQueuesRemoveSubm( RHConferenceModifBase ):
@@ -3613,14 +3598,11 @@ class RHConfModifPendingQueuesActionMgr:
 
     _uh = urlHandlers.UHConfModifPendingQueuesActionMgr
 
-    def __init__(self, req):
-        assert req is None
-
     def process(self, params):
         if 'remove' in params:
-            return RHConfModifPendingQueuesRemoveMgr(None).process(params)
+            return RHConfModifPendingQueuesRemoveMgr().process(params)
         elif 'reminder' in params:
-            return RHConfModifPendingQueuesReminderMgr(None).process(params)
+            return RHConfModifPendingQueuesReminderMgr().process(params)
         return "no action to do"
 
 class RHConfModifPendingQueuesRemoveMgr( RHConferenceModifBase ):
@@ -3683,14 +3665,11 @@ class RHConfModifPendingQueuesActionCoord:
 
     _uh = urlHandlers.UHConfModifPendingQueuesActionCoord
 
-    def __init__(self, req):
-        assert req is None
-
     def process(self, params):
         if 'remove' in params:
-            return RHConfModifPendingQueuesRemoveCoord(None).process(params)
+            return RHConfModifPendingQueuesRemoveCoord().process(params)
         elif 'reminder' in params:
-            return RHConfModifPendingQueuesReminderCoord(None).process(params)
+            return RHConfModifPendingQueuesReminderCoord().process(params)
         return "no action to do"
 
 class RHConfModifPendingQueuesRemoveCoord( RHConferenceModifBase ):
@@ -3930,8 +3909,8 @@ class RHRelocate(RHConferenceModifBase):
 class RHMaterialsAdd(RHSubmitMaterialBase, RHConferenceModifBase):
     _uh = urlHandlers.UHConfModifAddMaterials
 
-    def __init__(self, req):
-        RHConferenceModifBase.__init__(self, req)
+    def __init__(self):
+        RHConferenceModifBase.__init__(self)
         RHSubmitMaterialBase.__init__(self)
 
     def _checkParams(self, params):

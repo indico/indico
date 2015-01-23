@@ -162,7 +162,6 @@ class ServiceBase(RequestHandlerBase):
     UNICODE_PARAMS = False
 
     def __init__(self, params):
-        RequestHandlerBase.__init__(self)
         if not self.UNICODE_PARAMS:
             params = unicode_struct_to_utf8(params)
         self._reqParams = self._params = params

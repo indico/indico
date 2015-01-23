@@ -80,16 +80,10 @@ def make_view_func(obj):
                 return _send_file(path)
         elif hasattr(obj, 'process'):
             # Indico RH
-            # TODO: check if we can get rid of the unused req arg of RHs?
-            if len(inspect.getargspec(obj.__init__).args) < 2:
-                make_instance = lambda: obj()
-            else:
-                make_instance = lambda: obj(None)
-
             def wrapper(**kwargs):
                 params = create_flat_args()
                 params.update(kwargs)
-                return make_instance().process(params)
+                return obj().process(params)
         else:
             # Some class we didn't expect.
             raise ValueError('Unexpected view func class: %r' % obj)
