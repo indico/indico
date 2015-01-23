@@ -47,7 +47,9 @@ class IndicoForm(Form):
         def bind_field(self, form, unbound_field, options):
             # We don't set default filters for query-based fields as it breaks them if no query_factory is set
             # while the Form is instantiated. Also, it's quite pointless for those fields...
-            filters = [strip_whitespace] if not issubclass(unbound_field.field_class, QuerySelectField) else []
+            # FieldList simply doesn't support filters.
+            no_filter_fields = (QuerySelectField, FieldList)
+            filters = [strip_whitespace] if not issubclass(unbound_field.field_class, no_filter_fields) else []
             filters += unbound_field.kwargs.get('filters', [])
             return unbound_field.bind(form=form, filters=filters, **options)
 
