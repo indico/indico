@@ -16,25 +16,30 @@
  */
 
 
-.i-badges-list {
+%badges-list {
     //TODO replace with flexbox mixin once Compass is updated
     display: block;
-    text-align: center;
     display: -webkit-flex;
     -webkit-flex-direction: row;
-    -webkit-justify-content: space-around;
     -webkit-flex-wrap: wrap;
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
     flex-wrap: wrap;
 
     margin-top: -0.8em;
     margin-bottom: 0.8em;
 }
 
+.i-badges-list {
+    @extend badges-list;
+    text-align: center;
+    -webkit-justify-content: space-around;
+    justify-content: space-around;
+
+}
+
 .i-badges-list-left {
-    &:extend(.i-badges-list);
+    @extend badges-list;
 
     //TODO replace with justify-content mixin once Compass is updated
     text-align: left;
