@@ -60,7 +60,7 @@
         display: inline-block;
         float: left;
         margin: 0;
-        max-width: $input-width
+        max-width: $input-width;
 
         &.width-scrolling {
             width: ($input-width - 10);

@@ -20,7 +20,7 @@
 }
 
 .qtip.informational {
-   @include sbox-shadow(rgba($dark-gray, 0.2) 0px 0px 3px 3px, lighten($light-gray, 20%) 0px 1px 0px 0px inset);
+   @include box-shadow(rgba($dark-gray, 0.2) 0px 0px 3px 3px, lighten($light-gray, 20%) 0px 1px 0px 0px inset);
    @include border-all(#ADD9ED);
    background-color: #EDF3FD;
    color: $light-black;
