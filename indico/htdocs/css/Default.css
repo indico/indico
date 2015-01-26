@@ -2913,6 +2913,16 @@ ul.listCompact {
     font-size: 11px;
 }
 
+.footer.footerCERN {
+    margin-top: -100px;
+    height: 90px;
+    padding-bottom: 0;
+}
+
+.footer.footerCERN #social {
+    margin-top: 40px;
+}
+
 .footer.footerDark {
     font-weight: bold;
     color: #222;
