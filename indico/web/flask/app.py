@@ -22,7 +22,7 @@ import traceback
 
 from babel.numbers import format_currency, get_currency_name
 from flask import send_from_directory, request, _app_ctx_stack, Blueprint
-from flask import current_app as app
+from flask import current_app
 from flask_sqlalchemy import models_committed
 from flask_pluginengine import plugins_loaded
 
@@ -246,7 +246,7 @@ def handle_404(exception):
             # While not dangerous per se, we never serve *.py files as static
             raise NotFound
         try:
-            return send_from_directory(app.config['INDICO_HTDOCS'], request.path[1:], conditional=True)
+            return send_from_directory(current_app.config['INDICO_HTDOCS'], request.path[1:], conditional=True)
         except UnicodeEncodeError:
             raise NotFound
     except NotFound:
@@ -260,7 +260,7 @@ def handle_404(exception):
 
 def handle_exception(exception):
     Logger.get('wsgi').exception(exception.message or 'WSGI Exception')
-    if app.debug:
+    if current_app.debug:
         raise
     msg = (str(exception), _("An unexpected error ocurred."))
     return WErrorWSGI(msg).getHTML(), 500
