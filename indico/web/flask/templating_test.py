@@ -17,6 +17,25 @@
 import pytest
 from flask import render_template_string
 
+from indico.web.flask.templating import underline, markdown
+
+
+def test_underline():
+    assert underline('foo') == 'foo\n---'
+    assert underline('foobar', '=') == 'foobar\n======'
+
+
+def test_markdown():
+    # basic markdown
+    assert markdown('**hi**') == u'<p><strong>hi</strong></p>'
+    # nl2br extension
+    assert markdown('hello\nworld') == u'<p>hello<br />\nworld</p>'
+    # unicode
+    val = u'm\xf6p'
+    utfval = val.encode('utf-8')
+    assert markdown(utfval) == u'<p>{}</p>'.format(val)
+    assert markdown(val) == u'<p>{}</p>'.format(val)
+
 
 def _render(template, raises=None):
     val = u'm\xf6p'
