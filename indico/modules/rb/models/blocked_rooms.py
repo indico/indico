@@ -18,6 +18,7 @@ from datetime import datetime, time
 from operator import attrgetter
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
@@ -44,7 +45,7 @@ class BlockedRoom(db.Model):
         primary_key=True
     )
     state = db.Column(
-        db.SmallInteger,
+        PyIntEnum(BlockedRoomState),
         nullable=False,
         default=State.pending
     )

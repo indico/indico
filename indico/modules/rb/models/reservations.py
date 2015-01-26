@@ -25,7 +25,7 @@ from sqlalchemy.sql import cast
 from werkzeug.datastructures import OrderedMultiDict
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.custom import static_array
+from indico.core.db.sqlalchemy.custom import static_array, PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.core.errors import NoReportError
@@ -133,7 +133,7 @@ class Reservation(Serializer, db.Model):
         index=True
     )
     repeat_frequency = db.Column(
-        db.SmallInteger,
+        PyIntEnum(RepeatFrequency),
         nullable=False,
         default=RepeatFrequency.NEVER
     )  # week, month, year, etc.

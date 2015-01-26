@@ -20,6 +20,7 @@ from flask import render_template
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
@@ -141,8 +142,7 @@ class TransactionStatusTransition(object):
 class PaymentTransaction(db.Model):
     """Payment transactions"""
     __tablename__ = 'payment_transactions'
-    __table_args__ = (db.CheckConstraint('status IN ({})'.format(', '.join(map(str, TransactionStatus)))),
-                      db.CheckConstraint('amount > 0'),
+    __table_args__ = (db.CheckConstraint('amount > 0'),
                       db.UniqueConstraint('event_id', 'registrant_id', 'timestamp'),
                       {'schema': 'events'})
 
@@ -164,7 +164,7 @@ class PaymentTransaction(db.Model):
     )
     #: a :class:`TransactionStatus`
     status = db.Column(
-        db.SmallInteger,
+        PyIntEnum(TransactionStatus),
         nullable=False
     )
     #: the base amount the user needs to pay (without payment-specific fees)

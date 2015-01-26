@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from .greatest import greatest
+from .int_enum import PyIntEnum
 from .least import least
 from .static_array import array_agg
 from .time_diff import time_diff
