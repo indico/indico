@@ -57,3 +57,7 @@ object which will cause it to be rendered as HTML.
 The *sender* is the name of the actual hook. The keyword arguments
 depend on the hook.
 """)
+
+get_event_request_definitions = _signals.signal('get-event-request-definitions', """
+Expected to return one or more RequestDefinition subclasses.
+""")

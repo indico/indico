@@ -14,11 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from indico.core import signals
-from indico.modules.events.requests.util import get_request_definitions
+from indico.util.signals import named_objects_from_signal
 
 
-@signals.app_created.connect
-def _check_request_definitions(app, **kwargs):
-    # This will raise RuntimeError if the request type names are not unique
-    get_request_definitions()
+def get_request_definitions():
+    """Returns a dict of request definitions"""
+    return named_objects_from_signal(signals.plugin.get_event_request_definitions.send())
