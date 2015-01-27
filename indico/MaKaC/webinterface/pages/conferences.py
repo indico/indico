@@ -1468,6 +1468,10 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
             urlHandlers.UHConfModifEvaluation.getURL( self._conf ) )
         self._generalSection.addItem( self._evaluationMenuItem)
 
+        self._requestsMenuItem = wcomponents.SideMenuItem(_("Services"),
+                                                          url_for('requests.event_settings', self._conf))
+        self._generalSection.addItem(self._requestsMenuItem)
+
         self._pluginsDictMenuItem = {}
         self._notify('fillManagementSideMenu', self._pluginsDictMenuItem)
         for element in self._pluginsDictMenuItem.values():
@@ -1535,6 +1539,7 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
             self._toolsMenuItem.setVisible(False)
             self._logMenuItem.setVisible(False)
             self._evaluationMenuItem.setVisible(False)
+            self._requestsMenuItem.setVisible(False)
 
         if not (Config.getInstance().getIsRoomBookingActive() and canModify):
             self._roomBookingMenuItem.setVisible(False)
