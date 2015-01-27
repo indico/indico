@@ -65,6 +65,7 @@ class PyIntEnum(TypeDecorator, SchemaType):
 
     def _set_table(self, column, table):
         e = CheckConstraint(type_coerce(column, self).in_(x.value for x in self.enum))
+        e.info['alembic_dont_render'] = True
         assert e.table is table
 
     def alembic_render_type(self, autogen_context):

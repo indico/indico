@@ -39,6 +39,8 @@ def _include_symbol(tablename, schema):
 
 
 def _render_item(type_, obj, autogen_context):
+    if hasattr(obj, 'info') and obj.info.get('alembic_dont_render'):
+        return None
     func = getattr(obj, 'alembic_render_' + type_, None)
     if func is None:
         return False
