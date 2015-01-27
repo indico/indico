@@ -13,29 +13,22 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from MaKaC.paperReviewing import ConferencePaperReview
-from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
-from MaKaC.services.implementation.contribution import ContributionBase
-from MaKaC.services.implementation.base import TextModificationBase
-from MaKaC.services.implementation.base import HTMLModificationBase
-from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager,\
-    RCReferee
-from MaKaC.services.implementation.conference import ConferenceModifBase
-from MaKaC.services.implementation.base import DateTimeModificationBase
-from MaKaC.webinterface.rh.contribMod import RCContributionReferee
-from MaKaC.webinterface.rh.contribMod import RCContributionEditor
-from MaKaC.webinterface.rh.contribMod import RCContributionReviewer
-from MaKaC.webinterface.user import UserModificationBase, UserListModificationBase
-from MaKaC.services.implementation.base import ListModificationBase
-from MaKaC import user
-from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
-from MaKaC.i18n import _
-from MaKaC.errors import MaKaCError
+
 import datetime
-from MaKaC.common.mail import GenericMailer
-from MaKaC.contributionReviewing import ReviewManager
+
+from MaKaC import user
 from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.reviewing import IReviewingQuestionFossil
+from MaKaC.errors import MaKaCError
+from MaKaC.i18n import _
+from MaKaC.paperReviewing import ConferencePaperReview
+from MaKaC.services.implementation.base import (DateTimeModificationBase, HTMLModificationBase, ListModificationBase,
+                                                ParameterManager, ProtectedModificationService, TextModificationBase)
+from MaKaC.services.implementation.conference import ConferenceModifBase
+from MaKaC.services.implementation.contribution import ContributionBase
+from MaKaC.services.interface.rpc.common import HTMLSecurityError, NoReportError, ServiceError
+from MaKaC.webinterface.rh.contribMod import RCContributionEditor, RCContributionReferee, RCContributionReviewer
+from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReferee
+from MaKaC.webinterface.user import UserListModificationBase, UserModificationBase
 
 """
 Asynchronous request handlers for conference and contribution reviewing related data
@@ -832,6 +825,12 @@ class ContributionReviewingCommentsModification(ContributionReviewingHTMLModific
 
     def _handleGet(self):
         return self.getJudgementObject().getComments()
+
+    def process(self):
+        try:
+            return super(ContributionReviewingCommentsModification, self).process()
+        except HTMLSecurityError as e:
+            raise NoReportError(e.message)
 
 class ContributionReviewingCriteriaModification(ContributionReviewingTextModificationBase):
 
