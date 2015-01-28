@@ -58,6 +58,7 @@ from MaKaC.webinterface.pages import base
 from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
 import MaKaC.common.info as info
 from MaKaC.i18n import _
+from indico.modules.events.requests import get_request_definitions
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
 from indico.util.string import safe_upper
@@ -1569,6 +1570,9 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         # we disable the Participants section for events of type conference
         if self._conf.getType() == 'conference':
             self._participantsMenuItem.setVisible(False)
+
+        if not get_request_definitions():
+            self._requestsMenuItem.setVisible(False)
 
         wf = self._rh.getWebFactory()
         if wf:

@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals
 
+from werkzeug.exceptions import NotFound
+
+from indico.modules.events.requests import get_request_definitions
 from indico.modules.events.requests.views import WPRequestsEventManagement
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -24,4 +27,7 @@ class RHRequestsEventSettings(RHConferenceModifBase):
     """Overview of existing requests (event)"""
 
     def _process(self):
+        definitions = get_request_definitions()
+        if not definitions:
+            raise NotFound
         return WPRequestsEventManagement.render_template('event_settings.html', self._conf)
