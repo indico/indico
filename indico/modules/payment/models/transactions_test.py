@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import pytest
+from mock import MagicMock
 
 from indico.modules.payment.models.transactions import (PaymentTransaction, TransactionAction, TransactionStatus,
                                                         TransactionStatusTransition, IgnoredTransactionAction,
@@ -93,10 +94,10 @@ def test_next_providers(create_transaction, provider, manual):
     TransactionStatusTransition._next_from_pending.assert_called_with(action, manual)
 
 
-def test_next_invalid(dummy_transaction):
-    dummy_transaction.status = 'invalid status'
+def test_next_invalid():
+    transaction = MagicMock(status=1337)
     with pytest.raises(InvalidTransactionStatus):
-        TransactionStatusTransition.next(dummy_transaction, TransactionAction.complete, '')
+        TransactionStatusTransition.next(transaction, TransactionAction.complete, '')
 
 
 @pytest.mark.parametrize(('action', 'manual', 'expected'), (
