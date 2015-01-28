@@ -139,9 +139,29 @@ class Agreement(db.Model):
         from MaKaC.user import AvatarHolder
         return AvatarHolder().getById(str(self.user_id))
 
+    @user.setter
+    def user(self, user):
+        if user is None:
+            return
+        self.user_id = user.getId()
+        self.person_email = user.getEmail()
+        self.person_name = user.getStraightFullName().title()
+
     def __repr__(self):
         state = self.state.name if self.state is not None else None
-        return '<Agreement({}, {}, {}, {}, {})>'.format(self.id, self.event_id, self.type, state, self.person_email)
+        return '<Agreement({}, {}, {}, {}, {})>'.format(self.id, self.event_id, self.type, self.person_email, state)
+
+    @staticmethod
+    def create_from_data(event_id, type, user=None, email=None, name=None):
+        if user is None and (email is None or name is None):
+            raise ValueError('')
+        agreement = Agreement(event_id=event_id, type=type, state=AgreementState.pending, uuid=uuid4().hex)
+        if user:
+            agreement.user = user
+        else:
+            agreement.person_email = email
+            agreement.person_name = name
+        return agreement
 
     def accept(self, on_behalf=False):
         self.state = AgreementState.accepted if not on_behalf else AgreementState.accepted_on_behalf
