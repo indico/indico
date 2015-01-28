@@ -14,5 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.signals import acl, agreements, category, event, event_management, plugin
-from indico.core.signals.core import *
+from __future__ import unicode_literals
+
+from indico.core import signals
+from indico.util.signals import named_objects_from_signal
+
+
+def get_agreement_definitions():
+    return named_objects_from_signal(signals.agreements.get_definitions.send())

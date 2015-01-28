@@ -25,6 +25,8 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.struct.enum import IndicoEnum
 
+from indico.modules.agreements.util import get_agreement_definitions
+
 
 class AgreementState(int, IndicoEnum):
     pending = 1
@@ -122,6 +124,10 @@ class Agreement(db.Model):
         return (self.state == AgreementState.rejected) | (self.state == AgreementState.rejected_on_behalf)
 
     @property
+    def definition(self):
+        return get_agreement_definitions().get(self.type)
+
+    @property
     def event(self):
         from MaKaC.conference import ConferenceHolder
         return ConferenceHolder().getById(str(self.event_id))
@@ -136,3 +142,16 @@ class Agreement(db.Model):
     def __repr__(self):
         state = self.state.name if self.state is not None else None
         return '<Agreement({}, {}, {}, {}, {})>'.format(self.id, self.event_id, self.type, state, self.person_email)
+
+    def accept(self, on_behalf=False):
+        self.state = AgreementState.accepted if not on_behalf else AgreementState.accepted_on_behalf
+        self.signed_dt = now_utc
+        self.definition.handle_accepted(self)
+
+    def reject(self, on_behalf=False):
+        self.state = AgreementState.rejected if not on_behalf else AgreementState.rejected_on_behalf
+        self.signed_dt = now_utc
+        self.definition.handle_rejected(self)
+
+    def render(self):
+        return self.definition.render_form(self)
