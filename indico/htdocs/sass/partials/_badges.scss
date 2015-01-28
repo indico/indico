@@ -31,7 +31,7 @@
 }
 
 .i-badges-list {
-    @extend badges-list;
+    @extend %badges-list;
     text-align: center;
     -webkit-justify-content: space-around;
     justify-content: space-around;
@@ -39,7 +39,7 @@
 }
 
 .i-badges-list-left {
-    @extend badges-list;
+    @extend %badges-list;
 
     //TODO replace with justify-content mixin once Compass is updated
     text-align: left;

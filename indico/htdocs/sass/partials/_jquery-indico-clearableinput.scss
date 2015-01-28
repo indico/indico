@@ -28,7 +28,6 @@
         }
 
         .input-clear {
-            @extend %input-button;
             &:hover {
                 color: $red;
             }
@@ -39,7 +38,6 @@
         }
 
         .input-action {
-            @extend %input-button;
             &:hover {
                 color: $green;
             }
