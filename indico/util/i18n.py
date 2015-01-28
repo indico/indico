@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import ast
+from contextlib import contextmanager
 import re
 
 from babel.core import Locale
@@ -22,15 +23,26 @@ from babel.support import Translations
 from babel import negotiate_locale
 from flask import session, request, has_request_context, current_app
 from flask_babelex import Babel, get_domain
+from flask_pluginengine import current_plugin
 from speaklater import make_lazy_gettext
 
-from MaKaC.common.info import HelperMaKaCInfo
 from indico.core.db import DBMgr
+
+from MaKaC.common.info import HelperMaKaCInfo
 
 
 RE_TR_FUNCTION = re.compile(r"_\(\"([^\"]*)\"\)|_\('([^']*)'\)", re.DOTALL | re.MULTILINE)
 
 babel = Babel()
+
+
+def get_active_domain():
+    default_domain = get_domain()
+
+    if current_plugin:
+        return current_plugin.translation_domain or default_domain
+    else:
+        return default_domain
 
 
 def gettext_unicode(*args, **kwargs):
@@ -43,7 +55,7 @@ def gettext_unicode(*args, **kwargs):
     else:
         using_unicode = True
 
-    res = getattr(get_domain().get_translations(), func_name)(*args, **kwargs)
+    res = getattr(get_active_domain().get_translations(), func_name)(*args, **kwargs)
 
     if using_unicode:
         return res
@@ -72,8 +84,8 @@ def smart_func(func_name):
 
 
 # Shortcuts
-_ = gettext = smart_func('ugettext')
-ngettext = smart_func('ungettext')
+_ = ugettext = gettext = smart_func('ugettext')
+ungettext = ngettext = smart_func('ungettext')
 L_ = lazy_gettext
 
 # Just a marker for message extraction
@@ -153,6 +165,18 @@ def set_session_lang(lang):
     Set the current language in the current request context
     """
     session.lang = lang
+
+
+@contextmanager
+def session_language(lang):
+    """
+    Context manager that temporarily sets session language
+    """
+    old_lang = session.lang
+
+    set_session_lang(lang)
+    yield
+    set_session_lang(old_lang)
 
 
 def parse_locale(locale):

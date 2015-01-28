@@ -22,10 +22,12 @@ from copy import deepcopy
 from heapq import heappush
 from urlparse import urlparse
 
+from flask_babelex import Domain
 from flask_pluginengine import (PluginEngine, Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin,
                                 current_plugin, render_plugin_template, wrap_in_plugin_context)
 from markupsafe import Markup
 from webassets import Environment, Bundle
+from werkzeug.utils import cached_property
 
 from indico.core import signals
 from indico.core.config import Config
@@ -41,6 +43,7 @@ from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
+
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 
 
@@ -141,6 +144,15 @@ class IndicoPlugin(Plugin):
     def get_vars_js(self):
         """Return a dictionary with variables to be added to vars.js file"""
         return None
+
+    @cached_property
+    def translation_domain(self):
+        """
+        Return translation files to be used by the plugin.
+        By default, get <root_path>/translations, unless it does not exist
+        """
+        translations_path = os.path.join(self.root_path, 'translations')
+        return Domain(translations_path) if os.path.exists(translations_path) else None
 
     def add_cli_command(self, manager):
         """Add custom commands/submanagers to the manager of the `indico` cli tool."""
