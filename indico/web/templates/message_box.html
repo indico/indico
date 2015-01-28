@@ -1,0 +1,7 @@
+{% macro message_box(type, message=none) %}
+    <div class="{{ type }}-message-box">
+        <div class="message-text">
+            {{ message or caller() }}
+        </div>
+    </div>
+{% endmacro %}
