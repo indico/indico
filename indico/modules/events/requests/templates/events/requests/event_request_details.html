@@ -1,0 +1,100 @@
+{% extends 'admin/base.html' %}
+{% from 'message_box.html' import message_box %}
+{% from 'forms/form_widget.html' import form_header, form_fieldset, form_footer, form_rows %}
+
+{% block title %}{% trans %}Services{% endtrans %}{% endblock %}
+{% block subtitle %}{{ definition.title }}{% endblock %}
+
+{% block content %}
+    {{ form_header(id='request-form') }}
+
+    {% block warnings %}
+        {%- if not request -%}
+            {# nothing #}
+        {%- elif request.state.name == 'pending' -%}
+            {% call message_box('info') %}
+                <p>
+                    {%- trans -%}
+                        Your request is currently pending approval. You will be notified by e-mail once it has been accepted or rejected.
+                    {%- endtrans -%}
+                </p>
+            {% endcall %}
+        {%- elif request.state.name == 'accepted' -%}
+            {% call message_box('success') %}
+                <p>
+                    {%- trans -%}
+                        Your request has been accepted. If you make any modifications to it, it will have to be approved again.
+                    {%- endtrans -%}
+                </p>
+                {% if request.comment %}
+                    <p><strong>{% trans %}Comment{% endtrans %}:</strong> {{ request.comment }}</p>
+                {% endif %}
+            {% endcall %}
+        {%- elif request.state.name == 'rejected' -%}
+            {% call message_box('warning') %}
+                <p>
+                    {%- trans -%}
+                        Your request has been rejected. Please check the rejection reason (if provided) and, if necessary, resubmit your request.
+                    {%- endtrans -%}
+                </p>
+                {% if request.comment %}
+                    <p><strong>{% trans %}Comment{% endtrans %}:</strong> {{ request.comment }}</p>
+                {% endif %}
+            {% endcall %}
+        {%- elif request.state.name == 'withdrawn' -%}
+            {% call message_box('warning') %}
+                <p>
+                    {%- trans -%}
+                        You have withdrawn your request. If you need this service, please resubmit your request.
+                    {%- endtrans -%}
+                </p>
+            {% endcall %}
+        {%- endif -%}
+    {% endblock %}
+
+    {% block form %}
+{#        {{ form_rows(form) }}#}
+    {% endblock %}
+
+    {% call form_footer() %}
+        <input class="i-button big highlight" type="submit" value="
+            {%- if not request -%}
+                {%- trans -%}Send request{%- endtrans -%}
+            {%- elif request.state.name in ('accepted', 'pending') -%}
+                {%- trans -%}Modify request{%- endtrans -%}
+            {%- elif request.state.name in ('rejected', 'withdrawn') -%}
+                {%- trans -%}Send new request{%- endtrans -%}
+            {%- endif -%}
+        ">
+        {% if request and request.state.name in ('pending', 'accepted') %}
+            <a href="#" class="i-button big warning" id="withdraw-request"
+               data-href="{{ url_for('.event_requests_withdraw', event, type=request.type) }}">
+                {%- trans %}Withdraw request{% endtrans -%}
+            </a>
+        {% endif %}
+        <a href="{{ url_for('.event_requests', event) }}" class="i-button big">{% trans %}Back{% endtrans %}</a>
+    {% endcall %}
+
+    <script>
+        $('#withdraw-request').on('click', function(e) {
+            e.preventDefault();
+
+            if (!confirm($T('Do you really want to withdraw this request?'))) {
+                return;
+            }
+
+            $.ajax({
+                url: $(this).data('href'),
+                type: 'POST',
+                dataType: 'json',
+                complete: IndicoUI.Dialogs.Util.progress(),
+                success: function(data) {
+                    if (handleAjaxError(data)) {
+                        return;
+                    }
+                    location.href = data.url;
+                }
+            });
+        });
+    </script>
+{% endblock %}

@@ -1470,7 +1470,7 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         self._generalSection.addItem( self._evaluationMenuItem)
 
         self._requestsMenuItem = wcomponents.SideMenuItem(_("Services"),
-                                                          url_for('requests.event_settings', self._conf))
+                                                          url_for('requests.event_requests', self._conf))
         self._generalSection.addItem(self._requestsMenuItem)
 
         self._pluginsDictMenuItem = {}

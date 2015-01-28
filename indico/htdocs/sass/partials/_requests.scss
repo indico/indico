@@ -1,0 +1,43 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@mixin i-request-state($state, $color, $light-color, $dark-color) {
+    &.i-request-$state {
+        background-color: $light-color;
+        &, & * { color: $color; }
+        &:hover { background-color: darken($light-color, $light-color-variation); }
+        & > .i-badge-legend { border-color: $dark-color; }
+    }
+}
+
+.i-requests-list {
+    & > .i-badge {
+        @include transition(background-color $default-transition-duration $default-transition-function);
+
+        width: 10em;
+
+        @include i-request-state(accepted, $green, $light-green, $dark-green);
+        @include i-request-state(rejected, $red, $light-red, $dark-red);
+        @include i-request-state(pending, $yellow, $light-yellow, $dark-yellow);
+        @include i-request-state(withdrawn, $gray, $light-gray, $dark-gray);
+
+        & > .i-badge-content {
+            height: 4.2em;
+            & > .i-badge-title { font-size: 1em; }
+        }
+    }
+}

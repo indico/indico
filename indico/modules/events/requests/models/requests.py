@@ -20,6 +20,7 @@ from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
+from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.modules.events.requests import get_request_definitions
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -28,10 +29,11 @@ from indico.util.struct.enum import TitledIntEnum
 
 
 class RequestState(TitledIntEnum):
-    __titles__ = [_('Pending'), _('Accepted'), _('Rejected')]
+    __titles__ = [_('Pending'), _('Accepted'), _('Rejected'), _('Withdrawn')]
     pending = 0
     accepted = 1
     rejected = 2
+    withdrawn = 3
 
 
 class Request(db.Model):
@@ -58,7 +60,8 @@ class Request(db.Model):
     #: the requests's date, a :class:`RequestState` value
     state = db.Column(
         PyIntEnum(RequestState),
-        nullable=False
+        nullable=False,
+        default=RequestState.pending
     )
     #: plugin-specific data of the payment
     data = db.Column(
@@ -85,6 +88,11 @@ class Request(db.Model):
     #: the date/time the request was accepted/rejected
     processed_dt = db.Column(
         UTCDateTime,
+        nullable=True
+    )
+    #: an optional comment for an accepted/rejected request
+    comment = db.Column(
+        db.Text,
         nullable=True
     )
 
@@ -119,7 +127,30 @@ class Request(db.Model):
     def definition(self):
         return get_request_definitions().get(self.type)
 
+    def withdraw(self):
+        """Withdraws the request"""
+        self.state = RequestState.withdrawn
+        # TODO: notify
+
     @return_ascii
     def __repr__(self):
         state = self.state.name if self.state is not None else None
         return '<Request({}, {}, {})>'.format(self.id, self.event_id, state)
+
+    @classmethod
+    def find_latest_for_event(cls, event, type_=None):
+        """Returns the latest requests for a given event.
+
+        :param event: the event to find the requests for
+        :param type_: the request type to retrieve, or `None` to get all
+        :return: a dict mapping request types to a :class:`Request`
+                 or if `type_` was specified, a single :class:`Request` or `None`
+        """
+        query = cls.find(event_id=int(event.getId()))
+        if type_ is not None:
+            return (query.filter_by(type=type_)
+                    .order_by(cls.created_dt.desc())
+                    .first())
+        else:
+            query = limit_groups(query, cls, cls.type, cls.created_dt.desc(), 1)
+            return {req.type: req for req in query}

@@ -29,6 +29,7 @@ def upgrade():
                     sa.Column('created_dt', UTCDateTime, nullable=False, index=True),
                     sa.Column('processed_by_id', sa.Integer(), nullable=True),
                     sa.Column('processed_dt', UTCDateTime, nullable=True),
+                    sa.Column('comment', sa.Text(), nullable=True),
                     sa.PrimaryKeyConstraint('id'),
                     schema='events')
 
