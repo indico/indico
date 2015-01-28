@@ -305,4 +305,5 @@ def make_app(set_path=False, db_setup=True, testing=False):
         raise Exception('Could not load some plugins: {}'.format(', '.join(plugin_engine.get_failed_plugins(app))))
     # Below this points plugins are available, i.e. sending signals makes sense
     add_plugin_blueprints(app)
+    signals.app_created.send(app)
     return app

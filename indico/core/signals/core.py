@@ -19,6 +19,10 @@ from blinker import Namespace
 _signals = Namespace()
 
 
+app_created = _signals.signal('app-created', """
+Called when the app has been created. The *sender* is the flask app.
+""")
+
 after_process = _signals.signal('after-process', """
 Called after an Indico request has been processed.
 """)
