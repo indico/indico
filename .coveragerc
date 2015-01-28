@@ -5,6 +5,7 @@ include =
     indico/core/models/*.py
     indico/modules/payment/*.py
     indico/modules/rb/*.py
+    indico/util/signals.py
     indico/util/string.py
     indico/web/flask/templating.py
 

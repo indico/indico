@@ -36,7 +36,7 @@ def values_from_signal(signal_response, single_value=False, skip_none=True, as_l
                               It is used in an `isinstance()` call and if
                               the check succeeds, the value is passed to
                               `list.extend()`
-    :return: A set containing the results
+    :return: A set/list containing the results
     """
     values = []
     for _, value in signal_response:
@@ -47,3 +47,23 @@ def values_from_signal(signal_response, single_value=False, skip_none=True, as_l
     if skip_none:
         values = [v for v in values if v is not None]
     return values if as_list else set(values)
+
+
+def named_objects_from_signal(signal_response, name_attr='name'):
+    """Returns a dict of objects based on an unique attribute on each object.
+
+    The signal needs to return either a single object (which is not a
+    generator) or a generator (usually by returning its values using
+    `yield`).
+
+    :param signal_response: The return value of a Signal's `.send()` method
+    :param name_attr: The attribute containing each object's unique name
+    :return: dict mapping object names to objects
+    """
+    objects = values_from_signal(signal_response)
+    mapping = {getattr(cls, name_attr): cls for cls in objects}
+    missing = objects - set(mapping.viewvalues())
+    if missing:
+        names = ', '.join(sorted(getattr(x, name_attr) for x in missing))
+        raise RuntimeError('Non-unique request types: {}'.format(names))
+    return mapping
