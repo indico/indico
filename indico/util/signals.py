@@ -62,8 +62,8 @@ def named_objects_from_signal(signal_response, name_attr='name'):
     """
     objects = values_from_signal(signal_response)
     mapping = {getattr(cls, name_attr): cls for cls in objects}
-    missing = objects - set(mapping.viewvalues())
-    if missing:
-        names = ', '.join(sorted(getattr(x, name_attr) for x in missing))
-        raise RuntimeError('Non-unique request types: {}'.format(names))
+    conflicting = objects - set(mapping.viewvalues())
+    if conflicting:
+        names = ', '.join(sorted(getattr(x, name_attr) for x in conflicting))
+        raise RuntimeError('Non-unique object names: {}'.format(names))
     return mapping

@@ -79,4 +79,4 @@ def test_named_objects_from_signal_duplicate():
     signal_response = _make_signal_response(objects)
     with pytest.raises(RuntimeError) as exc_info:
         named_objects_from_signal(signal_response)
-    assert str(exc_info.value) == 'Non-unique request types: a, c'
+    assert str(exc_info.value) == 'Non-unique object names: a, c'
