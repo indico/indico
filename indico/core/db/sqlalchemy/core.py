@@ -17,10 +17,12 @@
 from __future__ import absolute_import
 
 import logging
+from functools import partial
 
 import flask_sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.event import listen
+from sqlalchemy.orm import mapper
 from sqlalchemy.sql.ddl import CreateSchema
 from werkzeug.utils import cached_property
 from zope.sqlalchemy import ZopeTransactionExtension
@@ -59,5 +61,19 @@ def _before_create(target, connection, **kw):
         CreateSchema(schema).execute_if(callable_=_should_create_schema).execute(connection)
 
 
+def _mapper_configured(mapper, class_):
+    # Create a setter listener to coerce attribute values for custom types supporting it
+    def _coerce_custom(target, value, oldvalue, initiator, fn):
+        return fn(value)
+
+    for prop in mapper.iterate_properties:
+        if hasattr(prop, 'columns'):
+            func = getattr(prop.columns[0].type, 'coerce_set_value', None)
+            if func is not None:
+                # Using partial here to avoid closure scoping issues
+                listen(getattr(class_, prop.key), 'set', partial(_coerce_custom, fn=func), retval=True)
+
+
 db = IndicoSQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
 listen(db.Model.metadata, 'before_create', _before_create)
+listen(mapper, 'mapper_configured', _mapper_configured)

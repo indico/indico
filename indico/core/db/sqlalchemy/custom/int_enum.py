@@ -63,6 +63,11 @@ class PyIntEnum(TypeDecorator, SchemaType):
         # Note: This raises a ValueError if `value` is not in the Enum.
         return self.enum(value)
 
+    def coerce_set_value(self, value):
+        if value is None:
+            return None
+        return self.enum(value)
+
     def _set_table(self, column, table):
         e = CheckConstraint(type_coerce(column, self).in_(x.value for x in self.enum))
         e.info['alembic_dont_render'] = True
