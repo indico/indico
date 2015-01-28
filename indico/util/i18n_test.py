@@ -14,34 +14,75 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import os
 import pytest
 from babel.support import Translations
-from flask import session
-from flask_babelex import get_domain
+from flask import session, request, has_request_context
+from flask_babelex import get_domain, Domain
 from speaklater import _LazyString
+from werkzeug.http import LanguageAccept
+from werkzeug.utils import cached_property
 
-from indico.util.i18n import _, ngettext
+from indico.util.i18n import _, ngettext, ungettext, session_language, babel
+from indico.core.plugins import IndicoPlugin, IndicoPluginEngine
+
+
+DICTIONARIES = {
+    'fr_MP': {
+        'Fetch the cow': u'Fetchez la vache',
+        'The wheels': u'Les wheels',
+        ('{} cow', 0): u'{} vache',
+        ('{} cow', 1): u'{} vaches',
+        'This is not a string': u"Ceci n'est pas une cha\u00cene"
+    },
+
+    'en_PI': {
+        'I need a drink.': u"I be needin' a bottle of rhum!"
+    }
+}
 
 
 class MockTranslations(Translations):
+    """
+    Mock `Translations` class - returns a mock dictionary
+    based on the selected locale
+    """
 
     def __init__(self):
         super(MockTranslations, self).__init__()
+        self._catalog = DICTIONARIES[babel.locale_selector_func()]
 
+
+class MockPluginTranslations(Translations):
+    """
+    Mock `Translations` class - returns a mock dictionary
+    based on the selected locale
+    """
+
+    def __init__(self):
+        super(MockPluginTranslations, self).__init__()
         self._catalog = {
-            'Fetch the cow': u'Fetchez la vache',
-            'The wheels': u'Les wheels',
-            ('{} cow', 0): u'{} vache',
-            ('{} cow', 1): u'{} vaches'
+            'This is not a string': u"Ceci n'est pas un string"
         }
 
 
-@pytest.fixture(autouse=True)
+class MockPlugin(IndicoPlugin):
+    root_path = os.path.dirname(__file__)
+
+    @cached_property
+    def translation_domain(self):
+        plugin_domain = Domain()
+        plugin_domain.get_translations = MockPluginTranslations
+        return plugin_domain
+
+
+@pytest.fixture
 def mock_translations(monkeypatch, request_context):
     domain = get_domain()
     monkeypatch.setattr(domain, 'get_translations', MockTranslations)
 
 
+@pytest.mark.usefixtures('mock_translations')
 def test_straight_translation():
     session.lang = 'fr_MP'  # 'Monty Python' French
 
@@ -52,6 +93,7 @@ def test_straight_translation():
     assert isinstance(b, unicode)
 
 
+@pytest.mark.usefixtures('mock_translations')
 def test_lazy_translation():
     a = _(u'Fetch the cow')
     b = _(u'The wheels')
@@ -65,15 +107,61 @@ def test_lazy_translation():
     assert unicode(b) == u'Les wheels'
 
 
+@pytest.mark.usefixtures('mock_translations')
 def test_ngettext():
     session.lang = 'fr_MP'
 
     assert ngettext(u'{} cow', u'{} cows', 1).format(1) == u'1 vache'
-    assert ngettext(u'{} cow', u'{} cows', 42).format(42) == u'42 vaches'
+    assert ungettext(u'{} cow', u'{} cows', 42).format(42) == u'42 vaches'
 
 
+@pytest.mark.usefixtures('mock_translations')
 def test_translate_bytes():
     session.lang = 'fr_MP'
 
     assert _(u'Fetch the cow') == u'Fetchez la vache'
     assert _('The wheels') == 'Les wheels'
+
+
+@pytest.mark.usefixtures('mock_translations')
+def test_context_manager():
+    session.lang = 'fr_MP'
+    with session_language('en_PI'):
+        assert session.lang == 'en_PI'
+        assert _(u'I need a drink.') == u"I be needin' a bottle of rhum!"
+
+    assert session.lang == 'fr_MP'
+
+
+def test_set_best_lang_no_request():
+    assert not has_request_context()
+    assert babel.locale_selector_func() == 'en_GB'
+
+
+@pytest.mark.usefixtures('mock_translations')
+def test_set_best_lang_request():
+    with session_language('en_PI'):
+        assert babel.locale_selector_func() == 'en_PI'
+
+
+@pytest.mark.usefixtures('mock_translations')
+def test_set_best_lang_no_session_lang():
+    request.accept_languages = LanguageAccept([('en-PI', 1), ('fr_FR', 0.7)])
+    assert babel.locale_selector_func() == 'fr_FR'
+
+    request.accept_languages = LanguageAccept([('fr-FR', 1)])
+    assert babel.locale_selector_func() == 'fr_FR'
+
+
+@pytest.mark.usefixtures('mock_translations')
+def test_translation_plugins(app):
+    session.lang = 'fr_MP'
+    engine = IndicoPluginEngine()
+    plugin = MockPlugin(engine, app)
+
+    assert _(u'This is not a string') == u"Ceci n'est pas une cha\u00cene"
+
+    with plugin.plugin_context():
+        assert _(u'This is not a string') == u"Ceci n'est pas un string"
+
+    assert _(u'This is not a string') == u"Ceci n'est pas une cha\u00cene"

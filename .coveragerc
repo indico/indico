@@ -8,6 +8,8 @@ include =
     indico/util/signals.py
     indico/util/string.py
     indico/web/flask/templating.py
+    indico/util/i18n.py
+    indico/util/translations.py
 
 [report]
 exclude_lines =

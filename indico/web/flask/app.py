@@ -296,6 +296,7 @@ def make_app(set_path=False, db_setup=True, testing=False):
     extend_url_map(app)
     add_handlers(app)
     add_blueprints(app)
+
     if app.config['INDICO_COMPAT_ROUTES']:
         add_compat_blueprints(app)
     Logger.init_app(app)
