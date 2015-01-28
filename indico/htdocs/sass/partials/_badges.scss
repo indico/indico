@@ -121,10 +121,14 @@
         & > .i-badge-title {
             @extend %i-badge-elem;
 
+            max-width: 100%;
             margin-top: 0.2em;
             margin-bottom: 0.2em;
+            overflow: hidden;
+
             font-size: 1.1em;
             font-weight: bold;
+            text-overflow: ellipsis;
         }
     }
 
