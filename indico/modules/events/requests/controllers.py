@@ -64,8 +64,8 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestBase):
     _require_request = False
 
     def _process(self):
-        return WPRequestsEventManagement.render_template('event_request_details.html', self.event, event=self.event,
-                                                         definition=self.definition, request=self.request)
+        form_html = self.definition.render_form(event=self.event, definition=self.definition, request=self.request)
+        return WPRequestsEventManagement.render_string(form_html, self.event)
 
 
 class RHRequestsEventRequestWithdraw(RHRequestsEventRequestBase):

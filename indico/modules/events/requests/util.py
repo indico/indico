@@ -22,4 +22,4 @@ from indico.util.signals import named_objects_from_signal
 
 def get_request_definitions():
     """Returns a dict of request definitions"""
-    return named_objects_from_signal(signals.plugin.get_event_request_definitions.send())
+    return named_objects_from_signal(signals.plugin.get_event_request_definitions.send(), plugin_attr='plugin')

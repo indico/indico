@@ -14,8 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from indico.core import signals
 from indico.modules.events.requests.util import get_request_definitions
+from indico.modules.events.requests.base import RequestDefinitionBase
+
+
+__all__ = ('RequestDefinitionBase',)
 
 
 @signals.app_created.connect
