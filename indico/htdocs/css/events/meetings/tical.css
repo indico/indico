@@ -22,6 +22,8 @@ div.meetingEventHeader {
     padding-top: 15px;
     padding-left: 200px;
     background-size: 230px;
+    border-top-left-radius: 0.2em;
+    border-top-right-radius: 0.2em;
 }
 
 div.meetingEventHeader .details{

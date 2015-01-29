@@ -438,11 +438,11 @@ div.meetingEventHeader {
     min-height: 125px;
     margin: 0px;
     padding: 10px 30px 10px;
-    border-radius: 10px 10px 0px 0px;
+    border-top-left-radius: 0.2em;
+    border-top-right-radius: 0.2em;
 }
 
 div.meetingEventHeader h1 {
-    text-shadow: 1px 1px 5px #000;
     font-size: 20pt;
     color: white;
     font-weight: normal;
@@ -488,6 +488,12 @@ div.meetingEventBody {
     padding: 10px 50px;
     position: relative;
     min-height: 200px;
+    border-bottom-left-radius: 0.2em;
+    border-bottom-right-radius: 0.2em;
+}
+
+div.meetingEventLocation {
+    margin-top: 0.5em;
 }
 
 div.partList {
@@ -557,6 +563,10 @@ div.minutesTable > span {
 li.meetingSession, li.meetingContrib, li.breakListItem {
     padding: 3px 0 3px 3px;
     margin: 0 0 0 0;
+}
+
+li.meetingContrib > a.i-button {
+    margin-top: 0;
 }
 
 li.breakListItem pre {
@@ -629,18 +639,6 @@ div.materialList h3, div.partList h3{
     display: inline;
 }
 
-.confModifIcon {
-    float: right;
-    width: 15px;
-    height: 15px;
-    cursor: pointer;
-    background: transparent url('../../images/popupMenuHover.png') scroll repeat-x 0 0;
-}
-
-.confModifIcon:hover {
-    background: transparent url('../../images/popupMenuHover.png') scroll repeat-x 0 -15px;
-}
-
 .confModifPadding {
     padding-right: 20px;
 }
@@ -652,10 +650,10 @@ div.materialList h3, div.partList h3{
     padding-right: 12px;
     background-color: #ECECEC;
     font-size: 10pt;
-    -webkit-border-top-right-radius: 3px;
-    -webkit-border-top-left-radius: 3px;
-    -moz-border-radius-topleft: 3px;
-    -moz-border-radius-topright: 3px;
+    -webkit-border-top-right-radius: 0.2em;
+    -webkit-border-top-left-radius: 0.2em;
+    -moz-border-radius-topleft: 0.2em;
+    -moz-border-radius-topright: 0.2em;
 }
 .manageLink div {
     padding-top: 7px;

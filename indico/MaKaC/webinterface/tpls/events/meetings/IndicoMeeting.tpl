@@ -13,13 +13,16 @@
         % endif
 
         <div class="details">
-            ${common.renderEventTime(startDate, endDate, timezone)}
-
+            <div class="meetingEventDate">
+                <i class="icon-calendar"></i>${common.renderEventTime(startDate, endDate, timezone)}
+            </div>
             % if getLocationInfo(conf) != ('', '', ''):
-                <br/>${ _("at")} <strong>${common.renderLocation(conf, span='headerRoomLink')}</strong>
-                % if conf.getLocation():
-                <div class="address">${conf.getLocation().getAddress()}</div>
-                % endif
+                <div class="meetingEventLocation">
+                    <i class="icon-location"></i><strong>${common.renderLocation(conf, span='headerRoomLink')}</strong>
+                    % if conf.getLocation():
+                    <div class="address">${conf.getLocation().getAddress()}</div>
+                    % endif
+                </div>
             % endif
         </div>
         <%include file="${INCLUDE}/ManageButton.tpl" args="item=conf, manageLink=True, alignRight=True"/>

@@ -24,27 +24,21 @@ body {
 }
 
 div.meetingEventBody {
+    border-bottom-left-radius: 0.2em;
+    border-bottom-right-radius: 0.2em;
 }
 
 div.meetingEventHeader {
+    border-top-left-radius: 0.2em;
+    border-top-right-radius: 0.2em;
 }
 
 div.meetingEventHeader > div.details,  div.meetingEventHeader a{
     color: #CCC;
 }
 
-
 div.meetingEventHeader > span.chairedBy {
     color: #CCC;
-}
-
-.eventWrapper {
-    border-radius: 10px 10px 0px 0px;
-    -moz-border-radius: 10px 10px 0px 0px;
-    -webkit-border-radius: 10px 10px 0px 0px;
-    box-shadow: 0px 0px 10px #000;
-    -moz-box-shadow: 0px 0px 10px #000;
-    -webkit-box-shadow: 0px 0px 10px #000;
 }
 
 .details .address {

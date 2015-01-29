@@ -21,6 +21,8 @@ div.meetingEventHeader {
     background: #fff url('../../../images/picosec_banner.jpg') no-repeat;
     padding-top: 15px;
     padding-left: 200px;
+    border-top-left-radius: 0.2em;
+    border-top-right-radius: 0.2em;
 }
 
 div.meetingEventHeader .details{

@@ -20,6 +20,8 @@
 div.meetingEventHeader {
     background: #006699;
     padding-left: 150px;
+    border-top-left-radius: 0.2em;
+    border-top-right-radius: 0.2em;
 }
 
 a.logo {

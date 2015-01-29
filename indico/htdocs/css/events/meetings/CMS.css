@@ -21,5 +21,7 @@ div.meetingEventHeader {
 	background: #1a64a0 url('../../../images/cms_logo.png') left top no-repeat;
 	background-position: 30px 45px;
 	padding-left: 150px;
+    border-top-left-radius: 0.2em;
+    border-top-right-radius: 0.2em;
 }
 

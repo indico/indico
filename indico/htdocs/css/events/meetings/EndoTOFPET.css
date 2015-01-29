@@ -22,6 +22,8 @@ div.meetingEventHeader {
     background: #fff url('../../../images/Logo-EndoTOFPET.jpg') left top no-repeat;
     padding-top: 15px;
     padding-left: 180px;
+    border-top-left-radius: 0.2em;
+    border-top-right-radius: 0.2em;
 }
 
 div.meetingEventHeader .details{

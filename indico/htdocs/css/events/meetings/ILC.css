@@ -35,6 +35,8 @@ div.meetingEventHeader {
     color: #333333;
 
     padding-left: 220px;
+    border-top-left-radius: 0.2em;
+    border-top-right-radius: 0.2em;
 }
 
 div.meetingEventSubHeader {

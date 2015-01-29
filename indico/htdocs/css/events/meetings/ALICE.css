@@ -29,6 +29,8 @@ div.meetingEventHeader {
 	background: #dedede url('../../../images/alicelogo.png') left top no-repeat;
 	background-position: 15px;
 	padding-left: 150px;
+    border-top-left-radius: 0.2em;
+    border-top-right-radius: 0.2em;
 }
 
 div.meetingEventHeader h1 {

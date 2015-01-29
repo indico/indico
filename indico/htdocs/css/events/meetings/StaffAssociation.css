@@ -21,4 +21,6 @@ div.meetingEventHeader {
 	background: #1a64a0 url('../../../images/APlogotype.png') left top no-repeat;
 	background-position: 15px 0px;
 	padding-left: 180px;
+    border-top-left-radius: 0.2em;
+    border-top-right-radius: 0.2em;
 }

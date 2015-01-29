@@ -131,15 +131,6 @@ div.lectureCategory {
     color:#C79810;
 }
 
-.eventWrapper {
-    border-radius: 10px 10px 0px 0px;
-    -moz-border-radius: 10px 10px 0px 0px;
-    -webkit-border-radius: 10px 10px 0px 0px;
-    box-shadow: 0px 0px 10px #000;
-    -moz-box-shadow: 0px 0px 10px #000;
-    -webkit-box-shadow: 0px 0px 10px #000;
-}
-
 .details .address {
     color: #aaa;
     font-size: 12px;
