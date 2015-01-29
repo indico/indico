@@ -45,6 +45,7 @@ from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.plugins import (plugin_engine, include_plugin_css_assets, include_plugin_js_assets, plugin_hook,
                                  url_for_plugin)
+from indico.util.signals import values_from_signal
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import EnsureUnicodeExtension, underline, markdown
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
@@ -222,22 +223,17 @@ def add_legacy_plugin_blueprints(app):
 
 def add_plugin_blueprints(app):
     blueprint_names = set()
-    for _, (plugin, blueprints) in signals.plugin.get_blueprints.send(app):
-        if blueprints is None:
+    for plugin, blueprint in values_from_signal(signals.plugin.get_blueprints.send(app), return_plugins=True):
+        expected_names = {'plugin_{}'.format(plugin.name), 'plugin_compat_{}'.format(plugin.name)}
+        if blueprint.name not in expected_names:
+            raise Exception("Blueprint '{}' does not match plugin name '{}'".format(blueprint.name, plugin.name))
+        if blueprint.name in blueprint_names:
+            raise Exception("Blueprint '{}' defined by multiple plugins".format(blueprint.name))
+        if not app.config['INDICO_COMPAT_ROUTES'] and blueprint.name.startswith('plugin_compat_'):
             continue
-        elif isinstance(blueprints, Blueprint):
-            blueprints = (blueprints,)
-        for blueprint in blueprints:
-            expected_name = 'plugin_{}'.format(plugin.name)
-            if blueprint.name not in (expected_name, 'compat_{}'.format(expected_name)):
-                raise Exception("Blueprint '{}' does not match plugin name '{}'".format(blueprint.name, plugin.name))
-            if blueprint.name in blueprint_names:
-                raise Exception("Blueprint '{}' defined by multiple plugins".format(blueprint.name))
-            if not app.config['INDICO_COMPAT_ROUTES'] and blueprint.name.startswith('compat_'):
-                continue
-            blueprint_names.add(blueprint.name)
-            with plugin.plugin_context():
-                app.register_blueprint(blueprint)
+        blueprint_names.add(blueprint.name)
+        with plugin.plugin_context():
+            app.register_blueprint(blueprint)
 
 
 def handle_404(exception):

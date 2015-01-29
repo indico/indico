@@ -96,7 +96,7 @@ class IndicoPlugin(Plugin):
         self.alembic_versions_path = os.path.join(self.root_path, 'migrations')
         self.connect(signals.plugin.cli, self.add_cli_command)
         self.connect(signals.plugin.shell_context, lambda _, add_to_context: self.extend_shell_context(add_to_context))
-        self.connect(signals.plugin.get_blueprints, lambda app: (self, self.get_blueprints()))
+        self.connect(signals.plugin.get_blueprints, lambda app: self.get_blueprints())
         self.template_hook('vars-js', self.inject_vars_js)
         self._setup_assets()
         self._import_models()

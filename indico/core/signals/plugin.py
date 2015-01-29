@@ -32,13 +32,9 @@ which allows you to add custom items to the context.
 """)
 
 get_blueprints = _signals.signal('get-blueprints', """
-Expected to return IndicoPluginBlueprint-based blueprints
-which will be registered on the application. The signal MUST return
-a `(plugin, blueprints)` tuple for technical reasons (the application
-needs to know from which plugin a blueprint originates). `blueprints`
-can be either a single Blueprint or an iterable containing no more
-than two blueprints. The Blueprint must be named either *PLUGINNAME*
-or *PLUGINNAME_compat*.
+Expected to return one or more IndicoPluginBlueprint-based blueprints
+which will be registered on the application. The Blueprint must be named
+either *PLUGINNAME* or *compat_PLUGINNAME*.
 """)
 
 inject_css = _signals.signal('inject-css', """
