@@ -24,7 +24,7 @@ class ConcatWidget(object):
         self.separator = separator
         self.prefix_label = prefix_label
 
-    def __call__(self, field, label_args=None, field_args=None):
+    def __call__(self, field, label_args=None, field_args=None, **kwargs):
         label_args = label_args or {}
         field_args = field_args or {}
         html = []
