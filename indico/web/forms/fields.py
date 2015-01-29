@@ -19,7 +19,7 @@ import json
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
 from wtforms.widgets.core import CheckboxInput, PasswordInput
-from wtforms.fields.core import RadioField
+from wtforms.fields.core import RadioField, SelectMultipleField
 
 from indico.util.fossilize import fossilize
 from indico.util.user import retrieve_principals
@@ -45,6 +45,11 @@ class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
 
 
 class IndicoQuerySelectMultipleCheckboxField(IndicoQuerySelectMultipleField):
+    option_widget = CheckboxInput()
+
+
+class IndicoSelectMultipleCheckboxField(SelectMultipleField):
+    widget = JinjaWidget('forms/checkbox_group_widget.html')
     option_widget = CheckboxInput()
 
 

@@ -1,0 +1,6 @@
+{% for subfield in field %}
+    <div class="i-checkbox">
+        {{ subfield() }}
+        {{ subfield.label }}
+    </div>
+{% endfor %}
