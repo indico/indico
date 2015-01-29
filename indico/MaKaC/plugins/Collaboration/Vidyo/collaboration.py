@@ -691,7 +691,7 @@ class CSBooking(CSBookingBase):
 
 
     def _getLaunchDisplayInfo(self):
-        return {'launchText' : _("Join Now!"),
+        return {'launchText' : _("Join"),
                 'launchLink' : str(self.getURL()),
                 'launchTooltip': _("Click here to join the Vidyo room!")}
 

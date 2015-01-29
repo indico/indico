@@ -6036,12 +6036,6 @@ span.num_events {
 	font-weight: bold;
 }
 
-.videoServiceWrapper {
-    display: block;
-    width: auto;
-    padding-bottom: 3px;
-}
-
 .videoServiceWrapperInline {
     display: inline-block;
     padding-left: 5px;

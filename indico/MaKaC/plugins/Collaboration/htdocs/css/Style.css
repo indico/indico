@@ -576,31 +576,6 @@ div.collaborationDisplayDateGroup {
     padding-bottom: 15px;
 }
 
-.collaborationDisplayMoreInfo {
-    color: #0B63A5;
-}
-
-.collaborationDisplayHideInfo {
-    color: #B38B1F;
-}
-
-.collaborationDisplayMoreInfo , .collaborationDisplayHideInfo {
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.collaborationDisplayMoreInfo:hover , .collaborationDisplayHideInfo:hover {
-    color: #DBB03A;
-}
-
-div.collaborationDisplayBookingLine {
-    padding-bottom: 5px;
-}
-
-div.collaborationConfDisplayBookingLine {
-    font-size:12px;
-}
-
 td.collaborationConfDisplayInfoLeftCol {
     white-space: nowrap;
     text-align: right;

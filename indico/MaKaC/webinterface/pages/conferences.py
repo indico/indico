@@ -693,6 +693,9 @@ class WConfDetails:
 
 class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
 
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['eventservices_sass'].urls()
+
     def _getBody(self, params):
 
         wc = WConfDetails(self._getAW(), self._conf)
@@ -1134,7 +1137,8 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         # flatten returned list
 
         return WPConferenceBase.getCSSFiles(self) + \
-               sum(self._notify('injectCSSFiles'), [])
+               sum(self._notify('injectCSSFiles'), []) + self._asset_env['eventservices_sass'].urls()
+
 
     def getJSFiles(self):
         modules = WPConferenceBase.getJSFiles(self)
