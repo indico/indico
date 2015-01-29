@@ -53,16 +53,16 @@
     {% endblock %}
 
     {% block form %}
-{#        {{ form_rows(form) }}#}
+        {{ form_rows(form) }}
     {% endblock %}
 
     {% call form_footer() %}
         <input class="i-button big highlight" type="submit" value="
             {%- if not request -%}
                 {%- trans -%}Send request{%- endtrans -%}
-            {%- elif request.state.name in ('accepted', 'pending') -%}
+            {%- elif request.can_be_modified -%}
                 {%- trans -%}Modify request{%- endtrans -%}
-            {%- elif request.state.name in ('rejected', 'withdrawn') -%}
+            {%- else -%}
                 {%- trans -%}Send new request{%- endtrans -%}
             {%- endif -%}
         ">

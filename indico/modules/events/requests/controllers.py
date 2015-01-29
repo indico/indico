@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import request, jsonify, flash
+from flask import request, jsonify, flash, redirect, session
 from werkzeug.exceptions import NotFound, BadRequest
 
 from indico.modules.events.requests import get_request_definitions
@@ -64,7 +64,27 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestBase):
     _require_request = False
 
     def _process(self):
-        form_html = self.definition.render_form(event=self.event, definition=self.definition, request=self.request)
+        form = self.definition.create_form(self.request)
+        if form.validate_on_submit():
+            if not self.request or not self.request.can_be_modified:
+                req = Request(event=self.event, definition=self.definition, created_by_user=session.user)
+                new = True
+            else:
+                req = self.request
+                new = False
+            req.data = form.data
+            req.send()
+            if new:
+                flash_msg = _("Your request ({0}) has been sent. "
+                              "You will be notified by e-mail once it has been accepted or rejected.")
+            else:
+                flash_msg = _("Your request ({0}) has been modified. "
+                              "You will be notified by e-mail once it has been accepted or rejected.")
+            flash(flash_msg.format(self.definition.title), 'success')
+            return redirect(url_for('.event_requests', self.event))
+
+        form_html = self.definition.render_form(event=self.event, definition=self.definition, request=self.request,
+                                                form=form)
         return WPRequestsEventManagement.render_string(form_html, self.event)
 
 

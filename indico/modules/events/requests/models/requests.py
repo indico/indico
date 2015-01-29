@@ -127,6 +127,23 @@ class Request(db.Model):
     def definition(self):
         return get_request_definitions().get(self.type)
 
+    @definition.setter
+    def definition(self, definition):
+        assert self.type is None
+        self.type = definition.name
+
+    @property
+    def can_be_modified(self):
+        """Determines if the request can be modified or if a new one must be sent"""
+        return self.state in {RequestState.pending, RequestState.accepted}
+
+    def send(self):
+        """Sends a new/modified request"""
+        self.state = RequestState.pending
+        if self.id is None:
+            db.session.add(self)
+        # TODO: notify
+
     def withdraw(self):
         """Withdraws the request"""
         self.state = RequestState.withdrawn
