@@ -123,6 +123,12 @@ class IndicoPlugin(Plugin):
                 raise Exception("Plugin '{}' added a model which is not in a plugin schema ('{}' in '{}')"
                                 .format(self.name, name, schema))
 
+    def connect(self, signal, receiver, **connect_kwargs):
+        connect_kwargs['weak'] = False
+        func = wrap_in_plugin_context(self, receiver)
+        func.indico_plugin = self
+        signal.connect(func, **connect_kwargs)
+
     def get_blueprints(self):
         """Return blueprints to be registered on the application
 

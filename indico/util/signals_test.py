@@ -13,7 +13,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 import pytest
+from mock import MagicMock
 
 from indico.util.signals import values_from_signal, named_objects_from_signal
 
@@ -67,11 +69,28 @@ def test_values_from_signal_multi_value_types():
     assert values_from_signal(signal_response, multi_value_types=list) == {'a', 'b', 'c'}
 
 
+def test_values_from_signal_return_plugins():
+    vals = ('a', 'b', 'c')
+    signal_response = _make_signal_response(vals) + [(MagicMock(indico_plugin='foo'), 'd')]
+    assert values_from_signal(signal_response, return_plugins=True) == set(zip([None] * 3, vals) + [('foo', 'd')])
+    assert values_from_signal(signal_response) == set(vals + ('d',))
+
+
 @pytest.mark.parametrize('name_attr', ('name', 'foobar'))
 def test_named_objects_from_signal(name_attr):
     objects = [type('Dummy', (object,), {name_attr: name}) for name in ('a', 'b')]
     signal_response = _make_signal_response(objects)
     assert named_objects_from_signal(signal_response, name_attr=name_attr) == {'a': objects[0], 'b': objects[1]}
+
+
+def test_named_objects_from_signal_plugin_attr():
+    objects = [type('Dummy', (object,), {'name': name}) for name in ('a', 'b')]
+    signal_response = _make_signal_response(objects)
+    signal_response[-1] = (MagicMock(indico_plugin='foo'), signal_response[-1][1])
+    rv = named_objects_from_signal(signal_response, plugin_attr='plugin')
+    assert rv == {'a': objects[0], 'b': objects[1]}
+    assert rv['a'].plugin is None
+    assert rv['b'].plugin == 'foo'
 
 
 def test_named_objects_from_signal_duplicate():
