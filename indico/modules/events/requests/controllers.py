@@ -27,7 +27,7 @@ from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-class RHRequestsEventSettings(RHConferenceModifBase):
+class RHRequestsEventRequests(RHConferenceModifBase):
     """Overview of existing requests (event)"""
 
     def _process(self):
@@ -36,7 +36,7 @@ class RHRequestsEventSettings(RHConferenceModifBase):
         if not definitions:
             raise NotFound
         requests = Request.find_latest_for_event(self._conf)
-        return WPRequestsEventManagement.render_template('event_settings.html', event, event=event,
+        return WPRequestsEventManagement.render_template('event_requests.html', event, event=event,
                                                          definitions=definitions, requests=requests)
 
 
