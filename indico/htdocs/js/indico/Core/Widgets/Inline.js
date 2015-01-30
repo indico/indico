@@ -166,7 +166,7 @@ type("RemoteSwitchButton", ["InlineWidget"],
 
              // icon for "in progress" state
              var imageLoading = Html.img({
-                 src: imageSrc("loading"),
+                 src: imageSrc("loading", 'gif'),
                  alt: 'Loading',
                  title: $T('Communicating with server')
              });

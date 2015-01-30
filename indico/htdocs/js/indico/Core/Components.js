@@ -25,8 +25,8 @@ var indicoRequest = null;
 var imageSrc = null;
 
 function imageFunctionGenerator(url) {
-    return function (imageId) {
-        return url + '/' + imageId + '.png';
+    return function (imageId, extension) {
+        return url + '/' + imageId + '.' + (extension || 'png');
     };
 }
 
