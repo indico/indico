@@ -21,4 +21,4 @@ from indico.util.signals import named_objects_from_signal
 
 
 def get_agreement_definitions():
-    return named_objects_from_signal(signals.agreements.get_definitions.send())
+    return named_objects_from_signal(signals.agreements.get_definitions.send(), plugin_attr='plugin')

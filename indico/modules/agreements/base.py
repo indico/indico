@@ -15,7 +15,8 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask import render_template
-from flask_pluginengine import current_plugin, render_plugin_template
+
+from indico.core.plugins import plugin_context
 
 
 class AgreementDefinitionBase(object):
@@ -23,26 +24,38 @@ class AgreementDefinitionBase(object):
 
     #: unique name of the agreement definition
     name = None
-
     #: readable name of the agreement definition
     title = None
+    #: plugin containing this agreement definition - assigned automatically
+    plugin = None
 
     @classmethod
     def render_form(cls, agreement):
-        func = render_plugin_template if current_plugin else render_template
-        return func('agreements/{}.html'.format(cls.name))
+        tpl = '{}.html'.format(cls.name)
+        core_tpl = 'agreements/{}'.format(tpl)
+        plugin_tpl = '{{}}:{}'.format(tpl)
+        if cls.plugin is None:
+            return render_template(core_tpl)
+        else:
+            with plugin_context(cls.plugin):
+                render_template((plugin_tpl.format(cls.plugin.name), core_tpl))
 
-    @staticmethod
-    def handle_accepted(agreement):
+    @classmethod
+    def handle_accepted(cls, agreement):
         """Handles logic on agreement accepted"""
-        raise NotImplementedError  # pragma: no cover
+        pass  # pragma: no cover
 
-    @staticmethod
-    def handle_rejected(agreement):
+    @classmethod
+    def handle_rejected(cls, agreement):
         """Handles logic on agreement rejected"""
-        raise NotImplementedError  # pragma: no cover
+        pass  # pragma: no cover
 
-    @staticmethod
-    def get_people(event):
+    @classmethod
+    def handle_reset(cls, agreement):
+        """Handles logic on agreement reset"""
+        pass  # pragma: no cover
+
+    @classmethod
+    def get_people(cls, event):
         """Return the list of people who should receive the agreement"""
         raise NotImplementedError  # pragma: no cover
