@@ -986,7 +986,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         customLinks.appendTo(this.menu);
 
-        var tt_hour_tip = $('<div id="tt_hour_tip"/>').hide().append($('<img/>').prop('src', imageSrc(Indico.SystemIcons.tt_time)).prop('title', $T("Add one hour")));
+        var tt_hour_tip = $('<div id="tt_hour_tip"/>').hide().append($('<img/>').prop('src', imageSrc('tt_time')).prop('title', $T("Add one hour")));
         var tt_status_info = $('<div id="tt_status_info" />');
 
         this.menu.children('a').addClass('i-button');

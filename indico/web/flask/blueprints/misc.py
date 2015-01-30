@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import (welcome, helpDisplay, newsDisplay, lang, resetTimezone, about, contact, JSContent,
+from MaKaC.webinterface.rh import (welcome, helpDisplay, newsDisplay, lang, resetTimezone, about, contact,
                                    errors, materialDisplay)
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -28,7 +28,6 @@ misc.add_url_rule('/change-language', 'changeLang', lang.RHChangeLang, methods=(
 misc.add_url_rule('/change-timezone', 'resetSessionTZ', resetTimezone.RHResetTZ, methods=('GET', 'POST'))
 misc.add_url_rule('/about', 'about', about.RHAbout)
 misc.add_url_rule('/contact', 'contact', contact.RHContact)
-misc.add_url_rule('/vars.js', 'JSContent-getVars', JSContent.RHGetVarsJs)
 misc.add_url_rule('/report-error', 'errors', errors.RHErrorReporting, methods=('GET', 'POST'))
 misc.add_url_rule('/error-report/<report_id>/<filename>', 'error-report-download', errors.RHDownloadErrorReport)
 misc.add_url_rule('/conversion-finished', 'getConvertedFile', materialDisplay.RHMaterialAddConvertedFile,

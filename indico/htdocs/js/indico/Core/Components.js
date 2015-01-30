@@ -26,11 +26,7 @@ var imageSrc = null;
 
 function imageFunctionGenerator(url) {
     return function (imageId) {
-        if (Indico.SystemIcons[imageId]) {
-            return url + '/' + Indico.SystemIcons[imageId];
-        } else {
-            return url + '/' + imageId;
-        }
+        return url + '/' + imageId + '.png';
     };
 }
 

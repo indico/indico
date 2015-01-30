@@ -207,7 +207,7 @@ legacy_endpoints = {
     'getFile-accessKey', 'getFile-flash', 'getFile-offlineEvent', 'getFile-wmv', 'groupDetails', 'groupList',
     'groupModification', 'groupModification-update', 'groupRegistration', 'groupRegistration-update', 'help',
     'identityCreation', 'identityCreation-changePassword', 'identityCreation-create', 'identityCreation-remove',
-    'index', 'internalPage', 'JSContent-getVars', 'logOut', 'materialDisplay', 'materialDisplay-accessKey',
+    'index', 'internalPage', 'logOut', 'materialDisplay', 'materialDisplay-accessKey',
     'myconference', 'myconference-myContributions', 'myconference-mySessions', 'myconference-myTracks', 'news',
     'oauth-access_token', 'oauth-authorize', 'oauth-authorize_consumer', 'oauth-request_token', 'oauth-thirdPartyAuth',
     'oauth-userThirdPartyAuth', 'paperReviewingDisplay', 'paperReviewingDisplay-downloadTemplate',
