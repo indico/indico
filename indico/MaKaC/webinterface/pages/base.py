@@ -69,6 +69,15 @@ class WPJinjaMixin:
             return cls(g.rh, *wp_args, **context).display()
 
     @classmethod
+    def render_string(cls, html, *wp_args):
+        """Renders a string inside the WP
+
+        :param html: a string containing html
+        :param wp_args: list of arguments to be passed to the WP's' constructor
+        """
+        return cls(g.rh, *wp_args, _html=html).display()
+
+    @classmethod
     def _prefix_template(cls, template):
         if isinstance(template, basestring):
             return cls.template_prefix + template
@@ -80,6 +89,9 @@ class WPJinjaMixin:
             return templates
 
     def _getPageContent(self, params):
+        html = params.pop('_html', None)
+        if html is not None:
+            return html
         template = params.pop('_jinja_template')
         return self.render_template_func(template, **params)
 
