@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from indico.core.plugins import plugin_context
 from indico.web.forms.base import FormDefaults
 
 from flask import render_template
@@ -44,9 +45,11 @@ class RequestDefinitionBase(object):
         if cls.plugin is None:
             return render_template(core_tpl, **kwargs)
         else:
-            return render_template((plugin_tpl.format(cls.plugin.name), core_tpl), **kwargs)
+            with plugin_context(cls.plugin):
+                return render_template((plugin_tpl.format(cls.plugin.name), core_tpl), **kwargs)
 
     @classmethod
     def create_form(cls, existing_request=None):
         defaults = FormDefaults(existing_request.data if existing_request else None)
-        return cls.form(prefix='request-', obj=defaults)
+        with plugin_context(cls.plugin):
+            return cls.form(prefix='request-', obj=defaults)
