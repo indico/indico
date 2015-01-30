@@ -4,7 +4,7 @@ if dark is not UNDEFINED:
 else:
     dark_ = False;
 %>
-<div id="footer" class="${"longFooter " if shortURL != "" and not isFrontPage else ""}footer${" footerDark" if dark_ == True else ""}">
+<div id="footer" class="${"longFooter " if shortURL != "" and not isFrontPage else ""}footer${" footerDark" if dark_ == True else ""} <%block name="footer_classes"></%block>">
 
 % if Config.getInstance().getMobileURL():
     <div class="mobile-footer" style="display:none">
@@ -23,7 +23,7 @@ else:
      </script>
 % endif
   <%block name="footer">
-          <img src="${ systemIcon("indico_small") }" alt="${ _("Indico - Integrated Digital Conference")}" style="vertical-align: middle; margin-right: 2px;"/>
+          <img src="${ systemIcon("indico_small") }" alt="${ _("Indico")}" style="vertical-align: middle; margin-right: 2px;"/>
             <span style="vertical-align: middle;">${ _("Powered by ")} <a href="http://indico-software.org">Indico</a></span>
   </%block>
 

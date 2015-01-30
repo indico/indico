@@ -359,7 +359,6 @@ class Avatar(Persistent, Fossilizable):
         self.address = [""]
         self.email = ""
         self.secondaryEmails = []
-        self.pendingSecondaryEmails = []
         self.telephone = [""]
         self.fax = [""]
         self.identities = []
@@ -782,20 +781,32 @@ class Avatar(Persistent, Fossilizable):
             self.secondaryEmails = []
             return self.secondaryEmails
 
-    def addSecondaryEmail(self, email):
+    def addSecondaryEmail(self, email, reindex=False):
         email = email.strip().lower()
-        if not email in self.getSecondaryEmails():
-            self.secondaryEmails.append(email)
+        if email not in self.getSecondaryEmails():
+            if reindex:
+                idx = indexes.IndexesHolder().getById('email')
+                idx.unindexUser(self)
+                self.secondaryEmails.append(email)
+                idx.indexUser(self)
+            else:
+                self.secondaryEmails.append(email)
             self._p_changed = 1
 
-    def removeSecondaryEmail(self, email):
+    def removeSecondaryEmail(self, email, reindex=False):
         email = email.strip().lower()
         if email in self.getSecondaryEmails():
-            self.secondaryEmails.remove(email)
+            if reindex:
+                idx = indexes.IndexesHolder().getById('email')
+                idx.unindexUser(self)
+                self.secondaryEmails.remove(email)
+                idx.indexUser(self)
+            else:
+                self.secondaryEmails.remove(email)
             self._p_changed = 1
 
     def setSecondaryEmails(self, emailList, reindex=False):
-        emailList = map(lambda email: email.lower().strip(), emailList)
+        emailList = [email.lower().strip() for email in emailList]
         if reindex:
             idx = indexes.IndexesHolder().getById('email')
             idx.unindexUser(self)
@@ -810,28 +821,6 @@ class Avatar(Persistent, Fossilizable):
 
     def hasSecondaryEmail(self, email):
         return email.lower().strip() in self.getSecondaryEmails()
-
-    def getPendingSecondaryEmails(self):
-        try:
-            return self.pendingSecondaryEmails
-        except:
-            self.pendingSecondaryEmails = []
-            return self.pendingSecondaryEmails
-
-    def addPendingSecondaryEmail(self, email):
-        email = email.lower().strip()
-        if not email in self.getPendingSecondaryEmails():  # create attribute if not exist
-            self.pendingSecondaryEmails.append(email)
-            self._p_changed = 1
-
-    def removePendingSecondaryEmail(self, email):
-        email = email.lower().strip()
-        if email in self.getPendingSecondaryEmails():  # create attribute if not exist
-            self.pendingSecondaryEmails.remove(email)
-            self._p_changed = 1
-
-    def setPendingSecondaryEmails(self, emailList):
-        self.pendingSecondaryEmails = emailList
 
     def addTelephone(self, newTel):
         self.telephone.append(newTel)

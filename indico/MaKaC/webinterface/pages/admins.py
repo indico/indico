@@ -1487,19 +1487,6 @@ class WUserDetails(wcomponents.WTemplated):
         return "".join(html)
 
 
-class WUserActiveSecondaryEmail(wcomponents.WTemplated):
-
-    def __init__(self, av, email):
-        self._avatar = av
-        self._email = email
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["user"] = self._avatar
-        vars["email"] = self._email
-        return vars
-
-
 class WPPersonalArea(WPUserBase):
 
     def _getBody( self, params ):
@@ -1566,18 +1553,6 @@ class WPUserDetails( WPPersonalArea ):
 
     def _setActiveTab( self ):
         self._tabDetails.setActive()
-
-
-class WPUserActiveSecondaryEmail(WPDecorated):
-
-    def __init__(self, rh, av, email):
-        WPDecorated.__init__(self, rh)
-        self._avatar = av
-        self._email = email
-
-    def _getBody(self, params):
-        c = WUserActiveSecondaryEmail(self._avatar, self._email)
-        return c.getHTML(params)
 
 
 class WPUserBaskets( WPPersonalArea ):

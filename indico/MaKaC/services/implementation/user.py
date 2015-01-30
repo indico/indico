@@ -15,31 +15,26 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import time
-from hashlib import md5
+import uuid
 from flask import session
 
-from MaKaC.services.implementation.base import LoggedOnlyService, AdminService
-from MaKaC.services.implementation.base import ServiceBase
-
-import MaKaC.user as user
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError, Warning, ResultWithWarning
-
 from MaKaC.common import info
-from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
+from MaKaC.common.cache import GenericCache
 from MaKaC.common.fossilize import fossilize
-
-from MaKaC.webinterface.common.timezones import TimezoneRegistry
-from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.webinterface.mail import GenericMailer, GenericNotification
-from MaKaC.webinterface.common.person_titles import TitlesRegistry
-import MaKaC.common.indexes as indexes
 from MaKaC.common.utils import validMail
-
+from MaKaC.fossils.user import IAvatarAllDetailsFossil, IAvatarFossil
+from MaKaC.services.implementation.base import LoggedOnlyService, AdminService, ParameterManager, ServiceBase
+from MaKaC.services.interface.rpc.common import (ServiceError, ServiceAccessError, NoReportError, Warning,
+                                                 ResultWithWarning)
+from MaKaC.user import AvatarHolder
+from MaKaC.webinterface.common.person_titles import TitlesRegistry
+from MaKaC.webinterface.common.timezones import TimezoneRegistry
+from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from indico.core.config import Config
+from indico.util.i18n import _, get_all_locales, set_session_lang
 from indico.util.redis import avatar_links
-from indico.util.i18n import get_all_locales, set_session_lang
-from indico.web.http_api.auth import APIKey
 from indico.web.flask.util import url_for
+from indico.web.http_api.auth import APIKey
 
 
 class UserComparator(object):
@@ -61,7 +56,7 @@ class UserBaseService(LoggedOnlyService):
         self._pm = ParameterManager(self._params)
         userId = self._pm.extract("userId", None)
         if userId is not None:
-            ah = user.AvatarHolder()
+            ah = AvatarHolder()
             self._target = ah.getById(userId)
         else:
             raise ServiceError("ERR-U5", _("User id not specified"))
@@ -134,7 +129,7 @@ class UserBasketBase:
         self._pm = ParameterManager(self._params)
         userId = self._pm.extract("userId", pType=str, allowEmpty=True)
         if userId is not None:
-            ah = user.AvatarHolder()
+            ah = AvatarHolder()
             self._target = ah.getById(userId)
         else:
             self._target = self._aw.getUser()
@@ -152,7 +147,7 @@ class UserAddToBasket(LoggedOnlyService, UserBasketBase):
 
         self._userList = []
         for userData in self._params['value']:
-            self._userList.append(user.AvatarHolder().getById(userData['id']))
+            self._userList.append(AvatarHolder().getById(userData['id']))
 
     def _getAnswer(self):
 
@@ -340,7 +335,7 @@ class UserPersonalDataBase(UserModifyBase):
         self._pm = ParameterManager(self._params)
         userId = self._pm.extract("userId", None)
         if userId is not None:
-            ah = user.AvatarHolder()
+            ah = AvatarHolder()
             self._user = self._avatar = self._target = ah.getById(userId)
         else:
             raise ServiceError("ERR-U5", _("User id not specified"))
@@ -351,122 +346,206 @@ class UserPersonalDataBase(UserModifyBase):
 
 class UserSetPersonalData(UserPersonalDataBase):
 
+    def __init__(self, *args, **kwargs):
+        UserPersonalDataBase.__init__(self, *args, **kwargs)
+        self.process_data = {
+            'title': self._process_title,
+            'surName': self._process_surname,
+            'name': self._process_name,
+            'organisation': self._process_organisation,
+            'email': self._process_email,
+            'secondaryEmails': self._process_secondary_emails,
+            'telephone': self._process_telephone,
+            'fax': self._process_fax,
+            'address': self._process_address
+        }
+
     def _checkParams(self):
         UserPersonalDataBase._checkParams(self)
-        if (self._dataType == "surName" or self._dataType == "name" or self._dataType == "organisation"):
-            self._value = self._pm.extract("value", pType=str, allowEmpty=False)
-        elif self._dataType == "email":
-            self._value = self._pm.extract("value", pType=str, allowEmpty=False)
-            if not validMail(self._value):
-                raise ServiceAccessError(_("The email address is not valid"))
-        elif self._dataType == "secondaryEmails":
-            self._value = self._pm.extract("value", pType=str, allowEmpty=True)
-            if self._value and not validMail(self._value):
-                raise ServiceAccessError(_("The email address is not valid. Please, review it."))
+        if self._dataType in {"surName", "name", "organisation", "email", "secondaryEmails"}:
+            # empty only for secondary emails
+            self._value = self._pm.extract("value", pType=str, allowEmpty=self._dataType == "secondaryEmails")
+
         else:
             self._value = self._pm.extract("value", pType=str, allowEmpty=True)
 
-    def _buildEmailList(self):
-        emailList = []
-        if (self._value == ""):
-            return emailList
+    def _generate_emails_list(self, value):
+        value = value.replace(' ', ',').replace(';', ',')  # replace to have only one separator
+        return [email for email in value.split(',') if email]
+
+    def _confirm_email_address(self, email, data_type):
+        email = email.strip().lower()
+
+        if not validMail(email):
+            raise NoReportError(_("Invalid email address: {0}").format(email))
+
+        # Prevent adding the primary email as a secondary email
+        if data_type == 'secondaryEmails' and email == self._avatar.getEmail():
+            raise NoReportError(_("{0} is already the primary email address "
+                                  "and cannot be used as a secondary email address.").format(email))
+
+        # When setting a secondary email as primary, set it automatically and
+        # re-index the user's emails without sending a confirmation email
+        # (We assume the secondary emails are valid)
+        if data_type == 'email' and email in self._avatar.getSecondaryEmails():
+            self._avatar.removeSecondaryEmail(email)
+            self._avatar.setEmail(email, reindex=True)
+            return False
+
+        existing = AvatarHolder().match({'email': email}, searchInAuthenticators=False)
+        if existing:
+            if any(av for av in existing if av != self._avatar):
+                raise NoReportError(_("The email address {0} is already used by another user.").format(email))
+            else:  # The email is already set correctly for the user: Do nothing
+                return False
+
+        # New email address
+        token_storage = GenericCache('confirm-email')
+        data = {'email': email, 'data_type': data_type, 'uid': self._avatar.getId()}
+        token = str(uuid.uuid4())
+        while token_storage.get(token):
+            token = str(uuid.uuid4())
+        token_storage.set(token, data, 24 * 3600)
+        url = url_for('user.confirm_email', token=token, _external=True, _secure=True)
+
+        if data_type == 'email':
+            body_format = _(
+                "Dear {0},\n"
+                "You requested to change your account's primary email address.\n"
+                "Please open the link below within 24 hours to confirm and activate this email address:\n"
+                "\n{1}\n\n"
+                "--\n"
+                "Indico"
+            )
         else:
-            # replace to have only one separator
-            self._value = self._value.replace(" ",",")
-            self._value = self._value.replace(";",",")
-            emailList = self._value.split(",")
-            return emailList
+            body_format = _(
+                "Dear {0},\n"
+                "You added this email address to your account's secondary emails list.\n"
+                "Please open the link below within 24 hours to confirm and activate this email address:\n"
+                "\n{1}\n\n"
+                "--\n"
+                "Indico"
+            )
 
-    def _sendSecondaryEmailNotifiication(self, email):
-        data = {}
-        data["toList"] = [email]
-        data["fromAddr"] = Config.getInstance().getSupportEmail()
-        data["subject"] = """[Indico] Email address confirmation"""
-        data["body"] = """Dear %s,
+        confirmation = {
+            'toList': [email],
+            'fromAddr': Config.getInstance().getSupportEmail(),
+            'subject': _("[Indico] Verify your email address"),
+            'body': body_format.format(self._avatar.getFirstName(), url)
+        }
 
-You have added a new email to your secondary email list.
-
-In order to confirm and activate this new email address, please open in your web browser the following URL:
-
-%s
-
-Once you have done it, the email address will appear in your profile.
-
-Best regards,
-Indico Team""" % (self._user.getStraightFullName(), url_for('user.userRegistration-validateSecondaryEmail',
-                                                            userId=self._user.getId(),
-                                                            key=md5(email).hexdigest(),
-                                                            _external=True))
-        GenericMailer.send(GenericNotification(data))
+        # Send mail with template message and link
+        GenericMailer.send(GenericNotification(confirmation))
+        return True
 
     def _getAnswer(self):
-        if self._user:
-            idxs = indexes.IndexesHolder()
-            funcGet = "get%s%s" % (self._dataType[0].upper(), self._dataType[1:])
-            funcSet = "set%s%s" % (self._dataType[0].upper(), self._dataType[1:])
-            if self._dataType == "title":
-                if self._value in TitlesRegistry().getList():
-                    self._user.setTitle(self._value)
-                else:
-                    raise NoReportError(_("Invalid title value"))
-            elif self._dataType == "surName":
-                self._user.setFieldSynced('surName', False)
-                self._user.setSurName(self._value, reindex=True)
-            elif self._dataType == "name":
-                self._user.setFieldSynced('firstName', False)
-                self._user.setName(self._value, reindex=True)
-            elif self._dataType == "organisation":
-                self._user.setFieldSynced('affiliation', False)
-                self._user.setOrganisation(self._value, reindex=True)
-            elif self._dataType == "email":
-                # Check if there is any user with this email address
-                if self._value != self._avatar.getEmail():
-                    other = user.AvatarHolder().match({"email": self._value}, searchInAuthenticators=False)
-                    if other and other[0] != self._avatar:
-                        raise NoReportError(_("The email address %s is already used by another user.") % self._value)
-                self._user.setEmail(self._value, reindex=True)
-            elif self._dataType == "secondaryEmails":
-                emailList = self._buildEmailList()
-                secondaryEmails = []
-                newSecondaryEmailAdded = False
-                # check if every secondary email is valid
-                for sEmail in emailList:
-                    sEmail = sEmail.lower().strip()
-                    if sEmail != "":
-                        av = user.AvatarHolder().match({"email": sEmail}, searchInAuthenticators=False)
-                        if av and av[0] != self._avatar:
-                            raise NoReportError(_("The email address %s is already used by another user.") % sEmail)
-                        elif self._user.getEmail() == sEmail:  # do not accept primary email address as secondary
-                            continue
-                        elif self._user.hasSecondaryEmail(sEmail):
-                            secondaryEmails.append(sEmail)
-                        else:
-                            newSecondaryEmailAdded = True
-                            self._user.addPendingSecondaryEmail(sEmail)
-                            self._sendSecondaryEmailNotifiication(sEmail)
-                self._user.setSecondaryEmails(secondaryEmails, reindex=True)
-                if newSecondaryEmailAdded:
-                    warn = Warning(_("New secondary email address"), _("You will receive an email in order to confirm\
-                                      your new email address. Once confirmed, it will be shown in your profile."))
-                    return ResultWithWarning(", ".join(self._user.getSecondaryEmails()), warn).fossilize()
-                else:
-                    return ", ".join(self._user.getSecondaryEmails())
-
-            elif self._dataType == "telephone":
-                self._user.setFieldSynced('phone', False)
-                self._user.setTelephone(self._value)
-            elif self._dataType == "fax":
-                self._user.setFieldSynced('fax', False)
-                self._user.setFax(self._value)
-            elif self._dataType == "address":
-                self._user.setFieldSynced('address', False)
-                self._user.setAddress(self._value)
-            else:
-                getattr(self._user, funcSet)(self._value)
-
-            return getattr(self._user, funcGet)()
-        else:
+        if not self._user:
             raise ServiceError("ERR-U5", _("User id not specified"))
+
+        getter_name = "get%s%s" % (self._dataType[0].upper(), self._dataType[1:])
+        setter_name = "set%s%s" % (self._dataType[0].upper(), self._dataType[1:])
+        setter = self.process_data.get(self._dataType, getattr(self._user, setter_name))
+
+        ret_val = setter(self._value)
+        if ret_val is not None:
+            return ret_val
+        return getattr(self._user, getter_name)()
+
+    def _process_title(self, new_title):
+        if self._value in TitlesRegistry().getList():
+            self._user.setTitle(new_title)
+        else:
+            raise NoReportError(_("Invalid title value"))
+
+    def _process_surname(self, new_surname):
+        self._user.setFieldSynced('surName', False)
+        self._user.setSurName(new_surname, reindex=True)
+
+    def _process_name(self, new_name):
+        self._user.setFieldSynced('firstName', False)
+        self._user.setName(new_name, reindex=True)
+
+    def _process_organisation(self, new_organisation):
+        self._user.setFieldSynced('affiliation', False)
+        self._user.setOrganisation(new_organisation, reindex=True)
+
+    def _process_email(self, new_email):
+        # Check if there is any user with this email address
+        confirmation_sent = self._confirm_email_address(new_email, 'email')
+
+        if confirmation_sent:
+            warning = Warning(
+                _("New primary email address"),
+                _("We have sent a verification email to: {0}. "
+                  "Once the address is verified, it will be set as your primary email address.").format(new_email)
+            )
+        else:  # Then the email has been set
+            warning = Warning(_("New primary email address set"),
+                              _("{0} has been set as your primary email address.").format(new_email))
+
+        return ResultWithWarning(self._user.getEmail(), warning).fossilize()
+
+    def _process_secondary_emails(self, value):
+        emails_to_confirm = []
+        emails_to_set = []
+        invalid_email_errors = []
+        secondary_emails = self._generate_emails_list(value)
+        for email in secondary_emails:
+            try:
+                if self._confirm_email_address(email, 'secondaryEmails'):
+                    emails_to_confirm.append(email)
+                else:
+                    emails_to_set.append(email)
+            except NoReportError as e:
+                invalid_email_errors.append(e.message)
+
+        self._avatar.setSecondaryEmails(emails_to_set, reindex=True)
+        # Generate confirmation message
+        if not emails_to_confirm:
+            confirmation_msg = None
+        elif len(emails_to_confirm) == 1:
+            email = emails_to_confirm[0]
+            confirmation_title = _("New secondary email address")
+            confirmation_msg = _("We have sent a verification email to: {0}. "
+                                 "Once the address is verified, it will be shown on your profile.").format(email)
+        else:
+            confirmation_title = _("New secondary email addresses")
+            confirmation_msg = _(
+                "We have sent verification emails to: {0}. "
+                "Once an address is verified, it will be shown on your profile.").format(', '.join(emails_to_confirm))
+
+        # Generate error message
+        if len(invalid_email_errors) == 1:
+            error_msg = invalid_email_errors[0]
+        elif invalid_email_errors:
+            error_msg = ' '.join([_("Some email addresses were not set.")] + invalid_email_errors)
+        else:
+            error_msg = None
+
+        if error_msg and confirmation_msg:
+            return ResultWithWarning(
+                ', '.join(self._user.getSecondaryEmails()),
+                Warning(_("Warning, not all addresses were set"), ' '.join([error_msg, confirmation_msg]))
+            ).fossilize()
+        elif error_msg:
+            raise NoReportError(error_msg)
+        elif confirmation_msg:
+            return ResultWithWarning(', '.join(self._user.getSecondaryEmails()),
+                                     Warning(confirmation_title, confirmation_msg)).fossilize()
+
+        return ', '.join(self._user.getSecondaryEmails())
+
+    def _process_telephone(self, value):
+        self._user.setFieldSynced('phone', False)
+        self._user.setTelephone(value)
+
+    def _process_fax(self, value):
+        self._user.setFieldSynced('fax', False)
+        self._user.setFax(value)
+
+    def _process_address(self, value):
+        self._user.setFieldSynced('address', False)
+        self._user.setAddress(value)
 
 
 class UserSyncPersonalData(UserPersonalDataBase):
@@ -490,10 +569,10 @@ class UserAcceptSecondaryEmail(UserModifyBase):
         self._secondaryEmail = self._params.get("secondaryEmail", None)
 
     def _getAnswer(self):
-        av = user.AvatarHolder().match({"email": self._secondaryEmai}, forceWithoutExtAuth=True)
+        av = AvatarHolder().match({"email": self._secondaryEmai}, forceWithoutExtAuth=True)
         if av and av[0] != self._user:
             raise NoReportError(_("The email address %s is already used by another user.") % self._secondaryEmai)
-        self._user.addSecondaryEmail(self._secondaryEmail)
+        self._user.addSecondaryEmail(self._secondaryEmail, reindex=True)
         return True
 
 
@@ -508,6 +587,7 @@ class UserSetPersistentSignatures(UserModifyBase):
         ak = self._target.getAPIKey()
         ak.setPersistentAllowed(not ak.isPersistentAllowed())
         return ak.isPersistentAllowed()
+
 
 class UserCreateKeyEnablePersistent(LoggedOnlyService):
 
@@ -532,7 +612,7 @@ class UserRefreshRedisLinks(AdminService):
         self._pm = ParameterManager(self._params)
         userId = self._pm.extract("userId", pType=str, allowEmpty=True)
         if userId is not None:
-            ah = user.AvatarHolder()
+            ah = AvatarHolder()
             self._avatar = ah.getById(userId)
         else:
             self._avatar = self._aw.getUser()

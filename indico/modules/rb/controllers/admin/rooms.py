@@ -126,7 +126,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
                            if form['attribute_{}'.format(attr.id)].data]
         # Bookable times
         room.bookable_hours = [BookableHours(start_time=bt['start'], end_time=bt['end'])
-                               for bt in form.bookable_hours.data if all(bt.viewvalues())]
+                               for bt in form.bookable_hours.data if all(x is not None for x in bt.viewvalues())]
         # Nonbookable dates
         room.nonbookable_periods = [NonBookablePeriod(start_dt=nbd['start'], end_dt=nbd['end'])
                                     for nbd in form.nonbookable_periods.data if all(nbd.viewvalues())]

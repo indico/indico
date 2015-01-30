@@ -22,6 +22,7 @@
             callback: function() {},
             validation: function(e) { return true; },
             clearable: true,
+            disableenter: true,
             emptyvalue: "",
             invalidclass: "invalid",
             wait: 250
@@ -59,6 +60,14 @@
                     $(this).val(opt.emptyvalue);
                 }
             });
+
+            if (opt.disableenter) {
+                element.on('keydown', function(e) {
+                    if (e.which == K.ENTER) {
+                        e.preventDefault();
+                    }
+                });
+            }
         },
 
         setValue: function(value) {

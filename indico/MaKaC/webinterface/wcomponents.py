@@ -693,14 +693,15 @@ class WFooter(WTemplated):
     def getVars( self ):
         vars = WTemplated.getVars( self )
 
-        vars["isFrontPage"] = self._isFrontPage;
+        vars["isFrontPage"] = self._isFrontPage
+        event = getattr(self._rh, '_conf', None)
+        vars['is_meeting'] = event and event.getType() == 'meeting'
 
         if not vars.has_key("modificationDate"):
             vars["modificationDate"] = ""
 
         if not vars.has_key("shortURL"):
             vars["shortURL"] = ""
-
         return vars
 
 

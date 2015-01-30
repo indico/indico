@@ -279,4 +279,7 @@ class RHRegistrationFormUserData(RHRegistrationFormDisplayBase):
             else:
                 personalData = self._regForm.getPersonalData()
                 reg_data['avatar'] = personalData.getFormValuesFromAvatar(user)
+                reg_data['avatar'].setdefault('sessionList', [{}, {}])
+        else:
+            reg_data['avatar'] = {'sessionList': [{}, {}]}
         return json.dumps(reg_data)

@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from datetime import time
+
 from indico.core.db import db
 from indico.util.string import return_ascii
 
@@ -48,4 +50,14 @@ class BookableHours(db.Model):
         )
 
     def fits_period(self, st, et):
-        return self.start_time <= st and self.end_time >= et
+        st = _tuplify(st, False)
+        et = _tuplify(et, True)
+        period_st = _tuplify(self.start_time, False)
+        period_et = _tuplify(self.end_time, True)
+        return period_st <= st and period_et >= et
+
+
+def _tuplify(t, end):
+    if end and t == time(0):
+        return 24, 0
+    return t.hour, t.minute

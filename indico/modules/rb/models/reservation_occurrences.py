@@ -138,6 +138,7 @@ class ReservationOccurrence(db.Model, Serializer):
                 raise IndicoError('Unsupported interval')
 
         elif repeat_frequency == RepeatFrequency.MONTH:
+
             if repeat_interval == 1:
                 position = int(ceil(start.day / 7.0))
                 if position == 5:
