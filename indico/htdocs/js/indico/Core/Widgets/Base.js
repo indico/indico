@@ -1549,9 +1549,9 @@ type("PreloadedWidget", ["IWidget"],
      });
 
 var progressIndicator = function(small, center) {
-    var htmlTag = small?Html.span:Html.div;
-    return htmlTag(center?{style:{textAlign: 'center'}}:{},Html.img({src: imageSrc(small?"loading":"ui_loading"), alt: "Loading..."
-}));
+    var htmlTag = small ? Html.span : Html.div;
+    return htmlTag(center ? {style: {textAlign: 'center'}} : {},
+                   Html.img({src: imageSrc(small ? "loading" : "load_big", 'gif'), alt: "Loading..."}));
 };
 
 type("ServiceWidget", ["IWidget"],

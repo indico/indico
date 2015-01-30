@@ -1679,7 +1679,7 @@ type("ToggleFavouriteButton", ["InlineWidget"], {
         });
 
         var imageLoading = Html.img({
-            src: imageSrc("loading"),
+            src: imageSrc("loading", 'gif'),
             alt: 'Loading',
             title: $T('Communicating with server'),
             style: this.imageStyle
