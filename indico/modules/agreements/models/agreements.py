@@ -165,12 +165,12 @@ class Agreement(db.Model):
 
     def accept(self, on_behalf=False):
         self.state = AgreementState.accepted if not on_behalf else AgreementState.accepted_on_behalf
-        self.signed_dt = now_utc
+        self.signed_dt = now_utc()
         self.definition.handle_accepted(self)
 
     def reject(self, on_behalf=False):
         self.state = AgreementState.rejected if not on_behalf else AgreementState.rejected_on_behalf
-        self.signed_dt = now_utc
+        self.signed_dt = now_utc()
         self.definition.handle_rejected(self)
 
     def reset(self):
