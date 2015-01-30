@@ -17,6 +17,7 @@
 import json
 import os
 import re
+from contextlib import contextmanager
 from copy import deepcopy
 from heapq import heappush
 from urlparse import urlparse
@@ -347,6 +348,22 @@ def wrap_cli_manager(manager, plugin):
         command.run = wrap_in_plugin_context(plugin, command.run)
         manager._commands[name] = command
     return manager
+
+
+@contextmanager
+def plugin_context(plugin):
+    """Enters a plugin context if a plugin is provided
+
+    Useful for code which sometimes needs a plugin context, e.g.
+    because it may be used in both the core and in a plugin.
+    """
+    if plugin is None:
+        yield
+        return
+    if hasattr(plugin, 'instance'):
+        plugin = plugin.instance
+    with plugin.plugin_context():
+        yield
 
 
 class IndicoPluginEngine(PluginEngine):
