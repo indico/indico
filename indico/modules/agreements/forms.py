@@ -16,12 +16,13 @@
 
 from __future__ import unicode_literals
 
-from indico.web.flask.wrappers import IndicoBlueprint
+from wtforms.validators import InputRequired
 
-from indico.modules.agreements.controllers import RHAgreementForm
+from indico.util.i18n import _
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoRadioField
 
-agreements_blueprint = _bp = IndicoBlueprint('agreements', __name__, template_folder='templates')
 
-
-# Event
-_bp.add_url_rule('/event/<confId>/agreement/<uuid>', 'agreement_form', RHAgreementForm, methods=('GET', 'POST'))
+class AgreementForm(IndicoForm):
+    agreed = IndicoRadioField('test', [InputRequired()], coerce=lambda x: bool(int(x)),
+                              choices=[(1, _("I agree")), (0, _("I disagree"))])

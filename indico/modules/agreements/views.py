@@ -16,12 +16,19 @@
 
 from __future__ import unicode_literals
 
-from indico.web.flask.wrappers import IndicoBlueprint
-
-from indico.modules.agreements.controllers import RHAgreementForm
-
-agreements_blueprint = _bp = IndicoBlueprint('agreements', __name__, template_folder='templates')
+from MaKaC.webinterface.pages.base import WPJinjaMixin
+from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 
 
-# Event
-_bp.add_url_rule('/event/<confId>/agreement/<uuid>', 'agreement_form', RHAgreementForm, methods=('GET', 'POST'))
+class WPAgreementsJinjaMixin(WPJinjaMixin):
+    template_prefix = 'agreements/'
+
+
+class WPAgreementForm(WPConferenceDefaultDisplayBase, WPAgreementsJinjaMixin):
+    _template = 'agreement_form.html'
+
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['agreements_sass'].urls()
+
+    def _getBody(self, params):
+        return self._getPageContent(params)
