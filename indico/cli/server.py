@@ -340,8 +340,6 @@ def start_web_server(app, host='localhost', port=0, with_ssl=False, keep_base_ur
         config._configVars['BaseURL'] = base_url
         config._configVars['BaseSecureURL'] = ''
     config._deriveOptions()
-    # Regenerate JSVars to account for the updated URLs
-    RHGetVarsJs.removeTmpVarsFile()
 
     if not enable_evalex:
         evalex_whitelist = False

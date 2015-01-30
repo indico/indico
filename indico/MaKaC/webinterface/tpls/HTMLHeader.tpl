@@ -27,7 +27,7 @@
         </script>
 
         <!-- Indico specific -->
-        ${ page._getJavaScriptInclude(str(urlHandlers.UHJSVars.getURL())) } <!-- Indico Variables -->
+        ${ page._getJavaScriptInclude(url_for('assets.js_vars_global')) } <!-- Indico Variables -->
 
         <!-- Page Specific JS files-->
         % for JSFile in extraJSFiles:
