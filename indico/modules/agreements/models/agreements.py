@@ -173,5 +173,10 @@ class Agreement(db.Model):
         self.signed_dt = now_utc
         self.definition.handle_rejected(self)
 
+    def reset(self):
+        self.state = AgreementState.pending
+        self.signed_dt = None
+        self.definition.handle_reset(self)
+
     def render(self):
         return self.definition.render_form(self)
