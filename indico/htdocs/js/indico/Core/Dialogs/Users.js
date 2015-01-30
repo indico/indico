@@ -1525,7 +1525,7 @@ type("UserListField", ["IWidget"], {
 
 
         if (this.allowNew) {
-            var addNewUserButton = Html.input("button", {style:{marginRight: pixels(5)}}, $T('Add New') );
+            var addNewUserButton = Html.input("button", {className: 'i-button', style:{marginRight: pixels(5)}}, $T('Add New') );
             addNewUserButton.observeClick(function(){
                 var newUserId = 'newUser' + self.newUserCounter++;
                 var newUser = $O({'id': newUserId});
