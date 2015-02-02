@@ -7,7 +7,7 @@
 {%- endmacro %}
 
 {% macro form_header(method='post', action='', orientation='horizontal', id=none) -%}
-    <form method="{{ method }}" action="{{ action }}" class="i-form {{ orientation }}"{% if id %} id="{{ id }}"{% endif %}>
+    <form method="{{ method }}" {%- if action %} action="{{ action }}"{% endif %} class="i-form {{ orientation }}"{% if id %} id="{{ id }}"{% endif %}>
 {%- endmacro %}
 
 {% macro form_row(field, widget_attrs={}, orientation='') %}
