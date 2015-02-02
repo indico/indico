@@ -595,13 +595,15 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
 
     def _process(self):
         room = self._reservation.room
-        form = ModifyBookingForm(obj=self._reservation, old_start_date=self._reservation.start_dt.date())
+        form = ModifyBookingForm(obj=self._reservation,
+                                 old_start_dt=self._reservation.start_dt, old_end_dt=self._reservation.end_dt)
         form.used_equipment.query = room.find_available_vc_equipment()
 
         if not room.notification_for_assistance and not self._reservation.needs_assistance:
             del form.needs_assistance
 
-        if form.is_submitted() and not form.validate():
+        invalid_form = form.is_submitted() and not form.validate()
+        if invalid_form:
             occurrences = {}
             candidates = {}
             conflicts = {}
@@ -618,6 +620,9 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
                 transaction.abort()
                 return jsonify(success=False, msg=unicode(e))
             return jsonify(success=True, url=self._get_success_url())
+
+        elif invalid_form and not form.submit_check.data and request.is_xhr:
+            return jsonify(success=False, msg='\n'.join(form.error_list))
 
         return self._get_view(form=form, room=room, rooms=Room.find_all(), occurrences=occurrences,
                               candidates=candidates, conflicts=conflicts, pre_conflicts=pre_conflicts,

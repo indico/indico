@@ -143,12 +143,27 @@ class ModifyBookingForm(NewBookingSimpleForm):
     submit_update = SubmitField(_(u'Update booking'))
 
     def __init__(self, *args, **kwargs):
-        self._old_start_date = kwargs.pop('old_start_date')
+        self._old_start_dt = kwargs.pop('old_start_dt')
+        self._old_end_dt = kwargs.pop('old_end_dt')
         super(ModifyBookingForm, self).__init__(*args, **kwargs)
         del self.room_id
         del self.submit_book
         del self.submit_prebook
 
     def validate_start_dt(self, field):
-        if field.data.date() < self._old_start_date and not session.user.is_admin:
+        new_start_dt = field.data
+        now = datetime.now()
+
+        if self._old_start_dt < now and new_start_dt != self._old_start_dt and not session.user.is_admin:
+            raise ValidationError(_(u"The start time is in the past and cannot be modified."))
+        if self._old_start_dt >= now and new_start_dt < now and not session.user.is_admin:
             raise ValidationError(_(u'The start time cannot be moved into the past.'))
+
+    def validate_end_dt(self, field):
+        new_end_dt = field.data
+        now = datetime.now()
+
+        if self._old_end_dt < now and new_end_dt != self._old_end_dt and not session.user.isAdmin():
+            raise ValidationError(_(u"The end time is in the past and cannot be modified."))
+        if self._old_end_dt >= now and new_end_dt < now and not session.user.isAdmin():
+            raise ValidationError(_(u'The end time cannot be moved into the past.'))
