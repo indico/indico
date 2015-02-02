@@ -254,7 +254,7 @@ jquery = rjs_bundle('jquery', *filter(None, [
               'jquery.watermark.js',
               'jquery.placeholder.js')))
 
-utils = rjs_bundle('utils', 'js/utils/routing.js')
+utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'i18n.js'))
 calendar = rjs_bundle('calendar', *namespace('js/calendar', 'calendar.js', 'calendar-setup.js'))
 
 presentation = rjs_bundle(
@@ -301,12 +301,8 @@ presentation = rjs_bundle(
 
 ie_compatibility = rjs_bundle('ie_compatibility', 'js/selectivizr.js')
 
-moment = rjs_bundle(
-    'moment',
-    *namespace('js/moment',
-               'moment.js',
-               'locale/es.js',
-               'locale/fr.js'))
+jed = rjs_bundle('jed', 'js/lib/jed.js')
+moment = rjs_bundle('moment', *namespace('js/moment', 'moment.js', 'locale/es.js', 'locale/fr.js'))
 
 jqplot_js = rjs_bundle('jqplot',
                        *namespace('js/lib/jqplot',
@@ -358,8 +354,8 @@ abstracts_js = rjs_bundle(
                'Markdown.Editor.js',
                'Markdown.Sanitizer.js'))
 
-base_js = Bundle(jquery, angular, utils, presentation, calendar, indico_jquery, moment, indico_core,
-                 indico_legacy, indico_common)
+base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
+                 indico_core, indico_legacy, indico_common)
 
 module_js = {
     'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js'),

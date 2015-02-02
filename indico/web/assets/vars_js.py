@@ -1,6 +1,5 @@
 from flask import render_template
 
-from indico.core.logger import Logger
 from indico.modules.rb.models.locations import Location
 
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
@@ -10,7 +9,7 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
 
 
-def generate_global_file(file_path, config):
+def generate_global_file(config):
 
     locations = Location.find_all() if config.getIsRoomBookingActive() else []
     default_location = next((loc.name for loc in locations if loc.is_default), None)
@@ -19,7 +18,7 @@ def generate_global_file(file_path, config):
     material_types = dict((evt_type, [(m, m.title()) for m in MaterialFactoryRegistry._allowedMaterials[evt_type]])
                           for evt_type in ['meeting', 'simple_event', 'conference', 'category'])
 
-    data = render_template(
+    return render_template(
         'assets/vars_globals.js',
         config=config,
         default_location=default_location,
@@ -31,11 +30,3 @@ def generate_global_file(file_path, config):
         file_type_icons=file_type_icons,
         urls=urlHandlers
     )
-
-    try:
-        with open(file_path, 'w') as f:
-            f.write(data)
-        return True
-    except:
-        Logger.get('vars_js').exception('Problem generating {}'.format(file_path))
-        return False

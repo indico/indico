@@ -15,18 +15,23 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import ast
-from contextlib import contextmanager
+import errno
+import os
 import re
+from contextlib import contextmanager
 
-from babel.core import Locale
-from babel.support import Translations
 from babel import negotiate_locale
+from babel.core import Locale
+from babel.messages.pofile import read_po
+from babel.support import Translations
 from flask import session, request, has_request_context, current_app
-from flask_babelex import Babel, get_domain
+from flask_babelex import Babel, Domain, get_domain
 from flask_pluginengine import current_plugin
 from speaklater import make_lazy_gettext
 
+from indico.core.config import Config
 from indico.core.db import DBMgr
+from indico.core.signals import after_process
 
 from MaKaC.common.info import HelperMaKaCInfo
 
@@ -39,8 +44,8 @@ babel = Babel()
 def get_active_domain():
     default_domain = get_domain()
 
-    if current_plugin:
-        return current_plugin.translation_domain or default_domain
+    if current_plugin and current_plugin.translation_path:
+        return Domain(current_plugin.translation_path)
     else:
         return default_domain
 
@@ -217,3 +222,41 @@ def extract_node(node, keywords, commentTags, options, parents=[None]):
         for cnode in ast.iter_child_nodes(node):
             for rslt in extract_node(cnode, keywords, commentTags, options, parents=(parents + [node])):
                 yield rslt
+
+
+def po_to_json(po_file, locale=None, domain=None):
+    """
+    Converts *.po file to a json-like data structure
+    """
+    with open(po_file, 'rb') as f:
+        po_data = read_po(f, locale=locale, domain=domain)
+
+    messages = dict((message.id[0], message.string) if message.pluralizable else (message.id, [message.string])
+                    for message in po_data)
+
+    messages[''] = {
+        'domain': po_data.domain,
+        'lang': str(po_data.locale),
+        'plural_forms': po_data.plural_forms
+    }
+
+    return {
+        (po_data.domain or ''): messages
+    }
+
+
+@after_process.connect
+def delete_old_i18n_cache(sender, **kwargs):
+    """
+    deletes old i18n files on startup
+    """
+    config = Config.getInstance()
+    for locale_name in get_all_locales():
+        file_path = os.path.join(config.getXMLCacheDir(), 'assets_i18n_{}.js'.format(locale_name))
+        if os.path.exists(file_path):
+            # file can be deleted many times in multi-process environment
+            try:
+                os.unlink(file_path)
+            except OSError, e:
+                if e.errno != errno.ENOENT:
+                    raise

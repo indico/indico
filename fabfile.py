@@ -268,6 +268,17 @@ def install_jquery():
             local('cp dist/jquery.js {0}/'.format(dest_dir))
 
 
+@recipe('jed')
+def install_jed():
+    """
+    Install jquery from Git
+    """
+    with lcd(os.path.join(env.ext_dir, 'Jed')):
+        dest_dir = lib_dir(env.src_dir, 'js')
+        local('mkdir -p {0}'.format(dest_dir))
+        local('cp jed.js {0}/'.format(dest_dir))
+
+
 @recipe('jqplot')
 def install_jqplot():
     """Install jQPlot from Git"""
