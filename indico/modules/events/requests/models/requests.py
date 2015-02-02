@@ -108,7 +108,7 @@ class Request(db.Model):
     @property
     def created_by_user(self):
         from MaKaC.user import AvatarHolder
-        return AvatarHolder().getById(str(self.event_id))
+        return AvatarHolder().getById(str(self.created_by_id))
 
     @created_by_user.setter
     def created_by_user(self, user):
@@ -117,7 +117,7 @@ class Request(db.Model):
     @property
     def processed_by_user(self):
         from MaKaC.user import AvatarHolder
-        return AvatarHolder().getById(str(self.event_id))
+        return AvatarHolder().getById(str(self.processed_by_id))
 
     @processed_by_user.setter
     def processed_by_user(self, user):
