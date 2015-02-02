@@ -68,9 +68,9 @@
                 </a>
             </div>
             <div id="error-box">
-                <h1>${ errorTitle }</h1>
+                <h1>${ errorTitle | h }</h1>
                 <div class="error-box-text">
-                    ${ errorText }
+                    ${ errorText | h }
                 </div>
                 <div class="error-box-small">
                     <a href="${ Config.getInstance().getBaseURL() }/">${ _("Back to the main page") }</a>
