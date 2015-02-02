@@ -178,5 +178,5 @@ class Agreement(db.Model):
         self.signed_dt = None
         self.definition.handle_reset(self)
 
-    def render(self):
-        return self.definition.render_form(self)
+    def render(self, form, **kwargs):
+        return self.definition.render_form(self, form, **kwargs)

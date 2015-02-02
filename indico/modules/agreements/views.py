@@ -20,12 +20,7 @@ from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 
 
-class WPAgreementsJinjaMixin(WPJinjaMixin):
-    template_prefix = 'agreements/'
-
-
-class WPAgreementForm(WPConferenceDefaultDisplayBase, WPAgreementsJinjaMixin):
-    _template = 'agreement_form.html'
+class WPAgreementForm(WPConferenceDefaultDisplayBase, WPJinjaMixin):
 
     def getCSSFiles(self):
         return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['agreements_sass'].urls()

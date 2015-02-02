@@ -30,15 +30,16 @@ class AgreementDefinitionBase(object):
     plugin = None
 
     @classmethod
-    def render_form(cls, agreement):
+    def render_form(cls, agreement, form, **kwargs):
         tpl = '{}.html'.format(cls.name)
         core_tpl = 'agreements/{}'.format(tpl)
         plugin_tpl = '{{}}:{}'.format(tpl)
         if cls.plugin is None:
-            return render_template(core_tpl)
+            return render_template(core_tpl, agreement=agreement, form=form, **kwargs)
         else:
             with plugin_context(cls.plugin):
-                render_template((plugin_tpl.format(cls.plugin.name), core_tpl))
+                render_template((plugin_tpl.format(cls.plugin.name), core_tpl),
+                                agreement=agreement, form=form, **kwargs)
 
     @classmethod
     def handle_accepted(cls, agreement):

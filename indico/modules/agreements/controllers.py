@@ -38,4 +38,5 @@ class RHAgreementForm(RHConferenceBaseDisplay):
                 self.agreement.accept()
             else:
                 self.agreement.reject()
-        return WPAgreementForm.render_template('agreement_form.html', self._conf, form=form, agreement=self.agreement)
+        html = self.agreement.render(form)
+        return WPAgreementForm.render_string(html, self._conf)
