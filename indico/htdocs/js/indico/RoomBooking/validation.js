@@ -247,7 +247,10 @@
                         location.href = data.url;
                     } else {
                         var error_box = $('.js-booking-creation-error-box').clone().show();
-                        error_box.find('.js-booking-creation-error-message').text(data.msg);
+                        var errors = error_box.find('.js-booking-creation-error-message');
+                        $.each(data.msg.split('\n'), function addError(_, error) {
+                            errors.append($('<li>', {text: error}));
+                        });
                         new AlertPopup($T("Booking creation error"), error_box[0]).open();
                     }
                 },
