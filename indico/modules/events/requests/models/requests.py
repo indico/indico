@@ -137,17 +137,9 @@ class Request(db.Model):
         """Determines if the request can be modified or if a new one must be sent"""
         return self.state in {RequestState.pending, RequestState.accepted}
 
-    def send(self):
-        """Sends a new/modified request"""
-        self.state = RequestState.pending
-        if self.id is None:
-            db.session.add(self)
-        # TODO: notify
-
-    def withdraw(self):
-        """Withdraws the request"""
-        self.state = RequestState.withdrawn
-        # TODO: notify
+    @property
+    def locator(self):
+        return {'confId': self.event_id, 'type': self.type}
 
     @return_ascii
     def __repr__(self):

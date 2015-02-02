@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.requests.controllers import (RHRequestsEventRequests, RHRequestsEventRequestDetails,
-                                                        RHRequestsEventRequestWithdraw)
+                                                        RHRequestsEventRequestWithdraw, RHRequestsEventRequestProcess)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 requests_blueprint = _bp = IndicoBlueprint('requests', __name__, template_folder='templates')
@@ -28,3 +28,5 @@ _bp.add_url_rule('/event/<confId>/manage/requests/<type>/', 'event_requests_deta
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/manage/requests/<type>/withdraw', 'event_requests_withdraw',
                  RHRequestsEventRequestWithdraw, methods=('POST',))
+_bp.add_url_rule('/event/<confId>/manage/requests/<type>/process', 'event_requests_process',
+                 RHRequestsEventRequestProcess, methods=('POST',))

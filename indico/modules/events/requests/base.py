@@ -16,10 +16,22 @@
 
 from __future__ import unicode_literals
 
-from indico.core.plugins import plugin_context
-from indico.web.forms.base import FormDefaults
-
 from flask import render_template
+from wtforms.fields import TextAreaField
+
+from indico.core.db import db
+from indico.core.plugins import plugin_context
+from indico.modules.events.requests.models.requests import RequestState
+from indico.util.date_time import now_utc
+from indico.util.i18n import _
+from indico.web.forms.base import FormDefaults, IndicoForm
+from indico.web.forms.fields import IndicoEnumSelectField
+
+
+class RequestManagerForm(IndicoForm):
+    state = IndicoEnumSelectField(_('State'), enum=RequestState)
+    comment = TextAreaField(_('Comment'),
+                            description=_('The comment will be shown only if the request is accepted or rejected.'))
 
 
 class RequestDefinitionBase(object):
@@ -33,6 +45,8 @@ class RequestDefinitionBase(object):
     title = None
     #: the :class:`IndicoForm` to use for the request form
     form = None
+    #: the :class:`IndicoForm` to use for the request manager form
+    manager_form = RequestManagerForm
 
     @classmethod
     def render_form(cls, **kwargs):
@@ -50,6 +64,66 @@ class RequestDefinitionBase(object):
 
     @classmethod
     def create_form(cls, existing_request=None):
+        """Creates the request form
+
+        :param existing_request: the :class:`Request` if there's an existing request of this type
+        :return: an instance of an :class:`IndicoForm` subclass
+        """
         defaults = FormDefaults(existing_request.data if existing_request else None)
         with plugin_context(cls.plugin):
             return cls.form(prefix='request-', obj=defaults)
+
+    @classmethod
+    def create_manager_form(cls, req):
+        """Creates the request management form
+
+        :param req: the :class:`Request` of the request
+        :return: an instance of an :class:`IndicoForm` subclass
+        """
+        defaults = FormDefaults(req)
+        with plugin_context(cls.plugin):
+            return cls.manager_form(prefix='request-manage-', obj=defaults)
+
+    @classmethod
+    def can_manage(cls, user):
+        """Checks whether the user is allowed to manage this request type
+
+        :param user: a :class:`Avatar`
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def send(cls, req, data):
+        """Sends a new/modified request
+
+        :param req: the :class:`Request` of the request
+        :param data: the form data from the request form
+        """
+        req.state = RequestState.pending
+        req.data = data
+        if req.id is None:
+            db.session.add(req)
+        # TODO: notify
+
+    @classmethod
+    def withdraw(cls, req):
+        """Withdraws the request
+
+        :param req: the :class:`Request` of the request
+        """
+        req.state = RequestState.withdrawn
+        # TODO: notify
+
+    @classmethod
+    def process(cls, req, state, data, user):
+        """Processes the request
+
+        :param req: the :class:`Request` of the request
+        :param state: the new state (a :class:`RequestState`)
+        :param data: the form data from the management form
+        :param user: the user processing the request
+        """
+        req.state = state
+        req.processed_by_user = user
+        req.processed_dt = now_utc()
+        # TODO: notify

@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import request, jsonify, flash, redirect, session
 from werkzeug.exceptions import NotFound, BadRequest
 
+from indico.core.errors import AccessError
 from indico.modules.events.requests import get_request_definitions
 from indico.modules.events.requests.models.requests import Request, RequestState
 from indico.modules.events.requests.views import WPRequestsEventManagement
@@ -58,34 +59,70 @@ class RHRequestsEventRequestBase(RHConferenceModifBase):
             raise NotFound
 
 
-class RHRequestsEventRequestDetails(RHRequestsEventRequestBase):
+class RHRequestsEventRequestDetailsBase(RHRequestsEventRequestBase):
+    """Base class for the details/edit/manage views of a specific request"""
+
+    def _process(self):
+        is_manager = self.definition.can_manage(session.user)
+
+        self.form = form = self.definition.create_form(self.request)
+        self.manager_form = manager_form = self.definition.create_manager_form(self.request) if self.request else None
+        rv = self.process_form()
+        if rv:
+            return rv
+
+        form_html = self.definition.render_form(event=self.event, definition=self.definition, req=self.request,
+                                                form=form, is_manager=is_manager, manager_form=manager_form)
+        return WPRequestsEventManagement.render_string(form_html, self.event)
+
+    def process_form(self):
+        raise NotImplementedError
+
+
+class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
     """Details/form for a specific request"""
 
     _require_request = False
 
-    def _process(self):
-        form = self.definition.create_form(self.request)
-        if form.validate_on_submit():
-            if not self.request or not self.request.can_be_modified:
-                req = Request(event=self.event, definition=self.definition, created_by_user=session.user)
-                new = True
-            else:
-                req = self.request
-                new = False
-            req.data = form.data
-            req.send()
-            if new:
-                flash_msg = _("Your request ({0}) has been sent. "
-                              "You will be notified by e-mail once it has been accepted or rejected.")
-            else:
-                flash_msg = _("Your request ({0}) has been modified. "
-                              "You will be notified by e-mail once it has been accepted or rejected.")
-            flash(flash_msg.format(self.definition.title), 'success')
-            return redirect(url_for('.event_requests', self.event))
+    def process_form(self):
+        form = self.form
+        if not form.validate_on_submit():
+            return
+        if not self.request or not self.request.can_be_modified:
+            req = Request(event=self.event, definition=self.definition, created_by_user=session.user)
+            new = True
+        else:
+            req = self.request
+            new = False
+        self.definition.send(req, form.data)
+        if new:
+            flash_msg = _("Your request ({0}) has been sent. "
+                          "You will be notified by e-mail once it has been accepted or rejected.")
+        else:
+            flash_msg = _("Your request ({0}) has been modified. "
+                          "You will be notified by e-mail once it has been accepted or rejected.")
+        flash(flash_msg.format(self.definition.title), 'success')
+        return redirect(url_for('.event_requests', self.event))
 
-        form_html = self.definition.render_form(event=self.event, definition=self.definition, request=self.request,
-                                                form=form)
-        return WPRequestsEventManagement.render_string(form_html, self.event)
+
+class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
+    """Process a request"""
+
+    def _checkProtection(self):
+        self._checkSessionUser()
+        if self._doProcess and not self.definition.can_manage(session.user):
+            raise AccessError()
+
+    def process_form(self):
+        form = self.manager_form
+        if not form.validate_on_submit():
+            # This is *very* unlikely to happen, at least with the default form.
+            return
+        self.request.comment = form.comment.data
+        self.definition.process(self.request, form.state.data, form.data, session.user)
+        flash('You have successfully processed this request. It is now {0}.'.format(self.request.state.title.lower()),
+              'info')
+        return redirect(url_for('.event_requests_details', self.request))
 
 
 class RHRequestsEventRequestWithdraw(RHRequestsEventRequestBase):
@@ -94,6 +131,6 @@ class RHRequestsEventRequestWithdraw(RHRequestsEventRequestBase):
     def _process(self):
         if self.request.state not in {RequestState.pending, RequestState.accepted}:
             raise BadRequest
-        self.request.withdraw()
+        self.definition.withdraw(self.request)
         flash(_('You have withdrawn your request ({0})').format(self.definition.title))
         return jsonify(success=True, url=url_for('.event_requests', self.event))
