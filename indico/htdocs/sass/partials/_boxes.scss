@@ -80,6 +80,13 @@
     }
 }
 
+.i-box .i-box-footer {
+    background: $light-gray;
+    box-shadow: inset 0px 15px 20px -20px $dark-gray;
+    margin: 10px -10px -10px;
+    padding: 10px;
+}
+
 
 // ============================================================================
 // Group of boxes
