@@ -22,13 +22,29 @@ from werkzeug.exceptions import NotFound, BadRequest
 from indico.core.errors import AccessError
 from indico.modules.events.requests import get_request_definitions
 from indico.modules.events.requests.models.requests import Request, RequestState
+from indico.modules.events.requests.util import is_request_manager
 from indico.modules.events.requests.views import WPRequestsEventManagement
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-class RHRequestsEventRequests(RHConferenceModifBase):
+class EventOrRequestManagerMixin:
+    def _checkProtection(self):
+        self.protection_overridden = False
+        if hasattr(self, 'definition'):
+            # check if user can manage *that* request
+            can_manage_request = session.user and self.definition.can_be_managed(session.user)
+        else:
+            # check if user can manage any request
+            can_manage_request = session.user and is_request_manager()
+        can_manage_event = self._conf.canModify(self.getAW())
+        self.protection_overridden = can_manage_request and not can_manage_event
+        if not can_manage_request and not can_manage_event:
+            RHConferenceModifBase._checkProtection(self)
+
+
+class RHRequestsEventRequests(EventOrRequestManagerMixin, RHConferenceModifBase):
     """Overview of existing requests (event)"""
 
     def _process(self):
@@ -37,6 +53,9 @@ class RHRequestsEventRequests(RHConferenceModifBase):
         if not definitions:
             raise NotFound
         requests = Request.find_latest_for_event(self._conf)
+        if self.protection_overridden:
+            definitions = {name: def_ for name, def_ in definitions.iteritems() if def_.can_be_managed(session.user)}
+            requests = {name: req for name, req in requests.iteritems() if req.definition.can_be_managed(session.user)}
         return WPRequestsEventManagement.render_template('event_requests.html', event, event=event,
                                                          definitions=definitions, requests=requests)
 
@@ -59,20 +78,19 @@ class RHRequestsEventRequestBase(RHConferenceModifBase):
             raise NotFound
 
 
-class RHRequestsEventRequestDetailsBase(RHRequestsEventRequestBase):
+class RHRequestsEventRequestDetailsBase(EventOrRequestManagerMixin, RHRequestsEventRequestBase):
     """Base class for the details/edit/manage views of a specific request"""
 
     def _process(self):
-        is_manager = self.definition.can_manage(session.user)
-
-        self.form = form = self.definition.create_form(self.request)
-        self.manager_form = manager_form = self.definition.create_manager_form(self.request) if self.request else None
+        is_manager = self.definition.can_be_managed(session.user)
+        self.form = self.definition.create_form(self.request)
+        self.manager_form = self.definition.create_manager_form(self.request) if self.request and is_manager else None
         rv = self.process_form()
         if rv:
             return rv
 
         form_html = self.definition.render_form(event=self.event, definition=self.definition, req=self.request,
-                                                form=form, is_manager=is_manager, manager_form=manager_form)
+                                                form=self.form, is_manager=is_manager, manager_form=self.manager_form)
         return WPRequestsEventManagement.render_string(form_html, self.event)
 
     def process_form(self):
@@ -110,7 +128,7 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
 
     def _checkProtection(self):
         self._checkSessionUser()
-        if self._doProcess and not self.definition.can_manage(session.user):
+        if self._doProcess and not self.definition.can_be_managed(session.user):
             raise AccessError()
 
     def process_form(self):
@@ -125,7 +143,7 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
         return redirect(url_for('.event_requests_details', self.request))
 
 
-class RHRequestsEventRequestWithdraw(RHRequestsEventRequestBase):
+class RHRequestsEventRequestWithdraw(EventOrRequestManagerMixin, RHRequestsEventRequestBase):
     """Withdraw a request"""
 
     def _process(self):

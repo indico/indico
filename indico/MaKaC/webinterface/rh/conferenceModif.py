@@ -57,6 +57,7 @@ from MaKaC.common import pendingQueues
 from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, ContributionsListToExcel
 from MaKaC.common import utils
 from MaKaC.i18n import _
+from indico.modules.events.requests.util import is_request_manager
 from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
 from MaKaC.plugins.base import Observable
@@ -68,7 +69,7 @@ from MaKaC.fossils.conference import ISessionBasicFossil
 from indico.modules.scheduler import Client
 from indico.util import json
 from indico.web.http_api.metadata.serializer import Serializer
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, url_for
 
 
 class RHConferenceModifBase( RHConferenceBase, RHModificationBaseProtected ):
@@ -190,6 +191,7 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         self._isRegistrar = self._target.isRegistrar( self._getUser() )
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
+        self._requests_manager = is_request_manager(session.user)
         self._isPluginManagerOrAdmin = any(self._notify("isPluginTypeAdmin", {"user": self._getUser()}) +
                                            self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"}) +
                                            self._notify("isPluginManager", {"user": self._getUser(), "conf": self._target, "plugins": "any"}))
@@ -198,7 +200,7 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
 
     def _checkProtection(self):
         if not (self._isRegistrar or self._isPRM or self._isReferee or self._isPluginManagerOrAdmin or
-                self._plugin_urls):
+                self._requests_manager or self._plugin_urls):
             RHConferenceModifKey._checkProtection(self)
 
     def _process(self):
@@ -215,6 +217,8 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
             url = urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf )
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
+        elif self._requests_manager:
+            url = url_for('requests.event_requests', self._conf)
         elif self._plugin_urls:
             url = next(iter(self._plugin_urls), None)
         elif self._isPluginManagerOrAdmin:

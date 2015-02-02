@@ -59,6 +59,7 @@ from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
 import MaKaC.common.info as info
 from MaKaC.i18n import _
 from indico.modules.events.requests import get_request_definitions
+from indico.modules.events.requests.util import is_request_manager
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
 from indico.util.string import safe_upper
@@ -1540,7 +1541,7 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
             self._toolsMenuItem.setVisible(False)
             self._logMenuItem.setVisible(False)
             self._evaluationMenuItem.setVisible(False)
-            self._requestsMenuItem.setVisible(False)
+            self._requestsMenuItem.setVisible(is_request_manager(session.user))
 
         if not (Config.getInstance().getIsRoomBookingActive() and canModify):
             self._roomBookingMenuItem.setVisible(False)

@@ -85,7 +85,7 @@ class RequestDefinitionBase(object):
             return cls.manager_form(prefix='request-manage-', obj=defaults)
 
     @classmethod
-    def can_manage(cls, user):
+    def can_be_managed(cls, user):
         """Checks whether the user is allowed to manage this request type
 
         :param user: a :class:`Avatar`
