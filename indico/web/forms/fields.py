@@ -15,11 +15,12 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import json
+from operator import attrgetter
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
-from wtforms.widgets.core import CheckboxInput, PasswordInput
-from wtforms.fields.core import RadioField, SelectMultipleField
+from wtforms.widgets.core import CheckboxInput, PasswordInput, Select
+from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase
 
 from indico.util.fossilize import fossilize
 from indico.util.user import retrieve_principals
@@ -97,6 +98,31 @@ class EmailListField(TextListField):
 class UnsafePasswordField(PasswordField):
     """Password field which does not hide the current value."""
     widget = PasswordInput(hide_value=False)
+
+
+class IndicoEnumSelectField(SelectFieldBase):
+    """Select field backed by a :class:`TitledEnum`"""
+
+    widget = Select()
+
+    def __init__(self, label=None, validators=None, enum=None, sorted=False, **kwargs):
+        super(IndicoEnumSelectField, self).__init__(label, validators, **kwargs)
+        self.enum = enum
+        self.sorted = sorted
+
+    def iter_choices(self):
+        items = self.enum
+        if self.sorted:
+            items = sorted(items, key=attrgetter('title'))
+        for item in items:
+            yield (item.name, item.title, item == self.data)
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            try:
+                self.data = self.enum[valuelist[0]]
+            except KeyError:
+                raise ValueError(self.gettext('Not a valid choice'))
 
 
 class PrincipalField(HiddenField):
