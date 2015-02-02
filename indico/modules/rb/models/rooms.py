@@ -522,7 +522,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return ~occurrences_filter & ~blockings_filter
 
     @staticmethod
-    def find_with_filters(filters, avatar):
+    def find_with_filters(filters, avatar=None):
         from indico.modules.rb.models.locations import Location
 
         equipment_count = len(filters.get('available_equipment', ()))
@@ -588,6 +588,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             # This may trigger additional SQL queries but is_public is cached and doing this check here is *much* easier
             rooms = [r for r in rooms if r.is_public]
         if filters.get('is_only_my_rooms'):
+            assert avatar is not None
             rooms = [r for r in rooms if r.is_owned_by(avatar)]
         if capacity:
             # Unless it would result in an empty resultset we don't want to show rooms with >20% more capacity
