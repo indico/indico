@@ -380,6 +380,15 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
                 }
             }
 
+            .static-text {
+                display: block;
+                height: 2.5em;
+                padding: 0.5em 1em 0.5em 0;
+                line-height: 1.5;
+                color: $black;
+                width: 400px;
+            }
+
             :invalid {
                 box-shadow: none !important;
             }
@@ -501,6 +510,10 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
 
         .form-group:first-of-type {
             margin-top: 2em;
+        }
+
+        & + .form-group-footer {
+            margin-top: -1em;
         }
     }
 }

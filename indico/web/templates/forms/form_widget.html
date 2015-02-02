@@ -10,6 +10,21 @@
     <form method="{{ method }}" {%- if action %} action="{{ action }}"{% endif %} class="i-form {{ orientation }}"{% if id %} id="{{ id }}"{% endif %}>
 {%- endmacro %}
 
+{% macro form_row_static(label='', content=none, single_row=true) -%}
+    <div class="form-group">
+        <div class="form-label form-block {%- if single_row %} form-label-middle{% endif %}">
+            {% if label %}
+                <label>{{ label }}</label>
+            {% endif %}
+        </div>
+        <div class="form-field form-block">
+            <div class="static-text">
+                {{ content or caller() }}
+            </div>
+        </div>
+    </div>
+{%- endmacro %}
+
 {% macro form_row(field, widget_attrs={}, orientation='') %}
     <div class="form-group{% if field.errors %} has-error{% endif %} {{ orientation }}" id="form-group-{{ field.id }}">
         <div class="form-label form-block{% if _is_single_line_field(field) %} form-label-middle{% endif %}
@@ -41,7 +56,7 @@
 
 {% macro form_footer() -%}
     {% if caller %}
-        <div class="form-group">
+        <div class="form-group form-group-footer">
             <div class="form-label form-block"></div>
             <div class="form-field form-block">
                 {{ caller() }}
