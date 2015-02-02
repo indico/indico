@@ -15,25 +15,30 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import os
+import tempfile
 import pytest
+from babel.messages import Catalog
+from babel.messages.mofile import write_mo
 from babel.support import Translations
 from flask import session, request, has_request_context
-from flask_babelex import get_domain, Domain
+from flask_babelex import get_domain
 from speaklater import _LazyString
 from werkzeug.http import LanguageAccept
-from werkzeug.utils import cached_property
 
 from indico.util.i18n import _, ngettext, ungettext, session_language, babel
 from indico.core.plugins import IndicoPlugin, IndicoPluginEngine
 
 
 DICTIONARIES = {
+    'fr_FR': {
+        'This is not a string': u"Ceci n'est pas une cha\u00cene"
+    },
+
     'fr_MP': {
         'Fetch the cow': u'Fetchez la vache',
         'The wheels': u'Les wheels',
         ('{} cow', 0): u'{} vache',
         ('{} cow', 1): u'{} vaches',
-        'This is not a string': u"Ceci n'est pas une cha\u00cene"
     },
 
     'en_PI': {
@@ -53,27 +58,8 @@ class MockTranslations(Translations):
         self._catalog = DICTIONARIES[babel.locale_selector_func()]
 
 
-class MockPluginTranslations(Translations):
-    """
-    Mock `Translations` class - returns a mock dictionary
-    based on the selected locale
-    """
-
-    def __init__(self):
-        super(MockPluginTranslations, self).__init__()
-        self._catalog = {
-            'This is not a string': u"Ceci n'est pas un string"
-        }
-
-
 class MockPlugin(IndicoPlugin):
-    root_path = os.path.dirname(__file__)
-
-    @cached_property
-    def translation_domain(self):
-        plugin_domain = Domain()
-        plugin_domain.get_translations = MockPluginTranslations
-        return plugin_domain
+    root_path = tempfile.mkdtemp(prefix='indico-test')
 
 
 @pytest.fixture
@@ -155,9 +141,18 @@ def test_set_best_lang_no_session_lang():
 
 @pytest.mark.usefixtures('mock_translations')
 def test_translation_plugins(app):
-    session.lang = 'fr_MP'
+    session.lang = 'fr_FR'
     engine = IndicoPluginEngine()
     plugin = MockPlugin(engine, app)
+
+    trans_dir = os.path.join(plugin.root_path, 'translations', 'fr_FR', 'LC_MESSAGES')
+    os.makedirs(trans_dir)
+
+    # Create proper *.mo file for plugin translation
+    with open(os.path.join(trans_dir, 'messages.mo'), 'wb') as f:
+        catalog = Catalog(locale='fr_FR')
+        catalog.add("This is not a string", "Ceci n'est pas un string")
+        write_mo(f, catalog)
 
     assert _(u'This is not a string') == u"Ceci n'est pas une cha\u00cene"
 

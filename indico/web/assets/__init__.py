@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from .bundles import configure_pyscss, core_env, ie_compatibility, include_css_assets, register_all_css, \
-    register_all_js, include_js_assets, PluginEnvironment, SASS_BASE_MODULES
+from .bundles import (configure_pyscss, core_env, ie_compatibility, include_css_assets, register_all_css,
+                      register_all_js, include_js_assets, PluginEnvironment, SASS_BASE_MODULES)
 
 __all__ = ['configure_pyscss', 'core_env', 'ie_compatibility', 'include_css_assets', 'include_js_assets',
            'PluginEnvironment', 'register_all_css', 'register_all_js', 'SASS_BASE_MODULES']

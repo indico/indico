@@ -55,19 +55,11 @@ def compile_languages(cmd):
     Needed to generate binary distro
     """
     from babel.messages import frontend
-    from indico.util.setup import compile_catalog_js
 
     compile_cmd = frontend.compile_catalog(cmd.distribution)
-    compile_js_cmd = compile_catalog_js(cmd.distribution)
-
     cmd.distribution._set_command_options(compile_cmd)
-    cmd.distribution._set_command_options(compile_js_cmd)
-
     compile_cmd.finalize_options()
-    compile_js_cmd.finalize_options()
-
     compile_cmd.run()
-    compile_js_cmd.run()
 
 
 def read_requirements_file(fname):
