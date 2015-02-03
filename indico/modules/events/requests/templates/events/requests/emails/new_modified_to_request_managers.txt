@@ -1,0 +1,9 @@
+{% extends 'events/requests/emails/base_to_request_managers.txt' %}
+
+{% block request_subject -%}
+    {% if new %}New{% else %}Modified{% endif %} service request
+{%- endblock %}
+
+{% block request_message -%}
+    A {{ req.definition.title }} request has been {% if new %}submitted{% else %}modified{% endif %}.
+{%- endblock %}

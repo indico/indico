@@ -1,0 +1,9 @@
+{% extends 'events/requests/emails/base_to_event_managers.txt' %}
+
+{% block request_subject -%}
+    Request withdrawn
+{%- endblock %}
+
+{% block request_message -%}
+    The {{ req.definition.title }} request for your event has been withdrawn.
+{%- endblock %}

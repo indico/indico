@@ -1,0 +1,12 @@
+{% extends 'events/requests/emails/base_to_event_managers.txt' %}
+
+{% block request_subject -%}
+    Request accepted
+{%- endblock %}
+
+{% block request_message -%}
+    The {{ req.definition.title }} request for your event has been accepted.
+    {%- if req.comment %}
+        Comment: {{ req.comment }}
+    {%- endif -%}
+{%- endblock %}

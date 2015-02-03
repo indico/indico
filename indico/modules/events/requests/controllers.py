@@ -137,7 +137,10 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
             # This is *very* unlikely to happen, at least with the default form.
             return
         self.request.comment = form.comment.data
-        self.definition.process(self.request, form.state.data, form.data, session.user)
+        if form.state.data == RequestState.accepted:
+            self.definition.accept(self.request, form.data, session.user)
+        elif form.state.data == RequestState.rejected:
+            self.definition.reject(self.request, form.data, session.user)
         flash('You have successfully processed this request. It is now {0}.'.format(self.request.state.title.lower()),
               'info')
         return redirect(url_for('.event_requests_details', self.request))

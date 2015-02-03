@@ -16,8 +16,9 @@
 
 import pytest
 from flask import render_template_string
+from mock import MagicMock
 
-from indico.web.flask.templating import underline, markdown, dedent
+from indico.web.flask.templating import underline, markdown, get_overridable_template_name, dedent
 
 
 def test_underline():
@@ -46,6 +47,21 @@ def test_dedent():
     test
     '''
     assert dedent(s) == '\nfoo foo\n\nbar\nfoobar\ntest\n'
+
+
+@pytest.mark.parametrize(('core_prefix', 'plugin_prefix'), (
+    ('',      ''),
+    ('core/', ''),
+    ('',      'plugin/'),
+    ('core/', 'plugin/'),
+))
+def test_get_overridable_template_name(core_prefix, plugin_prefix):
+    plugin = MagicMock(name='dummy')
+    name = 'test.html'
+    tpl = get_overridable_template_name(name, None, core_prefix=core_prefix, plugin_prefix=plugin_prefix)
+    assert tpl == core_prefix + name
+    tpl = get_overridable_template_name(name, plugin, core_prefix=core_prefix, plugin_prefix=plugin_prefix)
+    assert tpl == ['{}:{}{}'.format(plugin.name, plugin_prefix, name), core_prefix + name]
 
 
 def _render(template, raises=None):

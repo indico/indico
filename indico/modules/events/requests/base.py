@@ -22,8 +22,11 @@ from wtforms.fields import TextAreaField
 from indico.core.db import db
 from indico.core.plugins import plugin_context
 from indico.modules.events.requests.models.requests import RequestState
+from indico.modules.events.requests.notifications import (notify_new_modified_request, notify_withdrawn_request,
+                                                          notify_accepted_request, notify_rejected_request)
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.forms.fields import IndicoEnumSelectField
 
@@ -54,13 +57,10 @@ class RequestDefinitionBase(object):
 
         :param kwargs: arguments passed to the template
         """
-        core_tpl = 'events/requests/event_request_details.html'
-        plugin_tpl = '{}:event_request_details.html'
-        if cls.plugin is None:
-            return render_template(core_tpl, **kwargs)
-        else:
-            with plugin_context(cls.plugin):
-                return render_template((plugin_tpl.format(cls.plugin.name), core_tpl), **kwargs)
+
+        tpl = get_overridable_template_name('event_request_details.html', cls.plugin, 'events/requests/')
+        with plugin_context(cls.plugin):
+            return render_template(tpl, **kwargs)
 
     @classmethod
     def create_form(cls, existing_request=None):
@@ -93,6 +93,18 @@ class RequestDefinitionBase(object):
         raise NotImplementedError
 
     @classmethod
+    def get_manager_notification_emails(cls):
+        """Returns the email addresses of users who manage requests of this type
+
+        The email addresses are used only for notifications.
+        It usually makes sense to return the email addresses of the users who
+        pass the :method:`can_be_managed` check.
+
+        :return: set of email addresses
+        """
+        return set()
+
+    @classmethod
     def send(cls, req, data):
         """Sends a new/modified request
 
@@ -101,9 +113,11 @@ class RequestDefinitionBase(object):
         """
         req.state = RequestState.pending
         req.data = data
-        if req.id is None:
+        is_new = req.id is None
+        if is_new:
             db.session.add(req)
-        # TODO: notify
+            db.session.flush()  # we need the creation dt for the notification
+        notify_new_modified_request(req, is_new)
 
     @classmethod
     def withdraw(cls, req):
@@ -112,18 +126,30 @@ class RequestDefinitionBase(object):
         :param req: the :class:`Request` of the request
         """
         req.state = RequestState.withdrawn
-        # TODO: notify
+        notify_withdrawn_request(req)
 
     @classmethod
-    def process(cls, req, state, data, user):
-        """Processes the request
+    def accept(cls, req, data, user):
+        """Accepts the request
 
         :param req: the :class:`Request` of the request
-        :param state: the new state (a :class:`RequestState`)
         :param data: the form data from the management form
         :param user: the user processing the request
         """
-        req.state = state
+        req.state = RequestState.accepted
         req.processed_by_user = user
         req.processed_dt = now_utc()
-        # TODO: notify
+        notify_accepted_request(req)
+
+    @classmethod
+    def reject(cls, req, data, user):
+        """Rejects the request
+
+        :param req: the :class:`Request` of the request
+        :param data: the form data from the management form
+        :param user: the user processing the request
+        """
+        req.state = RequestState.accepted
+        req.processed_by_user = user
+        req.processed_dt = now_utc()
+        notify_rejected_request(req)

@@ -1,0 +1,12 @@
+{% extends 'events/requests/emails/base_to_request_managers.txt' %}
+
+{% block request_subject -%}
+    Rejected service request
+{%- endblock %}
+
+{% block request_message -%}
+    A {{ req.definition.title }} request has been rejected.
+    {%- if req.comment %}
+        Comment: {{ req.comment }}
+    {%- endif -%}
+{%- endblock %}
