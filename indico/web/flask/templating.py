@@ -41,12 +41,12 @@ def dedent(value):
     return indentation_re.sub('', value)
 
 
-def get_template_module(template_name, **context):
+def get_template_module(template_name_or_list, **context):
     """Returns the python module of a template.
 
     This allows you to call e.g. macros inside it from Python code."""
     app.update_template_context(context)
-    tpl = app.jinja_env.get_template(template_name)
+    tpl = app.jinja_env.get_or_select_template(template_name_or_list)
     return tpl.make_module(context)
 
 
