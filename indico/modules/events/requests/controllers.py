@@ -37,7 +37,7 @@ class EventOrRequestManagerMixin:
             can_manage_request = session.user and self.definition.can_be_managed(session.user)
         else:
             # check if user can manage any request
-            can_manage_request = session.user and is_request_manager()
+            can_manage_request = session.user and is_request_manager(session.user)
         can_manage_event = self._conf.canModify(self.getAW())
         self.protection_overridden = can_manage_request and not can_manage_event
         if not can_manage_request and not can_manage_event:
