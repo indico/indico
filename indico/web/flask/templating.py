@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import functools
+import re
 
 from flask import current_app as app
 from jinja2.ext import Extension
@@ -24,12 +25,20 @@ from markupsafe import Markup
 from indico.util.string import render_markdown
 
 
+indentation_re = re.compile(r'^ +', re.MULTILINE)
+
+
 def underline(s, sep='-'):
     return u'{0}\n{1}'.format(s, sep * len(s))
 
 
 def markdown(value):
     return Markup(EnsureUnicodeExtension.ensure_unicode(render_markdown(value, extensions=('nl2br',))))
+
+
+def dedent(value):
+    """Removes leading whitespace from each line"""
+    return indentation_re.sub('', value)
 
 
 def get_template_module(template_name, **context):
