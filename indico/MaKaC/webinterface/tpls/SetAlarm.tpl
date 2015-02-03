@@ -39,8 +39,8 @@
         <input size="3" name="timeBefore" id="timeBefore" value="${timeBefore}">
 
         <select name=timeTypeBefore >
-                <option value="hours" ${"selected" if dateType == 2 else ""}>${_("Hours")}
-                <option value="days" ${"selected" if dateType == 3 else ""}>${_("Days")}
+            <option value="hours" ${ "selected" if timeBeforeType == 'hours' else "" }>${_("Hours")}
+            <option value="days" ${ "selected" if timeBeforeType == 'days' else "" }>${_("Days")}
         </select>
   </td>
 </tr>
