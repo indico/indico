@@ -18,9 +18,11 @@ import glob
 import os
 import re
 from collections import OrderedDict
-from indico.core.logger import Logger
 
-import indico.util.json as json
+from werkzeug.local import LocalProxy
+
+from indico.core.logger import Logger
+from indico.util import json
 
 
 class RedisScript(object):
@@ -95,6 +97,10 @@ class RedisScript(object):
         if len(args) != self._args:
             raise TypeError('Script takes exactly %d argument (%d given)' % (self._args, len(args)))
         client = kwargs.get('client', self._script.registered_client)
+        # redis-py checks if the client is an instance of redis-py.client.BasePipeline.
+        # And if it's wrapped in a LocalProxy, we need to get it out first.
+        if isinstance(client, LocalProxy):
+            client = client._get_current_object()
         import redis
         if isinstance(client, redis.client.BasePipeline) and self._process_result:
             raise ValueError('Script with result conversion cannot be called on a pipeline')
