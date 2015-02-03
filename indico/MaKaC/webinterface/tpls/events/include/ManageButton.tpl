@@ -13,6 +13,7 @@
         <a class="meeting-timetable-item-edit i-button i-button-mini icon-edit arrow right" id="${menuName}"></a>
     % endif
     <script type="text/javascript">
+        var menuLink = null;
         $E('${menuName}').observeClick(function() {
 
             var menuOptions = {};
@@ -95,7 +96,15 @@
                          return false;}, display: $T('Edit material')};
                 % endif
             % endif
-            var menuLink = new PopupMenu(menuOptions, [element], null, false, ${dumps(alignRight)});
+
+            if (menuLink && menuLink.isOpen()) {
+                menuLink.close();
+                if (menuLink.chainElements[0].dom.id == ${menuName}.id) {
+                    return;
+                }
+            }
+
+            menuLink = new PopupMenu(menuOptions, [element], null, false, ${dumps(alignRight)});
 
             menuLink.open(element.getAbsolutePosition().x
             % if alignRight:
