@@ -68,13 +68,11 @@
         </div>
     </div>
     {% if agreement.pending %}
-        <div class="action-box highlight">
-            <div class="text">
-                <div class="toolbar right">
-                    <button id="agreement-submit" class="i-button big highlight right" title="{% trans %}This is a binding contract and your decision can't be changed afterwards. In case of any problem, please contact the manager of the event.{% endtrans %}" disabled>
-                        {% trans %}Submit{% endtrans %}
-                    </button>
-                </div>
+        <div class="toolbar">
+            <div class="group right">
+                <button id="agreement-submit" class="i-button big highlight" disabled>
+                    {% trans %}Submit{% endtrans %}
+                </button>
             </div>
         </div>
     {% endif %}
@@ -83,7 +81,18 @@
 <script type="text/javascript">
     $(function() {
         $('.agreement-form-sections input[type="radio"]').change(function(e) {
-            $('#agreement-submit').enable()
+            $('#agreement-submit').enable();
+            $('#agreement-submit').qtip({
+                content: {
+                    text: "{% trans %}You won't be able to change your decision later. If necessary, please contact the manager of the event.{% endtrans %}",
+                },
+                position: {
+                    my: 'right center',
+                    at: 'left center'
+                },
+                show: { ready: true },
+                hide: false
+            });
         });
     });
 </script>
