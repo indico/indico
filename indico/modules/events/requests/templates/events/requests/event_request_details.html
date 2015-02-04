@@ -89,8 +89,8 @@
     {% endcall %}
 
     {% if show_management %}
-        {{ form_header(id='request-manage-form', action=url_for('.event_requests_process', req)) }}
-        {% call form_fieldset(legend=_('Manage service request'), description=_('Here you can accept or reject the request.')) %}
+        {{ form_header(id='request-manage-form', classes='management-area', action=url_for('.event_requests_process', req)) }}
+        {% call form_fieldset(legend=_('Manage service request')) %}
             {% if req.processed_by_user %}
                 {{ form_row_static(_('Processed by'), req.processed_by_user.getStraightFullName()) }}
             {% endif %}

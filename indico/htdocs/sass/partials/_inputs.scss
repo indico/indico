@@ -311,6 +311,13 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
       @include box-sizing(border-box);
     }
 
+    &.management-area {
+        padding-top: 1em;
+        @include box-shadow(0 2px 1px -1px $pastel-gray);
+        border: 1px solid $pastel-gray;
+        background-color: $light-gray;
+    }
+
     .form-group {
         clear: both;
         display: inline-block;
