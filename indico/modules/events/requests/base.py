@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import render_template
-from wtforms.fields import TextAreaField
+from wtforms.fields import TextAreaField, SubmitField
 
 from indico.core.db import db
 from indico.core.plugins import plugin_context
@@ -28,13 +28,13 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults, IndicoForm
-from indico.web.forms.fields import IndicoEnumSelectField
 
 
 class RequestManagerForm(IndicoForm):
-    state = IndicoEnumSelectField(_('State'), enum=RequestState)
     comment = TextAreaField(_('Comment'),
                             description=_('The comment will be shown only if the request is accepted or rejected.'))
+    action_accept = SubmitField(_('Accept'))
+    action_reject = SubmitField(_('Reject'))
 
 
 class RequestDefinitionBase(object):

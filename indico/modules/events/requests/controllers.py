@@ -84,7 +84,14 @@ class RHRequestsEventRequestDetailsBase(EventOrRequestManagerMixin, RHRequestsEv
     def _process(self):
         is_manager = self.definition.can_be_managed(session.user)
         self.form = self.definition.create_form(self.request)
-        self.manager_form = self.definition.create_manager_form(self.request) if self.request and is_manager else None
+        self.manager_form = None
+        if self.request and is_manager:
+            self.manager_form = self.definition.create_manager_form(self.request)
+            if self.request.state == RequestState.accepted:
+                del self.manager_form.action_accept
+            if self.request.state == RequestState.rejected:
+                del self.manager_form.action_reject
+
         rv = self.process_form()
         if rv:
             return rv
@@ -124,7 +131,7 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
 
 
 class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
-    """Process a request"""
+    """Accept/Reject a request"""
 
     def _checkProtection(self):
         self._checkSessionUser()
@@ -133,16 +140,24 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
 
     def process_form(self):
         form = self.manager_form
-        if not form.validate_on_submit():
-            # This is *very* unlikely to happen, at least with the default form.
+        if self.request.state == RequestState.withdrawn:
             return
+        elif not form.validate_on_submit():
+            # very unlikely, unless the definition uses a custom form
+            return
+        if 'action_accept' in form and form.action_accept.data:
+            action = 'accept'
+        elif 'action_reject' in form and form.action_reject.data:
+            action = 'reject'
+        else:
+            raise ValueError('No action provided')
         self.request.comment = form.comment.data
-        if form.state.data == RequestState.accepted:
-            self.definition.accept(self.request, form.data, session.user)
-        elif form.state.data == RequestState.rejected:
-            self.definition.reject(self.request, form.data, session.user)
-        flash('You have successfully processed this request. It is now {0}.'.format(self.request.state.title.lower()),
-              'info')
+        if action == 'accept' and self.request.state != RequestState.accepted:
+            self.definition.accept(self.request, self.manager_form.data, session.user)
+            flash('You have accepted this request.', 'info')
+        elif action == 'reject' and self.request.state != RequestState.rejected:
+            self.definition.reject(self.request, self.manager_form.data, session.user)
+            flash('You have rejected this request.', 'info')
         return redirect(url_for('.event_requests_details', self.request))
 
 
