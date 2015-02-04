@@ -1,0 +1,89 @@
+<h2 class="page-title">
+    {{ agreement.definition.title }}
+</h2>
+
+{% if agreement.accepted %}
+    <div class="success-message-box">
+        <div class="message-text">
+            Accepted on {{ agreement.signed_dt | format_datetime }}
+        </div>
+    </div>
+{% elif agreement.rejected %}
+    <div class="error-message-box">
+        <div class="message-text">
+            Rejected on {{ agreement.signed_dt | format_datetime }}
+        </div>
+    </div>
+{% endif %}
+
+<form method="POST">
+    <div class="agreement-form-sections">
+        <div class="i-box info-body">
+            <div class="info-section info-person">
+                <div>
+                    <i class="icon-user"></i>
+                </div>
+                <div class="info-person-text">
+                    <div class="info-person-name">
+                        {{ agreement.person_name }}
+                    </div>
+                    <div class="info-person-email">
+                        {{ agreement.person_email }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="titled-rule">
+                {% trans %}Event information{% endtrans %}
+            </div>
+            <div class="info-section info-event">
+                <div class="info-event-title">
+                    {{ agreement.event.getTitle() }}
+                </div>
+                <div class="info-event-details">
+                    <i class="icon-time"></i>
+                    {{ agreement.event.getStartDate() | format_datetime }}
+                </div>
+                <div class="info-event-details">
+                    <i class="icon-location"></i>
+                    {{ agreement.event.getLocation().getName() }}
+                </div>
+            </div>
+            {% block info_more %}{% endblock %}
+        </div>
+        <div class="i-box">
+            <div class="legal-body">
+                {% block legal_body %}{% endblock %}
+            </div>
+            {% if agreement.pending %}
+                <div class="i-box-footer">
+                    <div class="legal-confirmation">
+                        <div class="question">
+                            {% trans %}Do you agree with the stated above?{% endtrans %}
+                        </div>
+                        {{ form.agreed }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    {% if agreement.pending %}
+        <div class="action-box highlight">
+            <div class="text">
+                <div class="toolbar right">
+                    <button id="agreement-submit" class="i-button big highlight right" title="{% trans %}This is a binding contract and your decision can't be changed afterwards. In case of any problem, please contact the manager of the event.{% endtrans %}" disabled>
+                        {% trans %}Submit{% endtrans %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</form>
+
+<script type="text/javascript">
+    $(function() {
+        $('.agreement-form-sections input[type="radio"]').change(function(e) {
+            $('#agreement-submit').enable()
+        });
+    });
+</script>

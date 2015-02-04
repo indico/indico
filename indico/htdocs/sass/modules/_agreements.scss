@@ -18,28 +18,109 @@
 @import 'base';
 @import 'partials/boxes';
 
-.agreement-body {
+.agreement-form-sections {
     @extend .i-box-group;
     @extend .i-box-group.vert;
+    color: $black;
     margin-bottom: 1em;
-}
 
-.legal-body {
-    @extend %font-family-serif;
-    padding: 10px 10em;
-    text-align: justify;
-    text-indent: 2em;
-}
+    .info-body {
+        padding: 20px 10px;
 
-.legal-confirmation {
-    padding: 0 10em;
+        .info-section {
+            padding: 0 20px;
+        }
 
-    .question {
-        font-weight: bold;
-        margin-bottom: 1em;
+        .info-person {
+            > div {
+                display: inline-block;
+                vertical-align: top;
+            }
+
+            i {
+                color: $gray;
+                font-size: 2rem;
+                line-height: 0;
+                padding-right: 0.25em;
+            }
+
+            .info-person-text {
+                .info-person-name {
+                    font-size: 1.1em;
+                    font-weight: bold;
+                    padding-bottom: 0.05em;
+                }
+
+                .info-person-email {
+                    color: $dark-gray;
+                }
+            }
+        }
+
+        .info-event {
+            .info-event-title {
+                font-size: 1.1em;
+                font-weight: bold;
+                margin-bottom: 1em;
+                text-align: justify;
+            }
+
+            .info-event-details:not(:last-of-type) {
+                margin-bottom: 0.1em;
+            }
+
+            i {
+                padding-right: 0.2em;
+            }
+        }
+
+        .info-tabular {
+            border-spacing: 0;
+            width: 100%;
+
+            td {
+                padding-top: 0.25em;
+                padding-bottom: 0.25em;
+                vertical-align: middle;
+
+                &:first-child {
+                    font-weight: bold;
+                    padding-right: 0.5em;
+                    width: 1%;
+                    white-space: nowrap;
+                }
+            }
+        }
     }
 
-    .i-radio label {
-        font-weight: normal;
+    .legal-body {
+        @extend %font-family-serif;
+        padding: 10px 10em;
+        text-align: justify;
+        text-indent: 2em;
+
+        h3 {
+            color: inherit;
+            font-family: inherit;
+            font-size: 1.1em;
+            font-weight: inherit;
+            margin: 0 0 1.2em 0;
+            text-align: center;
+            text-indent: 0;
+            text-transform: uppercase;
+        }
+    }
+
+    .legal-confirmation {
+        padding: 0 10em;
+
+        .question {
+            font-weight: bold;
+            margin-bottom: 1em;
+        }
+
+        .i-radio label {
+            font-weight: normal;
+        }
     }
 }

@@ -33,7 +33,7 @@ class RHAgreementForm(RHConferenceBaseDisplay):
 
     def _process(self):
         form = AgreementForm()
-        if form.validate_on_submit() and not self.agreement.pending:
+        if form.validate_on_submit() and self.agreement.pending:
             if form.agreed.data:
                 self.agreement.accept()
             else:
