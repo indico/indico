@@ -3941,6 +3941,8 @@ div.timetableBlockTitle {
     font-weight: bold;
     font-size: 11px;
     padding: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 div.timetableBlockPresenters {
