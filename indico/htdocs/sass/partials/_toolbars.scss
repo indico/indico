@@ -143,11 +143,13 @@ $toolbar-thin-height: 1.9em;
     padding: 0 0.4em;
     margin-bottom: -2px;
 
-    &:first-child {
+    &:first-child,
+    &.right:last-child {
         padding-left: 0;
     }
 
-    &:last-child {
+    &:last-child,
+    &.right:first-child {
         padding-right: 0;
     }
 
