@@ -2681,6 +2681,7 @@ ul.listCompact {
     clear:both;
     padding: 10px 5px 5px 5px;
     font-size: 11px;
+    z-index: -9999;
 }
 
 .footer.footerCERN {
