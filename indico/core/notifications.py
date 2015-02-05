@@ -37,7 +37,12 @@ def email_sender(fn):
     return wrapper
 
 
-def make_email(to_list, cc_list=None, subject=None, body=None, from_address=None, attachments=None):
+def make_email(to_list, cc_list=None, from_address=None, attachments=None, subject=None, body=None, template=None):
+    if template is not None and (subject is not None or body is not None):
+        raise ValueError("Only subject/body or template can be passed")
+    if template:
+        subject = template.get_subject()
+        body = template.get_body()
     if cc_list is None:
         cc_list = []
     to_list = [to_list] if isinstance(to_list, basestring) else to_list
@@ -47,8 +52,8 @@ def make_email(to_list, cc_list=None, subject=None, body=None, from_address=None
     return {
         'toList': to_list,
         'ccList': cc_list,
-        'subject': subject,
-        'body': body,
         'fromAddr': from_address,
-        'attachments': attachments
+        'attachments': attachments,
+        'subject': subject,
+        'body': body
     }
