@@ -16,8 +16,9 @@
 
 from __future__ import unicode_literals
 
-from flask import request
+from flask import request, session
 
+from indico.core.errors import AccessError
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 from indico.modules.agreements.forms import AgreementForm
@@ -30,6 +31,17 @@ class RHAgreementForm(RHConferenceBaseDisplay):
         RHConferenceBaseDisplay._checkParams(self, params)
         uuid = request.view_args['uuid']
         self.agreement = Agreement.find_one(uuid=uuid)
+
+    def _checkSessionUser(self):
+        if session.user is None:
+            self._redirect(self._getLoginURL())
+        if self.agreement.user != session.user:
+            raise AccessError()
+
+    def _checkProtection(self):
+        RHConferenceBaseDisplay._checkProtection(self)
+        if self.agreement.user:
+            self._checkSessionUser()
 
     def _process(self):
         form = AgreementForm()
