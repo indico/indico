@@ -40,8 +40,8 @@ def email_sender(fn):
 def make_email(to_list, cc_list=None, subject=None, body=None, from_address=None, attachments=None):
     if cc_list is None:
         cc_list = []
-    to_list = [to_list] if isinstance(to_list, str) else to_list
-    cc_list = [cc_list] if isinstance(cc_list, str) else cc_list
+    to_list = [to_list] if isinstance(to_list, basestring) else to_list
+    cc_list = [cc_list] if isinstance(cc_list, basestring) else cc_list
     if not from_address:
         from_address = Config.getInstance().getNoReplyEmail()
     return {
