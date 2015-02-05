@@ -301,14 +301,15 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
 
 .i-form {
     @extend %font-family-form;
+    @include box-sizing(border-box);
     max-width: 800px;
     display: block;
     font-size: 1em;
     color: $light-black;
     margin-top: 1em;
 
-    *:not(.switch) {
-      @include box-sizing(border-box);
+    *, *:before, *:after {
+        @include box-sizing(inherit);
     }
 
     &.management-area {
