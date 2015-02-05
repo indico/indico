@@ -7,10 +7,9 @@
 
     <script>
         var ScriptRoot = {{ (indico_config.BaseURL + '/js/') | tojson }};
-        var TextRoot   = {{ (indico_config.BaseURL + '/js/indico/i18n/') | tojson }};
     </script>
 
-    <script src="{{ url_for('misc.JSContent-getVars') }}"></script>
+    <script src="{{ url_for('assets.js_vars_global') }}"></script>
 
     {% assets 'base_js' -%}
     <script src="{{ ASSET_URL }}"></script>
