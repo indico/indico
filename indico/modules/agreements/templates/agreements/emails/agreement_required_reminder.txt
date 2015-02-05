@@ -1,0 +1,2 @@
+{% extends 'agreements/emails/agreement_required_new.txt' %}
+{% block subject %}Agreement signature required - Reminder{% endblock %}

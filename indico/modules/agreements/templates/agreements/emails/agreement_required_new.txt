@@ -1,0 +1,19 @@
+{% extends 'emails/base.txt' %}
+{% block subject %}Agreement signature required{% endblock %}
+{% block footer_title %}Agreements{% endblock %}
+
+{% block header_recipient -%}
+    {%- if agreement.user -%}
+        {{ agreement.user.getName() }}
+    {%- else -%}
+        {{ agreement.person_name }}
+    {%- endif -%}
+{%- endblock %}
+
+{% block body -%}
+There is an agreement you are requested to sign for the event:
+{{agreement.event.getTitle()}}
+
+You can sign it in the following link:
+{{ url_for('agreements.agreement_form', agreement, _external=true) }}
+{%- endblock %}

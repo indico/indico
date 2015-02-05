@@ -133,6 +133,11 @@ class Agreement(db.Model):
         return ConferenceHolder().getById(str(self.event_id))
 
     @property
+    def locator(self):
+        return {'confId': self.event_id,
+                'uuid': self.uuid}
+
+    @property
     def user(self):
         if not self.user_id:
             return None

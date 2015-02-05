@@ -7,6 +7,7 @@
 
 {% endblock -%}
 {% block body -%}{%- endblock %}
+
 --
 Indico :: {% block footer_title %}Email Notifier{% endblock %}
 {% block footer_url %}{{ url_for('misc.index', _external=true) }}{% endblock %}
