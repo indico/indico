@@ -31,7 +31,7 @@ from indico.web.flask.app import make_app
 
 
 def main():
-    app = make_app()
+    app = make_app(set_path=True)
     migrate.init_app(app, db, os.path.join(app.root_path, '..', 'migrations'))
     manager = Manager(app, with_default_commands=False)
 
