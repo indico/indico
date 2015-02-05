@@ -34,7 +34,6 @@ from werkzeug.wsgi import DispatcherMiddleware, SharedDataMiddleware
 from indico.core.config import Config
 from indico.core.logger import Logger
 from indico.util import console
-from MaKaC.webinterface.rh.JSContent import RHGetVarsJs
 
 
 try:
