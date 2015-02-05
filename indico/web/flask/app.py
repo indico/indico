@@ -285,9 +285,9 @@ def make_app(set_path=False, db_setup=True, testing=False):
     app.config['TESTING'] = testing
     fix_root_path(app)
     configure_app(app, set_path)
-    setup_jinja(app)
 
     babel.init_app(app)
+    setup_jinja(app)
 
     with app.app_context():
         setup_assets()

@@ -77,7 +77,6 @@ def smart_func(func_name):
         Returns either a translated string or a lazy-translatable object,
         depending on whether there is a session language or not (respectively)
         """
-
         if (has_request_context() and session.lang) or func_name != 'ugettext':
             # straight translation
             return gettext_unicode(*args, func_name=func_name, **kwargs)
