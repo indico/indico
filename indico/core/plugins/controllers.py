@@ -21,7 +21,7 @@ from flask import request, flash
 from werkzeug.exceptions import NotFound
 
 
-from indico.core.plugins import plugin_engine
+from indico.core.plugins import plugin_engine, PluginCategory
 from indico.core.plugins.views import WPPlugins
 from indico.web.forms.base import FormDefaults
 from indico.web.flask.util import url_for, redirect_or_jsonify
@@ -46,7 +46,7 @@ class RHPlugins(RHAdminBase):
             categories[category].sort(key=attrgetter('configurable', 'title'))
         ordered_categories = OrderedDict(sorted(categories.items()))
         if other:
-            ordered_categories['other'] = other
+            ordered_categories[PluginCategory.other] = other
         return WPPlugins.render_template('index.html', categorized_plugins=ordered_categories)
 
 
