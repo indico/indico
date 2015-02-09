@@ -42,12 +42,20 @@ class PrincipalWidget(object):
 
 class JinjaWidget(object):
     """Renders a field using a custom Jinja template"""
-    def __init__(self, template, render_func=render_template):
+    def __init__(self, template, plugin=None):
         self.template = template
-        self.render_func = render_func
+        self.plugin = plugin
 
     def __call__(self, field, **kwargs):
-        return HTMLString(self.render_func(self.template, field=field, **kwargs))
+        if self.plugin:
+            plugin = self.plugin
+            if hasattr(plugin, 'name'):
+                plugin = plugin.name
+            template = '{}:{}'.format(plugin, self.template)
+        else:
+            template = self.template
+
+        return HTMLString(render_template(template, field=field, **kwargs))
 
 
 class CKEditorWidget(JinjaWidget):
