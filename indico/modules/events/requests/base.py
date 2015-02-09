@@ -17,10 +17,10 @@
 from __future__ import unicode_literals
 
 from flask import render_template
+from flask_pluginengine import plugin_context
 from wtforms.fields import TextAreaField, SubmitField
 
 from indico.core.db import db
-from indico.core.plugins import plugin_context
 from indico.modules.events.requests.models.requests import RequestState
 from indico.modules.events.requests.notifications import (notify_new_modified_request, notify_withdrawn_request,
                                                           notify_accepted_request, notify_rejected_request)

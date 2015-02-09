@@ -16,9 +16,10 @@
 
 from __future__ import unicode_literals
 
+from flask_pluginengine import plugin_context
+
 from indico.core.config import Config
 from indico.core.notifications import email_sender, make_email
-from indico.core.plugins import plugin_context
 from indico.web.flask.templating import get_template_module, get_overridable_template_name
 
 
