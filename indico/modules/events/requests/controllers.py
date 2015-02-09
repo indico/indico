@@ -83,7 +83,7 @@ class RHRequestsEventRequestDetailsBase(EventOrRequestManagerMixin, RHRequestsEv
 
     def _process(self):
         is_manager = self.definition.can_be_managed(session.user)
-        self.form = self.definition.create_form(self.request)
+        self.form = self.definition.create_form(self.event, self.request)
         self.manager_form = None
         if self.request and is_manager:
             self.manager_form = self.definition.create_manager_form(self.request)

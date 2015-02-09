@@ -30,6 +30,12 @@ from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults, IndicoForm
 
 
+class RequestFormBase(IndicoForm):
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(RequestFormBase, self).__init__(*args, **kwargs)
+
+
 class RequestManagerForm(IndicoForm):
     comment = TextAreaField(_('Comment'),
                             description=_('The comment will be shown only if the request is accepted or rejected.'))
@@ -62,15 +68,16 @@ class RequestDefinitionBase(object):
         return render_template(tpl, **kwargs)
 
     @classmethod
-    def create_form(cls, existing_request=None):
+    def create_form(cls, event, existing_request=None):
         """Creates the request form
 
+        :param event: the event the request is for
         :param existing_request: the :class:`Request` if there's an existing request of this type
         :return: an instance of an :class:`IndicoForm` subclass
         """
         defaults = FormDefaults(existing_request.data if existing_request else None)
         with plugin_context(cls.plugin):
-            return cls.form(prefix='request-', obj=defaults)
+            return cls.form(prefix='request-', obj=defaults, event=event)
 
     @classmethod
     def create_manager_form(cls, req):

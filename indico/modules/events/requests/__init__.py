@@ -18,10 +18,10 @@ from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.modules.events.requests.util import get_request_definitions
-from indico.modules.events.requests.base import RequestDefinitionBase
+from indico.modules.events.requests.base import RequestDefinitionBase, RequestFormBase
 
 
-__all__ = ('RequestDefinitionBase',)
+__all__ = ('RequestDefinitionBase', 'RequestFormBase')
 
 
 @signals.app_created.connect
