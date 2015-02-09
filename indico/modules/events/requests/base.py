@@ -59,8 +59,7 @@ class RequestDefinitionBase(object):
         """
 
         tpl = get_overridable_template_name('event_request_details.html', cls.plugin, 'events/requests/')
-        with plugin_context(cls.plugin):
-            return render_template(tpl, **kwargs)
+        return render_template(tpl, **kwargs)
 
     @classmethod
     def create_form(cls, existing_request=None):
