@@ -110,7 +110,6 @@ class RequestDefinitionBase(object):
         :param req: the :class:`Request` of the request
         :param data: the form data from the request form
         """
-        req.state = RequestState.pending
         req.data = data
         is_new = req.id is None
         if is_new:
