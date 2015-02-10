@@ -18,10 +18,15 @@ from __future__ import unicode_literals
 
 from indico.web.flask.wrappers import IndicoBlueprint
 
-from indico.modules.agreements.controllers import RHAgreementForm
+from indico.modules.agreements.controllers import RHAgreementForm, RHAgreementManager, RHAgreementManagerDetails
 
 agreements_blueprint = _bp = IndicoBlueprint('agreements', __name__, template_folder='templates')
 
+
+# Event management
+_bp.add_url_rule('/event/<confId>/manage/agreements/', 'event_agreements', RHAgreementManager)
+_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>',
+                 'event_agreements_details', RHAgreementManagerDetails)
 
 # Event
 _bp.add_url_rule('/event/<confId>/agreement/<uuid>', 'agreement_form', RHAgreementForm, methods=('GET', 'POST'))

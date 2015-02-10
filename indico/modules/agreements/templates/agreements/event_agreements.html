@@ -1,0 +1,19 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}
+    {% trans %}Agreements{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="i-badges-list-left">
+        {% for definition in definitions %}
+            <a class="i-badge" href="{{ url_for('agreements.event_agreements_details', event, definition=definition.name) }}">
+                <div class="i-badge-content">
+                    {{ definition.title }}
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+

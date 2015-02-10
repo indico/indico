@@ -18,15 +18,19 @@ from __future__ import unicode_literals
 
 from flask import request, session
 
-from indico.core.errors import AccessError
+from indico.core.errors import AccessError, NotFoundError
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 from indico.modules.agreements.forms import AgreementForm
 from indico.modules.agreements.models.agreements import Agreement
-from indico.modules.agreements.views import WPAgreementForm
+from indico.modules.agreements.views import WPAgreementForm, WPAgreementManager
+from indico.modules.agreements.util import get_agreement_definitions
 
 
 class RHAgreementForm(RHConferenceBaseDisplay):
+    """Agreement form page"""
+
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
         uuid = request.view_args['uuid']
@@ -52,3 +56,27 @@ class RHAgreementForm(RHConferenceBaseDisplay):
                 self.agreement.reject()
         html = self.agreement.render(form)
         return WPAgreementForm.render_string(html, self._conf)
+
+
+class RHAgreementManager(RHConferenceModifBase):
+    """Agreement manager page (admin)"""
+
+    def _process(self):
+        definitions = get_agreement_definitions().values()
+        return WPAgreementManager.render_template('agreements/event_agreements.html', self._conf,
+                                                  event=self._conf, definitions=definitions)
+
+
+class RHAgreementManagerDetails(RHConferenceModifBase):
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        definition_name = request.view_args['definition']
+        self.definition = get_agreement_definitions().get(definition_name)
+        if self.definition is None:
+            raise NotFoundError("Agreement definition '{}' does not exist".format(definition_name))
+
+    def _process(self):
+        event = self._conf
+        agreements = Agreement.find_all(event_id=event.getId(), type=self.definition.name)
+        return WPAgreementManager.render_template('agreements/event_agreements_details.html', event,
+                                                  event=event, definition=self.definition, agreements=agreements)

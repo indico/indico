@@ -17,13 +17,20 @@
 from __future__ import unicode_literals
 
 from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
+from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
 
 
 class WPAgreementForm(WPConferenceDefaultDisplayBase, WPJinjaMixin):
-
     def getCSSFiles(self):
         return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['agreements_sass'].urls()
 
     def _getBody(self, params):
         return self._getPageContent(params)
+
+
+class WPAgreementManager(WPJinjaMixin, WPConferenceModifBase):
+    def getCSSFiles(self):
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['agreements_sass'].urls()
+
+    def _setActiveSideMenuItem(self):
+        self._agreementsMenuItem.setActive()
