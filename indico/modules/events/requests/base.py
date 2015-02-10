@@ -33,6 +33,7 @@ from indico.web.forms.base import FormDefaults, IndicoForm
 class RequestFormBase(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
+        self.request = kwargs.pop('request')
         super(RequestFormBase, self).__init__(*args, **kwargs)
 
 
@@ -79,7 +80,7 @@ class RequestDefinitionBase(object):
         """
         defaults = FormDefaults(existing_request.data if existing_request else cls.form_defaults)
         with plugin_context(cls.plugin):
-            return cls.form(prefix='request-', obj=defaults, event=event)
+            return cls.form(prefix='request-', obj=defaults, event=event, request=existing_request)
 
     @classmethod
     def create_manager_form(cls, req):
