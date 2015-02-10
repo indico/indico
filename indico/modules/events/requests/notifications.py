@@ -20,7 +20,6 @@ from flask_pluginengine import plugin_context
 
 from indico.core.config import Config
 from indico.core.notifications import email_sender, make_email
-from indico.web.flask.templating import get_template_module, get_overridable_template_name
 
 
 def _get_event_manager_emails(event):
@@ -43,8 +42,7 @@ def _get_template_module(name, req, **context):
     :param context: data passed to the template
     """
     context['req'] = req
-    tpl = get_overridable_template_name(name, req.definition.plugin, 'events/requests/emails/', 'emails/')
-    return get_template_module(tpl, **context)
+    return req.definition.get_notification_template(name, **context)
 
 
 def _notify_managers(req, event_manager_tpl, request_manager_tpl, **context):

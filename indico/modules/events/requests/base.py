@@ -26,7 +26,7 @@ from indico.modules.events.requests.notifications import (notify_new_modified_re
                                                           notify_accepted_request, notify_rejected_request)
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from indico.web.flask.templating import get_overridable_template_name
+from indico.web.flask.templating import get_overridable_template_name, get_template_module
 from indico.web.forms.base import FormDefaults, IndicoForm
 
 
@@ -67,7 +67,6 @@ class RequestDefinitionBase(object):
 
         :param kwargs: arguments passed to the template
         """
-
         tpl = get_overridable_template_name('event_request_details.html', cls.plugin, 'events/requests/')
         return render_template(tpl, **kwargs)
 
@@ -93,6 +92,17 @@ class RequestDefinitionBase(object):
         defaults = FormDefaults(req)
         with plugin_context(cls.plugin):
             return cls.manager_form(prefix='request-manage-', obj=defaults)
+
+    @classmethod
+    def get_notification_template(cls, name, **context):
+        """Gets the template module for a notification email
+
+        :param name: the template name
+        :param context: data passed to the template
+
+        """
+        tpl = get_overridable_template_name(name, cls.plugin, 'events/requests/emails/', 'emails/')
+        return get_template_module(tpl, **context)
 
     @classmethod
     def can_be_managed(cls, user):
