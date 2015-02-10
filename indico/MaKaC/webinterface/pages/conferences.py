@@ -80,6 +80,7 @@ from MaKaC.webinterface.general import WebFactory
 from MaKaC.common.TemplateExec import render
 
 from indico.core import signals
+from indico.modules.agreements.util import get_agreement_definitions
 from indico.util import json
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
@@ -1473,6 +1474,9 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         self._requestsMenuItem = wcomponents.SideMenuItem(_("Services"),
                                                           url_for('requests.event_requests', self._conf))
         self._generalSection.addItem(self._requestsMenuItem)
+        self._agreementsMenuItem = wcomponents.SideMenuItem(_("Agreements"),
+                                                            url_for('agreements.event_agreements', self._conf))
+        self._generalSection.addItem(self._agreementsMenuItem)
 
         self._pluginsDictMenuItem = {}
         self._notify('fillManagementSideMenu', self._pluginsDictMenuItem)
@@ -1574,6 +1578,8 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
 
         if not get_request_definitions():
             self._requestsMenuItem.setVisible(False)
+        if not get_agreement_definitions():
+            self._agreementsMenuItem.setVisible(False)
 
         wf = self._rh.getWebFactory()
         if wf:
