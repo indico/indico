@@ -98,17 +98,19 @@
                 {{ form_row_static(_('Processed at'), req.processed_dt | format_datetime) }}
             {% endif %}
             {% block manager_form %}
-                {{ form_rows(manager_form, skip=('action_accept', 'action_reject')) }}
+                {{ form_rows(manager_form, skip=('action_accept', 'action_reject', 'action_save')) }}
             {% endblock %}
         {% endcall %}
         {% call form_footer() %}
+            {% if req.state.name in ('accepted', 'rejected') %}
+                {{ manager_form.action_save(class_='i-button big') }}
+            {% endif %}
             {% if manager_form.action_accept %}
                 {{ manager_form.action_accept(class_='i-button big accept') }}
             {% endif %}
             {% if manager_form.action_reject %}
                 {{ manager_form.action_reject(class_='i-button big danger') }}
             {% endif %}
-            <a href="{{ url_for('.event_requests', event) }}" class="i-button big">{% trans %}Back{% endtrans %}</a>
         {% endcall %}
     {% endif %}
 

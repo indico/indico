@@ -87,6 +87,8 @@ class RHRequestsEventRequestDetailsBase(EventOrRequestManagerMixin, RHRequestsEv
         self.manager_form = None
         if self.request and is_manager:
             self.manager_form = self.definition.create_manager_form(self.request)
+            if self.request.state not in {RequestState.accepted, RequestState.rejected}:
+                del self.manager_form.action_save
             if self.request.state == RequestState.accepted:
                 del self.manager_form.action_accept
             if self.request.state == RequestState.rejected:
@@ -149,15 +151,19 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
             action = 'accept'
         elif 'action_reject' in form and form.action_reject.data:
             action = 'reject'
+        elif 'action_save' in form and form.action_save.data:
+            action = 'save'
         else:
             raise ValueError('No action provided')
-        self.request.comment = form.comment.data
-        if action == 'accept' and self.request.state != RequestState.accepted:
+        if action == 'accept':
             self.definition.accept(self.request, self.manager_form.data, session.user)
-            flash('You have accepted this request.', 'info')
-        elif action == 'reject' and self.request.state != RequestState.rejected:
+            flash(_('You have accepted this request.'), 'info')
+        elif action == 'reject':
             self.definition.reject(self.request, self.manager_form.data, session.user)
-            flash('You have rejected this request.', 'info')
+            flash(_('You have rejected this request.'), 'info')
+        elif action == 'save':
+            self.definition.manager_save(self.request, self.manager_form.data)
+            flash(_("You have updated the request (only management-specific data)."), 'info')
         return redirect(url_for('.event_requests_details', self.request))
 
 

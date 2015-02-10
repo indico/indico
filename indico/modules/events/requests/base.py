@@ -40,6 +40,7 @@ class RequestFormBase(IndicoForm):
 class RequestManagerForm(IndicoForm):
     comment = TextAreaField(_('Comment'),
                             description=_('The comment will be shown only if the request is accepted or rejected.'))
+    action_save = SubmitField(_('Save'))
     action_accept = SubmitField(_('Accept'))
     action_reject = SubmitField(_('Reject'))
 
@@ -140,10 +141,14 @@ class RequestDefinitionBase(object):
     def accept(cls, req, data, user):
         """Accepts the request
 
+        To ensure that additional data is saved, this method should
+        call :method:`manager_save`.
+
         :param req: the :class:`Request` of the request
         :param data: the form data from the management form
         :param user: the user processing the request
         """
+        cls.manager_save(req, data)
         req.state = RequestState.accepted
         req.processed_by_user = user
         req.processed_dt = now_utc()
@@ -153,11 +158,28 @@ class RequestDefinitionBase(object):
     def reject(cls, req, data, user):
         """Rejects the request
 
+        To ensure that additional data is saved, this method should
+        call :method:`manager_save`.
+
         :param req: the :class:`Request` of the request
         :param data: the form data from the management form
         :param user: the user processing the request
         """
-        req.state = RequestState.accepted
+        cls.manager_save(req, data)
+        req.state = RequestState.rejected
         req.processed_by_user = user
         req.processed_dt = now_utc()
         notify_rejected_request(req)
+
+    @classmethod
+    def manager_save(cls, req, data):
+        """Saves management-specific data
+
+        This method is called when the management form is submitted without
+        accepting/rejecting the request (which is guaranteed to be already
+        accepted or rejected).
+
+        :param req: the :class:`Request` of the request
+        :param data: the form data from the management form
+        """
+        req.comment = data['comment']
