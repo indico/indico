@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from collections import namedtuple
 from uuid import uuid4
 
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -26,6 +27,9 @@ from indico.util.date_time import now_utc
 from indico.util.struct.enum import IndicoEnum
 
 from indico.modules.agreements.util import get_agreement_definitions
+
+
+AgreementPersonInfo = namedtuple('Person', ['name', 'email'])
 
 
 class AgreementState(int, IndicoEnum):

@@ -17,6 +17,7 @@
 from flask import render_template
 
 from indico.core.plugins import plugin_context
+from indico.modules.agreements.models.agreements import Agreement
 
 
 class AgreementDefinitionBase(object):
@@ -58,5 +59,12 @@ class AgreementDefinitionBase(object):
 
     @classmethod
     def get_people(cls, event):
-        """Return the list of people who should receive the agreement"""
+        """Returns a list of :class:`AgreementPersonInfo` required to sign"""
         raise NotImplementedError  # pragma: no cover
+
+    @classmethod
+    def get_people_not_notified(cls, event):
+        """Returns a list of :class:`AgreementPersonInfo` yet to be notified"""
+        people = cls.get_people(event)
+        sent_agreement_emails = [a.person_email for a in Agreement.find(event_id=event.getId(), type=cls.name)]
+        return [person for person in people if person.email not in sent_agreement_emails]
