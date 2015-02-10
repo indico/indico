@@ -56,6 +56,8 @@ class RequestDefinitionBase(object):
     form = None
     #: the :class:`IndicoForm` to use for the request manager form
     manager_form = RequestManagerForm
+    #: default values to use if there's no existing request
+    form_defaults = {}
 
     @classmethod
     def render_form(cls, **kwargs):
@@ -75,7 +77,7 @@ class RequestDefinitionBase(object):
         :param existing_request: the :class:`Request` if there's an existing request of this type
         :return: an instance of an :class:`IndicoForm` subclass
         """
-        defaults = FormDefaults(existing_request.data if existing_request else None)
+        defaults = FormDefaults(existing_request.data if existing_request else cls.form_defaults)
         with plugin_context(cls.plugin):
             return cls.form(prefix='request-', obj=defaults, event=event)
 
