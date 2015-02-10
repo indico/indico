@@ -144,7 +144,7 @@ class Request(db.Model):
     @return_ascii
     def __repr__(self):
         state = self.state.name if self.state is not None else None
-        return '<Request({}, {}, {})>'.format(self.id, self.event_id, state)
+        return '<Request({}, {}, {}, {})>'.format(self.id, self.event_id, self.type, state)
 
     @classmethod
     def find_latest_for_event(cls, event, type_=None):
