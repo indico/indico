@@ -38,8 +38,8 @@ class AgreementDefinitionBase(object):
             return render_template(core_tpl, agreement=agreement, form=form, **kwargs)
         else:
             with plugin_context(cls.plugin):
-                render_template((plugin_tpl.format(cls.plugin.name), core_tpl),
-                                agreement=agreement, form=form, **kwargs)
+                return render_template((plugin_tpl.format(cls.plugin.name), core_tpl),
+                                       agreement=agreement, form=form, **kwargs)
 
     @classmethod
     def handle_accepted(cls, agreement):
