@@ -47,6 +47,33 @@
     justify-content: flex-start;
 }
 
+.i-badges-list-hover {
+    @extend %badges-list;
+
+    & > .i-badge {
+        @include transition(background-color $default-transition-duration $default-transition-function);
+
+        width: 10em;
+        height: 10em;
+
+        &:not(.i-badge-disabled):hover {
+            background-color: darken($light-gray, 2*$light-color-variation);
+        }
+
+        & > .i-badge-content {
+            height: 7em;
+
+            &:first-child {
+               height: 8.8em;
+            }
+
+            & > .i-badge-title { font-size: 1em; }
+
+            & .i-badge-img > img { max-height: 4em; }
+        }
+    }
+}
+
 %i-badge-elem {
     position: relative;
     display: block;

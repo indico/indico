@@ -18,14 +18,6 @@
 
 .i-payments-list {
     & > .i-badge {
-        @include transition(background-color $default-transition-duration $default-transition-function);
-
-        width: 10em;
-        height: 10em;
-
-        &:not(.i-badge-disabled):hover {
-            background-color: darken($light-gray, 2*$light-color-variation);
-        }
 
         &.i-payment-enabled {
             background-color: $light-green;
@@ -57,14 +49,6 @@
 
                 &> .i-payment-status-enabled { display: none; }
             }
-        }
-
-        & > .i-badge-content {
-            height: 7em;
-
-            & > .i-badge-title { font-size: 1em; }
-
-            & .i-badge-img > img { max-height: 4em; }
         }
     }
 }
