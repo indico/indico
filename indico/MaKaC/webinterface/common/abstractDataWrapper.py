@@ -305,6 +305,7 @@ class AbstractParam:
             display_values = True
 
         self._abstractData = AbstractData(conf.getAbstractMgr(), params, headerSize, displayValues=display_values)
+        self._doNotSanitizeFields = self._abstractData.getFieldNames() + ['title']
 
         if "validate" in params:
             self._action = "VALIDATE"
