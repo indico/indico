@@ -69,13 +69,14 @@ from indico.web.flask.blueprints.rooms_admin import rooms_admin
 from indico.core.plugins.blueprints import plugins_blueprint
 from indico.modules.events.agreements.blueprint import agreements_blueprint
 from indico.modules.payment.blueprint import payment_blueprint
+from indico.modules.vc.blueprint import vc_blueprint
 from indico.modules.events.registration.blueprint import event_registration_blueprint
 from indico.modules.events.requests.blueprint import requests_blueprint
 
 
 BLUEPRINTS = (legacy, api, misc, user, oauth, rooms, category, category_mgmt, event_display,
               event_creation, event_mgmt, files, admin, rooms_admin, plugins_blueprint, payment_blueprint,
-              event_registration_blueprint, requests_blueprint, agreements_blueprint)
+              event_registration_blueprint, requests_blueprint, agreements_blueprint, vc_blueprint)
 COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, user, oauth, rooms, category, category_mgmt, event_display,
                                                 event_creation, event_mgmt, files, admin, rooms_admin))
 
@@ -167,6 +168,8 @@ def setup_jinja(app):
 
 
 ASSETS_REGISTERED = False
+
+
 def setup_assets():
     global ASSETS_REGISTERED
     if ASSETS_REGISTERED:

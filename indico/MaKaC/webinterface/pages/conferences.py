@@ -1446,6 +1446,8 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         self._agreementsMenuItem = wcomponents.SideMenuItem(_("Agreements"),
                                                             url_for('agreements.event_agreements', self._conf))
         self._generalSection.addItem(self._agreementsMenuItem)
+        self._vcMenuItem = wcomponents.SideMenuItem(_("Video conference"), url_for('vc.manage_vc_rooms', self._conf))
+        self._generalSection.addItem(self._vcMenuItem)
 
         self._pluginsDictMenuItem = {}
         self._notify('fillManagementSideMenu', self._pluginsDictMenuItem)
@@ -1515,6 +1517,7 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
             self._logMenuItem.setVisible(False)
             self._evaluationMenuItem.setVisible(False)
             self._requestsMenuItem.setVisible(is_request_manager(session.user))
+            self._videoconferenceMenuItem.setVisible(False)
 
         if not (Config.getInstance().getIsRoomBookingActive() and canModify):
             self._roomBookingMenuItem.setVisible(False)

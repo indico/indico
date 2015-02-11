@@ -1,0 +1,69 @@
+{% from 'forms/form_widget.html' import form_header, form_row, form_footer  %}
+
+<div class="plugin-chat chat-mgmt" id="chat-info-container">
+    <div class="groupTitle">{% trans %}Current video rooms{% endtrans %}</div>
+    {% if event_vc_rooms %}
+        <table class="i-table-widget fixed-width">
+            <thead>
+                 <tr>
+                    <th class="small-column"></th>
+                    <th>{% trans %}Type{% endtrans %}</th>
+                    <th>{% trans %}Name{% endtrans %}</th>
+                    <th class="col-50">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event_vc_room in event_vc_rooms %}
+                    {% set vc_room = event_vc_room.vc_room %}
+                    <tr>
+                        <td><a href="#" class="icon-next toggle-details" title="Click to toggle collapse status"></a></td>
+                        <td>{{ vc_room.type }}</td>
+                        <td>{{ vc_room.name }}</td>
+                        <td>
+                            <div class="toolbar">
+                                <div class="group">
+                                    <!-- if it hasCheckStatus -->
+                                    <a class="i-button icon-refresh js-booking-refresh" title="{% trans %}Check Booking Status{% endtrans %}"></a>
+                                    <a href="{{ url_for('.manage_vc_rooms_modify', event_vc_room, service=vc_room.type) }}" class="i-button icon-edit js-booking-edit" title="{% trans %}Edit{% endtrans %}"></a>
+                                    <a class="i-button icon-remove js-booking-remove" title="{% trans %}Delete{% endtrans %}"></a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="details-row" colspan="6">
+                            <dl class="details-container">
+                            <!-- TODO: Each plugin should define it's own template in displaying
+                            the information of the "data" column -->
+                                {% for key, value in vc_room.data.items() %}
+                                    <dt>{{ key }}</dt>
+                                    <dd>{{ value }}</dd>
+                                {% endfor %}
+                            </dl>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="info-message-box fixed-width">
+            <div class="message-text">{% trans %}No video conference rooms have been added yet.{% endtrans %}</div>
+        </div>
+    {% endif %}
+    <a class="i-button bottom i-form-button icon-plus js-create-room" href="{{ url_for_plugin('.manage_vc_rooms_select', event) }}">{% trans %}Create new room{% endtrans %}</a>
+</div>
+<script>
+    $('.toggle-details').on('click', function(e) {
+        e.preventDefault();
+        var toggler = $(this);
+        toggler.closest('tr').next('tr').find('.details-container').slideToggle({
+            start: function() {
+                toggler.toggleClass('icon-next icon-expand');
+            }
+        });
+    });
+
+    $('.js-create-room').ajaxDialog({
+        title: $T('Video services')
+    });
+</script>
