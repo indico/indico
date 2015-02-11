@@ -126,8 +126,7 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
             flash_msg = _("Your request ({0}) has been sent. "
                           "You will be notified by e-mail once it has been accepted or rejected.")
         else:
-            flash_msg = _("Your request ({0}) has been modified. "
-                          "You will be notified by e-mail once it has been accepted or rejected.")
+            flash_msg = _("Your request ({0}) has been modified.")
         flash(flash_msg.format(self.definition.title), 'success')
         return redirect(url_for('.event_requests', self.event))
 
