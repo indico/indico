@@ -114,10 +114,11 @@ class RequestHandlerBase(OldObservable):
         """
         Reconstructs the request URL
         """
+        query_string = ('?' + request.query_string) if request.query_string else ''
         if secure:
-            return urljoin(Config.getInstance().getBaseSecureURL(), request.path)
+            return urljoin(Config.getInstance().getBaseSecureURL(), request.path) + query_string
         else:
-            return request.url
+            return request.url + query_string
 
     def use_https(self):
         """
