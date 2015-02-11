@@ -18,11 +18,13 @@ import functools
 import re
 
 from flask import current_app as app
+from jinja2 import environmentfilter
 from jinja2.ext import Extension
+from jinja2.filters import make_attrgetter
 from jinja2.lexer import Token
 from markupsafe import Markup
 
-from indico.util.string import render_markdown
+from indico.util.string import render_markdown, natural_sort_key
 
 
 indentation_re = re.compile(r'^ +', re.MULTILINE)
@@ -39,6 +41,50 @@ def markdown(value):
 def dedent(value):
     """Removes leading whitespace from each line"""
     return indentation_re.sub('', value)
+
+
+@environmentfilter
+def natsort(environment, value, reverse=False, case_sensitive=False, attribute=None):
+    """Sort an iterable in natural order.  Per default it sorts ascending,
+    if you pass it true as first argument it will reverse the sorting.
+
+    If the iterable is made of strings the third parameter can be used to
+    control the case sensitiveness of the comparison which is disabled by
+    default.
+
+    Based on Jinja2's `sort` filter.
+    """
+    if not case_sensitive:
+        def sort_func(item):
+            if isinstance(item, basestring):
+                item = item.lower()
+            return natural_sort_key(item)
+    else:
+        sort_func = natural_sort_key
+
+    if attribute is not None:
+        getter = make_attrgetter(environment, attribute)
+
+        def sort_func(item, processor=sort_func or (lambda x: x)):
+            return processor(getter(item))
+
+    return sorted(value, key=sort_func, reverse=reverse)
+
+
+def get_overridable_template_name(name, plugin, core_prefix='', plugin_prefix=''):
+    """Returns template names for templates that may be overridden in a plugin.
+
+    :param name: the name of the template
+    :param plugin: the :class:`IndicoPlugin` that may override it (can be none)
+    :param core_prefix: the path prefix of the template in the core
+    :param plugin_prefix: the path prefix of the template in the plugin
+    :return: template name or list of template names
+    """
+    core_tpl = core_prefix + name
+    if plugin is None:
+        return core_tpl
+    else:
+        return ['{}:{}{}'.format(plugin.name, plugin_prefix, name), core_tpl]
 
 
 def get_template_module(template_name_or_list, **context):
