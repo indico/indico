@@ -18,6 +18,7 @@ from flask import render_template
 
 from indico.core.plugins import plugin_context
 from indico.modules.agreements.models.agreements import Agreement
+from indico.util.decorators import classproperty
 
 
 class AgreementDefinitionBase(object):
@@ -29,6 +30,11 @@ class AgreementDefinitionBase(object):
     title = None
     #: plugin containing this agreement definition - assigned automatically
     plugin = None
+
+    @classproperty
+    @classmethod
+    def locator(cls):
+        return {'definition': cls.name}
 
     @classmethod
     def render_form(cls, agreement, form, **kwargs):

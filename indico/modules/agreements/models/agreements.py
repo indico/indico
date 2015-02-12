@@ -140,6 +140,7 @@ class Agreement(db.Model):
 
     @property
     def definition(self):
+        from indico.modules.agreements.util import get_agreement_definitions
         return get_agreement_definitions().get(self.type)
 
     @property
@@ -174,7 +175,7 @@ class Agreement(db.Model):
     @staticmethod
     def create_from_data(event_id, type, user=None, email=None, name=None):
         if user is None and (email is None or name is None):
-            raise ValueError('')
+            raise ValueError("Either an Indico user or email/name can be passed")
         agreement = Agreement(event_id=event_id, type=type, state=AgreementState.pending, uuid=uuid4().hex)
         if user:
             agreement.user = user

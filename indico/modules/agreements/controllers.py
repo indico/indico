@@ -16,16 +16,17 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session
+from flask import redirect, request, session
 
 from indico.core.errors import AccessError, NotFoundError
+from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 from indico.modules.agreements.forms import AgreementForm
 from indico.modules.agreements.models.agreements import Agreement
 from indico.modules.agreements.views import WPAgreementForm, WPAgreementManager
-from indico.modules.agreements.util import get_agreement_definitions
+from indico.modules.agreements.util import get_agreement_definitions, send_new_agreements
 
 
 class RHAgreementForm(RHConferenceBaseDisplay):
@@ -80,3 +81,11 @@ class RHAgreementManagerDetails(RHConferenceModifBase):
         agreements = Agreement.find_all(event_id=event.getId(), type=self.definition.name)
         return WPAgreementManager.render_template('agreements/event_agreements_details.html', event,
                                                   event=event, definition=self.definition, agreements=agreements)
+
+
+class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetails):
+    def _process(self):
+        event = self._conf
+        people = self.definition.get_people_not_notified(event)
+        send_new_agreements(event=event, name=self.definition.name, people=people)
+        return redirect(url_for('.event_agreements_details', event, self.definition))

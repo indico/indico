@@ -17,8 +17,31 @@
 from __future__ import unicode_literals
 
 from indico.core import signals
+from indico.core.db import db
 from indico.util.signals import named_objects_from_signal
+
+from indico.modules.agreements.models.agreements import Agreement
+from indico.modules.agreements.notifications import notify_agreement_required_new
 
 
 def get_agreement_definitions():
     return named_objects_from_signal(signals.agreements.get_definitions.send(), plugin_attr='plugin')
+
+
+def send_new_agreements(event, name, people):
+    """Creates and send agreements for a list of people on a given event.
+
+    :param event: The `Conference` associated with the agreement
+    :param name: The agreement type matcing a :class:`AgreementDefinition` name
+    :param people: The list of people for whom agreements will be created
+    """
+    agreements = []
+    for person in people:
+        person_info = {'user': person.user} if person.user else {'name': person.name, 'email': person.email}
+        agreement = Agreement.create_from_data(event_id=event.getId(), type=name, **person_info)
+        db.session.add(agreement)
+        agreements.append(agreement)
+    db.session.flush()
+    for agreement in agreements:
+        notify_agreement_required_new(agreement)
+    return agreements
