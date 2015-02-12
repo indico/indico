@@ -52,6 +52,7 @@ else:
                             <a href="${ webcastURL }">${ _("Webcast Service") }</a>.
                         </div>
                     % endif
+                    ${ plugin_hook('conference-header-subtitle', event=conf) }
                 </div>
             </div>
         </div>
