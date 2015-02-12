@@ -21,6 +21,7 @@ from email.mime.text import MIMEText
 from email import charset
 
 from indico.core.config import Config
+from indico.util.string import to_unicode
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
 
@@ -72,7 +73,7 @@ class GenericMailer:
             bccList = []
 
         msg = MIMEMultipart()
-        msg["Subject"] = notification.getSubject()
+        msg["Subject"] = to_unicode(notification.getSubject())
         msg["From"] = fromAddr
         # Filter out empty strings from the lists before join
         msg["To"] = ', '.join(filter(None, toList))
