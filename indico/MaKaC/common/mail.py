@@ -65,8 +65,8 @@ class GenericMailer:
     @staticmethod
     def _prepare(notification):
         fromAddr = notification.getFromAddr()
-        toList = notification.getToList()
-        ccList = notification.getCCList()
+        toList = filter(None, notification.getToList())
+        ccList = filter(None, notification.getCCList())
         if hasattr(notification, "getBCCList"):
             bccList = notification.getBCCList()
         else:
@@ -75,16 +75,17 @@ class GenericMailer:
         msg = MIMEMultipart()
         msg["Subject"] = to_unicode(notification.getSubject())
         msg["From"] = fromAddr
-        # Filter out empty strings from the lists before join
-        msg["To"] = ', '.join(filter(None, toList))
-        msg["Cc"] = ', '.join(filter(None, ccList))
+        if toList:
+            msg["To"] = ', '.join(toList)
+        if ccList:
+            msg["Cc"] = ', '.join(ccList)
 
         if not (msg["To"] or msg["Cc"]):
             return
 
         try:
             ct = notification.getContentType()
-        except:
+        except Exception:
             ct = "text/plain"
 
         body = notification.getBody()
