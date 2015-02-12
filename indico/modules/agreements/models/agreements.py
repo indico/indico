@@ -26,10 +26,21 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.struct.enum import IndicoEnum
 
-from indico.modules.agreements.util import get_agreement_definitions
 
+class AgreementPersonInfo(namedtuple('Person', ('name', 'email', 'user'))):
+    __slots__ = ()
 
-AgreementPersonInfo = namedtuple('Person', ['name', 'email'])
+    def __new__(cls, name=None, email=None, user=None):
+        if user:
+            if not name:
+                name = user.getStraightFullName()
+            if not email:
+                email = user.getEmail()
+        if not name:
+            raise ValueError('name is missing')
+        if not email:
+            raise ValueError('email is missing')
+        return super(AgreementPersonInfo, cls).__new__(cls, name, email, user)
 
 
 class AgreementState(int, IndicoEnum):
