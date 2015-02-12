@@ -45,28 +45,40 @@ def _get_template_module(name, req, **context):
     return req.definition.get_notification_template(name, **context)
 
 
-def _notify_managers(req, event_manager_tpl, request_manager_tpl, **context):
-    """Notifies event managers and request managers about new/modified request
+def notify_request_managers(req, template, **context):
+    """Notifies request managers about something
 
     :param req: the :class:`Request`
-    :param event_manager_tpl: the template for the event manager notification
-    :param request_manager_tpl: the template for the request manager notification
-    :param context: data passed to the templates
+    :param template: the template for the notification
+    :param context: data passed to the template
     """
     event = req.event
     from_addr = Config.getInstance().getSupportEmail()
-    event_manager_emails = _get_event_manager_emails(event) if event_manager_tpl else None
     request_manager_emails = _get_request_manager_emails(req)
+    if not request_manager_emails:
+        return
     context['event'] = event
     context['req'] = req
-    tpl_event_managers = _get_template_module(event_manager_tpl, **context) if event_manager_tpl else None
-    tpl_request_managers = _get_template_module(request_manager_tpl, **context)
-    if tpl_event_managers:
-        yield make_email(event_manager_emails, from_address=from_addr,
-                         subject=tpl_event_managers.get_subject(), body=tpl_event_managers.get_body())
-    if request_manager_emails:
-        yield make_email(request_manager_emails, from_address=from_addr,
-                         subject=tpl_request_managers.get_subject(), body=tpl_request_managers.get_body())
+    tpl_request_managers = _get_template_module(template, **context)
+    return make_email(request_manager_emails, from_address=from_addr,
+                      subject=tpl_request_managers.get_subject(), body=tpl_request_managers.get_body())
+
+
+def notify_event_managers(req, template, **context):
+    """Notifies event managers about something
+
+    :param req: the :class:`Request`
+    :param template: the template for the notification
+    :param context: data passed to the template
+    """
+    event = req.event
+    from_addr = Config.getInstance().getSupportEmail()
+    event_manager_emails = _get_event_manager_emails(event)
+    context['event'] = event
+    context['req'] = req
+    tpl_event_managers = _get_template_module(template, **context)
+    return make_email(event_manager_emails, from_address=from_addr, subject=tpl_event_managers.get_subject(),
+                      body=tpl_event_managers.get_body())
 
 
 @email_sender
@@ -76,18 +88,20 @@ def notify_new_modified_request(req, new):
     :param req: the :class:`Request`
     :param new: True if it's a new request
     """
-    return _notify_managers(req, 'new_modified_to_event_managers.txt', 'new_modified_to_request_managers.txt', new=new)
+    yield notify_event_managers(req, 'new_modified_to_event_managers.txt', new=new)
+    yield notify_request_managers(req, 'new_modified_to_request_managers.txt', new=new)
 
 
 @email_sender
-def notify_withdrawn_request(req, notify_event_managers):
+def notify_withdrawn_request(req, email_event_managers):
     """Notifies event managers and request managers about a withdrawn request
 
     :param req: the :class:`Request`
-    :param notify_event_managers: if event managers should be notified
+    :param email_event_managers: if event managers should be notified
     """
-    return _notify_managers(req, 'withdrawn_to_event_managers.txt' if notify_event_managers else None,
-                            'withdrawn_to_request_managers.txt')
+    if email_event_managers:
+        yield notify_event_managers(req, 'withdrawn_to_event_managers.txt')
+    yield notify_request_managers(req, 'withdrawn_to_request_managers.txt')
 
 
 @email_sender
@@ -96,7 +110,8 @@ def notify_accepted_request(req):
 
     :param req: the :class:`Request`
     """
-    return _notify_managers(req, 'accepted_to_event_managers.txt', 'accepted_to_request_managers.txt')
+    yield notify_event_managers(req, 'accepted_to_event_managers.txt')
+    yield notify_request_managers(req, 'accepted_to_request_managers.txt')
 
 
 @email_sender
@@ -105,4 +120,5 @@ def notify_rejected_request(req):
 
     :param req: the :class:`Request`
     """
-    return _notify_managers(req, 'rejected_to_event_managers.txt', 'rejected_to_request_managers.txt')
+    yield notify_event_managers(req, 'rejected_to_event_managers.txt')
+    yield notify_request_managers(req, 'rejected_to_request_managers.txt')
