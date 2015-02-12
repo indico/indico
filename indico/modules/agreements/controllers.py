@@ -16,15 +16,17 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, request, session
+from flask import flash, redirect, request, session
 
 from indico.core.errors import AccessError, NotFoundError
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 from indico.modules.agreements.forms import AgreementForm
 from indico.modules.agreements.models.agreements import Agreement
+from indico.modules.agreements.notifications import notify_agreement_required_reminder
 from indico.modules.agreements.views import WPAgreementForm, WPAgreementManager
 from indico.modules.agreements.util import get_agreement_definitions, send_new_agreements
 
@@ -88,4 +90,14 @@ class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetails):
         event = self._conf
         people = self.definition.get_people_not_notified(event)
         send_new_agreements(event=event, name=self.definition.name, people=people)
+        return redirect(url_for('.event_agreements_details', event, self.definition))
+
+
+class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetails):
+    def _process(self):
+        event = self._conf
+        agreements = Agreement.find_all(Agreement.pending, event_id=event.getId(), type=self.definition.name)
+        for agreement in agreements:
+            notify_agreement_required_reminder(agreement)
+        flash(_("Reminders sent"), 'success')
         return redirect(url_for('.event_agreements_details', event, self.definition))
