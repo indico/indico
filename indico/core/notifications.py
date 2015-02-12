@@ -32,7 +32,7 @@ def email_sender(fn):
             mails = list(mails)
         elif not isinstance(mails, list):
             mails = [mails]
-        for mail in mails:
+        for mail in filter(None, mails):
             GenericMailer.send(GenericNotification(mail))
     return wrapper
 
