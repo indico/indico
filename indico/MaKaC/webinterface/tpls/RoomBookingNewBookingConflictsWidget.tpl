@@ -3,7 +3,7 @@
 % if only_conflicts:
     <div class="warning-message-box new-booking-message-box">
         <div class="message-text">
-            ${ _("Unable to book! This room is not available for the day(s) you selected.") }<br>
+            ${ _("Unable to book! This room is not available for the period you selected.") }<br>
             <small>${ _("Please select another room or a different time.")}</small>
         </div>
     </div>
