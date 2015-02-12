@@ -10,7 +10,7 @@
         <div class="manageLink" style="background: ${bgColor};">
         <div class="dropDownMenu fakeLink" id="${menuName}">Manage</div></div>
     % else:
-        <a class="i-button i-button-mini icon-edit arrow right" id="${menuName}"></a>
+        <a class="meeting-timetable-item-edit i-button i-button-mini icon-edit arrow right" id="${menuName}"></a>
     % endif
     <script type="text/javascript">
         $E('${menuName}').observeClick(function() {

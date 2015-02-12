@@ -2,7 +2,7 @@
 <% from MaKaC.plugins.Collaboration.Vidyo.common import VidyoTools %>
 <span class="videoServiceWrapperInline">
     <span class="videoServiceType">
-        <img src="${Config.getInstance().getBaseURL()}/images/video_${video.getType()}.png" border="0" alt="locked" style="margin-left: 3px;"/>
+        <img src="${Config.getInstance().getBaseURL()}/images/video_${video.getType()}.png" border="0" alt="locked" style="margin-left: 3px; width: 13px;"/>
     </span>
     <span class="videoServiceLinks">
         <% launchInfo = video._getLaunchDisplayInfo() %>
