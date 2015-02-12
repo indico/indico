@@ -139,13 +139,14 @@ class RequestDefinitionBase(object):
         notify_new_modified_request(req, is_new)
 
     @classmethod
-    def withdraw(cls, req):
+    def withdraw(cls, req, notify_event_managers=True):
         """Withdraws the request
 
         :param req: the :class:`Request` of the request
+        :param notify_event_managers: if event managers should be notified
         """
         req.state = RequestState.withdrawn
-        notify_withdrawn_request(req)
+        notify_withdrawn_request(req, notify_event_managers)
 
     @classmethod
     def accept(cls, req, data, user):

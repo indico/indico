@@ -17,6 +17,7 @@
 from itertools import ifilter
 
 from indico.core.models.settings import EventSetting
+from indico.modules.events.requests.models.requests import Request, RequestState
 from indico.modules.rb.models.reservations import Reservation
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.plugins import Observable
@@ -2654,13 +2655,20 @@ class Conference(CommonObjectBase, Locatable):
         except Exception, e:
             try:
                 Logger.get('Conference').error("Exception while notifying the observer of a conference deletion for conference %s: %s" %
-                            (self.getId(), str(e)))
+                                               (self.getId(), str(e)))
             except Exception, e2:
                 Logger.get('Conference').error("Exception while notifying a conference deletion: %s (origin: %s)" % (str(e2), str(e)))
 
         signals.event.deleted.send(self)
 
         EventSetting.delete_event(self.id)
+
+        if self.id.isdigit():  # only for non-legacy events with a proper id
+            event_id = int(self.id)
+            requests = Request.find(event_id=event_id)
+            for req in requests.filter(Request.state.in_((RequestState.accepted, RequestState.pending))):
+                req.definition.withdraw(req, notify_event_managers=False)
+            requests.delete()
 
         self.notifyContributions()
 

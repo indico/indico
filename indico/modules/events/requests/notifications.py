@@ -55,14 +55,15 @@ def _notify_managers(req, event_manager_tpl, request_manager_tpl, **context):
     """
     event = req.event
     from_addr = Config.getInstance().getSupportEmail()
-    event_manager_emails = _get_event_manager_emails(event)
+    event_manager_emails = _get_event_manager_emails(event) if event_manager_tpl else None
     request_manager_emails = _get_request_manager_emails(req)
     context['event'] = event
     context['req'] = req
-    tpl_event_managers = _get_template_module(event_manager_tpl, **context)
+    tpl_event_managers = _get_template_module(event_manager_tpl, **context) if event_manager_tpl else None
     tpl_request_managers = _get_template_module(request_manager_tpl, **context)
-    yield make_email(event_manager_emails, from_address=from_addr,
-                     subject=tpl_event_managers.get_subject(), body=tpl_event_managers.get_body())
+    if tpl_event_managers:
+        yield make_email(event_manager_emails, from_address=from_addr,
+                         subject=tpl_event_managers.get_subject(), body=tpl_event_managers.get_body())
     if request_manager_emails:
         yield make_email(request_manager_emails, from_address=from_addr,
                          subject=tpl_request_managers.get_subject(), body=tpl_request_managers.get_body())
@@ -79,12 +80,14 @@ def notify_new_modified_request(req, new):
 
 
 @email_sender
-def notify_withdrawn_request(req):
+def notify_withdrawn_request(req, notify_event_managers):
     """Notifies event managers and request managers about a withdrawn request
 
     :param req: the :class:`Request`
+    :param notify_event_managers: if event managers should be notified
     """
-    return _notify_managers(req, 'withdrawn_to_event_managers.txt', 'withdrawn_to_request_managers.txt')
+    return _notify_managers(req, 'withdrawn_to_event_managers.txt' if notify_event_managers else None,
+                            'withdrawn_to_request_managers.txt')
 
 
 @email_sender
