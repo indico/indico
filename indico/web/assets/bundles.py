@@ -246,23 +246,26 @@ jquery = Bundle(*filter(None, [
     'js/jquery/jquery-migrate-silencer.js' if not Config.getInstance().getDebug() else None] +
     namespace('js/jquery',
 
-               'jquery-migrate.js',
-               'jquery.form.js',
-               'jquery.custom.js',
-               'jquery.daterange.js',
-               'jquery.dttbutton.js',
-               'jquery.colorbox.js',
-               'jquery.menu.js',
-               'date.js',
-               'jquery.colorpicker.js',
-               'jquery-extra-selectors.js',
-               'jquery.typewatch.js',
-               'jstorage.js',
-               'jquery.watermark.js',
-               'jquery.placeholder.js')),
+              'jquery-migrate.js',
+              'jquery.form.js',
+              'jquery.custom.js',
+              'jquery.daterange.js',
+              'jquery.dttbutton.js',
+              'jquery.colorbox.js',
+              'jquery.menu.js',
+              'date.js',
+              'jquery.colorpicker.js',
+              'jquery-extra-selectors.js',
+              'jquery.typewatch.js',
+              'jstorage.js',
+              'jquery.watermark.js',
+              'jquery.placeholder.js')),
     filters='rjsmin', output='js/jquery_code_%(version)s.min.js')
 
-utils = Bundle('js/utils/routing.js', filters='rjsmin', output='js/utils_%(version)s.min.js')
+utils = Bundle(
+    'js/utils/routing.js',
+    'js/utils/i18n.js',
+    filters='rjsmin', output='js/utils_%(version)s.min.js')
 
 calendar = Bundle(
     *namespace('js/calendar', 'calendar.js', 'calendar-setup.js'),
@@ -313,6 +316,11 @@ presentation = Bundle(
 ie_compatibility = Bundle('js/selectivizr.js',
                           filters='rjsmin', output='js/ie_compatibility_%(version)s.min.js')
 
+jed = Bundle(
+    'js/lib/jed.js',
+    filters='rjsmin', output='js/jed_%(version)s.min.js'
+)
+
 moment = Bundle(
     *namespace('js/moment',
                'moment.js',
@@ -350,8 +358,8 @@ abstracts_js = Bundle(
     filters='rjsmin',
     output='js/abstracts_%(version)s.min.js')
 
-base_js = Bundle(jquery, angular, utils, presentation, calendar, indico_jquery, moment, indico_core,
-                 indico_legacy, indico_common)
+base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
+                 indico_core, indico_legacy, indico_common)
 
 SASS_BASE_MODULES = ["sass/*.scss",
                      "sass/base/*.scss",

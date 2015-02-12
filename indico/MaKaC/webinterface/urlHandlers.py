@@ -3338,15 +3338,6 @@ class UHContact(URLHandler):
     _endpoint = 'misc.contact'
 
 
-class UHJSVars(URLHandler):
-    _endpoint = 'misc.JSContent-getVars'
-
-    @classmethod
-    def getStaticURL(cls, target=None, **params):
-        # We want a relative URL here, so just use url_for directly...
-        return url_for(cls._endpoint)
-
-
 class UHHelper(object):
     """ Returns the display or modif UH for an object of a given class
     """

@@ -8,8 +8,6 @@ from pkgutil import walk_packages
 from flask_script import Manager, Command, Option
 from babel.messages import frontend
 
-from indico.util.setup import compile_catalog_js
-
 IndicoI18nManager = Manager(usage="Takes care of i18n-related operations")
 
 TRANSLATIONS_DIR = 'indico/translations'
@@ -56,12 +54,6 @@ DEFAULT_OPTIONS = {
         'no_default_keywords': 1
     },
 
-    'compile_catalog_js': {
-        'input_dir': TRANSLATIONS_DIR,
-        'output_dir': 'indico/htdocs/js/indico/i18n',
-        'domain': 'messages-js'
-    },
-
     'update_catalog_js': {
         'input_file': MESSAGES_JS_POT,
         'output_dir': TRANSLATIONS_DIR,
@@ -100,12 +92,13 @@ def wrap_distutils_command(command_class):
     return _wrapper
 
 
-cmd_list = ['init_catalog', 'extract_messages', 'compile_catalog', 'update_catalog']
+cmd_list = ['init_catalog', 'extract_messages', 'update_catalog']
 cmd_list += [cmd + '_js' for cmd in cmd_list]
+cmd_list.append('compile_catalog')
+
 
 for cmd_name in cmd_list:
-    cmd_class = compile_catalog_js if cmd_name == 'compile_catalog_js' \
-        else getattr(frontend, re.sub(r'_js$', '', cmd_name))
+    cmd_class = getattr(frontend, re.sub(r'_js$', '', cmd_name))
 
     command = Command(wrap_distutils_command(cmd_class))
 

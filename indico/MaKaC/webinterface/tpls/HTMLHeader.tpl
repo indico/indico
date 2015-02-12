@@ -22,12 +22,14 @@
 % endif
 
         <script type="text/javascript">
-                var TextRoot = "${ baseUrl }/js/indico/i18n/";
                 var ScriptRoot = "${ baseUrl }/js/";
         </script>
 
+        <!-- Jed-based i18n -->
+        <script type="text/javascript" src="${ url_for('assets.i18n_locale', locale_name=language) }"></script>
+
         <!-- Indico specific -->
-        ${ page._getJavaScriptInclude(str(urlHandlers.UHJSVars.getURL())) } <!-- Indico Variables -->
+        ${ page._getJavaScriptInclude(url_for('assets.js_vars_global')) } <!-- Indico Variables -->
 
         <!-- Page Specific JS files-->
         % for JSFile in extraJSFiles:
@@ -39,11 +41,6 @@
             ${'<script src="'+ baseurl + JSFile +'" type="text/javascript"></script>\n'}
         % endfor
         <![endif]-->
-
-        <script type="text/javascript">
-          var currentLanguage = '${ language }';
-          loadDictionary(currentLanguage);
-        </script>
 
         <!-- Page Specific CSS files-->
         % for cssFile in extraCSS:

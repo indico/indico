@@ -15,22 +15,39 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import ast
+import errno
+import os
 import re
+from contextlib import contextmanager
 
-from babel.core import Locale
-from babel.support import Translations
 from babel import negotiate_locale
+from babel.core import Locale
+from babel.messages.pofile import read_po
+from babel.support import Translations
 from flask import session, request, has_request_context, current_app
-from flask_babelex import Babel, get_domain
+from flask_babelex import Babel, Domain, get_domain
+from flask_pluginengine import current_plugin
 from speaklater import make_lazy_gettext
 
-from MaKaC.common.info import HelperMaKaCInfo
+from indico.core.config import Config
 from indico.core.db import DBMgr
+from indico.core.signals import after_process
+
+from MaKaC.common.info import HelperMaKaCInfo
 
 
 RE_TR_FUNCTION = re.compile(r"_\(\"([^\"]*)\"\)|_\('([^']*)'\)", re.DOTALL | re.MULTILINE)
 
 babel = Babel()
+
+
+def get_active_domain():
+    default_domain = get_domain()
+
+    if current_plugin and current_plugin.translation_path:
+        return Domain(current_plugin.translation_path)
+    else:
+        return default_domain
 
 
 def gettext_unicode(*args, **kwargs):
@@ -43,7 +60,7 @@ def gettext_unicode(*args, **kwargs):
     else:
         using_unicode = True
 
-    res = getattr(get_domain().get_translations(), func_name)(*args, **kwargs)
+    res = getattr(get_active_domain().get_translations(), func_name)(*args, **kwargs)
 
     if using_unicode:
         return res
@@ -60,7 +77,6 @@ def smart_func(func_name):
         Returns either a translated string or a lazy-translatable object,
         depending on whether there is a session language or not (respectively)
         """
-
         if (has_request_context() and session.lang) or func_name != 'ugettext':
             # straight translation
             return gettext_unicode(*args, func_name=func_name, **kwargs)
@@ -72,8 +88,8 @@ def smart_func(func_name):
 
 
 # Shortcuts
-_ = gettext = smart_func('ugettext')
-ngettext = smart_func('ungettext')
+_ = ugettext = gettext = smart_func('ugettext')
+ungettext = ngettext = smart_func('ungettext')
 L_ = lazy_gettext
 
 # Just a marker for message extraction
@@ -155,6 +171,18 @@ def set_session_lang(lang):
     session.lang = lang
 
 
+@contextmanager
+def session_language(lang):
+    """
+    Context manager that temporarily sets session language
+    """
+    old_lang = session.lang
+
+    set_session_lang(lang)
+    yield
+    set_session_lang(old_lang)
+
+
 def parse_locale(locale):
     """
     Get a Locale object from a locale id
@@ -193,3 +221,41 @@ def extract_node(node, keywords, commentTags, options, parents=[None]):
         for cnode in ast.iter_child_nodes(node):
             for rslt in extract_node(cnode, keywords, commentTags, options, parents=(parents + [node])):
                 yield rslt
+
+
+def po_to_json(po_file, locale=None, domain=None):
+    """
+    Converts *.po file to a json-like data structure
+    """
+    with open(po_file, 'rb') as f:
+        po_data = read_po(f, locale=locale, domain=domain)
+
+    messages = dict((message.id[0], message.string) if message.pluralizable else (message.id, [message.string])
+                    for message in po_data)
+
+    messages[''] = {
+        'domain': po_data.domain,
+        'lang': str(po_data.locale),
+        'plural_forms': po_data.plural_forms
+    }
+
+    return {
+        (po_data.domain or ''): messages
+    }
+
+
+@after_process.connect
+def delete_old_i18n_cache(sender, **kwargs):
+    """
+    deletes old i18n files on startup
+    """
+    config = Config.getInstance()
+    for locale_name in get_all_locales():
+        file_path = os.path.join(config.getXMLCacheDir(), 'assets_i18n_{}.js'.format(locale_name))
+        if os.path.exists(file_path):
+            # file can be deleted many times in multi-process environment
+            try:
+                os.unlink(file_path)
+            except OSError, e:
+                if e.errno != errno.ENOENT:
+                    raise

@@ -584,8 +584,8 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
 
      },
      function() {
-         var arrowUp = Html.img({src: imageSrc('arrow_up'), title: $T('Move up')});
-         var arrowDown = Html.img({src: imageSrc('arrow_down'), style:{paddingLeft: '5px'}, title: $T('Move down')});
+         var arrowUp = Html.img({src: imageSrc('upArrow'), title: $T('Move up')});
+         var arrowDown = Html.img({src: imageSrc('downArrow'), style:{paddingLeft: '5px'}, title: $T('Move down')});
 
          var self = this;
 

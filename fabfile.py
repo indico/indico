@@ -218,9 +218,6 @@ def _install_dependencies(mod_name, sub_path, dtype, dest_subpath=None):
 
 @recipe('angular')
 def install_angular():
-    """
-    Install Angular.js from Git
-    """
     with node_env():
         with lcd(os.path.join(env.ext_dir, 'angular')):
             local('npm install')
@@ -236,9 +233,6 @@ def install_angular():
 
 @recipe('ui-sortable')
 def install_ui_sortable():
-    """
-    Install angular ui-sortable from Git
-    """
     with node_env():
         with lcd(os.path.join(env.ext_dir, 'ui-sortable')):
             dest_dir_js = lib_dir(env.src_dir, 'js')
@@ -248,17 +242,11 @@ def install_ui_sortable():
 
 @recipe('compass')
 def install_compass():
-    """
-    Install compass stylesheets from Git
-    """
     _install_dependencies('compass', 'frameworks/compass/stylesheets/*', 'sass', 'compass')
 
 
 @recipe('jquery')
 def install_jquery():
-    """
-    Install jquery from Git
-    """
     with node_env():
         with lcd(os.path.join(env.ext_dir, 'jquery')):
             local('npm install')
@@ -266,6 +254,14 @@ def install_jquery():
             dest_dir = lib_dir(env.src_dir, 'js')
             local('mkdir -p {0}'.format(dest_dir))
             local('cp dist/jquery.js {0}/'.format(dest_dir))
+
+
+@recipe('jed')
+def install_jed():
+    with lcd(os.path.join(env.ext_dir, 'Jed')):
+        dest_dir = lib_dir(env.src_dir, 'js')
+        local('mkdir -p {0}'.format(dest_dir))
+        local('cp jed.js {0}/'.format(dest_dir))
 
 
 @recipe('jqplot')
@@ -304,9 +300,6 @@ def install_rrule():
 
 @recipe('qtip2')
 def install_qtip2():
-    """
-    Install qtip2 from Git
-    """
     with node_env():
         with lcd(os.path.join(env.ext_dir, 'qtip2')):
             local('npm install')
@@ -319,9 +312,6 @@ def install_qtip2():
 
 @recipe('jquery-ui-multiselect')
 def install_jquery_ui_multiselect():
-    """
-    Install jquery ui multiselect widget from Git
-    """
     with node_env():
         with lcd(os.path.join(env.ext_dir, 'jquery-ui-multiselect')):
             dest_dir_js = lib_dir(env.src_dir, 'js')
@@ -335,10 +325,6 @@ def install_jquery_ui_multiselect():
 
 @recipe('MathJax')
 def install_mathjax():
-    """
-    Install MathJax from Git
-    """
-
     dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'mathjax/')
     mathjax_js = os.path.join(dest_dir, 'MathJax.js')
 
@@ -359,9 +345,6 @@ def install_mathjax():
 
 @recipe('PageDown')
 def install_pagedown():
-    """
-    Install PageDown from Git (mirror!)
-    """
     with lcd(os.path.join(env.ext_dir, 'pagedown')):
         dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'pagedown/')
         local('mkdir -p {0}'.format(dest_dir))

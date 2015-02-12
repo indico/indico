@@ -174,11 +174,9 @@ Babel not found! Babel is needed for internationalization if you're building Ind
 i.e. try 'easy_install babel'"""
         sys.exit(-1)
 
-    # call commands directly
+    # call command directly
     cc = cmd.distribution.get_command_obj('compile_catalog')
     cc.run()
-    gjs = cmd.distribution.get_command_obj('compile_catalog_js')
-    gjs.run()
 
 
 def copyTreeSilently(source, target):
