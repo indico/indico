@@ -483,15 +483,16 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
         return views[view](self, **kwargs)
 
     def _get_select_room_form_defaults(self):
-        start_dt, end_dt, self.date_changed = get_default_booking_interval(duration=self.DEFAULT_BOOKING_DURATION,
-                                                                           precision=self.DEFAULT_START_TIME_PRECISION,
-                                                                           force_today=False)
-        return FormDefaults(start_dt=start_dt, end_dt=end_dt)
+        start_dt, end_dt, date_changed = get_default_booking_interval(duration=self.DEFAULT_BOOKING_DURATION,
+                                                                      precision=self.DEFAULT_START_TIME_PRECISION,
+                                                                      force_today=False)
+        return FormDefaults(start_dt=start_dt, end_dt=end_dt), date_changed
 
     def _make_select_room_form(self):
         # Step 1
         self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.full_name))
-        form = NewBookingCriteriaForm(obj=self._get_select_room_form_defaults())
+        form_obj, self.date_changed = self._get_select_room_form_defaults()
+        form = NewBookingCriteriaForm(obj=form_obj)
         form.room_ids.choices = [(r.id, None) for r in self._rooms]
         return form
 

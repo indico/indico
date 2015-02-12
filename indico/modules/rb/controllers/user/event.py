@@ -310,10 +310,10 @@ class RHRoomBookingEventNewBooking(RHRoomBookingEventBase, RHRoomBookingNewBooki
         return views[view](self, self.event, **kwargs)
 
     def _get_select_room_form_defaults(self):
-        defaults = RHRoomBookingNewBooking._get_select_room_form_defaults(self)
+        defaults, _ = RHRoomBookingNewBooking._get_select_room_form_defaults(self)
         for key, value in _get_defaults_from_object(self._assign_to or self.event).iteritems():
             defaults[key] = value
-        return defaults
+        return defaults, False
 
     def _make_confirm_form(self, *args, **kwargs):
         if 'defaults' in kwargs:
