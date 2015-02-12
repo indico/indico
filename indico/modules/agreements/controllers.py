@@ -36,8 +36,7 @@ class RHAgreementForm(RHConferenceBaseDisplay):
 
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
-        uuid = request.view_args['uuid']
-        self.agreement = Agreement.find_one(uuid=uuid)
+        self.agreement = Agreement.find_one(id=request.view_args['id'])
 
     def _checkSessionUser(self):
         if session.user is None:
@@ -47,6 +46,8 @@ class RHAgreementForm(RHConferenceBaseDisplay):
 
     def _checkProtection(self):
         RHConferenceBaseDisplay._checkProtection(self)
+        if self.agreement.uuid != request.view_args['uuid']:
+            raise AccessError()
         if self.agreement.user:
             self._checkSessionUser()
 
