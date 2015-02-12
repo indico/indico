@@ -151,7 +151,7 @@ class Agreement(db.Model):
     @property
     def locator(self):
         return {'confId': self.event_id,
-                'uuid': self.uuid}
+                'id': self.id}
 
     @property
     def user(self):
@@ -176,7 +176,7 @@ class Agreement(db.Model):
     def create_from_data(event_id, type, user=None, email=None, name=None):
         if user is None and (email is None or name is None):
             raise ValueError("Either an Indico user or email/name can be passed")
-        agreement = Agreement(event_id=event_id, type=type, state=AgreementState.pending, uuid=uuid4().hex)
+        agreement = Agreement(event_id=event_id, type=type, state=AgreementState.pending, uuid=str(uuid4()))
         if user:
             agreement.user = user
         else:

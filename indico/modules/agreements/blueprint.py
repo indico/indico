@@ -34,4 +34,5 @@ _bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/remind_all',
                  'event_agreements_details_remind_all', RHAgreementManagerDetailsRemindAll)
 
 # Event
-_bp.add_url_rule('/event/<confId>/agreement/<uuid>', 'agreement_form', RHAgreementForm, methods=('GET', 'POST'))
+_bp.add_url_rule('/event/<confId>/agreement/<int:id>-<uuid>',
+                 'agreement_form', RHAgreementForm, methods=('GET', 'POST'))

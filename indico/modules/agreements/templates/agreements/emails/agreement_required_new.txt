@@ -15,5 +15,5 @@ There is an agreement you are requested to sign for the event:
 {{agreement.event.getTitle()}}
 
 You can sign it in the following link:
-{{ url_for('agreements.agreement_form', agreement, _external=true) }}
+{{ url_for('.agreement_form', agreement, uuid=agreement.uuid, _external=true) }}
 {%- endblock %}
