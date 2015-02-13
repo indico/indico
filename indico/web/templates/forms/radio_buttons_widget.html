@@ -1,6 +1,6 @@
 {% for subfield in field %}
     <div class="i-radio">
-        {{ subfield() }}
+        {{ subfield(required=field.flags.required) }}
         {{ subfield.label }}
     </div>
 {% endfor %}
