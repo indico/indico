@@ -142,6 +142,8 @@ type("ExclusivePopup", ["Printable"], {
             e.stopPropagation(); // otherwise this triggers twice for some reason
             if(this.closeHandler === null || !this.showCloseButton) {
                 // Ignore escape if we don't have a close button
+                // But trigger data-button-back in ajaxDialog
+                this.canvas.find('[data-button-back]').trigger('click');
                 return false;
             }
             if(isFunction(this.closeHandler) && !this.closeHandler()) {
