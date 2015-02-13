@@ -691,11 +691,12 @@ class WFooter(WTemplated):
         self._isFrontPage = isFrontPage
 
     def getVars( self ):
-        vars = WTemplated.getVars( self )
+        from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
+        vars = WTemplated.getVars(self)
         vars["isFrontPage"] = self._isFrontPage
         event = getattr(self._rh, '_conf', None)
-        vars['is_meeting'] = event and event.getType() == 'meeting'
+        vars['is_meeting'] = event and event.getType() == 'meeting' and not isinstance(self._rh, RHConferenceModifBase)
 
         if not vars.has_key("modificationDate"):
             vars["modificationDate"] = ""
