@@ -74,7 +74,7 @@ def convert_to_unicode(val):
 def convert_principal_list(opt):
     """Converts a 'users' plugin setting to the new format"""
     principals = set()
-    for principal in opt.getValue():
+    for principal in opt._PluginOption__value:
         if principal.__class__.__name__ == 'Avatar':
             principals.add(('Avatar', principal.id))
         else:
