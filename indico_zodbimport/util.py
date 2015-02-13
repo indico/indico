@@ -80,3 +80,11 @@ def convert_principal_list(opt):
         else:
             principals.add(('Group', principal.id))
     return list(principals)
+
+
+def option_value(opt):
+    """Gets a plugin option value"""
+    value = opt._PluginOption__value
+    if isinstance(value, basestring):
+        value = convert_to_unicode(value)
+    return value

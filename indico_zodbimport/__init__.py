@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-__all__ = ('Importer', 'convert_to_unicode', 'convert_principal_list')
+__all__ = ('Importer', 'convert_to_unicode', 'convert_principal_list', 'option_value')
 
 from .cli import Importer
-from .util import convert_to_unicode, convert_principal_list
+from .util import convert_to_unicode, convert_principal_list, option_value
