@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from wtforms.validators import InputRequired
+from wtforms.fields import BooleanField, FileField
+from wtforms.validators import InputRequired, DataRequired
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -24,5 +25,16 @@ from indico.web.forms.fields import IndicoRadioField
 
 
 class AgreementForm(IndicoForm):
-    agreed = IndicoRadioField('test', [InputRequired()], coerce=lambda x: bool(int(x)),
-                              choices=[(1, _("I agree")), (0, _("I disagree"))])
+    agreed = IndicoRadioField(_("Do you agree with the stated above?"), [InputRequired()],
+                              coerce=lambda x: bool(int(x)), choices=[(1, _("I agree")), (0, _("I disagree"))])
+
+
+class AgreementUploadForm(IndicoForm):
+    document = FileField(_("Document"), [DataRequired()])
+    answer = IndicoRadioField(_("Answer"), [InputRequired()], coerce=lambda x: bool(int(x)),
+                              choices=[(1, _("Agreement")), (0, _("Disagreement"))])
+    upload_confirm = BooleanField(_("I confirm that I'm uploading a document that clearly shows this person's answer"),
+                                  [DataRequired()])
+    understand = BooleanField(_("I understand that I'm signing an agreement on behalf of this person"),
+                              [DataRequired()], description=_("This answer is legally binding and can't be changed "
+                                                              "afterwards."))

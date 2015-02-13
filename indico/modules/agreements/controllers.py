@@ -16,15 +16,17 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, redirect, request, session
+from flask import flash, jsonify, redirect, request, session
+from werkzeug.exceptions import NotFound
 
-from indico.core.errors import AccessError, NotFoundError
+from indico.core.errors import AccessError, NoReportError
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
-from indico.modules.agreements.forms import AgreementForm
+from indico.modules.agreements.forms import AgreementForm, AgreementUploadForm
 from indico.modules.agreements.models.agreements import Agreement
 from indico.modules.agreements.notifications import notify_agreement_required_reminder
 from indico.modules.agreements.views import WPAgreementForm, WPAgreementManager
@@ -77,7 +79,7 @@ class RHAgreementManagerDetails(RHConferenceModifBase):
         definition_name = request.view_args['definition']
         self.definition = get_agreement_definitions().get(definition_name)
         if self.definition is None:
-            raise NotFoundError("Agreement definition '{}' does not exist".format(definition_name))
+            raise NotFound("Agreement type '{}' does not exist".format(definition_name))
 
     def _process(self):
         event = self._conf
@@ -102,3 +104,26 @@ class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetails):
             notify_agreement_required_reminder(agreement)
         flash(_("Reminders sent"), 'success')
         return redirect(url_for('.event_agreements_details', event, self.definition))
+
+
+class RHAgreementManagerDetailsUploadAgreement(RHAgreementManagerDetails):
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self.agreement = Agreement.find_one(id=request.view_args['id'])
+        if self._conf != self.agreement.event:
+            raise NotFound()
+        if not self.agreement.pending:
+            raise NoReportError("The agreement is already signed")
+
+    def _process(self):
+        event = self._conf
+        agreement = self.agreement
+        form = AgreementUploadForm()
+        if form.validate_on_submit():
+            func = agreement.accept if form.answer.data else agreement.reject
+            func(on_behalf=True)
+            agreement.attachment = form.document.data.read()
+            flash(_("Agreement uploaded on behalf of {0}".format(agreement.person_name)), 'success')
+            return jsonify({'success': True})
+        return WPJinjaMixin.render_template('agreements/agreement_upload_form.html', event, form=form,
+                                            event=event, agreement=agreement)

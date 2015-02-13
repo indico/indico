@@ -1,0 +1,21 @@
+{% extends 'admin/base.html' %}
+{% from 'forms/form_widget.html' import form_header, form_rows, form_footer  %}
+
+{% block title %}
+    {% trans %}Agreement Upload{% endtrans %}
+{% endblock %}
+
+{% block subtitle %}
+    {{ agreement.person_name }}
+{% endblock %}
+
+{% block content %}
+    {{ form_header(action=url_for('.event_agreements_details_upload_agreement', event, agreement)) }}
+    {{ form_rows(form) }}
+
+    {% call form_footer() %}
+        <input type="submit" class="i-button big highlight" value="{% trans %}Upload{% endtrans %}">
+        <a href="#" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+    {% endcall %}
+{% endblock %}
+

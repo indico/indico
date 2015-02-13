@@ -59,7 +59,7 @@
                 <div class="i-box-footer">
                     <div class="legal-confirmation">
                         <div class="question">
-                            {% trans %}Do you agree with the stated above?{% endtrans %}
+                            {{ form.agreed.label() }}
                         </div>
                         {{ form.agreed }}
                     </div>
