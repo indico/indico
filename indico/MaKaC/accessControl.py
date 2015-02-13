@@ -519,7 +519,7 @@ class _AdminList(Persistent):
             return True
         from MaKaC.user import Group
         for p in self.__list:
-            if type(p) is Group and p.containsUser(user):
+            if isinstance(p, Group) and p.containsUser(user):
                 return True
         return False
 
