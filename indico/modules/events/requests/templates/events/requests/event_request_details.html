@@ -58,7 +58,12 @@
     {% if show_management %}
         {% call form_fieldset(legend=_('Request details'), description=_('These are the details provided by the event manager.')) %}
             {% if show_management %}
-                {{ form_row_static(_('Created by'), req.created_by_user.getStraightFullName()) }}
+                {% call form_row_static(_('Created by')) %}
+                    <a href="mailto:{{ req.created_by_user.getEmail() }}">{{ req.created_by_user.getStraightFullName() }}</a>
+                    {% if req.created_by_user.getPhone() %}
+                        (Phone: {{ req.created_by_user.getPhone() }})
+                    {% endif %}
+                {% endcall %}
                 {{ form_row_static(_('Created at'), req.created_dt | format_datetime) }}
             {% endif %}
             {% block form %}
