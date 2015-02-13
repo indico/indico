@@ -10,12 +10,33 @@
 {% endblock %}
 
 {% block content %}
-    {{ form_header(action=url_for('.event_agreements_details_upload_agreement', event, agreement)) }}
+    {{ form_header(id='agreementUpload', action=url_for('.event_agreements_details_upload_agreement', event, agreement), multipart=True) }}
     {{ form_rows(form) }}
 
     {% call form_footer() %}
-        <input type="submit" class="i-button big highlight" value="{% trans %}Upload{% endtrans %}">
+        <input type="submit" class="i-button big highlight" value="{% trans %}Upload{% endtrans %}" disabled>
         <a href="#" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
     {% endcall %}
+
+    <script type="text/javascript">
+        var validate = function(form) {
+            if (!form.find(':input[name=answer]:checked').val()) {
+                return false
+            }
+            var valid = true;
+            form.find(':input').each(function() {
+                if (($(this).is(":checkbox") && !$(this).is(":checked")) || $(this).val() === '') {
+                    valid = false
+                    return false;
+                }
+            });
+            return valid;
+        }
+
+        $('#agreementUpload :input').change(function(e) {
+            var form = $(e.target).closest('form');
+            form.find('input[type=submit]').enable(validate(form));
+        });
+    </script>
 {% endblock %}
 
