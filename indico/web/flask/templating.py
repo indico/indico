@@ -71,6 +71,15 @@ def natsort(environment, value, reverse=False, case_sensitive=False, attribute=N
     return sorted(value, key=sort_func, reverse=reverse)
 
 
+def instanceof(value, type_):
+    """Checks if `value` is an instance of `type_`
+
+    :param value: an object
+    :param type_: a type
+    """
+    return isinstance(value, type_)
+
+
 def get_overridable_template_name(name, plugin, core_prefix='', plugin_prefix=''):
     """Returns template names for templates that may be overridden in a plugin.
 

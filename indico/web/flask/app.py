@@ -21,7 +21,7 @@ import re
 import traceback
 
 from babel.numbers import format_currency, get_currency_name
-from flask import send_from_directory, request, _app_ctx_stack, Blueprint
+from flask import send_from_directory, request, _app_ctx_stack
 from flask import current_app
 from flask_sqlalchemy import models_committed
 from flask_pluginengine import plugins_loaded
@@ -47,7 +47,7 @@ from indico.core.plugins import (plugin_engine, include_plugin_css_assets, inclu
                                  url_for_plugin)
 from indico.util.signals import values_from_signal
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
-from indico.web.flask.templating import EnsureUnicodeExtension, underline, markdown, dedent, natsort
+from indico.web.flask.templating import EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
                                    IndicoConfigWrapper)
 from indico.web.flask.wrappers import IndicoFlask
@@ -151,6 +151,8 @@ def setup_jinja(app):
     app.add_template_filter(markdown)
     app.add_template_filter(dedent)
     app.add_template_filter(natsort)
+    # Tests
+    app.add_template_test(instanceof)  # only use this test if you really have to!
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext, ngettext, True)
