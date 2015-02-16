@@ -28,6 +28,8 @@ class AgreementDefinitionBase(object):
     name = None
     #: readable name of the agreement definition
     title = None
+    #: optional and short description of the agreement definition
+    description = None
     #: plugin containing this agreement definition - assigned automatically
     plugin = None
 
