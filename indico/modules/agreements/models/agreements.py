@@ -155,7 +155,7 @@ class Agreement(db.Model):
 
     @property
     def user(self):
-        if not self.user_id:
+        if self.user_id is None:
             return None
         from MaKaC.user import AvatarHolder
         return AvatarHolder().getById(str(self.user_id))
