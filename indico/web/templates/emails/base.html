@@ -1,0 +1,29 @@
+{% macro get_subject() %}
+    [Indico] {% block subject %}{% endblock %}
+{% endmacro %}
+
+{% macro get_body(footer) %}
+    <body>
+        {{ get_html_body() }}
+    </body>
+{% endmacro %}
+
+{% macro get_html_body() %}
+    {%- block header %}
+        {% block header_content %}
+            Dear {% block header_recipient %}{% endblock %},
+        {% endblock %}
+        <br><br>
+    {% endblock %}
+
+    {% block body %}{% endblock %}
+
+    {% block footer %}
+        <br><br>
+        {% block footer_content %}
+            <hr>
+            <a href="{% block footer_url %}{{ url_for('misc.index', _external=true) }}{% endblock %}">Indico</a>
+            :: {% block footer_title %}Email Notifier{% endblock %}<br>
+        {% endblock %}
+    {% endblock %}
+{% endmacro %}
