@@ -49,6 +49,19 @@ class AgreementDefinitionBase(object):
                                        agreement=agreement, form=form, **kwargs)
 
     @classmethod
+    def get_people(cls, event):
+        """Returns a list of :class:`AgreementPersonInfo` required to sign agreements"""
+        people = cls.iter_people(event)
+        return [] if people is None else list(people)
+
+    @classmethod
+    def get_people_not_notified(cls, event):
+        """Returns a list of :class:`AgreementPersonInfo` yet to be notified"""
+        people = cls.get_people(event)
+        sent_agreement_emails = [a.person_email for a in Agreement.find(event_id=event.getId(), type=cls.name)]
+        return [person for person in people if person.email not in sent_agreement_emails]
+
+    @classmethod
     def handle_accepted(cls, agreement):
         """Handles logic on agreement accepted"""
         pass  # pragma: no cover
@@ -64,13 +77,6 @@ class AgreementDefinitionBase(object):
         pass  # pragma: no cover
 
     @classmethod
-    def get_people(cls, event):
-        """Returns a list of :class:`AgreementPersonInfo` required to sign"""
+    def iter_people(cls, event):
+        """Yields :class:`AgreementPersonInfo` required to sign agreements"""
         raise NotImplementedError  # pragma: no cover
-
-    @classmethod
-    def get_people_not_notified(cls, event):
-        """Returns a list of :class:`AgreementPersonInfo` yet to be notified"""
-        people = cls.get_people(event)
-        sent_agreement_emails = [a.person_email for a in Agreement.find(event_id=event.getId(), type=cls.name)]
-        return [person for person in people if person.email not in sent_agreement_emails]
