@@ -391,8 +391,15 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height ){
     // "wrapper" is the actual Indico API object that represents an editor
 
     try {
-
-        CKEDITOR.replace(editorId, {language : userLanguage, width : width, height : height - 75});
+        CKEDITOR.replace(editorId, {
+            language: userLanguage,
+            width   : width,
+            height  : height - 75,
+            //CKEDITOR Custom Config
+            blockedKeystrokes: [9 /* TAB */, CKEDITOR.SHIFT + 9  /* SHIFT + TAB */],
+            removeButtons      : '',
+            disableNativeSpellChecker: false
+        });
         var cki = CKEDITOR.instances[editorId];
 
         cki.setData(text);
