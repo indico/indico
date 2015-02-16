@@ -121,11 +121,11 @@ class Agreement(db.Model):
 
     @hybrid_property
     def accepted(self):
-        return self.state == AgreementState.accepted or self.state == AgreementState.accepted_on_behalf
+        return self.state in {AgreementState.accepted, AgreementState.accepted_on_behalf}
 
     @accepted.expression
     def accepted(self):
-        return (self.state == AgreementState.accepted) | (self.state == AgreementState.accepted_on_behalf)
+        return self.state.in_((AgreementState.accepted, AgreementState.accepted_on_behalf))
 
     @hybrid_property
     def pending(self):
@@ -133,11 +133,11 @@ class Agreement(db.Model):
 
     @hybrid_property
     def rejected(self):
-        return self.state == AgreementState.rejected or self.state == AgreementState.rejected_on_behalf
+        return self.state in {AgreementState.rejected, AgreementState.rejected_on_behalf}
 
     @rejected.expression
     def rejected(self):
-        return (self.state == AgreementState.rejected) | (self.state == AgreementState.rejected_on_behalf)
+        return self.state.in_((AgreementState.rejected, AgreementState.rejected_on_behalf))
 
     @property
     def definition(self):
