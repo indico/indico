@@ -35,7 +35,7 @@
             {%- if field.flags.required %}<i class="required" title="{% trans %}This field is required{% endtrans %}">*</i>{% endif -%}
         </div>
         <div class="form-field form-block"{% if field.errors %} data-error="{{ _render_errors(field.errors) }}"{% endif %}>
-            {{ field(required=(field.flags.required and not field.flags.conditional), **widget_attrs) }}
+            {{ _render_field(field, widget_attrs) }}
             {% if field.widget.input_type == 'checkbox' %}
                 <div class="checkbox-label">{{ field.label() }}</div>
             {% endif %}

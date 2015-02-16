@@ -52,7 +52,7 @@ from indico.web.flask.templating import (EnsureUnicodeExtension, underline, mark
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
                                    IndicoConfigWrapper)
 from indico.web.flask.wrappers import IndicoFlask
-from indico.web.forms.jinja_helpers import is_single_line_field
+from indico.web.forms.jinja_helpers import is_single_line_field, render_field
 
 from indico.web.flask.blueprints.legacy import legacy
 from indico.web.flask.blueprints.rooms import rooms
@@ -141,6 +141,7 @@ def setup_jinja(app):
     app.add_template_global(include_plugin_js_assets)
     app.add_template_global(call_template_hook, 'template_hook')
     app.add_template_global(is_single_line_field, '_is_single_line_field')
+    app.add_template_global(render_field, '_render_field')
     app.add_template_global(format_currency)
     app.add_template_global(get_currency_name)
     # Filters (indico functions returning UTF8)
