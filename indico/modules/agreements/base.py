@@ -16,9 +16,9 @@
 
 from flask import render_template
 
-from indico.core.plugins import plugin_context
 from indico.modules.agreements.models.agreements import Agreement
 from indico.util.decorators import classproperty
+from indico.web.flask.templating import get_overridable_template_name
 
 
 class AgreementDefinitionBase(object):
@@ -30,6 +30,8 @@ class AgreementDefinitionBase(object):
     title = None
     #: optional and short description of the agreement definition
     description = None
+    #: template of the agreement form - agreement definition name by default
+    template_name = None
     #: plugin containing this agreement definition - assigned automatically
     plugin = None
 
@@ -40,15 +42,9 @@ class AgreementDefinitionBase(object):
 
     @classmethod
     def render_form(cls, agreement, form, **kwargs):
-        tpl = '{}.html'.format(cls.name)
-        core_tpl = 'agreements/{}'.format(tpl)
-        plugin_tpl = '{{}}:{}'.format(tpl)
-        if cls.plugin is None:
-            return render_template(core_tpl, agreement=agreement, form=form, **kwargs)
-        else:
-            with plugin_context(cls.plugin):
-                return render_template((plugin_tpl.format(cls.plugin.name), core_tpl),
-                                       agreement=agreement, form=form, **kwargs)
+        template_name = cls.template_name or '{}.html'.format(cls.name.replace('-', '_'))
+        tpl = get_overridable_template_name(template_name, cls.plugin, 'agreements/')
+        return render_template(tpl, agreement=agreement, form=form, **kwargs)
 
     @classmethod
     def get_people(cls, event):
