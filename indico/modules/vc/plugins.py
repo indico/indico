@@ -40,12 +40,14 @@ class VCPluginMixin(object):
     #: the :class:`IndicoForm` to use for the video conference room form
     vc_room_form = None
     #: default values to use
-    vc_room_form_defaults = {}
 
     def init(self):
         super(VCPluginMixin, self).init()
         if not self.name.startswith('vc_'):
             raise Exception('Video conference plugins must be named vc_*')
+
+    def get_vc_room_form_defaults(self, event):
+        return {}
 
     @classproperty
     @classmethod
@@ -65,6 +67,13 @@ class VCPluginMixin(object):
         :param event: the event the video conference room is for
         :return: an instance of an :class:`IndicoForm` subclass
         """
-        defaults = FormDefaults(existing_vc_room.data if existing_vc_room else self.vc_room_form_defaults)
+        defaults = FormDefaults(existing_vc_room.data if existing_vc_room else self.get_vc_room_form_defaults(event))
         with self.plugin_context():
-            return self.vc_room_form(prefix='vc-', obj=defaults, event=event)
+            return self.vc_room_form(prefix='vc-', obj=defaults, event=event, vc_room=existing_vc_room)
+
+
+class VCRoomFormBase(IndicoForm):
+    def __init__(self, *args, **kwargs):
+        self.vc_room = kwargs.pop('vc_room')
+        self.event = kwargs.pop('event')
+        super(VCRoomFormBase, self).__init__(*args, **kwargs)

@@ -29,6 +29,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
+
 class RHVCManageEventBase(RHConferenceModifBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
@@ -78,24 +79,25 @@ class RHVCManageEventCreate(RHVCManageEventBase):
 
     def _process(self):
         form = self.plugin.create_form(event=self.event)
-        form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form)
         if form.validate_on_submit():
+            data = form.data
+
             vc_room = VCRoom(created_by_user=session.user)
             vc_room.type = remove_prefix(self.plugin)
             vc_room.status = VCRoomStatus.created
-
-            # TODO: Store extra information properly
-            vc_room.data = {}
+            vc_room.name = data.pop('name')
+            vc_room.data = data
 
             event_vc_room = VCRoomEventAssociation(event_id=self.event_id, vc_room=vc_room)
-            form.populate_obj(event_vc_room)
-            form.populate_obj(vc_room)
+
             db.session.add_all((vc_room, event_vc_room))
-            db.session.flush()
+
             # create_room(vc_room)
             # notify_created(vc_room, self.event, session.user)
             flash(_('Video conference room created'), 'success')
             return redirect(url_for('.manage_vc_rooms', self.event))
+        form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form)
+
         return WPVCManageEvent.render_string(form_html, self.event)
 
 
