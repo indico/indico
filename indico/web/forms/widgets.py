@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask import render_template
-from wtforms.widgets.core import HTMLString
+from wtforms.widgets.core import HTMLString, PasswordInput
 
 
 class ConcatWidget(object):
@@ -57,6 +57,16 @@ class JinjaWidget(object):
             template = self.template
 
         return HTMLString(render_template(template, field=field, **dict(self.context, **kwargs)))
+
+
+class PasswordWidget(object):
+    """Renders a password input"""
+
+    single_line = True
+
+    def __call__(self, field, **kwargs):
+        return HTMLString(render_template('forms/password_widget.html', field=field,
+                          input=PasswordInput(hide_value=False), input_args=kwargs))
 
 
 class CKEditorWidget(JinjaWidget):

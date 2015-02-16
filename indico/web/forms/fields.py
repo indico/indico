@@ -26,7 +26,7 @@ from indico.util.fossilize import fossilize
 from indico.util.user import retrieve_principals
 from indico.util.string import is_valid_mail
 from indico.util.i18n import _
-from indico.web.forms.widgets import PrincipalWidget, RadioButtonsWidget, JinjaWidget
+from indico.web.forms.widgets import PrincipalWidget, RadioButtonsWidget, JinjaWidget, PasswordWidget
 
 
 class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
@@ -131,6 +131,15 @@ class IndicoEnumSelectField(SelectFieldBase):
                     self.data = self.enum[valuelist[0]]
                 except KeyError:
                     raise ValueError(self.gettext('Not a valid choice'))
+
+
+class IndicoPasswordField(PasswordField):
+    """Password field which can show or hide the password."""
+    widget = PasswordWidget()
+
+    def __init__(self, *args, **kwargs):
+        self.toggle = kwargs.pop('toggle', False)
+        super(IndicoPasswordField, self).__init__(*args, **kwargs)
 
 
 class PrincipalField(HiddenField):
