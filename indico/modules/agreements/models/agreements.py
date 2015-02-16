@@ -166,8 +166,6 @@ class Agreement(db.Model):
         if user is None:
             return
         self.user_id = user.getId()
-        self.person_email = user.getEmail()
-        self.person_name = user.getStraightFullName().title()
 
     @return_ascii
     def __repr__(self):
@@ -175,15 +173,12 @@ class Agreement(db.Model):
         return '<Agreement({}, {}, {}, {}, {})>'.format(self.id, self.event_id, self.type, self.person_email, state)
 
     @staticmethod
-    def create_from_data(event_id, type, user=None, email=None, name=None):
-        if user is None and (email is None or name is None):
-            raise ValueError("Either an Indico user or email/name can be passed")
+    def create_from_data(event_id, type, person):
         agreement = Agreement(event_id=event_id, type=type, state=AgreementState.pending, uuid=str(uuid4()))
-        if user:
-            agreement.user = user
-        else:
-            agreement.person_email = email
-            agreement.person_name = name
+        agreement.person_email = person.email
+        agreement.person_name = person.name
+        if person.user:
+            agreement.user = person.user
         return agreement
 
     def accept(self, on_behalf=False):

@@ -37,8 +37,7 @@ def send_new_agreements(event, name, people):
     """
     agreements = []
     for person in people:
-        person_info = {'user': person.user} if person.user else {'name': person.name, 'email': person.email}
-        agreement = Agreement.create_from_data(event_id=event.getId(), type=name, **person_info)
+        agreement = Agreement.create_from_data(event_id=event.getId(), type=name, person=person)
         db.session.add(agreement)
         agreements.append(agreement)
     db.session.flush()
