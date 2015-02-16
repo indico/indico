@@ -23,9 +23,9 @@
                             <div class="toolbar">
                                 <div class="group">
                                     <!-- if it hasCheckStatus -->
-                                    <a class="i-button icon-refresh js-booking-refresh" title="{% trans %}Check Booking Status{% endtrans %}"></a>
-                                    <a href="{{ url_for('.manage_vc_rooms_modify', event_vc_room, service=vc_room.type) }}" class="i-button icon-edit js-booking-edit" title="{% trans %}Edit{% endtrans %}"></a>
-                                    <a class="i-button icon-remove js-booking-remove" title="{% trans %}Delete{% endtrans %}"></a>
+                                    <a class="i-button icon-refresh js-vcroom-refresh" title="{% trans %}Check Booking Status{% endtrans %}"></a>
+                                    <a href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}" class="i-button icon-edit js-vcroom-edit" title="{% trans %}Edit{% endtrans %}"></a>
+                                    <a data-href="{{ url_for_plugin('.manage_vc_rooms_remove', event_vc_room) }}" data-num-events="{{ vc_room.events | count }}" class="i-button icon-remove js-vcroom-remove" title="{% trans %}Delete{% endtrans %}"></a>
                                 </div>
                             </div>
                         </td>
@@ -33,7 +33,7 @@
                     <tr>
                         <td class="details-row" colspan="6">
                             <dl class="details-container">
-                            <!-- TODO: Each plugin should define it's own template in displaying
+                            <!-- TODO: Each plugin should define its own template in displaying
                             the information of the "data" column -->
                                 {% for key, value in vc_room.data.items() %}
                                     <dt>{{ key }}</dt>
@@ -53,6 +53,7 @@
     <a class="i-button bottom i-form-button icon-plus js-create-room" href="{{ url_for_plugin('.manage_vc_rooms_select', event) }}">{% trans %}Create new room{% endtrans %}</a>
 </div>
 <script>
+    eventManageVCRooms();
     $('.toggle-details').on('click', function(e) {
         e.preventDefault();
         var toggler = $(this);

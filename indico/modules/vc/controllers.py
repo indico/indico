@@ -21,6 +21,7 @@ from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
 from indico.core.errors import IndicoError
+from indico.core.logger import Logger
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
 from indico.modules.vc.util import get_vc_plugins, get_vc_plugin_by_service_name, remove_prefix
 from indico.modules.vc.views import WPVCManageEvent
@@ -40,7 +41,7 @@ class RHVCManageEventBase(RHConferenceModifBase):
         self.event = self._conf
 
 
-class RHEventChatroomMixin:
+class RHEventVCRoomMixin:
     def _checkParams(self):
         self.event_vc_room = VCRoomEventAssociation.find_one(event_id=self.event_id,
                                                              vc_room_id=request.view_args['vc_room_id'])
@@ -101,16 +102,15 @@ class RHVCManageEventCreate(RHVCManageEventBase):
         return WPVCManageEvent.render_string(form_html, self.event)
 
 
-class RHVCManageEventModify(RHEventChatroomMixin, RHVCManageEventBase):
-    """Modifies an existing VC room"""
+class RHVCSystemEventBase(RHEventVCRoomMixin, RHVCManageEventBase):
 
     def _checkParams(self, params):
         RHVCManageEventBase._checkParams(self, params)
-        try:
-            self.plugin = get_vc_plugin_by_service_name(request.view_args['service'])
-        except KeyError:
-            raise NotFound
-        RHEventChatroomMixin._checkParams(self)
+        RHEventVCRoomMixin._checkParams(self)
+
+
+class RHVCManageEventModify(RHVCSystemEventBase):
+    """Modifies an existing VC room"""
 
     def _process(self):
         form = self.plugin.create_form(event=self.event, existing_vc_room=self.vc_room)
@@ -128,3 +128,19 @@ class RHVCManageEventModify(RHEventChatroomMixin, RHVCManageEventBase):
             flash(_('Video conference room updated'), 'success')
             return redirect(url_for('.manage_vc_rooms', self.event))
         return WPVCManageEvent.render_string(form_html, self.event)
+
+
+class RHVCManageEventRemove(RHVCSystemEventBase):
+    """Removes an existing VC room"""
+
+    def _process(self):
+        Logger.get('modules.vc').info("Detaching VC room {} from event {}".format(
+            self.vc_room, self._conf))
+        db.session.delete(self.event_vc_room)
+
+        # delete room if not connected to any other events
+        if not self.vc_room.events:
+            Logger.get('modules.vc').info("Deleting VC room {}".format(self.vc_room))
+            db.session.delete(self.vc_room)
+            # TODO: VC-specific code !!!!
+        return redirect(url_for('.manage_vc_rooms', self.event))

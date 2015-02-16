@@ -333,6 +333,10 @@ abstracts_js = rjs_bundle(
 base_js = Bundle(jquery, angular, utils, presentation, calendar, indico_jquery, moment, indico_core,
                  indico_legacy, indico_common)
 
+module_js = {
+    'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js')
+}
+
 SASS_BASE_MODULES = ["sass/*.scss",
                      "sass/base/*.scss",
                      "sass/custom/*.scss",
@@ -384,6 +388,9 @@ def register_all_js(env):
     env.register('contributions_js', contributions_js)
     env.register('mathjax_js', mathjax_js)
     env.register('jqplot_js', jqplot_js)
+
+    for key, bundle in module_js.iteritems():
+        env.register('modules_{}_js'.format(key), bundle)
 
 
 def register_all_css(env, main_css_file):

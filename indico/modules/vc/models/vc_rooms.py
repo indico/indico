@@ -93,7 +93,7 @@ class VCRoom(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return '<VCRoom({}, {})>'.format(self.id, self.type)
+        return '<VCRoom({}, {}, {})>'.format(self.id, self.name, self.type)
 
 
 class VCRoomEventAssociation(db.Model):
@@ -146,17 +146,3 @@ class VCRoomEventAssociation(db.Model):
         """
         query = cls.find(event_id=int(event.id), **kwargs)
         return query
-
-    def delete(self):
-        """Deletes the event video conference room and if necessary the video conference room, too.
-
-        :return: True if the associated video conference room was also
-                 deleted, otherwise False
-        """
-        db.session.delete(self)
-        db.session.flush()
-        if not self.vc_room.events:
-            db.session.delete(self.vc_room)
-            db.session.flush()
-            return True
-        return False

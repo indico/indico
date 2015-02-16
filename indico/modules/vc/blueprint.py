@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.vc.controllers import (RHVCManageEvent, RHVCManageEventSelectService, RHVCManageEventCreate,
-                                           RHVCManageEventModify)
+                                           RHVCManageEventModify, RHVCManageEventRemove)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 vc_blueprint = _bp = IndicoBlueprint('vc', __name__, template_folder='templates')
@@ -26,7 +26,9 @@ vc_blueprint = _bp = IndicoBlueprint('vc', __name__, template_folder='templates'
 _bp.add_url_rule('/event/<confId>/manage/videoconference/', 'manage_vc_rooms', RHVCManageEvent)
 _bp.add_url_rule('/event/<confId>/manage/videoconference/select', 'manage_vc_rooms_select',
                  RHVCManageEventSelectService, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/create', 'manage_vc_rooms_create',
+_bp.add_url_rule('/event/<confId>/manage/videoconference/service/<service>/create', 'manage_vc_rooms_create',
                  RHVCManageEventCreate, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:vc_room_id>/', 'manage_vc_rooms_modify',
+_bp.add_url_rule('/event/<confId>/manage/videoconference/room/<int:vc_room_id>/', 'manage_vc_rooms_modify',
                  RHVCManageEventModify, methods=('GET', 'POST'))
+_bp.add_url_rule('/event/<confId>/manage/videoconference/room/<int:vc_room_id>/remove', 'manage_vc_rooms_remove',
+                 RHVCManageEventRemove, methods=('POST',))
