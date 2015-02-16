@@ -2,8 +2,10 @@
 <div id="{{ field.id }}-editor" style="margin-bottom: 10px;"></div>
 <script>
     (function() {
+        'use strict';
+
         var field = $('#{{ field.id }}');
-        var editor = new RichTextEditor(600, 300);
+        var editor = new RichTextEditor(600, 300, {{ simple | tojson }});
         editor.set(field.val());
         editor.onLoad(function() {
             editor.onChange(function() {

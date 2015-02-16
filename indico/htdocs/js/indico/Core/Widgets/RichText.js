@@ -41,7 +41,8 @@ type("RichTextEditor", ["IWidget", "Accessor"],
                      self.text ,
                      self.callbacks,
                      self.width,
-                     self.height);
+                     self.height,
+                     self.simple);
              },5);
              return this.div;
          },
@@ -94,11 +95,12 @@ type("RichTextEditor", ["IWidget", "Accessor"],
          }
 
      },
-     function(width, height) {
+     function(width, height, simple) {
          this.onLoadList = new WatchList();
          this.callbacks = new WatchList();
          this.width = width;
          this.height = height;
+         this.simple = simple;
 
          this.divId = Html.generateId();
      });
@@ -387,12 +389,28 @@ type("ParsedRichTextInlineEditWidget", ["RichTextInlineEditWidget"],
         });
 
 
-function initializeEditor( wrapper, editorId, text, callbacks, width, height ){
+function initializeEditor( wrapper, editorId, text, callbacks, width, height, simple ){
     // "wrapper" is the actual Indico API object that represents an editor
 
     try {
 
-        CKEDITOR.replace(editorId, {language : userLanguage, width : width, height : height - 75});
+        config = {language : userLanguage, width : width, height : height - 75};
+        if (simple) {
+            config.toolbar = [
+                { name: 'clipboard', items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
+                { name: 'editing', items : [ 'Find','Replace' ] },
+                { name: 'links', items : [ 'Link','Unlink','Anchor' ] },
+                { name: 'insert', items : [ 'HorizontalRule' ] },
+                { name: 'document', items : [ 'Source' ] },
+                { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','-','RemoveFormat' ] },
+                { name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent' ] },
+                { name: 'styles', items : [ 'Format' ] },
+                { name: 'colors', items : [ 'TextColor' ] },
+                {name: 'tools', items: [ 'Maximize' ] }
+            ];
+        }
+
+        CKEDITOR.replace(editorId, config);
         var cki = CKEDITOR.instances[editorId];
 
         cki.setData(text);
