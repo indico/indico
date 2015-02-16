@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from flask import render_template
-from flask_pluginengine import render_plugin_template, plugin_context
 
 from wtforms.fields.core import BooleanField
 
@@ -29,12 +28,11 @@ from indico.web.forms.fields import PrincipalField
 
 
 class VCPluginSettingsFormBase(IndicoForm):
-    admins = PrincipalField(_('Administrators'), description=_('Vidyo admins / responsibles'))
+    managers = PrincipalField(_('Managers'), description=_('Service managers'))
     authorized_users = PrincipalField(_('Authorized users'),
-                                      description=_('Users and Groups authorised to create Vidyo bookings'))
-    notify_admins = BooleanField(_('Notify admins'),
-                                 description=_('Should Vidyo administrators receive email notifications?'))
-    bookings_search = BooleanField(_('Search for bookings is allowed'))
+                                      description=_('Users and Groups authorised to create video conference rooms'))
+    notify_managers = BooleanField(_('Notify managers'),
+                                   description=_('Send email notifications to managers'))
 
 
 class VCPluginMixin(object):
