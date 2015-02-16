@@ -401,7 +401,8 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
 
             input[type="checkbox"],
             input[type="radio"] {
-                margin-left: 0;
+                margin: 0;
+                vertical-align: middle;
             }
 
             input[type=number] {
@@ -504,6 +505,7 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
             margin-left: 0.5em;
             position: relative;
             bottom: 1px;
+            vertical-align: middle;
         }
     }
 
