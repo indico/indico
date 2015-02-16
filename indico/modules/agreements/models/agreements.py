@@ -24,6 +24,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
+from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 
@@ -168,6 +169,7 @@ class Agreement(db.Model):
         self.person_email = user.getEmail()
         self.person_name = user.getStraightFullName().title()
 
+    @return_ascii
     def __repr__(self):
         state = self.state.name if self.state is not None else None
         return '<Agreement({}, {}, {}, {}, {})>'.format(self.id, self.event_id, self.type, self.person_email, state)
