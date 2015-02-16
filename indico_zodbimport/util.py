@@ -14,7 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import re
 from urlparse import urlparse
+
 from ZODB import DB, FileStorage
 from ZODB.broken import find_global, Broken
 from ZEO.ClientStorage import ClientStorage
@@ -31,6 +33,7 @@ class NotBroken(Broken):
 
 class UnbreakingDB(DB):
     def classFactory(self, connection, modulename, globalname):
+        modulename = re.sub(r'^IndexedCatalog\.BTrees\.', 'BTrees.', modulename)
         return find_global(modulename, globalname, Broken=NotBroken)
 
 
