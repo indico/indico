@@ -4,37 +4,56 @@
 
 <script>
     (function() {
-        var principals = {{ value_json }};
         var field = $('#{{ field.id }}');
+        var principals = JSON.parse(field.val());
 
-        function addPrincipal(newPrincipals, setResult) {
-            // remove existing ones first to avoid duplicates
-            _.each(newPrincipals, function(principal) {
+        {% if field.multiple %}
+            function addPrincipal(newPrincipals, setResult) {
+                // remove existing ones first to avoid duplicates
+                _.each(newPrincipals, function(principal) {
+                    principals = _.without(principals, _.findWhere(principals, {
+                        _type: principal._type,
+                        id: principal.id
+                    }));
+                });
+                principals = principals.concat(newPrincipals);
+                field.val(JSON.stringify(principals));
+                setResult(true);
+            }
+            function removePrincipal(principal, setResult) {
                 principals = _.without(principals, _.findWhere(principals, {
-                    _type: principal._type,
-                    id: principal.id
+                    _type: principal.get('_type'),
+                    id: principal.get('id')
                 }));
-            });
-            principals = principals.concat(newPrincipals);
-            field.val(JSON.stringify(principals));
-            setResult(true);
-        }
-        function removePrincipal(principal, setResult) {
-            principals = _.without(principals, _.findWhere(principals, {
-                _type: principal.get('_type'),
-                id: principal.get('id')
-            }));
-            field.val(JSON.stringify(principals));
-            setResult(true);
-        }
+                field.val(JSON.stringify(principals));
+                setResult(true);
+            }
+            var widget = new UserListField(
+                'PluginOptionPeopleListDiv', 'PeopleList', principals,
+                true, null, true,
+                {{ field.groups | tojson }},
+                null, null, false, false, false, true,
+                addPrincipal, userListNothing, removePrincipal
+            );
+        {% else %}
+            function addUser(newUser, setResult) {
+                field.val(JSON.stringify(newUser));
+                setResult(true);
+            }
 
-        var widget = new UserListField(
-            'PluginOptionPeopleListDiv', 'PeopleList', principals,
-            true, null, true,
-            {{ field.groups | tojson }},
-            null, null, false, false, false, true,
-            addPrincipal, userListNothing, removePrincipal
-        );
+            function removeUser(setResult) {
+                field.val('[]');
+                setResult(true);
+            }
+            var widget = new SingleUserField(principals[0],
+                    {{ field.name|tojson }},
+                    true, true, null,
+                    null, false,
+                    false, true,
+                    addUser, removeUser);
+        {% endif %}
+
+
         $E('userGroupList-{{ field.id }}').set(widget.draw());
     })();
 </script>

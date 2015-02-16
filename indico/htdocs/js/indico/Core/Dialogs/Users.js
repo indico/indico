@@ -891,6 +891,7 @@ type("SingleUserField", ["IWidget"], {
      * @param {Object} user a dictionary with the user info.
      */
     __userChosenObserver: function() {
+        var self = this;
         var user = this.user.getAll();
 
         this.variableButtonsDiv.clear();
@@ -899,13 +900,17 @@ type("SingleUserField", ["IWidget"], {
             this.variableButtonsDiv.append(favButtonDiv);
         }
 
-        if (this.allowDelete && this.userChosen) {
+        if (this.allowDelete && this.userChosen.get()) {
 
             var removeButton = Widget.link(command(function(){
-                self.userChosen.set(false);
-                var notChosenUser = self.__getNotChosenUser();
-                self.user.replace(notChosenUser);
-                self.__userChosenObserver();
+                self.removeProcess(function(value) {
+                    if (value) {
+                        self.userChosen.set(false);
+                        var notChosenUser = self.__getNotChosenUser();
+                        self.user.replace(notChosenUser);
+                        self.__userChosenObserver();
+                    }
+                });
             }, IndicoUI.Buttons.removeButton()));
 
             var removeButtonDiv = Html.div({style:{display:"inline"}}, removeButton);
@@ -936,15 +941,18 @@ type("SingleUserField", ["IWidget"], {
         var fixedButtonsDiv = Html.div({style: {display: 'inline'}});
         // Draw the choose button
         if (self.allowChoose) {
-            var chooseButton = Html.input("button", {style:{marginLeft: pixels(10), verticalAlign:'middle'}}, $T('Choose'));
+            var chooseButton = Html.input("button", {
+                className: 'i-button',
+                style: {marginLeft: pixels(10), verticalAlign: 'middle'}
+            }, $T('Choose'));
 
             var chooseUserHandler = function(userList) {
                 self.assignProcess(userList, function(value) {
                     if (value) { // the assignProcess function returned true
                         var returnedUser = userList[0];
                         self.user.replace(returnedUser);
-                        self.__userChosenObserver();
                         self.userChosen.set(true);
+                        self.__userChosenObserver();
                     }
                 });
             };

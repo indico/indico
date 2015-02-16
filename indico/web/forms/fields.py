@@ -138,6 +138,7 @@ class PrincipalField(HiddenField):
 
     def __init__(self, *args, **kwargs):
         self.groups = kwargs.pop('groups', False)
+        self.multiple = kwargs.pop('multiple', True)
         super(PrincipalField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
@@ -148,16 +149,25 @@ class PrincipalField(HiddenField):
 
     def process_formdata(self, valuelist):
         if valuelist:
-            data = json.loads(valuelist[0])
-            self.data = map(self._convert_principal, data)
+            data = map(self._convert_principal, json.loads(valuelist[0]))
+            if self.multiple:
+                self.data = data
+            else:
+                self.data = None if not data else data[0]
 
     def pre_validate(self, form):
-        for principal in self.data:
+        for principal in self._get_data():
             if not self.groups and principal[0] == 'Group':
                 raise ValueError(u'You cannot select groups')
 
     def _value(self):
-        return map(fossilize, retrieve_principals(self.data or []))
+        return map(fossilize, retrieve_principals(self._get_data()))
+
+    def _get_data(self):
+        if self.multiple:
+            return self.data
+        else:
+            return [] if self.data is None else [self.data]
 
 
 class MultipleItemsField(HiddenField):
