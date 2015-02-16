@@ -37,7 +37,8 @@ def email_sender(fn):
     return wrapper
 
 
-def make_email(to_list, cc_list=None, from_address=None, attachments=None, subject=None, body=None, template=None):
+def make_email(to_list, cc_list=None, from_address=None, attachments=None,
+               subject=None, body=None, template=None, html=False):
     if template is not None and (subject is not None or body is not None):
         raise ValueError("Only subject/body or template can be passed")
     if template:
@@ -55,5 +56,6 @@ def make_email(to_list, cc_list=None, from_address=None, attachments=None, subje
         'fromAddr': from_address,
         'attachments': attachments,
         'subject': subject,
-        'body': body
+        'body': body,
+        'content-type': 'text/html' if html else 'text/plain'
     }
