@@ -24,12 +24,12 @@ from indico.web.flask.templating import get_template_module
 @email_sender
 def notify_agreement_required_new(agreement):
     func = get_template_module if not current_plugin else get_plugin_template_module
-    template = func('agreements/emails/agreement_required_new.txt', agreement=agreement)
-    return make_email(agreement.person_email, template=template)
+    template = func('agreements/emails/agreement_required_new.html', agreement=agreement)
+    return make_email(agreement.person_email, template=template, html=True)
 
 
 @email_sender
 def notify_agreement_required_reminder(agreement):
     func = get_template_module if not current_plugin else get_plugin_template_module
-    template = func('agreements/emails/agreement_required_reminder.txt', agreement=agreement)
-    return make_email(agreement.person_email, template=template)
+    template = func('agreements/emails/agreement_required_reminder.html', agreement=agreement)
+    return make_email(agreement.person_email, template=template, html=True)

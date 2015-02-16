@@ -1,4 +1,4 @@
-{% extends 'emails/base.txt' %}
+{% extends 'emails/base.html' %}
 {% block subject %}Agreement signature required{% endblock %}
 {% block footer_title %}Agreements{% endblock %}
 
@@ -12,7 +12,7 @@
 
 {% block body -%}
 There is an agreement you are requested to sign for the event:
-{{agreement.event.getTitle()}}
+{{ agreement.event.getTitle() }}
 
 You can sign it in the following link:
 {{ url_for('.agreement_form', agreement, uuid=agreement.uuid, _external=true) }}
