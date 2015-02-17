@@ -17,16 +17,20 @@
 from __future__ import unicode_literals
 
 from flask import flash, jsonify, redirect, request, session
+from flask_pluginengine import current_plugin
 from werkzeug.exceptions import NotFound
 
 from indico.core.errors import AccessError, NoReportError
+from indico.core.plugins import get_plugin_template_module
 from indico.util.i18n import _
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
-from indico.modules.agreements.forms import AgreementForm, AgreementUploadForm
+from indico.modules.agreements.forms import AgreementForm, AgreementEmailForm, AgreementUploadForm
 from indico.modules.agreements.models.agreements import Agreement
 from indico.modules.agreements.notifications import notify_agreement_required_reminder
 from indico.modules.agreements.views import WPAgreementForm, WPAgreementManager
@@ -92,9 +96,17 @@ class RHAgreementManagerDetails(RHConferenceModifBase):
 class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetails):
     def _process(self):
         event = self._conf
-        people = self.definition.get_people_not_notified(event)
-        send_new_agreements(event=event, name=self.definition.name, people=people)
-        return redirect(url_for('.event_agreements_details', event, self.definition))
+        func = get_template_module if not current_plugin else get_plugin_template_module
+        template = func('agreements/emails/agreement_default.html', event=event)
+        form_defaults = FormDefaults(body=template.get_html_body())
+        form = AgreementEmailForm(obj=form_defaults)
+        if form.validate_on_submit():
+            email_body = form.body.data
+            people = self.definition.get_people_not_notified(event)
+            send_new_agreements(event=event, name=self.definition.name, people=people, email_body=email_body)
+            return jsonify({'success': True})
+        return WPJinjaMixin.render_template('agreements/agreement_email_form.html',
+                                            event=event, form=form, definition=self.definition)
 
 
 class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetails):
@@ -126,5 +138,5 @@ class RHAgreementManagerDetailsUploadAgreement(RHAgreementManagerDetails):
             agreement.attachment = form.document.data.read()
             flash(_("Agreement uploaded on behalf of {0}".format(agreement.person_name)), 'success')
             return jsonify({'success': True})
-        return WPJinjaMixin.render_template('agreements/agreement_upload_form.html', event, form=form,
+        return WPJinjaMixin.render_template('agreements/agreement_upload_form.html', form=form,
                                             event=event, agreement=agreement)

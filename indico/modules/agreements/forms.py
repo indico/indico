@@ -16,17 +16,33 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import BooleanField, FileField
+from flask import session
+
+from wtforms.fields import BooleanField, FileField, TextAreaField, SelectField
+from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired, DataRequired
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoRadioField
+from indico.web.forms.widgets import CKEditorWidget
 
 
 class AgreementForm(IndicoForm):
     agreed = IndicoRadioField(_("Do you agree with the stated above?"), [InputRequired()],
                               coerce=lambda x: bool(int(x)), choices=[(1, _("I agree")), (0, _("I disagree"))])
+
+
+class AgreementEmailForm(IndicoForm):
+    from_address = SelectField(_("From"), [DataRequired()])
+    cc_addresses = EmailField(_("CC"), description=_("Warning: this email adress will be able to sign the agreement!"))
+    body = TextAreaField(_("Email body"), widget=CKEditorWidget(simple=True))
+
+    def __init__(self, *args, **kwargs):
+        super(AgreementEmailForm, self).__init__(*args, **kwargs)
+        name = session.user.getStraightFullName()
+        from_addresses = ['{} <{}>'.format(name, email) for email in session.user.getEmails()]
+        self.from_address.choices = zip(from_addresses, from_addresses)
 
 
 class AgreementUploadForm(IndicoForm):

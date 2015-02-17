@@ -27,12 +27,14 @@ agreements_blueprint = _bp = IndicoBlueprint('agreements', __name__, template_fo
 
 # Event management
 _bp.add_url_rule('/event/<confId>/manage/agreements/', 'event_agreements', RHAgreementManager)
-_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>',
+_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/',
                  'event_agreements_details', RHAgreementManagerDetails)
-_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/send_all',
-                 'event_agreements_details_send_all', RHAgreementManagerDetailsSendAll)
-_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/remind_all',
-                 'event_agreements_details_remind_all', RHAgreementManagerDetailsRemindAll)
+_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/send-all',
+                 'event_agreements_details_send_all',
+                 RHAgreementManagerDetailsSendAll, methods=('GET', 'POST'))
+_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/remind-all',
+                 'event_agreements_details_remind_all',
+                 RHAgreementManagerDetailsRemindAll, methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/manage/agreements/upload/<id>',
                  'event_agreements_details_upload_agreement',
                  RHAgreementManagerDetailsUploadAgreement, methods=('GET', 'POST'))

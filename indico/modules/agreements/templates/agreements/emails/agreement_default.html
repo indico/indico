@@ -1,5 +1,4 @@
 {% extends 'emails/base.html' %}
-{% block footer_title %}Agreements{% endblock %}
 
 {% block header_recipient -%}
     {person_name}
@@ -19,6 +18,7 @@
     {% endif %}
 {%- endblock %}
 
+{% block footer_title %}Agreements{% endblock %}
 {% block footer %}
     {# Show default footer if sent from command line #}
     {% if not session.user %}

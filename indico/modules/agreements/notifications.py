@@ -14,22 +14,34 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from flask_pluginengine import current_plugin
+from markupsafe import Markup
 
 from indico.core.notifications import email_sender, make_email
 from indico.core.plugins import get_plugin_template_module
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
+
+
+def make_email_template(template, agreement, email_body=None):
+    func = get_template_module if not current_plugin else get_plugin_template_module
+    link = Markup('<a href="{0}">{0}</a>'.format(url_for('agreements.agreement_form', agreement,
+                                                 uuid=agreement.uuid, _external=True)))
+    if not email_body:
+        email_body = func('agreements/emails/agreement_default.html', event=agreement.event).get_body()
+    email_body = email_body.format(person_name=agreement.person_name, agreement_link=link)
+    return func(template, email_body=email_body)
 
 
 @email_sender
-def notify_agreement_required_new(agreement):
-    func = get_template_module if not current_plugin else get_plugin_template_module
-    template = func('agreements/emails/agreement_required_new.html', agreement=agreement)
+def notify_agreement_required_new(agreement, email_body=None):
+    template = make_email_template('agreements/emails/agreement_required_new.html', agreement, email_body)
     return make_email(agreement.person_email, template=template, html=True)
 
 
 @email_sender
-def notify_agreement_required_reminder(agreement):
-    func = get_template_module if not current_plugin else get_plugin_template_module
-    template = func('agreements/emails/agreement_required_reminder.html', agreement=agreement)
+def notify_agreement_required_reminder(agreement, email_body=None):
+    template = make_email_template('agreements/emails/agreement_required_reminder.html', agreement, email_body)
     return make_email(agreement.person_email, template=template, html=True)
