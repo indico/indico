@@ -25,6 +25,18 @@
     </div>
 {%- endmacro %}
 
+{% macro form_field(field, field_classes, widget_attrs={}) -%}
+    <div class="{{ field_classes }}"{% if field.errors %} data-error="{{ _render_errors(field.errors) }}"{% endif %}>
+        {{ _render_field(field, widget_attrs) }}
+        {% if field.widget.input_type == 'checkbox' %}
+            <div class="checkbox-label">{{ field.label() }}</div>
+        {% endif %}
+        {% if field.description %}
+            <p class="form-field-description"><em>{{ field.description | safe }}</em></p>
+        {% endif %}
+    </div>
+{%- endmacro %}
+
 {% macro form_row(field, widget_attrs={}, orientation='') %}
     <div class="form-group{% if field.errors %} has-error{% endif %} {{ orientation }}" id="form-group-{{ field.id }}">
         <div class="form-label form-block{% if _is_single_line_field(field) %} form-label-middle{% endif %}
@@ -34,15 +46,7 @@
             {%- endif -%}
             {%- if field.flags.required %}<i class="required" title="{% trans %}This field is required{% endtrans %}">*</i>{% endif -%}
         </div>
-        <div class="form-field form-block"{% if field.errors %} data-error="{{ _render_errors(field.errors) }}"{% endif %}>
-            {{ _render_field(field, widget_attrs) }}
-            {% if field.widget.input_type == 'checkbox' %}
-                <div class="checkbox-label">{{ field.label() }}</div>
-            {% endif %}
-            {% if field.description %}
-                <p class="form-field-description"><em>{{ field.description | safe }}</em></p>
-            {% endif %}
-        </div>
+        {{ form_field(field, "form-field form-block", widget_attrs) }}
     </div>
 {%- endmacro %}
 

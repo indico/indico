@@ -1,7 +1,9 @@
 {% set value_json = field._value() | tojson %}
-<div id="userGroupList-{{ field.id }}" style="margin-bottom: 10px;"></div>
-<input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}">
-
+<div class="form-row" data-tooltip-anchor>
+    <div id="userGroupList-{{ field.id }}" style="margin-bottom: 10px;"></div>
+    <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value_json | forceescape }}">
+    <span></span>
+</div>
 <script>
     (function() {
         var field = $('#{{ field.id }}');

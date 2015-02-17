@@ -16,7 +16,18 @@
 
 
 def retrieve_principals(iterable):
-    """Retrieves principal objects from `(type, id)` tuples.
+    """
+    Retrieves principal objects from `(type, id)` tuples.
+
+    Valid principal types are 'Avatar' and 'Group'
+    """
+
+    return filter(None, map(retrieve_principal, iterable))
+
+
+def retrieve_principal(principal):
+    """
+    Retrieves principal object from a `(type, id)` tuple.
 
     Valid principal types are 'Avatar' and 'Group'
     """
@@ -24,15 +35,9 @@ def retrieve_principals(iterable):
 
     ah = AvatarHolder()
     gh = GroupHolder()
-    principals = []
-    for type_, id_ in iterable:
-        if type_ == 'Avatar':
-            principal = ah.getById(id_)
-        else:
-            principal = gh.getById(id_)
-        if principal:
-            principals.append(principal)
-    return principals
+
+    type_, id_ = principal
+    return ah.getById(id_) if type_ == 'Avatar' else gh.getById(id_)
 
 
 def principals_merge_users(iterable, new_id, old_id):
