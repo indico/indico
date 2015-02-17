@@ -7,10 +7,11 @@ Create Date: 2015-01-27 15:21:59.489742
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
+
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.modules.agreements.models.agreements import AgreementState
-
 
 # revision identifiers, used by Alembic.
 revision = '5583f647dff5'
@@ -29,9 +30,12 @@ def upgrade():
                     sa.Column('timestamp', UTCDateTime, nullable=False),
                     sa.Column('user_id', sa.Integer(), nullable=True),
                     sa.Column('signed_dt', UTCDateTime, nullable=True),
+                    sa.Column('signed_from_ip', sa.String(), nullable=True),
+                    sa.Column('reason', sa.String(), nullable=True),
                     sa.Column('attachment', sa.LargeBinary(), nullable=True),
+                    sa.Column('attachment_filename', sa.String(), nullable=True),
+                    sa.Column('data', postgresql.JSON(), nullable=True),
                     sa.PrimaryKeyConstraint('id'),
-                    sa.UniqueConstraint('event_id', 'type', 'person_email'),
                     schema='events')
 
 

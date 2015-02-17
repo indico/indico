@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from collections import namedtuple
 from uuid import uuid4
 
+from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
@@ -57,8 +58,7 @@ class AgreementState(int, IndicoEnum):
 class Agreement(db.Model):
     """Agreements between a person and Indico"""
     __tablename__ = 'agreements'
-    __table_args__ = (db.UniqueConstraint('event_id', 'type', 'person_email'),
-                      {'schema': 'events'})
+    __table_args__ = {'schema': 'events'}
 
     #: Entry ID
     id = db.Column(
@@ -113,10 +113,25 @@ class Agreement(db.Model):
         UTCDateTime,
         index=True
     )
+    #: The IP from which the agreement was signed
+    signed_from_ip = db.Column(
+        db.String
+    )
+    #: Explanation as to why the agreement was accepted/rejected
+    reason = db.Column(
+        db.String
+    )
     #: Attachment
     attachment = db.Column(
-        db.LargeBinary,
-        nullable=True
+        db.LargeBinary
+    )
+    #: Filename and extension of the attachment
+    attachment_filename = db.Column(
+        db.String
+    )
+    #: Definition-specific data of the agreement
+    data = db.Column(
+        JSON
     )
 
     @hybrid_property
@@ -192,9 +207,14 @@ class Agreement(db.Model):
         self.definition.handle_rejected(self)
 
     def reset(self):
-        self.state = AgreementState.pending
-        self.signed_dt = None
         self.definition.handle_reset(self)
+        self.state = AgreementState.pending
+        self.attachment = None
+        self.attachment_filename = None
+        self.data = None
+        self.reason = None
+        self.signed_dt = None
+        self.signed_from_ip = None
 
     def render(self, form, **kwargs):
         return self.definition.render_form(self, form, **kwargs)
