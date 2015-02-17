@@ -60,6 +60,7 @@ class RHAgreementForm(RHConferenceBaseDisplay):
                 self.agreement.accept()
             else:
                 self.agreement.reject()
+            return redirect(url_for('.agreement_form', self.agreement, uuid=self.agreement.uuid))
         html = self.agreement.render(form)
         return WPAgreementForm.render_string(html, self._conf)
 
