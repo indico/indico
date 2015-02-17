@@ -29,10 +29,10 @@ from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 
-class AgreementPersonInfo(namedtuple('Person', ('name', 'email', 'user'))):
+class AgreementPersonInfo(namedtuple('Person', ('name', 'email', 'user', 'data'))):
     __slots__ = ()
 
-    def __new__(cls, name=None, email=None, user=None):
+    def __new__(cls, name=None, email=None, user=None, data=None):
         if user:
             if not name:
                 name = user.getStraightFullName()
@@ -42,7 +42,7 @@ class AgreementPersonInfo(namedtuple('Person', ('name', 'email', 'user'))):
             raise ValueError('name is missing')
         if not email:
             raise ValueError('email is missing')
-        return super(AgreementPersonInfo, cls).__new__(cls, name, email, user)
+        return super(AgreementPersonInfo, cls).__new__(cls, name, email, user, data)
 
 
 class AgreementState(int, IndicoEnum):

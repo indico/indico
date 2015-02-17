@@ -18,6 +18,7 @@ from flask import render_template
 
 from indico.modules.agreements.models.agreements import Agreement
 from indico.util.decorators import classproperty
+from indico.util.caching import make_hashable
 from indico.web.flask.templating import get_overridable_template_name
 
 
@@ -56,8 +57,9 @@ class AgreementDefinitionBase(object):
     def get_people_not_notified(cls, event):
         """Returns a list of :class:`AgreementPersonInfo` yet to be notified"""
         people = cls.get_people(event)
-        sent_agreement_emails = [a.person_email for a in Agreement.find(event_id=event.getId(), type=cls.name)]
-        return [person for person in people if person.email not in sent_agreement_emails]
+        sent_agreements = {(a.person_email, make_hashable(a.data))
+                           for a in Agreement.find(event_id=event.getId(), type=cls.name)}
+        return [person for person in people if (person.email, make_hashable(person.data)) not in sent_agreements]
 
     @classmethod
     def handle_accepted(cls, agreement):
