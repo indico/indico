@@ -30,18 +30,18 @@ def make_email_template(template, agreement, email_body=None):
     link = Markup('<a href="{0}">{0}</a>'.format(url_for('agreements.agreement_form', agreement,
                                                  uuid=agreement.uuid, _external=True)))
     if not email_body:
-        email_body = func('agreements/emails/agreement_default.html', event=agreement.event).get_body()
+        email_body = func('agreements/emails/agreement_default_body.html', event=agreement.event).get_body()
     email_body = email_body.format(person_name=agreement.person_name, agreement_link=link)
     return func(template, email_body=email_body)
 
 
 @email_sender
-def notify_agreement_required_new(agreement, email_body=None):
-    template = make_email_template('agreements/emails/agreement_required_new.html', agreement, email_body)
+def notify_agreement_new(agreement, email_body=None):
+    template = make_email_template('agreements/emails/agreement_new.html', agreement, email_body)
     return make_email(agreement.person_email, template=template, html=True)
 
 
 @email_sender
-def notify_agreement_required_reminder(agreement, email_body=None):
-    template = make_email_template('agreements/emails/agreement_required_reminder.html', agreement, email_body)
+def notify_agreement_reminder(agreement, email_body=None):
+    template = make_email_template('agreements/emails/agreement_reminder.html', agreement, email_body)
     return make_email(agreement.person_email, template=template, html=True)

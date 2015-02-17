@@ -21,7 +21,7 @@ from indico.core.db import db
 from indico.util.signals import named_objects_from_signal
 
 from indico.modules.agreements.models.agreements import Agreement
-from indico.modules.agreements.notifications import notify_agreement_required_new
+from indico.modules.agreements.notifications import notify_agreement_new
 
 
 def get_agreement_definitions():
@@ -43,5 +43,5 @@ def send_new_agreements(event, name, people, email_body):
         agreements.append(agreement)
     db.session.flush()
     for agreement in agreements:
-        notify_agreement_required_new(agreement, email_body)
+        notify_agreement_new(agreement, email_body)
     return agreements

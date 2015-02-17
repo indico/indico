@@ -32,7 +32,7 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 from indico.modules.agreements.forms import AgreementForm, AgreementEmailForm, AgreementUploadForm
 from indico.modules.agreements.models.agreements import Agreement
-from indico.modules.agreements.notifications import notify_agreement_required_reminder
+from indico.modules.agreements.notifications import notify_agreement_reminder
 from indico.modules.agreements.views import WPAgreementForm, WPAgreementManager
 from indico.modules.agreements.util import get_agreement_definitions, send_new_agreements
 
@@ -97,7 +97,7 @@ class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetails):
     def _process(self):
         event = self._conf
         func = get_template_module if not current_plugin else get_plugin_template_module
-        template = func('agreements/emails/agreement_default.html', event=event)
+        template = func('agreements/emails/agreement_default_body.html', event=event)
         form_defaults = FormDefaults(body=template.get_html_body())
         form = AgreementEmailForm(obj=form_defaults)
         if form.validate_on_submit():
@@ -114,7 +114,7 @@ class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetails):
         event = self._conf
         agreements = Agreement.find_all(Agreement.pending, event_id=event.getId(), type=self.definition.name)
         for agreement in agreements:
-            notify_agreement_required_reminder(agreement)
+            notify_agreement_reminder(agreement)
         flash(_("Reminders sent"), 'success')
         return redirect(url_for('.event_agreements_details', event, self.definition))
 
