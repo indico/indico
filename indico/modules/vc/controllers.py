@@ -79,6 +79,10 @@ class RHVCManageEventCreate(RHVCManageEventBase):
             raise NotFound
 
     def _process(self):
+        if not self.plugin.can_manage_vc_rooms(session.user, self.event):
+            flash(_('You are not allowed to create VC rooms for this event.'), 'error')
+            return redirect(url_for('.manage_vc_rooms', self.event))
+
         form = self.plugin.create_form(event=self.event)
         if form.validate_on_submit():
             data = form.data
@@ -107,12 +111,20 @@ class RHVCSystemEventBase(RHEventVCRoomMixin, RHVCManageEventBase):
     def _checkParams(self, params):
         RHVCManageEventBase._checkParams(self, params)
         RHEventVCRoomMixin._checkParams(self)
+        try:
+            self.plugin = get_vc_plugin_by_service_name(request.view_args['service'])
+        except KeyError:
+            raise NotFound
 
 
 class RHVCManageEventModify(RHVCSystemEventBase):
     """Modifies an existing VC room"""
 
     def _process(self):
+        if not self.plugin.can_manage_vc_rooms(session.user, self.event):
+            flash(_('You are not allowed to modify VC rooms for this event.'), 'error')
+            return redirect(url_for('.manage_vc_rooms', self.event))
+
         form = self.plugin.create_form(event=self.event, existing_vc_room=self.vc_room)
         form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form,
                                             existing_vc_room=self.vc_room)
@@ -134,6 +146,10 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
     """Removes an existing VC room"""
 
     def _process(self):
+        if not self.plugin.can_manage_vc_rooms(session.user, self.event):
+            flash(_('You are not allowed to remove VC rooms from this event.'), 'error')
+            return redirect(url_for('.manage_vc_rooms', self.event))
+
         Logger.get('modules.vc').info("Detaching VC room {} from event {}".format(
             self.vc_room, self._conf))
         db.session.delete(self.event_vc_room)

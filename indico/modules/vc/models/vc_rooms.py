@@ -80,7 +80,7 @@ class VCRoom(db.Model):
 
     @property
     def locator(self):
-        return {'vc_room_id': self.id}
+        return {'vc_room_id': self.id, 'service': self.type}
 
     @property
     def created_by_user(self):

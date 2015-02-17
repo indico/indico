@@ -22,6 +22,7 @@ from wtforms.fields.core import BooleanField
 
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
+from indico.util.user import retrieve_principals
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import IndicoForm, FormDefaults
 from indico.web.forms.fields import PrincipalField
@@ -29,8 +30,8 @@ from indico.web.forms.fields import PrincipalField
 
 class VCPluginSettingsFormBase(IndicoForm):
     managers = PrincipalField(_('Managers'), description=_('Service managers'))
-    authorized_users = PrincipalField(_('Authorized users'),
-                                      description=_('Users and Groups authorised to create video conference rooms'))
+    acl = PrincipalField(_('ACL'), groups=True,
+                         description=_('Users and Groups authorised to create video conference rooms'))
     notify_managers = BooleanField(_('Notify managers'),
                                    description=_('Send email notifications to managers'))
 
@@ -70,6 +71,14 @@ class VCPluginMixin(object):
         defaults = FormDefaults(existing_vc_room.data if existing_vc_room else self.get_vc_room_form_defaults(event))
         with self.plugin_context():
             return self.vc_room_form(prefix='vc-', obj=defaults, event=event, vc_room=existing_vc_room)
+
+    def can_manage_vc_rooms(self, user, event):
+        acl = self.settings.get('acl')
+        if not acl:
+            return True
+
+        principals = retrieve_principals(acl)
+        return any(principal.containsUser(user) for principal in principals)
 
 
 class VCRoomFormBase(IndicoForm):
