@@ -24,9 +24,10 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.util.i18n import _
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
-from indico.util.struct.enum import IndicoEnum
+from indico.util.struct.enum import TitledIntEnum
 
 
 class AgreementPersonInfo(namedtuple('Person', ('name', 'email', 'user', 'data'))):
@@ -45,14 +46,15 @@ class AgreementPersonInfo(namedtuple('Person', ('name', 'email', 'user', 'data')
         return super(AgreementPersonInfo, cls).__new__(cls, name, email, user, data)
 
 
-class AgreementState(int, IndicoEnum):
-    pending = 1
-    accepted = 2
-    rejected = 3
+class AgreementState(TitledIntEnum):
+    __titles__ = [_("Pending"), _("Accepted"), _("Rejected"), _("Accepted on behalf"), _("Rejected on behalf")]
+    pending = 0
+    accepted = 1
+    rejected = 2
     #: agreement accepted on behalf of the person
-    accepted_on_behalf = 4
+    accepted_on_behalf = 3
     #: agreement rejected on behalf of the person
-    rejected_on_behalf = 5
+    rejected_on_behalf = 4
 
 
 class Agreement(db.Model):
