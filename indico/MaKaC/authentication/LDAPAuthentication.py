@@ -373,6 +373,16 @@ class LDAPConnector(object):
     def _findDNOfGroup(self, groupName):
         return self._findDN(self.ldapGroupsDN,
                             self.ldapGroupsFilter, groupName)
+                            
+    def findUIDFromDN(self, dn):
+        filter = '(distinguishedName=' + dn + ')'
+        try:
+            memberuid = self.l.search_s(dn,ldap.SCOPE_BASE, filter, [UID_FIELD])[0][1][UID_FIELD][0]
+            if memberuid:
+                return memberuid
+            return None
+        except:
+            Logger.get('auth.ldap').warn("No " + UID_FIELD + " for " + dn + ".")
 
     def open(self):
         """
@@ -564,6 +574,8 @@ class LDAPConnector(object):
 
         if not entries:
             memberuid = LDAPTools.extractUIDFromDN(dnEgroup)
+            if not memberuid:
+                memberuid = self.findUIDFromDN(dnEgroup)
             if memberuid:
                 members.add(memberuid)
         else:
