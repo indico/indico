@@ -15,10 +15,13 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+import re
 
 from flask import render_template
 
 from wtforms.fields.core import BooleanField
+from wtforms.fields.simple import StringField
+from wtforms.validators import DataRequired, Length, Regexp
 
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
@@ -26,6 +29,9 @@ from indico.util.user import retrieve_principals
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import IndicoForm, FormDefaults
 from indico.web.forms.fields import PrincipalField
+
+ROOM_NAME_RE = re.compile(r'[\w\-]+')
+PREFIX_RE = re.compile('^vc_')
 
 
 class VCPluginSettingsFormBase(IndicoForm):
@@ -50,6 +56,10 @@ class VCPluginMixin(object):
     def get_vc_room_form_defaults(self, event):
         return {}
 
+    @property
+    def service_name(self):
+        return PREFIX_RE.sub('', self.name)
+
     @classproperty
     @classmethod
     def category(self):
@@ -62,6 +72,10 @@ class VCPluginMixin(object):
         """
         tpl = get_overridable_template_name('manage_event_create_room.html', self, 'vc/')
         return render_template(tpl, **kwargs)
+
+    def render_custom_create_button(self, **kwargs):
+        tpl = get_overridable_template_name('create_button.html', self, 'vc/')
+        return render_template(tpl, plugin=self, **kwargs)
 
     def create_form(self, event, existing_vc_room=None):
         """Creates the video conference room form
@@ -82,6 +96,9 @@ class VCPluginMixin(object):
 
 
 class VCRoomFormBase(IndicoForm):
+    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
+                       description=_('The name of the room'))
+
     def __init__(self, *args, **kwargs):
         self.vc_room = kwargs.pop('vc_room')
         self.event = kwargs.pop('event')

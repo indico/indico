@@ -7,7 +7,7 @@
         <p>{% trans %}The following video services are available. Click on one to create a new room:{% endtrans %}</p>
         <div class="i-badges-list-left i-badges-list-hover">
             {%- for plugin in plugins %}
-                <a class="js-plugin-details i-badge i-badge-gray" href="{{ url_for('.manage_vc_rooms_create', event, service=plugin.name|replace('vc_','')) }}">
+                <a class="js-plugin-details i-badge i-badge-gray" href="{{ url_for('.manage_vc_rooms_create', event, service=plugin.service_name) }}">
                     <div class="i-badge-content">
                         <span class="i-badge-img">
                             <img src="{{ plugin.logo_url }}">

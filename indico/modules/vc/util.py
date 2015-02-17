@@ -16,25 +16,20 @@
 
 from __future__ import unicode_literals
 
-import re
-
 from indico.core.plugins import plugin_engine
 from indico.modules.vc import VCPluginMixin
-
-remove_prefix_re = re.compile('^vc_')
-
-
-def remove_prefix(plugin):
-    return remove_prefix_re.sub('', plugin.name)
 
 
 def get_vc_plugins():
     """Returns a dict containing the available video conference plugins."""
-    return {remove_prefix_re.sub('', p.name): p for p in plugin_engine.get_active_plugins().itervalues()
+    return {p.service_name: p for p in plugin_engine.get_active_plugins().itervalues()
             if isinstance(p, VCPluginMixin)}
 
 
 def get_vc_plugin_by_service_name(plugin_name):
     """Returns a video conference plugin"""
     for name, plugin in get_vc_plugins().iteritems():
-        return plugin if name == plugin_name else None
+        if name == plugin_name:
+            return plugin
+    else:
+        raise KeyError()

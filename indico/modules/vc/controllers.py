@@ -23,11 +23,12 @@ from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
-from indico.modules.vc.util import get_vc_plugins, get_vc_plugin_by_service_name, remove_prefix
+from indico.modules.vc.util import get_vc_plugins, get_vc_plugin_by_service_name
 from indico.modules.vc.views import WPVCManageEvent
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -57,7 +58,7 @@ class RHVCManageEvent(RHVCManageEventBase):
         except ValueError:
             raise IndicoError(_('This page is not available for legacy events.'))
         return WPVCManageEvent.render_template('manage_event.html', self._conf, event=self._conf,
-                                               event_vc_rooms=vc_rooms)
+                                               event_vc_rooms=vc_rooms, vc_systems=get_vc_plugins().values())
 
 
 class RHVCManageEventSelectService(RHVCManageEventBase):
@@ -84,11 +85,12 @@ class RHVCManageEventCreate(RHVCManageEventBase):
             return redirect(url_for('.manage_vc_rooms', self.event))
 
         form = self.plugin.create_form(event=self.event)
+
         if form.validate_on_submit():
             data = form.data
 
             vc_room = VCRoom(created_by_user=session.user)
-            vc_room.type = remove_prefix(self.plugin)
+            vc_room.type = self.plugin.service_name
             vc_room.status = VCRoomStatus.created
             vc_room.name = data.pop('name')
             vc_room.data = data
