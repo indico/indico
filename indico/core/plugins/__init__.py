@@ -37,7 +37,7 @@ from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.struct.enum import IndicoEnum
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
-from indico.web.flask.templating import get_template_module
+from indico.web.flask.templating import get_template_module, register_template_hook
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 from MaKaC.webinterface.pages.base import WPJinjaMixin
@@ -229,25 +229,9 @@ class IndicoPlugin(Plugin):
     def template_hook(self, name, receiver, priority=50, markup=True):
         """Registers a function to be called when a template hook is invoked.
 
-        The receiver function should always support arbitrary ``**kwargs``
-        to prevent breakage in future Indico versions which might add new
-        arguments to a hook::
-
-            def receiver(something, **kwargs):
-                return do_stuff(something)
-
-        It needs to return a unicode string. If you intend to return plaintext
-        it is adviable to set the `markup` param to `False` which results in the
-        string being considered "unsafe" which will cause it to be HTML-escaped.
-
-        :param name: The name of the template hook.
-        :param receiver: The receiver function.
-        :param priority: The priority to use when multiple plugins
-                         inject data for the same hook.
-        :param markup: If the returned data is HTML
+        For details see :func:~`indico.web.flask.templating.register_template_hook`
         """
-        self.connect(signals.plugin.template_hook, lambda _, **kw: (markup, priority, receiver(**kw)),
-                     sender=unicode(name))
+        register_template_hook(name, receiver, priority, markup, self)
 
     @classproperty
     @classmethod

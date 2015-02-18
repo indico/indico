@@ -24,6 +24,7 @@ from jinja2.filters import make_attrgetter
 from jinja2.lexer import Token
 from markupsafe import Markup
 
+from indico.core import signals
 from indico.util.string import render_markdown, natural_sort_key
 
 
@@ -103,6 +104,44 @@ def get_template_module(template_name_or_list, **context):
     app.update_template_context(context)
     tpl = app.jinja_env.get_or_select_template(template_name_or_list)
     return tpl.make_module(context)
+
+
+def register_template_hook(name, receiver, priority=50, markup=True, plugin=None):
+    """Registers a function to be called when a template hook is invoked.
+
+    The receiver function should always support arbitrary ``**kwargs``
+    to prevent breakage in future Indico versions which might add new
+    arguments to a hook::
+
+        def receiver(something, **kwargs):
+            return do_stuff(something)
+
+    It needs to return a unicode string. If you intend to return plaintext
+    it is adviable to set the `markup` param to `False` which results in the
+    string being considered "unsafe" which will cause it to be HTML-escaped.
+
+    :param name: The name of the template hook.
+    :param receiver: The receiver function.
+    :param priority: The priority to use when multiple plugins
+                     inject data for the same hook.
+    :param markup: If the returned data is HTML
+    """
+    def _func(_, **kw):
+        return markup, priority, receiver(**kw)
+
+    if plugin is None:
+        signals.plugin.template_hook.connect(_func, sender=unicode(name), weak=False)
+    else:
+        plugin.connect(signals.plugin.template_hook, _func, sender=unicode(name))
+
+
+def template_hook(name, priority=50, markup=True):
+    """Decorator for register_template_hook"""
+    def decorator(func):
+        register_template_hook(name, func, priority, markup)
+        return func
+
+    return decorator
 
 
 class EnsureUnicodeExtension(Extension):
