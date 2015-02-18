@@ -31,6 +31,8 @@ class AgreementDefinitionBase(object):
     title = None
     #: optional and short description of the agreement definition
     description = None
+    #: url to obtain the paper version of the agreement form
+    paper_form_url = None
     #: template of the agreement form - agreement definition name by default
     template_name = None
     #: plugin containing this agreement definition - assigned automatically
