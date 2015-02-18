@@ -99,9 +99,8 @@ class RHVCManageEventCreate(RHVCManageEventBase):
 
             db.session.add_all((vc_room, event_vc_room))
 
-            # TODO: API
-            # create_room(vc_room)
-            # notify_created(vc_room, self.event, session.user)
+            self.plugin.create_room(vc_room, self.event)
+            # TODO: notify_created(vc_room, self.event, session.user)
 
             flash(_('Video conference room created'), 'success')
             return redirect(url_for('.manage_vc_rooms', self.event))

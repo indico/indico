@@ -91,6 +91,9 @@ class VCPluginMixin(object):
         with self.plugin_context():
             return self.vc_room_form(prefix='vc-', obj=defaults, event=event, vc_room=existing_vc_room)
 
+    def create_room(self, vc_room):
+        raise NotImplementedError('Plugin must implement create_room()')
+
     def can_manage_vc_rooms(self, user, event):
         acl = self.settings.get('acl')
         if not acl:
