@@ -1125,6 +1125,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         modules += self._includeJSPackage('MaterialEditor')
         modules += self._includeJSPackage('Display')
         modules += sum(self._notify('injectJSFiles'), [])
+        modules += self._asset_env['zero_clipboard_js'].urls()
         return modules
 
     def _applyDecoration( self, body ):

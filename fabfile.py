@@ -368,6 +368,20 @@ def install_pagedown():
         local('cp *.js {0}'.format(dest_dir))
 
 
+@recipe('ZeroClipboard')
+def install_zeroclipboard():
+    """
+    Install ZeroClipboard from Git
+    """
+    with lcd(os.path.join(env.ext_dir, 'zeroclipboard')):
+        dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'zeroclipboard/')
+        local('mkdir -p {0}'.format(dest_dir))
+        local('cp dist/ZeroClipboard.js {0}/'.format(dest_dir))
+        local('cp dist/ZeroClipboard.min.js {0}/'.format(dest_dir))
+        local('cp dist/ZeroClipboard.min.map {0}/'.format(dest_dir))
+        local('cp dist/ZeroClipboard.swf {0}/'.format(dest_dir))
+
+
 # Tasks
 
 @task

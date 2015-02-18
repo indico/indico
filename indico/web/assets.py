@@ -232,6 +232,8 @@ angular = rjs_bundle(
     'js/indico/angular/filters.js',
     'js/indico/angular/services.js')
 
+zero_clipboard_js = rjs_bundle('zero_clipboard_js', 'js/lib/zeroclipboard/ZeroClipboard.js')
+
 jquery = rjs_bundle('jquery', *filter(None, [
     'js/lib/underscore.js',
     'js/lib/jquery.js',
@@ -388,6 +390,7 @@ def register_all_js(env):
     env.register('contributions_js', contributions_js)
     env.register('mathjax_js', mathjax_js)
     env.register('jqplot_js', jqplot_js)
+    env.register('zero_clipboard_js', zero_clipboard_js)
 
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)
