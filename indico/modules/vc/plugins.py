@@ -21,14 +21,16 @@ from flask import render_template
 
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import StringField
-from wtforms.validators import DataRequired, Length, Regexp
+from wtforms.validators import DataRequired, Length, Regexp, ValidationError
 
+from indico.modules.vc.models import VCRoom
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.user import retrieve_principals
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import IndicoForm, FormDefaults
 from indico.web.forms.fields import PrincipalField
+
 
 ROOM_NAME_RE = re.compile(r'[\w\-]+')
 PREFIX_RE = re.compile('^vc_')
@@ -99,6 +101,7 @@ class VCPluginMixin(object):
 
 
 class VCRoomFormBase(IndicoForm):
+
     name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
                        description=_('The name of the room'))
 
@@ -106,3 +109,10 @@ class VCRoomFormBase(IndicoForm):
         self.vc_room = kwargs.pop('vc_room')
         self.event = kwargs.pop('event')
         super(VCRoomFormBase, self).__init__(*args, **kwargs)
+
+    def validate_name(self, field):
+        if field.data:
+            room = VCRoom.find_first(name=field.data)
+
+            if room and room != self.vc_room:
+                raise ValidationError(_("There is already a room with this name"))

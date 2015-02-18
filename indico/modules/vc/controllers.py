@@ -99,8 +99,10 @@ class RHVCManageEventCreate(RHVCManageEventBase):
 
             db.session.add_all((vc_room, event_vc_room))
 
+            # TODO: API
             # create_room(vc_room)
             # notify_created(vc_room, self.event, session.user)
+
             flash(_('Video conference room created'), 'success')
             return redirect(url_for('.manage_vc_rooms', self.event))
         form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form)
@@ -128,19 +130,26 @@ class RHVCManageEventModify(RHVCSystemEventBase):
             return redirect(url_for('.manage_vc_rooms', self.event))
 
         form = self.plugin.create_form(event=self.event, existing_vc_room=self.vc_room)
-        form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form,
-                                            existing_vc_room=self.vc_room)
 
         if form.validate_on_submit():
-            form.populate_obj(self.event_vc_room)
-            form.populate_obj(self.vc_room)
+            # form.data is a generated property, so we cannot just .pop() directly from it
+            data = form.data
+            self.vc_room.name = data.pop('name')
+            self.vc_room.data = data
             self.vc_room.modified_dt = now_utc()
-            # TODO: If the attributes have changed, update the booking
+
+            # TODO: API
+            # If the attributes have changed, update the booking
             # if attrs_changed(self.vc_room, 'name', 'description', ...):
             #     update_room(self.vc_room)
             # notify_modified(self.vc_room, self.event, session.user)
+
             flash(_('Video conference room updated'), 'success')
             return redirect(url_for('.manage_vc_rooms', self.event))
+
+        form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form,
+                                            existing_vc_room=self.vc_room)
+
         return WPVCManageEvent.render_string(form_html, self.event)
 
 
@@ -161,4 +170,5 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
             Logger.get('modules.vc').info("Deleting VC room {}".format(self.vc_room))
             db.session.delete(self.vc_room)
             # TODO: VC-specific code !!!!
+        flash(_("Video conference room '{0}' has been removed").format(self.vc_room.name), 'success')
         return redirect(url_for('.manage_vc_rooms', self.event))
