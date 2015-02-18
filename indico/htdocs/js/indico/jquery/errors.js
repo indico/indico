@@ -37,14 +37,16 @@
     // Select the field of an i-form which has an error and display the tooltip.
     global.showFormErrors = function showFormErrors(context) {
         context = context || $('body');
-        context.find('.i-form .has-error > .form-field').each(function() {
+        context.find(".i-form .has-error > .form-field, .i-form .has-error > .form-subfield").each(function() {
             var $this = $(this);
             // Try a custom tooltip anchor
             var input = $this.find('[data-tooltip-anchor]');
+
             if (!input.length) {
                 // Try the first non-hidden input field
                 input = $this.children(':input:not(:hidden)').eq(0);
             }
+
             if (!input.length) {
                 // Try the first element that's not a hidden input
                 input = $this.children(':not(:input:hidden)').eq(0);

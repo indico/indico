@@ -27,7 +27,9 @@
                 my: 'left middle',
                 at: 'middle right'
             },
-            hide: false,
+            hide: {
+                'event': 'click unfocus'
+            },
             style: {
                 classes: 'qtip-rounded qtip-shadow qtip-' + category
             },
