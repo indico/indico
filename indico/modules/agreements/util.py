@@ -38,7 +38,7 @@ def send_new_agreements(event, name, people, email_body):
     """
     agreements = []
     for person in people:
-        agreement = Agreement.create_from_data(event_id=event.getId(), type=name, person=person)
+        agreement = Agreement.create_from_data(event=event, type_=name, person=person)
         db.session.add(agreement)
         agreements.append(agreement)
     db.session.flush()

@@ -166,6 +166,10 @@ class Agreement(db.Model):
         from MaKaC.conference import ConferenceHolder
         return ConferenceHolder().getById(str(self.event_id))
 
+    @event.setter
+    def event(self, event):
+        self.event_id = int(event.getId())
+
     @property
     def locator(self):
         return {'confId': self.event_id,
@@ -180,8 +184,6 @@ class Agreement(db.Model):
 
     @user.setter
     def user(self, user):
-        if user is None:
-            return
         self.user_id = user.getId()
 
     @return_ascii
@@ -190,8 +192,8 @@ class Agreement(db.Model):
         return '<Agreement({}, {}, {}, {}, {})>'.format(self.id, self.event_id, self.type, self.person_email, state)
 
     @staticmethod
-    def create_from_data(event_id, type, person):
-        agreement = Agreement(event_id=event_id, type=type, state=AgreementState.pending, uuid=str(uuid4()))
+    def create_from_data(event, type_, person):
+        agreement = Agreement(event=event, type=type_, state=AgreementState.pending, uuid=str(uuid4()))
         agreement.person_email = person.email
         agreement.person_name = person.name
         if person.user:
