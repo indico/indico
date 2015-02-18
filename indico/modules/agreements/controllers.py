@@ -93,35 +93,71 @@ class RHAgreementManagerDetails(RHConferenceModifBase):
                                                   event=event, definition=self.definition, agreements=agreements)
 
 
-class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetails):
-    def _process(self):
-        event = self._conf
+class RHAgreementManagerDetailsEmail(RHAgreementManagerDetails):
+    dialog_template = None
+
+    def _success_handler(self, form):
+        raise NotImplementedError
+
+    def _get_form(self):
         func = get_template_module if not current_plugin else get_plugin_template_module
-        template = func('agreements/emails/agreement_default_body.html', event=event)
+        template = func('agreements/emails/agreement_default_body.html', event=self._conf)
         form_defaults = FormDefaults(body=template.get_html_body())
-        form = AgreementEmailForm(obj=form_defaults)
-        if form.validate_on_submit():
-            email_body = form.body.data
-            people = self.definition.get_people_not_notified(event)
-            send_new_agreements(event=event, name=self.definition.name, people=people, email_body=email_body)
-            return jsonify({'success': True})
-        return WPJinjaMixin.render_template('agreements/agreement_email_form.html',
-                                            event=event, form=form, definition=self.definition)
+        return AgreementEmailForm(obj=form_defaults)
 
-
-class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetails):
     def _process(self):
         event = self._conf
-        agreements = Agreement.find_all(Agreement.pending, event_id=event.getId(), type=self.definition.name)
+        form = self._get_form()
+        if form.validate_on_submit():
+            self._success_handler(form)
+            return jsonify({'success': True})
+        return WPJinjaMixin.render_template(self.dialog_template, event=event, form=form, definition=self.definition)
+
+
+class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmail):
+    dialog_template = 'agreements/agreement_email_form_send.html'
+
+    def _get_people(self):
+        return []
+
+    def _success_handler(self, form):
+        people = self._get_people()
+        email_body = form.body.data
+        send_new_agreements(event=self._conf, name=self.definition.name, people=people, email_body=email_body)
+
+
+class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmail):
+    dialog_template = 'agreements/agreement_email_form_remind.html'
+
+    def _get_agreements(self):
+        return []
+
+    def _success_handler(self, form):
+        email_body = form.body.data
+        agreements = self._get_agreements()
         for agreement in agreements:
-            notify_agreement_reminder(agreement)
+            notify_agreement_reminder(agreement, email_body)
         flash(_("Reminders sent"), 'success')
-        return redirect(url_for('.event_agreements_details', event, self.definition))
+
+
+class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetailsSend):
+    dialog_template = 'agreements/agreement_email_form_send_all.html'
+
+    def _get_people(self):
+        event = self._conf
+        return self.definition.get_people_not_notified(event)
+
+
+class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):
+    dialog_template = 'agreements/agreement_email_form_remind_all.html'
+
+    def _get_agreements(self):
+        return Agreement.find_all(Agreement.pending, event_id=self._conf.getId(), type=self.definition.name)
 
 
 class RHAgreementManagerDetailsUploadAgreement(RHAgreementManagerDetails):
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHAgreementManagerDetails._checkParams(self, params)
         self.agreement = Agreement.find_one(id=request.view_args['id'])
         if self._conf != self.agreement.event:
             raise NotFound()
