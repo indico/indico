@@ -82,7 +82,10 @@ class VCPluginMixin(object):
         :param event: the event the video conference room is for
         :return: an instance of an :class:`IndicoForm` subclass
         """
-        defaults = FormDefaults(existing_vc_room.data if existing_vc_room else self.get_vc_room_form_defaults(event))
+        if existing_vc_room:
+            defaults = FormDefaults(existing_vc_room.data, name=existing_vc_room.name)
+        else:
+            defaults = FormDefaults(self.get_vc_room_form_defaults(event))
         with self.plugin_context():
             return self.vc_room_form(prefix='vc-', obj=defaults, event=event, vc_room=existing_vc_room)
 
