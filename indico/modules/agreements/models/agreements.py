@@ -200,13 +200,15 @@ class Agreement(db.Model):
             agreement.user = person.user
         return agreement
 
-    def accept(self, on_behalf=False):
+    def accept(self, reason=None, on_behalf=False):
         self.state = AgreementState.accepted if not on_behalf else AgreementState.accepted_on_behalf
+        self.reason = reason
         self.signed_dt = now_utc()
         self.definition.handle_accepted(self)
 
-    def reject(self, on_behalf=False):
+    def reject(self, reason=None, on_behalf=False):
         self.state = AgreementState.rejected if not on_behalf else AgreementState.rejected_on_behalf
+        self.reason = reason
         self.signed_dt = now_utc()
         self.definition.handle_rejected(self)
 

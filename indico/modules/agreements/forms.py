@@ -31,6 +31,7 @@ from indico.web.forms.widgets import CKEditorWidget
 class AgreementForm(IndicoForm):
     agreed = IndicoRadioField(_("Do you agree with the stated above?"), [InputRequired()],
                               coerce=lambda x: bool(int(x)), choices=[(1, _("I agree")), (0, _("I disagree"))])
+    reason = TextAreaField(_("Reason"))
 
 
 class AgreementEmailForm(IndicoForm):

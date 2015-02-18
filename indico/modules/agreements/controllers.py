@@ -60,10 +60,10 @@ class RHAgreementForm(RHConferenceBaseDisplay):
     def _process(self):
         form = AgreementForm()
         if form.validate_on_submit() and self.agreement.pending:
-            if form.agreed.data:
-                self.agreement.accept()
-            else:
-                self.agreement.reject()
+            self.agreement.signed_from_ip = request.remote_addr
+            reason = form.reason.data if form.agreed.data else None
+            func = self.agreement.accept if form.agreed.data else self.agreement.reject
+            func(reason=reason)
             return redirect(url_for('.agreement_form', self.agreement, uuid=self.agreement.uuid))
         html = self.agreement.render(form)
         return WPAgreementForm.render_string(html, self._conf)

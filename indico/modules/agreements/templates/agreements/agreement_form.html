@@ -60,10 +60,23 @@
             {% if agreement.pending %}
                 <div class="i-box-footer">
                     <div class="legal-confirmation">
-                        <div class="question">
-                            {{ form.agreed.label() }}
+                        <div class="section">
+                            <div class="question">
+                                {{ form.agreed.label() }}
+                            </div>
+                            {{ form.agreed }}
                         </div>
-                        {{ form.agreed }}
+                        <div id="section-reason" class="section hidden">
+                            <div class="question">
+                                {{ form.reason.label() }}:
+                                <span class="text-superfluous">
+                                    {% trans %}
+                                        (optional)
+                                    {% endtrans %}
+                                </span>
+                            </div>
+                            {{ form.reason }}
+                        </div>
                     </div>
                 </div>
             {% endif %}
@@ -81,7 +94,8 @@
 </form>
 
 <script>
-    $('.agreement-form-sections input:radio').on('change', function() {
+    $('.agreement-form-sections input:radio').on('change', function(e) {
+        $('#section-reason').toggleClass('hidden', e.target.value == '1');
         $('#agreement-submit')
             .prop('disabled', false)
             .qtip('destroy', true)
@@ -90,6 +104,7 @@
                     text: $T("You won't be able to change your decision later. If necessary, please contact the manager of the event."),
                 },
                 position: {
+                    viewport: false,
                     my: 'right center',
                     at: 'left center'
                 },
