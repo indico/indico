@@ -144,8 +144,7 @@ class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetailsSend):
     dialog_template = 'agreements/agreement_email_form_send_all.html'
 
     def _get_people(self):
-        event = self._conf
-        return self.definition.get_people_not_notified(event)
+        return self.definition.get_people_not_notified(self._conf)
 
 
 class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):

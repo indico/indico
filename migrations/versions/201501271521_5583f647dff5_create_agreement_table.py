@@ -24,6 +24,7 @@ def upgrade():
                     sa.Column('uuid', sa.String(), nullable=False),
                     sa.Column('type', sa.String(), nullable=False),
                     sa.Column('event_id', sa.Integer(), nullable=False),
+                    sa.Column('identifier', sa.String(), nullable=False),
                     sa.Column('person_email', sa.String(), nullable=False),
                     sa.Column('person_name', sa.String(), nullable=False),
                     sa.Column('state', PyIntEnum(AgreementState), nullable=False),
@@ -35,6 +36,7 @@ def upgrade():
                     sa.Column('attachment', sa.LargeBinary(), nullable=True),
                     sa.Column('attachment_filename', sa.String(), nullable=True),
                     sa.Column('data', postgresql.JSON(), nullable=True),
+                    sa.UniqueConstraint('event_id', 'type', 'identifier'),
                     sa.PrimaryKeyConstraint('id'),
                     schema='events')
 

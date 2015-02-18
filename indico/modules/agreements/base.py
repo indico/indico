@@ -18,7 +18,6 @@ from flask import render_template
 
 from indico.modules.agreements.models.agreements import Agreement
 from indico.util.decorators import classproperty
-from indico.util.caching import make_hashable
 from indico.web.flask.templating import get_overridable_template_name
 
 
@@ -51,21 +50,18 @@ class AgreementDefinitionBase(object):
 
     @classmethod
     def get_people(cls, event):
-        """Returns a list of :class:`AgreementPersonInfo` required to sign agreements"""
+        """Returns a dictionary of :class:`AgreementPersonInfo` required to sign agreements"""
         people = cls.iter_people(event)
-        return [] if people is None else list(people)
+        if people is None:
+            return {}
+        return {p.identifier: p for p in people}
 
     @classmethod
     def get_people_not_notified(cls, event):
-        """Returns a list of :class:`AgreementPersonInfo` yet to be notified"""
+        """Returns a dictionary of :class:`AgreementPersonInfo` yet to be notified"""
         people = cls.get_people(event)
-        sent_agreements = {(a.person_email, make_hashable(a.data))
-                           for a in Agreement.find(event_id=event.getId(), type=cls.name)}
-        return [person for person in people if (person.email, make_hashable(person.data)) not in sent_agreements]
-
-    @classmethod
-    def match(cls, agreement, person):
-        return agreement.person_email == person.email and make_hashable(agreement.data) == make_hashable(person.data)
+        sent_agreements = {a.identifier for a in Agreement.find(event_id=event.getId(), type=cls.name)}
+        return {k: v for k, v in people.items() if v.identifier not in sent_agreements}
 
     @classmethod
     def handle_accepted(cls, agreement):

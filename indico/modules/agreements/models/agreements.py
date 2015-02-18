@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from collections import namedtuple
+from hashlib import sha1
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import JSON
@@ -24,16 +24,15 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
-from indico.util.i18n import _
+from indico.util.caching import make_hashable
 from indico.util.date_time import now_utc
+from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.util.struct.enum import TitledIntEnum
 
 
-class AgreementPersonInfo(namedtuple('Person', ('name', 'email', 'user', 'data'))):
-    __slots__ = ()
-
-    def __new__(cls, name=None, email=None, user=None, data=None):
+class AgreementPersonInfo(object):
+    def __init__(self, name=None, email=None, user=None, data=None):
         if user:
             if not name:
                 name = user.getStraightFullName()
@@ -43,7 +42,22 @@ class AgreementPersonInfo(namedtuple('Person', ('name', 'email', 'user', 'data')
             raise ValueError('name is missing')
         if not email:
             raise ValueError('email is missing')
-        return super(AgreementPersonInfo, cls).__new__(cls, name, email, user, data)
+        self.name = name
+        self.email = email
+        self.user = user
+        self.data = data
+
+    @return_ascii
+    def __repr__(self):
+        return '<AgreementPersonInfo({}, {}, {})>'.format(self.name, self.email, self.identifier)
+
+    @property
+    def identifier(self):
+        data_string = None
+        if self.data:
+            data_string = '-'.join('{}={}'.format(k, make_hashable(v)) for k, v in sorted(self.data.viewitems()))
+        identifier = '{}:{}'.format(self.email, data_string or None)
+        return sha1(identifier).hexdigest()
 
 
 class AgreementState(TitledIntEnum):
@@ -60,7 +74,8 @@ class AgreementState(TitledIntEnum):
 class Agreement(db.Model):
     """Agreements between a person and Indico"""
     __tablename__ = 'agreements'
-    __table_args__ = {'schema': 'events'}
+    __table_args__ = (db.UniqueConstraint('event_id', 'type', 'identifier'),
+                      {'schema': 'events'},)
 
     #: Entry ID
     id = db.Column(
@@ -80,6 +95,11 @@ class Agreement(db.Model):
     )
     #: Type of agreement
     type = db.Column(
+        db.String,
+        nullable=False
+    )
+    #: Unique identifier within the event and type
+    identifier = db.Column(
         db.String,
         nullable=False
     )
@@ -189,11 +209,13 @@ class Agreement(db.Model):
     @return_ascii
     def __repr__(self):
         state = self.state.name if self.state is not None else None
-        return '<Agreement({}, {}, {}, {}, {})>'.format(self.id, self.event_id, self.type, self.person_email, state)
+        return '<Agreement({}, {}, {}, {}, {}, {})>'.format(self.id, self.event_id, self.type, self.identifier,
+                                                            self.person_email, state)
 
     @staticmethod
     def create_from_data(event, type_, person):
         agreement = Agreement(event=event, type=type_, state=AgreementState.pending, uuid=str(uuid4()))
+        agreement.identifier = person.identifier
         agreement.person_email = person.email
         agreement.person_name = person.name
         if person.user:
@@ -226,4 +248,4 @@ class Agreement(db.Model):
         return self.definition.render_form(self, form, **kwargs)
 
     def belongs_to(self, person):
-        return self.definition.match(self, person)
+        return self.identifier == person.identifier
