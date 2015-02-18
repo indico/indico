@@ -222,3 +222,6 @@ class Agreement(db.Model):
 
     def render(self, form, **kwargs):
         return self.definition.render_form(self, form, **kwargs)
+
+    def belongs_to(self, person):
+        return self.definition.match(self, person)

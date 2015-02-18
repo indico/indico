@@ -62,6 +62,10 @@ class AgreementDefinitionBase(object):
         return [person for person in people if (person.email, make_hashable(person.data)) not in sent_agreements]
 
     @classmethod
+    def match(cls, agreement, person):
+        return agreement.person_email == person.email and make_hashable(agreement.data) == make_hashable(person.data)
+
+    @classmethod
     def handle_accepted(cls, agreement):
         """Handles logic on agreement accepted"""
         pass  # pragma: no cover
