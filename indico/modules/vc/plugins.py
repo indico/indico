@@ -69,13 +69,7 @@ class VCPluginMixin(object):
         tpl = get_overridable_template_name('info_box.html', self, 'vc/')
         moderator = retrieve_principal(vc_room.data.get('moderator'))
         phone_link = self.settings.get('vidyo_phone_link')
-        link_type = event_vc_room.link_type
-        if link_type == VCRoomLinkType.event:
-            link_type = 'event'
-        elif link_type == VCRoomLinkType.contribution:
-            link_type = 'contribution'
-        elif link_type == VCRoomLinkType.session:
-            link_type = 'session'
+        link_type = VCRoomLinkType.get(event_vc_room.link_type)
         link_id = event_vc_room.link_id
         return render_template(tpl, plugin=self, event_vc_room=event_vc_room, event=event, vc_room=vc_room,
                                moderator=moderator, phone_link=phone_link, link_type=link_type, link_id=link_id,
