@@ -56,7 +56,8 @@
                             </div>
                         </div>
                         <div class="toolbar right">
-                            <a class="i-button highlight js-ajax-dialog" href="#" data-href="{{ url_for('.event_agreements_details_send_all', event, definition=definition.name) }}">
+                            <a class="i-button highlight icon-mail js-ajax-dialog"
+                                href="#" data-href="{{ url_for('.event_agreements_details_send_all', event, definition=definition.name) }}">
                                 {% trans %}Send all{% endtrans %}
                             </a>
                         </div>
@@ -78,7 +79,8 @@
                             </div>
                         </div>
                         <div class="toolbar right">
-                            <a class="i-button js-ajax-dialog" href="#" data-href="{{ url_for('.event_agreements_details_remind_all', event, definition=definition.name) }}">
+                            <a class="i-button icon-alarm js-ajax-dialog"
+                                href="#" data-href="{{ url_for('.event_agreements_details_remind_all', event, definition=definition.name) }}">
                                 {% trans %}Remind all{% endtrans %}
                             </a>
                         </div>
@@ -87,34 +89,27 @@
             </div>
         {% endif %}
 
-        <div class="i-box">
-            <div class="toolbar follow-scroll">
-                <div class="group js-dropdown">
-                    <a href="#" class="i-button icon-checkbox-checked arrow" data-toggle="dropdown"></a>
-                    <ul class="dropdown">
-                        <li><a href="#" id="select-new">
-                            {% trans %}All new agreement requests{% endtrans %}
-                        </a></li>
-                        <li><a href="#" id="select-pending">
-                            {% trans %}All agreements pending to be signed{% endtrans %}
-                        </a></li>
-                        <li><a href="#" id="select-none">None</a></li>
-                    </ul>
-                </div>
-                <div class="group">
-                    <a id="send-new" class="i-button icon-mail disabled js-ajax-dialog-send"
-                        href="#" data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}">
-                        {% trans %}Send new{% endtrans %}
-                    </a>
-                </div>
-                <div class="group">
-                    <a id="send-pending" class="i-button icon-alarm disabled js-ajax-dialog-remind"
-                        href="#" data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}">
-                        {% trans %}Remind pending{% endtrans %}
-                    </a>
-                </div>
-            </div>
+        <div class="agreement-list i-box">
             {% if not_sent %}
+                <div class="toolbar">
+                    <div class="group js-dropdown">
+                        <a href="#" class="i-button icon-checkbox-checked arrow" data-toggle="dropdown"></a>
+                        <ul class="dropdown">
+                            <li><a href="#" id="select-new">
+                                {% trans %}All{% endtrans %}
+                            </a></li>
+                            <li><a href="#" id="select-new-none">
+                                {% trans %}None{% endtrans %}
+                            </a></li>
+                        </ul>
+                    </div>
+                    <div class="group">
+                        <a id="send-new" class="i-button icon-mail disabled js-ajax-dialog-send"
+                            href="#" data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}">
+                            {% trans %}Send new{% endtrans %}
+                        </a>
+                    </div>
+                </div>
                 <div class="titled-rule">
                     {% trans %}Agreements requests to be sent{% endtrans %}
                 </div>
@@ -141,7 +136,27 @@
                     {% endfor %}
                 </table>
             {% endif %}
+
             {% if pending %}
+                <div class="toolbar">
+                    <div class="group js-dropdown">
+                        <a href="#" class="i-button icon-checkbox-checked js-select-pending arrow" data-toggle="dropdown"></a>
+                        <ul class="dropdown">
+                            <li><a href="#" id="select-pending">
+                                {% trans %}All{% endtrans %}
+                            </a></li>
+                            <li><a href="#" id="select-pending-none">
+                                {% trans %}None{% endtrans %}
+                            </a></li>
+                        </ul>
+                    </div>
+                    <div class="group">
+                        <a id="send-pending" class="i-button icon-alarm disabled js-ajax-dialog-remind"
+                            href="#" data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}">
+                            {% trans %}Remind pending{% endtrans %}
+                        </a>
+                    </div>
+                </div>
                 <div class="titled-rule">
                     {% trans %}Pending agreements{% endtrans %}
                 </div>
@@ -164,7 +179,7 @@
                                     data-reference="{{ agreement.id }}"
                                     title="{% trans %}Remind this person{% endtrans %}">
                                 </a>
-                                <a id="agreement-upload-{{ agreement.id }}" class="icon-upload js-ajax-dialog"
+                                <a class="icon-upload js-ajax-dialog"
                                     href="#" data-href="{{ url_for('.event_agreements_details_upload_agreement', event, definition, agreement) }}"
                                     title="{% trans %}Upload a signed agreement form{% endtrans %}"></a>
                             </td>
@@ -172,6 +187,7 @@
                     {% endfor %}
                 </table>
             {% endif %}
+
             {% if signed %}
                 <div class="titled-rule">
                     {% trans %}Agreements signed{% endtrans %}
@@ -219,12 +235,15 @@
                 $('input.new-agreement').prop('checked', true).trigger('change');
             });
 
+            $('#select-new-none').on('click', function() {
+                $('input.new-agreement').prop('checked', false).trigger('change');
+            });
+
             $('#select-pending').on('click', function() {
                 $('input.pending-agreement').prop('checked', true).trigger('change');
             });
 
-            $('#select-none').on('click', function() {
-                $('input.new-agreement').prop('checked', false).trigger('change');
+            $('#select-pending-none').on('click', function() {
                 $('input.pending-agreement').prop('checked', false).trigger('change');
             });
 

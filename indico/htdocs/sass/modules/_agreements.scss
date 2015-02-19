@@ -146,7 +146,9 @@
             font-size: 1.2em;
         }
     }
+}
 
+.agreement-list {
     .agreement-table {
         border-collapse: collapse;
         border-spacing: 0;
@@ -197,5 +199,13 @@
                 visibility: visible;
             }
         }
+
+        &:not(:last-child) {
+            margin-bottom: 2em;
+        }
+    }
+
+    .titled-rule {
+        margin-top: 0;
     }
 }
