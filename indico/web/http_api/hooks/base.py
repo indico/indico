@@ -120,6 +120,8 @@ class HTTPAPIHook(object):
 
     def _getParams(self):
         self._offset = get_query_parameter(self._queryParams, ['O', 'offset'], 0, integer=True)
+        if self._offset < 0:
+            raise HTTPAPIError('Offset must be a positive number', 400)
         self._orderBy = get_query_parameter(self._queryParams, ['o', 'order'])
         self._descending = get_query_parameter(self._queryParams, ['c', 'descending'], 'no') == 'yes'
         self._detail = get_query_parameter(self._queryParams, ['d', 'detail'], self.DEFAULT_DETAIL)

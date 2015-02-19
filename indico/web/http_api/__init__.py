@@ -23,6 +23,7 @@ from indico.web.http_api.exceptions import LimitExceededException
 from indico.web.http_api.hooks.file import FileHook
 from indico.web.http_api.hooks.registration import RegistrantsHook
 from indico.web.http_api.hooks.user import UserInfoHook
+import indico.modules.events.agreements.api
 import indico.modules.rb.api
 
 

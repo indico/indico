@@ -21,6 +21,7 @@ from flask import render_template
 from indico.modules.events.agreements.models.agreements import Agreement
 from indico.util.decorators import classproperty
 from indico.web.flask.templating import get_overridable_template_name
+from MaKaC.accessControl import AccessWrapper
 
 
 class AgreementDefinitionBase(object):
@@ -43,6 +44,22 @@ class AgreementDefinitionBase(object):
     @classmethod
     def locator(cls):
         return {'definition': cls.name}
+
+    @classmethod
+    def can_access_api(cls, user, event):
+        """Checks if a user can list the agreements for an event."""
+        return event.canModify(AccessWrapper(user))
+
+    @classmethod
+    def extend_api_data(cls, event, person, agreement, data):  # pragma: no cover
+        """Extends the data returned in the HTTP API.
+
+        :param event: the event
+        :param person: the :class:`AgreementPersonInfo`
+        :param agreement: the :class:`Agreement` if available
+        :param data: a dict containing the default data for the agreement
+        """
+        pass
 
     @classmethod
     def render_form(cls, agreement, form, **kwargs):
