@@ -36,6 +36,7 @@ class VCRoomLinkType(int, IndicoEnum):
 
 class VCRoomStatus(int, IndicoEnum):
     created = 1
+    deleted = 2
 
 
 class VCRoom(db.Model):
