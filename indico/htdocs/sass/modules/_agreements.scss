@@ -132,3 +132,40 @@
         }
     }
 }
+
+.agreement-dashboard {
+    @extend .fixed-width;
+
+    td:first-child {
+        width: 1%;
+    }
+
+    .agreement-definition {
+        vertical-align: top;
+
+        .i-badge {
+            margin: 0;
+            padding: 0.3em;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+    }
+
+    .agreement-table {
+        border-collapse: collapse;
+        border-spacing: 0;
+        width: 100%;
+
+        td {
+            padding: 0;
+        }
+
+        tr:nth-child(odd) > td {
+            background: $light-gray;
+        }
+
+        .action-cell {
+            width: 1%;
+        }
+    }
+}

@@ -5,11 +5,18 @@
 {% endblock %}
 
 {% block content %}
+    <h2>
+        {% trans %}
+            List of agreement definitions
+        {% endtrans %}
+    </h2>
     <div class="i-badges-list-left">
         {% for definition in definitions %}
             <a class="i-badge" href="{{ url_for('agreements.event_agreements_details', event, definition=definition.name) }}">
                 <div class="i-badge-content">
-                    {{ definition.title }}
+                    <div class="i-badge-title">
+                        {{ definition.title }}
+                    </div>
                 </div>
             </a>
         {% endfor %}

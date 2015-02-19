@@ -8,3 +8,207 @@
     {{ definition.title }}
 {% endblock %}
 
+{% block description %}
+    {{ definition.description }}
+{% endblock %}
+
+{% block content %}
+    {% set not_sent = definition.get_people_not_notified(event).values() %}
+    {% set pending = agreements | selectattr('pending') | list %}
+    {% set signed = agreements | rejectattr('pending') | list %}
+
+    <div class="agreement-dashboard">
+
+        <div class="action-box">
+            {% if definition.paper_form_url %}
+                <a class="i-button">Download paper version</a>
+            {% endif %}
+            <div>
+                <input type="checkbox">
+                <label>Notify managers on signature</label>
+            </div>
+        </div>
+
+        {% if not_sent or pending %}
+            <div class="action-box highlight">
+                {% if not_sent %}
+                    <div class="section">
+                        <div class="icon icon-mail"></div>
+                        <div class="text">
+                            <div class="label">
+                                {% trans count=not_sent|length -%}
+                                    {{ count }} new agreement request to be sent
+                                {%- pluralize -%}
+                                    {{ count }} new agreement requests to be sent
+                                {%- endtrans %}
+                            </div>
+                            <div>
+                                {% trans %}You can send all agreement requests{% endtrans %}
+                            </div>
+                        </div>
+                        <div class="toolbar right">
+                            <a class="i-button highlight js-ajax-dialog" href="#" data-href="{{ url_for('.event_agreements_details_send_all', event, definition=definition.name) }}">
+                                {% trans %}Send all{% endtrans %}
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if pending %}
+                    <div class="section">
+                        <div class="icon icon-time"></div>
+                        <div class="text">
+                            <div class="label">
+                                {% trans count=pending|length -%}
+                                    {{ count }} agreement pending to be signed
+                                {%- pluralize -%}
+                                    {{ count }} agreements pending to be signed
+                                {%- endtrans %}
+                            </div>
+                            <div>
+                                {% trans %}You can send reminders for all pending agreements{% endtrans %}
+                            </div>
+                        </div>
+                        <div class="toolbar right">
+                            <a class="i-button js-ajax-dialog" href="#" data-href="{{ url_for('.event_agreements_details_remind_all', event, definition=definition.name) }}">
+                                {% trans %}Remind all{% endtrans %}
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <div class="i-box">
+            <div class="toolbar follow-scroll">
+                <div class="group">
+                    <a href="" class="i-button icon-checkbox-checked"></a>
+                </div>
+                <div class="group">
+                    <a class="i-button js-ajax-dialog-send" href="#" data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}">
+                        {% trans %}Send new{% endtrans %}
+                    </a>
+                    <a class="i-button js-ajax-dialog-remind" href="#" data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}">
+                        {% trans %}Remind{% endtrans %}
+                    </a>
+                </div>
+            </div>
+            {% if not_sent %}
+                <div class="titled-rule">
+                    {% trans %}Agreements requests to be sent{% endtrans %}
+                </div>
+                <table class="agreement-table">
+                    {% for person in not_sent %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" value="{{ person.identifier }}" class="new-agreement">
+                            </td>
+                            <td>{{ person.name }}</td>
+                            <td>{{ person.email }}</td>
+                            <td class="action-cell">
+                                <a class="i-button icon-mail js-ajax-dialog-email-one"
+                                    href="#" data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}"
+                                    data-reference="{{ person.identifier }}"></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+            {% if pending %}
+                <div class="titled-rule">
+                    {% trans %}Pending agreements{% endtrans %}
+                </div>
+                <table class="agreement-table">
+                    {% for agreement in pending %}
+                        <tr>
+                            <td>
+                                <input type="checkbox" value="{{ agreement.id }}" class="pending-agreement">
+                            </td>
+                            <td>{{ agreement.person_name }}</td>
+                            <td>{{ agreement.person_email }}</td>
+                            <td class="action-cell">
+                                <a class="i-button icon-alarm js-ajax-dialog-email-one"
+                                    href="#" data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}"
+                                    data-reference="{{ agreement.id }}"
+                                    title="{% trans %}Remind this person{% endtrans %}">
+                                </a>
+                                <a id="agreement-upload-{{ agreement.id }}" class="i-button icon-upload js-ajax-dialog"
+                                    href="#" data-href="{{ url_for('.event_agreements_details_upload_agreement', event, agreement) }}"
+                                    title="{% trans %}Upload a signed agreement form{% endtrans %}"></a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+            {% if signed %}
+                <div class="titled-rule">
+                    {% trans %}Agreements signed{% endtrans %}
+                </div>
+                <table>
+                    {% for agreement in signed %}
+                        <tr>
+                            <td></td>
+                            <td>
+                                {{ agreement.person_name }}
+                            </td>
+                            <td>
+                                {{ agreement.person_email }}
+                            </td>
+                            <td class="action-cell">
+                                {{ agreement.state }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            $(function() {
+                $(window).scroll(function(){
+                    IndicoUI.Effect.followScroll();
+                });
+            });
+
+            function close(data) {
+                if (data) {
+                    location.reload();
+                }
+            }
+
+            $('.js-ajax-dialog').ajaxDialog({
+                onClose: close
+            });
+
+            $('.js-ajax-dialog-send').ajaxDialog({
+                onClose: close,
+                getExtraData: function() {
+                    var identifiers = $('input.new-agreement:checked').map(function() {
+                        return $(this).val();
+                    }).get();
+                    return {references: identifiers};
+                }
+            });
+
+            $('.js-ajax-dialog-remind').ajaxDialog({
+                onClose: close,
+                getExtraData: function() {
+                    var ids = $('input.pending-agreement:checked').map(function() {
+                        return $(this).val();
+                    }).get();
+                    return {references: ids}
+                }
+            });
+
+            $('.js-ajax-dialog-email-one').ajaxDialog({
+                onClose: close,
+                getExtraData: function(trigger) {
+                    return {references: $(trigger).data('reference')};
+                }
+            });
+        })();
+    </script>
+{% endblock %}
