@@ -66,13 +66,17 @@ class AgreementDefinitionBase(object):
         return {k: v for k, v in people.items() if v.identifier not in sent_agreements}
 
     @classmethod
-    def render_data(cls, data):
+    def render_data(cls, event, data):  # pragma: no cover
         """Returns extra data to display in the agreement list
 
+        If you want a column to be rendered as HTML, use a :class:`~markupsafe.Markup`
+        object instead of a plain string.
+
+        :param event: The event containing the agreements
         :param data: The data from the :class:`AgreementPersonInfo`
         :return: List of extra columns for a row
         """
-        return ()
+        return None
 
     @classmethod
     def handle_accepted(cls, agreement):  # pragma: no cover

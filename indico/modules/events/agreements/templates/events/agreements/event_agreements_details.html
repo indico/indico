@@ -1,7 +1,7 @@
 {% extends 'admin/base.html' %}
 
 {% macro extra_columns(data) %}
-    {% for column in definition.render_data(data) %}
+    {% for column in definition.render_data(event, data) or () %}
         <td>
             {{ column }}
         </td>
