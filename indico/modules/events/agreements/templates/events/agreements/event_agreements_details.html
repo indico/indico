@@ -117,17 +117,20 @@
                     {% for person in not_sent|sort(attribute='name') %}
                         <tr>
                             <td class="agreement-checkbox">
-                                <input type="checkbox" value="{{ person.identifier }}" class="new-agreement" autocomplete="off">
+                                <input type="checkbox" class="new-agreement" autocomplete="off"
+                                    id="person-{{ person.identifier }}" value="{{ person.identifier }}">
                             </td>
                             <td class="person-name">
-                                {{ person.name }}
+                                <label for="person-{{ person.identifier }}">
+                                    {{ person.name }}
+                                </label>
                             </td>
                             <td class="person-email">
                                 {{ person.email }}
                             </td>
                             {{ extra_columns(person.data) }}
                             <td class="agreement-actions">
-                                <a class="icon-mail js-ajax-dialog-email-one"
+                                <a class="i-button icon-mail js-ajax-dialog-email-one"
                                     href="#" data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}"
                                     data-reference="{{ person.identifier }}"
                                     title="{% trans %}Send the agreement request to this person{% endtrans %}"></a>
@@ -164,10 +167,13 @@
                     {% for agreement in pending|sort(attribute='person_name') %}
                         <tr>
                             <td class="agreement-checkbox">
-                                <input type="checkbox" value="{{ agreement.id }}" class="pending-agreement" autocomplete="off">
+                                <input type="checkbox" class="pending-agreement" autocomplete="off"
+                                     id="agreement-{{ agreement.id }}" value="{{ agreement.id }}">
                             </td>
                             <td class="person-name">
-                                {{ agreement.person_name }}
+                                <label for="agreement-{{ agreement.id }}">
+                                    {{ agreement.person_name }}
+                                </label>
                             </td>
                             <td class="person-email">
                                 {{ agreement.person_email }}
@@ -192,19 +198,28 @@
                 <div class="titled-rule">
                     {% trans %}Agreements signed{% endtrans %}
                 </div>
-                <table>
+                <table class="agreement-table">
                     {% for agreement in signed|sort(attribute='person_name') %}
                         <tr>
-                            <td></td>
-                            <td>
+                            <td class="agreement-answer">
+                                {% if agreement.accepted %}
+                                    <i class="icon-checkmark"></i>
+                                {% else %}
+                                    <i class="icon-disable"></i>
+                                {% endif %}
+                            </td>
+                            <td class="person-name">
                                 {{ agreement.person_name }}
                             </td>
-                            <td>
+                            <td class="person-email">
                                 {{ agreement.person_email }}
                             </td>
                             {{ extra_columns(agreement.data) }}
-                            <td class="action-cell">
-                                {{ agreement.state.title }}
+                            <td class="agreement-actions">
+                                {% if agreement.signed_on_behalf %}
+                                    <a class="icon-file-download"
+                                        title="{% trans %}Download scanned agreement form{% endtrans %}"></a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}

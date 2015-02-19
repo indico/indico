@@ -177,6 +177,14 @@ class Agreement(db.Model):
     def rejected(self):
         return self.state.in_((AgreementState.rejected, AgreementState.rejected_on_behalf))
 
+    @hybrid_property
+    def signed_on_behalf(self):
+        return self.state in {AgreementState.accepted_on_behalf, AgreementState.rejected_on_behalf}
+
+    @signed_on_behalf.expression
+    def signed_on_behalf(self):
+        return self.state.in_((AgreementState.accepted_on_behalf, AgreementState.rejected_on_behalf))
+
     @property
     def definition(self):
         from indico.modules.events.agreements.util import get_agreement_definitions

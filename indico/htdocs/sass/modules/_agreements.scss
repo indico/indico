@@ -157,9 +157,22 @@
         td {
             padding: 0.35rem 0;
 
-            &.agreement-checkbox {
+            &.agreement-checkbox,
+            &.agreement-answer {
                 width: 1%;
                 padding: 0 5px;
+
+                i {
+                    margin: 4px;
+
+                    &.icon-disable {
+                        color: $red;
+                    }
+
+                    &.icon-checkmark {
+                        color: $green;
+                    }
+                }
             }
 
             &.person-name {
@@ -184,6 +197,11 @@
                     &:hover {
                         color: $blue;
                     }
+                }
+
+                .i-button {
+                    padding-top: 0;
+                    padding-bottom: 0;
                 }
             }
         }
