@@ -6,8 +6,8 @@
     </ul>
 {%- endmacro %}
 
-{% macro form_header(method='post', action='', orientation='horizontal', id=none, multipart=False) -%}
-    <form method="{{ method }}" {%- if action %} action="{{ action }}"{% endif %} class="i-form {{ orientation }}"{% if id %} id="{{ id }}"{% endif %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
+{% macro form_header(method='post', action='', orientation='horizontal', id=none, classes='', multipart=False) -%}
+    <form method="{{ method }}" {%- if action %} action="{{ action }}"{% endif %} class="i-form {{ orientation }} {{ classes }}"{% if id %} id="{{ id }}"{% endif %}{% if multipart %} enctype="multipart/form-data"{% endif %}>
 {%- endmacro %}
 
 {% macro form_row_static(label='', content=none, single_row=true) -%}
