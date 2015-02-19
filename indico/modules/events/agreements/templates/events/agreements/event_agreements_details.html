@@ -132,7 +132,7 @@
                                     title="{% trans %}Remind this person{% endtrans %}">
                                 </a>
                                 <a id="agreement-upload-{{ agreement.id }}" class="i-button icon-upload js-ajax-dialog"
-                                    href="#" data-href="{{ url_for('.event_agreements_details_upload_agreement', event, agreement) }}"
+                                    href="#" data-href="{{ url_for('.event_agreements_details_upload_agreement', event, definition, agreement) }}"
                                     title="{% trans %}Upload a signed agreement form{% endtrans %}"></a>
                             </td>
                         </tr>
