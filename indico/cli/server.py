@@ -125,6 +125,8 @@ class QuietWSGIRequestHandler(WSGIRequestHandler):
     def log_request(self, code='-', size='-'):
         if code not in (304, 200):
             super(QuietWSGIRequestHandler, self).log_request(code, size)
+        elif '?__debugger__=yes&cmd=resource' in self.path:
+            pass  # don't log debugger resources, they are quite uninteresting
         elif not any(self.path.startswith(self.INDICO_URL_PREFIX + x) for x in self.IGNORED_PATH_PREFIXES):
             super(QuietWSGIRequestHandler, self).log_request(code, size)
 
