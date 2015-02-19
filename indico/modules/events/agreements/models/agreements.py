@@ -26,6 +26,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.caching import make_hashable
 from indico.util.date_time import now_utc
+from indico.core.errors import IndicoError
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.util.struct.enum import TitledIntEnum
@@ -246,7 +247,10 @@ class Agreement(db.Model):
         self.signed_from_ip = None
 
     def render(self, form, **kwargs):
-        return self.definition.render_form(self, form, **kwargs)
+        definition = self.definition
+        if definition is None:
+            raise IndicoError(_('This agreement type is currently not available.'))
+        return definition.render_form(self, form, **kwargs)
 
     def belongs_to(self, person):
         return self.identifier == person.identifier
