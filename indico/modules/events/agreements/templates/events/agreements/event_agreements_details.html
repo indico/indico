@@ -1,5 +1,14 @@
 {% extends 'admin/base.html' %}
 
+{% macro extra_columns(data) %}
+    {% for column in definition.render_data(data) %}
+        <td>
+            {{ column }}
+        </td>
+    {% endfor %}
+{% endmacro %}
+
+
 {% block title %}
     {% trans %}Agreements{% endtrans %}
 {% endblock %}
@@ -121,6 +130,7 @@
                             <td class="person-email">
                                 {{ person.email }}
                             </td>
+                            {{ extra_columns(person.data) }}
                             <td class="agreement-actions">
                                 <a class="icon-mail js-ajax-dialog-email-one"
                                     href="#" data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}"
@@ -147,6 +157,7 @@
                             <td class="person-email">
                                 {{ agreement.person_email }}
                             </td>
+                            {{ extra_columns(agreement.data) }}
                             <td class="agreement-actions">
                                 <a class="icon-alarm js-ajax-dialog-email-one"
                                     href="#" data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}"
@@ -175,6 +186,7 @@
                             <td>
                                 {{ agreement.person_email }}
                             </td>
+                            {{ extra_columns(agreement.data) }}
                             <td class="action-cell">
                                 {{ agreement.state.title }}
                             </td>

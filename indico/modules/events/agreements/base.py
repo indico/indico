@@ -64,21 +64,30 @@ class AgreementDefinitionBase(object):
         return {k: v for k, v in people.items() if v.identifier not in sent_agreements}
 
     @classmethod
-    def handle_accepted(cls, agreement):
+    def render_data(cls, data):
+        """Returns extra data to display in the agreement list
+
+        :param data: The data from the :class:`AgreementPersonInfo`
+        :return: List of extra columns for a row
+        """
+        return ()
+
+    @classmethod
+    def handle_accepted(cls, agreement):  # pragma: no cover
         """Handles logic on agreement accepted"""
-        pass  # pragma: no cover
+        pass
 
     @classmethod
-    def handle_rejected(cls, agreement):
+    def handle_rejected(cls, agreement):  # pragma: no cover
         """Handles logic on agreement rejected"""
-        pass  # pragma: no cover
+        pass
 
     @classmethod
-    def handle_reset(cls, agreement):
+    def handle_reset(cls, agreement):  # pragma: no cover
         """Handles logic on agreement reset"""
-        pass  # pragma: no cover
+        pass
 
     @classmethod
-    def iter_people(cls, event):
+    def iter_people(cls, event):  # pragma: no cover
         """Yields :class:`AgreementPersonInfo` required to sign agreements"""
-        raise NotImplementedError  # pragma: no cover
+        raise NotImplementedError
