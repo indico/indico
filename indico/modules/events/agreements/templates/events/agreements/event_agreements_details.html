@@ -100,7 +100,7 @@
                     {% for person in not_sent %}
                         <tr>
                             <td>
-                                <input type="checkbox" value="{{ person.identifier }}" class="new-agreement">
+                                <input type="checkbox" value="{{ person.identifier }}" class="new-agreement" autocomplete="off">
                             </td>
                             <td>{{ person.name }}</td>
                             <td>{{ person.email }}</td>
@@ -121,7 +121,7 @@
                     {% for agreement in pending %}
                         <tr>
                             <td>
-                                <input type="checkbox" value="{{ agreement.id }}" class="pending-agreement">
+                                <input type="checkbox" value="{{ agreement.id }}" class="pending-agreement" autocomplete="off">
                             </td>
                             <td>{{ agreement.person_name }}</td>
                             <td>{{ agreement.person_email }}</td>
