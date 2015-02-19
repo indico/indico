@@ -19,29 +19,15 @@ import re
 
 from flask import render_template
 
-from wtforms.fields.core import BooleanField
-from wtforms.fields.simple import StringField
-from wtforms.validators import DataRequired, Length, Regexp, ValidationError
-
-from indico.modules.vc.models import VCRoom
 from indico.util.decorators import classproperty
-from indico.util.i18n import _
 from indico.util.user import retrieve_principals
+from indico.modules.vc.forms import VCPluginSettingsFormBase
+from indico.modules.vc.models.vc_rooms import VCRoomLinkType
 from indico.web.flask.templating import get_overridable_template_name
-from indico.web.forms.base import IndicoForm, FormDefaults
-from indico.web.forms.fields import PrincipalField
+from indico.web.forms.base import FormDefaults
 
 
-ROOM_NAME_RE = re.compile(r'[\w\-]+')
 PREFIX_RE = re.compile('^vc_')
-
-
-class VCPluginSettingsFormBase(IndicoForm):
-    managers = PrincipalField(_('Managers'), description=_('Service managers'))
-    acl = PrincipalField(_('ACL'), groups=True,
-                         description=_('Users and Groups authorised to create video conference rooms'))
-    notify_managers = BooleanField(_('Notify managers'),
-                                   description=_('Send email notifications to managers'))
 
 
 class VCPluginMixin(object):
@@ -79,13 +65,24 @@ class VCPluginMixin(object):
         tpl = get_overridable_template_name('create_button.html', self, 'vc/')
         return render_template(tpl, plugin=self, **kwargs)
 
-    def create_form(self, event, existing_vc_room=None):
+    def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
         """Creates the video conference room form
+
         :param event: the event the video conference room is for
+        :param existing_vc_room: a vc_room from which to retrieve data for the form
+        :param \*\*kwargs: extra data to pass to the form if an existing vc room is passed
         :return: an instance of an :class:`IndicoForm` subclass
         """
-        if existing_vc_room:
-            defaults = FormDefaults(existing_vc_room.data, name=existing_vc_room.name)
+        if existing_vc_room and existing_event_vc_room:
+            kwargs = {
+                'name': existing_vc_room.name,
+                'linking': existing_event_vc_room.link_type.name,
+            }
+
+            if existing_event_vc_room.link_type != VCRoomLinkType.event:
+                kwargs[existing_event_vc_room.link_type.name] = existing_event_vc_room.link_id
+
+            defaults = FormDefaults(existing_vc_room.data, **kwargs)
         else:
             defaults = FormDefaults(self.get_vc_room_form_defaults(event))
         with self.plugin_context():
@@ -101,21 +98,3 @@ class VCPluginMixin(object):
 
         principals = retrieve_principals(acl)
         return any(principal.containsUser(user) for principal in principals)
-
-
-class VCRoomFormBase(IndicoForm):
-
-    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
-                       description=_('The name of the room'))
-
-    def __init__(self, *args, **kwargs):
-        self.vc_room = kwargs.pop('vc_room')
-        self.event = kwargs.pop('event')
-        super(VCRoomFormBase, self).__init__(*args, **kwargs)
-
-    def validate_name(self, field):
-        if field.data:
-            room = VCRoom.find_first(name=field.data)
-
-            if room and room != self.vc_room:
-                raise ValidationError(_("There is already a room with this name"))

@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.vc.plugins import (VCPluginMixin, VCPluginSettingsFormBase)
+from indico.modules.vc.plugins import VCPluginMixin
+from indico.modules.vc.forms import VCPluginSettingsFormBase
 
 __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase')

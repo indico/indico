@@ -17,12 +17,13 @@
 from __future__ import unicode_literals
 
 from flask import request, session, redirect, flash
+from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
-from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType, VCRoomStatus
 from indico.modules.vc.util import get_vc_plugins, get_vc_plugin_by_service_name
 from indico.modules.vc.views import WPVCManageEvent
 from indico.util.date_time import now_utc
@@ -88,6 +89,13 @@ class RHVCManageEventCreate(RHVCManageEventBase):
 
         if form.validate_on_submit():
             data = form.data
+            contribution_id = data.pop('contribution')
+            session_id = data.pop('session')
+            link_type = VCRoomLinkType[data.pop('linking')]
+            if link_type == VCRoomLinkType.event:
+                link_id = None
+            else:
+                link_id = int(contribution_id if link_type == VCRoomLinkType.contribution else session_id)
 
             vc_room = VCRoom(created_by_user=session.user)
             vc_room.type = self.plugin.service_name
@@ -95,7 +103,12 @@ class RHVCManageEventCreate(RHVCManageEventBase):
             vc_room.name = data.pop('name')
             vc_room.data = data
 
-            event_vc_room = VCRoomEventAssociation(event_id=self.event_id, vc_room=vc_room)
+            event_vc_room = VCRoomEventAssociation(
+                event_id=self.event_id,
+                vc_room=vc_room,
+                link_type=link_type,
+                link_id=link_id
+            )
 
             db.session.add_all((vc_room, event_vc_room))
 
@@ -128,16 +141,20 @@ class RHVCManageEventModify(RHVCSystemEventBase):
             flash(_('You are not allowed to modify VC rooms for this event.'), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
-        form = self.plugin.create_form(event=self.event, existing_vc_room=self.vc_room)
+        form = self.plugin.create_form(self.event, existing_vc_room=self.vc_room,
+                                       existing_event_vc_room=self.event_vc_room)
 
         if form.validate_on_submit():
             # form.data is a generated property, so we cannot just .pop() directly from it
             data = form.data
+
             self.vc_room.name = data.pop('name')
-            self.vc_room.data = data
+            self.vc_room.data.update(data)
             self.vc_room.modified_dt = now_utc()
+            flag_modified(self.vc_room, 'data')
 
             # TODO: API
+            self.plugin.update_room(self.vc_room, self.event)
             # If the attributes have changed, update the booking
             # if attrs_changed(self.vc_room, 'name', 'description', ...):
             #     update_room(self.vc_room)

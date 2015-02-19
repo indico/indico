@@ -28,6 +28,12 @@ from MaKaC.user import AvatarHolder
 from MaKaC.conference import ConferenceHolder
 
 
+class VCRoomLinkType(int, IndicoEnum):
+    event = 1
+    contribution = 2
+    session = 3
+
+
 class VCRoomStatus(int, IndicoEnum):
     created = 1
 
@@ -120,6 +126,16 @@ class VCRoomEventAssociation(db.Model):
         lazy=False,
         backref=db.backref('events', cascade='all, delete-orphan')
     )
+    #: Link type of the vc_room to a event/contribution/session
+    link_type = db.Column(
+        PyIntEnum(VCRoomLinkType),
+        nullable=False
+    )
+    #: Id of the event/contribution/session id the vc_room is linked to
+    link_id = db.Column(
+        db.Integer,
+        nullable=True
+    )
 
     @property
     def locator(self):
@@ -128,6 +144,15 @@ class VCRoomEventAssociation(db.Model):
     @property
     def event(self):
         return ConferenceHolder().getById(str(self.event_id))
+
+    @property
+    def link_object(self):
+        if self.link_type == VCRoomLinkType.event:
+            return self.event
+        elif self.link_type == VCRoomLinkType.contribution:
+            return self.event.getContributionById(self.link_id)
+        else:
+            return self.event.getSessionById(self.link_id)
 
     @event.setter
     def event(self, event):
