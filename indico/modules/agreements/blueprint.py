@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from indico.web.flask.wrappers import IndicoBlueprint
 
 from indico.modules.agreements.controllers import (RHAgreementForm, RHAgreementManager, RHAgreementManagerDetails,
+                                                   RHAgreementManagerDetailsSend, RHAgreementManagerDetailsRemind,
                                                    RHAgreementManagerDetailsSendAll, RHAgreementManagerDetailsRemindAll,
                                                    RHAgreementManagerDetailsUploadAgreement)
 
@@ -29,6 +30,12 @@ agreements_blueprint = _bp = IndicoBlueprint('agreements', __name__, template_fo
 _bp.add_url_rule('/event/<confId>/manage/agreements/', 'event_agreements', RHAgreementManager)
 _bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/',
                  'event_agreements_details', RHAgreementManagerDetails)
+_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/send',
+                 'event_agreements_details_send',
+                 RHAgreementManagerDetailsSend, methods=('GET', 'POST'))
+_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/remind',
+                 'event_agreements_details_remind',
+                 RHAgreementManagerDetailsRemind, methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/send-all',
                  'event_agreements_details_send_all',
                  RHAgreementManagerDetailsSendAll, methods=('GET', 'POST'))
