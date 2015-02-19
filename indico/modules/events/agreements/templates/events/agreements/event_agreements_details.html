@@ -80,15 +80,28 @@
 
         <div class="i-box">
             <div class="toolbar follow-scroll">
-                <div class="group">
-                    <a href="" class="i-button icon-checkbox-checked"></a>
+                <div class="group js-dropdown">
+                    <a href="#" class="i-button icon-checkbox-checked arrow" data-toggle="dropdown"></a>
+                    <ul class="dropdown">
+                        <li><a href="#" id="select-new">
+                            {% trans %}All new agreement requests{% endtrans %}
+                        </a></li>
+                        <li><a href="#" id="select-pending">
+                            {% trans %}All agreements pending to be signed{% endtrans %}
+                        </a></li>
+                        <li><a href="#" id="select-none">None</a></li>
+                    </ul>
                 </div>
                 <div class="group">
-                    <a class="i-button js-ajax-dialog-send" href="#" data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}">
+                    <a id="send-new" class="i-button icon-mail disabled js-ajax-dialog-send"
+                        href="#" data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}">
                         {% trans %}Send new{% endtrans %}
                     </a>
-                    <a class="i-button js-ajax-dialog-remind" href="#" data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}">
-                        {% trans %}Remind{% endtrans %}
+                </div>
+                <div class="group">
+                    <a id="send-pending" class="i-button icon-alarm disabled js-ajax-dialog-remind"
+                        href="#" data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}">
+                        {% trans %}Remind pending{% endtrans %}
                     </a>
                 </div>
             </div>
@@ -97,17 +110,22 @@
                     {% trans %}Agreements requests to be sent{% endtrans %}
                 </div>
                 <table class="agreement-table">
-                    {% for person in not_sent %}
+                    {% for person in not_sent|sort(attribute='name') %}
                         <tr>
-                            <td>
+                            <td class="agreement-checkbox">
                                 <input type="checkbox" value="{{ person.identifier }}" class="new-agreement" autocomplete="off">
                             </td>
-                            <td>{{ person.name }}</td>
-                            <td>{{ person.email }}</td>
-                            <td class="action-cell">
-                                <a class="i-button icon-mail js-ajax-dialog-email-one"
+                            <td class="person-name">
+                                {{ person.name }}
+                            </td>
+                            <td class="person-email">
+                                {{ person.email }}
+                            </td>
+                            <td class="agreement-actions">
+                                <a class="icon-mail js-ajax-dialog-email-one"
                                     href="#" data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}"
-                                    data-reference="{{ person.identifier }}"></a>
+                                    data-reference="{{ person.identifier }}"
+                                    title="{% trans %}Send the agreement request to this person{% endtrans %}"></a>
                             </td>
                         </tr>
                     {% endfor %}
@@ -118,20 +136,24 @@
                     {% trans %}Pending agreements{% endtrans %}
                 </div>
                 <table class="agreement-table">
-                    {% for agreement in pending %}
+                    {% for agreement in pending|sort(attribute='person_name') %}
                         <tr>
-                            <td>
+                            <td class="agreement-checkbox">
                                 <input type="checkbox" value="{{ agreement.id }}" class="pending-agreement" autocomplete="off">
                             </td>
-                            <td>{{ agreement.person_name }}</td>
-                            <td>{{ agreement.person_email }}</td>
-                            <td class="action-cell">
-                                <a class="i-button icon-alarm js-ajax-dialog-email-one"
+                            <td class="person-name">
+                                {{ agreement.person_name }}
+                            </td>
+                            <td class="person-email">
+                                {{ agreement.person_email }}
+                            </td>
+                            <td class="agreement-actions">
+                                <a class="icon-alarm js-ajax-dialog-email-one"
                                     href="#" data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}"
                                     data-reference="{{ agreement.id }}"
                                     title="{% trans %}Remind this person{% endtrans %}">
                                 </a>
-                                <a id="agreement-upload-{{ agreement.id }}" class="i-button icon-upload js-ajax-dialog"
+                                <a id="agreement-upload-{{ agreement.id }}" class="icon-upload js-ajax-dialog"
                                     href="#" data-href="{{ url_for('.event_agreements_details_upload_agreement', event, definition, agreement) }}"
                                     title="{% trans %}Upload a signed agreement form{% endtrans %}"></a>
                             </td>
@@ -144,7 +166,7 @@
                     {% trans %}Agreements signed{% endtrans %}
                 </div>
                 <table>
-                    {% for agreement in signed %}
+                    {% for agreement in signed|sort(attribute='person_name') %}
                         <tr>
                             <td></td>
                             <td>
@@ -154,7 +176,7 @@
                                 {{ agreement.person_email }}
                             </td>
                             <td class="action-cell">
-                                {{ agreement.state }}
+                                {{ agreement.state.title }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -178,6 +200,26 @@
                     location.reload();
                 }
             }
+
+            $('.js-dropdown').dropdown();
+
+            $('#select-new').on('click', function() {
+                $('input.new-agreement').prop('checked', true).trigger('change');
+            });
+
+            $('#select-pending').on('click', function() {
+                $('input.pending-agreement').prop('checked', true).trigger('change');
+            });
+
+            $('#select-none').on('click', function() {
+                $('input.new-agreement').prop('checked', false).trigger('change');
+                $('input.pending-agreement').prop('checked', false).trigger('change');
+            });
+
+            $("input").on('change', function() {
+                $('#send-new').toggleClass('disabled', !$('input.new-agreement:checked').length);
+                $('#send-pending').toggleClass('disabled', !$('input.pending-agreement:checked').length);
+            });
 
             $('.js-ajax-dialog').ajaxDialog({
                 onClose: close

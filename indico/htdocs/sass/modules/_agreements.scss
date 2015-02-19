@@ -136,10 +136,6 @@
 .agreement-dashboard {
     @extend .fixed-width;
 
-    td:first-child {
-        width: 1%;
-    }
-
     .agreement-definition {
         vertical-align: top;
 
@@ -157,15 +153,49 @@
         width: 100%;
 
         td {
-            padding: 0;
+            padding: 0.35rem 0;
+
+            &.agreement-checkbox {
+                width: 1%;
+                padding: 0 5px;
+            }
+
+            &.person-name {
+                font-weight: bold;
+                width: 60%;
+            }
+
+            &.person-email {
+                width: 38%;
+            }
+
+            &.agreement-actions {
+                font-size: 1.2em;
+                padding: 0 5px;
+                width: 1%;
+                white-space: nowrap;
+
+                a {
+                    color: $dark-gray;
+                    visibility: hidden;
+
+                    &:hover {
+                        color: $blue;
+                    }
+                }
+            }
         }
 
         tr:nth-child(odd) > td {
             background: $light-gray;
         }
 
-        .action-cell {
-            width: 1%;
+        tr:hover > td {
+            background: $light-blue !important;
+
+            &.agreement-actions > a {
+                visibility: visible;
+            }
         }
     }
 }
