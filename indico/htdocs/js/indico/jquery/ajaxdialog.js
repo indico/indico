@@ -30,10 +30,11 @@
             var href = $(this).attr('href');
             if (href == '#') {
                 var data_href = $(this).data('href');
-                href = data_href? data_href : href;
+                href = data_href ? data_href : href;
             }
             ajaxDialog($.extend({}, options, {
-                url: href
+                url: href,
+                trigger: this
             }));
         });
     };
@@ -42,12 +43,14 @@
     // manually instead of triggering it from a link using its href.
     global.ajaxDialog = function ajaxDialog(options) {
         options = $.extend({
+            trigger: null, // element that opened the dialog
             title: null, // title of the dialog
             url: null, // url to GET the form from
             backSelector: '[data-button-back]', // elements in the form which will close the form
             clearFlashes: true, // clear existing flashed messages before showing new ones
-            onClose: null // callback to invoke after closing the dialog. first argument is null if closed manually,
-                          // otherwise the JSON returned by the server
+            onClose: null, // callback to invoke after closing the dialog. first argument is null if closed manually,
+                           // otherwise the JSON returned by the server
+            getExtraData: function() {}  // callback to add data to the form. receives the <form> element as `this`
         }, options);
 
         var popup = null;
@@ -101,6 +104,8 @@
                 $(this).ajaxForm({
                     url: action,
                     dataType: 'json',
+                    data: options.getExtraData.call(this, options.trigger),
+                    traditional: true,
                     beforeSubmit: function() {
                         killProgress = IndicoUI.Dialogs.Util.progress();
                     },
