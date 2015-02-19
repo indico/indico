@@ -178,7 +178,7 @@ class Agreement(db.Model):
 
     @property
     def definition(self):
-        from indico.modules.agreements.util import get_agreement_definitions
+        from indico.modules.events.agreements.util import get_agreement_definitions
         return get_agreement_definitions().get(self.type)
 
     @property

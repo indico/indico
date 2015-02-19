@@ -11,7 +11,8 @@ from sqlalchemy.dialects import postgresql
 
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy import UTCDateTime
-from indico.modules.agreements.models.agreements import AgreementState
+from indico.modules.events.agreements.models.agreements import AgreementState
+
 
 # revision identifiers, used by Alembic.
 revision = '5583f647dff5'

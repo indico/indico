@@ -16,7 +16,7 @@
 
 from flask import render_template
 
-from indico.modules.agreements.models.agreements import Agreement
+from indico.modules.events.agreements.models.agreements import Agreement
 from indico.util.decorators import classproperty
 from indico.web.flask.templating import get_overridable_template_name
 
@@ -45,7 +45,7 @@ class AgreementDefinitionBase(object):
     @classmethod
     def render_form(cls, agreement, form, **kwargs):
         template_name = cls.template_name or '{}.html'.format(cls.name.replace('-', '_'))
-        tpl = get_overridable_template_name(template_name, cls.plugin, 'agreements/')
+        tpl = get_overridable_template_name(template_name, cls.plugin, 'events/agreements/')
         return render_template(tpl, agreement=agreement, form=form, **kwargs)
 
     @classmethod

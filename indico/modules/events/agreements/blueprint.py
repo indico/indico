@@ -18,10 +18,12 @@ from __future__ import unicode_literals
 
 from indico.web.flask.wrappers import IndicoBlueprint
 
-from indico.modules.agreements.controllers import (RHAgreementForm, RHAgreementManager, RHAgreementManagerDetails,
-                                                   RHAgreementManagerDetailsSend, RHAgreementManagerDetailsRemind,
-                                                   RHAgreementManagerDetailsSendAll, RHAgreementManagerDetailsRemindAll,
-                                                   RHAgreementManagerDetailsUploadAgreement)
+from indico.modules.events.agreements.controllers import (RHAgreementForm, RHAgreementManager,
+                                                          RHAgreementManagerDetails, RHAgreementManagerDetailsSend,
+                                                          RHAgreementManagerDetailsRemind,
+                                                          RHAgreementManagerDetailsSendAll,
+                                                          RHAgreementManagerDetailsRemindAll,
+                                                          RHAgreementManagerDetailsUploadAgreement)
 
 agreements_blueprint = _bp = IndicoBlueprint('agreements', __name__, template_folder='templates')
 

@@ -29,6 +29,8 @@ class WPAgreementForm(WPConferenceDefaultDisplayBase, WPJinjaMixin):
 
 
 class WPAgreementManager(WPJinjaMixin, WPConferenceModifBase):
+    template_prefix = 'events/agreements/'
+
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['agreements_sass'].urls()
 

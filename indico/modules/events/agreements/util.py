@@ -20,8 +20,8 @@ from indico.core import signals
 from indico.core.db import db
 from indico.util.signals import named_objects_from_signal
 
-from indico.modules.agreements.models.agreements import Agreement
-from indico.modules.agreements.notifications import notify_agreement_new
+from indico.modules.events.agreements.models.agreements import Agreement
+from indico.modules.events.agreements.notifications import notify_agreement_new
 
 
 def get_agreement_definitions():

@@ -29,12 +29,11 @@ from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-
-from indico.modules.agreements.forms import AgreementForm, AgreementEmailForm, AgreementUploadForm
-from indico.modules.agreements.models.agreements import Agreement
-from indico.modules.agreements.notifications import notify_agreement_reminder
-from indico.modules.agreements.views import WPAgreementForm, WPAgreementManager
-from indico.modules.agreements.util import get_agreement_definitions, send_new_agreements
+from indico.modules.events.agreements.forms import AgreementForm, AgreementEmailForm, AgreementUploadForm
+from indico.modules.events.agreements.models.agreements import Agreement
+from indico.modules.events.agreements.notifications import notify_agreement_reminder
+from indico.modules.events.agreements.views import WPAgreementForm, WPAgreementManager
+from indico.modules.events.agreements.util import get_agreement_definitions, send_new_agreements
 
 
 class RHAgreementForm(RHConferenceBaseDisplay):
@@ -74,7 +73,7 @@ class RHAgreementManager(RHConferenceModifBase):
 
     def _process(self):
         definitions = get_agreement_definitions().values()
-        return WPAgreementManager.render_template('agreements/event_agreements.html', self._conf,
+        return WPAgreementManager.render_template('event_agreements.html', self._conf,
                                                   event=self._conf, definitions=definitions)
 
 
@@ -89,7 +88,7 @@ class RHAgreementManagerDetails(RHConferenceModifBase):
     def _process(self):
         event = self._conf
         agreements = Agreement.find_all(event_id=event.getId(), type=self.definition.name)
-        return WPAgreementManager.render_template('agreements/event_agreements_details.html', event,
+        return WPAgreementManager.render_template('event_agreements_details.html', event,
                                                   event=event, definition=self.definition, agreements=agreements)
 
 
@@ -101,7 +100,7 @@ class RHAgreementManagerDetailsEmail(RHAgreementManagerDetails):
 
     def _get_form(self):
         func = get_template_module if not current_plugin else get_plugin_template_module
-        template = func('agreements/emails/agreement_default_body.html', event=self._conf)
+        template = func('events/agreements/emails/agreement_default_body.html', event=self._conf)
         form_defaults = FormDefaults(body=template.get_html_body())
         return AgreementEmailForm(obj=form_defaults)
 
@@ -115,7 +114,7 @@ class RHAgreementManagerDetailsEmail(RHAgreementManagerDetails):
 
 
 class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmail):
-    dialog_template = 'agreements/agreement_email_form_send.html'
+    dialog_template = 'events/agreements/agreement_email_form_send.html'
 
     def _get_people(self):
         identifiers = set(request.form.getlist('references'))
@@ -129,7 +128,7 @@ class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmail):
 
 
 class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmail):
-    dialog_template = 'agreements/agreement_email_form_remind.html'
+    dialog_template = 'events/agreements/agreement_email_form_remind.html'
 
     def _get_agreements(self):
         ids = set(request.form.getlist('references'))
@@ -144,14 +143,14 @@ class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmail):
 
 
 class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetailsSend):
-    dialog_template = 'agreements/agreement_email_form_send_all.html'
+    dialog_template = 'events/agreements/agreement_email_form_send_all.html'
 
     def _get_people(self):
         return self.definition.get_people_not_notified(self._conf)
 
 
 class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):
-    dialog_template = 'agreements/agreement_email_form_remind_all.html'
+    dialog_template = 'events/agreements/agreement_email_form_remind_all.html'
 
     def _get_agreements(self):
         return Agreement.find_all(Agreement.pending, event_id=self._conf.getId(), type=self.definition.name)
@@ -176,5 +175,5 @@ class RHAgreementManagerDetailsUploadAgreement(RHAgreementManagerDetails):
             agreement.attachment = form.document.data.read()
             flash(_("Agreement uploaded on behalf of {0}".format(agreement.person_name)), 'success')
             return jsonify({'success': True})
-        return WPJinjaMixin.render_template('agreements/agreement_upload_form.html', form=form,
+        return WPJinjaMixin.render_template('events/agreements/agreement_upload_form.html', form=form,
                                             event=event, agreement=agreement)

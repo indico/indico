@@ -16,7 +16,7 @@
 
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.modules.agreements.util import get_agreement_definitions
+from indico.modules.events.agreements.util import get_agreement_definitions
 
 logger = Logger.get('agreements')
 

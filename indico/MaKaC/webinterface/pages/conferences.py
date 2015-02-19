@@ -80,7 +80,7 @@ from MaKaC.webinterface.general import WebFactory
 from MaKaC.common.TemplateExec import render
 
 from indico.core import signals
-from indico.modules.agreements.util import get_agreement_definitions
+from indico.modules.events.agreements.util import get_agreement_definitions
 from indico.util import json
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
