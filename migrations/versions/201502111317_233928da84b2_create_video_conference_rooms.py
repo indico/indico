@@ -34,7 +34,7 @@ def upgrade():
                     sa.Column('event_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
                     sa.Column('vc_room_id', sa.Integer(), nullable=False, index=True),
                     sa.Column('link_type', PyIntEnum(VCRoomLinkType), nullable=False),
-                    sa.Column('link_id', sa.Integer(), nullable=False),
+                    sa.Column('link_id', sa.Integer(), nullable=True),
                     sa.ForeignKeyConstraint(['vc_room_id'], ['events.vc_rooms.id']),
                     sa.PrimaryKeyConstraint('event_id', 'vc_room_id'),
                     schema='events')

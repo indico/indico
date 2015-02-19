@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import transaction
 from flask import request, session, redirect, flash
 from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import NotFound
@@ -23,8 +24,9 @@ from werkzeug.exceptions import NotFound
 from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
-from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType, VCRoomStatus
-from indico.modules.vc.util import get_vc_plugins, get_vc_plugin_by_service_name
+from indico.modules.vc.exceptions import VCRoomError
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
+from indico.modules.vc.util import get_vc_plugins, get_vc_plugin_by_service_name, process_form_data, update_vc_room
 from indico.modules.vc.views import WPVCManageEvent
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -88,20 +90,12 @@ class RHVCManageEventCreate(RHVCManageEventBase):
         form = self.plugin.create_form(event=self.event)
 
         if form.validate_on_submit():
-            data = form.data
-            contribution_id = data.pop('contribution')
-            session_id = data.pop('session')
-            link_type = VCRoomLinkType[data.pop('linking')]
-            if link_type == VCRoomLinkType.event:
-                link_id = None
-            else:
-                link_id = int(contribution_id if link_type == VCRoomLinkType.contribution else session_id)
+            data, name, link_type, link_id = process_form_data(form.data)
 
             vc_room = VCRoom(created_by_user=session.user)
             vc_room.type = self.plugin.service_name
             vc_room.status = VCRoomStatus.created
-            vc_room.name = data.pop('name')
-            vc_room.data = data
+            update_vc_room(vc_room, name, data)
 
             event_vc_room = VCRoomEventAssociation(
                 event_id=self.event_id,
@@ -110,13 +104,20 @@ class RHVCManageEventCreate(RHVCManageEventBase):
                 link_id=link_id
             )
 
-            db.session.add_all((vc_room, event_vc_room))
+            try:
+                self.plugin.create_room(vc_room, self.event)
+            except VCRoomError as err:
+                if err.field is None:
+                    raise
+                field = getattr(form, err.field)
+                field.errors.append(err.message)
+            else:
+                db.session.add_all((vc_room, event_vc_room))
+                # TODO: notify_created(vc_room, self.event, session.user)
 
-            self.plugin.create_room(vc_room, self.event)
-            # TODO: notify_created(vc_room, self.event, session.user)
+                flash(_('Video conference room created'), 'success')
+                return redirect(url_for('.manage_vc_rooms', self.event))
 
-            flash(_('Video conference room created'), 'success')
-            return redirect(url_for('.manage_vc_rooms', self.event))
         form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form)
 
         return WPVCManageEvent.render_string(form_html, self.event)
@@ -145,23 +146,29 @@ class RHVCManageEventModify(RHVCSystemEventBase):
                                        existing_event_vc_room=self.event_vc_room)
 
         if form.validate_on_submit():
-            # form.data is a generated property, so we cannot just .pop() directly from it
-            data = form.data
+            data, name, link_type, link_id = process_form_data(form.data)
 
-            self.vc_room.name = data.pop('name')
-            self.vc_room.data.update(data)
+            update_vc_room(self.vc_room, name, data)
             self.vc_room.modified_dt = now_utc()
-            flag_modified(self.vc_room, 'data')
+            self.event_vc_room.link_type = link_type
+            self.event_vc_room.link_id = link_id
 
-            # TODO: API
-            self.plugin.update_room(self.vc_room, self.event)
-            # If the attributes have changed, update the booking
-            # if attrs_changed(self.vc_room, 'name', 'description', ...):
-            #     update_room(self.vc_room)
-            # notify_modified(self.vc_room, self.event, session.user)
+            try:
+                self.plugin.update_room(self.vc_room, self.event)
+            except VCRoomError as err:
+                if err.field is None:
+                    raise
+                field = getattr(form, err.field)
+                field.errors.append(err.message)
+                transaction.abort()
+            else:
+                flag_modified(self.vc_room, 'data')
 
-            flash(_('Video conference room updated'), 'success')
-            return redirect(url_for('.manage_vc_rooms', self.event))
+                # TODO
+                # notify_modified(self.vc_room, self.event, session.user)
+
+                flash(_('Video conference room updated'), 'success')
+                return redirect(url_for('.manage_vc_rooms', self.event))
 
         form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form,
                                             existing_vc_room=self.vc_room)

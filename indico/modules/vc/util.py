@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.plugins import plugin_engine
 from indico.modules.vc import VCPluginMixin
+from indico.modules.vc.models.vc_rooms import VCRoomLinkType
 
 
 def get_vc_plugins():
@@ -33,3 +34,23 @@ def get_vc_plugin_by_service_name(plugin_name):
             return plugin
     else:
         raise KeyError()
+
+
+def process_form_data(data):
+    name = data.pop('name')
+    contribution_id = data.pop('contribution')
+    session_id = data.pop('session')
+    link_type = VCRoomLinkType[data.pop('linking')]
+    if link_type == VCRoomLinkType.event:
+        link_id = None
+    else:
+        link_id = int(contribution_id if link_type == VCRoomLinkType.contribution else session_id)
+
+    return data, name, link_type, link_id
+
+
+def update_vc_room(vc_room, name, data):
+    vc_room.name = name
+    if vc_room.data is None:
+        vc_room.data = {}
+    vc_room.data.update(data)
