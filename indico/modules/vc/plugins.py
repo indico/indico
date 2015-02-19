@@ -20,9 +20,9 @@ import re
 from flask import render_template
 
 from indico.util.decorators import classproperty
-from indico.util.user import retrieve_principals
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.models.vc_rooms import VCRoomLinkType
+from indico.util.user import retrieve_principals, retrieve_principal
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults
 
@@ -64,6 +64,13 @@ class VCPluginMixin(object):
     def render_custom_create_button(self, **kwargs):
         tpl = get_overridable_template_name('create_button.html', self, 'vc/')
         return render_template(tpl, plugin=self, **kwargs)
+
+    def render_info_box(self, vc_room, event, **kwargs):
+        tpl = get_overridable_template_name('info_box.html', self, 'vc/')
+        moderator = retrieve_principal(vc_room.data.get('moderator'))
+        phone_link = self.settings.get('vidyo_phone_link')
+        return render_template(tpl, plugin=self, event=event, vc_room=vc_room, moderator=moderator,
+                               phone_link=phone_link, **kwargs)
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
         """Creates the video conference room form

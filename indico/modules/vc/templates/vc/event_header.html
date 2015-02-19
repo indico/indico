@@ -1,0 +1,48 @@
+<tr>
+    <td class="leftCol">{% trans %}Video Conference Rooms{% endtrans %}</td>
+    <td>
+        <div>
+            {% for event_vc_room in event_vc_rooms %}
+                {% set vc_room = event_vc_room.vc_room %}
+                <div class="event-service-row">
+                    <div class="event-service-row-collapsed clearfix">
+                        <div class="event-service-info event-service-row-toggle left">
+                            <!-- TODO: Change icon to plugin specific -->
+                            <img src="/images/video_Vidyo.png" border="0" alt="locked"/>
+                            <span class="event-service-title">{{ vc_room.name }}</span>
+                        </div>
+                        <div class="event-service-toolbar toolbar right">
+                            <div class="group">
+                                <a class="i-button i-button-small event-service-right-button highlight join-button" href="{{ vc_room.data.url }}"><strong>{% trans %}Join{% endtrans %}</strong></a>
+                            </div>
+                            <!-- TODO: Add template hook for RAVEM "Connect" button -->
+                        </div>
+                    </div>
+                    <div class="event-service-details">
+                        {{ vc_room.plugin.render_info_box(vc_room, event) | safe }}
+                    </div>
+                    <a class="trigger icon-expand" title="{% trans %}More info{% endtrans %}"></a>
+                </div>
+            {% endfor %}
+        </div>
+        <script>
+            // Snippet to copy links to the clipboard
+            var client = new ZeroClipboard( $('.clip_button') );
+
+            client.on( 'ready', function(event) {
+
+                client.on( 'copy', function(event) {
+                    event.clipboardData.setData('text/plain', event.target.getAttribute('data-link'));
+                } );
+
+                client.on( 'aftercopy', function(event) {
+                    $(event.target).addClass('accept icon-checkmark');
+                } );
+            } );
+
+            client.on( 'error', function(event) {
+                ZeroClipboard.destroy();
+            } );
+        </script>
+    </td>
+</tr>
