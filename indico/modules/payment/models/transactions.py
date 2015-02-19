@@ -212,10 +212,7 @@ class PaymentTransaction(db.Model):
     @property
     def plugin(self):
         from indico.modules.payment.util import get_payment_plugins
-        try:
-            return get_payment_plugins()[self.provider]
-        except KeyError:
-            return None
+        return get_payment_plugins().get(self.provider)
 
     @property
     def manual(self):
