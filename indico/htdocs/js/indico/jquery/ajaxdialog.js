@@ -27,6 +27,9 @@
     $.fn.ajaxDialog = function jqAjaxDialog(options) {
         return this.on('click', function(e) {
             e.preventDefault();
+            if ($(this).hasClass('disabled')) {
+                return;
+            }
             var href = $(this).attr('href');
             if (href == '#') {
                 var data_href = $(this).data('href');
