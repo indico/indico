@@ -69,7 +69,7 @@
         <!-- Other Page Specific -->
         ${ page._getHeadContent() }
 
-        ${ plugin_hook('html-head', template=self) }
+        ${ template_hook('html-head', template=self) }
     </head>
     <body data-user-id="${ user.getId() if user else 'null' }">
         ${ page._getWarningMessage() }

@@ -157,4 +157,4 @@ var Indico = {
 
 };
 
-${ plugin_hook('vars-js') }
+${ template_hook('vars-js') }

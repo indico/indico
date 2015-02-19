@@ -10,7 +10,7 @@
         <div class="warning-message-box fixed-width">
             <div class="message-text">
                 {% trans %}You cannot modify this payment method.{% endtrans %}<br>
-                {{ plugin_hook('event-manage-payment-plugin-cannot-modify', plugin=plugin, event=event) }}
+                {{ template_hook('event-manage-payment-plugin-cannot-modify', plugin=plugin, event=event) }}
             </div>
         </div>
     {% endif %}

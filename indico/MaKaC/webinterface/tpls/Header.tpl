@@ -18,7 +18,7 @@ urlMeeting.addParam("event_type","meeting")
 <div class="page-header clearfix">
         <%include file="SessionBar.tpl" args="dark=False"/>
 
-        ${ plugin_hook('page-header', category=currentCategory) }
+        ${ template_hook('page-header', category=currentCategory) }
 
         <!--
             set fixed height on anchor to assure that the height is

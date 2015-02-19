@@ -18,7 +18,6 @@ import json
 import os
 import re
 from copy import deepcopy
-from heapq import heappush
 from urlparse import urlparse
 
 from flask_pluginengine import (PluginEngine, Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin,
@@ -34,7 +33,6 @@ from indico.core.logger import Logger
 from indico.core.models.settings import SettingsProxy, EventSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import _
-from indico.util.signals import values_from_signal
 from indico.util.struct.enum import IndicoEnum
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
 from indico.web.flask.templating import get_template_module, register_template_hook
@@ -270,25 +268,6 @@ def include_plugin_css_assets(bundle_name):
     """Jinja template function to generate HTML tags for a plugin CSS asset bundle."""
     return Markup('\n'.join('<link rel="stylesheet" type="text/css" href="{}">'.format(url)
                             for url in current_plugin.assets[bundle_name].urls()))
-
-
-def plugin_hook(*name, **kwargs):
-    """Template function to let plugins add their own data to a template.
-
-    :param name: The name of the hook.  Only accepts one argument.
-    :param kwargs: Data to pass to the signal receivers.
-    """
-    if len(name) != 1:
-        raise TypeError('plugin_hook() accepts only one positional argument, {} given'.format(len(name)))
-    name = name[0]
-    values = []
-    for is_markup, priority, value in values_from_signal(signals.plugin.template_hook.send(unicode(name), **kwargs),
-                                                         single_value=True):
-        if value:
-            if is_markup:
-                value = Markup(value)
-            heappush(values, (priority, value))
-    return Markup(u'\n').join(x[1] for x in values) if values else ''
 
 
 def plugin_url_rule_to_js(endpoint):

@@ -322,10 +322,11 @@ def escapeHTMLForJS(s):
             .replace("\f", "\\f")
 
 
-def mako_plugin_hook(*name, **kwargs):
-    from indico.core.plugins import plugin_hook
+def mako_call_template_hook(*name, **kwargs):
+    from indico.web.flask.templating import call_template_hook
+
     kwargs = {k: unicode(v, 'utf-8') if isinstance(v, str) else v for k, v in kwargs.iteritems()}
-    result = plugin_hook(*name, **kwargs)
+    result = call_template_hook(*name, **kwargs)
     return result.encode('utf-8')
 
 
@@ -427,4 +428,4 @@ def registerHelpers(objDict):
     objDict['url_for'] = url_for
     objDict['url_rule_to_js'] = url_rule_to_js
     objDict['render_template'] = render_template
-    objDict['plugin_hook'] = mako_plugin_hook
+    objDict['template_hook'] = mako_call_template_hook

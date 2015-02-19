@@ -25,5 +25,5 @@
         {% endcall %}
     {% endif %}
 
-    {{ plugin_hook('plugin-details', plugin=plugin) }}
+    {{ template_hook('plugin-details', plugin=plugin) }}
 {% endblock %}

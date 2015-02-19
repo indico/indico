@@ -31,7 +31,7 @@ else:
         </div>
         <div class="confSubTitleBox" ${ bgColorStyle }>
             <div class="confSubTitleContent">
-                ${ plugin_hook('conference-header', event=conf) }
+                ${ template_hook('conference-header', event=conf) }
                 <div class="confSubTitle" ${ textColorStyle }>
                    <div class="datePlace">
                         <div class="date">${ confDateInterval }</div>
@@ -52,7 +52,7 @@ else:
                             <a href="${ webcastURL }">${ _("Webcast Service") }</a>.
                         </div>
                     % endif
-                    ${ plugin_hook('conference-header-subtitle', event=conf) }
+                    ${ template_hook('conference-header-subtitle', event=conf) }
                 </div>
             </div>
         </div>

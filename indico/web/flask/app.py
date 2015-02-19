@@ -43,11 +43,11 @@ from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
-from indico.core.plugins import (plugin_engine, include_plugin_css_assets, include_plugin_js_assets, plugin_hook,
-                                 url_for_plugin)
+from indico.core.plugins import plugin_engine, include_plugin_css_assets, include_plugin_js_assets, url_for_plugin
 from indico.util.signals import values_from_signal
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
-from indico.web.flask.templating import EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof
+from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
+                                         call_template_hook)
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
                                    IndicoConfigWrapper)
 from indico.web.flask.wrappers import IndicoFlask
@@ -136,7 +136,7 @@ def setup_jinja(app):
     app.add_template_global(include_js_assets)
     app.add_template_global(include_plugin_css_assets)
     app.add_template_global(include_plugin_js_assets)
-    app.add_template_global(plugin_hook)
+    app.add_template_global(call_template_hook, 'template_hook')
     app.add_template_global(is_single_line_field, '_is_single_line_field')
     app.add_template_global(format_currency)
     app.add_template_global(get_currency_name)

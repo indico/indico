@@ -27,7 +27,7 @@ else:
             <span style="vertical-align: middle;">${ _("Powered by ")} <a href="http://indico-software.org">Indico</a></span>
   </%block>
 
-    ${ plugin_hook('page-footer') }
+    ${ template_hook('page-footer') }
 </div>
 
 % if Config.getInstance().getWorkerName():
