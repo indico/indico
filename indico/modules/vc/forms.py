@@ -53,6 +53,7 @@ class VCPluginSettingsFormBase(IndicoForm):
 
 
 class VCRoomFormBase(IndicoForm):
+    conditional_fields = {'contribution', 'block'}
 
     name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
                        description=_('The name of the room'))
