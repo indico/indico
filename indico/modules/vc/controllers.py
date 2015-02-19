@@ -184,14 +184,16 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
             flash(_('You are not allowed to remove VC rooms from this event.'), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
-        Logger.get('modules.vc').info("Detaching VC room {} from event {}".format(
-            self.vc_room, self._conf))
+        Logger.get('modules.vc').info("Detaching VC room {} from event {}".format(self.vc_room, self._conf))
         db.session.delete(self.event_vc_room)
+        db.session.flush()
 
         # delete room if not connected to any other events
         if not self.vc_room.events:
             Logger.get('modules.vc').info("Deleting VC room {}".format(self.vc_room))
+
+            self.plugin.delete_room(self.vc_room, self.event)
             db.session.delete(self.vc_room)
-            # TODO: VC-specific code !!!!
+
         flash(_("Video conference room '{0}' has been removed").format(self.vc_room.name), 'success')
         return redirect(url_for('.manage_vc_rooms', self.event))
