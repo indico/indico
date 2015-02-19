@@ -85,6 +85,11 @@ class VCRoom(db.Model):
     )
 
     @property
+    def plugin(self):
+        from indico.modules.vc.util import get_vc_plugins
+        return get_vc_plugins().get(self.type)
+
+    @property
     def locator(self):
         return {'vc_room_id': self.id, 'service': self.type}
 

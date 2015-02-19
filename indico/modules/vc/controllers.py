@@ -26,7 +26,7 @@ from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.modules.vc.exceptions import VCRoomError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
-from indico.modules.vc.util import get_vc_plugins, get_vc_plugin_by_service_name, process_form_data, update_vc_room
+from indico.modules.vc.util import get_vc_plugins, process_form_data, update_vc_room
 from indico.modules.vc.views import WPVCManageEvent
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -78,7 +78,7 @@ class RHVCManageEventCreate(RHVCManageEventBase):
     def _checkParams(self, params):
         RHVCManageEventBase._checkParams(self, params)
         try:
-            self.plugin = get_vc_plugin_by_service_name(request.view_args['service'])
+            self.plugin = get_vc_plugins().get(request.view_args['service'])
         except KeyError:
             raise NotFound
 
@@ -129,7 +129,7 @@ class RHVCSystemEventBase(RHEventVCRoomMixin, RHVCManageEventBase):
         RHVCManageEventBase._checkParams(self, params)
         RHEventVCRoomMixin._checkParams(self)
         try:
-            self.plugin = get_vc_plugin_by_service_name(request.view_args['service'])
+            self.plugin = get_vc_plugins().get(request.view_args['service'])
         except KeyError:
             raise NotFound
 

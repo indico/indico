@@ -27,15 +27,6 @@ def get_vc_plugins():
             if isinstance(p, VCPluginMixin)}
 
 
-def get_vc_plugin_by_service_name(plugin_name):
-    """Returns a video conference plugin"""
-    for name, plugin in get_vc_plugins().iteritems():
-        if name == plugin_name:
-            return plugin
-    else:
-        raise KeyError()
-
-
 def process_form_data(data):
     name = data.pop('name')
     contribution_id = data.pop('contribution')
