@@ -95,6 +95,10 @@ class RHAgreementManagerDetails(RHConferenceModifBase):
 class RHAgreementManagerDetailsEmail(RHAgreementManagerDetails):
     dialog_template = None
 
+    def _checkParams(self, params):
+        self._doNotSanitizeFields.append('from_address')
+        RHAgreementManagerDetails._checkParams(self, params)
+
     def _success_handler(self, form):
         raise NotImplementedError
 
