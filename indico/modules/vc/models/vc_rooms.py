@@ -31,7 +31,7 @@ from MaKaC.conference import ConferenceHolder
 class VCRoomLinkType(int, IndicoEnum):
     event = 1
     contribution = 2
-    session = 3
+    block = 3
 
 
 class VCRoomStatus(int, IndicoEnum):
@@ -136,9 +136,9 @@ class VCRoomEventAssociation(db.Model):
         PyIntEnum(VCRoomLinkType),
         nullable=False
     )
-    #: Id of the event/contribution/session id the vc_room is linked to
+    #: Id of the event/contribution/session block the vc_room is linked to
     link_id = db.Column(
-        db.Integer,
+        db.String,
         nullable=True
     )
 
@@ -157,7 +157,8 @@ class VCRoomEventAssociation(db.Model):
         elif self.link_type == VCRoomLinkType.contribution:
             return self.event.getContributionById(self.link_id)
         else:
-            return self.event.getSessionById(self.link_id)
+            session_id, slot_id = self.link_id.split(':')
+            return self.event.getSessionById(session_id).getSlotById(slot_id)
 
     @event.setter
     def event(self, event):

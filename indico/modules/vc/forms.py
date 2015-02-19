@@ -22,6 +22,7 @@ from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, Length, Regexp, ValidationError
 
 from indico.modules.vc.models import VCRoom
+from indico.modules.vc.util import full_block_id
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalField, IndicoRadioField
@@ -60,11 +61,12 @@ class VCRoomFormBase(IndicoForm):
     linking = IndicoRadioField(_("Link to"), [DataRequired()],
                                choices=[('event', _("Event")),
                                         ('contribution', _("Contribution")),
-                                        ('session', _("Session"))],
+                                        ('block', _("Session"))],
                                widget=LinkingWidget())
     contribution = SelectField(_("Contribution"),
                                [UsedIf(lambda form, field: form.linking.data == 'contribution'), DataRequired()])
-    session = SelectField(_("Session"), [UsedIf(lambda form, field: form.linking.data == 'session'), DataRequired()])
+    block = SelectField(_("Session block"),
+                        [UsedIf(lambda form, field: form.linking.data == 'block'), DataRequired()])
 
     def __init__(self, *args, **kwargs):
         self.vc_room = kwargs.pop('vc_room')
@@ -72,8 +74,8 @@ class VCRoomFormBase(IndicoForm):
         super(VCRoomFormBase, self).__init__(*args, **kwargs)
         self.contribution.choices = ([('', _("Please select a contribution"))] +
                                      [(contrib.id, contrib.title) for contrib in self.event.getContributionList()])
-        self.session.choices = ([('', _("Please select a session"))] +
-                                [(session.id, session.title) for session in self.event.getSessionList()])
+        self.block.choices = ([('', _("Please select a session block"))] +
+                              [(full_block_id(block), block.getFullTitle()) for block in self.event.getSessionSlotList()])
         self.linking._form = self
 
     def validate_name(self, field):
