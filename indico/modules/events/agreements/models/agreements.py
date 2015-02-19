@@ -220,6 +220,7 @@ class Agreement(db.Model):
         agreement.person_name = person.name
         if person.user:
             agreement.user = person.user
+        agreement.data = person.data
         return agreement
 
     def accept(self, reason=None, on_behalf=False):
