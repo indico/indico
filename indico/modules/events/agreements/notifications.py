@@ -36,12 +36,12 @@ def make_email_template(template, agreement, email_body=None):
 
 
 @email_sender
-def notify_agreement_new(agreement, email_body=None):
+def notify_agreement_new(agreement, email_body=None, cc_addresses=None):
     template = make_email_template('events/agreements/emails/agreement_new.html', agreement, email_body)
-    return make_email(agreement.person_email, template=template, html=True)
+    return make_email(agreement.person_email, cc_list=cc_addresses, template=template, html=True)
 
 
 @email_sender
-def notify_agreement_reminder(agreement, email_body=None):
+def notify_agreement_reminder(agreement, email_body=None, cc_addresses=None):
     template = make_email_template('events/agreements/emails/agreement_reminder.html', agreement, email_body)
-    return make_email(agreement.person_email, template=template, html=True)
+    return make_email(agreement.person_email, cc_list=cc_addresses, template=template, html=True)

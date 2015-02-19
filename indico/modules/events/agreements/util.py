@@ -28,13 +28,14 @@ def get_agreement_definitions():
     return named_objects_from_signal(signals.agreements.get_definitions.send(), plugin_attr='plugin')
 
 
-def send_new_agreements(event, name, people, email_body):
+def send_new_agreements(event, name, people, email_body, cc_addresses):
     """Creates and send agreements for a list of people on a given event.
 
     :param event: The `Conference` associated with the agreement
     :param name: The agreement type matcing a :class:`AgreementDefinition` name
     :param people: The list of people for whom agreements will be created
     :param email_body: The body of the email
+    :param cc_addresses: Email addresses to send CCs to
     """
     agreements = []
     for person in people.itervalues():
@@ -43,5 +44,5 @@ def send_new_agreements(event, name, people, email_body):
         agreements.append(agreement)
     db.session.flush()
     for agreement in agreements:
-        notify_agreement_new(agreement, email_body)
+        notify_agreement_new(agreement, email_body, cc_addresses)
     return agreements
