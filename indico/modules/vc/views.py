@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
 
 
 class WPVCJinjaMixin(WPJinjaMixin):
@@ -33,3 +33,24 @@ class WPVCManageEvent(WPVCJinjaMixin, WPConferenceModifBase):
 
     def _getPageContent(self, params):
         return WPVCJinjaMixin._getPageContent(self, params)
+
+
+class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
+
+    def __init__(self, rh, conf, **kwargs):
+        WPConferenceDefaultDisplayBase.__init__(self, rh, conf, **kwargs)
+        self._conf = conf
+        self._aw = rh.getAW()
+
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['eventservices_sass'].urls()
+
+    def getJSFiles(self):
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._asset_env['zero_clipboard_js'].urls()
+
+    def _getBody(self, params):
+        return self._getPageContent(params)
+
+    def _defineSectionMenu(self):
+        WPConferenceDefaultDisplayBase._defineSectionMenu(self)
+        self._sectionMenu.setCurrentItem(self._collaborationOpt)

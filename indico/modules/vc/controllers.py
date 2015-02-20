@@ -25,14 +25,15 @@ from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.modules.vc.exceptions import VCRoomError
-from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus, VCRoomLinkType
 from indico.modules.vc.util import get_vc_plugins, process_form_data, set_vc_room_data
-from indico.modules.vc.views import WPVCManageEvent
+from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHVCManageEventBase(RHConferenceModifBase):
@@ -213,3 +214,23 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
 
         flash(_("Video conference room '{0}' has been removed").format(self.vc_room.name), 'success')
         return redirect(url_for('.manage_vc_rooms', self.event))
+
+
+class RHVCEventPage(RHConferenceBaseDisplay):
+    """Lists the VC rooms in an event page"""
+
+    def _process(self):
+        event_vc_rooms = VCRoomEventAssociation.find_for_event(self._conf).all()
+        linked_to_event = []
+        linked_to_contr = []
+        linked_to_session = []
+        for event_vc_room in event_vc_rooms:
+            if event_vc_room.link_type == VCRoomLinkType.event:
+                linked_to_event.append(event_vc_room)
+            elif event_vc_room.link_type == VCRoomLinkType.contribution:
+                linked_to_contr.append(event_vc_room)
+            elif event_vc_room.link_type == VCRoomLinkType.block:
+                linked_to_session.append(event_vc_room)
+        return WPVCEventPage.render_template('event_vc.html', self._conf, event=self._conf,
+                                             event_vc_rooms=event_vc_rooms, linked_to_event=linked_to_event,
+                                             linked_to_contr=linked_to_contr, linked_to_session=linked_to_session)

@@ -1,40 +1,69 @@
-{% macro render_vc_rooms_list(event, event_vc_rooms) -%}
-    <div>
-        {% for event_vc_room in event_vc_rooms %}
-            {% set vc_room = event_vc_room.vc_room %}
-            <div class="event-service-row">
-                <div class="event-service-row-collapsed clearfix">
-                    <div class="event-service-info event-service-row-toggle left">
-                        <!-- TODO: Change icon to plugin specific -->
-                        <img src="/images/video_Vidyo.png" border="0" alt="locked"/>
-                        <span class="event-service-title">{{ vc_room.name }}</span>
-                    </div>
-                    <div class="event-service-toolbar toolbar right">
-                        <div class="group">
-                            <a class="i-button i-button-small event-service-right-button highlight join-button" href="{{ vc_room.data.url }}"><strong>{% trans %}Join{% endtrans %}</strong></a>
-                        </div>
-                        <!-- TODO: Add template hook for RAVEM "Connect" button -->
-                    </div>
-                </div>
-                <div class="event-service-details">
-                    {{ vc_room.plugin.render_info_box(vc_room, event_vc_room, event) | safe }}
-                </div>
-                <a class="trigger icon-expand" title="{% trans %}More info{% endtrans %}"></a>
+{% macro render_vc_room(event_vc_room, event) -%}
+    {% set vc_room = event_vc_room.vc_room %}
+    <div class="event-service-row">
+        <div class="event-service-row-collapsed clearfix">
+            <div class="event-service-info event-service-row-toggle left">
+                <!-- TODO: Change icon to plugin specific -->
+                <img src="/images/video_Vidyo.png" border="0" alt="locked"/>
+                <span class="event-service-title">{{ vc_room.name }}</span>
             </div>
-        {% endfor %}
+            <div class="event-service-toolbar toolbar right">
+                <div class="group">
+                    <a class="i-button i-button-small event-service-right-button highlight join-button" href="{{ vc_room.data.url }}"><strong>{% trans %}Join{% endtrans %}</strong></a>
+                </div>
+                <!-- TODO: Add template hook for RAVEM "Connect" button -->
+            </div>
+        </div>
+        <div class="event-service-details">
+            {{ vc_room.plugin.render_info_box(vc_room, event_vc_room, event) | safe }}
+        </div>
+        <a class="trigger icon-expand" title="{% trans %}More info{% endtrans %}"></a>
+    </div>
+{%- endmacro %}
+
+{% macro render_vc_rooms_list(event, event_vc_rooms, linked_to_event=None, linked_to_contr=None, linked_to_session=None) -%}
+    <div>
+        {% if linked_to_event or linked_to_contr or linked_to_session %}
+            {% if linked_to_event %}
+                <div class="groupTitleNoBorder collaborationDisplayTitle event-service-association-title">
+                    {{ event.getTitle() }}<span class="event-service-association-subtitle">event</span>
+                </div>
+                {% for event_vc_room in linked_to_event %}
+                    {{ render_vc_room(event_vc_room, event) }}
+                {% endfor %}
+            {% endif %}
+            {% if linked_to_contr %}
+                {% for event_vc_room in linked_to_contr %}
+                    <div class="groupTitleNoBorder collaborationDisplayTitle event-service-association-title">
+                        {{ event.getContributionById(event_vc_room.link_id).getTitle() }}<span class="event-service-association-subtitle">contribution</span>
+                    </div>
+                    {{ render_vc_room(event_vc_room, event) }}
+                {% endfor %}
+            {% endif %}
+            {% if linked_to_session %}
+                {% for event_vc_room in linked_to_session %}
+                    <div class="groupTitleNoBorder collaborationDisplayTitle event-service-association-title">
+                        {{ event.getSessionById(event_vc_room.link_id).getTitle() }}<span class="event-service-association-subtitle">session</span>
+                    </div>
+                    {{ render_vc_room(event_vc_room, event) }}
+                {% endfor %}
+            {% endif %}
+        {% else %}
+            {% for event_vc_room in event_vc_rooms %}
+                {{ render_vc_room(event_vc_room, event) }}
+            {% endfor %}
+        {% endif %}
     </div>
     <script>
         // Snippet to copy links to the clipboard
         var client = new ZeroClipboard( $('.clip_button') );
 
         client.on( 'ready', function(event) {
-
             client.on( 'copy', function(event) {
                 event.clipboardData.setData('text/plain', event.target.getAttribute('data-link'));
             } );
-
             client.on( 'aftercopy', function(event) {
-                $(event.target).addClass('accept icon-checkmark');
+                $(event.target).parent().siblings('.vc-room-url-copied').show().fadeOut(2000);
             } );
         } );
 

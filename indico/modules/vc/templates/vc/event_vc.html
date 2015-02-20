@@ -1,0 +1,6 @@
+{% from 'vc/list_vc_rooms.html' import render_vc_rooms_list  %}
+
+<h2 class="page-title">Video Conference Rooms</h2>
+<div>
+    {{ render_vc_rooms_list(event, event_vc_rooms, linked_to_event, linked_to_contr, linked_to_session) }}
+</div>
