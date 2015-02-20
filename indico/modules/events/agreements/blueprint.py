@@ -25,29 +25,22 @@ from indico.modules.events.agreements.controllers import (RHAgreementForm, RHAgr
                                                           RHAgreementManagerDetailsRemindAll,
                                                           RHAgreementManagerDetailsUploadAgreement)
 
-agreements_blueprint = _bp = IndicoBlueprint('agreements', __name__, template_folder='templates')
-
+agreements_blueprint = _bp = IndicoBlueprint('agreements', __name__, template_folder='templates',
+                                             url_prefix='/event/<confId>')
 
 # Event management
-_bp.add_url_rule('/event/<confId>/manage/agreements/', 'event_agreements', RHAgreementManager)
-_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/',
-                 'event_agreements_details', RHAgreementManagerDetails)
-_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/send',
-                 'event_agreements_details_send',
-                 RHAgreementManagerDetailsSend, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/remind',
-                 'event_agreements_details_remind',
+_bp.add_url_rule('/manage/agreements/', 'event_agreements', RHAgreementManager)
+_bp.add_url_rule('/manage/agreements/<definition>/', 'event_agreements_details', RHAgreementManagerDetails)
+_bp.add_url_rule('/manage/agreements/<definition>/send', 'event_agreements_details_send', RHAgreementManagerDetailsSend,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/agreements/<definition>/remind', 'event_agreements_details_remind',
                  RHAgreementManagerDetailsRemind, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/send-all',
-                 'event_agreements_details_send_all',
+_bp.add_url_rule('/manage/agreements/<definition>/send-all', 'event_agreements_details_send_all',
                  RHAgreementManagerDetailsSendAll, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/remind-all',
-                 'event_agreements_details_remind_all',
+_bp.add_url_rule('/manage/agreements/<definition>/remind-all', 'event_agreements_details_remind_all',
                  RHAgreementManagerDetailsRemindAll, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/agreements/<definition>/upload/<id>',
-                 'event_agreements_details_upload_agreement',
+_bp.add_url_rule('/manage/agreements/<definition>/upload/<id>', 'event_agreements_details_upload_agreement',
                  RHAgreementManagerDetailsUploadAgreement, methods=('GET', 'POST'))
 
 # Event
-_bp.add_url_rule('/event/<confId>/agreement/<int:id>-<uuid>',
-                 'agreement_form', RHAgreementForm, methods=('GET', 'POST'))
+_bp.add_url_rule('/agreement/<int:id>-<uuid>', 'agreement_form', RHAgreementForm, methods=('GET', 'POST'))
