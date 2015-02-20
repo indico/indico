@@ -25,7 +25,8 @@ from indico.modules.events.agreements.controllers import (RHAgreementForm, RHAgr
                                                           RHAgreementManagerDetailsSendAll,
                                                           RHAgreementManagerDetailsRemindAll,
                                                           RHAgreementManagerDetailsUploadAgreement,
-                                                          RHAgreementManagerDetailsToggleNotifications)
+                                                          RHAgreementManagerDetailsToggleNotifications,
+                                                          RHAgreementManagerDetailsDownloadAgreement)
 
 agreements_blueprint = _bp = IndicoBlueprint('agreements', __name__, template_folder='templates',
                                              url_prefix='/event/<confId>')
@@ -45,6 +46,8 @@ _bp.add_url_rule('/manage/agreements/<definition>/remind-all', 'event_agreements
                  RHAgreementManagerDetailsRemindAll, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/agreements/<definition>/upload/<id>', 'event_agreements_details_upload_agreement',
                  RHAgreementManagerDetailsUploadAgreement, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/agreements/<definition>/download/<id>/<filename>', 'download_file',
+                 RHAgreementManagerDetailsDownloadAgreement)
 
 # Event
 _bp.add_url_rule('/agreement/<int:id>-<uuid>', 'agreement_form', RHAgreementForm, methods=('GET', 'POST'))

@@ -222,7 +222,8 @@
                             <td class="agreement-actions">
                                 {% if agreement.signed_on_behalf %}
                                     <a class="icon-file-download"
-                                        title="{% trans %}Download scanned agreement form{% endtrans %}"></a>
+                                       href="{{ url_for('.download_file', event, definition, agreement, filename=agreement.attachment_filename) }}"
+                                       title="{% trans %}Download scanned agreement form{% endtrans %} ({{ agreement.attachment_filename }})"></a>
                                 {% endif %}
                             </td>
                         </tr>

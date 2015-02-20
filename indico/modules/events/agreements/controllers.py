@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals
 
+import os
+from io import BytesIO
+
 from flask import flash, jsonify, redirect, request, session
 from flask_pluginengine import current_plugin
 from werkzeug.exceptions import NotFound
@@ -23,13 +26,13 @@ from werkzeug.exceptions import NotFound
 from indico.core.errors import AccessError, NoReportError
 from indico.core.plugins import get_plugin_template_module
 from indico.modules.events.agreements.forms import AgreementForm, AgreementEmailForm, AgreementUploadForm
-from indico.modules.events.agreements.models.agreements import Agreement
+from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
 from indico.modules.events.agreements.notifications import notify_agreement_reminder, notify_new_signature_to_manager
 from indico.modules.events.agreements.views import WPAgreementForm, WPAgreementManager
 from indico.modules.events.agreements.util import get_agreement_definitions, send_new_agreements
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
+from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
@@ -173,12 +176,17 @@ class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):
         return Agreement.find_all(Agreement.pending, event_id=self._conf.getId(), type=self.definition.name)
 
 
-class RHAgreementManagerDetailsUploadAgreement(RHAgreementManagerDetails):
+class RHAgreementManagerDetailsAgreementBase(RHAgreementManagerDetails):
     def _checkParams(self, params):
         RHAgreementManagerDetails._checkParams(self, params)
         self.agreement = Agreement.find_one(id=request.view_args['id'])
         if self._conf != self.agreement.event:
-            raise NotFound()
+            raise NotFound
+
+
+class RHAgreementManagerDetailsUploadAgreement(RHAgreementManagerDetailsAgreementBase):
+    def _checkParams(self, params):
+        RHAgreementManagerDetailsAgreementBase._checkParams(self, params)
         if not self.agreement.pending:
             raise NoReportError("The agreement is already signed")
 
@@ -189,8 +197,21 @@ class RHAgreementManagerDetailsUploadAgreement(RHAgreementManagerDetails):
         if form.validate_on_submit():
             func = agreement.accept if form.answer.data else agreement.reject
             func(on_behalf=True)
+            agreement.attachment_filename = form.document.data.filename
             agreement.attachment = form.document.data.read()
             flash(_("Agreement uploaded on behalf of {0}".format(agreement.person_name)), 'success')
             return jsonify(success=True)
         return WPJinjaMixin.render_template('events/agreements/agreement_upload_form.html', form=form,
                                             event=event, agreement=agreement)
+
+
+class RHAgreementManagerDetailsDownloadAgreement(RHAgreementManagerDetailsAgreementBase):
+    def _checkParams(self, params):
+        RHAgreementManagerDetailsAgreementBase._checkParams(self, params)
+        if self.agreement.state not in {AgreementState.accepted_on_behalf, AgreementState.rejected_on_behalf}:
+            raise NoReportError("The agreement was not signed via file upload")
+
+    def _process(self):
+        io = BytesIO(self.agreement.attachment)
+        file_ext = os.path.splitext(self.agreement.attachment_filename)[1]
+        return send_file(self.agreement.attachment_filename, io, file_ext)
