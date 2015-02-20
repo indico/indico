@@ -14,9 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from indico.core import signals
 from indico.core.logger import Logger
+from indico.modules.events.agreements.base import AgreementPersonInfo, AgreementDefinitionBase
 from indico.modules.events.agreements.util import get_agreement_definitions
+
+
+__all__ = ('AgreementPersonInfo', 'AgreementDefinitionBase')
 
 logger = Logger.get('agreements')
 

@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-from hashlib import sha1
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import JSON
@@ -24,41 +23,11 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
-from indico.util.caching import make_hashable
 from indico.util.date_time import now_utc
 from indico.core.errors import IndicoError
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.util.struct.enum import TitledIntEnum
-
-
-class AgreementPersonInfo(object):
-    def __init__(self, name=None, email=None, user=None, data=None):
-        if user:
-            if not name:
-                name = user.getStraightFullName()
-            if not email:
-                email = user.getEmail()
-        if not name:
-            raise ValueError('name is missing')
-        if not email:
-            raise ValueError('email is missing')
-        self.name = name
-        self.email = email
-        self.user = user
-        self.data = data
-
-    @return_ascii
-    def __repr__(self):
-        return '<AgreementPersonInfo({}, {}, {})>'.format(self.name, self.email, self.identifier)
-
-    @property
-    def identifier(self):
-        data_string = None
-        if self.data:
-            data_string = '-'.join('{}={}'.format(k, make_hashable(v)) for k, v in sorted(self.data.viewitems()))
-        identifier = '{}:{}'.format(self.email, data_string or None)
-        return sha1(identifier).hexdigest()
 
 
 class AgreementState(TitledIntEnum):

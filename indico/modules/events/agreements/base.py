@@ -16,13 +16,46 @@
 
 from __future__ import unicode_literals
 
+from hashlib import sha1
+
 from flask import render_template
 
 from indico.core.models.settings import EventSettingsProxy
 from indico.modules.events.agreements.models.agreements import Agreement
+from indico.util.caching import make_hashable
 from indico.util.decorators import cached_classproperty, classproperty
+from indico.util.string import return_ascii
 from indico.web.flask.templating import get_overridable_template_name
 from MaKaC.accessControl import AccessWrapper
+
+
+class AgreementPersonInfo(object):
+    def __init__(self, name=None, email=None, user=None, data=None):
+        if user:
+            if not name:
+                name = user.getStraightFullName()
+            if not email:
+                email = user.getEmail()
+        if not name:
+            raise ValueError('name is missing')
+        if not email:
+            raise ValueError('email is missing')
+        self.name = name
+        self.email = email
+        self.user = user
+        self.data = data
+
+    @return_ascii
+    def __repr__(self):
+        return '<AgreementPersonInfo({}, {}, {})>'.format(self.name, self.email, self.identifier)
+
+    @property
+    def identifier(self):
+        data_string = None
+        if self.data:
+            data_string = '-'.join('{}={}'.format(k, make_hashable(v)) for k, v in sorted(self.data.viewitems()))
+        identifier = '{}:{}'.format(self.email, data_string or None)
+        return sha1(identifier).hexdigest()
 
 
 class AgreementDefinitionBase(object):
