@@ -2,5 +2,11 @@
 
 <h2 class="page-title">Video Conference Rooms</h2>
 <div>
-    {{ render_vc_rooms_list(event, event_vc_rooms, linked_to_event, linked_to_contr, linked_to_session) }}
+    {% if event_vc_rooms %}
+        {{ render_vc_rooms_list(event, event_vc_rooms, linked_to_event, linked_to_contr, linked_to_session) }}
+    {% else %}
+        <div class="info-message-box">
+            <div class="message-text">{% trans %}There are no bookings associated with this event.{% endtrans %}</div>
+        </div>
+    {% endif %}
 </div>

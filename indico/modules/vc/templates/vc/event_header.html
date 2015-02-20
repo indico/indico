@@ -1,8 +1,9 @@
 {% from 'vc/list_vc_rooms.html' import render_vc_rooms_list  %}
-
-<tr>
-    <td class="leftCol">{% trans %}Video Conference Rooms{% endtrans %}</td>
-    <td>
-        {{ render_vc_rooms_list(event, event_vc_rooms) }}
-    </td>
-</tr>
+{% if event_vc_rooms %}
+    <tr>
+        <td class="leftCol">{% trans %}Video Conference Rooms{% endtrans %}</td>
+        <td>
+            {{ render_vc_rooms_list(event, event_vc_rooms) }}
+        </td>
+    </tr>
+{% endif %}
