@@ -37,7 +37,10 @@ class AgreementForm(IndicoForm):
 class AgreementEmailForm(IndicoForm):
     from_address = SelectField(_("From"), [DataRequired()])
     cc_addresses = EmailField(_("CC"), description=_("Warning: this email adress will be able to sign the agreement!"))
-    body = TextAreaField(_("Email body"), widget=CKEditorWidget(simple=True))
+    body = TextAreaField(_("Email body"), widget=CKEditorWidget(simple=True),
+                         description="<strong>Placeholders</strong><br>"
+                                     "{person_name}: Name of the person<br>"
+                                     "{agreement_link}: Link to the agreement page")
 
     def __init__(self, *args, **kwargs):
         super(AgreementEmailForm, self).__init__(*args, **kwargs)
