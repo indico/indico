@@ -69,11 +69,8 @@ class VCPluginMixin(object):
         tpl = get_overridable_template_name('info_box.html', self, 'vc/')
         moderator = retrieve_principal(vc_room.data.get('moderator'))
         phone_link = self.settings.get('vidyo_phone_link')
-        link_type = VCRoomLinkType.get(event_vc_room.link_type)
-        link_id = event_vc_room.link_id
         return render_template(tpl, plugin=self, event_vc_room=event_vc_room, event=event, vc_room=vc_room,
-                               moderator=moderator, phone_link=phone_link, link_type=link_type, link_id=link_id,
-                               **kwargs)
+                               moderator=moderator, phone_link=phone_link, **kwargs)
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
         """Creates the video conference room form
