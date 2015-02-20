@@ -45,3 +45,10 @@ def notify_agreement_new(agreement, email_body=None, cc_addresses=None):
 def notify_agreement_reminder(agreement, email_body=None, cc_addresses=None):
     template = make_email_template('events/agreements/emails/agreement_reminder.html', agreement, email_body)
     return make_email(agreement.person_email, cc_list=cc_addresses, template=template, html=True)
+
+
+@email_sender
+def notify_new_signature_to_manager(agreement):
+    template = get_template_module('events/agreements/emails/new_signature_email_to_manager.txt', agreement=agreement)
+    to = [m.getEmail() for m in agreement.event.getManagerList()]
+    return make_email(to, template=template)

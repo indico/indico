@@ -1,0 +1,26 @@
+{% extends 'emails/base.txt' %}
+{% set state = 'accepted' if agreement.accepted else 'rejected' %}
+
+{% block subject %}Agreement {{ state }}{% endblock %}
+{% block footer_title %}Agreements{% endblock %}
+
+{% block header_recipient -%}
+    event manager
+{%- endblock %}
+
+{% block body -%}
+A new agreement has been {{ state }} for the event:
+{{ agreement.event.getTitle() }}
+
+Person Info:
+------------
+Name: {{ agreement.person_name }}
+Email: {{ agreement.person_email }}
+
+{%- if agreement.reason %}
+Reason:
+-------
+{{ agreement.reason }}
+{%- endif %}
+
+{%- endblock %}

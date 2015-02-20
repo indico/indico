@@ -22,6 +22,11 @@ from werkzeug.exceptions import NotFound
 
 from indico.core.errors import AccessError, NoReportError
 from indico.core.plugins import get_plugin_template_module
+from indico.modules.events.agreements.forms import AgreementForm, AgreementEmailForm, AgreementUploadForm
+from indico.modules.events.agreements.models.agreements import Agreement
+from indico.modules.events.agreements.notifications import notify_agreement_reminder, notify_new_signature_to_manager
+from indico.modules.events.agreements.views import WPAgreementForm, WPAgreementManager
+from indico.modules.events.agreements.util import get_agreement_definitions, send_new_agreements
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -29,11 +34,6 @@ from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-from indico.modules.events.agreements.forms import AgreementForm, AgreementEmailForm, AgreementUploadForm
-from indico.modules.events.agreements.models.agreements import Agreement
-from indico.modules.events.agreements.notifications import notify_agreement_reminder
-from indico.modules.events.agreements.views import WPAgreementForm, WPAgreementManager
-from indico.modules.events.agreements.util import get_agreement_definitions, send_new_agreements
 
 
 class RHAgreementForm(RHConferenceBaseDisplay):
@@ -63,6 +63,8 @@ class RHAgreementForm(RHConferenceBaseDisplay):
             reason = form.reason.data if form.agreed.data else None
             func = self.agreement.accept if form.agreed.data else self.agreement.reject
             func(reason=reason)
+            if self.agreement.definition.event_settings.get(self._conf, 'manager_notifications_enabled'):
+                notify_new_signature_to_manager(self.agreement)
             return redirect(url_for('.agreement_form', self.agreement, uuid=self.agreement.uuid))
         html = self.agreement.render(form)
         return WPAgreementForm.render_string(html, self._conf)
