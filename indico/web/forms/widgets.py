@@ -17,8 +17,6 @@
 from flask import render_template
 from wtforms.widgets.core import HTMLString
 
-from indico.util.i18n import L_
-
 
 class ConcatWidget(object):
     """Renders a list of fields as a simple string joined by an optional separator."""
@@ -75,7 +73,11 @@ class RadioButtonsWidget(JinjaWidget):
 
 class SwitchWidget(JinjaWidget):
     """Renders a switch widget"""
-    def __init__(self, on_label=L_('Yes'), off_label=L_('No')):
+    def __init__(self, on_label=None, off_label=None):
+        """
+        :param on_label: Text to override default ON label
+        :param off_label: Text to override default OFF label
+        """
         self.on_label = on_label
         self.off_label = off_label
         super(SwitchWidget, self).__init__('forms/switch_widget.html')

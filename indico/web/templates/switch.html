@@ -1,0 +1,17 @@
+{% macro switch(value='', id=none, name=none, checked=false, disabled=false,
+                on_label=none, off_label=none, href=none) %}
+    {% set on_label = _('Yes') if on_label is none else on_label %}
+    {% set off_label = _('No') if off_label is none else off_label %}
+
+    <label class="switch">
+        <input type="checkbox" class="switch-input" value="{{ value }}"
+               {%- if id %} id="{{ id }}"{% endif %}
+               {%- if name %} name="{{ name }}"{% endif %}
+               {%- if checked %} checked{% endif -%}
+               {%- if disabled %} disabled{% endif -%}
+               {%- if href %} data-href="{{ href }}"{% endif -%}
+               {%- if href %} data-checked="{{ 'yes' if checked else 'no' }}"{% endif -%}>
+        <span class="switch-label" data-on="{{ on_label }}" data-off=" {{ off_label }}"></span>
+        <span class="switch-handle"></span>
+    </label>
+{% endmacro %}

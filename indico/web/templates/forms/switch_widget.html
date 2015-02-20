@@ -1,7 +1,5 @@
-<label class="switch">
-    <input id="{{ field.id }}" name="{{ field.name }}" type="checkbox" class="switch-input" value="{{ field._value() }}"
-           {%- if checked %} checked {% endif -%}
-           {%- if disabled %} disabled {% endif -%}>
-    <span class="switch-label" data-on="{{ on_label }}" data-off="{{ off_label }}"></span>
-    <span class="switch-handle"></span>
-</label>
+{% from 'switch.html' import switch %}
+
+{{ switch(id=field.id, name=field.name, value=field._value(),
+          checked=checked, disabled=disabled,
+          on_label=on_label, off_label=off_label) }}
