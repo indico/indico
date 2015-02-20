@@ -104,7 +104,7 @@ class HTTPAPIHook(object):
     def _matchPath(cls, path):
         if not hasattr(cls, '_RE'):
             types = '|'.join(cls.TYPES)
-            cls._RE = re.compile(r'/' + cls.PREFIX + '/(' + types + r')/' + cls.RE + r'\.(\w+)$')
+            cls._RE = re.compile(r'/' + cls.PREFIX + '/(' + types + r')' + ('/' + cls.RE).rstrip('/') + r'\.(\w+)$')
         return cls._RE.match(path)
 
     @classmethod
@@ -165,7 +165,7 @@ class HTTPAPIHook(object):
     def _getMethodName(self):
         if self.METHOD_NAME:
             return self.METHOD_NAME
-        return self.PREFIX + '_' + self._type
+        return self.PREFIX + '_' + self._type.replace('-', '_')
 
     def _performCall(self, func, aw):
         resultList = []
