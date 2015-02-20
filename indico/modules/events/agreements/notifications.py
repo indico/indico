@@ -17,21 +17,18 @@
 from __future__ import unicode_literals
 
 from flask_pluginengine import current_plugin
-from markupsafe import Markup
 
 from indico.core.notifications import email_sender, make_email
 from indico.core.plugins import get_plugin_template_module
+from indico.modules.events.agreements.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
 
 
 def make_email_template(template, agreement, email_body=None):
     func = get_template_module if not current_plugin else get_plugin_template_module
-    link = Markup('<a href="{0}">{0}</a>'.format(url_for('agreements.agreement_form', agreement,
-                                                 uuid=agreement.uuid, _external=True)))
     if not email_body:
         email_body = func('events/agreements/emails/agreement_default_body.html', event=agreement.event).get_body()
-    email_body = email_body.format(person_name=agreement.person_name, agreement_link=link)
+    email_body = replace_placeholders(email_body, agreement.definition.get_email_placeholders(), agreement)
     return func(template, email_body=email_body)
 
 

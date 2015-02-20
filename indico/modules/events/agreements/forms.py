@@ -16,11 +16,11 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from flask import session, render_template
 
 from wtforms.fields import BooleanField, FileField, TextAreaField, SelectField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import InputRequired, DataRequired
+from wtforms.validators import InputRequired, DataRequired, ValidationError
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -37,16 +37,25 @@ class AgreementForm(IndicoForm):
 class AgreementEmailForm(IndicoForm):
     from_address = SelectField(_("From"), [DataRequired()])
     cc_addresses = EmailField(_("CC"), description=_("Warning: this email adress will be able to sign the agreement!"))
-    body = TextAreaField(_("Email body"), widget=CKEditorWidget(simple=True),
-                         description="<strong>Placeholders</strong><br>"
-                                     "{person_name}: Name of the person<br>"
-                                     "{agreement_link}: Link to the agreement page")
+    body = TextAreaField(_("Email body"), widget=CKEditorWidget(simple=True))
 
     def __init__(self, *args, **kwargs):
+        self._definition = kwargs.pop('definition')
         super(AgreementEmailForm, self).__init__(*args, **kwargs)
         name = session.user.getStraightFullName()
         from_addresses = ['{} <{}>'.format(name, email) for email in session.user.getEmails()]
         self.from_address.choices = zip(from_addresses, from_addresses)
+        placeholders = self._definition.get_email_placeholders()
+        self.body.description = render_template('events/agreements/placeholder_info.html', placeholders=placeholders)
+
+    def validate_body(self, field):
+        placeholders = {'{{{}}}'.format(name)
+                        for name, placeholder in self._definition.get_email_placeholders().iteritems()
+                        if placeholder.required}
+        missing = {p for p in placeholders if p not in field.data}
+        if missing:
+            raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))
+
 
 
 class AgreementUploadForm(IndicoForm):

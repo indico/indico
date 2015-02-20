@@ -119,7 +119,7 @@ class RHAgreementManagerDetailsEmailBase(RHAgreementManagerDetails):
         func = get_template_module if not current_plugin else get_plugin_template_module
         template = func('events/agreements/emails/agreement_default_body.html', event=self._conf)
         form_defaults = FormDefaults(body=template.get_html_body())
-        return AgreementEmailForm(obj=form_defaults)
+        return AgreementEmailForm(obj=form_defaults, definition=self.definition)
 
     def _process(self):
         event = self._conf

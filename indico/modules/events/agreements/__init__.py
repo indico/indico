@@ -18,11 +18,11 @@ from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.modules.events.agreements.base import AgreementPersonInfo, AgreementDefinitionBase
+from indico.modules.events.agreements.base import AgreementPersonInfo, AgreementDefinitionBase, EmailPlaceholderBase
 from indico.modules.events.agreements.util import get_agreement_definitions
 
 
-__all__ = ('AgreementPersonInfo', 'AgreementDefinitionBase')
+__all__ = ('AgreementPersonInfo', 'AgreementDefinitionBase', 'EmailPlaceholderBase')
 
 logger = Logger.get('agreements')
 

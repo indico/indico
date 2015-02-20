@@ -58,8 +58,22 @@ class AgreementPersonInfo(object):
         return sha1(identifier).hexdigest()
 
 
+class EmailPlaceholderBase(object):
+    """Base class for agreement email placeholders"""
+    required = False
+    description = None
+
+    @classmethod
+    def render(cls, agreement):
+        """Converts the placeholder to a string
+
+        :param agreement: the `Agreement` object the email is being sent for
+        """
+        raise NotImplementedError
+
+
 class AgreementDefinitionBase(object):
-    """AgreementDefinition base class"""
+    """Base class for agreement definitions"""
 
     #: unique name of the agreement definition
     name = None
@@ -71,6 +85,8 @@ class AgreementDefinitionBase(object):
     paper_form_url = None
     #: template of the agreement form - agreement definition name by default
     template_name = None
+    #: dict containing custom email placeholders
+    email_placeholders = {}
     #: plugin containing this agreement definition - assigned automatically
     plugin = None
 
@@ -156,3 +172,12 @@ class AgreementDefinitionBase(object):
     def iter_people(cls, event):  # pragma: no cover
         """Yields :class:`AgreementPersonInfo` required to sign agreements"""
         raise NotImplementedError
+
+    @classmethod
+    def get_email_placeholders(cls):
+        """Returns all available email placeholders"""
+        from indico.modules.events.agreements.placeholders import PersonNamePlaceholder, AgreementLinkPlaceholder
+        placeholders = {'person_name': PersonNamePlaceholder,
+                        'agreement_link': AgreementLinkPlaceholder}
+        placeholders.update(cls.email_placeholders or {})
+        return placeholders
