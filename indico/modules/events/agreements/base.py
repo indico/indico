@@ -18,8 +18,9 @@ from __future__ import unicode_literals
 
 from flask import render_template
 
+from indico.core.models.settings import EventSettingsProxy
 from indico.modules.events.agreements.models.agreements import Agreement
-from indico.util.decorators import classproperty
+from indico.util.decorators import cached_classproperty, classproperty
 from indico.web.flask.templating import get_overridable_template_name
 from MaKaC.accessControl import AccessWrapper
 
@@ -40,19 +41,27 @@ class AgreementDefinitionBase(object):
     #: plugin containing this agreement definition - assigned automatically
     plugin = None
 
+    #: default settings for an event
+    default_event_settings = {'manager_notifications_enabled': False}
+
     @classproperty
     @classmethod
     def locator(cls):
         return {'definition': cls.name}
 
+    @cached_classproperty
+    @classmethod
+    def event_settings(cls):
+        return EventSettingsProxy('agreement_{}'.format(cls.name), cls.default_event_settings)
+
     @classmethod
     def can_access_api(cls, user, event):
-        """Checks if a user can list the agreements for an event."""
+        """Checks if a user can list the agreements for an event"""
         return event.canModify(AccessWrapper(user))
 
     @classmethod
     def extend_api_data(cls, event, person, agreement, data):  # pragma: no cover
-        """Extends the data returned in the HTTP API.
+        """Extends the data returned in the HTTP API
 
         :param event: the event
         :param person: the :class:`AgreementPersonInfo`

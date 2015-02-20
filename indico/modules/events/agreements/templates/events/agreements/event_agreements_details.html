@@ -1,4 +1,5 @@
 {% extends 'admin/base.html' %}
+{% from 'switch.html' import switch %}
 
 {% macro extra_columns(data) %}
     {% for column in definition.render_data(event, data) or () %}
@@ -27,14 +28,17 @@
     {% set signed = agreements | rejectattr('pending') | list %}
 
     <div class="agreement-dashboard">
-
         <div class="action-box">
-            {% if definition.paper_form_url %}
-                <a class="i-button" href="{{ definition.paper_form_url }}">Download paper version</a>
-            {% endif %}
-            <div>
-                <input type="checkbox">
+            <div class="section">
+                {% if definition.paper_form_url or true %}
+                    <a class="i-button" href="{{ definition.paper_form_url }}">Download paper version</a>
+                {% endif %}
+            </div>
+            <div class="section">
                 <label>Notify managers on signature</label>
+                {{ switch(id="toggle-manager-notifications",
+                          checked=definition.event_settings.get(event, 'manager_notifications_enabled'),
+                          href=url_for_plugin('.toggle_notifications', event, definition)) }}
             </div>
         </div>
 
@@ -235,6 +239,24 @@
             $(function() {
                 $(window).scroll(function(){
                     IndicoUI.Effect.followScroll();
+                });
+            });
+
+            $('#toggle-manager-notifications').on('change', function(e) {
+                var elem = $(this)
+                $.ajax({
+                    url: $(this).data('href'),
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {'checked': elem.prop('checked')},
+                    error: function(data) {
+                        var checked = elem.data('checked') == 'yes'
+                        elem.prop('checked', checked)
+                    },
+                    success: function(data) {
+                        elem.data('checked', data.checked)
+                        elem.prop('checked', data.checked)
+                    }
                 });
             });
 

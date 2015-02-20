@@ -19,11 +19,13 @@ from __future__ import unicode_literals
 from indico.web.flask.wrappers import IndicoBlueprint
 
 from indico.modules.events.agreements.controllers import (RHAgreementForm, RHAgreementManager,
-                                                          RHAgreementManagerDetails, RHAgreementManagerDetailsSend,
+                                                          RHAgreementManagerDetails,
+                                                          RHAgreementManagerDetailsSend,
                                                           RHAgreementManagerDetailsRemind,
                                                           RHAgreementManagerDetailsSendAll,
                                                           RHAgreementManagerDetailsRemindAll,
-                                                          RHAgreementManagerDetailsUploadAgreement)
+                                                          RHAgreementManagerDetailsUploadAgreement,
+                                                          RHAgreementManagerDetailsToggleNotifications)
 
 agreements_blueprint = _bp = IndicoBlueprint('agreements', __name__, template_folder='templates',
                                              url_prefix='/event/<confId>')
@@ -31,8 +33,10 @@ agreements_blueprint = _bp = IndicoBlueprint('agreements', __name__, template_fo
 # Event management
 _bp.add_url_rule('/manage/agreements/', 'event_agreements', RHAgreementManager)
 _bp.add_url_rule('/manage/agreements/<definition>/', 'event_agreements_details', RHAgreementManagerDetails)
-_bp.add_url_rule('/manage/agreements/<definition>/send', 'event_agreements_details_send', RHAgreementManagerDetailsSend,
-                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/agreements/<definition>/toggle-notifications', 'toggle_notifications',
+                 RHAgreementManagerDetailsToggleNotifications, methods=('POST',))
+_bp.add_url_rule('/manage/agreements/<definition>/send', 'event_agreements_details_send',
+                 RHAgreementManagerDetailsSend, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/agreements/<definition>/remind', 'event_agreements_details_remind',
                  RHAgreementManagerDetailsRemind, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/agreements/<definition>/send-all', 'event_agreements_details_send_all',

@@ -69,7 +69,7 @@ class RHAgreementForm(RHConferenceBaseDisplay):
 
 
 class RHAgreementManager(RHConferenceModifBase):
-    """Agreement manager page (admin)"""
+    """Agreements types page (admin)"""
 
     def _process(self):
         definitions = get_agreement_definitions().values()
@@ -78,6 +78,8 @@ class RHAgreementManager(RHConferenceModifBase):
 
 
 class RHAgreementManagerDetails(RHConferenceModifBase):
+    """Management page for all agreements of a certain type (admin)"""
+
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         definition_name = request.view_args['definition']
@@ -92,7 +94,16 @@ class RHAgreementManagerDetails(RHConferenceModifBase):
                                                   event=event, definition=self.definition, agreements=agreements)
 
 
-class RHAgreementManagerDetailsEmail(RHAgreementManagerDetails):
+class RHAgreementManagerDetailsToggleNotifications(RHAgreementManagerDetails):
+    """Toggles notifications to managers for an agreement type on an event"""
+
+    def _process(self):
+        checked = request.form['checked'] == 'true'
+        self.definition.event_settings.set(self._conf, 'manager_notifications_enabled', checked)
+        return jsonify(success=True, checked=checked)
+
+
+class RHAgreementManagerDetailsEmailBase(RHAgreementManagerDetails):
     dialog_template = None
 
     def _checkParams(self, params):
@@ -113,11 +124,11 @@ class RHAgreementManagerDetailsEmail(RHAgreementManagerDetails):
         form = self._get_form()
         if form.validate_on_submit():
             self._success_handler(form)
-            return jsonify({'success': True})
+            return jsonify(success=True)
         return WPJinjaMixin.render_template(self.dialog_template, event=event, form=form, definition=self.definition)
 
 
-class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmail):
+class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmailBase):
     dialog_template = 'events/agreements/agreement_email_form_send.html'
 
     def _get_people(self):
@@ -131,7 +142,7 @@ class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmail):
         send_new_agreements(self._conf, self.definition.name, people, email_body, form.cc_addresses.data)
 
 
-class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmail):
+class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmailBase):
     dialog_template = 'events/agreements/agreement_email_form_remind.html'
 
     def _get_agreements(self):
@@ -178,6 +189,6 @@ class RHAgreementManagerDetailsUploadAgreement(RHAgreementManagerDetails):
             func(on_behalf=True)
             agreement.attachment = form.document.data.read()
             flash(_("Agreement uploaded on behalf of {0}".format(agreement.person_name)), 'success')
-            return jsonify({'success': True})
+            return jsonify(success=True)
         return WPJinjaMixin.render_template('events/agreements/agreement_upload_form.html', form=form,
                                             event=event, agreement=agreement)
