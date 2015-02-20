@@ -94,11 +94,14 @@ div.event-service-row {
                 margin-left: 100px;
                 display: block;
             }
+
+            & > dt.large-row, & > dd.large-row {
+                margin-top: 0.5em;
+            }
         }
 
-        & > .event-service-details-buttons {
-            margin-top: 1em;
-            margin-left: 1.9em;
+        .vc-room-url-copied {
+            display: none;
         }
     }
 
