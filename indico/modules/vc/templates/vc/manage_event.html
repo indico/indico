@@ -16,7 +16,7 @@
                 <tbody>
                     {% for event_vc_room in event_vc_rooms %}
                         {% set vc_room = event_vc_room.vc_room %}
-                        <tr>
+                        <tr class="{% if vc_room.status == 2 %}deleted{% endif %}">
                             <td><a href="#" class="icon-next toggle-details" title="Click to toggle collapse status"></a></td>
                             <td>{{ vc_room.type }}</td>
                             <td>{{ vc_room.name }}</td>
@@ -24,9 +24,11 @@
                                 <div class="toolbar">
                                     <div class="group">
                                         <!-- if it hasCheckStatus -->
-                                        <a class="i-button icon-refresh js-vcroom-refresh" title="{% trans %}Check Booking Status{% endtrans %}"
-                                        data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}"></a>
-                                        <a href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}" class="i-button icon-edit js-vcroom-edit" title="{% trans %}Edit{% endtrans %}"></a>
+                                        {% if vc_room.status != 2 %}
+                                            <a class="i-button icon-refresh js-vcroom-refresh" title="{% trans %}Check Booking Status{% endtrans %}"
+                                            data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}"></a>
+                                            <a href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}" class="i-button icon-edit js-vcroom-edit" title="{% trans %}Edit{% endtrans %}"></a>
+                                        {% endif %}
                                         <a data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}" data-num-events="{{ vc_room.events | count }}" class="i-button icon-remove js-vcroom-remove" title="{% trans %}Delete{% endtrans %}"></a>
                                     </div>
                                 </div>

@@ -110,12 +110,20 @@ class VCRoom(db.Model):
 
 class VCRoomEventAssociation(db.Model):
     __tablename__ = 'vc_room_events'
-    __table_args__ = {'schema': 'events'}
+    __table_args__ = (
+        db.UniqueConstraint('event_id', 'vc_room_id', 'vc_room_id', 'link_type', 'link_id'),
+        {'schema': 'events'}
+    )
+
+    #: Association ID
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
     #: ID of the event
     event_id = db.Column(
         db.Integer,
-        primary_key=True,
         index=True,
         autoincrement=False
     )
@@ -123,7 +131,6 @@ class VCRoomEventAssociation(db.Model):
     vc_room_id = db.Column(
         db.Integer,
         db.ForeignKey('events.vc_rooms.id'),
-        primary_key=True,
         index=True
     )
     #: The associated :class:VCRoom
@@ -145,7 +152,7 @@ class VCRoomEventAssociation(db.Model):
 
     @property
     def locator(self):
-        return dict(self.event.getLocator(), **self.vc_room.locator)
+        return dict(self.event.getLocator(), event_vc_room_id=self.id, **self.vc_room.locator)
 
     @property
     def event(self):

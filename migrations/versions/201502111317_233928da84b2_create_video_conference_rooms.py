@@ -31,13 +31,16 @@ def upgrade():
                     sa.PrimaryKeyConstraint('id'),
                     schema='events')
     op.create_table('vc_room_events',
+                    sa.Column('id', sa.Integer(), nullable=False),
                     sa.Column('event_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
                     sa.Column('vc_room_id', sa.Integer(), nullable=False, index=True),
                     sa.Column('link_type', PyIntEnum(VCRoomLinkType), nullable=False),
                     sa.Column('link_id', sa.String(), nullable=True),
                     sa.ForeignKeyConstraint(['vc_room_id'], ['events.vc_rooms.id']),
-                    sa.PrimaryKeyConstraint('event_id', 'vc_room_id'),
+                    sa.PrimaryKeyConstraint('id'),
                     schema='events')
+    op.create_unique_constraint(None, 'vc_room_events',
+                                ['event_id', 'vc_room_id', 'link_type', 'link_id'], schema='events')
 
 
 def downgrade():

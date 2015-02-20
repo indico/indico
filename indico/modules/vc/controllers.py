@@ -24,7 +24,7 @@ from werkzeug.exceptions import NotFound
 from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
-from indico.modules.vc.exceptions import VCRoomError
+from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus, VCRoomLinkType
 from indico.modules.vc.util import get_vc_plugins, process_form_data, set_vc_room_data
 from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage
@@ -48,8 +48,7 @@ class RHVCManageEventBase(RHConferenceModifBase):
 
 class RHEventVCRoomMixin:
     def _checkParams(self):
-        self.event_vc_room = VCRoomEventAssociation.find_one(event_id=self.event_id,
-                                                             vc_room_id=request.view_args['vc_room_id'])
+        self.event_vc_room = VCRoomEventAssociation.find_one(id=request.view_args['event_vc_room_id'])
         self.vc_room = self.event_vc_room.vc_room
 
 
@@ -156,6 +155,11 @@ class RHVCManageEventModify(RHVCSystemEventBase):
 
             try:
                 self.plugin.update_room(self.vc_room, self.event)
+            except VCRoomNotFoundError as err:
+                Logger.get('modules.vc').warning("VC room {} not found. Setting it as deleted.".format(self.vc_room))
+                self.vc_room.status = VCRoomStatus.deleted
+                flash(err.message, 'error')
+                return redirect(url_for('.manage_vc_rooms', self.event))
             except VCRoomError as err:
                 if err.field is None:
                     raise
@@ -187,7 +191,13 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
 
         Logger.get('modules.vc').info("Refreshing VC room {} from event {}".format(self.vc_room, self._conf))
 
-        self.plugin.refresh_room(self.vc_room, self.event)
+        try:
+            self.plugin.refresh_room(self.vc_room, self.event)
+        except VCRoomNotFoundError as err:
+            Logger.get('modules.vc').warning("VC room {} not found. Setting it as deleted.".format(self.vc_room))
+            self.vc_room.status = VCRoomStatus.deleted
+            flash(err.message, 'error')
+            return redirect(url_for('.manage_vc_rooms', self.event))
 
         flash(_("Video conference room '{0}' has been refreshed").format(self.vc_room.name), 'success')
         return redirect(url_for('.manage_vc_rooms', self.event))
@@ -201,15 +211,17 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
             flash(_('You are not allowed to remove VC rooms from this event.'), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
-        Logger.get('modules.vc').info("Detaching VC room {} from event {}".format(self.vc_room, self._conf))
+        Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
+                                      self.vc_room, self.event_vc_room.event, self.event_vc_room.link_object))
+
         db.session.delete(self.event_vc_room)
         db.session.flush()
 
         # delete room if not connected to any other events
         if not self.vc_room.events:
             Logger.get('modules.vc').info("Deleting VC room {}".format(self.vc_room))
-
-            self.plugin.delete_room(self.vc_room, self.event)
+            if self.vc_room.status != VCRoomStatus.deleted:
+                self.plugin.delete_room(self.self.vc_room, self.event)
             db.session.delete(self.vc_room)
 
         flash(_("Video conference room '{0}' has been removed").format(self.vc_room.name), 'success')
