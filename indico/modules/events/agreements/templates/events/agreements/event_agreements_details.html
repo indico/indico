@@ -35,10 +35,10 @@
                 {% endif %}
             </div>
             <div class="section">
-                <label>Notify managers on signature</label>
-                {{ switch(id="toggle-manager-notifications",
+                <strong>Notify managers on signature</strong>
+                {{ switch(id='toggle-manager-notifications',
                           checked=definition.event_settings.get(event, 'manager_notifications_enabled'),
-                          href=url_for_plugin('.toggle_notifications', event, definition)) }}
+                          data_href=url_for_plugin('.toggle_notifications', event, definition)) }}
             </div>
         </div>
 
@@ -242,20 +242,26 @@
                 });
             });
 
-            $('#toggle-manager-notifications').on('change', function(e) {
-                var elem = $(this)
+            $('#toggle-manager-notifications').on('change', function() {
+                var $this = $(this);
+                var checked = this.checked;
+                $this.prop('disabled', true);
                 $.ajax({
                     url: $(this).data('href'),
                     type: 'POST',
                     dataType: 'json',
-                    data: {'checked': elem.prop('checked')},
+                    data: {
+                        enabled: checked ? '1' : '0'
+                    },
+                    complete: function() {
+                        $this.prop('disabled', false);
+                    },
                     error: function(data) {
-                        var checked = elem.data('checked') == 'yes'
-                        elem.prop('checked', checked)
+                        handleAjaxError(data);
+                        $this.prop('checked', !checked);
                     },
                     success: function(data) {
-                        elem.data('checked', data.checked)
-                        elem.prop('checked', data.checked)
+                        $this.prop('checked', data.enabled);
                     }
                 });
             });

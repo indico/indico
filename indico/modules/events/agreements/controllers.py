@@ -100,9 +100,9 @@ class RHAgreementManagerDetailsToggleNotifications(RHAgreementManagerDetails):
     """Toggles notifications to managers for an agreement type on an event"""
 
     def _process(self):
-        checked = request.form['checked'] == 'true'
-        self.definition.event_settings.set(self._conf, 'manager_notifications_enabled', checked)
-        return jsonify(success=True, checked=checked)
+        enabled = request.form['enabled'] == '1'
+        self.definition.event_settings.set(self._conf, 'manager_notifications_enabled', enabled)
+        return jsonify(success=True, enabled=enabled)
 
 
 class RHAgreementManagerDetailsEmailBase(RHAgreementManagerDetails):
