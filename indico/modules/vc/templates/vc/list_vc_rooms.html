@@ -21,31 +21,35 @@
     </div>
 {%- endmacro %}
 
-{% macro render_vc_rooms_list(event, event_vc_rooms, linked_to_event=None, linked_to_contr=None, linked_to_session=None) -%}
+{% macro render_vc_rooms_list(event, event_vc_rooms, linked_to=None) -%}
     <div>
-        {% if linked_to_event or linked_to_contr or linked_to_session %}
-            {% if linked_to_event %}
+        {% if linked_to %}
+            {% if linked_to['event'] %}
                 <div class="groupTitleNoBorder collaborationDisplayTitle event-service-association-title">
                     {{ event.getTitle() }}<span class="event-service-association-subtitle">event</span>
                 </div>
-                {% for event_vc_room in linked_to_event %}
+                {% for event_vc_room in linked_to['event'][event] %}
                     {{ render_vc_room(event_vc_room, event) }}
                 {% endfor %}
             {% endif %}
-            {% if linked_to_contr %}
-                {% for event_vc_room in linked_to_contr %}
+            {% if linked_to['contribution'] %}
+                {% for contrib, event_vc_rooms in linked_to['contribution'].iteritems() %}
                     <div class="groupTitleNoBorder collaborationDisplayTitle event-service-association-title">
-                        {{ event.getContributionById(event_vc_room.link_id).getTitle() }}<span class="event-service-association-subtitle">contribution</span>
+                        {{ contrib.getTitle() }}<span class="event-service-association-subtitle">contribution</span>
                     </div>
-                    {{ render_vc_room(event_vc_room, event) }}
+                    {% for event_vc_room in event_vc_rooms %}
+                        {{ render_vc_room(event_vc_room, event) }}
+                    {% endfor %}
                 {% endfor %}
             {% endif %}
-            {% if linked_to_session %}
-                {% for event_vc_room in linked_to_session %}
+            {% if linked_to['block'] %}
+                {% for block, event_vc_rooms in linked_to['block'].iteritems() %}
                     <div class="groupTitleNoBorder collaborationDisplayTitle event-service-association-title">
-                        {{ event.getSessionById(event_vc_room.link_id).getTitle() }}<span class="event-service-association-subtitle">session</span>
+                        {{ block.getFullTitle() }}<span class="event-service-association-subtitle">session block</span>
                     </div>
-                    {{ render_vc_room(event_vc_room, event) }}
+                    {% for event_vc_room in event_vc_rooms %}
+                        {{ render_vc_room(event_vc_room, event) }}
+                    {% endfor %}
                 {% endfor %}
             {% endif %}
         {% else %}

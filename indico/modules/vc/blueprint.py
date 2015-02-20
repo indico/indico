@@ -36,4 +36,4 @@ _bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:vc_room_
 _bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:vc_room_id>/<int:event_vc_room_id>/refresh',
                  'manage_vc_rooms_refresh', RHVCManageEventRefresh, methods=('POST',))
 # Event page
-_bp.add_url_rule('/event/<confId>/videoconference', 'event_videoconference', RHVCEventPage)
+_bp.add_url_rule('/event/<confId>/videoconference/', 'event_videoconference', RHVCEventPage)

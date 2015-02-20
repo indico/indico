@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import transaction
+from collections import defaultdict
 from flask import request, session, redirect, flash
 from sqlalchemy.orm.attributes import flag_modified
 from werkzeug.exceptions import NotFound
@@ -233,16 +234,11 @@ class RHVCEventPage(RHConferenceBaseDisplay):
 
     def _process(self):
         event_vc_rooms = VCRoomEventAssociation.find_for_event(self._conf).all()
-        linked_to_event = []
-        linked_to_contr = []
-        linked_to_session = []
+
+        linked_to = defaultdict(lambda: defaultdict(list))
+
         for event_vc_room in event_vc_rooms:
-            if event_vc_room.link_type == VCRoomLinkType.event:
-                linked_to_event.append(event_vc_room)
-            elif event_vc_room.link_type == VCRoomLinkType.contribution:
-                linked_to_contr.append(event_vc_room)
-            elif event_vc_room.link_type == VCRoomLinkType.block:
-                linked_to_session.append(event_vc_room)
+            linked_to[event_vc_room.link_type.name][event_vc_room.link_object].append(event_vc_room)
+
         return WPVCEventPage.render_template('event_vc.html', self._conf, event=self._conf,
-                                             event_vc_rooms=event_vc_rooms, linked_to_event=linked_to_event,
-                                             linked_to_contr=linked_to_contr, linked_to_session=linked_to_session)
+                                             event_vc_rooms=event_vc_rooms, linked_to=linked_to)
