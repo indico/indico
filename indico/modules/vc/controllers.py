@@ -26,7 +26,7 @@ from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.modules.vc.exceptions import VCRoomError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
-from indico.modules.vc.util import get_vc_plugins, process_form_data, update_vc_room
+from indico.modules.vc.util import get_vc_plugins, process_form_data, set_vc_room_data
 from indico.modules.vc.views import WPVCManageEvent
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -95,7 +95,7 @@ class RHVCManageEventCreate(RHVCManageEventBase):
             vc_room = VCRoom(created_by_user=session.user)
             vc_room.type = self.plugin.service_name
             vc_room.status = VCRoomStatus.created
-            update_vc_room(vc_room, name, data)
+            set_vc_room_data(vc_room, name, data)
 
             event_vc_room = VCRoomEventAssociation(
                 event_id=self.event_id,
@@ -148,7 +148,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
         if form.validate_on_submit():
             data, name, link_type, link_id = process_form_data(form.data)
 
-            update_vc_room(self.vc_room, name, data)
+            set_vc_room_data(self.vc_room, name, data)
             self.vc_room.modified_dt = now_utc()
             self.event_vc_room.link_type = link_type
             self.event_vc_room.link_id = link_id
@@ -174,6 +174,22 @@ class RHVCManageEventModify(RHVCSystemEventBase):
                                             existing_vc_room=self.vc_room)
 
         return WPVCManageEvent.render_string(form_html, self.event)
+
+
+class RHVCManageEventRefresh(RHVCSystemEventBase):
+    """Refreshes an existing VC room, fetching information from the VC system"""
+
+    def _process(self):
+        if not self.plugin.can_manage_vc_rooms(session.user, self.event):
+            flash(_('You are not allowed to refresh VC rooms in this event.'), 'error')
+            return redirect(url_for('.manage_vc_rooms', self.event))
+
+        Logger.get('modules.vc').info("Refreshing VC room {} from event {}".format(self.vc_room, self._conf))
+
+        self.plugin.refresh_room(self.vc_room, self.event)
+
+        flash(_("Video conference room '{0}' has been refreshed").format(self.vc_room.name), 'success')
+        return redirect(url_for('.manage_vc_rooms', self.event))
 
 
 class RHVCManageEventRemove(RHVCSystemEventBase):

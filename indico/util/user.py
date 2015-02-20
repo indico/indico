@@ -40,6 +40,13 @@ def retrieve_principal(principal):
     return ah.getById(id_) if type_ == 'Avatar' else gh.getById(id_)
 
 
+def principal_to_tuple(principal):
+    """
+    Translates an Avatar or Group to a tuple of the form (<class_name>, <id>)
+    """
+    return (principal.__class__.__name__, principal.id)
+
+
 def principals_merge_users(iterable, new_id, old_id):
     """Creates a new principal list with one user being replaced with another one
 

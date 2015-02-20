@@ -24,9 +24,10 @@
                                 <div class="toolbar">
                                     <div class="group">
                                         <!-- if it hasCheckStatus -->
-                                        <a class="i-button icon-refresh js-vcroom-refresh" title="{% trans %}Check Booking Status{% endtrans %}"></a>
+                                        <a class="i-button icon-refresh js-vcroom-refresh" title="{% trans %}Check Booking Status{% endtrans %}"
+                                        data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}"></a>
                                         <a href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}" class="i-button icon-edit js-vcroom-edit" title="{% trans %}Edit{% endtrans %}"></a>
-                                        <a data-href="{{ url_for_plugin('.manage_vc_rooms_remove', event_vc_room) }}" data-num-events="{{ vc_room.events | count }}" class="i-button icon-remove js-vcroom-remove" title="{% trans %}Delete{% endtrans %}"></a>
+                                        <a data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}" data-num-events="{{ vc_room.events | count }}" class="i-button icon-remove js-vcroom-remove" title="{% trans %}Delete{% endtrans %}"></a>
                                     </div>
                                 </div>
                             </td>

@@ -23,5 +23,14 @@
                 }).appendTo('body').submit();
             }).open();
         });
+
+        $('.js-vcroom-refresh').on('click', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            $('<form>', {
+                action: $this.data('href'),
+                method: 'post'
+            }).appendTo('body').submit();
+        });
     };
 })(window);

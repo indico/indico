@@ -41,7 +41,7 @@ def process_form_data(data):
     return data, name, link_type, link_id
 
 
-def update_vc_room(vc_room, name, data):
+def set_vc_room_data(vc_room, name, data):
     vc_room.name = name
     if vc_room.data is None:
         vc_room.data = {}
