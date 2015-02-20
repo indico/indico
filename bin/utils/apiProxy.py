@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-#!/usr/bin/env python
-
 import hashlib
 import hmac
 import optparse
@@ -26,6 +24,7 @@ import urllib
 from contextlib import closing
 
 from flask import Flask, request, Response, abort
+from werkzeug.datastructures import MultiDict
 
 app = Flask(__name__)
 
@@ -42,12 +41,13 @@ def build_indico_request(path, params, api_key=None, secret_key=None, only_publi
         url = '%s?%s' % (path, urllib.urlencode(items))
         signature = hmac.new(secret_key, url, hashlib.sha1).hexdigest()
         items.append(('signature', signature))
-    return dict(items)
+    return items
 
 
 def indico_request(path):
-    params = request.values.to_dict(True)
-    method = params.pop('_method', request.method).upper()
+    request_values = MultiDict(request.values)
+    method = request_values.pop('_method', request.method).upper()
+    params = request_values.items(multi=True)
     data = build_indico_request(path, params, app.config['INDICO_API_KEY'], app.config['INDICO_SECRET_KEY'])
     request_args = {'params': data} if method == 'GET' else {'data': data}
     try:
