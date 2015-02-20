@@ -25,10 +25,11 @@ from flask import send_from_directory, request, _app_ctx_stack
 from flask import current_app
 from flask_sqlalchemy import models_committed
 from flask_pluginengine import plugins_loaded
-
+from markupsafe import Markup
 from sqlalchemy.orm import configure_mappers
 from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
+from wtforms.widgets import html_params
 
 import indico.util.date_time as date_time_util
 from indico.core.config import Config
@@ -149,6 +150,7 @@ def setup_jinja(app):
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_human_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_timedelta))
     # Filters (new ones returning unicode)
+    app.add_template_filter(lambda d: Markup(html_params(**d)), 'html_params')
     app.add_template_filter(underline)
     app.add_template_filter(markdown)
     app.add_template_filter(dedent)
