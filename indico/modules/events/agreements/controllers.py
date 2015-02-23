@@ -20,18 +20,15 @@ import os
 from io import BytesIO
 
 from flask import flash, jsonify, redirect, request, session
-from flask_pluginengine import current_plugin
 from werkzeug.exceptions import NotFound
 
 from indico.core.errors import AccessError, NoReportError
-from indico.core.plugins import get_plugin_template_module
 from indico.modules.events.agreements.forms import AgreementForm, AgreementEmailForm, AgreementUploadForm
 from indico.modules.events.agreements.models.agreements import Agreement
 from indico.modules.events.agreements.notifications import notify_agreement_reminder, notify_new_signature_to_manager
 from indico.modules.events.agreements.views import WPAgreementForm, WPAgreementManager
 from indico.modules.events.agreements.util import get_agreement_definitions, send_new_agreements
 from indico.util.i18n import _
-from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.pages.base import WPJinjaMixin
@@ -119,8 +116,7 @@ class RHAgreementManagerDetailsEmailBase(RHAgreementManagerDetails):
         raise NotImplementedError
 
     def _get_form(self):
-        func = get_template_module if not current_plugin else get_plugin_template_module
-        template = func('events/agreements/emails/agreement_default_body.html', event=self._conf)
+        template = self.definition.get_email_body_template(self._conf)
         form_defaults = FormDefaults(body=template.get_html_body())
         return AgreementEmailForm(obj=form_defaults, definition=self.definition)
 

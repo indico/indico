@@ -25,7 +25,7 @@ from indico.modules.events.agreements.models.agreements import Agreement
 from indico.util.caching import make_hashable
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.string import return_ascii
-from indico.web.flask.templating import get_overridable_template_name
+from indico.web.flask.templating import get_overridable_template_name, get_template_module
 from MaKaC.accessControl import AccessWrapper
 
 
@@ -84,7 +84,9 @@ class AgreementDefinitionBase(object):
     #: url to obtain the paper version of the agreement form
     paper_form_url = None
     #: template of the agreement form - agreement definition name by default
-    template_name = None
+    form_template_name = None
+    #: template of the email body - emails/agreement_default_body.html by default
+    email_body_template_name = None
     #: dict containing custom email placeholders
     email_placeholders = {}
     #: plugin containing this agreement definition - assigned automatically
@@ -120,10 +122,17 @@ class AgreementDefinitionBase(object):
         pass
 
     @classmethod
+    def get_email_body_template(cls, event, **kwargs):
+        """Returns the template of the email body for this agreement definition"""
+        template_name = cls.email_body_template_name or 'emails/agreement_default_body.html'
+        template_path = get_overridable_template_name(template_name, cls.plugin, 'events/agreements/')
+        return get_template_module(template_path, event=event)
+
+    @classmethod
     def render_form(cls, agreement, form, **kwargs):
-        template_name = cls.template_name or '{}.html'.format(cls.name.replace('-', '_'))
-        tpl = get_overridable_template_name(template_name, cls.plugin, 'events/agreements/')
-        return render_template(tpl, agreement=agreement, form=form, **kwargs)
+        template_name = cls.form_template_name or '{}.html'.format(cls.name.replace('-', '_'))
+        template_path = get_overridable_template_name(template_name, cls.plugin, 'events/agreements/')
+        return render_template(template_path, agreement=agreement, form=form, **kwargs)
 
     @classmethod
     def get_people(cls, event):
