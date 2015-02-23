@@ -36,7 +36,7 @@ class AgreementForm(IndicoForm):
 
 class AgreementEmailForm(IndicoForm):
     from_address = SelectField(_("From"), [DataRequired()])
-    cc_addresses = EmailField(_("CC"), description=_("Warning: this email adress will be able to sign the agreement!"))
+    cc_addresses = EmailField(_("CC"), description=_("Warning: this email address will be able to sign the agreement!"))
     body = TextAreaField(_("Email body"), widget=CKEditorWidget(simple=True))
 
     def __init__(self, *args, **kwargs):
@@ -55,7 +55,6 @@ class AgreementEmailForm(IndicoForm):
         missing = {p for p in placeholders if p not in field.data}
         if missing:
             raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))
-
 
 
 class AgreementUploadForm(IndicoForm):
