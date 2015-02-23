@@ -19,15 +19,15 @@ from __future__ import unicode_literals
 import transaction
 from collections import defaultdict
 from flask import request, session, redirect, flash
-from sqlalchemy.orm.attributes import flag_modified
+
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
-from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus, VCRoomLinkType
-from indico.modules.vc.util import get_vc_plugins, process_form_data, set_vc_room_data
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
+from indico.modules.vc.util import get_vc_plugins
 from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -91,19 +91,13 @@ class RHVCManageEventCreate(RHVCManageEventBase):
         form = self.plugin.create_form(event=self.event)
 
         if form.validate_on_submit():
-            data, name, link_type, link_id = process_form_data(form.data)
-
             vc_room = VCRoom(created_by_user=session.user)
             vc_room.type = self.plugin.service_name
             vc_room.status = VCRoomStatus.created
-            set_vc_room_data(vc_room, name, data)
 
-            event_vc_room = VCRoomEventAssociation(
-                event_id=self.event_id,
-                vc_room=vc_room,
-                link_type=link_type,
-                link_id=link_id
-            )
+            event_vc_room = VCRoomEventAssociation()
+
+            self.plugin.handle_form_data(self.event, vc_room, event_vc_room, form.data)
 
             try:
                 self.plugin.create_room(vc_room, self.event)
@@ -143,16 +137,14 @@ class RHVCManageEventModify(RHVCSystemEventBase):
             flash(_('You are not allowed to modify VC rooms for this event.'), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
-        form = self.plugin.create_form(self.event, existing_vc_room=self.vc_room,
+        form = self.plugin.create_form(self.event,
+                                       existing_vc_room=self.vc_room,
                                        existing_event_vc_room=self.event_vc_room)
 
         if form.validate_on_submit():
-            data, name, link_type, link_id = process_form_data(form.data)
 
-            set_vc_room_data(self.vc_room, name, data)
+            self.plugin.handle_form_data(self.event, self.vc_room, self.event_vc_room, form.data)
             self.vc_room.modified_dt = now_utc()
-            self.event_vc_room.link_type = link_type
-            self.event_vc_room.link_id = link_id
 
             try:
                 self.plugin.update_room(self.vc_room, self.event)
@@ -168,8 +160,6 @@ class RHVCManageEventModify(RHVCSystemEventBase):
                 field.errors.append(err.message)
                 transaction.abort()
             else:
-                flag_modified(self.vc_room, 'data')
-
                 # TODO
                 # notify_modified(self.vc_room, self.event, session.user)
 

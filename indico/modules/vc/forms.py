@@ -27,7 +27,7 @@ from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalField, IndicoRadioField
 from indico.web.forms.validators import UsedIf
-from indico.web.forms.widgets import JinjaWidget
+from indico.web.forms.widgets import JinjaWidget, SwitchWidget
 
 ROOM_NAME_RE = re.compile(r'[\w\-]+')
 
@@ -54,6 +54,7 @@ class VCPluginSettingsFormBase(IndicoForm):
 
 
 class VCRoomFormBase(IndicoForm):
+    advanced_fields = {'show'}
     conditional_fields = {'contribution', 'block'}
 
     name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
@@ -67,6 +68,9 @@ class VCRoomFormBase(IndicoForm):
                                [UsedIf(lambda form, field: form.linking.data == 'contribution'), DataRequired()])
     block = SelectField(_("Session block"),
                         [UsedIf(lambda form, field: form.linking.data == 'block'), DataRequired()])
+    show = BooleanField(_('Show room'),
+                        widget=SwitchWidget(),
+                        description=_('Display this room on the event page'))
 
     def __init__(self, *args, **kwargs):
         self.vc_room = kwargs.pop('vc_room')
@@ -74,8 +78,9 @@ class VCRoomFormBase(IndicoForm):
         super(VCRoomFormBase, self).__init__(*args, **kwargs)
         self.contribution.choices = ([('', _("Please select a contribution"))] +
                                      [(contrib.id, contrib.title) for contrib in self.event.getContributionList()])
-        self.block.choices = ([('', _("Please select a session block"))] +
-                              [(full_block_id(block), block.getFullTitle()) for block in self.event.getSessionSlotList()])
+        self.block.choices = (
+            [('', _("Please select a session block"))] +
+            [(full_block_id(block), block.getFullTitle()) for block in self.event.getSessionSlotList()])
         self.linking._form = self
 
     def validate_name(self, field):

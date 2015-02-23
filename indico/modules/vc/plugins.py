@@ -42,7 +42,12 @@ class VCPluginMixin(object):
             raise Exception('Video conference plugins must be named vc_*')
 
     def get_vc_room_form_defaults(self, event):
-        return {}
+        return {
+            'show': True,
+            'linking': 'event',
+            'contribution': '',
+            'block': ''
+        }
 
     @property
     def service_name(self):
@@ -84,16 +89,43 @@ class VCPluginMixin(object):
             kwargs = {
                 'name': existing_vc_room.name,
                 'linking': existing_event_vc_room.link_type.name,
+                'show': existing_event_vc_room.show
             }
 
             if existing_event_vc_room.link_type != VCRoomLinkType.event:
                 kwargs[existing_event_vc_room.link_type.name] = existing_event_vc_room.link_id
 
-            defaults = FormDefaults(existing_vc_room.data, **kwargs)
+            data = existing_vc_room.data
+            data.update(existing_event_vc_room.data)
+
+            defaults = FormDefaults(data, **kwargs)
         else:
             defaults = FormDefaults(self.get_vc_room_form_defaults(event))
         with self.plugin_context():
             return self.vc_room_form(prefix='vc-', obj=defaults, event=event, vc_room=existing_vc_room)
+
+    def handle_form_data(self, event, vc_room, event_vc_room, data):
+        contribution_id = data.pop('contribution')
+        block_id = data.pop('block')
+        link_type = VCRoomLinkType[data.pop('linking')]
+
+        if link_type == VCRoomLinkType.event:
+            link_id = None
+        else:
+            link_id = contribution_id if link_type == VCRoomLinkType.contribution else block_id
+
+        vc_room.name = data.pop('name')
+
+        event_vc_room.event_id = event.id
+        event_vc_room.vc_room = vc_room
+        event_vc_room.link_type = link_type
+        event_vc_room.link_id = link_id
+        event_vc_room.show = data.pop('show')
+
+        if vc_room.data is None:
+            vc_room.data = {}
+        if event_vc_room.data is None:
+            event_vc_room.data = {}
 
     def create_room(self, vc_room):
         raise NotImplementedError('Plugin must implement create_room()')

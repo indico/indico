@@ -36,6 +36,8 @@ def upgrade():
                     sa.Column('vc_room_id', sa.Integer(), nullable=False, index=True),
                     sa.Column('link_type', PyIntEnum(VCRoomLinkType), nullable=False),
                     sa.Column('link_id', sa.String(), nullable=True),
+                    sa.Column('show', sa.Boolean(), nullable=False),
+                    sa.Column('data', postgresql.JSON(), nullable=False),
                     sa.ForeignKeyConstraint(['vc_room_id'], ['events.vc_rooms.id']),
                     sa.PrimaryKeyConstraint('id'),
                     schema='events')

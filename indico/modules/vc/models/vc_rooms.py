@@ -1,3 +1,4 @@
+
 # This file is part of Indico.
 # Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
 #
@@ -75,6 +76,7 @@ class VCRoom(db.Model):
         nullable=False,
         default=now_utc
     )
+
     #: Modification timestamp of the video conference room
     modified_dt = db.Column(
         UTCDateTime
@@ -148,6 +150,17 @@ class VCRoomEventAssociation(db.Model):
     link_id = db.Column(
         db.String,
         nullable=True
+    )
+    #: If the chatroom should be hidden on the event page
+    show = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: video conference plugin-specific data
+    data = db.Column(
+        JSON,
+        nullable=False
     )
 
     @property
