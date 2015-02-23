@@ -129,10 +129,13 @@ class AgreementDefinitionBase(object):
         return get_template_module(template_path, event=event)
 
     @classmethod
-    def render_form(cls, agreement, form, **kwargs):
-        template_name = cls.form_template_name or '{}.html'.format(cls.name.replace('-', '_'))
-        template_path = get_overridable_template_name(template_name, cls.plugin, 'events/agreements/')
-        return render_template(template_path, agreement=agreement, form=form, **kwargs)
+    def get_email_placeholders(cls):
+        """Returns all available email placeholders"""
+        from indico.modules.events.agreements.placeholders import PersonNamePlaceholder, AgreementLinkPlaceholder
+        placeholders = {'person_name': PersonNamePlaceholder,
+                        'agreement_link': AgreementLinkPlaceholder}
+        placeholders.update(cls.email_placeholders or {})
+        return placeholders
 
     @classmethod
     def get_people(cls, event):
@@ -167,6 +170,12 @@ class AgreementDefinitionBase(object):
         return (everybody_signed, num_accepted, num_rejected)
 
     @classmethod
+    def render_form(cls, agreement, form, **kwargs):
+        template_name = cls.form_template_name or '{}.html'.format(cls.name.replace('-', '_'))
+        template_path = get_overridable_template_name(template_name, cls.plugin, 'events/agreements/')
+        return render_template(template_path, agreement=agreement, form=form, **kwargs)
+
+    @classmethod
     def render_data(cls, event, data):  # pragma: no cover
         """Returns extra data to display in the agreement list
 
@@ -198,12 +207,3 @@ class AgreementDefinitionBase(object):
     def iter_people(cls, event):  # pragma: no cover
         """Yields :class:`AgreementPersonInfo` required to sign agreements"""
         raise NotImplementedError
-
-    @classmethod
-    def get_email_placeholders(cls):
-        """Returns all available email placeholders"""
-        from indico.modules.events.agreements.placeholders import PersonNamePlaceholder, AgreementLinkPlaceholder
-        placeholders = {'person_name': PersonNamePlaceholder,
-                        'agreement_link': AgreementLinkPlaceholder}
-        placeholders.update(cls.email_placeholders or {})
-        return placeholders
