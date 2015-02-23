@@ -18,9 +18,9 @@ from __future__ import unicode_literals
 
 import transaction
 from collections import defaultdict
-from flask import request, session, redirect, flash
-
-from werkzeug.exceptions import NotFound
+from flask import request, session, redirect, flash, jsonify
+from sqlalchemy import func
+from werkzeug.exceptions import NotFound, BadRequest
 
 from indico.core.db import db
 from indico.core.errors import IndicoError
@@ -232,3 +232,21 @@ class RHVCEventPage(RHConferenceBaseDisplay):
 
         return WPVCEventPage.render_template('event_vc.html', self._conf, event=self._conf,
                                              event_vc_rooms=event_vc_rooms, linked_to=linked_to)
+
+
+class RHVCManageSearch(RHVCManageEventBase):
+    """Searches for a room based on its name"""
+
+    def _checkParams(self, params):
+        RHVCManageEventBase._checkParams(self, params)
+        try:
+            self.query = request.args['q']
+        except KeyError:
+            raise BadRequest("No query was provided.")
+
+    def _iter_allowed_rooms(self):
+        return (room for room in VCRoom.query.filter(func.lower(VCRoom.name).contains(self.query.lower())).limit(50)
+                if room.plugin.can_manage_room(session.user, room))
+
+    def _process(self):
+        return jsonify({room.id: room.name for room in self._iter_allowed_rooms()})

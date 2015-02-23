@@ -58,7 +58,8 @@ class VCRoomFormBase(IndicoForm):
     conditional_fields = {'contribution', 'block'}
 
     name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
-                       description=_('The name of the room'))
+                       description=_('The name of the room. It can contain only alphanumerical characters, underscores '
+                                     'and dashes. No spaces allowed.'))
     linking = IndicoRadioField(_("Link to"), [DataRequired()],
                                choices=[('event', _("Event")),
                                         ('contribution', _("Contribution")),
