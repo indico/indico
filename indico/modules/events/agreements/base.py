@@ -167,7 +167,7 @@ class AgreementDefinitionBase(object):
         num_accepted = query.filter(Agreement.accepted).count()
         num_rejected = query.filter(Agreement.rejected).count()
         everybody_signed = len(people) == (num_accepted + num_rejected)
-        return (everybody_signed, num_accepted, num_rejected)
+        return everybody_signed, num_accepted, num_rejected
 
     @classmethod
     def render_form(cls, agreement, form, **kwargs):
