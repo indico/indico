@@ -114,9 +114,9 @@ class Agreement(db.Model):
         db.String
     )
     #: Attachment
-    attachment = db.Column(
+    attachment = db.deferred(db.Column(
         db.LargeBinary
-    )
+    ))
     #: Filename and extension of the attachment
     attachment_filename = db.Column(
         db.String
