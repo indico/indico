@@ -633,12 +633,14 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
     > input {
         display: inline-block;
         width: 10em;
+        vertical-align: middle;
     }
 
     > .i-button {
         line-height: 1em;
         position: relative;
         left: -4px;
+        vertical-align: middle;
     }
 
     > input, > .i-button {

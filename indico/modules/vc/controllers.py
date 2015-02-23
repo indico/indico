@@ -222,7 +222,7 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
         if not self.vc_room.events:
             Logger.get('modules.vc').info("Deleting VC room {}".format(self.vc_room))
             if self.vc_room.status != VCRoomStatus.deleted:
-                self.plugin.delete_room(self.self.vc_room, self.event)
+                self.plugin.delete_room(self.vc_room, self.event)
             db.session.delete(self.vc_room)
 
         flash(_("Video conference room '{0}' has been removed").format(self.vc_room.name), 'success')
