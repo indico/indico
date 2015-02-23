@@ -26,7 +26,7 @@ from werkzeug.exceptions import NotFound
 from indico.core.errors import AccessError, NoReportError
 from indico.core.plugins import get_plugin_template_module
 from indico.modules.events.agreements.forms import AgreementForm, AgreementEmailForm, AgreementUploadForm
-from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
+from indico.modules.events.agreements.models.agreements import Agreement
 from indico.modules.events.agreements.notifications import notify_agreement_reminder, notify_new_signature_to_manager
 from indico.modules.events.agreements.views import WPAgreementForm, WPAgreementManager
 from indico.modules.events.agreements.util import get_agreement_definitions, send_new_agreements
@@ -208,7 +208,7 @@ class RHAgreementManagerDetailsUploadAgreement(RHAgreementManagerDetailsAgreemen
 class RHAgreementManagerDetailsDownloadAgreement(RHAgreementManagerDetailsAgreementBase):
     def _checkParams(self, params):
         RHAgreementManagerDetailsAgreementBase._checkParams(self, params)
-        if self.agreement.state not in {AgreementState.accepted_on_behalf, AgreementState.rejected_on_behalf}:
+        if not self.agreement.signed_on_behalf:
             raise NoReportError("The agreement was not signed via file upload")
 
     def _process(self):
