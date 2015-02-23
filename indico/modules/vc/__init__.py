@@ -18,10 +18,12 @@ from __future__ import unicode_literals
 
 from flask import render_template
 
+from indico.core import signals
 from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation
 from indico.modules.vc.plugins import VCPluginMixin
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.web.flask.templating import template_hook
+from MaKaC.webinterface.displayMgr import EventMenuEntry
 
 __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase')
 
@@ -30,3 +32,10 @@ __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase')
 def _inject_event_header(event, **kwargs):
     event_vc_rooms = VCRoomEventAssociation.find_for_event(event).all()
     return render_template('vc/event_header.html', event=event, event_vc_rooms=event_vc_rooms)
+
+
+def extend_event_menu(sender, **kwargs):
+    return EventMenuEntry('vc.event_videoconference', 'Video Conference Rooms', name='vc-event-page')
+
+signal = signals.event.sidemenu
+signal.connect(extend_event_menu, **{'weak': False})

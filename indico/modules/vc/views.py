@@ -53,4 +53,4 @@ class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
 
     def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._collaborationOpt)
+        self._sectionMenu.setCurrentItem(self._sectionMenu.getLinkByName('vc-event-page'))
