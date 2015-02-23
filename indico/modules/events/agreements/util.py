@@ -16,12 +16,13 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
 from indico.core.db import db
-from indico.util.signals import named_objects_from_signal
-
 from indico.modules.events.agreements.models.agreements import Agreement
 from indico.modules.events.agreements.notifications import notify_agreement_new
+from indico.util.signals import named_objects_from_signal
 
 
 def get_agreement_definitions():
@@ -43,6 +44,7 @@ def send_new_agreements(event, name, people, email_body, cc_addresses):
         db.session.add(agreement)
         agreements.append(agreement)
     db.session.flush()
+    from_address = session.user.getEmail()
     for agreement in agreements:
-        notify_agreement_new(agreement, email_body, cc_addresses)
+        notify_agreement_new(agreement, email_body, cc_addresses, from_address)
     return agreements

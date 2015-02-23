@@ -157,8 +157,9 @@ class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmailBase):
     def _success_handler(self, form):
         email_body = form.body.data
         agreements = self._get_agreements()
+        from_address = session.user.getEmail()
         for agreement in agreements:
-            notify_agreement_reminder(agreement, email_body, form.cc_addresses.data)
+            notify_agreement_reminder(agreement, email_body, form.cc_addresses.data, from_address)
         flash(_("Reminders sent"), 'success')
 
 
