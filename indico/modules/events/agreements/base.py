@@ -150,6 +150,23 @@ class AgreementDefinitionBase(object):
         return {k: v for k, v in people.items() if v.identifier not in sent_agreements}
 
     @classmethod
+    def get_stats_for_signed_agreements(cls, event):
+        """Returns a digest of signed agreements on an event
+
+        :param event: the event
+        :return: (everybody_signed, num_accepted, num_rejected)
+        """
+        people = cls.get_people(event)
+        identifiers = [p.identifier for p in people.itervalues()]
+        query = Agreement.find(Agreement.event_id == event.getId(),
+                               Agreement.type == cls.name,
+                               Agreement.identifier.in_(identifiers))
+        num_accepted = query.filter(Agreement.accepted).count()
+        num_rejected = query.filter(Agreement.rejected).count()
+        everybody_signed = len(people) == (num_accepted + num_rejected)
+        return (everybody_signed, num_accepted, num_rejected)
+
+    @classmethod
     def render_data(cls, event, data):  # pragma: no cover
         """Returns extra data to display in the agreement list
 
