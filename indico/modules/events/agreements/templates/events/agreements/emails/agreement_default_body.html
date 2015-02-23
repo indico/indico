@@ -5,11 +5,15 @@
 {%- endblock %}
 
 {% block body %}
-    There is an agreement you are requested to sign for the event:<br>
-    <strong>{{ event.getTitle() }}</strong><br><br>
+    {% block body_text %}
+        There is an agreement you are requested to sign for the event:<br>
+        <strong>{{ event.getTitle() }}</strong><br><br>
 
-    You can sign it on the following page:<br>
-    {agreement_link}
+        {% block body_agreement_request %}
+            You can sign it on the following page:
+        {% endblock %}<br>
+        {agreement_link}
+    {% endblock %}
 
     {% if session %}
         <br><br>
