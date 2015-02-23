@@ -10,7 +10,11 @@
         <div class="manageLink" style="background: ${bgColor};">
         <div class="dropDownMenu fakeLink" id="${menuName}">Manage</div></div>
     % else:
-        <a class="meeting-timetable-item-edit i-button i-button-mini icon-edit arrow right" id="${menuName}"></a>
+        <div class="toolbar right">
+            <div class="group">
+                <a class="meeting-timetable-item-edit i-button i-button-mini icon-edit arrow right" id="${menuName}"></a>
+            </div>
+        </div>
     % endif
     <script type="text/javascript">
         var menuLink = null;

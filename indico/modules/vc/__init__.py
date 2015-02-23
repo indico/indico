@@ -34,6 +34,14 @@ def _inject_event_header(event, **kwargs):
     return render_template('vc/event_header.html', event=event, event_vc_rooms=event_vc_rooms)
 
 
+@template_hook('vc-actions')
+def _inject_vc_room_action_buttons(event, item, event_vc_rooms_dict, **kwargs):
+    event_vc_room = event_vc_rooms_dict.get(item)
+    if event_vc_room:
+        return render_template('vc/vc_room_timetable_buttons.html', event=event, event_vc_room=event_vc_room)
+    return
+
+
 def extend_event_menu(sender, **kwargs):
     return EventMenuEntry('vc.event_videoconference', 'Video Conference Rooms', name='vc-event-page')
 

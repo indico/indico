@@ -78,6 +78,12 @@ ul.meetingTimetable > li {
     margin-left: 0;
     position: relative;
     padding-left: 120px;
+    margin-top: 1em;
+}
+
+ul.meetingTimetable .toolbar {
+    margin-bottom: 0;
+    padding: 0;
 }
 
 
@@ -135,15 +141,14 @@ ul.topLevelSCList li {
 }
 
 ul.subEventLevelSCList {
-    margin-top: 5px;
+    margin-top: 1em;
     list-style-type: none;
     margin-left: 40px;
     margin-bottom: 10px;
-    border-top: 1px dotted #AAA;
 }
 
 ul.subEventLevelSCList li {
-    padding: 0 0 8px 0;
+    padding: 0 0 1em 0;
     margin: 5px 0;
     list-style-type: none;
     border-bottom: 1px dotted #AAA;

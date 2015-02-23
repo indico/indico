@@ -41,7 +41,7 @@ from MaKaC.review import AbstractTextField
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.pages.signIn import WPResetPasswordBase
 from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
-from MaKaC.webinterface.materialFactories import ConfMFRegistry,PaperFactory,SlidesFactory,PosterFactory
+from MaKaC.webinterface.materialFactories import ConfMFRegistry, PaperFactory, SlidesFactory, PosterFactory
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from MaKaC.webinterface.common.contribStatusWrapper import ContribStatusList
 from MaKaC.common.output import outputGenerator
@@ -79,6 +79,7 @@ from MaKaC.common.TemplateExec import render
 
 from indico.core import signals
 from indico.modules.events.agreements.util import get_agreement_definitions
+from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation
 from indico.util import json
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
@@ -924,7 +925,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
         wvars["pluginDetails"] = "".join(self._notify('eventDetailBanner', self._conf))
         pluginDetailsSessionContribs = {}
-        self._notify('detailSessionContribs', self._conf, pluginDetailsSessionContribs)
+        # self._notify('detailSessionContribs', self._conf, pluginDetailsSessionContribs)
         wvars["pluginDetailsSessionContribs"] = pluginDetailsSessionContribs
         wvars["daysPerRow"] = self._daysPerRow
         wvars["firstDay"] = self._firstDay
@@ -932,6 +933,8 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         wvars["currentUser"] = self._rh._aw.getUser()
         wvars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
 
+        event_vc_rooms = VCRoomEventAssociation.find_for_event(conf).all()
+        wvars["event_vc_rooms_dict"] = {vcr.link_object: vcr for vcr in event_vc_rooms}
         return wvars
 
     def _getMaterialFiles(self, material):
