@@ -867,7 +867,7 @@ class SystemLink(Link):
         # TOREMOVE: fix events with "absolute" URL
         if not hasattr(self, '_URLHandler'):
             self.getMenu().updateSystemLink()
-        if isinstance(self._URLHandler, str):
+        if isinstance(self._URLHandler, basestring):
             if self._URLHandler.startswith("http"):  # Fix for hardcoded URLs
                 self.getMenu().updateSystemLink()
             if '.' in self._URLHandler:
