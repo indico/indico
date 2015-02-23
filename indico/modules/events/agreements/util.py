@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from flask import session
-
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.agreements.models.agreements import Agreement
@@ -29,7 +27,7 @@ def get_agreement_definitions():
     return named_objects_from_signal(signals.agreements.get_definitions.send(), plugin_attr='plugin')
 
 
-def send_new_agreements(event, name, people, email_body, cc_addresses):
+def send_new_agreements(event, name, people, email_body, cc_addresses, from_address):
     """Creates and send agreements for a list of people on a given event.
 
     :param event: The `Conference` associated with the agreement
@@ -37,6 +35,7 @@ def send_new_agreements(event, name, people, email_body, cc_addresses):
     :param people: The list of people for whom agreements will be created
     :param email_body: The body of the email
     :param cc_addresses: Email addresses to send CCs to
+    :param from_addresses: Email address of the sender
     """
     agreements = []
     for person in people.itervalues():
@@ -44,7 +43,6 @@ def send_new_agreements(event, name, people, email_body, cc_addresses):
         db.session.add(agreement)
         agreements.append(agreement)
     db.session.flush()
-    from_address = session.user.getEmail()
     for agreement in agreements:
         notify_agreement_new(agreement, email_body, cc_addresses, from_address)
     return agreements
