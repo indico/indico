@@ -51,6 +51,21 @@ urlMeeting.addParam("event_type","meeting")
             </ul>
         % endif
 
+        % for dropdown_title, items in extra_items:
+            % if not dropdown_title:
+                % for item in items:
+                    <a href="${ item.url }">${ item.caption }</a>
+                % endfor
+            % else:
+                <a class="arrow" href="#" data-toggle="dropdown">${ dropdown_title }</a>
+                <ul class="dropdown">
+                    % for item in items:
+                        <li><a href="${ item.url }">${ item.caption }</a></li>
+                    % endfor
+                </ul>
+            % endif
+        % endfor
+
         % if currentUser:
             <a href="${ urlHandlers.UHUserDashboard.getURL(currentUser) }">${ _("My profile") }</a>
         % endif

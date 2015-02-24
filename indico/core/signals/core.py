@@ -42,6 +42,11 @@ Expected to return a dict containing entries for the *Indico help* page::
     }
 """)
 
+indico_menu = _signals.signal('indico-menu', """
+Expected to return `HeaderMenuEntry` objects which are then added to the
+Indico head menu.
+""")
+
 user_preferences = _signals.signal('user-preferences', """
 Expected to return/yield one or more ``(title, content)`` tuples which are
 shown on the "User Preferences" page. The *sender* is the user for whom the

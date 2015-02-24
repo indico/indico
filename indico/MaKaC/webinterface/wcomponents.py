@@ -63,10 +63,13 @@ from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
 import MaKaC.common.TemplateExec as templateEngine
 
+from indico.core import signals
 from indico.core.db import DBMgr
 from indico.util.i18n import i18nformat, parse_locale, get_all_locales
 from indico.util.date_time import utc_timestamp, is_same_month
+from indico.util.signals import values_from_signal
 from indico.core.index import Catalog
+from indico.web.menu import HeaderMenuEntry
 
 MIN_PRESENT_EVENTS = 6
 OPTIMAL_PRESENT_EVENTS = 10
@@ -333,6 +336,7 @@ class WHeader(WTemplated):
                 adminItemList.append({'id': 'webcastAdmin', 'url': urlHandlers.UHWebcast.getURL(), 'text': _("Webcast Admin")})
 
         vars["adminItemList"] = adminItemList
+        vars['extra_items'] = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))
         vars["getProtection"] = lambda x: self._getProtection(x)
 
         announcement_header = getAnnoucementMgrInstance().getText()
