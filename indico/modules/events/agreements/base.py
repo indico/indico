@@ -171,6 +171,11 @@ class AgreementDefinitionBase(object):
         return everybody_signed, num_accepted, num_rejected
 
     @classmethod
+    def is_active(cls, event):
+        """Checks if the agreement type is active for a given event"""
+        return bool(cls.get_people(event))
+
+    @classmethod
     def is_agreement_orphan(cls, event, agreement):
         """Checks if the agreement no longer has a corresponding person info record"""
         return agreement.identifier not in cls.get_people(event)

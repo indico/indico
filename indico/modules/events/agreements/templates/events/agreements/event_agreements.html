@@ -11,7 +11,7 @@
         {% endtrans %}
     </h2>
     <div class="i-badges-list-left">
-        {% for definition in definitions %}
+        {% for definition in definitions if definition.is_active(event) %}
             <a class="i-badge" href="{{ url_for('agreements.event_agreements_details', event, definition=definition.name) }}">
                 <div class="i-badge-content">
                     <div class="i-badge-title">
