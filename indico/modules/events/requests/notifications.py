@@ -22,12 +22,6 @@ from indico.core.config import Config
 from indico.core.notifications import email_sender, make_email
 
 
-def _get_event_manager_emails(event):
-    """Get set of event manager emails"""
-    # XXX: doesn't this make much more sense as a method in the Conference class?
-    return {event.getCreator().getEmail()} | {u.getEmail() for u in event.getManagerList()}
-
-
 def _get_request_manager_emails(req):
     """Get set of request manager emails"""
     with plugin_context(req.definition.plugin):
@@ -73,11 +67,10 @@ def notify_event_managers(req, template, **context):
     """
     event = req.event
     from_addr = Config.getInstance().getSupportEmail()
-    event_manager_emails = _get_event_manager_emails(event)
     context['event'] = event
     context['req'] = req
     tpl_event_managers = _get_template_module(template, **context)
-    return make_email(event_manager_emails, from_address=from_addr, subject=tpl_event_managers.get_subject(),
+    return make_email(event.all_manager_emails, from_address=from_addr, subject=tpl_event_managers.get_subject(),
                       body=tpl_event_managers.get_body())
 
 
