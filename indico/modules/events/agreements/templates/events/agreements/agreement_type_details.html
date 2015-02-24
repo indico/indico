@@ -30,16 +30,39 @@
     <div class="agreement-dashboard">
         <div class="action-box">
             <div class="section">
-                {% if definition.paper_form_url or true %}
-                    <a class="i-button" href="{{ definition.paper_form_url }}">Download paper version</a>
-                {% endif %}
+                <div class="icon icon-bullhorn"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Notify managers on signature{% endtrans %}
+                    </div>
+                    <div>
+                        {% trans %}Event managers will receive emails every time an agreement is signed{% endtrans %}
+                    </div>
+                </div>
+                <div class="toolbar right">
+                    {{ switch(id='toggle-manager-notifications',
+                              checked=definition.event_settings.get(event, 'manager_notifications_enabled'),
+                              data_href=url_for_plugin('.toggle_notifications', event, definition)) }}
+                </div>
             </div>
-            <div class="section">
-                <strong>Notify managers on signature</strong>
-                {{ switch(id='toggle-manager-notifications',
-                          checked=definition.event_settings.get(event, 'manager_notifications_enabled'),
-                          data_href=url_for_plugin('.toggle_notifications', event, definition)) }}
-            </div>
+            {% if definition.paper_form_url %}
+                <div class="section">
+                    <div class="icon icon-file-pdf"></div>
+                    <div class="text">
+                        <div class="label">
+                            {% trans %}Paper form available{% endtrans %}
+                        </div>
+                        <div>
+                            {% trans %}Print this version for people to sign it physically{% endtrans %}
+                        </div>
+                    </div>
+                    <div class="toolbar right">
+                        <a class="i-button icon-file-download" href="{{ definition.paper_form_url }}">
+                            {% trans %}Download{% endtrans %}
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
         </div>
 
         {% if not_sent or pending %}
