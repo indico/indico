@@ -40,9 +40,8 @@ def upgrade():
                     sa.Column('data', postgresql.JSON(), nullable=False),
                     sa.ForeignKeyConstraint(['vc_room_id'], ['events.vc_rooms.id']),
                     sa.PrimaryKeyConstraint('id'),
+                    sa.UniqueConstraint('event_id', 'vc_room_id', 'link_type', 'link_id'),
                     schema='events')
-    op.create_unique_constraint(None, 'vc_room_events',
-                                ['event_id', 'vc_room_id', 'link_type', 'link_id'], schema='events')
 
 
 def downgrade():
