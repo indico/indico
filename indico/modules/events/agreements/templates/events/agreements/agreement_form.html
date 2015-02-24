@@ -81,6 +81,13 @@
                 </div>
             {% endif %}
         </div>
+        {% if not agreement.pending %}
+            <div class="i-box no-actions-notice">
+                {% trans -%}
+                    The agreement is already signed and no further action can be taken on this page.
+                {%- endtrans %}
+            </div>
+        {% endif %}
     </div>
     {% if agreement.pending %}
         <div class="toolbar">

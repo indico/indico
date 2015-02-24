@@ -24,7 +24,7 @@
     color: $black;
     margin-bottom: 1em;
 
-    .info-body {
+    .i-box.info-body {
         padding: 20px 10px;
 
         .info-section {
@@ -91,6 +91,15 @@
                 }
             }
         }
+    }
+
+    .i-box.no-actions-notice {
+        background: lighten($gray, $color-variation);
+        font-size: 0.9em;
+        font-style: italic;
+        padding-left: 8.8rem;
+        padding-right: 8.8rem;
+        text-align: justify;
     }
 
     .legal-body {
