@@ -152,10 +152,9 @@ ul.subEventLevelSCList {
 }
 
 ul.subEventLevelSCList li {
-    padding: 0 0 1em 0;
+    padding: 0;
     margin: 5px 0;
     list-style-type: none;
-    border-bottom: 1px dotted #AAA;
 }
 
 

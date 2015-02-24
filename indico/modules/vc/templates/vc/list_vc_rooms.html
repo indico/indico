@@ -45,7 +45,7 @@
             {% if linked_to['block'] %}
                 {% for block, event_vc_rooms in linked_to['block'].iteritems() %}
                     <div class="groupTitleNoBorder collaborationDisplayTitle event-service-association-title">
-                        {{ block.getFullTitle() }}<span class="event-service-association-subtitle">session block</span>
+                        {{ block.getFullTitle() }}<span class="event-service-association-subtitle">session</span>
                     </div>
                     {% for event_vc_room in event_vc_rooms %}
                         {{ render_vc_room(event_vc_room, event) }}
