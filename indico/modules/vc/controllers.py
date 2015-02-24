@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import transaction
 from collections import defaultdict
-from flask import request, session, redirect, flash, jsonify
+from flask import request, session, redirect, flash, json, Response
 from sqlalchemy import func
 from werkzeug.exceptions import NotFound, BadRequest
 
@@ -234,19 +234,65 @@ class RHVCEventPage(RHConferenceBaseDisplay):
                                              event_vc_rooms=event_vc_rooms, linked_to=linked_to)
 
 
+class RHVCManageAttach(RHVCManageEventBase):
+    """Attaches a room to the event"""
+
+    def _process(self):
+        defaults = FormDefaults({
+            'room': None,
+            'contribution': None,
+            'block': None,
+            'linking': 'event',
+            'show': True
+        })
+
+        form = VCAttachForm(prefix='vc-', obj=defaults, event=self.event)
+
+        if form.validate_on_submit():
+            vc_room = form.data['room']
+            if not vc_room.plugin.can_manage_vc_rooms(session.user, self.event):
+                flash(_("You are not allowed to attach '{}' rooms to this event.").format(vc_room.plugin.name),
+                      'error')
+            else:
+                event_vc_room = VCRoomEventAssociation()
+                vc_room.plugin.handle_form_data_association(self.event, vc_room, event_vc_room, form.data)
+
+                if (event_vc_room.link_type != VCRoomLinkType.event and
+                    VCRoomEventAssociation.find(event=self.event,
+                                                vc_room=vc_room,
+                                                link_type=event_vc_room.link_type,
+                                                link_id=event_vc_room.link_id)):
+                    transaction.abort()
+                    flash(_("There is already a room attached to that!").format(vc_room.plugin.name), 'error')
+                else:
+                    db.session.add(event_vc_room)
+            return redirect(url_for('.manage_vc_rooms', self.event))
+
+        return WPVCManageEvent.render_template('search_rooms.html', self._conf, event=self._conf, form=form)
+
+
 class RHVCManageSearch(RHVCManageEventBase):
     """Searches for a room based on its name"""
 
     def _checkParams(self, params):
         RHVCManageEventBase._checkParams(self, params)
-        try:
-            self.query = request.args['q']
-        except KeyError:
-            raise BadRequest("No query was provided.")
+
+        self.query = request.args.get('q', '')
+        if (len(self.query) < 3):
+            raise BadRequest("A query has to be provided, with at least 3 characters")
 
     def _iter_allowed_rooms(self):
-        return (room for room in VCRoom.query.filter(func.lower(VCRoom.name).contains(self.query.lower())).limit(50)
+        query = (db.session.query(VCRoom, func.count(VCRoomEventAssociation.id).label('event_count'))
+                 .options(db.lazyload('vidyo_extension'))
+                 .filter(func.lower(VCRoom.name).contains(self.query.lower()))
+                 .join(VCRoomEventAssociation)
+                 .group_by(VCRoom.id)
+                 .order_by(db.desc('event_count'))
+                 .limit(10))
+
+        return ((room, count) for room, count in query
                 if room.plugin.can_manage_room(session.user, room))
 
     def _process(self):
-        return jsonify({room.id: room.name for room in self._iter_allowed_rooms()})
+        return Response(json.dumps([{'id': room.id, 'name': room.name, 'count': count}
+                                   for room, count in self._iter_allowed_rooms()]),  mimetype='application/json')
