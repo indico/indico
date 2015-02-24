@@ -58,7 +58,7 @@ class AgreementEmailForm(IndicoForm):
             raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))
 
 
-class AgreementUploadForm(IndicoForm):
+class AgreementAnswerSubmissionForm(IndicoForm):
     answer = IndicoRadioField(_("Answer"), [InputRequired()], coerce=lambda x: bool(int(x)),
                               choices=[(1, _("Agreement")), (0, _("Disagreement"))])
     document = FileField(_("Document"), [UsedIf(lambda form, field: form.answer.data), DataRequired()])

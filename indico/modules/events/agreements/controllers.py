@@ -23,7 +23,7 @@ from flask import flash, jsonify, redirect, request, session
 from werkzeug.exceptions import NotFound
 
 from indico.core.errors import AccessError, NoReportError
-from indico.modules.events.agreements.forms import AgreementForm, AgreementEmailForm, AgreementUploadForm
+from indico.modules.events.agreements.forms import AgreementForm, AgreementEmailForm, AgreementAnswerSubmissionForm
 from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
 from indico.modules.events.agreements.notifications import notify_agreement_reminder, notify_new_signature_to_manager
 from indico.modules.events.agreements.views import WPAgreementForm, WPAgreementManager
@@ -197,7 +197,7 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetailsAgreementBa
     def _process(self):
         event = self._conf
         agreement = self.agreement
-        form = AgreementUploadForm()
+        form = AgreementAnswerSubmissionForm()
         if form.validate_on_submit():
             if form.answer.data:
                 agreement.accept(on_behalf=True)
