@@ -25,6 +25,7 @@ from wtforms.validators import InputRequired, DataRequired, ValidationError
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoRadioField
+from indico.web.forms.validators import UsedIf
 from indico.web.forms.widgets import CKEditorWidget
 
 
@@ -58,11 +59,11 @@ class AgreementEmailForm(IndicoForm):
 
 
 class AgreementUploadForm(IndicoForm):
-    document = FileField(_("Document"), [DataRequired()])
     answer = IndicoRadioField(_("Answer"), [InputRequired()], coerce=lambda x: bool(int(x)),
                               choices=[(1, _("Agreement")), (0, _("Disagreement"))])
+    document = FileField(_("Document"), [UsedIf(lambda form, field: form.answer.data), DataRequired()])
     upload_confirm = BooleanField(_("I confirm that I'm uploading a document that clearly shows this person's answer"),
-                                  [DataRequired()])
-    understand = BooleanField(_("I understand that I'm signing an agreement on behalf of this person"),
+                                  [UsedIf(lambda form, field: form.answer.data), DataRequired()])
+    understand = BooleanField(_("I understand that I'm answering the agreement on behalf of this person"),
                               [DataRequired()], description=_("This answer is legally binding and can't be changed "
                                                               "afterwards."))

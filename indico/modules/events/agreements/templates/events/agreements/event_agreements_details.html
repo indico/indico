@@ -191,7 +191,7 @@
                                 </a>
                                 <a class="icon-upload js-ajax-dialog"
                                     href="#" data-href="{{ url_for('.event_agreements_details_upload_agreement', event, definition, agreement) }}"
-                                    title="{% trans %}Upload a signed agreement form{% endtrans %}"></a>
+                                    title="{% trans %}Answer manually for this person{% endtrans %}"></a>
                             </td>
                         </tr>
                     {% endfor %}
@@ -220,7 +220,7 @@
                             </td>
                             {{ extra_columns(agreement.data) }}
                             <td class="agreement-actions">
-                                {% if agreement.signed_on_behalf %}
+                                {% if agreement.state.name == 'accepted_on_behalf' %}
                                     <a class="icon-file-download"
                                        href="{{ url_for('.download_file', event, definition, agreement, filename=agreement.attachment_filename) }}"
                                        title="{% trans %}Download scanned agreement form{% endtrans %} ({{ agreement.attachment_filename }})"></a>

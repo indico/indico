@@ -24,7 +24,7 @@ from werkzeug.exceptions import NotFound
 
 from indico.core.errors import AccessError, NoReportError
 from indico.modules.events.agreements.forms import AgreementForm, AgreementEmailForm, AgreementUploadForm
-from indico.modules.events.agreements.models.agreements import Agreement
+from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
 from indico.modules.events.agreements.notifications import notify_agreement_reminder, notify_new_signature_to_manager
 from indico.modules.events.agreements.views import WPAgreementForm, WPAgreementManager
 from indico.modules.events.agreements.util import get_agreement_definitions, send_new_agreements
@@ -181,7 +181,9 @@ class RHAgreementManagerDetailsAgreementBase(RHAgreementManagerDetails):
             raise NotFound
 
 
-class RHAgreementManagerDetailsUploadAgreement(RHAgreementManagerDetailsAgreementBase):
+class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetailsAgreementBase):
+    """Submits the answer of an agreement on behalf of the person"""
+
     def _checkParams(self, params):
         RHAgreementManagerDetailsAgreementBase._checkParams(self, params)
         if not self.agreement.pending:
@@ -192,21 +194,23 @@ class RHAgreementManagerDetailsUploadAgreement(RHAgreementManagerDetailsAgreemen
         agreement = self.agreement
         form = AgreementUploadForm()
         if form.validate_on_submit():
-            func = agreement.accept if form.answer.data else agreement.reject
-            func(on_behalf=True)
-            agreement.attachment_filename = form.document.data.filename
-            agreement.attachment = form.document.data.read()
-            flash(_("Agreement uploaded on behalf of {0}".format(agreement.person_name)), 'success')
+            if form.answer.data:
+                agreement.accept(on_behalf=True)
+                agreement.attachment_filename = form.document.data.filename
+                agreement.attachment = form.document.data.read()
+            else:
+                agreement.reject(on_behalf=True)
+            flash(_("Agreement answered on behalf of {0}".format(agreement.person_name)), 'success')
             return jsonify(success=True)
-        return WPJinjaMixin.render_template('events/agreements/agreement_upload_form.html', form=form,
+        return WPJinjaMixin.render_template('events/agreements/agreement_submit_answer_form.html', form=form,
                                             event=event, agreement=agreement)
 
 
 class RHAgreementManagerDetailsDownloadAgreement(RHAgreementManagerDetailsAgreementBase):
     def _checkParams(self, params):
         RHAgreementManagerDetailsAgreementBase._checkParams(self, params)
-        if not self.agreement.signed_on_behalf:
-            raise NoReportError("The agreement was not signed via file upload")
+        if self.agreement.state != AgreementState.accepted_on_behalf:
+            raise NoReportError("The agreement was not accepted manually by an admin")
 
     def _process(self):
         io = BytesIO(self.agreement.attachment)
