@@ -22,7 +22,7 @@ from indico.core import signals
 from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation
 from indico.modules.vc.plugins import VCPluginMixin
 from indico.modules.vc.forms import VCPluginSettingsFormBase
-from indico.web.flask.templating import template_hook
+from indico.web.flask.templating import template_hook, get_overridable_template_name
 from MaKaC.webinterface.displayMgr import EventMenuEntry
 
 __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase')
@@ -38,7 +38,8 @@ def _inject_event_header(event, **kwargs):
 def _inject_vc_room_action_buttons(event, item, event_vc_rooms_dict, **kwargs):
     event_vc_room = event_vc_rooms_dict.get(item)
     if event_vc_room:
-        return render_template('vc/vc_room_timetable_buttons.html', event=event, event_vc_room=event_vc_room)
+        tpl = get_overridable_template_name('vc_room_timetable_buttons.html', event_vc_room.vc_room.plugin, 'vc/')
+        return render_template(tpl, event=event, event_vc_room=event_vc_room, **kwargs)
     return
 
 
