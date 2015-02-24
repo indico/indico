@@ -198,3 +198,14 @@ class VCRoomEventAssociation(db.Model):
         """
         query = cls.find(event_id=int(event.id), **kwargs)
         return query
+
+    @classmethod
+    def find_for_event_linked_to_event(cls, event, **kwargs):
+        """Returns a Query that retrieves the video conference rooms for an event, which are
+        linked only to the event
+
+        :param event: an indico event (with a numeric ID)
+        :param kwargs: extra kwargs to pass to ``find()``
+        """
+        query = cls.find(event_id=int(event.id), link_type=int(VCRoomLinkType.event), **kwargs)
+        return query
