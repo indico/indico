@@ -42,6 +42,8 @@ class RHAgreementForm(RHConferenceBaseDisplay):
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
         self.agreement = Agreement.find_one(id=request.view_args['id'])
+        if self.agreement.is_orphan():
+            raise NotFound('The agreement is not active anymore')
 
     def _checkSessionUser(self):
         if session.user is None:
@@ -91,7 +93,10 @@ class RHAgreementManagerDetails(RHConferenceModifBase):
 
     def _process(self):
         event = self._conf
-        agreements = Agreement.find_all(event_id=event.getId(), type=self.definition.name)
+        people = self.definition.get_people(event)
+        agreements = Agreement.find_all(Agreement.event_id == event.getId(),
+                                        Agreement.type == self.definition.name,
+                                        Agreement.identifier.in_(people))
         return WPAgreementManager.render_template('event_agreements_details.html', event,
                                                   event=event, definition=self.definition, agreements=agreements)
 

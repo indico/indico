@@ -22,7 +22,7 @@ from flask import render_template
 
 from indico.core.models.settings import EventSettingsProxy
 from indico.modules.events.agreements.models.agreements import Agreement
-from indico.util.caching import make_hashable
+from indico.util.caching import make_hashable, memoize_request
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.string import return_ascii
 from indico.web.flask.templating import get_overridable_template_name, get_template_module
@@ -138,6 +138,7 @@ class AgreementDefinitionBase(object):
         return placeholders
 
     @classmethod
+    @memoize_request
     def get_people(cls, event):
         """Returns a dictionary of :class:`AgreementPersonInfo` required to sign agreements"""
         people = cls.iter_people(event)
@@ -168,6 +169,11 @@ class AgreementDefinitionBase(object):
         num_rejected = query.filter(Agreement.rejected).count()
         everybody_signed = len(people) == (num_accepted + num_rejected)
         return everybody_signed, num_accepted, num_rejected
+
+    @classmethod
+    def is_agreement_orphan(cls, event, agreement):
+        """Checks if the agreement no longer has a corresponding person info record"""
+        return agreement.identifier not in cls.get_people(event)
 
     @classmethod
     def render_form(cls, agreement, form, **kwargs):

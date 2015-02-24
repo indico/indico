@@ -231,3 +231,6 @@ class Agreement(db.Model):
 
     def belongs_to(self, person):
         return self.identifier == person.identifier
+
+    def is_orphan(self):
+        return self.definition.is_agreement_orphan(self.event, self)
