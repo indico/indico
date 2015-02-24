@@ -234,6 +234,13 @@ angular = rjs_bundle(
 
 zero_clipboard_js = rjs_bundle('zero_clipboard_js', 'js/lib/zeroclipboard/ZeroClipboard.js')
 
+selectize_js = rjs_bundle('selectize_js',
+                          'js/lib/selectize.js/selectize.js')
+
+selectize_css = rjs_bundle('selectize_css',
+                           'css/lib/selectize.js/selectize.css',
+                           'css/lib/selectize.js/selectize.default.css')
+
 jquery = rjs_bundle('jquery', *filter(None, [
     'js/lib/underscore.js',
     'js/lib/jquery.js',
@@ -391,6 +398,7 @@ def register_all_js(env):
     env.register('mathjax_js', mathjax_js)
     env.register('jqplot_js', jqplot_js)
     env.register('zero_clipboard_js', zero_clipboard_js)
+    env.register('selectize_js', selectize_js)
 
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)
@@ -417,6 +425,7 @@ def register_all_css(env, main_css_file):
     env.register('base_css', base_css)
     env.register('indico_badges_css', indico_badges_css)
     env.register('jqplot_css', jqplot_css)
+    env.register('selectize_css', selectize_css)
 
     # SASS/SCSS
     env.register('agreements_sass', agreements_sass)

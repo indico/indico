@@ -41,3 +41,6 @@
 [submodule "ext_modules/zeroclipboard"]
 	path = ext_modules/zeroclipboard
 	url = https://github.com/zeroclipboard/zeroclipboard
+[submodule "ext_modules/selectize.js"]
+	path = ext_modules/selectize.js
+	url = https://github.com/brianreavis/selectize.js.git
