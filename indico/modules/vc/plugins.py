@@ -147,6 +147,6 @@ class VCPluginMixin(object):
         return any(principal.containsUser(user) for principal in principals)
 
     def can_manage_room(self, user, room):
-        return (any(evt_assoc.event.canUserModify(user) for evt_assoc in room.events) or
+        return (user.isAdmin() or
                 user in retrieve_principals(room.plugin.settings.get('managers')) or
-                user.isAdmin())
+                any(evt_assoc.event.canUserModify(user) for evt_assoc in room.events))
