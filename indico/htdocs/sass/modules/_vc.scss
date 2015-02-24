@@ -1,0 +1,19 @@
+@import "base/palette";
+@import "compass/css3/box-shadow";
+
+.vc-management {
+    .add-room-options {
+        & > * {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .i-button {
+            line-height: 2em;
+            img {
+                vertical-align: middle;
+                width: 2em;
+            }
+        }
+    }
+}
