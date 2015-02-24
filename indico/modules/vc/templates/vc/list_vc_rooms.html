@@ -67,7 +67,7 @@
                 event.clipboardData.setData('text/plain', event.target.getAttribute('data-link'));
             } );
             client.on( 'aftercopy', function(event) {
-                $(event.target).parent().siblings('.vc-room-url-copied').show().fadeOut(2000);
+                $(event.target).parent().siblings('.button-info-message').show().fadeOut(2000);
             } );
         } );
 
