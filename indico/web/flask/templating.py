@@ -150,11 +150,13 @@ def call_template_hook(*name, **kwargs):
     """Template function to let plugins add their own data to a template.
 
     :param name: The name of the hook.  Only accepts one argument.
+    :param as_list: Return a list instead of a concatenated string
     :param kwargs: Data to pass to the signal receivers.
     """
     if len(name) != 1:
         raise TypeError('call_template_hook() accepts only one positional argument, {} given'.format(len(name)))
     name = name[0]
+    as_list = kwargs.pop('as_list', False)
     values = []
     for is_markup, priority, value in values_from_signal(signals.plugin.template_hook.send(unicode(name), **kwargs),
                                                          single_value=True):
@@ -162,7 +164,10 @@ def call_template_hook(*name, **kwargs):
             if is_markup:
                 value = Markup(value)
             heappush(values, (priority, value))
-    return Markup(u'\n').join(x[1] for x in values) if values else ''
+    if as_list:
+        return [x[1] for x in values]
+    else:
+        return Markup(u'\n').join(x[1] for x in values) if values else u''
 
 
 
