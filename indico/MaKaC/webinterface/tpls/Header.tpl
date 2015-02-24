@@ -84,7 +84,7 @@ urlMeeting.addParam("event_type","meeting")
     lecture: ${ _("A <strong>lecture</strong> is a simple event to annouce a talk.<br/><strong>Features</strong>: poster creation, participants management,...") | n,j },
     meeting: ${ _("A <strong>meeting</strong> is an event that defines an agenda with many talks.<br/><strong>Features</strong>: timetable, minutes, poster creation, participants management,...") | n,j},
     conference: ${ _("A <strong>conference</strong> is a complex event with features to manage the whole life cycle of a conference.<br/><strong>Features</strong>: call for abstracts, registration, e-payment, timetable, badges creation, paper reviewing,...") | n,j}
-  }
+  };
 
   $(function() {
 
