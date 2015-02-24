@@ -36,14 +36,7 @@
                         </tr>
                         <tr>
                             <td class="details-row" colspan="6">
-                                <dl class="details-container">
-                                <!-- TODO: Each plugin should define its own template in displaying
-                                the information of the "data" column -->
-                                    {% for key, value in vc_room.data.items() %}
-                                        <dt>{{ key }}</dt>
-                                        <dd>{{ value }}</dd>
-                                    {% endfor %}
-                                </dl>
+                                {{ vc_room.plugin.render_manage_event_info_box(vc_room, event_vc_room, event) | safe }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -78,5 +71,28 @@
 
     $('.js-create-room:not([data-vc-system])').ajaxDialog({
         title: $T('Video services')
+    });
+
+    // Snippet to copy links to the clipboard
+    var client = new ZeroClipboard( $('.clip_button') );
+
+    client.on( 'ready', function(event) {
+        client.on( 'copy', function(event) {
+            event.clipboardData.setData('text/plain', event.target.getAttribute('data-link'));
+        } );
+        client.on( 'aftercopy', function(event) {
+            $(event.target).parent().siblings('.button-info-message').show().fadeOut(2000);
+        } );
+    } );
+
+    client.on( 'error', function(event) {
+        ZeroClipboard.destroy();
+    } );
+
+    $('.toggle .i-button').on('click', function(){
+        var toogle = $(this);
+        toogle.toggleClass('icon-eye icon-eye-blocked');
+        var $input = toogle.siblings('input');
+        $input.prop('type',$input.prop('type') === 'text' ? 'password' : 'text');
     });
 </script>

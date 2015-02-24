@@ -26,7 +26,7 @@ class WPVCManageEvent(WPVCJinjaMixin, WPConferenceModifBase):
 
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + \
-            self._asset_env['modules_vc_js'].urls()
+            self._asset_env['modules_vc_js'].urls() + self._asset_env['zero_clipboard_js'].urls()
 
     def _setActiveSideMenuItem(self):
         self._vcMenuItem.setActive()
