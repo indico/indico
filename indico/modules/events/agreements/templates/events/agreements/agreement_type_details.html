@@ -221,7 +221,7 @@
                             {{ extra_columns(agreement.data) }}
                             <td class="agreement-actions">
                                 {% if agreement.state.name == 'accepted_on_behalf' %}
-                                    <a class="icon-file-download"
+                                    <a class="icon-file-download" target="_blank"
                                        href="{{ url_for('.download_file', event, definition, agreement, filename=agreement.attachment_filename) }}"
                                        title="{% trans %}Download scanned agreement form{% endtrans %} ({{ agreement.attachment_filename }})"></a>
                                 {% endif %}
