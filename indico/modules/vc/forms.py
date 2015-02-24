@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 import re
 
 from wtforms.fields.core import BooleanField, SelectField
-from wtforms.fields.simple import StringField
+from wtforms.fields.simple import StringField, HiddenField
 from wtforms.validators import DataRequired, Length, Regexp, ValidationError
 
 from indico.modules.vc.models import VCRoom
@@ -27,9 +27,26 @@ from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalField, IndicoRadioField
 from indico.web.forms.validators import UsedIf
-from indico.web.forms.widgets import JinjaWidget, SwitchWidget
+from indico.web.forms.widgets import JinjaWidget, SwitchWidget, SelectizeWidget
 
 ROOM_NAME_RE = re.compile(r'[\w\-]+')
+
+
+class VCRoomField(HiddenField):
+    widget = SelectizeWidget()
+
+    def _convert_principal(self, principal):
+        if principal['_type'] == 'Avatar':
+            return u'Avatar', principal['id']
+        else:
+            return u'Group', principal['id']
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            self.data = VCRoom.get(valuelist[0])
+
+    def _value(self):
+        return self.data.id if self.data is not None else None
 
 
 class LinkingWidget(JinjaWidget):
