@@ -5,21 +5,19 @@
 {% block footer_title %}Agreements{% endblock %}
 
 {% block header_recipient -%}
-    event manager
+    event managers
 {%- endblock %}
 
 {% block body -%}
 A new agreement has been {{ state }} for the event:
 {{ agreement.event.getTitle() }}
 
-Person Info:
-------------
-Name: {{ agreement.person_name }}
+{% filter underline %}Person Info{% endfilter %}
+Name:  {{ agreement.person_name }}
 Email: {{ agreement.person_email }}
 
 {%- if agreement.reason %}
-Reason:
--------
+{% filter underline %}Reason{% endfilter %}
 {{ agreement.reason }}
 {%- endif %}
 
