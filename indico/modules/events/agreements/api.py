@@ -20,11 +20,10 @@ from itertools import islice
 from operator import attrgetter
 
 from indico.modules.events.agreements.models.agreements import Agreement
-from MaKaC.conference import ConferenceHolder
-
+from indico.modules.events.agreements.util import get_agreement_definitions
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
-from indico.modules.events.agreements import get_agreement_definitions
+from MaKaC.conference import ConferenceHolder
 
 
 @HTTPAPIHook.register
