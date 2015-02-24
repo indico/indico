@@ -112,7 +112,7 @@ class VCPluginMixin(object):
         with self.plugin_context():
             return self.vc_room_form(prefix='vc-', obj=defaults, event=event, vc_room=existing_vc_room)
 
-    def handle_form_data(self, event, vc_room, event_vc_room, data):
+    def handle_form_data_association(self, event, vc_room, event_vc_room, data):
         contribution_id = data.pop('contribution')
         block_id = data.pop('block')
         link_type = VCRoomLinkType[data.pop('linking')]
@@ -122,18 +122,22 @@ class VCPluginMixin(object):
         else:
             link_id = contribution_id if link_type == VCRoomLinkType.contribution else block_id
 
-        vc_room.name = data.pop('name')
-
         event_vc_room.event_id = event.id
         event_vc_room.vc_room = vc_room
         event_vc_room.link_type = link_type
         event_vc_room.link_id = link_id
         event_vc_room.show = data.pop('show')
 
-        if vc_room.data is None:
-            vc_room.data = {}
         if event_vc_room.data is None:
             event_vc_room.data = {}
+
+    def handle_form_data(self, event, vc_room, event_vc_room, data):
+        vc_room.name = data.pop('name')
+
+        self.handle_form_data_association(event, vc_room, event_vc_room, data)
+
+        if vc_room.data is None:
+            vc_room.data = {}
 
     def create_room(self, vc_room):
         raise NotImplementedError('Plugin must implement create_room()')

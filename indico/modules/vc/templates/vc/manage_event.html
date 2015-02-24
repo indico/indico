@@ -48,14 +48,19 @@
                 <div class="message-text">{% trans %}No video conference rooms have been added yet.{% endtrans %}</div>
             </div>
         {% endif %}
-    {% if vc_systems|length == 1 %}
-        {{ vc_systems[0].render_custom_create_button(event=event) | safe }}
-    {% elif vc_systems|length > 1 %}
-        <a class="i-button bottom i-form-button icon-plus js-create-room right" href="{{ url_for_plugin('.manage_vc_rooms_select', event) }}">
-            {%- trans %}Create new room{% endtrans -%}
-        </a>
-    {% endif %}
-
+        <div class="add-room-options right">
+            {% if vc_systems|length == 1 %}
+                {{ vc_systems[0].render_custom_create_button(event=event) | safe }}
+            {% elif vc_systems|length > 1 %}
+                <a class="i-button i-form-button icon-plus js-create-room" href="{{ url_for_plugin('.manage_vc_rooms_select', event) }}">
+                    {%- trans %}Create new room{% endtrans -%}
+                </a>
+            {% endif %}
+            <span>
+                <a href="#" id="btn-add-existing" class="i-button i-form-button icon-plus" data-href="{{ url_for('.manage_vc_rooms_search_form', event) }}">{% trans %}Add existing room{% endtrans %}
+                </a>
+            </span>
+        </div>
     </div>
 </div>
 <script>
@@ -96,4 +101,9 @@
         var $input = toogle.siblings('input');
         $input.prop('type',$input.prop('type') === 'text' ? 'password' : 'text');
     });
+
+    $('#btn-add-existing').ajaxDialog({
+        title: $T('Video services')
+    });
+
 </script>

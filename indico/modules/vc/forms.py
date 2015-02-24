@@ -24,6 +24,7 @@ from wtforms.validators import DataRequired, Length, Regexp, ValidationError
 from indico.modules.vc.models import VCRoom
 from indico.modules.vc.util import full_block_id
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalField, IndicoRadioField
 from indico.web.forms.validators import UsedIf
@@ -70,13 +71,9 @@ class VCPluginSettingsFormBase(IndicoForm):
                                    description=_('Send email notifications to managers'))
 
 
-class VCRoomFormBase(IndicoForm):
-    advanced_fields = {'show'}
+class VCAttachFormBase(IndicoForm):
     conditional_fields = {'contribution', 'block'}
 
-    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
-                       description=_('The name of the room. It can contain only alphanumerical characters, underscores '
-                                     'and dashes. No spaces allowed.'))
     linking = IndicoRadioField(_("Link to"), [DataRequired()],
                                choices=[('event', _("Event")),
                                         ('contribution', _("Contribution")),
@@ -86,20 +83,36 @@ class VCRoomFormBase(IndicoForm):
                                [UsedIf(lambda form, field: form.linking.data == 'contribution'), DataRequired()])
     block = SelectField(_("Session block"),
                         [UsedIf(lambda form, field: form.linking.data == 'block'), DataRequired()])
+
     show = BooleanField(_('Show room'),
                         widget=SwitchWidget(),
                         description=_('Display this room on the event page'))
 
     def __init__(self, *args, **kwargs):
-        self.vc_room = kwargs.pop('vc_room')
         self.event = kwargs.pop('event')
-        super(VCRoomFormBase, self).__init__(*args, **kwargs)
+        super(VCAttachFormBase, self).__init__(*args, **kwargs)
         self.contribution.choices = ([('', _("Please select a contribution"))] +
                                      [(contrib.id, contrib.title) for contrib in self.event.getContributionList()])
         self.block.choices = (
             [('', _("Please select a session block"))] +
             [(full_block_id(block), block.getFullTitle()) for block in self.event.getSessionSlotList()])
         self.linking._form = self
+
+
+class VCAttachForm(VCAttachFormBase):
+    room = VCRoomField(_("Room to link"), [DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        super(VCAttachForm, self).__init__(*args, **kwargs)
+        self.room.search_url = url_for('.manage_vc_rooms_search', self.event)
+
+
+class VCRoomFormBase(VCAttachFormBase):
+    advanced_fields = {'show'}
+
+    name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
+                       description=_('The name of the room. It can contain only alphanumerical characters, underscores '
+                                     'and dashes. No spaces allowed.'))
 
     def validate_name(self, field):
         if field.data:

@@ -26,12 +26,14 @@ from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
-from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus
+from indico.modules.vc.forms import VCAttachForm
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus, VCRoomLinkType
 from indico.modules.vc.util import get_vc_plugins
 from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
 
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
@@ -268,7 +270,7 @@ class RHVCManageAttach(RHVCManageEventBase):
                     db.session.add(event_vc_room)
             return redirect(url_for('.manage_vc_rooms', self.event))
 
-        return WPVCManageEvent.render_template('search_rooms.html', self._conf, event=self._conf, form=form)
+        return WPVCManageEvent.render_template('attach_room.html', self._conf, event=self._conf, form=form)
 
 
 class RHVCManageSearch(RHVCManageEventBase):
