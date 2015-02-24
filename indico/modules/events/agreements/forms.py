@@ -47,7 +47,8 @@ class AgreementEmailForm(IndicoForm):
         from_addresses = ['{} <{}>'.format(name, email) for email in session.user.getEmails()]
         self.from_address.choices = zip(from_addresses, from_addresses)
         placeholders = self._definition.get_email_placeholders()
-        self.body.description = render_template('events/agreements/placeholder_info.html', placeholders=placeholders)
+        self.body.description = render_template('events/agreements/dialogs/placeholder_info.html',
+                                                placeholders=placeholders)
 
     def validate_body(self, field):
         placeholders = {'{{{}}}'.format(name)

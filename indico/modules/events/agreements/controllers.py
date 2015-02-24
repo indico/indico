@@ -77,7 +77,7 @@ class RHAgreementManager(RHConferenceModifBase):
 
     def _process(self):
         definitions = get_agreement_definitions().values()
-        return WPAgreementManager.render_template('event_agreements.html', self._conf,
+        return WPAgreementManager.render_template('agreement_types.html', self._conf,
                                                   event=self._conf, definitions=definitions)
 
 
@@ -100,7 +100,7 @@ class RHAgreementManagerDetails(RHConferenceModifBase):
         agreements = Agreement.find_all(Agreement.event_id == event.getId(),
                                         Agreement.type == self.definition.name,
                                         Agreement.identifier.in_(people))
-        return WPAgreementManager.render_template('event_agreements_details.html', event,
+        return WPAgreementManager.render_template('agreement_type_details.html', event,
                                                   event=event, definition=self.definition, agreements=agreements)
 
 
@@ -138,7 +138,7 @@ class RHAgreementManagerDetailsEmailBase(RHAgreementManagerDetails):
 
 
 class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmailBase):
-    dialog_template = 'events/agreements/agreement_email_form_send.html'
+    dialog_template = 'events/agreements/dialogs/agreement_email_form_send.html'
 
     def _get_people(self):
         identifiers = set(request.form.getlist('references'))
@@ -153,7 +153,7 @@ class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmailBase):
 
 
 class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmailBase):
-    dialog_template = 'events/agreements/agreement_email_form_remind.html'
+    dialog_template = 'events/agreements/dialogs/agreement_email_form_remind.html'
 
     def _get_agreements(self):
         ids = set(request.form.getlist('references'))
@@ -168,14 +168,14 @@ class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmailBase):
 
 
 class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetailsSend):
-    dialog_template = 'events/agreements/agreement_email_form_send_all.html'
+    dialog_template = 'events/agreements/dialogs/agreement_email_form_send_all.html'
 
     def _get_people(self):
         return self.definition.get_people_not_notified(self._conf)
 
 
 class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):
-    dialog_template = 'events/agreements/agreement_email_form_remind_all.html'
+    dialog_template = 'events/agreements/dialogs/agreement_email_form_remind_all.html'
 
     def _get_agreements(self):
         return Agreement.find_all(Agreement.pending, event_id=self._conf.getId(), type=self.definition.name)
@@ -210,7 +210,7 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetailsAgreementBa
                 agreement.reject(on_behalf=True)
             flash(_("Agreement answered on behalf of {0}".format(agreement.person_name)), 'success')
             return jsonify(success=True)
-        return WPJinjaMixin.render_template('events/agreements/agreement_submit_answer_form.html', form=form,
+        return WPJinjaMixin.render_template('events/agreements/dialogs/agreement_submit_answer_form.html', form=form,
                                             event=event, agreement=agreement)
 
 
