@@ -2136,6 +2136,12 @@ class Conference(CommonObjectBase, Locatable):
     def __repr__(self):
         return '<Conference({0}, {1}, {2})'.format(self.getId(), self.getTitle(), self.getStartDate())
 
+    @property
+    def all_manager_emails(self):
+        """Returns the emails of all managers, including the creator"""
+        emails = {self.getCreator().getEmail()} | {u.getEmail() for u in self.getManagerList()}
+        return {e for e in emails if e}
+
     @staticmethod
     def _cmpByDate(self, toCmp):
         res = cmp(self.getStartDate(), toCmp.getStartDate())
