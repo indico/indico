@@ -32,7 +32,7 @@ __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase')
 def _inject_event_header(event, **kwargs):
     """Fetches the VC rooms attached only to the whole event and display them in the event page
     header"""
-    event_vc_rooms = VCRoomEventAssociation.find_for_event_linked_to_event(event).all()
+    event_vc_rooms = VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True).all()
     return render_template('vc/event_header.html', event=event, event_vc_rooms=event_vc_rooms)
 
 
