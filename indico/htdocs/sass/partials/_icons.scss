@@ -243,6 +243,9 @@ i[class^="icon-"]:before {
 .icon-camera:before {
     content: "\e007";
 }
+.icon-no-camera:before {
+    content: "\e964"
+}
 .icon-lock:before {
     content: "\e008";
 }
@@ -371,6 +374,38 @@ i[class^="icon-"]:before {
 }
 .icon-eye-blocked:before {
     content: "\e9d1";
+}
+
+
+/* animated spinner icon */
+/* animation from https://github.com/FortAwesome/Font-Awesome/blob/master/scss/_animated.scss */
+.icon-spinner:before {
+    content: "\e97e";
+    -webkit-animation: icon-spin 1.2s infinite linear;
+            animation: icon-spin 1.2s infinite linear;
+}
+
+
+@-webkit-keyframes icon-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
+  }
+}
+
+@keyframes fa-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
+  }
 }
 
 
