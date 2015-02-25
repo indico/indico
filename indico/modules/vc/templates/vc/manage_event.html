@@ -105,7 +105,11 @@
     });
 
     $('#btn-add-existing').ajaxDialog({
-        title: $T('Video services')
+        onClose: function(data) {
+            if (data) {
+                location.reload();
+            }
+        }
     });
 
 </script>

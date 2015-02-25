@@ -268,7 +268,7 @@ class RHVCManageAttach(RHVCManageEventBase):
                     flash(_("There is already a room attached to that!").format(vc_room.plugin.name), 'error')
                 else:
                     db.session.add(event_vc_room)
-            return redirect(url_for('.manage_vc_rooms', self.event))
+            return redirect_or_jsonify(url_for('.manage_vc_rooms', self.event), flash=False)
 
         return WPVCManageEvent.render_template('attach_room.html', self._conf, event=self._conf, form=form)
 
