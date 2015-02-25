@@ -105,24 +105,32 @@ class IndicoEnumSelectField(SelectFieldBase):
 
     widget = Select()
 
-    def __init__(self, label=None, validators=None, enum=None, sorted=False, **kwargs):
+    def __init__(self, label=None, validators=None, enum=None, sorted=False, only=None, skip=None, none=None, **kwargs):
         super(IndicoEnumSelectField, self).__init__(label, validators, **kwargs)
         self.enum = enum
         self.sorted = sorted
+        self.only = only
+        self.skip = skip or set()
+        self.none = none
 
     def iter_choices(self):
-        items = self.enum
+        items = (x for x in self.enum if x not in self.skip and (self.only is None or x in self.only))
         if self.sorted:
             items = sorted(items, key=attrgetter('title'))
+        if self.none is not None:
+            yield ('', self.none, self.data is None)
         for item in items:
             yield (item.name, item.title, item == self.data)
 
     def process_formdata(self, valuelist):
         if valuelist:
-            try:
-                self.data = self.enum[valuelist[0]]
-            except KeyError:
-                raise ValueError(self.gettext('Not a valid choice'))
+            if not valuelist[0] and self.none is not None:
+                self.data = None
+            else:
+                try:
+                    self.data = self.enum[valuelist[0]]
+                except KeyError:
+                    raise ValueError(self.gettext('Not a valid choice'))
 
 
 class PrincipalField(HiddenField):
