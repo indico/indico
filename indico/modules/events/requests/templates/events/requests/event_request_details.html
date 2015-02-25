@@ -103,7 +103,7 @@
                 {{ form_row_static(_('Processed at'), req.processed_dt | format_datetime) }}
             {% endif %}
             {% block manager_form %}
-                {{ form_rows(manager_form, skip=('action_accept', 'action_reject', 'action_save')) }}
+                {{ form_rows(manager_form, skip=manager_form.action_buttons) }}
             {% endblock %}
         {% endcall %}
         {% call form_footer() %}

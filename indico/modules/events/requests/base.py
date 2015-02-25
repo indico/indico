@@ -38,6 +38,8 @@ class RequestFormBase(IndicoForm):
 
 
 class RequestManagerForm(IndicoForm):
+    action_buttons = {'action_save', 'action_accept', 'action_reject'}
+
     comment = TextAreaField(_('Comment'),
                             description=_('The comment will be shown only if the request is accepted or rejected.'))
     action_save = SubmitField(_('Save'))
@@ -89,7 +91,7 @@ class RequestDefinitionBase(object):
         :param req: the :class:`Request` of the request
         :return: an instance of an :class:`IndicoForm` subclass
         """
-        defaults = FormDefaults(req)
+        defaults = FormDefaults(req, **req.data)
         with plugin_context(cls.plugin):
             return cls.manager_form(prefix='request-manage-', obj=defaults)
 
@@ -131,7 +133,7 @@ class RequestDefinitionBase(object):
         :param req: the :class:`Request` of the request
         :param data: the form data from the request form
         """
-        req.data = data
+        req.data = dict(req.data or {}, **data)
         is_new = req.id is None
         if is_new:
             db.session.add(req)
