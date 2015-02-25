@@ -83,8 +83,8 @@
                             </div>
                         </div>
                         <div class="toolbar right">
-                            <a class="i-button highlight icon-mail js-ajax-dialog"
-                                href="#" data-href="{{ url_for('.event_agreements_details_send_all', event, definition=definition.name) }}">
+                            <a class="i-button highlight icon-mail js-ajax-dialog" href="#"
+                               data-href="{{ url_for('.event_agreements_details_send_all', event, definition=definition.name) }}">
                                 {% trans %}Send all{% endtrans %}
                             </a>
                         </div>
@@ -107,7 +107,7 @@
                         </div>
                         <div class="toolbar right">
                             <a class="i-button icon-alarm js-ajax-dialog"
-                                href="#" data-href="{{ url_for('.event_agreements_details_remind_all', event, definition=definition.name) }}">
+                               href="#" data-href="{{ url_for('.event_agreements_details_remind_all', event, definition=definition.name) }}">
                                 {% trans %}Remind all{% endtrans %}
                             </a>
                         </div>
@@ -131,8 +131,8 @@
                         </ul>
                     </div>
                     <div class="group">
-                        <a id="send-new" class="i-button icon-mail disabled js-ajax-dialog-send"
-                            href="#" data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}">
+                        <a id="send-new" class="i-button icon-mail disabled js-ajax-dialog-send" href="#"
+                           data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}">
                             {% trans %}Send new{% endtrans %}
                         </a>
                     </div>
@@ -145,7 +145,7 @@
                         <tr>
                             <td class="agreement-checkbox">
                                 <input type="checkbox" class="new-agreement" autocomplete="off"
-                                    id="person-{{ person.identifier }}" value="{{ person.identifier }}">
+                                       id="person-{{ person.identifier }}" value="{{ person.identifier }}">
                             </td>
                             <td class="person-name">
                                 <label for="person-{{ person.identifier }}">
@@ -157,10 +157,12 @@
                             </td>
                             {{ extra_columns(person.data) }}
                             <td class="agreement-actions">
-                                <a class="i-button icon-mail js-ajax-dialog-email-one"
-                                    href="#" data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}"
-                                    data-reference="{{ person.identifier }}"
-                                    title="{% trans %}Send the agreement request to this person{% endtrans %}"></a>
+                                <span class="right">
+                                    <a class="i-button icon-mail js-ajax-dialog-email-one" href="#"
+                                       data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}"
+                                       data-reference="{{ person.identifier }}"
+                                       title="{% trans %}Send the agreement request to this person{% endtrans %}"></a>
+                                </span>
                             </td>
                         </tr>
                     {% endfor %}
@@ -181,8 +183,8 @@
                         </ul>
                     </div>
                     <div class="group">
-                        <a id="send-pending" class="i-button icon-alarm disabled js-ajax-dialog-remind"
-                            href="#" data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}">
+                        <a id="send-pending" class="i-button icon-alarm disabled js-ajax-dialog-remind" href="#"
+                           data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}">
                             {% trans %}Remind pending{% endtrans %}
                         </a>
                     </div>
@@ -195,7 +197,7 @@
                         <tr>
                             <td class="agreement-checkbox">
                                 <input type="checkbox" class="pending-agreement" autocomplete="off"
-                                     id="agreement-{{ agreement.id }}" value="{{ agreement.id }}">
+                                       id="agreement-{{ agreement.id }}" value="{{ agreement.id }}">
                             </td>
                             <td class="person-name">
                                 <label for="agreement-{{ agreement.id }}">
@@ -207,14 +209,16 @@
                             </td>
                             {{ extra_columns(agreement.data) }}
                             <td class="agreement-actions">
-                                <a class="icon-alarm js-ajax-dialog-email-one"
-                                    href="#" data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}"
-                                    data-reference="{{ agreement.id }}"
-                                    title="{% trans %}Remind this person{% endtrans %}">
-                                </a>
-                                <a class="icon-upload js-ajax-dialog"
-                                    href="#" data-href="{{ url_for('.event_agreements_details_submit_answer', event, definition, agreement) }}"
-                                    title="{% trans %}Answer manually for this person{% endtrans %}"></a>
+                                <span class="right">
+                                    <a class="icon-alarm js-ajax-dialog-email-one" href="#"
+                                       data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}"
+                                       data-reference="{{ agreement.id }}"
+                                       title="{% trans %}Remind this person{% endtrans %}">
+                                    </a>
+                                    <a class="icon-upload js-ajax-dialog" href="#"
+                                       data-href="{{ url_for('.event_agreements_details_submit_answer', event, definition, agreement) }}"
+                                       title="{% trans %}Answer manually for this person{% endtrans %}"></a>
+                                </span>
                             </td>
                         </tr>
                     {% endfor %}
@@ -244,9 +248,11 @@
                             {{ extra_columns(agreement.data) }}
                             <td class="agreement-actions">
                                 {% if agreement.state.name == 'accepted_on_behalf' %}
-                                    <a class="icon-file-download" target="_blank"
-                                       href="{{ url_for('.download_file', event, definition, agreement, filename=agreement.attachment_filename) }}"
-                                       title="{% trans %}Download scanned agreement form{% endtrans %} ({{ agreement.attachment_filename }})"></a>
+                                    <span class="right">
+                                        <a class="icon-file-download" target="_blank"
+                                           href="{{ url_for('.download_file', event, definition, agreement, filename=agreement.attachment_filename) }}"
+                                           title="{% trans %}Download scanned agreement form{% endtrans %} ({{ agreement.attachment_filename }})"></a>
+                                    </span>
                                 {% endif %}
                             </td>
                         </tr>

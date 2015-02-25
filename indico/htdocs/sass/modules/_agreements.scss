@@ -170,12 +170,15 @@
         width: 100%;
 
         td {
-            padding: 0.35rem 0;
+            padding: 0.35rem 5px 0.35rem 0;
+
+            &:first-child {
+                padding-left: 5px;
+            }
 
             &.agreement-checkbox,
             &.agreement-answer {
                 width: 1%;
-                padding: 0 5px;
 
                 i {
                     margin: 4px;
@@ -192,21 +195,22 @@
 
             &.person-name {
                 font-weight: bold;
-                width: 60%;
+                width: 25%;
             }
 
             &.person-email {
-                width: 38%;
+                width: 32%;
             }
 
             &.agreement-actions {
                 font-size: 1.2em;
                 padding: 0 5px;
-                width: 1%;
+                width: 7%;
                 white-space: nowrap;
 
                 a {
                     color: $dark-gray;
+                    vertical-align: sub;
                     visibility: hidden;
 
                     &:hover {
@@ -228,7 +232,7 @@
         tr:hover > td {
             background: $light-blue !important;
 
-            &.agreement-actions > a {
+            &.agreement-actions a {
                 visibility: visible;
             }
         }
