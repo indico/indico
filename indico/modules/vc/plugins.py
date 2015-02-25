@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 import re
 
 from flask import render_template
+from flask_pluginengine import render_plugin_template
 
 from indico.util.decorators import classproperty
 from indico.modules.vc.forms import VCPluginSettingsFormBase
@@ -63,27 +64,41 @@ class VCPluginMixin(object):
         """Renders the video conference room form
         :param kwargs: arguments passed to the template
         """
-        tpl = get_overridable_template_name('manage_event_create_room.html', self, 'vc/')
-        return render_template(tpl, **kwargs)
+        return render_plugin_template('{}:manage_event_create_room.html'.format(self.name), **kwargs)
 
     def render_custom_create_button(self, **kwargs):
         tpl = get_overridable_template_name('create_button.html', self, 'vc/')
         return render_template(tpl, plugin=self, **kwargs)
 
     def render_info_box(self, vc_room, event_vc_room, event, **kwargs):
-        tpl = get_overridable_template_name('info_box.html', self, 'vc/')
-        return render_template(tpl, plugin=self, event_vc_room=event_vc_room, event=event, vc_room=vc_room,
-                               retrieve_principal=retrieve_principal, settings=self.settings, **kwargs)
+        """Renders the information shown in the expandable box of a VC room row
+        :param vc_room: the VC room object
+        :param event_vc_room: the association of an event and a VC room
+        :param event: the event with the current VC room attached to it
+        :param kwargs: arguments passed to the template
+        """
+        return render_plugin_template('{}:info_box.html'.format(self.name), plugin=self, event_vc_room=event_vc_room,
+                                      event=event, vc_room=vc_room, retrieve_principal=retrieve_principal,
+                                      settings=self.settings, **kwargs)
 
     def render_manage_event_info_box(self, vc_room, event_vc_room, event, **kwargs):
-        tpl = get_overridable_template_name('manage_event_info_box.html', self, 'vc/')
-        return render_template(tpl, plugin=self, event_vc_room=event_vc_room, event=event, vc_room=vc_room,
-                               retrieve_principal=retrieve_principal, settings=self.settings, **kwargs)
+        """Renders the information shown in the expandable box on a VC room in the management area
+        :param vc_room: the VC room object
+        :param event_vc_room: the association of an event and a VC room
+        :param event: the event with the current VC room attached to it
+        :param kwargs: arguments passed to the template
+        """
+        return render_plugin_template('{}:manage_event_info_box.html'.format(self.name), plugin=self,
+                                      event_vc_room=event_vc_room, event=event, vc_room=vc_room,
+                                      retrieve_principal=retrieve_principal, settings=self.settings, **kwargs)
 
-    def render_join_button(self, vc_room, event_vc_room, event, **kwargs):
-        tpl = get_overridable_template_name('join_button.html', self, 'vc/')
-        return render_template(tpl, plugin=self, event_vc_room=event_vc_room, event=event, vc_room=vc_room,
-                               **kwargs)
+    def render_buttons(self, vc_room, **kwargs):
+        """Renders a list of plugin specific buttons (eg: Join URL, etc)
+        :param vc_room: the VC room object
+        :param kwargs: arguments passed to the template
+        """
+        return render_plugin_template('{}:buttons.html'.format(self.name), plugin=self,
+                                      vc_room=vc_room, **kwargs)
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
         """Creates the video conference room form
