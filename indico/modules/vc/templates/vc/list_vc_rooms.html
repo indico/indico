@@ -7,12 +7,7 @@
                 <img src="/images/video_Vidyo.png" border="0" alt="locked"/>
                 <span class="event-service-title">{{ vc_room.name }}</span>
             </div>
-            <div class="event-service-toolbar toolbar right">
-                <div class="group">
-                    <a class="i-button i-button-small event-service-right-button highlight join-button" href="{{ vc_room.data.url }}"><strong>{% trans %}Join{% endtrans %}</strong></a>
-                </div>
-                <!-- TODO: Add template hook for RAVEM "Connect" button -->
-            </div>
+            {{ vc_room.plugin.render_event_buttons(vc_room, event_vc_room) | safe }}
         </div>
         <div class="event-service-details">
             {{ vc_room.plugin.render_info_box(vc_room, event_vc_room, event) | safe }}

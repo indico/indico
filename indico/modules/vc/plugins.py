@@ -92,13 +92,23 @@ class VCPluginMixin(object):
                                       event_vc_room=event_vc_room, event=event, vc_room=vc_room,
                                       retrieve_principal=retrieve_principal, settings=self.settings, **kwargs)
 
-    def render_buttons(self, vc_room, **kwargs):
-        """Renders a list of plugin specific buttons (eg: Join URL, etc)
+    def render_buttons(self, vc_room, event_vc_room, **kwargs):
+        """Renders a list of plugin specific buttons (eg: Join URL, etc) in the management area
         :param vc_room: the VC room object
+        :param event_vc_room: the association of an event and a VC room
         :param kwargs: arguments passed to the template
         """
-        return render_plugin_template('{}:buttons.html'.format(self.name), plugin=self,
-                                      vc_room=vc_room, **kwargs)
+        return render_plugin_template('{}:buttons.html'.format(self.name), plugin=self, vc_room=vc_room,
+                                      event_vc_room=event_vc_room, **kwargs)
+
+    def render_event_buttons(self, vc_room, event_vc_room, **kwargs):
+            """Renders a list of plugin specific buttons (eg: Join URL, etc) in the event page
+            :param vc_room: the VC room object
+            :param event_vc_room: the association of an event and a VC room
+            :param kwargs: arguments passed to the template
+            """
+            return render_plugin_template('{}:event_buttons.html'.format(self.name), plugin=self, vc_room=vc_room,
+                                          event_vc_room=event_vc_room, **kwargs)
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
         """Creates the video conference room form
