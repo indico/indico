@@ -354,7 +354,6 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
         .form-field {
             textarea, select, input:not(.i-button):not([type="checkbox"]):not([type="radio"]) {
                 @include border-radius();
-                display: block;
                 height: 2.5em;
                 padding: 0.5em 1em;
                 line-height: 1.5;
@@ -399,6 +398,15 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
 
             :invalid {
                 box-shadow: none !important;
+            }
+
+            .hasDatepicker {
+                margin: 0;
+                padding-right: 26px !important;
+            }
+
+            .ui-datepicker-trigger {
+                right: 24px;
             }
         }
 
