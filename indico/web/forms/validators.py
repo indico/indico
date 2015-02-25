@@ -16,7 +16,7 @@
 
 from wtforms.validators import StopValidation, ValidationError
 
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.util.string import is_valid_mail
 
 
@@ -38,6 +38,25 @@ class UsedIf(object):
         elif not self.condition(form, field):
             field.errors[:] = []
             raise StopValidation()
+
+
+class Exclusive(object):
+    """Makes a WTF field mutually exclusive with other fields.
+
+    If any of the given fields have a value, the validated field may not have one.
+    """
+    def __init__(self, *fields):
+        self.fields = fields
+
+    def __call__(self, form, field):
+        if field.data is None:
+            return
+        if any(form[f].data is not None for f in self.fields):
+            field_names = sorted(unicode(form[f].label.text) for f in self.fields)
+            msg = ngettext(u'This field is mutually exclusive with another field: {}',
+                           u'This field is mutually exclusive with other fields: {}',
+                           len(field_names))
+            raise ValidationError(msg.format(u', '.join(field_names)))
 
 
 class IndicoEmail(object):
