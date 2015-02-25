@@ -359,6 +359,12 @@ you can use the generic selector below, but it's slower:
 .icon-file-content:before {
     content: "\e07b";
 }
+.icon-quill:before {
+    content: "\e91b";
+}
+.icon-agreement:before {
+    content: "\e605";
+}
 
 
 /* KEEP THE FOLLOWING DEFINITIONS: necessary when rendering the icon 'after' e.g. mixin icon-after */

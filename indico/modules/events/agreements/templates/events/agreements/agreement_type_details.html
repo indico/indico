@@ -69,13 +69,13 @@
             <div class="action-box highlight">
                 {% if not_sent %}
                     <div class="section">
-                        <div class="icon icon-mail"></div>
+                        <div class="icon icon-agreement"></div>
                         <div class="text">
                             <div class="label">
                                 {% trans count=not_sent|length -%}
-                                    {{ count }} new agreement request to be sent
+                                    {{ count }} new agreement form to be sent
                                 {%- pluralize -%}
-                                    {{ count }} new agreement requests to be sent
+                                    {{ count }} new agreement forms to be sent
                                 {%- endtrans %}
                             </div>
                             <div>
@@ -215,7 +215,7 @@
                                        data-reference="{{ agreement.id }}"
                                        title="{% trans %}Remind this person{% endtrans %}">
                                     </a>
-                                    <a class="icon-upload js-ajax-dialog" href="#"
+                                    <a class="icon-quill js-ajax-dialog" href="#"
                                        data-href="{{ url_for('.event_agreements_details_submit_answer', event, definition, agreement) }}"
                                        title="{% trans %}Answer manually for this person{% endtrans %}"></a>
                                 </span>
