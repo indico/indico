@@ -25,29 +25,31 @@ from indico.modules.vc.plugins import VCPluginMixin
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.web.flask.templating import template_hook
 from MaKaC.webinterface.displayMgr import EventMenuEntry
+from indico.modules.vc.util import get_vc_plugins
 
 __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase')
 
 
 @template_hook('event-header')
 def _inject_event_header(event, **kwargs):
-    """Fetches the VC rooms attached only to the whole event and display them in the event page
-    header"""
-    event_vc_rooms = VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True).all()
-    return render_template('vc/event_header.html', event=event, event_vc_rooms=event_vc_rooms)
+    res = VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True)
+    event_vc_rooms = [event_vc_room for event_vc_room in res.all() if event_vc_room.vc_room.plugin is not None]
+    if event_vc_rooms:
+        return render_template('vc/event_header.html', event=event, event_vc_rooms=event_vc_rooms)
+    return
 
 
 @template_hook('vc-actions')
 def _inject_vc_room_action_buttons(event, item, event_vc_rooms_dict, **kwargs):
     event_vc_room = event_vc_rooms_dict.get(item)
-    if event_vc_room:
+    if event_vc_room and event_vc_room.vc_room.plugin:
         return render_plugin_template('{}:vc_room_timetable_buttons.html'.format(event_vc_room.vc_room.plugin.name),
                                       event=event, event_vc_room=event_vc_room, **kwargs)
-    return
 
 
+@signals.event.sidemenu.connect
 def extend_event_menu(sender, **kwargs):
-    return EventMenuEntry('vc.event_videoconference', 'Video Conference Rooms', name='vc-event-page')
-
-signal = signals.event.sidemenu
-signal.connect(extend_event_menu, **{'weak': False})
+    def _visible(event):
+        return (bool(get_vc_plugins()) and
+                bool(VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True).count()))
+    return EventMenuEntry('vc.event_videoconference', 'Video Conference Rooms', name='vc-event-page', visible=_visible)

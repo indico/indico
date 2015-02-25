@@ -2,7 +2,7 @@
 
 <h2 class="page-title">Video Conference Rooms</h2>
 <div>
-    {% if event_vc_rooms %}
+    {% if event_vc_rooms and vc_plugins_available %}
         {{ render_vc_rooms_list(event, event_vc_rooms, linked_to) }}
     {% else %}
         <div class="info-message-box">

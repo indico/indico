@@ -3,120 +3,121 @@
 <div class="module-vc vc-management" id="vc-info-container">
     <div class="groupTitle">{% trans %}Current video rooms{% endtrans %}</div>
     <div class="fixed-width">
-        {% if event_vc_rooms %}
-            <table class="i-table-widget fixed-width">
-                <thead>
-                     <tr>
-                        <th class="small-column"></th>
-                        <th>{% trans %}Type{% endtrans %}</th>
-                        <th>{% trans %}Name{% endtrans %}</th>
-                        <th class="col-50">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for event_vc_room in event_vc_rooms %}
-                        {% set vc_room = event_vc_room.vc_room %}
-                        <tr class="{% if vc_room.status == 2 %}deleted{% endif %}">
-                            <td><a href="#" class="icon-next toggle-details" title="Click to toggle collapse status"></a></td>
-                            <td>{{ vc_room.type }}</td>
-                            <td>{{ vc_room.name }}</td>
-                            <td>
-                                <div class="toolbar">
-                                    <div class="group">
-                                        <!-- if it hasCheckStatus -->
-                                        {% if vc_room.status != 2 %}
-                                            <a class="i-button icon-refresh js-vcroom-refresh" title="{% trans %}Check Booking Status{% endtrans %}"
-                                            data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}"></a>
-                                            <a href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}" class="i-button icon-edit js-vcroom-edit" title="{% trans %}Edit{% endtrans %}"></a>
-                                        {% endif %}
-                                        <a data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}" data-num-events="{{ vc_room.events | count }}" class="i-button icon-remove js-vcroom-remove" title="{% trans %}Delete{% endtrans %}"></a>
-                                        {% if vc_room.status != 2 %}
-                                            {{ vc_room.plugin.render_buttons(vc_room, event_vc_room) | safe }}
-                                        {% endif %}
+        {% if plugins %}
+            {% if event_vc_rooms %}
+                <table class="i-table-widget fixed-width">
+                    <thead>
+                         <tr>
+                            <th class="small-column"></th>
+                            <th>{% trans %}Type{% endtrans %}</th>
+                            <th>{% trans %}Name{% endtrans %}</th>
+                            <th class="col-50">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event_vc_room in event_vc_rooms %}
+                            {% set vc_room = event_vc_room.vc_room %}
+                            <tr class="{% if vc_room.status == 2 %}deleted{% endif %}">
+                                <td><a href="#" class="icon-next toggle-details" title="Click to toggle collapse status"></a></td>
+                                <td>{{ vc_room.type }}</td>
+                                <td>{{ vc_room.name }}</td>
+                                <td>
+                                    <div class="toolbar">
+                                        <div class="group">
+                                            <!-- if it hasCheckStatus -->
+                                            {% if vc_room.status != 2 %}
+                                                <a class="i-button icon-refresh js-vcroom-refresh" title="{% trans %}Check Booking Status{% endtrans %}"
+                                                data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}"></a>
+                                                <a href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}" class="i-button icon-edit js-vcroom-edit" title="{% trans %}Edit{% endtrans %}"></a>
+                                            {% endif %}
+                                            <a data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}" data-num-events="{{ vc_room.events | count }}" class="i-button icon-remove js-vcroom-remove" title="{% trans %}Delete{% endtrans %}"></a>
+                                            {% if vc_room.status != 2 %}
+                                                {{ vc_room.plugin.render_buttons(vc_room, event_vc_room) | safe }}
+                                            {% endif %}
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="details-row" colspan="6">
-                                {{ vc_room.plugin.render_manage_event_info_box(vc_room, event_vc_room, event) | safe }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <div class="info-message-box fixed-width">
-                <div class="message-text">{% trans %}No video conference rooms have been added yet.{% endtrans %}</div>
-            </div>
-        {% endif %}
-        <div class="add-room-options right">
-            {% if vc_systems|length == 1 %}
-                {{ vc_systems[0].render_custom_create_button(event=event) | safe }}
-            {% elif vc_systems|length > 1 %}
-                <a class="i-button i-form-button icon-plus js-create-room" href="{{ url_for_plugin('.manage_vc_rooms_select', event) }}">
-                    {%- trans %}Create new room{% endtrans -%}
-                </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="details-row" colspan="6">
+                                    {{ vc_room.plugin.render_manage_event_info_box(vc_room, event_vc_room, event) | safe }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="info-message-box fixed-width">
+                    <div class="message-text">{% trans %}No video conference rooms have been added yet.{% endtrans %}</div>
+                </div>
             {% endif %}
-            <span>
-                <a href="#" id="btn-add-existing"
-                   class="i-button i-form-button icon-plus"
-                   {% if vc_systems|length == 1 %}
-                       data-href="{{ url_for('.manage_vc_rooms_search_form', event, service=vc_systems[0].service_name) }}"
-                   {% else %}
-                       data-href="{{ url_for('.manage_vc_rooms_search_form', event) }}"
-                   {% endif %}
-                   >{% trans %}Add existing room{% endtrans %}
-                </a>
-            </span>
-        </div>
+            <div class="add-room-options right">
+                {% if plugins|length == 1 %}
+                    {{ plugins[0].render_custom_create_button(event=event) | safe }}
+                {% elif plugins|length > 1 %}
+                    <a class="i-button i-form-button icon-plus js-create-room" href="{{ url_for_plugin('.manage_vc_rooms_select', event) }}">
+                        {%- trans %}Create new room{% endtrans -%}
+                    </a>
+                {% endif %}
+                <span>
+                    <a href="#" id="btn-add-existing"
+                       class="i-button i-form-button icon-plus"
+                       {% if plugins|length == 1 %}
+                           data-href="{{ url_for('.manage_vc_rooms_search_form', event, service=plugins[0].service_name) }}"
+                       {% else %}
+                           data-href="{{ url_for('.manage_vc_rooms_search_form', event) }}"
+                       {% endif %}
+                       >{% trans %}Add existing room{% endtrans %}
+                    </a>
+                </span>
+            </div>
+            <script>
+                eventManageVCRooms();
+                $('.toggle-details').on('click', function(e) {
+                    e.preventDefault();
+                    var toggler = $(this);
+                    toggler.closest('tr').next('tr').find('.details-container').slideToggle({
+                        start: function() {
+                            toggler.toggleClass('icon-next icon-expand');
+                        }
+                    });
+                });
+                $('.js-create-room:not([data-vc-system])').ajaxDialog({
+                    title: $T('Video services')
+                });
+                // Snippet to copy links to the clipboard
+                var client = new ZeroClipboard( $('.clip_button') );
+                client.on('ready', function(event) {
+                    client.on( 'copy', function(event) {
+                        event.clipboardData.setData('text/plain', event.target.getAttribute('data-link'));
+                    });
+                    client.on('aftercopy', function(event) {
+                        $(event.target).parent().siblings('.button-info-message').show().fadeOut(2000);
+                    });
+                });
+                client.on('error', function(event) {
+                    ZeroClipboard.destroy();
+                });
+                $('.toggle .i-button').on('click', function(){
+                    var toogle = $(this);
+                    toogle.toggleClass('icon-eye icon-eye-blocked');
+                    var $input = toogle.siblings('input');
+                    $input.prop('type',$input.prop('type') === 'text' ? 'password' : 'text');
+                });
+                $('#btn-add-existing').ajaxDialog({
+                    onClose: function(data) {
+                        if (data) {
+                            location.reload();
+                        }
+                    }
+                });
+            </script>
+        {% else %}
+                <div class="warning-message-box">
+                    <div class="message-text">
+                        {% trans %}There are no Video Conference plugins available.{% endtrans %}
+                    </div>
+                </div>
+        {% endif %}
     </div>
 </div>
-<script>
-    eventManageVCRooms();
-    $('.toggle-details').on('click', function(e) {
-        e.preventDefault();
-        var toggler = $(this);
-        toggler.closest('tr').next('tr').find('.details-container').slideToggle({
-            start: function() {
-                toggler.toggleClass('icon-next icon-expand');
-            }
-        });
-    });
-
-    $('.js-create-room:not([data-vc-system])').ajaxDialog({
-        title: $T('Video services')
-    });
-
-    // Snippet to copy links to the clipboard
-    var client = new ZeroClipboard( $('.clip_button') );
-
-    client.on('ready', function(event) {
-        client.on( 'copy', function(event) {
-            event.clipboardData.setData('text/plain', event.target.getAttribute('data-link'));
-        });
-        client.on('aftercopy', function(event) {
-            $(event.target).parent().siblings('.button-info-message').show().fadeOut(2000);
-        });
-    });
-
-    client.on('error', function(event) {
-        ZeroClipboard.destroy();
-    });
-
-    $('.toggle .i-button').on('click', function(){
-        var toogle = $(this);
-        toogle.toggleClass('icon-eye icon-eye-blocked');
-        var $input = toogle.siblings('input');
-        $input.prop('type',$input.prop('type') === 'text' ? 'password' : 'text');
-    });
-
-    $('#btn-add-existing').ajaxDialog({
-        onClose: function(data) {
-            if (data) {
-                location.reload();
-            }
-        }
-    });
-
-</script>
