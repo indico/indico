@@ -27,6 +27,7 @@ from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus, VCRoomLinkType
+from indico.modules.vc.notifications import notify_created
 from indico.modules.vc.util import get_vc_plugins, resolve_title
 from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage
 from indico.util.date_time import now_utc
@@ -132,6 +133,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
 
             try:
                 self.plugin.create_room(vc_room, self.event)
+                notify_created(self.plugin, vc_room, event_vc_room, self.event, session.user)
             except VCRoomError as err:
                 if err.field is None:
                     raise

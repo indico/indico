@@ -38,6 +38,8 @@ class VCPluginMixin(object):
     #: the :class:`IndicoForm` to use for the video conference room attach form
     vc_room_attach_form = None
 
+    friendly_name = None
+
     #: default values to use
 
     def init(self):

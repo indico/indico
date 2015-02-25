@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.plugins import plugin_engine
+from indico.util.i18n import _
 
 from MaKaC.conference import SessionSlot
 
@@ -38,3 +39,11 @@ def resolve_title(obj):
         return obj.getFullTitle()
     else:
         return obj.getTitle()
+
+
+def get_linked_to_description(obj):
+    return {
+        'event': _('{} (event)'),
+        'contribution': _('{} (contribution)'),
+        'block': _('{} (session block)'),
+    }[obj.link_type.name].format(resolve_title(obj.link_object))
