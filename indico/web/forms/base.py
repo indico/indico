@@ -104,6 +104,11 @@ class FormDefaults(object):
 
     It allows you to specify default values via kwargs or certain attrs from an object.
     You can also set attributes directly on this object, which will act just like kwargs
+
+    :param obj: The object to get data from
+    :param attrs: Set of attributes that may be taken from obj
+    :param skip_attrs: Set of attributes which are never taken from obj
+    :param defaults: Additional values which are used only if not taken from obj
     """
 
     def __init__(self, obj=None, attrs=None, skip_attrs=None, **defaults):
