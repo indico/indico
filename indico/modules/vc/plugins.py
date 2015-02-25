@@ -35,6 +35,9 @@ class VCPluginMixin(object):
     settings_form = VCPluginSettingsFormBase
     #: the :class:`IndicoForm` to use for the video conference room form
     vc_room_form = None
+    #: the :class:`IndicoForm` to use for the video conference room attach form
+    vc_room_attach_form = None
+
     #: default values to use
 
     def init(self):
@@ -48,6 +51,15 @@ class VCPluginMixin(object):
             'linking': 'event',
             'contribution': '',
             'block': ''
+        }
+
+    def get_vc_room_attach_form_defaults(self, event):
+        return {
+            'room': None,
+            'contribution': None,
+            'block': None,
+            'linking': 'event',
+            'show': True
         }
 
     @property
@@ -156,10 +168,8 @@ class VCPluginMixin(object):
         if event_vc_room.data is None:
             event_vc_room.data = {}
 
-    def handle_form_data(self, event, vc_room, event_vc_room, data):
+    def handle_form_data_vc_room(self, vc_room, data):
         vc_room.name = data.pop('name')
-
-        self.handle_form_data_association(event, vc_room, event_vc_room, data)
 
         if vc_room.data is None:
             vc_room.data = {}

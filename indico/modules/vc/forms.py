@@ -71,7 +71,7 @@ class VCPluginSettingsFormBase(IndicoForm):
                                    description=_('Send email notifications to managers'))
 
 
-class VCAttachFormBase(IndicoForm):
+class VCRoomLinkFormBase(IndicoForm):
     conditional_fields = {'contribution', 'block'}
 
     linking = IndicoRadioField(_("Link to"), [DataRequired()],
@@ -90,7 +90,7 @@ class VCAttachFormBase(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(VCAttachFormBase, self).__init__(*args, **kwargs)
+        super(VCRoomLinkFormBase, self).__init__(*args, **kwargs)
         self.contribution.choices = ([('', _("Please select a contribution"))] +
                                      [(contrib.id, contrib.title) for contrib in self.event.getContributionList()])
         self.block.choices = (
@@ -99,15 +99,15 @@ class VCAttachFormBase(IndicoForm):
         self.linking._form = self
 
 
-class VCAttachForm(VCAttachFormBase):
+class VCRoomAttachFormBase(VCRoomLinkFormBase):
     room = VCRoomField(_("Room to link"), [DataRequired()])
 
     def __init__(self, *args, **kwargs):
-        super(VCAttachForm, self).__init__(*args, **kwargs)
-        self.room.search_url = url_for('.manage_vc_rooms_search', self.event)
+        super(VCRoomAttachFormBase, self).__init__(*args, **kwargs)
+        self.room.search_url = url_for('.manage_vc_rooms_search', self.event, service=kwargs.pop('service'))
 
 
-class VCRoomFormBase(VCAttachFormBase):
+class VCRoomFormBase(VCRoomLinkFormBase):
     advanced_fields = {'show'}
 
     name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
@@ -120,3 +120,7 @@ class VCRoomFormBase(VCAttachFormBase):
 
             if room and room != self.vc_room:
                 raise ValidationError(_("There is already a room with this name"))
+
+    def __init__(self, *args, **kwargs):
+        super(VCRoomFormBase, self).__init__(*args, **kwargs)
+        self.vc_room = kwargs.pop('vc_room')

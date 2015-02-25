@@ -59,7 +59,14 @@
                 </a>
             {% endif %}
             <span>
-                <a href="#" id="btn-add-existing" class="i-button i-form-button icon-plus" data-href="{{ url_for('.manage_vc_rooms_search_form', event) }}">{% trans %}Add existing room{% endtrans %}
+                <a href="#" id="btn-add-existing"
+                   class="i-button i-form-button icon-plus"
+                   {% if vc_systems|length == 1 %}
+                       data-href="{{ url_for('.manage_vc_rooms_search_form', event, service=vc_systems[0].service_name) }}"
+                   {% else %}
+                       data-href="{{ url_for('.manage_vc_rooms_search_form', event) }}"
+                   {% endif %}
+                   >{% trans %}Add existing room{% endtrans %}
                 </a>
             </span>
         </div>

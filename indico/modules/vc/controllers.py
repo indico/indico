@@ -26,17 +26,42 @@ from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
-from indico.modules.vc.forms import VCAttachForm
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus, VCRoomLinkType
-from indico.modules.vc.util import get_vc_plugins
+from indico.modules.vc.util import get_vc_plugins, resolve_title
 from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from indico.web.flask.util import url_for
+from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.web.forms.base import FormDefaults
 
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+
+
+def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None):
+    # disable autoflush, so that the new event_vc_room does not
+    # influence the result
+    with db.session.no_autoflush:
+        if event_vc_room is None:
+            event_vc_room = VCRoomEventAssociation()
+
+        plugin.handle_form_data_association(event, vc_room, event_vc_room, form.data)
+
+        num_existing = VCRoomEventAssociation.find(
+            VCRoom.type == plugin.service_name,
+            event_id=event.id,
+            link_type=event_vc_room.link_type,
+            link_id=event_vc_room.link_id
+        ).join(VCRoom).count()
+
+    if event_vc_room.link_type != VCRoomLinkType.event and num_existing > 0:
+        transaction.abort()
+        flash(_("There is already a {0} room attached to '{1}'!").format(
+            plugin.service_name, resolve_title(event_vc_room.link_object)), 'error')
+
+        return None
+    else:
+        return event_vc_room
 
 
 class RHVCManageEventBase(RHConferenceModifBase):
@@ -75,15 +100,17 @@ class RHVCManageEventSelectService(RHVCManageEventBase):
                                                plugins=get_vc_plugins().values())
 
 
-class RHVCManageEventCreate(RHVCManageEventBase):
-    """Loads the form for the selected VC plugin"""
-
+class RHVCManageEventCreateBase(RHVCManageEventBase):
     def _checkParams(self, params):
         RHVCManageEventBase._checkParams(self, params)
         try:
             self.plugin = get_vc_plugins().get(request.view_args['service'])
         except KeyError:
             raise NotFound
+
+
+class RHVCManageEventCreate(RHVCManageEventCreateBase):
+    """Loads the form for the selected VC plugin"""
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
@@ -97,9 +124,11 @@ class RHVCManageEventCreate(RHVCManageEventBase):
             vc_room.type = self.plugin.service_name
             vc_room.status = VCRoomStatus.created
 
-            event_vc_room = VCRoomEventAssociation()
+            event_vc_room = process_vc_room_association(self.plugin, self.event, vc_room, form)
+            if not event_vc_room:
+                return redirect(url_for('.manage_vc_rooms', self.event))
 
-            self.plugin.handle_form_data(self.event, vc_room, event_vc_room, form.data)
+            self.plugin.handle_form_data_vc_room(vc_room, form.data)
 
             try:
                 self.plugin.create_room(vc_room, self.event)
@@ -145,7 +174,13 @@ class RHVCManageEventModify(RHVCSystemEventBase):
 
         if form.validate_on_submit():
 
-            self.plugin.handle_form_data(self.event, self.vc_room, self.event_vc_room, form.data)
+            self.plugin.handle_form_data_vc_room(self.vc_room, form.data)
+
+            event_vc_room = process_vc_room_association(
+                self.plugin, self.event, self.vc_room, form, event_vc_room=self.event_vc_room)
+            if not event_vc_room:
+                return redirect(url_for('.manage_vc_rooms', self.event))
+
             self.vc_room.modified_dt = now_utc()
 
             try:
@@ -236,48 +271,34 @@ class RHVCEventPage(RHConferenceBaseDisplay):
                                              event_vc_rooms=event_vc_rooms, linked_to=linked_to)
 
 
-class RHVCManageAttach(RHVCManageEventBase):
+class RHVCManageAttach(RHVCManageEventCreateBase):
     """Attaches a room to the event"""
 
     def _process(self):
-        defaults = FormDefaults({
-            'room': None,
-            'contribution': None,
-            'block': None,
-            'linking': 'event',
-            'show': True
-        })
-
-        form = VCAttachForm(prefix='vc-', obj=defaults, event=self.event)
+        defaults = FormDefaults(self.plugin.get_vc_room_attach_form_defaults(self.event))
+        form = self.plugin.vc_room_attach_form(prefix='vc-', obj=defaults, event=self.event,
+                                               service=self.plugin.service_name)
 
         if form.validate_on_submit():
             vc_room = form.data['room']
-            if not vc_room.plugin.can_manage_vc_rooms(session.user, self.event):
-                flash(_("You are not allowed to attach '{}' rooms to this event.").format(vc_room.plugin.name),
+            if not self.plugin.can_manage_vc_rooms(session.user, self.event):
+                flash(_("You are not allowed to attach '{}' rooms to this event.").format(self.plugin.service_name),
                       'error')
             else:
-                event_vc_room = VCRoomEventAssociation()
-                vc_room.plugin.handle_form_data_association(self.event, vc_room, event_vc_room, form.data)
-
-                if (event_vc_room.link_type != VCRoomLinkType.event and
-                    VCRoomEventAssociation.find(event=self.event,
-                                                vc_room=vc_room,
-                                                link_type=event_vc_room.link_type,
-                                                link_id=event_vc_room.link_id)):
-                    transaction.abort()
-                    flash(_("There is already a room attached to that!").format(vc_room.plugin.name), 'error')
-                else:
+                event_vc_room = process_vc_room_association(self.plugin, self.event, vc_room, form)
+                if event_vc_room:
+                    flash(_("The room has been attached to the event."), 'success')
                     db.session.add(event_vc_room)
             return redirect_or_jsonify(url_for('.manage_vc_rooms', self.event), flash=False)
 
         return WPVCManageEvent.render_template('attach_room.html', self._conf, event=self._conf, form=form)
 
 
-class RHVCManageSearch(RHVCManageEventBase):
+class RHVCManageSearch(RHVCManageEventCreateBase):
     """Searches for a room based on its name"""
 
     def _checkParams(self, params):
-        RHVCManageEventBase._checkParams(self, params)
+        RHVCManageEventCreateBase._checkParams(self, params)
 
         self.query = request.args.get('q', '')
         if (len(self.query) < 3):
@@ -286,7 +307,8 @@ class RHVCManageSearch(RHVCManageEventBase):
     def _iter_allowed_rooms(self):
         query = (db.session.query(VCRoom, func.count(VCRoomEventAssociation.id).label('event_count'))
                  .options(db.lazyload('vidyo_extension'))
-                 .filter(func.lower(VCRoom.name).contains(self.query.lower()), VCRoom.status != VCRoomStatus.deleted)
+                 .filter(func.lower(VCRoom.name).contains(self.query.lower()), VCRoom.status != VCRoomStatus.deleted,
+                         VCRoom.type == self.plugin.service_name)
                  .join(VCRoomEventAssociation)
                  .group_by(VCRoom.id)
                  .order_by(db.desc('event_count'))

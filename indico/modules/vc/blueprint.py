@@ -35,9 +35,9 @@ _bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:vc_room_
                  'manage_vc_rooms_remove', RHVCManageEventRemove, methods=('POST',))
 _bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:vc_room_id>/<int:event_vc_room_id>/refresh',
                  'manage_vc_rooms_refresh', RHVCManageEventRefresh, methods=('POST',))
-_bp.add_url_rule('/event/<confId>/manage/videoconference/attach/',
+_bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/attach/',
                  'manage_vc_rooms_search_form', RHVCManageAttach, methods=('GET', 'POST'))
-_bp.add_url_rule('/event/<confId>/manage/videoconference/search/',
+_bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/search/',
                  'manage_vc_rooms_search', RHVCManageSearch)
 
 # Event page

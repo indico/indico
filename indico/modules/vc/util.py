@@ -18,6 +18,8 @@ from __future__ import unicode_literals
 
 from indico.core.plugins import plugin_engine
 
+from MaKaC.conference import SessionSlot
+
 
 def get_vc_plugins():
     """Returns a dict containing the available video conference plugins."""
@@ -29,3 +31,10 @@ def get_vc_plugins():
 
 def full_block_id(block):
     return "{}:{}".format(block.session.id, block.id)
+
+
+def resolve_title(obj):
+    if isinstance(obj, SessionSlot):
+        return obj.getFullTitle()
+    else:
+        return obj.getTitle()
