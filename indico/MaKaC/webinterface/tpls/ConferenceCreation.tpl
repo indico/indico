@@ -183,7 +183,13 @@
         dates.append(endDate);
 
         injectValuesInForm($E('conferenceCreationForm'), function() {
-                if (!verifyDates()) {
+                if (verifyDates()) {
+                    var sDate = Util.parseJSDateTime(dates.item(0).get(), IndicoDateTimeFormats.Default);
+                    var eDate = Util.parseJSDateTime(dates.item(1).get(), IndicoDateTimeFormats.Default);
+                    if (showDatesStorageErrorPopup(sDate, eDate)) {
+                        return false;
+                    }
+                } else {
                     var popup = new ErrorPopup("Invalid dates", [$T('Dates have an invalid format: dd/mm/yyyy hh:mm')], "");
                     popup.open();
                     return false
