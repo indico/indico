@@ -42,8 +42,9 @@ def js_vars_global():
     cache_file = os.path.join(config.getXMLCacheDir(), 'assets_global_{}.js'.format(config_hash))
 
     if not os.path.exists(cache_file):
+        data = generate_global_file(config)
         with open(cache_file, 'wb') as f:
-            f.write(generate_global_file(config))
+            f.write(data)
 
     return send_file('vars.js', cache_file,
                      mimetype='application/x-javascript', no_cache=False, conditional=True)
