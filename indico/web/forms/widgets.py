@@ -88,3 +88,29 @@ class SwitchWidget(object):
             'off_label': self.off_label
         })
         return HTMLString(render_template('forms/switch_widget.html', field=field, kwargs=kwargs))
+
+
+class SelectizeWidget(object):
+    """Renders a selectizer-based widget"""
+    def __call__(self, field, **kwargs):
+
+        choices = []
+
+        if field.data is not None:
+            print field.data
+            choices.append({'name': field.data.name, 'id': field.data.id})
+
+        options = {
+            'valueField': 'id',
+            'labelField': 'name',
+            'searchField': 'name',
+            'persist': False,
+            'options': choices,
+            'create': False,
+            'maxItems': 1,
+            'closeAfterSelect': True
+        }
+
+        options.update(kwargs.pop('options', {}))
+
+        return HTMLString(render_template('forms/selectize_widget.html', field=field, options=options))
