@@ -205,24 +205,23 @@ class NewVidyoPublicRoomNotificationAdmin(VidyoAdminNotificationBase):
         self.setSubject("""[Vidyo] New Vidyo public room: %s (event id: %s)"""
                         % (self._conference.getTitle(), str(self._conference.getId())))
 
-        self.setBody("""Dear Vidyo Manager,<br />
-<br />
-There is a <strong>new Vidyo public room</strong> in <a href="%s">%s</a><br />
-Click <a href="%s">here</a> to see it in Indico.<br />
-<br />
-%s
-<br />
-%s
-<br />
-<br />
-%s
-""" % (MailTools.getServerName(),
-       MailTools.getServerName(),
-       self._modifLink,
-       MailTools.eventDetails(self._conference),
-       MailTools.organizerDetails(self._conference),
-       self._getBookingDetails('new')
-       ))
+        body = (
+            "Dear Vidyo Manager<br>"
+            "There is a <strong>new Vidyo public room</strong> in <a href=\"{0}\">{0}</a><br>"
+            "Click <a href=\"{1}\">here</a> to see it in Indico."
+            "<br><br>{2}<br>{3}<br><br>{4}"
+        ).format(MailTools.getServerName(),
+                 self._modifLink,
+                 MailTools.eventDetails(self._conference),
+                 MailTools.organizerDetails(self._conference),
+                 self._getBookingDetails('new'))
+
+        extra_message = getVidyoOptionValue('booking_admin_message')
+
+        if extra_message:
+            body += '<br>' + extra_message
+
+        self.setBody(body)
 
 
 class VidyoPublicRoomModifiedNotificationAdmin(VidyoAdminNotificationBase):

@@ -1,12 +1,5 @@
-<%page args="Object=None, ObjectType=None, Favorites=None, Index=None, rbActive=None, baseURL=None"/>
+<%page args="Object=None, ObjectType=None, Favorites=None, Index=None, rbActive=None, baseURL=None, Id=None"/>
 <% from MaKaC.fossils.user import IAvatarFossil %>
-
-    <script type="text/javascript">
-    // dummies which will be redefined if ckEditor is used
-    var fillText = function() {};
-    var editor = { get: function(){} };
-    </script>
-
     % if ObjectType == "PluginType" :
     <form method="post" action="${ urlHandlers.UHAdminPluginsTypeSaveOptions.getURL(Object, subtab = Index) }" >
     % else:
@@ -374,14 +367,16 @@
                 % elif option.getType() =="ckEditor":
                     <input type="hidden" name="${ name }" id="${ name }" />
 
-                    <div id="editor" style="margin-bottom: 10px"></div>
+                    <div id="${ name }-ckEditor" style="margin-bottom: 10px"></div>
                     <script type="text/javascript">
+                    $(function setCkEditorInput() {
                         var editor = new RichTextEditor(600, 300);
-                            $E('editor').set(editor.draw());
-                            editor.set('${ escapeHTMLForJS(option.getValue()) }');
-                            var fillText = function(text){
-                                $E("${ name }").dom.value = text;
-                            };
+                        $E('${ name }-ckEditor').set(editor.draw());
+                        editor.set(${ option.getValue() | n, j });
+                        $('#${ Id }-save-btn').on('click', function setTextInput() {
+                            $E("${ name }").dom.value = editor.get();
+                        });
+                    });
                     </script>
                 % elif option.getType() =="rooms":
                     <div id="roomList${name}"></div>
@@ -430,7 +425,7 @@
 
                         $E('roomList${name}').set(rlf.draw());
                     </script>
-               % elif option.getType() == "usersGroups":
+                % elif option.getType() == "usersGroups":
                     <div id="userGroupList${name}" style="margin-bottom: 10px">
                     </div>
 
@@ -575,7 +570,7 @@
         % if len(Object.getOptionList(includeOnlyEditable=True, includeOnlyVisible=True)) > 0:
         <tr>
             <td colspan="2" style="text-align: right;">
-                <input type="submit" name="Save" value="${ _("Save settings") }" onclick="fillText(editor.get());"/>
+                <input id="${ Id }-save-btn" type="submit" name="Save" value="${ _("Save settings") }" />
             </td>
         </tr>
         % endif
