@@ -82,10 +82,10 @@ class RHRequestsEventRequestDetailsBase(EventOrRequestManagerMixin, RHRequestsEv
     """Base class for the details/edit/manage views of a specific request"""
 
     def _process(self):
-        is_manager = self.definition.can_be_managed(session.user)
+        self.is_manager = self.definition.can_be_managed(session.user)
         self.form = self.definition.create_form(self.event, self.request)
         self.manager_form = None
-        if self.request and is_manager:
+        if self.request and self.is_manager:
             self.manager_form = self.definition.create_manager_form(self.request)
             if self.request.state not in {RequestState.accepted, RequestState.rejected}:
                 del self.manager_form.action_save
@@ -99,7 +99,8 @@ class RHRequestsEventRequestDetailsBase(EventOrRequestManagerMixin, RHRequestsEv
             return rv
 
         form_html = self.definition.render_form(event=self.event, definition=self.definition, req=self.request,
-                                                form=self.form, is_manager=is_manager, manager_form=self.manager_form)
+                                                form=self.form, manager_form=self.manager_form,
+                                                is_manager=self.is_manager)
         return WPRequestsEventManagement.render_string(form_html, self.event)
 
     def process_form(self):
@@ -128,7 +129,10 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
         else:
             flash_msg = _("Your request ({0}) has been modified.")
         flash(flash_msg.format(self.definition.title), 'success')
-        return redirect(url_for('.event_requests', self.event))
+        if self.is_manager:
+            return redirect(url_for('.event_requests_details', self.event, type=self.definition.name))
+        else:
+            return redirect(url_for('.event_requests', self.event))
 
 
 class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
