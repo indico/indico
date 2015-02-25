@@ -113,7 +113,6 @@ class VCRoom(db.Model):
 class VCRoomEventAssociation(db.Model):
     __tablename__ = 'vc_room_events'
     __table_args__ = (
-        db.UniqueConstraint('event_id', 'link_type', 'link_id'),
         {'schema': 'events'}
     )
 
