@@ -70,6 +70,17 @@ input[type=checkbox].validate {
     }
 }
 
+input[type=number] {
+    -moz-appearance: textfield;
+    padding-right: 0;
+
+    &::-webkit-inner-spin-button {
+        cursor: pointer;
+        margin-left: 4px;
+        position: relative;
+    }
+}
+
 textarea {
     @extend %text-input;
 }
@@ -365,8 +376,19 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
                 width: 400px;
             }
 
-            input[type="checkbox"], input[type="radio"] {
+            input[type="checkbox"],
+            input[type="radio"] {
                 margin-left: 0;
+            }
+
+            input[type=number] {
+                padding-right: 0 !important;
+
+                &::-webkit-inner-spin-button {
+                    height: 2.3em;
+                    margin-left: 1em;
+                    margin-top: -0.5em;
+                }
             }
 
             input.table-input {
