@@ -1,0 +1,27 @@
+{% extends 'admin/base.html' %}
+{% from 'forms/form_widget.html' import form_header, form_fieldset, form_footer, form_row, form_rows %}
+
+{% block title %}
+    {%- if existing_vc_room -%}
+        {% trans %}Edit {% endtrans %}
+    {%- else -%}
+        {% trans %}Create {% endtrans %}
+    {%- endif -%}
+    {% trans %}Video Conference Room{% endtrans %}
+{% endblock %}
+{% block subtitle %}{{ plugin.title }}{% endblock %}
+{%- block content %}
+    {{ form_header(id='vc-room-form') }}
+
+    {{ form_row(form._fields.name) }}
+    {{ form_rows(form, skip=skip_fields) }}
+
+    {% call form_fieldset(legend='Advanced settings') %}
+        {{ form_rows(form, fields=form.advanced_fields) }}
+    {% endcall %}
+
+    {% call form_footer() %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
+        <a href="{{ url_for('vc.manage_vc_rooms', event) }}" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
+    {% endcall %}
+{%- endblock %}

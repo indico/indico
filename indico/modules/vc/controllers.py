@@ -144,7 +144,8 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
                 flash(_('Video conference room created'), 'success')
                 return redirect(url_for('.manage_vc_rooms', self.event))
 
-        form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form)
+        form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form,
+                                            skip_fields=form.skip_fields | {'name'})
 
         return WPVCManageEvent.render_string(form_html, self.event)
 
@@ -291,7 +292,8 @@ class RHVCManageAttach(RHVCManageEventCreateBase):
                     db.session.add(event_vc_room)
             return redirect_or_jsonify(url_for('.manage_vc_rooms', self.event), flash=False)
 
-        return WPVCManageEvent.render_template('attach_room.html', self._conf, event=self._conf, form=form)
+        return WPVCManageEvent.render_template('attach_room.html', self._conf, event=self._conf, form=form,
+                                               skip_fields=form.conditional_fields | {'room'})
 
 
 class RHVCManageSearch(RHVCManageEventCreateBase):

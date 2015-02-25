@@ -76,7 +76,7 @@ class VCPluginMixin(object):
         """Renders the video conference room form
         :param kwargs: arguments passed to the template
         """
-        return render_plugin_template('{}:manage_event_create_room.html'.format(self.name), **kwargs)
+        return render_template('vc/manage_event_create_room.html', **kwargs)
 
     def render_custom_create_button(self, **kwargs):
         tpl = get_overridable_template_name('create_button.html', self, 'vc/')
