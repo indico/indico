@@ -286,7 +286,7 @@ class RHVCManageSearch(RHVCManageEventBase):
     def _iter_allowed_rooms(self):
         query = (db.session.query(VCRoom, func.count(VCRoomEventAssociation.id).label('event_count'))
                  .options(db.lazyload('vidyo_extension'))
-                 .filter(func.lower(VCRoom.name).contains(self.query.lower()))
+                 .filter(func.lower(VCRoom.name).contains(self.query.lower()), VCRoom.status != VCRoomStatus.deleted)
                  .join(VCRoomEventAssociation)
                  .group_by(VCRoom.id)
                  .order_by(db.desc('event_count'))
