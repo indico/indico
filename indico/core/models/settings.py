@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from functools import wraps
 
+from flask import g, has_request_context
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db.sqlalchemy import db
@@ -25,6 +26,7 @@ from indico.util.string import return_ascii
 
 
 _default = object()
+_not_in_db = object()
 
 
 class SettingsBase(object):
@@ -144,12 +146,22 @@ def _get_all(cls, proxy, no_defaults, **kwargs):
     return settings
 
 
-def _get(cls, proxy, name, default, **kwargs):
+def _get(cls, proxy, name, default, cache, **kwargs):
     """Helper function for SettingsProxy.get"""
-    setting = cls.get(proxy.module, name, default, **kwargs)
-    if setting is _default:
-        return proxy.defaults.get(name)
-    return setting
+    cache_key = proxy.module, name, frozenset(kwargs.viewitems())
+    try:
+        return cache[cache_key]
+    except KeyError:
+        setting = cls.get(proxy.module, name, _not_in_db, **kwargs)
+        if setting is _not_in_db:
+            # we never cache a default value - it would have to be included in the cache key and we
+            # cannot do that because of mutable values (lists/dicts). of course we could convert
+            # them to tuples and frozen sets and then do include them in the key, but since most
+            # settings are actually set in the db that's overkill.
+            return proxy.defaults.get(name) if default is _default else default
+        else:
+            cache[cache_key] = setting
+            return setting
 
 
 class SettingsProxyBase(object):
@@ -172,6 +184,20 @@ class SettingsProxyBase(object):
         if self.strict and name not in self.defaults:
             raise ValueError('invalid setting: {}.{}'.format(self.module, name))
 
+    def _flush_cache(self):
+        if has_request_context():
+            g.get('settings_cache', {}).clear()
+
+    @property
+    def _cache(self):
+        if not has_request_context():
+            return {}  # new dict everytime, this effectively disables the cache
+        try:
+            return g.settings_cache
+        except AttributeError:
+            g.settings_cache = rv = {}
+            return rv
+
 
 class SettingsProxy(SettingsProxyBase):
     """Proxy class to access settings for a certain module"""
@@ -192,7 +218,7 @@ class SettingsProxy(SettingsProxyBase):
         :return: The settings's value or the default value
         """
         self._check_strict(name)
-        return _get(Setting, self, name, default)
+        return _get(Setting, self, name, default, self._cache)
 
     def set(self, name, value):
         """Sets a single setting.
@@ -201,7 +227,8 @@ class SettingsProxy(SettingsProxyBase):
         :param value: Setting value; must be JSON-serializable
         """
         self._check_strict(name)
-        return Setting.set(self.module, name, value)
+        Setting.set(self.module, name, value)
+        self._flush_cache()
 
     def set_multi(self, items):
         """Sets multiple settings at once.
@@ -210,7 +237,8 @@ class SettingsProxy(SettingsProxyBase):
         """
         for name in items:
             self._check_strict(name)
-        return Setting.set_multi(self.module, items)
+        Setting.set_multi(self.module, items)
+        self._flush_cache()
 
     def delete(self, *names):
         """Deletes settings.
@@ -219,11 +247,13 @@ class SettingsProxy(SettingsProxyBase):
         """
         for name in names:
             self._check_strict(name)
-        return Setting.delete(self.module, names)
+        Setting.delete(self.module, names)
+        self._flush_cache()
 
     def delete_all(self):
         """Deletes all settings."""
-        return Setting.delete_all(self.module)
+        Setting.delete_all(self.module)
+        self._flush_cache()
 
     @return_ascii
     def __repr__(self):
@@ -264,7 +294,7 @@ class EventSettingsProxy(SettingsProxyBase):
         :return: The settings's value or the default value
         """
         self._check_strict(name)
-        return _get(EventSetting, self, name, default, event_id=event)
+        return _get(EventSetting, self, name, default, self._cache, event_id=event)
 
     @event_or_id
     def set(self, event, name, value):
@@ -275,7 +305,8 @@ class EventSettingsProxy(SettingsProxyBase):
         :param value: Setting value; must be JSON-serializable
         """
         self._check_strict(name)
-        return EventSetting.set(self.module, name, value, event_id=event)
+        EventSetting.set(self.module, name, value, event_id=event)
+        self._flush_cache()
 
     @event_or_id
     def set_multi(self, event, items):
@@ -286,7 +317,8 @@ class EventSettingsProxy(SettingsProxyBase):
         """
         for name in items:
             self._check_strict(name)
-        return EventSetting.set_multi(self.module, items, event_id=event)
+        EventSetting.set_multi(self.module, items, event_id=event)
+        self._flush_cache()
 
     @event_or_id
     def delete(self, event, *names):
@@ -297,7 +329,8 @@ class EventSettingsProxy(SettingsProxyBase):
         """
         for name in names:
             self._check_strict(name)
-        return EventSetting.delete(self.module, names, event_id=event)
+        EventSetting.delete(self.module, names, event_id=event)
+        self._flush_cache()
 
     @event_or_id
     def delete_all(self, event):
@@ -305,7 +338,8 @@ class EventSettingsProxy(SettingsProxyBase):
 
         :param event: Event (or its ID)
         """
-        return EventSetting.delete_all(self.module, event_id=event)
+        EventSetting.delete_all(self.module, event_id=event)
+        self._flush_cache()
 
     @return_ascii
     def __repr__(self):

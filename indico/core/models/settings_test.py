@@ -44,7 +44,7 @@ def test_proxy_strict():
     assert proxy.get('hello') == 'world'
 
 
-@pytest.mark.usefixtures('db')
+@pytest.mark.usefixtures('db', 'request_context')  # use req ctx so the cache is active
 def test_proxy_defaults():
     proxy = SettingsProxy('test', {'hello': 'world', 'foo': None})
     assert proxy.get('hello') == 'world'
