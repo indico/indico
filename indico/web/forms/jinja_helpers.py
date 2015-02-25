@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from wtforms.widgets.core import Input, Select
-from wtforms.validators import Length, Regexp
+from wtforms.validators import Length, Regexp, NumberRange
 
 
 def is_single_line_field(field):
@@ -36,6 +36,11 @@ def _attrs_for_validators(validators):
                 attrs['maxlength'] = validator.max
         elif isinstance(validator, Regexp):
             attrs['pattern'] = validator.regex.pattern
+        elif isinstance(validator, NumberRange):
+            if validator.min is not None:
+                attrs['min'] = validator.min
+            if validator.max is not None:
+                attrs['max'] = validator.max
     return attrs
 
 
