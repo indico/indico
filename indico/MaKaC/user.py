@@ -1143,7 +1143,7 @@ class AvatarHolder(ObjectHolder):
             for userid in match:
                 if self.getById(userid) not in result:
                     av = self.getById(userid)
-                    if not onlyActivated or av.isActivated():
+                    if av and (not onlyActivated or av.isActivated()):
                         result[av.getEmail()] = av
         if searchInAuthenticators:
             for authenticator in AuthenticatorMgr().getList():
@@ -1177,7 +1177,7 @@ class AvatarHolder(ObjectHolder):
                         iset = iset & set(match)
         for userid in iset:
             av=self.getById(userid)
-            if not onlyActivated or av.isActivated():
+            if av and (not onlyActivated or av.isActivated()):
                 result[av.getEmail()]=av
         if searchInAuthenticators:
             for authenticator in AuthenticatorMgr().getList():
