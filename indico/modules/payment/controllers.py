@@ -125,30 +125,29 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
                  be automatically set on the event and a flag if the currency issues cannot be resolved
                  automatically and require user interaction (i.e. saving the plugin settings is disallowed)
         """
+        messages = []
         event = self._conf
         valid_currencies = self.plugin.valid_currencies
         currency = event_settings.get(event, 'currency')
         if valid_currencies is None or currency in valid_currencies:
-            return None, False
+            return None, False, messages
 
         if len(valid_currencies) == 1:
             auto_currency = list(valid_currencies)[0]
             for plugin in get_active_payment_plugins(event).itervalues():
                 if plugin.valid_currencies is not None and auto_currency not in plugin.valid_currencies:
-                    flash(_("This payment method only supports {}, but the payment method '{}' doesn't.").format(
-                        auto_currency, plugin.title
-                    ), 'error')
-                    return None, True
+                    messages.append(('error', _("This payment method only supports {}, but the payment method "
+                                                "'{}' doesn't.").format(auto_currency, plugin.title)))
+                    return None, True, messages
             if not form.is_submitted():
-                flash(_("This payment method only supports {0}. Enabling it will automatically change the currency "
-                        "of the event to {0}!").format(auto_currency), 'warning')
-            return auto_currency, False
+                messages.append(('warning', _("This payment method only supports {0}. Enabling it will automatically "
+                                              "change the currency of the event to {0}!").format(auto_currency)))
+            return auto_currency, False, messages
 
         if not form.is_submitted():
-            flash(_("To enable this payment method, please use one of the following currencies: {}".format(
-                ', '.join(valid_currencies)
-            )), 'error')
-        return None, True
+            messages.append(('error', _("To enable this payment method, please use one of the following "
+                                        "currencies: {}").format(', '.join(valid_currencies))))
+        return None, True, messages
 
     def _process(self):
         event = self._conf
@@ -156,7 +155,7 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
         plugin_settings = self.plugin.settings.get_all()
         defaults = FormDefaults(self.plugin.event_settings.get_all(event), **plugin_settings)
         form = self.plugin.event_settings_form(prefix='payment-', obj=defaults, plugin_settings=plugin_settings)
-        auto_currency, invalid_currency = self._check_currencies(form)
+        auto_currency, invalid_currency, messages = self._check_currencies(form)
         if can_modify and form.validate_on_submit() and not invalid_currency:
             self.plugin.event_settings.set_multi(event, form.data)
             flash(_('Settings for {} saved').format(self.plugin.title), 'success')
@@ -172,7 +171,7 @@ class RHPaymentEventPluginEdit(RHConferenceModifBase):
         if not can_modify:
             widget_attrs = {field.short_name: {'disabled': True} for field in form}
         return WPPaymentEventManagement.render_template('event_plugin_edit.html', event, event=event, form=form,
-                                                        plugin=self.plugin, can_modify=can_modify,
+                                                        plugin=self.plugin, can_modify=can_modify, messages=messages,
                                                         widget_attrs=widget_attrs, invalid_currency=invalid_currency)
 
 

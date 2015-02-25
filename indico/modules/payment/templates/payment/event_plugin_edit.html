@@ -1,5 +1,6 @@
 {% extends 'admin/base.html' %}
 {% from 'forms/form_widget.html' import form_header, form_rows, form_footer  %}
+{% from 'message_box.html' import message_box %}
 
 {% block title %}{% trans %}Payment settings{% endtrans %}{% endblock %}
 
@@ -7,13 +8,14 @@
 
 {% block content %}
     {% if not can_modify %}
-        <div class="warning-message-box fixed-width">
-            <div class="message-text">
-                {% trans %}You cannot modify this payment method.{% endtrans %}<br>
-                {{ template_hook('event-manage-payment-plugin-cannot-modify', plugin=plugin, event=event) }}
-            </div>
-        </div>
+        {% call message_box('warning', fixed_width=true) %}
+            {% trans %}You cannot modify this payment method.{% endtrans %}<br>
+            {{ template_hook('event-manage-payment-plugin-cannot-modify', plugin=plugin, event=event) }}
+        {% endcall %}
     {% endif %}
+    {% for type, text in messages %}
+        {{ message_box(type, text, fixed_width=true) }}
+    {% endfor %}
 
     {{ form_header() }}
     {{ form_rows(form, widget_attrs=widget_attrs) }}
