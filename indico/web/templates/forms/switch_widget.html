@@ -1,5 +1,2 @@
 {% from 'switch.html' import switch %}
-
-{{ switch(id=field.id, name=field.name, value=field._value(),
-          checked=checked, disabled=disabled,
-          on_label=on_label, off_label=off_label) }}
+{{ switch(id=field.id, name=field.name, value=field._value(), **kwargs) }}

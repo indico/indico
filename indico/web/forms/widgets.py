@@ -71,7 +71,7 @@ class RadioButtonsWidget(JinjaWidget):
         super(RadioButtonsWidget, self).__init__('forms/radio_buttons_widget.html')
 
 
-class SwitchWidget(JinjaWidget):
+class SwitchWidget(object):
     """Renders a switch widget"""
     def __init__(self, on_label=None, off_label=None):
         """
@@ -80,7 +80,6 @@ class SwitchWidget(JinjaWidget):
         """
         self.on_label = on_label
         self.off_label = off_label
-        super(SwitchWidget, self).__init__('forms/switch_widget.html')
 
     def __call__(self, field, **kwargs):
         kwargs.update({
@@ -88,4 +87,4 @@ class SwitchWidget(JinjaWidget):
             'on_label': self.on_label,
             'off_label': self.off_label
         })
-        return super(SwitchWidget, self).__call__(field, **kwargs)
+        return HTMLString(render_template('forms/switch_widget.html', field=field, kwargs=kwargs))
