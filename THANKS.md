@@ -72,9 +72,11 @@ jQuery placeholder (https://github.com/mathiasbynens/jquery-placeholder) is a MI
 
 [WebHostingHub Glyphs](http://www.webhostinghub.com/glyphs/) is a huge gallery of free font icons licensed under Creative Commons.
 
-[Room icon](http://thenounproject.com/noun/room/#icon-No17576)Room designed by [Tiago Dos Reis Rodrigues](http://thenounproject.com/tiagor2) from The Noun Project.
+[Room icon](http://thenounproject.com/noun/room/#icon-No17576) designed by [Tiago Dos Reis Rodrigues](http://thenounproject.com/tiagor2) from The Noun Project.
 
-[Projector icon](http://thenounproject.com/term/projector/24148/) Projector designed by [Örn Smári Gíslason](http://thenounproject.com/%C3%96rn%20Sm%C3%A1ri/) from the Noun Project.
+[Projector icon](http://thenounproject.com/term/projector/24148/) designed by [Örn Smári Gíslason](http://thenounproject.com/%C3%96rn%20Sm%C3%A1ri/) from The Noun Project.
+
+[Contract icon](http://thenounproject.com/term/contract/59244/) designed by [Michael Wohlwend](http://thenounproject.com/michael.wohlwend/) from The Noun Project.
 
 Simple Toogle switch CSS (http://www.cssflow.com) is freely distributed under MIT license.
 
