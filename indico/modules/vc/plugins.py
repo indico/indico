@@ -23,6 +23,7 @@ from flask_pluginengine import render_plugin_template
 from indico.util.decorators import classproperty
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.models.vc_rooms import VCRoomLinkType
+from indico.util.string import remove_accents
 from indico.util.user import retrieve_principals, retrieve_principal
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults
@@ -47,6 +48,7 @@ class VCPluginMixin(object):
 
     def get_vc_room_form_defaults(self, event):
         return {
+            'name': re.sub(r'[^\w_-]', '_', remove_accents(event.getTitle(), reencode=False)),
             'show': True,
             'linking': 'event',
             'contribution': '',
