@@ -27,6 +27,7 @@ from indico.util.console import cformat
 from indico.util.date_time import as_utc
 from indico.util.struct.iterables import committing_iterator
 from indico_zodbimport import Importer
+from indico_zodbimport.util import convert_to_unicode
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
 
 
@@ -83,15 +84,15 @@ class PaymentImporter(Importer):
             success_email = getattr(old_payment, 'successMsg', default_success_email)
             conditions = (getattr(old_payment, 'paymentConditions', default_conditions)
                           if (getattr(old_payment, 'paymentConditionsEnabled', False) and
-                              getattr(old_payment, 'specificPaymentConditions', '').strip() == '')
+                              convert_to_unicode(getattr(old_payment, 'specificPaymentConditions', '')).strip() == '')
                           else getattr(old_payment, 'specificPaymentConditions', ''))
             # The new messages are shown in an "additional info" section, so the old defaults can always go away
-            if register_email == 'Please, see the summary of your order:':
+            if convert_to_unicode(register_email) == 'Please, see the summary of your order:':
                 register_email = ''
-            if success_email == 'Congratulations, your payment was successful.':
+            if convert_to_unicode(success_email) == 'Congratulations, your payment was successful.':
                 success_email = ''
             # Get rid of the most terrible part of the old default conditions
-            conditions = conditions.replace('CANCELLATION :', 'CANCELLATION:')
+            conditions = convert_to_unicode(conditions).replace('CANCELLATION :', 'CANCELLATION:')
             settings = {
                 'enabled': getattr(old_payment, 'activated', False),
                 'currency': event._registrationForm._currency,
