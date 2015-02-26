@@ -37,10 +37,8 @@ class VCPluginMixin(object):
     vc_room_form = None
     #: the :class:`IndicoForm` to use for the video conference room attach form
     vc_room_attach_form = None
-
+    #: the readable name of the VC plugin
     friendly_name = None
-
-    #: default values to use
 
     def init(self):
         super(VCPluginMixin, self).init()
@@ -190,6 +188,7 @@ class VCPluginMixin(object):
         raise NotImplementedError('Plugin must implement create_room()')
 
     def can_manage_vc_rooms(self, user, event):
+        """Checks if a user can manage vc rooms on an event"""
         acl = self.settings.get('acl')
         if not acl:
             return True
@@ -197,7 +196,12 @@ class VCPluginMixin(object):
         principals = retrieve_principals(acl)
         return any(principal.containsUser(user) for principal in principals)
 
-    def can_manage_room(self, user, room):
+    def can_manage_vc_room(self, user, room):
+        """Checks if a user can manage a vc room"""
         return (user.isAdmin() or
                 user in retrieve_principals(room.plugin.settings.get('managers')) or
                 any(evt_assoc.event.canUserModify(user) for evt_assoc in room.events))
+
+    def can_manage_vc(self, user):
+        """Checks if a user has management rights on this VC system"""
+        return user.isAdmin() or user in retrieve_principals(self.settings.get('managers'))

@@ -327,7 +327,7 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
                  .limit(10))
 
         return ((room, count) for room, count in query
-                if room.plugin.can_manage_room(session.user, room))
+                if room.plugin.can_manage_vc_room(session.user, room))
 
     def _process(self):
         return Response(json.dumps([{'id': room.id, 'name': room.name, 'count': count}

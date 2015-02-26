@@ -47,3 +47,8 @@ def get_linked_to_description(obj):
         'contribution': _('{} (contribution)'),
         'block': _('{} (session block)'),
     }[obj.link_type.name].format(resolve_title(obj.link_object))
+
+
+def get_managed_vc_plugins(user):
+    """Returns the plugins the user can manage"""
+    return [p for p in get_vc_plugins().itervalues() if p.can_manage_vc(user)]
