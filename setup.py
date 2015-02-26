@@ -447,6 +447,7 @@ if __name__ == '__main__':
                           find_packages(where='indico',
                                         exclude=['htdocs*', 'MaKaC*']))
     foundPackages.append('indico')
+    foundPackages += list('indico_zodbimport.' + pkg for pkg in find_packages(where='indico_zodbimport'))
     foundPackages.append('indico_zodbimport')
 
     cmdclass = {'sdist': sdist_indico,
