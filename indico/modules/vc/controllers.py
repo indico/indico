@@ -39,7 +39,7 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
-def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None):
+def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None, allow_same_room=False):
     # disable autoflush, so that the new event_vc_room does not
     # influence the result
     with db.session.no_autoflush:
@@ -48,12 +48,19 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
 
         plugin.handle_form_data_association(event, vc_room, event_vc_room, form.data)
 
-        num_existing = VCRoomEventAssociation.find(
+        # check whether there is a room-event association already present
+        # for the given event, room and plugin
+        q = VCRoomEventAssociation.query.filter(
             VCRoom.type == plugin.service_name,
-            event_id=event.id,
-            link_type=event_vc_room.link_type,
-            link_id=event_vc_room.link_id
-        ).join(VCRoom).count()
+            VCRoomEventAssociation.event_id == event.id,
+            VCRoomEventAssociation.link_type == event_vc_room.link_type,
+            VCRoomEventAssociation.link_id == event_vc_room.link_id
+        )
+
+        if (allow_same_room):
+            q = q.filter(VCRoom.id != vc_room.id)
+
+        num_existing = q.join(VCRoom).count()
 
     if event_vc_room.link_type != VCRoomLinkType.event and num_existing > 0:
         transaction.abort()
@@ -180,7 +187,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
             self.plugin.handle_form_data_vc_room(self.vc_room, form.data)
 
             event_vc_room = process_vc_room_association(
-                self.plugin, self.event, self.vc_room, form, event_vc_room=self.event_vc_room)
+                self.plugin, self.event, self.vc_room, form, event_vc_room=self.event_vc_room, allow_same_room=True)
             if not event_vc_room:
                 return redirect(url_for('.manage_vc_rooms', self.event))
 
