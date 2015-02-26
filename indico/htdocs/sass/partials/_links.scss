@@ -15,28 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "partials/actionboxes";
-@import "partials/badges";
-@import "partials/boxes";
-@import "partials/buttons";
-@import "partials/core";
-@import "partials/main";
-@import "partials/dialogs";
-@import "partials/fonts";
-@import "partials/icons";
-@import "partials/infogrids";
-@import "partials/inputs";
-@import "partials/jquery-indico-clearableinput";
-@import "partials/links";
-@import "partials/lists";
-@import "partials/messageboxes";
-@import "partials/progress";
-@import "partials/payment";
-@import "partials/plugins";
-@import "partials/requests";
-@import "partials/qtips";
-@import "partials/sidebars";
-@import "partials/tables";
-@import "partials/toolbars";
-@import "partials/widgets";
-@import "partials/main";
+a.discreet-link {
+    color: inherit;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
