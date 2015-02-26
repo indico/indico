@@ -103,11 +103,8 @@ class SwitchWidget(object):
 class SelectizeWidget(object):
     """Renders a selectizer-based widget"""
     def __call__(self, field, **kwargs):
-
         choices = []
-
         if field.data is not None:
-            print field.data
             choices.append({'name': field.data.name, 'id': field.data.id})
 
         options = {
@@ -122,5 +119,4 @@ class SelectizeWidget(object):
         }
 
         options.update(kwargs.pop('options', {}))
-
         return HTMLString(render_template('forms/selectize_widget.html', field=field, options=options))
