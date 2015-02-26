@@ -186,7 +186,7 @@ class VCPluginMixin(object):
         if vc_room.data is None:
             vc_room.data = {}
 
-    def create_room(self, vc_room):
+    def create_room(self, vc_room, event):
         raise NotImplementedError('Plugin must implement create_room()')
 
     def can_manage_vc_rooms(self, user, event):
