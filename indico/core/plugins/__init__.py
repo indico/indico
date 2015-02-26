@@ -102,9 +102,13 @@ class IndicoPlugin(Plugin):
     def _setup_assets(self):
         config = Config.getInstance()
         url_base_path = urlparse(config.getBaseURL()).path
-        output_dir = os.path.join(self.root_path, 'static')
-        url = '{}/static/plugins/{}'.format(url_base_path, self.name)
-        self.assets = Environment(output_dir, url, debug=config.getDebug())
+        output_dir = os.path.join(config.getHtdocsDir(), 'static', 'assets', 'plugins', self.name)
+        output_url = '{}/static/assets/plugins/{}'.format(url_base_path, self.name)
+        static_dir = os.path.join(self.root_path, 'static')
+        static_url = '{}/static/plugins/{}'.format(url_base_path, self.name)
+        self.assets = Environment(output_dir, output_url, debug=config.getDebug())
+        self.assets.append_path(output_dir, output_url)
+        self.assets.append_path(static_dir, static_url)
         configure_pyscss(self.assets)
         self.register_assets()
 
