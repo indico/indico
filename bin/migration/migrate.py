@@ -32,12 +32,11 @@ from indico.core.config import Config
 from indico.core.db import DBMgr, db
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.index import Catalog
-from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.tasks import OccurrenceNotifications
 from indico.modules.scheduler.tasks import AlarmTask
 from indico.modules.scheduler.tasks.suggestions import CategorySuggestionTask
 from indico.modules.scheduler import Client
-from indico.util import console, i18n
+from indico.util import console
 from indico.util.redis import avatar_links
 from indico.util.redis import client as redis_client
 from indico.util.string import fix_broken_string
@@ -428,29 +427,6 @@ def addOccurrenceNotificationsTask(dbi, prevVersion):
         scheduler_client.dequeue(task)
 
     scheduler_client.enqueue(OccurrenceNotifications(rrule.HOURLY, byminute=0, bysecond=0))
-    dbi.commit()
-
-
-@since('1.9')
-def updatePluginSettingsNewRB(dbi, prevVersion):
-    """Migrate plugin settings to be compatible with the new RB module"""
-    ph = PluginsHolder()
-    # Custom attributes are now loercase-with-dashes internally
-    opt = ph.getPluginType('Collaboration').getPlugin('CERNMCU').getOption('H323_IP_att_name')
-    if opt.getValue() == 'H323 IP':
-        opt.setValue('h323-ip')
-    # Replace room GUIDs with plain room IDs
-    for plugin_name, rooms_opt in [('WebcastRequest', 'webcastCapableRooms'),
-                                   ('RecordingRequest', 'recordingCapableRooms')]:
-        opt = ph.getPluginType('Collaboration').getPlugin(plugin_name).getOption(rooms_opt)
-        room_ids = []
-        for room_id in opt.getValue():
-            if isinstance(room_id, basestring):
-                room_id = int(room_id.split('|')[1].strip())
-            if Room.get(room_id):
-                room_ids.append(room_id)
-        opt.setValue(room_ids)
-
     dbi.commit()
 
 

@@ -92,12 +92,6 @@
                                         $("<li style='font-weight: lighter;'></li>").append($T('[host] by the specified host')),
                                         $("<li style='font-weight: lighter;'></li>").append($T('[nickname] by the nick chosen by the user.')));
                             example = $T('Example: http://[host]/resource/?x=[chatroom]@conference.[host]?join');
-                        % elif option.getSubType() == 'webcastAudiences':
-                            addLinkText = $T('Add new audience');
-                            noLinksMsg = $T('No audiences created yet. Click "Add new audience" to create one');
-                            popupTitle = $T('Enter the name of the audience and its URL');
-                            linkNameLabel = $T('Audience name');
-                            linkNameHeader = $T('Name');
                         % endif
 
                         var renderLinkTable = function(table) {

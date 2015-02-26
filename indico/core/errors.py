@@ -109,12 +109,6 @@ class AdminError(AccessControlError):
         return _('only administrators can access this {0}').format(self._object_type)
 
 
-class WebcastAdminError(AccessControlError):
-    @ensure_str
-    def __str__(self):
-        return _('only webcast administrators can access this {0}').format(self._object_type)
-
-
 class TimingError(IndicoError):
     """
     Timetable problems

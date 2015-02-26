@@ -355,10 +355,6 @@ pre {
     float: left;
 }
 
-.webcast {
-    margin-bottom: 10px;
-}
-
 .simpleTextAnnouncement {
     background: #F5FAFF url(../images/conf/sprites_blue.png) repeat-x scroll 0 -400px;
     border-top: 1px solid #c2d6e7;

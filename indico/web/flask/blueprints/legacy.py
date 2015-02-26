@@ -53,16 +53,6 @@ legacy.add_url_rule('/xmlGateway.py/signOut',
                     mod_rh_xmlGateway.RHSignOut,
                     methods=('GET', 'POST'))
 
-legacy.add_url_rule('/xmlGateway.py/webcastForthcomingEvents',
-                    'xmlGateway-webcastForthcomingEvents',
-                    mod_rh_xmlGateway.RHWebcastForthcomingEvents,
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/webcastOnAir',
-                    'xmlGateway-webcastOnAir',
-                    mod_rh_xmlGateway.RHWebcastOnAir,
-                    methods=('GET', 'POST'))
-
 
 # Legacy endpoints defined in htdocs/*.py files (which need compatibility routes)
 # Note: When removing/renaming endpoints, feel free to remove them in here, too, but
@@ -95,14 +85,7 @@ legacy_endpoints = {
     'adminPlugins-toggleActivePluginType', 'adminProtection', 'adminServices-apiKeys',
     'adminServices-apiOptions', 'adminServices-apiOptionsSet', 'adminServices-ipbasedacl',
     'adminServices-ipbasedacl_fagrant', 'adminServices-ipbasedacl_farevoke', 'adminServices-oauthAuthorized',
-    'adminServices-oauthConsumers', 'adminServices-webcast',
-    'adminServices-webcastAddChannel', 'adminServices-webcastAddOnAir', 'adminServices-webcastAddStream',
-    'adminServices-webcastAddWebcast', 'adminServices-webcastArchive', 'adminServices-webcastArchiveWebcast',
-    'adminServices-webcastManualSynchronization', 'adminServices-webcastModifyChannel',
-    'adminServices-webcastMoveChannelDown', 'adminServices-webcastMoveChannelUp', 'adminServices-webcastRemoveChannel',
-    'adminServices-webcastRemoveFromAir', 'adminServices-webcastRemoveStream', 'adminServices-webcastRemoveWebcast',
-    'adminServices-webcastSaveWebcastSynchronizationURL', 'adminServices-webcastSetup',
-    'adminServices-webcastSwitchChannel', 'adminServices-webcastUnArchiveWebcast', 'adminSystem', 'adminSystem-modify',
+    'adminServices-oauthConsumers', 'adminSystem', 'adminSystem-modify',
     'adminUpcomingEvents', 'assignContributions', 'assignContributions-downloadAcceptedPapers', 'badgeTemplates',
     'badgeTemplates-badgeDesign', 'badgeTemplates-badgePrinting', 'categoryAC', 'categoryAC-setVisibility',
     'categoryConfCreationControl-setCreateConferenceControl', 'categoryConfCreationControl-setNotifyCreation',
@@ -251,6 +234,5 @@ legacy_endpoints = {
     'userManagement-switchNotifyAccountCreation', 'userMerge', 'userPreferences', 'userRegistration',
     'userRegistration-active', 'userRegistration-created', 'userRegistration-disable', 'userRegistration-UserExist',
     'wcalendar', 'wcalendar-select', 'xmlGateway', 'xmlGateway-getCategoryInfo', 'xmlGateway-getStatsIndico',
-    'xmlGateway-getStatsRoomBooking', 'xmlGateway-loginStatus', 'xmlGateway-signIn', 'xmlGateway-signOut',
-    'xmlGateway-webcastForthcomingEvents', 'xmlGateway-webcastOnAir'
+    'xmlGateway-getStatsRoomBooking', 'xmlGateway-loginStatus', 'xmlGateway-signIn', 'xmlGateway-signOut'
 }

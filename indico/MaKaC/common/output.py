@@ -27,7 +27,6 @@ from lxml import etree
 
 import MaKaC.conference as conference
 import MaKaC.schedule as schedule
-import MaKaC.webcast as webcast
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.linking import RoomLinker
 from xmlGen import XMLGen
@@ -298,8 +297,6 @@ class outputGenerator(Observable):
             out.writeTag("cloneLink", vars["cloneURL"])
         if  vars and vars.has_key("iCalURL"):
             out.writeTag("iCalLink", vars["iCalURL"])
-        if  vars and vars.has_key("webcastAdminURL"):
-            out.writeTag("webcastAdminLink", vars["webcastAdminURL"])
 
         if conf.getOrgText() != "":
             out.writeTag("organiser", conf.getOrgText())
@@ -486,26 +483,6 @@ class outputGenerator(Observable):
             if mat.canView(self.__aw) and mat.getTitle() != "Internal Page Files":
                 if includeMaterial:
                     self._materialToXML(mat, vars, out=out)
-
-        wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        url = wm.isOnAir(conf)
-        wc = wm.getForthcomingWebcast(conf)
-        if url:
-            out.openTag("material")
-            out.writeTag("ID","live webcast")
-            out.writeTag("title","live webcast")
-            out.writeTag("description","")
-            out.writeTag("type","")
-            out.writeTag("displayURL",url)
-            out.closeTag("material")
-        elif wc:
-            out.openTag("material")
-            out.writeTag("ID","forthcoming webcast")
-            out.writeTag("title","forthcoming webcast")
-            out.writeTag("description","")
-            out.writeTag("type","")
-            out.writeTag("displayURL", wm.getWebcastServiceURL(wc))
-            out.closeTag("material")
 
         #plugins XML
         out.openTag("plugins")

@@ -14,9 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.plugins import OldObservable
-from MaKaC.plugins.base import extension_point
-
 import os
 import sys
 import types
@@ -33,8 +30,7 @@ from dateutil.relativedelta import relativedelta
 from xml.sax.saxutils import escape, quoteattr
 
 from MaKaC.i18n import _
-from MaKaC.plugins import PluginsHolder, OldObservable
-from MaKaC.plugins.base import extension_point
+from MaKaC.plugins import OldObservable
 from MaKaC import conference
 from MaKaC import user
 from MaKaC import schedule
@@ -42,7 +38,6 @@ from MaKaC.common import info
 from MaKaC import domain
 from MaKaC.webinterface import urlHandlers
 from indico.core import config as Configuration
-from MaKaC import webcast
 from MaKaC.accessControl import AdminList
 from MaKaC.common.url import URL
 from indico.core.config import Config
@@ -332,8 +327,6 @@ class WHeader(WTemplated):
             if self._currentuser.isAdmin() or not adminList.getList():
                 adminItemList.append({'id': 'serverAdmin', 'url': urlHandlers.UHAdminArea.getURL(), 'text': _("Server admin")})
             self._notify("addParamsToHeaderItem",{"user": self._currentuser}, adminItemList)
-            if webcast.HelperWebcastManager.getWebcastManagerInstance().isManager(self._currentuser):
-                adminItemList.append({'id': 'webcastAdmin', 'url': urlHandlers.UHWebcast.getURL(), 'text': _("Webcast Admin")})
 
         vars["adminItemList"] = adminItemList
         vars['extra_items'] = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))

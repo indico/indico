@@ -17,7 +17,6 @@ from flask import session
 
 from MaKaC.webinterface.rh import base
 from MaKaC.common import xmlGen
-from MaKaC import webcast
 from MaKaC.user import LoginInfo
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.conference import CategoryManager
@@ -97,84 +96,6 @@ class RHSignOut( RHXMLHandlerBase ):
             self._setUser(None)
 
         return self._createResponse("OK", "Logged out")
-
-
-class RHWebcastOnAir( RHXMLHandlerBase ):
-
-    def _printWebcast(self, wc, XG):
-        XG.openTag("webcast")
-        XG.writeTag("title",wc.getTitle())
-        XG.writeTag("startDate",wc.getStartDate())
-        XG.writeTag("id",wc.getId())
-        XG.writeTag("room",wc.getRoom())
-        XG.closeTag("webcast")
-
-    def _printStream( self, stream, XG ):
-        XG.openTag("stream")
-        XG.writeTag("format",stream.getFormat())
-        XG.writeTag("url",stream.getURL())
-        XG.closeTag("stream")
-
-    def _printChannel(self, ch, XG):
-        XG.openTag("channel")
-        XG.writeTag("name",ch.getName())
-        XG.writeTag("width",ch.getWidth())
-        XG.writeTag("height",ch.getHeight())
-        if ch.isOnAir():
-            XG.writeTag("onair","True")
-        for stream in ch.getStreams():
-            self._printStream(stream,XG)
-        wc = ch.whatsOnAir()
-        if wc:
-            self._printWebcast(wc,XG)
-        XG.closeTag("channel")
-
-    def _process( self ):
-        wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        XG = xmlGen.XMLGen()
-        XG.openTag("response")
-        XG.openTag("status")
-        XG.writeTag("value", "OK")
-        XG.writeTag("message", "Returning on air events on all channels")
-        XG.closeTag("status")
-        XG.openTag("channels")
-        for ch in wm.getChannels():
-            self._printChannel(ch,XG)
-        XG.closeTag("channels")
-        XG.closeTag("response")
-        self._responseUtil.content_type = 'text/xml'
-        return XG.getXml()
-
-
-class RHWebcastForthcomingEvents( RHXMLHandlerBase ):
-
-    def _printWebcast(self, wc, XG):
-        XG.openTag("webcast")
-        XG.writeTag("title",wc.getTitle())
-        XG.writeTag("id",wc.getId())
-        XG.writeTag("startDate",wc.getStartDate())
-        XG.writeTag("room",wc.getRoom())
-        XG.closeTag("webcast")
-
-    def _process( self ):
-        wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        XG = xmlGen.XMLGen()
-        XG.openTag("response")
-        XG.openTag("status")
-        XG.writeTag("value", "OK")
-        XG.writeTag("message", "Returning all forthcoming webcasts")
-        XG.closeTag("status")
-        XG.openTag("webcasts")
-        webcasts = wm.getForthcomingWebcasts()
-        webcasts.sort(webcast.sortWebcastByDate)
-        for wc in webcasts:
-            if not wc in wm.whatsOnAir():
-                if not wc.getEvent().isProtected():
-                    self._printWebcast(wc,XG)
-        XG.closeTag("webcasts")
-        XG.closeTag("response")
-        self._responseUtil.content_type = 'text/xml'
-        return XG.getXml()
 
 
 class RHCategInfo( RHXMLHandlerBase ):

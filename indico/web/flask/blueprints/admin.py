@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import admins, announcement, taskManager, maintenance, domains, users, groups, templates, \
-    conferenceModif, services, api, oauth
+from MaKaC.webinterface.rh import (admins, announcement, taskManager, maintenance, domains, users, groups, templates,
+                                   conferenceModif, services, api, oauth)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -130,37 +130,6 @@ admin.add_url_rule('/api/keys', 'adminServices-apiKeys', api.RHAdminAPIKeys)
 # OAuth
 admin.add_url_rule('/oauth/consumers', 'adminServices-oauthAuthorized', oauth.RHAdminOAuthAuthorized)
 admin.add_url_rule('/oauth/authorized', 'adminServices-oauthConsumers', oauth.RHAdminOAuthConsumers)
-
-# Webcast
-admin.add_url_rule('/webcast/live', 'adminServices-webcast', services.RHWebcast, methods=('GET', 'POST'))
-admin.add_url_rule('/webcast/setup/', 'adminServices-webcastSetup', services.RHWebcastSetup)
-admin.add_url_rule('/webcast/setup/sync/set-url', 'adminServices-webcastSaveWebcastSynchronizationURL',
-                   services.RHWebcastSaveWebcastSynchronizationURL, methods=('POST',))
-admin.add_url_rule('/webcast/setup/sync', 'adminServices-webcastManualSynchronization',
-                   services.RHWebcastManuelSynchronizationURL, methods=('POST',))
-admin.add_url_rule('/webcast/setup/stream/add', 'adminServices-webcastAddStream', services.RHWebcastAddStream,
-                   methods=('POST',))
-admin.add_url_rule('/webcast/setup/stream/remove', 'adminServices-webcastRemoveStream', services.RHWebcastRemoveStream)
-admin.add_url_rule('/webcast/setup/channel/move/down', 'adminServices-webcastMoveChannelDown',
-                   services.RHWebcastMoveChannelDown)
-admin.add_url_rule('/webcast/setup/channel/move/up', 'adminServices-webcastMoveChannelUp',
-                   services.RHWebcastMoveChannelUp)
-admin.add_url_rule('/webcast/setup/channel/remove', 'adminServices-webcastRemoveChannel',
-                   services.RHWebcastRemoveChannel)
-admin.add_url_rule('/webcast/setup/channel/modify', 'adminServices-webcastModifyChannel',
-                   services.RHWebcastModifyChannel, methods=('POST',))
-admin.add_url_rule('/webcast/setup/channel/add', 'adminServices-webcastAddChannel', services.RHWebcastAddChannel,
-                   methods=('POST',))
-admin.add_url_rule('/webcast/archive/', 'adminServices-webcastArchive', services.RHWebcastArchive)
-admin.add_url_rule('/webcast/<webcastid>/archive', 'adminServices-webcastArchiveWebcast',
-                   services.RHWebcastArchiveWebcast)
-admin.add_url_rule('/webcast/<webcastid>/unarchive', 'adminServices-webcastUnArchiveWebcast',
-                   services.RHWebcastUnArchiveWebcast)
-admin.add_url_rule('/webcast/<webcastid>/remove', 'adminServices-webcastRemoveWebcast', services.RHWebcastRemoveWebcast)
-admin.add_url_rule('/webcast/add', 'adminServices-webcastAddWebcast', services.RHWebcastAddWebcast, methods=('POST',))
-admin.add_url_rule('/webcast/onair/add', 'adminServices-webcastAddOnAir', services.RHWebcastAddOnAir)
-admin.add_url_rule('/webcast/onair/remove', 'adminServices-webcastRemoveFromAir', services.RHWebcastRemoveFromAir)
-admin.add_url_rule('/webcast/channel/switch', 'adminServices-webcastSwitchChannel', services.RHWebcastSwitchChannel)
 
 # Plugins
 admin.add_url_rule('/plugins-old/', 'adminPlugins', admins.RHAdminPlugins, methods=('GET', 'POST'))

@@ -495,8 +495,6 @@ if __name__ == '__main__':
             Collaboration.Vidyo = MaKaC.plugins.Collaboration.Vidyo
             Collaboration.CERNMCU = MaKaC.plugins.Collaboration.CERNMCU
             Collaboration.RecordingManager = MaKaC.plugins.Collaboration.RecordingManager
-            Collaboration.RecordingRequest = MaKaC.plugins.Collaboration.RecordingRequest
-            Collaboration.WebcastRequest = MaKaC.plugins.Collaboration.WebcastRequest
             """,
           zip_safe=False,
           packages=foundPackages,

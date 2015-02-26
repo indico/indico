@@ -115,15 +115,6 @@ class AdminError(AccessControlError):
         return _("only administrators can access this %s") % self.objType
 
 
-class WebcastAdminError(AccessControlError):
-    """
-    """
-
-    @ensure_str
-    def __str__(self):
-        return _("only webcast administrators can access this %s") % self.objType
-
-
 class TimingError(MaKaCError):
     """
     Timetable problems

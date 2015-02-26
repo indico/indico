@@ -63,13 +63,11 @@ from indico.modules.events.requests.util import is_request_manager
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
 from indico.util.string import safe_upper
-import MaKaC.webcast as webcast
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
 from indico.core.logger import Logger
 from MaKaC.plugins.base import OldObservable
-from MaKaC.plugins.base import extension_point
 from indico.modules import ModuleHolder
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
 from MaKaC.conference import Session, Contribution, LocalFile
@@ -347,25 +345,12 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         drawer = wcomponents.WConfTickerTapeDrawer(self._conf, self._tz)
         frame = WConfDisplayFrame( self._getAW(), self._conf )
 
-        wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-
-        onAirURL = wm.isOnAir(self._conf)
-        if onAirURL:
-            webcastURL = onAirURL
-        else:
-            wc = wm.getForthcomingWebcast(self._conf)
-            webcastURL = wm.getWebcastServiceURL(wc)
-        forthcomingWebcast = not onAirURL and wm.getForthcomingWebcast(self._conf)
-
         frameParams = {
             "confModifURL": urlHandlers.UHConferenceModification.getURL(self._conf),
             "logoURL": urlHandlers.UHConferenceLogo.getURL(self._conf),
             "currentURL": request.url,
             "nowHappening": drawer.getNowHappeningHTML(),
             "simpleTextAnnouncement": drawer.getSimpleText(),
-            "onAirURL": onAirURL,
-            "webcastURL": webcastURL,
-            "forthcomingWebcast": forthcomingWebcast
         }
         if self._conf.getLogo():
             frameParams["logoURL"] = urlHandlers.UHConferenceLogo.getURL(self._conf)
@@ -782,10 +767,6 @@ class WPXSLConferenceDisplay(WPConferenceBase):
         self._firstDay = params.get("firstDay")
         self._lastDay = params.get("lastDay")
         self._daysPerRow = params.get("daysPerRow")
-        self._webcastadd = False
-        wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        if wm.isManager(self._getAW().getUser()):
-            self._webcastadd = True
 
     def _getFooter(self):
         """
@@ -815,11 +796,6 @@ class WPXSLConferenceDisplay(WPConferenceBase):
         "resourceURLGen": urlHandlers.UHFileAccess.getURL }
 
         pars.update({ 'firstDay' : self._firstDay, 'lastDay' : self._lastDay, 'daysPerRow' : self._daysPerRow })
-
-        if self._webcastadd:
-            urladdwebcast = urlHandlers.UHWebcastAddWebcast.getURL()
-            urladdwebcast.addParam("eventid",self._conf.getId())
-            pars['webcastAdminURL'] = urladdwebcast
         return pars
 
     def _getBody(self, params):
@@ -891,13 +867,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
         if conf.getParticipation().displayParticipantList() :
             wvars['participants']  = conf.getParticipation().getPresentParticipantListText()
-
-        wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        wvars['webcastOnAirURL'] = wm.isOnAir(conf)
-        forthcomingWebcast = wm.getForthcomingWebcast(conf)
-        wvars['forthcomingWebcast'] = forthcomingWebcast
-        if forthcomingWebcast:
-            wvars['forthcomingWebcastURL'] = wm.getWebcastServiceURL(forthcomingWebcast)
 
         wvars['files'] = {}
         lectureTitles = ['part%s' % nr for nr in xrange(1, 11)]

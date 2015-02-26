@@ -19,49 +19,11 @@ from MaKaC.services.implementation.base import AdminService, TextModificationBas
 
 from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.user import PrincipalHolder, AvatarHolder, GroupHolder
-import MaKaC.webcast as webcast
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 import MaKaC.common.info as info
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.user import IAvatarAllDetailsFossil
-
-
-### Webcast Administrators classes ###
-class AddWebcastAdministrators(AdminService):
-
-    def _checkParams(self):
-        AdminService._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
-
-    def _getAnswer( self):
-        ph = PrincipalHolder()
-        for user in self._userList:
-            pr = ph.getById(user["id"])
-            if pr is None:
-                raise NoReportError(_("The user that you are trying to add does not exist anymore in the database"))
-            self._wm.addManager(pr)
-
-        return fossilize(self._wm.getManagers())
-
-class RemoveWebcastAdministrator(AdminService):
-
-    def _checkParams(self):
-        AdminService._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        self._userId = pm.extract("userId", pType=str, allowEmpty=False)
-
-    def _getAnswer( self):
-        ph = PrincipalHolder()
-        pr = ph.getById(self._userId)
-        if pr != None:
-            self._wm.removeManager(pr)
-        elif not self._wm.removeManagerById(self._userId):
-            raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
-        return fossilize(self._wm.getManagers())
 
 
 ### Administrator Login as... class ###
@@ -233,9 +195,6 @@ class EditProtectionDisclaimerRestricted (TextModificationBase, AdminService):
         return minfo.getProtectionDisclaimerRestricted()
 
 methodMap = {
-    "services.addWebcastAdministrators": AddWebcastAdministrators,
-    "services.removeWebcastAdministrator": RemoveWebcastAdministrator,
-
     "general.addExistingAdmin": AddAdministrator,
     "general.removeAdmin": RemoveAdministrator,
 

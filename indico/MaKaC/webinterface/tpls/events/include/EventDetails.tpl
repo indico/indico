@@ -32,26 +32,6 @@
 </tr>
 % endif
 
-% if webcastOnAirURL or forthcomingWebcastURL:
-<tr id="webCastRow">
-    <td class="leftCol">
-    % if webcastOnAirURL:
-        ${_("Live Webcast")}
-    % elif forthcomingWebcast:
-        ${_("Webcast")}
-    % endif
-    </td>
-    <td>
-    % if webcastOnAirURL:
-         <a href="${webcastOnAirURL}" target="_blank"><strong>${_("View the live webcast")}</strong></a>
-    % elif forthcomingWebcast:
-         ${_("Please note that this event will be available <em>live</em> via the")}
-         <a href="${forthcomingWebcastURL}" target="_blank"><strong>${_("Webcast Service")}</strong>.</a>
-    % endif
-    </td>
-</tr>
-% endif
-
 % if len(materials) > 0:
 <tr id="materialList">
     <td class="leftCol">${_("Material")}:</td>

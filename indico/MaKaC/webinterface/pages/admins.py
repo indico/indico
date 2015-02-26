@@ -25,7 +25,6 @@ from pytz import timezone
 from indico.core.config import Config
 import MaKaC.common.indexes as indexes
 import MaKaC.common.info as info
-import MaKaC.webcast as webcast
 import MaKaC.conference as conference
 import MaKaC.user as user
 from MaKaC.authentication.LDAPAuthentication import LDAPGroup
@@ -109,9 +108,8 @@ class WPAdminsBase(WPMainBase):
             urlHandlers.UHAdminLayoutGeneral.getURL())
         mainSection.addItem( self._templatesMenuItem)
 
-        self._servicesMenuItem = wcomponents.SideMenuItem(_("Services"),
-            urlHandlers.UHWebcast.getURL())
-        mainSection.addItem( self._servicesMenuItem)
+        self._servicesMenuItem = wcomponents.SideMenuItem(_("Services"), urlHandlers.UHIPBasedACL.getURL())
+        mainSection.addItem(self._servicesMenuItem)
 
         self._pluginsOldMenuItem = wcomponents.SideMenuItem(_("Plugins (Old)"), urlHandlers.UHAdminPlugins.getURL())
         mainSection.addItem(self._pluginsOldMenuItem)
@@ -447,14 +445,6 @@ class WPServicesCommon( WPAdminsBase ):
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._subTabWebcast = self._tabCtrl.newTab( "webcast", _("Webcast"), \
-                urlHandlers.UHWebcast.getURL() )
-        self._subTabWebcast_Live = self._subTabWebcast.newSubTab( "live", _("Live"), \
-                urlHandlers.UHWebcast.getURL() )
-        self._subTabWebcast_Archive = self._subTabWebcast.newSubTab( "archive", _("Archive"), \
-                urlHandlers.UHWebcastArchive.getURL() )
-        self._subTabWebcast_Setup = self._subTabWebcast.newSubTab( "setup", _("Setup"), \
-                urlHandlers.UHWebcastSetup.getURL() )
         self._subTabIPBasedACL = self._tabCtrl.newTab( "ip_based_acl", _("IP Based ACL"), \
                 urlHandlers.UHIPBasedACL.getURL() )
         self._subTabHTTPAPI = self._tabCtrl.newTab( "http_api", _("HTTP API"), \
@@ -472,234 +462,6 @@ class WPServicesCommon( WPAdminsBase ):
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-
-class WPWebcast( WPServicesCommon ):
-
-    pageURL = "adminServices.py/webcast"
-
-    def __init__(self, rh):
-        WPServicesCommon.__init__(self, rh)
-
-    def _getTabContent( self, params ):
-        wp = WWebcast()
-        return wp.getHTML(params)
-
-    def _setActiveTab( self ):
-        self._subTabWebcast.setActive()
-
-
-class WWebcast( wcomponents.WTemplated ):
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        channels = wm.getChannels()
-        iconremove = Config.getInstance().getSystemIconURL( "remove" )
-        iconarchive = Config.getInstance().getSystemIconURL( "archive" )
-        iconadd = Config.getInstance().getSystemIconURL( "add" )
-        list_onair = ""
-        for ch in channels:
-            name = ch.getName()
-            urlchannel = ch.getURL()
-            onair = ch.whatsOnAir()
-            isonair = ch.isOnAir()
-            color = "#edaaa8"
-            iconswitch = iconadd
-            urlswitch = urlHandlers.UHWebcastSwitchChannel.getURL()
-            urlswitch.addParam("chname",name)
-            form = ""
-            if isonair:
-                color = "#b7eda8"
-                iconswitch = iconremove
-            if onair:
-                try:
-                    title = onair.getTitle()
-                    id = onair.getId()
-                    if onair.getEvent():
-                        eventurl = urlHandlers.UHConferenceDisplay.getURL(onair.getEvent())
-                        title = """<a href="%s">%s</a>""" % (eventurl, title)
-                except:
-                    title = "Unrecognised event"
-                    id = ""
-                urlremovefromair = urlHandlers.UHWebcastRemoveFromAir.getURL()
-                urlremovefromair.addParam("chname",name)
-                form = """%s<a href="%s"><img src="%s" border="0"></a>""" % (title, urlremovefromair, iconremove)
-            list_onair += """<TR bgcolor="%s"><TD><a href="%s">%s</a></TD><TD>%s</TD><TD><a href="%s"><IMG SRC="%s" border="0"></A></TD></TR>""" % (color, urlchannel, name, form, urlswitch, iconswitch)
-        vars["onair"] = list_onair
-        list_webcasts = ""
-        webcasts = wm.getForthcomingWebcasts()
-        webcasts.sort(webcast.sortWebcastByDate)
-        urladdonair = urlHandlers.UHWebcastAddOnAir.getURL()
-        channeloptions = ""
-        for ch in wm.getChannels():
-            channeloptions += "<option>%s" % ch.getName()
-        for wc in webcasts:
-            if wc.getAudience(): # skip webcasts with an audience
-                continue
-            onair = wc in wm.whatsOnAir()
-            if not onair:
-                list_webcasts += """<form action="%s">""" % urladdonair
-            title = wc.getTitle()
-            if wc.getEvent():
-                eventurl = urlHandlers.UHConferenceDisplay.getURL(wc.getEvent())
-                title = """<a href="%s">%s</a>""" % (eventurl, title)
-            list_webcasts += "<TD>%s - %s</TD><TD>"% (wc.getStartDate().strftime("%Y-%m-%d %H:%M"),title)
-            if not onair:
-                urlarchivewebcast = urlHandlers.UHWebcastArchiveWebcast.getURL()
-                urlarchivewebcast.addParam("webcastid",wc.getId())
-                urlremovewebcast = urlHandlers.UHWebcastRemoveWebcast.getURL()
-                urlremovewebcast.addParam("webcastid",wc.getId())
-                list_webcasts += """<SELECT name="chname" onchange="this.form.submit();"><option>not on air%s</SELECT>""" % channeloptions
-                list_webcasts += """<input type="hidden" name="eventid" value="%s"></td><td><a href="%s"><img src="%s" border="0" alt="archive webcast"></a></td><td><a href="%s"><img src="%s" border="0" alt="delete webcast"></a>""" % (wc.getId(),urlarchivewebcast,iconarchive,urlremovewebcast,iconremove)
-            list_webcasts += "</TD></TR>"
-            if not onair:
-                list_webcasts += "</FORM>"
-        vars["addwebcastURL"] = urlHandlers.UHWebcastAddWebcast.getURL()
-        vars["webcasts"] = list_webcasts
-        return vars
-
-
-class WPWebcastArchive( WPServicesCommon ):
-
-    pageURL = "adminServices.py/webcastArchive"
-
-    def __init__(self, rh):
-        WPServicesCommon.__init__(self, rh)
-
-    def _getTabContent( self, params ):
-        wp = WWebcastArchive()
-        return wp.getHTML(params)
-
-    def _setActiveTab( self ):
-        self._subTabWebcast_Archive.setActive()
-
-
-class WWebcastArchive( wcomponents.WTemplated ):
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        iconunarchive = Config.getInstance().getSystemIconURL( "unarchive" )
-        iconremove = Config.getInstance().getSystemIconURL( "remove" )
-        wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        list_webcasts = ""
-        webcasts = wm.getArchivedWebcasts()
-        webcasts.sort(webcast.sortWebcastByDate)
-        for wc in webcasts:
-            if wc.getAudience(): # skip webcasts with an audience
-                continue
-            title = wc.getTitle()
-            if wc.getEvent():
-                eventurl = urlHandlers.UHConferenceDisplay.getURL(wc.getEvent())
-                title = """<a href="%s">%s</a>""" % (eventurl, title)
-            list_webcasts += "<TD>%s - %s</TD><TD>"% (wc.getStartDate().strftime("%Y-%m-%d %H:%M"),title)
-            urlunarchivewebcast = urlHandlers.UHWebcastUnArchiveWebcast.getURL()
-            urlunarchivewebcast.addParam("webcastid",wc.getId())
-
-            urlremovewebcast = urlHandlers.UHWebcastRemoveWebcast.getURL()
-            urlremovewebcast.addParam("webcastid",wc.getId())
-            list_webcasts += """<a href="%s"><img src="%s" border="0" alt="unarchive webcast"></a></td><td><a href="%s"><img src="%s" border="0" alt="delete webcast"></a>""" % (urlunarchivewebcast,iconunarchive,urlremovewebcast,iconremove)
-            list_webcasts += "</TD></TR>"
-        vars["webcasts"] = list_webcasts
-        return vars
-
-
-class WPWebcastSetup( WPServicesCommon ):
-
-    pageURL = "adminServices.py/webcastSetup"
-
-    def __init__(self, rh):
-        WPServicesCommon.__init__(self, rh)
-
-    def _getTabContent( self, params ):
-        wp = WWebcastSetup()
-        return wp.getHTML(params)
-
-    def _setActiveTab( self ):
-        self._subTabWebcast_Setup.setActive()
-
-
-class WWebcastSetup( wcomponents.WTemplated ):
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        wm = webcast.HelperWebcastManager.getWebcastManagerInstance()
-        vars["adminList"] = wm.getManagers()
-        vars["webcastAdmins"] = fossilize(wm.getManagers())
-        channels = wm.getChannels()
-        iconremove = Config.getInstance().getSystemIconURL( "remove" )
-        iconadd = Config.getInstance().getSystemIconURL( "add" )
-        iconup = Config.getInstance().getSystemIconURL( "upArrow" )
-        icondown = Config.getInstance().getSystemIconURL( "downArrow" )
-        list_channels = """<table width="100%" cellspacing=0>"""
-        i = 0
-        for channel in channels:
-            i += 1
-            if int(i/2)*2 == i:
-                color = "#e5e5e5"
-            else:
-                color = "#eeeeee"
-            screenname = "%s (%sx%s)" % (channel.getName(),channel.getWidth(), channel.getHeight())
-            name = channel.getName()
-            churl = channel.getURL()
-            width = channel.getWidth()
-            height = channel.getHeight()
-            urlremove = urlHandlers.UHWebcastRemoveChannel.getURL()
-            urlremove.addParam("chname",name)
-            urlmoveup = urlHandlers.UHWebcastMoveChannelUp.getURL()
-            urlmoveup.addParam("chnb",i-1)
-            urlmovedown = urlHandlers.UHWebcastMoveChannelDown.getURL()
-            urlmovedown.addParam("chnb",i-1)
-            list_channels += """<tr bgcolor=%s><td valign=top><ul><li><a href="%s">%s</a><a href="%s"><img src="%s" border="0"></a><a href="%s"><img src="%s" border="0"></a><a href="%s"><img src="%s" border="0"></a></li>""" % (color,churl,screenname,urlremove,iconremove,urlmoveup,iconup,urlmovedown,icondown)
-            list_channels += "<ul><li>Streams:</li><ul>"
-            for stream in channel.getStreams():
-                url = stream.getURL()
-                format = stream.getFormat()
-                urlremovestream = urlHandlers.UHWebcastRemoveStream.getURL()
-                urlremovestream.addParam("chname",name)
-                urlremovestream.addParam("stformat",format)
-                list_channels += """<li><a href="%s">%s</a><a href="%s"><img src="%s" border="0"></a></li>""" % ( url, format, urlremovestream, iconremove )
-            urladdstream = urlHandlers.UHWebcastAddStream.getURL()
-            urladdstream.addParam("chname",name)
-            urlmodifychannel = urlHandlers.UHWebcastModifyChannel.getURL()
-            urlmodifychannel.addParam("chname",name)
-            list_channels += """<li>
-  <table bgcolor="#bbbbbb">
-    <form action="%s" method="POST">
-  <tr><td>format:</td><td><input name="stformat" size=5>
-  </td><td>url:</td><td><input name="sturl" size="20">
-  </td><td>
-  <input type="image" src="%s" name="submit" value="add stream" alt="add stream">
-  </td></tr>
-    </form>
-  </table></li></ul></ul></ul>
-    </td><td align=right>
-  <form action="%s" method="POST">
-  <table bgcolor="#bbbbbb">
-  <tr bgcolor="#999999"><td colspan=2><font color=white>Update Channel</font>
-  </td></tr><tr><td>
-  name:</td><td><input name="chnewname" value="%s" size=15>
-  </td></tr><tr><td>
-  url:</td><td><input name="churl" value="%s" size=30>
-  </td></tr><tr><td>
-  width:</td><td><input name="chwidth" value="%s" size=3>
-  </td></tr><tr><td>
-  height:</td><td><input name="chheight" value="%s" size=3>
-  </td></tr><tr><td colspan=2>
-  <input type="submit" name="submit" value="modify channel">
-  </td></tr>
-  </table>
-  </form>
-  </td></tr>""" % (urladdstream,iconadd,urlmodifychannel,name,churl,width,height)
-        list_channels += "</table>"
-        vars["channels"] = list_channels
-        vars["postURL"] = urlHandlers.UHWebcastAddChannel.getURL()
-
-        vars["saveWebcastSynchronizationURL"] = urlHandlers.UHWebcastSaveWebcastSynchronizationURL.getURL()
-        vars["webcastSynchronizationURL"] = wm.getWebcastSynchronizationURL()
-
-        vars["webcastManualSynchronize"] = urlHandlers.UHWebcastManualSynchronization.getURL()
-
-        return vars
 
 
 class WPTemplatesCommon( WPAdminsBase ):
