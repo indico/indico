@@ -32,6 +32,7 @@ from indico.modules.vc.util import get_vc_plugins, resolve_title
 from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.util.string import to_unicode
 from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.web.forms.base import FormDefaults
 
@@ -228,12 +229,13 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
             flash(_('You are not allowed to refresh VC rooms in this event.'), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
-        Logger.get('modules.vc').info("Refreshing VC room {} from event {}".format(self.vc_room, self._conf))
+        Logger.get('modules.vc').info("Refreshing VC room {} from event '{}'[{}]".format(
+            self.vc_room, to_unicode(self._conf), self._conf.id))
 
         try:
             self.plugin.refresh_room(self.vc_room, self.event)
         except VCRoomNotFoundError as err:
-            Logger.get('modules.vc').warning("VC room {} not found. Setting it as deleted.".format(self.vc_room))
+            Logger.get('modules.vc').warning("VC room '{}' not found. Setting it as deleted.".format(self.vc_room))
             self.vc_room.status = VCRoomStatus.deleted
             flash(err.message, 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
@@ -250,8 +252,9 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
             flash(_('You are not allowed to remove VC rooms from this event.'), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
-        Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
-                                      self.vc_room, self.event_vc_room.event, self.event_vc_room.link_object))
+        Logger.get('modules.vc').info("Detaching VC room {} from event '{}' ({})".format(
+            self.vc_room, to_unicode(self.event_vc_room.event.getTitle()),
+            to_unicode(repr(self.event_vc_room.link_object))))
 
         db.session.delete(self.event_vc_room)
         db.session.flush()
