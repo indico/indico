@@ -3,18 +3,30 @@
 {% block subject %} [{{ plugin.friendly_name }}] New videoconference room created: {{ vc_room.name }} {% endblock %}
 
 {% block header -%}
-A new videoconferencing room has been created in your event "<a href="{{ event.getURL() }}">{{ event.title }}</a>". You can manage it from:
-<br/>
-<a href="{{ url_for_plugin('.manage_vc_rooms', event, _external=true) }}">
-    {{ url_for_plugin('.manage_vc_rooms', event, _external=true) }}
-</a>
+<p>
+    A videoconferencing room has just been created for event "<a href="{{ event.getURL() }}">{{ event.title }}</a>".
+</p>
 
-<h3>Room information</h3>
-<ul>
-    <li><strong>Name:</strong> {{ vc_room.name }}</li>
-    {% if vc_room_event.link_type.name != 'event' -%}
-      <li><strong>Linked to:</strong> {{ linked_to_title }}</li>
-    {%- endif %}
-</ul>
+<p>
+    You can manage it from:
+    <br/>
+    <a href="{{ url_for_plugin('.manage_vc_rooms', event, _external=true) }}">
+        {{ url_for_plugin('.manage_vc_rooms', event, _external=true) }}
+    </a>
+</p>
+<br/>
+<p>
+    <strong>Room information</strong>
+    <br/>
+    <ul>
+        <li><strong>Name:</strong> {{ vc_room.name }}</li>
+        {% if vc_room_event.link_type.name != 'event' -%}
+          <li><strong>Linked to:</strong> {{ linked_to_title }}</li>
+        {%- endif %}
+        {% block plugin_specific_info %}{% endblock %}
+    </ul>
+</p>
+
+{% block custom_footer %}{% endblock %}
 
 {%- endblock %}

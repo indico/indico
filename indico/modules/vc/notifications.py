@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.config import Config
-from indico.core.plugins import get_template_module
+from indico.core.plugins import get_plugin_template_module
 from indico.modules.vc.util import get_linked_to_description
 from indico.util.user import retrieve_principals
 
@@ -32,10 +32,24 @@ def notify_created(plugin, room, room_assoc, event, user):
     :param event: the event
     :param user: the user performing the action
     """
-    tpl = get_template_module('vc/emails/created.html', plugin=plugin, vc_room=room, event=event,
-                              vc_room_event=room_assoc, user=user,
-                              linked_to_title=get_linked_to_description(room_assoc))
-    _send(user, plugin, event, tpl.get_subject(), tpl.get_body())
+    with plugin.plugin_context():
+        tpl = get_plugin_template_module('emails/created.html', plugin=plugin, vc_room=room, event=event,
+                                         vc_room_event=room_assoc, user=user,
+                                         linked_to_title=get_linked_to_description(room_assoc))
+        _send(user, plugin, event, tpl.get_subject(), tpl.get_body())
+
+
+def notify_deleted(plugin, room, room_assoc, event, user):
+    """Notifies about the deletion of a vc_room from the system.
+
+    :param room: the vc_room
+    :param event: the event
+    :param user: the user performing the action
+    """
+    with plugin.plugin_context():
+        tpl = get_plugin_template_module('emails/deleted.html', plugin=plugin, vc_room=room, event=event,
+                                         vc_room_event=room_assoc, user=user)
+        _send(user, plugin, event, tpl.get_subject(), tpl.get_body())
 
 
 def _send(user, plugin, event, subject, body):
