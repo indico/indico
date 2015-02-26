@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from indico.core.config import Config
 from indico.core.plugins import get_plugin_template_module
 from indico.modules.vc.util import get_linked_to_description
-from indico.util.user import retrieve_principals
 
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
@@ -36,7 +35,7 @@ def notify_created(plugin, room, room_assoc, event, user):
         tpl = get_plugin_template_module('emails/created.html', plugin=plugin, vc_room=room, event=event,
                                          vc_room_event=room_assoc, user=user,
                                          linked_to_title=get_linked_to_description(room_assoc))
-        _send(user, plugin, event, tpl.get_subject(), tpl.get_body())
+        _send('create', user, plugin, event, room, tpl.get_subject(), tpl.get_body())
 
 
 def notify_deleted(plugin, room, room_assoc, event, user):
@@ -49,19 +48,20 @@ def notify_deleted(plugin, room, room_assoc, event, user):
     with plugin.plugin_context():
         tpl = get_plugin_template_module('emails/deleted.html', plugin=plugin, vc_room=room, event=event,
                                          vc_room_event=room_assoc, user=user)
-        _send(user, plugin, event, tpl.get_subject(), tpl.get_body())
+        _send('delete', user, plugin, event, room, tpl.get_subject(), tpl.get_body())
 
 
-def _send(user, plugin, event, subject, body):
+def _send(action, user, plugin, event, room, subject, body):
     to_list = {user.getEmail()}
-    if plugin.settings.get('notify_managers'):
-        to_list |= {u.getEmail() for u in retrieve_principals(plugin.settings.get('managers'))}
-    if not to_list:
-        return
+    cc_list = plugin.get_notification_cc_list(action, room, event)
+    bcc_list = plugin.get_notification_bcc_list(action, room, event)
+
     notification = {
         'content-type': 'text/html',
         'fromAddr': Config.getInstance().getNoReplyEmail(),
         'toList': to_list,
+        'ccList': cc_list,
+        'bccList': bcc_list,
         'subject': subject,
         'body': body
     }
