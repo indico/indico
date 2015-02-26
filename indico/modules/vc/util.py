@@ -36,9 +36,9 @@ def full_block_id(block):
 
 def resolve_title(obj):
     if isinstance(obj, SessionSlot):
-        return obj.getFullTitle()
+        return obj.getFullTitle().decode('utf-8')
     else:
-        return obj.getTitle()
+        return obj.getTitle().decode('utf-8')
 
 
 def get_linked_to_description(obj):
