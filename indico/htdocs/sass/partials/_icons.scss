@@ -55,6 +55,10 @@ you can use the generic selector below, but it's slower:
     -webkit-font-smoothing: antialiased;
 }
 
+i[class^="icon-"]:before {
+    cursor: default;
+}
+
 .inactive[class^="icon-"]:before, .inactive[class*=" icon-"]:before {
     opacity: 0.15;
 }
