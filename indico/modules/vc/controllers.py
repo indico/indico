@@ -207,7 +207,8 @@ class RHVCManageEventModify(RHVCSystemEventBase):
                 return redirect(url_for('.manage_vc_rooms', self.event))
 
         form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form,
-                                            existing_vc_room=self.vc_room)
+                                            existing_vc_room=self.vc_room,
+                                            skip_fields=form.conditional_fields | {'name'})
 
         return WPVCManageEvent.render_string(form_html, self.event)
 
