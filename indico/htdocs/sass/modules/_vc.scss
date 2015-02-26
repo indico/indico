@@ -1,5 +1,4 @@
 @import "base/palette";
-@import "compass/css3/box-shadow";
 
 .vc-management {
     .add-room-options {
@@ -18,6 +17,20 @@
             }
         }
     }
+}
+
+@keyframes text-changed
+{
+  from {
+    color: $dark-blue;
+  }
+  to {
+    color: $black;
+  }
+}
+
+input[type="text"]#vc-name.highlight {
+    animation: text-changed .75s linear;
 }
 
 .selectize-dropdown {
