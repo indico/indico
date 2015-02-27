@@ -229,8 +229,8 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
             flash(_('You are not allowed to refresh VC rooms in this event.'), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
-        Logger.get('modules.vc').info("Refreshing VC room {} from event '{}'[{}]".format(
-            self.vc_room, to_unicode(self._conf.getTitle()), self._conf.id))
+        Logger.get('modules.vc').info("Refreshing VC room {} from event {}".format(
+            self.vc_room, self._conf))
 
         try:
             self.plugin.refresh_room(self.vc_room, self.event)
@@ -252,10 +252,8 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
             flash(_('You are not allowed to remove VC rooms from this event.'), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
-        Logger.get('modules.vc').info("Detaching VC room {} from event '{}' ({})".format(
-            self.vc_room, to_unicode(self.event_vc_room.event.getTitle()),
-            to_unicode(repr(self.event_vc_room.link_object))))
-
+        Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
+            self.vc_room, self.event_vc_room.event, self.event_vc_room.link_object))
         db.session.delete(self.event_vc_room)
         db.session.flush()
 

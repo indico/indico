@@ -43,7 +43,7 @@ from MaKaC.contributionReviewing import Review
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
 from indico.util.i18n import L_
-from indico.util.string import safe_upper, safe_slice, fix_broken_string
+from indico.util.string import safe_upper, safe_slice, fix_broken_string, return_ascii
 from MaKaC.review import AbstractFieldContent
 
 
@@ -379,6 +379,7 @@ class Category(CommonObjectBase):
             return cmp(hash(self), hash(other))
         return cmp(self.getId(), other.getId())
 
+    @return_ascii
     def __repr__(self):
         path = '/'.join(self.getCategoryPathTitles()[:-1])
         return '<Category({0}, {1}, {2})>'.format(self.getId(), self.getName(), path)
@@ -2133,6 +2134,7 @@ class Conference(CommonObjectBase, Locatable):
 
         self._observers = []
 
+    @return_ascii
     def __repr__(self):
         return '<Conference({0}, {1}, {2})'.format(self.getId(), self.getTitle(), self.getStartDate())
 
@@ -7736,6 +7738,7 @@ class Contribution(CommonObjectBase, Locatable):
             return cmp(self.getId(), other.getId())
         return cmp(self.getConference(), other.getConference())
 
+    @return_ascii
     def __repr__(self):
         parent_id = self.parent.getId() if self.parent else None
         return '<Contribution({}, {}, {})>'.format(self.getId(), self.getTitle(), parent_id)
@@ -10056,6 +10059,7 @@ class SubContribution(CommonObjectBase, Locatable):
         self._authorGen = Counter()
         self._keywords = ""
 
+    @return_ascii
     def __repr__(self):
         if self.parent:
             parent_id = self.parent.getId()
