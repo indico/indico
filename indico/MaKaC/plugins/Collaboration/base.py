@@ -924,6 +924,7 @@ class CSBookingManager(Persistent, Observer):
         if newList arg is True, don't check if there is an existing speakerWrapperList
         and create a new one straight forward. (Done to avoid loops)
         """
+        return  # obsolete
         SWList = []
         contributions = self.getSortedContributionSpeaker(True)
         requestType = ['recording', 'webcast', 'both']
