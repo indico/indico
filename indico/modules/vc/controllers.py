@@ -58,7 +58,7 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
             VCRoomEventAssociation.link_id == event_vc_room.link_id
         )
 
-        if (allow_same_room):
+        if allow_same_room:
             q = q.filter(VCRoom.id != vc_room.id)
 
         num_existing = q.join(VCRoom).count()
@@ -316,7 +316,7 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
         RHVCManageEventCreateBase._checkParams(self, params)
 
         self.query = request.args.get('q', '')
-        if (len(self.query) < 3):
+        if len(self.query) < 3:
             raise BadRequest("A query has to be provided, with at least 3 characters")
 
     def _iter_allowed_rooms(self):
@@ -329,8 +329,7 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
                  .order_by(db.desc('event_count'))
                  .limit(10))
 
-        return ((room, count) for room, count in query
-                if room.plugin.can_manage_vc_room(session.user, room))
+        return ((room, count) for room, count in query if room.plugin.can_manage_vc_room(session.user, room))
 
     def _process(self):
         return Response(json.dumps([{'id': room.id, 'name': room.name, 'count': count}
