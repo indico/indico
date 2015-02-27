@@ -180,7 +180,8 @@ class VCRoomEventAssociation(db.Model):
             return self.event.getContributionById(self.link_id)
         else:
             session_id, slot_id = self.link_id.split(':')
-            return self.event.getSessionById(session_id).getSlotById(slot_id)
+            sess = self.event.getSessionById(session_id)
+            return sess.getSlotById(slot_id) if sess is not None else None
 
     @event.setter
     def event(self, event):

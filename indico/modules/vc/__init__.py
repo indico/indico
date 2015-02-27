@@ -16,11 +16,13 @@
 
 from __future__ import unicode_literals
 
-from flask import render_template
+from flask import render_template, has_request_context, session
 from flask_pluginengine import render_plugin_template
+from MaKaC.user import AvatarHolder
 
 from indico.core import signals
-from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation
+from indico.core.config import Config
+from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLinkType
 from indico.modules.vc.plugins import VCPluginMixin
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.web.flask.templating import template_hook
@@ -48,8 +50,39 @@ def _inject_vc_room_action_buttons(event, item, event_vc_rooms_dict, **kwargs):
 
 
 @signals.event.sidemenu.connect
-def extend_event_menu(sender, **kwargs):
+def _extend_event_menu(sender, **kwargs):
     def _visible(event):
         return (bool(get_vc_plugins()) and
                 bool(VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True).count()))
     return EventMenuEntry('vc.event_videoconference', 'Video Conference Rooms', name='vc-event-page', visible=_visible)
+
+
+@signals.event.session_slot_deleted.connect
+def _session_slot_deleted(session_slot, **kwargs):
+    event = session_slot.getConference()
+    for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True):
+        if event_vc_room.link_object is None:
+            event_vc_room.link_type = VCRoomLinkType.event
+            event_vc_room.link_id = event.id
+
+
+@signals.event.contribution_deleted.connect
+def _contrib_deleted(contrib, **kwargs):
+    event = contrib.getConference()
+    for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True):
+        if event_vc_room.link_object is None:
+            event_vc_room.link_type = VCRoomLinkType.event
+            event_vc_room.link_id = event.id
+
+
+@signals.event.deleted.connect
+def _event_deleted(event, **kwargs):
+    for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True):
+        event_vc_room.delete(_get_user())
+
+
+def _get_user():
+    if has_request_context() and session.user:
+        return session.user
+    else:
+        return AvatarHolder().getById(Config.getInstance().getJanitorUserId())
