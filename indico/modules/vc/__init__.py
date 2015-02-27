@@ -18,16 +18,19 @@ from __future__ import unicode_literals
 
 from flask import render_template, has_request_context, session
 from flask_pluginengine import render_plugin_template
-from MaKaC.user import AvatarHolder
 
 from indico.core import signals
 from indico.core.config import Config
+from indico.core.db import db
 from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLinkType
 from indico.modules.vc.plugins import VCPluginMixin
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.web.flask.templating import template_hook
-from MaKaC.webinterface.displayMgr import EventMenuEntry
 from indico.modules.vc.util import get_vc_plugins
+from indico.util.i18n import _
+from MaKaC.conference import EventCloner
+from MaKaC.user import AvatarHolder
+from MaKaC.webinterface.displayMgr import EventMenuEntry
 
 __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase')
 
@@ -86,3 +89,27 @@ def _get_user():
         return session.user
     else:
         return AvatarHolder().getById(Config.getInstance().getJanitorUserId())
+
+
+class VCCloner(EventCloner):
+    def get_options(self):
+        enabled = bool(VCRoomEventAssociation.find_for_event(self.event, include_hidden=True).count())
+        return {'vc_rooms': (_('Video conference rooms'), enabled)}
+
+    def clone(self, new_event, options):
+        if 'vc_rooms' not in options:
+            return
+        for old_event_vc_room in VCRoomEventAssociation.find_for_event(self.event, include_hidden=True):
+            event_vc_room = VCRoomEventAssociation(event_id=int(new_event.id),
+                                                   link_type=old_event_vc_room.link_type,
+                                                   link_id=old_event_vc_room.link_id,
+                                                   show=old_event_vc_room.show,
+                                                   data=old_event_vc_room.data)
+            if event_vc_room.link_object is not None:
+                event_vc_room.vc_room = old_event_vc_room.vc_room
+                db.session.add(event_vc_room)
+
+
+@signals.event_management.clone.connect
+def _get_vc_cloner(event, **kwargs):
+    return VCCloner(event)
