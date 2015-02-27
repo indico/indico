@@ -19,21 +19,21 @@ from flask import flash
 from indico.core.config import Config
 from indico.modules.rb import settings as rb_settings
 from indico.modules.rb.forms.settings import SettingsForm
-from indico.modules.rb.views.admin.index import WPRoomBookingPluginAdmin
+from indico.modules.rb.views.admin.index import WPRoomBookingSettings
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
-class RHRoomBookingPluginAdmin(RHAdminBase):
+class RHRoomBookingSettings(RHAdminBase):
     def _process(self):
         defaults = FormDefaults(**rb_settings.get_all())
         form = SettingsForm(obj=defaults)
         if form.validate_on_submit():
             rb_settings.set_multi(form.data)
             flash(_(u'Settings saved'), 'success')
-            self._redirect(url_for('rooms_admin.roomBookingPluginAdmin'))
+            self._redirect(url_for('rooms_admin.settings'))
             return
         rb_active = Config.getInstance().getIsRoomBookingActive()
-        return WPRoomBookingPluginAdmin(self, rb_active=rb_active, form=form).display()
+        return WPRoomBookingSettings(self, rb_active=rb_active, form=form).display()

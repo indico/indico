@@ -21,6 +21,7 @@ from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.wcomponents import TabControl, WSimpleNavigationDrawer, WTabControl
 
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 
 
 class WPRoomsBase(WPAdminsBase):
@@ -34,13 +35,13 @@ class WPRoomsBase(WPAdminsBase):
             self._subTabRoomBooking = self._tabCtrl.newTab(
                 'booking',
                 _('Room Booking'),
-                urlHandlers.UHRoomBookingPluginAdmin.getURL()
+                url_for('rooms_admin.settings')
             )
 
             self._subTabMain = self._subTabRoomBooking.newSubTab(
                 'settings',
                 _('Settings'),
-                urlHandlers.UHRoomBookingPluginAdmin.getURL()
+                url_for('rooms_admin.settings')
             )
         else:
             self._subTabRoomBooking = self._tabCtrl.newTab(
@@ -64,7 +65,7 @@ class WPRoomsBase(WPAdminsBase):
         if self._rh._getUser().isAdmin():
             return WSimpleNavigationDrawer(
                 _('Room Booking Admin'),
-                urlHandlers.UHRoomBookingPluginAdmin.getURL,
+                lambda: url_for('rooms_admin.settings'),
                 bgColor='white'
             )
 
@@ -76,7 +77,7 @@ class WPRoomsBase(WPAdminsBase):
         return WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
 
 
-class WPRoomBookingPluginAdminBase(WPRoomsBase):
+class WPRoomBookingAdminBase(WPRoomsBase):
     def getJSFiles(self):
         return WPRoomsBase.getJSFiles(self) + self._includeJSPackage('Management')
 

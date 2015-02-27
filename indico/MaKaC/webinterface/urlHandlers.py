@@ -464,10 +464,6 @@ class UHRoomBookingCancelBookingOccurrence(URLHandler):
 
 
 # RB Administration
-class UHRoomBookingPluginAdmin(URLHandler):
-    _endpoint = 'rooms_admin.roomBookingPluginAdmin'
-
-
 class UHRoomBookingAdmin(URLHandler):
     _endpoint = 'rooms_admin.roomBooking-admin'
 

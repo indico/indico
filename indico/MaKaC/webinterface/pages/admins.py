@@ -97,9 +97,8 @@ class WPAdminsBase(WPMainBase):
             urlHandlers.UHDomains.getURL())
         mainSection.addItem( self._domainsMenuItem)
 
-        self._roomsMenuItem = wcomponents.SideMenuItem(_("Rooms"),
-            urlHandlers.UHRoomBookingPluginAdmin.getURL())
-        mainSection.addItem( self._roomsMenuItem)
+        self._roomsMenuItem = wcomponents.SideMenuItem(_("Rooms"), url_for('rooms_admin.settings'))
+        mainSection.addItem(self._roomsMenuItem)
 
         self._templatesMenuItem = wcomponents.SideMenuItem(_("Layout"),
             urlHandlers.UHAdminLayoutGeneral.getURL())

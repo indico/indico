@@ -15,10 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.wcomponents import WTemplated
-from indico.modules.rb.views.admin import WPRoomBookingPluginAdminBase
+from indico.modules.rb.views.admin import WPRoomBookingAdminBase
 
 
-class WPRoomBookingAdmin(WPRoomBookingPluginAdminBase):
+class WPRoomBookingAdmin(WPRoomBookingAdminBase):
     def _setActiveTab(self):
         self._subTabConfig.setActive()
 
@@ -26,7 +26,7 @@ class WPRoomBookingAdmin(WPRoomBookingPluginAdminBase):
         return WTemplated('RoomBookingAdmin').getHTML(params)
 
 
-class WPRoomBookingAdminLocation(WPRoomBookingPluginAdminBase):
+class WPRoomBookingAdminLocation(WPRoomBookingAdminBase):
     def _setActiveTab(self):
         self._subTabConfig.setActive()
 
