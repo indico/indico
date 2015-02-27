@@ -1,8 +1,9 @@
+{% extends 'admin/base.html' %}
 {% from 'forms/form_widget.html' import form_header, form_row, form_footer  %}
 
-<div class="module-vc vc-management" id="vc-info-container">
-    <div class="groupTitle">{% trans %}Current video rooms{% endtrans %}</div>
-    <div class="fixed-width">
+{% block title %}{% trans %}Current video rooms{% endtrans %}{% endblock %}
+{% block content %}
+    <div class="module-vc vc-management fixed-width" id="vc-info-container">
         {% if plugins %}
             {% if event_vc_rooms %}
                 <table class="i-table-widget fixed-width">
@@ -113,11 +114,11 @@
                 });
             </script>
         {% else %}
-                <div class="warning-message-box">
-                    <div class="message-text">
-                        {% trans %}There are no Video Conference plugins available.{% endtrans %}
-                    </div>
+            <div class="warning-message-box">
+                <div class="message-text">
+                    {% trans %}There are no Video Conference plugins available.{% endtrans %}
                 </div>
+            </div>
         {% endif %}
     </div>
-</div>
+{% endblock %}

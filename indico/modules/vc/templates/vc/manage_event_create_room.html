@@ -9,7 +9,9 @@
     {%- endif -%}
     {% trans %}Video Conference Room{% endtrans %}
 {% endblock %}
+
 {% block subtitle %}{{ plugin.title }}{% endblock %}
+
 {%- block content %}
     {{ form_header(id='vc-room-form') }}
 
@@ -47,6 +49,5 @@
                 }
             });
         })();
-
     </script>
 {%- endblock %}
