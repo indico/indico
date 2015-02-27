@@ -17,6 +17,13 @@
             }
         }
     }
+
+    .i-table-widget > tbody > tr.deleted {
+        background: $light-gray;
+        > td {
+            color: $gray !important;
+        }
+    }
 }
 
 @keyframes text-changed
