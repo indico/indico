@@ -77,63 +77,8 @@
                 </span>
             </div>
             <script>
-                (function() {
-                    eventManageVCRooms();
-                    $('.toggle-details').on('click', function(e) {
-                        e.preventDefault();
-                        var $this = $(this);
-
-                        if ($this.closest('.vc-room-entry.deleted').length) {
-                            return;
-                        }
-
-                        $this.closest('tr').next('tr').find('.details-container').slideToggle({
-                            start: function() {
-                                $this.toggleClass('icon-next icon-expand');
-                            }
-                        });
-                    }).filter('.vc-room-entry:not(.deleted) .toggle-details')
-                      .qtip({content: $T('Click to toggle collapse status')});
-
-                    $('.vc-room-entry.deleted').qtip({
-                        content: $T('This room has been deleted and cannot be used. \
-                                     You can detach it from the event, however.'),
-                        position: {
-                            my: 'top center',
-                            at: 'bottom center'
-                        }
-                    })
-
-                    $('.js-create-room:not([data-vc-system])').ajaxDialog({
-                        title: $T('Video services')
-                    });
-                    // Snippet to copy links to the clipboard
-                    var client = new ZeroClipboard($('.clip_button'));
-                    client.on('ready', function() {
-                        client.on('copy', function(event) {
-                            event.clipboardData.setData('text/plain', $(event.target).data('link'));
-                        });
-                        client.on('aftercopy', function(event) {
-                            $(event.target).parent().siblings('.button-info-message').show().fadeOut(2000);
-                        });
-                    });
-                    client.on('error', function() {
-                        ZeroClipboard.destroy();
-                    });
-                    $('.toggle .i-button').on('click', function(){
-                        var toogle = $(this);
-                        toogle.toggleClass('icon-eye icon-eye-blocked');
-                        var $input = toogle.siblings('input');
-                        $input.prop('type',$input.prop('type') === 'text' ? 'password' : 'text');
-                    });
-                    $('#btn-add-existing').ajaxDialog({
-                        onClose: function(data) {
-                            if (data) {
-                                location.reload();
-                            }
-                        }
-                    });
-                })();
+                eventClipboardVCRooms('.vc-room-entry', '.toggle-details', '~ tr .clip_button');
+                eventManageVCRooms();
             </script>
         {% else %}
             <div class="warning-message-box">

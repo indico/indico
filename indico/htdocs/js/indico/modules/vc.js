@@ -5,6 +5,19 @@
     var $t = $T;
 
     global.eventManageVCRooms = function() {
+
+        $('.js-create-room:not([data-vc-system])').ajaxDialog({
+            title: $T('Video services')
+        });
+
+        $('#btn-add-existing').ajaxDialog({
+            onClose: function(data) {
+                if (data) {
+                    location.reload();
+                }
+            }
+        });
+
         $('.js-vcroom-remove').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
@@ -32,5 +45,91 @@
                 method: 'post'
             }).appendTo('body').submit();
         });
+
+        $('.vc-room-entry.deleted').qtip({
+            content: $T('This room has been deleted and cannot be used. \
+                         You can detach it from the event, however.'),
+            position: {
+                my: 'top center',
+                at: 'bottom center'
+            }
+        })
+
+        $('.toggle-details').on('click', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+
+            if ($this.closest('.vc-room-entry.deleted').length) {
+                return;
+            }
+
+            $this.closest('tr').next('tr').find('.details-container').slideToggle({
+                start: function() {
+                    $this.toggleClass('icon-next icon-expand');
+                }
+            });
+        }).filter('.vc-room-entry:not(.deleted) .toggle-details')
+          .qtip({content: $T('Click to toggle collapse status')});
+
+        $('.toggle .i-button').on('click', function(){
+            var toggle = $(this);
+            toggle.toggleClass('icon-eye icon-eye-blocked');
+            var $input = toggle.siblings('input');
+            $input.prop('type', $input.prop('type') === 'text' ? 'password' : 'text');
+        });
     };
+
+    global.eventClipboardVCRooms = function(base, trigger_selector, button_selector) {
+        $(function() {
+            var $trigger = $(base + ' ' + trigger_selector),
+                $button = $(base).find(button_selector || '.clip_button');
+
+            // Clipboard handling using Zero Clipboard
+            // We will load it only on hovering, so that we defer using Flash
+            $trigger.one('click', function() {
+                var client = new ZeroClipboard($button);
+
+                client.on('error', function(e) {
+                    ZeroClipboard.destroy();
+                    $button.remove();
+                });
+
+                client.on('ready', function() {
+                    client.on('copy', function(event) {
+                        event.clipboardData.setData('text/plain', $(event.target).data('link'));
+                    });
+                    client.on('aftercopy', function(event) {
+                        $(event.target).parent().siblings('.button-info-message').show().fadeOut(2000);
+                    });
+                });
+            });
+        });
+    };
+
+    global.eventDisplayVCRooms = function() {
+        $(function() {
+            $('.event-service-row > .trigger').click(function() {
+                var toggler = $(this);
+                toggler.siblings('.event-service-details').slideToggle({
+                    start: function() {
+                        toggler.toggleClass('icon-expand icon-collapse');
+                    },
+                    duration: 'fast'
+                });
+            });
+
+            $('.event-service-row-toggle').on('click', function(e) {
+                e.preventDefault();
+                var toggler = $(this);
+                var toggler_button = $(this).parent().siblings('.trigger');
+                toggler.parent().siblings('.event-service-details').slideToggle({
+                    start: function() {
+                        toggler_button.toggleClass('icon-expand icon-collapse');
+                    },
+                    duration: 'fast'
+                });
+            });
+        });
+    };
+
 })(window);

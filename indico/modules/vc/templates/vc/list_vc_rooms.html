@@ -53,23 +53,4 @@
             {% endfor %}
         {% endif %}
     </div>
-    <script>
-        $('.clip_button').one('mouseover', function() {
-            // Snippet to copy links to the clipboard
-            var client = new ZeroClipboard($(this));
-
-            client.on('ready', function() {
-                client.on('copy', function(event) {
-                    event.clipboardData.setData('text/plain', $(event.target).data('link'));
-                });
-                client.on('aftercopy', function(event) {
-                    $(event.target).parent().siblings('.button-info-message').show().fadeOut(2000);
-                });
-            });
-
-            client.on('error', function() {
-                ZeroClipboard.destroy();
-            });
-        });
-    </script>
 {%- endmacro %}

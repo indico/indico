@@ -1097,20 +1097,16 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
     def getCSSFiles(self):
         return WPConferenceBase.getCSSFiles(self) + self._asset_env['eventservices_sass'].urls()
 
-
     def getJSFiles(self):
         modules = WPConferenceBase.getJSFiles(self)
 
-        # if the user has management powers, include
-        # these modules
-        #if self._conf.canModify(self._rh.getAW()):
-
         # TODO: find way to check if the user is able to manage
         # anything inside the conference (sessions, ...)
-        modules += self._includeJSPackage('Management')
-        modules += self._includeJSPackage('MaterialEditor')
-        modules += self._includeJSPackage('Display')
-        modules += self._asset_env['zero_clipboard_js'].urls()
+        modules += (self._includeJSPackage('Management') +
+                    self._includeJSPackage('MaterialEditor') +
+                    self._includeJSPackage('Display') +
+                    self._asset_env['modules_vc_js'].urls() +
+                    self._asset_env['zero_clipboard_js'].urls())
         return modules
 
     def _applyDecoration( self, body ):
