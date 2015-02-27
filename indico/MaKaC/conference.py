@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from itertools import ifilter
+from flask_pluginengine import plugin_context
 
 from indico.core.models.settings import EventSetting
 from indico.modules.events.requests.models.requests import Request, RequestState
@@ -12412,7 +12413,7 @@ class EventCloner(object):
         """Returns the items/checkboxes for the clone options provided by plugins"""
         plugin_options = []
         for plugin_cloner in values_from_signal(signals.event_management.clone.send(event), single_value=True):
-            with plugin_cloner.plugin.plugin_context():
+            with plugin_context(plugin_cloner.plugin):
                 for name, (title, enabled) in plugin_cloner.get_options().iteritems():
                     full_name = plugin_cloner.full_option_name(name)
                     plugin_options.append(
@@ -12427,14 +12428,14 @@ class EventCloner(object):
         """Calls the various cloning methods from plugins"""
         selected = set(request.values.getlist('cloners'))
         for plugin_cloner in values_from_signal(signals.event_management.clone.send(old_event), single_value=True):
-            with plugin_cloner.plugin.plugin_context():
+            with plugin_context(plugin_cloner.plugin):
                 selected_options = {name for name, (_, enabled) in plugin_cloner.get_options().iteritems()
                                     if enabled and plugin_cloner.full_option_name(name) in selected}
                 plugin_cloner.clone(new_event, selected_options)
 
-    def __init__(self, plugin, event):
-        self.plugin = plugin
+    def __init__(self, event, plugin=None):
         self.event = event
+        self.plugin = plugin
 
     def full_option_name(self, option):
         return '{}-{}'.format(self.__module__, option)
