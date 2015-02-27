@@ -9,7 +9,7 @@
 {%- block content %}
     {{ form_header(id='vc-attach-room-form') }}
 
-    {{ form_row(form['room']) }}
+    {{ form_row(form.room) }}
     {{ form_rows(form, skip=skip_fields) }}
 
     {% call form_footer() %}
