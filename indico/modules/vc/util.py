@@ -16,7 +16,9 @@
 
 from __future__ import unicode_literals
 
+from indico.core.db import db
 from indico.core.plugins import plugin_engine
+from indico.modules.fulltextindexes.models.events import IndexedEvent
 from indico.util.i18n import _
 
 from MaKaC.conference import SessionSlot
@@ -52,3 +54,21 @@ def get_linked_to_description(obj):
 def get_managed_vc_plugins(user):
     """Returns the plugins the user can manage"""
     return [p for p in get_vc_plugins().itervalues() if p.can_manage_vc(user)]
+
+
+def find_vc_rooms(from_dt=None, to_dt=None):
+    """Finds VC rooms matching certain criteria
+
+    :param from_dt: earliest event/contribution to include
+    :param to_dt: latest event/contribution to include
+    """
+    from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation
+    query = VCRoomEventAssociation.find()
+    if from_dt is not None:
+        query = (query.join(IndexedEvent, IndexedEvent.id == db.cast(VCRoomEventAssociation.event_id, db.String))
+                 .filter(IndexedEvent.start_date >= from_dt))
+    for vc_room in query:
+        event = vc_room.event
+        if to_dt is not None and event.getStartDate() > to_dt:
+            continue
+        yield vc_room
