@@ -230,7 +230,7 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
             return redirect(url_for('.manage_vc_rooms', self.event))
 
         Logger.get('modules.vc').info("Refreshing VC room {} from event '{}'[{}]".format(
-            self.vc_room, to_unicode(self._conf), self._conf.id))
+            self.vc_room, to_unicode(self._conf.getTitle()), self._conf.id))
 
         try:
             self.plugin.refresh_room(self.vc_room, self.event)
