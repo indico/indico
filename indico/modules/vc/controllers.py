@@ -16,25 +16,30 @@
 
 from __future__ import unicode_literals
 
+from collections import defaultdict, OrderedDict
+from operator import itemgetter
+
 import transaction
-from collections import defaultdict
 from flask import request, session, redirect, flash, json, Response
 from sqlalchemy import func
 from werkzeug.exceptions import NotFound, BadRequest
 
 from indico.core.db import db
-from indico.core.errors import IndicoError
+from indico.core.errors import AccessError, IndicoError
 from indico.core.logger import Logger
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
+from indico.modules.vc.forms import VCRoomListFilterForm
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus, VCRoomLinkType
 from indico.modules.vc.notifications import notify_created
-from indico.modules.vc.util import get_vc_plugins, resolve_title
-from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage
-from indico.util.date_time import now_utc
+from indico.modules.vc.util import get_vc_plugins, resolve_title, get_managed_vc_plugins, find_vc_rooms
+from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage, WPVCService
+from indico.util.date_time import as_utc, now_utc, get_day_start, get_day_end
 from indico.util.i18n import _
+from indico.util.struct.iterables import group_list
 from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.web.forms.base import FormDefaults
 
+from MaKaC.webinterface.rh.base import RHProtected
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
@@ -319,3 +324,28 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
     def _process(self):
         return Response(json.dumps([{'id': room.id, 'name': room.name, 'count': count}
                                    for room, count in self._iter_allowed_rooms()]),  mimetype='application/json')
+
+
+class RHVCRoomList(RHProtected):
+    """Provides a list of videoconference rooms"""
+
+    def _checkProtection(self):
+        RHProtected._checkProtection(self)
+        if self._doProcess and not get_managed_vc_plugins(session.user):
+            raise AccessError
+
+    def _process(self):
+        form = VCRoomListFilterForm(request.args)
+        results = None
+        if request.args and form.validate():
+            reverse = form.direction.data == 'desc'
+            from_dt = as_utc(get_day_start(form.start_date.data)) if form.start_date.data else None
+            to_dt = as_utc(get_day_end(form.end_date.data)) if form.end_date.data else None
+            results = find_vc_rooms(from_dt=from_dt, to_dt=to_dt)
+            results = group_list(results,
+                                 key=lambda x: x.event.getStartDate().date(),
+                                 sort_by=lambda x: x.event.getStartDate(),
+                                 sort_reverse=reverse)
+            results = OrderedDict(sorted(results.viewitems(), key=itemgetter(0), reverse=reverse))
+        return WPVCService.render_template('vc_room_list.html', form=form, results=results,
+                                           action=url_for('.vc_room_list'))

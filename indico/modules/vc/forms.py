@@ -17,17 +17,22 @@
 from __future__ import unicode_literals
 import re
 
+from datetime import date
+from datetime import timedelta
+
+from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields.core import BooleanField, SelectField
+from wtforms.fields.html5 import IntegerField
 from wtforms.fields.simple import StringField, HiddenField
-from wtforms.validators import DataRequired, Length, Regexp, ValidationError
+from wtforms.validators import DataRequired, Length, NumberRange, Optional, Regexp, ValidationError
 
 from indico.modules.vc.models import VCRoom
 from indico.modules.vc.util import full_block_id
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.forms.base import IndicoForm
+from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import PrincipalField, IndicoRadioField
-from indico.web.forms.validators import UsedIf
+from indico.web.forms.validators import UsedIf, Exclusive
 from indico.web.forms.widgets import JinjaWidget, SwitchWidget, SelectizeWidget
 
 ROOM_NAME_RE = re.compile(r'[\w\-]+')
@@ -124,3 +129,26 @@ class VCRoomFormBase(VCRoomLinkFormBase):
     def __init__(self, *args, **kwargs):
         super(VCRoomFormBase, self).__init__(*args, **kwargs)
         self.vc_room = kwargs.pop('vc_room')
+
+
+class VCRoomListFilterForm(IndicoForm):
+    direction = SelectField(_('Sort direction'), [DataRequired()],
+                            choices=[('asc', _('Ascending')), ('desc', _('Descending'))])
+    abs_start_date = DateField(_('Start Date'), [Optional(), Exclusive('rel_start_date')],
+                               parse_kwargs={'dayfirst': True})
+    abs_end_date = DateField(_('End Date'), [Optional(), Exclusive('rel_end_date')],
+                             parse_kwargs={'dayfirst': True})
+    rel_start_date = IntegerField(_('Days in the past'), [Optional(), Exclusive('abs_start_date'), NumberRange(min=0)])
+    rel_end_date = IntegerField(_('Days in the future'), [Optional(), Exclusive('abs_end_date'), NumberRange(min=0)])
+
+    @generated_data
+    def start_date(self):
+        if self.abs_start_date.data is None and self.rel_start_date.data is None:
+            return None
+        return self.abs_start_date.data or (date.today() - timedelta(days=self.rel_start_date.data))
+
+    @generated_data
+    def end_date(self):
+        if self.abs_end_date.data is None and self.rel_end_date.data is None:
+            return None
+        return self.abs_end_date.data or (date.today() + timedelta(days=self.rel_end_date.data))

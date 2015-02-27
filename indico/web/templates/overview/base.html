@@ -3,7 +3,9 @@
 {# Implement this macro in child templates
     {% macro result_group_entries(items) %}
         {% for item in items %}
-            <td>{{ item }}</td>
+            <tr class="result-group-entry">
+                <td>{{ item }}</td>
+            </tr>
         {% endfor %}
     {% endmacro %}
 #}

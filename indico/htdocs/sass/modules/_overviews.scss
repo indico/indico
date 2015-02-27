@@ -23,6 +23,10 @@ body {
     background: $light-gray;
 }
 
+%content-fit-cell {
+    width: 1%;
+}
+
 .overview-results {
     padding: 0;
 
@@ -65,6 +69,33 @@ body {
                 &:first-child {
                     padding-left: $result-group-padding + 1em;
                 }
+            }
+        }
+
+        td.entry-time {
+            @extend %content-fit-cell;
+            font-weight: bold;
+        }
+
+        td.entry-type {
+            @extend %content-fit-cell;
+        }
+
+        td.entry-location {
+            @extend %content-fit-cell;
+            white-space: nowrap;
+
+            .location {
+                color: $dark-gray;
+            }
+
+            .room {
+                font-weight: bold;
+            }
+
+            .no-location {
+                color: $gray;
+                font-style: italic;
             }
         }
     }

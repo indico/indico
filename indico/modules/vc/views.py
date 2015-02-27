@@ -14,8 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from indico.web.flask.util import url_for
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
+from MaKaC.webinterface.pages.main import WPMainBase
+from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
 
 
 class WPVCJinjaMixin(WPJinjaMixin):
@@ -61,3 +64,14 @@ class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
     def _defineSectionMenu(self):
         WPConferenceDefaultDisplayBase._defineSectionMenu(self)
         self._sectionMenu.setCurrentItem(self._sectionMenu.getLinkByName('vc-event-page'))
+
+
+class WPVCService(WPVCJinjaMixin, WPMainBase):
+    def getCSSFiles(self):
+        return WPMainBase.getCSSFiles(self) + self._asset_env['overviews_sass'].urls()
+
+    def _getNavigationDrawer(self):
+        return WSimpleNavigationDrawer('Videoconference', lambda: url_for('.vc_room_list'))
+
+    def _getBody(self, params):
+        return self._getPageContent(params)

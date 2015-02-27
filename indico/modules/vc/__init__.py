@@ -23,10 +23,12 @@ from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
 from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLinkType
-from indico.modules.vc.plugins import VCPluginMixin
 from indico.modules.vc.forms import VCPluginSettingsFormBase
+from indico.modules.vc.plugins import VCPluginMixin
+from indico.modules.vc.util import get_vc_plugins, get_managed_vc_plugins
 from indico.web.flask.templating import template_hook
-from indico.modules.vc.util import get_vc_plugins
+from indico.web.flask.util import url_for
+from indico.web.menu import HeaderMenuEntry
 from indico.util.i18n import _
 from MaKaC.conference import EventCloner
 from MaKaC.user import AvatarHolder
@@ -82,6 +84,13 @@ def _contrib_deleted(contrib, **kwargs):
 def _event_deleted(event, **kwargs):
     for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True):
         event_vc_room.delete(_get_user())
+
+
+@signals.indico_menu.connect
+def extend_header_menu(sender, **kwargs):
+    if not session.user or not get_managed_vc_plugins(session.user):
+        return
+    return HeaderMenuEntry(url_for('vc.vc_room_list'), _('Videoconference'), _('Services'))
 
 
 def _get_user():
