@@ -12406,26 +12406,27 @@ class BOAConfig(Persistent):
 
 
 class EventCloner(object):
-    """Base class to let plugins plug into the event cloning mechanism"""
+    """Base class to let plugins/modules plug into the event cloning mechanism"""
 
     @staticmethod
     def get_plugin_items(event):
-        """Returns the items/checkboxes for the clone options provided by plugins"""
+        """Returns the items/checkboxes for the clone options provided by EventCloner"""
         plugin_options = []
         for plugin_cloner in values_from_signal(signals.event_management.clone.send(event), single_value=True):
             with plugin_context(plugin_cloner.plugin):
                 for name, (title, enabled) in plugin_cloner.get_options().iteritems():
                     full_name = plugin_cloner.full_option_name(name)
-                    plugin_options.append(
+                    plugin_options.append((
+                        title,
                         """<li><input type="checkbox" name="cloners" id="cloner-{0}" value="{0}" {2}>{1}</li>""".format(
                             full_name, title, 'disabled' if not enabled else ''
-                        )
+                        ))
                     )
-        return '\n'.join(plugin_options)
+        return '\n'.join(x[1] for x in sorted(plugin_options))
 
     @staticmethod
     def clone_event(old_event, new_event):
-        """Calls the various cloning methods from plugins"""
+        """Calls the various cloning methods"""
         selected = set(request.values.getlist('cloners'))
         for plugin_cloner in values_from_signal(signals.event_management.clone.send(old_event), single_value=True):
             with plugin_context(plugin_cloner.plugin):
