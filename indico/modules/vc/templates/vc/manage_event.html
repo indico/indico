@@ -75,45 +75,47 @@
                 </span>
             </div>
             <script>
-                eventManageVCRooms();
-                $('.toggle-details').on('click', function(e) {
-                    e.preventDefault();
-                    var toggler = $(this);
-                    toggler.closest('tr').next('tr').find('.details-container').slideToggle({
-                        start: function() {
-                            toggler.toggleClass('icon-next icon-expand');
+                (function() {
+                    eventManageVCRooms();
+                    $('.toggle-details').on('click', function(e) {
+                        e.preventDefault();
+                        var toggler = $(this);
+                        toggler.closest('tr').next('tr').find('.details-container').slideToggle({
+                            start: function() {
+                                toggler.toggleClass('icon-next icon-expand');
+                            }
+                        });
+                    });
+                    $('.js-create-room:not([data-vc-system])').ajaxDialog({
+                        title: $T('Video services')
+                    });
+                    // Snippet to copy links to the clipboard
+                    var client = new ZeroClipboard( $('.clip_button') );
+                    client.on('ready', function(event) {
+                        client.on( 'copy', function(event) {
+                            event.clipboardData.setData('text/plain', event.target.getAttribute('data-link'));
+                        });
+                        client.on('aftercopy', function(event) {
+                            $(event.target).parent().siblings('.button-info-message').show().fadeOut(2000);
+                        });
+                    });
+                    client.on('error', function(event) {
+                        ZeroClipboard.destroy();
+                    });
+                    $('.toggle .i-button').on('click', function(){
+                        var toogle = $(this);
+                        toogle.toggleClass('icon-eye icon-eye-blocked');
+                        var $input = toogle.siblings('input');
+                        $input.prop('type',$input.prop('type') === 'text' ? 'password' : 'text');
+                    });
+                    $('#btn-add-existing').ajaxDialog({
+                        onClose: function(data) {
+                            if (data) {
+                                location.reload();
+                            }
                         }
                     });
-                });
-                $('.js-create-room:not([data-vc-system])').ajaxDialog({
-                    title: $T('Video services')
-                });
-                // Snippet to copy links to the clipboard
-                var client = new ZeroClipboard( $('.clip_button') );
-                client.on('ready', function(event) {
-                    client.on( 'copy', function(event) {
-                        event.clipboardData.setData('text/plain', event.target.getAttribute('data-link'));
-                    });
-                    client.on('aftercopy', function(event) {
-                        $(event.target).parent().siblings('.button-info-message').show().fadeOut(2000);
-                    });
-                });
-                client.on('error', function(event) {
-                    ZeroClipboard.destroy();
-                });
-                $('.toggle .i-button').on('click', function(){
-                    var toogle = $(this);
-                    toogle.toggleClass('icon-eye icon-eye-blocked');
-                    var $input = toogle.siblings('input');
-                    $input.prop('type',$input.prop('type') === 'text' ? 'password' : 'text');
-                });
-                $('#btn-add-existing').ajaxDialog({
-                    onClose: function(data) {
-                        if (data) {
-                            location.reload();
-                        }
-                    }
-                });
+                })();
             </script>
         {% else %}
             <div class="warning-message-box">
