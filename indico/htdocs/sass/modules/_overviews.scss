@@ -23,7 +23,7 @@ body {
     background: $light-gray;
 }
 
-.search-results {
+.overview-results {
     padding: 0;
 
     table {
@@ -65,40 +65,6 @@ body {
                 &:first-child {
                     padding-left: $result-group-padding + 1em;
                 }
-            }
-        }
-
-        td.time {
-            font-weight: bold;
-        }
-
-        td.request-state {
-            .icon-disable {
-                color: $red;
-            }
-            .icon-checkmark {
-                color: $green;
-            }
-        }
-
-        td.request-type {
-            color: $gray;
-            white-space: nowrap;
-
-            i.requested {
-                color: $blue;
-            }
-        }
-
-        td.request-location {
-            white-space: nowrap;
-
-            .location {
-                color: $dark-gray;
-            }
-
-            .room {
-                font-weight: bold;
             }
         }
     }
