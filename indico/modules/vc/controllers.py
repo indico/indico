@@ -216,7 +216,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
 
         form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form,
                                             existing_vc_room=self.vc_room,
-                                            skip_fields=form.conditional_fields | {'name'})
+                                            skip_fields=form.skip_fields | {'name'})
 
         return WPVCManageEvent.render_string(form_html, self.event)
 
