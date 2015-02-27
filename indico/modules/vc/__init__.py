@@ -63,7 +63,7 @@ def _session_slot_deleted(session_slot, **kwargs):
     for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True):
         if event_vc_room.link_object is None:
             event_vc_room.link_type = VCRoomLinkType.event
-            event_vc_room.link_id = event.id
+            event_vc_room.link_id = None
 
 
 @signals.event.contribution_deleted.connect
@@ -72,7 +72,7 @@ def _contrib_deleted(contrib, **kwargs):
     for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True):
         if event_vc_room.link_object is None:
             event_vc_room.link_type = VCRoomLinkType.event
-            event_vc_room.link_id = event.id
+            event_vc_room.link_id = None
 
 
 @signals.event.deleted.connect
