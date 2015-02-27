@@ -65,7 +65,7 @@ def _extend_event_menu(sender, **kwargs):
 @signals.event.session_slot_deleted.connect
 def _session_slot_deleted(session_slot, **kwargs):
     event = session_slot.getConference()
-    for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True):
+    for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True, include_deleted=True):
         if event_vc_room.link_object is None:
             event_vc_room.link_type = VCRoomLinkType.event
             event_vc_room.link_id = None
@@ -74,7 +74,7 @@ def _session_slot_deleted(session_slot, **kwargs):
 @signals.event.contribution_deleted.connect
 def _contrib_deleted(contrib, **kwargs):
     event = contrib.getConference()
-    for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True):
+    for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True, include_deleted=True):
         if event_vc_room.link_object is None:
             event_vc_room.link_type = VCRoomLinkType.event
             event_vc_room.link_id = None
@@ -82,7 +82,7 @@ def _contrib_deleted(contrib, **kwargs):
 
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
-    for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True):
+    for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True, include_deleted=True):
         event_vc_room.delete(_get_user())
 
 

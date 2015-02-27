@@ -192,7 +192,7 @@ class VCRoomEventAssociation(db.Model):
         return '<VCRoomEventAssociation({}, {})>'.format(self.event_id, self.vc_room)
 
     @classmethod
-    def find_for_event(cls, event, include_hidden=False, only_linked_to_event=False, **kwargs):
+    def find_for_event(cls, event, include_hidden=False, include_deleted=False, only_linked_to_event=False, **kwargs):
         """Returns a Query that retrieves the video conference rooms for an event
 
         :param event: an indico event (with a numeric ID)
@@ -204,6 +204,8 @@ class VCRoomEventAssociation(db.Model):
         query = cls.find(event_id=int(event.id), **kwargs)
         if not include_hidden:
             query = query.filter(cls.show)
+        if not include_deleted:
+            query = query.filter(VCRoom.status != VCRoomStatus.deleted).join(VCRoom)
         return query
 
     def delete(self, user):

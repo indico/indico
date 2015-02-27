@@ -98,7 +98,8 @@ class RHVCManageEvent(RHVCManageEventBase):
 
     def _process(self):
         try:
-            vc_rooms = VCRoomEventAssociation.find_for_event(self._conf, include_hidden=True).all()
+            vc_rooms = VCRoomEventAssociation.find_for_event(self._conf,
+                                                             include_hidden=True, include_deleted=True).all()
         except ValueError:
             raise IndicoError(_('This page is not available for legacy events.'))
         return WPVCManageEvent.render_template('manage_event.html', self._conf, event=self._conf,
