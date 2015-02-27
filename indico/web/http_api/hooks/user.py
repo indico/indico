@@ -36,6 +36,7 @@ from MaKaC.user import AvatarHolder
 class UserInfoHook(HTTPAPIHook):
     TYPES = ('user',)
     RE = r'(?P<user_id>[\d]+)'
+    VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
         super(UserInfoHook, self)._getParams()
@@ -59,6 +60,7 @@ class UserEventHook(HTTPAPIHook):
     RE = r'(?P<what>linked_events|categ_events)'
     DEFAULT_DETAIL = 'basic_events'
     GUEST_ALLOWED = False
+    VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
         super(UserEventHook, self)._getParams()
