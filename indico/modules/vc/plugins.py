@@ -198,9 +198,11 @@ class VCPluginMixin(object):
     def can_manage_vc_room(self, user, room):
         """Checks if a user can manage a vc room"""
         return (user.isAdmin() or
-                user in retrieve_principals(room.plugin.settings.get('managers')) or
+                self.can_manage_vc(user) or
                 any(evt_assoc.event.canUserModify(user) for evt_assoc in room.events))
 
     def can_manage_vc(self, user):
         """Checks if a user has management rights on this VC system"""
-        return user.isAdmin() or user in retrieve_principals(self.settings.get('managers'))
+        if user.isAdmin():
+            return True
+        return any(principal.containsUser(user) for principal in retrieve_principals(self.settings.get('managers')))
