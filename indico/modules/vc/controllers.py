@@ -31,7 +31,7 @@ from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.forms import VCRoomListFilterForm
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus, VCRoomLinkType
 from indico.modules.vc.notifications import notify_created
-from indico.modules.vc.util import get_vc_plugins, resolve_title, get_managed_vc_plugins, find_vc_rooms
+from indico.modules.vc.util import get_vc_plugins, resolve_title, get_managed_vc_plugins, find_event_vc_rooms
 from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage, WPVCService
 from indico.util.date_time import as_utc, now_utc, get_day_start, get_day_end
 from indico.util.i18n import _
@@ -341,7 +341,7 @@ class RHVCRoomList(RHProtected):
             reverse = form.direction.data == 'desc'
             from_dt = as_utc(get_day_start(form.start_date.data)) if form.start_date.data else None
             to_dt = as_utc(get_day_end(form.end_date.data)) if form.end_date.data else None
-            results = find_vc_rooms(from_dt=from_dt, to_dt=to_dt)
+            results = find_event_vc_rooms(from_dt=from_dt, to_dt=to_dt)
             results = group_list(results,
                                  key=lambda x: x.event.getStartDate().date(),
                                  sort_by=lambda x: x.event.getStartDate(),

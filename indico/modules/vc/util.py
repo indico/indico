@@ -56,7 +56,7 @@ def get_managed_vc_plugins(user):
     return [p for p in get_vc_plugins().itervalues() if p.can_manage_vc(user)]
 
 
-def find_vc_rooms(from_dt=None, to_dt=None):
+def find_event_vc_rooms(from_dt=None, to_dt=None):
     """Finds VC rooms matching certain criteria
 
     :param from_dt: earliest event/contribution to include

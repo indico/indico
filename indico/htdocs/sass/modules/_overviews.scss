@@ -100,3 +100,18 @@ body {
         }
     }
 }
+
+
+// ============================================================================
+// Module-specific
+// ============================================================================
+
+// TODO to be moved under indico.modules.<module>
+
+.overview-results {
+    td.entry-type {
+        img {
+            max-height: 2em;
+        }
+    }
+}

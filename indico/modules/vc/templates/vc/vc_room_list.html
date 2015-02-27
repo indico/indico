@@ -2,7 +2,7 @@
 {% block title %}Videoconference{% endblock %}
 
 {% macro result_group_title(key) %}
-    {{ key | format_human_date(format='full') }}
+    {{ key | format_human_date(format='full') | title }}
 {% endmacro %}
 
 {% macro result_group_entries(items) %}
@@ -19,8 +19,11 @@
             </a>
         </td>
         <td class="entry-type">
-            <i class="icon-camera"></i>
-            {#{{ event_vc_room.vc_room.type }}#}
+            {% if event_vc_room.vc_room.plugin %}
+                <img src="{{ event_vc_room.vc_room.plugin.logo_url }}">
+            {% else %}
+                <i class="icon-camera" title="{{ event_vc_room.vc_room.plugin.friendly_name }}"></i>
+            {% endif %}
         </td>
         <td class="entry-location">
             {% if event_vc_room.event.getRoom() %}
@@ -44,7 +47,9 @@
             </a>
         </td>
         <td>
-            {{ event_vc_room.vc_room.name }}
+            <a class="discreet-link" href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}">
+                {{ event_vc_room.vc_room.name }}
+            </a>
         </td>
     </tr>
 {% endmacro %}
