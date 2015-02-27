@@ -31,7 +31,7 @@ from indico.modules.vc.util import full_block_id
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import PrincipalField, IndicoRadioField
+from indico.web.forms.fields import PrincipalField, IndicoRadioField, EmailListField
 from indico.web.forms.validators import UsedIf, Exclusive
 from indico.web.forms.widgets import JinjaWidget, SwitchWidget, SelectizeWidget
 
@@ -72,8 +72,9 @@ class VCPluginSettingsFormBase(IndicoForm):
     managers = PrincipalField(_('Managers'), description=_('Service managers'))
     acl = PrincipalField(_('ACL'), groups=True,
                          description=_('Users and Groups authorised to create video conference rooms'))
-    notify_managers = BooleanField(_('Notify managers'),
-                                   description=_('Send email notifications to managers'))
+    notification_emails = EmailListField(_('Notification email addresses'),
+                                         description=_('Notifications about video conference rooms are sent to '
+                                                       'these email addresses (one per line).'))
 
 
 class VCRoomLinkFormBase(IndicoForm):

@@ -53,8 +53,8 @@ def notify_deleted(plugin, room, room_assoc, event, user):
 
 def _send(action, user, plugin, event, room, subject, body):
     to_list = {user.getEmail()}
-    cc_list = plugin.get_notification_cc_list(action, room, event)
-    bcc_list = plugin.get_notification_bcc_list(action, room, event)
+    cc_list = plugin.get_notification_cc_list(action, room, event) - to_list
+    bcc_list = plugin.get_notification_bcc_list(action, room, event) - cc_list - to_list
 
     notification = {
         'content-type': 'text/html',
