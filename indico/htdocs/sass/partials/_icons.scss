@@ -378,34 +378,21 @@ i[class^="icon-"]:before {
 
 
 /* animated spinner icon */
-/* animation from https://github.com/FortAwesome/Font-Awesome/blob/master/scss/_animated.scss */
 .icon-spinner:before {
-    content: "\e97e";
-    -webkit-animation: icon-spin 1.2s infinite linear;
-            animation: icon-spin 1.2s infinite linear;
+    content: "";
+    display: inline-block;
+    width: 1.2em;
+    height: 100%;
+    background-image: url('/images/loading.gif');
+    background-repeat: no-repeat;
+    background-size: 1.2em 1.2em;
+    vertical-align: middle !important;
+    opacity: 0.6; // full opacity is too dark compared to the text in a button
 }
 
+.disabled .icon-spinner:before {
+    opacity: 0.4; // "disabled feel" for the bg image with the spinner
 
-@-webkit-keyframes icon-spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  100% {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-
-@keyframes fa-spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  100% {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
 }
 
 
