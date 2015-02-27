@@ -121,15 +121,12 @@ div.containerTitle {
 }
 
 ul.topLevelSCList {
-    margin: 20px 0 5px 5px;
+    margin: 1em 0 5px 5px;
     list-style-type: none;
-    border-top: 1px dotted #AAA;
 }
 
 ul.topLevelSCList li {
-    padding: 5px 0;
-    margin: 0;
-    border-bottom: 1px dotted #AAA;
+    margin-top: 1em;
 }
 
 .subEventLevelAbstract {
