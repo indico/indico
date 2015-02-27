@@ -164,7 +164,7 @@ class VCRoomEventAssociation(db.Model):
 
     @property
     def locator(self):
-        return dict(self.event.getLocator(), event_vc_room_id=self.id, **self.vc_room.locator)
+        return dict(self.event.getLocator(), service=self.vc_room.type, event_vc_room_id=self.id)
 
     @property
     def event(self):
