@@ -66,13 +66,13 @@ class VCPluginMixin(object):
 
     def get_notification_cc_list(self, action, vc_room, event):
         owner = retrieve_principal(vc_room.data['owner'])
-        return {owner.getEmail()} if owner else {}
+        return {owner.getEmail()} if owner else set()
 
     def get_notification_bcc_list(self, action, vc_room, event):
         if self.settings.get('notify_managers'):
             return {u.getEmail() for u in retrieve_principals(self.settings.get('managers'))}
         else:
-            return {}
+            return set()
 
     @property
     def service_name(self):
