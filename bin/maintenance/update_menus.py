@@ -9,7 +9,7 @@ from MaKaC.webinterface.displayMgr import ConfDisplayMgrRegistery
 
 
 def update_menus(dbi):
-    links = ('collaboration', 'downloadETicket', 'ViewMyRegistration', 'NewRegistration')
+    links = ('downloadETicket', 'ViewMyRegistration', 'NewRegistration')
     ch = ConferenceHolder()
     cdmr = ConfDisplayMgrRegistery()
     counter = Counter()

@@ -426,7 +426,6 @@ class Menu(Persistent):
     def removeLink(self, link):
         if link in self._listLink:
             self._listLink.remove(link)
-            link.setParent(None)
             link.delete()
             self._p_changed = 1
 
@@ -736,7 +735,6 @@ class Link(Persistent):
     def removeLink(self, link):
         if link in self._listLink:
             self._listLink.remove(link)
-            link.setParent(None)
             link.delete()
             self._p_changed = 1
 

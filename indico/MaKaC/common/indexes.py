@@ -1357,7 +1357,7 @@ class IndexesHolder(ObjectHolder):
                     "pendingConfSubmittersTasks", "pendingConfManagers",
                     "pendingConfManagersTasks","pendingSubmittersTasks", "pendingManagers",
                     "pendingManagersTasks", "pendingCoordinators",
-                    "pendingCoordinatorsTasks", "collaboration"]
+                    "pendingCoordinatorsTasks"]
 
     def getIndex( self, name ):
         return self.getById(name)

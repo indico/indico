@@ -486,16 +486,6 @@ if __name__ == '__main__':
             [indico.zodb_importers]
             roombooking = indico_zodbimport.modules.roombooking:RoomBookingImporter
             payment = indico_zodbimport.modules.payment:PaymentImporter
-
-            [indico.ext_types]
-            Collaboration = MaKaC.plugins.Collaboration
-
-            [indico.ext]
-            Collaboration.EVO = MaKaC.plugins.Collaboration.EVO
-            Collaboration.WebEx = MaKaC.plugins.Collaboration.WebEx
-            Collaboration.Vidyo = MaKaC.plugins.Collaboration.Vidyo
-            Collaboration.CERNMCU = MaKaC.plugins.Collaboration.CERNMCU
-            Collaboration.RecordingManager = MaKaC.plugins.Collaboration.RecordingManager
             """,
           zip_safe=False,
           packages=foundPackages,

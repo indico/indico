@@ -45,7 +45,6 @@ from MaKaC import __version__
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import ConferenceHolder, CategoryManager
 from MaKaC.plugins.base import PluginsHolder, Plugin, PluginType
-from MaKaC.plugins.Collaboration import urlHandlers
 from MaKaC.webinterface import displayMgr
 from MaKaC.authentication.LocalAuthentication import LocalAuthenticator, LocalIdentity
 from MaKaC.authentication.LDAPAuthentication import LDAPIdentity, LDAPAuthenticator
@@ -232,22 +231,9 @@ def addSuggestionsTask(dbi, prevVersion):
 @since('1.2')
 def conferenceMigration1_2(dbi, prevVersion):
     """
-    Tasks: 1. Removing Video Services from core
-           2. Migrates old AbstractField to new AbstractField subclasses
-           3. Add download e-ticket PDF link to the menu
+    Tasks: 1. Migrates old AbstractField to new AbstractField subclasses
+           2. Add download e-ticket PDF link to the menu
     """
-
-    def removeVideoServicesLinksFromCore(conf):
-        """
-        Video Services migration remove from core
-        """
-
-        # Update Menu Links
-        menu = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(conf).getMenu()
-        if menu:
-            link = menu.getLinkByName("collaboration")
-            if link:
-                link.setURLHandler(urlHandlers.UHCollaborationDisplay)
 
     def updateAbstractFields(conf):
         """
@@ -283,7 +269,6 @@ def conferenceMigration1_2(dbi, prevVersion):
 
     for (__, conf) in console.conferenceHolderIterator(ch, deepness='event'):
 
-        removeVideoServicesLinksFromCore(conf)
         updateAbstractFields(conf)
         # Add download e-ticket PDF link to the menu:
         _fixDefaultStyle(conf, cdmr)
