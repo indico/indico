@@ -22,6 +22,8 @@ from sqlalchemy.dialects.postgresql import JSON
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
+from indico.core.logger import Logger
+from indico.modules.vc.notifications import notify_deleted
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
@@ -202,3 +204,22 @@ class VCRoomEventAssociation(db.Model):
         if not include_hidden:
             query = query.filter(cls.show)
         return query
+
+    def delete(self, user):
+        """Deletes a VC room from an event
+
+        If the room is not used anywhere else, the room itself is also deleted.
+
+        :param user: the user performing the deletion
+        """
+        Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
+            self.vc_room, self.event, self.link_object)
+        )
+        db.session.delete(self)
+        db.session.flush()
+        if not self.vc_room.events:
+            Logger.get('modules.vc').info("Deleting VC room {}".format(self.vc_room))
+            if self.vc_room.status != VCRoomStatus.deleted:
+                self.vc_room.plugin.delete_room(self.vc_room, self.event)
+                notify_deleted(self.vc_room.plugin, self.vc_room, self, self.event, user)
+            db.session.delete(self.vc_room)

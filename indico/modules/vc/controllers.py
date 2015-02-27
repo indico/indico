@@ -27,7 +27,7 @@ from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus, VCRoomLinkType
-from indico.modules.vc.notifications import notify_created, notify_deleted
+from indico.modules.vc.notifications import notify_created
 from indico.modules.vc.util import get_vc_plugins, resolve_title
 from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage
 from indico.util.date_time import now_utc
@@ -252,19 +252,7 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
             flash(_('You are not allowed to remove VC rooms from this event.'), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
-        Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
-            self.vc_room, self.event_vc_room.event, self.event_vc_room.link_object))
-        db.session.delete(self.event_vc_room)
-        db.session.flush()
-
-        # delete room if not connected to any other events
-        if not self.vc_room.events:
-            Logger.get('modules.vc').info("Deleting VC room {}".format(self.vc_room))
-            if self.vc_room.status != VCRoomStatus.deleted:
-                self.plugin.delete_room(self.vc_room, self.event)
-                notify_deleted(self.plugin, self.vc_room, self.event_vc_room, self.event, session.user)
-            db.session.delete(self.vc_room)
-
+        self.event_vc_room.delete(session.user)
         flash(_("Video conference room '{0}' has been removed").format(self.vc_room.name), 'success')
         return redirect(url_for('.manage_vc_rooms', self.event))
 
