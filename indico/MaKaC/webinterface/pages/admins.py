@@ -41,15 +41,12 @@ from MaKaC.common import (
 from MaKaC.common.Announcement import getAnnoucementMgrInstance
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.modules import INewsItemFossil
-from MaKaC.fossils.user import IAvatarFossil
 from MaKaC.i18n import _
-from MaKaC.plugins import PluginsHolder
 from MaKaC.services.implementation.user import UserComparator
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.webinterface.pages.base import WPDecorated
 
 # indico
 from indico.modules import ModuleHolder
@@ -110,9 +107,6 @@ class WPAdminsBase(WPMainBase):
 
         self._servicesMenuItem = wcomponents.SideMenuItem(_("Services"), urlHandlers.UHIPBasedACL.getURL())
         mainSection.addItem(self._servicesMenuItem)
-
-        self._pluginsOldMenuItem = wcomponents.SideMenuItem(_("Plugins (Old)"), urlHandlers.UHAdminPlugins.getURL())
-        mainSection.addItem(self._pluginsOldMenuItem)
 
         self._pluginsMenuItem = wcomponents.SideMenuItem(_("Plugins"), url_for('plugins.index'))
         mainSection.addItem(self._pluginsMenuItem)
@@ -340,102 +334,6 @@ class WAnnouncementModif(wcomponents.WTemplated):
         vars["announcement"] = escape(an.getText()).replace("\"", "&#34;")
         return vars
 
-
-class WPAdminPlugins( WPAdminsBase ):
-
-    _userData = ['favorite-user-list', 'favorite-user-ids']
-
-    def __init__(self, rh, pluginTypeId, initialPlugin):
-        WPAdminsBase.__init__(self, rh)
-        self._pluginTypeId = pluginTypeId
-        self._initialPlugin = initialPlugin
-        self._user = rh._getUser()
-        self._tabs = {}
-
-    def _createTabCtrl(self):
-        self._tabCtrl = wcomponents.TabControl()
-
-        self._tabs["Main"] = self._tabCtrl.newTab("Main", _("Main"), urlHandlers.UHAdminPlugins.getURL())
-
-        pluginTypes = PluginsHolder().getPluginTypes(doSort = True)
-        for pluginType in pluginTypes:
-            if pluginType.isVisible() and pluginType.isActive():
-                self._tabs[pluginType.getId()] = self._tabCtrl.newTab(pluginType.getName(), pluginType.getName(),
-                                                                       urlHandlers.UHAdminPlugins.getURL( pluginType ))
-
-    def _setActiveSideMenuItem(self):
-        self._pluginsOldMenuItem.setActive()
-
-    def _setActiveTab(self):
-        if self._pluginTypeId is None:
-            self._tabs["Main"].setActive()
-        else:
-            self._tabs[self._pluginTypeId].setActive()
-
-
-    def _getPageContent(self, params):
-        if self._pluginTypeId is None:
-            html = WAdminPluginsMainTab().getHTML(params)
-        else:
-            html = WAdminPlugins(self._pluginTypeId, self._initialPlugin, self._user).getHTML( params )
-
-        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( html )
-
-class WAdminPlugins (wcomponents.WTemplated):
-
-    def __init__(self, pluginType, initialPlugin, user):
-        self._pluginType = pluginType
-        self._initialPlugin = initialPlugin
-        self._user = user
-
-    def getVars (self):
-        vars = wcomponents.WTemplated.getVars( self )
-
-        vars["PluginType"] = PluginsHolder().getPluginType(self._pluginType)
-        vars["InitialPlugin"] = self._initialPlugin
-        vars["Favorites"] = fossilize(self._user.getPersonalInfo().getBasket().getUsers().values(), IAvatarFossil)
-        vars["rbActive"] = Config.getInstance().getIsRoomBookingActive()
-        vars["baseURL"] = Config.getInstance().getBaseURL()
-
-        return vars
-
-class WAdminPluginsMainTab(wcomponents.WTemplated):
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-
-        vars["PluginsHolder"] = PluginsHolder()
-
-        return vars
-
-class WPAdminPluginsActionResult(WPAdminPlugins):
-
-    def __init__(self, rh, pluginTypeId, initialPlugin, actionName, actionResult):
-        WPAdminPlugins.__init__(self, rh, pluginTypeId, initialPlugin)
-        self._actionName = actionName
-        self._actionResult = actionResult
-
-    def _getPageContent(self, params):
-        html = WAdminPluginsActionResult(self._pluginTypeId, self._initialPlugin, self._actionName, self._actionResult).getHTML(params)
-        return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( html )
-
-class WAdminPluginsActionResult(wcomponents.WTemplated):
-
-    def __init__(self, pluginType, initialPlugin, actionName, actionResult):
-        self._pluginType = pluginType
-        self._initialPlugin = initialPlugin
-        self._actionName = actionName
-        self._actionResult = actionResult
-
-    def getVars(self):
-        variables = wcomponents.WTemplated.getVars( self )
-
-        variables["PluginType"] = PluginsHolder().getPluginType(self._pluginType)
-        variables["InitialPlugin"] = self._initialPlugin
-        variables["ActionName"] = self._actionName
-        variables["ActionResult"] = self._actionResult
-
-        return variables
 
 class WPServicesCommon( WPAdminsBase ):
 
@@ -1189,7 +1087,6 @@ class WUserPreferences(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
         vars["showPastEvents"] = self._avatar.getPersonalInfo().getShowPastEvents()
-        vars["pluginUserPreferences"] = "".join(self._notify('userPreferences', self._avatar.getId()))
         vars["userId"] = self._avatar.getId()
         vars["defaultLanguage"] =  self._avatar.getLang()
         vars["defaultTimezone"] = self._avatar.getTimezone()

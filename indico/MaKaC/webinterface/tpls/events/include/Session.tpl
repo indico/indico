@@ -20,7 +20,6 @@
             ${session.getTitle()}
         % endif
         </span>
-        ${"".join(pluginDetailsSessionContribs.get(item.getUniqueId(),""))}
     </span>
 
     % if session.getDescription():

@@ -148,10 +148,6 @@ class NotFoundError(IndicoError):
     pass
 
 
-class PluginError(IndicoError):
-    pass
-
-
 class HtmlScriptError(IndicoError):
     pass
 

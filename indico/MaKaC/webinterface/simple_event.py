@@ -13,7 +13,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from MaKaC.plugins.base import Observable
 
 import urllib
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -277,7 +276,8 @@ class WPSEConfModifToolsBase (conferences.WPConfModifToolsBase):
     def __init__(self, rh, conf):
         conferences.WPConfModifToolsBase.__init__(self, rh, conf)
 
-class WPSEConfClone(WPSEConfModifToolsBase, Observable):
+
+class WPSEConfClone(WPSEConfModifToolsBase, object):
 
     def _setActiveTab( self ):
         self._tabCloneEvent.setActive()
@@ -294,8 +294,6 @@ class WPSEConfClone(WPSEConfModifToolsBase, Observable):
         _("Evaluation")</li>
            """)
         }
-        #let the plugins add their own elements
-        self._notify('addCheckBox2CloneConf', pars)
         pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
         return p.getHTML(pars)
 

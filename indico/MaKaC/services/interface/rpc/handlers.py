@@ -18,7 +18,6 @@ from MaKaC.services.implementation import resources
 from MaKaC.services.implementation import error
 
 from MaKaC.services.interface.rpc import description
-from MaKaC.plugins import PluginsHolder
 
 from indico.modules.rb import services as rb_services
 from indico.modules.rb.services import (
@@ -35,10 +34,6 @@ def importModule(name):
     for comp in components[1:]:
         mod = getattr(mod, comp)
     return mod
-
-
-def updateMethodMapWithPlugins():
-    methodMap.update(PluginsHolder().getById('ajaxMethodMap').getAJAXDict())
 
 
 methodMap = {
@@ -79,7 +74,6 @@ endpointMap = {
     "reviewing": importModule('MaKaC.services.implementation.reviewing'),
     "minutes": importModule('MaKaC.services.implementation.minutes'),
     "news": importModule('MaKaC.services.implementation.news'),
-    "plugins": importModule('MaKaC.services.implementation.plugins'),
     "category": importModule('MaKaC.services.implementation.category'),
     "upcomingEvents": importModule('MaKaC.services.implementation.upcoming'),
     "timezone": importModule('MaKaC.services.implementation.timezone'),

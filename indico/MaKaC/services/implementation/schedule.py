@@ -490,7 +490,6 @@ class ConferenceScheduleDeleteContribution(ScheduleOperation, conferenceServices
         contrib = self._schEntry.getOwner()
         logInfo = contrib.getLogInfo()
 
-        contrib._notify("contributionUnscheduled")
         self._conf.getSchedule().removeEntry(self._schEntry)
 
         if self._conf.getType() == "meeting":
@@ -668,7 +667,6 @@ class SessionSlotScheduleDeleteContribution(ScheduleOperation, sessionServices.S
         contrib = self._schEntry.getOwner()
 
         logInfo = contrib.getLogInfo()
-        contrib._notify("contributionUnscheduled")
         self._slot.getSchedule().removeEntry(self._schEntry)
 
         if type == "meeting":

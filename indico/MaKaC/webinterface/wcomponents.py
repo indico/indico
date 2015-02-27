@@ -30,9 +30,7 @@ from dateutil.relativedelta import relativedelta
 from xml.sax.saxutils import escape, quoteattr
 
 from MaKaC.i18n import _
-from MaKaC.plugins import OldObservable
 from MaKaC import conference
-from MaKaC import user
 from MaKaC import schedule
 from MaKaC.common import info
 from MaKaC import domain
@@ -70,7 +68,7 @@ MIN_PRESENT_EVENTS = 6
 OPTIMAL_PRESENT_EVENTS = 10
 
 
-class WTemplated(OldObservable):
+class WTemplated():
     """This class provides a basic implementation of a web component (an
        object which generates HTML related to a certain feature or
        functionality) which relies in a template file for generating the
@@ -326,7 +324,6 @@ class WHeader(WTemplated):
         if self._currentuser:
             if self._currentuser.isAdmin() or not adminList.getList():
                 adminItemList.append({'id': 'serverAdmin', 'url': urlHandlers.UHAdminArea.getURL(), 'text': _("Server admin")})
-            self._notify("addParamsToHeaderItem",{"user": self._currentuser}, adminItemList)
 
         vars["adminItemList"] = adminItemList
         vars['extra_items'] = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))

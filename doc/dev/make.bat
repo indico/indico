@@ -2,7 +2,6 @@
 
 REM Command file for Sphinx documentation
 
-set PYTHONEXEC=python
 set SPHINXBUILD=sphinx-build
 set BUILDDIR=build
 set ALLSPHINXOPTS=-d %BUILDDIR%/doctrees %SPHINXOPTS% source
@@ -35,9 +34,6 @@ if "%1" == "clean" (
 )
 
 if "%1" == "html" (
-        cd source
-        %PYTHONEXEC% event_api_docs.py extension.rst
-        cd ..
 	%SPHINXBUILD% -b html %ALLSPHINXOPTS% %BUILDDIR%/html
 	echo.
 	echo.Build finished. The HTML pages are in %BUILDDIR%/html.
@@ -45,9 +41,6 @@ if "%1" == "html" (
 )
 
 if "%1" == "dirhtml" (
-        cd source
-        %PYTHONEXEC% event_api_docs.py extension.rst
-        cd ..
 	%SPHINXBUILD% -b dirhtml %ALLSPHINXOPTS% %BUILDDIR%/dirhtml
 	echo.
 	echo.Build finished. The HTML pages are in %BUILDDIR%/dirhtml.
@@ -55,9 +48,6 @@ if "%1" == "dirhtml" (
 )
 
 if "%1" == "pickle" (
-        cd source
-        %PYTHONEXEC% event_api_docs.py extension.rst
-        cd ..
 	%SPHINXBUILD% -b pickle %ALLSPHINXOPTS% %BUILDDIR%/pickle
 	echo.
 	echo.Build finished; now you can process the pickle files.
@@ -65,9 +55,6 @@ if "%1" == "pickle" (
 )
 
 if "%1" == "json" (
-        cd source
-        %PYTHONEXEC% event_api_docs.py extension.rst
-        cd ..
 	%SPHINXBUILD% -b json %ALLSPHINXOPTS% %BUILDDIR%/json
 	echo.
 	echo.Build finished; now you can process the JSON files.
@@ -75,9 +62,6 @@ if "%1" == "json" (
 )
 
 if "%1" == "htmlhelp" (
-        cd source
-        %PYTHONEXEC% event_api_docs.py extension.rst
-        cd ..
 	%SPHINXBUILD% -b htmlhelp %ALLSPHINXOPTS% %BUILDDIR%/htmlhelp
 	echo.
 	echo.Build finished; now you can run HTML Help Workshop with the ^
@@ -86,9 +70,6 @@ if "%1" == "htmlhelp" (
 )
 
 if "%1" == "qthelp" (
-        cd source
-        %PYTHONEXEC% event_api_docs.py extension.rst
-        cd ..
 	%SPHINXBUILD% -b qthelp %ALLSPHINXOPTS% %BUILDDIR%/qthelp
 	echo.
 	echo.Build finished; now you can run "qcollectiongenerator" with the ^
@@ -100,9 +81,6 @@ if "%1" == "qthelp" (
 )
 
 if "%1" == "latex" (
-        cd source
-        %PYTHONEXEC% event_api_docs.py extension.rst
-        cd ..
 	%SPHINXBUILD% -b latex %ALLSPHINXOPTS% %BUILDDIR%/latex
 	echo.
 	echo.Build finished; the LaTeX files are in %BUILDDIR%/latex.
@@ -110,9 +88,6 @@ if "%1" == "latex" (
 )
 
 if "%1" == "changes" (
-        cd source
-        %PYTHONEXEC% event_api_docs.py extension.rst
-        cd ..
 	%SPHINXBUILD% -b changes %ALLSPHINXOPTS% %BUILDDIR%/changes
 	echo.
 	echo.The overview file is in %BUILDDIR%/changes.
@@ -120,9 +95,6 @@ if "%1" == "changes" (
 )
 
 if "%1" == "linkcheck" (
-        cd source
-        %PYTHONEXEC% event_api_docs.py extension.rst
-        cd ..
 	%SPHINXBUILD% -b linkcheck %ALLSPHINXOPTS% %BUILDDIR%/linkcheck
 	echo.
 	echo.Link check complete; look for any errors in the above output ^
@@ -131,9 +103,6 @@ or in %BUILDDIR%/linkcheck/output.txt.
 )
 
 if "%1" == "doctest" (
-        cd source
-        %PYTHONEXEC% event_api_docs.py extension.rst
-        cd ..
 	%SPHINXBUILD% -b doctest %ALLSPHINXOPTS% %BUILDDIR%/doctest
 	echo.
 	echo.Testing of doctests in the sources finished, look at the ^

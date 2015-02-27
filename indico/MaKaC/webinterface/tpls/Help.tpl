@@ -27,7 +27,6 @@
                 <a href="ihelp/html/UserGuide/index.html">${ _("User Guide")}</a>
             </div>
         </div>
-        ${pluginDocs}
         % for title, entries in extra_sections.iteritems():
             <div class="title">${ title }</div>
             % for entry_title, (html_url, pdf_url) in entries.iteritems():

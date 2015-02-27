@@ -59,11 +59,8 @@ except ImportError:
 import re
 from urlparse import urlparse
 
-from zope.interface import implements
-
+from indico.core import signals
 from indico.core.config import Config
-from indico.core.extpoint import Component
-from indico.core.extpoint.rh import IServerRequestListener
 from indico.core.logger import Logger
 from indico.util.contextManager import ContextManager
 
@@ -701,13 +698,8 @@ class LDAPTools:
         return None
 
 
-class RequestListener(Component):
-    implements(IServerRequestListener)
-
-    # IServerRequestListener
-    def requestFinished(self, obj):
-        LDAPConnector.destroy()
-
-
 def get_login_attribute():
     return Config.getInstance().getAuthenticatorConfigById('LDAP').get('loginAttribute', 'uid')
+
+
+signals.after_process.connect(lambda *s, **kw: LDAPConnector.destroy(), weak=False)

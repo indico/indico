@@ -54,12 +54,6 @@ from indico.web.http_api.metadata.serializer import Serializer
 
 
 class RHCategDisplayBase(base.RHDisplayBaseProtected):
-
-    def _checkProtection(self):
-        if not any(self._notify("isPluginTypeAdmin", {"user": self._getUser()}) +
-                   self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"})):
-            base.RHDisplayBaseProtected._checkProtection(self)
-
     def _checkParams(self, params, mustExist=True):
         if "categId" in params:
             params["categId"] = escape_html(str(params["categId"]))
@@ -480,7 +474,6 @@ class UtilsConference:
                 changed = True
 
         if changed:
-            c._notify('placeChanged')
             new_data = {'location': l.name if l else '',
                         'address': l.address if l else '',
                         'room': r.name if r else ''}

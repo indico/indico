@@ -21,8 +21,6 @@ from indico.core.models.settings import EventSetting
 from indico.modules.events.requests.models.requests import Request, RequestState
 from indico.modules.rb.models.reservations import Reservation
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
-from MaKaC.plugins import Observable
-from MaKaC.common.utils import formatDateTime
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
     ISubContribParticipationFullFossil, ISubContributionFossil, ISubContributionWithSpeakersFossil
 from MaKaC.fossils.contribution import IContributionParticipationFossil,\
@@ -200,7 +198,7 @@ class Locatable:
         self.notifyModification()
 
 
-class CommonObjectBase(CoreObject, Observable, Fossilizable):
+class CommonObjectBase(CoreObject, Fossilizable):
     """
     This class is for holding commonly used methods that are used by several classes.
     It is inherited by the following classes:
@@ -991,7 +989,6 @@ class Category(CommonObjectBase):
                 prin.unlinkTo(self, "manager")
         TrashCanManager().add(self)
 
-        self._notify('deleted', oldOwner)
         signals.category.deleted.send(self)
 
         return
@@ -1010,7 +1007,6 @@ class Category(CommonObjectBase):
         catDateIdx.indexCateg(self)
         catDateAllIdx.indexCateg(self)
 
-        self._notify('moved', oldOwner, newOwner)
         signals.category.moved.send(self, old_parent=oldOwner, new_parent=newOwner)
 
     def getName(self):
@@ -1025,7 +1021,6 @@ class Category(CommonObjectBase):
         nameIdx.unindex(self)
         nameIdx.index(self)
 
-        self._notify('categoryTitleChanged', oldName, newName)
         signals.category.title_changed.send(self, old=oldName, new=newName)
 
     def getDescription(self):
@@ -1040,7 +1035,6 @@ class Category(CommonObjectBase):
         """
         self.removeConference(conf)
         toCateg._addConference(conf)
-        conf._notify('moved', self, toCateg)
         signals.event.moved.send(conf, old_parent=self, new_parent=toCateg)
 
     def _addSubCategory(self, newSc):
@@ -1080,7 +1074,6 @@ class Category(CommonObjectBase):
         sc.setProtection(protection)
 
         Catalog.getIdx('categ_conf_sd').add_category(sc.getId())
-        sc._notify('created', self)
         signals.category.created.send(sc, parent=self)
 
         self._addSubCategory(sc)
@@ -1138,7 +1131,6 @@ class Category(CommonObjectBase):
         self._addConference(conf)
         conf.linkCreator()
 
-        conf._notify('created', self)
         signals.event.created.send(conf, parent=self)
 
         return conf
@@ -1371,7 +1363,6 @@ class Category(CommonObjectBase):
         oldProtection = 1 if self.isProtected() else -1
 
         self.__ac.setProtection(private)
-        self._notify('protectionChanged', oldProtection, private)
         if oldProtection != private:
             signals.category.protection_changed.send(self, old=oldProtection, new=private)
 
@@ -1470,12 +1461,10 @@ class Category(CommonObjectBase):
 
     def requireDomain(self, dom):
         self.__ac.requireDomain(dom)
-        self._notify('accessDomainAdded', dom)
         signals.category.domain_access_granted.send(self, domain=dom)
 
     def freeDomain(self, dom):
         self.__ac.freeDomain(dom)
-        self._notify('accessDomainRemoved', dom)
         signals.category.domain_access_revoked.send(self, domain=dom)
 
 
@@ -1494,7 +1483,6 @@ class Category(CommonObjectBase):
         """Method called to notify the current category has been modified.
         """
         if raiseEvent:
-            self._notify('infoChanged')
             signals.category.data_changed.send(self)
         self._p_changed = 1
 
@@ -1588,7 +1576,7 @@ class CustomRoom(Persistent):
         return self.fullName
 
 
-class ConferenceParticipation(Persistent, Fossilizable, Observable):
+class ConferenceParticipation(Persistent, Fossilizable):
 
     fossilizes(IConferenceParticipationFossil, IConferenceParticipationMinimalFossil)
 
@@ -2546,7 +2534,6 @@ class Conference(CommonObjectBase, Locatable):
         self.setModificationDate()
 
         if raiseEvent:
-            self._notify('infoChanged')
             signals.event.data_changed.send(self, attr=None, old=None, new=None)
 
         self.cleanCache()
@@ -2649,25 +2636,13 @@ class Conference(CommonObjectBase, Locatable):
         for c in self.getContributionList():
             # take care of subcontributions
             for sc in c.getSubContributionList():
-                sc._notify('deleted', c)
                 signals.event.subcontribution_deleted.send(sc, parent=c)
 
-            c._notify('deleted', self)
             signals.event.contribution_deleted.send(c, parent=self)
 
     def delete(self, user=None):
         """deletes the conference from the system.
         """
-        # we notify the observers that the conference has been deleted
-        try:
-            self._notify('deleted', self.getOwner())
-        except Exception, e:
-            try:
-                Logger.get('Conference').error("Exception while notifying the observer of a conference deletion for conference %s: %s" %
-                                               (self.getId(), str(e)))
-            except Exception, e2:
-                Logger.get('Conference').error("Exception while notifying a conference deletion: %s (origin: %s)" % (str(e2), str(e)))
-
         signals.event.deleted.send(self)
 
         EventSetting.delete_event(self.id)
@@ -2792,16 +2767,6 @@ class Conference(CommonObjectBase, Locatable):
         new_data = (self.getStartDate(), self.getEndDate())
         if old_data != new_data:
             signals.event.data_changed.send(self, attr='dates', old=old_data, new=new_data)
-        try:
-            self._notify('dateChanged', {'oldStartDate': oldStartDate, 'newStartDate': self.getStartDate(), 'oldEndDate': oldEndDate, 'newEndDate': self.getEndDate()})
-        except Exception, e:
-            try:
-                Logger.get('Conference').error("Exception while notifying the observer of a start and end date change from %s - %s to %s - %s for conference %s: %s" %
-                            (formatDateTime(oldStartDate), formatDateTime(oldEndDate),
-                            formatDateTime(self.getStartDate()), formatDateTime(self.getEndDate()), self.getId(), str(e)))
-            except Exception, e2:
-                Logger.get('Conference').error("Exception while notifying a start and end date change: %s (origin: %s)" % (str(e2), str(e)))
-
 
     def _checkInnerSchedule( self ):
         self.getSchedule().checkSanity()
@@ -2857,15 +2822,6 @@ class Conference(CommonObjectBase, Locatable):
         if notifyObservers:
             if oldSdate != sDate:
                 signals.event.data_changed.send(self, attr='start_date', old=oldSdate, new=sDate)
-            try:
-                self._notify('startDateChanged', {'newDate': sDate, 'oldDate': oldSdate})
-            except Exception, e:
-                try:
-                    Logger.get('Conference').error("Exception while notifying the observer of a start date change from %s to %s for conference %s: %s" %
-                    (formatDateTime(oldSdate), formatDateTime(sDate), self.getId(), str(e)))
-                except Exception, e2:
-                    Logger.get('Conference').error("Exception while notifying a start date change: %s (origin: %s)" % (str(e2), str(e)))
-
 
     def _updateAlarms(self):
         c = Client()
@@ -2889,19 +2845,6 @@ class Conference(CommonObjectBase, Locatable):
                                                     int(hours), int(minutes) )
         self.verifyStartDate(self.startDate)
         self.notifyModification()
-
-        #if everything went well, we notify the observers that the start date has changed
-        if notifyObservers:
-            try:
-                self._notify('startTimeChanged', sdate)
-            #for observer in self.getObservers():
-                    #observer.notifyEventDateChanges(sdate, self.startDate, None, None)
-            except Exception, e:
-                try:
-                    Logger.get('Conference').error("Exception while notifying the observer of a start date change from %s to %s for conference %s: %s"%
-                                                    (formatDateTime(sdate), formatDateTime(self.startDate), self.getId(), str(e)))
-                except Exception, e2:
-                    Logger.get('Conference').error("Exception while notifying a start time change: %s (origin: %s)"%(str(e2), str(e)))
 
     def getStartDate(self):
         """returns (datetime) the starting date of the conference"""
@@ -2985,15 +2928,6 @@ class Conference(CommonObjectBase, Locatable):
         if notifyObservers:
             if oldEdate != eDate:
                 signals.event.data_changed.send(self, attr='end_date', old=oldEdate, new=eDate)
-            try:
-                self._notify('endDateChanged', {'newDate': eDate, 'oldDate': oldEdate})
-            except Exception, e:
-                try:
-                    Logger.get('Conference').error("Exception while notifying the observer of a end date change from %s to %s for conference %s: " %
-                              (formatDateTime(oldEdate), formatDateTime(eDate), self.getId(), str(e)))
-                except Exception, e2:
-                    Logger.get('Conference').error("Exception while notifying a end date change: %s (origin: %s)" % (str(e2), str(e)))
-
 
     def setEndTime(self, hours = 0, minutes = 0, notifyObservers = True):
         """ Changes the current conference end time (not date) to the one specified by the parameters.
@@ -3003,18 +2937,6 @@ class Conference(CommonObjectBase, Locatable):
         self.verifyEndDate(self.endDate)
         self.notifyModification()
 
-        #if everything went well, we notify the observers that the start date has changed
-        if notifyObservers:
-            try:
-                self._notify('endTimeChanged', edate)
-            #for observer in self.getObservers():
-            except Exception, e:
-                #observer.notifyEventDateChanges(None, None, edate, self.endDate)
-                try:
-                    Logger.get('Conference').error("Exception while notifying the observer of a end timet change from %s to %s for conference %s: %s" %
-                                                    (formatDateTime(edate), formatDateTime(self.endDate), self.getId(), str(e)))
-                except Exception, e2:
-                    Logger.get('Conference').error("Exception while notifying a end time change: %s (origin: %s)"%(str(e2), str(e)))
 
     def getEndDate(self):
         """returns (datetime) the ending date of the conference"""
@@ -3071,16 +2993,6 @@ class Conference(CommonObjectBase, Locatable):
         except AttributeError:
             oldTimezone = tz
         self.timezone = tz
-        #for observer in self.getObservers():
-        try:
-            #observer.notifyTimezoneChange(oldTimezone, tz)
-            self._notify('timezoneChanged', oldTimezone)
-        except Exception, e:
-            try:
-                Logger.get('Conference').error("Exception while notifying the observer of a timezone change from %s to %s for conference %s: %s" %
-                                                (str(oldTimezone), str(tz), self.getId(), str(e)))
-            except Exception, e2:
-                Logger.get('Conference').error("Exception while notifying a timezone change: %s (origin: %s)"%(str(e2), str(e)))
 
     def getTimezone(self):
         try:
@@ -3134,11 +3046,6 @@ class Conference(CommonObjectBase, Locatable):
 
         if oldTitle != title:
             signals.event.data_changed.send(self, attr='title', old=oldTitle, new=title)
-        try:
-            self._notify('eventTitleChanged', oldTitle, title)
-        except Exception, e:
-            Logger.get('Conference').exception("Exception while notifying the observer of a conference title change for conference %s: %s" %
-                                               (self.getId(), str(e)))
 
     def getDescription(self):
         """returns (String) the description of the conference"""
@@ -3150,7 +3057,6 @@ class Conference(CommonObjectBase, Locatable):
         self.description = desc
         if oldDescription != desc:
             signals.event.data_changed.send(self, attr='description', old=oldDescription, new=desc)
-        self._notify('eventDescriptionChanged', oldDescription, desc)
         self.notifyModification()
 
     def getSupportInfo(self):
@@ -3460,7 +3366,6 @@ class Conference(CommonObjectBase, Locatable):
         for sub in newContrib.getSubmitterList():
             self.addContribSubmitter(newContrib,sub)
 
-        newContrib._notify('created', self)
         signals.event.contribution_created.send(newContrib, parent=self)
         self.notifyModification()
 
@@ -3676,12 +3581,10 @@ class Conference(CommonObjectBase, Locatable):
 
     def requireDomain(self, dom):
         self.__ac.requireDomain(dom)
-        self._notify('accessDomainAdded', dom)
         signals.event.domain_access_granted.send(self, domain=dom)
 
     def freeDomain(self, dom):
         self.__ac.freeDomain(dom)
-        self._notify('accessDomainRemoved', dom)
         signals.event.domain_access_revoked.send(self, domain=dom)
 
     def getDomainList(self):
@@ -3730,7 +3633,6 @@ class Conference(CommonObjectBase, Locatable):
 
         if oldValue != private:
             # notify listeners
-            self._notify('protectionChanged', oldValue, private)
             signals.event.protection_changed.send(self, old=oldValue, new=private)
 
     def grantAccess( self, prin ):
@@ -3779,9 +3681,6 @@ class Conference(CommonObjectBase, Locatable):
 
         # paper reviewing team should be also allowed to access
         if self.getConfPaperReview().isInReviewingTeam(av):
-            return True
-
-        if any(self._notify("isAllowedToAccess", {"conf": self, "user": av})):
             return True
 
         return False
@@ -4379,7 +4278,6 @@ class Conference(CommonObjectBase, Locatable):
         conf.notifyModification()
 
         #we inform the plugins in case they want to add anything to the new conference
-        self._notify('cloneEvent', {'conf': conf, 'user': userPerformingClone, 'options': options})
         EventCloner.clone_event(self, conf)
         return conf
 
@@ -4705,7 +4603,6 @@ class Conference(CommonObjectBase, Locatable):
         rp.setId( str(self._getRegistrantGenerator().newCount()) )
         rp.setOwner( self )
         self.getRegistrants()[rp.getId()] = rp
-        self._notify('registrantAdded', user)
         signals.event.registrant_changed.send(self, user=user, registrant=rp, action='added')
         self.notifyModification()
 
@@ -4732,7 +4629,6 @@ class Conference(CommonObjectBase, Locatable):
         del self.getRegistrants()[id]
         if part.getAvatar() is not None:
             part.getAvatar().removeRegistrant(part)
-        self._notify('registrantRemoved', part)
         signals.event.registrant_changed.send(self, user=part.getAvatar(), registrant=part, action='removed')
         TrashCanManager().add(part)
         self.notifyModification()
@@ -6164,7 +6060,6 @@ class Session(CommonObjectBase, Locatable):
             return
         if contrib.isScheduled():
             # unschedule the contribution
-            contrib._notify("contributionUnscheduled")
             sch=contrib.getSchEntry().getSchedule()
             sch.removeEntry(contrib.getSchEntry())
         del self.contributions[contrib.getId()]
@@ -6246,10 +6141,6 @@ class Session(CommonObjectBase, Locatable):
             or any of its sub-objects
         """
         if self.canAccess( aw ):
-            return True
-
-        if any(self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) +
-               self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
             return True
 
         for contrib in self.getContributionList():
@@ -6626,7 +6517,7 @@ class Session(CommonObjectBase, Locatable):
     _cmpTitle=staticmethod(_cmpTitle)
 
 
-class SessionSlot(Persistent, Observable, Fossilizable, Locatable):
+class SessionSlot(Persistent, Fossilizable, Locatable):
 
     fossilizes(ISessionSlotFossil)
 
@@ -7153,7 +7044,6 @@ class SessionSlot(Persistent, Observable, Fossilizable, Locatable):
         return self.session.conference
 
     def delete(self):
-        self._notify('deleted', self)
         signals.event.session_slot_deleted.send(self)
         self.getSchedule().clear()
         if self.getSession() is not None:
@@ -8062,7 +7952,6 @@ class Contribution(CommonObjectBase, Locatable):
         self.setModificationDate(date)
 
         if raiseEvent:
-            self._notify('infoChanged')
             signals.event.contribution_data_changed.send(self)
 
         if cleanCache:
@@ -8123,7 +8012,6 @@ class Contribution(CommonObjectBase, Locatable):
         oldParent = self.getConference()
 
         if oldParent != None:
-            self._notify('deleted', oldParent)
             signals.event.contribution_deleted.send(self, parent=oldParent)
 
             self.setTrack(None)
@@ -8180,7 +8068,6 @@ class Contribution(CommonObjectBase, Locatable):
         self.title = newTitle.strip()
 
         if notify:
-            self._notify('contributionTitleChanged', oldTitle, newTitle)
             if oldTitle != newTitle:
                 signals.event.contribution_title_changed.send(self, old=oldTitle, new=newTitle)
             self.notifyModification()
@@ -8273,7 +8160,6 @@ class Contribution(CommonObjectBase, Locatable):
     def setLocation(self, newLocation):
         oldLocation = self.place
         self.place = newLocation
-        self._notify('locationChanged', oldLocation, newLocation)
         self.notifyModification()
 
     def getOwnRoom(self):
@@ -8282,7 +8168,6 @@ class Contribution(CommonObjectBase, Locatable):
     def setRoom(self, newRoom):
         oldRoom = self.room
         self.room = newRoom
-        self._notify('roomChanged', oldRoom, newRoom)
         self.notifyModification()
 
     def setBoardNumber(self, newBoardNum):
@@ -8351,9 +8236,7 @@ class Contribution(CommonObjectBase, Locatable):
 
         if newDate != None and check != 0:
             self.verifyStartDate(newDate, check)
-        self._notify("contributionUnscheduled")
         self.startDate=copy.copy(newDate)
-        self._notify("contributionScheduled")
         self.getSchEntry().synchro()
         self.notifyModification()
 
@@ -8965,7 +8848,6 @@ class Contribution(CommonObjectBase, Locatable):
 
         if oldValue != private:
             # notify listeners
-            self._notify('protectionChanged', oldValue, private)
             signals.event.contribution_protection_changed.send(self, old=oldValue, new=private)
 
     def grantAccess(self, prin):
@@ -8985,9 +8867,6 @@ class Contribution(CommonObjectBase, Locatable):
             or any of its sub-objects
         """
         if self.canAccess( aw ):
-            return True
-        if any(self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"}) +
-               self._notify("isPluginTypeAdmin", {"user": aw.getUser()})):
             return True
         ################################################################################################
         for sc in self.getSubContributionList():
@@ -9130,7 +9009,6 @@ class Contribution(CommonObjectBase, Locatable):
     def newSubContribution(self):
         newSub = SubContribution()
         self.addSubContribution(newSub)
-        newSub._notify('created', self)
         signals.event.subcontribution_created.send(newSub, parent=self)
         return newSub
 
@@ -9355,11 +9233,9 @@ class Contribution(CommonObjectBase, Locatable):
 
     def requireDomain( self, dom ):
         self.__ac.requireDomain( dom )
-        self._notify('domainAdded', dom)
 
     def freeDomain( self, dom ):
         self.__ac.freeDomain( dom )
-        self._notify('domainRemoved', dom)
 
     def getDomainList( self ):
         return self.__ac.getRequiredDomainList()
@@ -10145,7 +10021,6 @@ class SubContribution(CommonObjectBase, Locatable):
         if parent:
             parent.setModificationDate()
         if raiseEvent:
-            self._notify('infoChanged')
             signals.event.subcontribution_data_changed.send(self)
         self._p_changed = 1
 
@@ -10592,8 +10467,6 @@ class SubContribution(CommonObjectBase, Locatable):
         return self.getOwner().getSchedule()
 
     def delete(self):
-
-        self._notify('deleted', self.getOwner())
         signals.event.subcontribution_deleted.send(self, parent=self.getOwner())
 
         while len(self.getSpeakerList()) > 0:
@@ -11016,10 +10889,6 @@ class Material(CommonObjectBase):
         if self.__ac.isHarvesterIP(aw.getIP()):
             return True
         #####################################################
-
-        if any(self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) +
-               self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
-            return True
 
         # Managers have always access
         if self.canModify(aw):
@@ -11467,10 +11336,6 @@ class Resource(CommonObjectBase):
         if self.__ac.isHarvesterIP(aw.getIP()):
             return True
         #####################################################
-
-        if any(self._notify("isPluginTypeAdmin", {"user": aw.getUser()}) +
-               self._notify("isPluginAdmin", {"user": aw.getUser(), "plugins": "any"})):
-            return True
 
         # Managers have always access
         if self.canModify(aw):

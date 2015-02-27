@@ -17,7 +17,6 @@
 from persistent import Persistent
 
 from MaKaC.common import log
-from MaKaC.plugins import Observable
 from MaKaC.common.timezoneUtils import nowutc
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.user import Avatar
@@ -33,7 +32,7 @@ from MaKaC.fossils.participant import IParticipantMinimalFossil
 from indico.util.contextManager import ContextManager
 
 
-class Participation(Persistent, Observable):
+class Participation(Persistent):
 
     def __init__(self, conference):
         self._conference = conference
@@ -432,7 +431,6 @@ class Participation(Persistent, Observable):
         avatar = participant.getAvatar()
         if avatar:
             avatar.unlinkTo(self._conference,"participant")
-        self._notify('participantRemoved', self._conference, participant)
         if participant._status in {'added', 'accepted'}:
             signals.event.participant_changed.send(self._conference, user=avatar, participant=participant,
                                                    old_status=participant._status, action='removed')
@@ -892,7 +890,6 @@ class Participant(Persistent, Fossilizable):
         #    logData["subject"] = _("%s : status set to ADDED")%self.getWholeName()
         #    self.getConference().getLogHandler().logAction(logData,"participants",responsibleUser)
 
-        self._participation._notify('participantAdded', self.getConference(), self)
         signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
                                                old_status=old_status, action='added')
         logData = self.getParticipantData()
@@ -908,7 +905,6 @@ class Participant(Persistent, Fossilizable):
         old_status = self._status
         self._status = "refused"
 
-        self._participation._notify('participantRemoved', self.getConference(), self)
         signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
                                                old_status=old_status, action='removed')
         logData = self.getParticipantData()
@@ -948,7 +944,6 @@ class Participant(Persistent, Fossilizable):
         old_status = self._status
         self._status = "accepted"
 
-        self._participation._notify('participantAdded', self.getConference(), self)
         if old_status != 'added':
             signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
                                                    old_status=old_status, action='added')
@@ -965,7 +960,6 @@ class Participant(Persistent, Fossilizable):
         old_status = self._status
         self._status = "rejected"
 
-        self._participation._notify('participantRemoved', self.getConference(), self)
         if old_status == 'added':
             signals.event.participant_changed.send(self.getConference(), user=self._avatar, participant=self,
                                                    old_status=old_status, action='removed')

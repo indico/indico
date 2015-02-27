@@ -626,9 +626,6 @@ class WPMConfClone(conferences.WPConfClone):
                      <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>
                """)
         }
-        # let the plugins add their own elements
-        self._notify('addCheckBox2CloneConf', pars)
-
         pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
         return p.getHTML(pars)
 

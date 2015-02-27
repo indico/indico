@@ -31,7 +31,6 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.errors import MaKaCError
 from MaKaC.conference import LocalFile
-from MaKaC.plugins.base import Observable
 from indico.util.signals import values_from_signal
 
 
@@ -912,8 +911,8 @@ class SystemLink(Link):
     def isVisible(self):
         return self._getURLObject().valid and super(SystemLink, self).isVisible()
 
-class SystemLinkData(Observable):
 
+class SystemLinkData(object):
     def __init__(self, conf=None):
         plugin_entries = None
         if not hasattr(self, '_linkData') or not hasattr(self, '_linkDataOrderedKeys'):
@@ -1038,7 +1037,6 @@ class SystemLinkData(Observable):
                     "URL": 'UHConfEvaluationDisplayModif',
                     "parent": "evaluation"}
             }
-            self._notify('confDisplaySMFillDict', {'dict': self._linkData, 'conf': conf})
             for entry in plugin_entries:
                 assert entry.name not in self._linkData
                 self._linkData[entry.name] = {
@@ -1077,7 +1075,6 @@ class SystemLinkData(Observable):
                                         "evaluation",
                                         "newEvaluation",
                                         "viewMyEvaluation"]
-            self._notify('confDisplaySMFillOrderedKeys', self._linkDataOrderedKeys)
             self._linkDataOrderedKeys += [x.name for x in plugin_entries]
 
     def getLinkData(self):

@@ -49,7 +49,6 @@ from MaKaC.errors import (
     ModificationError,
     NotLoggedError,
     NotFoundError)
-from MaKaC.plugins.base import OldObservable
 from MaKaC.webinterface.mail import GenericMailer
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.errors as errors
@@ -66,7 +65,7 @@ from indico.util.redis import RedisError
 from indico.web.flask.util import ResponseUtil
 
 
-class RequestHandlerBase(OldObservable):
+class RequestHandlerBase():
 
     _uh = None
 
@@ -549,20 +548,16 @@ class RH(RequestHandlerBase):
         textLog.append("%s : Database request started" % (datetime.now() - self._startTime))
         Logger.get('requestHandler').info('[pid=%s] Request %s started' % (
             os.getpid(), request))
-        self._notify('requestStarted')  # notify components about start
 
         try:
             for i, retry in enumerate(transaction.attempts(max_retries)):
                 with retry:
                     if i > 0:
-                        self._notify('requestRetry', i)  # notify components about retry
                         signals.before_retry.send()
 
                     try:
                         Logger.get('requestHandler').info('\t[pid=%s] from host %s' % (os.getpid(), request.remote_addr))
                         profile_name, res = self._process_retry(params, i, profile, forced_conflicts)
-                        # notify components that the request has finished
-                        self._notify('requestFinished')
                         signals.after_process.send()
                         if i < forced_conflicts:  # raise conflict error if enabled to easily handle conflict error case
                             raise ConflictError

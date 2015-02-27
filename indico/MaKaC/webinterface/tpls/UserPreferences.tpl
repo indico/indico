@@ -16,9 +16,6 @@
         <td class="titleCellTD" nowrap><span class="titleCellFormat">${ _("Show past events by default")}</span></td>
         <td class="blacktext spaceLeft" nowrap><div id="tabShowPastEvents"></div></td>
     </tr>
-    % if pluginUserPreferences:
-        ${pluginUserPreferences}
-    % endif
     % for title, content in plugin_preferences:
         <tr>
             <td class="titleCellTD" nowrap><span class="titleCellFormat">${ title }</span></td>

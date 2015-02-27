@@ -26,7 +26,6 @@ from indico.web import assets
 from indico.core.config import Config
 from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
-from MaKaC.plugins.base import OldObservable
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 
@@ -96,7 +95,7 @@ class WPJinjaMixin:
         return self.render_template_func(template, **params)
 
 
-class WPBase(OldObservable):
+class WPBase():
     """
     """
     _title = "Indico"
@@ -317,11 +316,6 @@ class WPDecorated(WPBase):
             Overload and return side menu whenever there is one
         """
         return None
-
-    def getJSFiles(self):
-        pluginJSFiles = {"paths" : []}
-        self._notify("includeMainJSFiles", pluginJSFiles)
-        return WPBase.getJSFiles(self) + pluginJSFiles['paths']
 
 
 class WPNotDecorated(WPBase):

@@ -890,20 +890,10 @@ class Config:
             return "%s/%s"%(self.getImagesBaseURL(), id )
         return "%s/%s"%(self.getImagesBaseURL(), self.__systemIcons[ id ])
 
-    def getPluginIconURL( self, pluginName, iconId ):
-        rh = ContextManager.get('currentRH', None)
-
-        if rh and request.is_secure and self.getBaseSecureURL():
-            baseURL = self.getBaseSecureURL()
-        else:
-            baseURL = self.getBaseURL()
-        return "%s/%s/images/%s.png"%(baseURL, pluginName, iconId)
-
     def getSystemIconFileName(self, id):
         if id not in self.__systemIcons:
             return id
         return self.__systemIcons[id]
-
 
     def getArchivedFileURL(self, localFile):
         return "%s/getFile.py?%s" % (self.getBaseURL(), localFile.getLocator().getURLForm() )

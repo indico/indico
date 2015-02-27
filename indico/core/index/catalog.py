@@ -19,7 +19,6 @@ from BTrees.OOBTree import OOBTree
 from indico.core.index.event import CategoryEventStartDateIndex
 
 from indico.core.db import DBMgr
-from MaKaC.plugins.base import extension_point
 from indico.modules.oauth.components import UserOAuthRequestTokenIndex, UserOAuthAccessTokenIndex
 
 
@@ -52,22 +51,9 @@ class Catalog(OOBTree):
         for t in cls._indexMap.iteritems():
             yield t
 
-        # ask plugins for their indexes
-        for lcomp in extension_point('catalogIndexProvider'):
-            for t in lcomp:
-                yield t
-
     @classmethod
     def _get_idx_class(cls, index_name):
-        if index_name in cls._indexMap:
-            return cls._indexMap[index_name]
-        else:
-            # ask plugins for their indexes
-            for lcomp in extension_point('catalogIndexProvider'):
-                for t in lcomp:
-                    if index_name in t:
-                        return t[1]
-        return None
+        return cls._indexMap.get(index_name)
 
     @classmethod
     def getIdx(cls, indexName, db=None):

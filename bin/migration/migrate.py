@@ -44,7 +44,6 @@ from indico.web.flask.app import make_app
 from MaKaC import __version__
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import ConferenceHolder, CategoryManager
-from MaKaC.plugins.base import PluginsHolder, Plugin, PluginType
 from MaKaC.webinterface import displayMgr
 from MaKaC.authentication.LocalAuthentication import LocalAuthenticator, LocalIdentity
 from MaKaC.authentication.LDAPAuthentication import LDAPIdentity, LDAPAuthenticator
@@ -124,34 +123,10 @@ def _fixDefaultStyle(conf, cdmr):
 
 
 @since('0.0', always=True)
-def pluginReload(dbi, prevVersion):
-    """
-    Reloading all plugins
-    """
-    PluginsHolder().reloadAllPlugins()
-    dbi.commit()
-
-
-@since('0.0', always=True)
 def catalogMigration(dbi, prevVersion):
     """
     Initializing/updating index catalog
     """
-    PluginsHolder().reloadAllPlugins(disable_if_broken=False)
-    skip = False
-
-    for plugin in (p for p in PluginsHolder().getList() if isinstance(p, Plugin) or isinstance(p, PluginType)):
-        if plugin.isActive() and not plugin.isUsable():
-            print console.colored(
-                "\r  Plugin '{0}' is going to be disabled: {1}".format(
-                    plugin.getName(),
-                    plugin.getNotUsableReason()
-                ), 'yellow')
-            skip = True
-
-    if skip and not console.yesno('\r  Do you want to continue the migration anyway?'):
-        raise ControlledExit()
-
     Catalog.updateDB(dbi=dbi)
 
 

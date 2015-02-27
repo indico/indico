@@ -2179,45 +2179,6 @@ class UHUpdateNews(URLHandler):
     _endpoint = 'admin.updateNews'
 
 
-# Server Admin, plugin management related
-class UHAdminPlugins(URLHandler):
-    _endpoint = 'admin.adminPlugins'
-
-
-class UHAdminPluginsSaveOptionReloadAll(URLHandler):
-    _endpoint = 'admin.adminPlugins-saveOptionReloadAll'
-
-
-class UHAdminPluginsReloadAll(URLHandler):
-    _endpoint = 'admin.adminPlugins-reloadAll'
-
-
-class UHAdminPluginsClearAllInfo(URLHandler):
-    _endpoint = 'admin.adminPlugins-clearAllInfo'
-
-
-class UHAdminReloadPlugins(URLHandler):
-    _endpoint = 'admin.adminPlugins-reload'
-
-
-class UHAdminTogglePluginType(URLHandler):
-    _endpoint = 'admin.adminPlugins-toggleActivePluginType'
-
-
-class UHAdminTogglePlugin(URLHandler):
-    _endpoint = 'admin.adminPlugins-toggleActive'
-
-
-class UHAdminPluginsTypeSaveOptions(URLHandler):
-    _endpoint = 'admin.adminPlugins-savePluginTypeOptions'
-
-
-class UHAdminPluginsSaveOptions(URLHandler):
-    _endpoint = 'admin.adminPlugins-savePluginOptions'
-
-# End of Server Admin, plugin management related
-
-
 class UHMaintenance(URLHandler):
     _endpoint = 'admin.adminMaintenance'
 

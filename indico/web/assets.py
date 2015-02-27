@@ -58,18 +58,6 @@ class IndicoEnvironment(Environment):
         self.append_path(os.path.join(config.getHtdocsDir(), 'js'), '{0}/js'.format(url_path))
 
 
-class PluginEnvironment(Environment):
-    def __init__(self, plugin_name, plugin_dir, url_path):
-        config = Config.getInstance()
-        url_base_path = urlparse(config.getBaseURL()).path
-        output_dir = os.path.join(config.getHtdocsDir(), 'static', 'assets', 'plugins-old', plugin_name)
-        url = '{0}/static/assets/plugins-old/{1}'.format(url_base_path, url_path)
-
-        super(PluginEnvironment, self).__init__(output_dir, url)
-        self.debug = Config.getInstance().getDebug()
-        self.append_path(os.path.join(plugin_dir, 'htdocs'), url=os.path.join(url_base_path, url_path))
-
-
 def namespace(dir_ns, *list_files):
     return [os.path.join(dir_ns, f) for f in list_files]
 

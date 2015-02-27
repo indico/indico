@@ -16,7 +16,6 @@
 
 from flask import session, g, request, render_template
 from flask import current_app as app
-import pkg_resources
 import os.path
 import re
 import posixpath
@@ -26,7 +25,6 @@ from MaKaC.user import Avatar
 from mako.lookup import TemplateLookup
 import mako.exceptions as exceptions
 import MaKaC
-from MaKaC.plugins.base import PluginsHolder
 import xml.sax.saxutils
 
 from indico.util.date_time import format_number, format_datetime, format_date, format_time
@@ -49,19 +47,6 @@ FILTER_IMPORTS = [
 
 
 class IndicoTemplateLookup(TemplateLookup):
-
-    def getPluginTPlDir(self, pTypeName, pluginName, tplName):
-        pType = PluginsHolder().getPluginType(pTypeName)
-        if pType == None:
-            raise Exception(_("The plugin type does not exist"))
-        if pluginName != None:
-            plugin = pType.getPlugin(pluginName)
-            if plugin == None:
-                raise Exception(_("The plugin does not exist"))
-            return posixpath.normpath(pkg_resources.resource_filename(plugin.getModule().__name__, 'tpls/{0}'.format(tplName)))
-        return posixpath.normpath(pkg_resources.resource_filename(pType.getModule().__name__, 'tpls/{0}'.format(tplName)))
-
-
     def get_template(self, uri, module=None):
         """Return a :class:`.Template` object corresponding to the given
         URL.
@@ -93,18 +78,7 @@ class IndicoTemplateLookup(TemplateLookup):
                 if os.path.isfile(srcfile):
                     return self._load(srcfile, uri)
             else:
-            #Case 3: we look into the plugins
-                uri_split = u.split("/")
-                if len(uri_split) == 2:
-                    srcfile = self.getPluginTPlDir(uri_split[0],None, uri_split[1])
-                    if os.path.isfile(srcfile):
-                        return self._load(srcfile, uri)
-                if len(uri_split) == 3:
-                    srcfile = self.getPluginTPlDir(*uri_split)
-                    if os.path.isfile(srcfile):
-                        return self._load(srcfile, uri)
-
-                # We do not find anything, so we raise the Exception
+                # We did not find anything, so we raise an exception
                 raise exceptions.TopLevelLookupException('Can\'t locate template for uri {0!r}'.format(uri))
 
 

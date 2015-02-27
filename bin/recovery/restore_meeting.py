@@ -90,12 +90,6 @@ def main(argv):
                 c = ConferenceHolder().getById(meeting)
                 from MaKaC.evaluation import Evaluation
                 c.setEvaluations([Evaluation(c)])
-
-                # indexes
-                c._notify('created', cat)
-
-                for contrib in c.getContributionList():
-                    contrib._notify('created', c)
         else:
             print "not found!"
 

@@ -36,7 +36,6 @@ from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
-from MaKaC.plugins.base import Observable
 from MaKaC.user import Avatar, Group
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 
@@ -68,7 +67,8 @@ class XSLTransformer:
 
         return str(result)
 
-class outputGenerator(Observable):
+
+class outputGenerator(object):
     """
     this class generates the application standard XML (getBasicXML)
     and also provides a method to format it using an XSLt stylesheet
@@ -285,8 +285,6 @@ class outputGenerator(Observable):
         out.writeTag("parentProtection", dumps(conf.getAccessController().isProtected()))
         out.writeTag("materialList", dumps(self._generateMaterialList(conf)))
 
-        self._notify('addXMLMetadata', {'out': out, 'obj': conf, 'type':"conference", 'recordingManagerTags':recordingManagerTags})
-
         if conf.canModify(self.__aw) and vars and modificons:
             out.writeTag("modifyLink", vars["modifyURL"])
         if conf.canModify( self.__aw ) and vars and modificons:
@@ -484,13 +482,6 @@ class outputGenerator(Observable):
                 if includeMaterial:
                     self._materialToXML(mat, vars, out=out)
 
-        #plugins XML
-        out.openTag("plugins")
-        #we add all the information to be displayed by the plugins
-        self._notify('meetingAndLectureDisplay', {'out': out, 'conf': conf, 'tz': tz})
-        out.closeTag("plugins")
-
-
     def _sessionToXML(self,
                       session,
                       vars,
@@ -583,7 +574,6 @@ class outputGenerator(Observable):
         for mat in mList:
             self._materialToXML(mat, vars, out=out)
 
-        self._notify('addXMLMetadata', {'out': out, 'obj': session, 'type':"session", 'recordingManagerTags':recordingManagerTags})
         out.closeTag("session")
 
     def _slotToXML(self,slot,vars,includeContribution,includeMaterial, showWithdrawed=True, out=None, recordingManagerTags=None):
@@ -784,7 +774,6 @@ class outputGenerator(Observable):
                 if showSubContribution == 'all' or str(showSubContribution) == str(subC.getId()):
                     self._subContributionToXML(subC, vars, includeMaterial, out=out, recordingManagerTags=recordingManagerTags)
 
-        self._notify('addXMLMetadata', {'out': out, 'obj': contribution, 'type':"contribution", 'recordingManagerTags':recordingManagerTags})
         out.closeTag("contribution")
 
 
@@ -839,7 +828,6 @@ class outputGenerator(Observable):
                 if includeMaterial:
                     self._materialToXML(mat, vars, out=out)
 
-        self._notify('addXMLMetadata', {'out': out, 'obj': subCont, 'type':"subcontribution", 'recordingManagerTags':recordingManagerTags})
         out.closeTag("subcontribution")
 
     def _materialToXML(self,mat, vars, out=None):

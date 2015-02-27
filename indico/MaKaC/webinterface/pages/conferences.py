@@ -68,7 +68,6 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
 from indico.core.logger import Logger
-from MaKaC.plugins.base import OldObservable
 from indico.modules import ModuleHolder
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
 from MaKaC.conference import Session, Contribution, LocalFile
@@ -149,20 +148,16 @@ class WPConferenceBase(base.WPDecorated):
         return urlHandlers.UHSignOut.getURL(str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
 
 
-class WPConferenceDisplayBase(WPConferenceBase, OldObservable):
+class WPConferenceDisplayBase(WPConferenceBase):
+    pass
 
-    def getCSSFiles(self):
-        # flatten returned list
-
-        return WPConferenceBase.getCSSFiles(self) + \
-               sum(self._notify('injectCSSFiles'), [])
 
 class WPConferenceDefaultDisplayBase( WPConferenceBase):
     navigationEntry = None
 
     def getJSFiles(self):
-        return WPConferenceBase.getJSFiles(self) + self._includeJSPackage('Display') + \
-               self._includeJSPackage('MaterialEditor') + sum(self._notify('injectJSFiles'), [])
+        return (WPConferenceBase.getJSFiles(self) + self._includeJSPackage('Display') +
+                self._includeJSPackage('MaterialEditor'))
 
     def _getFooter( self ):
         wc = wcomponents.WFooter()
@@ -171,8 +166,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
 
         cid = self._conf.getUrlTag().strip() or self._conf.getId()
         p["shortURL"] =  Config.getInstance().getShortEventURL() + cid
-
-        self._notify('eventDetailFooter', p)
 
         return wc.getHTML(p)
 
@@ -213,10 +206,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         else:
             self._regFormOpt.setVisible(True)
             self._registrantsListOpt.setVisible(True)
-
-
-        #instant messaging
-        self._notify('confDisplaySMShow', {})
 
         #evaluation
         evaluation = self._conf.getEvaluation()
@@ -924,10 +913,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                     newItem = entry.getOwner()
                 wvars['entries'].append(newItem)
 
-        wvars["pluginDetails"] = "".join(self._notify('eventDetailBanner', self._conf))
-        pluginDetailsSessionContribs = {}
-        # self._notify('detailSessionContribs', self._conf, pluginDetailsSessionContribs)
-        wvars["pluginDetailsSessionContribs"] = pluginDetailsSessionContribs
         wvars["daysPerRow"] = self._daysPerRow
         wvars["firstDay"] = self._firstDay
         wvars["lastDay"] = self._lastDay
@@ -1110,10 +1095,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                             "dark": True } )
 
     def getCSSFiles(self):
-        # flatten returned list
-
-        return WPConferenceBase.getCSSFiles(self) + \
-               sum(self._notify('injectCSSFiles'), []) + self._asset_env['eventservices_sass'].urls()
+        return WPConferenceBase.getCSSFiles(self) + self._asset_env['eventservices_sass'].urls()
 
 
     def getJSFiles(self):
@@ -1128,7 +1110,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         modules += self._includeJSPackage('Management')
         modules += self._includeJSPackage('MaterialEditor')
         modules += self._includeJSPackage('Display')
-        modules += sum(self._notify('injectJSFiles'), [])
         modules += self._asset_env['zero_clipboard_js'].urls()
         return modules
 
@@ -1367,7 +1348,8 @@ class WPMeetingTimeTable( WPTPLConferenceDisplay ):
         wc = WConferenceTimeTable( self._conf, self._getAW()  )
         return wc.getHTML(params)
 
-class WPConferenceModifBase( main.WPMainBase, OldObservable ):
+
+class WPConferenceModifBase(main.WPMainBase):
 
     _userData = ['favorite-user-ids']
 
@@ -1454,24 +1436,11 @@ class WPConferenceModifBase( main.WPMainBase, OldObservable ):
         self._vcMenuItem = wcomponents.SideMenuItem(_("Video Conference"), url_for('vc.manage_vc_rooms', self._conf))
         self._generalSection.addItem(self._vcMenuItem)
 
-        self._pluginsDictMenuItem = {}
-        self._notify('fillManagementSideMenu', self._pluginsDictMenuItem)
-        for element in self._pluginsDictMenuItem.values():
-            try:
-                self._generalSection.addItem(element)
-            except Exception as e:
-                Logger.get('Conference').error(
-                    "Exception while trying to access the plugin elements of the side menu: {}".format(str(e)))
-
         self._pluginMenuItems = {}
         for name, item in sorted(values_from_signal(signals.event_management.sidemenu.send(self._conf)),
                                  key=lambda x: x[1]._title):
-            try:
-                self._pluginMenuItems[name] = item
-                self._generalSection.addItem(item)
-            except Exception as e:
-                Logger.get('Conference').error(
-                    "Exception while trying to access the plugin elements of the side menu: {}".format(str(e)))
+            self._pluginMenuItems[name] = item
+            self._generalSection.addItem(item)
 
         self._sideMenu.addSection(self._generalSection)
 
@@ -2642,7 +2611,7 @@ class WConferenceClone(wcomponents.WTemplated):
         return vars
 
 
-class WPConfClone( WPConfModifToolsBase, OldObservable ):
+class WPConfClone(WPConfModifToolsBase):
 
     def _setActiveTab( self ):
         self._tabCloneEvent.setActive()
@@ -2656,8 +2625,6 @@ class WPConfClone( WPConfModifToolsBase, OldObservable ):
                                      <li><ul style="list-style-type: none;"><li><input type="checkbox" name="cloneSessions" id="cloneSessions" value="1" />_("Sessions")</li></ul></li>
                                      <li><input type="checkbox" name="cloneRegistration" id="cloneRegistration" value="1" >_("Registration")</li>
                                      <li><input type="checkbox" name="cloneEvaluation" id="cloneEvaluation" value="1" />_("Evaluation")</li>""") }
-        #let the plugins add their own elements
-        self._notify('addCheckBox2CloneConf', pars)
         pars['cloneOptions'] += EventCloner.get_plugin_items(self._conf)
         return p.getHTML(pars)
 

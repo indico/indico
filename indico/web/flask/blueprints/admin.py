@@ -130,23 +130,3 @@ admin.add_url_rule('/api/keys', 'adminServices-apiKeys', api.RHAdminAPIKeys)
 # OAuth
 admin.add_url_rule('/oauth/consumers', 'adminServices-oauthAuthorized', oauth.RHAdminOAuthAuthorized)
 admin.add_url_rule('/oauth/authorized', 'adminServices-oauthConsumers', oauth.RHAdminOAuthConsumers)
-
-# Plugins
-admin.add_url_rule('/plugins-old/', 'adminPlugins', admins.RHAdminPlugins, methods=('GET', 'POST'))
-admin.add_url_rule('/settings/plugins/reload-all', 'adminPlugins-saveOptionReloadAll',
-                   admins.RHAdminPluginsSaveOptionReloadAll, methods=('POST',))
-admin.add_url_rule('/plugins-old/reload-all', 'adminPlugins-reloadAll', admins.RHAdminPluginsReloadAll,
-                   methods=('POST',))
-admin.add_url_rule('/plugins-old/clear-all-info', 'adminPlugins-clearAllInfo', admins.RHAdminPluginsClearAllInfo,
-                   methods=('POST',))
-admin.add_url_rule('/plugins-old/type/<pluginType>/', 'adminPlugins', admins.RHAdminPlugins, methods=('GET', 'POST'))
-admin.add_url_rule('/plugins-old/type/<pluginType>/reload', 'adminPlugins-reload', admins.RHAdminPluginsReload,
-                   methods=('POST',))
-admin.add_url_rule('/plugins-old/type/<pluginType>/toggle', 'adminPlugins-toggleActivePluginType',
-                   admins.RHAdminTogglePluginType)
-admin.add_url_rule('/plugins-old/type/<pluginType>/save-options', 'adminPlugins-savePluginTypeOptions',
-                   admins.RHAdminPluginsSaveTypeOptions, methods=('POST',))
-admin.add_url_rule('/plugins-old/plugin/<pluginType>/<pluginId>/toggle', 'adminPlugins-toggleActive',
-                   admins.RHAdminTogglePlugin)
-admin.add_url_rule('/plugins-old/plugin/<pluginType>/<pluginId>/save-options', 'adminPlugins-savePluginOptions',
-                   admins.RHAdminPluginsSaveOptions, methods=('POST',))

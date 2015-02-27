@@ -178,10 +178,6 @@ class NotFoundError(MaKaCError):
         super(NotFoundError, self).__init__(title, explanation=message)
 
 
-class PluginError(MaKaCError):
-    pass
-
-
 class HtmlForbiddenTag(MaKaCError):
     """
     """

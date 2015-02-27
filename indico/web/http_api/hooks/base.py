@@ -48,7 +48,6 @@ from indico.web.http_api.exceptions import ArgumentParseError, LimitExceededExce
 
 # indico legacy imports
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.plugins.base import PluginsHolder
 from MaKaC.common.logger import Logger
 
 
@@ -75,7 +74,7 @@ class HTTPAPIHook(object):
     def parseRequest(cls, path, queryParams):
         """Parse a request path and return a hook and the requested data type."""
         path = urllib.unquote(path)
-        hooks = itertools.chain(cls.HOOK_LIST, cls._getPluginHooks())
+        hooks = cls.HOOK_LIST
         for expCls in hooks:
             Logger.get('HTTPAPIHook.parseRequest').debug(expCls)
             m = expCls._matchPath(path)
@@ -93,7 +92,7 @@ class HTTPAPIHook(object):
 
     @staticmethod
     def register(cls):
-        """Register a hook that is not part of a plugin.
+        """Register a hook.
 
         To use it, simply decorate the hook class with this method."""
         assert cls.RE is not None
@@ -106,12 +105,6 @@ class HTTPAPIHook(object):
             types = '|'.join(cls.TYPES)
             cls._RE = re.compile(r'/' + cls.PREFIX + '/(' + types + r')' + ('/' + cls.RE).rstrip('/') + r'\.(\w+)$')
         return cls._RE.match(path)
-
-    @classmethod
-    def _getPluginHooks(cls):
-        for plugin in PluginsHolder().getPluginTypes():
-            for expClsName in plugin.getHTTPAPIHookList():
-                yield getattr(plugin.getModule().http_api, expClsName)
 
     def __init__(self, queryParams, type, pathParams):
         self._queryParams = queryParams

@@ -17,11 +17,9 @@
 from seleniumTestCase import LoggedInSeleniumTestCase, setUpModule
 import unittest, time, re, datetime
 
-from indico.tests.python.unit.plugins import Plugins_Feature
-
 
 class RoomBookingTests(LoggedInSeleniumTestCase):
-    _requires = [Plugins_Feature]
+    _requires = []
 
     def setUp(self):
         super(RoomBookingTests, self).setUp()

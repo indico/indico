@@ -37,6 +37,5 @@ class WHelp(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        vars["pluginDocs"] = "".join(self._notify("providePluginDocumentation"))
         vars["IsAdmin"] = RCAdmin.hasRights(self._rh)
         return vars

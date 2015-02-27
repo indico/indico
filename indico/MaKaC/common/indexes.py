@@ -40,7 +40,6 @@ from indico.modules.fulltextindexes.models.categories import IndexedCategory
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.timezoneUtils import date2utctimestamp, datetimeToUnixTime
 from MaKaC.errors import MaKaCError
-from MaKaC.plugins.base import extension_point
 
 
 # BTrees are 32 bit by default
@@ -1417,8 +1416,6 @@ class IndexesHolder(ObjectHolder):
                 return CategoryTitleIndex()
             elif id=="conferenceTitle":
                 return ConferenceIndex()
-            else:
-                extension_point("indexHolderProvider", Idx, id)
             return Idx[str(id)]
 
 

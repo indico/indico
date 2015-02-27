@@ -33,7 +33,6 @@ from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 
 from indico.util.caching import memoize
-from indico.web.handlers import RHHtdocs
 
 
 def _convert_request_value(x):
@@ -71,14 +70,7 @@ def make_view_func(obj):
     """
     if inspect.isclass(obj):
         # Some class
-        if issubclass(obj, RHHtdocs):
-            # Special RH used to provide htdocs folders of plugins
-            def wrapper(filepath, plugin=None):
-                path = obj.calculatePath(filepath, plugin=plugin)
-                if not os.path.isfile(path):
-                    raise NotFound
-                return _send_file(path)
-        elif hasattr(obj, 'process'):
+        if hasattr(obj, 'process'):
             # Indico RH
             def wrapper(**kwargs):
                 params = create_flat_args()

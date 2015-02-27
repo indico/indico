@@ -25,7 +25,6 @@
             (${common.renderLocation(item, parent=parent, span='span')})
             </span>
         % endif
-        ${"".join(pluginDetailsSessionContribs.get(item.getUniqueId(),""))}
     </span>
 
     % if item.getDescription():

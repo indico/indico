@@ -60,7 +60,6 @@ from MaKaC.i18n import _
 from indico.modules.events.requests.util import is_request_manager
 from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
-from MaKaC.plugins.base import Observable
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept, AbstractStatusProposedToReject
 import MaKaC.webinterface.pages.abstracts as abstracts
@@ -192,15 +191,11 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
         self._requests_manager = is_request_manager(session.user)
-        self._isPluginManagerOrAdmin = any(self._notify("isPluginTypeAdmin", {"user": self._getUser()}) +
-                                           self._notify("isPluginAdmin", {"user": self._getUser(), "plugins": "any"}) +
-                                           self._notify("isPluginManager", {"user": self._getUser(), "conf": self._target, "plugins": "any"}))
         self._plugin_urls = values_from_signal(signals.event_management.management_url.send(self._conf),
                                                single_value=True)
 
     def _checkProtection(self):
-        if not (self._isRegistrar or self._isPRM or self._isReferee or self._isPluginManagerOrAdmin or
-                self._requests_manager or self._plugin_urls):
+        if not (self._isRegistrar or self._isPRM or self._isReferee or self._requests_manager or self._plugin_urls):
             RHConferenceModifKey._checkProtection(self)
 
     def _process(self):
@@ -221,10 +216,6 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
             url = url_for('requests.event_requests', self._conf)
         elif self._plugin_urls:
             url = next(iter(self._plugin_urls), None)
-        elif self._isPluginManagerOrAdmin:
-            urls = self._notify("conferencePluginManagementURL", {"conf": self._target, "secure": self.use_https()})
-            if urls:
-                url = urls[0]
         if not url:
             url = urlHandlers.UHConfManagementAccess.getURL( self._conf )
 
@@ -794,7 +785,7 @@ class RHContribParticipantsSendEmail( RHConferenceModifBase  ):
 #######################################################################################
 
 
-class RHConfPerformCloning(RHConferenceModifBase, Observable):
+class RHConfPerformCloning(RHConferenceModifBase, object):
     """
     New version of clone functionality -
     fully replace the old one, based on three different actions,
@@ -851,7 +842,6 @@ class RHConfPerformCloning(RHConferenceModifBase, Observable):
                     "managing"      : self._getUser()
                     }
         #we notify the event in case any plugin wants to add their options
-        self._notify('fillCloneDict', {'options': options, 'paramNames': paramNames})
         if self._cancel:
             self._redirect( urlHandlers.UHConfClone.getURL( self._conf ) )
         elif self._confirm:

@@ -23,7 +23,6 @@ from ZODB.POSException import ConflictError
 from ZEO.Exceptions import ClientDisconnected
 
 
-from MaKaC.plugins.base import Observable
 from MaKaC.errors import NoReportError, FormValuesError
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.mail import GenericMailer
@@ -44,9 +43,6 @@ from indico.util import fossilize
 
 
 def lookupHandler(method):
-    # TODO: better way to do this without the need of DB connection?
-    handlers.updateMethodMapWithPlugins()
-
     endpoint, functionName = handlers, method
     while True:
         handler = endpoint.methodMap.get(functionName, None)
@@ -83,14 +79,13 @@ def processRequest(method, params, internal=False):
     return result
 
 
-class ServiceRunner(Observable):
+class ServiceRunner(object):
 
     def _invokeMethodBefore(self):
         # clear the context
         ContextManager.destroy()
         # notify components that the request has started
         DBMgr.getInstance().startRequest()
-        self._notify('requestStarted')
 
     def _invokeMethodRetryBefore(self):
         # clear/init fossil cache
@@ -125,7 +120,6 @@ class ServiceRunner(Observable):
                 with retry:
                     if i > 0:
                         # notify components that the request is being retried
-                        self._notify('requestRetry', i)
                         signals.before_retry.send()
 
                     self._invokeMethodRetryBefore()
@@ -158,7 +152,6 @@ class ServiceRunner(Observable):
                 raise ProcessError('ERR-P0', 'Error processing method.')
         finally:
             # notify components that the request has ended
-            self._notify('requestFinished')
             DBMgr.getInstance().endRequest()
 
         return result

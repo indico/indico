@@ -37,7 +37,6 @@ from indico.core import signals
 from indico.util.i18n import gettext, ngettext, babel
 from indico.core.logger import Logger
 from MaKaC.i18n import _
-from MaKaC.plugins.base import RHMapMemory
 from MaKaC.webinterface.pages.error import WErrorWSGI
 
 from indico.core.db.sqlalchemy import db
@@ -226,13 +225,6 @@ def add_compat_blueprints(app):
         app.register_blueprint(blueprint)
 
 
-def add_legacy_plugin_blueprints(app):
-    for blueprint in RHMapMemory()._blueprints:
-        if not app.config['INDICO_COMPAT_ROUTES'] and blueprint.name.startswith('compat_'):
-            continue
-        app.register_blueprint(blueprint)
-
-
 def add_plugin_blueprints(app):
     blueprint_names = set()
     for plugin, blueprint in values_from_signal(signals.plugin.get_blueprints.send(app), return_plugins=True):
@@ -305,8 +297,6 @@ def make_app(set_path=False, db_setup=True, testing=False):
     add_blueprints(app)
     if app.config['INDICO_COMPAT_ROUTES']:
         add_compat_blueprints(app)
-    if not app.config['TESTING']:
-        add_legacy_plugin_blueprints(app)
     Logger.init_app(app)
     plugin_engine.init_app(app, Logger.get('plugins'))
     if not plugin_engine.load_plugins(app):
