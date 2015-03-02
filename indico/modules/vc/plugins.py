@@ -58,7 +58,7 @@ class VCPluginMixin(object):
 
     @property
     def icon_url(self):
-        return NotImplementedError('VC Plugin must have an icon URL')
+        raise NotImplementedError('VC Plugin must have an icon URL')
 
     @classproperty
     @classmethod
