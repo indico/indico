@@ -84,7 +84,7 @@ def create_json_error_answer(exception, status=200):
         details = {
             'code': type(exception).__name__,
             'type': 'unknown',
-            'message': exception.message,
+            'message': unicode(exception.message),
             'data': exception_data,
             'requestInfo': {},
             'inner': traceback.format_exc()
