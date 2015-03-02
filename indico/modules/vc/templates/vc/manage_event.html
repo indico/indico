@@ -10,9 +10,9 @@
                     <thead>
                          <tr>
                             <th class="small-column"></th>
-                            <th>{% trans %}Type{% endtrans %}</th>
+                            <th></th>
                             <th>{% trans %}Name{% endtrans %}</th>
-                            <th class="col-50">Actions</th>
+                            <th class="col-50"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -20,7 +20,14 @@
                             {% set vc_room = event_vc_room.vc_room %}
                             <tr class="vc-room-entry {% if vc_room.status == 2 %}deleted{% endif %}">
                                 <td><a href="#" class="icon-next toggle-details"></a></td>
-                                <td>{{ vc_room.plugin.friendly_name if vc_room.plugin else vc_room.type }}</td>
+                                <td>{% if vc_room. plugin %}
+                                        <img class="plugin-logo"
+                                             src="{{ vc_room.plugin.logo_url}}"
+                                             alt="{{ vc_room.friendly_name }}" title="{{ vc_room.friendly_name}}" />
+                                    {% else %}
+                                        {{ vc_room.type }}
+                                    {% endif %}
+                                </td>
                                 <td>{{ vc_room.name }}</td>
                                 <td>
                                     <div class="toolbar">

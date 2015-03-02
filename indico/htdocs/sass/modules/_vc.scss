@@ -18,10 +18,16 @@
         }
     }
 
-    .i-table-widget > tbody > tr.deleted {
-        background: $light-gray;
-        > td {
-            color: $gray !important;
+    .i-table-widget > tbody {
+        > tr.deleted {
+            background: $light-gray;
+            > td {
+                color: $gray !important;
+            }
+        }
+
+        img.plugin-logo {
+            height: 2em;
         }
     }
 }

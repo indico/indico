@@ -46,6 +46,24 @@ class VCPluginMixin(object):
         if not self.name.startswith('vc_'):
             raise Exception('Video conference plugins must be named vc_*')
 
+    @property
+    def service_name(self):
+        return PREFIX_RE.sub('', self.name)
+
+    @property
+    def logo_url(self):
+        raise NotImplementedError('VC Plugin must have a logo URL')
+
+    @property
+    def icon_url(self):
+        return NotImplementedError('VC Plugin must have an icon URL')
+
+    @classproperty
+    @classmethod
+    def category(self):
+        from indico.core.plugins import PluginCategory
+        return PluginCategory.videoconference
+
     def get_vc_room_form_defaults(self, event):
         return {
             'name': re.sub(r'[^\w_-]', '_', remove_accents(event.getTitle(), reencode=False)),
@@ -70,16 +88,6 @@ class VCPluginMixin(object):
 
     def get_notification_bcc_list(self, action, vc_room, event):
         return set(self.settings.get('notification_emails'))
-
-    @property
-    def service_name(self):
-        return PREFIX_RE.sub('', self.name)
-
-    @classproperty
-    @classmethod
-    def category(self):
-        from indico.core.plugins import PluginCategory
-        return PluginCategory.videoconference
 
     def render_form(self, **kwargs):
         """Renders the video conference room form
