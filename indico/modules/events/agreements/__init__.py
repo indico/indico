@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.events.agreements.base import AgreementPersonInfo, AgreementDefinitionBase, EmailPlaceholderBase
+from indico.modules.events.agreements.models.agreements import Agreement
 from indico.modules.events.agreements.util import get_agreement_definitions
 
 
@@ -31,3 +32,10 @@ logger = Logger.get('agreements')
 def _check_agreement_definitions(app, **kwargs):
     # This will raise RuntimeError if the agreement definition types are not unique
     get_agreement_definitions()
+
+
+@signals.merge_users.connect
+def _merge_users(user, merged, **kwargs):
+    new_id = int(user.id)
+    old_id = int(merged.id)
+    Agreement.find(user_id=old_id).update({'user_id': new_id})
