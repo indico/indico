@@ -44,7 +44,7 @@ def principal_to_tuple(principal):
     """
     Translates an Avatar or Group to a tuple of the form (<class_name>, <id>)
     """
-    return (principal.__class__.__name__, principal.id)
+    return principal.__class__.__name__, principal.id
 
 
 def principals_merge_users(iterable, new_id, old_id):
@@ -56,7 +56,7 @@ def principals_merge_users(iterable, new_id, old_id):
     """
     principals = []
     for type_, id_ in iterable:
-        if type_ == 'Avatar' and id_ == old_id:
+        if type_ == 'Avatar' and int(id_) == int(old_id):
             id_ = new_id
         principals.append((type_, id_))
     return principals
