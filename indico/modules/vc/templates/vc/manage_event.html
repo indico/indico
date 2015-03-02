@@ -18,7 +18,7 @@
                     <tbody>
                         {% for event_vc_room in event_vc_rooms %}
                             {% set vc_room = event_vc_room.vc_room %}
-                            <tr class="vc-room-entry {% if vc_room.status == 2 %}deleted{% endif %}">
+                            <tr class="vc-room-entry {% if vc_room.status.name == 'deleted' %}deleted{% endif %}">
                                 <td><a href="#" class="icon-next toggle-details"></a></td>
                                 <td>{% if vc_room.plugin %}
                                         <img class="plugin-logo"

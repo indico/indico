@@ -9,15 +9,15 @@
 
 <p>
     You can manage it from:
-    <br/>
+    <br>
     <a href="{{ url_for_plugin('.manage_vc_rooms', event, _external=true) }}">
         {{ url_for_plugin('.manage_vc_rooms', event, _external=true) }}
     </a>
 </p>
-<br/>
+<br>
 <p>
     <strong>Room information</strong>
-    <br/>
+    <br>
     <ul>
         <li><strong>Name:</strong> {{ vc_room.name }}</li>
         {% if vc_room_event.link_type.name != 'event' -%}
