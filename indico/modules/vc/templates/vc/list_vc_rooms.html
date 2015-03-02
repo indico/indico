@@ -3,8 +3,7 @@
     <div class="event-service-row">
         <div class="event-service-row-collapsed clearfix">
             <div class="event-service-info event-service-row-toggle left">
-                <!-- TODO: Change icon to plugin specific -->
-                <img src="/images/video_Vidyo.png" border="0" alt="locked"/>
+                <img src="{{ vc_room.plugin.icon_url }}" style="height: 16px;" alt="">
                 <span class="event-service-title">{{ vc_room.name }}</span>
             </div>
             {{ vc_room.plugin.render_event_buttons(vc_room, event_vc_room) | safe }}
