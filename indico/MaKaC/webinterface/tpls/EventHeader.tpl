@@ -113,6 +113,7 @@ else:
 
 </div>
 
+${ render_template('flashed_messages.html') }
 
 <script type="text/javascript">
 $(function() {

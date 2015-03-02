@@ -1095,7 +1095,9 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                             "dark": True } )
 
     def getCSSFiles(self):
-        return WPConferenceBase.getCSSFiles(self) + self._asset_env['eventservices_sass'].urls()
+        return (WPConferenceBase.getCSSFiles(self) +
+                self._asset_env['eventservices_sass'].urls() +
+                self._asset_env['event_display_sass'].urls())
 
     def getJSFiles(self):
         modules = WPConferenceBase.getJSFiles(self)

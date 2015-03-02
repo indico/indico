@@ -354,6 +354,7 @@ dashboard_sass = sass_module_bundle('dashboard')
 category_sass = sass_module_bundle('category')
 admin_sass = sass_module_bundle('admin')
 eventservices_sass = sass_module_bundle('eventservices')
+event_display_sass = sass_module_bundle('event_display')
 overviews_sass = sass_module_bundle('overviews')
 vc_sass = sass_module_bundle('vc')
 
@@ -426,6 +427,7 @@ def register_all_css(env, main_css_file):
     env.register('admin_sass', admin_sass)
     env.register('screen_sass', screen_sass)
     env.register('eventservices_sass', eventservices_sass)
+    env.register('event_display_sass', event_display_sass)
     env.register('overviews_sass', overviews_sass)
     env.register('vc_sass', vc_sass)
 
