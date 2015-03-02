@@ -53,7 +53,7 @@
                 my: 'top center',
                 at: 'bottom center'
             }
-        })
+        });
 
         $('.toggle-details').on('click', function(e) {
             e.preventDefault();

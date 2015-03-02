@@ -20,7 +20,7 @@ from collections import defaultdict, OrderedDict
 from operator import itemgetter
 
 import transaction
-from flask import request, session, redirect, flash, json, Response
+from flask import request, session, redirect, flash, json, Response, jsonify
 from sqlalchemy import func
 from werkzeug.exceptions import NotFound, BadRequest
 
@@ -326,6 +326,39 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
     def _process(self):
         return Response(json.dumps([{'id': room.id, 'name': room.name, 'count': count}
                                    for room, count in self._iter_allowed_rooms()]),  mimetype='application/json')
+
+
+class RHVCRoomModify(RHVCSystemEventBase):
+    """Modifies the VC room that owns a specific event-room association.
+       It uses the PATCH HTTP method """
+
+    def _process(self):
+        result = {}
+        json_data = request.get_json()
+
+        if json_data is None:
+            raise BadRequest("'application/json' expected")
+        elif len(json_data.keys()) > 1 or json_data.get('data') is None:
+            raise BadRequest("can only change 'data' fields for now")
+        elif not isinstance(json_data['data'], dict):
+            raise BadRequest("'data' should be a dictionary")
+
+        data = json_data['data']
+        self.plugin.update_data_vc_room(self.vc_room, data)
+
+        if data:
+            result['error'] = {'message': 'fields not accepted: {}'.format(', '.join(data))}
+        else:
+            try:
+                self.plugin.update_room(self.vc_room, self.event)
+            except VCRoomError as err:
+                result['error'] = {'message': err.message}
+                result['success'] = False
+                transaction.abort()
+            else:
+                flash(_("You are now the moderator of room '{0}'".format(self.vc_room.name)), 'success')
+                result['success'] = True
+        return jsonify(result)
 
 
 class RHVCRoomList(RHProtected):

@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from indico.modules.vc.controllers import (RHVCManageEvent, RHVCManageEventSelectService, RHVCManageEventCreate,
                                            RHVCManageEventModify, RHVCManageEventRefresh, RHVCManageEventRemove,
-                                           RHVCEventPage, RHVCManageSearch, RHVCManageAttach, RHVCRoomList)
+                                           RHVCEventPage, RHVCManageSearch, RHVCManageAttach, RHVCRoomList,
+                                           RHVCRoomModify)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 vc_blueprint = _bp = IndicoBlueprint('vc', __name__, template_folder='templates')
@@ -43,6 +44,10 @@ _bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/attach/',
                  'manage_vc_rooms_search_form', RHVCManageAttach, methods=('GET', 'POST'))
 _bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/search/',
                  'manage_vc_rooms_search', RHVCManageSearch)
+
+# Room management
+_bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:event_vc_room_id>/room/',
+                 'vc_room_modify', RHVCRoomModify, methods=('POST',))
 
 # Event page
 _bp.add_url_rule('/event/<confId>/videoconference/', 'event_videoconference', RHVCEventPage)

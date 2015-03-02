@@ -139,7 +139,7 @@ class VCPluginMixin(object):
             :param kwargs: arguments passed to the template
             """
             return render_plugin_template('{}:event_buttons.html'.format(self.name), plugin=self, vc_room=vc_room,
-                                          event_vc_room=event_vc_room, **kwargs)
+                                          event_vc_room=event_vc_room, event=event_vc_room.event, **kwargs)
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
         """Creates the video conference room form
