@@ -126,3 +126,24 @@ div.event-service-row {
         @include user-select(none);
     }
 }
+
+.vc-room-info-qtip {
+    dl {
+        clear: left;
+        font-size: 100%;
+
+        & > dt {
+            float: left;
+            color: #777;
+        }
+
+        & > dd {
+            margin-left: 100px;
+            display: block;
+        }
+
+        & > dt.large-row, & > dd.large-row {
+            margin-top: 0.5em;
+        }
+    }
+}
