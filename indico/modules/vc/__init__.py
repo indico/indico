@@ -22,7 +22,7 @@ from flask_pluginengine import render_plugin_template
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
-from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLinkType
+from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLinkType, VCRoom
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.plugins import VCPluginMixin
 from indico.modules.vc.util import get_vc_plugins, get_managed_vc_plugins
@@ -122,3 +122,10 @@ class VCCloner(EventCloner):
 @signals.event_management.clone.connect
 def _get_vc_cloner(event, **kwargs):
     return VCCloner(event)
+
+
+@signals.merge_users.connect
+def _merge_users(user, merged, **kwargs):
+    new_id = int(user.id)
+    old_id = int(merged.id)
+    VCRoom.find(created_by_id=old_id).update({'created_by_id': new_id})
