@@ -20,11 +20,12 @@ import re
 from flask import render_template
 from flask_pluginengine import render_plugin_template
 
+from indico.core import signals
 from indico.util.decorators import classproperty
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.models.vc_rooms import VCRoomLinkType
 from indico.util.string import remove_accents
-from indico.util.user import retrieve_principals, retrieve_principal
+from indico.util.user import retrieve_principals, retrieve_principal, principals_merge_users
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults
 
@@ -45,6 +46,7 @@ class VCPluginMixin(object):
         super(VCPluginMixin, self).init()
         if not self.name.startswith('vc_'):
             raise Exception('Video conference plugins must be named vc_*')
+        self.connect(signals.merge_users, self._merge_users)
 
     @property
     def service_name(self):
@@ -214,3 +216,9 @@ class VCPluginMixin(object):
         if user.isAdmin():
             return True
         return any(principal.containsUser(user) for principal in retrieve_principals(self.settings.get('managers')))
+
+    def _merge_users(self, user, merged, **kwargs):
+        new_id = int(user.id)
+        old_id = int(merged.id)
+        for key in {'managers', 'acl'}:
+            self.settings.set(key, principals_merge_users(self.settings.get(key), new_id, old_id))
