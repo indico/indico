@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from indico.core import signals
 from indico.modules.events.requests.util import get_request_definitions
 from indico.modules.events.requests.base import RequestDefinitionBase, RequestFormBase
+from indico.modules.events.requests.models.requests import Request
 
 
 __all__ = ('RequestDefinitionBase', 'RequestFormBase')
@@ -28,3 +29,11 @@ __all__ = ('RequestDefinitionBase', 'RequestFormBase')
 def _check_request_definitions(app, **kwargs):
     # This will raise RuntimeError if the request type names are not unique
     get_request_definitions()
+
+
+@signals.merge_users.connect
+def _merge_users(user, merged, **kwargs):
+    new_id = int(user.id)
+    old_id = int(merged.id)
+    Request.find(created_by_id=old_id).update({'created_by_id': new_id})
+    Request.find(processed_by_id=old_id).update({'processed_by_id': new_id})
