@@ -168,7 +168,7 @@ class VCPluginMixin(object):
         with self.plugin_context():
             return self.vc_room_form(prefix='vc-', obj=defaults, event=event, vc_room=existing_vc_room)
 
-    def handle_form_data_association(self, event, vc_room, event_vc_room, data):
+    def update_data_association(self, event, vc_room, event_vc_room, data):
         contribution_id = data.pop('contribution')
         block_id = data.pop('block')
         link_type = VCRoomLinkType[data.pop('linking')]
@@ -187,8 +187,9 @@ class VCPluginMixin(object):
         if event_vc_room.data is None:
             event_vc_room.data = {}
 
-    def handle_form_data_vc_room(self, vc_room, data):
-        vc_room.name = data.pop('name')
+    def update_data_vc_room(self, vc_room, data):
+        if 'name' in data:
+            vc_room.name = data.pop('name')
 
         if vc_room.data is None:
             vc_room.data = {}

@@ -51,7 +51,7 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
         if event_vc_room is None:
             event_vc_room = VCRoomEventAssociation()
 
-        plugin.handle_form_data_association(event, vc_room, event_vc_room, form.data)
+        plugin.update_data_association(event, vc_room, event_vc_room, form.data)
 
         # check whether there is a room-event association already present
         # for the given event, room and plugin
@@ -142,7 +142,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
             if not event_vc_room:
                 return redirect(url_for('.manage_vc_rooms', self.event))
 
-            self.plugin.handle_form_data_vc_room(vc_room, form.data)
+            self.plugin.update_data_vc_room(vc_room, form.data)
 
             try:
                 self.plugin.create_room(vc_room, self.event)
@@ -190,7 +190,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
 
         if form.validate_on_submit():
 
-            self.plugin.handle_form_data_vc_room(self.vc_room, form.data)
+            self.plugin.update_data_vc_room(self.vc_room, form.data)
 
             event_vc_room = process_vc_room_association(
                 self.plugin, self.event, self.vc_room, form, event_vc_room=self.event_vc_room, allow_same_room=True)
