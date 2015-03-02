@@ -69,11 +69,11 @@ def find_event_vc_rooms(from_dt=None, to_dt=None, distinct=False):
     query = VCRoomEventAssociation.find()
     if distinct:
         query = query.distinct(VCRoomEventAssociation.event_id, VCRoomEventAssociation.vc_room_id)
-    if from_dt is not None:
-        query = (query.join(IndexedEvent, IndexedEvent.id == db.cast(VCRoomEventAssociation.event_id, db.String))
-                 .filter(IndexedEvent.start_date >= from_dt))
+    if from_dt is not None or to_dt is not None:
+        query = query.join(IndexedEvent, IndexedEvent.id == db.cast(VCRoomEventAssociation.event_id, db.String))
+        if from_dt is not None:
+            query = query.filter(IndexedEvent.start_date >= from_dt)
+        if to_dt is not None:
+            query = query.filter(IndexedEvent.start_date < to_dt)
     for vc_room in query:
-        event = vc_room.event
-        if to_dt is not None and event.getStartDate() > to_dt:
-            continue
         yield vc_room
