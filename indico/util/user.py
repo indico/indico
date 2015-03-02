@@ -37,7 +37,10 @@ def retrieve_principal(principal):
     gh = GroupHolder()
 
     type_, id_ = principal
-    return ah.getById(id_) if type_ == 'Avatar' else gh.getById(id_)
+    try:
+        return ah.getById(id_) if type_ == 'Avatar' else gh.getById(id_)
+    except KeyError:
+        return None
 
 
 def principal_to_tuple(principal):
