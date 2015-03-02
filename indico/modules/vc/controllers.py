@@ -297,7 +297,8 @@ class RHVCManageAttach(RHVCManageEventCreateBase):
             return redirect_or_jsonify(url_for('.manage_vc_rooms', self.event), flash=False)
 
         return WPVCManageEvent.render_template('attach_room.html', self._conf, event=self._conf, form=form,
-                                               skip_fields=form.conditional_fields | {'room'})
+                                               skip_fields=form.conditional_fields | {'room'},
+                                               plugin=self.plugin)
 
 
 class RHVCManageSearch(RHVCManageEventCreateBase):

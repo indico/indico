@@ -6,6 +6,10 @@
     {% trans %}Attach Video Conference Room{% endtrans %}
 {% endblock %}
 
+{% block subtitle %}
+    {{ plugin.friendly_name }}
+{% endblock %}
+
 {%- block content %}
     {{ form_header(id='vc-attach-room-form') }}
 

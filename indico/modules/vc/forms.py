@@ -106,7 +106,10 @@ class VCRoomLinkFormBase(IndicoForm):
 
 
 class VCRoomAttachFormBase(VCRoomLinkFormBase):
-    room = VCRoomField(_("Room to link"), [DataRequired()])
+    room = VCRoomField(
+        _("Room to link"), [DataRequired()],
+        description=_("Please start writing the name of the room you would like to attach. "
+                      "Indico will suggest existing rooms."))
 
     def __init__(self, *args, **kwargs):
         super(VCRoomAttachFormBase, self).__init__(*args, **kwargs)
