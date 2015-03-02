@@ -31,6 +31,7 @@ import MaKaC.common.info as info
 from MaKaC.i18n import _
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
+from indico.core import signals
 from indico.core.logger import Logger
 from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
                             IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
@@ -1429,6 +1430,9 @@ class AvatarHolder(ObjectHolder):
         # Merge avatars in RB
         from indico.modules.rb.utils import rb_merge_users
         rb_merge_users(prin.getId(), merged.getId())
+
+        # Notify signal listeners about the merge
+        signals.merge_users.send(prin, merged=merged)
 
         # Merge API keys
         ak_prin = prin.getAPIKey()

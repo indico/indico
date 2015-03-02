@@ -53,3 +53,8 @@ shown on the "User Preferences" page. The *sender* is the user for whom the
 preferences page is being shown which might not be the currently logged-in
 user!
 """)
+
+merge_users = _signals.signal('merge-users', """
+Called when two users are merged. The *sender* is the main user while the merged
+user (i.e. the one being deleted in the merge) is passed via the *merged* kwarg.
+""")
