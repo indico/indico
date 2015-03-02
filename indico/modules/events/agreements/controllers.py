@@ -91,7 +91,7 @@ class RHAgreementManagerDetails(RHConferenceModifBase):
         if self.definition is None:
             raise NotFound("Agreement type '{}' does not exist".format(definition_name))
         if not self.definition.is_active(self._conf):
-            flash(_("Agreement type '{}' is not active for the event").format(self.definition.name), 'error')
+            flash(_("The '{}' agreement is not used in this event.").format(self.definition.title), 'error')
             return redirect(url_for('.event_agreements', self._conf))
 
     def _process(self):
