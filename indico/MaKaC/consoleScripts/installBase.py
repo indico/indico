@@ -138,12 +138,20 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
                 new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
             else:
                 new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
+
+        elif new_values[k].__class__ == set:
+            regexp = re.compile(r'^(%s\s*=\s*)\{([^}]+)}' % k, re.MULTILINE)
+            if regexp.search(new_contents):
+                new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
+            else:
+                new_contents = "%s\n%s = %s" % (new_contents, k, repr(result_values[k]))
+
         else:
             raise Exception('Invalid config value "%s = %s"' % (k, new_values[k]))
 
-    # We write unknown options to the end of the file, they may not be just outdated options but plugins'
-
-    open(existing_conf, 'w').write(new_contents)
+    # We write unknown options to the end of the file
+    with open(existing_conf, 'w') as f:
+        f.write(new_contents)
 
 
 def modifyOnDiskIndicoConfOption(indico_conf, optionName, optionValue):
