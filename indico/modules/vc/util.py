@@ -56,14 +56,19 @@ def get_managed_vc_plugins(user):
     return [p for p in get_vc_plugins().itervalues() if p.can_manage_vc(user)]
 
 
-def find_event_vc_rooms(from_dt=None, to_dt=None):
+def find_event_vc_rooms(from_dt=None, to_dt=None, distinct=False):
     """Finds VC rooms matching certain criteria
 
     :param from_dt: earliest event/contribution to include
     :param to_dt: latest event/contribution to include
+    :param distinct: if True, never return the same ``(event, vcroom)``
+                     more than once (even if it's linked more than once to
+                     that event)
     """
     from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation
     query = VCRoomEventAssociation.find()
+    if distinct:
+        query = query.distinct(VCRoomEventAssociation.event_id, VCRoomEventAssociation.vc_room_id)
     if from_dt is not None:
         query = (query.join(IndexedEvent, IndexedEvent.id == db.cast(VCRoomEventAssociation.event_id, db.String))
                  .filter(IndexedEvent.start_date >= from_dt))

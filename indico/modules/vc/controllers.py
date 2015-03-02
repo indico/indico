@@ -342,7 +342,7 @@ class RHVCRoomList(RHProtected):
             reverse = form.direction.data == 'desc'
             from_dt = as_utc(get_day_start(form.start_date.data)) if form.start_date.data else None
             to_dt = as_utc(get_day_end(form.end_date.data)) if form.end_date.data else None
-            results = find_event_vc_rooms(from_dt=from_dt, to_dt=to_dt)
+            results = find_event_vc_rooms(from_dt=from_dt, to_dt=to_dt, distinct=True)
             results = group_list(results,
                                  key=lambda x: x.event.getStartDate().date(),
                                  sort_by=lambda x: x.event.getStartDate(),
