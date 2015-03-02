@@ -133,11 +133,11 @@ def _check_pyenv(py_versions):
         print yellow("Are you sure you have installed it?")
         sys.exit(-2)
 
-    # list available pythonbrew versions
-    av_versions = list(entry.strip() for entry in pyenv_cmd('versions', capture=True).split('\n')[1:])
+    # list available pyenv versions
+    av_versions = os.listdir(os.path.join(env.pyenv_dir, 'versions'))
 
     for py_version in py_versions:
-        if (py_version) not in av_versions:
+        if py_version not in av_versions:
             print green('Installing Python {0}'.format(py_version))
             pyenv_cmd('install {0}'.format(py_version), capture=True)
 
