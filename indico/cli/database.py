@@ -67,6 +67,28 @@ def prepare():
 
 
 del DatabaseManager._commands['init']  # not useful since we already have a migration environment
+run_downgrade = DatabaseManager._commands['downgrade'].run
+
+
+def _safe_downgrade(*args, **kwargs):
+    print cformat('%{yellow!}*** DANGER')
+    print cformat('%{yellow!}***%{reset} '
+                  '%{red!}This operation may %{yellow!}PERMANENTLY ERASE %{red!}some data!%{reset}')
+    if current_app.debug:
+        print cformat('%{yellow!}***%{reset} '
+                      "%{green!}Debug mode is active, so you probably won't destroy valuable data")
+    else:
+        print cformat('%{yellow!}***%{reset} '
+                      "%{red!}Debug mode is NOT ACTIVE, so make sure you are on the right machine!")
+    if raw_input(cformat('%{yellow!}***%{reset} '
+                         'To confirm this, enter %{yellow!}YES%{reset}: ')) != 'YES':
+        print cformat('%{green}Aborted%{reset}')
+        sys.exit(1)
+    else:
+        return run_downgrade(*args, **kwargs)
+
+
+DatabaseManager._commands['downgrade'].run = _safe_downgrade
 
 
 class PluginScriptDirectory(ScriptDirectory):
