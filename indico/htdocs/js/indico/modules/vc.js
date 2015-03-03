@@ -87,6 +87,7 @@
             // Clipboard handling using Zero Clipboard
             // We will load it only on hovering, so that we defer using Flash
             $trigger.one('click', function() {
+                ZeroClipboard.config({'swfPath': Indico.Urls.Base + '/js/lib/zeroclipboard/ZeroClipboard.swf'});
                 var client = new ZeroClipboard($button);
 
                 client.on('error', function(e) {
