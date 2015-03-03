@@ -14,18 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.pages.main import WPMainBase
-import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC.i18n import _
 from pytz import timezone
-from MaKaC.common import timezoneUtils
 
 from indico.modules import ModuleHolder
+from indico.util.i18n import _
+
+from MaKaC.common import timezoneUtils
+from MaKaC.webinterface.pages.main import WPMainBase
+from MaKaC.webinterface.wcomponents import WTemplated
+
 
 class WPNews(WPMainBase):
 
     def _getBody(self, params):
-        wc = WNews(tz = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ()))
+        wc = WNews(tz=timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ()))
         return wc.getHTML()
 
     def getCSSFiles(self):
@@ -35,14 +37,14 @@ class WPNews(WPMainBase):
         return WPMainBase._getTitle(self) + " - " + _("News")
 
 
-class WNews(wcomponents.WTemplated):
+class WNews(WTemplated):
 
     def __init__(self, tz):
-        wcomponents.WTemplated.__init__(self)
+        WTemplated.__init__(self)
         self._tz = tz
 
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
+    def getVars(self):
+        vars = WTemplated.getVars(self)
 
         newsModule = ModuleHolder().getById("news")
         vars["news"] = newsModule.getNewsItemsList()
