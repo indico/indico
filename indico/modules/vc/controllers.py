@@ -171,10 +171,9 @@ class RHVCSystemEventBase(RHEventVCRoomMixin, RHVCManageEventBase):
     def _checkParams(self, params):
         RHVCManageEventBase._checkParams(self, params)
         RHEventVCRoomMixin._checkParams(self)
-        try:
-            self.plugin = get_vc_plugins().get(request.view_args['service'])
-        except KeyError:
+        if self.vc_room.type != request.view_args['service']:
             raise NotFound
+        self.plugin = self.vc_room.plugin
 
 
 class RHVCManageEventModify(RHVCSystemEventBase):
