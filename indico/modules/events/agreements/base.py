@@ -26,7 +26,6 @@ from indico.util.caching import make_hashable, memoize_request
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.string import return_ascii
 from indico.web.flask.templating import get_overridable_template_name, get_template_module
-from MaKaC.accessControl import AccessWrapper
 
 
 class AgreementPersonInfo(object):
@@ -108,7 +107,7 @@ class AgreementDefinitionBase(object):
     @classmethod
     def can_access_api(cls, user, event):
         """Checks if a user can list the agreements for an event"""
-        return event.canModify(AccessWrapper(user))
+        return event.canUserModify(user)
 
     @classmethod
     def extend_api_data(cls, event, person, agreement, data):  # pragma: no cover

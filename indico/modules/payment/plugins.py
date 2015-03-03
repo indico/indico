@@ -30,7 +30,6 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
-from MaKaC.accessControl import AccessWrapper
 
 
 class PaymentPluginSettingsFormBase(IndicoForm):
@@ -83,7 +82,7 @@ class PaymentPluginMixin(object):
         :param user: the :class:`Avatar` of the user
         :param event: the :class:`Conference`
         """
-        return event.canModify(AccessWrapper(user))
+        return event.canUserModify(user)
 
     def get_event_management_url(self, event, **kwargs):
         # This is needed only in case a plugin overrides `can_be_modified` and grants access to users who do not have
