@@ -128,7 +128,8 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
-            flash(_('You are not allowed to create VC rooms for this event.'), 'error')
+            flash(_('You are not allowed to create {} rooms for this event.').format(self.plugin.friendly_name),
+                  'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
         form = self.plugin.create_form(event=self.event)
@@ -181,7 +182,8 @@ class RHVCManageEventModify(RHVCSystemEventBase):
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
-            flash(_('You are not allowed to modify VC rooms for this event.'), 'error')
+            flash(_('You are not allowed to modify {} rooms for this event.').format(self.plugin.friendly_name),
+                  'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
         form = self.plugin.create_form(self.event,
@@ -231,7 +233,8 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
-            flash(_('You are not allowed to refresh VC rooms in this event.'), 'error')
+            flash(_('You are not allowed to refresh {} rooms in this event.').format(self.plugin.friendly_name),
+                  'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
         Logger.get('modules.vc').info("Refreshing VC room {} from event {}".format(
@@ -254,7 +257,8 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
-            flash(_('You are not allowed to remove VC rooms from this event.'), 'error')
+            flash(_('You are not allowed to remove {} rooms from this event.').format(self.plugin.friendly_name),
+                  'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
         self.event_vc_room.delete(session.user)
@@ -287,7 +291,7 @@ class RHVCManageAttach(RHVCManageEventCreateBase):
         if form.validate_on_submit():
             vc_room = form.data['room']
             if not self.plugin.can_manage_vc_rooms(session.user, self.event):
-                flash(_("You are not allowed to attach '{}' rooms to this event.").format(self.plugin.service_name),
+                flash(_("You are not allowed to attach {} rooms to this event.").format(self.plugin.friendly_name),
                       'error')
             else:
                 event_vc_room = process_vc_room_association(self.plugin, self.event, vc_room, form)
