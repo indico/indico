@@ -11,7 +11,7 @@
 
         var params = {
             load: function(query, callback) {
-                if (!query.length) {
+                if (query.length < 3) {
                     return callback();
                 }
                 $.ajax(SEARCH_URL, {
