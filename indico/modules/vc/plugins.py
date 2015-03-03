@@ -199,6 +199,9 @@ class VCPluginMixin(object):
 
     def can_manage_vc_rooms(self, user, event):
         """Checks if a user can manage vc rooms on an event"""
+        if self.can_manage_vc(user):
+            return True
+
         acl = self.settings.get('acl')
         if not acl:
             return True
