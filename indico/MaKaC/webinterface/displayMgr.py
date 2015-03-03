@@ -189,10 +189,10 @@ class ConfDisplayMgr(DisplayMgr):
     def getMenu(self):
         if self._menu.getParent() is None:
             self._menu.setParent(self)
-        plugin_items = frozenset(x.name for x in values_from_signal(signals.event.sidemenu.send()))
-        if getattr(self, 'plugin_items', frozenset()) != plugin_items:
+        extra_items = frozenset(x.name for x in values_from_signal(signals.event.sidemenu.send()))
+        if getattr(self, 'extra_items', frozenset()) != extra_items:
             self._menu.updateSystemLink()
-        self.plugin_items = plugin_items
+        self.extra_items = extra_items
         return self._menu
 
     def getConference(self):
