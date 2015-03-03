@@ -272,6 +272,9 @@ class WPUpdateNews( WPHomepageCommon ):
     def _setActiveTab( self ):
         self._subTabNews.setActive()
 
+    def getCSSFiles(self):
+        return WPHomepageCommon.getCSSFiles(self) + self._asset_env['news_sass'].urls()
+
     def _getTabContent( self, params ):
         tz = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ())
         wc = WUpdateNews()

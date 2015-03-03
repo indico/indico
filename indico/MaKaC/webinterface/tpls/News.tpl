@@ -1,22 +1,20 @@
 <div class="container">
-    <div class="groupTitle">${ _("Latest News") }</div>
+    <h2 class="page-title">${ _("Latest News") }</h2>
 
-<div>
-% for newsItem in news:
-    <div class="newsDisplayItem">
-        <div class="newsDisplayItemDateType">
-            ${ formatDate(newsItem.getAdjustedCreationDate(tz))}
-            -
-            ${ newsItem.getHumanReadableType() }
+    <div>
+    % for newsItem in news:
+        <div class="news-item">
+            <div class="right news-item-info">
+                <span class="date-time">${ formatDate(newsItem.getAdjustedCreationDate(tz))}</span> -
+                <span class="news-type">${ newsItem.getHumanReadableType() }</span>
+            </div>
+            <h2>${ newsItem.getTitle() }
+                % if newsItem.isNew():
+                    <i class="icon-new new-label"></i>
+                % endif
+            </h2>
+            <div class="content">${ newsItem.getContent() }</div>
         </div>
-        <div style="display: inline;">
-            <div class="newsDisplayItemTitle">${ newsItem.getTitle() }</div>
-            % if newsItem.isNew():
-            <i class="icon-new new-label" title="${_('This event is new')}"></i>
-            % endif
-            <div class="newsDisplayItemContent">${ newsItem.getContent() }</div>
-        </div>
+    % endfor
     </div>
-% endfor
-</div>
 </div>

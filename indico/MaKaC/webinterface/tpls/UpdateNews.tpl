@@ -16,16 +16,16 @@
 </div>
 
 
-<div id="newsToolBar" class="newsToolBar"></div>
-<div id="newsContainer" class="newsContainer"></div>
+<div id="news-toolbar" class="news-toolbar"></div>
+<div id="news-container" class="news-container"></div>
 
 <script type="text/javascript">
-    var newsList = new NewsList(${ newslist | j,n }, 'newsContainer', ${ newsTypesList | j,n });
+    var newsList = new NewsList(${ newslist | j,n }, 'news-container', ${ newsTypesList | j,n });
 
     var addButton = Widget.link(command(function(){
                                             newsList.addItem();
     },IndicoUI.Buttons.addButton()));
-    $E("newsToolBar").set(addButton);
+    $E("news-toolbar").set(addButton);
 
 
     $E('inPlaceEditRecentDays').set(new InputEditWidget('news.setRecentDays', {}, ${ jsonEncode(recentDays) }, false, null, null, null).draw());

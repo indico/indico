@@ -28,6 +28,9 @@ class WPNews(WPMainBase):
         wc = WNews(tz = timezone(timezoneUtils.DisplayTZ(self._getAW()).getDisplayTZ()))
         return wc.getHTML()
 
+    def getCSSFiles(self):
+        return WPMainBase.getCSSFiles(self) + self._asset_env['news_sass'].urls()
+
     def _getTitle(self):
         return WPMainBase._getTitle(self) + " - " + _("News")
 

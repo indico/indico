@@ -358,6 +358,7 @@ eventservices_sass = sass_module_bundle('eventservices')
 event_display_sass = sass_module_bundle('event_display')
 overviews_sass = sass_module_bundle('overviews')
 vc_sass = sass_module_bundle('vc')
+news_sass = sass_module_bundle('news')
 
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),
@@ -431,6 +432,7 @@ def register_all_css(env, main_css_file):
     env.register('event_display_sass', event_display_sass)
     env.register('overviews_sass', overviews_sass)
     env.register('vc_sass', vc_sass)
+    env.register('news_sass', news_sass)
 
 
 core_env = IndicoEnvironment()

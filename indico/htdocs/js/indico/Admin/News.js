@@ -129,21 +129,21 @@ type("NewsItem", ["ServiceWidget"],
                        content.set(self.text);
                    }
 
-                    return Html.div("newsItemEdit", titleField, typeField, content.draw(),
+                    return Html.div("news-item-edit", titleField, typeField, content.draw(),
                                                    saveButton, cancelButton); },
                 display: function() {
-                    var newsItemContentDiv = Html.div("newsItemContent");
+                    var newsItemContentDiv = Html.div("content");
                     newsItemContentDiv.dom.innerHTML = self.text;
-                    return Html.div("newsItem",
-                                    Html.div("newsItemOptions",
+                    return Html.div("news-item",
+                                    Html.div("options right",
                                             Widget.link(command(function (){
                                                 self.parentList.deleteNewsItem(self);
                                             }, IndicoUI.Buttons.removeButton())),
                                             Widget.link(command(function (){
                                                 self.chooser.set('edit');
                                             }, IndicoUI.Buttons.editButton()))),
-                                    Html.div("newsItemDate", IndicoUtil.formatJsonDate(self.creationDate)),
-                                    Html.div("newsItemTitle", self.title + " (" + self.type + ")"),
+                                    Html.div("date-time right", IndicoUtil.formatJsonDate(self.creationDate)),
+                                    Html.h2({}, self.title + " (" + self.type + ")"),
                                     newsItemContentDiv
                      );
                 }
