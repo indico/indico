@@ -58,6 +58,7 @@ class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
     def getJSFiles(self):
         return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
                 self._asset_env['zero_clipboard_js'].urls() +
+                self._asset_env['modules_event_display_js'].urls() +
                 self._asset_env['modules_vc_js'].urls())
 
     def _getBody(self, params):
