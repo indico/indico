@@ -124,10 +124,6 @@ class ServiceRunner(object):
 
                     self._invokeMethodRetryBefore()
                     try:
-                        # Raise a conflict error if enabled.
-                        # This allows detecting conflict-related issues easily.
-                        if i < forced_conflicts:
-                            raise ConflictError
                         try:
                             result = processRequest(method, copy.deepcopy(params))
                             signals.after_process.send()
@@ -135,7 +131,10 @@ class ServiceRunner(object):
                             raise ServiceNoReportError(e.getMessage())
                         except (NoReportIndicoError, FormValuesError) as e:
                             raise ServiceNoReportError(e.getMessage(), title=_("Error"))
-
+                        # Raise a conflict error if enabled.
+                        # This allows detecting conflict-related issues easily.
+                        if i < forced_conflicts:
+                            raise ConflictError
                         transaction.commit()
                         break
                     except ConflictError:
