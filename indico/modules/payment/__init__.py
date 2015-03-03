@@ -26,7 +26,7 @@ __all__ = ('settings', 'event_settings', 'PaymentPluginMixin', 'PaymentPluginSet
 
 CONDITIONS = ("CANCELLATION:\n"
               "All refunds requests must be in writing by mail to the Conference Secretary as soon as possible.\n"
-              "The Conference committee reserves the right to refuse reimbursement of part or all of the fee in the"
+              "The Conference committee reserves the right to refuse reimbursement of part or all of the fee in the "
               "case of late cancellation. However, each case of cancellation would be considered individually.")
 
 
