@@ -26,7 +26,7 @@
             {% endif %}
         </td>
         <td class="entry-location">
-            {% if event_vc_room.event.getRoom() %}
+            {% if event_vc_room.event.getLocation() and event_vc_room.event.getRoom() %}
                 <span class="room">
                     {{ event_vc_room.event.getRoom().getName() }}
                 </span>
