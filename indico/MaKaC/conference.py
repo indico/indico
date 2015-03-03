@@ -18,7 +18,6 @@ from itertools import ifilter
 from flask_pluginengine import plugin_context
 
 from indico.core.models.settings import EventSetting
-from indico.modules.events.requests.models.requests import Request, RequestState
 from indico.modules.rb.models.reservations import Reservation
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
@@ -2646,13 +2645,6 @@ class Conference(CommonObjectBase, Locatable):
         signals.event.deleted.send(self)
 
         EventSetting.delete_event(self.id)
-
-        if self.id.isdigit():  # only for non-legacy events with a proper id
-            event_id = int(self.id)
-            requests = Request.find(event_id=event_id)
-            for req in requests.filter(Request.state.in_((RequestState.accepted, RequestState.pending))):
-                req.definition.withdraw(req, notify_event_managers=False)
-            requests.delete()
 
         self.notifyContributions()
 

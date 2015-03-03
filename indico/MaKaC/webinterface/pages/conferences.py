@@ -58,8 +58,6 @@ from MaKaC.webinterface.pages import base
 from MaKaC.webinterface.materialFactories import MaterialFactoryRegistry
 import MaKaC.common.info as info
 from MaKaC.i18n import _
-from indico.modules.events.requests import get_request_definitions
-from indico.modules.events.requests.util import is_request_manager
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
 from indico.util.string import safe_upper
@@ -1422,10 +1420,6 @@ class WPConferenceModifBase(main.WPMainBase):
             urlHandlers.UHConfModifEvaluation.getURL( self._conf ) )
         self._generalSection.addItem( self._evaluationMenuItem)
 
-        self._requestsMenuItem = wcomponents.SideMenuItem(_("Services"),
-                                                          url_for('requests.event_requests', self._conf))
-        self._generalSection.addItem(self._requestsMenuItem)
-
         self.extra_menu_items = {}
         for name, item in sorted(values_from_signal(signals.event_management.sidemenu.send(self._conf)),
                                  key=lambda x: x[1]._title):
@@ -1480,7 +1474,6 @@ class WPConferenceModifBase(main.WPMainBase):
             self._toolsMenuItem.setVisible(False)
             self._logMenuItem.setVisible(False)
             self._evaluationMenuItem.setVisible(False)
-            self._requestsMenuItem.setVisible(is_request_manager(session.user))
 
         if not (Config.getInstance().getIsRoomBookingActive() and canModify):
             self._roomBookingMenuItem.setVisible(False)
@@ -1510,9 +1503,6 @@ class WPConferenceModifBase(main.WPMainBase):
         # we disable the Participants section for events of type conference
         if self._conf.getType() == 'conference':
             self._participantsMenuItem.setVisible(False)
-
-        if not get_request_definitions():
-            self._requestsMenuItem.setVisible(False)
 
         wf = self._rh.getWebFactory()
         if wf:

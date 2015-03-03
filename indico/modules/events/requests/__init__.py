@@ -16,10 +16,14 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
-from indico.modules.events.requests.util import get_request_definitions
+from indico.modules.events.requests.util import get_request_definitions, is_request_manager
 from indico.modules.events.requests.base import RequestDefinitionBase, RequestFormBase
-from indico.modules.events.requests.models.requests import Request
+from indico.modules.events.requests.models.requests import Request, RequestState
+from indico.web.flask.util import url_for
+from MaKaC.webinterface.wcomponents import SideMenuItem
 
 
 __all__ = ('RequestDefinitionBase', 'RequestFormBase')
@@ -31,9 +35,27 @@ def _check_request_definitions(app, **kwargs):
     get_request_definitions()
 
 
+@signals.event_management.sidemenu.connect
+def _extend_event_management_menu(event, **kwargs):
+    visible = bool(get_request_definitions()) and (event.canUserModify(session.user) or
+                                                   is_request_manager(session.user))
+    return 'requests', SideMenuItem('Services', url_for('requests.event_requests', event), visible=visible)
+
+
 @signals.merge_users.connect
 def _merge_users(user, merged, **kwargs):
     new_id = int(user.id)
     old_id = int(merged.id)
     Request.find(created_by_id=old_id).update({'created_by_id': new_id})
     Request.find(processed_by_id=old_id).update({'processed_by_id': new_id})
+
+
+@signals.event.deleted.connect
+def _event_deleted(event, **kwargs):
+    if not event.id.isdigit():
+        return
+    event_id = int(event.id)
+    requests = Request.find(event_id=event_id)
+    for req in requests.filter(Request.state.in_((RequestState.accepted, RequestState.pending))):
+        req.definition.withdraw(req, notify_event_managers=False)
+    requests.delete()

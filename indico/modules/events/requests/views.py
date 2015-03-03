@@ -26,7 +26,7 @@ class WPRequestsJinjaMixin(WPJinjaMixin):
 
 class WPRequestsEventManagement(WPConferenceModifBase, WPRequestsJinjaMixin):
     def _setActiveSideMenuItem(self):
-        self._requestsMenuItem.setActive()
+        self.extra_menu_items['requests'].setActive()
 
     def _getPageContent(self, params):
         return WPRequestsJinjaMixin._getPageContent(self, params)
