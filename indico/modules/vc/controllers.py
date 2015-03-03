@@ -45,8 +45,7 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None, allow_same_room=False):
-    # disable autoflush, so that the new event_vc_room does not
-    # influence the result
+    # disable autoflush, so that the new event_vc_room does not influence the result
     with db.session.no_autoflush:
         if event_vc_room is None:
             event_vc_room = VCRoomEventAssociation()
@@ -55,23 +54,27 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
 
         # check whether there is a room-event association already present
         # for the given event, room and plugin
-        q = VCRoomEventAssociation.query.filter(
+        q = VCRoomEventAssociation.find(
             VCRoom.type == plugin.service_name,
             VCRoomEventAssociation.event_id == event.id,
             VCRoomEventAssociation.link_type == event_vc_room.link_type,
-            VCRoomEventAssociation.link_id == event_vc_room.link_id
+            VCRoomEventAssociation.link_id == event_vc_room.link_id,
+            _join=VCRoom
         )
 
         if allow_same_room:
             q = q.filter(VCRoom.id != vc_room.id)
 
-        num_existing = q.join(VCRoom).count()
+        existing = {x.vc_room for x in q}
 
-    if event_vc_room.link_type != VCRoomLinkType.event and num_existing > 0:
+    if event_vc_room.link_type != VCRoomLinkType.event and existing:
         transaction.abort()
-        flash(_("There is already a {0} room attached to '{1}'!").format(
-            plugin.service_name, resolve_title(event_vc_room.link_object)), 'error')
-
+        flash(_("There is already a VC room attached to '{1}'.").format(resolve_title(event_vc_room.link_object)),
+              'error')
+        return None
+    elif event_vc_room.link_type == VCRoomLinkType.event and vc_room in existing:
+        transaction.abort()
+        flash(_("This {0} room is already attached to the event.").format(plugin.friendly_name), 'error')
         return None
     else:
         return event_vc_room
