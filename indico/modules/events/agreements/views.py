@@ -35,4 +35,4 @@ class WPAgreementManager(WPJinjaMixin, WPConferenceModifBase):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['agreements_sass'].urls()
 
     def _setActiveSideMenuItem(self):
-        self._agreementsMenuItem.setActive()
+        self.extra_menu_items['agreements'].setActive()

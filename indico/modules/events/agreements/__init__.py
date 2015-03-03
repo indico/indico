@@ -21,6 +21,8 @@ from indico.core.logger import Logger
 from indico.modules.events.agreements.base import AgreementPersonInfo, AgreementDefinitionBase, EmailPlaceholderBase
 from indico.modules.events.agreements.models.agreements import Agreement
 from indico.modules.events.agreements.util import get_agreement_definitions
+from indico.web.flask.util import url_for
+from MaKaC.webinterface.wcomponents import SideMenuItem
 
 
 __all__ = ('AgreementPersonInfo', 'AgreementDefinitionBase', 'EmailPlaceholderBase')
@@ -32,6 +34,12 @@ logger = Logger.get('agreements')
 def _check_agreement_definitions(app, **kwargs):
     # This will raise RuntimeError if the agreement definition types are not unique
     get_agreement_definitions()
+
+
+@signals.event_management.sidemenu.connect
+def _extend_event_management_menu(event, **kwargs):
+    return 'agreements', SideMenuItem('Agreements', url_for('agreements.event_agreements', event),
+                                      visible=bool(get_agreement_definitions()))
 
 
 @signals.merge_users.connect
