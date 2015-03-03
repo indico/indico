@@ -78,7 +78,8 @@ div.event-service-row {
 
             & > i:before {
                 font-size: 1.2em;
-                line-height: 2/1.2;
+                color: $black;
+                line-height: calc(2/1.2);
             }
 
             & > img {
