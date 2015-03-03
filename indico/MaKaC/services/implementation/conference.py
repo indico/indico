@@ -181,7 +181,7 @@ class ConferenceAdditionalInfoModification(ConferenceHTMLModificationBase):
 
 class ConferenceTypeModification(ConferenceTextModificationBase):
     """
-    Conference title modification
+    Event type modification
     """
     def _handleSet(self):
         curType = self._target.getType()
