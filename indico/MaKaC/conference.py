@@ -12286,7 +12286,7 @@ class EventCloner(object):
         selected = set(request.values.getlist('cloners'))
         for plugin_cloner in values_from_signal(signals.event_management.clone.send(old_event), single_value=True):
             with plugin_context(plugin_cloner.plugin):
-                selected_options = {name for name, (_, enabled) in plugin_cloner.get_options().iteritems()
+                selected_options = {name for name, (_, enabled, _) in plugin_cloner.get_options().iteritems()
                                     if enabled and plugin_cloner.full_option_name(name) in selected}
                 plugin_cloner.clone(new_event, selected_options)
 
