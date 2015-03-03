@@ -129,7 +129,7 @@ class VCPluginMixin(object):
         :param event_vc_room: the association of an event and a VC room
         :param kwargs: arguments passed to the template
         """
-        return render_plugin_template('{}:buttons.html'.format(self.name), plugin=self, vc_room=vc_room,
+        return render_plugin_template('{}:management_buttons.html'.format(self.name), plugin=self, vc_room=vc_room,
                                       event_vc_room=event_vc_room, **kwargs)
 
     def render_event_buttons(self, vc_room, event_vc_room, **kwargs):
