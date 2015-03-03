@@ -124,7 +124,7 @@ class RequestHandlerBase(OldObservable):
         if secure:
             return urljoin(Config.getInstance().getBaseSecureURL(), request.path) + query_string
         else:
-            return request.url + query_string
+            return request.url
 
     def use_https(self):
         """
