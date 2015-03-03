@@ -122,8 +122,8 @@ class Importer(object):
                     print 'Aborting'
                     sys.exit(1)
                 delete_all_tables(db)
-            stamp()
-            db.create_all()
+                stamp()
+                db.create_all()
             if self.has_data():
                 # Usually there's no good reason to migrate with data in the DB. However, during development one might
                 # comment out some migration tasks and run the migration anyway.
