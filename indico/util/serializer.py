@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from enum import Enum
+
 from indico.core.errors import IndicoError
 from indico.core.logger import Logger
 
@@ -42,6 +44,8 @@ class Serializer(object):
                 elif isinstance(v, dict):
                     v = dict((k, vv.to_serializable() if isinstance(vv, Serializer) else vv)
                              for k, vv in v.iteritems())
+                elif isinstance(v, Enum):
+                    v = v.name
                 if type(v) in converters:
                     v = converters[type(v)](v)
                 serializable[name] = v
