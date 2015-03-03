@@ -115,16 +115,16 @@ def legacy_rule_from_endpoint(endpoint):
 
 
 def make_compat_redirect_func(blueprint, endpoint, view_func=None):
-    def _redirect():
+    def _redirect(**view_args):
         # In case of POST we can't safely redirect since the method would switch to GET
         # and thus the request would most likely fail.
         if view_func and request.method == 'POST':
-            return view_func(**request.view_args)
+            return view_func(**view_args)
         # Ugly hack to get non-list arguments unless they are used multiple times.
         # This is necessary since passing a list for an URL path argument breaks things.
-        args = dict((k, v[0] if len(v) == 1 else v) for k, v in request.args.iterlists())
+        view_args.update((k, v[0] if len(v) == 1 else v) for k, v in request.args.iterlists())
         try:
-            target = _url_for('%s.%s' % (blueprint.name, endpoint), **args)
+            target = _url_for('%s.%s' % (blueprint.name, endpoint), **view_args)
         except BuildError:
             raise NotFound
         return redirect(target, 302 if app.debug else 301)

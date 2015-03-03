@@ -20,6 +20,7 @@ from indico.modules.vc.controllers import (RHVCManageEvent, RHVCManageEventSelec
                                            RHVCManageEventModify, RHVCManageEventRefresh, RHVCManageEventRemove,
                                            RHVCEventPage, RHVCManageSearch, RHVCManageAttach, RHVCRoomList,
                                            RHVCRoomModify)
+from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 vc_blueprint = _bp = IndicoBlueprint('vc', __name__, template_folder='templates')
@@ -51,3 +52,9 @@ _bp.add_url_rule('/event/<confId>/manage/videoconference/<service>/<int:event_vc
 
 # Event page
 _bp.add_url_rule('/event/<confId>/videoconference/', 'event_videoconference', RHVCEventPage)
+
+
+# Legacy URLs
+vc_compat_blueprint = _compat_bp = IndicoBlueprint('compat_vc', __name__)
+vc_compat_blueprint.add_url_rule('/event/<confId>/collaboration', 'collaboration',
+                                 make_compat_redirect_func(_bp, 'event_videoconference'))
