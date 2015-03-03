@@ -36,11 +36,11 @@
                 {% endif %}
             </dd>
             <dt>{% trans %}Conditions{% endtrans %}</dt>
-            <dd>{{ settings.conditions or 'None' }}</dd>
+            <dd>{{ settings.conditions or '<em>None</em>'|safe }}</dd>
             <dt>{% trans %}Register email message{% endtrans %}</dt>
-            <dd>{{ settings.register_email or 'None' }}</dd>
+            <dd>{{ settings.register_email or '<em>None</em>'|safe }}</dd>
             <dt>{% trans %}Success email message{% endtrans %}</dt>
-            <dd>{{ settings.success_email or 'None' }}</dd>
+            <dd>{{ settings.success_email or '<em>None</em>'|safe }}</dd>
             <dt></dt>
             <dd><a class="i-button big" href="{{ url_for('.event_settings_edit', event) }}">{% trans %}Configure{% endtrans %}</a></dd>
         {% endif %}
