@@ -34,6 +34,7 @@ from indico.util.user import retrieve_principal
 from MaKaC.conference import EventCloner
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.displayMgr import EventMenuEntry
+from MaKaC.webinterface.wcomponents import SideMenuItem
 
 __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase')
 
@@ -58,6 +59,12 @@ def _inject_vc_room_action_buttons(event, item, event_vc_rooms_dict, **kwargs):
                                           for_tooltip=True, **kwargs)
         return render_plugin_template('{}:vc_room_timetable_buttons.html'.format(plugin.name),
                                       event=event, event_vc_room=event_vc_room, info_box=info_box, **kwargs)
+
+
+@signals.event_management.sidemenu.connect
+def _extend_event_management_menu(event, **kwargs):
+    return 'vc', SideMenuItem('Video Conference', url_for('vc.manage_vc_rooms', event),
+                              visible=bool(get_vc_plugins()) and event.canUserModify(session.user))
 
 
 @signals.event.sidemenu.connect

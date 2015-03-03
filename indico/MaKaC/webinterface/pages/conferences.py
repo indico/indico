@@ -60,14 +60,12 @@ import MaKaC.common.info as info
 from MaKaC.i18n import _
 from indico.modules.events.requests import get_request_definitions
 from indico.modules.events.requests.util import is_request_manager
-from indico.modules.vc import get_vc_plugins
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
 from indico.util.string import safe_upper
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
-from indico.core.logger import Logger
 from indico.modules import ModuleHolder
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
 from MaKaC.conference import Session, Contribution, LocalFile
@@ -1431,8 +1429,6 @@ class WPConferenceModifBase(main.WPMainBase):
         self._agreementsMenuItem = wcomponents.SideMenuItem(_("Agreements"),
                                                             url_for('agreements.event_agreements', self._conf))
         self._generalSection.addItem(self._agreementsMenuItem)
-        self._vcMenuItem = wcomponents.SideMenuItem(_("Video Conference"), url_for('vc.manage_vc_rooms', self._conf))
-        self._generalSection.addItem(self._vcMenuItem)
 
         self.extra_menu_items = {}
         for name, item in sorted(values_from_signal(signals.event_management.sidemenu.send(self._conf)),
@@ -1489,7 +1485,6 @@ class WPConferenceModifBase(main.WPMainBase):
             self._logMenuItem.setVisible(False)
             self._evaluationMenuItem.setVisible(False)
             self._requestsMenuItem.setVisible(is_request_manager(session.user))
-            self._videoconferenceMenuItem.setVisible(False)
 
         if not (Config.getInstance().getIsRoomBookingActive() and canModify):
             self._roomBookingMenuItem.setVisible(False)
@@ -1524,8 +1519,6 @@ class WPConferenceModifBase(main.WPMainBase):
             self._requestsMenuItem.setVisible(False)
         if not get_agreement_definitions():
             self._agreementsMenuItem.setVisible(False)
-        if not get_vc_plugins():
-            self._vcMenuItem.setVisible(False)
 
         wf = self._rh.getWebFactory()
         if wf:

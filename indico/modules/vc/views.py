@@ -39,7 +39,7 @@ class WPVCManageEvent(WPVCJinjaMixin, WPConferenceModifBase):
                 self._asset_env['zero_clipboard_js'].urls())
 
     def _setActiveSideMenuItem(self):
-        self._vcMenuItem.setActive()
+        self.extra_menu_items['vc'].setActive()
 
     def _getPageContent(self, params):
         return WPVCJinjaMixin._getPageContent(self, params)
