@@ -225,9 +225,9 @@ zero_clipboard_js = rjs_bundle('zero_clipboard_js', 'js/lib/zeroclipboard/ZeroCl
 selectize_js = rjs_bundle('selectize_js',
                           'js/lib/selectize.js/selectize.js')
 
-selectize_css = rjs_bundle('selectize_css',
-                           'css/lib/selectize.js/selectize.css',
-                           'css/lib/selectize.js/selectize.default.css')
+selectize_css = Bundle('css/lib/selectize.js/selectize.css',
+                       'css/lib/selectize.js/selectize.default.css',
+                       filters='cssmin', output='css/selectize_css_%(version)s.min.css')
 
 jquery = rjs_bundle('jquery', *filter(None, [
     'js/lib/underscore.js',
