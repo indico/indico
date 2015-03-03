@@ -70,6 +70,8 @@ def _extend_event_management_menu(event, **kwargs):
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
     def _visible(event):
+        if not event.id.isdigit():
+            return False
         return (bool(get_vc_plugins()) and
                 bool(VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True).count()))
     return EventMenuEntry('vc.event_videoconference', 'Video Conference Rooms', name='vc-event-page', visible=_visible)
@@ -78,6 +80,8 @@ def _extend_event_menu(sender, **kwargs):
 @signals.event.session_slot_deleted.connect
 def _session_slot_deleted(session_slot, **kwargs):
     event = session_slot.getConference()
+    if not event.id.isdigit():
+        return
     for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True, include_deleted=True):
         if event_vc_room.link_object is None:
             event_vc_room.link_type = VCRoomLinkType.event
@@ -87,6 +91,8 @@ def _session_slot_deleted(session_slot, **kwargs):
 @signals.event.contribution_deleted.connect
 def _contrib_deleted(contrib, **kwargs):
     event = contrib.getConference()
+    if not event.id.isdigit():
+        return
     for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True, include_deleted=True):
         if event_vc_room.link_object is None:
             event_vc_room.link_type = VCRoomLinkType.event
@@ -95,6 +101,8 @@ def _contrib_deleted(contrib, **kwargs):
 
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
+    if not event.id.isdigit():
+        return
     for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True, include_deleted=True):
         event_vc_room.delete(_get_user())
 
