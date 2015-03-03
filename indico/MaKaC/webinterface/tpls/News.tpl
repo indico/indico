@@ -12,7 +12,7 @@
         <div style="display: inline;">
             <div class="newsDisplayItemTitle">${ newsItem.getTitle() }</div>
             % if newsItem.isNew():
-            <img src="${ systemIcon('new') }" style="padding-left: 10px" alt="new" />
+            <i class="icon-new new-label" title="${_('This event is new')}"></i>
             % endif
             <div class="newsDisplayItemContent">${ newsItem.getContent() }</div>
         </div>

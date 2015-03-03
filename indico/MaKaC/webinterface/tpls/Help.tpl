@@ -42,7 +42,7 @@
                 </div>
             % endfor
         % endfor
-        <div class="title">${ _("Paper Reviewing Guides")}<img src="${ systemIcon('new') }" style="padding-left: 5px;" alt="new" /></div>
+        <div class="title">${ _("Paper Reviewing Guides")}</div>
         <div class="content">
             <div class="item clearfix">
                 <div class="icons"><a href="ihelp/html/PaperReviewingGuides/PaperReviewingRoles/index.html" style="vertical-align: top">

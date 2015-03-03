@@ -3687,6 +3687,13 @@ ul.warningLevel1 {
     margin-left: 20px;
 }
 
+.newsDisplayItem .new-label {
+    font-size: 2em;
+    vertical-align: middle;
+    color: #ddd;
+    margin-left: 0.2em;
+}
+
 /* PLUGINS ADMIN */
 
 ul.optionList1 {

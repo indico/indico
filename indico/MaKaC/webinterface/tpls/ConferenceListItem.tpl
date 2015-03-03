@@ -51,7 +51,7 @@ if lItem.getType() == "simple_event":
             % endif
 
             % if creatDate > nowutc() - timedelta(weeks = 1):
-                   <img src="${ systemIcon('new') }" style="vertical-align:middle" alt="New" title="${ _("This event is New")}" />
+                <i class="icon-new new-label" title="${_('This event is new')}"></i>
             % endif
         </span>
     </span>
