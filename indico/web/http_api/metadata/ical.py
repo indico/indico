@@ -54,7 +54,7 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
     loc = fossil['location'] or ''
     if loc:
         loc = loc.decode('utf-8')
-    if fossil['room']:
+    if fossil['roomFullname']:
         loc += ' ' + fossil['roomFullname'].decode('utf-8')
     event.add('location', loc)
     description = ""
