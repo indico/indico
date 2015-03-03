@@ -116,7 +116,7 @@ def _get_user():
 class VCCloner(EventCloner):
     def get_options(self):
         enabled = bool(VCRoomEventAssociation.find_for_event(self.event, include_hidden=True).count())
-        return {'vc_rooms': (_('Video conference rooms'), enabled)}
+        return {'vc_rooms': (_('Video conference rooms'), enabled, True)}
 
     def clone(self, new_event, options):
         if 'vc_rooms' not in options:

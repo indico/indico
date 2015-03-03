@@ -12271,14 +12271,13 @@ class EventCloner(object):
         plugin_options = []
         for plugin_cloner in values_from_signal(signals.event_management.clone.send(event), single_value=True):
             with plugin_context(plugin_cloner.plugin):
-                for name, (title, enabled) in plugin_cloner.get_options().iteritems():
+                for name, (title, enabled, checked) in plugin_cloner.get_options().iteritems():
                     full_name = plugin_cloner.full_option_name(name)
                     plugin_options.append((
                         title,
-                        """<li><input type="checkbox" name="cloners" id="cloner-{0}" value="{0}" {2}>{1}</li>""".format(
-                            full_name, title, 'disabled' if not enabled else ''
-                        ))
-                    )
+                        """<li><input type="checkbox" name="cloners" id="cloner-{0}" value="{0}" {2} {3}>{1}</li>"""
+                        .format(full_name, title, 'disabled' if not enabled else '', 'checked' if checked else '')
+                    ))
         return '\n'.join(x[1] for x in sorted(plugin_options))
 
     @staticmethod
@@ -12301,7 +12300,7 @@ class EventCloner(object):
     def get_options(self):
         """Returns a dict containing the clone options.
 
-        :return: dict mapping option names to ``title, enabled`` tuples
+        :return: dict mapping option names to ``title, enabled, checked`` tuples
         """
         raise NotImplementedError
 
