@@ -48,7 +48,7 @@ class VCRoomField(HiddenField):
             return u'Group', principal['id']
 
     def process_formdata(self, valuelist):
-        if valuelist:
+        if valuelist and valuelist[0].isdigit():
             self.data = VCRoom.get(valuelist[0])
 
     def _value(self):
