@@ -44,6 +44,7 @@ globalname_dict = {
     'RoomReservationTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
     'RoomReservationEndTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
     'FoundationSyncTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
+    'LiveSyncUpdateTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
     'UHConferenceInstantMessaging': ('MaKaC.webinterface.urlHandlers', 'URLHandler')
 }
 
