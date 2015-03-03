@@ -8,7 +8,7 @@
     <span class="containerTitle confModifPadding">
         <a name="${session.getId()}"></a>
         <%include file="ManageButton.tpl" args="item=item, alignRight=True"/>
-        ${ template_hook('vc-actions', event=conf, item=item, event_vc_rooms_dict=event_vc_rooms_dict) }
+        ${ template_hook('vc-actions', event=conf, item=item) }
 
         <span class="topLevelTime">
             ${getTime(item.getAdjustedStartDate(timezone))} - ${getTime(item.getAdjustedEndDate(timezone))}

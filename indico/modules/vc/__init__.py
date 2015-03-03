@@ -49,8 +49,8 @@ def _inject_event_header(event, **kwargs):
 
 
 @template_hook('vc-actions')
-def _inject_vc_room_action_buttons(event, item, event_vc_rooms_dict, **kwargs):
-    event_vc_room = event_vc_rooms_dict.get(item)
+def _inject_vc_room_action_buttons(event, item, **kwargs):
+    event_vc_room = VCRoomEventAssociation.get_linked_for_event(event).get(item)
     if event_vc_room and event_vc_room.vc_room.plugin:
         plugin = event_vc_room.vc_room.plugin
         info_box = render_plugin_template('{}:info_box.html'.format(plugin.name), plugin=plugin,

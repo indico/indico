@@ -74,7 +74,6 @@ from MaKaC.webinterface.general import WebFactory
 from MaKaC.common.TemplateExec import render
 
 from indico.core import signals
-from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation
 from indico.util import json
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
@@ -913,9 +912,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         wvars["lastDay"] = self._lastDay
         wvars["currentUser"] = self._rh._aw.getUser()
         wvars["reportNumberSystems"] = Config.getInstance().getReportNumberSystems()
-
-        event_vc_rooms = VCRoomEventAssociation.find_for_event(conf).all()
-        wvars["event_vc_rooms_dict"] = {vcr.link_object: vcr for vcr in event_vc_rooms}
         return wvars
 
     def _getMaterialFiles(self, material):

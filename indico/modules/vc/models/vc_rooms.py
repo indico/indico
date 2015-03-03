@@ -24,6 +24,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.logger import Logger
 from indico.modules.vc.notifications import notify_deleted
+from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
@@ -207,6 +208,12 @@ class VCRoomEventAssociation(db.Model):
         if not include_deleted:
             query = query.filter(VCRoom.status != VCRoomStatus.deleted).join(VCRoom)
         return query
+
+    @classmethod
+    @memoize_request
+    def get_linked_for_event(cls, event):
+        """Get a dict mapping link objects to event vc rooms"""
+        return {vcr.link_object: vcr for vcr in cls.find_for_event(event)}
 
     def delete(self, user):
         """Deletes a VC room from an event
