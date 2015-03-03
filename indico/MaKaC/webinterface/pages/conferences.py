@@ -1434,10 +1434,10 @@ class WPConferenceModifBase(main.WPMainBase):
         self._vcMenuItem = wcomponents.SideMenuItem(_("Video Conference"), url_for('vc.manage_vc_rooms', self._conf))
         self._generalSection.addItem(self._vcMenuItem)
 
-        self._pluginMenuItems = {}
+        self.extra_menu_items = {}
         for name, item in sorted(values_from_signal(signals.event_management.sidemenu.send(self._conf)),
                                  key=lambda x: x[1]._title):
-            self._pluginMenuItems[name] = item
+            self.extra_menu_items[name] = item
             self._generalSection.addItem(item)
 
         self._sideMenu.addSection(self._generalSection)
