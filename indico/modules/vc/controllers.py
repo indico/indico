@@ -383,9 +383,9 @@ class RHVCRoomList(RHProtected):
             from_dt = as_utc(get_day_start(form.start_date.data)) if form.start_date.data else None
             to_dt = as_utc(get_day_end(form.end_date.data)) if form.end_date.data else None
             results = find_event_vc_rooms(from_dt=from_dt, to_dt=to_dt, distinct=True)
-            results = group_list(results,
-                                 key=lambda x: x.event.getStartDate().date(),
-                                 sort_by=lambda x: x.event.getStartDate(),
+            results = group_list((r for r in results if r.event),
+                                 key=lambda r: r.event.getStartDate().date(),
+                                 sort_by=lambda r: r.event.getStartDate(),
                                  sort_reverse=reverse)
             results = OrderedDict(sorted(results.viewitems(), key=itemgetter(0), reverse=reverse))
         return WPVCService.render_template('vc_room_list.html', form=form, results=results,
