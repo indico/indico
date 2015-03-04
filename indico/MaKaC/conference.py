@@ -141,6 +141,21 @@ class Locatable:
     * SubContributions
     """
 
+    @property
+    def rb_room(self):
+        if not self.getLocation() or not self.getRoom():
+            return None
+
+        location = self.getLocation().getName()
+        room = self.getRoom().getName()
+
+        if not location or not room:
+            return None
+
+        return Room.find_first(Room.name == fix_broken_string(room, True),
+                               Location.name == fix_broken_string(location, True),
+                               _join=Room.location)
+
     def getLocationParent(self):
         """
         Returns the object the location info should be inherited from
