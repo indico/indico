@@ -55,9 +55,8 @@ from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.hooks.event import CategoryEventHook
 from indico.web.flask.util import send_file
 from indico.util.contextManager import ContextManager
-from indico.util.i18n import i18nformat
+from indico.util.i18n import i18nformat, set_best_lang
 from MaKaC.PDFinterface.base import LatexRunner
-
 
 class RHConfSignIn( conferenceBase.RHConferenceBase, RHSignInBase):
 
@@ -584,6 +583,7 @@ class RHConferenceProgram(RHConferenceBaseDisplay):
 class RHConferenceProgramPDF(RHConferenceBaseDisplay):
 
     def _process(self):
+        set_best_lang()  # prevents from having a _LazyString when generating a pdf without session.lang set
         tz = timezoneUtils.DisplayTZ(self._aw, self._target).getDisplayTZ()
         filename = "%s - Programme.pdf" % self._target.getTitle()
         from MaKaC.PDFinterface.conference import ProgrammeToPDF
@@ -641,6 +641,7 @@ class RHTimeTablePDF(RHConferenceTimeTable):
         return False
 
     def _process(self):
+        set_best_lang()  # prevents from having a _LazyString when generating a pdf without session.lang set
         tz = timezoneUtils.DisplayTZ(self._aw,self._target).getDisplayTZ()
         params = self._getRequestParams()
         ttPDFFormat=TimetablePDFFormat(params)

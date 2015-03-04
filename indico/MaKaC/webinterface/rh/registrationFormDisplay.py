@@ -33,6 +33,7 @@ from indico.modules.payment import event_settings as payment_event_settings
 from indico.web.flask.util import send_file, url_for
 
 from indico.util import json
+from indico.util.i18n import set_best_lang
 
 
 class RHBaseRegistrationForm(RHConferenceBaseDisplay):
@@ -207,6 +208,7 @@ class RHRegistrationFormRegistrantBase(RHRegistrationForm):
 
 class RHConferenceTicketPDF(RHRegistrationFormRegistrantBase):
     def _process(self):
+        set_best_lang()  # prevents from having a _LazyString when generating a pdf without session.lang set
         filename = "{0}-Ticket.pdf".format(self._target.getTitle())
         pdf = TicketToPDF(self._target, self._registrant)
         return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')

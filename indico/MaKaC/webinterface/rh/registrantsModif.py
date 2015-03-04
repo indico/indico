@@ -35,6 +35,7 @@ from MaKaC.webinterface.rh import registrationFormModif
 from MaKaC.webinterface.rh.registrationFormModif import RHRegistrationFormModifBase
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionAction
 from indico.modules.payment.util import register_transaction
+from indico.util.i18n import set_best_lang
 from indico.web.flask.util import send_file, url_for
 
 
@@ -250,6 +251,7 @@ class RHRegistrantListModifAction( RHRegistrantListModifBase ):
         self._package = params.has_key("PKG")
 
     def _process( self ):
+        set_best_lang()  # prevents from having a _LazyString when generating a pdf without session.lang set
         if self._addNew:
             self._redirect(RHRegistrantNewForm._uh.getURL(self._conf))
         elif self._remove:

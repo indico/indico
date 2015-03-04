@@ -58,7 +58,7 @@ from MaKaC.export.excel import AbstractListToExcel, ParticipantsListToExcel, Con
 from MaKaC.common import utils
 from MaKaC.i18n import _
 from indico.modules.events.requests.util import is_request_manager
-from indico.util.i18n import i18nformat
+from indico.util.i18n import i18nformat, set_best_lang
 from indico.util.signals import values_from_signal
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.review import AbstractStatusSubmitted, AbstractStatusProposedToAccept, AbstractStatusProposedToReject
@@ -3300,6 +3300,7 @@ class RHMaterialPackage(RHConferenceModifBase):
 class RHProceedings(RHConferenceModifBase):
 
     def _process( self ):
+        set_best_lang()  # prevents from having a _LazyString when generating a pdf without session.lang set
         p=ProceedingsPacker(self._conf)
         path=p.pack(ZIPFileHandler())
         return send_file('proceedings.zip', path, 'ZIP', inline=False)
