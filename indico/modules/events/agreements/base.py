@@ -90,9 +90,8 @@ class AgreementDefinitionBase(object):
     email_placeholders = {}
     #: plugin containing this agreement definition - assigned automatically
     plugin = None
-
     #: default settings for an event
-    default_event_settings = {'manager_notifications_enabled': False}
+    default_event_settings = {'manager_notifications_enabled': True}
 
     @classproperty
     @classmethod
