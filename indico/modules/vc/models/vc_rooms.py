@@ -115,9 +115,7 @@ class VCRoom(db.Model):
 
 class VCRoomEventAssociation(db.Model):
     __tablename__ = 'vc_room_events'
-    __table_args__ = (
-        {'schema': 'events'}
-    )
+    __table_args__ = {'schema': 'events'}
 
     #: Association ID
     id = db.Column(
