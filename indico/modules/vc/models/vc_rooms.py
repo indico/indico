@@ -171,7 +171,11 @@ class VCRoomEventAssociation(db.Model):
 
     @property
     def event(self):
-        return ConferenceHolder().getById(str(self.event_id))
+        return ConferenceHolder().getById(str(self.event_id), True)
+
+    @event.setter
+    def event(self, event):
+        self.event_id = int(event.getId())
 
     @property
     def link_object(self):
@@ -183,10 +187,6 @@ class VCRoomEventAssociation(db.Model):
             session_id, slot_id = self.link_id.split(':')
             sess = self.event.getSessionById(session_id)
             return sess.getSlotById(slot_id) if sess is not None else None
-
-    @event.setter
-    def event(self, event):
-        self.event_id = int(event.getId())
 
     @return_ascii
     def __repr__(self):
