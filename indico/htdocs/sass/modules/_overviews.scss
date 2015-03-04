@@ -30,6 +30,10 @@ body {
 .overview-results {
     padding: 0;
 
+    & > .info-message-box {
+        margin-bottom: 0;
+    }
+
     table {
         border-collapse: collapse;
         border-spacing: 0;
