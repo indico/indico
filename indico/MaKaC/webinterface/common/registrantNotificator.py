@@ -14,9 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-"""
-"""
-
+from indico.web.flask.util import url_for
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.review as review
 from MaKaC.common import log
@@ -130,20 +128,25 @@ class RegistrantDepartureDateTplVar(TplVar):
         return departureDate
 
 
-class RegistrantPaymentLinkTplVar(TplVar):
-    _name="registrant_payment_link"
-    _description=""
+class RegistrantLinkTplVar(TplVar):
+    _name = "registrant_link"
+    _description = ""
 
     @classmethod
-    def getValue(cls,registrant):
-        return urlHandlers.UHConfRegistrationFormCreationDone.getURL(registrant)
+    def getValue(cls, registrant):
+        params = {}
+        if not registrant.getAvatar():
+            params = {'registrantId': registrant.getId(), 'authkey': registrant.getRandomId()}
+        reg_page = url_for('event.confRegistrationFormDisplay', registrant.getConference(), _external=True,
+                           _secure=True, **params)
+        return reg_page
 
 
 class Notificator:
     _vars = [ConfTitleTplVar, ConfURLTplVar, RegistrantIdTplVar, RegistrantFirstNameTplVar, RegistrantFamilyNameTplVar,
              RegistrantTitleTplVar, RegistrantAccommodationTplVar, RegistrantSocialEventsTplVar,
              RegistrantSessionsTplVar, RegistrantArrivalDateTplVar, RegistrantDepartureDateTplVar,
-             RegistrantPaymentLinkTplVar]
+             RegistrantLinkTplVar]
 
     @classmethod
     def getVarList(cls):

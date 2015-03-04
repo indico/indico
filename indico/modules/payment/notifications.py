@@ -62,7 +62,7 @@ def notify_payment_confirmation(registrant, amount):
         success_email_msg = payment_event_settings.get(event, 'success_email')
         params = {}
         if not registrant.getAvatar():
-            params = {'registrant_id': registrant.getId(), 'authkey': registrant.getRandomId()}
+            params = {'registrantId': registrant.getId(), 'authkey': registrant.getRandomId()}
         reg_page = url_for('event.confRegistrationFormDisplay', event, _external=True, _secure=True, **params)
         tpl = get_template_module('payment/emails/payment_confirmation_registrant.txt', event=event,
                                   registrant=registrant, amount=amount, currency=currency,

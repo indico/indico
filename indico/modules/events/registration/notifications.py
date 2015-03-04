@@ -43,7 +43,7 @@ def notify_registration_confirmation(event, registrant):
         registration_email_msg = payment_event_settings.get(event, 'register_email')
         params = {}
         if not registrant.getAvatar():
-            params = {'registrant_id': registrant.getId(), 'authkey': registrant.getRandomId()}
+            params = {'registrantId': registrant.getId(), 'authkey': registrant.getRandomId()}
         reg_page = url_for('event.confRegistrationFormDisplay', event, _external=True, _secure=True, **params)
         tpl = get_template_module('events/registration/emails/registration_confirmation_registrant.txt', event=event,
                                   registrant=registrant, payment_enabled=payment_event_settings.get(event, 'enabled'),
@@ -82,7 +82,7 @@ def notify_registration_modification(event, registrant):
         needs_to_pay = registrant.doPay() and payment_event_settings.get(event, 'enabled')
         params = {}
         if not registrant.getAvatar():
-            params = {'registrant_id': registrant.getId(), 'authkey': registrant.getRandomId()}
+            params = {'registrantId': registrant.getId(), 'authkey': registrant.getRandomId()}
         reg_page = url_for('event.confRegistrationFormDisplay', event, _external=True, _secure=True, **params)
         tpl = get_template_module('events/registration/emails/registration_modification_registrant.txt', event=event,
                                   registrant=registrant, payment_enabled=payment_event_settings.get(event, 'enabled'),
