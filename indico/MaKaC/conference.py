@@ -12276,7 +12276,9 @@ class EventCloner(object):
                     plugin_options.append((
                         title,
                         """<li><input type="checkbox" name="cloners" id="cloner-{0}" value="{0}" {2} {3}>{1}</li>"""
-                        .format(full_name, title, 'disabled' if not enabled else '', 'checked' if checked else '')
+                        .format(full_name, title,
+                                'disabled' if not enabled else '',
+                                'checked' if checked and enabled else '')
                     ))
         return '\n'.join(x[1] for x in sorted(plugin_options))
 
