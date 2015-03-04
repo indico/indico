@@ -142,8 +142,10 @@ class VCRoomListFilterForm(IndicoForm):
                                parse_kwargs={'dayfirst': True})
     abs_end_date = DateField(_('End Date'), [Optional(), Exclusive('rel_end_date')],
                              parse_kwargs={'dayfirst': True})
-    rel_start_date = IntegerField(_('Days in the past'), [Optional(), Exclusive('abs_start_date'), NumberRange(min=0)])
-    rel_end_date = IntegerField(_('Days in the future'), [Optional(), Exclusive('abs_end_date'), NumberRange(min=0)])
+    rel_start_date = IntegerField(_('Days in the past'), [Optional(), Exclusive('abs_start_date'), NumberRange(min=0)],
+                                  default=0)
+    rel_end_date = IntegerField(_('Days in the future'), [Optional(), Exclusive('abs_end_date'), NumberRange(min=0)],
+                                default=7)
 
     @generated_data
     def start_date(self):
