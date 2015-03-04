@@ -83,7 +83,6 @@ body {
 
         td.entry-location {
             @extend %content-fit-cell;
-            white-space: nowrap;
 
             .location {
                 color: $dark-gray;
