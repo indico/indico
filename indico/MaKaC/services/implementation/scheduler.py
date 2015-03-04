@@ -66,7 +66,9 @@ class GetFailedTaskList(SchedulerModuleAdminService):
     """
 
     def _getAnswer(self):
-        return fossilize.fossilize(list(reversed(self.schedModule.getFailedIndex().values())))
+        return fossilize.fossilize(x for x in reversed(self.schedModule.getFailedIndex().values())
+                                   if not hasattr(x, '__Broken_state__') and
+                                   not hasattr(getattr(x, '_task', None), '__Broken_state__'))
 
 
 class GetFinishedTaskList(SchedulerModuleAdminService):
@@ -87,8 +89,8 @@ class GetFinishedTaskList(SchedulerModuleAdminService):
             # 1 day
             ts = idx.maxKey() - 24*60*60
 
-            return fossilize.fossilize(
-                idx.itervalues(ts))
+            return fossilize.fossilize(x for x in idx.itervalues(ts)
+                                       if not hasattr(getattr(x, '_task', None), '__Broken_state__'))
         else:
             return {}
 
