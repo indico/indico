@@ -26,7 +26,7 @@ div.wrapper {
 }
 
 div.main {
-    padding-bottom: 60px;
+    padding-bottom: 90px; /* Equal to the size of the footer */
 }
 
 /*
@@ -2681,7 +2681,6 @@ ul.listCompact {
     clear:both;
     padding: 10px 5px 5px 5px;
     font-size: 11px;
-    z-index: -9999;
 }
 
 .footer.footerCERN {
