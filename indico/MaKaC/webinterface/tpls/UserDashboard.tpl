@@ -222,7 +222,7 @@ $(document).ready(function(){
 
     var momentDate = function(date) {
         var timezone_offset = "${offset}";
-        return moment(date.date + " " + date.time + " " + timezone_offset);
+        return moment(date.date + " " + date.time + timezone_offset);
     }
 
     % if suggested_categories:

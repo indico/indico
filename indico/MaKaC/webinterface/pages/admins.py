@@ -1059,7 +1059,7 @@ class WUserDashboard(wcomponents.WTemplated):
         # split offset in hours and minutes
         hours, minutes, __ = timedelta_split(tz.utcoffset(now))
 
-        html_vars["offset"] = '{0:+02d}:{1:02d}'.format(hours, minutes)
+        html_vars["offset"] = '{:+03d}:{:02d}'.format(hours, minutes)
         html_vars["categories"] = user.getRelatedCategories()
         html_vars["suggested_categories"] = user.getSuggestedCategories()
         html_vars["redisEnabled"] = bool(redis_client)
