@@ -58,7 +58,7 @@ import MaKaC.common.TemplateExec as templateEngine
 
 from indico.core import signals
 from indico.core.db import DBMgr
-from indico.util.i18n import i18nformat, parse_locale, get_all_locales
+from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
 from indico.util.date_time import utc_timestamp, is_same_month
 from indico.util.signals import values_from_signal
 from indico.core.index import Catalog
@@ -290,7 +290,7 @@ class WHeader(WTemplated):
         vars["isFrontPage"] = self._isFrontPage
         vars["target"] = vars["currentCategory"] = self.__currentCategory
 
-        selLang = session.lang
+        current_locale = get_current_locale()
         vars["ActiveTimezone"] = session.timezone
         """
             Get the timezone for displaying on top of the page.
@@ -301,8 +301,8 @@ class WHeader(WTemplated):
         """
         vars["ActiveTimezoneDisplay"] = self._getTimezoneDisplay(vars["ActiveTimezone"])
 
-        vars["SelectedLanguage"] = selLang
-        vars["SelectedLanguageName"] = parse_locale(selLang).language_name
+        vars["SelectedLanguage"] = str(current_locale)
+        vars["SelectedLanguageName"] = current_locale.language_name
         vars["Languages"] = get_all_locales()
 
         if DBMgr.getInstance().isConnected():
