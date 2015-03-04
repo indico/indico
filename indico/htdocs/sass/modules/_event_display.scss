@@ -18,4 +18,11 @@
 #flashed-messages {
     margin: 1em auto 0 auto;
     width: 1000px;
+    &:empty {
+        display: none;
+    }
+}
+
+#confSectionsBox > #flashed-messages {
+    width: 950px;
 }

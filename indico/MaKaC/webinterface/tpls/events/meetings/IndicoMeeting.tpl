@@ -1,5 +1,9 @@
 <%namespace name="common" file="${context['INCLUDE']}/Common.tpl"/>
 
+% if conf.getType() == 'conference':
+    ${ render_template('flashed_messages.html') }
+% endif
+
 <div class="eventWrapper" itemscope itemtype="http://schema.org/Event">
     <div class="meetingEventHeader">
         <%block name="logo"></%block>

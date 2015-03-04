@@ -113,7 +113,9 @@ else:
 
 </div>
 
-${ render_template('flashed_messages.html') }
+% if conf.getType() != 'conference':
+    ${ render_template('flashed_messages.html') }
+% endif
 
 <script type="text/javascript">
 $(function() {

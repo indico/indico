@@ -667,7 +667,9 @@ class WConfDetails:
 class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
 
     def getCSSFiles(self):
-        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['eventservices_sass'].urls()
+        return (WPConferenceDefaultDisplayBase.getCSSFiles(self)
+                + self._asset_env['eventservices_sass'].urls()
+                + self._asset_env['event_display_sass'].urls())
 
     def _getBody(self, params):
 

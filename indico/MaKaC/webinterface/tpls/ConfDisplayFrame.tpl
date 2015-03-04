@@ -50,6 +50,7 @@ else:
         % endif
     </div>
     <div id="confSectionsBox" class="clearfix">
+    ${ render_template('flashed_messages.html') }
     ${ menu }
     ${ body }
     </div>
