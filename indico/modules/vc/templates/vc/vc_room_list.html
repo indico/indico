@@ -26,13 +26,18 @@
             {% endif %}
         </td>
         <td class="entry-location">
-            {% if event_vc_room.event.getLocation() and event_vc_room.event.getRoom() %}
-                <span class="room">
-                    {{ event_vc_room.event.getRoom().getName() }}
-                </span>
-                <span class="location">
-                    ({{ event_vc_room.event.getLocation().getName() }})
-                </span>
+            {% if event_vc_room.event.getLocation() and event_vc_room.event.getRoom() and
+                  (event_vc_room.event.getLocation().getName() or event_vc_room.event.getRoom().getName()) %}
+                {% if event_vc_room.event.getRoom().getName() %}
+                    <span class="room">
+                        {{ event_vc_room.event.getRoom().getName() }}
+                    </span>
+                {% endif %}
+                {% if event_vc_room.event.getLocation().getName %}
+                    <span class="location">
+                        ({{ event_vc_room.event.getLocation().getName() }})
+                    </span>
+                {% endif %}
             {% else %}
                 <span class="no-location">
                     {% trans -%}
