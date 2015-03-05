@@ -12,13 +12,15 @@
         var params = {
             load: function(query, callback) {
                 if (query.length < 3) {
-                    return callback();
+                    callback();
                 }
                 $.ajax(SEARCH_URL, {
                     data: {q: query}
+                }).fail(function() {
+                    callback();
                 }).done(function(res) {
                     callback(res);
-                })
+                });
             }
         };
 
