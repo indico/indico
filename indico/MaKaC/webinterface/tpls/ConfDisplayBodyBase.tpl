@@ -8,6 +8,5 @@
 
 <div>
     <%block name="info"></%block>
-    ${ render_template('flashed_messages.html') }
     <%block name="content"></%block>
 </div>
