@@ -22,6 +22,7 @@ from io import BytesIO
 from flask import flash, jsonify, redirect, request, session
 from werkzeug.exceptions import NotFound
 
+from indico.core.db import db
 from indico.core.errors import AccessError, NoReportError
 from indico.modules.events.agreements.forms import AgreementForm, AgreementEmailForm, AgreementAnswerSubmissionForm
 from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
@@ -143,7 +144,7 @@ class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmailBase):
     def _get_people(self):
         identifiers = set(request.form.getlist('references'))
         return {k: v for k, v in self.definition.get_people_not_notified(self._conf).iteritems()
-                if v.identifier in identifiers}
+                if v.email and v.identifier in identifiers}
 
     def _success_handler(self, form):
         people = self._get_people()
@@ -157,7 +158,7 @@ class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmailBase):
 
     def _get_agreements(self):
         ids = set(request.form.getlist('references'))
-        return Agreement.find_all(Agreement.id.in_(ids))
+        return Agreement.find_all(Agreement.id.in_(ids), Agreement.person_email != None)
 
     def _success_handler(self, form):
         email_body = form.body.data
@@ -171,14 +172,15 @@ class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetailsSend):
     dialog_template = 'events/agreements/dialogs/agreement_email_form_send_all.html'
 
     def _get_people(self):
-        return self.definition.get_people_not_notified(self._conf)
+        return {k: v for k, v in self.definition.get_people_not_notified(self._conf).iteritems() if v.email}
 
 
 class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):
     dialog_template = 'events/agreements/dialogs/agreement_email_form_remind_all.html'
 
     def _get_agreements(self):
-        return Agreement.find_all(Agreement.pending, event_id=self._conf.getId(), type=self.definition.name)
+        return Agreement.find_all(Agreement.pending, Agreement.person_email != None,
+                                  Agreement.event_id == self._conf.getId(), Agreement.type == self.definition.name)
 
 
 class RHAgreementManagerDetailsAgreementBase(RHAgreementManagerDetails):
@@ -189,19 +191,34 @@ class RHAgreementManagerDetailsAgreementBase(RHAgreementManagerDetails):
             raise NotFound
 
 
-class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetailsAgreementBase):
+class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
     """Submits the answer of an agreement on behalf of the person"""
 
     def _checkParams(self, params):
-        RHAgreementManagerDetailsAgreementBase._checkParams(self, params)
-        if not self.agreement.pending:
-            raise NoReportError("The agreement is already signed")
+        RHAgreementManagerDetails._checkParams(self, params)
+        if 'id' in request.view_args:
+            self.agreement = Agreement.find_one(id=request.view_args['id'])
+            if self._conf != self.agreement.event:
+                raise NotFound
+            if not self.agreement.pending:
+                raise NoReportError(_("The agreement is already signed"))
+        else:
+            self.agreement = None
+            identifier = request.args['identifier']
+            try:
+                self.person = self.definition.get_people(self._conf)[identifier]
+            except KeyError:
+                raise NotFound
 
     def _process(self):
         event = self._conf
         agreement = self.agreement
         form = AgreementAnswerSubmissionForm()
         if form.validate_on_submit():
+            if agreement is None:
+                agreement = Agreement.create_from_data(event=self._conf, type_=self.definition.name, person=self.person)
+                db.session.add(agreement)
+                db.session.flush()
             if form.answer.data:
                 agreement.accept(on_behalf=True)
                 agreement.attachment_filename = form.document.data.filename

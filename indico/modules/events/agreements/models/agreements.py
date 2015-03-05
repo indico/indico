@@ -76,7 +76,7 @@ class Agreement(db.Model):
     #: Email of the person agreeing
     person_email = db.Column(
         db.String,
-        nullable=False
+        nullable=True
     )
     #: Full name of the person agreeing
     person_name = db.Column(

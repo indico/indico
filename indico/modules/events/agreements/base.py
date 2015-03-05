@@ -37,10 +37,9 @@ class AgreementPersonInfo(object):
                 email = user.getEmail()
         if not name:
             raise ValueError('name is missing')
-        if not email:
-            raise ValueError('email is missing')
         self.name = name
-        self.email = email
+        # Note: If you have persons with no email, you *MUST* have data that uniquely identifies such speakers
+        self.email = email or None
         self.user = user
         self.data = data
 

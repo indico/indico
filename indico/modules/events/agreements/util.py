@@ -35,7 +35,7 @@ def send_new_agreements(event, name, people, email_body, cc_addresses, from_addr
     :param people: The list of people for whom agreements will be created
     :param email_body: The body of the email
     :param cc_addresses: Email addresses to send CCs to
-    :param from_addresses: Email address of the sender
+    :param from_address: Email address of the sender
     """
     agreements = []
     for person in people.itervalues():

@@ -143,8 +143,12 @@
                 <table class="agreement-table">
                     {% for person in not_sent|sort(attribute='name') %}
                         <tr>
-                            <td class="agreement-checkbox">
+                            <td class="agreement-checkbox" {%- if not person.email %} title="{% trans -%}
+                                This person has no email address set so he cannot receive an agreement email.
+                                However, you can upload a signed agreement form for him.
+                                {%- endtrans %}"{% endif %}>
                                 <input type="checkbox" class="new-agreement" autocomplete="off"
+                                       {%- if not person.email %} disabled{% endif %}
                                        id="person-{{ person.identifier }}" value="{{ person.identifier }}">
                             </td>
                             <td class="person-name">
@@ -153,15 +157,24 @@
                                 </label>
                             </td>
                             <td class="person-email">
-                                {{ person.email }}
+                                {%- if person.email -%}
+                                    {{ person.email }}
+                                {%- else -%}
+                                    <em>{% trans %}No email{% endtrans %}</em>
+                                {%- endif -%}
                             </td>
                             {{ extra_columns(person.data) }}
                             <td class="agreement-actions">
                                 <span class="right">
-                                    <a class="i-button icon-mail js-ajax-dialog-email-one" href="#"
-                                       data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}"
-                                       data-reference="{{ person.identifier }}"
-                                       title="{% trans %}Send the agreement request to this person{% endtrans %}"></a>
+                                    {% if person.email %}
+                                        <a class="icon-mail js-ajax-dialog-email-one" href="#"
+                                           data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}"
+                                           data-reference="{{ person.identifier }}"
+                                           title="{% trans %}Send the agreement request to this person{% endtrans %}"></a>
+                                    {% endif %}
+                                    <a class="icon-quill js-ajax-dialog" href="#"
+                                       data-href="{{ url_for('.event_agreements_details_submit_answer', event, definition, identifier=person.identifier) }}"
+                                       title="{% trans %}Answer manually for this person{% endtrans %}"></a>
                                 </span>
                             </td>
                         </tr>
@@ -205,16 +218,22 @@
                                 </label>
                             </td>
                             <td class="person-email">
-                                {{ agreement.person_email }}
+                                {%- if agreement.person_email -%}
+                                    {{ agreement.person_email }}
+                                {%- else -%}
+                                    <em>{% trans %}No email{% endtrans %}</em>
+                                {%- endif -%}
                             </td>
                             {{ extra_columns(agreement.data) }}
                             <td class="agreement-actions">
                                 <span class="right">
-                                    <a class="icon-alarm js-ajax-dialog-email-one" href="#"
-                                       data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}"
-                                       data-reference="{{ agreement.id }}"
-                                       title="{% trans %}Remind this person{% endtrans %}">
-                                    </a>
+                                    {% if agreement.person_email %}
+                                        <a class="icon-alarm js-ajax-dialog-email-one" href="#"
+                                           data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}"
+                                           data-reference="{{ agreement.id }}"
+                                           title="{% trans %}Remind this person{% endtrans %}">
+                                        </a>
+                                    {% endif %}
                                     <a class="icon-quill js-ajax-dialog" href="#"
                                        data-href="{{ url_for('.event_agreements_details_submit_answer', event, definition, agreement) }}"
                                        title="{% trans %}Answer manually for this person{% endtrans %}"></a>
@@ -243,7 +262,11 @@
                                 {{ agreement.person_name }}
                             </td>
                             <td class="person-email">
-                                {{ agreement.person_email }}
+                                {%- if agreement.person_email -%}
+                                    {{ agreement.person_email }}
+                                {%- else -%}
+                                    <em>{% trans %}No email{% endtrans %}</em>
+                                {%- endif -%}
                             </td>
                             {{ extra_columns(agreement.data) }}
                             <td class="agreement-actions">
@@ -305,19 +328,19 @@
             $('.js-dropdown').dropdown();
 
             $('#select-new').on('click', function() {
-                $('input.new-agreement').prop('checked', true).trigger('change');
+                $('input.new-agreement:not([disabled])').prop('checked', true).trigger('change');
             });
 
             $('#select-new-none').on('click', function() {
-                $('input.new-agreement').prop('checked', false).trigger('change');
+                $('input.new-agreement:not([disabled])').prop('checked', false).trigger('change');
             });
 
             $('#select-pending').on('click', function() {
-                $('input.pending-agreement').prop('checked', true).trigger('change');
+                $('input.pending-agreement:not([disabled])').prop('checked', true).trigger('change');
             });
 
             $('#select-pending-none').on('click', function() {
-                $('input.pending-agreement').prop('checked', false).trigger('change');
+                $('input.pending-agreement:not([disabled])').prop('checked', false).trigger('change');
             });
 
             $("input").on('change', function() {
