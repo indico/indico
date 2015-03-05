@@ -127,13 +127,15 @@ class VCRoomEventAssociation(db.Model):
     event_id = db.Column(
         db.Integer,
         index=True,
-        autoincrement=False
+        autoincrement=False,
+        nullable=False
     )
     #: ID of the video conference room
     vc_room_id = db.Column(
         db.Integer,
         db.ForeignKey('events.vc_rooms.id'),
-        index=True
+        index=True,
+        nullable=False
     )
     #: The associated :class:VCRoom
     vc_room = db.relationship(
