@@ -26,7 +26,7 @@ div.wrapper {
 }
 
 div.main {
-    padding-bottom: 90px; /* Equal to the size of the footer */
+    padding-bottom: 100px; /* Equal to the height of the footer */
 }
 
 /*
