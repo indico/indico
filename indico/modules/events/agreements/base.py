@@ -24,6 +24,7 @@ from indico.core.models.settings import EventSettingsProxy
 from indico.modules.events.agreements.models.agreements import Agreement
 from indico.util.caching import make_hashable, memoize_request
 from indico.util.decorators import cached_classproperty, classproperty
+from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.web.flask.templating import get_overridable_template_name, get_template_module
 
@@ -91,6 +92,8 @@ class AgreementDefinitionBase(object):
     plugin = None
     #: default settings for an event
     default_event_settings = {'manager_notifications_enabled': True}
+    #: default message to display when the agreement definition type is disabled
+    disabled_reason = _('Currently there are no agreements of this type.')
 
     @classproperty
     @classmethod

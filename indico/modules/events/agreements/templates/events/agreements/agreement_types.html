@@ -5,22 +5,27 @@
 {% endblock %}
 
 {% block content %}
-    <h2>
-        {% trans %}
-            List of agreement definitions
-        {% endtrans %}
-    </h2>
-    <div class="i-badges-list-left">
+    <div class="fixed-width">
         {% for definition in definitions %}
             {% set active = definition.is_active(event) %}
-            <a class="i-badge {%- if not active %} i-badge-disabled{% endif %}"
-               {%- if active %} href="{{ url_for('agreements.event_agreements_details', event, definition=definition.name) }}"{% endif %}>
-                <div class="i-badge-content">
-                    <div class="i-badge-title">
-                        {{ definition.title }}
+            <div class="action-box">
+                <div class="section">
+                    <div class="icon icon-agreement"></div>
+                    <div class="text">
+                        <div class="label">
+                            {{ definition.title }}
+                        </div>
+                        <div>
+                            {{ definition.description }}
+                        </div>
+                    </div>
+                    <div class="toolbar right">
+                        <a class="i-button highlight {%- if not active %} disabled{% endif %} icon-settings" {% if active %}href="{{ url_for('agreements.event_agreements_details', event, definition=definition.name) }}"{% endif %} {%- if not active %} title="{{ definition.disabled_reason }}"{% endif %}>
+                            {%- trans %}Manage requests{% endtrans -%}
+                        </a>
                     </div>
                 </div>
-            </a>
+            </div>
         {% endfor %}
     </div>
 {% endblock %}
