@@ -28,6 +28,7 @@ from sqlalchemy.sql import func, select
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.migration import migrate as alembic_migrate
 from indico.core.db.sqlalchemy.util.management import delete_all_tables
+from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
@@ -100,6 +101,7 @@ class Importer(object):
                 ', '.join(plugin_engine.get_failed_plugins(app)))
             sys.exit(1)
         db.init_app(app)
+        import_all_models()
         alembic_migrate.init_app(app, db, os.path.join(app.root_path, '..', 'migrations'))
 
         self.connect_zodb()
