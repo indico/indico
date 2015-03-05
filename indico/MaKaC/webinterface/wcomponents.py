@@ -406,7 +406,7 @@ class WConferenceHeader(WHeader):
         vars["showLayout"] = True
 
         vars["usingModifKey"]=False
-        if self._conf.canKeyModify(self._aw):
+        if self._conf.canKeyModify():
             vars["usingModifKey"]=True
         vars["displayNavigationBar"] = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf, False).getDisplayNavigationBar()
 
@@ -461,7 +461,7 @@ class WMenuConferenceHeader( WConferenceHeader ):
         url = urlHandlers.UHConfEnterModifKey.getURL(self._conf)
         url.addParam("redirectURL",urlHandlers.UHConferenceOtherViews.getURL(self._conf))
         vars["confModif"] =  i18nformat("""<a href=%s> _("manage")</a>""")%quoteattr(str(url))
-        if self._conf.canKeyModify(self._aw):
+        if self._conf.canKeyModify():
             url = urlHandlers.UHConfCloseModifKey.getURL(self._conf)
             url.addParam("redirectURL",urlHandlers.UHConferenceOtherViews.getURL(self._conf))
             vars["confModif"] = i18nformat("""<a href=%s>_("exit manage")</a>""")%quoteattr(str(url))
@@ -663,7 +663,7 @@ class WMenuSimpleEventHeader( WMenuMeetingHeader ):
     def getVars( self ):
         vars = WMenuMeetingHeader.getVars( self )
         vars["confModif"] = """<a href=%s>manage</a>"""%quoteattr(str(urlHandlers.UHConfEnterModifKey.getURL(self._conf)))
-        if self._conf.canKeyModify(self._aw):
+        if self._conf.canKeyModify():
             vars["confModif"] = """<a href=%s>exit manage</a>"""%quoteattr(str(urlHandlers.UHConfCloseModifKey.getURL(self._conf)))
 
         # Setting the buttons that will be displayed in the header menu

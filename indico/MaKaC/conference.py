@@ -3723,7 +3723,7 @@ class Conference(CommonObjectBase, Locatable):
             return False
         return key == accessKey or session.get('accessKeys', {}).get(self.getUniqueId()) == accessKey
 
-    def canKeyModify(self, aw):
+    def canKeyModify(self):
         modifKey = self.getModifKey()
         if not modifKey:
             return False
@@ -3776,7 +3776,7 @@ class Conference(CommonObjectBase, Locatable):
             conference: only if the user is granted to modify the conference and
             he is accessing from an IP address which is not restricted.
         """
-        return self.canUserModify( aw.getUser() )  or self.canKeyModify( aw )
+        return self.canUserModify(aw.getUser()) or self.canKeyModify()
 
     def getManagerList( self ):
         return self.__ac.getModifierList()
@@ -6209,8 +6209,8 @@ class Session(CommonObjectBase, Locatable):
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "manager")
 
-    def canModify( self, aw ):
-        return self.canUserModify( aw.getUser() ) or self.getConference().canKeyModify( aw )
+    def canModify(self, aw):
+        return self.canUserModify(aw.getUser()) or self.getConference().canKeyModify()
 
     def canUserModify( self, av ):
         """Tells whether a user is allowed to modify the current session:
@@ -8918,8 +8918,8 @@ class Contribution(CommonObjectBase, Locatable):
             prin.unlinkTo(self, "manager")
         self.notifyModification(raiseEvent = False)
 
-    def canModify( self, aw ):
-        return self.canUserModify( aw.getUser() ) or self.getConference().canKeyModify( aw )
+    def canModify(self, aw):
+        return self.canUserModify(aw.getUser()) or self.getConference().canKeyModify()
 
     def canUserModify( self, av ):
         """Tells whether a user is allowed to modify the current contribution:
@@ -10234,8 +10234,8 @@ class SubContribution(CommonObjectBase, Locatable):
     def canAccess( self, aw ):
         return self.getOwner().canAccess(aw)
 
-    def canModify( self, aw ):
-        return self.canUserModify( aw.getUser() ) or self.getConference().canKeyModify( aw )
+    def canModify(self, aw):
+        return self.canUserModify(aw.getUser()) or self.getConference().canKeyModify()
 
     def canUserModify( self, av ):
         """Tells whether a user is allowed to modify the current contribution:
@@ -10934,8 +10934,8 @@ class Material(CommonObjectBase):
             prin.unlinkTo(self, "manager")
         self._p_changed = 1
 
-    def canModify( self, aw ):
-        return self.canUserModify( aw.getUser() ) or (self.getConference() and self.getConference().canKeyModify( aw ))
+    def canModify(self, aw):
+        return self.canUserModify(aw.getUser()) or (self.getConference() and self.getConference().canKeyModify())
 
     def canUserModify( self, user ):
         """Tells whether a user is allowed to modify the current contribution:
@@ -11364,8 +11364,8 @@ class Resource(CommonObjectBase):
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
 
-    def canModify( self, aw ):
-        return self.canUserModify( aw.getUser() ) or (self.getConference() and self.getConference().canKeyModify( aw ))
+    def canModify(self, aw):
+        return self.canUserModify(aw.getUser()) or (self.getConference() and self.getConference().canKeyModify())
 
     def canUserModify( self, user ):
         """Tells whether a user is allowed to modify the current contribution:

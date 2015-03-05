@@ -209,7 +209,8 @@ class RHSubmitMaterialBase(object):
 
     def _checkProtection(self):
         self._loggedIn = True
-        if self._getUser() == None and (isinstance(self._target, Category) or not self._target.getConference().canKeyModify(self._aw)):
+        if (self._getUser() is None and (isinstance(self._target, Category) or
+                                         not self._target.getConference().canKeyModify())):
             self._loggedIn = False
         elif self._getUser() and isinstance(self._target, Conference) and self._target.getAccessController().canUserSubmit(self._getUser()):
             self._loggedIn = True
