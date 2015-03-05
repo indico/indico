@@ -1335,8 +1335,10 @@ class Category(CommonObjectBase):
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "manager")
 
-    def canModify(self, aw):
-        return self.canUserModify(aw.getUser())
+    def canModify(self, aw_or_user):
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
+        return self.canUserModify(aw_or_user)
 
     def canUserModify(self, av):
         inherited = 0
@@ -3771,12 +3773,14 @@ class Conference(CommonObjectBase, Locatable):
                 return True
         return False
 
-    def canModify( self, aw ):
+    def canModify(self, aw_or_user):
         """Tells whether an access wrapper is allowed to modify the current
             conference: only if the user is granted to modify the conference and
             he is accessing from an IP address which is not restricted.
         """
-        return self.canUserModify(aw.getUser()) or self.canKeyModify()
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
+        return self.canUserModify(aw_or_user) or self.canKeyModify()
 
     def getManagerList( self ):
         return self.__ac.getModifierList()
@@ -6209,8 +6213,10 @@ class Session(CommonObjectBase, Locatable):
         if isinstance(prin, MaKaC.user.Avatar):
             prin.unlinkTo(self, "manager")
 
-    def canModify(self, aw):
-        return self.canUserModify(aw.getUser()) or self.getConference().canKeyModify()
+    def canModify(self, aw_or_user):
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
+        return self.canUserModify(aw_or_user) or self.getConference().canKeyModify()
 
     def canUserModify( self, av ):
         """Tells whether a user is allowed to modify the current session:
@@ -7157,8 +7163,8 @@ class SessionSlot(Persistent, Fossilizable, Locatable):
     def getRecursiveAllowedToAccessList(self):
         return self.getSession().getRecursiveAllowedToAccessList()
 
-    def canModify(self, aw):
-        return self.getSession().canModify(aw)
+    def canModify(self, aw_or_user):
+        return self.getSession().canModify(aw_or_user)
 
 
 class ContributionParticipation(Persistent, Fossilizable):
@@ -8918,8 +8924,10 @@ class Contribution(CommonObjectBase, Locatable):
             prin.unlinkTo(self, "manager")
         self.notifyModification(raiseEvent = False)
 
-    def canModify(self, aw):
-        return self.canUserModify(aw.getUser()) or self.getConference().canKeyModify()
+    def canModify(self, aw_or_user):
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
+        return self.canUserModify(aw_or_user) or self.getConference().canKeyModify()
 
     def canUserModify( self, av ):
         """Tells whether a user is allowed to modify the current contribution:
@@ -10234,8 +10242,10 @@ class SubContribution(CommonObjectBase, Locatable):
     def canAccess( self, aw ):
         return self.getOwner().canAccess(aw)
 
-    def canModify(self, aw):
-        return self.canUserModify(aw.getUser()) or self.getConference().canKeyModify()
+    def canModify(self, aw_or_user):
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
+        return self.canUserModify(aw_or_user) or self.getConference().canKeyModify()
 
     def canUserModify( self, av ):
         """Tells whether a user is allowed to modify the current contribution:
@@ -10934,8 +10944,10 @@ class Material(CommonObjectBase):
             prin.unlinkTo(self, "manager")
         self._p_changed = 1
 
-    def canModify(self, aw):
-        return self.canUserModify(aw.getUser()) or (self.getConference() and self.getConference().canKeyModify())
+    def canModify(self, aw_or_user):
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
+        return self.canUserModify(aw_or_user) or (self.getConference() and self.getConference().canKeyModify())
 
     def canUserModify( self, user ):
         """Tells whether a user is allowed to modify the current contribution:
@@ -11364,8 +11376,10 @@ class Resource(CommonObjectBase):
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
 
-    def canModify(self, aw):
-        return self.canUserModify(aw.getUser()) or (self.getConference() and self.getConference().canKeyModify())
+    def canModify(self, aw_or_user):
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
+        return self.canUserModify(aw_or_user) or (self.getConference() and self.getConference().canKeyModify())
 
     def canUserModify( self, user ):
         """Tells whether a user is allowed to modify the current contribution:
@@ -11776,8 +11790,8 @@ class Track(CoreObject):
     def recover(self):
         TrashCanManager().remove(self)
 
-    def canModify( self, aw ):
-        return self.conference.canModify( aw )
+    def canModify(self, aw_or_user):
+        return self.conference.canModify(aw_or_user)
 
     def canUserModify( self, av ):
         return self.conference.canUserModify( av )
@@ -12087,8 +12101,8 @@ class SubTrack(CoreObject):
     def recover(self):
         TrashCanManager().remove(self)
 
-    def canModify( self, aw ):
-        return self.track.canModify( aw )
+    def canModify(self, aw_or_user):
+        return self.track.canModify(aw_or_user)
 
     def canView( self, aw ):
         return self.track.canView( aw )
@@ -12180,8 +12194,8 @@ class ContributionType(Persistent):
         lconf["contribTypeId"] = self.getId()
         return lconf
 
-    def canModify(self, aw):
-        return self._conference.canModify(aw)
+    def canModify(self, aw_or_user):
+        return self._conference.canModify(aw_or_user)
 
     def delete(self):
         self.setConference(None)

@@ -1507,8 +1507,10 @@ class Comment(Persistent):
     def getModificationDate(self):
         return self._modificationDate
 
-    def canModify(self, aw):
-        return self.canUserModify(aw.getUser())
+    def canModify(self, aw_or_user):
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
+        return self.canUserModify(aw_or_user)
 
     def canUserModify(self, user):
         abstract = self.getAbstract()
@@ -2130,8 +2132,10 @@ class Abstract(Persistent):
         #only those users allowed to access are allowed to view
         return self.isAllowedToAccess(aw.getUser())
 
-    def canModify(self, aw):
-        return self.canUserModify(aw.getUser())
+    def canModify(self, aw_or_user):
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
+        return self.canUserModify(aw_or_user)
 
     def canUserModify(self, av):
         #the submitter can modify
@@ -3544,8 +3548,8 @@ class NotificationTemplate(Persistent):
 ##    def _setOriginalAbstract(self,abstract):
 ##        self._original=abstract
 
-    def canModify(self, aw):
-        return self.getConference().canModify(aw)
+    def canModify(self, aw_or_user):
+        return self.getConference().canModify(aw_or_user)
 
     def getLocator(self):
         loc = self.getOwner().getConference().getLocator()

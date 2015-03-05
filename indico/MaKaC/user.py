@@ -177,8 +177,10 @@ class Group(Persistent, Fossilizable):
                 continue
         return 0
 
-    def canModify(self, aw):
-        return self.canUserModify(aw.getUser())
+    def canModify(self, aw_or_user):
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
+        return self.canUserModify(aw_or_user)
 
     def canUserModify(self, user):
         return self.containsMember(user) or \
@@ -966,8 +968,10 @@ class Avatar(Persistent, Fossilizable):
         return avatar == self
     containsMember = containsUser
 
-    def canModify(self, aw):
-        return self.canUserModify(aw.getUser())
+    def canModify(self, aw_or_user):
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
+        return self.canUserModify(aw_or_user)
 
     def canUserModify(self, user):
         return user == self or (user in AdminList.getInstance().getList())
