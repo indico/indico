@@ -45,7 +45,7 @@ class Agreement(db.Model):
     """Agreements between a person and Indico"""
     __tablename__ = 'agreements'
     __table_args__ = (db.UniqueConstraint('event_id', 'type', 'identifier'),
-                      {'schema': 'events'},)
+                      {'schema': 'events'})
 
     #: Entry ID
     id = db.Column(
@@ -60,7 +60,6 @@ class Agreement(db.Model):
     #: ID of the event
     event_id = db.Column(
         db.Integer,
-        index=True,
         nullable=False
     )
     #: Type of agreement
@@ -97,13 +96,11 @@ class Agreement(db.Model):
     )
     #: ID of a linked user
     user_id = db.Column(
-        db.Integer,
-        index=True
+        db.Integer
     )
     #: The date and time the agreement was signed
     signed_dt = db.Column(
-        UTCDateTime,
-        index=True
+        UTCDateTime
     )
     #: The IP from which the agreement was signed
     signed_from_ip = db.Column(
