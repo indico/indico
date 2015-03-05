@@ -36,7 +36,8 @@ DEFAULT_OPTIONS = {
 
     'update_catalog': {
         'input_file': MESSAGES_POT,
-        'output_dir': TRANSLATIONS_DIR
+        'output_dir': TRANSLATIONS_DIR,
+        'domain': 'messages'
     },
 
 
