@@ -1613,8 +1613,6 @@ class PersonalBasket(Persistent):
             return self._users
         elif (type(element) == Group):
             return self._userGroups
-        elif (type(element) == MaKaC.rb_location.RoomGUID):
-            return self._rooms
         else:
             raise Exception(_("Unknown Element Type"))
 
