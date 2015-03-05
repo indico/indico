@@ -192,11 +192,12 @@ class PositionSF( RegistrantSortingField ):
     def compare( self, r1, r2 ):
         return cmp( r1.getPosition().lower(), r2.getPosition().lower() )
 
-class CountrySF( RegistrantSortingField ):
+class CountrySF(RegistrantSortingField):
     _id = "Country"
 
-    def compare( self, r1, r2 ):
-        return cmp( CountryHolder().getCountryById(r1.getCountry()).lower(), CountryHolder().getCountryById(r2.getCountry()).lower() )
+    def compare(self, r1, r2):
+        return cmp((CountryHolder().getCountryById(r1.getCountry()) or '').lower(),
+                   (CountryHolder().getCountryById(r2.getCountry()) or '').lower())
 
 class CitySF( RegistrantSortingField ):
     _id = "City"
