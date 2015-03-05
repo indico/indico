@@ -213,7 +213,7 @@ class VCPluginMixin(object):
         """Checks if a user can manage a vc room"""
         return (user.isAdmin() or
                 self.can_manage_vc(user) or
-                any(evt_assoc.event.canUserModify(user) for evt_assoc in room.events))
+                any(evt_assoc.event.canModify(user) for evt_assoc in room.events))
 
     def can_manage_vc(self, user):
         """Checks if a user has management rights on this VC system"""
