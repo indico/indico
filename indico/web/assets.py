@@ -308,7 +308,27 @@ moment = rjs_bundle(
                'locale/es.js',
                'locale/fr.js'))
 
-jqplot_js = rjs_bundle('jqplot', 'js/lib/jqplot/core/jquery.jqplot.js', 'js/lib/jqplot/plugins/*/*.js')
+jqplot_js = rjs_bundle('jqplot',
+                       'js/lib/jqplot/core/jqplot.core.js',
+                       'js/lib/jqplot/core/jqplot.linearTickGenerator.js',
+                       'js/lib/jqplot/core/jqplot.linearAxisRenderer.js',
+                       'js/lib/jqplot/core/jqplot.axisTickRenderer.js',
+                       'js/lib/jqplot/core/jqplot.axisLabelRenderer.js',
+                       'js/lib/jqplot/core/jqplot.tableLegendRenderer.js',
+                       'js/lib/jqplot/core/jqplot.lineRenderer.js',
+                       'js/lib/jqplot/core/jqplot.markerRenderer.js',
+                       'js/lib/jqplot/core/jqplot.divTitleRenderer.js',
+                       'js/lib/jqplot/core/jqplot.canvasGridRenderer.js',
+                       'js/lib/jqplot/core/jqplot.linePattern.js',
+                       'js/lib/jqplot/core/jqplot.shadowRenderer.js',
+                       'js/lib/jqplot/core/jqplot.shapeRenderer.js',
+                       'js/lib/jqplot/core/jqplot.sprintf.js',
+                       'js/lib/jqplot/core/jsdate.js',
+                       'js/lib/jqplot/core/jqplot.themeEngine.js',
+                       'js/lib/jqplot/core/jqplot.toImage.js',
+                       'js/lib/jqplot/core/jqplot.effects.core.js',
+                       'js/lib/jqplot/core/jqplot.effects.blind.js',
+                       'js/lib/jqplot/plugins/*/*.js')
 
 jqplot_css = Bundle(
     'css/lib/jquery.jqplot.css',
