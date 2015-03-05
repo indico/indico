@@ -41,5 +41,12 @@ class IndexedEvent(db.Model):
         TSVECTOR
     )
     start_date = db.Column(
-        db.DateTime
+        db.DateTime,
+        nullable=False,
+        index=True
+    )
+    end_date = db.Column(
+        db.DateTime,
+        nullable=False,
+        index=True
     )

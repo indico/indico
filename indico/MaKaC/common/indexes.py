@@ -1311,7 +1311,8 @@ class ConferenceIndex(object):
 
     def index(self, obj):
         self.unindex(obj)
-        event = IndexedEvent(id=obj.getId(), title=obj.getTitle(), start_date=obj.getStartDate())
+        event = IndexedEvent(id=obj.getId(), title=obj.getTitle(),
+                             start_date=obj.getStartDate(), end_date=obj.getEndDate())
         db.session.add(event)
         with retry_request_on_conflict():
             db.session.flush()
@@ -1335,7 +1336,8 @@ class ConferenceIndex(object):
 
     def initialize(self, items):
         for i, conf in enumerate(items, 1):
-            event = IndexedEvent(id=conf.getId(), title=conf.getTitle(), start_date=conf.getStartDate())
+            event = IndexedEvent(id=conf.getId(), title=conf.getTitle(),
+                                 start_date=conf.getStartDate(), end_date=conf.getEndDate())
             db.session.add(event)
             if i % 20000 == 0:
                 db.session.commit()
