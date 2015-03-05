@@ -73,7 +73,7 @@ class GenericMailer:
             bccList = []
 
         msg = MIMEMultipart()
-        msg["Subject"] = to_unicode(notification.getSubject())
+        msg["Subject"] = to_unicode(notification.getSubject()).strip()
         msg["From"] = fromAddr
         if toList:
             msg["To"] = ', '.join(toList)

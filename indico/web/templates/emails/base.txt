@@ -1,6 +1,6 @@
-{% macro get_subject() %}
+{% macro get_subject() -%}
 [Indico] {% block subject %}{% endblock %}
-{% endmacro %}
+{%- endmacro %}
 
 {% macro get_body(footer) %}
 {%- block header %}Dear {% block header_recipient %}{% endblock %},
