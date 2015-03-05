@@ -3,11 +3,13 @@ host = https://www.transifex.com
 
 [indico.messages-js-pot]
 file_filter = indico/translations/<lang>/LC_MESSAGES/messages-js.po
+source_file = indico/translations/messages-js.pot
 source_lang = en
 type = PO
 
 [indico.messagespot]
 file_filter = indico/translations/<lang>/LC_MESSAGES/messages.po
+source_file = indico/translations/messages.pot
 source_lang = en
 type = PO
 
