@@ -16,7 +16,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for event_vc_room in event_vc_rooms %}
+                        {% for event_vc_room in event_vc_rooms|sort(attribute='vc_room.name') %}
                             {% set vc_room = event_vc_room.vc_room %}
                             <tr class="vc-room-entry {% if vc_room.status.name == 'deleted' %}deleted{% endif %}">
                                 <td><a href="#" class="icon-next toggle-details"></a></td>

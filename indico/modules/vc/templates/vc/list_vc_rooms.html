@@ -22,26 +22,26 @@
                 <div class="groupTitleNoBorder event-service-association-title">
                     {{ event.getTitle() }}<span class="event-service-association-subtitle">{% trans %}Event{% endtrans %}</span>
                 </div>
-                {% for event_vc_room in linked_to.event[event] %}
+                {% for event_vc_room in linked_to.event[event]|sort(attribute='vc_room.name') %}
                     {{ render_vc_room(event_vc_room, event) }}
                 {% endfor %}
             {% endif %}
             {% if linked_to.contribution %}
-                {% for contrib, event_vc_rooms in linked_to.contribution.iteritems() %}
+                {% for contrib, event_vc_rooms in linked_to.contribution.items()|sort(attribute='0.title') %}
                     <div class="groupTitleNoBorder event-service-association-title">
                         {{ contrib.getTitle() }}<span class="event-service-association-subtitle">{% trans %}Contribution{% endtrans %}</span>
                     </div>
-                    {% for event_vc_room in event_vc_rooms %}
+                    {% for event_vc_room in event_vc_rooms|sort(attribute='vc_room.name') %}
                         {{ render_vc_room(event_vc_room, event) }}
                     {% endfor %}
                 {% endfor %}
             {% endif %}
             {% if linked_to.block %}
-                {% for block, event_vc_rooms in linked_to.block.iteritems() %}
+                {% for block, event_vc_rooms in linked_to.block.items()|sort(attribute='0.title') %}
                     <div class="groupTitleNoBorder event-service-association-title">
                         {{ block.getFullTitle() }}<span class="event-service-association-subtitle">{% trans %}Session{% endtrans %}</span>
                     </div>
-                    {% for event_vc_room in event_vc_rooms %}
+                    {% for event_vc_room in event_vc_rooms|sort(attribute='vc_room.name') %}
                         {{ render_vc_room(event_vc_room, event) }}
                     {% endfor %}
                 {% endfor %}
