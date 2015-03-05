@@ -17,6 +17,7 @@
 # python stdlib imports
 import icalendar as ical
 from lxml import html
+from lxml.etree import ParserError
 
 # indico imports
 from indico.web.http_api.metadata.serializer import Serializer
@@ -66,8 +67,12 @@ def serialize_event(cal, fossil, now, id_prefix="indico-event"):
         desc_text = fossil['description'].strip()
         if not desc_text:
             desc_text = '<p/>'
-        description += '{}\n\n{}'.format(html.fromstring(desc_text.decode('utf-8')).text_content().encode('utf-8'),
-                                         fossil['url'])
+        try:
+            description += '{}\n\n{}'.format(html.fromstring(desc_text.decode('utf-8')).text_content().encode('utf-8'),
+                                             fossil['url'])
+        except ParserError:
+            # this happens e.g. if desc_text contains only a html comment
+            description += fossil['url']
     else:
         description += fossil['url']
     event.add('description', description)
