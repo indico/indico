@@ -352,7 +352,7 @@ base_js = Bundle(jquery, angular, utils, presentation, calendar, indico_jquery, 
 
 module_js = {
     'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js'),
-    'event_display': rjs_bundle('modules_vc', 'js/indico/modules/eventdisplay.js')
+    'event_display': rjs_bundle('modules_event_display', 'js/indico/modules/eventdisplay.js')
 }
 
 SASS_BASE_MODULES = ["sass/*.scss",
