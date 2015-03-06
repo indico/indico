@@ -65,5 +65,8 @@ def _send(action, user, plugin, event, room, subject, body):
         'subject': subject,
         'body': body
     }
-    GenericMailer.sendAndLog(GenericNotification(notification),
-                             event, plugin.name)
+    if event is None:
+        GenericMailer.send(GenericNotification(notification))
+    else:
+        GenericMailer.sendAndLog(GenericNotification(notification),
+                                 event, plugin.name)
