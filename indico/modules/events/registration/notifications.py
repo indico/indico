@@ -18,8 +18,53 @@ from indico.core.notifications import email_sender, make_email
 from indico.modules.payment import event_settings as payment_event_settings
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
+from indico.util.string import to_unicode
 
 from MaKaC.PDFinterface.conference import TicketToPDF
+
+
+def _get_reg_details(reg_form, registrant):
+    reg_details = {'misc_details': {}}
+    for section in reg_form.getSortedForms():
+        if section.getId() == 'reasonParticipation':
+            reg_details['reason'] = registrant.getReasonParticipation()
+        elif section.getId() == 'sessions':
+            reg_details['sessions_type'] = 'priorities' if section.getType() == '2priorities' else None
+            reg_details['sessions'] = [to_unicode(session.getTitle()) for session in registrant.getSessionList()]
+        elif section.getId() == 'accommodation' and section.isEnabled():
+            accommodation = registrant.getAccommodation()
+            if accommodation.getAccommodationType():
+                reg_details['accommodation_type'] = accommodation.getAccommodationType().getCaption()
+                reg_details['accommodation_arrival'] = accommodation.getArrivalDate().strftime('%d %B %Y')
+                reg_details['accommodation_departure'] = accommodation.getDepartureDate().strftime('%d %B %Y')
+        elif section.getId() == 'socialEvents' and section.isEnabled():
+            reg_details['social'] = {}
+            for social_event in registrant.getSocialEvents():
+                reg_details['social'][social_event.getCaption()] = social_event.getNoPlaces()
+        elif section.getId() == 'furtherInformation':
+            pass
+        elif section.isEnabled():
+            misc = registrant.getMiscellaneousGroupById(section.getId())
+            if not misc:
+                continue
+            title = to_unicode(misc.getTitle())
+            reg_details['misc_details'][title] = {}
+            for field in section.getSortedFields():
+                response_item = misc.getResponseItemById(field.getId())
+                if not response_item:
+                    continue
+                input_field = response_item.getGeneralField().getInput()
+                form_field = {'value': response_item.getValue()}
+                if response_item.isBillable():
+                    form_field['price'] = response_item.getPrice()
+                    form_field['currency'] = response_item.getCurrency()
+                if form_field['value']:
+                    try:
+                        form_field['value'] = to_unicode(input_field.getValueDisplay(form_field['value']))
+                    except Exception:
+                        form_field['value'] = to_unicode(form_field['value']).strip()
+                reg_details['misc_details'][title][to_unicode(response_item.getCaption())] = form_field
+    return reg_details
 
 
 @email_sender
@@ -39,6 +84,7 @@ def notify_registration_confirmation(event, registrant):
 
     # Send email to the registrant
     if reg_form.isSendRegEmail():
+        reg_details = _get_reg_details(reg_form, registrant)
         needs_to_pay = registrant.doPay() and payment_event_settings.get(event, 'enabled')
         registration_email_msg = payment_event_settings.get(event, 'register_email')
         params = {}
@@ -47,7 +93,7 @@ def notify_registration_confirmation(event, registrant):
         reg_page = url_for('event.confRegistrationFormDisplay', event, _external=True, _secure=True, **params)
         tpl = get_template_module('events/registration/emails/registration_confirmation_registrant.txt', event=event,
                                   registrant=registrant, payment_enabled=payment_event_settings.get(event, 'enabled'),
-                                  reg_page=reg_page, needs_to_pay=needs_to_pay,
+                                  reg_page=reg_page, needs_to_pay=needs_to_pay, reg_details=reg_details,
                                   registration_email_msg=registration_email_msg)
 
         ticket = reg_form.getETicket()
@@ -59,7 +105,7 @@ def notify_registration_confirmation(event, registrant):
             })
 
         yield make_email(registrant.getEmail(), from_address=from_address, subject=tpl.get_subject(),
-                         body=tpl.get_body(), attachments=attachments)
+                         body=tpl.get_body(), attachments=attachments, html=True)
 
 
 @email_sender

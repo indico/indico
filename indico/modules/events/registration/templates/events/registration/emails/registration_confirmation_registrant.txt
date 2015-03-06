@@ -1,24 +1,117 @@
 {% extends 'emails/base.txt' %}
 
+{% macro print_dt(content, colon=True) %}
+    <dt style="width: 30%; float: left; clear:left;">{{ content }}{% if colon %}:{% endif %}</dt>
+{% endmacro %}
+
+{% macro print_dd(content) %}
+    <dd style="width: 70%; float: left; margin: 0; min-height: 20px; white-space: pre;">{{ content }}</dd>
+{% endmacro %}
+
 {%- block subject -%}
 Registration confirmation for {{ event.getTitle() }}: {{ registrant.getFirstName() }} {{ registrant.getFamilyName() }}
 {%- endblock -%}
 
-{% block header_recipient %}{{ registrant.getFirstName() }} {{ registrant.getFamilyName() }}{% endblock %}
+{%- block header %}{% endblock -%}
 
 {% block body -%}
-This is a confirmation message for your registration in the event '{{ event.getTitle() }}'
-{%- if needs_to_pay %}
-Please, do not forget to proceed with your payment in case you haven't done it yet.
-{%- endif %}
-
-Registrant ID: {{ registrant.getId() }}
-You can manage your registration on this page:
-{{ reg_page }}
-
-{%- if registration_email_msg %}
-
-Additional information:
-{{ registration_email_msg }}
-{%- endif %}
+    <div class="mail" style="width: 600px; margin: auto; font-family: Arial; border: 1px solid #dfdfdf; background-color: #f9f9f9; margin-bottom: 40px;">
+        <div class="header" style="background-color: #5D95EA; color: white; padding: 20px;">
+            <h1>Registration confirmation (# {{ registrant.getId() }})</h1>
+        </div>
+        <div class="content" style="padding: 20px; color: #555;">
+            <p>Dear {{ registrant.getFirstName() }} {{ registrant.getFamilyName() }},</p>
+            <p>This is a confirmation message for your registration in the event '{{ event.getTitle() }}'</p>
+            {%- if needs_to_pay %}
+            <p>Please, do not forget to proceed with your payment in case you haven't done it yet.</p>
+            {%- endif %}
+            <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
+                <h2>General information</h2>
+                <dl>
+                    {{ print_dt('Registrant ID') }}
+                    {{ print_dd(registrant.getId()) }}
+                    {%- if reg_details.reason %}
+                        {{ print_dt('Participation reason') }}
+                        {{ print_dd(reg_details.reason) }}</dd>
+                    {%- endif %}
+                </dl>
+                <div style="clear: both;"></div>
+            </div>
+            {%- if reg_details.accommodation_type %}
+                <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
+                    <h2>Accommodation details</h2>
+                    <dl>
+                        {{ print_dt('Arrival date') }}
+                        {{ print_dd(reg_details.accommodation_arrival) }}</dd>
+                        {{ print_dt('Departure date') }}
+                        {{ print_dd(reg_details.accommodation_departure) }}</dd>
+                        {{ print_dt('Accommodation type') }}
+                        {{ print_dd(reg_details.accommodation_type) }}</dd>
+                    </dl>
+                    <div style="clear: both;"></div>
+                </div>
+            {%- endif %}
+            {%- if reg_details.sessions %}
+                <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
+                    <h2>Sessions</h2>
+                    {%- if reg_details.sessions_type %}
+                        <dl>
+                            {{ print_dt('First priority') }}
+                            {{ print_dd(reg_details.sessions[0]) }}</dd>
+                            {% if reg_details.sessions[1] %}
+                                {{ print_dt('Other option') }}
+                                {{ print_dd(reg_details.sessions[1]) }}</dd>
+                            {%- endif %}
+                        </dl>
+                    {%- else %}
+                        <ul>
+                            {%- for session in reg_details.sessions %}
+                                <li>{{ session }}</li>
+                            {%- endfor %}
+                        </ul>
+                    {%- endif %}
+                    <div style="clear: both;"></div>
+                </div>
+            {%- endif %}
+            {%- if reg_details.social %}
+                <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
+                    <h2>Social events</h2>
+                    <ul>
+                        {% for name, places in reg_details.social.iteritems() %}
+                            <li>{{ name }} [{{ places }} place(s) needed]</li>
+                        {%- endfor %}
+                    </ul>
+                </div>
+            {%- endif %}
+            {%- if reg_details.misc_details %}
+                {% for title, fields in reg_details.misc_details.iteritems() %}
+                    <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
+                        <h2>{{ title }}</h2>
+                        <dl>
+                            {%- for name, value_attrs in fields.iteritems() if value_attrs.value %}
+                                {{ print_dt(name, value_attrs.value) }}
+                                {%- if value_attrs.value -%}
+                                    {% set description = value_attrs.value %}
+                                    {% if value_attrs.price -%}
+                                        {% set description = description + ' (' + value_attrs.price + ' ' + value_attrs.currency + ')' %}
+                                    {%- endif %}
+                                    {{ print_dd(description) }}
+                                {%- endif %}
+                            {%- endfor %}
+                        </dl>
+                        <div style="clear: both;"></div>
+                    </div>
+                {% endfor %}
+            {%- endif %}
+            {%- if registration_email_msg %}
+                <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
+                    <h2>Additional information</h2>
+                    <p style="white-space: pre;">{{ registration_email_msg }}</p>
+                </div>
+            {%- endif %}
+            <p>To manage your registration, follow this link:
+                <a href="{{ reg_page }}">Manage my registration</a>
+            </p>
+        </div>
+    </div>
 {% endblock %}
