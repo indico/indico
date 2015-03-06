@@ -49,7 +49,7 @@ def create_user(monkeypatch_methods):
 @pytest.fixture
 def dummy_user(create_user):
     """Creates a mocked dummy avatar"""
-    return create_user('dummy')
+    return create_user(1337)
 
 
 @pytest.yield_fixture
