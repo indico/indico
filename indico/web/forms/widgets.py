@@ -65,8 +65,7 @@ class PasswordWidget(object):
     single_line = True
 
     def __call__(self, field, **kwargs):
-        return HTMLString(render_template('forms/password_widget.html', field=field,
-                          input=PasswordInput(hide_value=False), input_args=kwargs))
+        return HTMLString(render_template('forms/password_widget.html', field=field, input_args=kwargs))
 
 
 class CKEditorWidget(JinjaWidget):

@@ -100,7 +100,7 @@
                         event.clipboardData.setData('text/plain', $(event.target).data('link'));
                     });
                     client.on('aftercopy', function(event) {
-                        $(event.target).parent().siblings('.button-info-message').show().fadeOut(2000);
+                        $(event.target).parent().siblings('.i-action-message').show().fadeOut(2000);
                     });
                 });
             });

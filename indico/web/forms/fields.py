@@ -95,11 +95,6 @@ class EmailListField(TextListField):
             raise ValueError(_(u'Invalid email address: {}').format(line))
 
 
-class UnsafePasswordField(PasswordField):
-    """Password field which does not hide the current value."""
-    widget = PasswordInput(hide_value=False)
-
-
 class IndicoEnumSelectField(SelectFieldBase):
     """Select field backed by a :class:`TitledEnum`"""
 
