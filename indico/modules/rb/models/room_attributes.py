@@ -44,7 +44,10 @@ class RoomAttributeAssociation(db.Model):
 
     attribute = db.relationship(
         'RoomAttribute',
-        backref='room_associations'
+        backref=db.backref(
+            'room_associations',
+            cascade='all, delete-orphan'
+        )
     )
 
     @return_ascii

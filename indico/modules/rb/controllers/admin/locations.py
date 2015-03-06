@@ -117,7 +117,8 @@ class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
         self._attr = request.args.get('removeCustomAttributeName', '')
 
     def _process(self):
-        self._location.attributes.filter_by(name=self._attr).delete()
+        attr = self._location.attributes.filter_by(name=self._attr).one()
+        db.session.delete(attr)
         flash(_(u'Custom attribute deleted'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
 
@@ -166,7 +167,8 @@ class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
         RHRoomBookingEquipmentBase._checkParams(self, 'removeEquipmentName')
 
     def _process(self):
-        self._location.equipment_types.filter_by(name=self._eq).delete()
+        eq = self._location.equipment_types.filter_by(name=self._eq).one()
+        db.session.delete(eq)
         flash(_(u'Equipment deleted'), 'success')
         self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
 
