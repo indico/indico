@@ -24,19 +24,13 @@ RoomEquipmentAssociation = db.Table(
     db.Column(
         'equipment_id',
         db.Integer,
-        db.ForeignKey(
-            'roombooking.equipment_types.id',
-            ondelete='cascade'
-        ),
+        db.ForeignKey('roombooking.equipment_types.id'),
         primary_key=True,
     ),
     db.Column(
         'room_id',
         db.Integer,
-        db.ForeignKey(
-            'roombooking.rooms.id',
-            ondelete='cascade'
-        ),
+        db.ForeignKey('roombooking.rooms.id'),
         primary_key=True
     ),
     schema='roombooking'
@@ -48,19 +42,13 @@ ReservationEquipmentAssociation = db.Table(
     db.Column(
         'equipment_id',
         db.Integer,
-        db.ForeignKey(
-            'roombooking.equipment_types.id',
-            ondelete='cascade'
-        ),
+        db.ForeignKey('roombooking.equipment_types.id'),
         primary_key=True,
     ),
     db.Column(
         'reservation_id',
         db.Integer,
-        db.ForeignKey(
-            'roombooking.reservations.id',
-            ondelete='cascade'
-        ),
+        db.ForeignKey('roombooking.reservations.id'),
         primary_key=True
     ),
     schema='roombooking'
