@@ -586,8 +586,8 @@ For information on how to configure Apache HTTPD, take a look at:
 http://indico-software.org/wiki/Admin/Installation#a3.ConfiguringApache
 
 
-Please do not forget to start the 'taskDaemon' in order to use alarms, creation
-of off-line websites, reminders, etc. You can find it in './bin/taskDaemon.py'
+Please do not forget to start the scheduler in order to use alarms, creation
+of off-line websites, reminders, etc. You can manage it with the 'indico_scheduler' command.
 
 %s
 """ % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'], _databaseText(targetDirs['etc']))
