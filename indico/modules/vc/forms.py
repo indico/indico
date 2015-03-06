@@ -26,7 +26,7 @@ from wtforms.fields.html5 import IntegerField
 from wtforms.fields.simple import StringField, HiddenField
 from wtforms.validators import DataRequired, Length, NumberRange, Optional, Regexp, ValidationError
 
-from indico.modules.vc.models import VCRoom
+from indico.modules.vc.models import VCRoom, VCRoomStatus
 from indico.modules.vc.util import full_block_id
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -125,8 +125,7 @@ class VCRoomFormBase(VCRoomLinkFormBase):
 
     def validate_name(self, field):
         if field.data:
-            room = VCRoom.find_first(name=field.data)
-
+            room = VCRoom.find_first(VCRoom.name == field.data, VCRoom.status != VCRoomStatus.deleted)
             if room and room != self.vc_room:
                 raise ValidationError(_("There is already a room with this name"))
 
