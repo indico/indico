@@ -156,7 +156,7 @@
                       <input type="checkbox" name="${ 'cattr_hid_' + attr.name }" ${ 'checked' if attr.is_hidden else '' }>
                     </td>
                     <td>
-                      <input type="button" class="i-button" value="Remove" onclick="document.location = '${ urlHandlers.UHRoomBookingDeleteCustomAttribute.getURL( location, removeCustomAttributeName=attr.name) }'; return false;" />
+                      <input type="button" class="i-button js-delete-attribute" value="Remove" data-href="${ url_for('rooms_admin.roomBooking-deleteCustomAttribute', location, removeCustomAttributeName=attr.name) }">
                     </td>
                   </tr>
                 % endfor
@@ -479,3 +479,14 @@ indicoRequest(
 </td>
 </tr>
 </table>
+<script>
+    $('.js-delete-attribute').on('click', function() {
+        if (!confirm($T('Do you really want to delete this attribute?'))) {
+            return;
+        }
+        $('<form>', {
+            action: $(this).data('href'),
+            method: 'post'
+        }).appendTo('body').submit();
+    });
+</script>

@@ -59,7 +59,8 @@ rooms_admin.add_url_rule('/location/<locationId>/',
 
 rooms_admin.add_url_rule('/location/<locationId>/attribute/delete',
                          'roomBooking-deleteCustomAttribute',
-                         location_handlers.RHRoomBookingDeleteCustomAttribute)
+                         location_handlers.RHRoomBookingDeleteCustomAttribute,
+                         methods=('POST',))
 
 rooms_admin.add_url_rule('/location/<locationId>/attribute/save',
                          'roomBooking-saveCustomAttributes',

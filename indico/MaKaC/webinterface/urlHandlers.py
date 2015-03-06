@@ -496,10 +496,6 @@ class UHRoomBookingSaveCustomAttributes(URLHandler):
     _endpoint = 'rooms_admin.roomBooking-saveCustomAttributes'
 
 
-class UHRoomBookingDeleteCustomAttribute(URLHandler):
-    _endpoint = 'rooms_admin.roomBooking-deleteCustomAttribute'
-
-
 class UHConferenceClose(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-close'
 
