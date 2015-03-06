@@ -99,7 +99,7 @@ class _Worker(object):
                     except ConflictError:
                         transaction.abort()
                     except ClientDisconnected:
-                        self._logger.warning("Retrying for the {}th time in {} secs..".format(i + 1, seconds))
+                        self._logger.warning("Retrying for the {}th time in {} secs..".format(i + 1, i * 10))
                         transaction.abort()
                         time.sleep(i * 10)
                     except TaskDelayed, e:
@@ -122,7 +122,7 @@ class _Worker(object):
                     self._setResult(True)
                 if i > (1 + int(self._delayed)):
                     self._logger.warning("{} failed {} times before "
-                                         "finishing correctly".format(self._task, i - int(delayed) - 1))
+                                         "finishing correctly".format(self._task, i - int(self._delayed) - 1))
             # task failed
             else:
                 with self._dbi.transaction():
