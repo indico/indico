@@ -27,6 +27,14 @@ body {
     width: 1%;
 }
 
+%results-title {
+    color: $light-black;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding-bottom: $result-group-padding;
+    padding-top: $result-group-padding;
+}
+
 .overview-results {
     padding: 0;
 
@@ -49,15 +57,20 @@ body {
 
         tr.result-group-title {
             td {
-                color: $light-black;
-                font-size: 1.5em;
-                font-weight: bold;
-                padding-top: $result-group-padding;
+                @extend %results-title;
                 padding-bottom: $result-group-padding / 2;
             }
 
             &:not(:first-child) td {
                 @include border-top($gray);
+            }
+        }
+
+        tr.no-results-title {
+            td {
+                @extend %results-title;
+                color: $gray;
+                font-style: italic;
             }
         }
 

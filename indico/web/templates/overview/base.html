@@ -27,9 +27,13 @@
         {% if results is not none %}
             <div class="i-box overview-results">
                 {% if not results %}
-                    <div class="info-message-box">
-                        <div class="message-text">{% trans %}Nothing found{% endtrans %}</div>
-                    </div>
+                <table>
+                    <tr class="no-results-title">
+                        <td>
+                            {% trans %}No results found{% endtrans %}
+                        </td>
+                    </tr>
+                </table>
                 {% else %}
                     {% block result_list %}
                         <table>
