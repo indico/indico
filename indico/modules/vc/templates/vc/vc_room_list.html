@@ -6,6 +6,21 @@
 {% endmacro %}
 
 {% macro result_group_entries(items) %}
+    <tr class="result-group-header">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>
+            <div class="title">
+                {% trans %}Event{% endtrans %}
+            </div>
+        </td>
+        <td>
+            <div class="title">
+                {% trans %}VC room{% endtrans %}
+            </div>
+        </td>
+    </tr>
     {% for event_vc_room in items %}
         {{ vc_room_entry(event_vc_room) }}
     {% endfor %}
@@ -20,7 +35,7 @@
         </td>
         <td class="entry-type">
             {% if event_vc_room.vc_room.plugin %}
-                <img src="{{ event_vc_room.vc_room.plugin.icon_url }}">
+                <img src="{{ event_vc_room.vc_room.plugin.icon_url }}" title="{{ event_vc_room.vc_room.plugin.friendly_name }}">
             {% else %}
                 <i class="icon-camera" title="{{ event_vc_room.vc_room.plugin.friendly_name }}"></i>
             {% endif %}
