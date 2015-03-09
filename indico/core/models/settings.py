@@ -103,7 +103,7 @@ class SettingsBase(object):
 
 
 class Setting(SettingsBase, db.Model):
-    __table_args__ = (db.Index('ix_settings_module_key', 'module', 'name'),
+    __table_args__ = (db.Index('ix_settings_module_name', 'module', 'name'),
                       db.UniqueConstraint('module', 'name'),
                       db.CheckConstraint('module = lower(module)'),
                       db.CheckConstraint('name = lower(name)'),
