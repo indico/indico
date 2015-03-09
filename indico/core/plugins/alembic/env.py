@@ -34,7 +34,7 @@ version_table = 'alembic_version_plugin_{}'.format(current_plugin.name)
 
 
 def _include_symbol(tablename, schema):
-    # We ignore plugin tables in migrations
+    # We only include tables in this plugin's schema in migrations
     return schema == plugin_schema
 
 
