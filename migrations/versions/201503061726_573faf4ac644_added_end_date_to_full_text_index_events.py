@@ -1,8 +1,8 @@
 """Added end_date to full text index events
 
 Revision ID: 573faf4ac644
-Revises: 49ac5164a65b
-Create Date: 2015-03-05 14:39:54.718493
+Revises: 342fa3076650
+Create Date: 2015-03-06 17:26:54.718493
 """
 
 import sqlalchemy as sa
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '573faf4ac644'
-down_revision = '49ac5164a65b'
+down_revision = '342fa3076650'
 
 
 def upgrade():
