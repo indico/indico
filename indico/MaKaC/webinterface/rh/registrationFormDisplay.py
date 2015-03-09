@@ -79,14 +79,16 @@ class RHRegistrationFormDisplayBase(RHBaseRegistrationForm):
             urlLogin = urlLogin.replace("http://", "https://")
         return urlLogin
 
+
+class RHRegistrationFormDisplayBaseCheckProtection(RHRegistrationFormDisplayBase):
     def _checkProtection(self):
-        RHBaseRegistrationForm._checkProtection(self)
+        RHRegistrationFormDisplayBase._checkProtection(self)
         if self._regForm.inRegistrationPeriod() and self._regForm.isMandatoryAccount() and self._getUser() is None:
             self._redirect(self._getLoginURL())
             self._doProcess = False
 
 
-class RHRegistrationFormDisplay(RHRegistrationFormDisplayBase):
+class RHRegistrationFormDisplay(RHRegistrationFormDisplayBaseCheckProtection):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
 
     def _processIfActive(self):
@@ -97,7 +99,7 @@ class RHRegistrationFormDisplay(RHRegistrationFormDisplayBase):
         return registrationForm.WPRegistrationFormDisplay(self, self._conf).display()
 
 
-class RHRegistrationFormCreation(RHRegistrationFormDisplayBase):
+class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
 
     def _checkParams(self, params):
@@ -206,7 +208,7 @@ class RHRegistrationFormRegistrantBase(RHRegistrationForm):
             raise NotFoundError(_("You are not registered or your registration has been deleted"))
 
 
-class RHConferenceTicketPDF(RHRegistrationFormRegistrantBase):
+class RHConferenceTicketPDF(RHRegistrationFormDisplayBaseCheckProtection):
     def _process(self):
         set_best_lang()  # prevents from having a _LazyString when generating a pdf without session.lang set
         filename = "{0}-Ticket.pdf".format(self._target.getTitle())
@@ -214,7 +216,7 @@ class RHConferenceTicketPDF(RHRegistrationFormRegistrantBase):
         return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
 
 
-class RHRegistrationFormModify(RHRegistrationFormDisplayBase):
+class RHRegistrationFormModify(RHRegistrationFormDisplayBaseCheckProtection):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
 
     def _checkParams(self, params):
@@ -259,14 +261,14 @@ class RHRegistrationFormPerformModify(RHRegistrationFormCreation):
             self._redirect(urlHandlers.UHConfRegistrationForm.getURL(self._conf))
 
 
-class RHRegistrationFormConditions(RHRegistrationFormDisplayBase):
+class RHRegistrationFormConditions(RHRegistrationFormDisplayBaseCheckProtection):
 
     def _process(self):
         p = registrationForm.WPRegistrationFormConditions(self, self._conf)
         return p.display()
 
 
-class RHRegistrationFormUserData(RHRegistrationFormDisplayBase):
+class RHRegistrationFormUserData(RHRegistrationFormDisplayBaseCheckProtection):
 
     def _checkProtection(self):
         RHBaseRegistrationForm._checkProtection(self)
