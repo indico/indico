@@ -529,7 +529,7 @@ def test_find_with_filters_only_public(dummy_room, create_room_attribute,
 
 
 @pytest.mark.parametrize(('owner_id', 'match'), (
-    (u'dummy', True),
+    (1337, True),
     (u'other', False)
 ))
 def test_find_with_filters_only_my_rooms(dummy_room, create_user, owner_id, match):

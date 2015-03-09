@@ -433,9 +433,9 @@ def test_get_vc_equipment(db, dummy_reservation, create_equipment_type):
 @pytest.mark.parametrize(('is_booked_for', 'contact_email', 'expected'), (
     (True,  '', True),
     (False, '', False),
-    (False, 'dummy@example.com', True),
+    (False, '1337@example.com', True),
     (False, 'other@example.com', False),
-    (False, 'dummy@example.com, other@example.com', True),
+    (False, '1337@example.com, other@example.com', True),
     (False, 'other1@example.com, other2@example.com', False),
 ))
 def test_is_booked_for(dummy_reservation, dummy_user, create_user, is_booked_for, contact_email, expected):
