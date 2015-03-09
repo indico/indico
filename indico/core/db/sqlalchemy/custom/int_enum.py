@@ -69,7 +69,8 @@ class PyIntEnum(TypeDecorator, SchemaType):
         return self.enum(value)
 
     def _set_table(self, column, table):
-        e = CheckConstraint(type_coerce(column, self).in_(x.value for x in self.enum))
+        e = CheckConstraint(type_coerce(column, self).in_(x.value for x in self.enum),
+                            'valid_enum_{}'.format(column.name))
         e.info['alembic_dont_render'] = True
         assert e.table is table
 

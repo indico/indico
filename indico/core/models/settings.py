@@ -105,8 +105,8 @@ class SettingsBase(object):
 class Setting(SettingsBase, db.Model):
     __table_args__ = (db.Index('ix_settings_module_name', 'module', 'name'),
                       db.UniqueConstraint('module', 'name'),
-                      db.CheckConstraint('module = lower(module)'),
-                      db.CheckConstraint('name = lower(name)'),
+                      db.CheckConstraint('module = lower(module)', 'lowercase_module'),
+                      db.CheckConstraint('name = lower(name)', 'lowercase_name'),
                       {'schema': 'indico'})
 
     @return_ascii
@@ -118,8 +118,8 @@ class EventSetting(SettingsBase, db.Model):
     __table_args__ = (db.Index('ix_settings_event_id_module_name', 'event_id', 'module', 'name'),
                       db.Index('ix_settings_event_id_module', 'event_id', 'module'),
                       db.UniqueConstraint('event_id', 'module', 'name'),
-                      db.CheckConstraint('module = lower(module)'),
-                      db.CheckConstraint('name = lower(name)'),
+                      db.CheckConstraint('module = lower(module)', 'lowercase_module'),
+                      db.CheckConstraint('name = lower(name)', 'lowercase_name'),
                       {'schema': 'events'})
 
     event_id = db.Column(

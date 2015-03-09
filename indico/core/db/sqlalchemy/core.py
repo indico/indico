@@ -74,6 +74,20 @@ def _mapper_configured(mapper, class_):
                 listen(getattr(class_, prop.key), 'set', partial(_coerce_custom, fn=func), retval=True)
 
 
+def _column_names(constraint, table):
+    return '_'.join(c.name for c in constraint.columns)
+
+
+naming_convention = {
+    'fk': 'fk_%(table_name)s_%(column_names)s_%(referred_table_name)s',
+    'pk': 'pk_%(table_name)s',
+    'ix': 'ix_%(table_name)s_%(column_names)s',
+    'ck': 'ck_%(table_name)s_%(constraint_name)s',
+    'uq': 'uq_%(table_name)s_%(column_names)s',
+    'column_names': _column_names
+}
+
 db = IndicoSQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
+db.Model.metadata.naming_convention = naming_convention
 listen(db.Model.metadata, 'before_create', _before_create)
 listen(mapper, 'mapper_configured', _mapper_configured)

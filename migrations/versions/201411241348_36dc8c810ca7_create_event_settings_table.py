@@ -22,8 +22,8 @@ def upgrade():
                     sa.Column('name', sa.String(), nullable=False, index=True),
                     sa.Column('value', postgresql.JSON(), nullable=False),
                     sa.Column('event_id', sa.String(), nullable=False, index=True),
-                    sa.CheckConstraint('module = lower(module)'),
-                    sa.CheckConstraint('name = lower(name)'),
+                    sa.CheckConstraint('module = lower(module)', 'lowercase_module'),
+                    sa.CheckConstraint('name = lower(name)', 'lowercase_name'),
                     sa.PrimaryKeyConstraint('id'),
                     sa.UniqueConstraint('event_id', 'module', 'name'),
                     schema='events')
