@@ -347,7 +347,7 @@ class RegistrationForm(Persistent):
 
     def inModificationPeriod(self):
         if self.getModificationEndDate() is None:
-            return False
+            return True
         date = nowutc()
         sd = self.getStartRegistrationDate()
         ed = self.getModificationEndDate()
