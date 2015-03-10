@@ -15,7 +15,7 @@ Registration confirmation for {{ event.getTitle() }}: {{ registrant.getFirstName
 {%- block header %}{% endblock -%}
 
 {% block body -%}
-    <div class="mail" style="width: 600px; margin: auto; font-family: Arial; border: 1px solid #dfdfdf; background-color: #f9f9f9; margin-bottom: 40px;">
+    <div class="mail" style="width: 600px; font-family: Arial; border: 1px solid #dfdfdf; background-color: #f9f9f9; margin: auto auto 40px auto;">
         <div class="header" style="background-color: #5D95EA; color: white; padding: 20px;">
             <h1>Registration confirmation (# {{ registrant.getId() }})</h1>
         </div>
@@ -32,7 +32,7 @@ Registration confirmation for {{ event.getTitle() }}: {{ registrant.getFirstName
                     {{ print_dd(registrant.getId()) }}
                     {%- if reg_details.reason %}
                         {{ print_dt('Participation reason') }}
-                        {{ print_dd(reg_details.reason) }}</dd>
+                        {{ print_dd(reg_details.reason) }}
                     {%- endif %}
                 </dl>
                 <div style="clear: both;"></div>
@@ -42,11 +42,11 @@ Registration confirmation for {{ event.getTitle() }}: {{ registrant.getFirstName
                     <h2>Accommodation details</h2>
                     <dl>
                         {{ print_dt('Arrival date') }}
-                        {{ print_dd(reg_details.accommodation_arrival) }}</dd>
+                        {{ print_dd(reg_details.accommodation_arrival) }}
                         {{ print_dt('Departure date') }}
-                        {{ print_dd(reg_details.accommodation_departure) }}</dd>
+                        {{ print_dd(reg_details.accommodation_departure) }}
                         {{ print_dt('Accommodation type') }}
-                        {{ print_dd(reg_details.accommodation_type) }}</dd>
+                        {{ print_dd(reg_details.accommodation_type) }}
                     </dl>
                     <div style="clear: both;"></div>
                 </div>
@@ -57,10 +57,10 @@ Registration confirmation for {{ event.getTitle() }}: {{ registrant.getFirstName
                     {%- if reg_details.sessions_type %}
                         <dl>
                             {{ print_dt('First priority') }}
-                            {{ print_dd(reg_details.sessions[0]) }}</dd>
+                            {{ print_dd(reg_details.sessions[0]) }}
                             {% if reg_details.sessions[1] %}
                                 {{ print_dt('Other option') }}
-                                {{ print_dd(reg_details.sessions[1]) }}</dd>
+                                {{ print_dd(reg_details.sessions[1]) }}
                             {%- endif %}
                         </dl>
                     {%- else %}
