@@ -38,7 +38,7 @@ from MaKaC.review import AbstractStatusSubmitted
 from MaKaC.review import AbstractTextField
 from MaKaC.common.TemplateExec import render
 
-from indico.util.string import render_markdown
+from indico.util.string import render_markdown, natural_sort_key
 
 
 class WConfCFADeactivated(WConfDisplayBodyBase):
@@ -914,7 +914,7 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
 
     def _getSessionItemsHTML( self ):
         items = [ i18nformat("""<option value="conf">--_("no session")--</option>""")]
-        for session in self._conf.getSessionList():
+        for session in sorted(self._conf.getSessionList(), key=lambda s: natural_sort_key(s.getTitle().lower())):
             items.append("""<option value="%s">%s</option>"""%(session.getId(), session.getTitle()))
         return items
 
