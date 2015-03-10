@@ -7,10 +7,13 @@ Create Date: 2015-03-09 15:49:20.566037
 
 from alembic import op
 
+from indico.core.db.sqlalchemy.util.bulk_rename import bulk_rename
+
 
 # revision identifiers, used by Alembic.
 revision = '4ae6d2113a2b'
 down_revision = '573faf4ac644'
+
 
 mapping = {
     # indico
@@ -275,39 +278,11 @@ mapping = {
 }
 
 
-def _rename_constraint(schema, table, name, new_name):
-    stmt = 'ALTER TABLE "{}"."{}" RENAME CONSTRAINT "{}" TO "{}"'
-    op.execute(stmt.format(schema, table, name, new_name))
-
-
-def _rename_index(schema, name, new_name):
-    stmt = 'ALTER INDEX "{}"."{}" RENAME TO "{}"'
-    op.execute(stmt.format(schema, name, new_name))
-
-
-def _iter_renames():
-    for table, types in mapping.iteritems():
-        schema, table = table.split('.', 1)
-        for type_, renames in types.iteritems():
-            for old, new in renames.iteritems():
-                yield schema, table, type_, old, new
-
-
-def _exec_renames(reverse=False):
-    for schema, table, type_, old, new in _iter_renames():
-        if reverse:
-            old, new = new, old
-        if type_ == 'constraints':
-            _rename_constraint(schema, table, old, new)
-        elif type_ == 'indexes':
-            _rename_index(schema, old, new)
-        else:
-            raise ValueError('invalid type: ' + type_)
-
-
 def upgrade():
-    _exec_renames()
+    for stmt in bulk_rename(mapping):
+        op.execute(stmt)
 
 
 def downgrade():
-    _exec_renames(True)
+    for stmt in bulk_rename(mapping, True):
+        op.execute(stmt)
