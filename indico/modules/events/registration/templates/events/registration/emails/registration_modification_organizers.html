@@ -1,0 +1,13 @@
+{% extends 'events/registration/emails/base_registration_details.html' %}
+
+{% block registration_subject -%}
+    Registration modification
+{%- endblock %}
+
+{% block registration_header -%}
+    <p>Dear organizer,</p>
+    <p>The payment status of a registrant has changed.</p>
+    <p>To manage this registration, follow this link: <a href="{{ reg_page }}">Manage registration</a></p>
+{%- endblock %}
+
+{% block registration_footer %}{% endblock %}

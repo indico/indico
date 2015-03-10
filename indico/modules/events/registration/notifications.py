@@ -71,6 +71,7 @@ def _get_reg_details(reg_form, registrant):
 def notify_registration_confirmation(event, registrant):
     reg_form = registrant.getRegistrationForm()
     from_address = reg_form.getNotificationSender()
+    reg_details = _get_reg_details(reg_form, registrant)
 
     # Send email to organizers
     notification = reg_form.getNotification()
@@ -78,13 +79,13 @@ def notify_registration_confirmation(event, registrant):
     cc_list = notification.getCCList()
     if to_list or cc_list:
         reg_page = url_for('event_mgmt.confModifRegistrants-modification', registrant, _external=True, _secure=True)
-        tpl = get_template_module('events/registration/emails/registration_confirmation_organizers.txt', event=event,
-                                  registrant=registrant, reg_page=reg_page)
-        yield make_email(to_list, cc_list, from_address=from_address, subject=tpl.get_subject(), body=tpl.get_body())
+        tpl = get_template_module('events/registration/emails/registration_confirmation_organizers.html', event=event,
+                                  registrant=registrant, reg_page=reg_page, reg_details=reg_details)
+        yield make_email(to_list, cc_list, from_address=from_address, subject=tpl.get_subject(), body=tpl.get_body(),
+                         html=True)
 
     # Send email to the registrant
     if reg_form.isSendRegEmail():
-        reg_details = _get_reg_details(reg_form, registrant)
         needs_to_pay = registrant.doPay() and payment_event_settings.get(event, 'enabled')
         registration_email_msg = payment_event_settings.get(event, 'register_email')
         params = {}
@@ -112,6 +113,7 @@ def notify_registration_confirmation(event, registrant):
 def notify_registration_modification(event, registrant):
     reg_form = registrant.getRegistrationForm()
     from_address = reg_form.getNotificationSender()
+    reg_details = _get_reg_details(reg_form, registrant)
 
     # Send email to organizers
     notification = reg_form.getNotification()
@@ -119,9 +121,10 @@ def notify_registration_modification(event, registrant):
     cc_list = notification.getCCList()
     if to_list or cc_list:
         reg_page = url_for('event_mgmt.confModifRegistrants-modification', registrant, _external=True, _secure=True)
-        tpl = get_template_module('events/registration/emails/registration_modification_organizers.txt', event=event,
-                                  registrant=registrant, reg_page=reg_page)
-        yield make_email(to_list, cc_list, from_address=from_address, subject=tpl.get_subject(), body=tpl.get_body())
+        tpl = get_template_module('events/registration/emails/registration_modification_organizers.html', event=event,
+                                  registrant=registrant, reg_page=reg_page, reg_details=reg_details)
+        yield make_email(to_list, cc_list, from_address=from_address, subject=tpl.get_subject(), body=tpl.get_body(),
+                         html=True)
 
     # Send email to the registrant
     if reg_form.isSendRegEmail():
@@ -130,9 +133,9 @@ def notify_registration_modification(event, registrant):
         if not registrant.getAvatar():
             params = {'registrantId': registrant.getId(), 'authkey': registrant.getRandomId()}
         reg_page = url_for('event.confRegistrationFormDisplay', event, _external=True, _secure=True, **params)
-        tpl = get_template_module('events/registration/emails/registration_modification_registrant.txt', event=event,
+        tpl = get_template_module('events/registration/emails/registration_modification_registrant.html', event=event,
                                   registrant=registrant, payment_enabled=payment_event_settings.get(event, 'enabled'),
-                                  reg_page=reg_page, needs_to_pay=needs_to_pay)
+                                  reg_page=reg_page, needs_to_pay=needs_to_pay, reg_details=reg_details)
 
         yield make_email(registrant.getEmail(), from_address=from_address, subject=tpl.get_subject(),
-                         body=tpl.get_body())
+                         body=tpl.get_body(), html=True)
