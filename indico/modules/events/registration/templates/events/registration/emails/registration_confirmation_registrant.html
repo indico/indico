@@ -1,4 +1,4 @@
-{% extends 'emails/base.txt' %}
+{% extends 'emails/base.html' %}
 
 {% macro print_dt(content, colon=True) %}
     <dt style="width: 30%; float: left; clear:left;">{{ content }}{% if colon %}:{% endif %}</dt>
@@ -8,11 +8,12 @@
     <dd style="width: 70%; float: left; margin: 0; min-height: 20px; white-space: pre;">{{ content }}</dd>
 {% endmacro %}
 
-{%- block subject -%}
+{% block subject -%}
 Registration confirmation for {{ event.getTitle() }}: {{ registrant.getFirstName() }} {{ registrant.getFamilyName() }}
-{%- endblock -%}
+{%- endblock %}
 
-{%- block header %}{% endblock -%}
+{% block header %}{% endblock %}
+{% block footer %}{% endblock %}
 
 {% block body -%}
     <div class="mail" style="width: 600px; font-family: Arial; border: 1px solid #dfdfdf; background-color: #f9f9f9; margin: auto auto 40px auto;">

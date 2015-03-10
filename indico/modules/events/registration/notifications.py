@@ -91,7 +91,7 @@ def notify_registration_confirmation(event, registrant):
         if not registrant.getAvatar():
             params = {'registrantId': registrant.getId(), 'authkey': registrant.getRandomId()}
         reg_page = url_for('event.confRegistrationFormDisplay', event, _external=True, _secure=True, **params)
-        tpl = get_template_module('events/registration/emails/registration_confirmation_registrant.txt', event=event,
+        tpl = get_template_module('events/registration/emails/registration_confirmation_registrant.html', event=event,
                                   registrant=registrant, payment_enabled=payment_event_settings.get(event, 'enabled'),
                                   reg_page=reg_page, needs_to_pay=needs_to_pay, reg_details=reg_details,
                                   registration_email_msg=registration_email_msg)
