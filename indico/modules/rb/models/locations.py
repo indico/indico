@@ -55,7 +55,7 @@ class Location(db.Model):
         db.ForeignKey(
             'roombooking.aspects.id',
             use_alter=True,
-            name='fk_default_aspect_id',
+            name='fk_locations_default_aspect_id',
             onupdate='CASCADE',
             ondelete='SET NULL'
         )
