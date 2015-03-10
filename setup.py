@@ -494,7 +494,7 @@ if __name__ == '__main__':
                        'MaKaC': os.path.join('indico', 'MaKaC')},
           package_data={'indico': ['*.*']},
           include_package_data=True,
-          namespace_packages=['indico', 'indico.ext'],
+          namespace_packages=['indico'],
           install_requires=_getInstallRequires(),
           tests_require=['nose', 'rednose', 'twill', 'selenium', 'figleaf', 'contextlib2'],
           data_files=dataFiles,
