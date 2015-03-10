@@ -5,8 +5,8 @@
 {%- endblock %}
 
 {% block registration_header -%}
-    <p>Dear {{ registrant.getFirstName() }} {{ registrant.getFamilyName() }},</p>
-    <p>Your registration for the event '{{ event.getTitle() }}' has been successfully modified.</p>
+    <p>Dear {{ registrant.getFullName(firstNameFirst=true, title=false) }},</p>
+    <p>Your registration for the event <a href="{{ event.getURL() }}">{{ event.getTitle() }}</a> has been successfully modified.</p>
     {%- if needs_to_pay %}
     <p>Please, do not forget to proceed with your payment in case you haven't done it yet.</p>
     {%- endif %}

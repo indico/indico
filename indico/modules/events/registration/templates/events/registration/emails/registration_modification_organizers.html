@@ -6,7 +6,7 @@
 
 {% block registration_header -%}
     <p>Dear organizer,</p>
-    <p>The payment status of a registrant has changed.</p>
+    <p>The information of one of the registrants in <a href="{{ event.getURL() }}">{{ event.getTitle() }}</a> has changed.</p>
     <p>To manage this registration, follow this link: <a href="{{ reg_page }}">Manage registration</a></p>
 {%- endblock %}
 
