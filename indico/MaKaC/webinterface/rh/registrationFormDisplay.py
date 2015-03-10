@@ -245,13 +245,9 @@ class RHRegistrationFormPerformModify(RHRegistrationFormCreation):
                 # check if the email is being changed by another one that already exists
                 if self._getRequestParams().get("email", "") != rp.getEmail() and self._conf.hasRegistrantByEmail(self._getRequestParams().get("email", "")):
                     raise FormValuesError(_("There is already a user with the email \"%s\". Please choose another one") % self._getRequestParams().get("email", "--no email--"))
-                had_to_pay = rp.doPay()
                 rp.setValues(self._getRequestParams(), self._getUser())
-                has_to_pay = rp.doPay()
 
-                # Send email only when the payment status changes
-                if had_to_pay != has_to_pay:
-                    notify_registration_modification(self._conf, rp)
+                notify_registration_modification(self._conf, rp)
                 flash(_(u"Your registration has been modified successfully."), 'success')
                 if rp.doPay():
                     self._redirect(urlHandlers.UHConfRegistrationFormCreationDone.getURL(rp))
