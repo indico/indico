@@ -128,7 +128,7 @@ $(document).ready(function(){
                 lastDay : '[Yesterday]',
                 sameDay : '[Today]',
                 nextDay : '[Tomorrow]',
-                lastWeek : '[last] dddd',
+                lastWeek : '[Last] dddd',
                 nextWeek : 'dddd',
                 sameElse : 'L'
             }
