@@ -248,7 +248,7 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                 scope.userdata = {};
             } else if (!scope.updateMode) {
                 scope.userdata = regFormFactory.UserData.get({confId: scope.confId}, function() {
-                    scope.userdata = scope.userdata.avatar || {};
+                    scope.userdata = scope.userdata.avatar || {sessionList: [{}, {}]};
                 });
             } else {
                 scope.userdata = regFormFactory.UserData.get({confId: scope.confId}, function() {
