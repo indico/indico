@@ -69,7 +69,7 @@
                     <a ng-repeat="action in config.actions | filter: actionIsArray"
                         ng-click="actionItem(item, action[0])"
                         title="{{ action[1] }}"
-                        class="action-button {{ action[3] }}"></a>
+                        class="{{ action[3] }}"></a>
                 </span>
             </td>
         </tr>
