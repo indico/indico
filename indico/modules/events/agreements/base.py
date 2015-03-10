@@ -93,7 +93,7 @@ class AgreementDefinitionBase(object):
     #: default settings for an event
     default_event_settings = {'manager_notifications_enabled': True}
     #: default message to display when the agreement definition type is disabled
-    disabled_reason = _('Currently there are no agreements of this type.')
+    disabled_reason = _('No signatures needed.')
 
     @classproperty
     @classmethod
