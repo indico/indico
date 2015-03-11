@@ -62,21 +62,29 @@ def i18n_locale(locale_name):
     """
     config = Config.getInstance()
     root_path = os.path.join(current_app.root_path, 'translations')
-    cache_file = os.path.join(config.getXMLCacheDir(), 'assets_i18n_{}.js'.format(locale_name))
+    plugin_key = ','.join(sorted(plugin_engine.get_active_plugins()))
+    plugin_hash = binascii.crc32(plugin_key) & 0xffffffff
+    cache_file = os.path.join(config.getXMLCacheDir(), 'assets_i18n_{}_{}.js'.format(locale_name, plugin_hash))
 
-    if not os.path.exists(cache_file):
+    if not os.path.exists(cache_file) or True:
         i18n_data = {}
         i18n_data.update(locale_data(root_path, locale_name, 'indico'))
 
         for pid, plugin in plugin_engine.get_active_plugins().iteritems():
+            data = {}
             if plugin.translation_path:
-                i18n_data.update(locale_data(plugin.translation_path, locale_name, pid))
+                data = locale_data(plugin.translation_path, locale_name, pid)
+            if not data:
+                # Dummy entry so we can still load the domain
+                data = {pid: {'': {'domain': pid,
+                                   'lang': locale_name}}}
+            i18n_data.update(data)
 
-        if i18n_data:
-            with open(cache_file, 'wb') as f:
-                f.write("window.TRANSLATIONS = {};".format(json.dumps(i18n_data)))
-        else:
+        if not i18n_data:
             raise NotFound("Translation for language '{}' not found".format(locale_name))
+
+        with open(cache_file, 'wb') as f:
+            f.write("window.TRANSLATIONS = {};".format(json.dumps(i18n_data)))
 
     return send_file('{}.js'.format(locale_name), cache_file, mimetype='application/x-javascript',
                      no_cache=False, conditional=True)
