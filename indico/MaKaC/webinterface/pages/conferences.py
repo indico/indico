@@ -949,6 +949,9 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                     newItem = entry.getOwner()
                 wvars['entries'].append(newItem)
 
+        wvars['entries'].sort(key=lambda entry: entry.getEndDate(), reverse=True)
+        wvars['entries'].sort(key=lambda entry: entry.getStartDate())
+
         wvars["pluginDetails"] = "".join(self._notify('eventDetailBanner', self._conf))
         pluginDetailsSessionContribs = {}
         self._notify('detailSessionContribs', self._conf, pluginDetailsSessionContribs)
