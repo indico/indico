@@ -102,10 +102,12 @@ def smart_func(func_name, plugin_name=None):
 
 
 def make_bound_gettext(plugin_name):
+    """Creates a smart gettext callable bound to the domain of the specified plugin"""
     return smart_func('ugettext', plugin_name=plugin_name)
 
 
 def make_bound_ngettext(plugin_name):
+    """Creates a smart ngettext callable bound to the domain of the specified plugin"""
     return smart_func('ungettext', plugin_name=plugin_name)
 
 
