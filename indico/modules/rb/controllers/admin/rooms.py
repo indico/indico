@@ -164,8 +164,8 @@ class RHRoomBookingCreateRoom(RHRoomBookingCreateModifyRoomBase):
         self._form = self._make_form()
 
     def _save(self):
-        RHRoomBookingCreateModifyRoomBase._save(self)
         self._room.location = self._location
+        RHRoomBookingCreateModifyRoomBase._save(self)
         db.session.add(self._room)
         db.session.flush()
         flash(_(u'Room added'), 'success')
