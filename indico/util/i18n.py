@@ -42,10 +42,10 @@ from MaKaC.common.info import HelperMaKaCInfo
 RE_TR_FUNCTION = re.compile(r'''_\("([^"]*)"\)|_\('([^']*)'\)''', re.DOTALL | re.MULTILINE)
 
 babel = Babel()
-_auto = object()
+_use_context = object()
 
 
-def get_translation_domain(plugin_name=_auto):
+def get_translation_domain(plugin_name=_use_context):
     """Get the translation domain for the given plugin
 
     If `plugin_name` is omitted, the plugin will be taken from current_plugin.
@@ -55,7 +55,7 @@ def get_translation_domain(plugin_name=_auto):
         return get_domain()
     else:
         from indico.core.plugins import plugin_engine
-        plugin = plugin_engine.get_plugin(plugin_name) if plugin_name is not _auto else current_plugin
+        plugin = plugin_engine.get_plugin(plugin_name) if plugin_name is not _use_context else current_plugin
         if plugin and plugin.translation_path:
             return current_plugin.translation_domain
         else:
@@ -117,8 +117,8 @@ ungettext = ngettext = make_bound_ngettext(None)
 L_ = lazy_gettext
 
 # Plugin-context-sensitive gettext
-gettext_context = make_bound_gettext(_auto)
-ngettext_context = make_bound_ngettext(_auto)
+gettext_context = make_bound_gettext(_use_context)
+ngettext_context = make_bound_ngettext(_use_context)
 
 # Just a marker for message extraction
 N_ = lambda text: text
