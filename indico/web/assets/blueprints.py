@@ -38,7 +38,7 @@ def js_vars_global():
     Useful for server-wide config options, URLs, etc...
     """
     config = Config.getInstance()
-    config_hash = binascii.crc32(repr(make_hashable(sorted(config._configVars.items()))))
+    config_hash = binascii.crc32(repr(make_hashable(sorted(config._configVars.items())))) & 0xffffffff
     cache_file = os.path.join(config.getXMLCacheDir(), 'assets_global_{}.js'.format(config_hash))
 
     if not os.path.exists(cache_file):
@@ -46,7 +46,7 @@ def js_vars_global():
         with open(cache_file, 'wb') as f:
             f.write(data)
 
-    return send_file('vars.js', cache_file,
+    return send_file('global.js', cache_file,
                      mimetype='application/x-javascript', no_cache=False, conditional=True)
 
 
