@@ -6906,10 +6906,6 @@ ul.speaker_list > li .contributions li {
     width: 20em;
 }
 
-.watermark {
-   color: gray;
-}
-
 .plugin-settings-form input[type=text], .plugin-settings-form input[type=url], .plugin-settings-form input[type=password] {
     width: 400px;
 }

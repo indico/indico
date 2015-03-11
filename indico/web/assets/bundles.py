@@ -251,7 +251,6 @@ jquery = rjs_bundle('jquery', *filter(None, [
               'jquery-extra-selectors.js',
               'jquery.typewatch.js',
               'jstorage.js',
-              'jquery.watermark.js',
               'jquery.placeholder.js')))
 
 utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'i18n.js'))
