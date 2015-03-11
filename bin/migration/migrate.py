@@ -949,15 +949,23 @@ def lowercaseLDAPIdentities(dbi, withRBDB, prevVersion):
     auth = LDAPAuthenticator()
     total = len(auth.getList())
     idx = auth.getIdx()
-    for i, identity in enumerate(auth.getList()):
-        print '\r  Processing %d/%d' % (i + 1, total),
+    to_fix = set()
+    for i, (key, identity) in enumerate(idx.iteritems(), 1):
+        print '\r  Checking %d/%d' % (i, total),
         # getId() returns getLogin().lower()
-        if identity.getLogin() == identity.getId() or identity.getLogin() not in idx:
+        if key == identity.getId():
             continue
-        del idx[identity.getLogin()]
-        assert identity.getId() not in idx
+        to_fix.add((key, identity))
+
+    print
+    for i, (key, identity) in enumerate(to_fix, 1):
+        print '\r  Fixing %d/%d' % (i, len(to_fix)),
+        del idx[key]
+        if identity.getId() in idx:
+            assert identity.getId() == idx[identity.getId()].getId()
+            continue
         idx[identity.getId()] = identity
-        if i % 1000 == 999:
+        if i % 1000 == 0:
             dbi.commit()
     print
     dbi.commit()
