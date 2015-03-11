@@ -60,25 +60,6 @@ def always(f):
     PATCHES.append((None, f))
 
 
-@version('2.6')
-def patch_collections():
-    """
-    Support for OrderedDict on 2.6 is added by the `ordereddict` package,
-    but we need to make it available inside `collections`
-    """
-    import collections
-    try:
-        from ordereddict import OrderedDict
-        collections.OrderedDict = OrderedDict
-    except ImportError:
-        # during the setup process, indico.* will be imported
-        # and this will be triggered
-        pass
-    # This one shouldn't fail even during setup
-    from indico.util.counter import Counter
-    collections.Counter = Counter
-
-
 @always
 def redis_pipeline_nonzero():
     """
