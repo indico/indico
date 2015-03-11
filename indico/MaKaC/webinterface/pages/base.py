@@ -132,9 +132,6 @@ class WPBase():
         return self._asset_env['base_css'].urls() + \
             self._asset_env['screen_sass'].urls()
 
-    def _getJavaScriptInclude(self, scriptPath):
-        return '<script src="'+ scriptPath +'" type="text/javascript"></script>\n'
-
     def getJSFiles(self):
         return self._asset_env['base_js'].urls()
 

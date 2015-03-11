@@ -22,18 +22,14 @@
 % endif
 
         <script type="text/javascript">
-                var ScriptRoot = "${ baseUrl }/js/";
+            var ScriptRoot = "${ baseUrl }/js/";
         </script>
-
-        <!-- Jed-based i18n -->
         <script type="text/javascript" src="${ url_for('assets.i18n_locale', locale_name=language) }"></script>
+        <script type="text/javascript" src="${ url_for('assets.js_vars_global') }"></script>
 
-        <!-- Indico specific -->
-        ${ page._getJavaScriptInclude(url_for('assets.js_vars_global')) } <!-- Indico Variables -->
-
-        <!-- Page Specific JS files-->
-        % for JSFile in extraJSFiles:
-            ${ page._getJavaScriptInclude(JSFile) }
+        <!-- page-specific JS files -->
+        % for js_file in extraJSFiles:
+            <script type="text/javascript" src="${ js_file }"></script>
         % endfor
 
         <!--[if (gte IE 6)&(lte IE 8)]>
@@ -42,18 +38,18 @@
         % endfor
         <![endif]-->
 
-        <!-- Page Specific CSS files-->
+        <!-- page-specific CSS files-->
         % for cssFile in extraCSS:
             <link rel="stylesheet" type="text/css" href="${cssFile}">
         % endfor
 
-        <!-- Page Specific, directly inserted Javascript -->
-        <script type="text/javascript">
+        <!-- page-specific, directly inserted Javascript -->
+        <script>
             ${ "\n\n".join(extraJS) }
         </script>
 
-        <!-- Indico page-wide global JS variables -->
-        <script type="text/javascript">
+        <!-- global JS variables -->
+        <script>
         <% user = page._rh.getAW().getUser() %>
         % if user:
             IndicoGlobalVars.isUserAuthenticated = true;
@@ -63,7 +59,7 @@
         % endif
         </script>
 
-        <!-- Other Page Specific -->
+        <!-- other page-specific things -->
         ${ page._getHeadContent() }
 
         ${ template_hook('html-head', template=self) }
