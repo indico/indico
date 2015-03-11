@@ -25,9 +25,9 @@ from babel.core import Locale
 from babel.messages.pofile import read_po
 from babel.support import Translations
 from flask import session, request, has_request_context, current_app
-from flask_babelex import Babel, Domain, get_domain
+from flask_babelex import Babel, get_domain
 from flask_pluginengine import current_plugin
-from speaklater import make_lazy_gettext
+from speaklater import is_lazy_string, make_lazy_string
 
 from indico.core.config import Config
 from indico.core.db import DBMgr
@@ -39,20 +39,29 @@ from MaKaC.common.info import HelperMaKaCInfo
 RE_TR_FUNCTION = re.compile(r'''_\("([^"]*)"\)|_\('([^']*)'\)''', re.DOTALL | re.MULTILINE)
 
 babel = Babel()
+_auto = object()
 
 
-def get_active_domain():
-    default_domain = get_domain()
+def get_translation_domain(plugin_name=_auto):
+    """Get the translation domain for the given plugin
 
-    if current_plugin and current_plugin.translation_path:
-        return Domain(current_plugin.translation_path)
+    If `plugin_name` is omitted, the plugin will be taken from current_plugin.
+    If `plugin_name` is None, the core translation domain ('indico') will be used.
+    """
+    if plugin_name is None:
+        return get_domain()
     else:
-        return default_domain
+        from indico.core.plugins import plugin_engine
+        plugin = plugin_engine.get_plugin(plugin_name) if plugin_name is not _auto else current_plugin
+        if plugin and plugin.translation_path:
+            return current_plugin.translation_domain
+        else:
+            return get_domain()
 
 
 def gettext_unicode(*args, **kwargs):
-
     func_name = kwargs.pop('func_name', 'ugettext')
+    plugin_name = kwargs.pop('plugin_name', None)
 
     if not isinstance(args[0], unicode):
         args = [(text.decode('utf-8') if isinstance(text, str) else text) for text in args]
@@ -60,18 +69,20 @@ def gettext_unicode(*args, **kwargs):
     else:
         using_unicode = True
 
-    res = getattr(get_active_domain().get_translations(), func_name)(*args, **kwargs)
-
-    if using_unicode:
-        return res
-    else:
-        return res.encode('utf-8')
-
-
-lazy_gettext = make_lazy_gettext(lambda: gettext_unicode)
+    translations = get_translation_domain(plugin_name).get_translations()
+    res = getattr(translations, func_name)(*args, **kwargs)
+    if not using_unicode:
+        res = res.encode('utf-8')
+    return res
 
 
-def smart_func(func_name):
+def lazy_gettext(string, plugin_name=None):
+    if is_lazy_string(string):
+        return string
+    return make_lazy_string(lambda s: gettext_unicode(s, plugin_name=plugin_name), string)
+
+
+def smart_func(func_name, plugin_name=None):
     def _wrap(*args, **kwargs):
         """
         Returns either a translated string or a lazy-translatable object,
@@ -79,18 +90,30 @@ def smart_func(func_name):
         """
         if (has_request_context() and session.lang) or func_name != 'ugettext':
             # straight translation
-            return gettext_unicode(*args, func_name=func_name, **kwargs)
+            return gettext_unicode(*args, func_name=func_name, plugin_name=plugin_name, **kwargs)
 
         else:
             # otherwise, defer translation to eval time
-            return lazy_gettext(*args)
+            return lazy_gettext(*args, plugin_name=plugin_name)
     return _wrap
 
 
+def make_bound_gettext(plugin_name):
+    return smart_func('ugettext', plugin_name=plugin_name)
+
+
+def make_bound_ngettext(plugin_name):
+    return smart_func('ungettext', plugin_name=plugin_name)
+
+
 # Shortcuts
-_ = ugettext = gettext = smart_func('ugettext')
-ungettext = ngettext = smart_func('ungettext')
+_ = ugettext = gettext = make_bound_gettext(None)
+ungettext = ngettext = make_bound_ngettext(None)
 L_ = lazy_gettext
+
+# Plugin-context-sensitive gettext
+gettext_context = make_bound_gettext(_auto)
+ngettext_context = make_bound_ngettext(_auto)
 
 # Just a marker for message extraction
 N_ = lambda text: text

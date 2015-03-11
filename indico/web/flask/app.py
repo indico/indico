@@ -34,7 +34,7 @@ from wtforms.widgets import html_params
 import indico.util.date_time as date_time_util
 from indico.core.config import Config
 from indico.core import signals
-from indico.util.i18n import gettext, ngettext, babel
+from indico.util.i18n import gettext_context, ngettext_context, babel
 from indico.core.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.webinterface.pages.error import WErrorWSGI
@@ -163,7 +163,7 @@ def setup_jinja(app):
     app.add_template_test(instanceof)  # only use this test if you really have to!
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
-    app.jinja_env.install_gettext_callables(gettext, ngettext, True)
+    app.jinja_env.install_gettext_callables(gettext_context, ngettext_context, True)
     # webassets
     app.jinja_env.add_extension('webassets.ext.jinja2.AssetsExtension')
     app.jinja_env.assets_environment = core_env

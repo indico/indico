@@ -20,6 +20,7 @@ import re
 from copy import deepcopy
 from urlparse import urlparse
 
+from flask_babelex import Domain
 from flask_pluginengine import (PluginEngine, Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin,
                                 current_plugin, render_plugin_template, wrap_in_plugin_context)
 from markupsafe import Markup
@@ -154,6 +155,11 @@ class IndicoPlugin(Plugin):
         """
         translations_path = os.path.join(self.root_path, 'translations')
         return translations_path if os.path.exists(translations_path) else None
+
+    @cached_property
+    def translation_domain(self):
+        """Return the domain for this plugin's translation_path"""
+        return Domain(self.translation_path)
 
     def add_cli_command(self, manager):
         """Add custom commands/submanagers to the manager of the `indico` cli tool."""
