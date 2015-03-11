@@ -25,7 +25,7 @@ import re
 import operator as ops
 
 
-VERSION_RE = re.compile(r'(\>=|\>|\<|\<=)?(\d)(?:\.(\d))?')
+VERSION_RE = re.compile(r'(>=|>|<|<=)?(\d)(?:\.(\d))?')
 PATCHES = []
 
 
@@ -33,7 +33,7 @@ def _version_data(ver):
     m = VERSION_RE.match(ver)
     if m:
         m = m.groups()
-        return (m[0], int(m[1]), int(m[2]))
+        return m[0], int(m[1]), int(m[2])
     else:
         raise Exception("Wrong version specification: '{0}'".format(ver))
 
