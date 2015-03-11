@@ -57,7 +57,7 @@ def get_translation_domain(plugin_name=_use_context):
         from indico.core.plugins import plugin_engine
         plugin = plugin_engine.get_plugin(plugin_name) if plugin_name is not _use_context else current_plugin
         if plugin and plugin.translation_path:
-            return current_plugin.translation_domain
+            return plugin.translation_domain
         else:
             return get_domain()
 
