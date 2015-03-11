@@ -1,0 +1,8 @@
+{%- macro clipboard_input(value, name='') -%}
+    <div class="i-has-action i-has-action-clip">
+        <input name="{{ name }}" type="text" value="{{ value }}" readonly>{#
+        #}<button type="button"
+         class="i-button icon-clipboard" title="Click to copy the URL"></button>
+    </div>
+    <span class="i-has-action-message icon-checkmark"></span>
+{%- endmacro -%}

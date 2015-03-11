@@ -384,7 +384,7 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
                 @include transition-timing-function(ease-in-out, ease-in-out);
             }
 
-            > .form-row.i-action-input > input {
+            > .form-row.i-has-action > input {
                 width: 10em;
             }
 
@@ -636,9 +636,9 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
     }
 }
 
-.i-action-input {
-    @extend %toolbar-group;
-    > input {
+.i-has-action {
+@extend %toolbar-group;
+> input {
         display: inline-block;
     }
 
@@ -651,12 +651,16 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
         padding: 0 0.8em;
     }
 
-    +  .i-action-message {
-        display: none;
+    +  .i-has-action-message {
+        display: inline-block;
+        visibility: hidden;
+        opacity: 0;
+        height: 1em;
+        vertical-align: middle;
     }
 }
 
-dd > .i-action-input {
+dd > .i-has-action {
     vertical-align: middle;
     > .i-button, > input {
         height: 2em;
@@ -665,5 +669,14 @@ dd > .i-action-input {
     > input {
         width: 18em;
         background-color: white;
+    }
+}
+
+.qtip-content dl > dd > .i-has-action {
+    > * {
+        line-height: 1em;
+    }
+    > input {
+        width: 110px;
     }
 }
