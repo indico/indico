@@ -36,7 +36,7 @@ from indico.core.signals import after_process
 from MaKaC.common.info import HelperMaKaCInfo
 
 
-RE_TR_FUNCTION = re.compile(r"_\(\"([^\"]*)\"\)|_\('([^']*)'\)", re.DOTALL | re.MULTILINE)
+RE_TR_FUNCTION = re.compile(r'''_\("([^"]*)"\)|_\('([^']*)'\)''', re.DOTALL | re.MULTILINE)
 
 babel = Babel()
 
