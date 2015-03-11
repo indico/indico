@@ -16,8 +16,11 @@
 
 import ast
 import errno
+import traceback
 import os
 import re
+import textwrap
+import warnings
 from contextlib import contextmanager
 
 from babel import negotiate_locale
@@ -135,10 +138,31 @@ class IndicoTranslations(Translations):
     Routes translations through the 'smart' translators defined above
     """
 
+    def _check_stack(self):
+        stack = traceback.extract_stack()
+        # [..., the caller we are looking for, ugettext/ungettext, this function]
+        frame = stack[-3]
+        frame_msg = textwrap.dedent("""
+            File "{}", line {}, in {}
+              {}
+        """).strip().format(*frame)
+        msg = ('Using the gettext function (`_`) patched into the builtins is disallowed.\n'
+               'Please import it from `indico.util.i18n` instead.\n'
+               'The offending code was found in this location:\n{}').format(frame_msg)
+        if 'MaKaC/' in frame[0]:
+            # legacy code gets off with a warning
+            warnings.warn(msg, RuntimeWarning)
+        else:
+            raise RuntimeError(msg)
+
     def ugettext(self, message):
+        if Config.getInstance().getDebug():
+            self._check_stack()
         return gettext(message)
 
     def ungettext(self, msgid1, msgid2, n):
+        if Config.getInstance().getDebug():
+            self._check_stack()
         return ngettext(msgid1, msgid2, n)
 
 
