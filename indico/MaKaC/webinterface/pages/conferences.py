@@ -909,6 +909,8 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                     newItem = entry.getOwner()
                 wvars['entries'].append(newItem)
 
+        wvars['entries'].sort(key=lambda entry: entry.getEndDate(), reverse=True)
+        wvars['entries'].sort(key=lambda entry: entry.getStartDate())
         wvars["daysPerRow"] = self._daysPerRow
         wvars["firstDay"] = self._firstDay
         wvars["lastDay"] = self._lastDay
