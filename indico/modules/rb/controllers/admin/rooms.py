@@ -99,7 +99,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
                 form.bookable_hours[i].end.data = bt.end_time
 
         # Custom attributes, part 2
-        form._attribute_fields = [field for name, field in form._fields.iteritems() if name.startswith('attribute_')]
+        form._attribute_fields = [field_ for name, field_ in form._fields.iteritems() if name.startswith('attribute_')]
 
         # Equipment
         form.available_equipment.query = self._location.equipment_types.order_by(EquipmentType.name)
