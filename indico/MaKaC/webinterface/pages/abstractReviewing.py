@@ -19,6 +19,7 @@ import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from xml.sax.saxutils import quoteattr
 from indico.core.config import Config
+from indico.util.i18n import _
 from MaKaC import review
 from MaKaC.webinterface.common.abstractNotificator import EmailNotificator
 from MaKaC.webinterface.pages.conferences import WPConferenceModifAbstractBase

@@ -17,6 +17,7 @@
 from MaKaC.errors import MaKaCError
 
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.util.i18n import _
 
 
 class RHRoomBookingAdminBase(RHRoomBookingBase):
