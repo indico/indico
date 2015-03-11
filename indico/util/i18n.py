@@ -26,9 +26,9 @@ from contextlib import contextmanager
 from babel import negotiate_locale
 from babel.core import Locale
 from babel.messages.pofile import read_po
-from babel.support import Translations
-from flask import session, request, has_request_context, current_app
-from flask_babelex import Babel, get_domain
+from babel.support import Translations, NullTranslations
+from flask import session, request, has_request_context, current_app, has_app_context
+from flask_babelex import Babel, get_domain, Domain
 from flask_pluginengine import current_plugin
 from speaklater import is_lazy_string, make_lazy_string
 
@@ -54,9 +54,11 @@ def get_translation_domain(plugin_name=_use_context):
     if plugin_name is None:
         return get_domain()
     else:
-        from indico.core.plugins import plugin_engine
-        plugin = plugin_engine.get_plugin(plugin_name) if plugin_name is not _use_context else current_plugin
-        if plugin and plugin.translation_path:
+        plugin = None
+        if has_app_context():
+            from indico.core.plugins import plugin_engine
+            plugin = plugin_engine.get_plugin(plugin_name) if plugin_name is not _use_context else current_plugin
+        if plugin:
             return plugin.translation_domain
         else:
             return get_domain()
@@ -82,7 +84,7 @@ def gettext_unicode(*args, **kwargs):
 def lazy_gettext(string, plugin_name=None):
     if is_lazy_string(string):
         return string
-    return make_lazy_string(lambda s: gettext_unicode(s, plugin_name=plugin_name), string)
+    return make_lazy_string(gettext_unicode, string, plugin_name=plugin_name)
 
 
 def smart_func(func_name, plugin_name=None):
@@ -98,6 +100,10 @@ def smart_func(func_name, plugin_name=None):
         else:
             # otherwise, defer translation to eval time
             return lazy_gettext(*args, plugin_name=plugin_name)
+    if plugin_name is _use_context:
+        _wrap.__name__ = '<smart {}>'.format(func_name)
+    else:
+        _wrap.__name__ = '<smart {} bound to {}>'.format(func_name, plugin_name or 'indico')
     return _wrap
 
 
@@ -124,10 +130,22 @@ ngettext_context = make_bound_ngettext(_use_context)
 N_ = lambda text: text
 
 
+class NullDomain(Domain):
+    """A `Domain` that doesn't contain any translations"""
+
+    def __init__(self):
+        super(NullDomain, self).__init__()
+        self.null = NullTranslations()
+
+    def get_translations(self):
+        return self.null
+
+
 class IndicoLocale(Locale):
     """
     Extends the Babel Locale class with some utility methods
     """
+
     def weekday(self, daynum, short=True):
         """
         Returns the week day given the index

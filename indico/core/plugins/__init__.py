@@ -34,7 +34,7 @@ from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.models.settings import SettingsProxy, EventSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
-from indico.util.i18n import _
+from indico.util.i18n import _, NullDomain
 from indico.util.struct.enum import IndicoEnum
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
 from indico.web.flask.templating import get_template_module, register_template_hook
@@ -159,7 +159,8 @@ class IndicoPlugin(Plugin):
     @cached_property
     def translation_domain(self):
         """Return the domain for this plugin's translation_path"""
-        return Domain(self.translation_path)
+        path = self.translation_path
+        return Domain(path) if path else NullDomain()
 
     def add_cli_command(self, manager):
         """Add custom commands/submanagers to the manager of the `indico` cli tool."""
