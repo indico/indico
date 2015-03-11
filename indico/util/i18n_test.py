@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import os
-import tempfile
 import pytest
 from babel.messages import Catalog
 from babel.messages.mofile import write_mo
@@ -25,8 +24,8 @@ from flask_babelex import get_domain
 from speaklater import _LazyString
 from werkzeug.http import LanguageAccept
 
-from indico.util.i18n import _, ngettext, ungettext, session_language, babel
-from indico.core.plugins import IndicoPlugin, IndicoPluginEngine
+from indico.util.i18n import _, ngettext, ungettext, gettext_context, session_language, babel, make_bound_gettext
+from indico.core.plugins import IndicoPlugin, plugin_engine
 
 
 DICTIONARIES = {
@@ -59,7 +58,8 @@ class MockTranslations(Translations):
 
 
 class MockPlugin(IndicoPlugin):
-    root_path = tempfile.mkdtemp(prefix='indico-test')
+    def init(self):
+        pass
 
 
 @pytest.fixture
@@ -140,23 +140,30 @@ def test_set_best_lang_no_session_lang():
 
 
 @pytest.mark.usefixtures('mock_translations')
-def test_translation_plugins(app):
+def test_translation_plugins(app, tmpdir):
     session.lang = 'fr_FR'
-    engine = IndicoPluginEngine()
-    plugin = MockPlugin(engine, app)
+    plugin = MockPlugin(plugin_engine, app)
+    app.extensions['pluginengine'].plugins['dummy'] = plugin
+    plugin.root_path = tmpdir.strpath
+    french_core_str = DICTIONARIES['fr_FR']['This is not a string']
+    french_plugin_str = "This is not le french string"
 
     trans_dir = os.path.join(plugin.root_path, 'translations', 'fr_FR', 'LC_MESSAGES')
     os.makedirs(trans_dir)
 
     # Create proper *.mo file for plugin translation
     with open(os.path.join(trans_dir, 'messages.mo'), 'wb') as f:
-        catalog = Catalog(locale='fr_FR')
-        catalog.add("This is not a string", "Ceci n'est pas un string")
+        catalog = Catalog(locale='fr_FR', domain='plugin')
+        catalog.add("This is not a string", "This is not le french string")
         write_mo(f, catalog)
 
-    assert _(u'This is not a string') == u"Ceci n'est pas une cha\u00cene"
+    gettext_plugin = make_bound_gettext('dummy')
+
+    assert _(u'This is not a string') == french_core_str
+    assert gettext_context(u"This is not a string") == french_core_str
+    assert gettext_plugin(u"This is not a string") == french_plugin_str
 
     with plugin.plugin_context():
-        assert _(u'This is not a string') == u"Ceci n'est pas un string"
-
-    assert _(u'This is not a string') == u"Ceci n'est pas une cha\u00cene"
+        assert _(u'This is not a string') == french_core_str
+        assert gettext_context(u"This is not a string") == french_plugin_str
+        assert gettext_plugin(u"This is not a string") == french_plugin_str
