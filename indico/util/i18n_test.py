@@ -65,6 +65,9 @@ class MockPlugin(IndicoPlugin):
 @pytest.fixture
 def mock_translations(monkeypatch, request_context):
     domain = get_domain()
+    locales = {'fr_FR': 'French',
+               'en_GB': 'English'}
+    monkeypatch.setattr('indico.util.i18n.get_all_locales', lambda: locales)
     monkeypatch.setattr(domain, 'get_translations', MockTranslations)
 
 
