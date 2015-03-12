@@ -72,7 +72,7 @@ from indico.modules.payment.blueprint import payment_blueprint
 from indico.modules.vc.blueprint import vc_blueprint, vc_compat_blueprint
 from indico.modules.events.registration.blueprint import event_registration_blueprint
 from indico.modules.events.requests.blueprint import requests_blueprint
-from indico.web.assets.blueprints import assets_blueprint
+from indico.web.assets.blueprint import assets_blueprint
 
 
 BLUEPRINTS = (legacy, api, misc, user, oauth, rooms, category, category_mgmt, event_display,
