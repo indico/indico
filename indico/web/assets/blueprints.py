@@ -67,8 +67,11 @@ def i18n_locale(locale_name):
     cache_file = os.path.join(config.getXMLCacheDir(), 'assets_i18n_{}_{}.js'.format(locale_name, plugin_hash))
 
     if not os.path.exists(cache_file) or True:
-        i18n_data = {}
-        i18n_data.update(locale_data(root_path, locale_name, 'indico'))
+        i18n_data = locale_data(root_path, locale_name, 'indico')
+        if not i18n_data:
+            # Dummy data, not having the indico domain would cause lots of failures
+            i18n_data = {'indico': {'': {'domain': 'indico',
+                                         'lang': locale_name}}}
 
         for pid, plugin in plugin_engine.get_active_plugins().iteritems():
             data = {}
