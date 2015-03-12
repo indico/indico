@@ -637,6 +637,11 @@ def upload_ssh(build_dir=None, server_host=None, server_port=None,
 
 @task
 def _package_release(build_dir, py_versions, system_node):
+    if isinstance(py_versions, basestring):
+        py_versions = py_versions.split(':')
+    if isinstance(system_node, basestring):
+        system_node = system_node == 'yes'
+
     # Build source tarball
     with settings(system_node=system_node):
         print green('Generating '), cyan('tarball')
@@ -657,9 +662,6 @@ def package_release(py_versions=None, build_dir=None, system_node=False,
     """
     Create an Indico release - source and binary distributions
     """
-
-    DEVELOP_REQUIRES = ['pojson>=0.4', 'termcolor', 'werkzeug', 'nodeenv', 'fabric',
-                        'sphinx', 'repoze.sphinx.autointerface']
 
     py_versions = py_versions.split('/') if py_versions else env.py_versions
     upload_to = upload_to.split('/') if upload_to else []
@@ -694,9 +696,9 @@ def package_release(py_versions=None, build_dir=None, system_node=False,
                 local('git clone {0}'.format(upstream))
             with lcd('indico'):
                 print green("Checking out branch \'{0}\'".format(indico_version))
-                local('git checkout origin/{0}'.format(indico_version))
-
-                _package_release(os.path.join(build_dir, 'indico'), py_versions, system_node)
+                local('git checkout {0}'.format(indico_version))
+                local('fab _package_release:{},{},{}'.format(
+                    os.path.join(build_dir, 'indico'), ':'.join(py_versions), str(system_node).lower()))
 
     for u in upload_to:
         if u == 'github':
