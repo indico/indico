@@ -104,6 +104,9 @@ def _update_header(file_path, year, substring, regex, data):
     modified = False
     with open(file_path, 'r') as file_read:
         content = file_read.read()
+        if not content.strip():
+            print('{0} - empty'.format(file_path))
+            return
         for match in regex.finditer(content):
             if substring in match.group():
                 print('{0}[{1}-{2}]'.format(file_path, match.start(), match.end()))
