@@ -2,7 +2,7 @@
     "use strict";
 
     var default_i18n = new Jed({
-        locale_data: TRANSLATIONS,
+        locale_data: global.TRANSLATIONS,
         domain: "indico"
     });
 
@@ -15,7 +15,7 @@
 
     global.$T.domain = _.memoize(function(domain) {
         return new Jed({
-            locale_data: TRANSLATIONS,
+            locale_data: global.TRANSLATIONS,
             domain: domain
         });
     });
