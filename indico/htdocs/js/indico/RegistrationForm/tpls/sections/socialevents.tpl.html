@@ -22,29 +22,29 @@
                 type="checkbox" name="socialEvents" value="{{ item.id }}"
                 ng-model="selectedInputs[item.id]"
                 ng-required="section.mandatory && !anySelected()"
-                ng-disabled="!hasPlacesLeft(item, getNoPlaces(item), 'socialEvent') || paymentBlocked(item, userdata) "/>
+                ng-disabled="!hasPlacesLeft(item, getNoPlacesFromUserData(item), 'socialEvent') || paymentBlocked(item, userdata) "/>
             <input ng-switch-default
                 type="radio" name="socialEvents" value="{{ item.id }}"
                 ng-model="selectedRadioInput.id"
                 ng-required="section.mandatory && selectedRadioInput.id === undefined"
-                ng-disabled="!hasPlacesLeft(item, getNoPlaces(item), 'socialEvent') || paymentBlocked(item, userdata) || anyBillableEventPayed(userdata)"/>
+                ng-disabled="!hasPlacesLeft(item, getNoPlacesFromUserData(item), 'socialEvent') || paymentBlocked(item, userdata) || anyBillableEventPayed(userdata)"/>
             {{ item.caption }}
-            <span ng-if="!hasPlacesLeft(item, getNoPlaces(item), 'socialEvent')" class="noPlacesLeft">
+            <span ng-if="!hasPlacesLeft(item, getNoPlacesFromUserData(item), 'socialEvent')" class="noPlacesLeft">
                 ({{ 'no places left' | i18n }})
             </span>
         </td>
-        <td ng-if="hasPlacesLeft(item, getNoPlaces(item), 'socialEvent')">
+        <td ng-if="hasPlacesLeft(item, getNoPlacesFromUserData(item), 'socialEvent')">
             <select
                 ng-model="selectedPlaces[item.id]"
                 ng-disabled="paymentBlocked(item, userdata) || (section.selectionType == 'unique' && anyBillableEventPayed(userdata))"
                 ng-options="n for n in [] | range:1:getMaxRegistrations(item)">
             </select>
             <input type="hidden" name="places-{{ item.id }}" value="{{ selectedPlaces[item.id] || 1 }}">
-            <span ng-show="hasPlacesLimit(item, getNoPlaces(item), 'socialEvent')" class="placesLeft">
-                [{{ getNoPlacesLeft(item, getNoPlaces(item), 'socialEvent')}} {{ 'place(s) left' | i18n }}]
+            <span ng-show="hasPlacesLimit(item, getNoPlacesFromUserData(item), 'socialEvent')" class="placesLeft">
+                [{{ getPlacesLeft(item, 'socialEvent', getNoPlacesFromUserData(item), getNoPlaces(item))}} {{ 'place(s) left' | i18n }}]
             </span>
         </td>
-        <td ng-if="hasPlacesLeft(item, getNoPlaces(item), 'socialEvent') && isBillable(item)" align="right">
+        <td ng-if="hasPlacesLeft(item, getNoPlacesFromUserData(item), 'socialEvent') && isBillable(item)" align="right">
             <span class="regFormPrice">{{ item.price }}</span>
             <span ng-show="item.billable">
                 <nd-currency currency="currency"></nd-currency>

@@ -266,6 +266,14 @@ ndRegForm.directive("ndAccommodationSection", function($rootScope) {
             scope.buttons.config = true;
             scope.buttons.disable = true;
 
+            scope.accommodation = {};
+            scope.$watch('userdata.accommodation', function() {
+                if (scope.userdata.accommodation === undefined) return;
+                scope.accommodation.typeId = scope.userdata.accommodation.accommodationType.id;
+                scope.accommodation.arrivalDate = scope.userdata.accommodation.arrivalDate;
+                scope.accommodation.departureDate = scope.userdata.accommodation.departureDate;
+            });
+
             scope.billableOptionPayed = function(userdata) {
                 if (userdata.accommodation !== undefined) {
                     var accommodation = userdata.accommodation.accommodationType || {};
@@ -565,9 +573,9 @@ ndRegForm.directive("ndSocialEventSection", function() {
 
             scope.$watch('userdata.socialEvents', function() {
                 angular.forEach(scope.userdata.socialEvents, function(item){
-                    scope.selectedRadioInput['id'] = item.id;  // Used when radio buttons
+                    scope.selectedRadioInput.id = item.id;  // Used when radio buttons
                     scope.selectedInputs[item.id] = true;  // Used when checkboxes
-                    scope.selectedPlaces[item.id] = scope.getNoPlaces(item);
+                    scope.selectedPlaces[item.id] = scope.getNoPlacesFromUserData(item);
                 });
             });
 
@@ -579,7 +587,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
 
             scope.getMaxRegistrations = function(item) {
                 if (item.placesLimit !== 0) {
-                    return Math.min(item.maxPlace + 1, item.noPlacesLeft + scope.getNoPlaces(item));
+                    return Math.min(item.maxPlace + 1, item.noPlacesLeft + scope.getNoPlacesFromUserData(item));
                 } else {
                     return item.maxPlace + 1;
                 }
@@ -609,6 +617,17 @@ ndRegForm.directive("ndSocialEventSection", function() {
                 }
 
                 return false;
+            };
+
+            scope.getNoPlacesFromUserData = function(item) {
+                var e = _.find(scope.userdata.socialEvents, function(e) {
+                    return item.id == e.id;
+                });
+                if (e !== undefined) {
+                    return e.noPlaces;
+                } else {
+                   return 0;
+                }
             };
 
             scope.getNoPlaces = function(item) {
@@ -789,8 +808,8 @@ ndRegForm.directive('ndSectionDialog', function(url) {
 
 ndRegForm.filter('possibleDeparture', function () {
     return function (departure, scope) {
-        if (scope.input.arrival !== undefined) {
-            var arrival = moment(scope.input.arrival, 'DD/MM/YYY');
+        if (scope.accommodation.arrival !== undefined) {
+            var arrival = moment(scope.accommodation.arrival, 'DD/MM/YYY');
             var possibleDepartures = {};
             _.each(scope.section.departureDates, function(value, key) {
                 var departure = moment(key, 'DD/MM/YYY');

@@ -6,7 +6,7 @@
                 name="{{ getName(field.id) }}"
                 ng-model="checkboxValue"
                 ng-required="field.mandatory"
-                ng-disabled="!hasPlacesLeft(field, userdata[getName(field.id)], field.input) || paymentBlocked(field, userdata)"/>
+                ng-disabled="!hasPlacesLeft(field, getUserdataValue(), field.input) || paymentBlocked(field, userdata)"/>
             <div>
                 <label for="field-{{ section.id }}-{{ field.id }}"
                     ng-bind-html="field.caption"></label>
@@ -26,9 +26,9 @@
             <nd-currency currency="currency"></nd-currency>
         </span>
 
-        <span ng-if="hasPlacesLimit(field)" ng-switch="hasPlacesLeft(field, userdata[getName(field.id)], field.input)">
+        <span ng-if="hasPlacesLimit(field)" ng-switch="hasPlacesLeft(field, getUserdataValue(), field.input)">
             <span ng-switch-when="true" class="placesLeft">
-                [{{ getNoPlacesLeft(field, checkboxValue, field.input) }} {{ 'place(s) left' | i18n }}]
+                [{{ getPlacesLeft(field, field.input, getUserdataValue(), checkboxValue) }} {{ 'place(s) left' | i18n }}]
             </span>
             <span ng-switch-when="false" class="noPlacesLeft">
                 ({{ 'no places left' | i18n }})

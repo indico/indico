@@ -167,13 +167,38 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
 
         if ($scope.hasPlacesLimit(item)) {
             if ($scope.hasPlacesLeft(item, userValue, type)) {
-                str += ' [{0} {1}]'.format($scope.getNoPlacesLeft(item, userValue, type), $filter('i18n')('place(s) left'));
+                str += ' [{0} {1}]'.format($scope.getPlacesLeft(item, type, userValue), $filter('i18n')('place(s) left'));
             } else {
                 str += ' [{0}]'.format($filter('i18n')('no places left'));
             }
         }
 
         return str;
+    };
+
+    /*
+     * Returns the places a field has left taking into account its type, the
+     * the value the user selected initially, and the current selection on the
+     * page.
+     *
+     * :param item: the item to be checked
+     * :param type: the type of the item
+     * :param uservalue: previously selected value that adds up to the currently stored total places left
+     * :param selectedvalue: places selected currently selected substracting from the total places left
+     */
+    $scope.getPlacesLeft = function(item, type, uservalue, selectedvalue) {
+        var places = item.noPlacesLeft;
+        if (type === 'checkbox') {
+            if (uservalue) places += 1;
+            if (selectedvalue) places -= 1;
+        } else if (type === 'radio' || type === 'accommodation') {
+            if (uservalue === item.id) places += 1;
+            if (selectedvalue === item.id) places -= 1;
+        } else if (type === 'socialEvent') {
+            if (uservalue) places += uservalue;
+            if (selectedvalue) places -= selectedvalue;
+        }
+        return places;
     };
 
     $scope.isBillable = function(item) {
@@ -192,7 +217,7 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         if (!$scope.hasPlacesLimit(item)) {
             return true;
         } else {
-            return $scope.getNoPlacesLeft(item, userValue, type) > 0;
+            return $scope.getPlacesLeft(item, type, userValue) > 0;
         }
     };
 
@@ -215,20 +240,6 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
         } else {
             return $scope.isBillable(item) && userdata.paid;
         }
-    };
-
-    $scope.getNoPlacesLeft = function(item, userValue, type) {
-        var noPlaces = item.noPlacesLeft;
-        if (type === 'checkbox' && userValue) {
-            noPlaces -= 1;
-        } else if (type === 'radio' && item.id === userValue) {
-            noPlaces -= 1;
-        } else if (type === 'accomodation' && item.id === userValue) {
-            noPlaces -= 1;
-        } else if (type === 'socialEvent') {
-            noPlaces -= userValue;
-        }
-        return noPlaces;
     };
 });
 
@@ -270,8 +281,12 @@ ndRegForm.directive('ndCheckboxField', function(url) {
             scope.settings.formData.push('placesLimit');
 
             scope.$watch('userdata[fieldName]', function() {
-                scope.checkboxValue = scope.userdata[scope.fieldName] === 'yes';
+                scope.checkboxValue = scope.getUserdataValue();
             });
+
+            scope.getUserdataValue = function() {
+                return scope.userdata[scope.fieldName] === 'yes';
+            };
         }
     };
 });
@@ -399,8 +414,12 @@ ndRegForm.directive('ndRadioField', function(url) {
             scope.radioValue = {};
 
             scope.$watch('userdata[fieldName]', function(){
-                scope.radioValue['id'] = scope.getId(scope.getValue(scope.fieldName));
+                scope.radioValue.id = scope.getUserdataValue();
             });
+
+            scope.getUserdataValue = function() {
+                return scope.getId(scope.getValue(scope.fieldName));
+            };
 
             scope.getInputTpl = function(inputType) {
                 return url.tpl('fields/{0}.tpl.html'.format(inputType));

@@ -1,4 +1,4 @@
-<div ng-controller="BillableCtrl" ng-init="input = {}">
+<div ng-controller="BillableCtrl">
     <table cellspacing="0">
         <tr>
             <td align="left">
@@ -10,7 +10,7 @@
                     <select required
                         id="arrivalDate"
                         name="arrivalDate"
-                        ng-model="userdata.accommodation.arrivalDate"
+                        ng-model="accommodation.arrivalDate"
                         ng-class="{hasError: validationStarted && nestedFormArrival.$invalid}"
                         ng-options="s_date as l_date for (s_date, l_date) in section.arrivalDates"
                         ng-disabled="billableOptionPayed(userdata)">
@@ -19,7 +19,7 @@
                     <input type="hidden"
                         ng-if="billableOptionPayed(userdata)"
                         name="arrivalDate"
-                        value="{{ userdata.accommodation.arrivalDate }}"/>
+                        value="{{ accommodation.arrivalDate }}"/>
                 </ng-form>
             </td>
         </tr>
@@ -33,7 +33,7 @@
                     <select required
                         id="departureDate"
                         name="departureDate"
-                        ng-model="userdata.accommodation.departureDate"
+                        ng-model="accommodation.departureDate"
                         ng-class="{hasError: validationStarted && nestedFormDeparture.$invalid}"
                         ng-options="s_date as l_date for (s_date, l_date) in section.departureDates | possibleDeparture:this"
                         ng-disabled="billableOptionPayed(userdata)">
@@ -42,7 +42,7 @@
                     <input type="hidden"
                         ng-if="billableOptionPayed(userdata)"
                         name="departureDate"
-                        value="{{ userdata.accommodation.departureDate }}"/>
+                        value="{{ accommodation.departureDate }}"/>
                 </ng-form>
             </td>
         </tr>
@@ -67,32 +67,32 @@
                         id="{{ item.id }}"
                         name="accommodation_type"
                         value="{{ item.id }}"
-                        ng-model="userdata.accommodation.accommodationType.id"
-                        ng-disabled="isDisabled(item, userdata.accommodation.accommodationType.id, 'accomodation') || paymentBlocked(item, userdata) || billableOptionPayed(userdata)"
-                        ng-required="hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accomodation') && !item.cancelled"
+                        ng-model="accommodation.typeId"
+                        ng-disabled="isDisabled(item, userdata.accommodation.accommodationType.id, 'accommodation') || paymentBlocked(item, userdata) || billableOptionPayed(userdata)"
+                        ng-required="hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accommodation') && !item.cancelled"
                         />
                     {{ item.caption }}
 
-                    <font ng-if="item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accomodation')" color="red">
+                    <font ng-if="item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accommodation')" color="red">
                         ({{ 'currently not available' | i18n }})
                     </font>
                     <span ng-if="hasPlacesLimit(item)">
-                        <font ng-if="!item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accomodation')" color="red">
+                        <font ng-if="!item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accommodation')" color="red">
                             ({{ 'no places left' | i18n }})
                         </font>
-                        <font ng-if="!item.cancelled && hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accomodation')" color="green">
-                            [{{ getNoPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accomodation') }} {{ "place(s) left" | i18n }}]
+                        <font ng-if="!item.cancelled && hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accommodation')" color="green">
+                            [{{ getPlacesLeft(item, 'accommodation', userdata.accommodation.accommodationType.id, accommodation.typeId) }} {{ "place(s) left" | i18n }}]
                         </font>
                     </span>
                 </td>
                 <td align="right">
-                    <span ng-if="item.id == userdata.accommodation.accommodationType.id && userdata.accommodation.billable">
+                    <span ng-if="item.id == accommodation.typeId && userdata.accommodation.billable">
                         <span class="regFormPrice">{{ userdata.accommodation.price }}</span>
                         <nd-currency currency="currency"></nd-currency>
                         <span ng-if="item.billable">{{ "per night" | i18n }}</span>
                     </span>
 
-                    <span ng-if="item.id != userdata.accommodation.accommodationType.id && item.billable">
+                    <span ng-if="item.id != accommodation.typeId && item.billable">
                         <span class="regFormPrice">{{ item.price }}</span>
                         <nd-currency currency="currency"></nd-currency>
                         <span ng-if="item.billable">{{ "per night" | i18n }}</span>
@@ -103,6 +103,6 @@
         <input type="hidden"
             ng-if="billableOptionPayed(userdata)"
             name="accommodation_type"
-            value="{{ userdata.accommodation.accommodationType.id }}"/>
+            value="{{ accommodation.typeId }}"/>
     </ng-form>
 </div>
