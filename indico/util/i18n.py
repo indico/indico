@@ -15,9 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import ast
-import errno
 import traceback
-import os
 import re
 import textwrap
 import warnings
@@ -34,7 +32,6 @@ from speaklater import is_lazy_string, make_lazy_string
 
 from indico.core.config import Config
 from indico.core.db import DBMgr
-from indico.core.signals import after_process
 
 from MaKaC.common.info import HelperMaKaCInfo
 
@@ -309,20 +306,3 @@ def po_to_json(po_file, locale=None, domain=None):
     return {
         (po_data.domain or ''): messages
     }
-
-
-@after_process.connect
-def delete_old_i18n_cache(sender, **kwargs):
-    """
-    deletes old i18n files on startup
-    """
-    config = Config.getInstance()
-    for locale_name in get_all_locales():
-        file_path = os.path.join(config.getXMLCacheDir(), 'assets_i18n_{}.js'.format(locale_name))
-        if os.path.exists(file_path):
-            # file can be deleted many times in multi-process environment
-            try:
-                os.unlink(file_path)
-            except OSError, e:
-                if e.errno != errno.ENOENT:
-                    raise
