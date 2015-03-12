@@ -45,13 +45,7 @@ except ImportError:
     pass
 
 
-try:
-    INDICO_DIST = pkg_resources.get_distribution('indico')
-except pkg_resources.DistributionNotFound:
-    INDICO_DIST = None
-
-if INDICO_DIST:
-    LOCALE_DIR = INDICO_DIST.get_resource_filename('indico', 'indico/locale')
+LOCALE_DIR = os.path.join(os.path.dirname(__file__), '..', 'locale')
 
 LOCALE_DOMAIN = 'messages'
 RE_TR_FUNCTION = re.compile(r"_\(\"([^\"]*)\"\)|_\('([^']*)'\)", re.DOTALL | re.MULTILINE)
@@ -76,10 +70,7 @@ def getAllLocales():
     """
     List all available locales/translations
     """
-    if INDICO_DIST:
-        return [loc for loc in INDICO_DIST.resource_listdir('indico/locale') if '.' not in loc]
-    else:
-        return []
+    return [loc for loc in os.listdir(LOCALE_DIR) if '.' not in loc]
 
 
 availableLocales = getAllLocales()
