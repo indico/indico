@@ -78,13 +78,18 @@ def _column_names(constraint, table):
     return '_'.join((c if isinstance(c, basestring) else c.name) for c in constraint.columns)
 
 
+def _unique_index(constraint, table):
+    return 'uq_' if constraint.unique else ''
+
+
 naming_convention = {
     'fk': 'fk_%(table_name)s_%(column_names)s_%(referred_table_name)s',
     'pk': 'pk_%(table_name)s',
-    'ix': 'ix_%(table_name)s_%(column_names)s',
+    'ix': 'ix_%(unique_index)s%(table_name)s_%(column_names)s',
     'ck': 'ck_%(table_name)s_%(constraint_name)s',
     'uq': 'uq_%(table_name)s_%(column_names)s',
-    'column_names': _column_names
+    'column_names': _column_names,
+    'unique_index': _unique_index
 }
 
 db = IndicoSQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
