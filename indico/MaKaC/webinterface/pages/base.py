@@ -200,7 +200,7 @@ class WPBase():
             "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css),
             "extraJSFiles": map(self._fix_path, self.getJSFiles() + plugin_js),
             "extraJS": self._extraJS,
-            "language": session.lang,
+            "language": session.lang or info.getLang(),
             "social": info.getSocialAppConfig(),
             "assets": self._asset_env
         })
