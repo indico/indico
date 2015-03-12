@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from indico.util.i18n import _
+
 #some general functions
 def strfFileSize( sizeInBytes ):
     sizeInBytes = int(sizeInBytes)
