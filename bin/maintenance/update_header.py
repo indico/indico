@@ -118,7 +118,7 @@ def _update_header(file_path, year, substring, regex, data):
 
 def update_header(file_path, year):
     ext = file_path.rsplit('.', 1)[-1]
-    if ext not in SUPPORTED_FILES:
+    if ext not in SUPPORTED_FILES or not os.path.isfile(file_path):
         return
     _update_header(file_path, year, SUBSTRING, SUPPORTED_FILES[ext]['regex'], SUPPORTED_FILES[ext]['format'])
 
