@@ -268,8 +268,10 @@ ndRegForm.directive("ndAccommodationSection", function($rootScope) {
 
             scope.accommodation = {};
             scope.$watch('userdata.accommodation', function() {
-                if (scope.userdata.accommodation === undefined) return;
-                if (scope.userdata.accommodation.accommodationType === null) return;
+                if (scope.userdata.accommodation === undefined ||
+                    scope.userdata.accommodation.accommodationType === null) {
+                    return;
+                }
                 scope.accommodation.typeId = scope.userdata.accommodation.accommodationType.id;
                 scope.accommodation.arrivalDate = scope.userdata.accommodation.arrivalDate;
                 scope.accommodation.departureDate = scope.userdata.accommodation.departureDate;
@@ -627,7 +629,7 @@ ndRegForm.directive("ndSocialEventSection", function() {
                 if (e !== undefined) {
                     return e.noPlaces;
                 } else {
-                   return 0;
+                    return 0;
                 }
             };
 
