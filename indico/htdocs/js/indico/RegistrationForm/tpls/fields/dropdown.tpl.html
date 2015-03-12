@@ -12,10 +12,10 @@
         <option value="">-- {{ 'Choose a value' | i18n }} --</option>
         <option ng-repeat="item in field.values.radioitems | filter: {isEnabled: true}"
             value="{{ item.id }}"
-            ng-disabled="!hasPlacesLeft(item, getValue(fieldName), field.input) || paymentBlocked(item, userdata)"
+            ng-disabled="!hasPlacesLeft(item, getUserdataValue()) || paymentBlocked(item, userdata)"
             ng-selected="item.caption == getValue(fieldName)">
             {{ item.caption }}
-            {{ getBillableStr(item, input, field.input) }}
+            {{ getBillableStr(item, getUserdataValue()) }}
             </span>
         </option>
     </select>

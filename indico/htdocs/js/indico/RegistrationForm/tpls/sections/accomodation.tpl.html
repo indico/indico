@@ -68,20 +68,20 @@
                         name="accommodation_type"
                         value="{{ item.id }}"
                         ng-model="accommodation.typeId"
-                        ng-disabled="isDisabled(item, userdata.accommodation.accommodationType.id, 'accommodation') || paymentBlocked(item, userdata) || billableOptionPayed(userdata)"
-                        ng-required="hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accommodation') && !item.cancelled"
+                        ng-disabled="isDisabled(item, userdata.accommodation.accommodationType.id) || paymentBlocked(item, userdata) || billableOptionPayed(userdata)"
+                        ng-required="hasPlacesLeft(item, userdata.accommodation.accommodationType.id) && !item.cancelled"
                         />
                     {{ item.caption }}
 
-                    <font ng-if="item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accommodation')" color="red">
+                    <font ng-if="item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id)" color="red">
                         ({{ 'currently not available' | i18n }})
                     </font>
                     <span ng-if="hasPlacesLimit(item)">
-                        <font ng-if="!item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accommodation')" color="red">
+                        <font ng-if="!item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id)" color="red">
                             ({{ 'no places left' | i18n }})
                         </font>
-                        <font ng-if="!item.cancelled && hasPlacesLeft(item, userdata.accommodation.accommodationType.id, 'accommodation')" color="green">
-                            [{{ getPlacesLeft(item, 'accommodation', userdata.accommodation.accommodationType.id, accommodation.typeId) }} {{ "place(s) left" | i18n }}]
+                        <font ng-if="!item.cancelled && hasPlacesLeft(item, userdata.accommodation.accommodationType.id)" color="green">
+                            [{{ getPlacesLeft(item, userdata.accommodation.accommodationType.id, accommodation.typeId) }} {{ "place(s) left" | i18n }}]
                         </font>
                     </span>
                 </td>

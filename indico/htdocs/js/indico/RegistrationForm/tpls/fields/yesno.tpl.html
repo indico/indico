@@ -3,16 +3,15 @@
         <select
             id="field-{{ section.id }}-{{ field.id }}"
             name="{{ fieldName }}"
-            ng-model="userdata[fieldName]"
             ng-required="field.mandatory || paymentBlocked(field, userdata) == false"
             ng-disabled="paymentBlocked(field, userdata)"
             ng-class="{hasError: validationStarted && nestedForm.$invalid}">
             <option value="">-- {{ 'Choose a value' | i18n }} --</option>
             <option value="yes"
-                ng-disabled="!hasPlacesLeft(field, userdata[fieldName], 'checkbox')"
+                ng-disabled="!hasPlacesLeft(field, userdata[fieldName])"
                 ng-selected="userdata[fieldName] === 'yes'">
                 {{ 'yes' | i18n }}
-                {{ getBillableStr(field, userdata[fieldName], 'checkbox') }}
+                {{ getBillableStr(field, userdata[fieldName]) }}
             </option>
             <option value="no"
                 ng-selected="userdata[fieldName] === 'no'">
