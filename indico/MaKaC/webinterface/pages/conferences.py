@@ -682,9 +682,13 @@ class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
         return wc.getHTML(pars)
 
     def _getHeadContent(self):
-        printCSS = WPConferenceDefaultDisplayBase._getHeadContent(self)
-        confMetadata = WConfMetadata(self._conf).getHTML()
-        return printCSS + confMetadata
+        return '\n'.join([
+            WPConferenceDefaultDisplayBase._getHeadContent(self),  # printCss
+            WConfMetadata(self._conf).getHTML(),                   # confMetadata
+            render('js/mathjax.config.js.tpl'),                    # mathJax
+            '\n'.join('<script src="{0}" type="text/javascript"></script>'.format(url)
+                      for url in self._asset_env['mathjax_js'].urls())
+        ])
 
     def _getFooter(self):
         wc = wcomponents.WEventFooter(self._conf)
