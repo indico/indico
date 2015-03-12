@@ -75,7 +75,7 @@ def _mapper_configured(mapper, class_):
 
 
 def _column_names(constraint, table):
-    return '_'.join(c.name for c in constraint.columns)
+    return '_'.join((c if isinstance(c, basestring) else c.name) for c in constraint.columns)
 
 
 naming_convention = {
