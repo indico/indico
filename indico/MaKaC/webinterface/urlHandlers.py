@@ -2984,24 +2984,6 @@ class UHConfModifPosterPrintingPDF(URLHandler):
     _endpoint = 'event_mgmt.confModifTools-posterPrintingPDF'
 
 
-class UHJsonRpcService(OptionallySecureURLHandler):
-    _endpoint = 'api.jsonrpc'
-
-    @classmethod
-    def getStaticURL(cls, target=None, **params):
-        return ""
-
-
-class UHAPIExport(OptionallySecureURLHandler):
-    _endpoint = 'api.httpapi'
-    _defaultParams = dict(prefix='export')
-
-
-class UHAPIAPI(OptionallySecureURLHandler):
-    _endpoint = 'api.httpapi'
-    _defaultParams = dict(prefix='api')
-
-
 ############
 #Evaluation# DISPLAY AREA
 ############
