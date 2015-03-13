@@ -19,9 +19,10 @@ from flask import current_app as app
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import DBMgr
+from indico.util.i18n import _
+from indico.web.flask.blueprints.event.display import event
 from MaKaC.webinterface.rh import conferenceDisplay
 from MaKaC.webinterface.urlHandlers import UHConferenceDisplay
-from indico.web.flask.blueprints.event.display import event
 
 
 def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
