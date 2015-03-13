@@ -1678,12 +1678,20 @@ class ConferenceExportURLs(ConferenceDisplayBase, ExportToICalBase):
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
-        urls = generate_public_auth_request(self._apiMode, self._apiKey, '/export/event/%s.ics'%self._target.getId(), {}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
+        urls = generate_public_auth_request(
+            self._apiMode, self._apiKey, '/export/event/%s.ics' % self._target.getId(), {},
+            minfo.isAPIPersistentAllowed() and self._apiKey.is_persistent_allowed,
+            minfo.isAPIHTTPSRequired()
+        )
         result["publicRequestURL"] = urls["publicRequestURL"]
-        result["authRequestURL"] =  urls["authRequestURL"]
-        urls = generate_public_auth_request(self._apiMode, self._apiKey, '/export/event/%s.ics'%self._target.getId(), {'detail': "contribution"}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
+        result["authRequestURL"] = urls["authRequestURL"]
+        urls = generate_public_auth_request(
+            self._apiMode, self._apiKey, '/export/event/%s.ics' % self._target.getId(), {'detail': 'contribution'},
+            minfo.isAPIPersistentAllowed() and self._apiKey.is_persistent_allowed,
+            minfo.isAPIHTTPSRequired()
+        )
         result["publicRequestDetailedURL"] = urls["publicRequestURL"]
-        result["authRequestDetailedURL"] =  urls["authRequestURL"]
+        result["authRequestDetailedURL"] = urls["authRequestURL"]
         return result
 
 class ConferenceOfflineAddTask(ConferenceModifBase):

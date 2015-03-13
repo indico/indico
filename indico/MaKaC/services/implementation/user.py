@@ -35,10 +35,11 @@ from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from indico.core.config import Config
+from indico.core.db import db
+from indico.modules.api.models.keys import APIKey
 from indico.util.i18n import _, get_all_locales, set_session_lang
 from indico.util.redis import avatar_links
 from indico.web.flask.util import url_for
-from indico.web.http_api.auth import APIKey
 
 
 class UserComparator(object):
@@ -590,13 +591,15 @@ class UserSetPersistentSignatures(UserModifyBase):
 
     def _checkParams(self):
         UserModifyBase._checkParams(self)
-        if self._target == None:
-            raise ServiceAccessError((_("The user with does not exist")))
+        if self._target is None:
+            raise ServiceAccessError(_("The user does not exist"))
 
     def _getAnswer(self):
-        ak = self._target.getAPIKey()
-        ak.setPersistentAllowed(not ak.isPersistentAllowed())
-        return ak.isPersistentAllowed()
+        ak = self._target.api_key
+        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
+        if minfo.isAPIPersistentAllowed():
+            ak.is_persistent_allowed = not ak.is_persistent_allowed
+        return ak.is_persistent_allowed
 
 
 class UserCreateKeyEnablePersistent(LoggedOnlyService):
@@ -607,12 +610,13 @@ class UserCreateKeyEnablePersistent(LoggedOnlyService):
         pm = ParameterManager(self._params)
         self._enablePersistent = pm.extract("enablePersistent", bool, False, False)
 
-    def _getAnswer( self):
+    def _getAnswer(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        ak = APIKey(self._avatar)
-        ak.create()
-        if minfo.isAPIPersistentAllowed() and self._enablePersistent:
-            ak.setPersistentAllowed(True)
+        ak = APIKey(user=self._avatar)
+        if self._enablePersistent and minfo.isAPIPersistentAllowed():
+            ak.is_persistent_allowed = True
+        db.session.add(ak)
+        db.session.flush()
         return True
 
 

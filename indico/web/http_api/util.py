@@ -50,8 +50,8 @@ def generate_public_auth_request(apiMode, apiKey, path, params={}, persistent=Fa
     from indico.web.http_api import API_MODE_KEY, API_MODE_ONLYKEY, API_MODE_SIGNED, \
         API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 
-    key = apiKey.getKey() if apiKey else None
-    secret_key = apiKey.getSignKey() if apiKey else None
+    key = apiKey.token if apiKey else None
+    secret_key = apiKey.secret if apiKey else None
     if https:
         baseURL = Config.getInstance().getBaseSecureURL()
     else:

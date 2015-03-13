@@ -419,15 +419,15 @@ class WConferenceHeader(WHeader):
         vars["apiMode"] = apiMode
         vars["signingEnabled"] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
         vars["persistentAllowed"] = minfo.isAPIPersistentAllowed()
-        user  = self._aw.getUser()
-        apiKey = user.getAPIKey() if user else None
+        user = self._aw.getUser()
+        apiKey = user.api_key if user else None
 
         topURLs = generate_public_auth_request(apiMode, apiKey, '/export/event/%s.ics' % \
             self._conf.getId(), {}, minfo.isAPIPersistentAllowed() and \
-            (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
+            (apiKey.is_persistent_allowed if apiKey else False), minfo.isAPIHTTPSRequired())
         urls = generate_public_auth_request(apiMode, apiKey, '/export/event/%s.ics' % \
             self._conf.getId(), {'detail': 'contributions'}, minfo.isAPIPersistentAllowed() and \
-            (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
+            (apiKey.is_persistent_allowed if apiKey else False), minfo.isAPIHTTPSRequired())
 
         vars["requestURLs"] = {
             'publicRequestURL': topURLs["publicRequestURL"],
@@ -436,9 +436,9 @@ class WConferenceHeader(WHeader):
             'authRequestDetailedURL':  urls["authRequestURL"]
         }
 
-        vars["persistentUserEnabled"] = apiKey.isPersistentAllowed() if apiKey else False
-        vars["apiActive"] = apiKey != None
-        vars["userLogged"] = user != None
+        vars["persistentUserEnabled"] = apiKey.is_persistent_allowed if apiKey else False
+        vars["apiActive"] = apiKey is not None
+        vars["userLogged"] = user is not None
         vars['apiKeyUserAgreement'] = minfo.getAPIKeyUserAgreement()
         vars['apiPersistentUserAgreement'] = minfo.getAPIPersistentUserAgreement()
 

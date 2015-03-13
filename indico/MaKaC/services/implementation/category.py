@@ -338,9 +338,13 @@ class CategoryExportURLs(CategoryDisplayBase, ExportToICalBase):
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
 
-        urls = generate_public_auth_request(self._apiMode, self._apiKey, '/export/categ/%s.ics'%self._target.getId(), {}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
+        urls = generate_public_auth_request(
+            self._apiMode, self._apiKey, '/export/categ/%s.ics' % self._target.getId(), {},
+            minfo.isAPIPersistentAllowed() and self._apiKey.is_persistent_allowed,
+            minfo.isAPIHTTPSRequired()
+        )
         result["publicRequestURL"] = urls["publicRequestURL"]
-        result["authRequestURL"] =  urls["authRequestURL"]
+        result["authRequestURL"] = urls["authRequestURL"]
         return result
 
 class CategoryProtectionToggleDomains(CategoryModifBase):

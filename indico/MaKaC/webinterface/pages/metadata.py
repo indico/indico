@@ -31,10 +31,13 @@ class WICalExportBase(wcomponents.WTemplated):
     def _getIcalExportParams(self, user, url, params = {}):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         apiMode = minfo.getAPIMode()
-        apiKey = user.getAPIKey() if user else None
+        apiKey = user.api_key if user else None
 
-        urls = generate_public_auth_request(apiMode, apiKey, url, params,
-            minfo.isAPIPersistentAllowed() and (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
+        urls = generate_public_auth_request(
+            apiMode, apiKey, url, params,
+            minfo.isAPIPersistentAllowed() and (apiKey.is_persistent_allowed if apiKey else False),
+            minfo.isAPIHTTPSRequired()
+        )
 
         return {
             'currentUser': user,
@@ -43,9 +46,9 @@ class WICalExportBase(wcomponents.WTemplated):
             'signingEnabled': apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED),
             'persistentAllowed': minfo.isAPIPersistentAllowed(),
             'requestURLs': urls,
-            'persistentUserEnabled': apiKey.isPersistentAllowed() if apiKey else False,
-            'apiActive': apiKey != None,
-            'userLogged': user != None,
+            'persistentUserEnabled': apiKey.is_persistent_allowed if apiKey else False,
+            'apiActive': apiKey is not None,
+            'userLogged': user is not None,
             'apiKeyUserAgreement': minfo.getAPIKeyUserAgreement(),
             'apiPersistentUserAgreement': minfo.getAPIPersistentUserAgreement()
         }

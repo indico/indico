@@ -486,9 +486,9 @@ class ExportToICalBase(object):
         user = self._getUser()
         if not user:
             raise ServiceAccessError("User is not logged in!")
-        apiKey = user.getAPIKey()
+        apiKey = user.api_key
         if not apiKey:
             raise ServiceAccessError("User has no API key!")
-        elif apiKey.isBlocked():
+        elif apiKey.is_blocked:
             raise ServiceAccessError("This API key is blocked!")
         self._apiKey = apiKey

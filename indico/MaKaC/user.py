@@ -470,15 +470,11 @@ class Avatar(Persistent, Fossilizable):
     def getKey(self):
         return self.key
 
-    def getAPIKey(self):
-        try:
-            return self.apiKey
-        except:
-            self.apiKey = None
-            return self.apiKey
-
-    def setAPIKey(self, apiKey):
-        self.apiKey = apiKey
+    @property
+    @memoize_request
+    def api_key(self):
+        from indico.modules.api.models.keys import APIKey
+        return APIKey.find_first(user_id=int(self.id), is_active=True)
 
     def getRelatedCategories(self):
         favorites = self.getLinkTo('category', 'favorite')
