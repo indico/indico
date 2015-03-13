@@ -14,7 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.web.http_api.auth import APIKey, APIKeyHolder
+from indico.core.db import db
+from indico.modules.api.models.keys import APIKey
 from indico.web.http_api import API_MODES
 from MaKaC.webinterface.rh.users import RHUserBase
 from MaKaC.webinterface.rh.services import RHServicesBase
@@ -22,32 +23,33 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.api import WPUserAPI, WPAdminAPIOptions, WPAdminAPIKeys
 from MaKaC.errors import AccessError, FormValuesError
 
+
 class RHUserAPI(RHUserBase):
     def _process(self):
         p = WPUserAPI(self, self._avatar)
         return p.display()
 
+
 class RHUserAPICreate(RHUserBase):
     def _checkProtection(self):
         RHUserBase._checkProtection(self)
-        ak = self._avatar.getAPIKey()
-        if ak and ak.isBlocked():
+        ak = self._avatar.api_key
+        if ak and ak.is_blocked:
             raise AccessError()
 
     def _process(self):
-        ak = self._avatar.getAPIKey()
-        if not ak:
-            ak = APIKey(self._avatar)
-            ak.create()
-        else:
-            ak.newKey()
-            ak.newSignKey()
+        old_ak = self._avatar.api_key
+        ak = APIKey(user=self._avatar)
+        if old_ak:
+            old_ak.is_active = False
+            ak.is_persistent_allowed = old_ak.is_persistent_allowed
+        db.session.add(ak)
         self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))
+
 
 class RHUserAPIBlock(RHUserBase):
     def _checkParams(self, params):
         RHUserBase._checkParams(self, params)
-        self._ak = self._avatar.getAPIKey()
 
     def _checkProtection(self):
         RHUserBase._checkProtection(self)
@@ -55,13 +57,14 @@ class RHUserAPIBlock(RHUserBase):
             raise AccessError()
 
     def _process(self):
-        self._ak.setBlocked(not self._ak.isBlocked())
+        ak = self._avatar.api_key
+        ak.is_blocked = not ak.is_blocked
         self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))
+
 
 class RHUserAPIDelete(RHUserBase):
     def _checkParams(self, params):
         RHUserBase._checkParams(self, params)
-        self._ak = self._avatar.getAPIKey()
 
     def _checkProtection(self):
         RHUserBase._checkProtection(self)
@@ -69,7 +72,7 @@ class RHUserAPIDelete(RHUserBase):
             raise AccessError()
 
     def _process(self):
-        self._ak.remove()
+        self._avatar.api_key.is_active = False
         self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))
 
 
@@ -77,6 +80,7 @@ class RHAdminAPIOptions(RHServicesBase):
     def _process(self):
         p = WPAdminAPIOptions(self)
         return p.display()
+
 
 class RHAdminAPIOptionsSet(RHServicesBase):
     def _checkParams(self, params):
@@ -110,6 +114,7 @@ class RHAdminAPIOptionsSet(RHServicesBase):
         self._minfo.setAPIKeyUserAgreement(self._apiKeyUserAgreement)
         self._minfo.setAPIPersistentUserAgreement(self._apiPersistentUserAgreement)
         self._redirect(urlHandlers.UHAdminAPIOptions.getURL())
+
 
 class RHAdminAPIKeys(RHServicesBase):
     def _process(self):

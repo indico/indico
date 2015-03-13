@@ -7,8 +7,8 @@
     <tr>
         <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("API Key")}</span></td>
         <td class="blacktext">
-            ${apiKey.getKey() if apiKey else _('None')}
-            % if apiKey and apiKey.isBlocked():
+            ${apiKey.token if apiKey else _('None')}
+            % if apiKey and apiKey.is_blocked:
                 <span class="warningText">Blocked ${inlineContextHelp(_('Your API key has been blocked. Please contact an administrator for details.'))}</span>
             % endif
         </td>
@@ -17,33 +17,33 @@
         <tr>
             <td class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Secret Key")}</span></td>
             <td class="blacktext">
-                ${apiKey.getSignKey() if apiKey else _('None')}
+                ${apiKey.secret if apiKey else _('None')}
             </td>
         </tr>
     % endif
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Created")}</span></td>
         <td class="blacktext">
-            ${formatDateTime(apiKey.getCreatedDT()) if apiKey else _('n/a')}
+            ${formatDateTime(apiKey.created_dt) if apiKey else _('n/a')}
         </td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Last used")}</span></td>
         <td class="blacktext">
-            ${apiKey.getLastUsedDT() and formatDateTime(apiKey.getLastUsedDT()) or _('Never') if apiKey else _('n/a')}
+            ${apiKey.last_used_dt and formatDateTime(apiKey.last_used_dt) or _('Never') if apiKey else _('n/a')}
         </td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Last used by")}</span></td>
         <td class="blacktext">
-            ${apiKey.getLastUsedIP() or _('n/a') if apiKey else _('n/a')}
+            ${apiKey.last_used_ip or _('n/a') if apiKey else _('n/a')}
         </td>
     </tr>
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Last request")}</span></td>
         <td class="blacktext">
-            % if apiKey and apiKey.getLastRequest():
-                ${escape(apiKey.getLastRequest())} (${_('Authenticated') if apiKey.isLastUseAuthenticated() else 'Public'})
+            % if apiKey and apiKey.last_used_uri:
+                ${escape(apiKey.last_used_uri)} (${_('Authenticated') if apiKey.last_used_auth else 'Public'})
             % else:
                 ${_('n/a')}
             % endif
@@ -52,23 +52,23 @@
     <tr>
         <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Total uses")}</span></td>
         <td class="blacktext">
-            ${apiKey.getUseCount() if apiKey else _('n/a')}
+            ${apiKey.use_count if apiKey else _('n/a')}
         </td>
     </tr>
-    % if not apiKey or not apiKey.isBlocked():
+    % if not apiKey or not apiKey.is_blocked:
         <tr>
             <td></td>
             <td>
                 % if not apiKey:
                     <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" style="display: inline;">
-                        <input type="submit" id="createAPIKey" value="${_('Create API key')}" />
+                        <input type="submit" id="createAPIKey" value="${_('Create API key')}">
                     </form>
                 % else:
                     <form action="${urlHandlers.UHUserAPICreate.getURL(avatar)}" method="POST" style="display: inline;">
-                        <input type="submit" id="createNewAPIKey" value="${_('Create a new API key pair')}" />
+                        <input type="submit" id="createNewAPIKey" value="${_('Create a new API key pair')}">
                     </form>
                     % if persistentAllowed:
-                         <input type="submit" id="enablePersistentSignatures" data-enabled="${'1' if apiKey.isPersistentAllowed() else '0'}" value="${(_('Disable') if apiKey.isPersistentAllowed() else _('Enable')) + _(' persistent signatures')}" />
+                         <input type="submit" id="enablePersistentSignatures" data-enabled="${'1' if apiKey.is_persistent_allowed else '0'}" value="${(_('Disable') if apiKey.is_persistent_allowed else _('Enable')) + _(' persistent signatures')}" />
                          <div style="display:inline;" id="progressPersistentSignatures"></div>
                     % endif
                 % endif
@@ -87,7 +87,7 @@
                 <td></td>
                 <td>
                     <form action="${urlHandlers.UHUserAPIBlock.getURL(avatar)}" method="POST" style="display:inline;">
-                        <input type="submit" value="${_('Unblock API key') if apiKey.isBlocked() else _('Block API key')}" />
+                        <input type="submit" value="${_('Unblock API key') if apiKey.is_blocked else _('Block API key')}">
                     </form>
 
                     <form action="${urlHandlers.UHUserAPIDelete.getURL(avatar)}" method="POST" style="display:inline;">
@@ -98,10 +98,10 @@
             <tr>
                  <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Old keys") }</span></td>
                  <td class="blacktext">
-                    % if apiKey.getOldKeys():
+                    % if old_keys:
                         <ul>
-                            % for key in apiKey.getOldKeys():
-                                <li>${key}</li>
+                            % for key in old_keys:
+                                <li>${key.token} (${_('used {} times').format(key.use_count)})</li>
                             % endfor
                         </ul>
                     % else:
@@ -139,10 +139,10 @@
                         }
                     });
             }
-        }
+        };
         new ConfirmPopup($T("Persistent signatures"), Html.div({style: {width: '350px'}},$(this).data("enabled") == "1" ? disableText : enableText), confirmHandler).open();
     });
-% if not apiKey or not apiKey.isBlocked():
+% if not apiKey or not apiKey.is_blocked:
     % if not apiKey:
     $("#createAPIKey").click(function(){
         var self = this;
@@ -168,7 +168,7 @@
 % if apiKey and isAdmin:
     $("#deleteAPIKey").click(function(){
         var self = this;
-        new ConfirmPopup($T("Delete API Key"),$T("Do you really want to DELETE the API key? The user will be able to create a new key, but all history will be lost."), function(confirmed) {
+        new ConfirmPopup($T("Delete API Key"),$T("Do you really want to delete the API key? The user will be able to create a new key."), function(confirmed) {
             if(confirmed) {
                 $(self).closest("form").submit();
             }

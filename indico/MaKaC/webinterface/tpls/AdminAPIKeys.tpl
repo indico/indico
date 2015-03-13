@@ -20,13 +20,13 @@
                 <tbody>
                     % for key in apiKeys:
                         <tr>
-                            <td>${key.getUser().getFullName()}</td>
-                            <td>${key.getUseCount()}</td>
-                            <td>${formatDateTime(key.getLastUsedDT()) if key.getLastUsedDT() else _('Never')}</td>
-                            <td>${_('Yes') if key.isBlocked() else _('No')}</td>
-                            <td>${ key.getKey() }</td>
+                            <td>${key.user.getFullName()}</td>
+                            <td>${key.use_count}</td>
+                            <td>${formatDateTime(key.last_used_dt) if key.last_used_dt else _('Never')}</td>
+                            <td>${_('Yes') if key.is_blocked else _('No')}</td>
+                            <td>${ key.token }</td>
                             <td>
-                                <a href="${urlHandlers.UHUserAPI.getURL(key.getUser())}">${_('Details')}</a>
+                                <a href="${urlHandlers.UHUserAPI.getURL(key.user)}">${_('Details')}</a>
                             </td>
                         </tr>
                     % endfor

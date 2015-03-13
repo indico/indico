@@ -13,12 +13,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from operator import attrgetter
 
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface.pages.admins import WPPersonalArea, WPServicesCommon
 from MaKaC.webinterface.wcomponents import WTemplated
-from indico.web.http_api.auth import APIKeyHolder
+from indico.modules.api.models.keys import APIKey
 from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 
 
@@ -41,7 +40,9 @@ class WUserAPI(WTemplated):
         apiMode = minfo.getAPIMode()
         vars = WTemplated.getVars(self)
         vars['avatar'] = self._avatar
-        vars['apiKey'] = self._avatar.getAPIKey()
+        vars['apiKey'] = self._avatar.api_key
+        old_keys = APIKey.find(user_id=self._avatar.id, is_active=False).order_by(APIKey.created_dt.desc()).all()
+        vars['old_keys'] = old_keys
         vars['isAdmin'] = self._rh._getUser().isAdmin()
         vars['signingEnabled'] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
         vars['persistentAllowed'] = minfo.isAPIPersistentAllowed()
@@ -91,6 +92,5 @@ class WAdminAPIKeys(WTemplated):
 
     def getVars(self):
         vars = WTemplated.getVars(self)
-        akh = APIKeyHolder()
-        vars['apiKeys'] = sorted(akh.getList(), key=lambda ak: ak.getUser().getFullName())
+        vars['apiKeys'] = sorted(APIKey.find_all(is_active=True), key=lambda ak: ak.user.getFullName())
         return vars
