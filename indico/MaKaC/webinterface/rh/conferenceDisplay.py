@@ -54,9 +54,10 @@ from indico.util.contextManager import ContextManager
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.hooks.event import CategoryEventHook
 from indico.web.flask.util import send_file
-from indico.util.contextManager import ContextManager
-from indico.util.i18n import i18nformat, set_best_lang
-from MaKaC.PDFinterface.base import LatexRunner
+from indico.core import signals
+from indico.util.i18n import set_best_lang
+from indico.util.signals import values_from_signal
+
 
 class RHConfSignIn( conferenceBase.RHConferenceBase, RHSignInBase):
 
@@ -344,6 +345,12 @@ class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
 
 class RHConferenceDisplay(RHConferenceBaseDisplay):
     _uh = urlHandlers.UHConferenceDisplay
+
+    def _checkProtection(self):
+        # check users allowed by plugins
+        if any(values_from_signal(signals.event.core.has_read_access.send(self._conf, user=session.user))):
+            return
+        RHConferenceBaseDisplay._checkProtection(self)
 
     def _process( self ):
         params = self._getRequestParams()
