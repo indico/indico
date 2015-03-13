@@ -28,7 +28,7 @@ import MaKaC
 import xml.sax.saxutils
 
 from indico.util.date_time import format_number, format_datetime, format_date, format_time
-from indico.util.i18n import ngettext, _
+from indico.util.i18n import ngettext
 from indico.util.contextManager import ContextManager
 from indico.util.mdx_latex import latex_escape
 from indico.util.string import safe_upper

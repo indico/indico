@@ -33,6 +33,7 @@ from indico.core.logger import Logger
 from MaKaC.common.utils import formatTime, formatDateTime
 import MaKaC.webinterface.wcomponents as wcomponents
 
+from indico.util.i18n import _
 from indico.modules import Module
 
 
