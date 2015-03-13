@@ -15,11 +15,6 @@
     <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
 
-    <script>
-        var currentLanguage = {{ session.lang | tojson }};
-        loadDictionary(currentLanguage);
-    </script>
-
     {% assets 'base_css', 'screen_sass' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
     {% endassets %}

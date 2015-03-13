@@ -98,6 +98,7 @@
 
 <script>
 $(document).ready(function(){
+    var currentLanguage = ${ _session.lang | n,j };
 
     /* Time formatting */
     if (currentLanguage === "fr_FR") {
