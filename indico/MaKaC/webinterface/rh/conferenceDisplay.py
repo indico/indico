@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 from datetime import datetime
-from flask import session, redirect
+from flask import session
 import os
 import re
 import pytz
@@ -28,7 +28,7 @@ import MaKaC.webinterface.displayMgr as displayMgr
 import MaKaC.webinterface.internalPagesMgr as internalPagesMgr
 import MaKaC.user as user
 import MaKaC.webinterface.mail as mail
-from MaKaC.webinterface.pages.errors import WPAccessError, WPError404
+from MaKaC.webinterface.pages.errors import WPError404
 import MaKaC.conference as conference
 from indico.core.config import Config
 from indico.core.db import DBMgr
@@ -39,7 +39,7 @@ from MaKaC.webinterface.rh.login import RHSignInBase, RHResetPasswordBase
 import MaKaC.common.filters as filters
 import MaKaC.webinterface.common.contribFilters as contribFilters
 from MaKaC.errors import MaKaCError, NoReportError, NotFoundError
-from MaKaC.PDFinterface.conference import TimeTablePlain,AbstractBook, SimplifiedTimeTablePlain, TimetablePDFFormat
+from MaKaC.PDFinterface.conference import TimeTablePlain, AbstractBook, SimplifiedTimeTablePlain, TimetablePDFFormat
 from MaKaC.common.contribPacker import ConferencePacker, ZIPFileHandler
 import zipfile
 from cStringIO import StringIO
@@ -47,10 +47,8 @@ from MaKaC.i18n import _
 
 import MaKaC.common.timezoneUtils as timezoneUtils
 from reportlab.platypus.doctemplate import LayoutError
-from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
-from indico.util.contextManager import ContextManager
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.hooks.event import CategoryEventHook
 from indico.web.flask.util import send_file
