@@ -24,18 +24,18 @@ class MockAvatarHolder:
 
     @classmethod
     def add(cls, avatar):
-        if avatar.id in cls._avatars:
+        if str(avatar.id) in cls._avatars:
             __tracebackhide__ = True
             raise Exception("Avatar '{}' already exists".format(avatar.id))
-        cls._avatars[avatar.id] = avatar
+        cls._avatars[str(avatar.id)] = avatar
 
     @classmethod
     def remove(cls, avatar):
-        del cls._avatars[avatar.id]
+        del cls._avatars[str(avatar.id)]
 
     @classmethod
     def getById(cls, id_):
-        return cls._avatars.get(id_)
+        return cls._avatars.get(str(id_))
 
 
 class MockAvatar(object):
