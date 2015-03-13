@@ -47,7 +47,7 @@ class RHCategModifBase( RHModificationBaseProtected ):
         self._target = l.getObject()
         if self._target is None:
             raise NotFoundError(_("The category with id '{}' does not exist or has been deleted").format(
-                                "<strong>{}</strong>".format(params["categId"])),
+                                params["categId"]),
                                 title=_("Category not found"))
 
 

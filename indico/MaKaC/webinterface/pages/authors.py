@@ -45,8 +45,7 @@ class WAuthorDisplay( wcomponents.WTemplated ):
         vars = wcomponents.WTemplated.getVars(self)
         authorObj = self._contrib.getAuthorById(self._authorId)
 
-        not_found = NotFoundError(_("No author with id {} was found").format(
-                                  "<strong>{}</strong>".format(self._authorId)),
+        not_found = NotFoundError(_("No author with id {} was found").format(self._authorId),
                                   title=_("Author not found"))
 
         if authorObj is None:

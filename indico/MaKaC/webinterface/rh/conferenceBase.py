@@ -121,7 +121,7 @@ class RHMaterialBase(RHConferenceSite):
         self._material = self._target = l.getObject()
         if self._material is None:
             raise NotFoundError(_("The material you are trying to access does not exist or was removed").format(
-                                "<strong>{}</strong>".format(params['confId'])),
+                                params['confId']),
                                 title=_("Resource not found"))
 
         self._conf = self._material.getConference()

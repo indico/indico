@@ -63,7 +63,7 @@ class RHCategDisplayBase(base.RHDisplayBaseProtected):
         # throw an error if the category was not found
         if mustExist and self._target is None:
             raise NotFoundError(_("The category with id '{}' does not exist or has been deleted").format(
-                                "<strong>{}</strong>".format(params["categId"])),
+                                params["categId"]),
                                 title=_("Category not found"))
 
 

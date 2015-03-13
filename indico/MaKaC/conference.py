@@ -4868,8 +4868,7 @@ class ConferenceHolder( ObjectHolder ):
         elif quiet:
             return None
         else:
-            raise NotFoundError(_("The event with id '{}' does not exist or has been deleted").format(
-                                "<strong>{}</strong>".format(id)),
+            raise NotFoundError(_("The event with id '{}' does not exist or has been deleted").format(id),
                                 title=_("Event not found"))
 
 
