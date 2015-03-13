@@ -73,14 +73,14 @@
                         />
                     {{ item.caption }}
 
-                    <span ng-if="item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id)" style="color: red;">
+                    <span class="unavailable-text" ng-if="item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id)">
                         ({{ 'currently not available' | i18n }})
                     </span>
                     <span ng-if="hasPlacesLimit(item)">
-                        <span ng-if="!item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id)" style="color: red;">
+                        <span class="unavailable-text" ng-if="!item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id)">
                             ({{ 'no places left' | i18n }})
                         </span>
-                        <span ng-if="!item.cancelled && hasPlacesLeft(item, userdata.accommodation.accommodationType.id)" style="color: green;">
+                        <span class="available-text" ng-if="!item.cancelled && hasPlacesLeft(item, userdata.accommodation.accommodationType.id)">
                             [{{ getPlacesLeft(item, userdata.accommodation.accommodationType.id, accommodation.typeId) }} {{ "place(s) left" | i18n }}]
                         </span>
                     </span>

@@ -64,7 +64,7 @@
     </tr>
     <tr ng-repeat="item in section.items | filter: {cancelled: '!false'}">
         <td>
-            <b>-</b> {{ item.caption }} <span style="color: red;">({{ item.cancelledReason }})</span>
+            <b>-</b> {{ item.caption }} <span class="unavailable-text">({{ item.cancelledReason }})</span>
         </td>
     </tr>
 </table>
