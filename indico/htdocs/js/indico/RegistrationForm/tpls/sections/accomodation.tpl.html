@@ -73,16 +73,16 @@
                         />
                     {{ item.caption }}
 
-                    <font ng-if="item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id)" color="red">
+                    <span ng-if="item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id)" style="color: red;">
                         ({{ 'currently not available' | i18n }})
-                    </font>
+                    </span>
                     <span ng-if="hasPlacesLimit(item)">
-                        <font ng-if="!item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id)" color="red">
+                        <span ng-if="!item.cancelled && !hasPlacesLeft(item, userdata.accommodation.accommodationType.id)" style="color: red;">
                             ({{ 'no places left' | i18n }})
-                        </font>
-                        <font ng-if="!item.cancelled && hasPlacesLeft(item, userdata.accommodation.accommodationType.id)" color="green">
+                        </span>
+                        <span ng-if="!item.cancelled && hasPlacesLeft(item, userdata.accommodation.accommodationType.id)" style="color: green;">
                             [{{ getPlacesLeft(item, userdata.accommodation.accommodationType.id, accommodation.typeId) }} {{ "place(s) left" | i18n }}]
-                        </font>
+                        </span>
                     </span>
                 </td>
                 <td align="right">

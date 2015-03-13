@@ -24,12 +24,12 @@
             </span>
 
             <span ng-if="hasPlacesLimit(item)" ng-switch="hasPlacesLeft(item, getUserdataValue())">
-                <font ng-switch-when="false" color="red" style="margin-left:25px;">
+                <span ng-switch-when="false" style="color: red; margin-left: 25px;">
                     ({{ "no places left" | i18n }})
-                </font>
-                <font ng-switch-when="true" color="green" style="margin-left:25px;">
+                </span>
+                <span ng-switch-when="true" style="color: green; margin-left: 25px;">
                     [{{ getPlacesLeft(item, getUserdataValue(), radioValue.id) }} {{ 'place(s) left' | i18n }}]
-                </font>
+                </span>
             </span>
         </li>
     </ul>
