@@ -198,14 +198,16 @@ class Agreement(db.Model):
         agreement.data = person.data
         return agreement
 
-    def accept(self, reason=None, on_behalf=False):
+    def accept(self, from_ip, reason=None, on_behalf=False):
         self.state = AgreementState.accepted if not on_behalf else AgreementState.accepted_on_behalf
+        self.signed_from_ip = from_ip
         self.reason = reason
         self.signed_dt = now_utc()
         self.definition.handle_accepted(self)
 
-    def reject(self, reason=None, on_behalf=False):
+    def reject(self, from_ip, reason=None, on_behalf=False):
         self.state = AgreementState.rejected if not on_behalf else AgreementState.rejected_on_behalf
+        self.signed_from_ip = from_ip
         self.reason = reason
         self.signed_dt = now_utc()
         self.definition.handle_rejected(self)

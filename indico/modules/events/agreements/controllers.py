@@ -62,10 +62,9 @@ class RHAgreementForm(RHConferenceBaseDisplay):
     def _process(self):
         form = AgreementForm()
         if form.validate_on_submit() and self.agreement.pending:
-            self.agreement.signed_from_ip = request.remote_addr
             reason = form.reason.data if form.agreed.data else None
             func = self.agreement.accept if form.agreed.data else self.agreement.reject
-            func(reason=reason)
+            func(from_ip=request.remote_addr, reason=reason)
             if self.agreement.definition.event_settings.get(self._conf, 'manager_notifications_enabled'):
                 notify_new_signature_to_manager(self.agreement)
             return redirect(url_for('.agreement_form', self.agreement, uuid=self.agreement.uuid))
@@ -220,11 +219,11 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
                 db.session.add(agreement)
                 db.session.flush()
             if form.answer.data:
-                agreement.accept(on_behalf=True)
+                agreement.accept(from_ip=request.remote_addr, on_behalf=True)
                 agreement.attachment_filename = form.document.data.filename
                 agreement.attachment = form.document.data.read()
             else:
-                agreement.reject(on_behalf=True)
+                agreement.reject(from_ip=request.remote_addr, on_behalf=True)
             flash(_("Agreement answered on behalf of {0}".format(agreement.person_name)), 'success')
             return jsonify(success=True)
         return WPJinjaMixin.render_template('events/agreements/dialogs/agreement_submit_answer_form.html', form=form,
