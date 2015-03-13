@@ -1434,28 +1434,6 @@ class AvatarHolder(ObjectHolder):
         # Notify signal listeners about the merge
         signals.merge_users.send(prin, merged=merged)
 
-        # Merge API keys
-        ak_prin = prin.getAPIKey()
-        ak_merged = merged.getAPIKey()
-        if ak_prin and ak_merged:
-            # Keep the more recent API key
-            if not ak_prin.getLastUsedDT() or (ak_merged.getLastUsedDT() and
-                                               ak_merged.getLastUsedDT() > ak_prin.getLastUsedDT()):
-                # Move the merged user's key to the principal
-                ak_prin.remove()
-                ak_merged.setUser(prin)
-                prin.setAPIKey(ak_merged)
-                merged.setAPIKey(None)
-            else:
-                # Just delete the merged user's key. This removes it from the Avatar, too!
-                ak_merged.remove()
-        elif ak_merged:
-            # Only the merged user has an API key => move it to the principal
-            ak_merged.setUser(prin)
-            prin.setAPIKey(ak_merged)
-            merged.setAPIKey(None)
-
-
         # remove merged from holder
         self.remove(merged)
         idxs = indexes.IndexesHolder()
