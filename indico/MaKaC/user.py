@@ -369,7 +369,6 @@ class Avatar(Persistent, Fossilizable):
         from MaKaC.common import utils
         self.key = utils.newKey() #key to activate the account
         self.registrants = {}
-        self.apiKey = None
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         self._lang = minfo.getLang()
