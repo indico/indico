@@ -19,22 +19,22 @@ Base classes for pages that allow metadata to be exported
 """
 
 from indico.modules.api import settings as api_settings
+from indico.web.flask.templating import get_template_module
 from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.http_api.util import generate_public_auth_request
 
 import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC.common import info
 from indico.core.config import Config
 
 
 class WICalExportBase(wcomponents.WTemplated):
 
     def _getIcalExportParams(self, user, url, params=None):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         apiMode = api_settings.get('security_mode')
         apiKey = user.api_key if user else None
 
         urls = generate_public_auth_request(apiKey, url, params)
+        tpl = get_template_module('api/_messages.html')
 
         return {
             'currentUser': user,
@@ -46,6 +46,6 @@ class WICalExportBase(wcomponents.WTemplated):
             'persistentUserEnabled': apiKey.is_persistent_allowed if apiKey else False,
             'apiActive': apiKey is not None,
             'userLogged': user is not None,
-            'apiKeyUserAgreement': minfo.getAPIKeyUserAgreement(),
-            'apiPersistentUserAgreement': minfo.getAPIPersistentUserAgreement()
+            'apiKeyUserAgreement': tpl.get_ical_api_key_msg(),
+            'apiPersistentUserAgreement': tpl.get_ical_persistent_msg()
         }

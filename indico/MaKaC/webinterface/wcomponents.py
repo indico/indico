@@ -63,6 +63,7 @@ from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
 from indico.util.date_time import utc_timestamp, is_same_month
 from indico.util.signals import values_from_signal
 from indico.core.index import Catalog
+from indico.web.flask.templating import get_template_module
 from indico.web.menu import HeaderMenuEntry
 
 MIN_PRESENT_EVENTS = 6
@@ -437,8 +438,9 @@ class WConferenceHeader(WHeader):
         vars["persistentUserEnabled"] = apiKey.is_persistent_allowed if apiKey else False
         vars["apiActive"] = apiKey is not None
         vars["userLogged"] = user is not None
-        vars['apiKeyUserAgreement'] = minfo.getAPIKeyUserAgreement()
-        vars['apiPersistentUserAgreement'] = minfo.getAPIPersistentUserAgreement()
+        tpl = get_template_module('api/_messages.html')
+        vars['apiKeyUserAgreement'] = tpl.get_ical_api_key_msg()
+        vars['apiPersistentUserAgreement'] = tpl.get_ical_persistent_msg()
 
         return vars
 

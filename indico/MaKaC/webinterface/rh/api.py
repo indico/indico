@@ -89,10 +89,6 @@ class RHAdminAPIOptionsSet(RHServicesBase):
         self._httpsRequired = bool(params.get('httpsRequired'))
         self._persistentAllowed = bool(params.get('persistentAllowed'))
         self._apiMode = int(params.get('apiMode'))
-        self._apiPersistentEnableAgreement = params.get('apiPersistentEnableAgreement', "")
-        self._apiPersistentDisableAgreement = params.get('apiPersistentDisableAgreement', "")
-        self._apiKeyUserAgreement = params.get('apiKeyUserAgreement', "")
-        self._apiPersistentUserAgreement = params.get('apiPersistentUserAgreement', "")
 
         try:
             self._apiCacheTTL = int(params.get('apiCacheTTL', 0))
@@ -112,10 +108,6 @@ class RHAdminAPIOptionsSet(RHServicesBase):
             'cache_ttl': self._apiCacheTTL,
             'signature_ttl': self._apiSignatureTTL
         })
-        self._minfo.setAPIPersistentEnableAgreement(self._apiPersistentEnableAgreement)
-        self._minfo.setAPIPersistentDisableAgreement(self._apiPersistentDisableAgreement)
-        self._minfo.setAPIKeyUserAgreement(self._apiKeyUserAgreement)
-        self._minfo.setAPIPersistentUserAgreement(self._apiPersistentUserAgreement)
         self._redirect(urlHandlers.UHAdminAPIOptions.getURL())
 
 

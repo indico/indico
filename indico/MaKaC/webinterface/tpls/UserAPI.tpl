@@ -120,8 +120,8 @@
 </table>
 
 <script type="text/javascript">
-    var disableText = $T('${apiPersistentDisableAgreement}');
-    var enableText = $T('${apiPersistentEnableAgreement}');
+    var disableText = ${ apiPersistentDisableAgreement | n,j };
+    var enableText = ${ apiPersistentEnableAgreement | n,j };
 
     $('#enablePersistentSignatures').click(function(e) {
         var confirmHandler= function(value){

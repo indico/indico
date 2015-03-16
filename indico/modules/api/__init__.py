@@ -49,7 +49,6 @@ settings = SettingsProxy('api', {
     'require_https': False,
     'allow_persistent': False,
     'security_mode': 0,  # TODO: use an enum
-    # TODO: check if api related messages really need to be configurable
     'cache_ttl': 600,
     'signature_ttl': 600
 })

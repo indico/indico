@@ -1,0 +1,41 @@
+{% macro get_enable_persistent_msg() -%}
+    {%- trans -%}
+        Enabling persistent signatures will allow signed requests without a timestamp.
+        This means that the same link can be used forever to access private information.
+        This introduces the risk that if somebody finds out about the link, they can access
+        the same private information as yourself. By enabling this you agree to keep those links
+        private and ensure that no unauthorized people will use them.
+    {%- endtrans -%}
+{%- endmacro %}
+
+{% macro get_disable_persistent_msg() -%}
+    {%- trans -%}
+        When disabling persistent signatures, all signed requests need a valid timestamp again.
+        If you enable them again, old persistent links will start working again - if you need to
+        invalidate them, you have to create a new API key!
+    {%- endtrans -%}
+{%- endmacro %}
+
+{% macro get_ical_api_key_msg() -%}
+    {%- trans -%}
+        In order to enable an iCal export link, your account needs to have an API key created.
+        This key enables other applications to access data from within Indico even when you are
+        neither using nor logged into the Indico system yourself with the link provided.
+        Once created, you can manage your key at any time by going to 'My Profile' and looking
+        under the tab entitled 'HTTP API'. Further information about HTTP API keys can be found
+        in the Indico documentation.
+    {%- endtrans -%}
+{%- endmacro %}
+
+
+{% macro get_ical_persistent_msg() -%}
+    {%- trans -%}
+        Additionally to having an API key associated with your account, exporting private event
+        information requires the usage of a persistent signature. This enables API URLs which do
+        not expire after a few minutes so while the setting is active, anyone in possession of the
+        link provided can access the information. Due to this, it is extremely important that you keep
+        these links private and for your use only. If you think someone else may have acquired access
+        to a link using this key in the future, you must immediately create a new key pair on the
+        'My Profile' page under the 'HTTP API' and update the iCalendar links afterwards.
+    {%- endtrans -%}
+{%- endmacro %}
