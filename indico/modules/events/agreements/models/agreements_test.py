@@ -46,8 +46,10 @@ def test_accepted(dummy_agreement, state, expected):
 ))
 def test_pending(dummy_agreement, state, expected):
     dummy_agreement.state = state
+    filter_ = Agreement.pending if expected else ~Agreement.pending
     assert dummy_agreement.pending == expected
-    assert Agreement.find_one(pending=expected) == dummy_agreement
+    assert Agreement.find_one(filter_) == dummy_agreement
+    assert not Agreement.find_first(~filter_)
 
 
 @pytest.mark.parametrize(('state', 'expected'), (
