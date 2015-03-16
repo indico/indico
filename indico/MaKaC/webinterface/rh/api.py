@@ -15,14 +15,12 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.db import db
-from indico.modules.api import settings as api_settings
 from indico.modules.api.models.keys import APIKey
-from indico.web.http_api import API_MODES
 from MaKaC.webinterface.rh.users import RHUserBase
 from MaKaC.webinterface.rh.services import RHServicesBase
 from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.pages.api import WPUserAPI, WPAdminAPIOptions, WPAdminAPIKeys
-from MaKaC.errors import AccessError, FormValuesError
+from MaKaC.webinterface.pages.api import WPUserAPI, WPAdminAPIKeys
+from MaKaC.errors import AccessError
 
 
 class RHUserAPI(RHUserBase):
@@ -75,40 +73,6 @@ class RHUserAPIDelete(RHUserBase):
     def _process(self):
         self._avatar.api_key.is_active = False
         self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))
-
-
-class RHAdminAPIOptions(RHServicesBase):
-    def _process(self):
-        p = WPAdminAPIOptions(self)
-        return p.display()
-
-
-class RHAdminAPIOptionsSet(RHServicesBase):
-    def _checkParams(self, params):
-        RHServicesBase._checkParams(self, params)
-        self._httpsRequired = bool(params.get('httpsRequired'))
-        self._persistentAllowed = bool(params.get('persistentAllowed'))
-        self._apiMode = int(params.get('apiMode'))
-
-        try:
-            self._apiCacheTTL = int(params.get('apiCacheTTL', 0))
-            self._apiSignatureTTL = int(params.get('apiSignatureTTL', 0))
-            if self._apiCacheTTL < 0 or self._apiSignatureTTL < 0:
-                raise ValueError
-        except ValueError:
-            raise FormValuesError('TTLs must be positive numbers')
-        if self._apiMode not in API_MODES:
-            raise FormValuesError()
-
-    def _process(self):
-        api_settings.set_multi({
-            'require_https': self._httpsRequired,
-            'allow_persistent': self._persistentAllowed,
-            'security_mode': self._apiMode,
-            'cache_ttl': self._apiCacheTTL,
-            'signature_ttl': self._apiSignatureTTL
-        })
-        self._redirect(urlHandlers.UHAdminAPIOptions.getURL())
 
 
 class RHAdminAPIKeys(RHServicesBase):

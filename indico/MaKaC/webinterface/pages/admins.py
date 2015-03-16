@@ -352,12 +352,9 @@ class WPServicesCommon( WPAdminsBase ):
 
         self._subTabIPBasedACL = self._tabCtrl.newTab( "ip_based_acl", _("IP Based ACL"), \
                 urlHandlers.UHIPBasedACL.getURL() )
-        self._subTabHTTPAPI = self._tabCtrl.newTab( "http_api", _("HTTP API"), \
-                urlHandlers.UHAdminAPIOptions.getURL() )
-        self._subTabHTTPAPI_Options = self._subTabHTTPAPI.newSubTab( "api_options", _("Options"), \
-                urlHandlers.UHAdminAPIOptions.getURL() )
-        self._subTabHTTPAPI_Keys = self._subTabHTTPAPI.newSubTab( "api_keys", _("API Keys"), \
-                urlHandlers.UHAdminAPIKeys.getURL() )
+        self._subTabHTTPAPI = self._tabCtrl.newTab("http_api", _("HTTP API"), urlHandlers.UHAdminAPIKeys.getURL())
+        self._subTabHTTPAPI_Keys = self._subTabHTTPAPI.newSubTab("api_keys", _("API Keys"),
+                                                                 urlHandlers.UHAdminAPIKeys.getURL())
         self._subTabOauth = self._tabCtrl.newTab( "oauth", _("OAuth"), \
                 urlHandlers.UHAdminOAuthConsumers.getURL() )
         self._subTabOauth_Consumers = self._subTabOauth.newSubTab( "oauth_consumers", _("Consumers"), \

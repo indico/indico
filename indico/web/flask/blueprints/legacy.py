@@ -80,7 +80,7 @@ legacy_endpoints = {
     'adminLayout-setDefaultPDFOptions', 'adminLayout-styles', 'adminList',
     'adminList-switchNewsActive', 'adminMaintenance', 'adminMaintenance-pack', 'adminMaintenance-performPack',
     'adminMaintenance-performTmpCleanup', 'adminMaintenance-tmpCleanup', 'adminProtection', 'adminServices-apiKeys',
-    'adminServices-apiOptions', 'adminServices-apiOptionsSet', 'adminServices-ipbasedacl',
+    'adminServices-ipbasedacl',
     'adminServices-ipbasedacl_fagrant', 'adminServices-ipbasedacl_farevoke', 'adminServices-oauthAuthorized',
     'adminServices-oauthConsumers', 'adminSystem', 'adminSystem-modify',
     'adminUpcomingEvents', 'assignContributions', 'assignContributions-downloadAcceptedPapers', 'badgeTemplates',

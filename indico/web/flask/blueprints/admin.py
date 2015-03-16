@@ -123,9 +123,7 @@ admin.add_url_rule('/protection/ip-acl/remove', 'adminServices-ipbasedacl_farevo
                    services.RHIPBasedACLFullAccessRevoke, methods=('POST',))
 
 # HTTP API
-admin.add_url_rule('/api/', 'adminServices-apiOptions', api.RHAdminAPIOptions)
-admin.add_url_rule('/api/', 'adminServices-apiOptionsSet', api.RHAdminAPIOptionsSet, methods=('POST',))
-admin.add_url_rule('/api/keys', 'adminServices-apiKeys', api.RHAdminAPIKeys)
+admin.add_url_rule('/api-old/keys', 'adminServices-apiKeys', api.RHAdminAPIKeys)
 
 # OAuth
 admin.add_url_rule('/oauth/consumers', 'adminServices-oauthAuthorized', oauth.RHAdminOAuthAuthorized)

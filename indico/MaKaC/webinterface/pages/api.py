@@ -52,29 +52,6 @@ class WUserAPI(WTemplated):
         return vars
 
 
-class WPAdminAPIOptions(WPServicesCommon):
-
-    def _getTabContent(self, params):
-        c = WAdminAPIOptions()
-        return c.getHTML(params)
-
-    def _setActiveTab( self ):
-        self._subTabHTTPAPI.setActive()
-        self._subTabHTTPAPI_Options.setActive()
-
-
-class WAdminAPIOptions(WTemplated):
-    def getVars(self):
-        vars = WTemplated.getVars(self)
-        settings = api_settings.get_all()
-        vars['apiMode'] = settings['security_mode']
-        vars['httpsRequired'] = settings['require_https'],
-        vars['persistentAllowed'] = settings['allow_persistent']
-        vars['apiCacheTTL'] = settings['cache_ttl']
-        vars['apiSignatureTTL'] = settings['signature_ttl']
-        return vars
-
-
 class WPAdminAPIKeys(WPServicesCommon):
 
     def _getTabContent(self, params):

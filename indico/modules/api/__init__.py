@@ -20,9 +20,19 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.models.settings import SettingsProxy
 from indico.modules.api.models.keys import APIKey
+from indico.web.flask.util import url_for
+from indico.util.i18n import _
 
 
 __all__ = ('settings',)
+
+settings = SettingsProxy('api', {
+    'require_https': False,
+    'allow_persistent': False,
+    'security_mode': 0,  # TODO: use an enum
+    'cache_ttl': 600,
+    'signature_ttl': 600
+})
 
 
 @signals.merge_users.connect
@@ -45,10 +55,7 @@ def _merge_users(user, merged, **kwargs):
             ak_merged.user = user
 
 
-settings = SettingsProxy('api', {
-    'require_https': False,
-    'allow_persistent': False,
-    'security_mode': 0,  # TODO: use an enum
-    'cache_ttl': 600,
-    'signature_ttl': 600
-})
+@signals.admin_sidemenu.connect
+def _extend_admin_menu(sender, **kwargs):
+    from MaKaC.webinterface.wcomponents import SideMenuItem
+    return 'api', SideMenuItem(_("API"), url_for('api.admin_settings'))
