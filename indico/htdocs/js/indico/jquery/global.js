@@ -110,6 +110,17 @@ $(document).ready(function() {
         return false;
     });
 
+    if (navigator.userAgent.match(/Trident\/7\./)) {
+        // Silly IE11 will clear the second password field if
+        // password autocompletion is enabled!
+        // https://social.msdn.microsoft.com/Forums/en-US/7d02173f-8f45-4a74-90bf-5dfbd8f9c1de/ie-11-issue-with-two-password-input-fields
+        $('input:password').each(function(){
+            if (!this.value && this.getAttribute('value')) {
+                this.value = this.getAttribute('value');
+            }
+        });
+    }
+
     // jQuery UI prevents anything outside modal dialogs from gaining focus.
     // This breaks e.g. the session color date selector. To fix this we prevent
     // the focus trap (focusin event bound on document) from ever receiving the
