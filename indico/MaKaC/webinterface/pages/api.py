@@ -18,6 +18,7 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface.pages.admins import WPPersonalArea, WPServicesCommon
 from MaKaC.webinterface.wcomponents import WTemplated
 from indico.modules.api.models.keys import APIKey
+from indico.modules.api import settings as api_settings
 from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 
 
@@ -37,7 +38,7 @@ class WUserAPI(WTemplated):
 
     def getVars(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        apiMode = minfo.getAPIMode()
+        apiMode = api_settings.get('security_mode')
         vars = WTemplated.getVars(self)
         vars['avatar'] = self._avatar
         vars['apiKey'] = self._avatar.api_key
@@ -45,7 +46,7 @@ class WUserAPI(WTemplated):
         vars['old_keys'] = old_keys
         vars['isAdmin'] = self._rh._getUser().isAdmin()
         vars['signingEnabled'] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
-        vars['persistentAllowed'] = minfo.isAPIPersistentAllowed()
+        vars['persistentAllowed'] = api_settings.get('allow_persistent')
         vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
         vars['apiPersistentDisableAgreement'] = minfo.getAPIPersistentDisableAgreement()
         return vars
@@ -66,11 +67,12 @@ class WAdminAPIOptions(WTemplated):
     def getVars(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         vars = WTemplated.getVars(self)
-        vars['apiMode'] = minfo.getAPIMode()
-        vars['httpsRequired'] = minfo.isAPIHTTPSRequired()
-        vars['persistentAllowed'] = minfo.isAPIPersistentAllowed()
-        vars['apiCacheTTL'] = minfo.getAPICacheTTL()
-        vars['apiSignatureTTL'] = minfo.getAPISignatureTTL()
+        settings = api_settings.get_all()
+        vars['apiMode'] = settings['security_mode']
+        vars['httpsRequired'] = settings['require_https'],
+        vars['persistentAllowed'] = settings['allow_persistent']
+        vars['apiCacheTTL'] = settings['cache_ttl']
+        vars['apiSignatureTTL'] = settings['signature_ttl']
         vars['apiPersistentEnableAgreement'] = minfo.getAPIPersistentEnableAgreement()
         vars['apiPersistentDisableAgreement'] = minfo.getAPIPersistentDisableAgreement()
         vars['apiKeyUserAgreement'] = minfo.getAPIKeyUserAgreement()

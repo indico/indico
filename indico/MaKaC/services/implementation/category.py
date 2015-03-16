@@ -336,13 +336,7 @@ class CategoryExportURLs(CategoryDisplayBase, ExportToICalBase):
     def _getAnswer(self):
         result = {}
 
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-
-        urls = generate_public_auth_request(
-            self._apiMode, self._apiKey, '/export/categ/%s.ics' % self._target.getId(), {},
-            minfo.isAPIPersistentAllowed() and self._apiKey.is_persistent_allowed,
-            minfo.isAPIHTTPSRequired()
-        )
+        urls = generate_public_auth_request(self._apiKey, '/export/categ/%s.ics' % self._target.getId())
         result["publicRequestURL"] = urls["publicRequestURL"]
         result["authRequestURL"] = urls["authRequestURL"]
         return result

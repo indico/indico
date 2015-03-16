@@ -319,56 +319,6 @@ class MaKaCInfo(Persistent):
     def getIPBasedACLMgr(self):
         return self._ip_based_acl_mgr
 
-    def isAPIHTTPSRequired(self):
-        if hasattr(self, '_apiHTTPSRequired'):
-            return self._apiHTTPSRequired
-        else:
-            self._apiHTTPSRequired = False
-            return False
-
-    def setAPIHTTPSRequired(self, v):
-        self._apiHTTPSRequired = v
-
-    def isAPIPersistentAllowed(self):
-        if hasattr(self, '_apiPersistentAllowed'):
-            return self._apiPersistentAllowed
-        else:
-            self._apiPersistentAllowed = False
-            return False
-
-    def setAPIPersistentAllowed(self, v):
-        self._apiPersistentAllowed = v
-
-    def getAPIMode(self):
-        if hasattr(self, '_apiMode'):
-            return self._apiMode
-        else:
-            self._apiMode = 0
-            return 0
-
-    def setAPIMode(self, v):
-        self._apiMode = v
-
-    def getAPICacheTTL(self):
-        if hasattr(self, '_apiCacheTTL'):
-            return self._apiCacheTTL
-        else:
-            self._apiCacheTTL = 600
-            return 600
-
-    def setAPICacheTTL(self, v):
-        self._apiCacheTTL = v
-
-    def getAPISignatureTTL(self):
-        if hasattr(self, '_apiSignatureTTL'):
-            return self._apiSignatureTTL
-        else:
-            self._apiSignatureTTL = 600
-            return 600
-
-    def setAPISignatureTTL(self, v):
-        self._apiSignatureTTL = v
-
     def getAPIPersistentEnableAgreement(self):
         if not hasattr(self, '_apiPersistentEnableAgreement'):
             self._apiPersistentEnableAgreement = DEFAULT_PERSISTENT_ENABLE_AGREEMENT

@@ -36,6 +36,7 @@ from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 from indico.core.config import Config
 from indico.core.db import db
+from indico.modules.api import settings as api_settings
 from indico.modules.api.models.keys import APIKey
 from indico.util.i18n import _, get_all_locales, set_session_lang
 from indico.util.redis import avatar_links
@@ -596,8 +597,7 @@ class UserSetPersistentSignatures(UserModifyBase):
 
     def _getAnswer(self):
         ak = self._target.api_key
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if minfo.isAPIPersistentAllowed():
+        if api_settings.get('allow_persistent'):
             ak.is_persistent_allowed = not ak.is_persistent_allowed
         return ak.is_persistent_allowed
 
@@ -611,9 +611,8 @@ class UserCreateKeyEnablePersistent(LoggedOnlyService):
         self._enablePersistent = pm.extract("enablePersistent", bool, False, False)
 
     def _getAnswer(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         ak = APIKey(user=self._avatar)
-        if self._enablePersistent and minfo.isAPIPersistentAllowed():
+        if self._enablePersistent and api_settings.get('allow_persistent'):
             ak.is_persistent_allowed = True
         db.session.add(ak)
         db.session.flush()

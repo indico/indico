@@ -34,6 +34,7 @@ from werkzeug.exceptions import NotFound
 from indico.core.db import DBMgr
 from indico.core.config import Config
 from indico.core.logger import Logger
+from indico.modules.api import settings as api_settings
 from indico.modules.api.models.keys import APIKey
 from indico.modules.oauth.errors import OAuthError
 from indico.modules.oauth.components import OAuthUtils
@@ -49,7 +50,6 @@ from indico.web.flask.util import ResponseUtil
 
 from MaKaC.common.fossilize import fossilize, clearCache
 from MaKaC.accessControl import AccessWrapper
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.cache import GenericCache
 from MaKaC.authentication.LDAPAuthentication import LDAPConnector
 
@@ -81,9 +81,9 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
         return path
 
 
-def validateSignature(ak, minfo, signature, timestamp, path, query):
-    ttl = HelperMaKaCInfo.getMaKaCInfoInstance().getAPISignatureTTL()
-    if not timestamp and not (ak.is_persistent_allowed and minfo.isAPIPersistentAllowed()):
+def validateSignature(ak, signature, timestamp, path, query):
+    ttl = api_settings.get('signature_ttl')
+    if not timestamp and not (ak.is_persistent_allowed and api_settings.get('allow_persistent')):
         raise HTTPAPIError('Signature invalid (no timestamp)', 403)
     elif timestamp and abs(timestamp - int(time.time())) > ttl:
         raise HTTPAPIError('Signature invalid (bad timestamp)', 403)
@@ -93,8 +93,7 @@ def validateSignature(ak, minfo, signature, timestamp, path, query):
 
 
 def checkAK(apiKey, signature, timestamp, path, query):
-    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-    apiMode = minfo.getAPIMode()
+    apiMode = api_settings.get('security_mode')
     if not apiKey:
         if apiMode in (API_MODE_ONLYKEY, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED):
             raise HTTPAPIError('API key is missing', 403)
@@ -111,7 +110,7 @@ def checkAK(apiKey, signature, timestamp, path, query):
     # Signature validation
     onlyPublic = False
     if signature:
-        validateSignature(ak, minfo, signature, timestamp, path, query)
+        validateSignature(ak, signature, timestamp, path, query)
     elif apiMode == API_MODE_ALL_SIGNED:
         raise HTTPAPIError('Signature missing', 403)
     elif apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED):
@@ -124,10 +123,9 @@ def buildAW(ak, onlyPublic=False):
     aw.setIP(str(request.remote_addr))
     if ak and not onlyPublic:
         # If we have an authenticated request, require HTTPS
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         # Dirty hack: Google calendar converts HTTP API requests from https to http
         # Therefore, not working with Indico setup (requiring https for HTTP API authenticated)
-        if not request.is_secure and minfo.isAPIHTTPSRequired() and request.user_agent.browser != 'google':
+        if not request.is_secure and api_settings.get('require_https') and request.user_agent.browser != 'google':
             raise HTTPAPIError('HTTPS is required', 403)
         aw.setUser(ak.user)
     return aw
@@ -240,7 +238,7 @@ def handler(prefix, path):
             else:
                 result, extra, complete, typeMap = res, {}, True, {}
         if result is not None and addToCache:
-            ttl = HelperMaKaCInfo.getMaKaCInfoInstance().getAPICacheTTL()
+            ttl = api_settings.get('cache_ttl')
             cache.set(cacheKey, (result, extra, ts, complete, typeMap), ttl)
     except HTTPAPIError, e:
         error = e

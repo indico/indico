@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.db import db
+from indico.modules.api import settings as api_settings
 from indico.modules.api.models.keys import APIKey
 from indico.web.http_api import API_MODES
 from MaKaC.webinterface.rh.users import RHUserBase
@@ -104,11 +105,13 @@ class RHAdminAPIOptionsSet(RHServicesBase):
             raise FormValuesError()
 
     def _process(self):
-        self._minfo.setAPIHTTPSRequired(self._httpsRequired)
-        self._minfo.setAPIPersistentAllowed(self._persistentAllowed)
-        self._minfo.setAPIMode(self._apiMode)
-        self._minfo.setAPICacheTTL(self._apiCacheTTL)
-        self._minfo.setAPISignatureTTL(self._apiSignatureTTL)
+        api_settings.set_multi({
+            'require_https': self._httpsRequired,
+            'allow_persistent': self._persistentAllowed,
+            'security_mode': self._apiMode,
+            'cache_ttl': self._apiCacheTTL,
+            'signature_ttl': self._apiSignatureTTL
+        })
         self._minfo.setAPIPersistentEnableAgreement(self._apiPersistentEnableAgreement)
         self._minfo.setAPIPersistentDisableAgreement(self._apiPersistentDisableAgreement)
         self._minfo.setAPIKeyUserAgreement(self._apiKeyUserAgreement)

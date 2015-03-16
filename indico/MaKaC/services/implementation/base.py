@@ -481,8 +481,6 @@ class TwoListModificationBase:
 class ExportToICalBase(object):
 
     def _checkParams(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        self._apiMode = minfo.getAPIMode()
         user = self._getUser()
         if not user:
             raise ServiceAccessError("User is not logged in!")

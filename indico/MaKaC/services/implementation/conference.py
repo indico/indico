@@ -1675,21 +1675,11 @@ class ConferenceExportURLs(ConferenceDisplayBase, ExportToICalBase):
 
     def _getAnswer(self):
         result = {}
-
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-
-        urls = generate_public_auth_request(
-            self._apiMode, self._apiKey, '/export/event/%s.ics' % self._target.getId(), {},
-            minfo.isAPIPersistentAllowed() and self._apiKey.is_persistent_allowed,
-            minfo.isAPIHTTPSRequired()
-        )
+        urls = generate_public_auth_request(self._apiKey, '/export/event/%s.ics' % self._target.getId())
         result["publicRequestURL"] = urls["publicRequestURL"]
         result["authRequestURL"] = urls["authRequestURL"]
-        urls = generate_public_auth_request(
-            self._apiMode, self._apiKey, '/export/event/%s.ics' % self._target.getId(), {'detail': 'contribution'},
-            minfo.isAPIPersistentAllowed() and self._apiKey.is_persistent_allowed,
-            minfo.isAPIHTTPSRequired()
-        )
+        urls = generate_public_auth_request(self._apiKey, '/export/event/%s.ics' % self._target.getId(),
+                                            {'detail': 'contribution'})
         result["publicRequestDetailedURL"] = urls["publicRequestURL"]
         result["authRequestDetailedURL"] = urls["authRequestURL"]
         return result

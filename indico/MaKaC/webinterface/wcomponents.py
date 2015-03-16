@@ -58,6 +58,7 @@ import MaKaC.common.TemplateExec as templateEngine
 
 from indico.core import signals
 from indico.core.db import DBMgr
+from indico.modules.api import settings as api_settings
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
 from indico.util.date_time import utc_timestamp, is_same_month
 from indico.util.signals import values_from_signal
@@ -413,21 +414,18 @@ class WConferenceHeader(WHeader):
         # This is basically the same WICalExportBase, but we need some extra
         # logic in order to have the detailed URLs
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        apiMode = minfo.getAPIMode()
+        apiMode = api_settings.get('security_mode')
 
         vars["icsIconURL"] = str(Config.getInstance().getSystemIconURL("ical_grey"))
         vars["apiMode"] = apiMode
         vars["signingEnabled"] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
-        vars["persistentAllowed"] = minfo.isAPIPersistentAllowed()
+        vars["persistentAllowed"] = api_settings.get('allow_persistent')
         user = self._aw.getUser()
         apiKey = user.api_key if user else None
 
-        topURLs = generate_public_auth_request(apiMode, apiKey, '/export/event/%s.ics' % \
-            self._conf.getId(), {}, minfo.isAPIPersistentAllowed() and \
-            (apiKey.is_persistent_allowed if apiKey else False), minfo.isAPIHTTPSRequired())
-        urls = generate_public_auth_request(apiMode, apiKey, '/export/event/%s.ics' % \
-            self._conf.getId(), {'detail': 'contributions'}, minfo.isAPIPersistentAllowed() and \
-            (apiKey.is_persistent_allowed if apiKey else False), minfo.isAPIHTTPSRequired())
+        topURLs = generate_public_auth_request(apiKey, '/export/event/%s.ics' % self._conf.getId())
+        urls = generate_public_auth_request(apiKey, '/export/event/%s.ics' % self._conf.getId(),
+                                            {'detail': 'contributions'})
 
         vars["requestURLs"] = {
             'publicRequestURL': topURLs["publicRequestURL"],

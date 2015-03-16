@@ -23,6 +23,7 @@ import pytz
 from babel.dates import get_timezone
 
 from indico.core.db import db
+from indico.modules.api import settings as api_settings
 from indico.modules.api.models.keys import APIKey
 from indico.util.console import cformat
 from indico.util.struct.iterables import committing_iterator
@@ -35,8 +36,20 @@ class APIImporter(Importer):
         return bool(APIKey.find().count())
 
     def migrate(self):
-        # TODO: migrate settings
+        self.migrate_settings()
         self.migrate_keys()
+
+    def migrate_settings(self):
+        print cformat('%{white!}migrating settings')
+        settings_map = {
+            '_apiHTTPSRequired': 'require_https',
+            '_apiPersistentAllowed': 'allow_persistent',
+            '_apiMode': 'security_mode',
+            '_apiCacheTTL': 'cache_ttl',
+            '_apiSignatureTTL': 'signature_ttl'
+        }
+        for old, new in settings_map.iteritems():
+            api_settings.set(new, getattr(self.zodb_root['MaKaCInfo']['main'], old))
 
     def migrate_keys(self):
         print cformat('%{white!}migrating api keys')

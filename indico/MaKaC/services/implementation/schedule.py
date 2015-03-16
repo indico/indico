@@ -1417,12 +1417,8 @@ class SessionExportURLs(conferenceServices.ConferenceDisplayBase, base.ExportToI
         self._sessionId = pm.extract("sessionId", str, False, "")
 
     def _getAnswer(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-
-        return generate_public_auth_request(
-            self._apiMode, self._apiKey, '/export/event/%s/session/%s.ics' % (self._target.getId(), self._sessionId),
-            {}, minfo.isAPIPersistentAllowed() and self._apiKey.is_persistent_allowed, minfo.isAPIHTTPSRequired()
-        )
+        return generate_public_auth_request(self._apiKey, '/export/event/%s/session/%s.ics' % (self._target.getId(),
+                                                                                               self._sessionId))
 
 
 class ContributionGetExportPopup(conferenceServices.ConferenceDisplayBase):
@@ -1446,14 +1442,9 @@ class ContributionExportURLs(conferenceServices.ConferenceDisplayBase, base.Expo
 
     def _getAnswer(self):
         result = {}
-
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-
-        urls = generate_public_auth_request(
-            self._apiMode, self._apiKey,
-            '/export/event/%s/contribution/%s.ics' % (self._target.getId(), self._contribId), {},
-            minfo.isAPIPersistentAllowed() and self._apiKey.is_persistent_allowed, minfo.isAPIHTTPSRequired()
-        )
+        urls = generate_public_auth_request(self._apiKey,
+                                            '/export/event/%s/contribution/%s.ics' % (self._target.getId(),
+                                                                                      self._contribId))
         result["publicRequestURL"] = urls["publicRequestURL"]
         result["authRequestURL"] = urls["authRequestURL"]
 

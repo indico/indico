@@ -18,7 +18,11 @@ from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.core.db import db
+from indico.core.models.settings import SettingsProxy
 from indico.modules.api.models.keys import APIKey
+
+
+__all__ = ('settings',)
 
 
 @signals.merge_users.connect
@@ -41,4 +45,11 @@ def _merge_users(user, merged, **kwargs):
             ak_merged.user = user
 
 
-# TODO: settings
+settings = SettingsProxy('api', {
+    'require_https': False,
+    'allow_persistent': False,
+    'security_mode': 0,  # TODO: use an enum
+    # TODO: check if api related messages really need to be configurable
+    'cache_ttl': 600,
+    'signature_ttl': 600
+})
