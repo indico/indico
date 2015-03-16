@@ -205,6 +205,9 @@ def set_best_lang():
     resolved_lang = negotiate_locale(preferred, get_all_locales())
 
     if not resolved_lang:
+        if current_app.config['TESTING']:
+            return 'en_GB'
+
         with DBMgr.getInstance().global_connection():
             # fall back to server default
             minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
