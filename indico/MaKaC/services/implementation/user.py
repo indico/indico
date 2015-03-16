@@ -581,9 +581,9 @@ class UserAcceptSecondaryEmail(UserModifyBase):
         self._secondaryEmail = self._params.get("secondaryEmail", None)
 
     def _getAnswer(self):
-        av = AvatarHolder().match({"email": self._secondaryEmai}, forceWithoutExtAuth=True)
+        av = AvatarHolder().match({"email": self._secondaryEmail}, forceWithoutExtAuth=True)
         if av and av[0] != self._user:
-            raise NoReportError(_("The email address %s is already used by another user.") % self._secondaryEmai)
+            raise NoReportError(_("The email address %s is already used by another user.") % self._secondaryEmail)
         self._user.addSecondaryEmail(self._secondaryEmail, reindex=True)
         return True
 
