@@ -16,6 +16,7 @@
 
 import pytest
 from freezegun import freeze_time
+from mock import MagicMock
 
 from indico.core.errors import IndicoError
 from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
@@ -120,7 +121,7 @@ def test_user_setter(dummy_user):
     assert agreement.user_id == dummy_user.getId()
 
 
-@pytest.mark.parametrize(('person_with_user'), (True, False))
+@pytest.mark.parametrize('person_with_user', (True, False))
 def test_create_from_data(dummy_event, dummy_person, dummy_user, person_with_user):
     type_ = 'dummy'
     dummy_person.user = dummy_user if person_with_user else None
@@ -210,3 +211,9 @@ def test_is_orphan(dummy_event):
     agreement = Agreement(event_id=dummy_event.id)
     agreement.is_orphan()
     agreement.definition.is_agreement_orphan(agreement.event, agreement)
+
+
+def test_belongs_to():
+    agreement = Agreement(identifier='foo')
+    assert agreement.belongs_to(MagicMock(identifier='foo'))
+    assert not agreement.belongs_to(MagicMock(identifier='bar'))
