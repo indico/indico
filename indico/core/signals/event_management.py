@@ -20,7 +20,7 @@ _signals = Namespace()
 
 
 sidemenu = _signals.signal('sidemenu', """
-Expected to return `(plugin_menu_item_name, SideMenuItem)` tuples to be added to
+Expected to return `(extra_menu_item_name, SideMenuItem)` tuples to be added to
 the event management side menu. The *sender* is the event object.
 """)
 

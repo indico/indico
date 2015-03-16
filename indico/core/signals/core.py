@@ -47,6 +47,11 @@ Expected to return `HeaderMenuEntry` objects which are then added to the
 Indico head menu.
 """)
 
+admin_sidemenu = _signals.signal('admin-sidemenu', """
+Expected to return `(extra_menu_item_name, SideMenuItem)` tuples to be added to
+the admin side menu.
+""")
+
 user_preferences = _signals.signal('user-preferences', """
 Expected to return/yield one or more ``(title, content)`` tuples which are
 shown on the "User Preferences" page. The *sender* is the user for whom the

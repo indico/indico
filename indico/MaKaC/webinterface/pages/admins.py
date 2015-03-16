@@ -22,7 +22,6 @@ from cgi import escape
 from pytz import timezone
 
 # MaKaC
-from indico.core.config import Config
 import MaKaC.common.indexes as indexes
 import MaKaC.common.info as info
 import MaKaC.conference as conference
@@ -49,10 +48,13 @@ from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 from MaKaC.webinterface.pages.main import WPMainBase
 
 # indico
+from indico.core import signals
+from indico.core.config import Config
 from indico.modules import ModuleHolder
 from indico.util.date_time import timedelta_split
 from indico.util.i18n import i18nformat, get_all_locales
 from indico.util.redis import client as redis_client
+from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
 
 
@@ -122,8 +124,11 @@ class WPAdminsBase(WPMainBase):
             urlHandlers.UHAdminsProtection.getURL())
         mainSection.addItem( self._protectionMenuItem)
 
-        self._paymentMenuItem = wcomponents.SideMenuItem(_("Payment"), url_for('payment.admin_settings'))
-        mainSection.addItem(self._paymentMenuItem)
+        self.extra_menu_items = {}
+        for name, item in sorted(values_from_signal(signals.admin_sidemenu.send()),
+                                 key=lambda x: x[1]._title):
+            self.extra_menu_items[name] = item
+            mainSection.addItem(item)
 
         self._sideMenu.addSection(mainSection)
 

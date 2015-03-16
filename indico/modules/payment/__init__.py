@@ -16,9 +16,12 @@
 
 from __future__ import unicode_literals
 
+from indico.core import signals
 from indico.core.models.settings import SettingsProxy, EventSettingsProxy
 from indico.modules.payment.plugins import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
                                             PaymentEventSettingsFormBase)
+from indico.util.i18n import _
+from indico.web.flask.util import url_for
 
 
 __all__ = ('settings', 'event_settings', 'PaymentPluginMixin', 'PaymentPluginSettingsFormBase',
@@ -46,3 +49,9 @@ event_settings = EventSettingsProxy('payment', {
     'register_email': '',
     'success_email': ''
 })
+
+
+@signals.admin_sidemenu.connect
+def _extend_admin_menu(sender, **kwargs):
+    from MaKaC.webinterface.wcomponents import SideMenuItem
+    return 'payment', SideMenuItem(_("Payment"), url_for('payment.admin_settings'))
