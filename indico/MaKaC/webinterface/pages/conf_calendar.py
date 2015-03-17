@@ -173,7 +173,7 @@ class WCalendarMonthItem:
                 </table>
                 %s
                 """) % (self._month.getName(), self._month.getYear(),
-                        ''.join(list('<td align="right" bgcolor="#CCCCCC">%s</td>'.format(
+                        ''.join(list('<td align="right" bgcolor="#CCCCCC">{}</td>'.format(
                             get_current_locale().weekday(wd)[:2]) for wd in xrange(0, 7))),
                         "\n".join(res), "\n".join(divs))
 
