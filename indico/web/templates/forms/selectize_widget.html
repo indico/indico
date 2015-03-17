@@ -12,7 +12,7 @@
         var params = {
             load: function(query, callback) {
                 if (query.length < 3) {
-                    callback();
+                    return callback();
                 }
                 $.ajax(SEARCH_URL, {
                     data: {q: query}
