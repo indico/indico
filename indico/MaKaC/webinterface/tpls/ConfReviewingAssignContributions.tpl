@@ -923,7 +923,7 @@ var removeRefereeAlertsMessage = function(contributions){
         contribution = getContribution(contributionId)
     }
     var warning = $T("You have to assign new referee.")
-    var message = $T("")
+    var message = ""
     if(contribution.reviewManager.reviewersList.length != 0 && contribution.reviewManager.editor != null) {
             message = $T("Please note that layout and content have already been assigned for this/these contributions."+ warning)
             return message;
