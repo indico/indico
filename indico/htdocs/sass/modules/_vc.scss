@@ -42,6 +42,10 @@
   }
 }
 
+input[type="radio"]:disabled + label {
+    color: $gray;
+}
+
 input[type="text"]#vc-name.highlight {
     animation: text-changed .75s linear;
 }
