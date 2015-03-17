@@ -59,7 +59,7 @@ class LinkingWidget(JinjaWidget):
     """Renders a composite radio/select field"""
 
     def __init__(self, **context):
-        super(LinkingWidget, self).__init__('linking_widget.html', plugin='vc_vidyo', **context)
+        super(LinkingWidget, self).__init__('forms/linking_widget.html', **context)
 
     def __call__(self, field, **kwargs):
         form = field._form
