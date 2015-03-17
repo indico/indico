@@ -959,7 +959,12 @@ class WRegistrantModifMain( wcomponents.WTemplated ):
         elif self._registrant.doPay():
             urlEpayment=""
             if payment_event_settings.get(self._registrant.getConference(), 'enabled') and self._registrant.doPay():
-                urlEpayment = """<br/><br/><i>Direct access link for epayment:</i><br/><small>%s</small>"""%escape(str(urlHandlers.UHConfRegistrationFormCreationDone.getURL(self._registrant)))
+                if not self._registrant.getAvatar():
+                    params = {'registrantId': self._registrant.getId(), 'authkey': self._registrant.getRandomId()}
+                    reg_page = url_for('event.confRegistrationFormDisplay',
+                                       self._registrant.getConference(), _external=True, _secure=True, **params)
+                    urlEpayment = """<br/><br/><i>Direct access link for epayment (The link should not be used while
+                        logged in with an Indico account):</i><br/><small>%s</small>""" % escape(str(reg_page))
             return i18nformat(""" <form action=%s method="POST">
                             <tr>
                               <td class="dataCaptionTD"><span class="dataCaptionFormat">_("Amount")</span></td>
