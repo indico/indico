@@ -144,7 +144,7 @@ ${ additionalInfo }
         $E('eDatePlace').set(endDate);
 
         % if conference.getType() != "simple_event" and chairText != '""':
-            var removeChairpersonTextButton = Html.img({src: imageSrc("remove.png")});
+            var removeChairpersonTextButton = Html.img({src: imageSrc("remove")});
             removeChairpersonTextButton.observeClick( function(){
                 $E('chairText').dom.value = "";
             });

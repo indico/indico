@@ -1346,7 +1346,7 @@ type("ResourceListWidget", ["ListWidget"], {
             resourceNode = Widget.block(concat([IndicoUI.Buttons.arrowExpandIcon(fileData)], information));
             resourceNode.append(fileData);
         } else if (resource.get('type') == 'converting') {
-            resourceNode = Html.div({}, Html.img({src:imageSrc("collapsd.png")}), information);
+            resourceNode = Html.div({}, Html.img({src:imageSrc("collapsd")}), information);
             $(resourceNode.dom).qtip({
                     content: {
                         text: $T('Indico is currently performing the conversion of the file to PDF. The conversion may take a few seconds.')

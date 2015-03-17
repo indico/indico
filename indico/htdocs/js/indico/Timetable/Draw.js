@@ -1032,7 +1032,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
                                    Html.div('roomPopupTitle', 'Duration: '),
                                    this.eventData.startDate.time.substring(0,5) + ' - ' +
                                    this.eventData.endDate.time.substring(0,5),
-                                   Html.img({src: imageSrc("edit_16.png")}));
+                                   Html.img({src: imageSrc("edit_16")}));
 
             this.startEndTimeField = IndicoUI.Widgets.Generic.dateStartEndTimeField(
                     this.eventData.startDate.time.substring(0,5),
@@ -1237,7 +1237,7 @@ type("TimetableBlockPopupManagement", ["TimetableBlockPopup"],
 
             var roomLocationDiv = Html.div({},Html.div('roomPopupTitle', 'Location: '),
                     self.eventData.location, Html.br(), Html.div('roomPopupTitle', 'Room: '),
-                    self.eventData.room, Html.img({src: imageSrc("edit_16.png")}), Html.br());
+                    self.eventData.room, Html.img({src: imageSrc("edit_16")}), Html.br());
 
             this.editRoomLocationFunction = function(e){
                 roomLocationDiv.dom.style.display = 'none';

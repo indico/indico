@@ -73,5 +73,5 @@
     var displayTimezoneSelector = new SelectRemoteWidget("user.getDisplayTimezones",{"userId": "${userId}"},displayTzCallback, null, null, ${defaultDisplayTimeZone | h, j});
 
     $E("tabShowPastEvents").set(new RemoteSwitchButton(${"true" if showPastEvents else "false"},
-            Html.img({src:imageSrc("tick.png")}), Html.img({src:imageSrc("cross.png")}), "user.hidePastEvents", "user.showPastEvents",{"userId": "${userId}"}).draw());
+            Html.img({src:imageSrc("tick")}), Html.img({src:imageSrc("cross")}), "user.hidePastEvents", "user.showPastEvents",{"userId": "${userId}"}).draw());
 </script>

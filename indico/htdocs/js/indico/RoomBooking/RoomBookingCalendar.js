@@ -774,8 +774,8 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                 function draw_sort_link(criterion, caption) {
                     return $('<a href="#"/ class="sort-link sort-link-' + criterion + '">').append(
                         caption,
-                        $('<img class="arrow arrow-up"/>').attr('src', imageSrc('upArrow.png')).hide(),
-                        $('<img class="arrow arrow-down"/>').attr('src', imageSrc('downArrow.png')).hide()
+                        $('<img class="arrow arrow-up"/>').attr('src', imageSrc('upArrow')).hide(),
+                        $('<img class="arrow arrow-down"/>').attr('src', imageSrc('downArrow')).hide()
                     ).click(function() {
                         var $this = $(this);
 
@@ -823,7 +823,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                     var self = this;
                     var contentLoaded = false;
                     var showContent = false;
-                    var arrowDown = Html.img({src:imageSrc("menu_arrow_black.png"), style:{display:"inline"}});
+                    var arrowDown = Html.img({src:imageSrc("menu_arrow_black"), style:{display:"inline"}});
                     var toggleSummary = Html.span({className:"fakeLink", style:{paddingRight:pixels(2)}},
                             $T("Display room booking summary "));
                     toggleSummary.observeClick(function(){
