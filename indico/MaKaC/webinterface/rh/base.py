@@ -30,7 +30,7 @@ import oauth2 as oauth
 import transaction
 from flask import request, session, g, current_app
 from sqlalchemy.orm.exc import NoResultFound
-from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound
+from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound, Forbidden
 from werkzeug.wrappers import Response
 from ZEO.Exceptions import ClientDisconnected
 from ZODB.POSException import ConflictError, POSKeyError
@@ -61,6 +61,7 @@ from indico.core.logger import Logger
 from indico.util import json
 from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
+from indico.util.i18n import _
 from indico.util.redis import RedisError
 from indico.web.flask.util import ResponseUtil
 
@@ -318,6 +319,15 @@ class RH(RequestHandlerBase):
         """Unexpected errors"""
 
         return errors.WPHostnameResolveError(self).display()
+
+    @jsonify_error(status=403)
+    def _processForbidden(self, e):
+        message = _("Access Denied")
+        if e.description == Forbidden.description:
+            explanation = _("You are not allowed to access this page.")
+        else:
+            explanation = e.description
+        return WErrorWSGI((message, explanation)).getHTML()
 
     @jsonify_error(status=403)
     def _processAccessError(self, e):
