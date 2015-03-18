@@ -14,5 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.signals import acl, agreements, category, event, event_management, plugin, users
-from indico.core.signals.core import *
+from __future__ import unicode_literals
+
+from blinker import Namespace
+
+_signals = Namespace()
+
+
+profile_sidemenu = _signals.signal('profile-sidemenu', """
+Expected to return `MenuItem` instances to be added to the user profile side menu.
+The *sender* is the user whose profile is currently being displayed.
+""")

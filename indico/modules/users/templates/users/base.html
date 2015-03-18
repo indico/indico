@@ -1,12 +1,20 @@
 {% extends 'layout/full_page_base.html' %}
 
 {% block title -%}
-    {% trans %}My Profile{% endtrans %}
+    {% if user == session.user %}
+        {% trans %}My Profile{% endtrans %}
+    {% else %}
+        {% trans name=user.getStraightFullName(upper=false) %}Profile of {{ name }}{% endtrans %}
+    {% endif %}
 {%- endblock %}
 
 {% block content %}
     <div>
-        TODO vertical tabs
+        <ul>
+            {% for item in user_menu_items %}
+                <li style="{% if item.active %}font-weight: bold;{% endif %}"><a href="{{ item.url }}">{{ item.title }}</a></li>
+            {% endfor %}
+        </ul>
     </div>
 
     <div>

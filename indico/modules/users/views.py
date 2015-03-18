@@ -16,7 +16,13 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
+from indico.core import signals
 from indico.util.i18n import _
+from indico.util.signals import values_from_signal
+from indico.web.menu import MenuItem
+
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
@@ -29,6 +35,12 @@ class WPUser(WPJinjaMixin, WPMainBase):
         return WSimpleNavigationDrawer(_('My Profile'))
 
     def _getBody(self, params):
+        extra_items = sorted(values_from_signal(signals.users.profile_sidemenu.send(params['user'])),
+                             key=attrgetter('title'))
+        params['user_menu_items'] = [
+            MenuItem(_('Dashboard'), 'users.user_dashboard'),
+            # TODO: other menu items
+        ] + extra_items
         return self._getPageContent(params)
 
 

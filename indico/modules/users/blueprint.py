@@ -15,8 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
-from indico.modules.users.controllers import RHUserDashboard
 
+from flask import request
+
+from indico.modules.users.controllers import RHUserDashboard
 from indico.web.flask.wrappers import IndicoBlueprint
 
 # TODO: remove -new later
@@ -24,3 +26,18 @@ users_blueprint = _bp = IndicoBlueprint('users', __name__, template_folder='temp
 
 with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/dashboard/', 'user_dashboard', RHUserDashboard)
+
+
+@_bp.url_defaults
+def _add_user_id(endpoint, values):
+    """Add user id to user-specific urls if one was set for the current page.
+
+    This ensures that the URLs we have both with an without user id always
+    preserve the user id if there is one, but regular users don't end up
+    with the user id in the URL all the time.
+
+    Note that this needs to be replicated in other blueprints when they add
+    stuff to the user pages using the `user_sidemenu` signal.
+    """
+    if endpoint.startswith('users.user_'):
+        values['user_id'] = request.view_args.get('user_id')
