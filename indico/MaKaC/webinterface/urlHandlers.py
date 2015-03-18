@@ -2219,10 +2219,6 @@ class UHIPBasedACLFullAccessRevoke(URLHandler):
     _endpoint = 'admin.adminServices-ipbasedacl_farevoke'
 
 
-class UHAdminAPIKeys(URLHandler):
-    _endpoint = 'admin.adminServices-apiKeys'
-
-
 class UHAdminOAuthConsumers(URLHandler):
     _endpoint = 'admin.adminServices-oauthConsumers'
 

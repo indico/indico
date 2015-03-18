@@ -1,7 +1,7 @@
 {% extends 'layout/base.html' %}
 {% from 'forms/form_widget.html' import form_header, form_rows, form_footer  %}
 
-{% block title %}{% trans %}API{% endtrans %}{% endblock %}
+{% block title %}{% trans %}API Settings{% endtrans %}{% endblock %}
 
 {%- block content %}
     {{ form_header() }}
@@ -9,4 +9,12 @@
     {% call form_footer() %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
     {% endcall %}
+
+    <p>
+        {% trans count=count, url=url_for('api.admin_keys') -%}
+            There is currently <strong><a href="{{ url }}">one active API key</a></strong> in the system.
+        {%- pluralize -%}
+            There are currently <strong><a href="{{ url }}">{{ count }} active API keys</a></strong> in the system.
+        {%- endtrans %}
+    </p>
 {%- endblock %}

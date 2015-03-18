@@ -20,6 +20,7 @@ from flask import flash, redirect
 
 from indico.modules.api import settings as api_settings
 from indico.modules.api.forms import AdminSettingsForm
+from indico.modules.api.models.keys import APIKey
 from indico.modules.api.views import WPAPIAdmin
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -37,4 +38,13 @@ class RHAPIAdminSettings(RHAdminBase):
             api_settings.set_multi(form.data)
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.admin_settings'))
-        return WPAPIAdmin.render_template('admin_settings.html', form=form)
+        count = APIKey.find(is_active=True).count()
+        return WPAPIAdmin.render_template('admin_settings.html', form=form, count=count)
+
+
+class RHAPIAdminKeys(RHAdminBase):
+    """API key list (admin)"""
+
+    def _process(self):
+        keys = sorted(APIKey.find_all(is_active=True), key=lambda ak: (ak.use_count == 0, ak.user.getFullName()))
+        return WPAPIAdmin.render_template('admin_keys.html', keys=keys)

@@ -17,9 +17,8 @@
 from indico.core.db import db
 from indico.modules.api.models.keys import APIKey
 from MaKaC.webinterface.rh.users import RHUserBase
-from MaKaC.webinterface.rh.services import RHServicesBase
 from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.pages.api import WPUserAPI, WPAdminAPIKeys
+from MaKaC.webinterface.pages.api import WPUserAPI
 from MaKaC.errors import AccessError
 
 
@@ -73,9 +72,3 @@ class RHUserAPIDelete(RHUserBase):
     def _process(self):
         self._avatar.api_key.is_active = False
         self._redirect(urlHandlers.UHUserAPI.getURL(self._avatar))
-
-
-class RHAdminAPIKeys(RHServicesBase):
-    def _process(self):
-        p = WPAdminAPIKeys(self)
-        return p.display()

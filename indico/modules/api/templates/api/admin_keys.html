@@ -1,0 +1,41 @@
+{% extends 'layout/base.html' %}
+
+{% block title %}{% trans %}API Keys{% endtrans %}{% endblock %}
+
+{%- block content %}
+    <table class="i-table-widget fixed-width">
+        <thead>
+            <tr>
+                <th>{% trans %}User{% endtrans %}</th>
+                <th class="small-column">{% trans %}Uses{% endtrans %}</th>
+                <th class="small-column">{% trans %}Last use{% endtrans %}</th>
+                <th>{% trans %}Token{% endtrans %}</th>
+                <th class="col-50">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for key in keys %}
+                <tr>
+                    <td>
+                        {{ key.user.getFullName() }}
+                        {% if key.is_blocked %}
+                            <i class="icon-warning warningText" title="{% trans %}This user's API key has been blocked.{%- endtrans %}"></i>
+                        {% endif %}
+                    </td>
+                    <td>{{ key.use_count }}</td>
+                    <td>
+                        {% if key.last_used_dt %}
+                            {{ key.last_used_dt | format_datetime }}
+                        {% else %}
+                            <em>{% trans %}never{% endtrans %}</em>
+                        {% endif %}
+                    </td>
+                    <td>{{ key.token }}</td>
+                    <td>
+                        <a href="{{ url_for('user.userAPI', key.user) }}">{% trans %}Details{% endtrans %}</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{%- endblock %}

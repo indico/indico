@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.pages.admins import WPPersonalArea, WPServicesCommon
+from MaKaC.webinterface.pages.admins import WPPersonalArea
 from MaKaC.webinterface.wcomponents import WTemplated
 from indico.modules.api.models.keys import APIKey
 from indico.modules.api import settings as api_settings
@@ -30,6 +30,7 @@ class WPUserAPI(WPPersonalArea):
 
     def _setActiveTab(self):
         self._tabAPI.setActive()
+
 
 class WUserAPI(WTemplated):
 
@@ -49,22 +50,4 @@ class WUserAPI(WTemplated):
         tpl = get_template_module('api/_messages.html')
         vars['apiPersistentEnableAgreement'] = tpl.get_enable_persistent_msg()
         vars['apiPersistentDisableAgreement'] = tpl.get_disable_persistent_msg()
-        return vars
-
-
-class WPAdminAPIKeys(WPServicesCommon):
-
-    def _getTabContent(self, params):
-        c = WAdminAPIKeys()
-        return c.getHTML(params)
-
-    def _setActiveTab( self ):
-        self._subTabHTTPAPI.setActive()
-        self._subTabHTTPAPI_Keys.setActive()
-
-class WAdminAPIKeys(WTemplated):
-
-    def getVars(self):
-        vars = WTemplated.getVars(self)
-        vars['apiKeys'] = sorted(APIKey.find_all(is_active=True), key=lambda ak: ak.user.getFullName())
         return vars

@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.api.controllers import RHAPIAdminSettings
+from indico.modules.api.controllers import RHAPIAdminSettings, RHAPIAdminKeys
 from indico.web.flask.wrappers import IndicoBlueprint
 from indico.web.http_api.handlers import handler as api_handler
 from MaKaC.services.interface.rpc.json import process as jsonrpc_handler
@@ -34,3 +34,4 @@ _bp.add_url_rule('/<any(api, export):prefix>', endpoint='httpapi', build_only=Tr
 
 # Administration
 _bp.add_url_rule('/admin/api/', 'admin_settings', RHAPIAdminSettings, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/api/keys', 'admin_keys', RHAPIAdminKeys)

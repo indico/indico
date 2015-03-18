@@ -122,9 +122,6 @@ admin.add_url_rule('/protection/ip-acl/add', 'adminServices-ipbasedacl_fagrant',
 admin.add_url_rule('/protection/ip-acl/remove', 'adminServices-ipbasedacl_farevoke',
                    services.RHIPBasedACLFullAccessRevoke, methods=('POST',))
 
-# HTTP API
-admin.add_url_rule('/api-old/keys', 'adminServices-apiKeys', api.RHAdminAPIKeys)
-
 # OAuth
 admin.add_url_rule('/oauth/consumers', 'adminServices-oauthAuthorized', oauth.RHAdminOAuthAuthorized)
 admin.add_url_rule('/oauth/authorized', 'adminServices-oauthConsumers', oauth.RHAdminOAuthConsumers)
