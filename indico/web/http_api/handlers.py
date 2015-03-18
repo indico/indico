@@ -34,6 +34,7 @@ from werkzeug.exceptions import NotFound
 from indico.core.db import DBMgr
 from indico.core.config import Config
 from indico.core.logger import Logger
+from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.api.models.keys import APIKey
 from indico.modules.oauth.errors import OAuthError
@@ -43,7 +44,6 @@ from indico.util.string import to_unicode
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
-from indico.web.http_api import API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.flask.util import ResponseUtil
@@ -95,7 +95,7 @@ def validateSignature(ak, signature, timestamp, path, query):
 def checkAK(apiKey, signature, timestamp, path, query):
     apiMode = api_settings.get('security_mode')
     if not apiKey:
-        if apiMode in (API_MODE_ONLYKEY, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED):
+        if apiMode in {APIMode.ONLYKEY, APIMode.ONLYKEY_SIGNED, APIMode.ALL_SIGNED}:
             raise HTTPAPIError('API key is missing', 403)
         return None, True
     try:
@@ -111,9 +111,9 @@ def checkAK(apiKey, signature, timestamp, path, query):
     onlyPublic = False
     if signature:
         validateSignature(ak, signature, timestamp, path, query)
-    elif apiMode == API_MODE_ALL_SIGNED:
+    elif apiMode == APIMode.ALL_SIGNED:
         raise HTTPAPIError('Signature missing', 403)
-    elif apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED):
+    elif apiMode in {APIMode.SIGNED, APIMode.ONLYKEY_SIGNED}:
         onlyPublic = True
     return ak, onlyPublic
 

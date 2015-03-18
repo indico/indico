@@ -16,23 +16,24 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields.core import BooleanField, SelectField
+from wtforms.fields.core import BooleanField
 from wtforms.fields.html5 import IntegerField
 from wtforms.validators import NumberRange
 
+from indico.modules.api import APIMode
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoEnumSelectField
 from indico.web.forms.widgets import SwitchWidget
 
 
-# TODO: use enum
-API_MODE_CHOICES = [
-    (0, _("Key for authenticated requests only")),
-    (1, _("Key for all requests")),
-    (2, _("Key+signature for authenticated requests only")),
-    (3, _("Key for all requests. Signature for authenticated requests")),
-    (4, _("Key+signature for all requests"))
-]
+security_mode_titles = {
+    APIMode.KEY: _("Key for authenticated requests only"),
+    APIMode.ONLYKEY: _("Key for all requests"),
+    APIMode.SIGNED: _("Key+signature for authenticated requests only"),
+    APIMode.ONLYKEY_SIGNED: _("Key for all requests. Signature for authenticated requests"),
+    APIMode.ALL_SIGNED: _("Key+signature for all requests")
+}
 
 
 class AdminSettingsForm(IndicoForm):
@@ -40,8 +41,9 @@ class AdminSettingsForm(IndicoForm):
                                  description=_("Require HTTPS for all authenticated API requests."))
     allow_persistent = BooleanField(_('Persistent signatures'), widget=SwitchWidget(),
                                     description=_("Allow users to enable persistent signatures (without timestamp)."))
-    security_mode = SelectField(_('Security mode'), choices=API_MODE_CHOICES, coerce=int,
-                                description=_('Specify if/when people need to use an API key or a signed request.'))
+    security_mode = IndicoEnumSelectField(_('Security mode'), enum=APIMode, titles=security_mode_titles,
+                                          description=_('Specify if/when people need to use an API key or a '
+                                                        'signed request.'))
     cache_ttl = IntegerField(_('Cache TTL'), [NumberRange(min=0)],
                              description=_('Time to cache API results (in seconds)'))
     signature_ttl = IntegerField(_('Signature TTL'), [NumberRange(min=1)],

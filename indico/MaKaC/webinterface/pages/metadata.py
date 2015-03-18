@@ -18,9 +18,9 @@
 Base classes for pages that allow metadata to be exported
 """
 
+from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.web.flask.templating import get_template_module
-from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 from indico.web.http_api.util import generate_public_auth_request
 
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -40,7 +40,7 @@ class WICalExportBase(wcomponents.WTemplated):
             'currentUser': user,
             'icsIconURL': str(Config.getInstance().getSystemIconURL("ical_grey")),
             'apiMode': apiMode,
-            'signingEnabled': apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED),
+            'signingEnabled': apiMode in {APIMode.SIGNED, APIMode.ONLYKEY_SIGNED, APIMode.ALL_SIGNED},
             'persistentAllowed': api_settings.get('allow_persistent'),
             'requestURLs': urls,
             'persistentUserEnabled': apiKey.is_persistent_allowed if apiKey else False,

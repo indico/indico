@@ -22,14 +22,24 @@ from indico.core.models.settings import SettingsProxy
 from indico.modules.api.models.keys import APIKey
 from indico.web.flask.util import url_for
 from indico.util.i18n import _
+from indico.util.struct.enum import IndicoEnum
 
 
 __all__ = ('settings',)
 
+
+class APIMode(int, IndicoEnum):
+    KEY = 0  # public requests without API key, authenticated requests with api key
+    ONLYKEY = 1  # all requests require an API key
+    SIGNED = 2  # public requests without API key, authenticated requests with api key and signature
+    ONLYKEY_SIGNED = 3  # all requests require an API key, authenticated requests need signature
+    ALL_SIGNED = 4  # all requests require an api key and a signature
+
+
 settings = SettingsProxy('api', {
     'require_https': False,
     'allow_persistent': False,
-    'security_mode': 0,  # TODO: use an enum
+    'security_mode': APIMode.KEY.value,
     'cache_ttl': 600,
     'signature_ttl': 600
 })

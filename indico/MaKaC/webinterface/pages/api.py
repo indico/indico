@@ -17,9 +17,9 @@
 from MaKaC.webinterface.pages.admins import WPPersonalArea
 from MaKaC.webinterface.wcomponents import WTemplated
 from indico.modules.api.models.keys import APIKey
+from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.web.flask.templating import get_template_module
-from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
 
 
 class WPUserAPI(WPPersonalArea):
@@ -45,7 +45,7 @@ class WUserAPI(WTemplated):
         old_keys = APIKey.find(user_id=self._avatar.id, is_active=False).order_by(APIKey.created_dt.desc()).all()
         vars['old_keys'] = old_keys
         vars['isAdmin'] = self._rh._getUser().isAdmin()
-        vars['signingEnabled'] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
+        vars['signingEnabled'] = apiMode in {APIMode.SIGNED, APIMode.ONLYKEY_SIGNED, APIMode.ALL_SIGNED}
         vars['persistentAllowed'] = api_settings.get('allow_persistent')
         tpl = get_template_module('api/_messages.html')
         vars['apiPersistentEnableAgreement'] = tpl.get_enable_persistent_msg()

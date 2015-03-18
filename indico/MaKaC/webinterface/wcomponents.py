@@ -58,6 +58,7 @@ import MaKaC.common.TemplateExec as templateEngine
 
 from indico.core import signals
 from indico.core.db import DBMgr
+from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
 from indico.util.date_time import utc_timestamp, is_same_month
@@ -377,7 +378,6 @@ class WConferenceHeader(WHeader):
         self._locTZ = tzUtil.getDisplayTZ()
 
     def getVars( self ):
-        from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
         from indico.web.http_api.util import generate_public_auth_request
 
         vars = WHeader.getVars( self )
@@ -414,12 +414,11 @@ class WConferenceHeader(WHeader):
 
         # This is basically the same WICalExportBase, but we need some extra
         # logic in order to have the detailed URLs
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         apiMode = api_settings.get('security_mode')
 
         vars["icsIconURL"] = str(Config.getInstance().getSystemIconURL("ical_grey"))
         vars["apiMode"] = apiMode
-        vars["signingEnabled"] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
+        vars["signingEnabled"] = apiMode in {APIMode.SIGNED, APIMode.ONLYKEY_SIGNED, APIMode.ALL_SIGNED}
         vars["persistentAllowed"] = api_settings.get('allow_persistent')
         user = self._aw.getUser()
         apiKey = user.api_key if user else None

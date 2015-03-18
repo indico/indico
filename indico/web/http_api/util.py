@@ -20,6 +20,7 @@ import time
 import urllib
 
 from indico.core.config import Config
+from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 
 
@@ -53,9 +54,6 @@ def build_indico_request(path, params, api_key=None, secret_key=None, persistent
 
 
 def generate_public_auth_request(apiKey, path, params=None):
-    from indico.web.http_api import API_MODE_KEY, API_MODE_ONLYKEY, API_MODE_SIGNED, \
-        API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
-
     apiMode = api_settings.get('security_mode')
     if params is None:
         params = {}
@@ -72,20 +70,20 @@ def generate_public_auth_request(apiKey, path, params=None):
         baseURL = Config.getInstance().getBaseURL()
     publicRequestsURL = None
     authRequestURL = None
-    if apiMode == API_MODE_KEY:
+    if apiMode == APIMode.KEY:
         publicRequestsURL = build_indico_request(path, params)
         authRequestURL = build_indico_request(path, params, key) if key else None
-    elif apiMode == API_MODE_ONLYKEY:
+    elif apiMode == APIMode.ONLYKEY:
         authRequestURL = build_indico_request(path, params, key) if key else None
         params["onlypublic"] = "yes"
         publicRequestsURL = build_indico_request(path, params, key) if key else None
-    elif apiMode == API_MODE_SIGNED:
+    elif apiMode == APIMode.SIGNED:
         publicRequestsURL = build_indico_request(path, params)
         authRequestURL = build_indico_request(path, params, key, secret_key, persistent)  if key and secret_key else None
-    elif apiMode == API_MODE_ONLYKEY_SIGNED:
+    elif apiMode == APIMode.ONLYKEY_SIGNED:
         publicRequestsURL = build_indico_request(path, params, key)  if key else None
         authRequestURL = build_indico_request(path, params, key, secret_key, persistent)  if key and secret_key else None
-    elif apiMode == API_MODE_ALL_SIGNED:
+    elif apiMode == APIMode.ALL_SIGNED:
         authRequestURL = build_indico_request(path, params, key, secret_key, persistent)  if key else None
         params["onlypublic"] = "yes"
         publicRequestsURL = build_indico_request(path, params, key, secret_key, persistent)  if key else None
