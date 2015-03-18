@@ -106,6 +106,7 @@ from indico.util.date_time import utc_timestamp
 from indico.util.signals import values_from_signal
 from indico.util.redis import write_client as redis_write_client
 import indico.util.redis.avatar_links as avatar_links
+from indico.web.flask.util import url_for
 
 
 class CoreObject(Persistent):
@@ -397,6 +398,13 @@ class Category(CommonObjectBase):
     def __repr__(self):
         path = '/'.join(self.getCategoryPathTitles()[:-1])
         return '<Category({0}, {1}, {2})>'.format(self.getId(), self.getName(), path)
+
+    @property
+    def url(self):
+        if self.isRoot():
+            return url_for('misc.index')
+        else:
+            return url_for('category.categoryDisplay', self)
 
     def getAccessController(self):
         return self.__ac

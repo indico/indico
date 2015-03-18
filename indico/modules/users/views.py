@@ -15,3 +15,23 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+
+from indico.util.i18n import _
+from MaKaC.webinterface.pages.base import WPJinjaMixin
+from MaKaC.webinterface.pages.main import WPMainBase
+from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
+
+
+class WPUser(WPJinjaMixin, WPMainBase):
+    template_prefix = 'users/'
+
+    def _getNavigationDrawer(self):
+        return WSimpleNavigationDrawer(_('My Profile'))
+
+    def _getBody(self, params):
+        return self._getPageContent(params)
+
+
+class WPUserDashboard(WPUser):
+    def getCSSFiles(self):
+        return WPUser.getCSSFiles(self) + self._asset_env['dashboard_sass'].urls()

@@ -15,7 +15,12 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+from indico.modules.users.controllers import RHUserDashboard
 
 from indico.web.flask.wrappers import IndicoBlueprint
 
-users_blueprint = _bp = IndicoBlueprint('users', __name__, template_folder='templates')
+# TODO: remove -new later
+users_blueprint = _bp = IndicoBlueprint('users', __name__, template_folder='templates', url_prefix='/user-new')
+
+with _bp.add_prefixed_rules('/<int:user_id>'):
+    _bp.add_url_rule('/dashboard/', 'user_dashboard', RHUserDashboard)
