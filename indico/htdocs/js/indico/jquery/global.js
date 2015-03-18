@@ -32,6 +32,10 @@ $(document).ready(function() {
         });
     });
 
+    $('.main-breadcrumb a[href="#"]').css({cursor: 'default', outline: 'none'}).on('click', function(e) {
+        e.preventDefault();
+    });
+
     // Use qtip for context help
 
     $.fn.qtip.defaults = $.extend(true, {}, $.fn.qtip.defaults, {
