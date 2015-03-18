@@ -21,7 +21,8 @@ from flask import flash, redirect
 from indico.modules.api import settings as api_settings
 from indico.modules.api.forms import AdminSettingsForm
 from indico.modules.api.models.keys import APIKey
-from indico.modules.api.views import WPAPIAdmin
+from indico.modules.api.views import WPAPIAdmin, WPAPIUserProfile
+from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -48,3 +49,10 @@ class RHAPIAdminKeys(RHAdminBase):
     def _process(self):
         keys = sorted(APIKey.find_all(is_active=True), key=lambda ak: (ak.use_count == 0, ak.user.getFullName()))
         return WPAPIAdmin.render_template('admin_keys.html', keys=keys)
+
+
+class RHAPIUserProfile(RHUserBase):
+    """API key details (user)"""
+
+    def _process(self):
+        return WPAPIUserProfile.render_template('user_profile.html', user=self.user)

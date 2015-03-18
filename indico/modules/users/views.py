@@ -29,6 +29,14 @@ from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
 
 
 class WPUser(WPJinjaMixin, WPMainBase):
+    """Base WP for user profile pages.
+
+    Whenever you use this, you MUST include `user` in the params passed to
+    `render_template`. Any RH using this should inherit from `RHUserBase`
+    which already handles user/admin access. In this case, simply add
+    ``user=self.user`` to your `render_template` call.
+    """
+
     template_prefix = 'users/'
 
     def _getNavigationDrawer(self):

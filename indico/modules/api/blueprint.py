@@ -16,7 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.api.controllers import RHAPIAdminSettings, RHAPIAdminKeys
+from flask import request
+
+from indico.modules.api.controllers import RHAPIAdminSettings, RHAPIAdminKeys, RHAPIUserProfile
 from indico.web.flask.wrappers import IndicoBlueprint
 from indico.web.http_api.handlers import handler as api_handler
 from MaKaC.services.interface.rpc.json import process as jsonrpc_handler
@@ -35,3 +37,14 @@ _bp.add_url_rule('/<any(api, export):prefix>', endpoint='httpapi', build_only=Tr
 # Administration
 _bp.add_url_rule('/admin/api/', 'admin_settings', RHAPIAdminSettings, methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/api/keys', 'admin_keys', RHAPIAdminKeys)
+
+# User profile
+with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
+    _bp.add_url_rule('/api/', 'user_profile', RHAPIUserProfile)
+
+
+@_bp.url_defaults
+def _add_user_id(endpoint, values):
+    if endpoint == 'api.user_profile':
+        # Inject user id if it's present in the url
+        values['user_id'] = request.view_args.get('user_id')

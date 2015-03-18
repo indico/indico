@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.users.views import WPUser
 from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 
@@ -25,3 +26,7 @@ class WPAPIAdmin(WPJinjaMixin, WPAdminsBase):
 
     def _setActiveSideMenuItem(self):
         self.extra_menu_items['api'].setActive()
+
+
+class WPAPIUserProfile(WPUser):
+    template_prefix = 'api/'
