@@ -602,23 +602,6 @@ class UserSetPersistentSignatures(UserModifyBase):
         return ak.is_persistent_allowed
 
 
-class UserCreateKeyEnablePersistent(LoggedOnlyService):
-
-    def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-        self._target = self._avatar = self.getAW().getUser()
-        pm = ParameterManager(self._params)
-        self._enablePersistent = pm.extract("enablePersistent", bool, False, False)
-
-    def _getAnswer(self):
-        ak = APIKey(user=self._avatar)
-        if self._enablePersistent and api_settings.get('allow_persistent'):
-            ak.is_persistent_allowed = True
-        db.session.add(ak)
-        db.session.flush()
-        return True
-
-
 class UserRefreshRedisLinks(AdminService):
     def _checkParams(self):
         AdminService._checkParams(self)
@@ -656,6 +639,5 @@ methodMap = {
     "syncPersonalData": UserSyncPersonalData,
     "acceptSecondaryEmail": UserAcceptSecondaryEmail,
     "togglePersistentSignatures": UserSetPersistentSignatures,
-    "createKeyAndEnablePersistent": UserCreateKeyEnablePersistent,
     "refreshRedisLinks": UserRefreshRedisLinks
 }
