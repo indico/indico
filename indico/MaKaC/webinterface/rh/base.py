@@ -329,6 +329,11 @@ class RH(RequestHandlerBase):
             explanation = e.description
         return WErrorWSGI((message, explanation)).getHTML()
 
+    @jsonify_error(status=400)
+    def _processBadRequest(self, e):
+        message = _("Bad Request")
+        return WErrorWSGI((message, e.description)).getHTML()
+
     @jsonify_error(status=403)
     def _processAccessError(self, e):
         """Treats access errors occured during the process of a RH."""
