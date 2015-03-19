@@ -255,7 +255,7 @@ jquery = rjs_bundle('jquery', *filter(None, [
               'jstorage.js',
               'jquery.placeholder.js')))
 
-utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'i18n.js'))
+utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'i18n.js', 'misc.js'))
 calendar = rjs_bundle('calendar', *namespace('js/calendar', 'calendar.js', 'calendar-setup.js'))
 
 presentation = rjs_bundle(

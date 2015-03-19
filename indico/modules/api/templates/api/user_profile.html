@@ -1,9 +1,161 @@
 {% extends 'users/base.html' %}
+{% from 'switch.html' import switch %}
+{% from 'api/_messages.html' import get_enable_persistent_msg, get_disable_persistent_msg %}
 
 {% block subtitle -%}
     {% trans %}HTTP API{% endtrans %}
 {%- endblock %}
 
 {% block user_content %}
-    TODO
+    {% if not key %}
+        <p>
+            {%- trans -%}
+                You do not have an API key at the moment. If you would like to use our API,
+                please create an API key using the button below.
+            {%- endtrans -%}
+        </p>
+
+        <button type="button" class="i-button highlight" data-href="{{ url_for('.key_create') }}" data-method="post">
+            {%- trans %}Create API key{% endtrans -%}
+        </button>
+    {% else %}
+        <dl class="i-data-list">
+            <dt>{% trans %}Token{% endtrans %}</dt>
+            <dd>
+                {{ key.token }}
+                {% if key.is_blocked %}
+                    <i class="icon-warning warningText" title="{% trans %}Your API key has been blocked. Please contact an administrator for further details.{% endtrans %}"></i>
+                {% endif %}
+            </dd>
+            {% if use_signatures %}
+                <dt>{% trans %}Secret{% endtrans %}</dt>
+                <dd>{{ key.secret }}</dd>
+            {% endif %}
+            <dt>{% trans %}Created{% endtrans %}</dt>
+            <dd>{{ key.created_dt | format_datetime('short') }}</dd>
+            <dt>{% trans %}Total uses{% endtrans %}</dt>
+            <dd>{{ key.use_count }}</dd>
+            {% if key.last_used_dt %}
+                <dt>{% trans %}Last used{% endtrans %}</dt>
+                <dd>{{ key.last_used_dt | format_datetime('short') }}</dd>
+            {% endif %}
+            {% if key.last_used_ip %}
+                <dt>{% trans %}Last IP{% endtrans %}</dt>
+                <dd>{{ key.last_used_ip }}</dd>
+            {% endif %}
+            {% if key.last_used_uri %}
+                <dt>{% trans %}Last request{% endtrans %}</dt>
+                <dd>
+                    {{ key.last_used_uri }}
+                    {% if key.last_used_auth %}
+                        <i class="icon-shield" title="{% trans %}Last request could access private data.{% endtrans %}"></i>
+                    {% else %}
+                        <i class="icon-earth" title="{% trans %}Last request could only access public data.{% endtrans %}"></i>
+                    {% endif %}
+                </dd>
+            {% endif %}
+            {% if allow_persistent and use_signatures %}
+                <dt>{% trans %}Persistent signatures{% endtrans %}</dt>
+                <dd>
+                    {{ switch(id='toggle-persistent-signatures', checked=key.is_persistent_allowed,
+                              on_label=_('On'), off_label=_('Off'),
+                              disabled=not can_modify,
+                              data_href=url_for('.key_toggle_persistent'),
+                              data_confirm_enable=get_enable_persistent_msg(),
+                              data_confirm_disable=get_disable_persistent_msg()) }}
+                </dd>
+            {% endif %}
+        </dl>
+
+        {% if can_modify %}
+            <button type="button" class="i-button danger" data-href="{{ url_for('.key_create') }}" data-method="post"
+                    data-title="{% trans %}Create new API key{% endtrans %}"
+                    data-confirm="{% trans %}Do you really want to create a new API key? Your old key will stop working immediately!{% endtrans %}">
+                {%- trans %}Create new API key{% endtrans -%}
+            </button>
+            <button type="button" class="i-button danger" data-href="{{ url_for('.key_delete') }}" data-method="post"
+                    data-title="{% trans %}Delete API key{% endtrans %}"
+                    data-confirm="{% trans %}Do you really want to delete your API key?{% endtrans %}">
+                {%- trans %}Delete API key{% endtrans -%}
+            </button>
+        {% endif %}
+    {% endif %}
+
+    {% if session.user.isAdmin() %}
+        <div class="i-form management-area">
+            <fieldset>
+                <legend>{% trans %}Administration{% endtrans %}</legend>
+                {% if key %}
+                    {% if key.is_blocked %}
+                        <button type="button" class="i-button accept" data-href="{{ url_for('.key_block') }}"
+                                data-method="post">
+                            {%- trans %}Unblock API key{% endtrans -%}
+                        </button>
+                    {% else %}
+                        <button type="button" class="i-button warning" data-href="{{ url_for('.key_block') }}"
+                                data-method="post">
+                            {%- trans %}Block API key{% endtrans -%}
+                        </button>
+                    {% endif %}
+                {% endif %}
+                {% if old_keys %}
+                    <h3>{% trans %}Old keys{% endtrans %}</h3>
+                    <ul>
+                        {% for old_key in old_keys -%}
+                            <li>
+                                {{ old_key.token }}
+                                (
+                                {%- if not old_key.use_count -%}
+                                    {%- trans %}never used{% endtrans -%}
+                                {%- else -%}
+                                    {%- trans n = old_key.use_count -%}
+                                        used once
+                                    {%- pluralize -%}
+                                        used {{ n }} times
+                                    {%- endtrans -%}
+                                    {%- if old_key.last_used_dt -%}
+                                        , {% trans date=old_key.last_used_dt|format_datetime('short')|ensure_unicode -%}
+                                            last used on {{ date }}
+                                        {%- endtrans %}
+                                    {%- endif -%}
+                                {%- endif -%}
+                                )
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </fieldset>
+        </div>
+    {% endif %}
+
+    <script>
+        $('#toggle-persistent-signatures').on('click', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            var checked = this.checked;
+            var message = checked ? $this.data('confirm_enable') : $this.data('confirm_disable');
+
+            confirmPrompt(message).then(function() {
+                $this.prop('checked', checked).prop('disabled', true);
+                $.ajax({
+                    url: $this.data('href'),
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {
+                        enabled: checked ? '1' : '0'
+                    },
+                    complete: function() {
+                        $this.prop('disabled', false);
+                    },
+                    error: function(data) {
+                        handleAjaxError(data);
+                        $this.prop('checked', !checked);
+                    },
+                    success: function(data) {
+                        $this.prop('checked', data.enabled);
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}

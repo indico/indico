@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from flask import request
 
-from indico.modules.api.controllers import RHAPIAdminSettings, RHAPIAdminKeys, RHAPIUserProfile
+from indico.modules.api.controllers import (RHAPIAdminSettings, RHAPIAdminKeys, RHAPIUserProfile, RHAPICreateKey,
+                                            RHAPIBlockKey, RHAPIDeleteKey, RHAPITogglePersistent)
 from indico.web.flask.wrappers import IndicoBlueprint
 from indico.web.http_api.handlers import handler as api_handler
 from MaKaC.services.interface.rpc.json import process as jsonrpc_handler
@@ -39,12 +40,17 @@ _bp.add_url_rule('/admin/api/', 'admin_settings', RHAPIAdminSettings, methods=('
 _bp.add_url_rule('/admin/api/keys', 'admin_keys', RHAPIAdminKeys)
 
 # User profile
-with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
+# TODO: remove -new
+with _bp.add_prefixed_rules('/user-new/<int:user_id>', '/user-new'):
     _bp.add_url_rule('/api/', 'user_profile', RHAPIUserProfile)
+    _bp.add_url_rule('/api/create', 'key_create', RHAPICreateKey, methods=('POST',))
+    _bp.add_url_rule('/api/delete', 'key_delete', RHAPIDeleteKey, methods=('POST',))
+    _bp.add_url_rule('/api/persistent', 'key_toggle_persistent', RHAPITogglePersistent, methods=('POST',))
+    _bp.add_url_rule('/api/block', 'key_block', RHAPIBlockKey, methods=('POST',))
 
 
 @_bp.url_defaults
 def _add_user_id(endpoint, values):
-    if endpoint == 'api.user_profile':
+    if endpoint == 'api.user_profile' or endpoint.startswith('api.key_'):
         # Inject user id if it's present in the url
         values['user_id'] = request.view_args.get('user_id')

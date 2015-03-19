@@ -9,6 +9,8 @@
 {%- endblock %}
 
 {% block content %}
+    {% include 'flashed_messages.html' %}
+
     <div>
         <ul>
             {% for item in user_menu_items %}

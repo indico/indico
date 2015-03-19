@@ -343,8 +343,7 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
 
 
 class RHVCRoomModify(RHVCSystemEventBase):
-    """Modifies the VC room that owns a specific event-room association.
-       It uses the PATCH HTTP method """
+    """Modifies the VC room that owns a specific event-room association."""
 
     def _process(self):
         result = {}
