@@ -10,16 +10,18 @@
 
 {% block content %}
     {% include 'flashed_messages.html' %}
-
-    <div>
-        <ul>
-            {% for item in user_menu_items %}
-                <li style="{% if item.active %}font-weight: bold;{% endif %}"><a href="{{ item.url }}">{{ item.title }}</a></li>
-            {% endfor %}
-        </ul>
-    </div>
-
-    <div>
-        {% block user_content %}{% endblock %}
+    <div class="row">
+        {% if request.endpoint != 'users.user_dashboard' %}
+            <div class="column one-fifth">
+                <nav class="menu vertical i-box">
+                    {% for item in user_menu_items %}
+                        <a class="item{% if item.active %} active{% endif %}" href="{{ item.url }}">{{ item.title }}</a>
+                    {% endfor %}
+                </nav>
+            </div>
+        {% endif %}
+        <div class="column {% if request.endpoint != 'users.user_dashboard' %}four-fifths{% else %}full{% endif %}">
+            {% block user_content %}{% endblock %}
+        </div>
     </div>
 {% endblock %}
