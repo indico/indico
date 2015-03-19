@@ -9,7 +9,9 @@
 {%- endblock %}
 
 {% block content %}
-    {% include 'flashed_messages.html' %}
+    <div class="row">
+        {% include 'flashed_messages.html' %}
+    </div>
     <div class="row">
         {% if request.endpoint != 'users.user_dashboard' %}
             <div class="column one-fifth">
