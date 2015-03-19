@@ -100,10 +100,6 @@ type("ExportIcalInterface", [], {
         $('#authLinkWrapper'+this.id).append($(agreementTarget)).show();
     },
 
-    getAgreementMethod: function(){
-        return this.agreementMethod;
-    },
-
     getRequestURLs: function(){
         return this.requestURLs;
     },
@@ -111,34 +107,46 @@ type("ExportIcalInterface", [], {
     createKey: function(enablePersistent, progressTarget){
         var self = this;
         $(progressTarget).html($(progressIndicator(true, false).dom));
-        indicoRequest('user.createKeyAndEnablePersistent', {enablePersistent: enablePersistent},
-                function(result, error) {
-                    if (error){
-                        $(progressTarget).html('');
-                        IndicoUI.Dialogs.Util.error(error);
-                    }
-                    else{
-                        self.apiActive = true;
-                        self.persistentUserEnabled = enablePersistent;
-                        self._getExportURLs(progressTarget);
-                    }
-                });
+        $.ajax({
+            url: Indico.Urls.APIKeyCreate,
+            method: 'POST',
+            dataType: 'json',
+            data: {
+                quiet: '1',
+                persistent: enablePersistent ? '1': '0'
+            },
+            error: function(xhr) {
+                handleAjaxError(xhr);
+                $(progressTarget).html('');
+            },
+            success: function(data) {
+                self.apiActive = true;
+                self.persistentUserEnabled = data.is_persistent_allowed;
+                self._getExportURLs(progressTarget);
+            }
+        });
     },
 
     enablePersistentSignatures: function() {
         var self = this;
-        if(self.apiActive){
-            indicoRequest('user.togglePersistentSignatures', {userId: self.userId},
-                    function(result, error) {
-                        if (error){
-                            $('#progressPersistentSignatures').html('');
-                            IndicoUI.Dialogs.Util.error(error);
-                        }
-                        else{
-                            self.persistentUserEnabled = true;
-                            self._getExportURLs('progressPersistentSignatures');
-                        }
-                    });
+        if (self.apiActive) {
+            $.ajax({
+                url: Indico.Urls.APIKeyTogglePersistent,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    enabled: '1',
+                    quiet: '1'
+                },
+                error: function(xhr) {
+                    handleAjaxError(xhr);
+                    $('#progressPersistentSignatures').html('');
+                },
+                success: function(data) {
+                    self.persistentUserEnabled = data.enabled;
+                    self._getExportURLs('progressPersistentSignatures');
+                }
+            });
         }
 
         else{
@@ -224,7 +232,6 @@ type("ExportIcalInterface", [], {
     this.getURLsParams = any(getURLsParams, {});
     this.requestURLs = any(requestURLs, {});
     this.id = any(id,"");
-    this.agreementMethod = "";
     this.userId = any(userId, "");
 
     var self = this;

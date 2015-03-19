@@ -69,6 +69,7 @@
 
         {% if can_modify %}
             <button type="button" class="i-button danger" data-href="{{ url_for('.key_create') }}" data-method="post"
+                    data-params='{"force": "1"}'
                     data-title="{% trans %}Create new API key{% endtrans %}"
                     data-confirm="{% trans %}Do you really want to create a new API key? Your old key will stop working immediately!{% endtrans %}">
                 {%- trans %}Create new API key{% endtrans -%}

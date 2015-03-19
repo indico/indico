@@ -122,15 +122,23 @@ $(document).ready(function() {
         var $this = $(this);
         var url = $this.data('href');
         var method = ($this.data('method') || 'GET').toUpperCase();
+        var params = $this.data('params') || {};
+        if (!$.isPlainObject(params)) {
+            throw new Error('Invalid params. Must be valid JSON if set.');
+        }
 
         function execute() {
             if (method == 'GET') {
-                location.href = url;
+                location.href = build_url(url, params);
             } else {
-                $('<form>', {
+                var form = $('<form>', {
                     action: url,
                     method: method
-                }).appendTo('body').submit();
+                });
+                $.each(params, function(key, value) {
+                    form.append($('<input>', {type: 'hidden', name: key, value: value}));
+                });
+                form.appendTo('body').submit();
             }
         }
 

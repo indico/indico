@@ -84,7 +84,10 @@ def generate_global_file(config):
             'ConfModifSchedule': urlHandlers.UHConfModifSchedule.getURL(_ignore_static=True).js_router,
             'SubcontrModif': urlHandlers.UHContribModifSubCont.getURL(_ignore_static=True).js_router,
             'AuthorDisplay': urlHandlers.UHContribAuthorDisplay.getURL(_ignore_static=True).js_router,
-            'AuthorEmail': urlHandlers.UHConferenceEmail.getURL(_ignore_static=True).js_router
+            'AuthorEmail': urlHandlers.UHConferenceEmail.getURL(_ignore_static=True).js_router,
+
+            'APIKeyCreate': url_for('api.key_create'),
+            'APIKeyTogglePersistent': url_for('api.key_toggle_persistent')
         },
 
         'Data': {

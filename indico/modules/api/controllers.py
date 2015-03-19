@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import flash, redirect, session, request
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, BadRequest
 
 from indico.core.db import db
 from indico.modules.api import APIMode
@@ -72,22 +72,33 @@ class RHAPICreateKey(RHUserBase):
     """API key creation"""
 
     def _process(self):
+        quiet = request.form.get('quiet') == '1'
+        force = request.form.get('force') == '1'
+        persistent = request.form.get('persistent') == '1' and api_settings.get('allow_persistent')
         old_key = self.user.api_key
         if old_key:
+            if not force:
+                raise BadRequest('There is already an API key for this user')
             if old_key.is_blocked and not session.user.isAdmin():
                 raise Forbidden
             old_key.is_active = False
             db.session.flush()
         key = APIKey(user=self.user)
         db.session.add(key)
-        if old_key:
+        if persistent:
+            key.is_persistent_allowed = persistent
+        elif old_key:
             key.is_persistent_allowed = old_key.is_persistent_allowed
-            flash(_('Your API key has been successfully replaced.'), 'success')
-            if old_key.use_count:
-                flash(_('Please update any applications which use old key.'), 'warning')
-        else:
-            flash(_('Your API key has been successfully created.'), 'success')
-        return redirect(url_for('api.user_profile'))
+        if not quiet:
+            if old_key:
+                flash(_('Your API key has been successfully replaced.'), 'success')
+                if old_key.use_count:
+                    flash(_('Please update any applications which use old key.'), 'warning')
+            else:
+                flash(_('Your API key has been successfully created.'), 'success')
+        db.session.flush()
+        return redirect_or_jsonify(url_for('api.user_profile'), flash=not quiet,
+                                   is_persistent_allowed=key.is_persistent_allowed)
 
 
 class RHAPIDeleteKey(RHUserBase):
@@ -104,14 +115,15 @@ class RHAPITogglePersistent(RHUserBase):
     """API key - persistent signatures on/off"""
 
     def _process(self):
+        quiet = request.form.get('quiet') == '1'
         key = self.user.api_key
         key.is_persistent_allowed = api_settings.get('allow_persistent') and request.form['enabled'] == '1'
-        if request.form.get('quiet') != '1':
+        if not quiet:
             if key.is_persistent_allowed:
                 flash(_('You can now use persistent signatures.'), 'success')
             else:
                 flash(_('Persistent signatures have been disabled for your API key.'), 'success')
-        return redirect_or_jsonify(url_for('api.user_profile'), enabled=key.is_persistent_allowed)
+        return redirect_or_jsonify(url_for('api.user_profile'), flash=not quiet, enabled=key.is_persistent_allowed)
 
 
 class RHAPIBlockKey(RHUserBase):
