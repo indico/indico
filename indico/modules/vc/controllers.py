@@ -69,7 +69,7 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
 
     if event_vc_room.link_type != VCRoomLinkType.event and existing:
         transaction.abort()
-        flash(_("There is already a VC room attached to '{1}'.").format(resolve_title(event_vc_room.link_object)),
+        flash(_("There is already a VC room attached to '{}'.").format(resolve_title(event_vc_room.link_object)),
               'error')
         return None
     elif event_vc_room.link_type == VCRoomLinkType.event and vc_room in existing:
