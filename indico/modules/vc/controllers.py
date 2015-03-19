@@ -345,7 +345,7 @@ class RHVCRoomModify(RHVCSystemEventBase):
 
         if json_data is None:
             raise BadRequest("'application/json' expected")
-        elif len(json_data.keys()) > 1 or json_data.get('data') is None:
+        elif len(json_data) > 1 or 'data' not in json_data:
             raise BadRequest("can only change 'data' fields for now")
         elif not isinstance(json_data['data'], dict):
             raise BadRequest("'data' should be a dictionary")
