@@ -104,14 +104,46 @@ $(document).ready(function() {
         }
     });
 
-    $(".body").on("click", "[data-confirm]", function(event){
-        var self = this;
+    $('.body').on('click', '[data-confirm]:not(button[data-href])', function() {
+        var $this = $(this);
         new ConfirmPopup($(this).data("title"), $(this).data("confirm"), function(confirmed){
-            if(confirmed){
-                window.location = self.getAttribute("href");
+            if (confirmed){
+                if ($this.is('form')) {
+                    $this.submit();
+                } else {
+                    window.location = self.getAttribute("href");
+                }
             }
         }).open();
         return false;
+    });
+
+    $('.body').on('click', 'button[data-href]', function() {
+        var $this = $(this);
+        var url = $this.data('href');
+        var method = ($this.data('method') || 'GET').toUpperCase();
+
+        function execute() {
+            if (method == 'GET') {
+                location.href = url;
+            } else {
+                $('<form>', {
+                    action: url,
+                    method: method
+                }).appendTo('body').submit();
+            }
+        }
+
+        var promptMsg = $this.data('confirm');
+        if (promptMsg) {
+            new ConfirmPopup($(this).data('title') || $T('Confirm action'), promptMsg, function(confirmed) {
+                if (confirmed) {
+                    execute();
+                }
+            }).open();
+        } else {
+            execute();
+        }
     });
 
     if (navigator.userAgent.match(/Trident\/7\./)) {
