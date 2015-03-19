@@ -22,7 +22,7 @@ from flask import session, request
 from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.modules.users.views import WPUserDashboard
+from indico.modules.users.views import WPUserDashboard, WPUserAccount
 from indico.util.date_time import timedelta_split
 from indico.util.redis import suggestions
 from indico.util.redis import client as redis_client
@@ -61,3 +61,8 @@ class RHUserDashboard(RHUserBase):
                                                offset='{:+03d}:{:02d}'.format(hours, minutes), user=self.user,
                                                categories=self.user.getRelatedCategories(),
                                                suggested_categories=self.user.getSuggestedCategories())
+
+
+class RHUserAccount(RHUserBase):
+    def _process(self):
+        return WPUserAccount.render_template('account.html', user=self.user)
