@@ -122,3 +122,33 @@
         }
     }
 }
+
+
+// ============================================================================
+// Boxed group lists
+// ============================================================================
+
+.i-box {
+    ul.group-list {
+        color: $light-black;
+        list-style: outside none none;
+        margin: 0 0 -10px 0;
+        padding: 0;
+
+        > li:first-child {
+            border-top: 1px solid #ddd;
+        }
+
+        > li:last-child {
+            border-bottom: 0;
+        }
+
+        > li {
+            border-bottom: 1px solid #e5e5e5;
+            display: block;
+            margin-left: -10px;
+            margin-right: -10px;
+            padding: 10px 10px;
+        }
+    }
+}
