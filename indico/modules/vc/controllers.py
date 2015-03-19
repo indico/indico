@@ -295,6 +295,8 @@ class RHVCManageAttach(RHVCManageEventCreateBase):
             if not self.plugin.can_manage_vc_rooms(session.user, self.event):
                 flash(_("You are not allowed to attach {} rooms to this event.").format(self.plugin.friendly_name),
                       'error')
+            elif not self.plugin.can_manage_vc_room(session.user, vc_room):
+                flash(_("You are not authorized to attach room '{}'".format(vc_room.name)), 'error')
             else:
                 event_vc_room = process_vc_room_association(self.plugin, self.event, vc_room, form)
                 if event_vc_room:

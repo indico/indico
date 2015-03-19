@@ -15,7 +15,8 @@
                     return callback();
                 }
                 $.ajax(SEARCH_URL, {
-                    data: {q: query}
+                    data: {q: query},
+                    cache: false
                 }).fail(function() {
                     callback();
                 }).done(function(res) {
