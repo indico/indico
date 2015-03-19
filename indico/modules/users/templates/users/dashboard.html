@@ -5,6 +5,13 @@
 {%- endblock %}
 
 {% block user_content %}
+    <div class="clearfix">
+        <div class="toolbar right">
+            <div class="group">
+                <a type="button" class="i-button icon-settings" href="{{ url_for('users.user_account') }}">My settings</a>
+            </div>
+        </div>
+    </div>
     <div class="dashboard-tab">
         <div class="quick-access-pane">
             {% if redis_enabled %}
