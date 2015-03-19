@@ -82,7 +82,7 @@
         {% endif %}
     {% endif %}
 
-    {% if session.user.isAdmin() %}
+    {% if session.user.isAdmin() and (key or old_keys) %}
         <div class="i-form management-area">
             <fieldset>
                 <legend>{% trans %}Administration{% endtrans %}</legend>
