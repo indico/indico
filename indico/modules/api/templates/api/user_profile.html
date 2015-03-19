@@ -129,33 +129,6 @@
     {% endif %}
 
     <script>
-        $('#toggle-persistent-signatures').on('click', function(e) {
-            e.preventDefault();
-            var $this = $(this);
-            var checked = this.checked;
-            var message = checked ? $this.data('confirm_enable') : $this.data('confirm_disable');
-
-            confirmPrompt(message).then(function() {
-                $this.prop('checked', checked).prop('disabled', true);
-                $.ajax({
-                    url: $this.data('href'),
-                    method: 'POST',
-                    dataType: 'json',
-                    data: {
-                        enabled: checked ? '1' : '0'
-                    },
-                    complete: function() {
-                        $this.prop('disabled', false);
-                    },
-                    error: function(data) {
-                        handleAjaxError(data);
-                        $this.prop('checked', !checked);
-                    },
-                    success: function(data) {
-                        $this.prop('checked', data.enabled);
-                    }
-                });
-            });
-        });
+        $('#toggle-persistent-signatures').ajaxCheckbox();
     </script>
 {% endblock %}
