@@ -64,23 +64,23 @@
             float: left;
             padding: 0 1em 0 1em;
 
-            &.one-fifth {
+            &.col-20 {
                 width: 20%;
             }
 
-            &.two-fifths {
+            &.col-40 {
                 width: 40%;
             }
 
-            &.three-fifths {
+            &.col-60 {
                 width: 60%;
             }
 
-            &.four-fifths {
+            &.col-80 {
                 width: 80%;
             }
 
-            &.full {
+            &.col-full {
                 width: 100%;
             }
 

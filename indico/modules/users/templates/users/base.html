@@ -14,7 +14,7 @@
     </div>
     <div class="row">
         {% if request.endpoint != 'users.user_dashboard' %}
-            <div class="column one-fifth">
+            <div class="column col-20">
                 <nav class="menu vertical i-box">
                     {% for item in user_menu_items %}
                         <a class="item{% if item.active %} active{% endif %}" href="{{ item.url }}">{{ item.title }}</a>
@@ -22,7 +22,7 @@
                 </nav>
             </div>
         {% endif %}
-        <div class="column {% if request.endpoint != 'users.user_dashboard' %}four-fifths{% else %}full{% endif %}">
+        <div class="column {% if request.endpoint != 'users.user_dashboard' %}col-80{% else %}col-full{% endif %}">
             {% block user_content %}{% endblock %}
         </div>
     </div>
