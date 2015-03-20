@@ -1,5 +1,7 @@
 {% extends 'layout/full_page_base.html' %}
 
+{% set show_nav = request.endpoint != 'users.user_dashboard' %}
+
 {% block title -%}
     {% if user == session.user %}
         {% trans %}My Profile{% endtrans %}
@@ -13,7 +15,7 @@
         {% include 'flashed_messages.html' %}
     </div>
     <div class="row">
-        {% if request.endpoint != 'users.user_dashboard' %}
+        {% if show_nav %}
             <div class="column col-20">
                 <nav class="menu vertical i-box">
                     {% for item in user_menu_items %}
@@ -22,7 +24,7 @@
                 </nav>
             </div>
         {% endif %}
-        <div class="column {% if request.endpoint != 'users.user_dashboard' %}col-80{% else %}col-full{% endif %}">
+        <div class="column {% if show_nav %}col-80{% else %}col-full{% endif %}">
             {% block user_content %}{% endblock %}
         </div>
     </div>
