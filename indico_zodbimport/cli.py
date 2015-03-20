@@ -180,12 +180,14 @@ class Importer(object):
     def migrate(self):
         raise NotImplementedError
 
-    def fix_sequences(self, schema=None):
+    def fix_sequences(self, schema=None, tables=None):
         for name, cls in sorted(db.Model._decl_class_registry.iteritems(), key=itemgetter(0)):
             table = getattr(cls, '__table__', None)
             if table is None:
                 continue
             elif schema is not None and table.schema != schema:
+                continue
+            elif tables is not None and cls.__tablename__ not in tables:
                 continue
             # Check if we have a single autoincrementing primary key
             candidates = [col for col in table.c if col.autoincrement and col.primary_key]
