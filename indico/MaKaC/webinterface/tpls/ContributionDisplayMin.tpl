@@ -154,6 +154,7 @@
             % endif
         </div>
     </div>
+</div>
 <script type="text/javascript">
     $("#manageMaterial").click(function(){
         IndicoUI.Dialogs.Material.editor('${Contribution.getOwner().getId()}', '${Contribution.getConference().getId()}',
