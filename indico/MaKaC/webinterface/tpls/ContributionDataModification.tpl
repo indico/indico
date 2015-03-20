@@ -88,7 +88,7 @@ IndicoUI.executeOnLoad(function()
         $E('dateTime').set(dateTime)
         info.set('startDate', dateTime.get());
     % endif
-% else:
+% elif sessionType != "poster":
 $E('dateTime').set('Not scheduled')
 % endif
 % if sessionType != 'poster':
