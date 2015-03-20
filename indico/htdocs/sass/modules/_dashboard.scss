@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import "base/palette";
+
 .dashboard-col {
     display: table-cell;
     width: 1%;
@@ -182,4 +184,29 @@
 
 .item-legend [class*=icon-].active {
     color: #777;
+}
+
+.your-details {
+    margin-bottom: 15px;
+
+    .avatar-image {
+        font-size: 123px;
+        color: $black;
+        margin-right: 35px;
+    }
+
+    .your-details-wrapper {
+        color: $black;
+        font-size: 1.2em;
+        line-height: 1.5;
+
+        h3 {
+            margin-top: 0;
+        }
+
+        i {
+            color: $dark-gray;
+            margin-right: 10px;
+        }
+    }
 }

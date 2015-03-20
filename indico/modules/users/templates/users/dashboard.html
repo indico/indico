@@ -5,13 +5,31 @@
 {%- endblock %}
 
 {% block user_content %}
-    <div class="clearfix">
+    <div class="your-details clearfix">
+        <div class="avatar-image left">
+            <i class="icon-user"></i>
+        </div>
+        <div class="your-details-wrapper left">
+            <h3>
+                {{ user.getFirstName() }} {{ user.getFamilyName() }}
+            </h3>
+            <div>
+                <i class="icon-users"></i><span>{{ user.getOrganisation() }}</span>
+            </div>
+            <div>
+                <i class="icon-mail"></i><span>{{ user.getEmail() }}</span>
+            </div>
+            <div>
+                <i class="icon-phone"></i><span>{{ user.getTelephone() }}</span>
+            </div>
+        </div>
         <div class="toolbar right">
             <div class="group">
-                <a type="button" class="i-button icon-settings" href="{{ url_for('users.user_account') }}">My settings</a>
+                <a type="button" class="i-button icon-settings" href="{{ url_for('users.user_account') }}">Settings</a>
             </div>
         </div>
     </div>
+
     <div class="dashboard-tab">
         <div class="quick-access-pane">
             {% if redis_enabled %}
