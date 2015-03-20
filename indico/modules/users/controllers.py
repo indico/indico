@@ -65,4 +65,7 @@ class RHUserDashboard(RHUserBase):
 
 class RHUserAccount(RHUserBase):
     def _process(self):
-        return WPUserAccount.render_template('account.html', user=self.user)
+        display_tz = self.user.getDisplayTZMode() or "MyTimezone"
+        show_past_events = int(self.user.getPersonalInfo().getShowPastEvents())
+        return WPUserAccount.render_template('account.html', user=self.user, display_timezones=display_tz,
+                                             show_past_events=show_past_events)
