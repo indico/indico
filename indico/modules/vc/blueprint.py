@@ -58,3 +58,5 @@ _bp.add_url_rule('/event/<confId>/videoconference/', 'event_videoconference', RH
 vc_compat_blueprint = _compat_bp = IndicoBlueprint('compat_vc', __name__)
 vc_compat_blueprint.add_url_rule('/event/<confId>/collaboration', 'collaboration',
                                  make_compat_redirect_func(_bp, 'event_videoconference'))
+vc_compat_blueprint.add_url_rule('/collaborationDisplay.py', 'collaborationpy',
+                                 make_compat_redirect_func(_bp, 'event_videoconference'))
