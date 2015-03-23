@@ -20,6 +20,7 @@
 .dashboard-col {
     display: table-cell;
     width: 1%;
+    vertical-align: top;
 }
 
 .dashboard-col:last-child {
@@ -190,15 +191,16 @@
     margin-bottom: 15px;
 
     .avatar-image {
-        font-size: 123px;
+        font-size: 130px;
         color: $black;
-        margin-right: 35px;
+        margin-right: 34px;
     }
 
     .your-details-wrapper {
         color: $black;
         font-size: 1.2em;
         line-height: 1.5;
+        max-width: 300px;
 
         h3 {
             margin-top: 0;

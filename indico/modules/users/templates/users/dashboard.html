@@ -5,89 +5,33 @@
 {%- endblock %}
 
 {% block user_content %}
-    <div class="your-details clearfix">
-        <div class="avatar-image left">
-            <i class="icon-user"></i>
-        </div>
-        <div class="your-details-wrapper left">
-            <h3>
-                {{ user.getFirstName() }} {{ user.getFamilyName() }}
-            </h3>
-            <div>
-                <i class="icon-users"></i><span>{{ user.getOrganisation() }}</span>
-            </div>
-            <div>
-                <i class="icon-mail"></i><span>{{ user.getEmail() }}</span>
-            </div>
-            <div>
-                <i class="icon-phone"></i><span>{{ user.getTelephone() }}</span>
-            </div>
-        </div>
-        <div class="toolbar right">
-            <div class="group">
-                <a type="button" class="i-button icon-settings" href="{{ url_for('users.user_account') }}">Settings</a>
-            </div>
-        </div>
-    </div>
-
     <div class="dashboard-tab">
         <div class="quick-access-pane">
-            {% if redis_enabled %}
-                <div class="dashboard-col">
-                    <div id="yourEvents" class="dashboard-box">
-                        <h3>
-                            {% trans %}Your events at hand{% endtrans %}
-                            {% if session.user.isAdmin() %}
-                                <a href="#" id="refresh-redis-links" style="float: right;" class="icon-refresh" title="{% trans %}Admin tool: Refresh Redis links{% endtrans %}"></a>
-                                <script>
-                                    $('#refresh-redis-links').on('click', function(e) {
-                                        e.preventDefault();
-                                        var killProgress = IndicoUI.Dialogs.Util.progress();
-                                        indicoRequest('user.refreshRedisLinks', {
-                                            userId: {{ user.id | tojson }}
-                                        }, function(result, error) {
-                                            if(error) {
-                                                killProgress();
-                                                IndicoUtil.errorReport(error);
-                                                return;
-                                            }
-                                            location.reload();
-                                        });
-                                    });
-                                </script>
-                            {% endif %}
-                        </h3>
-                        <ol></ol>
-                    </div>
-                </div>
-            {% endif %}
+
             <div class="dashboard-col">
-                <div id="yourCategories" class="dashboard-box">
-                    <h3>{% trans %}Your categories{% endtrans %}</h3>
-                    <ol>
-                        {% if not categories %}
-                            <li class="no-event">
-                                <span class="event-title italic text-superfluous">{% trans %}You have no categories.{% endtrans %}</span>
-                            </li>
-                        {% else %}
-                            {% for category in categories.itervalues() %}
-                                <li>
-                                    <a href="{{ category.categ.url }}" class="truncate">
-                                    <span class="category-name truncate-target">{{ category.categ.getTitle() }}</span>
-                                    <span class="item-legend">
-                                        {% if category.managed %}
-                                            <span title="{% trans %}You have management rights{% endtrans %}" class="icon-medal active"></span>
-                                        {% else %}
-                                            <span title="{% trans %}You have favorited this category{% endtrans %}" class="icon-star active"></span>
-                                        {% endif %}
-                                    </span>
-                                    {% if category.path %}
-                                        <span class="category-path">{{ category.path }}</span>
-                                    {% endif %}
-                                    </a></li>
-                            {% endfor %}
-                        {% endif %}
-                    </ol>
+                <div class="your-details clearfix">
+                    <div class="avatar-image left">
+                        <i class="icon-user"></i>
+                    </div>
+                    <div class="your-details-wrapper left">
+                        <h3>
+                            {{- user.getFirstName() }} {{ user.getFamilyName() -}}
+                        </h3>
+                        <div>
+                            <i class="icon-users"></i><span>{{ user.getOrganisation() }}</span>
+                        </div>
+                        <div>
+                            <i class="icon-mail"></i><span>{{ user.getEmail() }}</span>
+                        </div>
+                        <div>
+                            <i class="icon-phone"></i><span>{{ user.getTelephone() }}</span>
+                        </div>
+                    </div>
+                    <div class="toolbar right">
+                        <div class="group">
+                            <a type="button" class="i-button icon-settings" href="{{ url_for('users.user_account') }}">Settings</a>
+                        </div>
+                    </div>
                 </div>
                 {% if suggested_categories %}
                     <div id="suggestedCategories" class="dashboard-box suggestions">
@@ -117,6 +61,62 @@
                         </ol>
                     </div>
                 {% endif %}
+                {% if redis_enabled %}
+                    <div id="yourEvents" class="dashboard-box">
+                        <h3>
+                            {% trans %}Your events at hand{% endtrans %}
+                            {% if session.user.isAdmin() %}
+                                <a href="#" id="refresh-redis-links" style="float: right;" class="icon-refresh" title="{% trans %}Admin tool: Refresh Redis links{% endtrans %}"></a>
+                                <script>
+                                    $('#refresh-redis-links').on('click', function(e) {
+                                        e.preventDefault();
+                                        var killProgress = IndicoUI.Dialogs.Util.progress();
+                                        indicoRequest('user.refreshRedisLinks', {
+                                            userId: {{ user.id | tojson }}
+                                        }, function(result, error) {
+                                            if(error) {
+                                                killProgress();
+                                                IndicoUtil.errorReport(error);
+                                                return;
+                                            }
+                                            location.reload();
+                                        });
+                                    });
+                                </script>
+                            {% endif %}
+                        </h3>
+                        <ol></ol>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="dashboard-col">
+                <div id="yourCategories" class="dashboard-box">
+                    <h3>{% trans %}Your categories{% endtrans %}</h3>
+                    <ol>
+                        {% if not categories %}
+                            <li class="no-event">
+                                <span class="event-title italic text-superfluous">{% trans %}You have no categories.{% endtrans %}</span>
+                            </li>
+                        {% else %}
+                            {% for category in categories.itervalues() %}
+                                <li>
+                                    <a href="{{ category.categ.url }}" class="truncate">
+                                    <span class="category-name truncate-target">{{ category.categ.getTitle() }}</span>
+                                    <span class="item-legend">
+                                        {% if category.managed %}
+                                            <span title="{% trans %}You have management rights{% endtrans %}" class="icon-medal active"></span>
+                                        {% else %}
+                                            <span title="{% trans %}You have favorited this category{% endtrans %}" class="icon-star active"></span>
+                                        {% endif %}
+                                    </span>
+                                    {% if category.path %}
+                                        <span class="category-path">{{ category.path }}</span>
+                                    {% endif %}
+                                    </a></li>
+                            {% endfor %}
+                        {% endif %}
+                    </ol>
+                </div>
                 <div id="happeningCategories" class="dashboard-box">
                     <h3>{% trans %}Happening in your categories{% endtrans %}</h3>
                     <ol>
