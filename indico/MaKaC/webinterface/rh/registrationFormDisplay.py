@@ -208,7 +208,13 @@ class RHRegistrationFormRegistrantBase(RHRegistrationForm):
             raise NotFoundError(_("You are not registered or your registration has been deleted"))
 
 
-class RHConferenceTicketPDF(RHRegistrationFormDisplayBaseCheckProtection):
+class RHConferenceTicketPDF(RHRegistrationFormRegistrantBase):
+    def _checkProtection(self):
+        RHRegistrationFormRegistrantBase._checkProtection(self)
+        if self._regForm.inRegistrationPeriod() and self._regForm.isMandatoryAccount() and self._getUser() is None:
+            self._redirect(self._getLoginURL())
+            self._doProcess = False
+
     def _process(self):
         set_best_lang()  # prevents from having a _LazyString when generating a pdf without session.lang set
         filename = "{0}-Ticket.pdf".format(self._target.getTitle())
