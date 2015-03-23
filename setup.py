@@ -479,6 +479,7 @@ if __name__ == '__main__':
             roombooking = indico_zodbimport.modules.roombooking:RoomBookingImporter
             payment = indico_zodbimport.modules.payment:PaymentImporter
             api = indico_zodbimport.modules.api:APIImporter
+            users = indico_zodbimport.modules.users:UserImporter
             """,
           zip_safe=False,
           packages=foundPackages,
