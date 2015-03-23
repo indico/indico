@@ -75,7 +75,8 @@ class User(db.Model):
     is_admin = db.Column(
         db.Boolean,
         nullable=False,
-        default=False
+        default=False,
+        index=True
     )
     #: if the user has been blocked
     is_blocked = db.Column(

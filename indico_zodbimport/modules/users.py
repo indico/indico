@@ -43,6 +43,7 @@ class UserImporter(Importer):
         self.users_by_secondary_email = {}
         self.migrate_users()
         self.fix_sequences('users', {'users'})
+        self.migrate_admins()
 
     def migrate_users(self):
         print cformat('%{white!}migrating users')
@@ -83,6 +84,13 @@ class UserImporter(Importer):
                 self._fix_collisions(merged)
                 db.session.add(merged)
                 db.session.flush()
+
+    def migrate_admins(self):
+        print cformat('%{white!}migrating admins')
+        for avatar in committing_iterator(self.zodb_root['adminlist']._AdminList__list):
+            user = User.get(int(avatar.id))
+            user.is_admin = True
+            print cformat('%{green}+++%{reset} %{cyan}{}').format(user)
 
     def _user_from_avatar(self, avatar, **kwargs):
         email = _sanitize_email(convert_to_unicode(avatar.email).lower().strip())
