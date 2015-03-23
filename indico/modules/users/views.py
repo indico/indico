@@ -48,6 +48,7 @@ class WPUser(WPJinjaMixin, WPMainBase):
         params['user_menu_items'] = [
             MenuItem(_('Dashboard'), 'users.user_dashboard'),
             MenuItem(_('Account details'), 'users.user_account'),
+            MenuItem(_('Favorites'), 'users.user_favorites'),
             # TODO: other menu items
         ] + extra_items
         return self._getPageContent(params)
@@ -56,7 +57,3 @@ class WPUser(WPJinjaMixin, WPMainBase):
 class WPUserDashboard(WPUser):
     def getCSSFiles(self):
         return WPUser.getCSSFiles(self) + self._asset_env['dashboard_sass'].urls()
-
-
-class WPUserAccount(WPUser):
-    pass

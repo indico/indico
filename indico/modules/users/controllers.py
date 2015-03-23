@@ -22,12 +22,14 @@ from flask import session, request
 from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.modules.users.views import WPUserDashboard, WPUserAccount
+from indico.modules.users.views import WPUserDashboard, WPUser
 from indico.util.date_time import timedelta_split
 from indico.util.redis import suggestions
 from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
+from MaKaC.common.fossilize import fossilize
 from MaKaC.common.timezoneUtils import DisplayTZ
+from MaKaC.services.implementation.user import UserComparator
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.rh.base import RHProtected
 
@@ -67,5 +69,16 @@ class RHUserAccount(RHUserBase):
     def _process(self):
         display_tz = self.user.getDisplayTZMode() or "MyTimezone"
         show_past_events = int(self.user.getPersonalInfo().getShowPastEvents())
-        return WPUserAccount.render_template('account.html', user=self.user, display_timezones=display_tz,
-                                             show_past_events=show_past_events)
+        return WPUser.render_template('account.html', user=self.user, display_timezones=display_tz,
+                                      show_past_events=show_past_events)
+
+
+class RHUserFavorites(RHUserBase):
+    def _process(self):
+        favorite_categs = [dict(id=c.getId(), title=c.getTitle()) for c in
+                           self.user.getLinkTo('category', 'favorite')]
+        users = self.user.getPersonalInfo().getBasket().getUsers().values()
+        fossilizedUsers = sorted(fossilize(users), cmp=UserComparator.cmpUsers)
+        favorite_users = fossilizedUsers
+        return WPUser.render_template('favorites.html', user=self.user, favorite_categs=favorite_categs,
+                                      favorite_users=favorite_users)

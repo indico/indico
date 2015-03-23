@@ -150,5 +150,13 @@
             margin-right: -10px;
             padding: 10px 10px;
         }
+
+        &.no-description {
+            margin-top: -20px;
+
+            > li:first-child {
+                border-top: 0;
+            }
+        }
     }
 }
