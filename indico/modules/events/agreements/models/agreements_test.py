@@ -201,9 +201,9 @@ def test_render_no_definition(monkeypatch):
 
 
 def test_belongs_to():
-    person_identifier = '1234asdf'
-    agreement = Agreement(identifier=person_identifier)
-    assert agreement.identifier == person_identifier
+    agreement = Agreement(identifier='foo')
+    assert agreement.belongs_to(MagicMock(identifier='foo'))
+    assert not agreement.belongs_to(MagicMock(identifier='bar'))
 
 
 @pytest.mark.usefixtures('mock_agreement_definition')
@@ -211,9 +211,3 @@ def test_is_orphan(dummy_event):
     agreement = Agreement(event_id=dummy_event.id)
     agreement.is_orphan()
     agreement.definition.is_agreement_orphan(agreement.event, agreement)
-
-
-def test_belongs_to():
-    agreement = Agreement(identifier='foo')
-    assert agreement.belongs_to(MagicMock(identifier='foo'))
-    assert not agreement.belongs_to(MagicMock(identifier='bar'))
