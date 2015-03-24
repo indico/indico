@@ -18,9 +18,13 @@ from __future__ import unicode_literals
 
 import re
 
+from pytz import all_timezones_set
+
 from indico.core.db import db
-from indico.modules.users import User
+from indico.modules.users import User, user_settings
+from indico.util.caching import memoize
 from indico.util.console import cformat
+from indico.util.i18n import get_all_locales
 from indico.util.string import is_valid_mail
 from indico.util.struct.iterables import committing_iterator
 
@@ -32,6 +36,11 @@ def _sanitize_email(email):
         return email
     m = re.search(r'<([^>]+)>', email)
     return email if m is None else m.group(1)
+
+
+@memoize
+def _get_all_locales():
+    return set(get_all_locales())
 
 
 class UserImporter(Importer):
@@ -68,13 +77,15 @@ class UserImporter(Importer):
                     continue
 
             user = self._user_from_avatar(avatar)
+            self._fix_collisions(user)
+            db.session.add(user)
+            settings = self._settings_from_avatar(avatar)
+            user_settings.set_multi(user, settings)
+            db.session.flush()
             print cformat('%{green}+++%{reset} '
                           '%{white!}{:6d}%{reset} %{cyan}{} {}%{reset} [%{blue!}{}%{reset}] '
                           '{{%{cyan!}{}%{reset}}}').format(user.id, user.first_name, user.last_name, user.email,
                                                            ', '.join(user.secondary_emails))
-            self._fix_collisions(user)
-            db.session.add(user)
-            db.session.flush()
             for merged_avatar in getattr(avatar, '_mergeFrom', ()):
                 merged = self._user_from_avatar(merged_avatar, is_deleted=True, merged_into_id=user.id)
                 print cformat('%{blue!}***%{reset} '
@@ -112,6 +123,23 @@ class UserImporter(Importer):
         if is_deleted or not is_valid_mail(user.email):
             user.is_deleted = True
         return user
+
+    def _settings_from_avatar(self, avatar):
+        timezone = avatar.timezone
+        if not timezone or timezone not in all_timezones_set:
+            timezone = getattr(self.zodb_root['MaKaCInfo']['main'], '_timezone', 'UTC')
+        language = avatar._lang
+        if language not in _get_all_locales():
+            language = getattr(self.zodb_root['MaKaCInfo']['main'], '_lang', 'en_GB')
+        show_past_events = False
+        if hasattr(avatar, 'personalInfo'):
+            show_past_events = bool(getattr(avatar.personalInfo, '_showPastEvents', False))
+        return {
+            'lang': language,
+            'timezone': timezone,
+            'force_timezone': avatar.displayTZMode == 'MyTimezone',
+            'show_past_events': show_past_events,
+        }
 
     def _fix_collisions(self, user):
         is_deleted = user.is_deleted

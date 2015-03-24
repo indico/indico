@@ -21,4 +21,11 @@ from indico.modules.users.models.users import User
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
 
 
-__all__ = ('User', 'UserSettings', 'UserSettingsProxy')
+__all__ = ('User', 'UserSettings', 'UserSettingsProxy', 'user_settings')
+
+user_settings = UserSettingsProxy('users', {
+    'lang': None,
+    'timezone': None,
+    'force_timezone': False,  # always use the user's timezone instead of an event's timezone
+    'show_past_events': False
+})
