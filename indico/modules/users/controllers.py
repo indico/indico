@@ -23,7 +23,7 @@ from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.users.views import WPUserDashboard, WPUser
-from indico.modules.users.forms import UserDetailsForm
+from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm
 from indico.util.date_time import timedelta_split
 from indico.util.redis import suggestions
 from indico.util.redis import client as redis_client
@@ -68,12 +68,14 @@ class RHUserDashboard(RHUserBase):
 
 class RHUserAccount(RHUserBase):
     def _process(self):
-        display_tz = self.user.getDisplayTZMode() or "MyTimezone"
-        show_past_events = int(self.user.getPersonalInfo().getShowPastEvents())
-
         form = UserDetailsForm()
-        return WPUser.render_template('account.html', user=self.user, display_timezones=display_tz,
-                                      show_past_events=show_past_events, form=form)
+        return WPUser.render_template('account.html', user=self.user, form=form)
+
+
+class RHUserPreferences(RHUserBase):
+    def _process(self):
+        form = UserPreferencesForm()
+        return WPUser.render_template('preferences.html', user=self.user, form=form)
 
 
 class RHUserFavorites(RHUserBase):

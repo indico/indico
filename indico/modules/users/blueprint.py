@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import request
 
-from indico.modules.users.controllers import RHUserDashboard, RHUserAccount, RHUserFavorites
+from indico.modules.users.controllers import RHUserDashboard, RHUserAccount, RHUserPreferences, RHUserFavorites
 from indico.web.flask.wrappers import IndicoBlueprint
 
 # TODO: remove -new later
@@ -27,6 +27,7 @@ users_blueprint = _bp = IndicoBlueprint('users', __name__, template_folder='temp
 with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/dashboard/', 'user_dashboard', RHUserDashboard)
     _bp.add_url_rule('/account/', 'user_account', RHUserAccount)
+    _bp.add_url_rule('/preferences/', 'user_preferences', RHUserPreferences)
     _bp.add_url_rule('/favorites/', 'user_favorites', RHUserFavorites)
 
 

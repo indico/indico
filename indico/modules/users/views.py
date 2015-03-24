@@ -48,6 +48,7 @@ class WPUser(WPJinjaMixin, WPMainBase):
         params['user_menu_items'] = [
             MenuItem(_('Dashboard'), 'users.user_dashboard'),
             MenuItem(_('Account details'), 'users.user_account'),
+            MenuItem(_('Preferences'), 'users.user_preferences'),
             MenuItem(_('Favorites'), 'users.user_favorites'),
             # TODO: other menu items
         ] + extra_items

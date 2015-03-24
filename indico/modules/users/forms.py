@@ -16,21 +16,29 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields.core import SelectField
+from wtforms.fields.core import SelectField, BooleanField
 from wtforms.fields.html5 import EmailField
 from wtforms.fields.simple import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
-from indico.util.i18n import _
+from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import EmailListField
+from indico.web.forms.widgets import SwitchWidget
+
+from operator import itemgetter
+from pytz import all_timezones
 
 
-_title_choices = [('Mrs.', _('Mrs.')),
+_title_choices = [('', ''),
+                  ('Mrs.', _('Mrs.')),
                   ('Ms.', _('Ms.')),
                   ('Mr.', _('Mr.')),
                   ('Dr.', _('Dr.')),
                   ('Prof.', _('Prof.'))]
+
+_display_timezones = [('event', 'Event Timezone'),
+                      ('user', 'My Timezone')]
 
 
 class UserDetailsForm(IndicoForm):
@@ -43,3 +51,17 @@ class UserDetailsForm(IndicoForm):
                                       description=_('Your secondary email addresses (one per line).'))
     address = TextAreaField(_('Address'))
     phone = StringField(_('Phone number'))
+
+
+class UserPreferencesForm(IndicoForm):
+    language = SelectField(_('Language'))
+    timezone = SelectField(_('Timezone'))
+    display_tz = SelectField(_('Display timezone'), choices=_display_timezones)
+    show_past = BooleanField(_('Show past events'),
+                             widget=SwitchWidget(),
+                             description='Show past events by default.')
+
+    def __init__(self, *args, **kwargs):
+        super(UserPreferencesForm, self).__init__(*args, **kwargs)
+        self.language.choices = sorted(get_all_locales().items(), key=itemgetter(1))
+        self.timezone.choices = zip(all_timezones, all_timezones)
