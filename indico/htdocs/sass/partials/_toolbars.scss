@@ -160,17 +160,17 @@ $toolbar-thin-height: 1.9em;
 
     &:first-child,
     &.right:last-child {
-        padding-left: 0 !important;
+        padding-left: 0;
     }
 
     &:last-child,
     &.right:first-child {
-        padding-right: 0 !important;
+        padding-right: 0;
     }
 
     .i-button {
-        @include border-radius(0 !important);
-        border-right-width: 0px !important;
+        @include border-radius(0);
+        border-right-width: 0px;
 
         &:not(.label):not(.disabled):not(:disabled) {
             &:hover + .i-button {
@@ -179,33 +179,33 @@ $toolbar-thin-height: 1.9em;
         }
 
         &.arrow:last-of-type {
-            @include border-bottom-right-radius(2px !important);
-            @include border-top-right-radius(2px !important);
+            @include border-bottom-right-radius();
+            @include border-top-right-radius();
         }
     }
 
     .i-button:not(.hidden) {
         &:first-child {
-            @include border-bottom-left-radius(2px !important);
-            @include border-top-left-radius(2px !important);
+            @include border-bottom-left-radius();
+            @include border-top-left-radius();
         }
 
         &:last-child {
-            @include border-bottom-right-radius(2px !important);
-            @include border-top-right-radius(2px !important);
-            border-right-width: 1px !important;
+            @include border-bottom-right-radius();
+            @include border-top-right-radius();
+            border-right-width: 1px;
         }
 
         &.label {
             &:not(:last-child) {
-                @include border-bottom-right-radius(0 !important);
-                @include border-top-right-radius(0 !important);
+                @include border-bottom-right-radius(0);
+                @include border-top-right-radius(0);
                 border-right: none !important;
             }
 
             & ~ .i-button:not(.hidden):first-child {
-                @include border-bottom-left-radius(0 !important);
-                @include border-top-left-radius(0 !important);
+                @include border-bottom-left-radius(0);
+                @include border-top-left-radius(0);
             }
         }
     }
@@ -224,8 +224,8 @@ $toolbar-thin-height: 1.9em;
     input[type=text]:first-child,
     input[type=password]:first-child {
         + .i-button {
-            @include border-bottom-left-radius(2px !important);
-            @include border-top-left-radius(2px !important);
+            @include border-bottom-left-radius();
+            @include border-top-left-radius();
         }
     }
 
@@ -236,26 +236,26 @@ $toolbar-thin-height: 1.9em;
     > input[type=text]:first-child,
     > input[type=password]:first-child,
     > .clearableinput:first-child input[type=text] {
-        @include border-bottom-left-radius(2px !important);
-        @include border-top-left-radius(2px !important);
+        @include border-bottom-left-radius();
+        @include border-top-left-radius();
     }
 
     > input[type=text]:last-child,
     > input[type=password]:last-child,
     > .clearableinput:last-child input[type=text] {
-        @include border-bottom-right-radius(2px !important);
-        @include border-top-right-radius(2px !important);
+        @include border-bottom-right-radius();
+        @include border-top-right-radius();
     }
 
     > input[type=text]:not(:last-child),
     > input[type=password]:not(:last-child),
     > .clearableinput:not(:last-child) {
-        @include border-bottom-right-radius(0 !important);
-        @include border-top-right-radius(0 !important);
+        @include border-bottom-right-radius(0);
+        @include border-top-right-radius(0);
         & + .i-button {
             border-left: none;
-            @include border-bottom-left-radius(0 !important);
-            @include border-top-left-radius(0 !important);
+            @include border-bottom-left-radius(0);
+            @include border-top-left-radius(0);
         }
     }
 }
@@ -284,8 +284,8 @@ $toolbar-thin-height: 1.9em;
 
             &:last-child {
                 input[type=text] {
-                    @include border-bottom-right-radius(2px !important);
-                    @include border-top-right-radius(2px !important);
+                    @include border-bottom-right-radius();
+                    @include border-top-right-radius();
                 }
             }
 
