@@ -44,17 +44,23 @@
             text-align: center;
             top: 1px !important;
 
-            &.ui-state-disabled {
-                background: none !important;
-            }
-
-            &:hover:not(.ui-state-disabled) {
-                color: white;
-                background: $blue;
-            }
-
             &:before {
                 vertical-align: -30%;
+            }
+        }
+
+        &.ui-state-disabled {
+            .ui-datepicker-prev,
+            .ui-datepicker-next {
+                background: none !important;
+            }
+        }
+
+        &:hover:not(.ui-state-disabled) {
+            .ui-datepicker-prev,
+            .ui-datepicker-next {
+                color: white;
+                background: $blue;
             }
         }
 
@@ -123,11 +129,11 @@
             margin-top: .2em;
             opacity: 1;
             outline: none;
+        }
 
-            &:hover {
-                background: $blue;
-                color: white;
-            }
+        &:not(.ui-state-disabled) button.ui-datepicker-current:hover {
+            background: $blue;
+            color: white;
         }
     }
 }

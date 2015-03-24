@@ -71,75 +71,6 @@ ${ form.repeat_interval(type='hidden') }
 <script>
     $(document).ready(function() {
         'use strict';
-        var validEndDates = null;
-        var frequencies = {
-                '1' : RRule.DAILY,
-                '2' : RRule.WEEKLY,
-                '3' : RRule.MONTHLY
-            };
-
-        $('#timerange').timerange({
-            initStartTime: '${ form.start_dt.data.strftime("%H:%M") }',
-            initEndTime: '${ form.end_dt.data.strftime("%H:%M") }',
-            startTimeName: 'sTime',
-            endTimeName: 'eTime',
-            sliderWidth: '512px',
-            change: function() {
-                combineDatetime();
-                validateForm();
-            }
-        });
-
-        $('#sDatePlace, #eDatePlace').datepicker({
-            dateformat: 'dd/mm/yy',
-            % if not can_override:
-                maxDate: ${ room.max_advance_days - 1 if room and room.max_advance_days else 'null' },
-            % endif
-            showButtonPanel: true,
-            changeMonth: true,
-            changeYear: true,
-            showOn: 'focus'
-        });
-
-        % if not can_override:
-            $('#sDatePlace').datepicker('option', 'minDate', ${ "'{}'".format(min(min_date, form.start_dt.data).strftime('%d/%m/%Y')) if min_date else 0 });
-            $('#eDatePlace').datepicker('option', 'minDate', ${ "'{}'".format(min_date.strftime('%d/%m/%Y')) if min_date else 0 });
-        % endif
-
-        $('#eDatePlace').datepicker('option', 'beforeShowDay', function validateDate(date) {
-            if (validEndDates === null) {
-                return [true, '', ''];
-            }
-            return [validEndDates.indexOf(date.getTime()) !== -1, '', ''];
-        });
-
-        $('#sDatePlace').datepicker('option', 'onSelect', function startDateOnSelect(selectedDateText) {
-            disableInvalidDays();
-            refreshDatePicker($('#eDatePlace'));
-
-            selectEndDate();
-            commonOnSelect();
-        });
-
-        $('#eDatePlace').datepicker('option', 'onSelect', commonOnSelect);
-        $('#eDatePlace').datepicker('option', 'onChangeMonthYear', disableInvalidDays);
-
-        $('#sDatePlace').datepicker('setDate', "${ form.start_dt.data.strftime('%d/%m/%Y') }");
-        $('#eDatePlace').datepicker('setDate', "${ form.end_dt.data.strftime('%d/%m/%Y') }");
-
-        $('#repeatability input:radio[name=repeat_frequency]').change(function() {
-            checkFrequency();
-        });
-
-        % if not can_override:
-            % if form.start_dt.data < datetime.now():
-                $('#timerange').timerange('disable');
-                $('#sDatePlace').datepicker('disable');
-            % endif
-            % if form.end_dt.data < datetime.now():
-                $('#eDatePlace').datepicker('disable');
-            % endif
-        % endif
 
         function checkFrequency() {
             var frequency = $('#repeatability input:radio[name=repeat_frequency]:checked').val();
@@ -277,7 +208,90 @@ ${ form.repeat_interval(type='hidden') }
             }
         }
 
+        var validEndDates = null;
+        var frequencies = {
+            '1' : RRule.DAILY,
+            '2' : RRule.WEEKLY,
+            '3' : RRule.MONTHLY
+        };
+
+        $('#timerange').timerange({
+            initStartTime: '${ form.start_dt.data.strftime("%H:%M") }',
+            initEndTime: '${ form.end_dt.data.strftime("%H:%M") }',
+            startTimeName: 'sTime',
+            endTimeName: 'eTime',
+            sliderWidth: '512px',
+            change: function() {
+                combineDatetime();
+                validateForm();
+            }
+        });
+
+        $('#sDatePlace, #eDatePlace').datepicker({
+            dateformat: 'dd/mm/yy',
+            % if not can_override:
+                maxDate: ${ room.max_advance_days - 1 if room and room.max_advance_days else 'null' },
+            % endif
+            showButtonPanel: true,
+            changeMonth: true,
+            changeYear: true,
+            showOn: 'focus',
+            unifyNumRows: true
+        });
+
+        % if not can_override:
+            $('#sDatePlace').datepicker('option', 'minDate', ${ "'{}'".format(min(min_date, form.start_dt.data).strftime('%d/%m/%Y')) if min_date else 0 });
+            $('#eDatePlace').datepicker('option', 'minDate', ${ "'{}'".format(min_date.strftime('%d/%m/%Y')) if min_date else 0 });
+        % endif
+
+        $('#eDatePlace').datepicker('option', 'beforeShowDay', function validateDate(date) {
+            if (validEndDates === null) {
+                return [true, '', ''];
+            }
+            return [validEndDates.indexOf(date.getTime()) !== -1, '', ''];
+        });
+
+        $('#sDatePlace').datepicker('option', 'onSelect', function startDateOnSelect(selectedDateText) {
+            disableInvalidDays();
+            refreshDatePicker($('#eDatePlace'));
+
+            selectEndDate();
+            commonOnSelect();
+        });
+        $('#eDatePlace').datepicker('option', 'onSelect', commonOnSelect);
+
+        $('#eDatePlace').datepicker('option', 'onChangeMonthYear', disableInvalidDays);
+
+        $('#sDatePlace').datepicker('setDate', "${ form.start_dt.data.strftime('%d/%m/%Y') }");
+        $('#eDatePlace').datepicker('setDate', "${ form.end_dt.data.strftime('%d/%m/%Y') }");
+
+        $('#repeatability input:radio[name=repeat_frequency]').change(function() {
+            checkFrequency();
+        });
+
         checkFrequency();
         checkHolidays();
+
+        % if not can_override:
+            % if form.start_dt.data < datetime.now():
+                $('#timerange').timerange('disable');
+                var startDate = moment($('#sDatePlace').datepicker('getDate')).format('D/MM/YYYY');
+                // Disable the datea in calendar as well as the calendar itself...
+                $('#sDatePlace').datepicker('option', 'beforeShowDay', function validateDate(date) {
+                    return [moment(date).format('D/MM/YYYY') == startDate, '', ''];
+                });
+                $('#sDatePlace').datepicker('disable');
+            % endif
+            % if form.end_dt.data < datetime.now():
+                var endDate = moment($('#eDatePlace').datepicker('getDate')).format('D/MM/YYYY');
+                // Disable the datea in calendar as well as the calendar itself...
+                $('#eDatePlace').datepicker('option', 'beforeShowDay', function validateDate(date) {
+                    return [moment(date).format('D/MM/YYYY') == endDate, '', ''];
+                });
+                $('#eDatePlace').datepicker('disable');
+                $('#repeatability > input[name=repeat_frequency]').not(':checked').prop('disabled', true);
+            % endif
+        % endif
+
     });
 </script>
