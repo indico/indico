@@ -20,6 +20,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
+from indico.modules.users.models.emails import UserEmail
 from indico.util.caching import memoize_request
 from indico.util.string import return_ascii
 

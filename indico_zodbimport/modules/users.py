@@ -26,7 +26,7 @@ from indico.util.caching import memoize
 from indico.util.console import cformat
 from indico.util.i18n import get_all_locales
 from indico.util.string import is_valid_mail
-from indico.util.struct.iterables import committing_iterator
+from indico.util.struct.iterables import committing_iterator, grouper
 
 from indico_zodbimport import Importer, convert_to_unicode
 
@@ -52,6 +52,7 @@ class UserImporter(Importer):
         self.users_by_secondary_email = {}
         self.migrate_users()
         self.fix_sequences('users', {'users'})
+        self.migrate_favorite_users()
         self.migrate_admins()
 
     def migrate_users(self):
@@ -81,6 +82,8 @@ class UserImporter(Importer):
             db.session.add(user)
             settings = self._settings_from_avatar(avatar)
             user_settings.set_multi(user, settings)
+            # favorite users cannot be migrated here since the target user might not have been migrated yet
+            user.favorite_categories = list(avatar.linkedTo['category']['favorite'])
             db.session.flush()
             print cformat('%{green}+++%{reset} '
                           '%{white!}{:6d}%{reset} %{cyan}{} {}%{reset} [%{blue!}{}%{reset}] '
@@ -95,6 +98,34 @@ class UserImporter(Importer):
                 self._fix_collisions(merged)
                 db.session.add(merged)
                 db.session.flush()
+
+    def migrate_favorite_users(self):
+        print cformat('%{white!}migrating favorite users')
+        for avatars in grouper(self._iter_avatars_with_favorite_users(), 2500, skip_missing=True):
+            avatars = list(avatars)
+            users = {u.id: u for u in User.find(User.id.in_(int(a.id) for a, _ in avatars))}
+            print
+            print 'fetched users', len(users), len(avatars)
+            for avatar, user_ids in committing_iterator(avatars, 1000):
+                user = users.get(int(avatar.id))
+                if user is None:
+                    print cformat('%{red!}!!!%{reset} '
+                                  '%{yellow!}User {} does not exist').format(avatar.id)
+                    continue
+                print cformat('%{green}+++%{reset} '
+                              '%{white!}{:6d}%{reset} %{cyan}{} {}%{reset}').format(user.id, user.first_name,
+                                                                                    user.last_name)
+                valid_users = {u.id: u for u in User.find(User.id.in_(user_ids))}
+                for user_id in user_ids:
+                    target = valid_users.get(user_id)
+                    if target is None:
+                        print cformat('%{yellow!}!!!%{reset} '
+                                      '%{yellow!}User {} does not exist').format(user_id)
+                        continue
+                    user.favorite_users.append(target)
+                    print cformat('%{blue!}<->%{reset} '
+                                  '%{white!}{:6d}%{reset} %{cyan}{} {}%{reset}').format(target.id, target.first_name,
+                                                                                        target.last_name)
 
     def migrate_admins(self):
         print cformat('%{white!}migrating admins')
@@ -191,3 +222,11 @@ class UserImporter(Importer):
 
     def _iter_avatars(self):
         return self.zodb_root['avatars'].itervalues()
+
+    def _iter_avatars_with_favorite_users(self):
+        for avatar in self._iter_avatars():
+            if not hasattr(avatar, 'personalInfo'):
+                continue
+            if not avatar.personalInfo._basket._users:
+                continue
+            yield avatar, map(int, avatar.personalInfo._basket._users)
