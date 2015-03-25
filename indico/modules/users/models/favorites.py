@@ -16,97 +16,54 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.event import listens_for
-from sqlalchemy.ext.associationproxy import association_proxy
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.orm import mapper
-
 from indico.core.db import db
 from indico.util.string import return_ascii
 
 from MaKaC.conference import CategoryManager
 
 
-class FavoriteBase(object):
-    __table_args__ = {'schema': 'users'}
-    _type = None  #: name of the favorite; used in backref names, should be a plural form
-
-    @declared_attr
-    def user_id(cls):
-        """The id of the user owning this favorite"""
-        return db.Column(
-            db.Integer,
-            db.ForeignKey('users.users.id'),
-            nullable=False,
-            index=True,
-            primary_key=True,
-            autoincrement=False
-        )
-
-    @declared_attr
-    def user(cls):
-        """The user owning this favorite"""
-        return db.relationship(
-            'User',
-            lazy=False,
-            foreign_keys=lambda: [cls.user_id],
-            backref=db.backref(
-                '_favorite_{}'.format(cls._type),
-                lazy=True,
-                cascade='all, delete-orphan'
-            )
-        )
-
-    @property
-    def target(self):
-        """The favorited object"""
-        raise NotImplementedError('target property/relationship is not defined')
-
-    @return_ascii
-    def __repr__(self):
-        return '<{}({}, {})>'.format(type(self).__name__, self.user_id, self.target)
-
-
-class FavoriteUser(FavoriteBase, db.Model):
-    __tablename__ = 'favorite_users'
-    _type = 'users'
-
-    #: the id of the favorited user
-    target_id = db.Column(
+favorite_user_table = db.Table(
+    'favorite_users',
+    db.metadata,
+    db.Column(
+        'user_id',
         db.Integer,
         db.ForeignKey('users.users.id'),
-        nullable=False,
         primary_key=True,
-        autoincrement=False
-    )
-
-    #: the favorited user
-    target = db.relationship(
-        'User',
-        lazy=False,
-        foreign_keys=[target_id],
-        backref=db.backref(
-            '_favorite_of',
-            lazy=True,
-            cascade='all, delete-orphan'
-        )
-    )
+        nullable=False,
+        index=True
+    ),
+    db.Column(
+        'target_id',
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        primary_key=True,
+        nullable=False
+    ),
+    schema='users'
+)
 
 
-class FavoriteCategory(FavoriteBase, db.Model):
+# TODO: change this to a proper many-to-many association once categories are in SQL
+class FavoriteCategory(db.Model):
     __tablename__ = 'favorite_categories'
-    _type = 'categories'
+    __table_args__ = {'schema': 'users'}
 
-    #: the id of the favorited category
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        primary_key=True,
+        nullable=False,
+        index=True
+    )
     target_id = db.Column(
         db.String,
-        nullable=False,
-        primary_key=True
+        primary_key=True,
+        nullable=False
     )
 
     @property
     def target(self):
-        """The favorited category"""
         try:
             return CategoryManager().getById(self.target_id)
         except KeyError:
@@ -116,23 +73,6 @@ class FavoriteCategory(FavoriteBase, db.Model):
     def target(self, value):
         self.target_id = value.id
 
-
-@listens_for(mapper, 'after_configured')
-def _add_association_proxies():
-    """Create association proxies in the related classes of each favorite.
-
-    This is done in a central place so the User model itself doesn't have to be modified
-    when adding new favorite types.
-    """
-    for name, cls in db.Model._decl_class_registry.iteritems():
-        if getattr(cls, '__table__', None) is None or not issubclass(cls, FavoriteBase):
-            continue
-        # User.favorite_XXX
-        attr = 'favorite_{}'.format(cls._type)
-        setattr(cls.user.mapper.class_, attr,
-                association_proxy('_' + attr, 'target', creator=lambda x, cls=cls: cls(target=x)))
-        # Whatever.favorite_of - if Whatever is already in the DB, and not e.g. a ZODB object
-        if hasattr(cls.target, 'mapper'):
-            assert not hasattr(cls.target.mapper.class_, 'favorite_of')
-            setattr(cls.target.mapper.class_, 'favorite_of',
-                    association_proxy('_favorite_of', 'user', creator=lambda x, cls=cls: cls(user=x)))
+    @return_ascii
+    def __repr__(self):
+        return '<FavoriteCategory({}, {})>'.format(self.user_id, self.target_id)

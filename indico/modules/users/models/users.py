@@ -21,6 +21,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.modules.users.models.emails import UserEmail
+from indico.modules.users.models.favorites import favorite_user_table, FavoriteCategory
 from indico.util.caching import memoize_request
 from indico.util.string import return_ascii
 
@@ -121,12 +122,30 @@ class User(db.Model):
     #: modifying `email` or `secondary_emails` and a session expire/commit!
     all_emails = association_proxy('_all_emails', 'email')  # read-only!
 
+    #: the user this user has been merged into
     merged_into_user = db.relationship(
         'User',
         lazy=True,
         backref=db.backref('merged_from_users', lazy=True),
         remote_side='User.id',
     )
+    #: the users's favorite users
+    favorite_users = db.relationship(
+        'User',
+        secondary=favorite_user_table,
+        primaryjoin=id == favorite_user_table.c.user_id,
+        secondaryjoin=(id == favorite_user_table.c.target_id) & ~_is_deleted,
+        lazy=True,
+        backref=db.backref('favorite_of', lazy=True),
+    )
+    _favorite_categories = db.relationship(
+        'FavoriteCategory',
+        lazy=True,
+        cascade='all, delete-orphan'
+    )
+    #: the users's favorite categories
+    favorite_categories = association_proxy('_favorite_categories', 'target',
+                                            creator=lambda x: FavoriteCategory(target=x))
 
     @hybrid_property
     def is_deleted(self):
