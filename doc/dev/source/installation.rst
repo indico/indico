@@ -139,7 +139,7 @@ Copy the next lines into that file, making sure to replace ``jdoe`` with your us
         Alias /indico/js "/opt/indico/htdocs/js"
         Alias /indico/ihelp "/opt/indico/htdocs/ihelp"
 
-        WSGIDaemonProcess WSGIDAEMON processes=32 threads=1 inactivity-timeout=3600 maximum-requests=10000 \
+        WSGIDaemonProcess WSGIDAEMON processes=8 threads=1 inactivity-timeout=3600 maximum-requests=10000 \
                 python-eggs=/opt/indico/tmp/egg-cache
 
         WSGIScriptAlias /indico "/opt/indico/htdocs/indico.wsgi"
@@ -173,11 +173,11 @@ Copy the next lines into that file, making sure to replace ``jdoe`` with your us
 
 Here's the explanation of the above lines:
 
-* Alias: Redirects some static locations to the containing folders, reducing load times.
-* WSGIDaemonProcess: Create 32 daemon processes of 1 thread each with name WSGIDAEMON. Set the python-path and python-eggs paths. (The other two parameters are for robustness).
-* WSGIScriptAlias: Redirect all petitions starting with /indico to the specified file.
-* WSGIProcessGroup: Configure the execution with the settings of WSGIDAEMON.
-* WSGIApplicationGroup: Set the execution to run under the same Python interpreter (the first created).
+* Alias: Redirects some static locations to the containing folders, reducing load times
+* WSGIDaemonProcess: Create 8 daemon processes of 1 thread each with name WSGIDAEMON. Set ``python-path`` and ``python-eggs`` paths. (The other two parameters are for robustness). Please note that the maximum number of processes will depend on how much load your server can handle (it's normal to have > 30 processes)
+* WSGIScriptAlias: Redirect all petitions starting with /indico to the specified file
+* WSGIProcessGroup: Configure the execution with the settings of WSGIDAEMON
+* WSGIApplicationGroup: Set the execution to run under the same Python interpreter (the first created)
 
 Accessing ``http://localhost/indico/`` should give you the main Indico page.
 
