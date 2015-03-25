@@ -25,10 +25,11 @@ from werkzeug.datastructures import CallbackDict
 from werkzeug.utils import cached_property
 
 from indico.core.db import DBMgr
+from indico.modules.users import User
+from indico.util.decorators import cached_writable_property
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.user import AvatarHolder
-from indico.util.decorators import cached_writable_property
 
 
 class BaseSession(CallbackDict, SessionMixin):
@@ -67,6 +68,13 @@ class IndicoSession(BaseSession):
             self.pop('_avatarId', None)
         else:
             self['_avatarId'] = avatar.getId()
+
+    @property
+    def new_user(self):
+        user_id = self.get('_avatarId')
+        if not user_id:
+            return None
+        return User.get(int(user_id))
 
     @property
     def lang(self):

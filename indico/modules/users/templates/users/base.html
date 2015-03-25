@@ -3,10 +3,10 @@
 {% set show_nav = request.endpoint != 'users.user_dashboard' %}
 
 {% block title -%}
-    {% if user == session.user %}
+    {% if user == session.new_user %}
         {% trans %}My Profile{% endtrans %}
     {% else %}
-        {% trans name=user.getStraightFullName(upper=false) %}Profile of {{ name }}{% endtrans %}
+        {% trans name=user.full_name %}Profile of {{ name }}{% endtrans %}
     {% endif %}
 {%- endblock %}
 

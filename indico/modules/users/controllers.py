@@ -22,6 +22,7 @@ from flask import session, request
 from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.modules.users import User
 from indico.modules.users.views import WPUserDashboard, WPUser
 from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm
 from indico.util.date_time import timedelta_split
@@ -31,7 +32,6 @@ from indico.util.redis import write_client as redis_write_client
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.services.implementation.user import UserComparator
-from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.rh.base import RHProtected
 
 
@@ -39,9 +39,9 @@ class RHUserBase(RHProtected):
     def _checkParams(self):
         if not session.user:
             return
-        self.user = session.user
+        self.user = session.new_user
         if 'user_id' in request.view_args:
-            self.user = AvatarHolder().getById(request.view_args['user_id'])
+            self.user = User.get(request.view_args['user_id'])
             if self.user is None:
                 raise NotFound('This user does not exist')
 
@@ -49,7 +49,7 @@ class RHUserBase(RHProtected):
         RHProtected._checkProtection(self)
         if not self._doProcess:  # not logged in
             return
-        if not self.user.canUserModify(session.user):
+        if not self.user.can_be_modified(session.new_user):
             raise Forbidden('You cannot modify this user.')
 
 

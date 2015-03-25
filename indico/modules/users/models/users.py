@@ -174,6 +174,11 @@ class User(db.Model):
         from indico.modules.users import user_settings
         return user_settings.bind(self)
 
+    @property
+    def full_name(self):
+        """Returns the user's name in 'Firstname Lastname' notation."""
+        return '{} {}'.format(self.first_name, self.last_name)
+
     @return_ascii
     def __repr__(self):
         return '<User({}, {}, {}, {})>'.format(self.id, self.first_name, self.last_name, self.email)
