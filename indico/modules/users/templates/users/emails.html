@@ -16,7 +16,10 @@
             <div class="i-box-content">
                 <p class="group-list-description">{% trans %}Your <strong>primary email</strong> will be used for account-related notifications (e.g. registration emails and billing information).{% endtrans %}</p>
                 <ul class="group-list with-buttons">
-                    {% for email in emails %}
+                    <li>
+                        <span><strong>{{ user.email }}</strong></span>
+                    </li>
+                    {% for email in user.secondary_emails %}
                         <li>
                             <span>{{ email }}</span>
                             <a class="toggle icon-remove fakeLink right" style="margin-left: 10px;"></a>

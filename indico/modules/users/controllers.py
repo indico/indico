@@ -92,5 +92,4 @@ class RHUserFavorites(RHUserBase):
 class RHUserEmails(RHUserBase):
     def _process(self):
         form = UserEmailsForm()
-        emails = []
-        return WPUser.render_template('emails.html', user=self.user, form=form, emails=emails)
+        return WPUser.render_template('emails.html', user=self.user, form=form)
