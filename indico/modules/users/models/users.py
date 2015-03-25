@@ -177,3 +177,7 @@ class User(db.Model):
     @return_ascii
     def __repr__(self):
         return '<User({}, {}, {}, {})>'.format(self.id, self.first_name, self.last_name, self.email)
+
+    def can_be_modified(self, user):
+        """If this user can be modified by the given user"""
+        return self == user or user.is_admin
