@@ -360,10 +360,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
                     body)
         return frame.getHTML( self._sectionMenu, body, frameParams)
 
-    def _getHeadContent( self ):
-        #This is used for fetching the default css file for the conference pages
-        #And also the modificated uploaded css
-
+    def _getHeadContent(self):
         dmgr = displayMgr.ConfDisplayMgrRegistery().getDisplayMgr(self._conf)
         path = self._getBaseURL()
         timestamp = os.stat(__file__).st_mtime
@@ -373,7 +370,17 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         confCSS = dmgr.getStyleManager().getCSS()
 
         if confCSS:
-            printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s">"""%(confCSS.getURL())
+            printCSS = printCSS + """<link rel="stylesheet" type="text/css" href="%s">""" % (confCSS.getURL())
+
+        # Include MathJax
+
+        return '\n'.join([
+            printCSS,
+            WConfMetadata(self._conf).getHTML(),                   # confMetadata
+            render('js/mathjax.config.js.tpl'),                    # mathJax
+            '\n'.join('<script src="{0}" type="text/javascript"></script>'.format(url)
+                      for url in self._asset_env['mathjax_js'].urls())
+        ])
 
         return printCSS
 
@@ -680,15 +687,6 @@ class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
                 "subContribModifyURLGen":  urlHandlers.UHSubContribModification.getURL,
                 "materialURLGen": urlHandlers.UHMaterialDisplay.getURL}
         return wc.getHTML(pars)
-
-    def _getHeadContent(self):
-        return '\n'.join([
-            WPConferenceDefaultDisplayBase._getHeadContent(self),  # printCss
-            WConfMetadata(self._conf).getHTML(),                   # confMetadata
-            render('js/mathjax.config.js.tpl'),                    # mathJax
-            '\n'.join('<script src="{0}" type="text/javascript"></script>'.format(url)
-                      for url in self._asset_env['mathjax_js'].urls())
-        ])
 
     def _getFooter(self):
         wc = wcomponents.WEventFooter(self._conf)
@@ -1325,15 +1323,6 @@ class WPConferenceTimeTable(WPConferenceDefaultDisplayBase):
     def _defineSectionMenu( self ):
         WPConferenceDefaultDisplayBase._defineSectionMenu( self )
         self._sectionMenu.setCurrentItem(self._timetableOpt)
-
-    def _getHeadContent( self ):
-        headContent=WPConferenceDefaultDisplayBase._getHeadContent(self)
-        baseurl = self._getBaseURL()
-        timestamp = os.stat(__file__).st_mtime
-        return """
-                 %s
-                 <link rel="stylesheet" type="text/css" href="%s/css/timetable.css?%d">
-                """ % ( headContent, baseurl, timestamp)
 
 
 class WPMeetingTimeTable( WPTPLConferenceDisplay ):

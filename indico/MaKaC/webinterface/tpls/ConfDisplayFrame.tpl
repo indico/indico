@@ -54,4 +54,9 @@ else:
     ${ menu }
     ${ body }
     </div>
+    <script>
+        $(document).ready(function() {
+            $('h1, .subLevelTitle, .subEventLevelTitle, .topLevelTitle').mathJax();
+        });
+    </script>
 </div>

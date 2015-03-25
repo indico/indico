@@ -35,4 +35,9 @@
     <%block name="meetingBody">
         <%include file="${INCLUDE}/MeetingBody.tpl"/>
     </%block>
+    <script>
+        $(document).ready(function() {
+            $('h1, .subLevelTitle, .subEventLevelTitle, .topLevelTitle').mathJax();
+        });
+    </script>
 </div>

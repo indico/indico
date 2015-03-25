@@ -16,4 +16,8 @@
             % endif
         % endfor
     </div>
+
+    <script>
+        $('#contributionList .contributionListContribItem a').mathJax();
+    </script>
 </%block>
