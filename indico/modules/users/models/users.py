@@ -23,6 +23,7 @@ from werkzeug.utils import cached_property
 from indico.core.db import db
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table, FavoriteCategory
+from indico.modules.users.models.links import UserLink
 from indico.util.caching import memoize_request
 from indico.util.string import return_ascii
 
@@ -147,6 +148,13 @@ class User(db.Model):
     #: the users's favorite categories
     favorite_categories = association_proxy('_favorite_categories', 'target',
                                             creator=lambda x: FavoriteCategory(target=x))
+    #: the legacy objects the user is connected to
+    linked_objects = db.relationship(
+        'UserLink',
+        lazy='dynamic',
+        cascade='all, delete-orphan',
+        backref=db.backref('user', lazy=True)
+    )
 
     @hybrid_property
     def is_deleted(self):
@@ -186,3 +194,23 @@ class User(db.Model):
     def can_be_modified(self, user):
         """If this user can be modified by the given user"""
         return self == user or user.is_admin
+
+    def get_linked_objects(self, type_, role):
+        """Retrieves linked objects for the user"""
+        return UserLink.get_links(self, type_, role)
+
+    def link_to(self, obj, role):
+        """Adds a link between the user and an object
+
+        :param obj: a legacy object
+        :param role: the role to use in the link
+        """
+        UserLink.create_link(self, obj, role)
+
+    def unlink_to(self, obj, role):
+        """Removes a link between the user and an object
+
+        :param obj: a legacy object
+        :param role: the role to use in the link
+        """
+        UserLink.remove_link(self, obj, role)
