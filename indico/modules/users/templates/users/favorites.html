@@ -19,7 +19,7 @@
                             {% for principal in favorite_users %}
                                 <li data-user-id="{{ principal.id }}" class="favorite-user">
                                     <span>{{ principal.name }}</span>
-                                    <a class="toggle icon-remove fakeLink right"></a>
+                                    <a class="toggle icon-remove right" href="#"></a>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -39,7 +39,7 @@
                             {% for category in favorite_categs %}
                                 <li data-categ-id="{{ category.id }}" class="favorite-categ">
                                     <span>{{ category.title }}</span>
-                                    <a class="toggle icon-remove fakeLink right"></a>
+                                    <a class="toggle icon-remove right" href="#"></a>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -61,7 +61,7 @@
                         } else {
                             _.each(list, function(principal) {
                                 if(!_.findWhere(favorite_users, { id: principal.id })) {
-                                    $('.favorite-users').append('<li data-user-id="' + principal.id +'" class="favorite-user"><span>' + principal.name + '</span><a class="toggle icon-remove fakeLink right"></a></li>');
+                                    $('.favorite-users').append('<li data-user-id="' + principal.id +'" class="favorite-user"><span>' + principal.name + '</span><a class="toggle icon-remove right" href="#"></a></li>');
                                     favorite_users.push(principal);
                                 }
                             });
