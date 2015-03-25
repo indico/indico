@@ -86,15 +86,15 @@ class UserImporter(Importer):
             user.favorite_categories = list(avatar.linkedTo['category']['favorite'])
             db.session.flush()
             print cformat('%{green}+++%{reset} '
-                          '%{white!}{:6d}%{reset} %{cyan}{} {}%{reset} [%{blue!}{}%{reset}] '
-                          '{{%{cyan!}{}%{reset}}}').format(user.id, user.first_name, user.last_name, user.email,
+                          '%{white!}{:6d}%{reset} %{cyan}{}%{reset} [%{blue!}{}%{reset}] '
+                          '{{%{cyan!}{}%{reset}}}').format(user.id, user.full_name, user.email,
                                                            ', '.join(user.secondary_emails))
             for merged_avatar in getattr(avatar, '_mergeFrom', ()):
                 merged = self._user_from_avatar(merged_avatar, is_deleted=True, merged_into_id=user.id)
                 print cformat('%{blue!}***%{reset} '
-                              '%{white!}{:6d}%{reset} %{cyan}{} {}%{reset} [%{blue!}{}%{reset}] '
-                              '{{%{cyan!}{}%{reset}}}').format(merged.id, merged.first_name, merged.last_name,
-                                                               merged.email, ', '.join(merged.secondary_emails))
+                              '%{white!}{:6d}%{reset} %{cyan}{}%{reset} [%{blue!}{}%{reset}] '
+                              '{{%{cyan!}{}%{reset}}}').format(merged.id, merged.full_name, merged.email,
+                                                               ', '.join(merged.secondary_emails))
                 self._fix_collisions(merged)
                 db.session.add(merged)
                 db.session.flush()
@@ -104,8 +104,6 @@ class UserImporter(Importer):
         for avatars in grouper(self._iter_avatars_with_favorite_users(), 2500, skip_missing=True):
             avatars = list(avatars)
             users = {u.id: u for u in User.find(User.id.in_(int(a.id) for a, _ in avatars))}
-            print
-            print 'fetched users', len(users), len(avatars)
             for avatar, user_ids in committing_iterator(avatars, 1000):
                 user = users.get(int(avatar.id))
                 if user is None:
@@ -113,8 +111,7 @@ class UserImporter(Importer):
                                   '%{yellow!}User {} does not exist').format(avatar.id)
                     continue
                 print cformat('%{green}+++%{reset} '
-                              '%{white!}{:6d}%{reset} %{cyan}{} {}%{reset}').format(user.id, user.first_name,
-                                                                                    user.last_name)
+                              '%{white!}{:6d}%{reset} %{cyan}{}%{reset}').format(user.id, user.full_name)
                 valid_users = {u.id: u for u in User.find(User.id.in_(user_ids))}
                 for user_id in user_ids:
                     target = valid_users.get(user_id)
@@ -124,8 +121,7 @@ class UserImporter(Importer):
                         continue
                     user.favorite_users.append(target)
                     print cformat('%{blue!}<->%{reset} '
-                                  '%{white!}{:6d}%{reset} %{cyan}{} {}%{reset}').format(target.id, target.first_name,
-                                                                                        target.last_name)
+                                  '%{white!}{:6d}%{reset} %{cyan}{}%{reset}').format(target.id, target.full_name)
 
     def migrate_admins(self):
         print cformat('%{white!}migrating admins')
