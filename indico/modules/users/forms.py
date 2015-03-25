@@ -64,4 +64,4 @@ class UserPreferencesForm(IndicoForm):
 
 
 class UserEmailsForm(IndicoForm):
-    email = EmailField(_('Add new email address'))
+    email = EmailField(_('Add new email address'), [DataRequired()], filters=[lambda x: x.lower() if x else x])
