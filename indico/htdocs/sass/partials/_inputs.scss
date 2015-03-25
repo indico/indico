@@ -627,6 +627,12 @@ $dropdown-transition: $dropdown-transition-step ease-out;
             margin-top: -1em;
         }
     }
+
+    &.no-block-padding {
+        .form-block {
+            padding-left: 0;
+        }
+    }
 }
 
 /* inspired by https://github.com/brianreavis/selectize.js/blob/master/examples/github.html */
