@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
+from werkzeug.utils import cached_property
 
 from indico.core.db import db
 from indico.modules.users.models.emails import UserEmail
@@ -166,6 +167,12 @@ class User(db.Model):
         # TODO: convert to relationship
         from indico.modules.api.models.keys import APIKey
         return APIKey.find_first(user_id=self.id, is_active=True)
+
+    @cached_property
+    def settings(self):
+        """Returns the user settings proxy for this user"""
+        from indico.modules.users import user_settings
+        return user_settings.bind(self)
 
     @return_ascii
     def __repr__(self):

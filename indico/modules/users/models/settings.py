@@ -44,7 +44,7 @@ class UserSetting(SettingsBase, db.Model):
         'User',
         lazy=True,
         backref=db.backref(
-            'settings',
+            '_all_settings',
             lazy='dynamic',
             cascade='all, delete-orphan'
         )
@@ -134,7 +134,3 @@ class UserSettingsProxy(SettingsProxyBase):
         """
         UserSetting.delete_all(self.module, user_id=user)
         self._flush_cache()
-
-    @return_ascii
-    def __repr__(self):
-        return '<UserSettingsProxy({})>'.format(self.module)
