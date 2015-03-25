@@ -27,7 +27,7 @@ import ZODB
 from persistent import Persistent
 from BTrees import OOBTree
 
-import MaKaC.common.db as db
+from MaKaC.common.db import DBMgr
 import os
 from Configuration import Config
 from MaKaC.common.info import HelperMaKaCInfo
