@@ -23,7 +23,7 @@ from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.users.views import WPUserDashboard, WPUser
-from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm
+from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm
 from indico.util.date_time import timedelta_split
 from indico.util.redis import suggestions
 from indico.util.redis import client as redis_client
@@ -87,3 +87,10 @@ class RHUserFavorites(RHUserBase):
         favorite_users = fossilizedUsers
         return WPUser.render_template('favorites.html', user=self.user, favorite_categs=favorite_categs,
                                       favorite_users=favorite_users)
+
+
+class RHUserEmails(RHUserBase):
+    def _process(self):
+        form = UserEmailsForm()
+        emails = []
+        return WPUser.render_template('emails.html', user=self.user, form=form, emails=emails)

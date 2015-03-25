@@ -50,6 +50,7 @@ class WPUser(WPJinjaMixin, WPMainBase):
             MenuItem(_('Account details'), 'users.user_account'),
             MenuItem(_('Preferences'), 'users.user_preferences'),
             MenuItem(_('Favorites'), 'users.user_favorites'),
+            MenuItem(_('Emails'), 'users.user_emails'),
             # TODO: other menu items
         ] + extra_items
         return self._getPageContent(params)

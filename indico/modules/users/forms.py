@@ -23,7 +23,6 @@ from wtforms.validators import DataRequired
 
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import EmailListField
 from indico.web.forms.widgets import SwitchWidget
 
 from operator import itemgetter
@@ -46,9 +45,6 @@ class UserDetailsForm(IndicoForm):
     first_name = StringField(_('First name'), [DataRequired()])
     family_name = StringField(_('Family name'), [DataRequired()])
     affiliation = StringField(_('Affiliation'), [DataRequired()])
-    email = EmailField(_('Email'), [DataRequired()])
-    secondary_emails = EmailListField(_('Secondary emails'),
-                                      description=_('Your secondary email addresses (one per line).'))
     address = TextAreaField(_('Address'))
     phone = StringField(_('Phone number'))
 
@@ -65,3 +61,7 @@ class UserPreferencesForm(IndicoForm):
         super(UserPreferencesForm, self).__init__(*args, **kwargs)
         self.language.choices = sorted(get_all_locales().items(), key=itemgetter(1))
         self.timezone.choices = zip(all_timezones, all_timezones)
+
+
+class UserEmailsForm(IndicoForm):
+    email = EmailField(_('Add new email address'))

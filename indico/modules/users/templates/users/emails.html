@@ -1,0 +1,46 @@
+{% extends 'users/base.html' %}
+{% from 'forms/form_widget.html' import form_header, form_rows, form_footer  %}
+
+{% block subtitle -%}
+    {% trans %}Emails{% endtrans %}
+{%- endblock %}
+
+{% block user_content %}
+    <div class="i-box-group vert">
+        <div class="i-box titled">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {%- trans %}Emails{% endtrans -%}
+                </div>
+            </div>
+            <div class="i-box-content">
+                <p class="group-list-description">{% trans %}Your <strong>primary email</strong> will be used for account-related notifications (e.g. registration emails and billing information).{% endtrans %}</p>
+                <ul class="group-list with-buttons">
+                    {% for email in emails %}
+                        <li>
+                            <span>{{ email }}</span>
+                            <a class="toggle icon-remove fakeLink right" style="margin-left: 10px;"></a>
+                            <button type="button" class="i-button right">
+                                {%- trans %}Set as primary{% endtrans -%}
+                            </button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="i-box titled">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {%- trans %}New Email{% endtrans -%}
+                </div>
+            </div>
+            <div class="i-box-content">
+                {{ form_header(orientation='vertical') }}
+                {{ form_rows(form) }}
+                {% call form_footer() %}
+                    <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
+                {% endcall %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
