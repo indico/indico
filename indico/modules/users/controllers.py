@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from flask import session, request
+from flask import session, request, flash
 from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -26,6 +26,7 @@ from indico.modules.users import User
 from indico.modules.users.views import WPUserDashboard, WPUser
 from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm
 from indico.util.date_time import timedelta_split
+from indico.util.i18n import _
 from indico.util.redis import suggestions
 from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
@@ -92,4 +93,13 @@ class RHUserFavorites(RHUserBase):
 class RHUserEmails(RHUserBase):
     def _process(self):
         form = UserEmailsForm()
+        if form.validate_on_submit():
+            email = form.email.data
+            if email != self.user.email and email not in self.user.secondary_emails:
+                self.user.secondary_emails.append(email)
+                form.email.data = None
+                flash(_('Your email was successfully added in your secondary emails. If you wish to make it your '
+                        'primary email, click on the button Set as primary next to it.'), 'success')
+            else:
+                flash(_('This email already exists.'), 'warning')
         return WPUser.render_template('emails.html', user=self.user, form=form)
