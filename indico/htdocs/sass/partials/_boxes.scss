@@ -144,7 +144,7 @@
             border-top: 1px solid #ddd;
         }
 
-        > li:last-child {
+        > li:last-child:not(.keep-last-border) {
             border-bottom: 0;
         }
 
