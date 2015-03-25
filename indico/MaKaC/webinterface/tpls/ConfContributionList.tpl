@@ -18,6 +18,6 @@
     </div>
 
     <script>
-        $('#contributionList .contributionListContribItem a').mathJax();
+        $('#contributionList .contributionListContribItem').mathJax();
     </script>
 </%block>
