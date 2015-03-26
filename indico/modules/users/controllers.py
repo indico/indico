@@ -30,10 +30,10 @@ from indico.util.i18n import _
 from indico.util.redis import suggestions
 from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
-from MaKaC.common.fossilize import fossilize
 from MaKaC.common.timezoneUtils import DisplayTZ
-from MaKaC.services.implementation.user import UserComparator
+from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.base import RHProtected
 
 
@@ -82,13 +82,31 @@ class RHUserPreferences(RHUserBase):
 
 class RHUserFavorites(RHUserBase):
     def _process(self):
-        favorite_categs = [dict(id=c.getId(), title=c.getTitle()) for c in
-                           self.user.getLinkTo('category', 'favorite')]
-        users = self.user.getPersonalInfo().getBasket().getUsers().values()
-        fossilizedUsers = sorted(fossilize(users), cmp=UserComparator.cmpUsers)
-        favorite_users = fossilizedUsers
-        return WPUser.render_template('favorites.html', user=self.user, favorite_categs=favorite_categs,
-                                      favorite_users=favorite_users)
+        return WPUser.render_template('favorites.html', user=self.user)
+
+
+class RHUserFavoritesUsersAdd(RHUserBase):
+    def _process(self):
+        users = [User.get(int(id_)) for id_ in request.form.getlist('user_id')]
+        self.user.favorite_users |= set(filter(None, users))
+        tpl = get_template_module('users/_favorites.html')
+        return jsonify(success=True, html=tpl.favorite_users_list(self.user))
+
+
+class RHUserFavoritesUserRemove(RHUserBase):
+    def _process(self):
+        user = User.get(int(request.view_args['fav_user_id']))
+        if user in self.user.favorite_users:
+            self.user.favorite_users.remove(user)
+        return jsonify(success=True)
+
+
+class RHUserFavoritesCategoryRemove(RHUserBase):
+    def _process(self):
+        category = CategoryManager().getById(int(request.view_args['category_id']))
+        if category in self.user.favorite_categories:
+            self.user.favorite_categories.remove(category)
+        return jsonify(success=True)
 
 
 class RHUserEmails(RHUserBase):
