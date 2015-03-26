@@ -23,7 +23,7 @@
                         <li class="js-email-row keep-last-border">
                             <span>{{ email }}</span>
                             <a class="toggle icon-remove right js-delete-email" href="#" data-href="{{ url_for('.user_emails_delete', email=email) }}" style="margin-left: 10px;"></a>
-                            <button type="button" class="i-button right">
+                            <button type="button" class="i-button right" data-href="{{ url_for('.users_emails_set_primary') }}" data-method='POST' data-params="{{ {'email': email} | tojson | forceescape }}">
                                 {%- trans %}Set as primary{% endtrans -%}
                             </button>
                         </li>

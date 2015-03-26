@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from flask import session, request, flash, jsonify
+from flask import session, request, flash, jsonify, redirect
 from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -30,6 +30,7 @@ from indico.util.i18n import _
 from indico.util.redis import suggestions
 from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
+from indico.web.flask.util import url_for
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.services.implementation.user import UserComparator
@@ -111,3 +112,12 @@ class RHUserEmailsDelete(RHUserBase):
         if email in self.user.secondary_emails:
             self.user.secondary_emails.remove(email)
         return jsonify(success=True)
+
+
+class RHUserEmailsSetPrimary(RHUserBase):
+    def _process(self):
+        email = request.form['email']
+        if email in self.user.secondary_emails:
+            self.user.make_email_primary(email)
+            flash(_('Your primary email was updated successfully.'), 'success')
+        return redirect(url_for('.user_emails'))
