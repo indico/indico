@@ -58,11 +58,11 @@ def test_emails(db):
     assert not user.secondary_emails
     user.email = 'foo@bar.com'
     db.session.flush()
-    assert set(user.all_emails) == {'foo@bar.com'}
-    user.secondary_emails.append('guinea@pig.com')
+    assert user.all_emails == {'foo@bar.com'}
+    user.secondary_emails.add('guinea@pig.com')
     db.session.flush()
     db.session.expire(user)  # all_emails is only updated after expire (or commit)
-    assert set(user.all_emails) == {'foo@bar.com', 'guinea@pig.com'}
+    assert user.all_emails == {'foo@bar.com', 'guinea@pig.com'}
 
 
 def test_make_email_primary(db):
@@ -71,12 +71,12 @@ def test_make_email_primary(db):
     db.session.flush()
     with pytest.raises(ValueError):
         user.make_email_primary('tasty@pig.com')
-    user.secondary_emails = ['tasty@pig.com', 'little@pig.com']
+    user.secondary_emails = {'tasty@pig.com', 'little@pig.com'}
     db.session.flush()
     user.make_email_primary('tasty@pig.com')
     db.session.expire(user)
     assert user.email == 'tasty@pig.com'
-    assert set(user.secondary_emails) == {'guinea@pig.com', 'little@pig.com'}
+    assert user.secondary_emails == {'guinea@pig.com', 'little@pig.com'}
 
 
 def test_deletion(db):

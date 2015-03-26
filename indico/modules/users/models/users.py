@@ -107,6 +107,7 @@ class User(db.Model):
         'UserEmail',
         lazy=True,
         cascade='all, delete-orphan',
+        collection_class=set,
         primaryjoin='(User.id == UserEmail.user_id) & ~UserEmail.is_primary'
     )
     _all_emails = db.relationship(
@@ -114,6 +115,7 @@ class User(db.Model):
         lazy=True,
         viewonly=True,
         primaryjoin='User.id == UserEmail.user_id',
+        collection_class=set,
         backref=db.backref('user', lazy=False)
     )
     #: the primary email address of the user

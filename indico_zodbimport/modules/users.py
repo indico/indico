@@ -164,8 +164,8 @@ class UserImporter(Importer):
 
     def _user_from_avatar(self, avatar, **kwargs):
         email = _sanitize_email(convert_to_unicode(avatar.email).lower().strip())
-        secondary_emails = [_sanitize_email(convert_to_unicode(x).lower().strip()) for x in avatar.secondaryEmails]
-        secondary_emails = [x for x in secondary_emails if x and is_valid_mail(x, False) and x != email]
+        secondary_emails = {_sanitize_email(convert_to_unicode(x).lower().strip()) for x in avatar.secondaryEmails}
+        secondary_emails = {x for x in secondary_emails if x and is_valid_mail(x, False) and x != email}
         # we handle deletion later. otherwise it might be set before secondary_emails which would
         # result in those emails not being marked as deleted
         is_deleted = kwargs.pop('is_deleted', False)
