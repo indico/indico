@@ -113,8 +113,9 @@ class RHVCManageEventSelectService(RHVCManageEventBase):
     """List available video conference plugins to create a new video room"""
 
     def _process(self):
-        return WPVCManageEvent.render_template('manage_event_select.html', self._conf, event=self._conf,
-                                               plugins=get_vc_plugins().values())
+        action = request.args.get('vc_room_action', '.manage_vc_rooms_create')
+        return WPVCManageEvent.render_template('manage_event_select.html', self._conf, vc_room_action=action,
+                                               event=self._conf, plugins=get_vc_plugins().values())
 
 
 class RHVCManageEventCreateBase(RHVCManageEventBase):
