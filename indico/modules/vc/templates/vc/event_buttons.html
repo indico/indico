@@ -1,0 +1,6 @@
+<div class="event-service-toolbar vc-toolbar toolbar right">
+    <div class="group">
+        {% block buttons %}{% endblock %}
+    </div>
+    {{ template_hook('event-vc-extra-buttons', event_vc_room=event_vc_room) }}
+</div>

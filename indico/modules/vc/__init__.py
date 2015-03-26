@@ -26,7 +26,7 @@ from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLink
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.plugins import VCPluginMixin
 from indico.modules.vc.util import get_vc_plugins, get_managed_vc_plugins
-from indico.web.flask.templating import template_hook
+from indico.web.flask.templating import get_overridable_template_name, template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry
 from indico.util.i18n import _
@@ -51,9 +51,9 @@ def _inject_event_header(event, **kwargs):
 def _inject_vc_room_action_buttons(event, item, **kwargs):
     event_vc_room = VCRoomEventAssociation.get_linked_for_event(event).get(item)
     if event_vc_room and event_vc_room.vc_room.plugin:
-        return render_plugin_template('{}:vc_room_timetable_buttons.html'.format(event_vc_room.vc_room.plugin.name),
-                                      event=event, event_vc_room=event_vc_room, **kwargs)
-
+        plugin = event_vc_room.vc_room.plugin
+        name = get_overridable_template_name('vc_room_timetable_buttons.html', plugin, core_prefix='vc/')
+        return render_template(name, event=event, event_vc_room=event_vc_room, **kwargs)
 
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
