@@ -65,6 +65,20 @@ def test_emails(db):
     assert set(user.all_emails) == {'foo@bar.com', 'guinea@pig.com'}
 
 
+def test_make_email_primary(db):
+    user = User(first_name='Guinea', last_name='Pig', email='guinea@pig.com')
+    db.session.add(user)
+    db.session.flush()
+    with pytest.raises(ValueError):
+        user.make_email_primary('tasty@pig.com')
+    user.secondary_emails = ['tasty@pig.com', 'little@pig.com']
+    db.session.flush()
+    user.make_email_primary('tasty@pig.com')
+    db.session.expire(user)
+    assert user.email == 'tasty@pig.com'
+    assert set(user.secondary_emails) == {'guinea@pig.com', 'little@pig.com'}
+
+
 def test_deletion(db):
     user = User(first_name='Guinea', last_name='Pig', email='foo@bar.com', secondary_emails=['a@b.c'])
     db.session.add(user)

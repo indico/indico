@@ -211,6 +211,19 @@ class User(db.Model):
         first_name = '{}.'.format(self.first_name[0].upper()) if abbrev_first_name else self.first_name
         return '{}, {}'.format(last_name, first_name) if last_name_first else '{} {}'.format(first_name, last_name)
 
+    def make_email_primary(self, email):
+        """Promotes a secondary email address to the primary email address
+
+        :param email: an email address that is currently a secondary email
+        """
+        secondary = next((x for x in self._secondary_emails if x.email == email), None)
+        if secondary is None:
+            raise ValueError('email is not a secondary email address')
+        self._primary_email.is_primary = False
+        db.session.flush()
+        secondary.is_primary = True
+        db.session.flush()
+
     def get_linked_objects(self, type_, role):
         """Retrieves linked objects for the user"""
         return UserLink.get_links(self, type_, role)
