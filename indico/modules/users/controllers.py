@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import datetime
 
-from flask import session, request, flash
+from flask import session, request, flash, jsonify
 from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -103,3 +103,11 @@ class RHUserEmails(RHUserBase):
             else:
                 flash(_('This email already exists.'), 'warning')
         return WPUser.render_template('emails.html', user=self.user, form=form)
+
+
+class RHUserEmailsDelete(RHUserBase):
+    def _process(self):
+        email = request.view_args['email']
+        if email in self.user.secondary_emails:
+            self.user.secondary_emails.remove(email)
+        return jsonify(success=True)

@@ -20,9 +20,9 @@
                         <span><strong>{{ user.email }}</strong></span><span class="i-label">{% trans %}Primary{% endtrans %}</span>
                     </li>
                     {% for email in user.secondary_emails %}
-                        <li class="keep-last-border">
+                        <li class="js-email-row keep-last-border">
                             <span>{{ email }}</span>
-                            <a class="toggle icon-remove right" href="#" style="margin-left: 10px;"></a>
+                            <a class="toggle icon-remove right js-delete-email" href="#" data-href="{{ url_for('.user_emails_delete', email=email) }}" style="margin-left: 10px;"></a>
                             <button type="button" class="i-button right">
                                 {%- trans %}Set as primary{% endtrans -%}
                             </button>
@@ -37,4 +37,20 @@
             </div>
         </div>
     </div>
+    <script>
+        $('.js-delete-email').on('click', function(e){
+            e.preventDefault();
+            var $this = $(this);
+            $.ajax({
+                url: $this.data('href'),
+                method: 'DELETE',
+                error: handleAjaxError,
+                success: function(data) {
+                    $this.closest('.js-email-row').fadeOut(function() {
+                        $(this).remove();
+                    });
+                }
+            });
+        });
+    </script>
 {% endblock %}
