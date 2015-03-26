@@ -40,7 +40,7 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
         try:
             RHFileBase._checkParams( self, params )
         except:
-            raise NotFoundError("The file you try to access does not exist.")
+            raise NotFoundError("The file you tried to access does not exist.")
 
     def _checkProtection( self ):
         if isinstance(self._file.getOwner(), Reviewing):
@@ -52,7 +52,7 @@ class RHFileAccess(RHFileBase, RHDisplayBaseProtected):
                 raise AccessError()
         elif isinstance(self._file.getOwner(), Registrant) and \
              not self._file.getOwner().canUserModify(self.getAW().getUser()):
-            raise AccessError(_("The access to this resource is forbidden"))
+            raise AccessError(_("Access to this resource is forbidden."))
 
         else:
             RHDisplayBaseProtected._checkProtection( self )
@@ -94,7 +94,7 @@ class RHVideoWmvAccess( RHLinkBase, RHDisplayBaseProtected ):
         try:
             RHLinkBase._checkParams( self, params )
         except:
-            raise NotFoundError("The file you try to access does not exist.")
+            raise NotFoundError("The file you tried to access does not exist.")
 
     def _checkProtection( self ):
         """targets for this RH are exclusively URLs so no protection apply"""
@@ -111,7 +111,7 @@ class RHVideoFlashAccess( RHLinkBase, RHDisplayBaseProtected ):
         try:
             RHLinkBase._checkParams( self, params )
         except:
-            raise NotFoundError("The file you try to access does not exist.")
+            raise NotFoundError("The file you tried to access does not exist.")
 
     def _checkProtection( self ):
         """targets for this RH are exclusively URLs so no protection apply"""
@@ -133,7 +133,7 @@ class RHOfflineEventAccess(RHConferenceModifBase):
                                                                                              params["fileId"])
         if not self._offlineEvent or not self._offlineEvent.file or \
            not os.path.isfile(self._offlineEvent.file.getFilePath()):
-            raise NotFoundError(_("The file you try to access does not exist anymore."))
+            raise NotFoundError(_("The file you tried to access does not exist anymore."))
 
     def _process(self):
         f = self._offlineEvent.file
