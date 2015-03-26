@@ -138,12 +138,14 @@ class User(db.Model):
         primaryjoin=id == favorite_user_table.c.user_id,
         secondaryjoin=(id == favorite_user_table.c.target_id) & ~_is_deleted,
         lazy=True,
-        backref=db.backref('favorite_of', lazy=True),
+        collection_class=set,
+        backref=db.backref('favorite_of', lazy=True, collection_class=set),
     )
     _favorite_categories = db.relationship(
         'FavoriteCategory',
         lazy=True,
-        cascade='all, delete-orphan'
+        cascade='all, delete-orphan',
+        collection_class=set
     )
     #: the users's favorite categories
     favorite_categories = association_proxy('_favorite_categories', 'target',

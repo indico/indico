@@ -85,7 +85,7 @@ class UserImporter(Importer):
             settings = self._settings_from_avatar(avatar)
             user_settings.set_multi(user, settings)
             # favorite users cannot be migrated here since the target user might not have been migrated yet
-            user.favorite_categories = list(avatar.linkedTo['category']['favorite'])
+            user.favorite_categories = set(avatar.linkedTo['category']['favorite'])
             db.session.flush()
             print cformat('%{green}+++%{reset} '
                           '%{white!}{:6d}%{reset} %{cyan}{}%{reset} [%{blue!}{}%{reset}] '
@@ -121,7 +121,7 @@ class UserImporter(Importer):
                         print cformat('%{yellow!}!!!%{reset} '
                                       '%{yellow!}User {} does not exist').format(user_id)
                         continue
-                    user.favorite_users.append(target)
+                    user.favorite_users.add(target)
                     print cformat('%{blue!}<->%{reset} '
                                   '%{white!}{:6d}%{reset} %{cyan}{}%{reset}').format(target.id, target.full_name)
 
