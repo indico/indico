@@ -55,7 +55,6 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
         # check whether there is a room-event association already present
         # for the given event, room and plugin
         q = VCRoomEventAssociation.find(
-            VCRoom.type == plugin.service_name,
             VCRoomEventAssociation.event_id == event.id,
             VCRoomEventAssociation.link_type == event_vc_room.link_type,
             VCRoomEventAssociation.link_id == event_vc_room.link_id,
