@@ -45,7 +45,6 @@ def _inject_event_header(event, **kwargs):
     event_vc_rooms = [event_vc_room for event_vc_room in res.all() if event_vc_room.vc_room.plugin is not None]
     if event_vc_rooms:
         return render_template('vc/event_header.html', event=event, event_vc_rooms=event_vc_rooms)
-    return
 
 
 @template_hook('vc-actions')
