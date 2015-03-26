@@ -195,6 +195,22 @@ class User(db.Model):
         """If this user can be modified by the given user"""
         return self == user or user.is_admin
 
+    def get_full_name(self, last_name_first=True, last_name_upper=True, abbrev_first_name=True):
+        """Returns the user's name in the specified notation.
+
+        Note: Do not use positional arguments when calling this method.
+        Always use keyword arguments!
+
+        :param last_name_first: if "lastname, firstname" instead of
+                                "firstname lastname" should be used
+        :param last_name_upper: if the last name should be all-uppercase
+        :param abbrev_first_name: if the first name should be abbreviated to
+                                  use only the first character
+        """
+        last_name = self.last_name.upper() if last_name_upper else self.last_name
+        first_name = '{}.'.format(self.first_name[0].upper()) if abbrev_first_name else self.first_name
+        return '{}, {}'.format(last_name, first_name) if last_name_first else '{} {}'.format(first_name, last_name)
+
     def get_linked_objects(self, type_, role):
         """Retrieves linked objects for the user"""
         return UserLink.get_links(self, type_, role)
