@@ -19,6 +19,16 @@ import pytest
 from indico.modules.users import User
 
 
+def test_can_be_modified():
+    user = User()
+    # user can modify himself
+    assert user.can_be_modified(user)
+    # admin can modify anyone
+    assert user.can_be_modified(User(is_admin=True))
+    # normal users can't
+    assert not user.can_be_modified(User())
+
+
 def test_full_name():
     assert User(first_name='Guinea', last_name='Pig').full_name == 'Guinea Pig'
 
@@ -34,7 +44,48 @@ def test_full_name():
     (True,  True,  True,  'PIG, G.'),
 ))
 def test_get_full_name(last_name_first, last_name_upper, abbrev_first_name, expected):
-    u = User(first_name='Guinea', last_name='Pig')
-    name = u.get_full_name(last_name_first=last_name_first, last_name_upper=last_name_upper,
-                           abbrev_first_name=abbrev_first_name)
+    user = User(first_name='Guinea', last_name='Pig')
+    name = user.get_full_name(last_name_first=last_name_first, last_name_upper=last_name_upper,
+                              abbrev_first_name=abbrev_first_name)
     assert name == expected
+
+
+def test_emails(db):
+    user = User(first_name='Guinea', last_name='Pig')
+    db.session.add(user)
+    db.session.flush()
+    assert user.email is None
+    assert not user.secondary_emails
+    user.email = 'foo@bar.com'
+    db.session.flush()
+    assert set(user.all_emails) == {'foo@bar.com'}
+    user.secondary_emails.append('guinea@pig.com')
+    db.session.flush()
+    db.session.expire(user)  # all_emails is only updated after expire (or commit)
+    assert set(user.all_emails) == {'foo@bar.com', 'guinea@pig.com'}
+
+
+def test_deletion(db):
+    user = User(first_name='Guinea', last_name='Pig', email='foo@bar.com', secondary_emails=['a@b.c'])
+    db.session.add(user)
+    db.session.flush()
+    assert not user.is_deleted
+    assert all(not ue.is_user_deleted for ue in user._all_emails)
+    user.is_deleted = True
+    db.session.flush()
+    assert all(ue.is_user_deleted for ue in user._all_emails)
+
+
+def test_deletion_no_primary_email():
+    # this tests setting the is_deleted property on a user with no primary email
+    # very unlikely case but let's make sure we never try to set the deleted
+    # flag on a None primary email.
+    user = User()
+    assert user.email is None
+    user.is_deleted = True
+
+
+def test_settings():
+    user = User(id=123)
+    # make sure it's a bound settings proxy
+    assert user.settings._bound_args == (user,)
