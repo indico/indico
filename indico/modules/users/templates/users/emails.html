@@ -14,10 +14,15 @@
                 </div>
             </div>
             <div class="i-box-content">
-                <p class="group-list-description">{% trans %}Your <strong>primary email</strong> will be used for account-related notifications (e.g. registration emails and billing information).{% endtrans %}</p>
+                <p class="group-list-description">
+                    {%- trans -%}
+                        Your <strong>primary email</strong> will be used for account-related notifications (e.g. registration emails and billing information).
+                    {%- endtrans -%}
+                </p>
                 <ul class="group-list with-buttons">
                     <li>
-                        <span><strong>{{ user.email }}</strong></span><span class="i-label">{% trans %}Primary{% endtrans %}</span>
+                        <span><strong>{{ user.email }}</strong></span>
+                        <span class="i-label">{% trans %}Primary{% endtrans %}</span>
                     </li>
                     {% for email in user.secondary_emails %}
                         <li class="js-email-row keep-last-border">
@@ -45,7 +50,7 @@
                 url: $this.data('href'),
                 method: 'DELETE',
                 error: handleAjaxError,
-                success: function(data) {
+                success: function() {
                     $this.closest('.js-email-row').fadeOut(function() {
                         $(this).remove();
                     });
