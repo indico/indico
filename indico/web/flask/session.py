@@ -64,6 +64,8 @@ class IndicoSession(BaseSession):
 
     @user.setter
     def user(self, avatar):
+        if hasattr(self, '_user'):
+            del self._user
         if avatar is None:
             self.pop('_avatarId', None)
         else:
@@ -72,9 +74,12 @@ class IndicoSession(BaseSession):
     @property
     def new_user(self):
         user_id = self.get('_avatarId')
-        if not user_id:
+        if user_id is None:
             return None
-        return User.get(int(user_id))
+        if getattr(self, '_user', None) and self._user.id == int(user_id):
+            return self._user
+        self._user = User.get(int(user_id))
+        return self._user
 
     @property
     def lang(self):
