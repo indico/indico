@@ -199,7 +199,7 @@ var filters = [
     },
     % if not forVideoConference:
     {
-        label: "${ _('Video conference') }",
+        label: "${ _('Videoconference') }",
         filterType: "room",
         inputType: "boolean",
         defaultValue: false,

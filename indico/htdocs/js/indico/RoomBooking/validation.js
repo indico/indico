@@ -93,7 +93,7 @@
             var vcLabel = $('label[for="uses_vc"]');
             vcLabel.toggleClass('text-error', vcErrors);
             if (vcErrors) {
-                vcLabel.attr('title', 'You need to select at least one piece of Video Conference equipment');
+                vcLabel.attr('title', 'You need to select at least one piece of Videoconference equipment');
             }
             else {
                 vcLabel.qtip('destroy', true).removeAttr('title');

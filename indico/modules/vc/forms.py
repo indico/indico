@@ -72,9 +72,9 @@ class LinkingWidget(JinjaWidget):
 class VCPluginSettingsFormBase(IndicoForm):
     managers = PrincipalField(_('Managers'), groups=True, description=_('Service managers'))
     acl = PrincipalField(_('ACL'), groups=True,
-                         description=_('Users and Groups authorised to create video conference rooms'))
+                         description=_('Users and Groups authorised to create videoconference rooms'))
     notification_emails = EmailListField(_('Notification email addresses'),
-                                         description=_('Notifications about video conference rooms are sent to '
+                                         description=_('Notifications about videoconference rooms are sent to '
                                                        'these email addresses (one per line).'))
 
 

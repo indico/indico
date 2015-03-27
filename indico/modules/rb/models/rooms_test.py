@@ -184,7 +184,7 @@ def test_location_name(dummy_room, dummy_location):
     (2, False, True,  False, u'2 people, private, needs confirmation'),
     (2, True,  True,  False, u'2 people, public, needs confirmation'),
     (2, False, False, False, u'2 people, private, auto-confirmation'),
-    (2, False, True,  True,  u'2 people, private, needs confirmation, video conference')
+    (2, False, True,  True,  u'2 people, private, needs confirmation, videoconference')
 ))
 def test_marker_description(db, create_room, create_equipment_type,
                             capacity, is_reservable, reservations_need_confirmation, has_vc, expected):

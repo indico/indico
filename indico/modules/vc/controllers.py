@@ -97,7 +97,7 @@ class RHEventVCRoomMixin:
 
 
 class RHVCManageEvent(RHVCManageEventBase):
-    """Lists the available video conference rooms"""
+    """Lists the available videoconference rooms"""
 
     def _process(self):
         try:
@@ -110,7 +110,7 @@ class RHVCManageEvent(RHVCManageEventBase):
 
 
 class RHVCManageEventSelectService(RHVCManageEventBase):
-    """List available video conference plugins to create a new video room"""
+    """List available videoconference plugins to create a new videoconference room"""
 
     def _process(self):
         action = request.args.get('vc_room_action', '.manage_vc_rooms_create')

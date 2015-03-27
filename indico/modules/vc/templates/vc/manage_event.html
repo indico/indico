@@ -1,7 +1,7 @@
 {% extends 'layout/base.html' %}
 {% from 'forms/form_widget.html' import form_header, form_row, form_footer  %}
 
-{% block title %}{% trans %}Current video rooms{% endtrans %}{% endblock %}
+{% block title %}{% trans %}Current videoconference rooms{% endtrans %}{% endblock %}
 {% block content %}
     <div class="module-vc vc-management fixed-width" id="vc-info-container">
         {% if plugins %}
@@ -60,7 +60,7 @@
                 </table>
             {% else %}
                 <div class="info-message-box fixed-width">
-                    <div class="message-text">{% trans %}No video conference rooms have been added yet.{% endtrans %}</div>
+                    <div class="message-text">{% trans %}No videoconference rooms have been added yet.{% endtrans %}</div>
                 </div>
             {% endif %}
             <div class="add-room-options right">
@@ -89,7 +89,7 @@
         {% else %}
             <div class="warning-message-box">
                 <div class="message-text">
-                    {% trans %}There are no Video Conference plugins available.{% endtrans %}
+                    {% trans %}There are no Videoconference plugins available.{% endtrans %}
                 </div>
             </div>
         {% endif %}

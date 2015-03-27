@@ -47,22 +47,22 @@ class VCRoom(db.Model):
     __tablename__ = 'vc_rooms'
     __table_args__ = {'schema': 'events'}
 
-    #: Video conference room ID
+    #: Videoconference room ID
     id = db.Column(
         db.Integer,
         primary_key=True
     )
-    #: Type of the video conference room
+    #: Type of the videoconference room
     type = db.Column(
         db.String,
         nullable=False
     )
-    #: Name of the video conference room
+    #: Name of the videoconference room
     name = db.Column(
         db.String,
         nullable=False
     )
-    #: Status of the video conference room
+    #: Status of the videoconference room
     status = db.Column(
         PyIntEnum(VCRoomStatus),
         nullable=False
@@ -73,18 +73,18 @@ class VCRoom(db.Model):
         nullable=False,
         index=True
     )
-    #: Creation timestamp of the video conference room
+    #: Creation timestamp of the videoconference room
     created_dt = db.Column(
         UTCDateTime,
         nullable=False,
         default=now_utc
     )
 
-    #: Modification timestamp of the video conference room
+    #: Modification timestamp of the videoconference room
     modified_dt = db.Column(
         UTCDateTime
     )
-    #: video conference plugin-specific data
+    #: videoconference plugin-specific data
     data = db.Column(
         JSON,
         nullable=False
@@ -101,7 +101,7 @@ class VCRoom(db.Model):
 
     @property
     def created_by_user(self):
-        """The Avatar who created the video conference room."""
+        """The Avatar who created the videoconference room."""
         return AvatarHolder().getById(str(self.created_by_id))
 
     @created_by_user.setter
@@ -130,7 +130,7 @@ class VCRoomEventAssociation(db.Model):
         autoincrement=False,
         nullable=False
     )
-    #: ID of the video conference room
+    #: ID of the videoconference room
     vc_room_id = db.Column(
         db.Integer,
         db.ForeignKey('events.vc_rooms.id'),
@@ -159,7 +159,7 @@ class VCRoomEventAssociation(db.Model):
         nullable=False,
         default=False
     )
-    #: video conference plugin-specific data
+    #: videoconference plugin-specific data
     data = db.Column(
         JSON,
         nullable=False
@@ -194,7 +194,7 @@ class VCRoomEventAssociation(db.Model):
 
     @classmethod
     def find_for_event(cls, event, include_hidden=False, include_deleted=False, only_linked_to_event=False, **kwargs):
-        """Returns a Query that retrieves the video conference rooms for an event
+        """Returns a Query that retrieves the videoconference rooms for an event
 
         :param event: an indico event (with a numeric ID)
         :param only_linked_to_event: only retrieve the vc rooms linked to the whole event
