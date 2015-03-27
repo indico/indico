@@ -19,8 +19,9 @@ from __future__ import unicode_literals
 from wtforms.fields.core import SelectField, BooleanField
 from wtforms.fields.html5 import EmailField
 from wtforms.fields.simple import StringField, TextAreaField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 
+from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import UserTitle
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm
@@ -58,3 +59,7 @@ class UserPreferencesForm(IndicoForm):
 
 class UserEmailsForm(IndicoForm):
     email = EmailField(_('Add new email address'), [DataRequired()], filters=[lambda x: x.lower() if x else x])
+
+    def validate_email(self, field):
+        if UserEmail.find(is_user_deleted=False, email=field.data).count():
+            raise ValidationError(_('This email address is already in use.'))

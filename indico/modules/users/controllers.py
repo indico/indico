@@ -146,13 +146,11 @@ class RHUserEmails(RHUserBase):
         form = UserEmailsForm()
         if form.validate_on_submit():
             email = form.email.data
-            if email != self.user.email and email not in self.user.secondary_emails:
-                self.user.secondary_emails.append(email)
-                form.email.data = None
-                flash(_('Your email was successfully added in your secondary emails. If you wish to make it your '
-                        'primary email, click on the button Set as primary next to it.'), 'success')
-            else:
-                flash(_('This email already exists.'), 'warning')
+            self.user.secondary_emails.add(email)
+            form.email.data = None
+            flash(_('Your email was successfully added in your secondary emails. If you wish to make it your '
+                    'primary email, click on the "Set as primary" button next to it.'), 'success')
+            return redirect(url_for('.user_emails'))
         return WPUser.render_template('emails.html', user=self.user, form=form)
 
 
