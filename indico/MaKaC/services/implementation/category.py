@@ -359,38 +359,6 @@ class CategoryProtectionToggleDomains(CategoryModifBase):
             self._target.freeDomain(d)
 
 
-class CategoryBasketBase(LoggedOnlyService, CategoryDisplayBase):
-
-    def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-        CategoryDisplayBase._checkParams(self)
-        userId = ParameterManager(self._params).extract('userId', pType=str, allowEmpty=True)
-        if userId is not None:
-            self._avatar = AvatarHolder().getById(userId)
-        else:
-            self._avatar = self._aw.getUser()
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        CategoryDisplayBase._checkProtection(self)
-        if not self._avatar.canUserModify(self._aw.getUser()):
-            raise ServiceAccessError('Access denied')
-
-
-class CategorySuggestionDel(CategoryBasketBase):
-    def _getAnswer(self):
-        suggestions.unsuggest(self._avatar, 'category', self._categ.getId(), True)
-
-    def _checkParams(self):
-        CategoryDisplayBase._checkParams(self)
-        CategoryBasketBase._checkParams(self)
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        CategoryBasketBase._checkProtection(self)
-        CategoryDisplayBase._checkProtection(self)
-
-
 methodMap = {
     "getCategoryList": GetCategoryList,
     "getPastEventsList": GetPastEventsList,
@@ -405,5 +373,4 @@ methodMap = {
     "protection.removeConfCreator": CategoryRemoveControlUser,
     "protection.toggleDomains": CategoryProtectionToggleDomains,
     "api.getExportURLs": CategoryExportURLs,
-    "suggestions.delSuggestion": CategorySuggestionDel
 }

@@ -131,6 +131,12 @@ class RHUserFavoritesCategoryAPI(RHUserBase):
         return jsonify(success=True)
 
 
+class RHUserSuggestionsRemove(RHUserBase):
+    def _process(self):
+        suggestions.unsuggest(self.user, 'category', request.view_args['category_id'], True)
+        return jsonify(success=True)
+
+
 class RHUserEmails(RHUserBase):
     def _process(self):
         form = UserEmailsForm()
