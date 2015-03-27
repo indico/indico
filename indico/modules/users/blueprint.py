@@ -30,7 +30,7 @@ users_blueprint = _bp = IndicoBlueprint('users', __name__, template_folder='temp
 with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/dashboard/', 'user_dashboard', RHUserDashboard)
     _bp.add_url_rule('/account/', 'user_account', RHUserAccount)
-    _bp.add_url_rule('/preferences/', 'user_preferences', RHUserPreferences)
+    _bp.add_url_rule('/preferences/', 'user_preferences', RHUserPreferences, methods=('GET', 'POST'))
     _bp.add_url_rule('/favorites/', 'user_favorites', RHUserFavorites)
     _bp.add_url_rule('/favorites/users/add/', 'user_favorites_users_add', RHUserFavoritesUsersAdd, methods=('POST',))
     _bp.add_url_rule('/favorites/user/<int:fav_user_id>', 'user_favorites_user_remove',

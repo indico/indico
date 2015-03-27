@@ -32,6 +32,7 @@ from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.base import RHProtected
@@ -76,7 +77,12 @@ class RHUserAccount(RHUserBase):
 
 class RHUserPreferences(RHUserBase):
     def _process(self):
-        form = UserPreferencesForm()
+        defaults = FormDefaults(**self.user.settings.get_all(self.user))
+        form = UserPreferencesForm(obj=defaults)
+        if form.validate_on_submit():
+            self.user.settings.set_multi(form.data)
+            flash(_('Preferences saved'), 'success')
+            return redirect(url_for('.user_preferences'))
         return WPUser.render_template('preferences.html', user=self.user, form=form)
 
 

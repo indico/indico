@@ -36,9 +36,6 @@ _title_choices = [('', ''),
                   ('Dr.', _('Dr.')),
                   ('Prof.', _('Prof.'))]
 
-_display_timezones = [('event', 'Event Timezone'),
-                      ('user', 'My Timezone')]
-
 
 class UserDetailsForm(IndicoForm):
     title = SelectField(_('Title'), [DataRequired()], choices=_title_choices)
@@ -50,16 +47,18 @@ class UserDetailsForm(IndicoForm):
 
 
 class UserPreferencesForm(IndicoForm):
-    language = SelectField(_('Language'))
+    lang = SelectField(_('Language'))
     timezone = SelectField(_('Timezone'))
-    display_tz = SelectField(_('Display timezone'), choices=_display_timezones)
-    show_past = BooleanField(_('Show past events'),
-                             widget=SwitchWidget(),
-                             description='Show past events by default.')
+    force_timezone = BooleanField(_('Use my timezone'),
+                                  widget=SwitchWidget(),
+                                  description='Always use my current timezone instead of an event\'s timezone.')
+    show_past_events = BooleanField(_('Show past events'),
+                                    widget=SwitchWidget(),
+                                    description='Show past events by default.')
 
     def __init__(self, *args, **kwargs):
         super(UserPreferencesForm, self).__init__(*args, **kwargs)
-        self.language.choices = sorted(get_all_locales().items(), key=itemgetter(1))
+        self.lang.choices = sorted(get_all_locales().items(), key=itemgetter(1))
         self.timezone.choices = zip(all_timezones, all_timezones)
 
 
