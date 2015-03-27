@@ -118,10 +118,10 @@ $(document).ready(function() {
         return false;
     });
 
-    $('.body').on('click', 'button[data-href]', function() {
+    $('.body').on('click', 'button[data-method][data-href]', function() {
         var $this = $(this);
         var url = $this.data('href');
-        var method = ($this.data('method') || 'GET').toUpperCase();
+        var method = $this.data('method').toUpperCase();
         var params = $this.data('params') || {};
         if (!$.isPlainObject(params)) {
             throw new Error('Invalid params. Must be valid JSON if set.');
