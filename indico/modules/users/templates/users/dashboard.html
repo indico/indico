@@ -14,18 +14,18 @@
                         <i class="icon-user"></i>
                     </div>
                     <div class="your-details-wrapper left">
-                        <h3>
-                            {{- user.getFirstName() }} {{ user.getFamilyName() -}}
-                        </h3>
+                        <h3>{{ user.full_name }}</h3>
                         <div>
-                            <i class="icon-users"></i><span>{{ user.getOrganisation() }}</span>
+                            <i class="icon-users"></i><span>{{ user.affiliation }}</span>
                         </div>
                         <div>
-                            <i class="icon-mail"></i><span>{{ user.getEmail() }}</span>
+                            <i class="icon-mail"></i><span>{{ user.email }}</span>
                         </div>
-                        <div>
-                            <i class="icon-phone"></i><span>{{ user.getTelephone() }}</span>
-                        </div>
+                        {% if user.phone %}
+                            <div>
+                                <i class="icon-phone"></i><span>{{ user.phone }}</span>
+                            </div>
+                        {% endif %}
                     </div>
                     <div class="toolbar right">
                         <div class="group">

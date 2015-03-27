@@ -89,7 +89,7 @@ class UserLink(db.Model):
 
     @classmethod
     def get_links(cls, user, type_, role):
-        return [x.object for x in user.linked_objects.filter_by(type=type_, role=role) if x.object is not None]
+        return {x.object for x in user.linked_objects.filter_by(type=type_, role=role) if x.object is not None}
 
     @classmethod
     def create_link(cls, user, obj, role, type_=None):

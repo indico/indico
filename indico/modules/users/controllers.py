@@ -23,6 +23,7 @@ from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.users import User
+from indico.modules.users.util import get_related_categories, get_suggested_categories
 from indico.modules.users.views import WPUserDashboard, WPUser
 from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm
 from indico.util.date_time import timedelta_split
@@ -65,8 +66,8 @@ class RHUserDashboard(RHUserBase):
         hours, minutes = timedelta_split(tz.utcoffset(datetime.now()))[:2]
         return WPUserDashboard.render_template('dashboard.html', redis_enabled=bool(redis_client), timezone=unicode(tz),
                                                offset='{:+03d}:{:02d}'.format(hours, minutes), user=self.user,
-                                               categories=self.user.getRelatedCategories(),
-                                               suggested_categories=self.user.getSuggestedCategories())
+                                               categories=get_related_categories(self.user),
+                                               suggested_categories=get_suggested_categories(self.user))
 
 
 class RHUserAccount(RHUserBase):

@@ -546,9 +546,9 @@ class AccessWrapper:
             control operations over the objects in the system.
     """
 
-    def __init__( self, user=None ):
+    def __init__(self, user=None, ip=None):
         self._currentUser = user
-        self._ip = ""
+        self._ip = ip or ''
 
     def setUser( self, newAvatar ):
         self._currentUser = newAvatar
