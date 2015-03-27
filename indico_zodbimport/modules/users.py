@@ -68,7 +68,8 @@ class UserImporter(Importer):
     def migrate(self):
         self.users_by_primary_email = {}
         self.users_by_secondary_email = {}
-        self.migrate_users()
+        with self._monkeypatch():
+            self.migrate_users()
         self.fix_sequences('users', {'users'})
         self.migrate_favorite_users()
         self.migrate_admins()
