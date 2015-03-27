@@ -92,7 +92,7 @@ def getSansStyleSheet():
     }
 
     styles = getSampleStyleSheet()
-    for (name, style) in styles.byName.items():
+    for name, style in styles.byName.items():
         if _font_map.has_key(style.fontName):
             style.fontName = _font_map[style.fontName]
         if _font_map.has_key(style.bulletFontName):
