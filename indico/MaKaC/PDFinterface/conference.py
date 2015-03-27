@@ -68,7 +68,6 @@ from indico.util.string import safe_upper, safe_slice, html_color_to_rgb
 from indico.util import json
 from MaKaC.common.Configuration import Config
 
-styles = getSampleStyleSheet()
 charRplace = [
 [u'\u2019', u"'"],
 [u'\u0153', u"oe"],
@@ -76,6 +75,30 @@ charRplace = [
 [u'\u2013', u"-"],
 [u'\u2018', u"'"]
 ]
+
+
+# Change reportlab default pdf font Helvetica to indico ttf font,
+# because of better support for international characters.
+# Default font can't be easily changed by setting new value to
+# reportlab.rl_config.canvas_basefontname, because this variable
+# is used directly to initialize state of several reportlab modules
+# during their (first) import.
+def getSansStyleSheet():
+    _font_map = {
+        'Helvetica': 'Sans',
+        'Helvetica-Bold': 'Sans-Bold',
+        'Helvetica-Oblique': 'Sans-Italic',
+        'Helvetica-BoldOblique': 'Sans-Bold-Italic',
+    }
+
+    styles = getSampleStyleSheet()
+    for (name, style) in styles.byName.items():
+        if _font_map.has_key(style.fontName):
+            style.fontName = _font_map[style.fontName]
+        if _font_map.has_key(style.bulletFontName):
+            style.bulletFontName = _font_map[style.bulletFontName]
+
+    return styles
 
 
 def extract_affiliations(contrib):
@@ -143,7 +166,7 @@ class ProgrammeToPDF(PDFBase):
     def getBody(self, story=None):
         if not story:
             story = self._story
-        style = styles["Normal"]
+        style = getSansStyleSheet()["Normal"]
         style.alignment = TA_JUSTIFY
         p = Paragraph(escape(self._conf.getProgramDescription()), style)
         story.append(p)
@@ -152,7 +175,7 @@ class ProgrammeToPDF(PDFBase):
         for track in self._conf.getTrackList():
 
             bogustext = track.getTitle()
-            p = Paragraph(escape(bogustext), styles["Heading1"])
+            p = Paragraph(escape(bogustext), getSansStyleSheet()["Heading1"])
             self._story.append(p)
             bogustext = track.getDescription()
             p = Paragraph(escape(bogustext), style)
@@ -703,6 +726,7 @@ class TimeTablePlain(PDFWithTOC):
             self._story.append(Spacer(inch, 1*cm))
             if len(self._showSessions)>0:
                 style2=ParagraphStyle({})
+                style2.fontName = "Sans"
                 style2.fontSize=modifiedFontSize(14, self._fontsize)
                 style2.leading=modifiedFontSize(10, self._fontsize)
                 style2.alignment=TA_CENTER
@@ -754,26 +778,26 @@ class TimeTablePlain(PDFWithTOC):
     def _defineStyles(self):
         self._styles={}
 
-        dayStyle=getSampleStyleSheet()["Heading1"]
+        dayStyle=getSansStyleSheet()["Heading1"]
         dayStyle.fontSize = modifiedFontSize(dayStyle.fontSize, self._fontsize)
         self._styles["day"]=dayStyle
 
-        sessionTitleStyle=getSampleStyleSheet()["Heading2"]
+        sessionTitleStyle=getSansStyleSheet()["Heading2"]
         sessionTitleStyle.fontSize = modifiedFontSize(12.0, self._fontsize)
         self._styles["session_title"]=sessionTitleStyle
 
-        sessionDescriptionStyle=getSampleStyleSheet()["Heading2"]
+        sessionDescriptionStyle=getSansStyleSheet()["Heading2"]
         sessionDescriptionStyle.fontSize = modifiedFontSize(10.0, self._fontsize)
         self._styles["session_description"] = sessionDescriptionStyle
 
-        self._styles["table_body"]=getSampleStyleSheet()["Normal"]
+        self._styles["table_body"]=getSansStyleSheet()["Normal"]
 
-        convenersStyle=getSampleStyleSheet()["Normal"]
+        convenersStyle=getSansStyleSheet()["Normal"]
         convenersStyle.fontSize = modifiedFontSize(10.0, self._fontsize)
         convenersStyle.leftIndent=10
         self._styles["conveners"]=convenersStyle
 
-        subContStyle=getSampleStyleSheet()["Normal"]
+        subContStyle=getSansStyleSheet()["Normal"]
         subContStyle.fontSize=modifiedFontSize(10.0, self._fontsize)
         subContStyle.leftIndent=15
         self._styles["subContrib"]=subContStyle
@@ -973,7 +997,7 @@ class TimeTablePlain(PDFWithTOC):
         return self._ttPDFFormat.showUseSessionColorCodes()
 
     def _fontify(self, text, fSize=10, fName=""):
-        style = getSampleStyleSheet()["Normal"]
+        style = getSansStyleSheet()["Normal"]
         style.fontSize=modifiedFontSize(fSize, self._fontsize)
         style.leading=modifiedFontSize(fSize+3, self._fontsize)
         return Paragraph(text,style)
@@ -986,15 +1010,18 @@ class TimeTablePlain(PDFWithTOC):
 
     def _processDayEntries(self,day,story):
         res=[]
-        originalts=TableStyle([('VALIGN',(0,0),(-1,-1),"TOP"),
+        originalts=TableStyle([('FONTNAME',(0,0),(-1,-1),"Sans"),
+                        ('VALIGN',(0,0),(-1,-1),"TOP"),
                         ('LEFTPADDING',(0,0),(-1,-1),1),
                         ('RIGHTPADDING',(0,0),(-1,-1),1),
                         ('GRID',(0,1),(-1,-1),1,colors.lightgrey)])
-        self._tsSpk=TableStyle([("LEFTPADDING",(0,0),(0,-1),0),
+        self._tsSpk=TableStyle([('FONTNAME',(0,0),(-1,-1),"Sans"),
+                            ("LEFTPADDING",(0,0),(0,-1),0),
                             ("RIGHTPADDING",(0,0),(0,-1),0),
                             ("TOPPADDING",(0,0),(0,-1),1),
                             ("BOTTOMPADDING",(0,0),(0,-1),0)])
-        colorts=TableStyle([("LEFTPADDING",(0,0),(-1,-1),3),
+        colorts=TableStyle([('FONTNAME',(0,0),(-1,-1),"Sans"),
+                            ("LEFTPADDING",(0,0),(-1,-1),3),
                             ("RIGHTPADDING",(0,0),(-1,-1),0),
                             ("TOPPADDING",(0,0),(-1,-1),0),
                             ("BOTTOMPADDING",(0,0),(-1,-1),0),
@@ -1277,21 +1304,21 @@ class SimplifiedTimeTablePlain(PDFBase):
 
     def _defineStyles(self):
         self._styles={}
-        normalStl=getSampleStyleSheet()["Normal"]
+        normalStl=getSansStyleSheet()["Normal"]
         normalStl.fontName="Courier"
         normalStl.fontSize = modifiedFontSize(10, self._fontsize)
         normalStl.spaceBefore=0
         normalStl.spaceAfter=0
         normalStl.alignment=TA_LEFT
         self._styles["normal"]=normalStl
-        titleStl=getSampleStyleSheet()["Normal"]
+        titleStl=getSansStyleSheet()["Normal"]
         titleStl.fontName="Courier-Bold"
         titleStl.fontSize = modifiedFontSize(12, self._fontsize)
         titleStl.spaceBefore=0
         titleStl.spaceAfter=0
         titleStl.alignment=TA_LEFT
         self._styles["title"]=titleStl
-        dayStl=getSampleStyleSheet()["Normal"]
+        dayStl=getSansStyleSheet()["Normal"]
         dayStl.fontName="Courier-Bold"
         dayStl.fontSize = modifiedFontSize(10, self._fontsize)
         dayStl.spaceBefore=0
@@ -1505,7 +1532,8 @@ class ProceedingsTOC(PDFBase):
         styleTrack.spaceAfter=30
         styleTrack.alignment=TA_LEFT
 
-        tsContribs=TableStyle([('VALIGN',(0,0),(-1,0),"BOTTOM"),
+        tsContribs=TableStyle([('FONTNAME',(0,0),(-1,-1),"Sans"),
+                        ('VALIGN',(0,0),(-1,0),"BOTTOM"),
                         ('VALIGN',(0,0),(-1,-1),"BOTTOM"),
                         ('ALIGN',(0,1),(-1,1),"RIGHT"),
                         ('BOTTOMPADDING',(0,0),(-1,-1),0),
@@ -1644,6 +1672,7 @@ class RegistrantToPDF(PDFBase):
             story = self._story
 
         style = ParagraphStyle({})
+        style.fontName = "Sans"
         style.fontSize = 12
         text = i18nformat(""" _("Registrant ID") : %s""")%self._reg.getId()
         p = Paragraph(text, style, part=escape(self._reg.getFullName()))
@@ -1653,6 +1682,7 @@ class RegistrantToPDF(PDFBase):
 
         style = ParagraphStyle({})
         style.alignment = TA_CENTER
+        style.fontName = "Sans"
         style.fontSize = 25
         style.leading = 30
         text = escape(self._reg.getFullName())
@@ -1663,6 +1693,7 @@ class RegistrantToPDF(PDFBase):
         story.append(Spacer(inch, 1*cm, part=escape(self._reg.getFullName())))
         style = ParagraphStyle({})
         style.alignment = TA_JUSTIFY
+        style.fontName = "Sans"
         for key in self._display:
             text = ""
             if key == "Email" and self._reg.getEmail() <> "":
@@ -1821,6 +1852,7 @@ class RegistrantsListToPDF(PDFBase):
             story = self._story
 
         style = ParagraphStyle({})
+        style.fontName = "Sans"
         style.fontSize = 12
         style.alignment = TA_CENTER
         text = i18nformat("""<b>_("List of registrants")</b>""")
@@ -1838,7 +1870,8 @@ class RegistrantsListToPDF(PDFBase):
         styleRegistrant.leftIndent=10
         styleRegistrant.firstLineIndent=0
 
-        tsRegs=TableStyle([('VALIGN',(0,0),(-1,-1),"MIDDLE"),
+        tsRegs=TableStyle([('FONTNAME',(0,0),(-1,-1),"Sans"),
+                        ('VALIGN',(0,0),(-1,-1),"MIDDLE"),
                         ('LINEBELOW',(0,0),(-1,0), 1, colors.black),
                         ('ALIGN',(0,0),(-1,0),"CENTER"),
                         ('ALIGN',(0,1),(-1,-1),"LEFT") ] )
