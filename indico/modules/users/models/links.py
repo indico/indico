@@ -95,7 +95,7 @@ class UserLink(db.Model):
     def create_link(cls, user, obj, role, type_=None):
         if type_ is None:
             type_ = cls._get_type(obj, role)
-        data = cls._get_link_data(obj)
+        data = cls._get_link_data(obj, type_)
         if data['locator']:
             user.linked_objects.append(cls(type=type_, role=role, data=data))
 
@@ -116,8 +116,8 @@ class UserLink(db.Model):
         raise ValueError('invalid object type: {}'.format(type(obj).__name__))
 
     @classmethod
-    def _get_link_data(cls, obj):
-        return {'type': cls._get_type(obj),
+    def _get_link_data(cls, obj, type_):
+        return {'type': type_,
                 'locator': dict(obj.getLocator())}
 
     @cached_classproperty
