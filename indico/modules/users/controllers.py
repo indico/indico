@@ -109,7 +109,7 @@ class RHUserFavoritesUserRemove(RHUserBase):
 
 class RHUserFavoritesCategoryRemove(RHUserBase):
     def _process(self):
-        category = CategoryManager().getById(int(request.view_args['category_id']))
+        category = CategoryManager().getById(request.view_args['category_id'])
         if category in self.user.favorite_categories:
             self.user.favorite_categories.remove(category)
         return jsonify(success=True)
