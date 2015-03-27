@@ -22,7 +22,9 @@ from flask import session, request, flash, jsonify, redirect
 from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core.notifications import make_email
 from indico.modules.users import User
+from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.util import get_related_categories, get_suggested_categories
 from indico.modules.users.views import WPUserDashboard, WPUser
 from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm
@@ -31,10 +33,13 @@ from indico.util.i18n import _
 from indico.util.redis import suggestions
 from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
+from indico.util.string import make_unique_token
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from MaKaC.accessControl import AccessWrapper
+from MaKaC.common.cache import GenericCache
+from MaKaC.common.mail import GenericMailer
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.base import RHProtected
@@ -142,16 +147,52 @@ class RHUserSuggestionsRemove(RHUserBase):
 
 
 class RHUserEmails(RHUserBase):
+    def _send_confirmation(self, email):
+        token_storage = GenericCache('confirm-email')
+        data = {'email': email, 'user_id': self.user.id}
+        token = make_unique_token(lambda t: not token_storage.get(t))
+        token_storage.set(token, data, 24 * 3600)
+        GenericMailer.send(make_email(email, template=get_template_module('users/emails/verify_email.txt',
+                                                                          user=self.user, email=email, token=token)))
+
     def _process(self):
         form = UserEmailsForm()
         if form.validate_on_submit():
-            email = form.email.data
-            self.user.secondary_emails.add(email)
-            form.email.data = None
-            flash(_('Your email was successfully added in your secondary emails. If you wish to make it your '
-                    'primary email, click on the "Set as primary" button next to it.'), 'success')
+            self._send_confirmation(form.email.data)
+            flash(_("We have sent an email to {email}. Please click the link in that email within 24 hours to "
+                    "confirm your new email address.").format(email=form.email.data), 'success')
             return redirect(url_for('.user_emails'))
         return WPUser.render_template('emails.html', user=self.user, form=form)
+
+
+class RHUserEmailsVerify(RHUserBase):
+    token_storage = GenericCache('confirm-email')
+
+    def _validate(self, data):
+        if not data:
+            flash(_('The verification token is invalid or expired.'), 'error')
+            return False
+        user = User.get(data['user_id'])
+        if not user or user != self.user:
+            flash(_('This token is for a different Indico user. Please login with the correct account'), 'error')
+            return False
+        existing = UserEmail.find_first(is_user_deleted=False, email=data['email'])
+        if existing:
+            if existing.user == self.user:
+                flash(_('This email address is already attached to your account.'))
+            else:
+                flash(_('This email address is already in use by another account.'), 'error')
+            return False
+        return True
+
+    def _process(self):
+        token = request.view_args['token']
+        data = self.token_storage.get(token)
+        if self._validate(data):
+            self.token_storage.delete(token)
+            self.user.secondary_emails.add(data['email'])
+            flash(_('The email address {email} has been added to your account.').format(email=data['email']), 'success')
+        return redirect(url_for('.user_emails'))
 
 
 class RHUserEmailsDelete(RHUserBase):

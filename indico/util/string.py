@@ -21,6 +21,7 @@ String manipulation functions
 import functools
 import re
 import unicodedata
+from uuid import uuid4
 
 import markdown
 import bleach
@@ -277,3 +278,15 @@ def strip_whitespace(s):
     if isinstance(s, basestring):
         s = s.strip()
     return s
+
+
+def make_unique_token(is_unique):
+    """Create a unique UUID4-based token
+
+    :param is_unique: a callable invoked with the token which should
+                      return a boolean indicating if the token is actually
+    """
+    token = unicode(uuid4())
+    while not is_unique(token):
+        token = unicode(uuid4())
+    return token

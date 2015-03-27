@@ -14,9 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from itertools import count
+
 import pytest
 
-from indico.util.string import seems_html, to_unicode
+from indico.util.string import seems_html, to_unicode, make_unique_token
 
 
 def test_seems_html():
@@ -36,3 +38,18 @@ def test_seems_html():
 ))
 def test_to_unicode(input, output):
     assert to_unicode(input) == output
+
+
+def test_make_unique_token(monkeypatch):
+    monkeypatch.setattr('indico.util.string.uuid4', lambda _counter=count(): str(next(_counter)))
+    tokens = {'1', '3'}
+
+    def _get_token():
+        token = make_unique_token(lambda t: t not in tokens)
+        tokens.add(token)
+        return token
+
+    assert _get_token() == '0'
+    assert _get_token() == '2'
+    assert _get_token() == '4'
+    assert _get_token() == '5'
