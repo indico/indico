@@ -17,11 +17,13 @@
 from __future__ import unicode_literals
 
 import re
+from contextlib import contextmanager
 
 from pytz import all_timezones_set
 
 from indico.core.db import db
 from indico.modules.users import User, user_settings
+from indico.modules.users.models.favorites import FavoriteCategory
 from indico.modules.users.models.links import UserLink
 from indico.util.caching import memoize
 from indico.util.console import cformat
@@ -47,6 +49,17 @@ def _get_all_locales():
 class UserImporter(Importer):
     def has_data(self):
         return bool(User.find().count())
+
+    @contextmanager
+    def _monkeypatch(self):
+        prop = FavoriteCategory.target
+        FavoriteCategory.target = property(lambda fc: self.zodb_root['categories'][str(fc.target_id)],
+                                           prop.fset,
+                                           prop.fdel)
+        try:
+            yield
+        finally:
+            FavoriteCategory.target = prop
 
     def migrate(self):
         self.users_by_primary_email = {}
