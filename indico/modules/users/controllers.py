@@ -34,6 +34,7 @@ from indico.util.redis import write_client as redis_write_client
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.base import RHProtected
@@ -108,11 +109,25 @@ class RHUserFavoritesUserRemove(RHUserBase):
         return jsonify(success=True)
 
 
-class RHUserFavoritesCategoryRemove(RHUserBase):
-    def _process(self):
+class RHUserFavoritesCategoryAPI(RHUserBase):
+    def _process_PUT(self):
+        category = CategoryManager().getById(request.view_args['category_id'])
+        if category not in self.user.favorite_categories:
+            # TODO: enable with a LegacyAvatarWrapper(self.user) once we have it
+            # if not category.canAccess(AccessWrapper(self.user, request.remote_addr)):
+            #     raise Forbidden()
+            self.user.favorite_categories.add(category)
+            if redis_write_client:
+                suggestions.unignore(self.user, 'category', category.getId())
+                suggestions.unsuggest(self.user, 'category', category.getId())
+        return jsonify(success=True)
+
+    def _process_DELETE(self):
         category = CategoryManager().getById(request.view_args['category_id'])
         if category in self.user.favorite_categories:
             self.user.favorite_categories.remove(category)
+            if redis_write_client:
+                suggestions.unsuggest(self.user, 'category', category.getId())
         return jsonify(success=True)
 
 

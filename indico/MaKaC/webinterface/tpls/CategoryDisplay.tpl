@@ -50,7 +50,9 @@ from MaKaC.webinterface.general import strfFileSize
             </div>
             % if isLoggedIn and not isRootCategory:
             <div id="categFavorite" class="group">
-                <a class="i-button fav-button icon-only icon-bookmark ${'enabled' if categ in favoriteCategs else ''}" href="#"></a>
+                <button type="button"
+                        class="i-button fav-button icon-only icon-bookmark ${'enabled' if categ in _session.new_user.favorite_categories else ''}"
+                        data-href="${ url_for('users.user_favorites_category_api', category_id=categ.id) }"></button>
             </div>
             % endif
         </div>
@@ -239,30 +241,26 @@ $(document).ready(function(){
                 }
             });
 
-            $('.i-button.fav-button').click(function() {
+            $('.i-button.fav-button').on('click', function() {
                 var $this = $(this);
-
-                if ($this.hasClass('disabled')) {
-                    return;
-                } else {
-                    $this.addClass('disabled');
-                    indicoRequest('category.favorites.' + ($this.hasClass("enabled") ? 'delCategory' : 'addCategory'), {
-                        categId: '${ categ.getId() }'
-                    }, function(result, error) {
-                        if(error) {
-                            $this.qtip({content: {text: $T('There has been an error. Please reload the page.')}});
-                            IndicoUtil.errorReport(error);
-                        } else {
-                            $this.toggleClass('enabled');
-                            $this.removeClass('disabled');
-                        }
-                    });
-                }
+                var isFavorite = $this.hasClass('enabled');
+                $this.prop('disabled', true);
+                $.ajax({
+                    url: $this.data('href'),
+                    method: isFavorite ? 'DELETE' : 'PUT',
+                    error: handleAjaxError,
+                    success: function() {
+                        $this.toggleClass('enabled', !isFavorite);
+                    },
+                    complete: function() {
+                        $this.prop('disabled', false);
+                    }
+                });
             }).qtip({
                 hide: {
-                        fixed: true,
-                        delay: 500
-                    },
+                    fixed: true,
+                    delay: 500
+                },
                 content: {
                     text: function() {
                         if ($(this).hasClass('enabled')) {

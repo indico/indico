@@ -377,43 +377,6 @@ class CategoryBasketBase(LoggedOnlyService, CategoryDisplayBase):
             raise ServiceAccessError('Access denied')
 
 
-class CategoryFavoriteAdd(CategoryBasketBase):
-
-    def _getAnswer(self):
-        if self._categ is conference.CategoryManager().getRoot():
-            raise ServiceError('ERR-U0', _('Cannot add root category as favorite'))
-        self._avatar.linkTo(self._categ, 'favorite')
-        if redis_write_client:
-            suggestions.unignore(self._avatar, 'category', self._categ.getId())
-            suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
-
-    def _checkParams(self):
-        CategoryDisplayBase._checkParams(self)
-        CategoryBasketBase._checkParams(self)
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        CategoryBasketBase._checkProtection(self)
-        CategoryDisplayBase._checkProtection(self)
-
-
-class CategoryFavoriteDel(CategoryBasketBase):
-
-    def _getAnswer(self):
-        self._avatar.unlinkTo(self._categ, 'favorite')
-        if redis_write_client:
-            suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
-
-    def _checkParams(self):
-        CategoryDisplayBase._checkParams(self)
-        CategoryBasketBase._checkParams(self)
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        CategoryBasketBase._checkProtection(self)
-        CategoryDisplayBase._checkProtection(self)
-
-
 class CategorySuggestionDel(CategoryBasketBase):
     def _getAnswer(self):
         suggestions.unsuggest(self._avatar, 'category', self._categ.getId(), True)
@@ -442,7 +405,5 @@ methodMap = {
     "protection.removeConfCreator": CategoryRemoveControlUser,
     "protection.toggleDomains": CategoryProtectionToggleDomains,
     "api.getExportURLs": CategoryExportURLs,
-    "favorites.addCategory": CategoryFavoriteAdd,
-    "favorites.delCategory": CategoryFavoriteDel,
     "suggestions.delSuggestion": CategorySuggestionDel
 }

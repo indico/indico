@@ -40,12 +40,12 @@
                             {% for category in suggested_categories %}
                                 <li class="suggestion" data-id="{{ category.categ.getId() }}">
                                     <a href="{{ category.categ.url }}" class="truncate">
-                                        <span class="category-name truncate-target">${category["categ"].getTitle()}</span>
+                                        <span class="category-name truncate-target">{{ category.categ.getTitle() }}</span>
                                         <span class="item-legend">
                                             <span title="You have favorited this category" class="icon-star active"></span>
                                         </span>
                                         {% if category.path %}
-                                            <span class="category-path">${category["path"]}</span>
+                                            <span class="category-path">{{ category.path }}</span>
                                         {% endif %}
                                     </a>
                                     <div class="close-box">
@@ -53,7 +53,9 @@
                                            class="icon-close active suggestion-remove"></a>
                                     </div>
                                     <div class="actions">
-                                        <a href="#" title="{% trans %}Click here to add this category to your favorites.{% endtrans %}"
+                                        <a href="#"
+                                           data-href="{{ url_for('.user_favorites_category_api', category_id=category.categ.id) }}"
+                                           title="{% trans %}Click here to add this category to your favorites.{% endtrans %}"
                                            class="icon-star active suggestion-favorite"><span>{% trans %}Add to favorites{% endtrans %}</span></a>
                                     </div>
                                 </li>
@@ -266,19 +268,19 @@
                     var $this = $(this);
                     e.preventDefault();
 
-                    indicoRequest('category.favorites.addCategory', {
-                        categId: ''+container.data('id')
-                    }, function(result, error) {
-                        if (error) {
-                            $this.qtip({content: {text: $T('There has been an error. Please reload the page.')}});
-                            IndicoUtil.errorReport(error);
-                        }
-                        else {
+                    $.ajax({
+                        url: $this.data('href'),
+                        method: 'PUT',
+                        error: handleAjaxError,
+                        success: function() {
                             container.find('.actions, .close-box').remove();
                             container.appendTo('#yourCategories ol');
                             if(!$('#suggestedCategories ol > li').length) {
                                 $('#suggestedCategories').remove();
                             }
+                        },
+                        complete: function() {
+                            $this.prop('disabled', false);
                         }
                     });
                 });

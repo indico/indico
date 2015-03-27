@@ -21,7 +21,7 @@ from flask import request
 from indico.modules.users.controllers import (RHUserDashboard, RHUserAccount, RHUserPreferences, RHUserFavorites,
                                               RHUserEmails, RHUserEmailsDelete, RHUserEmailsSetPrimary,
                                               RHUserFavoritesUsersAdd, RHUserFavoritesUserRemove,
-                                              RHUserFavoritesCategoryRemove)
+                                              RHUserFavoritesCategoryAPI)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 # TODO: remove -new later
@@ -35,8 +35,8 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/favorites/users/', 'user_favorites_users_add', RHUserFavoritesUsersAdd, methods=('POST',))
     _bp.add_url_rule('/favorites/users/<int:fav_user_id>', 'user_favorites_user_remove', RHUserFavoritesUserRemove,
                      methods=('DELETE',))
-    _bp.add_url_rule('/favorites/categories/<category_id>', 'user_favorites_category_remove',
-                     RHUserFavoritesCategoryRemove, methods=('DELETE',))
+    _bp.add_url_rule('/favorites/categories/<category_id>', 'user_favorites_category_api',
+                     RHUserFavoritesCategoryAPI, methods=('PUT', 'DELETE'))
     _bp.add_url_rule('/emails/', 'user_emails', RHUserEmails, methods=('GET', 'POST'))
     _bp.add_url_rule('/emails/<email>', 'user_emails_delete', RHUserEmailsDelete, methods=('DELETE',))
     _bp.add_url_rule('/emails/make-primary', 'users_emails_set_primary', RHUserEmailsSetPrimary, methods=('POST',))
