@@ -16,12 +16,12 @@
                         </div>
                     </div>
                     <div class="i-box-content">
-                        <ul class="group-list no-description favorite-users">
+                        <ul class="group-list no-description" id="favorite-users">
                             {{ favorite_users_list(user) }}
                         </ul>
                     </div>
                 </div>
-                <button class="i-button highlight add-user" style="margin-top: 15px;">{% trans %}Add Indico user{% endtrans %}</button>
+                <button class="i-button highlight js-add-user" style="margin-top: 15px;">{% trans %}Add Indico user{% endtrans %}</button>
             </div>
             <div class="column col-50">
                 <div class="i-box titled">
@@ -47,27 +47,25 @@
     </div>
     <script>
         (function() {
-            var initFavoriteUserRemoval = function(){
-                $('.js-delete-user').on('click', function(e){
-                    e.preventDefault();
-                    var $this = $(this);
-                    $.ajax({
-                        url: $this.data('href'),
-                        method: 'DELETE',
-                        error: handleAjaxError,
-                        success: function(data) {
-                            $this.closest('.js-user-row').fadeOut(function() {
-                                $(this).remove();
-                            });
-                        }
-                    });
-                });
-            };
-
-
-            var addFavoriteUsers = function(list, setResult){
+            $('#favorite-users').on('click', '.js-delete-user', function(e){
+                e.preventDefault();
+                var $this = $(this);
                 $.ajax({
-                    url: "{{ url_for('.user_favorites_users_add') }}",
+                    url: $this.data('href'),
+                    method: 'DELETE',
+                    error: handleAjaxError,
+                    success: function() {
+                        $this.closest('.js-user-row').fadeOut(function() {
+                            $(this).remove();
+                        });
+                    }
+                });
+            });
+
+
+            var addFavoriteUsers = function(list) {
+                $.ajax({
+                    url: {{ url_for('.user_favorites_users_add') | tojson }},
                     method: 'POST',
                     dataType: 'json',
                     data: {
@@ -76,18 +74,15 @@
                     traditional: true,
                     error: handleAjaxError,
                     success: function(data) {
-                        $('.favorite-users').html(data.html);
-                        initFavoriteUserRemoval();
+                        $('#favorite-users').html(data.html);
                     }
                 });
             };
 
-            $('.add-user').on('click', function(){
+            $('.js-add-user').on('click', function(){
                 var chooseUsersPopup = new ChooseUsersPopup($T('Search Users'), true, null, false, false, null, false, false, false, addFavoriteUsers);
                 chooseUsersPopup.execute();
             });
-
-            initFavoriteUserRemoval();
 
             $('.js-delete-category').on('click', function(e){
                 e.preventDefault();
