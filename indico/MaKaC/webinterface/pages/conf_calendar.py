@@ -14,26 +14,26 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from copy import copy
 from datetime import datetime
 import random
-import MaKaC.webinterface.pages.main as main
-from MaKaC.i18n import _
-from indico.util.i18n import i18nformat, get_current_locale
-from indico.util.date_time import format_date
-import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC.webinterface.pages.main import WPMainBase
-from indico.core.config import Config
+
 from MaKaC import conference
-from copy import copy
+from MaKaC.common import timezoneUtils
 from MaKaC.common.Counter import Counter
-import MaKaC.common.timezoneUtils as timezoneUtils
+from MaKaC.webinterface.pages.main import WPMainBase
+from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface import wcomponents
+
+from indico.core.config import Config
+from indico.util.i18n import _, get_current_locale
+from indico.util.date_time import format_date
 
 
 class WPCalendarBase( WPMainBase ):
 
     def __init__( self, rh, calendar, categ=None ):
-        main.WPMainBase.__init__( self, rh )
+        WPMainBase.__init__( self, rh )
         self._cal  = calendar
         self._categ = categ
         self._locTZ = timezoneUtils.DisplayTZ(self._getAW(),None,useServerTZ=1).getDisplayTZ()
@@ -156,7 +156,7 @@ class WCalendarMonthItem:
                 res.append("""
                     </tr>
                     <tr>\n""")
-        str = i18nformat("""
+        str = """
                 <table cellspacing="1" cellpadding="5">
                     <tr>
                         <td colspan="7" align="center" style="font-size: 1.2em;">%s</b></td>
@@ -169,10 +169,10 @@ class WCalendarMonthItem:
                     </tr>
                 </table>
                 %s
-                """) % (format_date(self._month._date, 'MMM YYYY'),
-                        ''.join(list('<td align="right" bgcolor="#CCCCCC">{}</td>'.format(
-                            get_current_locale().weekday(wd)[:2]) for wd in xrange(0, 7))),
-                        "\n".join(res), "\n".join(divs))
+                """ % (format_date(self._month._date, 'MMM YYYY'),
+                       ''.join(list('<td align="right" bgcolor="#CCCCCC">{}</td>'.format(
+                               get_current_locale().weekday(wd)[:2]) for wd in xrange(0, 7))),
+                       "\n".join(res), "\n".join(divs))
 
         return str
 
