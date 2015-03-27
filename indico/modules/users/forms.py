@@ -21,26 +21,20 @@ from wtforms.fields.html5 import EmailField
 from wtforms.fields.simple import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
+from indico.modules.users.models.users import UserTitle
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoEnumSelectField
 from indico.web.forms.widgets import SwitchWidget
 
 from operator import itemgetter
 from pytz import all_timezones
 
 
-_title_choices = [('', ''),
-                  ('Mrs.', _('Mrs.')),
-                  ('Ms.', _('Ms.')),
-                  ('Mr.', _('Mr.')),
-                  ('Dr.', _('Dr.')),
-                  ('Prof.', _('Prof.'))]
-
-
 class UserDetailsForm(IndicoForm):
-    title = SelectField(_('Title'), [DataRequired()], choices=_title_choices)
+    title = IndicoEnumSelectField(_('Title'), enum=UserTitle)
     first_name = StringField(_('First name'), [DataRequired()])
-    family_name = StringField(_('Family name'), [DataRequired()])
+    last_name = StringField(_('Family name'), [DataRequired()])
     affiliation = StringField(_('Affiliation'), [DataRequired()])
     address = TextAreaField(_('Address'))
     phone = StringField(_('Phone number'))

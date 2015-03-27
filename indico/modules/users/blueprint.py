@@ -31,7 +31,7 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/dashboard/', 'user_dashboard', RHUserDashboard)
     _bp.add_url_rule('/suggestions/categories/<category_id>', 'user_suggestions_remove', RHUserSuggestionsRemove,
                      methods=('DELETE',))
-    _bp.add_url_rule('/account/', 'user_account', RHUserAccount)
+    _bp.add_url_rule('/account/', 'user_account', RHUserAccount, methods=('GET', 'POST'))
     _bp.add_url_rule('/preferences/', 'user_preferences', RHUserPreferences, methods=('GET', 'POST'))
     _bp.add_url_rule('/favorites/', 'user_favorites', RHUserFavorites)
     _bp.add_url_rule('/favorites/users/', 'user_favorites_users_add', RHUserFavoritesUsersAdd, methods=('POST',))
