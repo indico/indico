@@ -32,10 +32,11 @@
                     </div>
                     <div class="i-box-content">
                         <ul class="group-list no-description">
-                            {% for category in user.favorite_categories %}
+                            {% for category in user.favorite_categories|sort(attribute='name') %}
                                 <li data-categ-id="{{ category.id }}" class="favorite-categ js-category-row">
                                     <span>{{ category.name }}</span>
-                                    <a class="toggle icon-remove right js-delete-category" href="#" data-href="{{ url_for('.user_favorites_category_remove', category_id=category.id) }}"></a>
+                                    <a class="toggle icon-remove right js-delete-category" href="#"
+                                       data-href="{{ url_for('.user_favorites_category_remove', category_id=category.id) }}"></a>
                                 </li>
                             {% endfor %}
                         </ul>

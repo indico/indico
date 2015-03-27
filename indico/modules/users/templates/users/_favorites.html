@@ -1,8 +1,9 @@
 {% macro favorite_users_list(user) %}
-    {% for fav in user.favorite_users %}
+    {% for fav in user.favorite_users|sort(attribute='full_name') %}
         <li data-user-id="{{ fav.id }}" class="js-user-row">
             <span>{{ fav.full_name }}</span>
-            <a class="toggle icon-remove right js-delete-user" href="#" data-href="{{ url_for('.user_favorites_user_remove', fav_user_id=fav.id) }}"></a>
+            <a class="toggle icon-remove right js-delete-user" href="#"
+               data-href="{{ url_for('.user_favorites_user_remove', fav_user_id=fav.id) }}"></a>
         </li>
     {% endfor %}
 {% endmacro %}
