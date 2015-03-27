@@ -22,6 +22,7 @@ from werkzeug.utils import cached_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table, FavoriteCategory
 from indico.modules.users.models.links import UserLink
@@ -76,13 +77,6 @@ class User(db.Model):
         nullable=False,
         default=''
     )
-    #: the affiliation of the user
-    affiliation = db.Column(
-        db.String,
-        nullable=False,
-        default='',
-        index=True
-    )
     #: the address of the user
     address = db.Column(
         db.Text,
@@ -116,6 +110,12 @@ class User(db.Model):
         default=False
     )
 
+    _affiliation = db.relationship(
+        'UserAffiliation',
+        lazy=False,
+        uselist=False,
+        cascade='all, delete-orphan'
+    )
     _primary_email = db.relationship(
         'UserEmail',
         lazy=False,
@@ -138,6 +138,8 @@ class User(db.Model):
         collection_class=set,
         backref=db.backref('user', lazy=False)
     )
+    #: the affiliation of the user
+    affiliation = association_proxy('_affiliation', 'name', creator=lambda v: UserAffiliation(name=v))
     #: the primary email address of the user
     email = association_proxy('_primary_email', 'email', creator=lambda v: UserEmail(email=v, is_primary=True))
     #: any additional emails the user might have
