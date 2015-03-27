@@ -59,8 +59,8 @@ def get_suggested_categories(user):
             continue
         if any(p.isSuggestionsDisabled() for p in categ.iterParents()):
             continue
-        # TODO: enable with a LegacyAvatarWrapper(user) once we have it
-        # if not categ.canAccess(AccessWrapper(user, request.remote_addr)):
+        # TODO: enable once there's a user.avatar property returning a wrapper with Avatar-style methods
+        # if not categ.canAccess(AccessWrapper(user.avatar, request.remote_addr)):
         #     continue
         res.append({
             'score': score,

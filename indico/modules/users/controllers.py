@@ -113,8 +113,8 @@ class RHUserFavoritesCategoryAPI(RHUserBase):
     def _process_PUT(self):
         category = CategoryManager().getById(request.view_args['category_id'])
         if category not in self.user.favorite_categories:
-            # TODO: enable with a LegacyAvatarWrapper(self.user) once we have it
-            # if not category.canAccess(AccessWrapper(self.user, request.remote_addr)):
+            # TODO: enable once there's a user.avatar property returning a wrapper with Avatar-style methods
+            # if not category.canAccess(AccessWrapper(self.user.avatar, request.remote_addr)):
             #     raise Forbidden()
             self.user.favorite_categories.add(category)
             if redis_write_client:
