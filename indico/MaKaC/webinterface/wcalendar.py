@@ -259,10 +259,6 @@ class Calendar:
 
 
 class Month:
-    def getNames():
-        return [ _("January"),  _("February"),  _("March"),  _("April"),  _("May"),  _("June"),  _("July"), _("August"),  _("September"),  _("October"),  _("November"),  _("December") ]
-    getNames = staticmethod(getNames)
-
     def __init__( self, cal, date ):
         self._cal = cal
         self._date = date.replace(day=1)
@@ -278,9 +274,6 @@ class Month:
     def getCalendar( self ):
         return self._cal
 
-    def getName( self ):
-        return self.getNames()[self._month-1]
-
     def getDayList( self ):
         inc = timedelta(1)
         sd = self._date
@@ -289,16 +282,6 @@ class Month:
             l.append( self.getCalendar().getDay( sd ) )
             sd += inc
         return l
-
-    def __str__( self ):
-        l = []
-        for day in self.getDayList():
-                l.append("%s"%(day))
-        str =  _("Month '%s %s':%s")%(\
-                            self.getName(), \
-                            self.getYear(), \
-                            "\n\t\t".join(l) )
-        return str
 
 
 class MonthCalendar( Calendar ):

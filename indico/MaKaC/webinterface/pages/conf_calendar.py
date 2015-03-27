@@ -14,23 +14,20 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, date
-import calendar
-import time
+from datetime import datetime
 import random
 import MaKaC.webinterface.pages.main as main
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat, get_current_locale
+from indico.util.date_time import format_date
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.webinterface.pages.base import WPNotDecorated
 from indico.core.config import Config
 from MaKaC import conference
 from copy import copy
 from MaKaC.common.Counter import Counter
 import MaKaC.common.timezoneUtils as timezoneUtils
-from MaKaC.errors import MaKaCError
 
 
 class WPCalendarBase( WPMainBase ):
@@ -162,7 +159,7 @@ class WCalendarMonthItem:
         str = i18nformat("""
                 <table cellspacing="1" cellpadding="5">
                     <tr>
-                        <td colspan="7" align="center" style="font-size: 1.2em;">%s %s</b></td>
+                        <td colspan="7" align="center" style="font-size: 1.2em;">%s</b></td>
                     </tr>
                     <tr>
                       %s
@@ -172,7 +169,7 @@ class WCalendarMonthItem:
                     </tr>
                 </table>
                 %s
-                """) % (self._month.getName(), self._month.getYear(),
+                """) % (format_date(self._month._date, 'MMM YYYY'),
                         ''.join(list('<td align="right" bgcolor="#CCCCCC">{}</td>'.format(
                             get_current_locale().weekday(wd)[:2]) for wd in xrange(0, 7))),
                         "\n".join(res), "\n".join(divs))
