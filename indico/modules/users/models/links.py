@@ -130,7 +130,7 @@ class UserLink(db.Model):
         import MaKaC.user
         return {
             'category': {'cls': MaKaC.conference.Category,
-                         'roles': {'access', 'creator', 'favorite', 'manager'}},
+                         'roles': {'access', 'creator', 'manager'}},
             'conference': {'cls': MaKaC.conference.Conference,
                            'roles': {'abstractSubmitter', 'access', 'chair', 'creator', 'editor', 'manager',
                                      'paperReviewManager', 'participant', 'referee', 'registrar', 'reviewer'}},
