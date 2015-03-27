@@ -62,8 +62,7 @@
                 });
             });
 
-
-            var addFavoriteUsers = function(list) {
+            function addFavoriteUsers(list) {
                 $.ajax({
                     url: {{ url_for('.user_favorites_users_add') | tojson }},
                     method: 'POST',
@@ -77,7 +76,7 @@
                         $('#favorite-users').html(data.html);
                     }
                 });
-            };
+            }
 
             $('.js-add-user').on('click', function(){
                 var chooseUsersPopup = new ChooseUsersPopup($T('Search Users'), true, null, false, false, null, false, false, false, addFavoriteUsers);
