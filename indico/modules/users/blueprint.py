@@ -32,10 +32,10 @@ with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/account/', 'user_account', RHUserAccount)
     _bp.add_url_rule('/preferences/', 'user_preferences', RHUserPreferences, methods=('GET', 'POST'))
     _bp.add_url_rule('/favorites/', 'user_favorites', RHUserFavorites)
-    _bp.add_url_rule('/favorites/users/add/', 'user_favorites_users_add', RHUserFavoritesUsersAdd, methods=('POST',))
-    _bp.add_url_rule('/favorites/user/<int:fav_user_id>', 'user_favorites_user_remove',
-                     RHUserFavoritesUserRemove, methods=('DELETE',))
-    _bp.add_url_rule('/favorites/category/<int:category_id>', 'user_favorites_category_remove',
+    _bp.add_url_rule('/favorites/users/', 'user_favorites_users_add', RHUserFavoritesUsersAdd, methods=('POST',))
+    _bp.add_url_rule('/favorites/users/<int:fav_user_id>', 'user_favorites_user_remove', RHUserFavoritesUserRemove,
+                     methods=('DELETE',))
+    _bp.add_url_rule('/favorites/categories/<int:category_id>', 'user_favorites_category_remove',
                      RHUserFavoritesCategoryRemove, methods=('DELETE',))
     _bp.add_url_rule('/emails/', 'user_emails', RHUserEmails, methods=('GET', 'POST'))
     _bp.add_url_rule('/emails/<email>', 'user_emails_delete', RHUserEmailsDelete, methods=('DELETE',))
