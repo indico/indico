@@ -23,7 +23,7 @@ from indico.util.redis import write_client as redis_write_client
 def schedule_check(avatar, client=None):
     if client is None:
         client = redis_write_client
-    client.sadd('suggestions/scheduled_checks', avatar.getId())
+    client.sadd('suggestions/scheduled_checks', avatar.id)
 
 
 def unschedule_check(avatar_id, client=None):
@@ -42,39 +42,39 @@ def next_scheduled_check(client=None):
 def suggest(avatar, what, id, score, client=None):
     if client is None:
         client = redis_write_client
-    scripts.suggestions_suggest(avatar.getId(), what, id, score, client=client)
+    scripts.suggestions_suggest(avatar.id, what, id, score, client=client)
 
 
 def unsuggest(avatar, what, id, ignore=False, client=None):
     if client is None:
         client = redis_write_client
-    client.zrem('suggestions/suggested:%s:%s' % (avatar.getId(), what), id)
+    client.zrem('suggestions/suggested:%s:%s' % (avatar.id, what), id)
     if ignore:
-        client.sadd('suggestions/ignored:%s:%s' % (avatar.getId(), what), id)
+        client.sadd('suggestions/ignored:%s:%s' % (avatar.id, what), id)
 
 
 def unignore(avatar, what, id, client=None):
     if client is None:
         client = redis_write_client
-    client.srem('suggestions/ignored:%s:%s' % (avatar.getId(), what), id)
+    client.srem('suggestions/ignored:%s:%s' % (avatar.id, what), id)
 
 
 def get_suggestions(avatar, what, client=None):
     if client is None:
         client = redis_client
-    key = 'suggestions/suggested:%s:%s' % (avatar.getId(), what)
+    key = 'suggestions/suggested:%s:%s' % (avatar.id, what)
     return OrderedDict(client.zrevrangebyscore(key, '+inf', '-inf', withscores=True))
 
 
 def merge_avatars(destination, source, client=None):
     if client is None:
         client = redis_write_client
-    scripts.suggestions_merge_avatars(destination.getId(), source.getId(), client=client)
+    scripts.suggestions_merge_avatars(destination.id, source.id, client=client)
 
 
 def delete_avatar(avatar, client=None):
     if client is None:
         client = redis_write_client
-    client.srem('suggestions/scheduled_checks', avatar.getId())
-    client.delete('suggestions/suggested:%s:category' % avatar.getId())
-    client.delete('suggestions/ignored:%s:category' % avatar.getId())
+    client.srem('suggestions/scheduled_checks', avatar.id)
+    client.delete('suggestions/suggested:%s:category' % avatar.id)
+    client.delete('suggestions/ignored:%s:category' % avatar.id)
