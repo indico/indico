@@ -15,8 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import pytest
+from speaklater import is_lazy_string
 
 from indico.modules.users import User
+from indico.modules.users.models.users import UserTitle
 
 
 def test_can_be_modified():
@@ -44,10 +46,19 @@ def test_full_name():
     (True,  True,  True,  'PIG, G.'),
 ))
 def test_get_full_name(last_name_first, last_name_upper, abbrev_first_name, expected):
-    user = User(first_name='Guinea', last_name='Pig')
+    user = User(first_name='Guinea', last_name='Pig', title=UserTitle.none)
     name = user.get_full_name(last_name_first=last_name_first, last_name_upper=last_name_upper,
-                              abbrev_first_name=abbrev_first_name)
+                              abbrev_first_name=abbrev_first_name, show_title=False)
     assert name == expected
+    # titled name with no title is the same
+    titled_name = user.get_full_name(last_name_first=last_name_first, last_name_upper=last_name_upper,
+                                     abbrev_first_name=abbrev_first_name, show_title=True)
+    assert titled_name == expected
+    # titled name with a non-empty title
+    user.title = UserTitle.mr
+    titled_name = user.get_full_name(last_name_first=last_name_first, last_name_upper=last_name_upper,
+                                     abbrev_first_name=abbrev_first_name, show_title=True)
+    assert titled_name == 'Mr. {}'.format(expected)
 
 
 def test_emails(db):
@@ -103,3 +114,14 @@ def test_settings():
     user = User(id=123)
     # make sure it's a bound settings proxy
     assert user.settings._bound_args == (user,)
+
+
+def test_title(db):
+    user = User(first_name='Guinea', last_name='Pig')
+    db.session.add(user)
+    db.session.flush()
+    assert user.title == ''
+    user.title = UserTitle.prof
+    assert user.title == UserTitle.prof.title
+    assert is_lazy_string(user.title)
+    assert User.find_one(title=UserTitle.prof) == user

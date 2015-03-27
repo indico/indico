@@ -25,6 +25,7 @@ from indico.core.db import db
 from indico.modules.users import User, user_settings
 from indico.modules.users.models.favorites import FavoriteCategory
 from indico.modules.users.models.links import UserLink
+from indico.modules.users.models.users import UserTitle
 from indico.util.caching import memoize
 from indico.util.console import cformat
 from indico.util.i18n import get_all_locales
@@ -32,6 +33,9 @@ from indico.util.string import is_valid_mail
 from indico.util.struct.iterables import committing_iterator, grouper
 
 from indico_zodbimport import Importer, convert_to_unicode
+
+
+USER_TITLE_MAP = {x.title: x for x in UserTitle}
 
 
 def _sanitize_email(email):
@@ -186,6 +190,7 @@ class UserImporter(Importer):
                     email=email,
                     first_name=convert_to_unicode(avatar.name).strip() or 'UNKNOWN',
                     last_name=convert_to_unicode(avatar.surName).strip() or 'UNKNOWN',
+                    title=USER_TITLE_MAP.get(avatar.title, UserTitle.none),
                     phone=convert_to_unicode(avatar.telephone[0]).strip(),
                     affiliation=convert_to_unicode(avatar.organisation[0]).strip(),
                     address=convert_to_unicode(avatar.address[0]).strip(),

@@ -9,6 +9,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
+from indico.core.db.sqlalchemy import PyIntEnum
+from indico.modules.users.models.users import UserTitle
 
 # revision identifiers, used by Alembic.
 revision = '17be284e4062'
@@ -21,6 +23,7 @@ def upgrade():
                     sa.Column('id', sa.Integer(), nullable=False),
                     sa.Column('first_name', sa.String(), nullable=False, index=True),
                     sa.Column('last_name', sa.String(), nullable=False, index=True),
+                    sa.Column('title', PyIntEnum(UserTitle), nullable=False),
                     sa.Column('phone', sa.String(), nullable=False),
                     sa.Column('affiliation', sa.String(), nullable=False, index=True),
                     sa.Column('address', sa.Text(), nullable=False),

@@ -21,11 +21,24 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.utils import cached_property
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table, FavoriteCategory
 from indico.modules.users.models.links import UserLink
 from indico.util.caching import memoize_request
+from indico.util.i18n import _
 from indico.util.string import return_ascii
+from indico.util.struct.enum import TitledIntEnum
+
+
+class UserTitle(TitledIntEnum):
+    __titles__ = ('', _('Mr.'), _('Ms.'), _('Mrs.'), _('Dr.'), _('Prof.'))
+    none = 0
+    mr = 1
+    ms = 2
+    mrs = 3
+    dr = 4
+    prof = 5
 
 
 class User(db.Model):
@@ -49,6 +62,13 @@ class User(db.Model):
         db.String,
         nullable=False,
         index=True
+    )
+    # the title of the user - you usually want the `title` property!
+    _title = db.Column(
+        'title',
+        PyIntEnum(UserTitle),
+        nullable=False,
+        default=UserTitle.none
     )
     #: the phone number of the user
     phone = db.Column(
@@ -161,6 +181,19 @@ class User(db.Model):
     )
 
     @hybrid_property
+    def title(self):
+        """the title of the user"""
+        return self._title.title
+
+    @title.expression
+    def title(cls):
+        return cls._title
+
+    @title.setter
+    def title(self, value):
+        self._title = value
+
+    @hybrid_property
     def is_deleted(self):
         return self._is_deleted
 
@@ -199,7 +232,7 @@ class User(db.Model):
         """If this user can be modified by the given user"""
         return self == user or user.is_admin
 
-    def get_full_name(self, last_name_first=True, last_name_upper=True, abbrev_first_name=True):
+    def get_full_name(self, last_name_first=True, last_name_upper=True, abbrev_first_name=True, show_title=False):
         """Returns the user's name in the specified notation.
 
         Note: Do not use positional arguments when calling this method.
@@ -210,10 +243,12 @@ class User(db.Model):
         :param last_name_upper: if the last name should be all-uppercase
         :param abbrev_first_name: if the first name should be abbreviated to
                                   use only the first character
+        :param show_title: if the title of the user should be included
         """
         last_name = self.last_name.upper() if last_name_upper else self.last_name
         first_name = '{}.'.format(self.first_name[0].upper()) if abbrev_first_name else self.first_name
-        return '{}, {}'.format(last_name, first_name) if last_name_first else '{} {}'.format(first_name, last_name)
+        full_name = '{}, {}'.format(last_name, first_name) if last_name_first else '{} {}'.format(first_name, last_name)
+        return full_name if not show_title or not self.title else '{} {}'.format(self.title, full_name)
 
     def make_email_primary(self, email):
         """Promotes a secondary email address to the primary email address
