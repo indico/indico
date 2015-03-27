@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from collections import OrderedDict
+
 from indico.core.notifications import email_sender, make_email
 from indico.modules.payment import event_settings as payment_event_settings
 from indico.web.flask.templating import get_template_module
@@ -21,10 +23,11 @@ from indico.web.flask.util import url_for
 from indico.util.string import to_unicode
 
 from MaKaC.PDFinterface.conference import TicketToPDF
+from MaKaC.registration import PersonalDataForm
 
 
 def _get_reg_details(reg_form, registrant):
-    reg_details = {'misc_details': {}}
+    reg_details = {'misc_details': {}, 'personal_data': {}}
     for section in reg_form.getSortedForms():
         if section.getId() == 'reasonParticipation':
             reg_details['reason'] = registrant.getReasonParticipation()
@@ -48,7 +51,7 @@ def _get_reg_details(reg_form, registrant):
             if not misc:
                 continue
             title = to_unicode(misc.getTitle())
-            reg_details['misc_details'][title] = {}
+            fields = {title: OrderedDict()}
             for field in section.getSortedFields():
                 response_item = misc.getResponseItemById(field.getId())
                 if not response_item:
@@ -63,7 +66,11 @@ def _get_reg_details(reg_form, registrant):
                         form_field['value'] = to_unicode(input_field.getValueDisplay(form_field['value']))
                     except Exception:
                         form_field['value'] = to_unicode(form_field['value']).strip()
-                reg_details['misc_details'][title][to_unicode(response_item.getCaption())] = form_field
+                fields[title][to_unicode(response_item.getCaption())] = form_field
+            if isinstance(section, PersonalDataForm):
+                reg_details['personal_data'] = fields
+            else:
+                reg_details['misc_details'] = fields
     return reg_details
 
 

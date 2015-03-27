@@ -26,6 +26,24 @@
         </div>
         <div class="content" style="padding: 20px; color: #555;">
             {% block registration_header %}{% endblock %}
+            {% for title, fields in reg_details.personal_data.iteritems() %}
+                <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
+                    <h2>{{ title }}</h2>
+                    <dl>
+                        {%- for name, value_attrs in fields.iteritems() if value_attrs.value %}
+                            {{ print_dt(name, value_attrs.value) }}
+                            {%- if value_attrs.value -%}
+                                {% set description = value_attrs.value %}
+                                {% if value_attrs.price -%}
+                                    {% set description = description + ' (' + value_attrs.price + ' ' + value_attrs.currency + ')' %}
+                                {%- endif %}
+                                {{ print_dd(description) }}
+                            {%- endif %}
+                        {%- endfor %}
+                    </dl>
+                    <div style="clear: both;"></div>
+                </div>
+            {% endfor %}
             <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
                 <h2>General information</h2>
                 <dl>
