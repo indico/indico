@@ -46,61 +46,63 @@
         </div>
     </div>
     <script>
-        var initFavoriteUserRemoval = function(){
-            $('.js-delete-user').on('click', function(e){
+        (function() {
+            var initFavoriteUserRemoval = function(){
+                $('.js-delete-user').on('click', function(e){
+                    e.preventDefault();
+                    var $this = $(this);
+                    $.ajax({
+                        url: $this.data('href'),
+                        method: 'DELETE',
+                        error: handleAjaxError,
+                        success: function(data) {
+                            $this.closest('.js-user-row').fadeOut(function() {
+                                $(this).remove();
+                            });
+                        }
+                    });
+                });
+            };
+
+
+            var addFavoriteUsers = function(list, setResult){
+                $.ajax({
+                    url: "{{ url_for('.user_favorites_users_add') }}",
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {
+                        user_id: _.pluck(list, 'id')
+                    },
+                    traditional: true,
+                    error: handleAjaxError,
+                    success: function(data) {
+                        $('.favorite-users').html(data.html);
+                        initFavoriteUserRemoval();
+                    }
+                });
+            };
+
+            $('.add-user').on('click', function(){
+                var chooseUsersPopup = new ChooseUsersPopup($T('Search Users'), true, null, false, false, null, false, false, false, addFavoriteUsers);
+                chooseUsersPopup.execute();
+            });
+
+            initFavoriteUserRemoval();
+
+            $('.js-delete-category').on('click', function(e){
                 e.preventDefault();
                 var $this = $(this);
                 $.ajax({
                     url: $this.data('href'),
                     method: 'DELETE',
                     error: handleAjaxError,
-                    success: function(data) {
-                        $this.closest('.js-user-row').fadeOut(function() {
+                    success: function() {
+                        $this.closest('.js-category-row').fadeOut(function() {
                             $(this).remove();
                         });
                     }
                 });
             });
-        };
-
-
-        var addFavoriteUsers = function(list, setResult){
-            $.ajax({
-                url: "{{ url_for('.user_favorites_users_add') }}",
-                method: 'POST',
-                dataType: 'json',
-                data: {
-                    user_id: _.pluck(list, 'id')
-                },
-                traditional: true,
-                error: handleAjaxError,
-                success: function(data) {
-                    $('.favorite-users').html(data.html);
-                    initFavoriteUserRemoval();
-                }
-            });
-        };
-
-        $('.add-user').on('click', function(){
-            var chooseUsersPopup = new ChooseUsersPopup($T('Search Users'), true, null, false, false, null, false, false, false, addFavoriteUsers);
-            chooseUsersPopup.execute();
-        });
-
-        initFavoriteUserRemoval();
-
-        $('.js-delete-category').on('click', function(e){
-            e.preventDefault();
-            var $this = $(this);
-            $.ajax({
-                url: $this.data('href'),
-                method: 'DELETE',
-                error: handleAjaxError,
-                success: function(data) {
-                    $this.closest('.js-category-row').fadeOut(function() {
-                        $(this).remove();
-                    });
-                }
-            });
-        });
+       })();
     </script>
 {% endblock %}
