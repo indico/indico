@@ -57,7 +57,7 @@ def _inject_vc_room_action_buttons(event, item, **kwargs):
 
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
-    return 'vc', SideMenuItem('Video Conference', url_for('vc.manage_vc_rooms', event),
+    return 'vc', SideMenuItem(_('Videoconference'), url_for('vc.manage_vc_rooms', event),
                               visible=bool(get_vc_plugins()) and event.canModify(session.user))
 
 
@@ -68,7 +68,7 @@ def _extend_event_menu(sender, **kwargs):
             return False
         return (bool(get_vc_plugins()) and
                 bool(VCRoomEventAssociation.find_for_event(event, only_linked_to_event=True).count()))
-    return EventMenuEntry('vc.event_videoconference', 'Video Conference Rooms', name='vc-event-page', visible=_visible)
+    return EventMenuEntry('vc.event_videoconference', 'Videoconference Rooms', name='vc-event-page', visible=_visible)
 
 
 @signals.event.session_slot_deleted.connect
@@ -118,7 +118,7 @@ def _get_user():
 class VCCloner(EventCloner):
     def get_options(self):
         enabled = bool(VCRoomEventAssociation.find_for_event(self.event, include_hidden=True).count())
-        return {'vc_rooms': (_('Video conference rooms'), enabled, True)}
+        return {'vc_rooms': (_('Videoconference rooms'), enabled, True)}
 
     def clone(self, new_event, options):
         if 'vc_rooms' not in options:

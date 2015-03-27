@@ -137,10 +137,10 @@
   </div>
   <!-- Created -->
   <div id="iWillUseVideoConferencing" class="tip">
-    ${ _('Is user going to use video-conferencing equipment?') }<br />
+    ${ _('Is user going to use videoconferencing equipment?') }<br />
   </div>
   <div id="iNeedAVCSupport" class="tip">
-    ${ _('Has user requested support for video-conferencing equipment?') }<br />
+    ${ _('Has user requested support for videoconferencing equipment?') }<br />
   </div>
 </div>
 <!-- END OF CONTEXT HELP DIVS -->

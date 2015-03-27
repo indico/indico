@@ -1,4 +1,4 @@
-"""Create video conference rooms
+"""Create videoconference rooms
 
 Revision ID: 233928da84b2
 Revises: 50c2b5ee2726

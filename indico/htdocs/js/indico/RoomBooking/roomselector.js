@@ -348,12 +348,12 @@
             var myRooms = self.options.myRooms;
 
             var icons = ["icon-camera", "icon-broadcast", 'icon-projector', "icon-unlocked", "icon-user"];
-            var activetitles = [$T("Video conference available"),
+            var activetitles = [$T("Videoconference available"),
                                 $T("Webcast/Recording available"),
                                 $T('Projector available'),
                                 $T("Public room"),
                                 $T("Maximum capacity")];
-            var disabledtitles = [$T("Video conference not available"),
+            var disabledtitles = [$T("Videoconference not available"),
                                   $T("Webcast/Recording not available"),
                                   $T('Projector not available'),
                                   $T("Private room")];

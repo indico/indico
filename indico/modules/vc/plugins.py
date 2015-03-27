@@ -35,9 +35,9 @@ PREFIX_RE = re.compile('^vc_')
 
 class VCPluginMixin(object):
     settings_form = VCPluginSettingsFormBase
-    #: the :class:`IndicoForm` to use for the video conference room form
+    #: the :class:`IndicoForm` to use for the videoconference room form
     vc_room_form = None
-    #: the :class:`IndicoForm` to use for the video conference room attach form
+    #: the :class:`IndicoForm` to use for the videoconference room attach form
     vc_room_attach_form = None
     #: the readable name of the VC plugin
     friendly_name = None
@@ -45,7 +45,7 @@ class VCPluginMixin(object):
     def init(self):
         super(VCPluginMixin, self).init()
         if not self.name.startswith('vc_'):
-            raise Exception('Video conference plugins must be named vc_*')
+            raise Exception('Videoconference plugins must be named vc_*')
         self.connect(signals.merge_users, self._merge_users)
 
     @property
@@ -91,7 +91,7 @@ class VCPluginMixin(object):
         return set(self.settings.get('notification_emails', set()))
 
     def render_form(self, **kwargs):
-        """Renders the video conference room form
+        """Renders the videoconference room form
         :param kwargs: arguments passed to the template
         """
         return render_template('vc/manage_event_create_room.html', **kwargs)
@@ -145,9 +145,9 @@ class VCPluginMixin(object):
                                event=event_vc_room.event, **kwargs)
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
-        """Creates the video conference room form
+        """Creates the videoconference room form
 
-        :param event: the event the video conference room is for
+        :param event: the event the videoconference room is for
         :param existing_vc_room: a vc_room from which to retrieve data for the form
         :param \*\*kwargs: extra data to pass to the form if an existing vc room is passed
         :return: an instance of an :class:`IndicoForm` subclass

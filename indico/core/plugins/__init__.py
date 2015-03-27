@@ -49,7 +49,7 @@ class PluginCategory(unicode, IndicoEnum):
     synchronization = _('Synchronization')
     payment = _('Payment')
     importers = _('Importers')
-    videoconference = _('Video conference')
+    videoconference = _('Videoconference')
     other = _('Other')
 
 
