@@ -83,7 +83,7 @@ charRplace = [
 # reportlab.rl_config.canvas_basefontname, because this variable
 # is used directly to initialize state of several reportlab modules
 # during their (first) import.
-def getSansStyleSheet():
+def get_sans_style_sheet():
     _font_map = {
         'Helvetica': 'Sans',
         'Helvetica-Bold': 'Sans-Bold',
@@ -166,7 +166,7 @@ class ProgrammeToPDF(PDFBase):
     def getBody(self, story=None):
         if not story:
             story = self._story
-        style = getSansStyleSheet()["Normal"]
+        style = get_sans_style_sheet()["Normal"]
         style.alignment = TA_JUSTIFY
         p = Paragraph(escape(self._conf.getProgramDescription()), style)
         story.append(p)
@@ -175,7 +175,7 @@ class ProgrammeToPDF(PDFBase):
         for track in self._conf.getTrackList():
 
             bogustext = track.getTitle()
-            p = Paragraph(escape(bogustext), getSansStyleSheet()["Heading1"])
+            p = Paragraph(escape(bogustext), get_sans_style_sheet()["Heading1"])
             self._story.append(p)
             bogustext = track.getDescription()
             p = Paragraph(escape(bogustext), style)
@@ -778,26 +778,26 @@ class TimeTablePlain(PDFWithTOC):
     def _defineStyles(self):
         self._styles={}
 
-        dayStyle=getSansStyleSheet()["Heading1"]
+        dayStyle=get_sans_style_sheet()["Heading1"]
         dayStyle.fontSize = modifiedFontSize(dayStyle.fontSize, self._fontsize)
         self._styles["day"]=dayStyle
 
-        sessionTitleStyle=getSansStyleSheet()["Heading2"]
+        sessionTitleStyle=get_sans_style_sheet()["Heading2"]
         sessionTitleStyle.fontSize = modifiedFontSize(12.0, self._fontsize)
         self._styles["session_title"]=sessionTitleStyle
 
-        sessionDescriptionStyle=getSansStyleSheet()["Heading2"]
+        sessionDescriptionStyle=get_sans_style_sheet()["Heading2"]
         sessionDescriptionStyle.fontSize = modifiedFontSize(10.0, self._fontsize)
         self._styles["session_description"] = sessionDescriptionStyle
 
-        self._styles["table_body"]=getSansStyleSheet()["Normal"]
+        self._styles["table_body"]=get_sans_style_sheet()["Normal"]
 
-        convenersStyle=getSansStyleSheet()["Normal"]
+        convenersStyle=get_sans_style_sheet()["Normal"]
         convenersStyle.fontSize = modifiedFontSize(10.0, self._fontsize)
         convenersStyle.leftIndent=10
         self._styles["conveners"]=convenersStyle
 
-        subContStyle=getSansStyleSheet()["Normal"]
+        subContStyle=get_sans_style_sheet()["Normal"]
         subContStyle.fontSize=modifiedFontSize(10.0, self._fontsize)
         subContStyle.leftIndent=15
         self._styles["subContrib"]=subContStyle
@@ -997,7 +997,7 @@ class TimeTablePlain(PDFWithTOC):
         return self._ttPDFFormat.showUseSessionColorCodes()
 
     def _fontify(self, text, fSize=10, fName=""):
-        style = getSansStyleSheet()["Normal"]
+        style = get_sans_style_sheet()["Normal"]
         style.fontSize=modifiedFontSize(fSize, self._fontsize)
         style.leading=modifiedFontSize(fSize+3, self._fontsize)
         return Paragraph(text,style)
@@ -1304,21 +1304,21 @@ class SimplifiedTimeTablePlain(PDFBase):
 
     def _defineStyles(self):
         self._styles={}
-        normalStl=getSansStyleSheet()["Normal"]
+        normalStl=get_sans_style_sheet()["Normal"]
         normalStl.fontName="Courier"
         normalStl.fontSize = modifiedFontSize(10, self._fontsize)
         normalStl.spaceBefore=0
         normalStl.spaceAfter=0
         normalStl.alignment=TA_LEFT
         self._styles["normal"]=normalStl
-        titleStl=getSansStyleSheet()["Normal"]
+        titleStl=get_sans_style_sheet()["Normal"]
         titleStl.fontName="Courier-Bold"
         titleStl.fontSize = modifiedFontSize(12, self._fontsize)
         titleStl.spaceBefore=0
         titleStl.spaceAfter=0
         titleStl.alignment=TA_LEFT
         self._styles["title"]=titleStl
-        dayStl=getSansStyleSheet()["Normal"]
+        dayStl=get_sans_style_sheet()["Normal"]
         dayStl.fontName="Courier-Bold"
         dayStl.fontSize = modifiedFontSize(10, self._fontsize)
         dayStl.spaceBefore=0
