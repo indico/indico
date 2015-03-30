@@ -78,13 +78,13 @@ class RHUserDashboard(RHUserBase):
                                                suggested_categories=get_suggested_categories(self.user))
 
 
-class RHUserAccount(RHUserBase):
+class RHPersonalData(RHUserBase):
     def _process(self):
         form = UserDetailsForm(obj=FormDefaults(self.user, skip_attrs={'title'}, title=self.user._title))
         if form.validate_on_submit():
             form.populate_obj(self.user)
             flash(_('Your account details were successfully updated.'), 'success')
-            return redirect(url_for('.user_account'))
+            return redirect(url_for('.user_profile'))
         return WPUser.render_template('account.html', user=self.user, form=form)
 
 

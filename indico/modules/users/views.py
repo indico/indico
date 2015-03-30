@@ -47,10 +47,10 @@ class WPUser(WPJinjaMixin, WPMainBase):
                              key=attrgetter('title'))
         params['user_menu_items'] = [
             MenuItem(_('Dashboard'), 'users.user_dashboard'),
-            MenuItem(_('Account details'), 'users.user_account'),
+            MenuItem(_('Personal data'), 'users.user_profile'),
+            MenuItem(_('Emails'), 'users.user_emails'),
             MenuItem(_('Preferences'), 'users.user_preferences'),
             MenuItem(_('Favorites'), 'users.user_favorites'),
-            MenuItem(_('Emails'), 'users.user_emails'),
             # TODO: other menu items
         ] + extra_items
         return self._getPageContent(params)
