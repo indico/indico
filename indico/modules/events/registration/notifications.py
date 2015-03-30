@@ -27,7 +27,7 @@ from MaKaC.registration import PersonalDataForm
 
 
 def _get_reg_details(reg_form, registrant):
-    reg_details = {'misc_details': {}, 'personal_data': {}}
+    reg_details = {'misc_details': OrderedDict(), 'personal_data': OrderedDict()}
     for section in reg_form.getSortedForms():
         if section.getId() == 'reasonParticipation':
             reg_details['reason'] = registrant.getReasonParticipation()
@@ -51,7 +51,7 @@ def _get_reg_details(reg_form, registrant):
             if not misc:
                 continue
             title = to_unicode(misc.getTitle())
-            fields = {title: OrderedDict()}
+            fields = OrderedDict()
             for field in section.getSortedFields():
                 response_item = misc.getResponseItemById(field.getId())
                 if not response_item:
@@ -66,11 +66,11 @@ def _get_reg_details(reg_form, registrant):
                         form_field['value'] = to_unicode(input_field.getValueDisplay(form_field['value']))
                     except Exception:
                         form_field['value'] = to_unicode(form_field['value']).strip()
-                fields[title][to_unicode(response_item.getCaption())] = form_field
+                fields[to_unicode(response_item.getCaption())] = form_field
             if isinstance(section, PersonalDataForm):
-                reg_details['personal_data'] = fields
+                reg_details['personal_data'][title] = fields
             else:
-                reg_details['misc_details'] = fields
+                reg_details['misc_details'][title] = fields
     return reg_details
 
 
