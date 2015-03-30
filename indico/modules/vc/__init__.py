@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from flask import render_template, has_request_context, session
-from flask_pluginengine import render_plugin_template
 
 from indico.core import signals
 from indico.core.config import Config
@@ -30,7 +29,6 @@ from indico.web.flask.templating import get_overridable_template_name, template_
 from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry
 from indico.util.i18n import _
-from indico.util.user import retrieve_principal
 from MaKaC.conference import EventCloner
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.displayMgr import EventMenuEntry
@@ -54,6 +52,7 @@ def _inject_vc_room_action_buttons(event, item, **kwargs):
         plugin = event_vc_room.vc_room.plugin
         name = get_overridable_template_name('vc_room_timetable_buttons.html', plugin, core_prefix='vc/')
         return render_template(name, event=event, event_vc_room=event_vc_room, **kwargs)
+
 
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):

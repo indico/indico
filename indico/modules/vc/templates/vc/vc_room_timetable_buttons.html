@@ -1,4 +1,5 @@
 {% set vc_room = event_vc_room.vc_room %}
+{% set plugin = vc_room.plugin %}
 
 <div class="toolbar right vc-toolbar">
     <div class="group">
@@ -7,10 +8,13 @@
     </div>
     {{ template_hook('event-timetable-vc-extra-buttons', event_vc_room=event_vc_room) }}
 </div>
+<div style="display: none;">
+    <span>{{ plugin.render_info_box(vc_room, event_vc_room, event) | safe }}</span>
+</div>
 <script>
     $('#vc-room-{{ vc_room.id }}').qtip({
         content: {
-            text: {{ info_box | tojson }}
+            text: $('#vc-room-{{ vc_room.id }}').closest('.toolbar.right.vc-toolbar').next('div')
         },
         position: {
             my: 'top middle',
