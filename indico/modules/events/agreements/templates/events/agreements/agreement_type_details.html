@@ -1,5 +1,5 @@
 {% extends 'layout/base.html' %}
-{% from 'switch.html' import switch %}
+{% from '_switch.html' import switch %}
 
 {% macro extra_columns(data) %}
     {% for column in definition.render_data(event, data) or () %}

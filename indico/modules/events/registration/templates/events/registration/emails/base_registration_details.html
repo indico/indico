@@ -26,6 +26,24 @@
         </div>
         <div class="content" style="padding: 20px; color: #555;">
             {% block registration_header %}{% endblock %}
+            {% for title, fields in reg_details.personal_data.iteritems() %}
+                <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
+                    <h2>{{ title }}</h2>
+                    <dl>
+                        {%- for name, value_attrs in fields.iteritems() if value_attrs.value %}
+                            {{ print_dt(name, value_attrs.value) }}
+                            {%- if value_attrs.value -%}
+                                {% set description = value_attrs.value %}
+                                {% if value_attrs.price -%}
+                                    {% set description = description + ' (' + value_attrs.price + ' ' + value_attrs.currency + ')' %}
+                                {%- endif %}
+                                {{ print_dd(description) }}
+                            {%- endif %}
+                        {%- endfor %}
+                    </dl>
+                    <div style="clear: both;"></div>
+                </div>
+            {% endfor %}
             <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
                 <h2>General information</h2>
                 <dl>
@@ -86,7 +104,7 @@
             {%- endif %}
             {%- if reg_details.misc_details %}
                 {% for title, fields in reg_details.misc_details.iteritems() %}
-                    <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
+                    <div style="padding-bottom: 20px;{% if not loop.first %} border-top: 1px solid #EBEBEB;{% endif %}">
                         <h2>{{ title }}</h2>
                         <dl>
                             {%- for name, value_attrs in fields.iteritems() if value_attrs.value %}
@@ -106,12 +124,12 @@
             {%- endif %}
             {% block registration_footer %}
                 {%- if registration_email_msg %}
-                    <div style="padding-bottom: 20px; border-bottom: 1px solid #EBEBEB;">
+                    <div style="padding-bottom: 20px; border-top: 1px solid #EBEBEB;">
                         <h2>Additional information</h2>
                         <p style="white-space: pre;">{{ registration_email_msg }}</p>
                     </div>
                 {%- endif %}
-                <p>To manage your registration, follow this link:
+                <p style="padding-top: 20px; border-top: 1px solid #EBEBEB;">To manage your registration, follow this link:
                     <a href="{{ reg_page }}">Manage my registration</a>
                 </p>
             {% endblock %}

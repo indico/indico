@@ -360,8 +360,6 @@ def install_zeroclipboard():
         dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'zeroclipboard/')
         local('mkdir -p {0}'.format(dest_dir))
         local('cp dist/ZeroClipboard.js {0}/'.format(dest_dir))
-        local('cp dist/ZeroClipboard.min.js {0}/'.format(dest_dir))
-        local('cp dist/ZeroClipboard.min.map {0}/'.format(dest_dir))
         local('cp dist/ZeroClipboard.swf {0}/'.format(dest_dir))
 
 

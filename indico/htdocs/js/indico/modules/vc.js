@@ -79,32 +79,4 @@
         });
     };
 
-    global.eventClipboardVCRooms = function(base, trigger_selector, button_selector) {
-        $(function() {
-            var $trigger = $(base + ' ' + trigger_selector),
-                $button = $(base).find(button_selector || '.clip_button');
-
-            // Clipboard handling using Zero Clipboard
-            // We will load it only on hovering, so that we defer using Flash
-            $trigger.one('click', function() {
-                ZeroClipboard.config({'swfPath': Indico.Urls.Base + '/js/lib/zeroclipboard/ZeroClipboard.swf'});
-                var client = new ZeroClipboard($button);
-
-                client.on('error', function(e) {
-                    ZeroClipboard.destroy();
-                    $button.remove();
-                });
-
-                client.on('ready', function() {
-                    client.on('copy', function(event) {
-                        event.clipboardData.setData('text/plain', $(event.target).data('link'));
-                    });
-                    client.on('aftercopy', function(event) {
-                        $(event.target).parent().siblings('.button-info-message').show().fadeOut(2000);
-                    });
-                });
-            });
-        });
-    };
-
 })(window);

@@ -95,6 +95,7 @@ div.event-service-row {
             clear: left;
             font-size: 90%;
             margin: 0.3em 0 0 2.2em;
+            vertical-align: middle;
 
             & > dt {
                 float: left;
@@ -106,8 +107,23 @@ div.event-service-row {
                 display: block;
             }
 
-            & > dt.large-row, & > dd.large-row {
-                margin-top: 0.5em;
+            & > dt.large-row {
+                line-height: 2.3em;
+                vertical-align: middle;
+                margin-bottom: 0;
+            }
+
+            & > dd.large-row {
+                margin-bottom: 0.3em;
+
+                & > .i-has-action {
+                    vertical-align: middle;
+                    line-height: 2em;
+                }
+                & > .i-has-action-message {
+                    height: 2em;
+                    line-height: 2.3em;
+                }
             }
         }
     }
@@ -143,8 +159,18 @@ div.event-service-row {
             display: block;
         }
 
-        & > dt.large-row, & > dd.large-row {
-            margin-top: 0.5em;
+        & > dt.large-row {
+            line-height: 2.3em;
+            vertical-align: middle;
+            margin-bottom: -0.6em;
+        }
+
+        & > dd.large-row {
+            margin-bottom: 0.3em;
+            & > .i-has-action {
+                vertical-align: middle;
+                line-height: 1em;
+            }
         }
     }
 }

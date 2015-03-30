@@ -220,7 +220,9 @@ angular = rjs_bundle(
     'js/indico/angular/filters.js',
     'js/indico/angular/services.js')
 
-zero_clipboard_js = rjs_bundle('zero_clipboard_js', 'js/lib/zeroclipboard/ZeroClipboard.js')
+zero_clipboard_js = rjs_bundle('zero_clipboard_js',
+                               'js/lib/zeroclipboard/ZeroClipboard.js',
+                               'js/custom/zeroclipboard.js')
 
 selectize_js = rjs_bundle('selectize_js',
                           'js/lib/selectize.js/selectize.js')

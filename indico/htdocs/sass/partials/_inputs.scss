@@ -384,19 +384,13 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
                 @include transition-timing-function(ease-in-out, ease-in-out);
             }
 
-            > .form-row.i-password.toggle
-            {
-                @extend %toolbar-group;
-                > input {
-                    display: inline-block;
-                    width: 10em;
-                }
-                > .i-button, > input {
-                    height: 2.5em;
-                    line-height: 1.5;
-                    vertical-align: bottom;
-                    padding: 0 0.8em;
-                }
+            .i-has-action > input {
+                @include border-top-right-radius(0 !important);
+                @include border-bottom-right-radius(0 !important);
+            }
+
+            > .form-row.i-has-action > input {
+                width: 10em;
             }
 
             input[type="checkbox"],
@@ -647,32 +641,47 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
     }
 }
 
-.form-field-with-addon {
-    .form-field-with-addon-wrapper {
-        @extend %toolbar-group;
-        box-sizing: border-box;
+.i-has-action {
+@extend %toolbar-group;
+> input {
         display: inline-block;
-        margin-bottom: 0;
-        > input {
-            display: inline-block;
-            width: 17em;
-            vertical-align: middle;
-            background-color: white;
-        }
-
-        > .i-button {
-            line-height: 1em;
-            vertical-align: middle;
-        }
-
-        > input, > .i-button {
-            height: 2em;
-            box-sizing: border-box;
-            font-size: 90%;
-        }
     }
 
-    .button-info-message {
-        display: none;
+
+    > input, > .i-button {
+        height: 2.5em;
+        vertical-align: middle;
+        line-height: 1.2em;
+        margin: 0;
+        padding: 0 0.8em;
+    }
+
+    +  .i-has-action-message {
+        display: inline-block;
+        visibility: hidden;
+        opacity: 0;
+        height: 1em;
+        vertical-align: middle;
+    }
+}
+
+dd > .i-has-action {
+    vertical-align: middle;
+    > .i-button, > input {
+        height: 2em;
+        font-size: 90%;
+    }
+    > input {
+        width: 18em;
+        background-color: white;
+    }
+}
+
+.qtip-content dl > dd > .i-has-action {
+    > * {
+        line-height: 1em;
+    }
+    > input {
+        width: 110px;
     }
 }

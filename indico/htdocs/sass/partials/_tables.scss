@@ -276,6 +276,9 @@ td.i-table {
         dd {
             width: 80%;
             margin: 0;
+            > * {
+                vertical-align: middle;
+            }
         }
     }
 }
