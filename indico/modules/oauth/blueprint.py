@@ -24,8 +24,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 oauth_blueprint = _bp = IndicoBlueprint('oauth', __name__, template_folder='templates')
 
 # User profile
-# TODO: remove -new
-with _bp.add_prefixed_rules('/user-new/<int:user_id>', '/user-new'):
+with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
     _bp.add_url_rule('/oauth/', 'user_profile', RHOAuthUserProfile)
 
 

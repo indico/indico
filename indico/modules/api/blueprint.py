@@ -40,8 +40,7 @@ _bp.add_url_rule('/admin/api/', 'admin_settings', RHAPIAdminSettings, methods=('
 _bp.add_url_rule('/admin/api/keys', 'admin_keys', RHAPIAdminKeys)
 
 # User profile
-# TODO: remove -new
-with _bp.add_prefixed_rules('/user-new/<int:user_id>', '/user-new'):
+with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
     _bp.add_url_rule('/api/', 'user_profile', RHAPIUserProfile)
     _bp.add_url_rule('/api/create', 'key_create', RHAPICreateKey, methods=('POST',))
     _bp.add_url_rule('/api/delete', 'key_delete', RHAPIDeleteKey, methods=('POST',))

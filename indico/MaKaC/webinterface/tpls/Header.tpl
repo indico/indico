@@ -67,7 +67,7 @@ urlMeeting.addParam("event_type","meeting")
         % endfor
 
         % if currentUser:
-            <a href="${ urlHandlers.UHUserDashboard.getURL(currentUser) }">${ _("My profile") }</a>
+            <a href="${ url_for('users.user_dashboard') }">${ _("My profile") }</a>
         % endif
 
         <a class="arrow" href="#" data-toggle="dropdown">${ _("Help") }</a>

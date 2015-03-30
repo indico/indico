@@ -47,7 +47,7 @@ user.add_url_rule('/register/success', 'userRegistration-created', users.RHUserC
 # Confirm email
 user.add_url_rule('/account/confirm-email/<token>', 'confirm_email', users.RHConfirmEmail)
 
-with user.add_prefixed_rules('/<userId>'):
+with user.add_prefixed_rules('!/user-old/<userId>', '!/user-old'):
     # Identities
     user.add_url_rule('/account/create-identity', 'identityCreation', users.RHUserIdentityCreation)
     user.add_url_rule('/account/create-identity', 'identityCreation-create', users.RHUserIdentityCreation,

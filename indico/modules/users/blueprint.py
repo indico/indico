@@ -26,7 +26,7 @@ from indico.modules.users.controllers import (RHUserDashboard, RHUserAccount, RH
 from indico.web.flask.wrappers import IndicoBlueprint
 
 # TODO: remove -new later
-users_blueprint = _bp = IndicoBlueprint('users', __name__, template_folder='templates', url_prefix='/user-new')
+users_blueprint = _bp = IndicoBlueprint('users', __name__, template_folder='templates', url_prefix='/user')
 
 with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/dashboard/', 'user_dashboard', RHUserDashboard)

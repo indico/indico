@@ -325,7 +325,7 @@ class RHUserPreferences(RHUserBase):
                 raise errors.AccessControlError("user")
 
     def _process(self):
-        plugin_preferences = values_from_signal(signals.user_preferences.send(self._avatar))
+        plugin_preferences = []  # obsolete, the signal now provides data for the new preference page
         p = adminPages.WPUserPreferences(self, self._avatar, plugin_preferences=plugin_preferences)
         return p.display()
 
