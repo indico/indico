@@ -96,10 +96,6 @@ class VCPluginMixin(object):
         """
         return render_template('vc/manage_event_create_room.html', **kwargs)
 
-    def render_custom_create_button(self, **kwargs):
-        tpl = get_overridable_template_name('create_button.html', self, 'vc/')
-        return render_template(tpl, plugin=self, **kwargs)
-
     def render_info_box(self, vc_room, event_vc_room, event, **kwargs):
         """Renders the information shown in the expandable box of a VC room row
         :param vc_room: the VC room object

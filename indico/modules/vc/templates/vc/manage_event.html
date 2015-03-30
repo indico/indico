@@ -65,9 +65,15 @@
             {% endif %}
             <div class="add-room-options right">
                 {% if plugins|length == 1 %}
-                    {{ plugins[0].render_custom_create_button(event=event) | safe }}
+                    <a class="i-button i-form-button js-create-room"
+                       data-vc-system="{{ plugins[0].service_name }}"
+                       href="{{ url_for_plugin('.manage_vc_rooms_create', event, service=plugins[0].service_name) }}">
+                        <img src="{{ plugins[0].icon_url }}" alt="">
+                        {% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} room{% endtrans %}
+                    </a>
                 {% elif plugins|length > 1 %}
-                    <a class="i-button i-form-button icon-plus js-create-room" href="{{ url_for_plugin('.manage_vc_rooms_select', event, vc_room_action='.manage_vc_rooms_create') }}">
+                    <a class="i-button i-form-button icon-plus js-create-room"
+                       href="{{ url_for_plugin('.manage_vc_rooms_select', event, vc_room_action='.manage_vc_rooms_create') }}">
                         {%- trans %}Create new room{% endtrans -%}
                     </a>
                 {% endif %}

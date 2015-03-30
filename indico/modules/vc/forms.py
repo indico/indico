@@ -118,7 +118,8 @@ class VCRoomAttachFormBase(VCRoomLinkFormBase):
 
 
 class VCRoomFormBase(VCRoomLinkFormBase):
-    skip_fields = advanced_fields = {'show'}
+    advanced_fields = {'show'}
+    skip_fields = advanced_fields | VCRoomLinkFormBase.conditional_fields
 
     name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
                        description=_('The name of the room. It can contain only alphanumerical characters, underscores '
