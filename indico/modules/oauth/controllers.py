@@ -16,11 +16,14 @@
 
 from __future__ import unicode_literals
 
-from indico.core import signals
-from indico.util.i18n import _
-from indico.web.menu import MenuItem
+from indico.core.index import Catalog
+from indico.modules.users.controllers import RHUserBase
+from indico.modules.oauth.views import WPOAuthUserProfile
 
 
-@signals.users.profile_sidemenu.connect
-def _extend_profile_menu(user, **kwargs):
-    return MenuItem(_('Authorized Apps'), 'oauth.user_profile')
+class RHOAuthUserProfile(RHUserBase):
+    """OAuth overview (user)"""
+
+    def _process(self):
+        tokens = Catalog.getIdx('user_oauth_access_token').get(str(self.user.id), [])
+        return WPOAuthUserProfile.render_template('user_profile.html', user=self.user, tokens=tokens)

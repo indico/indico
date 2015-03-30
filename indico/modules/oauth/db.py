@@ -14,14 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from datetime import datetime
+
 from zope.interface import implements
 from persistent import Persistent
 import oauth2 as oauth
+
 from indico.modules.oauth.components import IIndexableByUserId
 from indico.core.index import IUniqueIdProvider, Catalog
 from indico.modules.oauth.fossils import IConsumerFossil
-from MaKaC.common.ObjectHolders import ObjectHolder
+from indico.util.date_time import as_utc
 from indico.util.fossilize import fossilizes
+from MaKaC.common.ObjectHolders import ObjectHolder
+
 
 class OAuthServer:
     _instance = None
@@ -132,6 +137,8 @@ class Token(Persistent):
         self._token = token
 
     def getTimestamp(self):
+        if isinstance(self._timestamp, (int, float)):
+            return as_utc(datetime.fromtimestamp(self._timestamp))
         return self._timestamp
 
     def setTimestamp(self, timestamp):

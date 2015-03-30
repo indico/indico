@@ -18,7 +18,7 @@ from MaKaC.webinterface.rh import oauth as oauth_rh
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
-oauth = IndicoBlueprint('oauth', __name__)
+oauth = IndicoBlueprint('oauth_old', __name__)
 
 # Consumer endpoints
 oauth.add_url_rule('/oauth/access_token', 'oauth-access_token', oauth_rh.RHOAuthAccessTokenURL, methods=('GET', 'POST'))

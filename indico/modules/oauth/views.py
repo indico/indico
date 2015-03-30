@@ -16,11 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.core import signals
-from indico.util.i18n import _
-from indico.web.menu import MenuItem
+from indico.modules.users.views import WPUser
 
 
-@signals.users.profile_sidemenu.connect
-def _extend_profile_menu(user, **kwargs):
-    return MenuItem(_('Authorized Apps'), 'oauth.user_profile')
+class WPOAuthUserProfile(WPUser):
+    template_prefix = 'oauth/'

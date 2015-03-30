@@ -1,0 +1,63 @@
+{% extends 'users/base.html' %}
+{% from '_switch.html' import switch %}
+{% from 'message_box.html' import message_box %}
+
+{% block subtitle -%}
+    {% trans %}OAuth{% endtrans %}
+{%- endblock %}
+
+{% block user_content %}
+    {% if tokens %}
+        <ol id="oauth-token-list" class="ordered-list" style="border-top: 1px solid #ddd;">
+            {% for token in tokens %}
+                <li>
+                    <div class="list-item-title">
+                        {{ token.getConsumer().getName() }}
+                        <div data-third-party-app="{{ token.getConsumer().getName() }}" aria-hidden="true"
+                        style="margin: 0;" class="i-button i-button-mini icon-remove icon-only right"></div>
+                    </div>
+                    {% if session.new_user.is_admin %}
+                        <div class="list-item-content">
+                            <span class="list-item-content-title">{% trans %}Access Token{% endtrans %}</span>
+                            <span class="list-item-content-data">{{ token.getId() }}</span>
+                        </div>
+                        <div class="list-item-content">
+                            <span class="list-item-content-title">{% trans %}Token secret{% endtrans %}</span>
+                            <span class="list-item-content-data">{{ token.getToken().secret }}</span>
+                        </div>
+                    {% endif %}
+                    <div class="list-item-content">
+                        <span class="list-item-content-title">{% trans %}Last update{% endtrans %}</span>
+                        <span class="list-item-content-data">{{ token.getTimestamp() | format_datetime }}</span>
+                    </div>
+                </li>
+            {% endfor %}
+        </ol>
+    {% endif %}
+
+    {% call message_box('warning', id='no-third-apps', style=('display:none;' if tokens else '')) %}
+        {%- trans %}No third party applications have been authorized.{% endtrans -%}
+    {% endcall %}
+
+    <script>
+        $('#oauth-token-list').on('click', '.icon-remove', function() {
+            var self = $(this);
+            var killProgress = IndicoUI.Dialogs.Util.progress($T('Deleting...'));
+            jsonRpc(Indico.Urls.JsonRpcService, 'oauth.unauthorizeConsumer', {
+                third_party_app: self.data('third-party-app'),
+                userId: '{{ user.id }}'
+            }, function(result, error){
+                killProgress();
+                if (error) {
+                    IndicoUtil.errorReport(error);
+                    return
+                }
+                self.closest('li').remove();
+                if (!$('#oauth-token-list').children().length) {
+                    $('#oauth-token-list').hide();
+                    $('#no-third-apps').show();
+                }
+            });
+        });
+    </script>
+{% endblock %}

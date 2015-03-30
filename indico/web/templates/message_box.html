@@ -1,5 +1,5 @@
 {% macro message_box(type, message=none, fixed_width=false) %}
-    <div class="{{ type }}-message-box {%- if fixed_width %} fixed-width{% endif %}">
+    <div class="{{ type }}-message-box {%- if fixed_width %} fixed-width{% endif %}" {{ kwargs | html_params }}>
         <div class="message-text">
             {{ message or caller() }}
         </div>

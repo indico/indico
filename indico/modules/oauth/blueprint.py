@@ -16,11 +16,21 @@
 
 from __future__ import unicode_literals
 
-from indico.core import signals
-from indico.util.i18n import _
-from indico.web.menu import MenuItem
+from flask import request
+
+from indico.modules.oauth.controllers import RHOAuthUserProfile
+from indico.web.flask.wrappers import IndicoBlueprint
+
+oauth_blueprint = _bp = IndicoBlueprint('oauth', __name__, template_folder='templates')
+
+# User profile
+# TODO: remove -new
+with _bp.add_prefixed_rules('/user-new/<int:user_id>', '/user-new'):
+    _bp.add_url_rule('/oauth/', 'user_profile', RHOAuthUserProfile)
 
 
-@signals.users.profile_sidemenu.connect
-def _extend_profile_menu(user, **kwargs):
-    return MenuItem(_('Authorized Apps'), 'oauth.user_profile')
+@_bp.url_defaults
+def _add_user_id(endpoint, values):
+    if endpoint == 'oauth.user_profile':
+        # Inject user id if it's present in the url
+        values['user_id'] = request.view_args.get('user_id')

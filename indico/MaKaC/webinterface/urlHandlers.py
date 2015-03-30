@@ -240,27 +240,27 @@ class UHSignOut(URLHandler):
 
 
 class UHOAuthRequestToken(URLHandler):
-    _endpoint = 'oauth.oauth-request_token'
+    _endpoint = 'oauth_old.oauth-request_token'
 
 
 class UHOAuthAuthorization(URLHandler):
-    _endpoint = 'oauth.oauth-authorize'
+    _endpoint = 'oauth_old.oauth-authorize'
 
 
 class UHOAuthAccessTokenURL(URLHandler):
-    _endpoint = 'oauth.oauth-access_token'
+    _endpoint = 'oauth_old.oauth-access_token'
 
 
 class UHOAuthAuthorizeConsumer(UserURLHandler):
-    _endpoint = 'oauth.oauth-authorize_consumer'
+    _endpoint = 'oauth_old.oauth-authorize_consumer'
 
 
 class UHOAuthThirdPartyAuth(UserURLHandler):
-    _endpoint = 'oauth.oauth-thirdPartyAuth'
+    _endpoint = 'oauth_old.oauth-thirdPartyAuth'
 
 
 class UHOAuthUserThirdPartyAuth(UserURLHandler):
-    _endpoint = 'oauth.oauth-userThirdPartyAuth'
+    _endpoint = 'oauth_old.oauth-userThirdPartyAuth'
 
 
 class UHIndicoNews(URLHandler):
