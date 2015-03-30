@@ -101,12 +101,13 @@ class RHVCManageEvent(RHVCManageEventBase):
 
     def _process(self):
         try:
-            vc_rooms = VCRoomEventAssociation.find_for_event(self._conf,
-                                                             include_hidden=True, include_deleted=True).all()
+            room_event_assos = VCRoomEventAssociation.find_for_event(self._conf, include_hidden=True,
+                                                                     include_deleted=True).all()
         except ValueError:
             raise IndicoError(_('This page is not available for legacy events.'))
+        event_vc_rooms = (event_vc_room for event_vc_room in room_event_assos if event_vc_room.vc_room.plugin)
         return WPVCManageEvent.render_template('manage_event.html', self._conf, event=self._conf,
-                                               event_vc_rooms=vc_rooms, plugins=get_vc_plugins().values())
+                                               event_vc_rooms=event_vc_rooms, plugins=get_vc_plugins().values())
 
 
 class RHVCManageEventSelectService(RHVCManageEventBase):
@@ -281,7 +282,8 @@ class RHVCEventPage(RHConferenceBaseDisplay):
         vc_plugins_available = True if get_vc_plugins() else False
         linked_to = defaultdict(lambda: defaultdict(list))
         for event_vc_room in event_vc_rooms:
-            linked_to[event_vc_room.link_type.name][event_vc_room.link_object].append(event_vc_room)
+            if event_vc_room.vc_room.plugin:
+                linked_to[event_vc_room.link_type.name][event_vc_room.link_object].append(event_vc_room)
         return WPVCEventPage.render_template('event_vc.html', self._conf, event=self._conf,
                                              event_vc_rooms=event_vc_rooms, linked_to=linked_to,
                                              vc_plugins_available=vc_plugins_available)
