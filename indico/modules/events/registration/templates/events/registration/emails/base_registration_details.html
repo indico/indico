@@ -5,7 +5,7 @@
 {% endmacro %}
 
 {% macro print_dd(content) %}
-    <dd style="width: 70%; float: left; margin: 0; min-height: 20px; white-space: pre;">{{ content }}</dd>
+    <dd style="width: 70%; float: left; margin: 0; min-height: 20px; white-space: pre-wrap; padding-left: 20px; box-sizing: border-box;">{{ content }}</dd>
 {% endmacro %}
 
 {% macro registration_subject() %}
@@ -103,7 +103,7 @@
                 </div>
             {%- endif %}
             {%- if reg_details.misc_details %}
-                {% for title, fields in reg_details.misc_details.iteritems() %}
+                {% for title, fields in reg_details.misc_details.iteritems() if fields %}
                     <div style="padding-bottom: 20px;{% if not loop.first %} border-top: 1px solid #EBEBEB;{% endif %}">
                         <h2>{{ title }}</h2>
                         <dl>
