@@ -25,3 +25,10 @@ profile_sidemenu = _signals.signal('profile-sidemenu', """
 Expected to return `MenuItem` instances to be added to the user profile side menu.
 The *sender* is the user whose profile is currently being displayed.
 """)
+
+preferences = _signals.signal('preferences', """
+Expected to return a `ExtraUserPreferences` subclass which implements extra
+preferences for the user preference page. The *sender* is the user for whom the
+preferences page is being shown which might not be the currently logged-in
+user!
+""")

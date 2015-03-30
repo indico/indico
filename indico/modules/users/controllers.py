@@ -22,6 +22,7 @@ from flask import session, request, flash, jsonify, redirect
 from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core import signals
 from indico.core.notifications import make_email
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
@@ -33,6 +34,7 @@ from indico.util.i18n import _
 from indico.util.redis import suggestions
 from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
+from indico.util.signals import values_from_signal
 from indico.util.string import make_unique_token
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -88,10 +90,18 @@ class RHUserAccount(RHUserBase):
 
 class RHUserPreferences(RHUserBase):
     def _process(self):
+        extra_preferences = [pref(self.user) for pref in values_from_signal(signals.users.preferences.send(self.user))]
+        form_class = UserPreferencesForm
         defaults = FormDefaults(**self.user.settings.get_all(self.user))
-        form = UserPreferencesForm(obj=defaults)
+        for pref in extra_preferences:
+            form_class = pref.extend_form(form_class)
+            pref.extend_defaults(defaults)
+        form = form_class(obj=defaults)
         if form.validate_on_submit():
-            self.user.settings.set_multi(form.data)
+            data = form.data
+            for pref in extra_preferences:
+                pref.process_form_data(data)
+            self.user.settings.set_multi(data)
             flash(_('Preferences saved'), 'success')
             return redirect(url_for('.user_preferences'))
         return WPUser.render_template('preferences.html', user=self.user, form=form)

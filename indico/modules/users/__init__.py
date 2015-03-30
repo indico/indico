@@ -17,11 +17,12 @@
 from __future__ import unicode_literals
 
 
+from indico.modules.users.ext import ExtraUserPreferences
 from indico.modules.users.models.users import User
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
 
 
-__all__ = ('User', 'UserSettings', 'UserSettingsProxy', 'user_settings')
+__all__ = ('ExtraUserPreferences', 'User', 'UserSettings', 'UserSettingsProxy', 'user_settings')
 
 user_settings = UserSettingsProxy('users', {
     'lang': None,

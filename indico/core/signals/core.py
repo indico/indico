@@ -52,13 +52,6 @@ Expected to return `(extra_menu_item_name, SideMenuItem)` tuples to be added to
 the admin side menu.
 """)
 
-user_preferences = _signals.signal('user-preferences', """
-Expected to return/yield one or more ``(title, content)`` tuples which are
-shown on the "User Preferences" page. The *sender* is the user for whom the
-preferences page is being shown which might not be the currently logged-in
-user!
-""")
-
 merge_users = _signals.signal('merge-users', """
 Called when two users are merged. The *sender* is the main user while the merged
 user (i.e. the one being deleted in the merge) is passed via the *merged* kwarg.
