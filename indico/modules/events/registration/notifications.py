@@ -27,7 +27,7 @@ from MaKaC.registration import PersonalDataForm
 
 
 def _get_reg_details(reg_form, registrant):
-    reg_details = {'misc_details': {}, 'personal_data': {}}
+    reg_details = {'misc_details': OrderedDict(), 'personal_data': OrderedDict()}
     for section in reg_form.getSortedForms():
         if section.getId() == 'reasonParticipation':
             reg_details['reason'] = registrant.getReasonParticipation()
