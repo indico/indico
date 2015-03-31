@@ -27,25 +27,25 @@ from indico.web.flask.util import url_for
 
 def getSubjectIndicoTitle():
     """Return Indico instance name for use in e-mail subject lines
-    
+
     Result is of form 'Indico @ OrgName', where OrgName is defined systemwide.
     """
-    minfo=HelperMaKaCInfo.getMaKaCInfoInstance()
-    systitle="Indico"
+    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
+    systitle = "Indico"
     if minfo.getTitle().strip() != "":
-        systitle=minfo.getTitle().strip()
+        systitle = minfo.getTitle().strip()
     if minfo.getOrganisation().strip() != "":
-        systitle="%s @ %s"%(systitle, minfo.getOrganisation().strip())
+        systitle = "%s @ %s" % (systitle, minfo.getOrganisation().strip())
     return systitle
 
 class personMail:
-    """Class that holds only one method, send(), 
+    """Class that holds only one method, send(),
     to send any kind of e-mail to individuals.
     """
 
     def send(addto, addcc, addfrom, subject, body):
         """Send any kind of e-mail to individuals."""
-        addto = addto.replace("\r\n","")
+        addto = addto.replace("\r\n", "")
         tolist = addto.split(",")
         cclist = addcc.split(",")
         maildata = {
@@ -56,10 +56,10 @@ class personMail:
             "body": body
             }
         GenericMailer.send(GenericNotification(maildata))
-    send = staticmethod( send )
+    send = staticmethod(send)
 
 
-class GenericNotification :
+class GenericNotification:
 
     def __init__(self, data=None):
         if data is None:
@@ -103,7 +103,7 @@ class GenericNotification :
         return self._fromAddr
 
     def setFromAddr(self, fromAddr):
-        if fromAddr is None :
+        if fromAddr is None:
             return False
         self._fromAddr = fromAddr
         return True
@@ -112,7 +112,7 @@ class GenericNotification :
         return self._toList
 
     def setToList(self, toList):
-        if toList is None :
+        if toList is None:
             return False
         self._toList = toList
         return True
@@ -121,13 +121,13 @@ class GenericNotification :
         return self._ccList
 
     def setCCList(self, ccList):
-        if ccList is None :
+        if ccList is None:
             return False
         self._ccList = ccList
         return True
 
     def setBCCList(self, bccList):
-        if bccList is None :
+        if bccList is None:
             return False
         self._bccList = bccList
         return True
@@ -139,7 +139,7 @@ class GenericNotification :
         return self._subject
 
     def setSubject(self, subject):
-        if subject is None :
+        if subject is None:
             return False
         self._subject = subject
         return True
@@ -148,7 +148,7 @@ class GenericNotification :
         return self._body
 
     def setBody(self, body):
-        if body is None :
+        if body is None:
             return False
         self._body = body
         return True
@@ -156,15 +156,18 @@ class GenericNotification :
 
 class Mailer:
 
-    def send( notification, fromAddress="" ):
+    def send(notification, fromAddress=""):
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
         if fromAddress.strip() == "":
-            fromAddr = "%s <%s>"%(info.getTitle(), Config.getInstance().getSupportEmail())
+            fromAddr = "%s <%s>" % (
+                info.getTitle(),
+                Config.getInstance().getSupportEmail()
+                )
         else:
             fromAddr = notification.getFromAddr()
         toAddr = str(notification.getDestination().getEmail())
         text = """%s
---
+-- 
 Indico project <http://indico-software.org/>
                 """%(notification.getMsg())
         maildata = {
@@ -174,7 +177,7 @@ Indico project <http://indico-software.org/>
             "body": text
             }
         GenericMailer.send(GenericNotification(maildata))
-    send = staticmethod( send )
+    send = staticmethod(send)
 
 
 class sendConfirmationRequest:
@@ -183,9 +186,9 @@ class sendConfirmationRequest:
         self._user = user
         self._conf = conf
 
-    def send( self ):
+    def send(self):
         url = urlHandlers.UHConfActiveAccount.getURL(self._conf) if self._conf else urlHandlers.UHActiveAccount.getURL()
-        text =  _("""Welcome to Indico,
+        text = _("""Welcome to Indico,
 You have created a new account on the Indico conference management system.
 
 In order to activate your new account and being able to be authenticated by the system, please open on your web browser the following URL:
@@ -195,11 +198,10 @@ In order to activate your new account and being able to be authenticated by the 
 Once you've done it, your account will be fully operational so you can log in and start using the system normally.
 
 Thank you for using our system.
-                """)%(url,
-                        self._user.getId(), \
-                        self._user.getKey())
+                """) % (url, self._user.getId(), self._user.getKey())
         maildata = {
-            "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
+            "fromAddr":
+                "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
             "toList": [self._user.getEmail()],
             "subject": _("[%s] Confirmation request") % getSubjectIndicoTitle(),
             "body": text
@@ -208,20 +210,24 @@ Thank you for using our system.
 
 class sendAccountCreationModeration:
 
-    def __init__( self, user ):
+    def __init__(self, user):
         self._user = user
 
-    def send( self ):
+    def send(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        name = self._user.getStraightFullName()
-        text = """ Dear Administrator,
+        text = _(
+            """ Dear Administrator,
 %s has created a new account in Indico.
 
 In order to activate it, please go to this URL:
 <%s>
-"""% (name,urlHandlers.UHUserDetails.getURL( self._user ))
+""") % (
+            self._user.getStraightFullName(),
+            urlHandlers.UHUserDetails.getURL(self._user)
+            )
         maildata = {
-            "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
+            "fromAddr": "Indico Mailer <%s>" %
+                Config.getInstance().getNoReplyEmail(),
             "toList": minfo.getAdminEmails(),
             "subject": _("[Indico] New account request from %s") % name,
             "body": text
@@ -230,18 +236,19 @@ In order to activate it, please go to this URL:
 
 class sendAccountCreationNotification:
 
-    def __init__( self, user ):
+    def __init__(self, user):
         self._user = user
 
-    def send( self ):
+    def send(self):
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         name = self._user.getStraightFullName()
-        text = """Dear Administrator,
+        text = _("""Dear Administrator,
 %s has created a new account in Indico.
 <%s>
-""" % (name,urlHandlers.UHUserDetails.getURL( self._user ))
+""") % (name, urlHandlers.UHUserDetails.getURL(self._user))
         maildata = {
-            "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getSupportEmail(),
+            "fromAddr": "Indico Mailer <%s>" %
+                Config.getInstance().getSupportEmail(),
             "toList": minfo.getAdminEmails(),
             "subject": _("[Indico] New account creation"),
             "body": text
@@ -250,11 +257,11 @@ class sendAccountCreationNotification:
 
 class sendAccountActivated:
 
-    def __init__( self, user ):
+    def __init__(self, user):
         self._user = user
 
-    def send( self ):
-        text =  _("""Welcome to Indico,
+    def send(self):
+        text = _("""Welcome to Indico,
 Your registration has been accepted by the site administrator.
 
 You can now login using the following username: %s
@@ -262,27 +269,30 @@ You can now login using the following username: %s
 Thank you for using Indico.
                 """)%(self._user.getIdentityList()[0].getLogin())
         maildata = {
-            "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
+            "fromAddr": "Indico Mailer <%s>" %
+                Config.getInstance().getNoReplyEmail(),
             "toList": [self._user.getEmail()],
-            "subject": _("[%s] Registration accepted") % getSubjectIndicoTitle(),
+            "subject": _("[%s] Registration accepted") %
+                getSubjectIndicoTitle(),
             "body": text
             }
         GenericMailer.send(GenericNotification(maildata))
 
 class sendAccountDisabled:
 
-    def __init__( self, user ):
+    def __init__(self, user):
         self._user = user
 
-    def send( self ):
-        text =  _("""Dear user,
+    def send(self):
+        text = _("""Dear user,
 Your account has been disabled by the site administrator.
                 """)
-        maildata = { 
-            "fromAddr": "Indico Mailer<%s>"%Config.getInstance().getNoReplyEmail(), 
-            "toList": [self._user.getEmail()], 
-            "subject": _("[%s] Account disabled")%getSubjectIndicoTitle(), 
-            "body": text 
+        maildata = {
+            "fromAddr": "Indico Mailer<%s>" %
+                Config.getInstance().getNoReplyEmail(),
+            "toList": [self._user.getEmail()],
+            "subject": _("[%s] Account disabled")%getSubjectIndicoTitle(),
+            "body": text
             }
         GenericMailer.send(GenericNotification(maildata))
 
@@ -296,8 +306,13 @@ def send_login_info(user, event=None):
     for id in idList:
         if not hasattr(id, 'setPassword'):
             config = Config.getInstance()
-            extra_message = config.getAuthenticatorConfigById(id.getAuthenticatorTag()).get("ResetPasswordMessage")
-            msg = _("Sorry, you are using an externally managed account (%s) to login into Indico.") % id.getLogin()
+            extra_message = config.getAuthenticatorConfigById(
+                id.getAuthenticatorTag()
+                ).get("ResetPasswordMessage")
+            msg = _("""
+Sorry, you are using an externally managed account (%s)
+to login into Indico.
+""") % id.getLogin()
             if extra_message:
                 msg += "\n" + extra_message
             logins.append({
@@ -313,22 +328,30 @@ def send_login_info(user, event=None):
             while token_storage.get(token):
                 token = str(uuid.uuid4())
             token_storage.set(token, data, 6*3600)
-            url = url_for(endpoint, event, token=token, _external=True, _secure=True)
+            url = url_for(
+                endpoint,
+                event,
+                token=token,
+                _external=True,
+                _secure=True)
             logins.append({
                 'tag': tag,
                 'login': login,
                 'link': url
             })
     if not logins:
-        url = urlHandlers.UHUserDetails.getURL(user)
-        text = _("Sorry, we did not find your login.\nPlease, create one here:\n%s") % url
+        text = _("""Sorry, we did not find your login.
+Please, create one here:
+%s""") % urlHandlers.UHUserDetails.getURL(user)
     else:
-        text = _("You can use the following links within the next six hours to reset your password.")
+        text = _("""You can use the following link(s) within the next six hours
+to reset your password.""")
         for entry in logins:
             text += "\n\n==================\n"
             if 'link' in entry:
-                text += _("Click below to reset your password for the %s login '%s':\n") % (entry['tag'],
-                                                                                            entry['login'])
+                text += _("Click below to reset your password for the %s login '%s':\n") % (
+                    entry['tag'],
+                    entry['login'])
                 text += entry['link']
             else:
                 text += entry['error']
