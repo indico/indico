@@ -270,7 +270,12 @@ class sendAccountDisabled:
         text =  _("""Dear user,
 Your account has been disabled by the site administrator.
                 """)
-        maildata = { "fromAddr": "Indico Mailer<%s>"%Config.getInstance().getNoReplyEmail(), "toList": [self._user.getEmail()], "subject": _("[%s] Account disabled")%getSubjectIndicoTitle(), "body": text }
+        maildata = { 
+            "fromAddr": "Indico Mailer<%s>"%Config.getInstance().getNoReplyEmail(), 
+            "toList": [self._user.getEmail()], 
+            "subject": _("[%s] Account disabled")%getSubjectIndicoTitle(), 
+            "body": text 
+            }
         GenericMailer.send(GenericNotification(maildata))
 
 
