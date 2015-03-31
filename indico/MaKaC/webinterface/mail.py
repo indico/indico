@@ -26,6 +26,10 @@ from indico.web.flask.util import url_for
 
 
 def getSubjectIndicoTitle():
+    """Return Indico instance name for use in e-mail subject lines
+    
+    Result is of form 'Indico @ OrgName', where OrgName is defined systemwide.
+    """
     minfo=HelperMaKaCInfo.getMaKaCInfoInstance()
     systitle="Indico"
     if minfo.getTitle().strip() != "":
@@ -35,8 +39,12 @@ def getSubjectIndicoTitle():
     return systitle
 
 class personMail:
+    """Class that holds only one method, send(), 
+    to send any kind of e-mail to individuals.
+    """
 
     def send(addto, addcc, addfrom, subject, body):
+        """Send any kind of e-mail to individuals."""
         addto = addto.replace("\r\n","")
         tolist = addto.split(",")
         cclist = addcc.split(",")
