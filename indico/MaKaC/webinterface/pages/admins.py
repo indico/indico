@@ -1038,32 +1038,6 @@ class WUserIdentitiesTable(wcomponents.WTemplated):
         vars["accountManagementActive"] = 'Local' in authTagList
         return vars
 
-class WUserDashboard(wcomponents.WTemplated):
-
-    def __init__(self, av, aw):
-        self._avatar = av
-        self._aw = aw
-
-    def getVars(self):
-        html_vars = wcomponents.WTemplated.getVars(self)
-        user = self._avatar
-
-        now = datetime.datetime.now()
-
-        tzUtil = timezoneUtils.DisplayTZ(self._aw)
-        tz = timezone(tzUtil.getDisplayTZ())
-
-        html_vars["timezone"] = tz
-
-        # split offset in hours and minutes
-        hours, minutes, __ = timedelta_split(tz.utcoffset(now))
-
-        html_vars["offset"] = '{:+03d}:{:02d}'.format(hours, minutes)
-        html_vars["categories"] = user.getRelatedCategories()
-        html_vars["suggested_categories"] = user.getSuggestedCategories()
-        html_vars["redisEnabled"] = bool(redis_client)
-
-        return html_vars
 
 class WUserBaskets(wcomponents.WTemplated):
 
@@ -1186,19 +1160,6 @@ class WPPersonalArea(WPUserBase):
 
     def _getNavigationDrawer(self):
         return wcomponents.WSimpleNavigationDrawer(_("My Profile"))
-
-
-class WPUserDashboard(WPPersonalArea):
-
-    def getCSSFiles(self):
-        return WPPersonalArea.getCSSFiles(self) + self._asset_env['dashboard_sass'].urls()
-
-    def _getTabContent(self, params):
-        c = WUserDashboard(self._avatar, self._getAW())
-        return c.getHTML(params)
-
-    def _setActiveTab(self):
-        self._tabRights.setActive()
 
 
 class WPUserDetails( WPPersonalArea ):
