@@ -1650,7 +1650,7 @@ class CategSelectTree:
             html = "%s&nbsp;&nbsp;&nbsp;"%html
         cfg = Config.getInstance()
         if categ in self._excludedCategs:
-            return """%s<img src="%s" border="0" alt=""> %s"""%(html, cfg.getSystemIconURL("itemCollapsed"), categ.getName())
+            return """%s<img src="%s" border="0" alt=""> %s"""%(html, cfg.getSystemIconURL("collapsd.png"), categ.getName())
         if (self._movingConference) and categ.getSubCategoryList():
             title = """%s"""%categ.getName()
         else:
@@ -1659,11 +1659,11 @@ class CategSelectTree:
         if categ in self._expandedCategs:
             ex = copy( self._expandedCategs )
             ex.remove( categ )
-            html = """%s<a href="%s"><img src="%s" border="0" alt=""></a> %s"""%(html, self._expandURLGen( ex ), cfg.getSystemIconURL("itemExploded"), title)
+            html = """%s<a href="%s"><img src="%s" border="0" alt=""></a> %s"""%(html, self._expandURLGen( ex ), cfg.getSystemIconURL("exploded.png"), title)
             for subcat in categ.getSubCategoryList():
                 html = "%s<br>%s"%(html, self._getItem(subcat, level+1) )
         else:
-            html = """%s<a href="%s"><img src="%s" border="0" alt=""></a> %s"""%(html, self._expandURLGen( self._expandedCategs+[categ] ), cfg.getSystemIconURL("itemCollapsed"), title)
+            html = """%s<a href="%s"><img src="%s" border="0" alt=""></a> %s"""%(html, self._expandURLGen( self._expandedCategs+[categ] ), cfg.getSystemIconURL("collapsd.png"), title)
         return html
 
     def getHTML( self ):

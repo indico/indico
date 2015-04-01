@@ -88,11 +88,11 @@ IndicoUI.Buttons = {
         return IndicoUI.Buttons.expandIcon(target, state,
                                            Html.img({
                                                alt: 'Collapse',
-                                               src: imageSrc("itemExploded")
+                                               src: imageSrc("exploded")
                                            }),
                                            Html.img({
                                                alt: 'Expand',
-                                               src: imageSrc("currentMenuItem")
+                                               src: imageSrc("collapsd")
                                            })
                                           );
     },
