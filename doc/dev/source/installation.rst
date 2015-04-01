@@ -43,31 +43,44 @@ Or, you can also do it fetching a tarball or egg file from our `releases on Gith
 From our Git repository
 -----------------------
 
-First of all, you will need to install our development dependencies:
+You can find the source code in our `Github repository <https://github.com/indico/indico/>`_. Cloning it is as easy as:
+
+.. code-block:: console
+
+    $ git clone https://github.com/indico/indico/
+
+You should now have an ``indico`` directory. ``cd`` into it:
+
+.. code-block:: console
+
+    $ cd indico
+
+Since you are building from source, you will need to install our development dependencies:
 
 .. code-block:: console
 
     $ pip install -r requirements.dev.txt
 
-You can find the source code in our `Github repository <https://github.com/indico/indico/>`_. Cloning it is as easy as:
-
-.. code-block:: console
-
-   $ git clone https://github.com/indico/indico/
-
-You should have checked out an ``indico`` directory. ``cd`` into it and simply do (as root):
+And then fetch any non-Python external modules.
 
 .. code-block:: console
 
     $ fab setup_deps
 
-which will get the external dependencies, followed by:
+Finally, you can install Indico:
 
 .. code-block:: console
 
     # python setup.py install
 
-The setup script will fetch all the dependencies for you and install Indico as a Python EGG in your Python library path.
+Or, alternatively, if you are just trying to set up an Indico development environment:
+
+.. code-block:: console
+
+    # python setup.py develop_config
+
+
+The setup script will fetch all the dependencies for you and install Indico in your Python library path.
 
 ===================
 Post-Install script
@@ -112,27 +125,21 @@ Indico needs to run behind a WSGI-compliant web server. This guide describes two
 Configuring Apache (recommended)
 --------------------------------
 
-+++++++++
-HTTP Mode
-+++++++++
-
-Create a new file in the ``sites-available`` folder of apache. It's located by default under ``/etc/apache2/sites-available/``:
+Create a new file in Apache HTTPD's config folder. Depending on the OS, it can be something like ``/etc/httpd/conf.d/``:
 
 .. code-block:: console
 
-    $ sudo vim /etc/apache2/sites-available/indico
+    $ sudo vim /etc/httpd/conf.d/indico
 
-Copy the next lines into that file, making sure to replace ``jdoe`` with your username:
+This is an example configuration that should be able to get you started:
 
 .. code-block:: apacheconf
 
     AddDefaultCharset UTF-8
 
     <VirtualHost *:80>
-            # mod_wsgi indico
-
         ErrorLog /var/log/apache2/error.log
-            LogLevel warn
+        LogLevel warn
 
         Alias /indico/images "/opt/indico/htdocs/images"
         Alias /indico/css "/opt/indico/htdocs/css"
@@ -155,9 +162,8 @@ Copy the next lines into that file, making sure to replace ``jdoe`` with your us
     </VirtualHost>
 
     <VirtualHost *:443>
-
         ErrorLog /var/log/apache2/error.log
-                LogLevel warn
+        LogLevel warn
 
         Alias /indico/images "/opt/indico/htdocs/images"
         Alias /indico/css "/opt/indico/htdocs/css"
@@ -173,11 +179,11 @@ Copy the next lines into that file, making sure to replace ``jdoe`` with your us
 
 Here's the explanation of the above lines:
 
-* Alias: Redirects some static locations to the containing folders, reducing load times
-* WSGIDaemonProcess: Create 8 daemon processes of 1 thread each with name WSGIDAEMON. Set ``python-path`` and ``python-eggs`` paths. (The other two parameters are for robustness). Please note that the maximum number of processes will depend on how much load your server can handle (it's normal to have > 30 processes)
-* WSGIScriptAlias: Redirect all petitions starting with /indico to the specified file
-* WSGIProcessGroup: Configure the execution with the settings of WSGIDAEMON
-* WSGIApplicationGroup: Set the execution to run under the same Python interpreter (the first created)
+* ``Alias``: Redirects some static locations to the containing folders, reducing load times
+* ``WSGIDaemonProcess``: Create 8 daemon processes of 1 thread each with name WSGIDAEMON. Set ``python-path`` and ``python-eggs`` paths. (The other two parameters are for robustness). Please note that the maximum number of processes will depend on how much load your server can handle (it's normal to have > 30 processes)
+* ``WSGIScriptAlias``: Redirect all petitions starting with ``/indico`` to the specified file
+* ``WSGIProcessGroup``: Configure the execution with the settings of ``WSGIDAEMON``
+* ``WSGIApplicationGroup``: Set the execution to run under the same Python interpreter (the first created)
 
 Accessing ``http://localhost/indico/`` should give you the main Indico page.
 
