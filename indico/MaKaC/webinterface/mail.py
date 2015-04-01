@@ -38,6 +38,7 @@ def getSubjectIndicoTitle():
         systitle = "%s @ %s" % (systitle, minfo.getOrganisation().strip())
     return systitle
 
+
 class personMail:
     """Class that holds only one method, send(),
     to send any kind of e-mail to individuals.
@@ -169,7 +170,7 @@ class Mailer:
         text = """%s
 -- 
 Indico project <http://indico-software.org/>
-                """%(notification.getMsg())
+                """ % (notification.getMsg())
         maildata = {
             "fromAddr": fromAddr,
             "toList": [toAddr],
@@ -208,6 +209,7 @@ Thank you for using our system.
             }
         GenericMailer.send(GenericNotification(maildata))
 
+
 class sendAccountCreationModeration:
 
     def __init__(self, user):
@@ -234,6 +236,7 @@ In order to activate it, please go to this URL:
             }
         GenericMailer.send(GenericNotification(maildata))
 
+
 class sendAccountCreationNotification:
 
     def __init__(self, user):
@@ -255,6 +258,7 @@ class sendAccountCreationNotification:
             }
         GenericMailer.send(GenericNotification(maildata))
 
+
 class sendAccountActivated:
 
     def __init__(self, user):
@@ -267,7 +271,7 @@ Your registration has been accepted by the site administrator.
 You can now login using the following username: %s
 
 Thank you for using Indico.
-                """)%(self._user.getIdentityList()[0].getLogin())
+                """) % (self._user.getIdentityList()[0].getLogin())
         maildata = {
             "fromAddr": "Indico Mailer <%s>" %
                 Config.getInstance().getNoReplyEmail(),
@@ -277,6 +281,7 @@ Thank you for using Indico.
             "body": text
             }
         GenericMailer.send(GenericNotification(maildata))
+
 
 class sendAccountDisabled:
 
@@ -291,7 +296,7 @@ Your account has been disabled by the site administrator.
             "fromAddr": "Indico Mailer<%s>" %
                 Config.getInstance().getNoReplyEmail(),
             "toList": [self._user.getEmail()],
-            "subject": _("[%s] Account disabled")%getSubjectIndicoTitle(),
+            "subject": _("[%s] Account disabled") % getSubjectIndicoTitle(),
             "body": text
             }
         GenericMailer.send(GenericNotification(maildata))
