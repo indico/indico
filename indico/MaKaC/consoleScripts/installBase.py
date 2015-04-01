@@ -578,7 +578,7 @@ Indico has been installed correctly.
 
 For information on how to configure Apache HTTPD, take a look at:
 
-http://indico-software.org/wiki/Admin/Installation#a3.ConfiguringApache
+http://indico.readthedocs.org/en/latest/installation/#configuring-the-web-server
 
 
 Please do not forget to start the 'taskDaemon' in order to use alarms, creation
