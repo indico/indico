@@ -1408,7 +1408,7 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
                         answerValues.append("%.2f" % ans.getValue())
                     rating = "%.2f" % status.getJudValue()
                     total = "%.2f" % status.getTotalJudValue()
-                    imgIcon = Configuration.Config.getInstance().getSystemIconURL("itemCollapsed")
+                    imgIcon = Configuration.Config.getInstance().getSystemIconURL("collapsd.png")
                     detailsImg = """<img src="%s" onClick = "showQuestionDetails(%s,%s,%s,%s)" style="cursor: pointer;">"""% (imgIcon, questionNames, answerValues, rating, total)
 
                 tracks += "<tr bgcolor=\"%s\">"%color

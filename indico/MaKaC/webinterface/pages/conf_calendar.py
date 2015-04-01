@@ -289,7 +289,7 @@ class MulSelectCategTree:
             html = """%s<a href="%s"><img src="%s" border="0" alt="fold"></a> %s"""%\
                 (   html, \
                     self._expandURLGen( temp ), \
-                    cfg.getSystemIconURL("itemExploded"), \
+                    cfg.getSystemIconURL("exploded.png"), \
                     title )
             for subcat in categ.getSubCategoryList():
                 html = "%s<br>%s"%(html, self._getItem(subcat, level+1) )
@@ -297,7 +297,7 @@ class MulSelectCategTree:
             html = """%s<a href="%s"><img src="%s" border="0" alt="unfold"></a> %s"""%\
                 (   html, \
                     self._expandURLGen( self._expandedCategs+[categ] ), \
-                    cfg.getSystemIconURL("itemCollapsed"), \
+                    cfg.getSystemIconURL("collapsd.png"), \
                     title )
         return html
 
