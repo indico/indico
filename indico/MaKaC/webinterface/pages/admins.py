@@ -1039,21 +1039,6 @@ class WUserIdentitiesTable(wcomponents.WTemplated):
         return vars
 
 
-class WUserBaskets(wcomponents.WTemplated):
-
-    def __init__(self, av):
-        self._avatar = av
-
-    def getHTML(self, params):
-        params['user'] = self._avatar
-        params['favoriteCategs'] = [dict(id=c.getId(), title=c.getTitle()) for c in
-                                    self._avatar.getLinkTo('category', 'favorite')]
-        users = self._avatar.getPersonalInfo().getBasket().getUsers().values()
-        fossilizedUsers = sorted(fossilize(users), cmp=UserComparator.cmpUsers)
-        params['favoriteUsers'] = fossilizedUsers
-        return wcomponents.WTemplated.getHTML( self, params )
-
-
 class WUserPreferences(wcomponents.WTemplated):
 
     def __init__(self, av):
@@ -1174,17 +1159,6 @@ class WPUserDetails( WPPersonalArea ):
 
     def _setActiveTab( self ):
         self._tabDetails.setActive()
-
-
-class WPUserBaskets( WPPersonalArea ):
-
-    def _getTabContent( self, params ):
-        c = WUserBaskets( self._avatar )
-
-        return c.getHTML( params )
-
-    def _setActiveTab( self ):
-        self._tabBaskets.setActive()
 
 
 class WPUserPreferences( WPPersonalArea ):

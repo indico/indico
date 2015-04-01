@@ -301,20 +301,6 @@ class RHUserDetails(RHUserBase):
         return p.display()
 
 
-class RHUserBaskets(RHUserBase):
-    _uh = urlHandlers.UHUserBaskets
-
-    def _checkProtection(self):
-        RHUserBase._checkProtection(self)
-        if self._aw.getUser():
-            if not self._avatar.canModify(self._aw):
-                raise errors.AccessControlError("user")
-
-    def _process(self):
-        p = adminPages.WPUserBaskets(self, self._avatar)
-        return p.display()
-
-
 class RHUserPreferences(RHUserBase):
     _uh = urlHandlers.UHUserPreferences
 

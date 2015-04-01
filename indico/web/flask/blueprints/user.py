@@ -60,7 +60,6 @@ with user.add_prefixed_rules('!/user-old/<userId>', '!/user-old'):
     # Dashboard, Favorites, etc.
     user.add_url_rule('/dashboard', 'userDashboard', users.RHUserDashboard)
     user.add_url_rule('/account/', 'userDetails', users.RHUserDetails)
-    user.add_url_rule('/favorites', 'userBaskets', users.RHUserBaskets)
     user.add_url_rule('/preferences', 'userPreferences', users.RHUserPreferences)
 
     # API Keys
