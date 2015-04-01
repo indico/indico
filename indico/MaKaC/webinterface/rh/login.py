@@ -34,7 +34,7 @@ import MaKaC.common.info as info
 
 from indico.web.flask.util import send_file
 from indico.core.config import Config
-from indico.util.i18n import set_session_lang
+from indico.util.i18n import set_session_lang, _
 
 
 class RHSignInBase(base.RH):
