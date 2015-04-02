@@ -604,7 +604,7 @@ type ("SuggestedUsersPanel", ["IWidget"], {
 
         if (exists(suggestedUsers)) {
             each(suggestedUsers, function(user){
-                if (any(user._type, null) === "Avatar") {
+                if (any(user._type, null) === "AvatarUserWrapper") {
                     self.suggestedUserList.set('existingAv' + user.id, $O(user));
                 } else {
                     self.suggestedUserList.set(user.id, $O(user));
@@ -918,7 +918,7 @@ type("SingleUserField", ["IWidget"], {
         var user = this.user.getAll();
 
         this.variableButtonsDiv.clear();
-        if (IndicoGlobalVars.isUserAuthenticated && this.userChosen && user._type === "Avatar") {
+        if (IndicoGlobalVars.isUserAuthenticated && this.userChosen && user._type === "AvatarUserWrapper") {
             var favButtonDiv = Html.div({style:{display:"inline", paddingLeft:pixels(5)}}, new Html(create_favorite_button(this.user.get('id')).get(0)));
             this.variableButtonsDiv.append(favButtonDiv);
         }
@@ -1519,9 +1519,9 @@ type("UserListField", ["IWidget"], {
                             if (person.isGroup || person._fossil === 'group') {
                                 key = person.id;
                             } else {
-                                key = (person._type === "Avatar") ? "existingAv" + person.id : person.id;
+                                key = (person._type === "AvatarUserWrapper") ? "existingAv" + person.id : person.id;
                             }
-                            if (person._type === "Avatar" && self.userList.get(key)) {
+                            if (person._type === "AvatarUserWrapper" && self.userList.get(key)) {
                                 // it is an existing avatar, unchanged, and already exists: we do nothing
                             } else {
                                 if (self.userList.get(key)) {
@@ -1642,7 +1642,7 @@ type("UserListField", ["IWidget"], {
 
         if (exists(initialUsers)) {
             each(initialUsers, function(user){
-                if (any(user._type, null) === 'Avatar') {
+                if (any(user._type, null) === 'AvatarUserWrapper') {
                     self.userList.set('existingAv' + user.id, $O(user));
                 } else {
                     self.userList.set(user.id, $O(user));
