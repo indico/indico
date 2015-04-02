@@ -26,7 +26,7 @@ from indico.core import signals
 from indico.core.notifications import make_email
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
-from indico.modules.users.util import get_related_categories, get_suggested_categories
+from indico.modules.users.util import get_related_categories, get_suggested_categories, serialize_user
 from indico.modules.users.views import WPUserDashboard, WPUser
 from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm
 from indico.util.date_time import timedelta_split
@@ -39,6 +39,7 @@ from indico.util.string import make_unique_token
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.mail import GenericMailer
@@ -117,7 +118,8 @@ class RHUserFavoritesUsersAdd(RHUserBase):
         users = [User.get(int(id_)) for id_ in request.form.getlist('user_id')]
         self.user.favorite_users |= set(filter(None, users))
         tpl = get_template_module('users/_favorites.html')
-        return jsonify(success=True, html=tpl.favorite_users_list(self.user))
+        return jsonify(success=True, users=[serialize_user(user) for user in users],
+                       html=tpl.favorite_users_list(self.user))
 
 
 class RHUserFavoritesUserRemove(RHUserBase):

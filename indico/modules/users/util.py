@@ -68,3 +68,16 @@ def get_suggested_categories(user):
             'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
         })
     return res
+
+
+def serialize_user(user):
+    """Serialize user to JSON-like object"""
+    return {
+        'id': user.id,
+        'name': user.full_name,
+        'familyName': user.last_name,
+        'firstName': user.first_name,
+        'affiliation': user.affiliation,
+        'email': user.email,
+        '_type': 'AvatarUserWrapper'
+    }

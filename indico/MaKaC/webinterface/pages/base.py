@@ -143,22 +143,6 @@ class WPBase():
                 for pkg_name in pkg_names
                 for url in self._asset_env[prefix + pkg_name.lower()].urls()]
 
-    def _getJavaScriptUserData(self):
-        """
-        Returns structured data that should be passed on to the client side
-        but depends on user data (can't be in vars.js.tpl)
-        """
-
-        user = self._getAW().getUser()
-
-        from MaKaC.webinterface.asyndico import UserDataFactory
-
-        userData = dict((packageName,
-                         UserDataFactory(user).build(packageName))
-                        for packageName in self._userData)
-
-        return userData
-
     def _getHeadContent( self ):
         """
         Returns _additional_ content between <head></head> tags.

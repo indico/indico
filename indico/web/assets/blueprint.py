@@ -17,11 +17,12 @@
 import binascii
 import os
 
-from flask import current_app, json
+from flask import current_app, json, session, render_template
 from werkzeug.exceptions import NotFound
 
 from indico.core.config import Config
 from indico.core.plugins import plugin_engine
+from indico.modules.users.util import serialize_user
 from indico.util.caching import make_hashable
 from indico.util.i18n import po_to_json
 from indico.web.flask.util import send_file
@@ -48,6 +49,21 @@ def js_vars_global():
 
     return send_file('global.js', cache_file,
                      mimetype='application/x-javascript', no_cache=False, conditional=True)
+
+
+@assets_blueprint.route('/js-vars/user.js')
+def js_vars_user():
+    """
+    Provides a JS file with global definitions (all users)
+    Useful for server-wide config options, URLs, etc...
+    """
+    # TODO: set MIME type
+
+    if session.new_user:
+        favorites = {user.id: serialize_user(user) for user in session.new_user.favorite_users}
+        return render_template('assets/vars_user.js', favorites=favorites, user=session.new_user)
+    else:
+        return ''
 
 
 def locale_data(path, name, domain):
