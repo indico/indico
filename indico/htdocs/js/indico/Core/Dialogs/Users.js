@@ -49,15 +49,6 @@ function userSort(user1, user2) {
     }
 }
 
-function updateFavList(favouriteList) {
-    IndicoGlobalVars['favorite-user-ids'] = {};
-    IndicoGlobalVars['favorite-user-list'] = [];
-    each(favouriteList, function(user) {
-        IndicoGlobalVars['favorite-user-ids'][user.id] = true;
-        IndicoGlobalVars['favorite-user-list'].push(user);
-    });
-}
-
 function create_favorite_button(user_id, active) {
     active = active === undefined ? true : active;
 
