@@ -49,18 +49,17 @@ function userSort(user1, user2) {
     }
 }
 
-function create_favorite_button(user_id, active) {
-    active = active === undefined ? true : active;
-
-    var span = $('<span class="favorite-user icon-star">')
-        .attr({
-            title: active ? $T('Remove from your list of favorite users') : $T('Add to your list of favorite users'),
-            'data-id': user_id
-        })
-        .on('click', function(e) {
-            e.stopPropagation();
-            $(document).trigger('favorites.' + ($(this).hasClass('active') ? 'remove-user' : 'add-user'), user_id);
-        });
+function create_favorite_button(user_id) {
+    var active = !!Indico.User.favorite_users[user_id],
+        span = $('<span class="favorite-user icon-star">')
+            .attr({
+                title: active ? $T('Remove from your list of favorite users') : $T('Add to your list of favorite users'),
+                'data-id': user_id
+            })
+            .on('click', function(e) {
+                e.stopPropagation();
+                $(document).trigger('favorites.' + ($(this).hasClass('active') ? 'remove-user' : 'add-user'), user_id);
+            });
 
     if (active) {
         span.addClass('active');
@@ -1339,7 +1338,7 @@ type("UserListWidget", ["ListWidget"],
             } else {
                 var buttonDiv = Html.div({style: {cssFloat: "right", clear: "both", paddingRight: pixels(10)}});
                 if (IndicoGlobalVars.isUserAuthenticated & this.showToggleFavouriteButtons && userData.get('_type') === "AvatarUserWrapper") {
-                    buttonDiv.append(new Html(create_favorite_button(userData.get('id'), !!Indico.User.favorite_users[userData.get('id')]).get(0)));
+                    buttonDiv.append(new Html(create_favorite_button(userData.get('id')).get(0)));
                 }
                 if (this.allowSetRights) {
                     buttonDiv.append($("<span></span>").shield({userData: userData}).get(0));

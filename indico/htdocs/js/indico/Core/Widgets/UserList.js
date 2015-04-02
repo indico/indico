@@ -125,7 +125,7 @@ type("ListOfUsersManager", [], {
         favorite: function(user) {
             if (user._type == "AvatarUserWrapper") {
                 return $('<span/>').css({'float':'right'}).
-                    html(create_favorite_button(user.id, Indico.User.favorite_users[user.id]));
+                    html(create_favorite_button(user.id));
             }
         },
 
