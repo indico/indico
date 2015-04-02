@@ -21,9 +21,11 @@ from werkzeug.utils import cached_property
 from MaKaC.user import GroupHolder
 
 from indico.core.db import db
+from indico.core.errors import IndicoError
 from indico.util.decorators import cached_classproperty
 from indico.util.string import return_ascii
 from MaKaC.webinterface.locators import WebLocator
+from MaKaC.errors import MaKaCError
 
 # TODO: remove this whole thing once all linked objects are in SQL
 
@@ -76,16 +78,20 @@ class UserLink(db.Model):
             'abstract': 'setAbstract',
             'registration': 'setRegistrant',
         }
-        if self.type == 'group':
-            return GroupHolder().getById(self.data['locator']['groupId'])
-        elif self.type == 'evaluation':
-            loc = WebLocator()
-            loc.setConference(self.data['locator'])
-            return loc.getObject().getEvaluation().getSubmissionById(self.data['locator']['submission_id'])
-        else:
-            loc = WebLocator()
-            getattr(loc, mapping[self.type])(self.data['locator'])
-            return loc.getObject()
+
+        try:
+            if self.type == 'group':
+                return GroupHolder().getById(self.data['locator']['groupId'])
+            elif self.type == 'evaluation':
+                loc = WebLocator()
+                loc.setConference(self.data['locator'])
+                return loc.getObject().getEvaluation().getSubmissionById(self.data['locator']['submission_id'])
+            else:
+                loc = WebLocator()
+                getattr(loc, mapping[self.type])(self.data['locator'])
+                return loc.getObject()
+        except (IndicoError, MaKaCError):
+            return None
 
     @classmethod
     def get_links(cls, user, type_, role):
