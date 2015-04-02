@@ -275,19 +275,10 @@ class GetMaterialAllowedUsers(MaterialModifBase):
 
     def _checkParams(self):
         MaterialModifBase._checkParams(self)
-        self._includeFavList = self._params.get("includeFavList", False)
         self._user = self._getUser() #will be None if user is not authenticated
 
     def _getAnswer(self):
-        #will use IAvatarFossil or IGroupFossil
-        allowedAccesList = fossilize(self._material.getAllowedToAccessList())
-        if self._includeFavList and self._user:
-            favList = fossilize(
-                self._user.getPersonalInfo().getBasket().getUsers().values())
-
-            return [allowedAccesList, favList]
-        else:
-            return allowedAccesList
+        return fossilize(self._material.getAllowedToAccessList())
 
 
 class GetMaterialProtection(MaterialModifBase):
@@ -417,17 +408,11 @@ class GetResourceAllowedUsers(ResourceModifBase):
 
     def _checkParams(self):
         ResourceModifBase._checkParams(self)
-        self._includeFavList = self._params.get("includeFavList", False)
         self._user = self._getUser() #will be None if user is not authenticated
 
     def _getAnswer(self):
         #will use IAvatarFossil or IGroupFossil
-        allowedAccesList = fossilize(self._resource.getAllowedToAccessList())
-        if self._includeFavList and self._user:
-            favList = fossilize(self._user.getPersonalInfo().getBasket().getUsers().values())
-            return [allowedAccesList, favList]
-        else:
-            return allowedAccesList
+        return fossilize(self._resource.getAllowedToAccessList())
 
 
 class DeleteResourceBase(ResourceModifBase):

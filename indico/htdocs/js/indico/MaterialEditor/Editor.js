@@ -758,18 +758,11 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
         var self = this;
 
         var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
-        self.args.includeFavList = IndicoGlobalVars.isUserAuthenticated && !exists(IndicoGlobalVars['favorite-user-ids']);
         var users = indicoSource(method, self.args);
 
         users.state.observe(function(state) {
             if (state == SourceState.Loaded) {
-                var result = users.get();
-                if (self.args.includeFavList) {
-                    self.allowedUsers = result[0];
-                    updateFavList(result[1]);
-                } else {
-                    self.allowedUsers = result;
-                }
+                self.allowedUsers = users.get();
                 killProgress();
                 hook.set(true);
             } else if (state == SourceState.Error) {
