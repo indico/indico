@@ -123,7 +123,9 @@ class WContributionDisplayBase(WICalExportBase):
 
         vars["getAuthorURL"] = lambda auth: self._getAuthorURL(auth)
         vars["formatDate"] = lambda date: format_date(date, "d MMM yyyy")
-        vars["formatTime"] = lambda time: format_time(time, format="short", timezone=timezone(DisplayTZ(self._aw, self._contrib.getConference()).getDisplayTZ()))
+        tz = timezone(DisplayTZ(self._aw, self._contrib.getConference()).getDisplayTZ())
+        vars["formatTime"] = lambda time: format_time(time, format="short", timezone=tz)
+        vars["formatDateTime"] = lambda dt: format_datetime(dt, format='d/M/yyyy H:mm', timezone=tz)
         vars["accessWrapper"] = self._aw
         statusReviewing = self._getStatusReviewing()
         vars["showSubmit"] = statusReviewing not in ["Accept", "Reject", "Submitted"]
