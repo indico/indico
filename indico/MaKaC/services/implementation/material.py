@@ -36,14 +36,14 @@ from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
 
 class UserListChange(object):
 
-    def changeUserList(self, object, newList):
+    def changeUserList(self, obj, newList):
         # clone the list, to avoid problems
-        allowedUsers = object.getAllowedToAccessList()[:]
+        allowedUsers = obj.getAllowedToAccessList()[:]
 
         # user can be a user or group
         for user in allowedUsers:
             if not user.getId() in newList:
-                object.revokeAccess(user)
+                obj.revokeAccess(user)
             else:
                 del newList[user.getId()]
 
@@ -54,7 +54,7 @@ class UserListChange(object):
                 avatar = GroupHolder().getById(elem['id'])
             else:
                 avatar = AvatarHolder().getById(elem['id'])
-            object.grantAccess(avatar)
+            obj.grantAccess(avatar)
 
 
 class MaterialBase:
