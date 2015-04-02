@@ -182,6 +182,12 @@ class User(db.Model):
         backref=db.backref('user', lazy=True)
     )
 
+    @property
+    def as_avatar(self):
+        # TODO: remove this after DB is free of Avatars
+        from indico.modules.users.legacy import AvatarUserWrapper
+        return AvatarUserWrapper(self.id)
+
     @hybrid_property
     def title(self):
         """the title of the user"""
