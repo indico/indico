@@ -48,7 +48,7 @@ def generate_global_file(config):
             'SecureImagesBase': config.getImagesBaseSecureURL(),
 
             'Login': urlHandlers.UHSignIn.getURL().js_router,
-            'Favourites': urlHandlers.UHUserBaskets.getURL(_ignore_static=True).js_router,
+            'Favorites': url_for('users.user_favorites'),
 
             'ConferenceDisplay': urlHandlers.UHConferenceDisplay.getURL(_ignore_static=True).js_router,
             'ContributionDisplay': urlHandlers.UHContributionDisplay.getURL(_ignore_static=True).js_router,

@@ -215,7 +215,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
         this.criteria = new WatchObject();
 
         this.foundPeopleList = new FoundPeopleList(null, this.onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver);
-        this.foundPeopleList.setMessage("Fill any of the upper fields and click search...");
+        this.foundPeopleList.setMessage($T("You can use the form above to search for users..."));
         this.extraDiv = any(extraDiv, Html.div({}));
 
         this.searchForm = null;
@@ -532,7 +532,7 @@ type ("SuggestedUsersPanel", ["IWidget"], {
 
         if (this.suggestedUserList.isEmpty()) {
             var message = Html.span({}, $T("There are no suggested users for you at the moment. Why not add some "),
-                                        Html.a({href: build_url(Indico.Urls.Favourites)}, $T("favourites")),
+                                        Html.a({href: Indico.Urls.Favorites}, $T("favourites")),
                                         "?");
             this.suggestedUserList.setMessage(message);
         }
