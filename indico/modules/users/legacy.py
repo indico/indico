@@ -63,14 +63,14 @@ class AvatarUserWrapper(Persistent):
         # deleted users shouldn't be able to be linked
         # TODO: log deleted users?
 
-        if not self.user.is_deleted():
+        if not self.user.is_deleted:
             self.user.link_to(obj, role)
 
     def unlinkTo(self, obj, role):
         # deleted users shouldn't be able to be linked
         # TODO: log deleted users?
 
-        if not self.user.is_deleted():
+        if not self.user.is_deleted:
             self.user.unlink_to(obj, role)
 
     def getLinkedTo(self):
@@ -172,7 +172,9 @@ class AvatarUserWrapper(Persistent):
         self.user.address = to_unicode(address)
 
     def getEmails(self):
-        return self.user.all_emails
+        # avoid 'stale association proxy'
+        user = self.user
+        return set(user.all_emails)
 
     @encode_utf8
     def getEmail(self):
