@@ -73,6 +73,9 @@
                     traditional: true,
                     error: handleAjaxError,
                     success: function(data) {
+                        $.each(list, function(i, user) {
+                            Indico.User.favorite_users[user.id] = user;
+                        });
                         $('#favorite-users').html(data.html);
                     }
                 });
@@ -93,6 +96,7 @@
                     success: function() {
                         $this.closest('.js-category-row').fadeOut(function() {
                             $(this).remove();
+                            delete Indico.User.favorite_users[$(this).closest('li').data('user-id')];
                         });
                     }
                 });
