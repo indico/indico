@@ -122,7 +122,7 @@ class WCategoryDisplay(WICalExportBase):
         elif confs:
             pastEvents = session.get('fetchPastEventsFrom', set())
             showPastEvents = (self._target.getId() in pastEvents or
-                             (self._aw.getUser() and self._aw.getUser().getPersonalInfo().getShowPastEvents()))
+                             (session.new_user and session.new_user.settings.get('show_past_events')))
             cl = wcomponents.WConferenceList(self._target, self._wfReg, showPastEvents)
             params = {"conferenceDisplayURLGen": vars["confDisplayURLGen"]}
             vars["contents"] = cl.getHTML( self._aw, params )
@@ -144,7 +144,6 @@ class WCategoryDisplay(WICalExportBase):
             vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/categ/%s.ics' % self._target.getId(), {'from':"-7d"}))
 
         vars["isLoggedIn"] = self._aw.getUser() is not None
-        vars["favoriteCategs"] = self._aw.getUser().getLinkTo('category', 'favorite') if self._aw.getUser() else []
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["isNewsActive"] = minfo.isNewsActive()

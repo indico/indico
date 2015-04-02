@@ -87,7 +87,7 @@ def _get_category_score(avatar, categ, attended_events, debug=False):
             first_event_date = b[0].getStartDate().replace(hour=0, minute=0)
 
     # Favorite categories get a higher base score
-    favorite = categ in avatar.getLinkTo('category', 'favorite')
+    favorite = categ in avatar.user.favorite_categories
     score = 1 if favorite else 0
     if debug:
         print '{0:+.3f} - initial'.format(score)

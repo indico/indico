@@ -118,7 +118,7 @@ class CategoryEventHook(HTTPAPIHook):
         expInt = CategoryEventFetcher(aw, self)
         idList = list(self._idList)
         if self._wantFavorites and aw.getUser():
-            idList += [c.getId() for c in aw.getUser().getLinkTo('category', 'favorite')]
+            idList += [c.getId() for c in aw.getUser().user.favorite_categories]
         return expInt.category(idList)
 
     def export_categ_extra(self, aw, resultList):
