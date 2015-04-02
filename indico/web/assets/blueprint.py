@@ -17,7 +17,7 @@
 import binascii
 import os
 
-from flask import current_app, json, session, render_template
+from flask import current_app, json, session, render_template, Response
 from werkzeug.exceptions import NotFound
 
 from indico.core.config import Config
@@ -61,9 +61,11 @@ def js_vars_user():
 
     if session.new_user:
         favorites = {user.id: serialize_user(user) for user in session.new_user.favorite_users}
-        return render_template('assets/vars_user.js', favorites=favorites, user=session.new_user)
+        data = render_template('assets/vars_user.js', favorites=favorites, user=session.new_user)
     else:
-        return ''
+        data = ''
+
+    return Response(data, mimetype='application/x-javascript')
 
 
 def locale_data(path, name, domain):
