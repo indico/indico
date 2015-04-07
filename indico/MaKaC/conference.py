@@ -3270,6 +3270,8 @@ class Conference(CommonObjectBase, Locatable):
                  self.setEndDate(newSession.getEndDate())
         if id!=None:
             sessionId = id
+            # Keep ID counter up to date
+            self.__sessionGenerator.newCount()
         else:
             sessionId=self.__generateNewSessionId()
         self.sessions[sessionId]=newSession
@@ -4218,7 +4220,7 @@ class Conference(CommonObjectBase, Locatable):
         # Meetings' and conferences' sessions cloning
         if options.get("sessions",False) :
             for s in self.getSessionList() :
-                newSes = s.clone(timeDelta, conf, options)
+                newSes = s.clone(timeDelta, conf, options, session_id=s.getId())
                 ContextManager.setdefault("clone.unique_id_map", {})[s.getUniqueId()] = newSes.getUniqueId()
                 conf.addSession(newSes)
         # Materials' cloning
@@ -5646,9 +5648,9 @@ class Session(CommonObjectBase, Locatable):
             self.getConference().getSchedule().reSchedule()
             self.notifyModification()
 
-    def clone(self, deltaTime, conf, options):
+    def clone(self, deltaTime, conf, options, session_id=None):
         ses = Session()
-        conf.addSession(ses,check=0)
+        conf.addSession(ses, check=0, id=session_id)
         ses.setTitle(self.getTitle())
         ses.setDescription(self.getDescription())
         startDate = self.getStartDate() + deltaTime
