@@ -57,5 +57,5 @@ def _add_user_id(endpoint, values):
     Note that this needs to be replicated in other blueprints when they add
     stuff to the user pages using the `user_sidemenu` signal.
     """
-    if endpoint.startswith('users.user_'):
+    if endpoint.startswith('users.user_') and 'user_id' not in values:
         values['user_id'] = request.view_args.get('user_id')

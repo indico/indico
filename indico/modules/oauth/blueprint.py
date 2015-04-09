@@ -30,6 +30,6 @@ with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
 
 @_bp.url_defaults
 def _add_user_id(endpoint, values):
-    if endpoint == 'oauth.user_profile':
+    if endpoint == 'oauth.user_profile' and 'user_id' not in values:
         # Inject user id if it's present in the url
         values['user_id'] = request.view_args.get('user_id')
