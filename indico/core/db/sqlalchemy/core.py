@@ -18,11 +18,12 @@ from __future__ import absolute_import
 
 import logging
 from functools import partial
+from flask import has_app_context, g
 
 import flask_sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.event import listen
-from sqlalchemy.orm import mapper
+from sqlalchemy.orm import mapper, Session
 from sqlalchemy.sql.ddl import CreateSchema
 from werkzeug.utils import cached_property
 from zope.sqlalchemy import ZopeTransactionExtension
@@ -74,6 +75,15 @@ def _mapper_configured(mapper, class_):
                 listen(getattr(class_, prop.key), 'set', partial(_coerce_custom, fn=func), retval=True)
 
 
+def _transaction_ended(session, transaction):
+    # The zope transaction system closes the session (and thus the
+    # transaction) e.g. when calling `transaction.abort()`.
+    # in this case we need to clear the memoization cache to avoid
+    # accessing memoized objects (which are now session-less)
+    if has_app_context() and 'memoize_cache' in g:
+        del g.memoize_cache
+
+
 def _column_names(constraint, table):
     return '_'.join((c if isinstance(c, basestring) else c.name) for c in constraint.columns)
 
@@ -96,3 +106,4 @@ db = IndicoSQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
 db.Model.metadata.naming_convention = naming_convention
 listen(db.Model.metadata, 'before_create', _before_create)
 listen(mapper, 'mapper_configured', _mapper_configured)
+listen(Session, 'after_transaction_end', _transaction_ended)
