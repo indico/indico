@@ -20,7 +20,7 @@ from functools import wraps
 
 from indico.modules.users.models.users import User
 from indico.util.caching import memoize_request
-from indico.util.fossilize import fossilizes
+from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.string import to_unicode
 from indico.util.user import retrieve_principals
 
@@ -36,10 +36,8 @@ def encode_utf8(f):
     return _wrapper
 
 
-class AvatarUserWrapper(Persistent):
-    """
-    Wrapper Avatar-like class that holds a DB-stored user.
-    """
+class AvatarUserWrapper(Persistent, Fossilizable):
+    """Avatar-like wrapper class that holds a DB-stored user."""
 
     fossilizes(IAvatarFossil, IAvatarMinimalFossil)
 
