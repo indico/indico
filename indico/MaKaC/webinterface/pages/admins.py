@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import datetime
 import os
 import re
 from cgi import escape
@@ -44,6 +43,7 @@ from MaKaC.webinterface.pages.main import WPMainBase
 from indico.core import signals
 from indico.core.config import Config
 from indico.modules import ModuleHolder
+from indico.modules.users import User
 from indico.util.i18n import i18nformat, get_all_locales
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
@@ -184,7 +184,7 @@ class WAdmins(wcomponents.WTemplated):
         url = urlHandlers.UHAdminSwitchNewsActive.getURL()
         icon = iconEnabled if minfo.isNewsActive() else iconDisabled
         vars["features"] = i18nformat("""<a href="%s"><img src="%s" border="0" style="float:left; padding-right: 5px">_("News Pages")</a>""") % (url, icon)
-        vars["administrators"] = fossilize(minfo.getAdminList())
+        vars["administrators"] = fossilize([u.as_avatar for u in User.find(is_admin=True)])
         return vars
 
 
