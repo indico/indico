@@ -52,10 +52,8 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return self.id
 
     @property
-    @memoize_request
     def api_key(self):
-        from indico.modules.api.models.keys import APIKey
-        return APIKey.find_first(user_id=int(self.id), is_active=True)
+        return self.user.api_key
 
     def linkTo(self, obj, role):
         # deleted users shouldn't be able to be linked
