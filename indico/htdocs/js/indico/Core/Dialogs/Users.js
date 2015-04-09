@@ -1479,7 +1479,7 @@ type("UserListField", ["IWidget"], {
 
         if (this.allowSearch || this.includeFavourites || exists(this.suggestedUsers)) {
 
-            var chooseUserButton = Html.input("button", {style:{marginRight: pixels(5)}, className: 'i-button'}, $T('Add Indico User'+(this.enableGroups?" / Group":"")));
+            var chooseUserButton = Html.input("button", {style:{marginRight: pixels(5)}, className: 'i-button'}, $T('Add Indico User'+(this.enableGroups?$T(" / Group"):"")));
 
             var title = "";
             if (this.includeFavourites || exists(this.suggestedUsers)) {

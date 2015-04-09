@@ -30,7 +30,7 @@
                     % endif
                     <td nowrap class="content" valign="top" style="text-align: right;">
                     % if c.canModify(self_._aw):
-                            <a href="${urlHandlers.UHContributionModification.getURL(c)}">${ _("Edit") }</a><span class="horizontalSeparator">|</span><a href="${urlHandlers.UHContributionDisplay.getURL(c)}">View</a>
+                            <a href="${urlHandlers.UHContributionModification.getURL(c)}">${ _("Edit") }</a><span class="horizontalSeparator">|</span><a href="${urlHandlers.UHContributionDisplay.getURL(c)}">${ _("View") }</a>
                     % else:
                             <a href="${urlHandlers.UHContributionDisplay.getURL(c)}">${ _("View") }</a>
                     % endif

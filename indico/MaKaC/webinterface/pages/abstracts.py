@@ -549,10 +549,10 @@ class WPAbstractManagementBase( WPConferenceModifBase ):
             urlHandlers.UHAbstractModTools.getURL( self._abstract))
 
         # Sub tabs for the track judgements
-        self._subTabTrack = self._tabTracks.newSubTab( "byTrack", "Judgement details",\
-                urlHandlers.UHAbstractTrackProposalManagment.getURL(self._abstract))
-        self._subTabRating = self._tabTracks.newSubTab( "byRating", "Rating per question",\
-                urlHandlers.UHAbstractTrackOrderByRating.getURL(self._abstract))
+        self._subTabTrack = self._tabTracks.newSubTab(
+            "byTrack", _("Judgement details"), urlHandlers.UHAbstractTrackProposalManagment.getURL(self._abstract))
+        self._subTabRating = self._tabTracks.newSubTab(
+            "byRating", _("Rating per question"), urlHandlers.UHAbstractTrackOrderByRating.getURL(self._abstract))
 
         self._setActiveTab()
 
