@@ -18,13 +18,11 @@ from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSON
 from werkzeug.utils import cached_property
-from MaKaC.user import GroupHolder
 
 from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.util.decorators import cached_classproperty
 from indico.util.string import return_ascii
-from MaKaC.webinterface.locators import WebLocator
 from MaKaC.errors import MaKaCError
 
 # TODO: remove this whole thing once all linked objects are in SQL
@@ -67,6 +65,9 @@ class UserLink(db.Model):
     @cached_property
     def object(self):
         """Retrieves the linked object"""
+        from MaKaC.user import GroupHolder
+        from MaKaC.webinterface.locators import WebLocator
+
         mapping = {
             'category': 'setCategory',
             'conference': 'setConference',

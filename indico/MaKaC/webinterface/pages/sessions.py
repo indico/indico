@@ -36,6 +36,7 @@ from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from MaKaC.common.utils import isStringHTML
 from MaKaC import user
 from MaKaC.i18n import _
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.i18n import i18nformat
 
 from pytz import timezone
@@ -46,7 +47,6 @@ import pytz
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil, ISessionFossil
-from MaKaC.user import Avatar
 from MaKaC.common.TemplateExec import render
 
 from indico.core.config import Config
@@ -565,7 +565,7 @@ class WSessionModifAC(wcomponents.WTemplated):
         result = []
         for sessionChair in list:
             sessionChairFossil = fossilize(sessionChair)
-            if isinstance(sessionChair, Avatar):
+            if isinstance(sessionChair, AvatarUserWrapper):
                 isConvener = False
                 if self._session.hasConvenerByEmail(sessionChair.getEmail()):
                     isConvener = True

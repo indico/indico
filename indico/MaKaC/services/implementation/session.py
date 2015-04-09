@@ -26,8 +26,9 @@ from MaKaC.services.implementation import conference as conferenceServices
 import MaKaC.webinterface.locators as locators
 from MaKaC.conference import SessionSlot, SessionChair
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
+from MaKaC.user import PrincipalHolder, Group, AvatarHolder
 import MaKaC.domain as domain
+from indico.modules.users.legacy import AvatarUserWrapper
 
 
 class SessionBase(conferenceServices.ConferenceBase):
@@ -209,7 +210,7 @@ class SessionProtectionRemoveUser(SessionModifBase):
 
         if not userToRemove :
             raise ServiceError("ERR-U0","User does not exist!")
-        elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
+        elif isinstance(userToRemove, AvatarUserWrapper) or isinstance(userToRemove, Group):
             self._session.revokeAccess(userToRemove)
 
 
@@ -231,7 +232,7 @@ class SessionChairListBase(SessionModifBase):
         result = []
         for sessionChair in list:
             sessionChairFossil = fossilize(sessionChair)
-            if isinstance(sessionChair, Avatar):
+            if isinstance(sessionChair, AvatarUserWrapper):
                 isConvener = False
                 if self._session.hasConvenerByEmail(sessionChair.getEmail()):
                     isConvener = True

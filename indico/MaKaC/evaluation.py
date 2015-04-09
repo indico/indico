@@ -19,16 +19,15 @@ from persistent   import Persistent
 from registration import Notification
 from MaKaC.common import utils
 from MaKaC.common.Counter import Counter
-from MaKaC.user   import Avatar
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
+from indico.core.config import Config
 from indico.modules.scheduler import Client
 from indico.modules.scheduler.tasks import AlarmTask
-from indico.core.config import Config
+from indico.modules.users.legacy import AvatarUserWrapper
 
 
 class Evaluation(Persistent):
@@ -1468,7 +1467,7 @@ class Submission(Persistent):
 
     def setSubmitter(self, submitter):
         """Set the submitter. He is of type None when anonymous, Avatar otherwise."""
-        if isinstance(submitter, Avatar) :
+        if isinstance(submitter, AvatarUserWrapper):
             submitter.linkTo(self, "submitter")
         self._submitter = submitter
     def getSubmitter(self):
@@ -1479,14 +1478,14 @@ class Submission(Persistent):
     def removeSubmitter(self):
         """remove the submitter, i.e. he is set to None."""
         submitter = self.getSubmitter()
-        if isinstance(submitter, Avatar) :
+        if isinstance(submitter, AvatarUserWrapper):
             submitter.unlinkTo(self, "submitter")
         self._submitter = None
 
     def getSubmitterName(self):
         """returns name of submitter"""
         submitter = self.getSubmitter()
-        if not self.isAnonymous() and isinstance(submitter, Avatar) :
+        if not self.isAnonymous() and isinstance(submitter, AvatarUserWrapper):
             return submitter.getFullName()
         else :
             return "Anonymous (%s)"%self.getId()

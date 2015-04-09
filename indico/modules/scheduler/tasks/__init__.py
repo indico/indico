@@ -21,13 +21,13 @@ import zope.interface
 from persistent import Persistent
 from flask import render_template
 
-from MaKaC.user import Avatar
 from MaKaC.authentication.LDAPAuthentication import LDAPConnector
 
 from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.date_time import int_timestamp, format_datetime
 from indico.modules.scheduler.fossils import ITaskFossil
 from indico.modules.scheduler import base
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.index import IUniqueIdProvider, IIndexableByArbitraryDateTime
@@ -406,12 +406,12 @@ class AlarmTask(SendMailTask):
 
     def addToUser(self, user):
         super(AlarmTask, self).addToUser(user)
-        if isinstance(user, Avatar):
+        if isinstance(user, AvatarUserWrapper):
             user.linkTo(self, "to")
 
     def removeToUser(self, user):
         super(AlarmTask, self).removeToUser(user)
-        if isinstance(user, Avatar):
+        if isinstance(user, AvatarUserWrapper):
             user.unlinkTo(self, "to")
 
     def getText(self):

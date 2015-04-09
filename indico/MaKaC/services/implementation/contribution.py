@@ -29,9 +29,10 @@ from MaKaC.services.implementation.base import HTMLModificationBase
 from MaKaC.services.implementation.base import DateTimeModificationBase
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
-from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
+from MaKaC.user import PrincipalHolder, Group, AvatarHolder
 import MaKaC.webinterface.pages.contributionReviewing as contributionReviewing
 import MaKaC.domain as domain
+from indico.modules.users.legacy import AvatarUserWrapper
 
 
 class ContributionBase(object):
@@ -217,7 +218,7 @@ class ContributionProtectionRemoveUser(ContributionModifBase):
 
         if not userToRemove :
             raise ServiceError("ERR-U0","User does not exist!")
-        elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
+        elif isinstance(userToRemove, AvatarUserWrapper) or isinstance(userToRemove, Group):
             self._contribution.revokeAccess(userToRemove)
 
 class ContributionGetChildrenProtected(ContributionModifBase):
@@ -707,7 +708,7 @@ class ContributionSubmittersBase(ContributionModifBase):
         result = []
         for submitter in self._contribution.getSubmitterList():
             submitterFossil = fossilize(submitter)
-            if isinstance(submitter, Avatar):
+            if isinstance(submitter, AvatarUserWrapper):
                 isSpeaker = False
                 if self._conf.getType() == "conference":
                     isPrAuthor = False

@@ -40,7 +40,7 @@ from MaKaC.common.contextManager import ContextManager
 from indico.core.logger import Logger
 
 from MaKaC.errors import TimingError
-from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
+from MaKaC.user import PrincipalHolder, Group, AvatarHolder
 from MaKaC.participant import Participant
 from MaKaC.fossils.contribution import IContributionFossil
 
@@ -63,6 +63,7 @@ from indico.modules import ModuleHolder
 from indico.modules.offlineEvents import OfflineEventItem
 from indico.modules.scheduler.tasks.offlineEventGenerator import OfflineEventGeneratorTask
 from indico.modules.scheduler import tasks, Client
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.web.http_api.util import generate_public_auth_request
 from indico.core.config import Config
 
@@ -918,7 +919,7 @@ class ConferenceApplyParticipant(ConferenceDisplayBase, ConferenceAddEditPartici
 
         toList = []
         for manager in self._conf.getManagerList():
-            if isinstance(manager, Avatar) :
+            if isinstance(manager, AvatarUserWrapper):
                 toList.append(manager.getEmail())
 
         data = {}
@@ -1028,7 +1029,7 @@ class ConferenceAddParticipants(ConferenceParticipantBase, ConferenceParticipant
             if selected is None and user["_type"] == "Avatar":
                 raise NoReportError(_("""The user with email %s that you are adding does
                                     not exist anymore in the database""") % user["email"])
-            if isinstance(selected, Avatar):
+            if isinstance(selected, AvatarUserWrapper):
                 self._addParticipant(self._generateParticipant(selected), participation)
             else:
                 self._addParticipant(self._generateParticipant(), participation)
@@ -1088,7 +1089,7 @@ class ConferenceInviteParticipants(ConferenceParticipantBase, ConferenceParticip
         for user in self._userList:
             ph = PrincipalHolder()
             selected = ph.getById(user['id'])
-            if isinstance(selected, Avatar):
+            if isinstance(selected, AvatarUserWrapper):
                 participant = self._generateParticipant(selected)
                 if self._inviteParticipant(participant, participation):
                     self._sendEmailWithFormat(participant, data)
@@ -1260,7 +1261,7 @@ class ConferenceProtectionRemoveUser(ConferenceModifBase):
 
         if not userToRemove :
             raise ServiceError("ERR-U0","User does not exist!")
-        elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
+        elif isinstance(userToRemove, AvatarUserWrapper) or isinstance(userToRemove, Group):
             self._conf.revokeAccess(userToRemove)
 
 

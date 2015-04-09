@@ -34,6 +34,7 @@ from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC import schedule
 import MaKaC.common.info as info
 from MaKaC.i18n import _
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.i18n import i18nformat
 
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
@@ -43,7 +44,6 @@ from pytz import timezone
 from MaKaC.common.TemplateExec import truncateTitle
 
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import Avatar
 
 from indico.core.index import Catalog
 from indico.modules import ModuleHolder
@@ -132,7 +132,7 @@ class WCategoryDisplay(WICalExportBase):
 
         mgrs = []
         for mgr in self._target.getManagerList():
-            if isinstance(mgr, Avatar):
+            if isinstance(mgr, AvatarUserWrapper):
                 mgrs.append(("avatar", mgr.getAbrName()))
             elif isinstance(mgr, Group) and mgr.groupType != "Default":
                 mgrs.append(("group", mgr.getName()))

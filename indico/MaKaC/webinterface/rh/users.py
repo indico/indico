@@ -31,12 +31,10 @@ from MaKaC.errors import MaKaCError, NotFoundError, NoReportError
 from MaKaC.user import Avatar, AvatarHolder, LoginInfo
 from MaKaC.webinterface import mail
 from MaKaC.webinterface.rh.base import RH, RHProtected
-from indico.core import signals
 from indico.core.db import DBMgr
 from indico.util.i18n import _
 from indico.util.redis import suggestions
 from indico.util.redis import write_client as redis_write_client
-from indico.util.signals import values_from_signal
 from indico.web.flask.util import url_for
 
 

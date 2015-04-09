@@ -79,5 +79,5 @@ def serialize_user(user):
         'firstName': user.first_name,
         'affiliation': user.affiliation,
         'email': user.email,
-        '_type': 'AvatarUserWrapper'
+        '_type': 'Avatar'
     }

@@ -40,6 +40,7 @@ from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.i18n import L_
 from indico.util.string import safe_upper, safe_slice, fix_broken_string, return_ascii
 from MaKaC.review import AbstractFieldContent
@@ -1005,10 +1006,10 @@ class Category(CommonObjectBase):
         self.getOwner()._removeSubCategory(self)
         CategoryManager().remove(self)
         for prin in self.__ac.getAccessList():
-            if isinstance(prin, MaKaC.user.Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.unlinkTo(self, "access")
         for prin in self.__ac.getModifierList():
-            if isinstance(prin, MaKaC.user.Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.unlinkTo(self, "manager")
         TrashCanManager().add(self)
 
@@ -1336,12 +1337,12 @@ class Category(CommonObjectBase):
 
     def grantModification(self, prin):
         self.__ac.grantModification(prin)
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "manager")
 
     def revokeModification(self, prin):
         self.__ac.revokeModification(prin)
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "manager")
 
     def canModify(self, aw_or_user):
@@ -1427,12 +1428,12 @@ class Category(CommonObjectBase):
 
     def grantAccess(self, prin):
         self.__ac.grantAccess(prin)
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "access")
 
     def revokeAccess(self, prin):
         self.__ac.revokeAccess(prin)
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "access")
 
     def isConferenceCreationRestricted(self):
@@ -1447,14 +1448,14 @@ class Category(CommonObjectBase):
     def grantConferenceCreation(self, prin):
         if prin not in self.__confCreators:
             self.__confCreators.append(prin)
-            if isinstance(prin, MaKaC.user.Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.linkTo(self, "creator")
             self._p_changed = 1
 
     def revokeConferenceCreation(self, prin):
         if prin in self.__confCreators:
             self.__confCreators.remove(prin)
-            if isinstance(prin, MaKaC.user.Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.unlinkTo(self, "creator")
             self._p_changed = 1
 
@@ -2699,7 +2700,7 @@ class Conference(CommonObjectBase, Locatable):
         # the link in every manager to the conference then, when the manager goes to his "My profile" he
         # will see a link to a conference that doesn't exist. Therefore, we need to delete that link as well
         for manager in self.getManagerList():
-            if isinstance(manager, MaKaC.user.Avatar):
+            if isinstance(manager, AvatarUserWrapper):
                 manager.unlinkTo(self, "manager")
 
         creator = self.getCreator()
@@ -3136,7 +3137,7 @@ class Conference(CommonObjectBase, Locatable):
         if isinstance(newChair,ConferenceChair):
             newChair.includeInConference(self,id)
         self._chairs.append(newChair)
-        if isinstance(newChair, MaKaC.user.Avatar):
+        if isinstance(newChair, AvatarUserWrapper):
             newChair.linkTo(self, "chair")
         self.notifyModification()
 
@@ -3153,7 +3154,7 @@ class Conference(CommonObjectBase, Locatable):
         if chair not in self._chairs:
             return
         self._chairs.remove(chair)
-        if isinstance(chair, MaKaC.user.Avatar):
+        if isinstance(chair, AvatarUserWrapper):
             chair.unlinkTo(self, "chair")
         chair.delete()
         self.notifyModification()
@@ -3660,12 +3661,12 @@ class Conference(CommonObjectBase, Locatable):
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "access")
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "access")
 
     def canView( self, aw ):
@@ -3769,12 +3770,12 @@ class Conference(CommonObjectBase, Locatable):
                 results[0].linkTo(self, "manager")
         else:
             self.__ac.grantModification( prin )
-            if isinstance(prin, MaKaC.user.Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.linkTo(self, "manager")
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "manager")
 
     def canUserModify( self, av ):
@@ -3802,13 +3803,13 @@ class Conference(CommonObjectBase, Locatable):
     def addToRegistrars(self, av):
         self.getRegistrarList().append(av)
         self.notifyModification()
-        if isinstance(av, MaKaC.user.Avatar):
+        if isinstance(av, AvatarUserWrapper):
             av.linkTo(self, "registrar")
 
     def removeFromRegistrars(self, av):
         self.getRegistrarList().remove(av)
         self.notifyModification()
-        if isinstance(av, MaKaC.user.Avatar):
+        if isinstance(av, AvatarUserWrapper):
             av.unlinkTo(self, "registrar")
 
     def isRegistrar(self, av):
@@ -6012,7 +6013,7 @@ class Session(CommonObjectBase, Locatable):
     def addConvener(self,newConv):
         self._resetConveners()
         self._addConvener(newConv)
-        if isinstance(newConv, MaKaC.user.Avatar):
+        if isinstance(newConv, AvatarUserWrapper):
             conv.unlinkTo(self, "convener")
 
     def removeConvener(self,conv):
@@ -6026,7 +6027,7 @@ class Session(CommonObjectBase, Locatable):
         self.getConference().getPendingQueuesMgr().removePendingCoordinator(conv)
         #--
         self._conveners.remove(conv)
-        if isinstance(conv, MaKaC.user.Avatar):
+        if isinstance(conv, AvatarUserWrapper):
             conv.linkTo(self, "convener")
         conv.delete()
         self.notifyModification()
@@ -6152,12 +6153,12 @@ class Session(CommonObjectBase, Locatable):
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "access")
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "access")
 
     def canView( self, aw ):
@@ -6218,12 +6219,12 @@ class Session(CommonObjectBase, Locatable):
                     mail.GenericMailer.sendAndLog( notif, self.getConference() )
         else:
             self.__ac.grantModification( sb )
-            if isinstance(sb, MaKaC.user.Avatar):
+            if isinstance(sb, AvatarUserWrapper):
                 sb.linkTo(self, "manager")
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "manager")
 
     def canModify(self, aw_or_user):
@@ -6395,7 +6396,7 @@ class Session(CommonObjectBase, Locatable):
 
             Arguments:
                 sb -- It can be either:
-                        (MaKaC.user.Avatar) the user to which
+                        (AvatarUserWrapper) the user to which
                         coordination privileges must be granted.
                       or:
                         (MaKaC.conference.SessionChair) a non-existing which
@@ -6425,14 +6426,14 @@ class Session(CommonObjectBase, Locatable):
                 self.getConference().getPendingQueuesMgr().addPendingCoordinator(sb)
         else:
             self._addCoordinator(sb)
-            if isinstance(sb, MaKaC.user.Avatar):
+            if isinstance(sb, AvatarUserWrapper):
                 sb.linkTo(self, "coordinator")
 
     def removeCoordinator( self, av ):
         """Revokes coordination privileges to user.
 
            Arguments:
-            av -- (MaKaC.user.Avatar) user for which coordination privileges
+            av -- (AvatarUserWrapper) user for which coordination privileges
                     must be revoked
         """
         try:
@@ -6444,7 +6445,7 @@ class Session(CommonObjectBase, Locatable):
         if av is None or not self._coordinators.has_key(av.getId()):
             return
         del self._coordinators[av.getId()]
-        if isinstance(av, MaKaC.user.Avatar):
+        if isinstance(av, AvatarUserWrapper):
             av.unlinkTo(self, "coordinator")
         if self.getConference() is not None:
             self.getConference().removeSessionCoordinator(self,av)
@@ -6453,7 +6454,7 @@ class Session(CommonObjectBase, Locatable):
         """Tells whether the specified user is a coordinator of the session.
 
            Arguments:
-            av -- (MaKaC.user.Avatar) user to be checked
+            av -- (AvatarUserWrapper) user to be checked
 
            Return value: (boolean)
         """
@@ -6465,7 +6466,7 @@ class Session(CommonObjectBase, Locatable):
         if (av is not None) and self._coordinators.has_key(av.getId()):
             return True
         ret = False
-        if isinstance(av, MaKaC.user.Avatar):
+        if isinstance(av, AvatarUserWrapper):
             for email in av.getEmails():
                 if email in self.getCoordinatorEmailList():
                     self.addCoordinator(av)
@@ -7773,7 +7774,7 @@ class Contribution(CommonObjectBase, Locatable):
         for sp in self._speakers:
             data["speaker %s" % sp.getId()] = sp.getFullName()
         for s in self.getSubmitterList():
-            if isinstance(s, MaKaC.user.Avatar):
+            if isinstance(s, AvatarUserWrapper):
                 data["submitter"] = s.getFullName()
             else:
                 data["submitter"] = s.getName()
@@ -8878,13 +8879,13 @@ class Contribution(CommonObjectBase, Locatable):
 
     def grantAccess(self, prin):
         self.__ac.grantAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "access")
         self.notifyModification(raiseEvent = False)
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "access")
         self.notifyModification(raiseEvent = False)
 
@@ -8927,13 +8928,13 @@ class Contribution(CommonObjectBase, Locatable):
 
     def grantModification( self, prin ):
         self.__ac.grantModification( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "manager")
         self.notifyModification(raiseEvent = False)
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "manager")
         self.notifyModification(raiseEvent = False)
 
@@ -9369,7 +9370,7 @@ class Contribution(CommonObjectBase, Locatable):
             self.getSubmitterList().append(av)
         if self.getConference() is not None:
             self.getConference().addContribSubmitter(self,av)
-        if isinstance(av, MaKaC.user.Avatar):
+        if isinstance(av, AvatarUserWrapper):
             av.linkTo(self, "submission")
         self.notifyModification(raiseEvent = False)
 
@@ -9418,7 +9419,7 @@ class Contribution(CommonObjectBase, Locatable):
             self.getSubmitterList().remove(av)
         if self.getConference():
             self.getConference().removeContribSubmitter(self, av)
-        if isinstance(av, MaKaC.user.Avatar):
+        if isinstance(av, AvatarUserWrapper):
             av.unlinkTo(self, "submission")
         self.notifyModification(raiseEvent = False)
 
@@ -10892,13 +10893,13 @@ class Material(CommonObjectBase):
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "access")
         self._p_changed = 1
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "access")
         self._p_changed = 1
 
@@ -10949,13 +10950,13 @@ class Material(CommonObjectBase):
 
     def grantModification( self, prin ):
         self.__ac.grantModification( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "manager")
         self._p_changed = 1
 
     def revokeModification( self, prin ):
         self.__ac.revokeModification( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "manager")
         self._p_changed = 1
 
@@ -11347,12 +11348,12 @@ class Resource(CommonObjectBase):
 
     def grantAccess( self, prin ):
         self.__ac.grantAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(self, "access")
 
     def revokeAccess( self, prin ):
         self.__ac.revokeAccess( prin )
-        if isinstance(prin, MaKaC.user.Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "access")
 
     def canView( self, aw ):
@@ -11965,7 +11966,7 @@ class Track(CoreObject):
         """Grants coordination privileges to user.
 
             Arguments:
-                av -- (MaKaC.user.Avatar) the user to which
+                av -- (AvatarUserWrapper) the user to which
                     coordination privileges must be granted.
         """
 
@@ -11986,7 +11987,7 @@ class Track(CoreObject):
         """Revokes coordination privileges to user.
 
            Arguments:
-            av -- (MaKaC.user.Avatar) user for which coordination privileges
+            av -- (AvatarUserWrapper) user for which coordination privileges
                     must be revoked
         """
         try:
@@ -12006,7 +12007,7 @@ class Track(CoreObject):
         """Tells whether the specified user is a coordinator of the track.
 
            Arguments:
-            av -- (MaKaC.user.Avatar) user to be checke
+            av -- (AvatarUserWrapper) user to be checke
 
            Return value: (boolean)
         """

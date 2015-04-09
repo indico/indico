@@ -48,6 +48,7 @@ from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
 
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.web.flask.util import send_file, endpoint_for_url
 from indico.web.http_api.hooks.event import CategoryEventHook
 from indico.web.http_api.metadata.serializer import Serializer
@@ -345,7 +346,7 @@ class UtilPersons:
 
         if avatars:
             for selected in avatars:
-                if isinstance(selected, user.Avatar) :
+                if isinstance(selected, AvatarUserWrapper):
                     person = ConferenceChair()
                     person.setDataFromAvatar(selected)
                     UtilPersons._addChair(conf, person, grantManager, grantSubmission)
@@ -367,7 +368,7 @@ class UtilPersons:
 
         if accessingAvatars:
             for person in accessingAvatars:
-                if isinstance(person, user.Avatar) or isinstance(person, user.Group):
+                if isinstance(person, AvatarUserWrapper) or isinstance(person, user.Group):
                     conf.grantAccess(person)
 
     @staticmethod

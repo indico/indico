@@ -251,7 +251,7 @@ class Fossilizable(object):
                                   **kwargs)
 
     @classmethod
-    def fossilize_obj(cls, obj, interfaceArg=None, useAttrCache=False, mapClassType={}, **kwargs):
+    def fossilize_obj(cls, obj, interfaceArg=None, useAttrCache=False, mapClassType=None, **kwargs):
         """
         Fossilizes the object, using the fossil provided by `interface`.
 
@@ -262,6 +262,7 @@ class Fossilizable(object):
         :type useAttrCache: boolean
         """
 
+        mapClassType = dict(mapClassType or {}, AvatarUserWrapper='Avatar')
         interface = cls.__obtainInterface(obj, interfaceArg)
 
         name = interface.getName()

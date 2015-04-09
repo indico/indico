@@ -19,24 +19,21 @@ Asynchronous request handlers for category-related services.
 
 from datetime import datetime
 from flask import session
-from indico.util.redis import suggestions
 from itertools import islice
 from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import TextModificationBase
 from MaKaC.services.implementation.base import ExportToICalBase
-from MaKaC.services.implementation.base import LoggedOnlyService
 
 import MaKaC.conference as conference
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
+from MaKaC.services.interface.rpc.common import ServiceError
 import MaKaC.webinterface.locators as locators
 from MaKaC.webinterface.wcomponents import WConferenceListItem
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
+from MaKaC.user import PrincipalHolder, Group
 from indico.core.index import Catalog
 from indico.web.http_api.util import generate_public_auth_request
-from indico.util.redis import write_client as redis_write_client
-import MaKaC.common.info as info
+from indico.modules.users.legacy import AvatarUserWrapper
 from MaKaC import domain
 from indico.core.config import Config
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
@@ -238,7 +235,7 @@ class CategoryProtectionRemoveUser(CategoryModifBase):
 
         if not userToRemove :
             raise ServiceError("ERR-U0","User does not exist!")
-        elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
+        elif isinstance(userToRemove, AvatarUserWrapper) or isinstance(userToRemove, Group):
             self._categ.revokeAccess(userToRemove)
 
 class CategoryContactInfoModification( CategoryTextModificationBase ):
@@ -280,7 +277,7 @@ class CategoryAddExistingControlUser(CategoryControlUserListBase):
         self._sendEmailManagers = pm.extract("sendEmailManagers", pType=bool, allowEmpty=True, defaultValue = True)
 
     def _sendMail(self, currentList, newManager):
-        if isinstance(newManager, Avatar):
+        if isinstance(newManager, AvatarUserWrapper):
             managerName = newManager.getStraightFullName()
         else:
             managerName = newManager.getName()

@@ -19,9 +19,6 @@ from __future__ import unicode_literals
 from indico.core.db import db
 from indico.util.string import return_ascii
 
-from MaKaC.conference import CategoryManager
-
-
 favorite_user_table = db.Table(
     'favorite_users',
     db.metadata,
@@ -64,6 +61,7 @@ class FavoriteCategory(db.Model):
 
     @property
     def target(self):
+        from MaKaC.conference import CategoryManager
         try:
             return CategoryManager().getById(self.target_id)
         except KeyError:

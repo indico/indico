@@ -39,6 +39,7 @@ from MaKaC.common.fossilize import Fossilizable, fossilizes
 
 from pytz import all_timezones
 
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.caching import memoize_request
 from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
@@ -124,7 +125,7 @@ class Group(Persistent, Fossilizable):
         if self.containsMember(newMember) or newMember.containsMember(self):
             return
         self.members.append(newMember)
-        if isinstance(newMember, Avatar):
+        if isinstance(newMember, AvatarUserWrapper):
             newMember.linkTo(self, "member")
         self._p_changed = 1
 
@@ -135,7 +136,7 @@ class Group(Persistent, Fossilizable):
         if member is None or member not in self.members:
             return
         self.members.remove(member)
-        if isinstance(member, Avatar):
+        if isinstance(member, AvatarUserWrapper):
             member.unlinkTo(self, "member")
         self._p_changed = 1
 

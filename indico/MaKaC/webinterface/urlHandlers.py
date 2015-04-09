@@ -19,7 +19,7 @@ import re
 import string
 import urlparse
 
-from flask import request, session, url_for, has_request_context
+from flask import request, session, has_request_context
 
 import MaKaC.user as user
 from MaKaC.common.url import URL, EndpointURL
@@ -28,6 +28,7 @@ from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
 
 from indico.core.config import Config
+from indico.modules.users.legacy import AvatarUserWrapper
 
 
 class BooleanMixin:
@@ -1344,7 +1345,7 @@ class UHPrincipalDetails:
     def getURL(cls, member):
         if isinstance(member, user.Group):
             return UHGroupDetails.getURL(member)
-        elif isinstance(member, user.Avatar):
+        elif isinstance(member, AvatarUserWrapper):
             return UHUserDetails.getURL(member)
         else:
             return ''
