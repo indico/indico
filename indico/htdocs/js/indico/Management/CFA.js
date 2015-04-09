@@ -328,6 +328,7 @@ type("AuthorListManager", [], {
                                        'firstName': any(newData.get('firstName'), ''),
                                        'familyName': any(newData.get('familyName'), ''),
                                        'affiliation': any(newData.get('affiliation'), ''),
+                                       'address': any(newData.get('address'), ''),
                                        'email': any(newData.get('email'), ''),
                                        'phone': any(newData.get('phone'), ''),
                                        'isSpeaker': any(newData.get('isSpeaker'), false)
@@ -390,6 +391,7 @@ type("AuthorListManager", [], {
         author['familyName'] = any(newData.get('familyName'), '');
         author['firstName'] = any(newData.get('firstName'), '');
         author['affiliation'] = any(newData.get('affiliation'), '');
+        author['address'] = any(newData.get('address'), '');
         author['email'] = any(newData.get('email'), '');
         author['phone'] = any(newData.get('phone'), '');
     },

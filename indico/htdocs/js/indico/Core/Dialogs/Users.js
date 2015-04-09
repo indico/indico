@@ -1143,6 +1143,7 @@ type("AuthorDataPopup", ["ExclusivePopupWithButtons"],
                [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('familyName'))],
                [$T('First Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('firstName'))],
                [$T('Affiliation'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('affiliation'))],
+               [$T('Address'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('address'))],
                [$T('Email'),  $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'email', false), userData.accessor('email'))],
                [$T('Telephone'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('phone'))]
                ]);
