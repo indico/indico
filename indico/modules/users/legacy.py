@@ -21,7 +21,7 @@ from functools import wraps
 from indico.modules.users.models.users import User
 from indico.util.caching import memoize_request
 from indico.util.fossilize import fossilizes, Fossilizable
-from indico.util.string import to_unicode
+from indico.util.string import to_unicode, return_ascii
 from indico.util.user import retrieve_principals
 
 from MaKaC.common.Locators import Locator
@@ -42,11 +42,12 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     fossilizes(IAvatarFossil, IAvatarMinimalFossil)
 
     def __init__(self, user_id):
-        self.id = user_id
+        self.id = str(user_id)
 
     @property
+    @memoize_request
     def user(self):
-        return User.get(self.id)
+        return User.get(int(self.id))
 
     def getId(self):
         return self.id
@@ -82,10 +83,6 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     def isDisabled(self):
         # The user has been blocked or deleted (due to merge)
         return self.user.is_blocked or self.user.is_deleted
-
-    def isNotConfirmed(self):
-        # Never happens, as we are not storing immediately non-confirmed users
-        return False
 
     def setName(self, name, reindex=False):
         self.user.first_name = to_unicode(name)
@@ -233,7 +230,8 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     def hasSubmittedEvaluation(self, evaluation):
         for submission in evaluation.getSubmissions():
-            if submission.getSubmitter().id == self.id:
+            submitter = submission.getSubmitter()
+            if submitter and submitter.id == self.id:
                 return True
         return False
 
@@ -302,5 +300,6 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     def setLang(self, lang):
         self.user.settings.set('lang', to_unicode(lang))
 
+    @return_ascii
     def __repr__(self):
-        return "<AvatarUserWrapper {}: {} ({})>".format(self.id, self.user.full_name, self.user.email)
+        return u'<AvatarUserWrapper {}: {} ({})>'.format(self.id, self.user.full_name, self.user.email)
