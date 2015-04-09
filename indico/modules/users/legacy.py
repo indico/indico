@@ -250,7 +250,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return self.canUserModify(aw_or_user)
 
     def canUserModify(self, avatar):
-        return avatar.id == self.id or self.user.is_admin
+        return avatar.id == self.id or avatar.user.is_admin
 
     def getLocator(self):
         d = Locator()
