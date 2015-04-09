@@ -11,11 +11,11 @@
     <div class="topBar" style="margin-bottom: 10px">
         <div class="content smaller">
             <span id="futureEventsShow">
-                There are ${ numOfEventsInTheFuture } events in the <em>future</em>.
-                <span class="fakeLink futureEventsLink">Show them.</span>
+		 There are ${ numOfEventsInTheFuture } events in the <em>future</em>.
+		 <span class="fakeLink futureEventsLink">Show them.</span>
             </span>
             <span id="futureEventsHide" style="display: none;">
-                <span class="fakeLink futureEventsLink">Hide</span> the events in the future (${ numOfEventsInTheFuture })
+		 <span class="fakeLink futureEventsLink">Hide</span> the events in the future (${ numOfEventsInTheFuture })
             </span>
         </div>
     </div>
@@ -34,11 +34,11 @@
         <div class="content smaller">
             <span id="pastEventsText">
                 <span id="pastEventsShow" class="pastEventsControl">
-                    There are ${ numOfEventsInThePast } events in the <em>past</em>.
-                    <span class="fakeLink pastEventsLink">Show them.</span>
+		     There are ${ numOfEventsInThePast } events in the <em>past</em>.
+		     <span class="fakeLink pastEventsLink">Show them.</span>
                 </span>
                 <span id="pastEventsHide" class="pastEventsControl" style="display: none;">
-                    <span class="fakeLink pastEventsLink">Hide</span> the events in the past (${ numOfEventsInThePast })
+		     <span class="fakeLink pastEventsLink">Hide</span> the events in the past (${ numOfEventsInThePast })  
                 </span>
                 <span id="loadingPast" class="loadingPast"><em>fetching past events...</em></span>
             </span>

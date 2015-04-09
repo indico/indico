@@ -18,7 +18,7 @@
       <small> ${ _("Change password") }</small>
     </a>
     % else:
-    External account
+    ${ _("External account") }
     % endif
   </td>
 </td>

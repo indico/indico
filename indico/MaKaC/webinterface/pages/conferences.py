@@ -5241,10 +5241,12 @@ class WConfMyStuffMySessions(WConfDisplayBodyBase):
             res.append("""
                 <tr class="infoTR">
                     <td class="infoTD" width="100%%">%s</td>
-                    <td nowrap class="infoTD"><a href=%s>Edit</a><span class="horizontalSeparator">|</span><a href=%s>View</a></td>
+                    <td nowrap class="infoTD"><a href=%s>%s</a><span class="horizontalSeparator">|</span><a href=%s>%s</a></td>
                 </tr>""" % (self.htmlText(s.getTitle()),
                             quoteattr(str(modURL)),
-                            quoteattr(str(dispURL))))
+                            _("Edit"),
+                            quoteattr(str(dispURL)),
+                            _("View")))
         return """
             <table class="infoTable" cellspacing="0" width="100%%">
                 <tr>
@@ -5329,9 +5331,10 @@ class WConfMyStuffMyTracks(WConfDisplayBodyBase):
             res.append("""
                 <tr class="infoTR">
                     <td class="infoTD" width="100%%">%s</td>
-                    <td nowrap class="infoTD"><a href=%s>Edit</a></td>
+                    <td nowrap class="infoTD"><a href=%s>%s</a></td>
                 </tr>""" % (self.htmlText(t.getTitle()),
-                            quoteattr(str(modURL))))
+                            quoteattr(str(modURL)),
+                            _("Edit")))
         return """
             <table class="infoTable" cellspacing="0" width="100%%">
                 <tr>

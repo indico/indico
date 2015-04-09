@@ -917,7 +917,7 @@ type("ContributionsPopup", ["ExclusivePopup"], {
             }
 
             if (contrib.presenters.length > 0) {
-                var speakers = Html.span({style: {marginTop: pixels(5), display: 'block'}}, Html.strong({}, 'Presenter(s): '));
+                var speakers = Html.span({style: {marginTop: pixels(5), display: 'block'}}, Html.strong({}, $T('Presenter(s): ')));
 
                 var i = 0;
                 each(contrib.presenters, function(p) {
@@ -931,12 +931,12 @@ type("ContributionsPopup", ["ExclusivePopup"], {
             }
 
             if (contrib.room && contrib.room !== '') {
-                var room = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, 'Room: '), contrib.room);
+                var room = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, $T('Room: ')), contrib.room);
                 infoDiv.append(room);
             }
 
             if (contrib.location && contrib.location !== '') {
-                var location = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, 'Location: '), contrib.location);
+                var location = Html.span({style: {marginTop: pixels(3), display: 'block'}}, Html.strong({}, $T('Location: ')), contrib.location);
                 infoDiv.append(location);
             }
 

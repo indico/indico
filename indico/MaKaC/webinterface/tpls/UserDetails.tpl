@@ -184,14 +184,14 @@ var beforeEdit = function(field, widget) {
             .format(authenticatorName),
         function(confirmed){
             if(confirmed || _.contains(unlockedFields, field)){
-                widget.modeChooser.set("edit");
+                widget.modeChooser.set($T("edit"));
         }
     });
 
     if (!_.contains(unlockedFields, field)) {
         syncPopup.open();
     } else {
-        widget.modeChooser.set("edit");
+        widget.modeChooser.set($T("edit"));
     }
 
     return false;

@@ -5,7 +5,7 @@ from MaKaC.webinterface.urlHandlers import UHConferenceModification
 <div class="banner">
 
     <div style="float: right; height: 20px; line-height: 20px;padding:0px;" class="eventModifButtonBar">
-        <div style="border-bottom:1px solid #AAA;"><span class="eventActionsToolBarLabel"><strong>Event</strong> actions</span></div>
+        <div style="border-bottom:1px solid #AAA;"><span class="eventActionsToolBarLabel"><strong>${_("Event")}</strong>${_(" actions")}</span></div>
         <div class="eventActionsToolBarButtons">
           <a style="vertical-align: middle;" href="${ urlHandlers.UHConfClone.getURL(conf) }">
               ${ _("Clone") }<div class="leftCorner"></div>

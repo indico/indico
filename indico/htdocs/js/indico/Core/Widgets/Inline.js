@@ -1325,14 +1325,14 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
                          // save it, in case we need to come back to edit mode;
                          self._handleSave();
                      }
-             }, 'Save'));
+             }, $T('Save')));
 
              var editButtons = Html.span({},
                                          this.saveButton,
                                          Widget.button(command(function() {
                                              // back to the start
                                              self.setMode('display');
-                                         }, 'Cancel')));
+                                         }, $T('Cancel'))));
 
 
              // there are two possible states for the "switch" area
@@ -1349,7 +1349,7 @@ type("InlineEditWidget", ["InlineRemoteWidget"],
                                      Widget.link(command(function() {
                                          self.setMode('edit');
                                          return false;
-                                     }, '(edit)')));
+                                     }, $T('(edit)'))));
          },
 
          _handleContent: function(mode) {
@@ -1702,7 +1702,7 @@ type("InputEditWidget", ["InlineEditWidget", "ErrorAware"],
                     var content = Html.span({}, value);
                 }
                 else{
-                    var content = Html.em({}, "No text");
+                    var content = Html.em({}, $T("No text"));
                 }
                 return content;
             },

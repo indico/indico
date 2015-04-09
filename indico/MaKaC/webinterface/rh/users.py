@@ -408,7 +408,7 @@ class RHUserIdentityCreation(RHUserIdentityBase):
             authManager = AuthenticatorMgr()
             #first, check if login is free
             if not authManager.isLoginAvailable(self._login):
-                msg += "Sorry, the login you requested is already in use. Please choose another one.<br>"
+                msg += _("Sorry, the login you requested is already in use. Please choose another one.")+"<br>"
                 ok = False
             if not self._pwd:
                 msg += "you must enter a password<br>"
