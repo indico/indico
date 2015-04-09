@@ -54,17 +54,20 @@ def js_vars_global():
 @assets_blueprint.route('/js-vars/user.js')
 def js_vars_user():
     """
-    Provides a JS file with global definitions (all users)
-    Useful for server-wide config options, URLs, etc...
+    Provides a JS file with user-specific definitions
+    Useful for favorites, settings etc.
     """
-    # TODO: set MIME type
-
-    if session.new_user:
-        favorites = {user.id: serialize_user(user) for user in session.new_user.favorite_users}
-        data = render_template('assets/vars_user.js', favorites=favorites, user=session.new_user)
+    user = session.new_user
+    if user is None:
+        user_vars = {}
     else:
-        data = ''
-
+        user_vars = {
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'favorite_users': {u.id: serialize_user(u) for u in user.favorite_users}
+        }
+    data = render_template('assets/vars_user.js', user_vars=user_vars, user=user)
     return Response(data, mimetype='application/x-javascript')
 
 
