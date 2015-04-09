@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import (admins, announcement, taskManager, maintenance, domains, users, groups, templates,
-                                   conferenceModif, services, api, oauth)
+                                   conferenceModif, services, oauth)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 

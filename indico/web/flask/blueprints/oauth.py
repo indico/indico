@@ -27,6 +27,5 @@ oauth.add_url_rule('/oauth/request_token', 'oauth-request_token', oauth_rh.RHOAu
 
 # User endpoints: App list and authorization
 with oauth.add_prefixed_rules('/user-old/<userId>', '/user-old'):
-    oauth.add_url_rule('/oauth', 'oauth-userThirdPartyAuth', oauth_rh.RHOAuthUserThirdPartyAuth)
     oauth.add_url_rule('/oauth/authorize', 'oauth-thirdPartyAuth', oauth_rh.RHOAuthThirdPartyAuth)
     oauth.add_url_rule('/oauth/authorize_consumer', 'oauth-authorize_consumer', oauth_rh.RHOAuthAuthorizeConsumer)

@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import login, users, api
+from MaKaC.webinterface.rh import login, users
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -33,9 +33,6 @@ user.add_url_rule('/login/not-activated', 'signIn-unactivatedAccount', login.RHU
 # Passwords
 user.add_url_rule('/reset-password', 'signIn-sendLogin', login.RHSendLogin, methods=('POST',))
 user.add_url_rule('/reset-password/<token>', 'signIn-resetPassword', login.RHResetPassword, methods=('GET', 'POST'))
-with user.add_prefixed_rules('/<userId>'):
-    user.add_url_rule('/account/change-password', 'identityCreation-changePassword', users.RHUserIdentityChangePassword,
-                      methods=('GET', 'POST'))
 
 # Registration
 user.add_url_rule('/register/activate', 'signIn-active', login.RHActive)
@@ -44,26 +41,7 @@ user.add_url_rule('/register', 'userRegistration', users.RHUserCreation, methods
 user.add_url_rule('/register/exists', 'userRegistration-UserExist', users.RHUserExistWithIdentity)
 user.add_url_rule('/register/success', 'userRegistration-created', users.RHUserCreated, methods=('GET', 'POST'))
 
-# Confirm email
-user.add_url_rule('/account/confirm-email/<token>', 'confirm_email', users.RHConfirmEmail)
-
 with user.add_prefixed_rules('!/user-old/<userId>', '!/user-old'):
-    # Identities
-    user.add_url_rule('/account/create-identity', 'identityCreation', users.RHUserIdentityCreation)
-    user.add_url_rule('/account/create-identity', 'identityCreation-create', users.RHUserIdentityCreation,
-                      methods=('POST',))
-    user.add_url_rule('/account/delete-identity', 'identityCreation-remove', users.RHUserRemoveIdentity,
-                      methods=('POST',))
+    # XXX: legacy, to be rewritten+removed
     user.add_url_rule('/account/disable', 'userRegistration-disable', users.RHUserDisable, methods=('GET', 'POST'))
     user.add_url_rule('/account/activate', 'userRegistration-active', users.RHUserActive, methods=('GET', 'POST'))
-
-    # Dashboard, Favorites, etc.
-    user.add_url_rule('/dashboard', 'userDashboard', users.RHUserDashboard)
-    user.add_url_rule('/account/', 'userDetails', users.RHUserDetails)
-    user.add_url_rule('/preferences', 'userPreferences', users.RHUserPreferences)
-
-    # API Keys
-    user.add_url_rule('/api', 'userAPI', api.RHUserAPI)
-    user.add_url_rule('/api/block', 'userAPI-block', api.RHUserAPIBlock, methods=('POST',))
-    user.add_url_rule('/api/create', 'userAPI-create', api.RHUserAPICreate, methods=('POST',))
-    user.add_url_rule('/api/delete', 'userAPI-delete', api.RHUserAPIDelete, methods=('POST',))

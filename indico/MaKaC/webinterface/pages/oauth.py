@@ -16,11 +16,10 @@
 
 from indico.util.date_time import format_datetime
 from indico.modules.oauth.db import ConsumerHolder, AccessTokenHolder
-from indico.core.index import Catalog
 from indico.core.logger import Logger
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.base import WPDecorated
-from MaKaC.webinterface.pages.admins import WPServicesCommon, WPPersonalArea
+from MaKaC.webinterface.pages.admins import WPServicesCommon
 from MaKaC.webinterface.wcomponents import WTemplated
 
 
@@ -101,28 +100,4 @@ class WOAuthThirdPartyAuth(WTemplated):
         wvars["allowURL"] = str(allowURL)
         wvars["refuseURL"] = str(refuseURL)
 
-        return wvars
-
-
-class WPOAuthUserThirdPartyAuth(WPPersonalArea):
-
-    def _getTabContent(self, params):
-        c = WOAuthUserThirdPartyAuth(self._avatar)
-        return c.getHTML(params)
-
-    def _setActiveTab(self):
-        self._tabThirdPartyAuth.setActive()
-
-
-class WOAuthUserThirdPartyAuth(WTemplated):
-
-    def __init__(self, av):
-        self._avatar = av
-
-    def getVars(self):
-        wvars = WTemplated.getVars(self)
-        wvars['user'] = self._avatar
-        wvars['currentUser'] = self._rh._getUser()
-        wvars["tokens"] = Catalog.getIdx('user_oauth_access_token').get(self._avatar.getId(), [])
-        wvars["formatTimestamp"] = lambda ts: format_datetime(ts, format='d/M/yyyy H:mm')
         return wvars

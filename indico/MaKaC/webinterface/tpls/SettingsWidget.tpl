@@ -16,9 +16,9 @@
         </form>
     </div>
     % if currentUser:
-        <div class="settingsWidgetSection"><a href="${ urlHandlers.UHUserDashboard.getURL(currentUser) }">${ _("My profile") }</a></div>
-        <div class="settingsWidgetSection"><a href="${ urlHandlers.UHUserPreferences.getURL(currentUser) }">${ _("My preferences") }</a></div>
-        % if currentUser.isAdmin():
+        <div class="settingsWidgetSection"><a href="${ url_for('users.user_dashboard') }">${ _("My profile") }</a></div>
+        <div class="settingsWidgetSection"><a href="${ url_for('users.user_preferences') }">${ _("My preferences") }</a></div>
+        % if _session.new_user.is_admin:
             <div class="settingsWidgetSection"><a href="#" class="login-as">${ _("Login as...") }</a></div>
         % endif
         % if 'login_as_orig_user' in _session:

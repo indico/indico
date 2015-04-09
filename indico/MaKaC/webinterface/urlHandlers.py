@@ -1260,48 +1260,14 @@ class UHUserDisable(UserURLHandler):
     _endpoint = 'user.userRegistration-disable'
 
 
-class UHUserDashboard(UserURLHandler):
-    _endpoint = 'user.userDashboard'
-
-
 class UHUserDetails(UserURLHandler):
-    _endpoint = 'user.userDetails'
-
-
-class UHUserBaskets(UserURLHandler):
-    _endpoint = 'user.userBaskets'
-
-
-class UHUserPreferences(UserURLHandler):
-    _endpoint = 'user.userPreferences'
-
-
-class UHUserAPI(UserURLHandler):
-    _endpoint = 'user.userAPI'
-
-
-class UHUserAPICreate(UserURLHandler):
-    _endpoint = 'user.userAPI-create'
-
-
-class UHUserAPIBlock(UserURLHandler):
-    _endpoint = 'user.userAPI-block'
-
-
-class UHUserAPIDelete(UserURLHandler):
-    _endpoint = 'user.userAPI-delete'
+    # XXX: This UH is deprecated. It's just kept around to have a
+    # quick reference to find code that needs to be rewritten/removed.
+    _endpoint = None
 
 
 class UHUserRegistration(URLHandler):
     _endpoint = 'user.userRegistration'
-
-
-class UHUserIdentityCreation(UserURLHandler):
-    _endpoint = 'user.identityCreation'
-
-
-class UHUserRemoveIdentity(UserURLHandler):
-    _endpoint = 'user.identityCreation-remove'
 
 
 class UHUserExistWithIdentity(UHConfUser):
@@ -1310,10 +1276,6 @@ class UHUserExistWithIdentity(UHConfUser):
 
 class UHUserIdPerformCreation(UserURLHandler):
     _endpoint = 'user.identityCreation-create'
-
-
-class UHUserIdentityChangePassword(UserURLHandler):
-    _endpoint = 'user.identityCreation-changePassword'
 
 
 class UHGroups(URLHandler):
