@@ -1399,8 +1399,8 @@ class Submission(Persistent):
                 submitter -- [Avatar/None] submitter who submitted this submission.
         """
         self._evaluation = evaluation
+        self._id = str(evaluation._getSubmissionCounter().newCount())
         self.setSubmitter(submitter)
-        self._id = str( evaluation._getSubmissionCounter().newCount() )
         self._answers = []
         self.submissionDate = nowutc()
         self.modificationDate = None

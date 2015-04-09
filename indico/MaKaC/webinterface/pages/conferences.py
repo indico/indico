@@ -269,20 +269,19 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             self._downloadTemplateOpt.setVisible(False)
 
         if awUser is not None:
-
-            conferenceRoles = awUser.getLinkedTo()["conference"]
+            conferenceRoles = awUser.user.get_linked_roles('conference')
 
             if "paperReviewManager" in conferenceRoles:
-                if self._conf in awUser.getLinkedTo()["conference"]["paperReviewManager"]:
+                if self._conf in awUser.user.get_linked_objects('conference', 'paperReviewManager'):
                     self._paperReviewingMgtOpt.setVisible(True)
                     self._assignContribOpt.setVisible(True)
                     self._uploadPaperOpt.setVisible(len(lc)>0)
                     self._downloadTemplateOpt.setVisible(True)
 
             if "referee" in conferenceRoles and "editor" in conferenceRoles and "reviewer" in conferenceRoles:
-                showrefereearea = self._conf in awUser.getLinkedTo()["conference"]["referee"]
-                showreviewerarea = self._conf in awUser.getLinkedTo()["conference"]["reviewer"]
-                showeditorarea = self._conf in awUser.getLinkedTo()["conference"]["editor"]
+                showrefereearea = self._conf in awUser.user.get_linked_objects('conference', 'referee')
+                showreviewerarea = self._conf in awUser.user.get_linked_objects('conference', 'reviewer')
+                showeditorarea = self._conf in awUser.user.get_linked_objects('conference', 'editor')
 
                 if showrefereearea and (self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_REVIEWING or self._conf.getConfPaperReview().getChoice() == CPR.CONTENT_AND_LAYOUT_REVIEWING):
                     self._assignContribOpt.setVisible(True)

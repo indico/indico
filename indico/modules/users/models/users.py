@@ -271,6 +271,10 @@ class User(db.Model):
         secondary.is_primary = True
         db.session.flush()
 
+    def get_linked_roles(self, type_):
+        """Retrieves the roles the user is linked to for a given type"""
+        return UserLink.get_linked_roles(self, type_)
+
     def get_linked_objects(self, type_, role):
         """Retrieves linked objects for the user"""
         return UserLink.get_links(self, type_, role)

@@ -99,6 +99,14 @@ class UserLink(db.Model):
         return {x.object for x in user.linked_objects.filter_by(type=type_, role=role) if x.object is not None}
 
     @classmethod
+    def get_linked_roles(cls, user, type_):
+        query = (db.session
+                 .query(db.distinct(UserLink.role))
+                 .with_parent(user, 'linked_objects')
+                 .filter_by(type=type_))
+        return {x[0] for x in query}
+
+    @classmethod
     def create_link(cls, user, obj, role, type_=None):
         if type_ is None:
             type_ = cls._get_type(obj, role)
