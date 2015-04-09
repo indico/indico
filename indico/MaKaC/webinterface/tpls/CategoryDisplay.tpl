@@ -266,7 +266,7 @@ $(document).ready(function(){
                         if ($(this).hasClass('enabled')) {
                             return $T("Remove from your favorites");
                         } else {
-                            return format($T('<h3>Add to your favorites</h3><p>This will make events in this category visible on your <a href="{0}">Dashboard</a>.</p>'), [${str(urlHandlers.UHUserDashboard().getURL()) | n,j}]);
+                            return format($T('<h3>Add to your favorites</h3><p>This will make events in this category visible on your <a href="{0}">Dashboard</a>.</p>'), [${url_for('users.user_dashboard') | n,j}]);
                         }
                     }
                 }
