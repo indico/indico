@@ -19,7 +19,7 @@ import operator
 from BTrees.OOBTree import OOTreeSet, union
 
 from persistent import Persistent
-from accessControl import AdminList, AccessWrapper
+from accessControl import AccessWrapper
 import MaKaC
 from MaKaC.common import filters, indexes
 from MaKaC.common.cache import GenericCache
@@ -184,8 +184,7 @@ class Group(Persistent, Fossilizable):
         return self.canUserModify(aw_or_user)
 
     def canUserModify(self, user):
-        return self.containsMember(user) or \
-                                (user in AdminList.getInstance().getList())
+        return self.containsMember(user) or user.user.is_admin
 
     def getLocator(self):
         d = Locator()

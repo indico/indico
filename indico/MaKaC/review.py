@@ -28,7 +28,6 @@ from datetime import datetime, timedelta
 import MaKaC
 from MaKaC.common.Counter import Counter
 from MaKaC.errors import MaKaCError, NoReportError
-from MaKaC.accessControl import AdminList
 from MaKaC.trashCan import TrashCanManager
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _

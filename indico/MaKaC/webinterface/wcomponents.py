@@ -36,7 +36,6 @@ from MaKaC.common import info
 from MaKaC import domain
 from MaKaC.webinterface import urlHandlers
 from indico.core import config as Configuration
-from MaKaC.accessControl import AdminList
 from MaKaC.common.url import URL
 from indico.core.config import Config
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
@@ -312,11 +311,10 @@ class WHeader(WTemplated):
         vars['protectionDisclaimerProtected'] = minfo.getProtectionDisclaimerProtected()
         vars['protectionDisclaimerRestricted'] = minfo.getProtectionDisclaimerRestricted()
         #Build a list of items for the administration menu
-        adminList = AdminList.getInstance()
         adminItemList = []
-        if self._currentuser:
-            if self._currentuser.isAdmin() or not adminList.getList():
-                adminItemList.append({'id': 'serverAdmin', 'url': urlHandlers.UHAdminArea.getURL(), 'text': _("Server admin")})
+        if session.new_user and session.new_user.is_admin:
+            adminItemList.append({'id': 'serverAdmin', 'url': urlHandlers.UHAdminArea.getURL(),
+                                  'text': _("Server admin")})
 
         vars["adminItemList"] = adminItemList
         vars['extra_items'] = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))

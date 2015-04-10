@@ -228,7 +228,7 @@ class AccessController(Persistent):
         return any(domain.belongsTo(ip) for domain in self.getRequiredDomainList())
 
     def isAdmin(self, av):
-        return AdminList.getInstance().isAdmin(av)
+        return av.user.is_admin
 
     def canUserAccess(self, av):
         if self.isAdmin(av):
@@ -294,9 +294,9 @@ class AccessController(Persistent):
             self._p_changed = 1
         signals.acl.modification_revoked.send(self, principal=principal)
 
-    def canModify( self, user ):
+    def canModify(self, user):
         """tells whether the specified user has modification privileges"""
-        if AdminList.getInstance().isAdmin( user ):
+        if user.user.is_admin:
             return True
 
         for principal in self.managers:
@@ -480,64 +480,6 @@ class CategoryAC(AccessController):
 
     def __init__( self ):
         pass
-
-
-
-class _AdminList(Persistent):
-
-    def __init__(self):
-        self.__list = []
-
-    def grant( self, user ):
-        if user not in self.__list:
-            self.__list.append( user )
-            self._p_changed=1
-
-    def revoke( self, user ):
-        if user in self.__list:
-            self.__list.remove( user )
-            self._p_changed=1
-        else:
-            # TODO: this is just a workaround for users which id
-            # is "Nice:jbgl@cern.ch"
-            for u in self.__list:
-                if u.getEmail() in user.getEmails():
-                    self.__list.remove(u)
-                    self._p_changed=1
-                    break
-
-    def revokeById( self, userId ):
-        for u in self.__list:
-            if u.getId() == userId:
-                self.__list.remove(u)
-                self._p_changed=1
-                return True
-        else:
-            return False
-
-    def isAdmin( self, user ):
-        if user in self.__list:
-            return True
-        from MaKaC.user import Group
-        for p in self.__list:
-            if isinstance(p, Group) and p.containsUser(user):
-                return True
-        return False
-
-    def getList( self ):
-        return self.__list
-
-
-class AdminList:
-
-    def getInstance( self ):
-        dbroot = DBMgr.getInstance().getDBConnection().root()
-        if dbroot.has_key("adminlist"):
-            return dbroot["adminlist"]
-        al = _AdminList()
-        dbroot["adminlist"] = al
-        return al
-    getInstance = classmethod(getInstance)
 
 
 class AccessWrapper:

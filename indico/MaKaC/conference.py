@@ -40,6 +40,7 @@ from MaKaC.common.url import ShortURLMapper
 from MaKaC.contributionReviewing import Review
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
+from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.i18n import L_
 from indico.util.string import safe_upper, safe_slice, fix_broken_string, return_ascii
@@ -74,7 +75,7 @@ from MaKaC.common import utils
 from MaKaC.common.Counter import Counter
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.Locators import Locator
-from MaKaC.accessControl import AccessController, AdminList
+from MaKaC.accessControl import AccessController
 from MaKaC.errors import MaKaCError, TimingError, ParentTimingError, EntryTimingError, NotFoundError, FormValuesError
 from MaKaC import registration
 from MaKaC.evaluation import Evaluation
@@ -4847,13 +4848,11 @@ class DefaultConference(Conference):
         pass
 
     def __init__(self):
-        """ Default constructor
-        """
-        try:
-            Conference.__init__(self, AdminList.getInstance().getList()[0], "default")
-        except IndexError:
+        admin = User.find_first(is_admin=True)
+        if admin is None:
             raise MaKaCError(_("""There are no admin users. The "default" conference that stores the template cannot be created.
                                 Please add at least 1 user to the admin list."""))
+        Conference.__init__(self, admin.as_avatar, "default")
 
 
 class ConferenceHolder( ObjectHolder ):

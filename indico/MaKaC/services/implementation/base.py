@@ -340,18 +340,9 @@ class AdminService(LoggedOnlyService):
     """
     A AdminService can only be accessed by administrators
     """
-    def _checkProtection( self ):
-        """
-        Overloads ProtectedService._checkProtection
-        """
-
+    def _checkProtection(self):
         LoggedOnlyService._checkProtection(self)
-
-        # If there are no administrators, allow to add one
-        # Otherwise, forbid access to users that are not admin
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        adminList = minfo.getAdminList()
-        if not self._getUser().isAdmin() and len( adminList.getList() ) !=0 :
+        if not session.new_user.is_admin:
             raise ServiceAccessError(_("Only administrators can perform this operation"))
 
 class TextModificationBase:

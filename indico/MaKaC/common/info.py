@@ -221,16 +221,6 @@ class MaKaCInfo(Persistent):
             tz = 'UTC'
         self._timezone = tz
 
-    def getAdminList( self ):
-        from MaKaC.accessControl import AdminList
-        return AdminList.getInstance()
-
-    def getAdminEmails( self ):
-        emails = []
-        for admin in self.getAdminList().getList():
-            emails.append(admin.getEmail())
-        return emails
-
     def getDefaultConference( self ):
         try:
             self._defaultConference

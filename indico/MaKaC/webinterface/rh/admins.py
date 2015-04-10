@@ -27,26 +27,6 @@ from MaKaC.webinterface.rh.base import RHProtected
 from indico.util.i18n import _
 
 
-class RCAdmin(object):
-    @staticmethod
-    def hasRights(request = None, user = None):
-        """ Returns True if the user is a Server Admin
-            request: an RH or Service object
-            user: an Avatar object
-            If user is not None, the request object will be used to check the user's privileges.
-            Otherwise the user will be retrieved from the request object
-        """
-        if user is None:
-            if request is None:
-                return False
-            else:
-                user = request._getUser()
-
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        serverAdmins = minfo.getAdminList()
-        return serverAdmins.isAdmin(user)
-
-
 class RHAdminBase(RHProtected):
     def _checkParams(self, params):
         RHProtected._checkParams(self, params)
@@ -56,10 +36,7 @@ class RHAdminBase(RHProtected):
         RHProtected._checkProtection(self)
         if not session.user and not self._doProcess:
             return
-        self._al = HelperMaKaCInfo.getMaKaCInfoInstance().getAdminList()
-        if not session.user.isAdmin():
-            if not self._al.getList():  # XXX can we just fail here instead of pretending the user is an admin?!
-                return
+        if not session.new_user.is_admin:
             raise AdminError("area")
 
 

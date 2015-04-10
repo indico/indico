@@ -14,13 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
+
 import MaKaC.webinterface.pages.base as base
 import MaKaC.webinterface.wcomponents as wcomponents
-import MaKaC.accessControl as accessControl
 from MaKaC.common import timezoneUtils
 from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.conference import Category, Conference
+
 
 class WPMainBase(base.WPDecorated):
 
@@ -35,8 +37,7 @@ class WPMainBase(base.WPDecorated):
         self._setCurrentMenuItem()
 
         # Check if user is administrator
-        adminList = accessControl.AdminList.getInstance()
-        self._isAdmin = ( not adminList.getList() and self._getAW().getUser() != None ) or adminList.isAdmin( self._getAW().getUser() )
+        self._isAdmin = session.new_user.is_admin
         self._isCategoryManager = self._isAdmin or \
                                   isinstance(self._rh.getTarget(), Category) and self._rh.getTarget().canModify(self._getAW()) or \
                                   isinstance(self._rh.getTarget(), Conference) and self._rh.getTarget().getOwnerList()!=[] and self._rh.getTarget().getOwner().canModify(self._getAW())

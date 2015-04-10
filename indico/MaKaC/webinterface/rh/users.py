@@ -15,27 +15,21 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import re
-from flask import flash, request, session
+from flask import session
 
-import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.admins as admins
 import MaKaC.webinterface.pages.admins as adminPages
 import MaKaC.common.info as info
 import MaKaC.errors as errors
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.accessControl import AdminList
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common import pendingQueues
-from MaKaC.common.cache import GenericCache
-from MaKaC.errors import MaKaCError, NotFoundError, NoReportError
+from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.user import Avatar, AvatarHolder, LoginInfo
 from MaKaC.webinterface import mail
 from MaKaC.webinterface.rh.base import RH, RHProtected
 from indico.core.db import DBMgr
 from indico.util.i18n import _
-from indico.util.redis import suggestions
-from indico.util.redis import write_client as redis_write_client
-from indico.web.flask.util import url_for
 
 
 class RHUserManagementSwitchAuthorisedAccountCreation(admins.RHAdminBase):
@@ -89,7 +83,7 @@ class RHUserCreation(RH):
 
     def _checkProtection(self):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if self._aw.getUser() and self._aw.getUser() in minfo.getAdminList().getList():
+        if self._aw.getUser() and self._aw.getUser().user.is_admin:
             return
         if not minfo.getAuthorisedAccountCreation():
             raise MaKaCError(_("User registration has been disabled by the site administrator"))
@@ -184,7 +178,7 @@ class RHUserCreation(RH):
             if "cpEmail" in self._params:
                 ph = pendingQueues.PendingQueuesHolder()
                 cp = ph.getFirstPending(self._params["cpEmail"])
-            if self._aw.getUser() and self._aw.getUser() in minfo.getAdminList().getList():
+            if self._aw.getUser() and self._aw.getUser().user.is_admin:
                 p = adminPages.WPUserCreation(self, self._params, cp)
             else:
                 p = adminPages.WPUserCreationNonAdmin(self, self._params, cp)
@@ -203,8 +197,7 @@ class RHUserCreated(RH):
         self._av = AvatarHolder().getById(params["userId"])
 
     def _process(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if self._aw.getUser() and self._aw.getUser() in minfo.getAdminList().getList():
+        if self._aw.getUser() and self._aw.getUser().user.is_admin:
             p = adminPages.WPUserCreated(self, self._av)
         else:
             p = adminPages.WPUserCreatedNonAdmin(self, self._av)
@@ -217,8 +210,7 @@ class RHUserExistWithIdentity(RH):
         self._av = AvatarHolder().getById(params["userId"])
 
     def _process(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        if self._aw.getUser() and self._aw.getUser() in minfo.getAdminList().getList():
+        if self._aw.getUser() and self._aw.getUser().user.is_admin:
             p = adminPages.WPUserExistWithIdentity(self, self._av)
         else:
             p = adminPages.WPUserExistWithIdentityNonAdmin(self, self._av)
@@ -284,8 +276,7 @@ class RHUserBase(RHProtected):
 class RHUserActive(RHUserBase):
 
     def _checkProtection(self):
-        al = AdminList.getInstance()
-        if not (self._aw.getUser() in al.getList()):
+        if not session.new_user.is_admin:
             raise errors.AccessError("user status")
 
     def _process(self):
@@ -299,8 +290,7 @@ class RHUserActive(RHUserBase):
 class RHUserDisable(RHUserBase):
 
     def _checkProtection(self):
-        al = AdminList.getInstance()
-        if not (self._aw.getUser() in al.getList()):
+        if not session.new_user.is_admin:
             raise errors.AccessError("user status")
 
     def _process(self):
