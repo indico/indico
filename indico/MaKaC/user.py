@@ -475,47 +475,6 @@ class Avatar(Persistent, Fossilizable):
         from indico.modules.api.models.keys import APIKey
         return APIKey.find_first(user_id=int(self.id), is_active=True)
 
-    def getRelatedCategories(self):
-        favorites = self.getLinkTo('category', 'favorite')
-        managed = self.getLinkTo('category', 'manager')
-        res = {}
-        for categ in union(favorites, managed):
-            res[(categ.getTitle(), categ.getId())] = {
-                'categ': categ,
-                'favorite': categ in favorites,
-                'managed': categ in managed,
-                'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
-            }
-        return OrderedDict(sorted(res.items(), key=operator.itemgetter(0)))
-
-    def getSuggestedCategories(self):
-        if not redis_write_client:
-            return []
-        related = union(self.getLinkTo('category', 'favorite'), self.getLinkTo('category', 'manager'))
-        res = []
-        for id, score in suggestions.get_suggestions(self, 'category').iteritems():
-            try:
-                categ = MaKaC.conference.CategoryManager().getById(id)
-            except KeyError:
-                suggestions.unsuggest(self, 'category', id)
-                continue
-            if not categ or categ.isSuggestionsDisabled() or categ in related:
-                continue
-            if any(p.isSuggestionsDisabled() for p in categ.iterParents()):
-                continue
-            aw = AccessWrapper()
-            aw.setUser(self)
-            if request:
-                aw.setIP(request.remote_addr)
-            if not categ.canAccess(aw):
-                continue
-            res.append({
-                'score': score,
-                'categ': categ,
-                'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
-            })
-        return res
-
     def resetLinkedTo(self):
         self.linkedTo = {}
         self.updateLinkedTo()

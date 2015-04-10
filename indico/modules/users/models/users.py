@@ -285,7 +285,7 @@ class User(db.Model):
         :param obj: a legacy object
         :param role: the role to use in the link
         """
-        UserLink.create_link(self, obj, role)
+        return UserLink.create_link(self, obj, role)
 
     def unlink_to(self, obj, role):
         """Removes a link between the user and an object
@@ -293,4 +293,4 @@ class User(db.Model):
         :param obj: a legacy object
         :param role: the role to use in the link
         """
-        UserLink.remove_link(self, obj, role)
+        return UserLink.remove_link(self, obj, role)

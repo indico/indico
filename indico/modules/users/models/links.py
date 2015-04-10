@@ -112,14 +112,19 @@ class UserLink(db.Model):
             type_ = cls._get_type(obj, role)
         data = cls._get_link_data(obj, type_)
         if data['locator']:
-            user.linked_objects.append(cls(type=type_, role=role, data=data))
+            link = cls(type=type_, role=role, data=data)
+            user.linked_objects.append(link)
+            return link
 
     @classmethod
     def remove_link(cls, user, obj, role):
+        removed = set()
         type_ = cls._get_type(obj, role)
         for link in user.linked_objects.filter_by(type=type_, role=role).all():
             if link.object == obj:
                 user.linked_objects.remove(link)
+                removed.add(link)
+        return removed
 
     @classmethod
     def _get_type(cls, obj, role=None):

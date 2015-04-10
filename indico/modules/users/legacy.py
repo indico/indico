@@ -23,6 +23,8 @@ from indico.util.caching import memoize_request
 from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.string import to_unicode, return_ascii
 from indico.util.user import retrieve_principals
+from indico.util.redis import write_client as redis_write_client
+from indico.util.redis import avatar_links, suggestions
 
 from MaKaC.common.Locators import Locator
 from MaKaC.fossils.user import IAvatarFossil, IAvatarMinimalFossil
@@ -61,14 +63,22 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         # TODO: log deleted users?
 
         if not self.user.is_deleted:
-            self.user.link_to(obj, role)
+            link = self.user.link_to(obj, role)
+            if link and redis_write_client:
+                event = avatar_links.event_from_obj(obj)
+                if event:
+                    avatar_links.add_link(self, event, '{}_{}'.format(link.type, link.role))
 
     def unlinkTo(self, obj, role):
         # deleted users shouldn't be able to be linked
         # TODO: log deleted users?
-
         if not self.user.is_deleted:
-            self.user.unlink_to(obj, role)
+            links = self.user.unlink_to(obj, role)
+            if redis_write_client:
+                for link in links:
+                    event = avatar_links.event_from_obj(obj)
+                    if event:
+                        avatar_links.del_link(self, event, '{}_{}'.format(link.type, link.role))
 
     def getLinkedTo(self):
         return None
