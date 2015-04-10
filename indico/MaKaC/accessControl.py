@@ -20,9 +20,9 @@ from persistent import Persistent
 from functools import wraps
 
 from indico.core import signals
-from indico.core.db import DBMgr
 from MaKaC.common import info
 import MaKaC
+from indico.modules.users.legacy import AvatarUserWrapper
 from MaKaC.common.contextManager import ContextManager
 
 def isFullyAccess(level):
@@ -95,7 +95,7 @@ class AccessController(Persistent):
 
     def unlinkAvatars(self, role):
         for prin in itertools.chain(self.getSubmitterList(), self.managers, self.allowed):
-            if isinstance(prin, MaKaC.user.Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.unlinkTo(self.owner, role)
 
     def _getAccessProtection( self ):
@@ -152,15 +152,12 @@ class AccessController(Persistent):
         self._fatherProtection = protected
         self._p_changed = 1
 
-    def grantAccess( self, principal ):
+    def grantAccess(self, principal):
         """grants read access for the related resource to the specified
             principal"""
 
-        # TODO: make this extensible
-        if principal not in self.allowed and \
-               (isinstance(principal, MaKaC.user.Avatar) or \
-                isinstance(principal, MaKaC.user.Group)):
-            self.allowed.append( principal )
+        if principal not in self.allowed and isinstance(principal, (AvatarUserWrapper, MaKaC.user.Group)):
+            self.allowed.append(principal)
             self._p_changed = 1
         signals.acl.access_granted.send(self, principal=principal)
 
@@ -237,10 +234,9 @@ class AccessController(Persistent):
             if principal is None:
                 self.revokeAccess(principal)
                 continue
-            if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.Group)) and \
-               principal.containsUser(av):
+            if isinstance(principal, (AvatarUserWrapper, MaKaC.user.Group)) and principal.containsUser(av):
                 return True
-        if isinstance(av, MaKaC.user.Avatar):
+        if isinstance(av, AvatarUserWrapper):
             for email in av.getEmails():
                 if email in self.getAccessEmail():
                     self.grantAccess(av)
@@ -281,8 +277,8 @@ class AccessController(Persistent):
         """grants modification access for the related resource to the specified
             principal"""
         # ToDo: should the groups allowed to be managers?
-        if principal not in self.managers and (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.Group)):
-            self.managers.append( principal )
+        if principal not in self.managers and (isinstance(principal, (AvatarUserWrapper, MaKaC.user.Group))):
+            self.managers.append(principal)
             self._p_changed = 1
         signals.acl.modification_granted.send(self, principal=principal)
 
@@ -300,10 +296,10 @@ class AccessController(Persistent):
             return True
 
         for principal in self.managers:
-            if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.Group)) and principal.containsUser( user ):
+            if isinstance(principal, (AvatarUserWrapper, MaKaC.user.Group)) and principal.containsUser(user):
                 return True
         ret = False
-        if isinstance(user, MaKaC.user.Avatar):
+        if isinstance(user, AvatarUserWrapper):
             for email in user.getEmails():
                 if email in self.getModificationEmail():
                     self.grantModification(user)
