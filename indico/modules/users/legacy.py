@@ -210,6 +210,15 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     setPhone = setTelephone
 
+    def clearAuthenticatorPersonalData(self):
+        pass
+
+    def setAuthenticatorPersonalData(self, field, value):
+        pass
+
+    def getIdentityById(self, id, tag):
+        return True
+
     def addRegistrant(self, r):
         # This doesn't seem to be needed, as it is stored in linkedTo as well
         # TODO: Check that it can be deleted
