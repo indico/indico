@@ -15,8 +15,8 @@
 
     function isDateValid(date) {
         // ZODB-specific, should be changed once the DB is migrated
-        var minDate = new Date('1901-12-13 21:45:52+00:00');
-        var maxDate = new Date('2038-01-19 04:14:07+00:00');
+        var minDate = new Date('1901-12-13T21:45:52+00:00');
+        var maxDate = new Date('2038-01-19T04:14:07+00:00');
         return minDate <= date && date <=  maxDate;
     }
 
