@@ -230,7 +230,7 @@ class User(db.Model):
     @property
     def full_name(self):
         """Returns the user's name in 'Firstname Lastname' notation."""
-        return '{} {}'.format(self.first_name, self.last_name)
+        return self.get_full_name(last_name_first=False, last_name_upper=False, abbrev_first_name=False)
 
     @return_ascii
     def __repr__(self):

@@ -32,7 +32,7 @@ def test_can_be_modified():
 
 
 def test_full_name():
-    assert User(first_name='Guinea', last_name='Pig').full_name == 'Guinea Pig'
+    assert User(first_name='Guinea', last_name='Pig', title=UserTitle.prof).full_name == 'Guinea Pig'
 
 
 @pytest.mark.parametrize(('last_name_first', 'last_name_upper', 'abbrev_first_name', 'expected'), (
