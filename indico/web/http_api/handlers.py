@@ -127,7 +127,7 @@ def buildAW(ak, onlyPublic=False):
         # Therefore, not working with Indico setup (requiring https for HTTP API authenticated)
         if not request.is_secure and api_settings.get('require_https') and request.user_agent.browser != 'google':
             raise HTTPAPIError('HTTPS is required', 403)
-        aw.setUser(ak.user)
+        aw.setUser(ak.user.as_avatar)
     return aw
 
 

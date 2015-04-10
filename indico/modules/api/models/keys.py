@@ -53,6 +53,7 @@ class APIKey(db.Model):
     #: ID of the user associated with the key
     user_id = db.Column(
         db.Integer,
+        db.ForeignKey('users.users.id'),
         nullable=False,
         index=True,
     )
@@ -107,14 +108,11 @@ class APIKey(db.Model):
         default=0
     )
 
-    @property
-    def user(self):
-        from MaKaC.user import AvatarHolder
-        return AvatarHolder().getById(str(self.user_id))
-
-    @user.setter
-    def user(self, user):
-        self.user_id = int(user.id)
+    #: the user associated with this API key
+    user = db.relationship(
+        'User',
+        lazy=False
+    )
 
     @return_ascii
     def __repr__(self):

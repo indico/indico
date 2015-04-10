@@ -50,7 +50,7 @@ class RHAPIAdminKeys(RHAdminBase):
     """API key list (admin)"""
 
     def _process(self):
-        keys = sorted(APIKey.find_all(is_active=True), key=lambda ak: (ak.use_count == 0, ak.user.getFullName()))
+        keys = sorted(APIKey.find_all(is_active=True), key=lambda ak: (ak.use_count == 0, ak.user.full_name))
         return WPAPIAdmin.render_template('admin_keys.html', keys=keys)
 
 
@@ -62,10 +62,10 @@ class RHAPIUserProfile(RHUserBase):
         use_signatures = api_settings.get('security_mode') in {APIMode.SIGNED, APIMode.ONLYKEY_SIGNED,
                                                                APIMode.ALL_SIGNED}
         allow_persistent = api_settings.get('allow_persistent')
-        old_keys = APIKey.find(user_id=self.user.id, is_active=False).order_by(APIKey.created_dt.desc()).all()
+        old_keys = self.user.old_api_keys
         return WPAPIUserProfile.render_template('user_profile.html', user=self.user, key=key, old_keys=old_keys,
                                                 use_signatures=use_signatures, allow_persistent=allow_persistent,
-                                                can_modify=(not key or not key.is_blocked or session.user.isAdmin()))
+                                                can_modify=(not key or not key.is_blocked or session.new_user.is_admin))
 
 
 class RHAPICreateKey(RHUserBase):
@@ -79,7 +79,7 @@ class RHAPICreateKey(RHUserBase):
         if old_key:
             if not force:
                 raise BadRequest('There is already an API key for this user')
-            if old_key.is_blocked and not session.user.isAdmin():
+            if old_key.is_blocked and not session.new_user.is_admin:
                 raise Forbidden
             old_key.is_active = False
             db.session.flush()
@@ -131,7 +131,7 @@ class RHAPIBlockKey(RHUserBase):
 
     def _checkProtection(self):
         RHUserBase._checkProtection(self)
-        if self._doProcess and not session.user.isAdmin():
+        if self._doProcess and not session.new_user.is_admin:
             raise Forbidden
 
     def _process(self):

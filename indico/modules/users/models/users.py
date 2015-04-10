@@ -181,12 +181,33 @@ class User(db.Model):
         cascade='all, delete-orphan',
         backref=db.backref('user', lazy=True)
     )
+    #: the active API key of the user
+    api_key = db.relationship(
+        'APIKey',
+        lazy=True,
+        uselist=False,
+        cascade='all, delete-orphan',
+        primaryjoin='(User.id == APIKey.user_id) & APIKey.is_active',
+        back_populates='user'
+    )
+    old_api_keys = db.relationship(
+        'APIKey',
+        lazy=True,
+        cascade='all, delete-orphan',
+        order_by='APIKey.created_dt.desc()',
+        primaryjoin='(User.id == APIKey.user_id) & ~APIKey.is_active',
+        back_populates='user'
+    )
 
     @property
     def as_avatar(self):
         # TODO: remove this after DB is free of Avatars
         from indico.modules.users.legacy import AvatarUserWrapper
         return AvatarUserWrapper(self.id)
+
+    @property
+    def locator(self):
+        return {'user_id': self.id}
 
     @hybrid_property
     def title(self):
@@ -213,13 +234,6 @@ class User(db.Model):
             self._primary_email.is_user_deleted = value
         for email in self._secondary_emails:
             email.is_user_deleted = value
-
-    @property
-    @memoize_request
-    def api_key(self):
-        # TODO: convert to relationship
-        from indico.modules.api.models.keys import APIKey
-        return APIKey.find_first(user_id=self.id, is_active=True)
 
     @cached_property
     def settings(self):

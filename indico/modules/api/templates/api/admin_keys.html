@@ -17,7 +17,7 @@
             {% for key in keys %}
                 <tr>
                     <td>
-                        {{ key.user.getFullName() }}
+                        {{ key.user.full_name }}
                         {% if key.is_blocked %}
                             <i class="icon-warning warningText" title="{% trans %}This user's API key has been blocked.{%- endtrans %}"></i>
                         {% endif %}
@@ -32,7 +32,7 @@
                     </td>
                     <td>{{ key.token }}</td>
                     <td>
-                        <a href="{{ url_for('user.userAPI', key.user) }}">{% trans %}Details{% endtrans %}</a>
+                        <a href="{{ url_for('api.user_profile', key.user) }}">{% trans %}Details{% endtrans %}</a>
                     </td>
                 </tr>
             {% endfor %}
