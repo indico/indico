@@ -4719,6 +4719,7 @@ class Conference(CommonObjectBase, Locatable):
         if self.sessions.has_key(session.getId()):
             session.addCoordinator(av)
             self._sessionCoordinators.index(av,session)
+            session._addCoordinatorEmail(av.getEmail())
 
     def removeSessionCoordinator( self, session, av ):
         """Removes a user as coordinator for a session.
@@ -4731,6 +4732,7 @@ class Conference(CommonObjectBase, Locatable):
         if self.sessions.has_key(session.getId()):
             session.removeCoordinator( av )
             self._sessionCoordinators.unindex(av,session)
+            session.removeCoordinatorEmail(av.getEmail())
 
     def _getSubmitterIdx(self):
         try:
@@ -6380,7 +6382,7 @@ class Session(CommonObjectBase, Locatable):
         return self._coordinatorsEmail
 
     def _addCoordinatorEmail(self, email):
-        if not email in self.getCoordinatorEmailList():
+        if email not in self.getCoordinatorEmailList():
             self.getCoordinatorEmailList().append(email)
 
     def removeCoordinatorEmail(self, email):
