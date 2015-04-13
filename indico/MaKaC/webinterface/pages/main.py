@@ -37,7 +37,7 @@ class WPMainBase(base.WPDecorated):
         self._setCurrentMenuItem()
 
         # Check if user is administrator
-        self._isAdmin = session.new_user.is_admin
+        self._isAdmin = session.new_user and session.new_user.is_admin
         self._isCategoryManager = self._isAdmin or \
                                   isinstance(self._rh.getTarget(), Category) and self._rh.getTarget().canModify(self._getAW()) or \
                                   isinstance(self._rh.getTarget(), Conference) and self._rh.getTarget().getOwnerList()!=[] and self._rh.getTarget().getOwner().canModify(self._getAW())

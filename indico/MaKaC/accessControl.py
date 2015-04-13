@@ -292,7 +292,7 @@ class AccessController(Persistent):
 
     def canModify(self, user):
         """tells whether the specified user has modification privileges"""
-        if user.user.is_admin:
+        if user and user.user.is_admin:
             return True
 
         for principal in self.managers:
