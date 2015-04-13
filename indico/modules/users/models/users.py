@@ -26,7 +26,6 @@ from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table, FavoriteCategory
 from indico.modules.users.models.links import UserLink
-from indico.util.caching import memoize_request
 from indico.util.i18n import _
 from indico.util.string import return_ascii
 from indico.util.struct.enum import TitledIntEnum
@@ -190,6 +189,7 @@ class User(db.Model):
         primaryjoin='(User.id == APIKey.user_id) & APIKey.is_active',
         back_populates='user'
     )
+    #: the previous API keys of the user
     old_api_keys = db.relationship(
         'APIKey',
         lazy=True,

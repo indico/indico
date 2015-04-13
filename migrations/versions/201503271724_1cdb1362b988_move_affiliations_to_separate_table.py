@@ -18,7 +18,7 @@ def upgrade():
     op.create_table('affiliations',
                     sa.Column('id', sa.Integer(), nullable=False),
                     sa.Column('user_id', sa.Integer(), nullable=False, index=True),
-                    sa.Column('name', sa.String(), nullable=False),
+                    sa.Column('name', sa.String(), nullable=False, index=True),
                     sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
                     sa.PrimaryKeyConstraint('id'),
                     schema='users')
