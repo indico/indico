@@ -18,7 +18,8 @@ from __future__ import absolute_import
 
 import logging
 from functools import partial
-from flask import has_app_context, g
+from flask import has_app_context, g, has_request_context
+from flask import session as flask_session
 
 import flask_sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
@@ -82,6 +83,8 @@ def _transaction_ended(session, transaction):
     # accessing memoized objects (which are now session-less)
     if has_app_context() and 'memoize_cache' in g:
         del g.memoize_cache
+    if has_request_context() and hasattr(flask_session, '_user'):
+        delattr(flask_session, '_user')
 
 
 def _column_names(constraint, table):
