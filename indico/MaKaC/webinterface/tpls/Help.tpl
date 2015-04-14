@@ -5,7 +5,7 @@
         <div class="title">${ _("User Guides")}</div>
 
         <div class="content">
-            % if _session.new_user.is_admin:
+            % if _session.user.is_admin:
             <div class="item clearfix">
                 <div class="icons">
                 <a href="ihelp/html/AdminGuide/index.html" style="vertical-align: top">

@@ -31,7 +31,7 @@ class WPRoomsBase(WPAdminsBase):
     def _createTabCtrl(self):
         self._tabCtrl = TabControl()
 
-        if session.user.isAdmin():
+        if session.user.is_admin:
             self._subTabRoomBooking = self._tabCtrl.newTab(
                 'booking',
                 _('Room Booking'),

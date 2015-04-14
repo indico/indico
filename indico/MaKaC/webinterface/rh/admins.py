@@ -34,9 +34,9 @@ class RHAdminBase(RHProtected):
 
     def _checkProtection(self):
         RHProtected._checkProtection(self)
-        if not session.user and not self._doProcess:
+        if not session.avatar and not self._doProcess:
             return
-        if not session.new_user.is_admin:
+        if not session.user.is_admin:
             raise AdminError("area")
 
 

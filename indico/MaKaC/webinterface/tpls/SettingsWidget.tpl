@@ -18,7 +18,7 @@
     % if currentUser:
         <div class="settingsWidgetSection"><a href="${ url_for('users.user_dashboard') }">${ _("My profile") }</a></div>
         <div class="settingsWidgetSection"><a href="${ url_for('users.user_preferences') }">${ _("My preferences") }</a></div>
-        % if _session.new_user.is_admin:
+        % if _session.user.is_admin:
             <div class="settingsWidgetSection"><a href="#" class="login-as">${ _("Login as...") }</a></div>
         % endif
         % if 'login_as_orig_user' in _session:

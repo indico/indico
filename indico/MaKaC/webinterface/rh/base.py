@@ -201,7 +201,7 @@ class RH(RequestHandlerBase):
         return self._isMobile
 
     def _setSessionUser(self):
-        self._aw.setUser(session.user)
+        self._aw.setUser(session.avatar)
 
     @property
     def csrf_token(self):

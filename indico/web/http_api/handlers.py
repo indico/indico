@@ -178,7 +178,7 @@ def handler(prefix, path):
         used_session = None
         if cookieAuth:
             used_session = session
-            if not used_session.user:  # ignore guest sessions
+            if not used_session.avatar:  # ignore guest sessions
                 used_session = None
 
         if apiKey or oauthToken or not used_session:
@@ -211,8 +211,8 @@ def handler(prefix, path):
                     raise HTTPAPIError('Invalid CSRF token', 403)
             aw = AccessWrapper()
             if not onlyPublic:
-                aw.setUser(used_session.user)
-            userPrefix = 'user-' + used_session.user.getId() + '_'
+                aw.setUser(used_session.avatar)
+            userPrefix = 'user-' + used_session.avatar.getId() + '_'
             cacheKey = userPrefix + normalizeQuery(path, query,
                                                    remove=('_', 'nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed',
                                                            'csrftoken'))

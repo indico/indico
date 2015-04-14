@@ -50,9 +50,9 @@ from MaKaC.webinterface.rh.base import RHProtected
 
 class RHUserBase(RHProtected):
     def _checkParams(self):
-        if not session.user:
+        if not session.avatar:
             return
-        self.user = session.new_user
+        self.user = session.user
         if 'user_id' in request.view_args:
             self.user = User.get(request.view_args['user_id'])
             if self.user is None:
@@ -62,7 +62,7 @@ class RHUserBase(RHProtected):
         RHProtected._checkProtection(self)
         if not self._doProcess:  # not logged in
             return
-        if not self.user.can_be_modified(session.new_user):
+        if not self.user.can_be_modified(session.user):
             raise Forbidden('You cannot modify this user.')
 
 

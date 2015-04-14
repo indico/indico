@@ -132,7 +132,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
     """Loads the form for the selected VC plugin"""
 
     def _process(self):
-        if not self.plugin.can_manage_vc_rooms(session.user, self.event):
+        if not self.plugin.can_manage_vc_rooms(session.avatar, self.event):
             flash(_('You are not allowed to create {plugin_name} rooms for this event.').format(
                 plugin_name=self.plugin.friendly_name), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
@@ -140,7 +140,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
         form = self.plugin.create_form(event=self.event)
 
         if form.validate_on_submit():
-            vc_room = VCRoom(created_by_user=session.user)
+            vc_room = VCRoom(created_by_user=session.avatar)
             vc_room.type = self.plugin.service_name
             vc_room.status = VCRoomStatus.created
 
@@ -152,7 +152,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
 
             try:
                 self.plugin.create_room(vc_room, self.event)
-                notify_created(self.plugin, vc_room, event_vc_room, self.event, session.user)
+                notify_created(self.plugin, vc_room, event_vc_room, self.event, session.avatar)
             except VCRoomError as err:
                 if err.field is None:
                     raise
@@ -160,7 +160,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
                 field.errors.append(err.message)
             else:
                 db.session.add_all((vc_room, event_vc_room))
-                # TODO: notify_created(vc_room, self.event, session.user)
+                # TODO: notify_created(vc_room, self.event, session.avatar)
 
                 flash(_("{plugin_name} room '{room.name}' created").format(
                     plugin_name=self.plugin.friendly_name, room=vc_room), 'success')
@@ -186,7 +186,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
     """Modifies an existing VC room"""
 
     def _process(self):
-        if not self.plugin.can_manage_vc_rooms(session.user, self.event):
+        if not self.plugin.can_manage_vc_rooms(session.avatar, self.event):
             flash(_('You are not allowed to modify {} rooms for this event.').format(self.plugin.friendly_name),
                   'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
@@ -221,7 +221,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
                 transaction.abort()
             else:
                 # TODO
-                # notify_modified(self.vc_room, self.event, session.user)
+                # notify_modified(self.vc_room, self.event, session.avatar)
 
                 flash(_("{plugin_name} room '{room.name}' updated").format(
                     plugin_name=self.plugin.friendly_name, room=self.vc_room), 'success')
@@ -238,7 +238,7 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
     """Refreshes an existing VC room, fetching information from the VC system"""
 
     def _process(self):
-        if not self.plugin.can_manage_vc_rooms(session.user, self.event):
+        if not self.plugin.can_manage_vc_rooms(session.avatar, self.event):
             flash(_('You are not allowed to refresh {plugin_name} rooms for this event.').format(
                 plugin_name=self.plugin.friendly_name), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
@@ -263,12 +263,12 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
     """Removes an existing VC room"""
 
     def _process(self):
-        if not self.plugin.can_manage_vc_rooms(session.user, self.event):
+        if not self.plugin.can_manage_vc_rooms(session.avatar, self.event):
             flash(_('You are not allowed to remove {} rooms from this event.').format(self.plugin.friendly_name),
                   'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
-        self.event_vc_room.delete(session.user)
+        self.event_vc_room.delete(session.avatar)
         flash(_("{plugin_name} room '{room.name}' removed").format(
             plugin_name=self.plugin.friendly_name, room=self.vc_room), 'success')
         return redirect(url_for('.manage_vc_rooms', self.event))
@@ -299,10 +299,10 @@ class RHVCManageAttach(RHVCManageEventCreateBase):
 
         if form.validate_on_submit():
             vc_room = form.data['room']
-            if not self.plugin.can_manage_vc_rooms(session.user, self.event):
+            if not self.plugin.can_manage_vc_rooms(session.avatar, self.event):
                 flash(_("You are not allowed to attach {plugin_name} rooms to this event.").format(
                     plugin_name=self.plugin.friendly_name), 'error')
-            elif not self.plugin.can_manage_vc_room(session.user, vc_room):
+            elif not self.plugin.can_manage_vc_room(session.avatar, vc_room):
                 flash(_("You are not authorized to attach the room '{room.name}'".format(room=vc_room)), 'error')
             else:
                 event_vc_room = process_vc_room_association(self.plugin, self.event, vc_room, form)
@@ -335,7 +335,7 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
                  .order_by(db.desc('event_count'))
                  .limit(10))
 
-        return ((room, count) for room, count in query if room.plugin.can_manage_vc_room(session.user, room))
+        return ((room, count) for room, count in query if room.plugin.can_manage_vc_room(session.avatar, room))
 
     def _process(self):
         return Response(json.dumps([{'id': room.id, 'name': room.name, 'count': count}
@@ -379,7 +379,7 @@ class RHVCRoomList(RHProtected):
 
     def _checkProtection(self):
         RHProtected._checkProtection(self)
-        if self._doProcess and not get_managed_vc_plugins(session.user):
+        if self._doProcess and not get_managed_vc_plugins(session.avatar):
             raise AccessError
 
     def _process(self):

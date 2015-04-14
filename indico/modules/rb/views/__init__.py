@@ -46,9 +46,9 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
         return WPMainBase.getCSSFiles(self) + self._asset_env['roombooking_sass'].urls()
 
     def _getSideMenu(self):
-        self._leftMenu = BasicSideMenu(session.user is not None)
-        user_has_rooms = session.user is not None and session.user.has_rooms
-        user_is_admin = session.user is not None and session.user.isRBAdmin()
+        self._leftMenu = BasicSideMenu(session.avatar is not None)
+        user_has_rooms = session.avatar is not None and session.avatar.has_rooms
+        user_is_admin = session.avatar is not None and session.avatar.isRBAdmin()
 
         self._roomsBookingOpt = SideMenuSection(currentPage=url_for('rooms.book'))
 

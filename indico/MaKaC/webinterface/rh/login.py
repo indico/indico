@@ -57,7 +57,7 @@ class RHSignInBase(base.RH):
         tzUtil = timezoneUtils.SessionTZ(av)
         tz = tzUtil.getSessionTZ()
         session.timezone = tz
-        session.user = av
+        session.user = av.user
         set_session_lang(av.getLang())
         if Config.getInstance().getBaseSecureURL().startswith('https://'):
             self._url = str(self._url).replace('http://', 'https://')

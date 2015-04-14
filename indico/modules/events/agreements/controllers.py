@@ -47,9 +47,9 @@ class RHAgreementForm(RHConferenceBaseDisplay):
             raise NotFound('The agreement is not active anymore')
 
     def _checkSessionUser(self):
-        if session.user is None:
+        if session.avatar is None:
             self._redirect(self._getLoginURL())
-        if self.agreement.user != session.user:
+        if self.agreement.user != session.avatar:
             raise AccessError()
 
     def _checkProtection(self):

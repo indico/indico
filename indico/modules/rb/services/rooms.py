@@ -98,7 +98,7 @@ class BookingPermission(LoggedOnlyService):
         self._blocking = Blocking.get(blocking_id) if blocking_id else None
 
     def _getAnswer(self):
-        user = session.user
+        user = session.avatar
         return {
             'blocked': not self._blocking.can_be_overridden(user, self._room) if self._blocking else False,
             'is_reservable': self._room.is_reservable,

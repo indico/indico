@@ -190,7 +190,7 @@ class RHConferenceModifManagementAccess( RHConferenceModifKey ):
         self._isRegistrar = self._target.isRegistrar( self._getUser() )
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
-        self._requests_manager = is_request_manager(session.user)
+        self._requests_manager = is_request_manager(session.avatar)
         self._plugin_urls = values_from_signal(signals.event_management.management_url.send(self._conf),
                                                single_value=True)
 

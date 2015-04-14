@@ -57,7 +57,7 @@ def js_vars_user():
     Provides a JS file with user-specific definitions
     Useful for favorites, settings etc.
     """
-    user = session.new_user
+    user = session.user
     if user is None:
         user_vars = {}
     else:

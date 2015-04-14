@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from indico.modules.users import User
+
 
 class MockAvatarHolder:
     # This class is monkeypatched on top of the real avatar holder
@@ -41,6 +43,10 @@ class MockAvatarHolder:
 class MockAvatar(object):
     def __repr__(self):
         return '<MockAvatar({})>'.format(self.id)
+
+    @property
+    def user(self):
+        return User(id=int(self.id), first_name=self.name, last_name=self.surname, email=self.email)
 
     def getEmail(self):
         return self.email

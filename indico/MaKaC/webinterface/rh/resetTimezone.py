@@ -37,7 +37,7 @@ class RHResetTZ(base.RH):
 
         try:
             if parms["saveToProfile"] == "on":
-                user = session.user
+                user = session.avatar
                 if tz == "LOCAL":
                     user.setDisplayTZMode("Event Timezone")
                 else:

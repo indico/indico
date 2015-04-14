@@ -169,7 +169,7 @@ class ServiceBase(RequestHandlerBase):
         # Fill in the aw instance with the current information
         self._aw = AccessWrapper()
         self._aw.setIP(request.remote_addr)
-        self._aw.setUser(session.user)
+        self._aw.setUser(session.avatar)
         self._target = None
         self._startTime = None
         self._tohttps = request.is_secure
@@ -342,7 +342,7 @@ class AdminService(LoggedOnlyService):
     """
     def _checkProtection(self):
         LoggedOnlyService._checkProtection(self)
-        if not session.new_user.is_admin:
+        if not session.user.is_admin:
             raise ServiceAccessError(_("Only administrators can perform this operation"))
 
 class TextModificationBase:

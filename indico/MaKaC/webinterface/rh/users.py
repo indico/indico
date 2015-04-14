@@ -251,7 +251,7 @@ class _UserUtils:
 
 class RHUserBase(RHProtected):
     def _checkParams(self, params):
-        if not session.user:
+        if not session.avatar:
             # Let checkProtection deal with it.. no need to raise an exception here
             # if no user is specified
             return
@@ -276,7 +276,7 @@ class RHUserBase(RHProtected):
 class RHUserActive(RHUserBase):
 
     def _checkProtection(self):
-        if not session.new_user.is_admin:
+        if not session.user.is_admin:
             raise errors.AccessError("user status")
 
     def _process(self):
@@ -290,7 +290,7 @@ class RHUserActive(RHUserBase):
 class RHUserDisable(RHUserBase):
 
     def _checkProtection(self):
-        if not session.new_user.is_admin:
+        if not session.user.is_admin:
             raise errors.AccessError("user status")
 
     def _process(self):

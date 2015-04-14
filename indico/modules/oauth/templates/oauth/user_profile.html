@@ -16,7 +16,7 @@
                         <div data-third-party-app="{{ token.getConsumer().getName() }}" aria-hidden="true"
                         style="margin: 0;" class="i-button i-button-mini icon-remove icon-only right"></div>
                     </div>
-                    {% if session.new_user.is_admin %}
+                    {% if session.user.is_admin %}
                         <div class="list-item-content">
                             <span class="list-item-content-title">{% trans %}Access Token{% endtrans %}</span>
                             <span class="list-item-content-data">{{ token.getId() }}</span>

@@ -3,7 +3,7 @@
 {% set show_nav = request.endpoint != 'users.user_dashboard' %}
 
 {% block title -%}
-    {% if user == session.new_user %}
+    {% if user == session.user %}
         {% trans %}My Profile{% endtrans %}
     {% else %}
         {% trans name=user.full_name %}Profile of {{ name }}{% endtrans %}

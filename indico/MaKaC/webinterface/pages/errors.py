@@ -63,7 +63,7 @@ class WGenericError( WTemplated ):
         show_details = Config.getInstance().getDebug()
         if not show_details:
             try:
-                show_details = session.user and session.user.isAdmin()
+                show_details = session.user and session.user.is_admin
             except Exception:
                 # We are handling some error so we cannot know if accessing the session user works
                 # If it fails we simply don't show details...

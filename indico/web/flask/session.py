@@ -55,38 +55,28 @@ class BaseSession(CallbackDict, SessionMixin):
 # - Always prefix the dict keys backing a property with an underscore (to prevent clashes with externally-set items)
 # - When you store something like the avatar that involves a DB lookup, use cached_writable_property
 class IndicoSession(BaseSession):
-    @cached_writable_property('_avatar')
+    @cached_writable_property('_user')
     def user(self):
-        avatarId = self.get('_avatarId')
-        if not avatarId:
-            return None
-        return AvatarHolder().getById(avatarId)
+        user_id = self.get('_user_id')
+        return User.get(user_id) if user_id is not None else None
 
     @user.setter
-    def user(self, avatar):
-        if hasattr(self, '_user'):
-            del self._user
-        if avatar is None:
-            self.pop('_avatarId', None)
+    def user(self, user):
+        if user is None:
+            self.pop('_user_id', None)
         else:
-            self['_avatarId'] = avatar.getId()
+            self['_user_id'] = user.id
 
     @property
-    def new_user(self):
-        user_id = self.get('_avatarId')
-        if user_id is None:
-            return None
-        if getattr(self, '_user', None) and self._user.id == int(user_id):
-            return self._user
-        self._user = User.get(int(user_id))
-        return self._user
+    def avatar(self):
+        return self.user.as_avatar if self.user else None
 
     @property
     def lang(self):
         if '_lang' in self:
             return self['_lang']
         elif self.user:
-            return self.user.getLang()
+            return self.user.settings.get('lang')
         else:
             return None
 

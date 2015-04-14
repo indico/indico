@@ -122,7 +122,7 @@ class WCategoryDisplay(WICalExportBase):
         elif confs:
             pastEvents = session.get('fetchPastEventsFrom', set())
             showPastEvents = (self._target.getId() in pastEvents or
-                             (session.new_user and session.new_user.settings.get('show_past_events')))
+                             (session.user and session.user.settings.get('show_past_events')))
             cl = wcomponents.WConferenceList(self._target, self._wfReg, showPastEvents)
             params = {"conferenceDisplayURLGen": vars["confDisplayURLGen"]}
             vars["contents"] = cl.getHTML( self._aw, params )

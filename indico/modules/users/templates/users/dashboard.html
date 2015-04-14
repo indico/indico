@@ -69,7 +69,7 @@
                     <div id="yourEvents" class="dashboard-box">
                         <h3>
                             {% trans %}Your events at hand{% endtrans %}
-                            {% if session.new_user.is_admin %}
+                            {% if session.user.is_admin %}
                                 <a href="#" id="refresh-redis-links" style="float: right;" class="icon-refresh" title="{% trans %}Admin tool: Refresh Redis links{% endtrans %}"></a>
                                 <script>
                                     $('#refresh-redis-links').on('click', function(e) {

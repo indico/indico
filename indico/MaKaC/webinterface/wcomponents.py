@@ -312,7 +312,7 @@ class WHeader(WTemplated):
         vars['protectionDisclaimerRestricted'] = minfo.getProtectionDisclaimerRestricted()
         #Build a list of items for the administration menu
         adminItemList = []
-        if session.new_user and session.new_user.is_admin:
+        if session.user and session.user.is_admin:
             adminItemList.append({'id': 'serverAdmin', 'url': urlHandlers.UHAdminArea.getURL(),
                                   'text': _("Server admin")})
 

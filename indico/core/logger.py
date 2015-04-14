@@ -70,7 +70,7 @@ class IndicoMailFormatter(logging.Formatter):
 
             if session:
                 try:
-                    info.append('User: {0}'.format(session.user))
+                    info.append('User: {0}'.format(session.avatar))
                 except POSError:
                     # If the DB connection is closed getting the avatar may fail
                     info.append('User id: {0}'.format(session.get('_avatarId')))

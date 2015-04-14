@@ -648,8 +648,8 @@ class WConfDetailsBase( wcomponents.WTemplated ):
             vars["registration_deadline"] = format_date(regform.getEndRegistrationDate())
             vars["modification_deadline"] = format_date(regform.getModificationEndDate())
             vars["ticket_enabled"] = regform.getETicket().isEnabled()
-            if session.user:
-                vars["registrant"] = session.user.getRegistrantById(self._conf.getId())
+            if session.avatar:
+                vars["registrant"] = session.avatar.getRegistrantById(self._conf.getId())
         return vars
 
 

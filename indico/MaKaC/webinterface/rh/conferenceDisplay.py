@@ -346,7 +346,7 @@ class RHConferenceDisplay(RHConferenceBaseDisplay):
 
     def _checkProtection(self):
         # check users allowed by plugins
-        if any(values_from_signal(signals.event.core.has_read_access.send(self._conf, user=session.user))):
+        if any(values_from_signal(signals.event.core.has_read_access.send(self._conf, user=session.avatar))):
             return
         RHConferenceBaseDisplay._checkProtection(self)
 

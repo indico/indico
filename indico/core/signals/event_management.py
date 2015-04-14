@@ -35,6 +35,6 @@ This is used when someone who does not have event management access wants
 to go to the event management area. He is then redirected to one of the URLs
 returned by plugins, i.e. it is not guaranteed that the user ends up on a
 specific plugin's management page. The signal should return None if the current
-user (available via ``session.user``) cannot access the management area.
+user (available via ``session.avatar``) cannot access the management area.
 The *sender* is the event object.
 """)

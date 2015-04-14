@@ -65,7 +65,7 @@ class RHAPIUserProfile(RHUserBase):
         old_keys = self.user.old_api_keys
         return WPAPIUserProfile.render_template('user_profile.html', user=self.user, key=key, old_keys=old_keys,
                                                 use_signatures=use_signatures, allow_persistent=allow_persistent,
-                                                can_modify=(not key or not key.is_blocked or session.new_user.is_admin))
+                                                can_modify=(not key or not key.is_blocked or session.user.is_admin))
 
 
 class RHAPICreateKey(RHUserBase):
@@ -79,7 +79,7 @@ class RHAPICreateKey(RHUserBase):
         if old_key:
             if not force:
                 raise BadRequest('There is already an API key for this user')
-            if old_key.is_blocked and not session.new_user.is_admin:
+            if old_key.is_blocked and not session.user.is_admin:
                 raise Forbidden
             old_key.is_active = False
             db.session.flush()
@@ -131,7 +131,7 @@ class RHAPIBlockKey(RHUserBase):
 
     def _checkProtection(self):
         RHUserBase._checkProtection(self)
-        if self._doProcess and not session.new_user.is_admin:
+        if self._doProcess and not session.user.is_admin:
             raise Forbidden
 
     def _process(self):
