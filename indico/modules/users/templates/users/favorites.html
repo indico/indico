@@ -16,9 +16,13 @@
                         </div>
                     </div>
                     <div class="i-box-content">
-                        <ul class="group-list no-description" id="favorite-users">
-                            {{ favorite_users_list(user) }}
-                        </ul>
+                        {% if user.favorite_users %}
+                            <ul class="group-list no-description" id="favorite-users">
+                                {{ favorite_users_list(user) }}
+                            </ul>
+                        {% else %}
+                            <p class="group-list-description">{% trans %}You have not marked any user as favorite.{% endtrans %}</p>
+                        {% endif %}
                     </div>
                 </div>
                 <button class="i-button highlight js-add-user" style="margin-top: 15px;">{% trans %}Add Indico user{% endtrans %}</button>
@@ -31,15 +35,19 @@
                         </div>
                     </div>
                     <div class="i-box-content">
-                        <ul class="group-list no-description">
-                            {% for category in user.favorite_categories|sort(attribute='name') %}
-                                <li data-categ-id="{{ category.id }}" class="favorite-categ js-category-row">
-                                    <span>{{ category.name }}</span>
-                                    <a class="toggle icon-close right js-delete-category" title="{% trans %}Remove from favorites{% endtrans %}" href="#"
-                                       data-href="{{ url_for('.user_favorites_category_api', category_id=category.id) }}"></a>
-                                </li>
-                            {% endfor %}
-                        </ul>
+                        {% if user.favorite_categories %}
+                            <ul class="group-list no-description">
+                                {% for category in user.favorite_categories|sort(attribute='name') %}
+                                    <li data-categ-id="{{ category.id }}" class="favorite-categ js-category-row">
+                                        <span>{{ category.name }}</span>
+                                        <a class="toggle icon-close right js-delete-category" title="{% trans %}Remove from favorites{% endtrans %}" href="#"
+                                           data-href="{{ url_for('.user_favorites_category_api', category_id=category.id) }}"></a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="group-list-description">{% trans %}You have not marked any category as favorite.{% endtrans %}</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
