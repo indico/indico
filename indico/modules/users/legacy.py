@@ -319,6 +319,15 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     def setLang(self, lang):
         self.user.settings.set('lang', to_unicode(lang))
 
+    def __eq__(self, other):
+        if not isinstance(other, (AvatarUserWrapper, User)):
+            return False
+        other_id = int(other.id)
+        return int(self.id) == other_id
+
+    def __hash__(self):
+        return hash(self.id)
+
     @return_ascii
     def __repr__(self):
         return u'<AvatarUserWrapper {}: {} ({})>'.format(self.id, self.user.full_name, self.user.email)
