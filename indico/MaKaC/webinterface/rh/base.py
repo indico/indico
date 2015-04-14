@@ -23,6 +23,7 @@ import sys
 import random
 import StringIO
 from datetime import datetime, timedelta
+from functools import wraps, partial
 from urlparse import urljoin
 from xml.sax.saxutils import escape
 
@@ -651,6 +652,35 @@ class RH(RequestHandlerBase):
                     os.remove(f)
 
     relativeURL = None
+
+
+class RHSimple(RH):
+    """A simple RH that calls a function to build the response
+
+    The main purpose of this RH is to allow external library to
+    display something within the Indico layout (which requires a
+    RH / a ZODB connection in most cases).
+
+    The preferred way to use this class is by using the
+    `RHSimple.wrap_function` decorator.
+
+    :param func: A function returning HTML
+    """
+    def __init__(self, func):
+        RH.__init__(self)
+        self.func = func
+
+    def _process(self):
+        return self.func()
+
+    @classmethod
+    def wrap_function(cls, func):
+        """Decorates a function to run within the RH's framework"""
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return cls(partial(func, *args, **kwargs)).process({})
+
+        return wrapper
 
 
 class RHProtected(RH):
