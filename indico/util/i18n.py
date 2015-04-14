@@ -22,7 +22,7 @@ import warnings
 from contextlib import contextmanager
 
 from babel import negotiate_locale
-from babel.core import Locale
+from babel.core import Locale, LOCALE_ALIASES
 from babel.messages.pofile import read_po
 from babel.support import Translations, NullTranslations
 from flask import session, request, has_request_context, current_app, has_app_context
@@ -36,6 +36,7 @@ from indico.core.db import DBMgr
 from MaKaC.common.info import HelperMaKaCInfo
 
 
+LOCALE_ALIASES = dict(LOCALE_ALIASES, en='en_GB')
 RE_TR_FUNCTION = re.compile(r'''_\("([^"]*)"\)|_\('([^']*)'\)''', re.DOTALL | re.MULTILINE)
 
 babel = Babel()
@@ -202,7 +203,7 @@ def set_best_lang():
 
     # try to use browser language
     preferred = [x.replace('-', '_') for x in request.accept_languages.values()]
-    resolved_lang = negotiate_locale(preferred, get_all_locales())
+    resolved_lang = negotiate_locale(preferred, list(get_all_locales()), aliases=LOCALE_ALIASES)
 
     if not resolved_lang:
         if current_app.config['TESTING']:
