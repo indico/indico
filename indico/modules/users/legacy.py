@@ -244,8 +244,8 @@ class AvatarUserWrapper(Persistent, Fossilizable):
                    if obj.getConference() == conf)
 
     def getRegistrantById(self, conf_id):
-        return next(obj for obj in self.user.get_linked_objects('registration', 'registrant')
-                    if obj.getConference().id == conf_id)
+        return next((obj for obj in self.user.get_linked_objects('registration', 'registrant')
+                    if obj.getConference().id == conf_id), None)
 
     def hasSubmittedEvaluation(self, evaluation):
         for submission in evaluation.getSubmissions():
