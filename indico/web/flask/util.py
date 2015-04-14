@@ -421,6 +421,10 @@ class ResponseUtil(object):
         if self._redirect:
             return self.make_redirect()
 
+        # Return a plain string if that's all we have
+        if not res and not self.modified:
+            return ''
+
         res = app.make_response((res, self.status, self.headers))
         if self.content_type:
             res.content_type = self.content_type
