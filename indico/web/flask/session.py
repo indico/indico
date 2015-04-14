@@ -137,6 +137,9 @@ class IndicoSessionInterface(SessionInterface):
         threshold = self.get_storage_lifetime(app, session) / 2
         return session['_expires'] - datetime.now() < threshold
 
+    def should_refresh_sid(self, app, session):
+        return self.get_cookie_secure(app) and not session.get('_secure')
+
     def open_session(self, app, request):
         sid = request.cookies.get(app.session_cookie_name)
         if not sid:
@@ -148,13 +151,15 @@ class IndicoSessionInterface(SessionInterface):
 
     def save_session(self, app, session, response):
         domain = self.get_cookie_domain(app)
+        secure = self.get_cookie_secure(app)
+        refresh_sid = self.should_refresh_sid(app, session)
         if not session and not session.new:
             # empty session, delete it from storage and cookie
             self.storage.delete(session.sid)
             response.delete_cookie(app.session_cookie_name, domain=domain)
             return
 
-        if not session.modified and not self.should_refresh_session(app, session):
+        if not refresh_sid and not session.modified and not self.should_refresh_session(app, session):
             # If the session has not been modified we only store if it needs to be refreshed
             return
 
@@ -167,6 +172,11 @@ class IndicoSessionInterface(SessionInterface):
         cookie_lifetime = self.get_expiration_time(app, session)
         session['_expires'] = datetime.now() + storage_ttl
 
+        if refresh_sid:
+            self.storage.delete(session.sid)
+            session.sid = self.generate_sid()
+
+        session['_secure'] = request.is_secure
         self.storage.set(session.sid, self.serializer.dumps(dict(session)), storage_ttl)
         response.set_cookie(app.session_cookie_name, session.sid, expires=cookie_lifetime, httponly=True,
-                            secure=self.get_cookie_secure(app))
+                            secure=secure)
