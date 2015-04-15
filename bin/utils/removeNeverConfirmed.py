@@ -10,8 +10,6 @@ InDiCo user (Avatar+Identity) search-and-destroy tool for never
 Copyright (C) 2012-2015 Dirk Hoffmann -CPPM-
 All rights reserved. Use within the CTA consortium and other public research
 projects in High Energy Physics permitted.
-
-$Id: indicoUserDump.py 6843 2014-06-12 23:33:57Z dirk $
 """
 
 
