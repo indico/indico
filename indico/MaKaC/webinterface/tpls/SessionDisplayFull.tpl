@@ -73,9 +73,9 @@
                 <% eDate = session.getAdjustedEndDate(tz) %>
                 ${_("Date")}:
                 % if sDate.date() == eDate.date():
-                    <span style="font-weight: bold"> ${format_datetime(sDate, format='d MMM HH:mm')} - ${format_time(eDate)}</span>
+                    <span style="font-weight: bold"> ${format_datetime(sDate, format='d MMM HH:mm', timezone=tz)} - ${format_time(eDate, timezone=tz)}</span>
                 % else:
-                    ${_("from")} <span style="font-weight: bold">${format_datetime(sDate, 'd MMM HH:mm')} </span> ${_("to")} <span style="font-weight: bold">${format_datetime(eDate, 'd MMM HH:mm')}</span>
+                    ${_("from")} <span style="font-weight: bold">${format_datetime(sDate, 'd MMM HH:mm', timezone=tz)} </span> ${_("to")} <span style="font-weight: bold">${format_datetime(eDate, 'd MMM HH:mm', timezone=tz)}</span>
                 % endif
             </div>
         </div>
@@ -96,7 +96,7 @@
                       <li>
                         <span class="time">
                           % if sDate.date() != eDate.date():
-                            ${format_datetime(slot['startDate'], 'd MMM HH:mm')} - ${format_time(slot['endDate'])}
+                            ${format_datetime(slot['startDate'], 'd MMM HH:mm', timezone=tz)} - ${format_time(slot['endDate'], timezone=tz)}
                           % endif
                         </span>
                         % if slot['title']:
