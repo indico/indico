@@ -29,7 +29,7 @@
             </div>
         % endif
         <div style="border-bottom: 1px solid #DDDDDD; margin-bottom:5px; margin-top:10px"></div>
-        <div class="settingsWidgetSection"><a href="${ logoutURL }">${ _("Logout") }</a></div>
+        <div class="settingsWidgetSection"><a href="${ url_for('auth.logout', next=_request.full_path.rstrip('?')) }">${ _("Logout") }</a></div>
     % endif
 </div>
 

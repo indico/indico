@@ -1,0 +1,16 @@
+{% extends 'layout/full_page_base.html' %}
+{% from 'forms/form_widget.html' import form_header, form_rows, form_footer  %}
+
+{% block title %}
+    {% trans name=provider.title %}Login using {{ name }}{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% include 'flashed_messages.html' %}
+
+    {{ form_header() }}
+    {{ form_rows(form) }}
+    {% call form_footer() %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Log in{% endtrans %}">
+    {% endcall %}
+{% endblock %}

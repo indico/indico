@@ -30,6 +30,7 @@ from xml.sax.saxutils import escape
 import oauth2 as oauth
 import transaction
 from flask import request, session, g, current_app
+from itsdangerous import BadData
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound, Forbidden
 from werkzeug.wrappers import Response
@@ -51,7 +52,6 @@ from MaKaC.errors import (
     NotLoggedError,
     NotFoundError)
 from MaKaC.webinterface.mail import GenericMailer
-import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.errors as errors
 from MaKaC.webinterface.pages.error import WErrorWSGI
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
@@ -64,7 +64,7 @@ from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
 from indico.util.redis import RedisError
-from indico.web.flask.util import ResponseUtil
+from indico.web.flask.util import ResponseUtil, url_for
 
 
 class RequestHandlerBase():
@@ -334,6 +334,11 @@ class RH(RequestHandlerBase):
     def _processBadRequest(self, e):
         message = _("Bad Request")
         return WErrorWSGI((message, e.description)).getHTML()
+
+    @jsonify_error(status=400)
+    def _processBadData(self, e):
+        message = _("Invalid or expired token")
+        return WErrorWSGI((message, e.message)).getHTML()
 
     @jsonify_error(status=403)
     def _processAccessError(self, e):
@@ -643,6 +648,8 @@ class RH(RequestHandlerBase):
             'Exception': 'UnexpectedError',
             'AccessControlError': 'AccessError'
         }.get(type(e).__name__, type(e).__name__)
+        if isinstance(e, BadData):  # we also want its subclasses
+            exception_name = 'BadData'
         return getattr(self, '_process{}'.format(exception_name), self._processUnexpectedError)
 
     def _deleteTempFiles(self):
@@ -671,7 +678,8 @@ class RHSimple(RH):
         self.func = func
 
     def _process(self):
-        return self.func()
+        rv = self.func()
+        return rv
 
     @classmethod
     def wrap_function(cls, func):
@@ -686,7 +694,7 @@ class RHSimple(RH):
 class RHProtected(RH):
 
     def _getLoginURL(self):
-        return urlHandlers.UHSignIn.getURL(self.getRequestURL())
+        return url_for('auth.login', next=request.full_path.rstrip('?'), _external=True, _secure=True)
 
     def _checkSessionUser(self):
         if self._getUser() is None:

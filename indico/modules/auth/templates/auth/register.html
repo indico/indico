@@ -1,0 +1,33 @@
+{% extends 'layout/full_page_base.html' %}
+{% from 'forms/form_widget.html' import form_header, form_row, form_rows, form_footer  %}
+
+{% block title %}
+    {% trans %}Create a new Indico account{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% include 'flashed_messages.html' %}
+
+    {% if must_verify_email and not email_sent %}
+        <p>
+            {% trans -%}
+                To create a new Indico account you first need to verify your email address.
+            {%- endtrans %}
+        </p>
+    {% endif %}
+    {% if email_sent %}
+        <a class="i-button big" href="{{ url_for('auth.logout') }}">{% trans %}Cancel{% endtrans %}</a>
+    {% else %}
+        {{ form_header() }}
+        {{ form_row(form.email) }}
+        {{ form_rows(form, fields=('first_name', 'last_name', 'affiliation', 'phone')) }}
+        {% call form_footer() %}
+            <a class="i-button big" href="{{ url_for('auth.logout') }}">{% trans %}Cancel{% endtrans %}</a>
+            {% if must_verify_email %}
+                <input class="i-button big highlight" type="submit" value="{% trans %}Send me a verification email{% endtrans %}">
+            {% else %}
+                <input class="i-button big highlight" type="submit" value="{% trans %}Create my Indico account{% endtrans %}">
+            {% endif %}
+        {% endcall %}
+    {% endif %}
+{% endblock %}

@@ -44,6 +44,7 @@ from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.plugins import plugin_engine, include_plugin_css_assets, include_plugin_js_assets, url_for_plugin
+from indico.modules.auth import multiauth
 from indico.util.signals import values_from_signal
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
@@ -67,6 +68,7 @@ from indico.web.flask.blueprints.rooms_admin import rooms_admin
 
 from indico.core.plugins.blueprints import plugins_blueprint
 from indico.modules.api.blueprint import api_blueprint
+from indico.modules.auth.blueprint import auth_blueprint
 from indico.modules.events.agreements.blueprint import agreements_blueprint
 from indico.modules.payment.blueprint import payment_blueprint
 from indico.modules.vc.blueprint import vc_blueprint, vc_compat_blueprint
@@ -80,7 +82,7 @@ from indico.web.assets.blueprint import assets_blueprint
 BLUEPRINTS = (legacy, misc, user, oauth, rooms, category, category_mgmt, event_display,
               event_creation, event_mgmt, files, admin, rooms_admin, plugins_blueprint, payment_blueprint,
               event_registration_blueprint, requests_blueprint, agreements_blueprint, vc_blueprint, assets_blueprint,
-              api_blueprint, users_blueprint, oauth_blueprint)
+              api_blueprint, users_blueprint, oauth_blueprint, auth_blueprint)
 COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, user, oauth, rooms, category, category_mgmt, event_display,
                                                 event_creation, event_mgmt, files, admin, rooms_admin))
 COMPAT_BLUEPRINTS += (vc_compat_blueprint,)
@@ -112,6 +114,20 @@ def configure_app(app, set_path=False):
     app.config['INDICO_SESSION_PERMANENT'] = cfg.getSessionLifetime() > 0
     app.config['INDICO_HTDOCS'] = cfg.getHtdocsDir()
     app.config['INDICO_COMPAT_ROUTES'] = cfg.getRouteOldUrls()
+    app.config['MULTIAUTH_AUTH_PROVIDERS'] = cfg.getAuthProviders()
+    app.config['MULTIAUTH_IDENTITY_PROVIDERS'] = cfg.getIdentityProviders()
+    app.config['MULTIAUTH_PROVIDER_MAP'] = cfg.getProviderMap() or {x: x for x in cfg.getAuthProviders()}
+    if 'indico' in app.config['MULTIAUTH_AUTH_PROVIDERS'] or 'indico' in app.config['MULTIAUTH_IDENTITY_PROVIDERS']:
+        raise ValueError('The name `indico` is reserved and cannot be used as an Auth/Identity provider name.')
+    if cfg.getLocalIdentities():
+        configure_multiauth_local(app)
+    app.config['MULTIAUTH_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone'}
+    app.config['MULTIAUTH_LOGIN_SELECTOR_TEMPLATE'] = 'auth/login_selector.html'
+    app.config['MULTIAUTH_LOGIN_FORM_TEMPLATE'] = 'auth/login_form.html'
+    app.config['MULTIAUTH_LOGIN_ENDPOINT'] = 'auth.login'
+    app.config['MULTIAUTH_LOGIN_URLS'] = None  # registered in a blueprint
+    app.config['MULTIAUTH_SUCCESS_ENDPOINT'] = 'misc.index'
+    app.config['MULTIAUTH_FAILURE_MESSAGE'] = _(u'Login failed: {error}')
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
     app.config['PLUGINENGINE_PLUGINS'] = cfg.getPlugins()
     if set_path:
@@ -132,6 +148,13 @@ def configure_app(app, set_path=False):
             app.wsgi_app = XAccelMiddleware(app.wsgi_app, args)
         else:
             raise ValueError('Invalid static file method: %s' % method)
+
+
+def configure_multiauth_local(app):
+    raise NotImplementedError
+    # app.config['MULTIAUTH_AUTH_PROVIDERS']['indico'] = {'type': IndicoAuthProvider, 'title': _('Local Accounts')}
+    # app.config['MULTIAUTH_IDENTITY_PROVIDERS']['indico'] = {'type': IndicoIdentityProvider}
+    # app.config['MULTIAUTH_PROVIDER_MAP']['indico'] = 'indico'
 
 
 def setup_jinja(app):
@@ -294,6 +317,7 @@ def make_app(set_path=False, db_setup=True, testing=False):
     configure_app(app, set_path)
 
     babel.init_app(app)
+    multiauth.init_app(app)
     setup_jinja(app)
 
     with app.app_context():

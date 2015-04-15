@@ -137,8 +137,10 @@ from MaKaC.webinterface.general import strfFileSize
     </div>
     % endif
 
+
     <div class="category-content-wrapper">
         <div class="category-content">
+            ${ render_template('flashed_messages.html') }
             <div class="category-info">
 
             % if isRootCategory:

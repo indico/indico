@@ -198,6 +198,14 @@ class User(db.Model):
         primaryjoin='(User.id == APIKey.user_id) & ~APIKey.is_active',
         back_populates='user'
     )
+    #: the identities used by this user
+    identities = db.relationship(
+        'Identity',
+        lazy=True,
+        cascade='all, delete-orphan',
+        collection_class=set,
+        backref=db.backref('user', lazy=False)
+    )
 
     @property
     def as_avatar(self):

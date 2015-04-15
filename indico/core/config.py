@@ -526,6 +526,10 @@ class Config:
         'CategoryCleanup'           : {},
         'JanitorUserId'             : 0,
         'Plugins'                   : {},
+        'AuthProviders'             : {},
+        'IdentityProviders'         : {},
+        'ProviderMap'               : {},
+        'LocalIdentities'           : False,
         'SecretKey'                 : None
     }
 

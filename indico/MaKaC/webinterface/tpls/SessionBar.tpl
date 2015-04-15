@@ -25,7 +25,15 @@ protection = getProtection(target) if target else None
         <%include file="SettingsWidget.tpl" args="Languages = Languages"/>
         % else:
         <%include file="LanguageSelector.tpl" args="Languages = Languages, IsHeader = False, dark=dark_"/>
-        <a class="i-button icon-enter" href="${ loginURL }">${ _("Login")}</a>
+
+        <%
+            after_login_url = _request.values.get('next')
+            if after_login_url is None and _request.endpoint != _app.config['MULTIAUTH_LOGIN_ENDPOINT']:
+                after_login_url = _request.full_path.rstrip('?')
+            if after_login_url == '/':
+                after_login_url = None
+        %>
+        <a class="i-button icon-enter" href="${ url_for('auth.login', next=after_login_url, _external=True, _secure=True) }">${ _("Login")}</a>
         % endif
       </div>
     </div>

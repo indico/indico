@@ -1,0 +1,16 @@
+{% extends 'layout/full_page_base.html' %}
+
+{% block title %}
+    {% trans %}Login{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% include 'flashed_messages.html' %}
+
+    Available login providers:
+    <ul>
+        {% for provider in providers|sort(attribute='title') %}
+            <li><a href="{{ url_for(login_endpoint, provider=provider.name, next=next) }}">{{ provider.title }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
