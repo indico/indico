@@ -19,6 +19,7 @@ import re
 
 from datetime import date
 from datetime import timedelta
+from operator import methodcaller, attrgetter
 
 from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields.core import BooleanField, SelectField
@@ -97,11 +98,12 @@ class VCRoomLinkFormBase(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(VCRoomLinkFormBase, self).__init__(*args, **kwargs)
-        self.contribution.choices = ([('', _("Please select a contribution"))] +
-                                     [(contrib.id, contrib.title) for contrib in self.event.getContributionList()])
-        self.block.choices = (
-            [('', _("Please select a session block"))] +
-            [(full_block_id(block), block.getFullTitle()) for block in self.event.getSessionSlotList()])
+        contrib_choices = [(contrib.id, contrib.title) for contrib in
+                           sorted(self.event.getContributionList(), key=attrgetter('title'))]
+        block_choices = [(full_block_id(block), block.getFullTitle()) for block in
+                         sorted(self.event.getSessionSlotList(), key=methodcaller('getFullTitle'))]
+        self.contribution.choices = [('', _("Please select a contribution"))] + contrib_choices
+        self.block.choices = [('', _("Please select a session block"))] + block_choices
         self.linking._form = self
 
 
