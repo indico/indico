@@ -3,6 +3,7 @@
 # ex: set tabstop=4 expandtab:
 """
 removeNeverConfirmed.py
+
 InDiCo user (Avatar+Identity) search-and-destroy tool for never
  confirmed account requests (spam).
 # Adapted from removePasswords.py script
@@ -12,22 +13,27 @@ All rights reserved. Use within the CTA consortium and other public research
 projects in High Energy Physics permitted.
 """
 
+# System imports
+import sys
+import getopt
+from datetime import datetime
 
-import sys, getopt
-
+# Indico imports
 from MaKaC.common.db import DBMgr
 from MaKaC.user import AvatarHolder
 
 
 def main():
-    """Script for removal of never-confirmed Indico account requests.
-
-       Usage: {0} [options]
-
-       Valid options:
-         -n/--dry-run  Only list Avatars/Ids that would be removed.
-         -h/--help     This help text.
     """
+    Script for removal of never-confirmed Indico account requests.
+
+    Usage: {0} [options]
+
+    Valid options:
+      -n/--dry-run  only list Avatars/Ids that would be removed
+      -q/--quiet    remove all non-confirmed accounts with minimal output
+      -h/--help     this help text
+"""
 
     try:
         optlist, args = getopt.getopt(
@@ -40,13 +46,15 @@ def main():
         sys.exit(2)
 
     dryrun = False
+    silent = False
     for o, a in optlist:
         if o in ("-n", "--dry-run"):
             dryrun = True
+        if o in ("-q", "--quiet"):
+            silent = True
         elif o in ("-h", "--help"):
             print main.__doc__.format(sys.argv[0])
             sys.exit(0)
-
 
     DBMgr.getInstance().startRequest()
 
@@ -69,26 +77,38 @@ def main():
                 avatar.getId(),
                 ids
                 )
-        if not dryrun and notcon:
+        if notcon:
+            if silent:
+                avh.remove(avatar)
+                removed += 1
+                continue
+
             print " +", " / ".join(
                 (
                     avatar.getOrganisation()[0:25],
                     avatar.getPhone(),
                     avatar.getEmail()
                 ))
-            if sys.stdin.isatty():
-                ans = raw_input(" Remove {0}? [yNxq] >".format(
-                    avatar.getFullName()
+            print " + Last modified", datetime.fromtimestamp(avatar._p_mtime)
+            if not dryrun and sys.stdin.isatty():
+                ans = raw_input(
+                    " Remove {0}? (No[|Yes|All|eXit]) >".format(
+                        avatar.getFullName()
                     ))
                 if ans.lower() in ("yes", "y"):
                     avh.remove(avatar)
-                    print "REMOVED."
                     removed += 1
-                elif ans.lower() in ("exit", "x", "quit", "q"):
+                    print "REMOVED."
+                elif ans.lower() in ("all", "a"):
+                    silent = True
+                    avh.remove(avatar)
+                    removed += 1
+                    print "REMOVED and going to remove ALL the following ..."
+                elif ans.lower() in ("exit", "x"):
                     print "Committing previous removals and exiting ..."
                     break
 
-        print removed, "account requests (Avatars) removed."
+    print removed, "account requests (Avatars) removed."
 
     DBMgr.getInstance().endRequest()
 
