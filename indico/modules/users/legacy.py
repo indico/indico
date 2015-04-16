@@ -24,8 +24,9 @@ from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.string import to_unicode, return_ascii
 from indico.util.user import retrieve_principals
 from indico.util.redis import write_client as redis_write_client
-from indico.util.redis import avatar_links, suggestions
+from indico.util.redis import avatar_links
 
+from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.Locators import Locator
 from MaKaC.fossils.user import IAvatarFossil, IAvatarMinimalFossil
 
@@ -155,7 +156,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     @encode_utf8
     def getTimezone(self):
-        return self.user.settings.get('timezone')
+        return self.user.settings.get('timezone', HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
 
     def getDisplayTZMode(self):
         return 'MyTimezone' if self.user.settings.get('force_timezone') else 'Event Timezone'

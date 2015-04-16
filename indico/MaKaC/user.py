@@ -39,6 +39,7 @@ from MaKaC.common.fossilize import Fossilizable, fossilizes
 
 from pytz import all_timezones
 
+from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.caching import memoize_request
 from indico.util.decorators import cached_classproperty
@@ -1202,9 +1203,11 @@ class AvatarHolder(ObjectHolder):
         return True
 
 
-
-
     def getById(self, id):
+        if isinstance(id, int) or id.isdigit():
+            user = User.get(int(id))
+            if user:
+                return user.as_avatar
         try:
             return ObjectHolder.getById(self, id)
         except:
