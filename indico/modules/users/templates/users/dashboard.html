@@ -15,6 +15,11 @@
                     </div>
                     <div class="your-details-wrapper left">
                         <h3>{{ user.full_name }}</h3>
+                        {% if config.DEBUG %}
+                            <div>
+                                <i class="icon-info" title="{% trans %}User ID{% endtrans %}"></i><span>{{ user.id }}</span>
+                            </div>
+                        {% endif %}
                         <div>
                             <i class="icon-users"></i><span>{{ user.affiliation }}</span>
                         </div>
