@@ -59,7 +59,9 @@ def user_or_id(f):
     @wraps(f)
     def wrapper(self, user, *args, **kwargs):
         if isinstance(user, User):
-            user = user.id
+            user = {'user': user}
+        else:
+            user = {'user_id': user.id}
         return f(self, user, *args, **kwargs)
 
     return wrapper
@@ -72,65 +74,65 @@ class UserSettingsProxy(SettingsProxyBase):
     def get_all(self, user, no_defaults=False):
         """Retrieves all settings
 
-        :param user: User (or their ID)
+        :param user: ``{'user': user}`` or ``{'user_id': id}``
         :param no_defaults: Only return existing settings and ignore defaults.
         :return: Dict containing the settings
         """
-        return _get_all(UserSetting, self, no_defaults, user_id=user)
+        return _get_all(UserSetting, self, no_defaults, **user)
 
     @user_or_id
     def get(self, user, name, default=_default):
         """Retrieves the value of a single setting.
 
-        :param user: User (or their ID)
+        :param user: ``{'user': user}`` or ``{'user_id': id}``
         :param name: Setting name
         :param default: Default value in case the setting does not exist
         :return: The settings's value or the default value
         """
         self._check_strict(name)
-        return _get(UserSetting, self, name, default, self._cache, user_id=user)
+        return _get(UserSetting, self, name, default, self._cache, **user)
 
     @user_or_id
     def set(self, user, name, value):
         """Sets a single setting.
 
-        :param user: User (or their ID)
+        :param user: ``{'user': user}`` or ``{'user_id': id}``
         :param name: Setting name
         :param value: Setting value; must be JSON-serializable
         """
         self._check_strict(name)
-        UserSetting.set(self.module, name, value, user_id=user)
+        UserSetting.set(self.module, name, value, **user)
         self._flush_cache()
 
     @user_or_id
     def set_multi(self, user, items):
         """Sets multiple settings at once.
 
-        :param user: User (or their ID)
+        :param user: ``{'user': user}`` or ``{'user_id': id}``
         :param items: Dict containing the new settings
         """
         for name in items:
             self._check_strict(name)
-        UserSetting.set_multi(self.module, items, user_id=user)
+        UserSetting.set_multi(self.module, items, **user)
         self._flush_cache()
 
     @user_or_id
     def delete(self, user, *names):
         """Deletes settings.
 
-        :param user: User (or their ID)
+        :param user: ``{'user': user}`` or ``{'user_id': id}``
         :param names: One or more names of settings to delete
         """
         for name in names:
             self._check_strict(name)
-        UserSetting.delete(self.module, names, user_id=user)
+        UserSetting.delete(self.module, names, **user)
         self._flush_cache()
 
     @user_or_id
     def delete_all(self, user):
         """Deletes all settings.
 
-        :param user: User (or their ID)
+        :param user: ``{'user': user}`` or ``{'user_id': id}``
         """
-        UserSetting.delete_all(self.module, user_id=user)
+        UserSetting.delete_all(self.module, **user)
         self._flush_cache()
