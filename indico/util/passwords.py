@@ -21,10 +21,11 @@ import bcrypt
 
 class BCryptPassword(object):
     def __init__(self, hash_):
-        self.hash = hash_
+        self.hash = str(hash_)
 
     def __eq__(self, value):
-        if not self.hash:
+        if not self.hash or not value:
+            # For security reasons we never consider an empty password/hash valid
             return False
         if isinstance(value, unicode):
             value = value.encode('utf-8')

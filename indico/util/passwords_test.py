@@ -39,6 +39,7 @@ class Foo(object):
 def mock_bcrypt(mocker):
     def _hashpw(value, salt):
         assert isinstance(value, str), 'hashpw expects bytes'
+        assert isinstance(salt, str), 'hashpw expects bytes'
         return md5(value)
 
     bcrypt = mocker.patch('indico.util.passwords.bcrypt')
@@ -57,13 +58,15 @@ def test_passwordproperty_set(mock_bcrypt, password):
 
 
 @pytest.mark.parametrize('password', ('', None))
-def test_passwordproperty_set_invalid(mock_bcrypt, password):
+@pytest.mark.usefixtures('mock_bcrypt')
+def test_passwordproperty_set_invalid(password):
     test = Foo()
     with pytest.raises(ValueError):
         test.password = password
 
 
-def test_passwordproperty_del(mock_bcrypt):
+@pytest.mark.usefixtures('mock_bcrypt')
+def test_passwordproperty_del():
     test = Foo()
     test.password = 'foo'
     assert test._password == md5('foo')
@@ -71,20 +74,38 @@ def test_passwordproperty_del(mock_bcrypt):
     assert test._password is None
 
 
-def test_passwordproperty_get(mock_bcrypt):
+def test_passwordproperty_get():
     test = Foo()
-    test.password = 'foo'
     assert isinstance(test.password, BCryptPassword)
-    assert test.password == 'foo'
-    assert test.password == u'foo'
-    assert test.password != 'bar'
-    assert test.password != u'bar'
 
 
-def test_bcryptpassword_eq(mock_bcrypt):
-    test = Foo()
-    test.password = 'foo'
-    pw = test.password
-    pw.hash = ''
-    assert pw != 'foo'
-    assert pw != ''
+@pytest.mark.parametrize(('password_hash_unicode', 'password'), (
+    (False, 'moep'),
+    (True,  'moep'),
+    (False, u'm\xf6p'),
+    (True,  u'm\xf6p')
+))
+@pytest.mark.usefixtures('mock_bcrypt')
+def test_bcryptpassword_check(password_hash_unicode, password):
+    password_hash = bytes(md5(password))
+    if password_hash_unicode:
+        password_hash = unicode(password_hash)
+    pw = BCryptPassword(password_hash)
+    assert pw == unicode(password)
+    assert pw == unicode(password).encode('utf-8')
+    assert pw != u'notthepassword'
+    assert pw != 'notthepassword'
+
+
+@pytest.mark.parametrize(('password_hash', 'password'), (
+    (md5(''), ''),
+    ('',      ''),
+    ('',      'foo'),
+    ('foo',   '')
+))
+@pytest.mark.usefixtures('mock_bcrypt')
+def test_bcryptpassword_check_empty(password_hash, password):
+    pw = Foo().password
+    pw.hash = password_hash
+    assert pw != 'xxx'
+    assert pw != password
