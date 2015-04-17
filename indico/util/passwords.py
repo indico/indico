@@ -26,9 +26,14 @@ class BCryptPassword(object):
     def __eq__(self, value):
         if not self.hash:
             return False
+        if isinstance(value, unicode):
+            value = value.encode('utf-8')
         return self.hash == bcrypt.hashpw(value, self.hash)
 
-    def __hash__(self):
+    def __ne__(self, other):
+        return not (self == other)
+
+    def __hash__(self):  # pragma: no cover
         return hash(self.hash)
 
     def __repr__(self):
@@ -36,6 +41,8 @@ class BCryptPassword(object):
 
     @staticmethod
     def hash(value):
+        if isinstance(value, unicode):
+            value = value.encode('utf-8')
         return bcrypt.hashpw(value, bcrypt.gensalt())
 
 
@@ -61,6 +68,8 @@ class PasswordProperty(object):
         return self.backend(getattr(instance, self.attr, None))
 
     def __set__(self, instance, value):
+        if not value:
+            raise ValueError('Password may not be empty')
         setattr(instance, self.attr, self.backend.hash(value))
 
     def __delete__(self, instance):
