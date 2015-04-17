@@ -71,12 +71,27 @@
     </form>
 {% endmacro %}
 
-{% macro form_fieldset(legend, description=none, disabled=false) %}
-    <fieldset{% if disabled %} disabled {% endif %}>
-        <legend>{{ legend }}</legend>
-        {% if description %}
-            <p class="description">{{ description }}</p>
-        {% endif %}
+{% macro form_fieldset(legend, description=none, disabled=false, render_as_fieldset=true) %}
+    {% if not render_as_fieldset %}
+        {#
+        This is sugar for cases where you sometimes want the fieldset
+        to show up as a fieldset and sometimes just want the contents.
+        The most common use case for this is a form which has either
+        a single fieldset or multiple fieldsets depending on the user's
+        privileges. In this case it often looks better not to show the
+        single fieldset as an actual fieldset.
+        Using `render_as_fieldset` keep the code using this macro clean
+        as it won't need extra conditions/macros/blocks to show the same
+        content either inside or outside this fieldset.
+        #}
         {{ caller() }}
-    </fieldset>
+    {% else %}
+        <fieldset{% if disabled %} disabled {% endif %}>
+            <legend>{{ legend }}</legend>
+            {% if description %}
+                <p class="description">{{ description }}</p>
+            {% endif %}
+            {{ caller() }}
+        </fieldset>
+    {% endif %}
 {% endmacro %}
