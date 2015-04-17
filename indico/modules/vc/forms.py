@@ -21,6 +21,7 @@ from datetime import date
 from datetime import timedelta
 from operator import methodcaller, attrgetter
 
+from flask_pluginengine import current_plugin
 from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields.core import BooleanField, SelectField
 from wtforms.fields.html5 import IntegerField
@@ -72,9 +73,9 @@ class LinkingWidget(JinjaWidget):
 class VCPluginSettingsFormBase(IndicoForm):
     managers = PrincipalField(_('Managers'), groups=True, description=_('Service managers'))
     acl = PrincipalField(_('ACL'), groups=True,
-                         description=_('Users and Groups authorised to create video conference rooms'))
+                         description=_('Users and Groups authorised to create videoconference rooms'))
     notification_emails = EmailListField(_('Notification email addresses'),
-                                         description=_('Notifications about video conference rooms are sent to '
+                                         description=_('Notifications about videoconference rooms are sent to '
                                                        'these email addresses (one per line).'))
 
 
@@ -120,6 +121,7 @@ class VCRoomAttachFormBase(VCRoomLinkFormBase):
 
 class VCRoomFormBase(VCRoomLinkFormBase):
     advanced_fields = {'show'}
+    skip_fields = advanced_fields | VCRoomLinkFormBase.conditional_fields
 
     name = StringField(_('Name'), [DataRequired(), Length(min=3, max=60), Regexp(ROOM_NAME_RE)],
                        description=_('The name of the room. It can contain only alphanumerical characters, underscores '
@@ -127,13 +129,15 @@ class VCRoomFormBase(VCRoomLinkFormBase):
 
     def validate_name(self, field):
         if field.data:
-            room = VCRoom.find_first(VCRoom.name == field.data, VCRoom.status != VCRoomStatus.deleted)
+            room = VCRoom.find_first(VCRoom.name == field.data, VCRoom.status != VCRoomStatus.deleted,
+                                     VCRoom.type == self.service_name)
             if room and room != self.vc_room:
                 raise ValidationError(_("There is already a room with this name"))
 
     def __init__(self, *args, **kwargs):
         super(VCRoomFormBase, self).__init__(*args, **kwargs)
         self.vc_room = kwargs.pop('vc_room')
+        self.service_name = current_plugin.service_name
 
 
 class VCRoomListFilterForm(IndicoForm):

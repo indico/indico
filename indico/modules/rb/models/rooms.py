@@ -329,7 +329,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         infos.append(_(u'public') if self.is_public else _(u'private'))
         infos.append(_(u'auto-confirmation') if self.is_auto_confirm else _(u'needs confirmation'))
         if self.has_vc:
-            infos.append(_(u'video conference'))
+            infos.append(_(u'videoconference'))
 
         return u', '.join(map(unicode, infos))
 

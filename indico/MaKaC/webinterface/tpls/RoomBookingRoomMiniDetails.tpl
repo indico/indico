@@ -81,7 +81,7 @@
     <div class="warning-message-box new-booking-message-box" style="margin-top: 2em;">
         <div class="message-text ">
             <p>
-                ${ _("This room is equipped for video-conferencing.") }
+                ${ _("This room is equipped for videoconferencing.") }
             </p>
             ${ _("If you need this equipment, <strong>do not forget</strong> to select it. If you don't need any of this equipment please <strong>choose another room</strong> unless there is no suitable one available for your meeting.") }
         </div>

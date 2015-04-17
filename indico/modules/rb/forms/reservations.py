@@ -51,8 +51,8 @@ class BookingSearchForm(IndicoForm):
     is_cancelled = BooleanField('Is Cancelled')
     is_archived = BooleanField('Is Archived')
 
-    uses_vc = BooleanField('Uses Video Conference')
-    needs_vc_assistance = BooleanField('Video Conference Setup Assistance')
+    uses_vc = BooleanField(_('Uses Videoconference'))
+    needs_vc_assistance = BooleanField(_('Videoconference Setup Assistance'))
     needs_assistance = BooleanField('General Assistance')
 
     @generated_data
@@ -125,13 +125,13 @@ class NewBookingConfirmForm(NewBookingPeriodForm):
 
     def validate_used_equipment(self, field):
         if field.data and not self.uses_vc.data:
-            raise ValidationError(_(u'Video Conference equipment is not used.'))
+            raise ValidationError(_(u'Videoconference equipment is not used.'))
         elif not field.data and self.uses_vc.data:
-            raise ValidationError(_(u'You need to select some Video Conference equipment'))
+            raise ValidationError(_(u'You need to select some Videoconference equipment'))
 
     def validate_needs_vc_assistance(self, field):
         if field.data and not self.uses_vc.data:
-            raise ValidationError(_(u'Video Conference equipment is not used.'))
+            raise ValidationError(_(u'Videoconference equipment is not used.'))
 
 
 class NewBookingSimpleForm(NewBookingConfirmForm):

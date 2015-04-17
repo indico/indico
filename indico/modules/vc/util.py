@@ -25,7 +25,7 @@ from MaKaC.conference import SessionSlot
 
 
 def get_vc_plugins():
-    """Returns a dict containing the available video conference plugins."""
+    """Returns a dict containing the available videoconference plugins."""
     from indico.modules.vc import VCPluginMixin
 
     return {p.service_name: p for p in plugin_engine.get_active_plugins().itervalues()

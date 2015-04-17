@@ -312,6 +312,29 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
     }
 }
 
+$dropdown-transition-step: 0.05s;
+$dropdown-transition: $dropdown-transition-step ease-out;
+
+%dropdown-visible {
+    visibility: visible;
+    opacity: 1.0;
+    @include transition(visibility $dropdown-transition,
+                        opacity $dropdown-transition,
+                        height $dropdown-transition,
+                        padding $dropdown-transition);
+}
+
+%dropdown-hidden {
+    visibility: hidden;
+    opacity: 0.0;
+    height: 0 !important;
+    padding: 0 !important;
+    @include transition(visibility $dropdown-transition,
+                        opacity $dropdown-transition,
+                        height $dropdown-transition,
+                        padding $dropdown-transition);
+}
+
 .i-form {
     @extend %font-family-form;
     @include box-sizing(border-box);
@@ -341,6 +364,34 @@ $switch-inner-shadow: inset 0 0 0.4em $switch-shadow-color;
             padding-left: 1em;
             padding-right: 1em;
             margin-bottom: 0.7em;
+
+            > .i-linking {
+                width: 400px;
+                > label {
+                    width: 28%;
+                    padding: 0.7em 0;
+                }
+                > .i-linking-dropdown,
+                > span.static-text {
+                    display: inline-block !important;
+                    width: 65% !important;
+                }
+                > .i-linking-dropdown > select { width: 100%; }
+
+                > input:checked + label {
+                    + .i-linking-dropdown,
+                    + span {
+                        @extend %dropdown-visible;
+                    }
+                }
+
+                > input:not(:checked) + label {
+                    + .i-linking-dropdown,
+                    + span {
+                        @extend %dropdown-hidden;
+                    }
+                }
+            }
         }
 
         .form-label {

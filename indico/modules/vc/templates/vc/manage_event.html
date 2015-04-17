@@ -1,7 +1,7 @@
 {% extends 'layout/base.html' %}
 {% from 'forms/form_widget.html' import form_header, form_row, form_footer  %}
 
-{% block title %}{% trans %}Current video rooms{% endtrans %}{% endblock %}
+{% block title %}{% trans %}Current videoconference rooms{% endtrans %}{% endblock %}
 {% block content %}
     <div class="module-vc vc-management fixed-width" id="vc-info-container">
         {% if plugins %}
@@ -60,14 +60,20 @@
                 </table>
             {% else %}
                 <div class="info-message-box fixed-width">
-                    <div class="message-text">{% trans %}No video conference rooms have been added yet.{% endtrans %}</div>
+                    <div class="message-text">{% trans %}No videoconference rooms have been added yet.{% endtrans %}</div>
                 </div>
             {% endif %}
             <div class="add-room-options right">
                 {% if plugins|length == 1 %}
-                    {{ plugins[0].render_custom_create_button(event=event) | safe }}
+                    <a class="i-button i-form-button js-create-room"
+                       data-vc-system="{{ plugins[0].service_name }}"
+                       href="{{ url_for_plugin('.manage_vc_rooms_create', event, service=plugins[0].service_name) }}">
+                        <img src="{{ plugins[0].icon_url }}" alt="">
+                        {% trans plugin_name=plugins[0].friendly_name %}Create {{ plugin_name }} room{% endtrans %}
+                    </a>
                 {% elif plugins|length > 1 %}
-                    <a class="i-button i-form-button icon-plus js-create-room" href="{{ url_for_plugin('.manage_vc_rooms_select', event) }}">
+                    <a class="i-button i-form-button icon-plus js-create-room"
+                       href="{{ url_for_plugin('.manage_vc_rooms_select', event, vc_room_action='.manage_vc_rooms_create') }}">
                         {%- trans %}Create new room{% endtrans -%}
                     </a>
                 {% endif %}
@@ -77,7 +83,7 @@
                        {% if plugins|length == 1 %}
                            data-href="{{ url_for('.manage_vc_rooms_search_form', event, service=plugins[0].service_name) }}"
                        {% else %}
-                           data-href="{{ url_for('.manage_vc_rooms_search_form', event) }}"
+                           data-href="{{ url_for('.manage_vc_rooms_select', event, vc_room_action='.manage_vc_rooms_search_form') }}"
                        {% endif %}
                        >{% trans %}Add existing room{% endtrans %}
                     </a>
@@ -89,7 +95,7 @@
         {% else %}
             <div class="warning-message-box">
                 <div class="message-text">
-                    {% trans %}There are no Video Conference plugins available.{% endtrans %}
+                    {% trans %}There are no Videoconference plugins available.{% endtrans %}
                 </div>
             </div>
         {% endif %}

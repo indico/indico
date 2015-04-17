@@ -634,8 +634,8 @@ class Reservation(Serializer, db.Model):
             'booking_reason': "booking reason",
             'used_equipment': "list of equipment",
             'needs_assistance': "option 'General Assistance'",
-            'uses_vc': "option 'Uses Video Conference'",
-            'needs_vc_assistance': "option 'Video Conference Setup Assistance'"
+            'uses_vc': "option 'Uses Videoconference'",
+            'needs_vc_assistance': "option 'Videoconference Setup Assistance'"
         }
 
         self.room.check_advance_days(data['end_dt'].date(), user)

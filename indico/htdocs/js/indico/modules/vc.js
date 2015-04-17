@@ -21,11 +21,11 @@
         $('.js-vcroom-remove').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
-            var msg = $t('Do you really want to remove this video-conferencing room from the event?');
+            var msg = $t('Do you really want to remove this videoconference room from the event?');
             if ($this.data('numEvents') == 1) {
                 msg += ' ' + $t('Since it is only used in this event, it will be deleted from the server, too!');
             }
-            new ConfirmPopup($t('Delete this Vidyo Room?'), msg, function(confirmed) {
+            new ConfirmPopup($t('Delete this videoconference room?'), msg, function(confirmed) {
                 if (!confirmed) {
                     return;
                 }

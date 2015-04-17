@@ -55,7 +55,6 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
         # check whether there is a room-event association already present
         # for the given event, room and plugin
         q = VCRoomEventAssociation.find(
-            VCRoom.type == plugin.service_name,
             VCRoomEventAssociation.event_id == event.id,
             VCRoomEventAssociation.link_type == event_vc_room.link_type,
             VCRoomEventAssociation.link_id == event_vc_room.link_id,
@@ -69,12 +68,13 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
 
     if event_vc_room.link_type != VCRoomLinkType.event and existing:
         transaction.abort()
-        flash(_("There is already a VC room attached to '{}'.").format(resolve_title(event_vc_room.link_object)),
-              'error')
+        flash(_("There is already a VC room attached to '{link_object_title}'.").format(
+            link_object_title=resolve_title(event_vc_room.link_object)), 'error')
         return None
     elif event_vc_room.link_type == VCRoomLinkType.event and vc_room in existing:
         transaction.abort()
-        flash(_("This {0} room is already attached to the event.").format(plugin.friendly_name), 'error')
+        flash(_("This {plugin_name} room is already attached to the event.").format(plugin_name=plugin.friendly_name),
+              'error')
         return None
     else:
         return event_vc_room
@@ -97,24 +97,26 @@ class RHEventVCRoomMixin:
 
 
 class RHVCManageEvent(RHVCManageEventBase):
-    """Lists the available video conference rooms"""
+    """Lists the available videoconference rooms"""
 
     def _process(self):
         try:
-            vc_rooms = VCRoomEventAssociation.find_for_event(self._conf,
-                                                             include_hidden=True, include_deleted=True).all()
+            room_event_assos = VCRoomEventAssociation.find_for_event(self._conf, include_hidden=True,
+                                                                     include_deleted=True).all()
         except ValueError:
             raise IndicoError(_('This page is not available for legacy events.'))
+        event_vc_rooms = (event_vc_room for event_vc_room in room_event_assos if event_vc_room.vc_room.plugin)
         return WPVCManageEvent.render_template('manage_event.html', self._conf, event=self._conf,
-                                               event_vc_rooms=vc_rooms, plugins=get_vc_plugins().values())
+                                               event_vc_rooms=event_vc_rooms, plugins=get_vc_plugins().values())
 
 
 class RHVCManageEventSelectService(RHVCManageEventBase):
-    """List available video conference plugins to create a new video room"""
+    """List available videoconference plugins to create a new videoconference room"""
 
     def _process(self):
-        return WPVCManageEvent.render_template('manage_event_select.html', self._conf, event=self._conf,
-                                               plugins=get_vc_plugins().values())
+        action = request.args.get('vc_room_action', '.manage_vc_rooms_create')
+        return WPVCManageEvent.render_template('manage_event_select.html', self._conf, vc_room_action=action,
+                                               event=self._conf, plugins=get_vc_plugins().values())
 
 
 class RHVCManageEventCreateBase(RHVCManageEventBase):
@@ -131,8 +133,8 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
-            flash(_('You are not allowed to create {} rooms for this event.').format(self.plugin.friendly_name),
-                  'error')
+            flash(_('You are not allowed to create {plugin_name} rooms for this event.').format(
+                plugin_name=self.plugin.friendly_name), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
         form = self.plugin.create_form(event=self.event)
@@ -160,7 +162,8 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
                 db.session.add_all((vc_room, event_vc_room))
                 # TODO: notify_created(vc_room, self.event, session.user)
 
-                flash(_('Video conference room created'), 'success')
+                flash(_("{plugin_name} room '{room.name}' created").format(
+                    plugin_name=self.plugin.friendly_name, room=vc_room), 'success')
                 return redirect(url_for('.manage_vc_rooms', self.event))
 
         form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form,
@@ -220,7 +223,8 @@ class RHVCManageEventModify(RHVCSystemEventBase):
                 # TODO
                 # notify_modified(self.vc_room, self.event, session.user)
 
-                flash(_('Video conference room updated'), 'success')
+                flash(_("{plugin_name} room '{room.name}' updated").format(
+                    plugin_name=self.plugin.friendly_name, room=self.vc_room), 'success')
                 return redirect(url_for('.manage_vc_rooms', self.event))
 
         form_html = self.plugin.render_form(plugin=self.plugin, event=self.event, form=form,
@@ -235,8 +239,8 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event):
-            flash(_('You are not allowed to refresh {} rooms in this event.').format(self.plugin.friendly_name),
-                  'error')
+            flash(_('You are not allowed to refresh {plugin_name} rooms for this event.').format(
+                plugin_name=self.plugin.friendly_name), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
         Logger.get('modules.vc').info("Refreshing VC room {} from event {}".format(
@@ -250,7 +254,8 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
             flash(err.message, 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
-        flash(_("Video conference room '{0}' has been refreshed").format(self.vc_room.name), 'success')
+        flash(_("{plugin_name} room '{room.name}' refreshed").format(
+            plugin_name=self.plugin.friendly_name, room=self.vc_room), 'success')
         return redirect(url_for('.manage_vc_rooms', self.event))
 
 
@@ -264,7 +269,8 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
             return redirect(url_for('.manage_vc_rooms', self.event))
 
         self.event_vc_room.delete(session.user)
-        flash(_("Video conference room '{0}' has been removed").format(self.vc_room.name), 'success')
+        flash(_("{plugin_name} room '{room.name}' removed").format(
+            plugin_name=self.plugin.friendly_name, room=self.vc_room), 'success')
         return redirect(url_for('.manage_vc_rooms', self.event))
 
 
@@ -276,7 +282,8 @@ class RHVCEventPage(RHConferenceBaseDisplay):
         vc_plugins_available = True if get_vc_plugins() else False
         linked_to = defaultdict(lambda: defaultdict(list))
         for event_vc_room in event_vc_rooms:
-            linked_to[event_vc_room.link_type.name][event_vc_room.link_object].append(event_vc_room)
+            if event_vc_room.vc_room.plugin:
+                linked_to[event_vc_room.link_type.name][event_vc_room.link_object].append(event_vc_room)
         return WPVCEventPage.render_template('event_vc.html', self._conf, event=self._conf,
                                              event_vc_rooms=event_vc_rooms, linked_to=linked_to,
                                              vc_plugins_available=vc_plugins_available)
@@ -293,10 +300,10 @@ class RHVCManageAttach(RHVCManageEventCreateBase):
         if form.validate_on_submit():
             vc_room = form.data['room']
             if not self.plugin.can_manage_vc_rooms(session.user, self.event):
-                flash(_("You are not allowed to attach {} rooms to this event.").format(self.plugin.friendly_name),
-                      'error')
+                flash(_("You are not allowed to attach {plugin_name} rooms to this event.").format(
+                    plugin_name=self.plugin.friendly_name), 'error')
             elif not self.plugin.can_manage_vc_room(session.user, vc_room):
-                flash(_("You are not authorized to attach room '{}'".format(vc_room.name)), 'error')
+                flash(_("You are not authorized to attach the room '{room.name}'".format(room=vc_room)), 'error')
             else:
                 event_vc_room = process_vc_room_association(self.plugin, self.event, vc_room, form)
                 if event_vc_room:
@@ -363,7 +370,7 @@ class RHVCRoomModify(RHVCSystemEventBase):
                 result['success'] = False
                 transaction.abort()
             else:
-                flash(_("You are now the moderator of room '{0}'".format(self.vc_room.name)), 'success')
+                flash(_("You are now the moderator of the room '{room.name}'".format(room=self.vc_room)), 'success')
                 result['success'] = True
         return jsonify(result)
 
