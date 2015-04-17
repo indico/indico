@@ -16,13 +16,23 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import StringField, SelectField
+from wtforms.fields import StringField, SelectField, PasswordField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, EqualTo, Length
+from wtforms.validators import DataRequired, EqualTo, Length, ValidationError
 
+from indico.modules.auth import Identity
+from indico.modules.users.models.emails import UserEmail
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoPasswordField
+
+
+def _tolower(s):
+    return s.lower() if s else s
+
+
+def _check_existing_email(form, field):
+    if UserEmail.find(email=field.data, is_user_deleted=False).count():
+        raise ValidationError(_('This email address is already in use.'))
 
 
 class SelectEmailForm(IndicoForm):
@@ -31,7 +41,7 @@ class SelectEmailForm(IndicoForm):
 
 
 class RegistrationEmailForm(IndicoForm):
-    email = EmailField(_('Email address'), [DataRequired()], filters=[lambda x: x.lower() if x else x])
+    email = EmailField(_('Email address'), [DataRequired(), _check_existing_email], filters=[_tolower])
 
 
 class RegistrationForm(IndicoForm):
@@ -41,14 +51,17 @@ class RegistrationForm(IndicoForm):
 
 
 class MultiAuthRegistrationForm(RegistrationForm):
-    email = SelectField(_('Email address'), [DataRequired()])
+    email = SelectField(_('Email address'), [DataRequired(), _check_existing_email])
     phone = StringField(_('Phone number'))
 
 
 class LocalRegistrationForm(RegistrationForm):
-    email = EmailField(_('Email address'), [DataRequired()])
-    username = StringField(_('Username'), [DataRequired()])
-    password = IndicoPasswordField(_('Password'), [DataRequired(), Length(min=5)], toggle=True)
-    confirm_password = IndicoPasswordField(_('Confirm password'),
-                                           [DataRequired(), EqualTo('password',
-                                                                    message=_('The passwords do not match.'))])
+    email = EmailField(_('Email address'))
+    username = StringField(_('Username'), [DataRequired()], filters=[_tolower])
+    password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
+    confirm_password = PasswordField(_('Confirm password'),
+                                     [DataRequired(), EqualTo('password', message=_('The passwords do not match.'))])
+
+    def validate_username(self, field):
+        if Identity.find(provider='indico', identifier=field.data).count():
+            raise ValidationError(_('This username is already in use.'))

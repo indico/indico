@@ -129,7 +129,7 @@ class RequestHandlerBase():
         """Truncates params"""
         params = {}
         for key, value in self._reqParams.iteritems():
-            if key == 'password':
+            if key in {'password', 'confirm_password'}:
                 params[key] = '[password hidden, len=%d]' % len(value)
             elif isinstance(value, basestring):
                 params[key] = truncate(value, 1024)

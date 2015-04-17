@@ -172,7 +172,7 @@ class RHRegister(RH):
             else:
                 return self._create_user(form.data, handler)
         return WPAuth.render_template('register.html', form=form, local=(not self.identity_info),
-                                      must_verify_email=handler.must_verify_email,
+                                      must_verify_email=handler.must_verify_email, widget_attrs=handler.widget_attrs,
                                       email_sent=session.pop('register_verification_email_sent', False))
 
     def _send_confirmation(self, email):
@@ -224,6 +224,10 @@ class RegistrationHandler(object):
             return RegistrationEmailForm(obj=defaults)
         else:
             return self.form(obj=defaults)
+
+    @property
+    def widget_attrs(self):
+        return {}
 
     @property
     def must_verify_email(self):
@@ -284,3 +288,34 @@ class MultiAuthRegistrationHandler(RegistrationHandler):
 
 class LocalRegistrationHandler(RegistrationHandler):
     form = LocalRegistrationForm
+
+    def __init__(self, rh):
+        if 'next' in request.args:
+            session['register_next_url'] = request.args['next']
+
+    @property
+    def widget_attrs(self):
+        return {'email': {'disabled': not self.must_verify_email}}
+
+    @property
+    def must_verify_email(self):
+        return 'register_verified_email' not in session
+
+    def email_verified(self, email):
+        session['register_verified_email'] = email
+
+    def get_form_defaults(self):
+        return FormDefaults(email=session.get('register_verified_email'))
+
+    def create_form(self):
+        form = super(LocalRegistrationHandler, self).create_form()
+        if not self.must_verify_email:
+            form.email.data = session['register_verified_email']
+        return form
+
+    def create_identity(self, data):
+        del session['register_verified_email']
+        return Identity(provider='indico', identifier=data['username'], password=data['password'])
+
+    def redirect_success(self):
+        return redirect(session.pop('register_next_url', url_for('misc.index')))

@@ -13,4 +13,12 @@
             <li><a href="{{ url_for(login_endpoint, provider=provider.name, next=next) }}">{{ provider.title }}</a></li>
         {% endfor %}
     </ul>
+
+    {% if indico_config.LocalIdentities %}
+        <p>
+            {% trans url=url_for('.register', next=next) -%}
+                If you do not have an Indico account yet, you can <a href="{{ url }}">create one here</a>.
+            {%- endtrans %}
+        </p>
+    {% endif %}
 {% endblock %}

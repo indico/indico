@@ -13,4 +13,12 @@
     {% call form_footer() %}
         <input class="i-button big highlight" type="submit" value="{% trans %}Log in{% endtrans %}">
     {% endcall %}
+
+    {% if provider.name == 'indico' %}
+        <p>
+            {% trans url=url_for('.register') -%}
+                If you do not have an Indico account yet, you can <a href="{{ url }}">create one here</a>.
+            {%- endtrans %}
+        </p>
+    {% endif %}
 {% endblock %}

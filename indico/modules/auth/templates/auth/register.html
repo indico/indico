@@ -1,5 +1,6 @@
 {% extends 'layout/full_page_base.html' %}
-{% from 'forms/form_widget.html' import form_header, form_row, form_rows, form_footer  %}
+{% from 'forms/form_widget.html' import form_header, form_row, form_rows, form_fieldset, form_footer %}
+{% set show_extra_form = local and not must_verify_email %}
 
 {% block title %}
     {% trans %}Create a new Indico account{% endtrans %}
@@ -18,9 +19,31 @@
     {% if email_sent %}
         <a class="i-button big" href="{{ url_for('auth.logout') }}">{% trans %}Cancel{% endtrans %}</a>
     {% else %}
-        {{ form_header() }}
-        {{ form_row(form.email) }}
-        {{ form_rows(form, fields=('first_name', 'last_name', 'affiliation', 'phone')) }}
+        {{ form_header(id='register-form') }}
+        {% call form_fieldset(_('User information'), render_as_fieldset=show_extra_form) %}
+            {{ form_row(form.email, widget_attrs=widget_attrs.email) }}
+            {{ form_rows(form, fields=('first_name', 'last_name', 'affiliation', 'phone'), widget_attrs=widget_attrs) }}
+        {% endcall %}
+        {% if show_extra_form %}
+            {% call form_fieldset(_('Login details')) %}
+                {{ form_rows(form, fields=('username', 'password', 'confirm_password')) }}
+            {% endcall %}
+            <script>
+                (function() {
+                    var passwordField = $('#password');
+                    var confirmField = $('#confirm_password');
+                    if (confirmField[0].setCustomValidity) {
+                        $('#password, #confirm_password').on('change', function() {
+                            if (passwordField.val() != confirmField.val()) {
+                                confirmField[0].setCustomValidity($T('The passwords do not match.'));
+                            } else {
+                                confirmField[0].setCustomValidity('');
+                            }
+                        });
+                    }
+                })();
+            </script>
+        {% endif %}
         {% call form_footer() %}
             <a class="i-button big" href="{{ url_for('auth.logout') }}">{% trans %}Cancel{% endtrans %}</a>
             {% if must_verify_email %}
