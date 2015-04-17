@@ -60,7 +60,8 @@ class Identity(db.Model):
     _data = db.Column(
         'data',
         JSON,
-        nullable=False
+        nullable=False,
+        default={}
     )
     #: the hash of the password in case of a local identity
     password_hash = db.Column(

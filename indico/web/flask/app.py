@@ -45,6 +45,8 @@ from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.plugins import plugin_engine, include_plugin_css_assets, include_plugin_js_assets, url_for_plugin
 from indico.modules.auth import multiauth
+from indico.modules.auth.providers import IndicoAuthProvider
+from indico.modules.auth.providers import IndicoIdentityProvider
 from indico.util.signals import values_from_signal
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
@@ -151,10 +153,16 @@ def configure_app(app, set_path=False):
 
 
 def configure_multiauth_local(app):
-    raise NotImplementedError
-    # app.config['MULTIAUTH_AUTH_PROVIDERS']['indico'] = {'type': IndicoAuthProvider, 'title': _('Local Accounts')}
-    # app.config['MULTIAUTH_IDENTITY_PROVIDERS']['indico'] = {'type': IndicoIdentityProvider}
-    # app.config['MULTIAUTH_PROVIDER_MAP']['indico'] = 'indico'
+    app.config['MULTIAUTH_AUTH_PROVIDERS']['indico'] = {
+        'type': IndicoAuthProvider,
+        'title': _('Local Account')
+    }
+    app.config['MULTIAUTH_IDENTITY_PROVIDERS']['indico'] = {
+        'type': IndicoIdentityProvider,
+        # We don't want any user info from this provider
+        'identity_info_keys': {}
+    }
+    app.config['MULTIAUTH_PROVIDER_MAP']['indico'] = 'indico'
 
 
 def setup_jinja(app):

@@ -35,6 +35,11 @@ def _check_existing_email(form, field):
         raise ValidationError(_('This email address is already in use.'))
 
 
+class LocalLoginForm(IndicoForm):
+    identifier = StringField(_('Username'), [DataRequired()], filters=[_tolower])
+    password = PasswordField(_('Password'), [DataRequired()])
+
+
 class SelectEmailForm(IndicoForm):
     email = SelectField(_('Email address'), [DataRequired()],
                         description=_('Choose the email address you want to verify.'))
