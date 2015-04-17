@@ -45,10 +45,7 @@ class RHLogout(RH):
     """Logs the user out"""
 
     def _process(self):
-        session.clear()
-        url = request.args.get('next') or url_for('misc.index')
-        return redirect(url)
-        # return multiauth.logout(url) or redirect(url)
+        return multiauth.logout(request.args.get('next') or url_for('misc.index'), clear_session=True)
 
 
 def _send_confirmation(email, salt, endpoint, template, template_args=None, url_args=None):
