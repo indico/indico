@@ -29,19 +29,7 @@
                 {{ form_rows(form, fields=('username', 'password', 'confirm_password')) }}
             {% endcall %}
             <script>
-                (function() {
-                    var passwordField = $('#password');
-                    var confirmField = $('#confirm_password');
-                    if (confirmField[0].setCustomValidity) {
-                        $('#password, #confirm_password').on('change', function() {
-                            if (passwordField.val() != confirmField.val()) {
-                                confirmField[0].setCustomValidity($T('The passwords do not match.'));
-                            } else {
-                                confirmField[0].setCustomValidity('');
-                            }
-                        });
-                    }
-                })();
+                validatePasswordConfirmation('#password', '#confirm_password');
             </script>
         {% endif %}
         {% call form_footer() %}

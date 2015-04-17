@@ -19,6 +19,10 @@
             {% trans url=url_for('.register') -%}
                 If you do not have an Indico account yet, you can <a href="{{ url }}">create one here</a>.
             {%- endtrans %}
+            <br>
+            {% trans url=url_for('.resetpass') -%}
+                If you forgot your username/password, you can <a href="{{ url }}">reset it here</a>.
+            {%- endtrans %}
         </p>
     {% endif %}
 {% endblock %}

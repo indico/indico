@@ -26,7 +26,7 @@ from indico.core.db import db
 from indico.core.notifications import make_email
 from indico.modules.auth import multiauth, logger, Identity, login_user
 from indico.modules.auth.forms import (SelectEmailForm, MultiAuthRegistrationForm, LocalRegistrationForm,
-                                       RegistrationEmailForm)
+                                       RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm)
 from indico.modules.auth.util import load_identity_info
 from indico.modules.auth.views import WPAuth
 from indico.modules.users import User
@@ -48,10 +48,10 @@ class RHLogout(RH):
         return multiauth.logout(request.args.get('next') or url_for('misc.index'), clear_session=True)
 
 
-def _send_confirmation(email, salt, endpoint, template, template_args=None, url_args=None):
+def _send_confirmation(email, salt, endpoint, template, template_args=None, url_args=None, data=None):
     template_args = template_args or {}
     url_args = url_args or {}
-    token = secure_serializer.dumps(email, salt=salt)
+    token = secure_serializer.dumps(data or email, salt=salt)
     url = url_for(endpoint, token=token, _external=True, _secure=True, **url_args)
     template_module = get_template_module(template, email=email, url=url, **template_args)
     GenericMailer.send(make_email(email, template=template_module))
@@ -115,7 +115,7 @@ class RHAssociateIdentity(RH):
                             multiauth_data=self.identity_info['multiauth_data'])
         logger.info('Created new identity for {}: {}'.format(self.user, identity))
         del session['login_identity_info']
-        login_user(self.user)
+        login_user(self.user, identity)
         return multiauth.redirect_success()
 
     def _send_confirmation(self, email):
@@ -192,7 +192,7 @@ class RHRegister(RH):
         user.settings.set('timezone', timezone)
         user.settings.set('lang', session.lang or minfo.getLang())
         db.session.flush()
-        login_user(user, (identity.provider, identity.identifier))
+        login_user(user, identity)
         msg = _('You have sucessfully registered your Indico account. '
                 'Check <a href="{url}">your profile</a> for further account details and settings.')
         flash(Markup(msg).format(url=url_for('users.user_profile')), 'success')
@@ -316,3 +316,50 @@ class LocalRegistrationHandler(RegistrationHandler):
 
     def redirect_success(self):
         return redirect(session.pop('register_next_url', url_for('misc.index')))
+
+
+class RHResetPassword(RH):
+    """Resets the password for a local identity."""
+
+    def _checkParams(self):
+        if not Config.getInstance().getLocalIdentities():
+            raise Forbidden('Local identities are disabled')
+
+    def _process(self):
+        if 'token' in request.args:
+            identity_id = secure_serializer.loads(request.args['token'], max_age=3600, salt='reset-password')
+            identity = Identity.get(identity_id)
+            if not identity:
+                raise BadData('Identity does not exist')
+            return self._reset_password(identity)
+        else:
+            return self._request_token()
+
+    def _request_token(self):
+        form = ResetPasswordEmailForm()
+        if form.validate_on_submit():
+            user = form.user
+            # The only case where someone would have more than one identity is after a merge.
+            # And the worst case that can happen here is that we send the user a different
+            # username than the one he expects. But he still gets back into his account.
+            # Showing a list of usernames would be a little bit more user-friendly but less
+            # secure as we'd expose valid usernames for a specific user to an untrusted person.
+            identity = next(x for x in user.identities if x.provider == 'indico')
+            _send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
+                               {'user': user, 'username': identity.identifier}, data=identity.id)
+            session['resetpass_email_sent'] = True
+            return redirect(url_for('.resetpass'))
+        return WPAuth.render_template('reset_password.html', form=form, identity=None, widget_attrs={},
+                                      email_sent=session.pop('resetpass_email_sent', False))
+
+    def _reset_password(self, identity):
+        form = ResetPasswordForm()
+        if form.validate_on_submit():
+            identity.password = form.password.data
+            flash(_("Your password has been changed successfully."), 'success')
+            login_user(identity.user, identity)
+            # We usually come here from a multiauth login page so we should have a target url
+            return multiauth.redirect_success()
+        form.username.data = identity.identifier
+        return WPAuth.render_template('reset_password.html', form=form, identity=identity,
+                                      widget_attrs={'username': {'disabled': True}})

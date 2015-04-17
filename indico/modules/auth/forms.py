@@ -21,6 +21,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, EqualTo, Length, ValidationError
 
 from indico.modules.auth import Identity
+from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -70,3 +71,28 @@ class LocalRegistrationForm(RegistrationForm):
     def validate_username(self, field):
         if Identity.find(provider='indico', identifier=field.data).count():
             raise ValidationError(_('This username is already in use.'))
+
+
+class ResetPasswordEmailForm(IndicoForm):
+    email = EmailField(_('Email address'), [DataRequired()], filters=[_tolower])
+
+    def validate_email(self, field):
+        user = self.user
+        if user is None:
+            raise ValidationError(_('There is no user with this email address.'))
+        elif not any(x.provider == 'indico' for x in user.identities):
+            # XXX: Should we allow creating a new identity instead? Would be user-friendly for sure!
+            raise ValidationError(_('This account has no username/password associated.'))
+
+    @property
+    def user(self):
+        if not self.is_submitted() or not self.email.data:
+            return None
+        return User.find_first(~User.is_deleted, ~User.is_blocked, User.all_emails.contains(self.email.data))
+
+
+class ResetPasswordForm(IndicoForm):
+    username = StringField(_('Username'))
+    password = PasswordField(_('New password'), [DataRequired(), Length(min=5)])
+    confirm_password = PasswordField(_('Confirm password'),
+                                     [DataRequired(), EqualTo('password', message=_('The passwords do not match.'))])

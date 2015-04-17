@@ -69,6 +69,8 @@ def process_identity(identity_info):
         else:
             logger.info('Found user with matching email: {}'.format(user))
             return redirect(url_for('auth.associate_identity'))
+    elif identity.user.is_deleted:
+        raise MultiAuthException(_('Your Indico account has been deleted.'))
     else:
         user = identity.user
         logger.info('Found existing identity {} for user {}'.format(identity, user))
@@ -81,7 +83,7 @@ def process_identity(identity_info):
         identity.data = identity_info.data
     if user.is_blocked:
         raise MultiAuthException(_('Your Indico account has been blocked.'))
-    login_user(user)
+    login_user(user, identity)
 
 
 @multiauth.login_check
@@ -89,21 +91,21 @@ def is_logged_in():
     return session.user is not None
 
 
-def login_user(user, logged_in_with=None):
+def login_user(user, identity=None):
     """Sets the session user and performs on-login logic
 
-    When specifying `logged_in_with`, this information is saved in the
-    session so the identity management page can prevent the user from
-    removing the identity he used to login.
+    When specifying `identity`, the provider/identitifer information
+    is saved in the session so the identity management page can prevent
+    the user from removing the identity he used to login.
 
     :param user: The :class:`~indico.modules.users.User` to log in to.
-    :param logged_in_with: A ``provider_name, identifier`` tuple
+    :param identity: The :class:`Identity` instance used to log in.
     """
     avatar = user.as_avatar
     session.timezone = SessionTZ(avatar).getSessionTZ()
     session.user = user
     session.lang = user.settings.get('lang')
-    if logged_in_with:
-        session['logged_in_with'] = logged_in_with
+    if identity:
+        session['logged_in_with'] = (identity.provider, identity.identifier)
     else:
         session.pop('logged_in_with', None)
