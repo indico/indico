@@ -1,28 +1,12 @@
-{% extends 'layout/full_page_base.html' %}
-{% from 'forms/form_widget.html' import form_header, form_rows, form_footer  %}
-
-{% block title %}
-    {% trans name=provider.title %}Login using {{ name }}{% endtrans %}
-{% endblock %}
-
-{% block content %}
-    {% include 'flashed_messages.html' %}
-
-    {{ form_header() }}
-    {{ form_rows(form) }}
-    {% call form_footer() %}
-        <input class="i-button big highlight" type="submit" value="{% trans %}Log in{% endtrans %}">
-    {% endcall %}
-
-    {% if provider.name == 'indico' %}
-        <p>
-            {% trans url=url_for('.register') -%}
-                If you do not have an Indico account yet, you can <a href="{{ url }}">create one here</a>.
-            {%- endtrans %}
-            <br>
-            {% trans url=url_for('.resetpass') -%}
-                If you forgot your username/password, you can <a href="{{ url }}">reset it here</a>.
-            {%- endtrans %}
-        </p>
-    {% endif %}
-{% endblock %}
+<form method="post" id="login-form">
+    {% for field in (form.visible_fields if form.visible_fields is defined else form) %}
+        {{ field(placeholder=field.label.text, required=field.flags.required) }}
+    {% endfor %}
+    <div>
+        <input type="hidden" id="login-provider" name="provider" value="{{ provider.name }}">
+    </div>
+    <div id="forgot-my-password">
+        <a href="{{ url_for('auth.resetpass') }}">Forgot my password</a>
+    </div>
+    <input type="submit" id="hidden-submit" style="display: none">
+</form>

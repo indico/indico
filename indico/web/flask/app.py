@@ -126,7 +126,7 @@ def configure_app(app, set_path=False):
         configure_multipass_local(app)
     app.config['MULTIPASS_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone',
                                                   'address'}
-    app.config['MULTIPASS_LOGIN_SELECTOR_TEMPLATE'] = 'auth/login_selector.html'
+    app.config['MULTIPASS_LOGIN_PAGE_TEMPLATE'] = 'auth/login_page.html'
     app.config['MULTIPASS_LOGIN_FORM_TEMPLATE'] = 'auth/login_form.html'
     app.config['MULTIPASS_LOGIN_ENDPOINT'] = 'auth.login'
     app.config['MULTIPASS_LOGIN_URLS'] = None  # registered in a blueprint
@@ -157,7 +157,8 @@ def configure_app(app, set_path=False):
 def configure_multipass_local(app):
     app.config['MULTIPASS_AUTH_PROVIDERS']['indico'] = {
         'type': IndicoAuthProvider,
-        'title': _('Local Account')
+        'title': _('Local Account'),
+        'default': not any(x.get('default') for x in app.config['MULTIPASS_AUTH_PROVIDERS'].itervalues())
     }
     app.config['MULTIPASS_IDENTITY_PROVIDERS']['indico'] = {
         'type': IndicoIdentityProvider,

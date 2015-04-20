@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session, redirect, request, flash
+from flask import session, redirect, request, flash, render_template
 from itsdangerous import BadData
 from markupsafe import Markup
 from werkzeug.exceptions import BadRequest, Forbidden

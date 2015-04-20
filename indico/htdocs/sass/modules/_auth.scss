@@ -1,0 +1,172 @@
+body {
+    background-color: #f9f9f9;
+    font-family: Helvetica, Verdana, Sans;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    background-position: center;
+    background-size: cover;
+}
+
+.login-page {
+    display: table;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+
+    .middle {
+        display: table-cell;
+        vertical-align: middle;
+
+        .centered-column-wrapper {
+            margin: auto;
+            width: 800px;
+
+            @media (max-width: 800px) {
+                width: 400px;
+            }
+
+            .centered-column {
+                width: 300px;
+                margin: 100px auto;
+            }
+
+            .header-logo {
+                margin-bottom: 20px;
+                height: 100px;
+            }
+
+            .footer {
+                margin-top: 0;
+                position: absolute;
+                bottom: 0;
+            }
+        }
+    }
+
+    form {
+        margin-bottom: 10px;
+    }
+
+    @mixin login-form-button() {
+        width: 100%;
+        height: 2.5em;
+        padding: 0.5em 1em;
+        line-height: 1.5;
+        margin-bottom: 10px;
+        position: relative;
+
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
+
+    .login-form-button, .provider-with-form {
+        @include login-form-button();
+    }
+
+    form input {
+        height: 2.5em;
+        padding: 0.5em 1em;
+        line-height: 1.5;
+        width: 100%;
+        color: #555;
+        border: 1px solid #bbb;
+        margin-top: -1px;
+
+        &:first-of-type {
+            // @include border-top-radius();
+            border-top-right-radius: 0.2em;
+            border-top-left-radius: 0.2em;
+            margin-top: 0;
+        }
+
+        &:last-of-type {
+            // @include border-bottom-radius();
+            border-bottom-right-radius: 0.2em;
+            border-bottom-left-radius: 0.2em;
+        }
+    }
+
+    .login-providers {
+        margin-top: 20px;
+
+        &.external {
+            .i-button {
+                color: white !important;
+            }
+        }
+
+        .i-button {
+            @include login-form-button();
+
+            &.external-provider-facebook {
+                background-color: #3b579d;
+                border-color: #3b579d;
+                &:hover {
+                    background: #3f5da8;
+                    border-color: #3f5da8;
+                }
+            }
+
+            &.external-provider-twitter {
+                background-color: #4092cc;
+                border-color: #4092cc;
+
+                &:hover {
+                    background: #55acee;
+                    border-color: #55acee;
+                }
+            }
+
+            &.external-provider-github {
+                background-color: #666;
+                border-color: #666;
+
+                &:hover {
+                    background: #999;
+                    border-color: #999;
+                }
+            }
+        }
+    }
+
+    .seperator-line-center{
+        text-align: center;
+        position: relative;
+        z-index: -1;
+        margin-top: 20px;
+    }
+
+    .seperator-line-center:after{
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        border-top: solid 1px #bbb;
+        z-index: -1;
+    }
+
+    .seperator-text{
+        margin: 0;
+        padding: 0 10px;
+        background: #f9f9f9;
+        display: inline-block;
+        color: #bbb;
+    }
+
+    .link {
+        text-align: left;
+        margin-top: 20px;
+    }
+
+    #forgot-my-password {
+        text-align: right;
+        margin-top: 10px;
+    }
+
+    .register {
+        color: #555;
+    }
+}
