@@ -344,7 +344,7 @@ class RHResetPassword(RH):
             # username than the one he expects. But he still gets back into his account.
             # Showing a list of usernames would be a little bit more user-friendly but less
             # secure as we'd expose valid usernames for a specific user to an untrusted person.
-            identity = next(x for x in user.identities if x.provider == 'indico')
+            identity = next(iter(user.local_identities))
             _send_confirmation(form.email.data, 'reset-password', '.resetpass', 'auth/emails/reset_password.txt',
                                {'user': user, 'username': identity.identifier}, data=identity.id)
             session['resetpass_email_sent'] = True

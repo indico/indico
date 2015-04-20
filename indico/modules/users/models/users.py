@@ -214,6 +214,16 @@ class User(db.Model):
         return AvatarUserWrapper(self.id)
 
     @property
+    def local_identities(self):
+        """The local identities of the user"""
+        return {x for x in self.identities if x.provider == 'indico'}
+
+    @property
+    def external_identities(self):
+        """The external identities of the user"""
+        return {x for x in self.identities if x.provider != 'indico'}
+
+    @property
     def locator(self):
         return {'user_id': self.id}
 
