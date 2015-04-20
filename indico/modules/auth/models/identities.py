@@ -16,10 +16,12 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSON, INET
 from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import UTCDateTime
+from indico.util.date_time import now_utc
 from indico.util.passwords import PasswordProperty
 from indico.util.string import return_ascii
 
@@ -69,6 +71,14 @@ class Identity(db.Model):
     )
     #: the password of the user in case of a local identity
     password = PasswordProperty('password_hash')
+    #: the timestamp of the latest login
+    last_login_dt = db.Column(
+        UTCDateTime
+    )
+    #: the ip address that was used for the latest login
+    last_login_ip = db.Column(
+        INET
+    )
 
     @property
     def data(self):
@@ -79,6 +89,11 @@ class Identity(db.Model):
     @data.setter
     def data(self, data):
         self._data = dict(data.lists())
+
+    def register_login(self, ip):
+        """Updates the last login information"""
+        self.last_login_dt = now_utc()
+        self.last_login_ip = ip
 
     @return_ascii
     def __repr__(self):

@@ -9,6 +9,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
+from indico.core.db.sqlalchemy import UTCDateTime
+
 
 # revision identifiers, used by Alembic.
 revision = '2f0fc72b91b4'
@@ -24,6 +26,8 @@ def upgrade():
                     sa.Column('multiauth_data', postgresql.JSON(), nullable=False),
                     sa.Column('data', postgresql.JSON(), nullable=False),
                     sa.Column('password_hash', sa.String(), nullable=True),
+                    sa.Column('last_login_dt', UTCDateTime, nullable=True),
+                    sa.Column('last_login_ip', postgresql.INET(), nullable=True),
                     sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
                     sa.PrimaryKeyConstraint('id'),
                     sa.UniqueConstraint('provider', 'identifier'),

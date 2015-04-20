@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session, redirect
+from flask import session, redirect, request
 from flask_multiauth import MultiAuth, MultiAuthException
 
 from indico.core.db import db
@@ -106,6 +106,7 @@ def login_user(user, identity=None):
     session.user = user
     session.lang = user.settings.get('lang')
     if identity:
+        identity.register_login(request.remote_addr)
         session['logged_in_with'] = (identity.provider, identity.identifier)
     else:
         session.pop('logged_in_with', None)
