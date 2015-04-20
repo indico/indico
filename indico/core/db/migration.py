@@ -35,6 +35,7 @@ We have two dictionaries
 globalname_dict = {
     "PersistentMapping": ("persistent.mapping", None),
     "PersistentList": ("persistent.list", None),
+    "LDAPGroup": ("MaKaC.authentication.LDAPAuthentication", None),
     "CERNGroup": ("MaKaC.authentication.LDAPAuthentication", "LDAPGroup"),
     "PeriodicTask": ("indico.modules.scheduler.tasks.periodic", None),
     "PeriodicUniqueTask": ("indico.modules.scheduler.tasks.periodic", None),
