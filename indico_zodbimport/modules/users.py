@@ -19,9 +19,11 @@ from __future__ import unicode_literals
 import re
 from contextlib import contextmanager
 
+import click
 from pytz import all_timezones_set
 
 from indico.core.db import db
+from indico.modules.auth import Identity
 from indico.modules.users import User, user_settings
 from indico.modules.users.models.favorites import FavoriteCategory
 from indico.modules.users.models.links import UserLink
@@ -51,6 +53,16 @@ def _get_all_locales():
 
 
 class UserImporter(Importer):
+    def __init__(self, **kwargs):
+        self.ldap_provider_name = kwargs.pop('ldap_provider_name')
+        super(UserImporter, self).__init__(**kwargs)
+
+    @staticmethod
+    def decorate_command(command):
+        command = click.option('--ldap-provider-name', default='legacy-ldap',
+                               help="Provider name to use for existing LDAP identities")(command)
+        return command
+
     def has_data(self):
         return bool(User.find().count())
 
@@ -109,6 +121,20 @@ class UserImporter(Importer):
                           '%{white!}{:6d}%{reset} %{cyan}{}%{reset} [%{blue!}{}%{reset}] '
                           '{{%{cyan!}{}%{reset}}}').format(user.id, user.full_name, user.email,
                                                            ', '.join(user.secondary_emails))
+            for old_identity in avatar.identities:
+                identity = None
+                if old_identity.__class__.__name__ == 'LocalIdentity':
+                    identity = Identity(provider='indico', identifier=old_identity.login)
+                    if not hasattr(old_identity, 'algorithm'):  # plaintext password
+                        identity.password = old_identity.password
+                    else:
+                        assert old_identity.algorithm == 'bcrypt'
+                        identity.password_hash = old_identity.password
+                elif old_identity.__class__.__name__ == 'LDAPIdentity':
+                    identity = Identity(provider=self.ldap_provider_name, identifier=old_identity.login)
+                if identity:
+                    print cformat('%{blue!}<->%{reset}  %{yellow}{}%{reset}').format(identity)
+                    user.identities.add(identity)
             for merged_avatar in getattr(avatar, '_mergeFrom', ()):
                 merged = self._user_from_avatar(merged_avatar, is_deleted=True, merged_into_id=user.id)
                 print cformat('%{blue!}***%{reset} '
