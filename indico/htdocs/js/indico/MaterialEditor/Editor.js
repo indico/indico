@@ -1260,9 +1260,9 @@ type("ResourceListWidget", ["ListWidget"], {
                 list.append(Html.li({},Html.span({},Html.strong({},label+": "),value)));
             };
 
-            labelAndValue('File Name',info.get('fileName'));
-            labelAndValue('Size',Math.floor(info.get('fileSize')/1024)+ " KB");
-            labelAndValue('Creation Date',info.get('creationDate'));
+            labelAndValue($T('File Name'),info.get('fileName'));
+            labelAndValue($T('Size'),Math.floor(info.get('fileSize')/1024)+ " KB");
+            labelAndValue($T('Creation Date'),info.get('creationDate'));
 
             var filetype = info.get('fileType');
 

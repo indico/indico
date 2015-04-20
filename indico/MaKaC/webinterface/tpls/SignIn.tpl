@@ -96,7 +96,7 @@
         % endif
     </div>
     <div style="color: #444">
-        ${ _("Forgot your password?") } <span class="fakeLink" onclick="$('#reset_password').show(); $(this).hide();">${ ("Click here") }</span>
+        ${ _("Forgot your password?") } <span class="fakeLink" onclick="$('#reset_password').show(); $(this).hide();">${ _("Click here") }</span>
     </div>
     <div id="reset_password" style="padding: 5px 0; display:none">
         <form action=${ forgotPasswordURL } method="POST">

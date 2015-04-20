@@ -215,7 +215,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
         this.criteria = new WatchObject();
 
         this.foundPeopleList = new FoundPeopleList(null, this.onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver);
-        this.foundPeopleList.setMessage("Fill any of the upper fields and click search...");
+        this.foundPeopleList.setMessage($T("Fill any of the upper fields and click search..."));
         this.extraDiv = any(extraDiv, Html.div({}));
 
         this.searchForm = null;
@@ -1478,7 +1478,7 @@ type("UserListField", ["IWidget"], {
 
         if (this.allowSearch || this.includeFavourites || exists(this.suggestedUsers)) {
 
-            var chooseUserButton = Html.input("button", {style:{marginRight: pixels(5)}, className: 'i-button'}, $T('Add Indico User'+(this.enableGroups?" / Group":"")));
+            var chooseUserButton = Html.input("button", {style:{marginRight: pixels(5)}, className: 'i-button'}, $T('Add Indico User'+(this.enableGroups?$T(" / Group"):"")));
 
             var title = "";
             if (this.includeFavourites || exists(this.suggestedUsers)) {
