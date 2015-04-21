@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.utils import cached_property
@@ -235,14 +237,25 @@ class User(db.Model):
         return AvatarUserWrapper(self.id, _user=self)
 
     @property
+    def external_identities(self):
+        """The external identities of the user"""
+        return {x for x in self.identities if x.provider != 'indico'}
+
+    @property
     def local_identities(self):
         """The local identities of the user"""
         return {x for x in self.identities if x.provider == 'indico'}
 
     @property
-    def external_identities(self):
-        """The external identities of the user"""
-        return {x for x in self.identities if x.provider != 'indico'}
+    def local_identity(self):
+        """The main (most recently used) local identity"""
+        identities = sorted(self.local_identities, key=attrgetter('last_login_dt'), reverse=True)
+        return identities[0] if identities else None
+
+    @property
+    def secondary_local_identities(self):
+        """The local identities of the user except the main one"""
+        return self.local_identities - {self.local_identity}
 
     @property
     def locator(self):
