@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import session, redirect, request
 from flask_multipass import MultipassException
 
+from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.logger import Logger
@@ -27,6 +28,7 @@ from indico.modules.auth.util import save_identity_info
 from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from indico.web.menu import MenuItem
 from MaKaC.common.timezoneUtils import SessionTZ
 
 
@@ -93,3 +95,8 @@ def login_user(user, identity=None):
         session['login_identity'] = identity.id
     else:
         session.pop('login_identity', None)
+
+
+@signals.users.profile_sidemenu.connect
+def _extend_profile_menu(user, **kwargs):
+    return MenuItem(_('Accounts'), 'auth.accounts')
