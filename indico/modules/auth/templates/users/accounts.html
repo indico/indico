@@ -1,0 +1,84 @@
+{% extends 'users/base.html' %}
+{% from 'forms/form_widget.html' import form_header, form_rows, form_footer  %}
+
+{% block subtitle -%}
+    {% trans %}Accounts{% endtrans %}
+{%- endblock %}
+
+{% block user_content %}
+    {% if indico_config.LocalIdentities %}
+        <div class="i-box-group vert">
+            <div class="i-box titled">
+                <div class="i-box-header">
+                    <div class="i-box-title">
+                        {%- trans %}Local Account{% endtrans -%}
+                    </div>
+                </div>
+                <div class="i-box-content">
+                    {% if not user.local_identity %}
+                        {{ form_header() }}
+                        {{ form_rows(form) }}
+                        {% call form_footer() %}
+                            <input class="i-button big highlight" type="submit" value="{% trans %}Add credentials{% endtrans %}">
+                        {% endcall %}
+                        <script>
+                            validatePasswordConfirmation('#password', '#confirm_password');
+                        </script>
+                    {% else %}
+                        {{ form_header() }}
+                        {{ form_rows(form) }}
+                        {% call form_footer() %}
+                            <input class="i-button big highlight" type="submit" value="{% trans %}Modify credentials{% endtrans %}">
+                        {% endcall %}
+                        <script>
+                            validatePasswordConfirmation('#new_password', '#confirm_new_password');
+                        </script>
+                    {% endif %}
+                    {% if user.secondary_local_identities %}
+                        <ul class="group-list no-description with-buttons">
+                            {% for identity in user.secondary_local_identities %}
+                                <li>
+                                    <i class="icon-user"></i>
+                                    <span>{{ identity.identifier }}</span>
+                                    <a href="{{ url_for('auth.remove-account', identity) }}" class="i-button right">
+                                        {% trans %}
+                                            Remove
+                                        {% endtrans %}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="i-box titled">
+            <div class="i-box-header">
+                <div class="i-box-title">
+                    {%- trans %}Connected Accounts{% endtrans -%}
+                </div>
+            </div>
+            <div class="i-box-content">
+                {% if user.external_identities %}
+                    <ul class="group-list no-description with-buttons">
+                        {% for identity in user.external_identities %}
+                            <li>
+                                <span>{{ provider_titles[identity.provider] }}</span>
+                                <a href="{{ url_for('auth.remove-account', identity) }}" class="i-button right">
+                                    {% trans %}
+                                        Disconnect
+                                    {% endtrans %}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    {% trans %}
+                        You have no external accounts connected.
+                    {% endtrans %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
