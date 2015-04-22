@@ -55,12 +55,15 @@ def _get_all_locales():
 class UserImporter(Importer):
     def __init__(self, **kwargs):
         self.ldap_provider_name = kwargs.pop('ldap_provider_name')
+        self.ignore_local_accounts = kwargs.pop('ignore_local_accounts')
         super(UserImporter, self).__init__(**kwargs)
 
     @staticmethod
     def decorate_command(command):
         command = click.option('--ldap-provider-name', default='legacy-ldap',
                                help="Provider name to use for existing LDAP identities")(command)
+        command = click.option('--ignore-local-accounts', is_flag=True, default=False,
+                               help="Do not migrate existing local accounts")(command)
         return command
 
     def has_data(self):
