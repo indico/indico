@@ -28,6 +28,8 @@ from MaKaC.services.implementation.user import UserComparator
 
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
+from indico.modules.users.groups import GroupProxy
+
 #################################
 # User and group search
 #################################
@@ -75,50 +77,18 @@ class SearchGroups(SearchBase):
 
     def _checkParams(self):
         SearchBase._checkParams(self)
-        self._group = self._params.get("group", "")
+        self._group = self._params.get("group", "").strip()
+        self._exactMatch = self._params.get("exactMatch", False)
 
     def _getAnswer(self):
-
-        results = search.searchGroups(self._group, self._searchExt)
-
-        fossilizedResults = fossilize(results, IGroupFossil)
-        fossilizedResults.sort(cmp=UserComparator.cmpGroups)
-
-        for fossilizedGroup in fossilizedResults:
+        results = [g.as_legacy_group for g in GroupProxy.search(self._group, exact=self._exactMatch)]
+        fossilized_results = fossilize(results, IGroupFossil)
+        for fossilizedGroup in fossilized_results:
             fossilizedGroup["isGroup"] = True
-
-        return fossilizedResults
-
-
-class SearchUsersGroups(ServiceBase):
-
-    def _getAnswer(self):
-        results = {}
-        users = search.searchUsers(surName=self._params.get("surName", ""),
-                                   name=self._params.get("name", ""),
-                                   organisation=self._params.get("organisation", ""),
-                                   email=self._params.get("email", ""),
-                                   conferenceId=self._params.get("conferenceId", None),
-                                   exactMatch=self._params.get("exactMatch", False),
-                                   searchExt=self._params.get("searchExt", False))
-
-        groups = search.searchGroups(group=self._params.get("group", ""),
-                                     searchExt=self._params.get("searchExt", False))
-
-        fossilizedUsers = [human.fossilize(IAvatarFossil) for human in users]
-        fossilizedGroups = [group.fossilize(IGroupFossil) for group in groups]
-
-        fossilizedUsers.sort(cmp=UserComparator.cmpUsers)
-        fossilizedGroups.sort(cmp=UserComparator.cmpGroups)
-
-        results["people"] = fossilizedUsers
-        results["groups"] = fossilizedGroups
-
-        return results
+        return fossilized_results
 
 
 methodMap = {
     "users": SearchUsers,
     "groups": SearchGroups,
-    "usersGroups": SearchUsersGroups
 }

@@ -21,14 +21,14 @@ Session-related services
 from MaKaC.services.implementation.base import ProtectedModificationService
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
 from MaKaC.services.implementation import conference as conferenceServices
 import MaKaC.webinterface.locators as locators
 from MaKaC.conference import SessionSlot, SessionChair
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import PrincipalHolder, Group, AvatarHolder
+from MaKaC.user import AvatarHolder
 import MaKaC.domain as domain
-from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.users.legacy import AvatarUserWrapper, principal_from_fossil
 
 
 class SessionBase(conferenceServices.ConferenceBase):
@@ -180,38 +180,22 @@ class SessionProtectionAddUsers(SessionModifBase):
 
     def _checkParams(self):
         SessionModifBase._checkParams(self)
-
-        self._usersData = self._params['value']
+        self._principals = map(principal_from_fossil, self._params['value'])
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
-
-        for user in self._usersData :
-
-            userToAdd = PrincipalHolder().getById(user['id'])
-
-            if not userToAdd :
-                raise ServiceError("ERR-U0","User does not exist!")
-
-            self._session.grantAccess(userToAdd)
+        for principal in self._principals:
+            self._session.grantAccess(principal)
 
 class SessionProtectionRemoveUser(SessionModifBase):
 
     def _checkParams(self):
         SessionModifBase._checkParams(self)
-
-        self._userData = self._params['value']
-
+        self._principal = principal_from_fossil(self._params['value'])
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
-
-        userToRemove = PrincipalHolder().getById(self._userData['id'])
-
-        if not userToRemove :
-            raise ServiceError("ERR-U0","User does not exist!")
-        elif isinstance(userToRemove, AvatarUserWrapper) or isinstance(userToRemove, Group):
-            self._session.revokeAccess(userToRemove)
+        self._session.revokeAccess(self._principal)
 
 
 class SessionChairListBase(SessionModifBase):
@@ -252,18 +236,14 @@ class SessionAddExistingChair(SessionChairListBase):
     def _checkParams(self):
         SessionChairListBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+        self._principals = map(principal_from_fossil, pm.extract("userList", pType=list, allowEmpty=False))
 
     def _getAnswer(self):
-        ph = PrincipalHolder()
-        for user in self._userList:
-            person = ph.getById(user["id"])
-            if person is None:
-                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
+        for principal in self._principals:
             if self._kindOfList == "manager":
-                self._session.grantModification(person)
+                self._session.grantModification(principal)
             elif self._kindOfList == "coordinator":
-                self._session.addCoordinator(person)
+                self._session.addCoordinator(principal)
         return self._getSessionChairList()
 
 
@@ -288,11 +268,11 @@ class SessionRemoveChair(SessionChairListBase):
                     # the user is not in the list of conveners (the table is not updated). Do nothing and update the list
                     pass
         else:
-            ph = PrincipalHolder()
+            principal = principal_from_fossil(self._params['principal'])
             if self._kindOfList == "manager":
-                self._session.revokeModification(ph.getById(self._chairId))
+                self._session.revokeModification(principal)
             elif self._kindOfList == "coordinator":
-                self._session.removeCoordinator(ph.getById(self._chairId))
+                self._session.removeCoordinator(principal)
         return self._getSessionChairList()
 
 

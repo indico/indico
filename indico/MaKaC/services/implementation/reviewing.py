@@ -367,8 +367,7 @@ class ConferenceReviewingCompetenceModification(ListModificationBase, Conference
         ConferenceReviewingPRMBase._checkParams(self)
         userId = self._params.get("user", None)
         if userId:
-            ph = user.PrincipalHolder()
-            self._user =  ph.getById( userId )
+            self._user = user.AvatarHolder().getById(userId)
         else:
             raise ServiceError("ERR-REV4",_("No user id specified"))
 

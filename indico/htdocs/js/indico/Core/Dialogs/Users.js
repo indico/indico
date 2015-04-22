@@ -394,16 +394,13 @@ type ("GroupSearchPanel", ["SimpleSearchPanel"], {
             self._searchAction();
             return false;
         });
+        var exactMatch = Html.checkbox({});
 
         $B(groupName, this.criteria.accessor('group'));
+        $B(exactMatch, this.criteria.accessor('exactMatch'));
+        this.criteria.set('exactMatch', true);
 
-        var fieldList = [[$T("Group name"), groupName.draw()]];
-
-        var authenticatorSearch = this._createAuthenticatorSearch();
-        if (exists(authenticatorSearch)) {
-            fieldList = concat(fieldList, authenticatorSearch);
-        }
-
+        var fieldList = [[$T("Group name"), groupName.draw()], [$T("Exact Match"), exactMatch]];
         return IndicoUtil.createFormFromMap(fieldList, true);
     },
 

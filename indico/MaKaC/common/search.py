@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.user import AvatarHolder, GroupHolder
+from MaKaC.user import AvatarHolder
 from MaKaC.conference import ConferenceHolder
 
 def searchUsers(surName="", name="", organisation="", email="", conferenceId=None, exactMatch=True, searchExt=False):
@@ -48,18 +48,5 @@ def searchUsers(surName="", name="", organisation="", email="", conferenceId=Non
             except Exception:
                 pass
         return people
-    else:
-        return []
-
-
-def searchGroups(group="", searchExt=False):
-    if group != "":
-        # build criteria
-        criteria = {
-            "name": group
-        }
-        # search not obsolete groups
-        groups = [ group for group in GroupHolder().match(criteria, searchInAuthenticators=searchExt) if not group.isObsolete()]
-        return groups
     else:
         return []

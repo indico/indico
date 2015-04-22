@@ -41,7 +41,7 @@ from MaKaC.contributionReviewing import Review
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
 from indico.modules.users import User
-from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.users.legacy import AvatarUserWrapper, GroupWrapper
 from indico.util.i18n import L_
 from indico.util.string import safe_upper, safe_slice, fix_broken_string, return_ascii
 from MaKaC.review import AbstractFieldContent
@@ -1474,11 +1474,9 @@ class Category(CommonObjectBase):
 
         # Otherwise, if  it is a member of one of the groups in the list...
         for group in self.__confCreators:
-            if isinstance(group, MaKaC.user.Group):
+            if isinstance(group, GroupWrapper):
                 if group.containsUser(av):
                     return 1
-            else:
-                pass
         return 0
 
     def canCreateConference(self, av):
@@ -3814,10 +3812,10 @@ class Conference(CommonObjectBase, Locatable):
             av.unlinkTo(self, "registrar")
 
     def isRegistrar(self, av):
-        if av == None:
+        if av is None:
             return False
         try:
-            return av in self.getRegistrarList()
+            return any(principal.containsUser(av) for principal in self.getRegistrarList())
         except AttributeError:
             return False
 
@@ -9360,7 +9358,7 @@ class Contribution(CommonObjectBase, Locatable):
             self._submitters=[] #create the attribute
             self.notifyModification(raiseEvent = False)
         if no_groups:
-            return filter(lambda s: not isinstance(s, MaKaC.user.Group), self._submitters)
+            return [s for s in self._submitters if not isinstance(s, GroupWrapper)]
         else:
             return self._submitters
 
@@ -9563,7 +9561,7 @@ class AcceptedContribution(Contribution):
             self._submitters = []  # create the attribute
             self._grantSubmission(self.getAbstract().getSubmitter().getUser())
         if no_groups:
-            return filter(lambda s: not isinstance(s, MaKaC.user.Group), self._submitters)
+            return [s for s in self._submitters if not isinstance(s, GroupWrapper)]
         else:
             return self._submitters
 

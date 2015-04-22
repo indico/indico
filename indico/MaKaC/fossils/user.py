@@ -27,6 +27,11 @@ class IGroupFossil(IFossil):
     def getEmail(self):
         """ Group email """
 
+    def getProvider(self):
+        pass
+    getProvider.produce = lambda x: getattr(x, 'provider', None)
+
+
 class IAvatarMinimalFossil(IFossil):
 
     def getId(self):

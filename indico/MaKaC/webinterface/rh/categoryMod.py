@@ -23,13 +23,12 @@ import MaKaC.webinterface.pages.category as category
 from MaKaC.webinterface.user import UserListModificationBase
 from indico.core.config import Config
 from MaKaC.common.utils import sortCategoryByTitle, validMail
-import MaKaC.user as user
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
 import MaKaC.conference as conference
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 
-from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.users.legacy import AvatarUserWrapper, GroupWrapper
 from indico.util.i18n import _
 
 
@@ -328,7 +327,7 @@ class RHCategoryPerformCreation( RHCategModifBase ):
                 allowedUsers = self._getAllowedUsers(params)
                 if allowedUsers :
                     for person in allowedUsers :
-                        if isinstance(person, AvatarUserWrapper) or isinstance(person, user.Group):
+                        if isinstance(person, (AvatarUserWrapper, GroupWrapper)):
                             nc.grantAccess(person)
 
         self._redirect( urlHandlers.UHCategoryModification.getURL( self._target ) )

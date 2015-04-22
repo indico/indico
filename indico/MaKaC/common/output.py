@@ -36,13 +36,12 @@ from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
 from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
-from MaKaC.user import Group
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 
 from indico.core.config import Config
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
-from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.users.legacy import AvatarUserWrapper, LDAPGroupWrapper
 from indico.util.event import uniqueId
 
 
@@ -236,7 +235,7 @@ class outputGenerator(object):
             if isinstance(user_obj, AvatarUserWrapper):
                 for account in self._getExternalUserAccounts(user_obj):
                     allowed_logins.append(account)
-            elif isinstance(user_obj, Group) and user_obj.groupType != "Default":
+            elif isinstance(user_obj, LDAPGroupWrapper):
                 allowed_groups.append(user_obj.getId())
             else:
                 allowed_logins.append(user_obj.getId())

@@ -201,7 +201,12 @@ type("ListOfUsersManager", [], {
             var kindOfUser = "pending";
             this._manageUserList(this.methods["remove"], this._getRemoveParams(user.email, kindOfUser), this.blockOnRemove);
         } else {
-            this._manageUserList(this.methods["remove"], this._getRemoveParams(user.id), this.blockOnRemove);
+            var params = $.extend(
+                {},
+                this._getRemoveParams(user.id),
+                {principal: _.pick(user, '_type', 'id', 'provider')}
+            );
+            this._manageUserList(this.methods["remove"], params, this.blockOnRemove);
         }
     },
 
@@ -277,7 +282,7 @@ type("ListOfUsersManager", [], {
         this.usersList.each(function(val, idx) {
             var user = val;
             var elemStyle = self.elementClass;
-            if (user._type == 'Group')
+            if (~user._type.indexOf('Group'))
                 elemStyle = "UIGroup";
 
             var row = $('<li/>').attr('class', elemStyle);

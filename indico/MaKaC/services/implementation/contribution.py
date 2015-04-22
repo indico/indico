@@ -29,10 +29,10 @@ from MaKaC.services.implementation.base import HTMLModificationBase
 from MaKaC.services.implementation.base import DateTimeModificationBase
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
-from MaKaC.user import PrincipalHolder, Group, AvatarHolder
+from MaKaC.user import AvatarHolder
 import MaKaC.webinterface.pages.contributionReviewing as contributionReviewing
 import MaKaC.domain as domain
-from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.users.legacy import AvatarUserWrapper, principal_from_fossil
 
 
 class ContributionBase(object):
@@ -184,42 +184,28 @@ class ContributionProtectionUserList(ContributionModifBase):
         #will use IAvatarFossil or IGroupFossil
         return fossilize(self._contribution.getAllowedToAccessList())
 
+
 class ContributionProtectionAddUsers(ContributionModifBase):
 
     def _checkParams(self):
         ContributionModifBase._checkParams(self)
-
-        self._usersData = self._params['value']
+        self._principals = map(principal_from_fossil, self._params['value'])
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
+        for principal in self._principals:
+            self._contribution.grantAccess(principal)
 
-        for user in self._usersData :
-
-            userToAdd = PrincipalHolder().getById(user['id'])
-
-            if not userToAdd :
-                raise ServiceError("ERR-U0","User does not exist!")
-
-            self._contribution.grantAccess(userToAdd)
 
 class ContributionProtectionRemoveUser(ContributionModifBase):
-
     def _checkParams(self):
         ContributionModifBase._checkParams(self)
-
-        self._userData = self._params['value']
-
+        self._principal = principal_from_fossil(self._params['value'])
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
+        self._contribution.revokeAccess(self._principal)
 
-        userToRemove = PrincipalHolder().getById(self._userData['id'])
-
-        if not userToRemove :
-            raise ServiceError("ERR-U0","User does not exist!")
-        elif isinstance(userToRemove, AvatarUserWrapper) or isinstance(userToRemove, Group):
-            self._contribution.revokeAccess(userToRemove)
 
 class ContributionGetChildrenProtected(ContributionModifBase):
 
@@ -736,15 +722,11 @@ class ContributionAddExistingSubmitter(ContributionSubmittersBase):
 
     def _checkParams(self):
         ContributionSubmittersBase._checkParams(self)
-        self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
+        self._principals = map(principal_from_fossil, self._pm.extract("userList", pType=list, allowEmpty=False))
 
     def _getAnswer(self):
-        ah = PrincipalHolder()
-        for user in self._userList:
-            av = ah.getById(user["id"])
-            if av is None:
-                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
-            self._contribution.grantSubmission(av)
+        for principal in self._principals:
+            self._contribution.grantSubmission(principal)
         return self._getSubmittersList()
 
 
@@ -760,13 +742,13 @@ class ContributionRemoveSubmitter(ContributionSubmittersBase):
             # remove pending email, self._submitterId is an email address
             self._contribution.revokeSubmissionEmail(self._submitterId)
         else:
-            ah = PrincipalHolder()
-            av = ah.getById(self._submitterId)
-            if av is not None:
-                # remove submitter
-                self._contribution.revokeSubmission(av)
-            else:
+            try:
+                principal = principal_from_fossil(self._params['principal'])
+            except ValueError:
+                # WTF is this.. this used to be called if the user wasn't in avatarholder
                 self._removeUserFromSubmitterList(self._submitterId)
+            else:
+                self._contribution.revokeSubmission(principal)
         return self._getSubmittersList()
 
 
@@ -858,15 +840,11 @@ class ContributionAddExistingManager(ContributionManagerListBase):
 
     def _checkParams(self):
         ContributionManagerListBase._checkParams(self)
-        self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
+        self._principals = map(principal_from_fossil, self._pm.extract("userList", pType=list, allowEmpty=False))
 
     def _getAnswer(self):
-        ph = PrincipalHolder()
-        for user in self._userList:
-            principal = ph.getById(user["id"])
-            if principal is None and user["_type"] == "Avatar":
-                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
-            self._contribution.grantModification(ph.getById(user["id"]))
+        for principal in self._principals:
+            self._contribution.grantModification(principal)
         return self._getManagersList()
 
 
@@ -874,11 +852,10 @@ class ContributionRemoveManager(ContributionManagerListBase):
 
     def _checkParams(self):
         ContributionManagerListBase._checkParams(self)
-        self._managerId = self._pm.extract("userId", pType=str, allowEmpty=False)
+        self._principal = principal_from_fossil(self._params['principal'])
 
     def _getAnswer(self):
-        ph = PrincipalHolder()
-        self._contribution.revokeModification(ph.getById(self._managerId))
+        self._contribution.revokeModification(self._principal)
         return self._getManagersList()
 
 

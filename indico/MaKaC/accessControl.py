@@ -21,8 +21,7 @@ from functools import wraps
 
 from indico.core import signals
 from MaKaC.common import info
-import MaKaC
-from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.users.legacy import AvatarUserWrapper, GroupWrapper
 from MaKaC.common.contextManager import ContextManager
 
 def isFullyAccess(level):
@@ -156,7 +155,7 @@ class AccessController(Persistent):
         """grants read access for the related resource to the specified
             principal"""
 
-        if principal not in self.allowed and isinstance(principal, (AvatarUserWrapper, MaKaC.user.Group)):
+        if principal not in self.allowed and isinstance(principal, (AvatarUserWrapper, GroupWrapper)):
             self.allowed.append(principal)
             self._p_changed = 1
         signals.acl.access_granted.send(self, principal=principal)
@@ -234,7 +233,7 @@ class AccessController(Persistent):
             if principal is None:
                 self.revokeAccess(principal)
                 continue
-            if isinstance(principal, (AvatarUserWrapper, MaKaC.user.Group)) and principal.containsUser(av):
+            if isinstance(principal, (AvatarUserWrapper, GroupWrapper)) and principal.containsUser(av):
                 return True
         if isinstance(av, AvatarUserWrapper):
             for email in av.getEmails():
@@ -277,7 +276,7 @@ class AccessController(Persistent):
         """grants modification access for the related resource to the specified
             principal"""
         # ToDo: should the groups allowed to be managers?
-        if principal not in self.managers and (isinstance(principal, (AvatarUserWrapper, MaKaC.user.Group))):
+        if principal not in self.managers and (isinstance(principal, (AvatarUserWrapper, GroupWrapper))):
             self.managers.append(principal)
             self._p_changed = 1
         signals.acl.modification_granted.send(self, principal=principal)
@@ -296,7 +295,7 @@ class AccessController(Persistent):
             return True
 
         for principal in self.managers:
-            if isinstance(principal, (AvatarUserWrapper, MaKaC.user.Group)) and principal.containsUser(user):
+            if isinstance(principal, (AvatarUserWrapper, GroupWrapper)) and principal.containsUser(user):
                 return True
         ret = False
         if isinstance(user, AvatarUserWrapper):

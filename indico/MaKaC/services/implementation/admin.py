@@ -22,7 +22,7 @@ from indico.util.i18n import _
 from MaKaC.services.implementation.base import AdminService, TextModificationBase, LoggedOnlyService
 
 from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.user import PrincipalHolder, AvatarHolder, GroupHolder
+from MaKaC.user import AvatarHolder, GroupHolder
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 import MaKaC.common.info as info
@@ -113,12 +113,11 @@ class GroupAddExistingMember(GroupMemberBase):
         self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
 
     def _getAnswer(self):
-        ph = PrincipalHolder()
         for user in self._userList:
-            principal = ph.getById(user["id"])
-            if principal is None:
+            user = AvatarHolder().getById(user["id"])
+            if user is None:
                 raise NoReportError(_("The user that you are trying to add does not exist anymore in the database"))
-            self._group.addMember(principal)
+            self._group.addMember(user)
         return fossilize(self._group.getMemberList())
 
 
@@ -129,9 +128,8 @@ class GroupRemoveMember(GroupMemberBase):
         self._userId = self._pm.extract("userId", pType=str, allowEmpty=False)
 
     def _getAnswer(self):
-        ph = PrincipalHolder()
-        user = ph.getById(self._userId)
-        if user != None:
+        user = AvatarHolder().getById(self._userId)
+        if user is not None:
             self._group.removeMember(user)
         else:
             raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)

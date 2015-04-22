@@ -14,12 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
-import operator
-from BTrees.OOBTree import OOTreeSet, union
+from BTrees.OOBTree import OOTreeSet
 
 from persistent import Persistent
-from accessControl import AccessWrapper
 import MaKaC
 from MaKaC.common import filters, indexes
 from MaKaC.common.cache import GenericCache
@@ -43,15 +40,11 @@ from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.caching import memoize_request
 from indico.util.decorators import cached_classproperty
-from indico.util.event import truncate_path
 from indico.util.user import retrieve_principals
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import avatar_links, suggestions
 from indico.util.string import safe_upper, safe_slice
-from flask import request
 
-"""Contains the classes that implement the user management subsystem
-"""
 
 class Group(Persistent, Fossilizable):
     fossilizes(IGroupFossil)
@@ -221,6 +214,9 @@ class GroupHolder(ObjectHolder):
     """
     idxName = "groups"
     counterName = "PRINCIPAL"
+
+    def getById(self, id):
+        raise RuntimeError('obsolete')
 
     def add(self, group):
         ObjectHolder.add(self, group)
@@ -1452,42 +1448,6 @@ class AvatarHolder(ObjectHolder):
 
         email.indexUser(prin)
         return True
-
-
-
-# ToDo: This class should ideally derive from TreeHolder as it is thought to
-#   be a index over the "Principal" objects i.e. it will be a top indexing of
-#   the contents of AvatarHolder and GroupHolder. This will allow to
-#   transparently access to Principal objects from its id. To transparently
-#   index all the objects AvatarHolder and GroupHolder must override the
-#   "add" method and, apart from their normal operation, include an adding call
-#   for the PrincipalHolder.
-# The problem is that I have experienced some troubles (it seems not to perform
-#   the adding of objects) while adding an object both to the AvatarHolder and
-#   to this one; so, for the time being, I will implement it in a "dirty" and
-#   non-optimal way to be able to continue working, but the trouble must be
-#   investigated and a better solution found.
-# I'll keep the ObjectHolder interface so it will be easier afterwards to
-#   implement a more optimised solution (just this object needs to be modified)
-class PrincipalHolder:
-    def __init__(self):
-        self.__gh = GroupHolder()
-        self.__ah = AvatarHolder()
-
-    def getById(self, id):
-        try:
-            prin = self.__gh.getById(id)
-            return prin
-        except KeyError, e:
-            pass
-        prin = self.__ah.getById(id)
-        return prin
-
-    def match(self, element_id, exact=1, searchInAuthenticators=True):
-        prin = self.__gh.match({"name": element_id}, searchInAuthenticators=searchInAuthenticators, exact=exact)
-        if not prin:
-            prin = self.__ah.match({"login": element_id}, searchInAuthenticators=searchInAuthenticators, exact=exact)
-        return prin
 
 
 class LoginInfo:

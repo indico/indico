@@ -149,7 +149,11 @@ from MaKaC import conference as cmod
                 % if type != 'Category' and type!= 'Home' and type != 'Event':
                     'confId' : '${ target.getConference().getId() }',
                 % endif
-                    value: {'id': user.get('id')}},
+                    value: {
+                        '_type': user.get('_type'),
+                        'id': user.get('id'),
+                        'provider': user.get('provider')
+                    }},
                 function(result, error){
                     if (exists(error)) {
                         % if type == 'Category' or type == 'Home' :

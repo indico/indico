@@ -40,7 +40,7 @@ from MaKaC.common.contextManager import ContextManager
 from indico.core.logger import Logger
 
 from MaKaC.errors import TimingError
-from MaKaC.user import PrincipalHolder, Group, AvatarHolder
+from MaKaC.user import AvatarHolder
 from MaKaC.participant import Participant
 from MaKaC.fossils.contribution import IContributionFossil
 
@@ -63,7 +63,7 @@ from indico.modules import ModuleHolder
 from indico.modules.offlineEvents import OfflineEventItem
 from indico.modules.scheduler.tasks.offlineEventGenerator import OfflineEventGeneratorTask
 from indico.modules.scheduler import tasks, Client
-from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.users.legacy import AvatarUserWrapper, principal_from_fossil
 from indico.web.http_api.util import generate_public_auth_request
 from indico.core.config import Config
 
@@ -1024,8 +1024,7 @@ class ConferenceAddParticipants(ConferenceParticipantBase, ConferenceParticipant
         infoWarning = []
 
         for user in self._userList:
-            ph = PrincipalHolder()
-            selected = ph.getById(user['id'])
+            selected = AvatarHolder().getById(user['id'])
             if selected is None and user["_type"] == "Avatar":
                 raise NoReportError(_("""The user with email %s that you are adding does
                                     not exist anymore in the database""") % user["email"])
@@ -1087,8 +1086,7 @@ class ConferenceInviteParticipants(ConferenceParticipantBase, ConferenceParticip
         data["subject"] = self._emailSubject
         data["body"] = self._emailBody
         for user in self._userList:
-            ph = PrincipalHolder()
-            selected = ph.getById(user['id'])
+            selected = AvatarHolder().getById(user['id'])
             if isinstance(selected, AvatarUserWrapper):
                 participant = self._generateParticipant(selected)
                 if self._inviteParticipant(participant, participation):
@@ -1227,42 +1225,28 @@ class ConferenceProtectionUserList(ConferenceModifBase):
         #will use IAvatarFossil or IGroupFossil
         return fossilize(self._conf.getAllowedToAccessList())
 
+
 class ConferenceProtectionAddUsers(ConferenceModifBase):
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
-
-        self._usersData = self._params['value']
+        self._principals = map(principal_from_fossil, self._params['value'])
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
+        for principal in self._principals:
+            self._conf.grantAccess(principal)
 
-        for user in self._usersData :
-
-            userToAdd = PrincipalHolder().getById(user['id'])
-
-            if not userToAdd :
-                raise ServiceError("ERR-U0","User does not exist!")
-
-            self._conf.grantAccess(userToAdd)
 
 class ConferenceProtectionRemoveUser(ConferenceModifBase):
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
-
-        self._userData = self._params['value']
-
+        self._principal = principal_from_fossil(self._params['value'])
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
-
-        userToRemove = PrincipalHolder().getById(self._userData['id'])
-
-        if not userToRemove :
-            raise ServiceError("ERR-U0","User does not exist!")
-        elif isinstance(userToRemove, AvatarUserWrapper) or isinstance(userToRemove, Group):
-            self._conf.revokeAccess(userToRemove)
+        self._conf.revokeAccess(self._principal)
 
 
 class ConferenceProtectionToggleDomains(ConferenceModifBase):
@@ -1602,14 +1586,10 @@ class ConferenceProtectionAddExistingManager(ConferenceManagerListBase):
     def _checkParams(self):
         ConferenceManagerListBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+        self._principals = map(principal_from_fossil, pm.extract("userList", pType=list, allowEmpty=False))
 
     def _getAnswer(self):
-        ph = PrincipalHolder()
-        for user in self._userList:
-            principal = ph.getById(user["id"])
-            if principal is None and user["_type"] == "Avatar":
-                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
+        for principal in self._principals:
             self._conf.grantModification(principal)
         return self._getManagersList()
 
@@ -1627,8 +1607,7 @@ class ConferenceProtectionRemoveManager(ConferenceManagerListBase):
             # remove pending email, self._submitterId is an email address
             self._conf.getAccessController().revokeModificationEmail(self._managerId)
         else:
-            ph = PrincipalHolder()
-            self._conf.revokeModification(ph.getById(self._managerId))
+            self._conf.revokeModification(principal_from_fossil(self._params['principal']))
         return self._getManagersList()
 
 
@@ -1637,12 +1616,11 @@ class ConferenceProtectionAddExistingRegistrar(ConferenceModifBase):
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
+        self._principals = map(principal_from_fossil, pm.extract("userList", pType=list, allowEmpty=False))
 
     def _getAnswer(self):
-        ph = PrincipalHolder()
-        for user in self._userList:
-            self._conf.addToRegistrars(ph.getById(user["id"]))
+        for principal in self._principals:
+            self._conf.addToRegistrars(principal)
         return fossilize(self._conf.getRegistrarList())
 
 
@@ -1650,13 +1628,12 @@ class ConferenceProtectionRemoveRegistrar(ConferenceManagerListBase):
 
     def _checkParams(self):
         ConferenceManagerListBase._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._registrarId = pm.extract("userId", pType=str, allowEmpty=False)
+        self._principal = principal_from_fossil(self._params['principal'])
 
     def _getAnswer(self):
-        ph = PrincipalHolder()
-        self._conf.removeFromRegistrars(ph.getById(self._registrarId))
+        self._conf.removeFromRegistrars(self._principal)
         return fossilize(self._conf.getRegistrarList())
+
 
 class ConferenceGetChildrenProtected(ConferenceModifBase):
 
