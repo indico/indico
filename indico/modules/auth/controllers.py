@@ -220,6 +220,8 @@ class RHRegister(RH):
         return secure_serializer.loads(request.args['token'], max_age=3600, salt='register-email')
 
     def _process(self):
+        if session.user:
+            return redirect(url_for('misc.index'))
         handler = MultipassRegistrationHandler(self) if self.identity_info else LocalRegistrationHandler(self)
         verified_email = self._get_verified_email()
         if verified_email is not None:
