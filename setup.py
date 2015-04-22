@@ -480,6 +480,7 @@ if __name__ == '__main__':
             payment = indico_zodbimport.modules.payment:PaymentImporter
             api = indico_zodbimport.modules.api:APIImporter
             users = indico_zodbimport.modules.users:UserImporter
+            groups = indico_zodbimport.modules.groups:GroupImporter
             """,
           zip_safe=False,
           packages=foundPackages,

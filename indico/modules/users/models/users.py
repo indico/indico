@@ -25,6 +25,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table, FavoriteCategory
+from indico.modules.users.models.groups import group_members_table
 from indico.modules.users.models.links import UserLink
 from indico.util.i18n import _
 from indico.util.string import return_ascii
@@ -206,6 +207,14 @@ class User(db.Model):
         collection_class=set,
         backref=db.backref('user', lazy=False)
     )
+    #: the local groups this user belongs to
+    local_groups = db.relationship(
+        'LocalGroup',
+        secondary=group_members_table,
+        lazy=True,
+        collection_class=set,
+        backref=db.backref('members', lazy=True, collection_class=set),
+    )
 
     @property
     def as_avatar(self):
@@ -302,6 +311,13 @@ class User(db.Model):
         db.session.flush()
         secondary.is_primary = True
         db.session.flush()
+
+    def is_in_group(self, group):
+        """Checks if the user is in a group
+
+        :param group: A :class:`GroupProxy`
+        """
+        return group.has_member(self)
 
     def get_linked_roles(self, type_):
         """Retrieves the roles the user is linked to for a given type"""
