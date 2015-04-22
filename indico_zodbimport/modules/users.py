@@ -298,7 +298,7 @@ class UserImporter(Importer):
             for u in (user, coll):
                 print cformat('%{magenta!}---%{reset} '
                               '%{yellow!}Deleting {} - primary email collision%{reset} '
-                              '[%{blue!}{}%{reset}]').format(user.id, user.email)
+                              '[%{blue!}{}%{reset}]').format(u.id, u.email)
                 u.is_deleted = True
                 db.session.flush()
         # if the user was already deleted we don't care about primary email collisions
