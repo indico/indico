@@ -15,14 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function(global) {
+(function() {
     'use strict';
 
-    global.validatePasswordConfirmation = function validatePasswordConfirmation(fieldSelector, confirmFieldSelector) {
-        var passwordField = $(fieldSelector);
-        var confirmField = $(confirmFieldSelector);
+    function validatePasswordConfirmation(passwordField, confirmField) {
         if ('setCustomValidity' in confirmField[0]) {
-            $([fieldSelector, confirmFieldSelector].join(',')).on('change', function() {
+            passwordField.add(confirmField).on('change input', function() {
                 if (passwordField.val() != confirmField.val()) {
                     confirmField[0].setCustomValidity($T('The passwords do not match.'));
                 } else {
@@ -30,5 +28,13 @@
                 }
             });
         }
-    };
-})(window);
+    }
+
+    $(document).ready(function() {
+        $('form input[data-confirm-password]').each(function() {
+            var confirmField = $(this);
+            var passwordField = $(this.form).find('input[name="' + confirmField.data('confirmPassword') + '"]');
+            validatePasswordConfirmation(passwordField, confirmField);
+        });
+    });
+})();

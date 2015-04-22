@@ -18,13 +18,14 @@ from __future__ import unicode_literals
 
 from wtforms.fields import StringField, SelectField, PasswordField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, EqualTo, Length, ValidationError
+from wtforms.validators import DataRequired, Length, ValidationError
 
 from indico.modules.auth import Identity
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.validators import ConfirmPassword
 
 
 def _tolower(s):
@@ -66,8 +67,7 @@ class LocalRegistrationForm(RegistrationForm):
     email = EmailField(_('Email address'))
     username = StringField(_('Username'), [DataRequired()], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
-    confirm_password = PasswordField(_('Confirm password'),
-                                     [DataRequired(), EqualTo('password', message=_('The passwords do not match.'))])
+    confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
 
     def validate_username(self, field):
         if Identity.find(provider='indico', identifier=field.data).count():
@@ -95,5 +95,4 @@ class ResetPasswordEmailForm(IndicoForm):
 class ResetPasswordForm(IndicoForm):
     username = StringField(_('Username'))
     password = PasswordField(_('New password'), [DataRequired(), Length(min=5)])
-    confirm_password = PasswordField(_('Confirm password'),
-                                     [DataRequired(), EqualTo('password', message=_('The passwords do not match.'))])
+    confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])

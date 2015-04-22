@@ -28,9 +28,6 @@
             {% call form_fieldset(_('Login details')) %}
                 {{ form_rows(form, fields=('username', 'password', 'confirm_password')) }}
             {% endcall %}
-            <script>
-                validatePasswordConfirmation('#password', '#confirm_password');
-            </script>
         {% endif %}
         {% call form_footer() %}
             <a class="i-button big" href="{{ url_for('auth.logout') }}">{% trans %}Cancel{% endtrans %}</a>
