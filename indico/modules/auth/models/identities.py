@@ -53,8 +53,8 @@ class Identity(db.Model):
         db.String,
         nullable=False
     )
-    #: internal data used by the flask-multiauth system
-    multiauth_data = db.Column(
+    #: internal data used by the flask-multipass system
+    multipass_data = db.Column(
         JSON,
         nullable=False
     )

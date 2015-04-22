@@ -27,7 +27,7 @@ def save_identity_info(identity_info, user):
         'provider': identity_info.provider.name,
         'provider_title': identity_info.provider.title,
         'identifier': identity_info.identifier,
-        'multiauth_data': identity_info.multiauth_data,
+        'multipass_data': identity_info.multipass_data,
         'data': dict(identity_info.data.lists()),
         'indico_user_id': user.id if user else None,
         'email_verified': bool(identity_info.data['email'] and trusted_email)

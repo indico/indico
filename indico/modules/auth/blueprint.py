@@ -16,15 +16,15 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.auth import multiauth
+from indico.modules.auth import multipass
 from indico.modules.auth.controllers import RHLogout, RHAssociateIdentity, RHRegister, RHResetPassword
 from indico.web.flask.wrappers import IndicoBlueprint
 
 auth_blueprint = _bp = IndicoBlueprint('auth', __name__, template_folder='templates')
 
 
-_bp.add_url_rule('/login/', 'login', multiauth.process_login, methods=('GET', 'POST'))
-_bp.add_url_rule('/login/<provider>', 'login', multiauth.process_login, methods=('GET', 'POST'))
+_bp.add_url_rule('/login/', 'login', multipass.process_login, methods=('GET', 'POST'))
+_bp.add_url_rule('/login/<provider>', 'login', multipass.process_login, methods=('GET', 'POST'))
 
 _bp.add_url_rule('/logout/', 'logout', RHLogout, methods=('GET', 'POST'))
 

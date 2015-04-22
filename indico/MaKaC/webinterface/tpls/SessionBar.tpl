@@ -28,7 +28,7 @@ protection = getProtection(target) if target else None
 
         <%
             after_login_url = _request.values.get('next')
-            if after_login_url is None and _request.endpoint != _app.config['MULTIAUTH_LOGIN_ENDPOINT']:
+            if after_login_url is None and _request.endpoint != _app.config['MULTIPASS_LOGIN_ENDPOINT']:
                 after_login_url = _request.full_path.rstrip('?')
             if after_login_url == '/':
                 after_login_url = None

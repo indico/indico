@@ -56,7 +56,7 @@ class RegistrationForm(IndicoForm):
     affiliation = StringField(_('Affiliation'), [DataRequired()])
 
 
-class MultiAuthRegistrationForm(RegistrationForm):
+class MultipassRegistrationForm(RegistrationForm):
     email = SelectField(_('Email address'), [DataRequired(), _check_existing_email])
     phone = StringField(_('Phone number'))
 

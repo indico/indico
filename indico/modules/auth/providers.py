@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask_multiauth.providers.sqlalchemy import SQLAlchemyAuthProviderBase, SQLAlchemyIdentityProviderBase
+from flask_multipass.providers.sqlalchemy import SQLAlchemyAuthProviderBase, SQLAlchemyIdentityProviderBase
 
 from indico.modules.auth import Identity
 from indico.modules.auth.forms import LocalLoginForm

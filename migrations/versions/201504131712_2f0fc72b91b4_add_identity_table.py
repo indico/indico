@@ -23,7 +23,7 @@ def upgrade():
                     sa.Column('user_id', sa.Integer(), nullable=False),
                     sa.Column('provider', sa.String(), nullable=False),
                     sa.Column('identifier', sa.String(), nullable=False),
-                    sa.Column('multiauth_data', postgresql.JSON(), nullable=False),
+                    sa.Column('multipass_data', postgresql.JSON(), nullable=False),
                     sa.Column('data', postgresql.JSON(), nullable=False),
                     sa.Column('password_hash', sa.String(), nullable=True),
                     sa.Column('last_login_dt', UTCDateTime, nullable=True),

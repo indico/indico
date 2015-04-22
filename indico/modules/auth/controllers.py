@@ -24,8 +24,8 @@ from werkzeug.exceptions import BadRequest, Forbidden
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.notifications import make_email
-from indico.modules.auth import multiauth, logger, Identity, login_user
-from indico.modules.auth.forms import (SelectEmailForm, MultiAuthRegistrationForm, LocalRegistrationForm,
+from indico.modules.auth import multipass, logger, Identity, login_user
+from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationForm, LocalRegistrationForm,
                                        RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm)
 from indico.modules.auth.util import load_identity_info
 from indico.modules.auth.views import WPAuth
@@ -45,7 +45,7 @@ class RHLogout(RH):
     """Logs the user out"""
 
     def _process(self):
-        return multiauth.logout(request.args.get('next') or url_for('misc.index'), clear_session=True)
+        return multipass.logout(request.args.get('next') or url_for('misc.index'), clear_session=True)
 
 
 def _send_confirmation(email, salt, endpoint, template, template_args=None, url_args=None, data=None):
@@ -73,7 +73,7 @@ class RHAssociateIdentity(RH):
             # Just redirect to the front page or whereever we wanted to go.
             # Probably someone simply used his browser's back button.
             flash('There is no pending login.', 'warning')
-            return multiauth.redirect_success()
+            return multipass.redirect_success()
         self.user = User.get(self.identity_info['indico_user_id'])
         self.emails = sorted(self.user.all_emails & set(self.identity_info['data'].getlist('email')))
         self.verification_email_sent = self.identity_info.get('verification_email_sent', False)
@@ -112,11 +112,11 @@ class RHAssociateIdentity(RH):
     def _create_identity(self):
         identity = Identity(user=self.user, provider=self.identity_info['provider'],
                             identifier=self.identity_info['identifier'], data=self.identity_info['data'],
-                            multiauth_data=self.identity_info['multiauth_data'])
+                            multipass_data=self.identity_info['multipass_data'])
         logger.info('Created new identity for {}: {}'.format(self.user, identity))
         del session['login_identity_info']
         login_user(self.user, identity)
-        return multiauth.redirect_success()
+        return multipass.redirect_success()
 
     def _send_confirmation(self, email):
         session['login_identity_info']['verification_email_sent'] = True
@@ -154,7 +154,7 @@ class RHRegister(RH):
         return secure_serializer.loads(request.args['token'], max_age=3600, salt='register-email')
 
     def _process(self):
-        handler = MultiAuthRegistrationHandler(self) if self.identity_info else LocalRegistrationHandler(self)
+        handler = MultipassRegistrationHandler(self) if self.identity_info else LocalRegistrationHandler(self)
         verified_email = self._get_verified_email()
         if verified_email is not None:
             handler.email_verified(verified_email)
@@ -243,8 +243,8 @@ class RegistrationHandler(object):
         raise NotImplementedError
 
 
-class MultiAuthRegistrationHandler(RegistrationHandler):
-    form = MultiAuthRegistrationForm
+class MultipassRegistrationHandler(RegistrationHandler):
+    form = MultipassRegistrationForm
 
     def __init__(self, rh):
         self.identity_info = rh.identity_info
@@ -258,7 +258,7 @@ class MultiAuthRegistrationHandler(RegistrationHandler):
         return FormDefaults(self.identity_info['data'])
 
     def create_form(self):
-        form = super(MultiAuthRegistrationHandler, self).create_form()
+        form = super(MultipassRegistrationHandler, self).create_form()
         # We only want the phone field if the provider gave us a phone number
         if 'phone' in form and not self.identity_info['data']['phone']:
             del form.phone
@@ -277,10 +277,10 @@ class MultiAuthRegistrationHandler(RegistrationHandler):
     def create_identity(self, data):
         del session['login_identity_info']
         return Identity(provider=self.identity_info['provider'], identifier=self.identity_info['identifier'],
-                        data=self.identity_info['data'], multiauth_data=self.identity_info['multiauth_data'])
+                        data=self.identity_info['data'], multipass_data=self.identity_info['multipass_data'])
 
     def redirect_success(self):
-        return multiauth.redirect_success()
+        return multipass.redirect_success()
 
 
 class LocalRegistrationHandler(RegistrationHandler):
@@ -358,8 +358,8 @@ class RHResetPassword(RH):
             identity.password = form.password.data
             flash(_("Your password has been changed successfully."), 'success')
             login_user(identity.user, identity)
-            # We usually come here from a multiauth login page so we should have a target url
-            return multiauth.redirect_success()
+            # We usually come here from a multipass login page so we should have a target url
+            return multipass.redirect_success()
         form.username.data = identity.identifier
         return WPAuth.render_template('reset_password.html', form=form, identity=identity,
                                       widget_attrs={'username': {'disabled': True}})

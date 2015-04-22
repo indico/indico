@@ -44,7 +44,7 @@ from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.plugins import plugin_engine, include_plugin_css_assets, include_plugin_js_assets, url_for_plugin
-from indico.modules.auth import multiauth
+from indico.modules.auth import multipass
 from indico.modules.auth.providers import IndicoAuthProvider
 from indico.modules.auth.providers import IndicoIdentityProvider
 from indico.util.signals import values_from_signal
@@ -116,20 +116,20 @@ def configure_app(app, set_path=False):
     app.config['INDICO_SESSION_PERMANENT'] = cfg.getSessionLifetime() > 0
     app.config['INDICO_HTDOCS'] = cfg.getHtdocsDir()
     app.config['INDICO_COMPAT_ROUTES'] = cfg.getRouteOldUrls()
-    app.config['MULTIAUTH_AUTH_PROVIDERS'] = cfg.getAuthProviders()
-    app.config['MULTIAUTH_IDENTITY_PROVIDERS'] = cfg.getIdentityProviders()
-    app.config['MULTIAUTH_PROVIDER_MAP'] = cfg.getProviderMap() or {x: x for x in cfg.getAuthProviders()}
-    if 'indico' in app.config['MULTIAUTH_AUTH_PROVIDERS'] or 'indico' in app.config['MULTIAUTH_IDENTITY_PROVIDERS']:
+    app.config['MULTIPASS_AUTH_PROVIDERS'] = cfg.getAuthProviders()
+    app.config['MULTIPASS_IDENTITY_PROVIDERS'] = cfg.getIdentityProviders()
+    app.config['MULTIPASS_PROVIDER_MAP'] = cfg.getProviderMap() or {x: x for x in cfg.getAuthProviders()}
+    if 'indico' in app.config['MULTIPASS_AUTH_PROVIDERS'] or 'indico' in app.config['MULTIPASS_IDENTITY_PROVIDERS']:
         raise ValueError('The name `indico` is reserved and cannot be used as an Auth/Identity provider name.')
     if cfg.getLocalIdentities():
-        configure_multiauth_local(app)
-    app.config['MULTIAUTH_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone'}
-    app.config['MULTIAUTH_LOGIN_SELECTOR_TEMPLATE'] = 'auth/login_selector.html'
-    app.config['MULTIAUTH_LOGIN_FORM_TEMPLATE'] = 'auth/login_form.html'
-    app.config['MULTIAUTH_LOGIN_ENDPOINT'] = 'auth.login'
-    app.config['MULTIAUTH_LOGIN_URLS'] = None  # registered in a blueprint
-    app.config['MULTIAUTH_SUCCESS_ENDPOINT'] = 'misc.index'
-    app.config['MULTIAUTH_FAILURE_MESSAGE'] = _(u'Login failed: {error}')
+        configure_multipass_local(app)
+    app.config['MULTIPASS_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone'}
+    app.config['MULTIPASS_LOGIN_SELECTOR_TEMPLATE'] = 'auth/login_selector.html'
+    app.config['MULTIPASS_LOGIN_FORM_TEMPLATE'] = 'auth/login_form.html'
+    app.config['MULTIPASS_LOGIN_ENDPOINT'] = 'auth.login'
+    app.config['MULTIPASS_LOGIN_URLS'] = None  # registered in a blueprint
+    app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'misc.index'
+    app.config['MULTIPASS_FAILURE_MESSAGE'] = _(u'Login failed: {error}')
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
     app.config['PLUGINENGINE_PLUGINS'] = cfg.getPlugins()
     if set_path:
@@ -152,17 +152,17 @@ def configure_app(app, set_path=False):
             raise ValueError('Invalid static file method: %s' % method)
 
 
-def configure_multiauth_local(app):
-    app.config['MULTIAUTH_AUTH_PROVIDERS']['indico'] = {
+def configure_multipass_local(app):
+    app.config['MULTIPASS_AUTH_PROVIDERS']['indico'] = {
         'type': IndicoAuthProvider,
         'title': _('Local Account')
     }
-    app.config['MULTIAUTH_IDENTITY_PROVIDERS']['indico'] = {
+    app.config['MULTIPASS_IDENTITY_PROVIDERS']['indico'] = {
         'type': IndicoIdentityProvider,
         # We don't want any user info from this provider
         'identity_info_keys': {}
     }
-    app.config['MULTIAUTH_PROVIDER_MAP']['indico'] = 'indico'
+    app.config['MULTIPASS_PROVIDER_MAP']['indico'] = 'indico'
 
 
 def setup_jinja(app):
@@ -325,7 +325,7 @@ def make_app(set_path=False, db_setup=True, testing=False):
     configure_app(app, set_path)
 
     babel.init_app(app)
-    multiauth.init_app(app)
+    multipass.init_app(app)
     setup_jinja(app)
 
     with app.app_context():

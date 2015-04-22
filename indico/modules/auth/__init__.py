@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import session, redirect, request
-from flask_multiauth import MultiAuth, MultiAuthException
+from flask_multipass import Multipass, MultipassException
 
 from indico.core.db import db
 from indico.core.logger import Logger
@@ -34,17 +34,17 @@ from MaKaC.webinterface.rh.base import RHSimple
 logger = Logger.get('auth')
 
 
-class IndicoMultiAuth(MultiAuth):
+class IndicoMultipass(Multipass):
     @RHSimple.wrap_function
     def render_template(self, template_key, **kwargs):
-        rv = super(IndicoMultiAuth, self).render_template(template_key, **kwargs)
+        rv = super(IndicoMultipass, self).render_template(template_key, **kwargs)
         return WPAuth.render_string(rv)
 
 
-multiauth = IndicoMultiAuth()
+multipass = IndicoMultipass()
 
 
-@multiauth.identity_handler
+@multipass.identity_handler
 @RHSimple.wrap_function
 def process_identity(identity_info):
     logger.info('Received identity info: {}'.format(identity_info))
@@ -70,23 +70,23 @@ def process_identity(identity_info):
             logger.info('Found user with matching email: {}'.format(user))
             return redirect(url_for('auth.associate_identity'))
     elif identity.user.is_deleted:
-        raise MultiAuthException(_('Your Indico account has been deleted.'))
+        raise MultipassException(_('Your Indico account has been deleted.'))
     else:
         user = identity.user
         logger.info('Found existing identity {} for user {}'.format(identity, user))
     # Update the identity with the latest information
-    if identity.multiauth_data != identity_info.multiauth_data:
-        logger.info('Updated multiauth data'.format(identity, user))
-        identity.multiauth_data = identity_info.multiauth_data
+    if identity.multipass_data != identity_info.multipass_data:
+        logger.info('Updated multipass data'.format(identity, user))
+        identity.multipass_data = identity_info.multipass_data
     if identity.data != identity_info.data:
         logger.info('Updated data'.format(identity, user))
         identity.data = identity_info.data
     if user.is_blocked:
-        raise MultiAuthException(_('Your Indico account has been blocked.'))
+        raise MultipassException(_('Your Indico account has been blocked.'))
     login_user(user, identity)
 
 
-@multiauth.login_check
+@multipass.login_check
 def is_logged_in():
     return session.user is not None
 
