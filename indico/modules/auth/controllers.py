@@ -115,6 +115,7 @@ class RHAssociateIdentity(RH):
                             multipass_data=self.identity_info['multipass_data'])
         logger.info('Created new identity for {}: {}'.format(self.user, identity))
         del session['login_identity_info']
+        db.session.flush()
         login_user(self.user, identity)
         return multipass.redirect_success()
 

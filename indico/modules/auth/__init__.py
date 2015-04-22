@@ -107,6 +107,6 @@ def login_user(user, identity=None):
     session.lang = user.settings.get('lang')
     if identity:
         identity.register_login(request.remote_addr)
-        session['logged_in_with'] = (identity.provider, identity.identifier)
+        session['login_identity'] = identity.id
     else:
-        session.pop('logged_in_with', None)
+        session.pop('login_identity', None)
