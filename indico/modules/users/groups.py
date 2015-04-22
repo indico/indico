@@ -23,6 +23,7 @@ from werkzeug.utils import cached_property
 
 from indico.core.db import db
 from indico.modules.auth import Identity, multipass
+from indico.modules.users.legacy import LocalGroupWrapper, LDAPGroupWrapper
 from indico.modules.users.models.groups import LocalGroup
 from indico.modules.users.models.users import User
 from indico.util.caching import memoize_request
@@ -69,6 +70,12 @@ class GroupProxy(object):
         """The underlying group object"""
         raise NotImplementedError
 
+    @cached_property
+    def as_legacy_group(self):
+        """The legacy-style group wrapper"""
+        # TODO: remove once groups are gone from ZODB
+        raise NotImplementedError
+
     def has_member(self, user):
         """Checks if the user is a member of the group"""
         raise NotImplementedError
@@ -99,6 +106,10 @@ class _LocalGroupProxy(GroupProxy):
     def group(self):
         """The underlying :class:`.LocalGroup`"""
         return LocalGroup.get(self.id)
+
+    @cached_property
+    def as_legacy_group(self):
+        return LocalGroupWrapper(self.id)
 
     def has_member(self, user):
         return self.group in user.local_groups
@@ -134,6 +145,10 @@ class _MultipassGroupProxy(GroupProxy):
         except MultipassException as e:
             warn('Could not retrieve group {}:{}: {}'.format(self.provider, self.name, e))
             return None
+
+    @cached_property
+    def as_legacy_group(self):
+        return LDAPGroupWrapper(self.name)
 
     def has_member(self, user):
         if self.group is None:

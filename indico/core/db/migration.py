@@ -34,7 +34,6 @@ globalname_dict = {
     "PersistentList": ("persistent.list", None),
     'SlotSchedule': ('MaKaC.schedule', 'SlotSchedule'),
     'PosterSlotSchedule': ('MaKaC.schedule', 'PosterSlotSchedule'),
-    "CERNGroup": ("MaKaC.authentication.LDAPAuthentication", "LDAPGroup"),
     "PeriodicTask": ("indico.modules.scheduler.tasks.periodic", None),
     "PeriodicUniqueTask": ("indico.modules.scheduler.tasks.periodic", None),
     "TaskOccurrence": ("indico.modules.scheduler.tasks.periodic", None),
@@ -46,7 +45,10 @@ globalname_dict = {
     'FoundationSyncTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
     'LiveSyncUpdateTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
     'UHConferenceInstantMessaging': ('MaKaC.webinterface.urlHandlers', 'URLHandler'),
-    'Avatar': ('indico.modules.users.legacy', 'AvatarUserWrapper')
+    'Avatar': ('indico.modules.users.legacy', 'AvatarUserWrapper'),
+    'Group': ('indico.modules.users.legacy', 'LocalGroupWrapper'),
+    'LDAPGroup': ('indico.modules.users.legacy', 'LDAPGroupWrapper'),
+    'CERNGroup': ('indico.modules.users.legacy', 'LDAPGroupWrapper')
 }
 
 modulename_dict = {

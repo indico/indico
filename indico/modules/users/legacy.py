@@ -14,9 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from persistent import Persistent
-
 from functools import wraps
+from operator import attrgetter
+
+from persistent import Persistent
 
 from indico.modules.users.models.users import User
 from indico.util.caching import memoize_request
@@ -28,13 +29,14 @@ from indico.util.redis import avatar_links
 
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.Locators import Locator
-from MaKaC.fossils.user import IAvatarFossil, IAvatarMinimalFossil
+from MaKaC.fossils.user import IAvatarFossil, IAvatarMinimalFossil, IGroupFossil
 
 
 def encode_utf8(f):
     @wraps(f)
     def _wrapper(*args, **kwargs):
-        return f(*args, **kwargs).encode('utf-8')
+        rv = f(*args, **kwargs)
+        return rv.encode('utf-8') if isinstance(rv, unicode) else str(rv)
 
     return _wrapper
 
@@ -331,4 +333,153 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     @return_ascii
     def __repr__(self):
+        if self.user is None:
+            return u'<AvatarUserWrapper {}: user does not exist>'.format(self.id)
         return u'<AvatarUserWrapper {}: {} ({})>'.format(self.id, self.user.full_name, self.user.email)
+
+
+class GroupWrapper(Persistent, Fossilizable):
+    """Group-like wrapper class that holds a DB-stored (or remote) group."""
+
+    fossilizes(IGroupFossil)
+
+    def __init__(self, group_id):
+        self.id = to_unicode(group_id).encode('utf-8')
+
+    @property
+    def group(self):
+        """Returns the underlying GroupProxy
+
+        :rtype: indico.modules.users.groups.GroupProxy
+        """
+        raise NotImplementedError
+
+    def getId(self):
+        return self.id
+
+    def getName(self):
+        raise NotImplementedError
+
+    def getFullName(self):
+        return self.getName()
+
+    def getDescription(self):
+        return ''
+
+    def setDescription(self, value):
+        pass
+
+    def getEmail(self):
+        return ''
+
+    def isObsolete(self):
+        return False
+
+    def containsUser(self, avatar):
+        return self.group.has_member(avatar.user)
+
+    def getMemberList(self):
+        return sorted([x.as_avatar for x in self.group.get_members()], key=attrgetter('user.last_name'))
+
+    def canModify(self, aw_or_user):
+        if hasattr(aw_or_user, 'getUser'):
+            aw_or_user = aw_or_user.getUser()
+        return self.canUserModify(aw_or_user)
+
+    def canUserModify(self, avatar):
+        return avatar.user.is_admin
+
+    def getLocator(self):
+        return Locator(groupId=self.id)
+
+    def exists(self):
+        return self.group.group is not None
+
+    def __eq__(self, other):
+        from indico.modules.users.groups import GroupProxy
+        if not hasattr(other, 'group') or not isinstance(other.group, GroupProxy):
+            return False
+        return self.group == other.group
+
+    def __hash__(self):
+        return hash(self.group)
+
+    @return_ascii
+    def __repr__(self):
+        return u'<{} {}: {}>'.format(type(self).__name__, self.id, self.group)
+
+
+class LocalGroupWrapper(GroupWrapper):
+    is_local = True
+    groupType = 'Default'
+
+    @property
+    def group(self):
+        from indico.modules.users.groups import GroupProxy
+        return GroupProxy(self.id)
+
+    @encode_utf8
+    def getName(self):
+        return self.group.group.name if self.exists() else self.id
+
+    def addMember(self, member):
+        if not isinstance(member, AvatarUserWrapper):
+            raise TypeError('Groups can only contain users')
+        group = self.group.group  # needed to avoid GC
+        group.members.add(member.user)
+
+    def removeMember(self, member):
+        if not isinstance(member, AvatarUserWrapper):
+            raise TypeError('Groups can only contain users')
+        group = self.group.group  # needed to avoid GC
+        group.members.discard(member.user)
+
+
+class LDAPGroupWrapper(GroupWrapper):
+    is_local = False
+    provider_name = None
+    groupType = 'LDAP'
+
+    @property
+    def provider(self):
+        from indico.modules.auth import multipass
+        provider_name = self.provider_name
+        if not provider_name:
+            provider_name = next((provider.name for provider in multipass.identity_providers.itervalues()
+                                  if provider.settings.get('legacy_groups')), None)
+            assert provider_name, 'No identity provider has legacy_groups enabled'
+        return provider_name
+
+    @property
+    def group(self):
+        from indico.modules.users.groups import GroupProxy
+        return GroupProxy(self.id, self.provider)
+
+    @encode_utf8
+    def getName(self):
+        return self.id
+
+
+def principal_from_fossil(fossil):
+    """Gets a GroupWrapper or AvatarUserWrapper from a fossil"""
+    from indico.modules.users.groups import GroupProxy
+    type_ = fossil['_type']
+    id_ = fossil['id']
+    if type_ == 'Avatar':
+        user = User.get(int(id_))
+        if user is None:
+            raise ValueError('User does not exist: {}'.format(id_))
+        return user.as_avatar
+    elif type_ == 'LocalGroupWrapper':
+        group = GroupProxy(int(id_))
+        if group.group is None:
+            raise ValueError('Local group does not exist: {}'.format(id_))
+        return group.as_legacy_group
+    elif type_ == 'LDAPGroupWrapper':
+        provider = fossil['provider']
+        group = GroupProxy(id_, provider)
+        if group.group is None:
+            raise ValueError('Multipass group does not exist: {}:{}'.format(provider, id_))
+        return group.as_legacy_group
+    else:
+        raise ValueError('Unexpected fossil type: {}'.format(type_))
