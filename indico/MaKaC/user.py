@@ -1084,38 +1084,6 @@ class AvatarHolder(ObjectHolder):
     counterName = "PRINCIPAL"
     _indexes = [ "email", "name", "surName","organisation", "status" ]
 
-    def matchFirstLetter(self, index, letter, onlyActivated=True, searchInAuthenticators=True):
-        result = {}
-        if index not in self._indexes:
-            return None
-        if index in ["name", "surName", "organisation"]:
-            match = indexes.IndexesHolder().getById(index).matchFirstLetter(letter, accent_sensitive=False)
-        else:
-            match = indexes.IndexesHolder().getById(index).matchFirstLetter(letter)
-        if match is not None:
-            for userid in match:
-                if self.getById(userid) not in result:
-                    av = self.getById(userid)
-                    if not onlyActivated or av.isActivated():
-                        result[av.getEmail()] = av
-        if searchInAuthenticators:
-            for authenticator in AuthenticatorMgr().getList():
-                matches = authenticator.matchUserFirstLetter(index, letter)
-                if matches:
-                    for email, record in matches.iteritems():
-                        emailResultList = [av.getEmails() for av in result.values()]
-                        if email not in emailResultList:
-                            userMatched = self.match({'email': email}, exact=1, searchInAuthenticators=False)
-                            if not userMatched:
-                                av = Avatar(record)
-                                av.setId(record["id"])
-                                av.status = record["status"]
-                                result[email] = av
-                            else:
-                                av = userMatched[0]
-                                result[av.getEmail()] = av
-        return result.values()
-
     def match(self, criteria, exact=0, onlyActivated=True, searchInAuthenticators=True):
         result = {}
         iset = set()
@@ -1198,31 +1166,11 @@ class AvatarHolder(ObjectHolder):
                     return False
         return True
 
-
     def getById(self, id):
         if isinstance(id, int) or id.isdigit():
             user = User.get(int(id))
             if user:
                 return user.as_avatar
-        try:
-            return ObjectHolder.getById(self, id)
-        except:
-            pass
-        try:
-            authId, extId, email = id.split(":")
-        except:
-            return None
-        av = self.match({"email": email}, searchInAuthenticators=False)
-        if av:
-            return av[0]
-        user_data = AuthenticatorMgr().getById(authId).searchUserById(extId)
-        av = Avatar(user_data)
-        identity = user_data["identity"](user_data["login"], av)
-        user_data["authenticator"].add(identity)
-        av.activateAccount()
-        self.add(av)
-        return av
-
 
     def add(self,av):
         """
