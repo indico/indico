@@ -93,6 +93,8 @@ class UserImporter(Importer):
     def migrate_users(self):
         print cformat('%{white!}migrating users')
 
+        seen_identities = set()
+
         for avatar in committing_iterator(self._iter_avatars(), 5000):
             if getattr(avatar, '_mergeTo', None):
                 print cformat('%{red!}!!!%{reset} '
@@ -124,8 +126,6 @@ class UserImporter(Importer):
                           '%{white!}{:6d}%{reset} %{cyan}{}%{reset} [%{blue!}{}%{reset}] '
                           '{{%{cyan!}{}%{reset}}}').format(user.id, user.full_name, user.email,
                                                            ', '.join(user.secondary_emails))
-            local_identities = set()
-
             # migrate identities of non-deleted avatars
             if not user.is_deleted:
                 for old_identity in avatar.identities:
@@ -138,8 +138,19 @@ class UserImporter(Importer):
                                           old_identity)
                         continue
 
-                    if old_identity.__class__.__name__ == 'LocalIdentity' and not self.ignore_local_accounts:
-                        identity = Identity(provider='indico', identifier=username)
+                    provider = {
+                        'LocalIdentity': 'indico',
+                        'LDAPIdentity': self.ldap_provider_name
+                    }[old_identity.__class__.__name__]
+
+                    if (provider, username) in seen_identities:
+                        print cformat("%{red!}!!!%{reset} "
+                                      "%{yellow!}Duplicate local identity: {}. Skipping.").format(username)
+                        continue
+
+                    if provider == 'indico' and not self.ignore_local_accounts:
+                        identity = Identity(provider=provider, identifier=username)
+
                         if not hasattr(old_identity, 'algorithm'):  # plaintext password
                             if not old_identity.password:
                                 # password is empty, skip identity
@@ -152,18 +163,13 @@ class UserImporter(Importer):
                             assert old_identity.algorithm == 'bcrypt'
                             identity.password_hash = old_identity.password
 
-                        if username in local_identities:
-                            print cformat("%{red!}!!!%{reset} "
-                                          "%{yellow!}Duplicate local identity: {}. Skipping.").format(username)
-                            continue
-                        else:
-                            local_identities.add(username)
-                    elif old_identity.__class__.__name__ == 'LDAPIdentity':
-                        identity = Identity(provider=self.ldap_provider_name,
-                                            identifier=username)
+                    elif provider == self.ldap_provider_name:
+                        identity = Identity(provider=provider, identifier=username)
+
                     if identity:
                         print cformat('%{blue!}<->%{reset}  %{yellow}{}%{reset}').format(identity)
                         user.identities.add(identity)
+                        seen_identities.add((provider, username))
 
             for merged_avatar in getattr(avatar, '_mergeFrom', ()):
                 merged = self._user_from_avatar(merged_avatar, is_deleted=True, merged_into_id=user.id)
