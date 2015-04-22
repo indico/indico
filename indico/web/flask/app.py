@@ -123,7 +123,8 @@ def configure_app(app, set_path=False):
         raise ValueError('The name `indico` is reserved and cannot be used as an Auth/Identity provider name.')
     if cfg.getLocalIdentities():
         configure_multipass_local(app)
-    app.config['MULTIPASS_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone'}
+    app.config['MULTIPASS_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone',
+                                                  'address'}
     app.config['MULTIPASS_LOGIN_SELECTOR_TEMPLATE'] = 'auth/login_selector.html'
     app.config['MULTIPASS_LOGIN_FORM_TEMPLATE'] = 'auth/login_form.html'
     app.config['MULTIPASS_LOGIN_ENDPOINT'] = 'auth.login'

@@ -179,7 +179,7 @@ class RHRegister(RH):
 
     def _create_user(self, data, handler):
         user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'],
-                    phone=data.get('phone', ''), affiliation=data['affiliation'])
+                    address=data.get('address', ''), phone=data.get('phone', ''), affiliation=data['affiliation'])
         identity = handler.create_identity(data)
         user.identities.add(identity)
         user.secondary_emails = handler.extra_emails - {user.email}
@@ -259,9 +259,10 @@ class MultipassRegistrationHandler(RegistrationHandler):
 
     def create_form(self):
         form = super(MultipassRegistrationHandler, self).create_form()
-        # We only want the phone field if the provider gave us a phone number
-        if 'phone' in form and not self.identity_info['data']['phone']:
-            del form.phone
+        # We only want the phone/address fields if the provider gave us data for it
+        for field in {'address', 'phone'}:
+            if field in form and not self.identity_info['data'][field]:
+                delattr(form, field)
         emails = self.identity_info['data'].getlist('email')
         form.email.choices = zip(emails, emails)
         return form

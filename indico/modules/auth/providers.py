@@ -28,6 +28,7 @@ class IndicoAuthProvider(SQLAlchemyAuthProviderBase):
     identity_model = Identity
     provider_column = Identity.provider
     identifier_column = Identity.identifier
+    multi_instance = False
 
     def check_password(self, identity, password):
         # No, the passwords are not stored in plaintext. Magic is happening here!
@@ -37,3 +38,4 @@ class IndicoAuthProvider(SQLAlchemyAuthProviderBase):
 class IndicoIdentityProvider(SQLAlchemyIdentityProviderBase):
     user_model = User
     identity_user_relationship = 'user'
+    multi_instance = False
