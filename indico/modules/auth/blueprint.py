@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.auth.controllers import (RHLogin, RHLoginForm, RHLogout, RHAssociateIdentity, RHRegister,
-                                             RHResetPassword)
+                                             RHResetPassword, RHUserAccounts, RHUserAccountsRemove)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 auth_blueprint = _bp = IndicoBlueprint('auth', __name__, template_folder='templates')
@@ -30,6 +30,8 @@ _bp.add_url_rule('/login/<provider>/form', 'login_form', RHLoginForm)
 _bp.add_url_rule('/logout/', 'logout', RHLogout, methods=('GET', 'POST'))
 
 _bp.add_url_rule('/user/identities/associate', 'associate_identity', RHAssociateIdentity, methods=('GET', 'POST'))
+_bp.add_url_rule('/user/accounts/', 'accounts', RHUserAccounts, methods=('GET', 'POST'))
+_bp.add_url_rule('/user/accounts/remove/<identity>', 'remove-account', RHUserAccountsRemove)
 
 _bp.add_url_rule('/register/', 'register', RHRegister, methods=('GET', 'POST'), defaults={'provider': None})
 _bp.add_url_rule('/register/<provider>', 'register', RHRegister, methods=('GET', 'POST'))

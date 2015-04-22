@@ -27,10 +27,13 @@ from indico.core.db import db
 from indico.core.notifications import make_email
 from indico.modules.auth import logger, Identity, login_user
 from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationForm, LocalRegistrationForm,
-                                       RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm)
+                                       RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm,
+                                       LocalLoginAddForm, LocalLoginEditForm)
 from indico.modules.auth.util import load_identity_info
 from indico.modules.auth.views import WPAuth
 from indico.modules.users import User
+from indico.modules.users.controllers import RHUserBase
+from indico.modules.users.views import WPUser
 from indico.util.i18n import _
 from indico.util.signing import secure_serializer
 from indico.web.flask.util import url_for
@@ -276,6 +279,60 @@ class RHRegister(RH):
                 'Check <a href="{url}">your profile</a> for further account details and settings.')
         flash(Markup(msg).format(url=url_for('users.user_profile')), 'success')
         return handler.redirect_success()
+
+
+class RHUserAccounts(RHUserBase):
+    """Displays user accounts"""
+
+    def _create_form(self):
+        if self.user.local_identity:
+            defaults = FormDefaults(username=self.user.local_identity.identifier)
+            local_account_form = LocalLoginEditForm(identity=self.user.local_identity, obj=defaults)
+        else:
+            local_account_form = LocalLoginAddForm()
+        return local_account_form
+
+    def _handle_add_local_account(self, form):
+        identity = Identity(provider='indico', identifier=form.data['username'], password=form.data['password'])
+        self.user.identities.add(identity)
+        flash(_("Local account added successfully"), 'success')
+
+    def _handle_edit_local_account(self, form):
+        self.user.local_identity.identifier = form.data['username']
+        self.user.local_identity.password = form.data['password']
+        flash(_("Your local account credentials have been updated successfully"), 'success')
+
+    def _process(self):
+        form = self._create_form()
+        if form.validate_on_submit():
+            if isinstance(form, LocalLoginAddForm):
+                self._handle_add_local_account(form)
+            elif isinstance(form, LocalLoginEditForm):
+                self._handle_edit_local_account(form)
+            return redirect(url_for('auth.accounts'))
+        provider_titles = {name: provider.title for name, provider in multipass.auth_providers.iteritems()}
+        return WPUser.render_template('accounts.html', form=form, user=self.user, provider_titles=provider_titles)
+
+
+class RHUserAccountsRemove(RHUserBase):
+    """Removes an account"""
+
+    def _checkParams(self):
+        RHUserBase._checkParams(self)
+        self.identity = Identity.get_one(request.view_args['identity'])
+        if self.identity.user != self.user:
+            raise Forbidden("This identity doesn't belong to the user".format(self.identity.id))
+
+    def _process(self):
+        if session['login_identity'] == self.identity.id:
+            raise BadRequest("The identity used to log in can't be removed")
+        if self.user.local_identity == self.identity:
+            raise BadRequest("The main local identity can't be removed")
+        self.user.identities.remove(self.identity)
+        provider_title = multipass.identity_providers[self.identity.provider].title
+        flash(_("Account {} ({}) successfully removed from your accounts"
+              .format(self.identity.identifier, provider_title)), 'success')
+        return redirect(url_for('auth.accounts'))
 
 
 class RegistrationHandler(object):
