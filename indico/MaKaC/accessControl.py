@@ -225,7 +225,7 @@ class AccessController(Persistent):
         return any(domain.belongsTo(ip) for domain in self.getRequiredDomainList())
 
     def isAdmin(self, av):
-        return av.user.is_admin
+        return av and av.user and av.user.is_admin
 
     def canUserAccess(self, av):
         if self.isAdmin(av):
