@@ -14,36 +14,34 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from BTrees.OOBTree import OOTreeSet
 
+from BTrees.OOBTree import OOTreeSet
 from persistent import Persistent
+from pytz import all_timezones
+
 import MaKaC
+from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 from MaKaC.common import filters, indexes
 from MaKaC.common.cache import GenericCache
+import MaKaC.common.info as info
 from MaKaC.common.Locators import Locator
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import UserError, MaKaCError
+from MaKaC.common.fossilize import Fossilizable, fossilizes
+from MaKaC.fossils.user import (IAvatarFossil, IAvatarAllDetailsFossil, IGroupFossil, IPersonalInfoFossil,
+                                IAvatarMinimalFossil)
 from MaKaC.trashCan import TrashCanManager
-import MaKaC.common.info as info
-from MaKaC.i18n import _
-from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
 from indico.core import signals
 from indico.core.logger import Logger
-from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
-                            IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
-from MaKaC.common.fossilize import Fossilizable, fossilizes
-
-from pytz import all_timezones
-
 from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.caching import memoize_request
 from indico.util.decorators import cached_classproperty
-from indico.util.user import retrieve_principals
-from indico.util.redis import write_client as redis_write_client
-from indico.util.redis import avatar_links, suggestions
+from indico.util.i18n import _
+from indico.util.redis import avatar_links, suggestions, write_client as redis_write_client
 from indico.util.string import safe_upper, safe_slice
+from indico.util.user import retrieve_principals
 
 
 class Group(Persistent, Fossilizable):
