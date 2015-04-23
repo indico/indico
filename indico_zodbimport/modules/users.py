@@ -250,7 +250,7 @@ class UserImporter(Importer):
                                               '{}').format(unicode(e), obj)
 
                 # add old "registrant" entries to registration/registrant
-                for reg in avatar.registrants.itervalues():
+                for reg in getattr(avatar, 'registrants', {}).itervalues():
                     if reg.getConference().getOwner() and reg not in registrants:
                         UserLink.create_link(user, reg, 'registrant', 'registration')
                         print cformat('%{cyan!}<->%{reset}        '
