@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.groups.controllers import RHGroups, RHGroupDetails, RHGroupMembers
+from indico.modules.groups.controllers import (RHGroups, RHGroupDetails, RHGroupMembers, RHGroupEdit, RHGroupDelete,
+                                               RHGroupDeleteMember)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 groups_blueprint = _bp = IndicoBlueprint('groups', __name__, template_folder='templates', url_prefix='/admin/groups')
@@ -25,3 +26,8 @@ groups_blueprint = _bp = IndicoBlueprint('groups', __name__, template_folder='te
 _bp.add_url_rule('/', 'groups', RHGroups, methods=('GET', 'POST'))
 _bp.add_url_rule('/<provider>/<group_id>/', 'group_details', RHGroupDetails)
 _bp.add_url_rule('/<provider>/<group_id>/members', 'group_members', RHGroupMembers)
+_bp.add_url_rule('/indico/new', 'group_add', RHGroupEdit, methods=('GET', 'POST'))
+_bp.add_url_rule('/<any(indico):provider>/<int:group_id>/edit', 'group_edit', RHGroupEdit, methods=('GET', 'POST'))
+_bp.add_url_rule('/<any(indico):provider>/<int:group_id>/delete', 'group_delete', RHGroupDelete, methods=('POST',))
+_bp.add_url_rule('/<any(indico):provider>/<int:group_id>/<int:user_id>', 'group_delete_member', RHGroupDeleteMember,
+                 methods=('DELETE',))

@@ -17,13 +17,32 @@
 from __future__ import unicode_literals
 
 from wtforms.fields import StringField, BooleanField, SelectField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 
-from indico.web.forms.base import IndicoForm
+from indico.core.db import db
+from indico.modules.groups.models.groups import LocalGroup
 from indico.util.i18n import _
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import PrincipalField
 
 
 class SearchForm(IndicoForm):
     provider = SelectField(_('Provider'))
     name = StringField(_('Group name'), [DataRequired()])
     exact = BooleanField(_('Exact match'))
+
+
+class EditGroupForm(IndicoForm):
+    name = StringField(_('Group name'), [DataRequired()])
+    members = PrincipalField(_('Group members'), serializable=False)
+
+    def __init__(self, *args, **kwargs):
+        self.group = kwargs.pop('group', None)
+        super(EditGroupForm, self).__init__(*args, **kwargs)
+
+    def validate_name(self, field):
+        query = LocalGroup.find(db.func.lower(LocalGroup.name) == field.data.lower())
+        if self.group:
+            query = query.filter(LocalGroup.id != self.group.id)
+        if query.count():
+            raise ValidationError(_('A group with this name already exists.'))

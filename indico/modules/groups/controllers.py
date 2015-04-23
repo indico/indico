@@ -18,18 +18,20 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from flask import request, jsonify
+from flask import request, jsonify, redirect, flash
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import NotFound
 
 from indico.core.auth import multipass
 from indico.core.db import db
 from indico.modules.groups import GroupProxy
-from indico.modules.groups.forms import SearchForm
+from indico.modules.groups.forms import SearchForm, EditGroupForm
 from indico.modules.groups.models.groups import LocalGroup
 from indico.modules.groups.views import WPGroupsAdmin
+from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
@@ -65,7 +67,7 @@ class RHGroupBase(RHAdminBase):
         except ValueError:
             group = None
         if group is None or group.group is None:
-            raise NotFound('Group does not exist')
+            raise NotFound
         self.group = group
 
 
@@ -85,3 +87,56 @@ class RHGroupMembers(RHGroupBase):
         group = self.group
         tpl = get_template_module('groups/_group_members.html')
         return jsonify(success=True, html=tpl.group_members(group))
+
+
+class RHGroupEdit(RHAdminBase):
+    """Admin group creation"""
+
+    def _checkParams(self):
+        if 'group_id' in request.view_args:
+            self.new_group = False
+            self.group = LocalGroup.get(request.view_args['group_id'])
+            if self.group is None:
+                raise NotFound
+        else:
+            self.new_group = True
+            self.group = LocalGroup()
+
+    def _process(self):
+        existing_group = self.group if not self.new_group else None
+        form = EditGroupForm(obj=existing_group, group=existing_group)
+        if form.validate_on_submit():
+            form.populate_obj(self.group)
+            if self.new_group:
+                db.session.add(self.group)
+                msg = _("The group '{name}' has been created.")
+            else:
+                msg = _("The group '{name}' has been updated.")
+            db.session.flush()
+            flash(msg.format(name=self.group.name), 'success')
+            return redirect(url_for('.groups'))
+        return WPGroupsAdmin.render_template('group_edit.html', group=existing_group, form=form)
+
+
+class RHLocalGroupBase(RHAdminBase):
+    def _checkParams(self):
+        self.group = LocalGroup.get(request.view_args['group_id'])
+        if self.group is None:
+            raise NotFound
+
+
+class RHGroupDelete(RHLocalGroupBase):
+    """Admin group deletion"""
+
+    def _process(self):
+        db.session.delete(self.group)
+        flash(_("The group '{name}' has been deleted.").format(name=self.group.name), 'success')
+        return redirect(url_for('.groups'))
+
+
+class RHGroupDeleteMember(RHLocalGroupBase):
+    """Admin group member deletion (ajax)"""
+
+    def _process(self):
+        self.group.members.discard(User.get(request.view_args['user_id']))
+        return jsonify(success=True)
