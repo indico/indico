@@ -20,6 +20,7 @@ from operator import attrgetter
 
 from persistent.cPersistence import Persistent
 
+from indico.core.auth import multipass
 from indico.modules.users.legacy import encode_utf8, AvatarUserWrapper
 from indico.util.fossilize import Fossilizable, fossilizes
 from indico.util.string import to_unicode, return_ascii
@@ -131,7 +132,6 @@ class LDAPGroupWrapper(GroupWrapper):
 
     @property
     def provider(self):
-        from indico.modules.auth import multipass
         provider_name = self.provider_name
         if not provider_name:
             provider_name = next((provider.name for provider in multipass.identity_providers.itervalues()

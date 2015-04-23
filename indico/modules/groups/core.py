@@ -21,8 +21,9 @@ from warnings import warn
 from flask_multipass import MultipassException
 from werkzeug.utils import cached_property
 
+from indico.core.auth import multipass
 from indico.core.db import db
-from indico.modules.auth import Identity, multipass
+from indico.modules.auth import Identity
 from indico.modules.groups.models.groups import LocalGroup
 from indico.util.caching import memoize_request
 from indico.util.string import return_ascii

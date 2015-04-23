@@ -17,35 +17,23 @@
 from __future__ import unicode_literals
 
 from flask import session, redirect, request
-from flask_multipass import Multipass, MultipassException
+from flask_multipass import MultipassException
 
+from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.auth.models.identities import Identity
 from indico.modules.auth.util import save_identity_info
-from indico.modules.auth.views import WPAuth
 from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.common.timezoneUtils import SessionTZ
-from MaKaC.webinterface.rh.base import RHSimple
 
 
 logger = Logger.get('auth')
 
 
-class IndicoMultipass(Multipass):
-    @RHSimple.wrap_function
-    def render_template(self, template_key, **kwargs):
-        rv = super(IndicoMultipass, self).render_template(template_key, **kwargs)
-        return WPAuth.render_string(rv)
-
-
-multipass = IndicoMultipass()
-
-
 @multipass.identity_handler
-@RHSimple.wrap_function
 def process_identity(identity_info):
     logger.info('Received identity info: {}'.format(identity_info))
     identity = Identity.query.filter_by(provider=identity_info.provider.name,

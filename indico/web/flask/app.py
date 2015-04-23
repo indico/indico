@@ -39,12 +39,12 @@ from indico.core.logger import Logger
 from MaKaC.i18n import _
 from MaKaC.webinterface.pages.error import WErrorWSGI
 
+from indico.core.auth import multipass
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.plugins import plugin_engine, include_plugin_css_assets, include_plugin_js_assets, url_for_plugin
-from indico.modules.auth import multipass
 from indico.modules.auth.providers import IndicoAuthProvider
 from indico.modules.auth.providers import IndicoIdentityProvider
 from indico.util.signals import values_from_signal

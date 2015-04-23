@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.auth import multipass
+from indico.core.auth import multipass
 from indico.modules.auth.controllers import RHLogout, RHAssociateIdentity, RHRegister, RHResetPassword
 from indico.web.flask.wrappers import IndicoBlueprint
 

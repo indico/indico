@@ -21,10 +21,11 @@ from itsdangerous import BadData
 from markupsafe import Markup
 from werkzeug.exceptions import BadRequest, Forbidden
 
+from indico.core.auth import multipass
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.notifications import make_email
-from indico.modules.auth import multipass, logger, Identity, login_user
+from indico.modules.auth import logger, Identity, login_user
 from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationForm, LocalRegistrationForm,
                                        RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm)
 from indico.modules.auth.util import load_identity_info
