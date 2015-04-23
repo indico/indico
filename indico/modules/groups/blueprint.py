@@ -16,16 +16,12 @@
 
 from __future__ import unicode_literals
 
-from indico.core import signals
-from indico.modules.groups.core import GroupProxy
-from indico.util.i18n import _
-from indico.web.flask.util import url_for
+from indico.modules.groups.controllers import RHGroups, RHGroupDetails, RHGroupMembers
+from indico.web.flask.wrappers import IndicoBlueprint
+
+groups_blueprint = _bp = IndicoBlueprint('groups', __name__, template_folder='templates', url_prefix='/admin/groups')
 
 
-__all__ = ('GroupProxy',)
-
-
-@signals.admin_sidemenu.connect
-def _extend_admin_menu(sender, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'groups', SideMenuItem(_("Groups"), url_for('groups.groups'))
+_bp.add_url_rule('/', 'groups', RHGroups, methods=('GET', 'POST'))
+_bp.add_url_rule('/<provider>/<group_id>/', 'group_details', RHGroupDetails)
+_bp.add_url_rule('/<provider>/<group_id>/members', 'group_members', RHGroupMembers)

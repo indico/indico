@@ -16,16 +16,14 @@
 
 from __future__ import unicode_literals
 
-from indico.core import signals
-from indico.modules.groups.core import GroupProxy
+from wtforms.fields import StringField, BooleanField, SelectField
+from wtforms.validators import DataRequired
+
+from indico.web.forms.base import IndicoForm
 from indico.util.i18n import _
-from indico.web.flask.util import url_for
 
 
-__all__ = ('GroupProxy',)
-
-
-@signals.admin_sidemenu.connect
-def _extend_admin_menu(sender, **kwargs):
-    from MaKaC.webinterface.wcomponents import SideMenuItem
-    return 'groups', SideMenuItem(_("Groups"), url_for('groups.groups'))
+class SearchForm(IndicoForm):
+    provider = SelectField(_('Provider'))
+    name = StringField(_('Group name'), [DataRequired()])
+    exact = BooleanField(_('Exact match'))

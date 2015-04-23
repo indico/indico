@@ -72,6 +72,7 @@ from indico.core.plugins.blueprints import plugins_blueprint
 from indico.modules.api.blueprint import api_blueprint
 from indico.modules.auth.blueprint import auth_blueprint
 from indico.modules.events.agreements.blueprint import agreements_blueprint
+from indico.modules.groups.blueprint import groups_blueprint
 from indico.modules.payment.blueprint import payment_blueprint
 from indico.modules.vc.blueprint import vc_blueprint, vc_compat_blueprint
 from indico.modules.events.registration.blueprint import event_registration_blueprint
@@ -84,7 +85,7 @@ from indico.web.assets.blueprint import assets_blueprint
 BLUEPRINTS = (legacy, misc, user, oauth, rooms, category, category_mgmt, event_display,
               event_creation, event_mgmt, files, admin, rooms_admin, plugins_blueprint, payment_blueprint,
               event_registration_blueprint, requests_blueprint, agreements_blueprint, vc_blueprint, assets_blueprint,
-              api_blueprint, users_blueprint, oauth_blueprint, auth_blueprint)
+              api_blueprint, users_blueprint, oauth_blueprint, auth_blueprint, groups_blueprint)
 COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, user, oauth, rooms, category, category_mgmt, event_display,
                                                 event_creation, event_mgmt, files, admin, rooms_admin))
 COMPAT_BLUEPRINTS += (vc_compat_blueprint,)

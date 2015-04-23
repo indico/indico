@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-
 from indico.modules.users.ext import ExtraUserPreferences
 from indico.modules.users.models.users import User
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy

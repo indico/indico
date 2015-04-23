@@ -1,0 +1,26 @@
+{% extends 'layout/base.html' %}
+{% from 'groups/_group_members.html' import group_members %}
+
+{% block title %}{% trans %}Group Details{% endtrans %}{% endblock %}
+{% block subtitle %}{{ group.name }} ({{ provider_title }}){% endblock %}
+
+{%- block content %}
+    <h3>{% trans %}Group members{% endtrans %}</h3>
+    <div id="group-members">
+        {% if group.is_local %}
+            {# Local groups usually don't have massive amounts of members so we load them immediately #}
+            {{ group_members(group) }}
+        {% else %}
+            <img src="{{ indico_config.BaseURL }}/images/loading.gif" title="{% trans %}Loading member list{% endtrans %}">
+            <script>
+                $.ajax({
+                    url: {{ url_for('.group_members', group) | tojson }},
+                    error: handleAjaxError,
+                    success: function(data) {
+                        $('#group-members').html(data.html);
+                    }
+                });
+            </script>
+        {% endif %}
+    </div>
+{%- endblock %}

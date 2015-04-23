@@ -1,0 +1,18 @@
+{% macro group_members(group) %}
+    <table class="i-table-widget fixed-width">
+        <thead>
+            <tr>
+                <th>{% trans %}Name{% endtrans %}</th>
+                <th>{% trans %}Email{% endtrans %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in group.get_members()|sort(attribute='full_name') %}
+                <tr>
+                    <td>{{ user.full_name }}</td>
+                    <td>{{ user.email }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}

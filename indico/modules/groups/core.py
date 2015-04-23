@@ -43,9 +43,9 @@ class GroupProxy(object):
 
     def __new__(cls, name_or_id, provider=None, _group=None):
         """Creates the correct GroupProxy for the group type"""
-        if provider is None:
+        if provider is None or provider == 'indico':
             obj = object.__new__(_LocalGroupProxy)
-            obj.id = name_or_id
+            obj.id = int(name_or_id)
         else:
             obj = object.__new__(_MultipassGroupProxy)
             obj.name = name_or_id
@@ -84,7 +84,16 @@ class GroupProxy(object):
         raise NotImplementedError
 
     @classmethod
-    def search(cls, name, exact=False):
+    def search(cls, name, exact=False, providers=None):
+        """Searches for groups
+
+        :param name: The group name to search for.
+        :param exact: If only exact matches should be found (much faster)
+        :param providers: ``None`` to search in all providers and
+                          local groups. May be a set specifying
+                          providers to search in. For local groups, the
+                          ``'indico'`` provider name may be used.
+        """
         name = name.strip()
         if not name:
             return []
@@ -92,14 +101,26 @@ class GroupProxy(object):
             criterion = db.func.lower(LocalGroup.name) == name.lower()
         else:
             criterion = db.func.lower(LocalGroup.name).contains(name.lower())
-        result = {GroupProxy(g.id, _group=g) for g in LocalGroup.find(criterion)}
-        result |= {GroupProxy(g.name, g.provider, _group=g) for g in multipass.search_groups(name, exact=exact)}
-        return sorted(result, key=lambda x: x.group.name.lower())
+        result = set()
+        if providers is None or 'indico' in providers:
+            result |= {GroupProxy(g.id, _group=g) for g in LocalGroup.find(criterion)}
+        result |= {GroupProxy(g.name, g.provider.name, _group=g)
+                   for g in multipass.search_groups(name, providers=providers, exact=exact)}
+        return sorted(result, key=lambda x: x.name.lower())
 
 
 class _LocalGroupProxy(GroupProxy):
     is_local = True
     supports_member_list = True
+    provider = None
+
+    @property
+    def locator(self):
+        return {'provider': 'indico', 'group_id': self.id}
+
+    @property
+    def name(self):
+        return self.group.name
 
     @cached_property
     def group(self):
@@ -132,6 +153,10 @@ class _LocalGroupProxy(GroupProxy):
 
 class _MultipassGroupProxy(GroupProxy):
     is_local = False
+
+    @property
+    def locator(self):
+        return {'provider': self.provider, 'group_id': self.name}
 
     @property
     def supports_member_list(self):
