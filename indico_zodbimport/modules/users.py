@@ -145,7 +145,7 @@ class UserImporter(Importer):
 
                     if (provider, username) in seen_identities:
                         print cformat("%{red!}!!!%{reset} "
-                                      "%{yellow!}Duplicate local identity: {}. Skipping.").format(username)
+                                      "%{yellow!}Duplicate identity: {}, {}. Skipping.").format(provider, username)
                         continue
 
                     if provider == 'indico' and not self.ignore_local_accounts:
@@ -222,18 +222,19 @@ class UserImporter(Importer):
         for avatars in grouper(self._iter_avatars(), 2500, skip_missing=True):
             avatars = {int(a.id): a for a in avatars}
             users = ((u, avatars[u.id]) for u in User.find(User.id.in_(avatars)))
+
             for user, avatar in committing_iterator(self.flushing_iterator(users, 250)):
+                registrants = set()
                 user_shown = False
                 for type_, entries in avatar.linkedTo.iteritems():
                     # store registrant roles, in order to avoid duplication below
-                    registrants = set()
                     for role, objects in entries.iteritems():
                         if (type_ == 'category' and role == 'favorite') or type_ == 'group':
                             continue
                         if not objects:
                             continue
                         if type_ == 'registration' and role == 'registrant':
-                            registrants.add(object)
+                            registrants |= set(objects)
                         if not user_shown:
                             print cformat('%{green}+++%{reset} '
                                           '%{white!}{:6d}%{reset} %{cyan}{}%{reset}').format(user.id, user.full_name)
