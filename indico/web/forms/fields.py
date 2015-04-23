@@ -19,11 +19,13 @@ from operator import attrgetter
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectMultipleField
 from wtforms.fields.simple import HiddenField, TextAreaField, PasswordField
-from wtforms.widgets.core import CheckboxInput, PasswordInput, Select
+from wtforms.widgets.core import CheckboxInput, Select
 from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase
 
+from indico.modules.groups import GroupProxy
+from indico.modules.users import User
 from indico.util.fossilize import fossilize
-from indico.util.user import retrieve_principals
+from indico.util.user import retrieve_principals, principal_from_fossil
 from indico.util.string import is_valid_mail
 from indico.util.i18n import _
 from indico.web.forms.widgets import PrincipalWidget, RadioButtonsWidget, JinjaWidget, PasswordWidget
@@ -146,29 +148,36 @@ class PrincipalField(HiddenField):
     def __init__(self, *args, **kwargs):
         self.groups = kwargs.pop('groups', False)
         self.multiple = kwargs.pop('multiple', True)
+        # if we want serializable objects (usually for json) or the real thing (User/GroupProxy)
+        self.serializable = kwargs.pop('serializable', True)
         super(PrincipalField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
-        if principal['_type'] == 'Avatar':
-            return u'Avatar', principal['id']
-        else:
-            return u'Group', principal['id']
+        principal = principal_from_fossil(principal, legacy=False)
+        return principal.as_principal if self.serializable else principal
 
     def process_formdata(self, valuelist):
         if valuelist:
             data = map(self._convert_principal, json.loads(valuelist[0]))
             if self.multiple:
-                self.data = data
+                self.data = data if self.serializable else set(data)
             else:
                 self.data = None if not data else data[0]
 
     def pre_validate(self, form):
-        for principal in self._get_data():
-            if not self.groups and principal[0] == 'Group':
-                raise ValueError(u'You cannot select groups')
+        if self.groups:
+            return
+        if not self.serializable and any(isinstance(p, GroupProxy) for p in self._get_data()):
+            raise ValueError(u'You cannot select groups')
+        elif self.serializable and any(p[0] == 'Group' for p in self._get_data()):
+            raise ValueError(u'You cannot select groups')
 
     def _value(self):
-        return map(fossilize, retrieve_principals(self._get_data()))
+        if self.serializable:
+            return map(fossilize, retrieve_principals(self._get_data()))
+        else:
+            data = sorted(self._get_data(), key=lambda x: (x.last_name if isinstance(x, User) else x.name).lower())
+            return fossilize(x.as_avatar if isinstance(x, User) else x.as_legacy_group for x in data)
 
     def _get_data(self):
         if self.multiple:

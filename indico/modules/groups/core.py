@@ -70,6 +70,11 @@ class GroupProxy(object):
         raise NotImplementedError
 
     @cached_property
+    def as_principal(self):
+        """"The serializable principal identifier of this group"""
+        raise NotImplementedError
+
+    @cached_property
     def as_legacy_group(self):
         """The legacy-style group wrapper"""
         # TODO: remove once groups are gone from ZODB
@@ -128,6 +133,10 @@ class _LocalGroupProxy(GroupProxy):
         return LocalGroup.get(self.id)
 
     @cached_property
+    def as_principal(self):
+        return 'Group', (None, self.id)
+
+    @cached_property
     def as_legacy_group(self):
         from indico.modules.groups.legacy import LocalGroupWrapper
         return LocalGroupWrapper(self.id)
@@ -170,6 +179,10 @@ class _MultipassGroupProxy(GroupProxy):
         except MultipassException as e:
             warn('Could not retrieve group {}:{}: {}'.format(self.provider, self.name, e))
             return None
+
+    @cached_property
+    def as_principal(self):
+        return 'Group', (self.provider, self.name)
 
     @cached_property
     def as_legacy_group(self):

@@ -216,6 +216,11 @@ class User(db.Model):
     )
 
     @property
+    def as_principal(self):
+        """The serializable principal identifier of this user"""
+        return 'User', self.id
+
+    @property
     def as_avatar(self):
         # TODO: remove this after DB is free of Avatars
         from indico.modules.users.legacy import AvatarUserWrapper
