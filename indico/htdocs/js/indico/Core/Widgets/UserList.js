@@ -123,7 +123,7 @@ type("ListOfUsersManager", [], {
         },
 
         favorite: function(user) {
-            if (user._type == "AvatarUserWrapper") {
+            if (user._type == "Avatar") {
                 return $('<span/>').css({'float':'right'}).
                     html(create_favorite_button(user.id));
             }
