@@ -14,6 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from indico.modules.groups import GroupProxy
+from indico.modules.users import User
+
 
 def retrieve_principals(iterable):
     """
@@ -67,8 +70,6 @@ def principals_merge_users(iterable, new_id, old_id):
 
 def principal_from_fossil(fossil):
     """Gets a GroupWrapper or AvatarUserWrapper from a fossil"""
-    from indico.modules.groups.core import GroupProxy
-    from indico.modules.users import User
     type_ = fossil['_type']
     id_ = fossil['id']
     if type_ == 'Avatar':

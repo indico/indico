@@ -21,6 +21,7 @@ from operator import attrgetter
 from persistent.cPersistence import Persistent
 
 from indico.core.auth import multipass
+from indico.modules.groups import GroupProxy
 from indico.modules.users.legacy import encode_utf8, AvatarUserWrapper
 from indico.util.fossilize import Fossilizable, fossilizes
 from indico.util.string import to_unicode, return_ascii
@@ -86,7 +87,6 @@ class GroupWrapper(Persistent, Fossilizable):
         return self.group.group is not None
 
     def __eq__(self, other):
-        from indico.modules.groups.core import GroupProxy
         if not hasattr(other, 'group') or not isinstance(other.group, GroupProxy):
             return False
         return self.group == other.group
@@ -105,7 +105,6 @@ class LocalGroupWrapper(GroupWrapper):
 
     @property
     def group(self):
-        from indico.modules.groups.core import GroupProxy
         return GroupProxy(self.id)
 
     @encode_utf8
@@ -141,7 +140,6 @@ class LDAPGroupWrapper(GroupWrapper):
 
     @property
     def group(self):
-        from indico.modules.groups.core import GroupProxy
         return GroupProxy(self.id, self.provider)
 
     @encode_utf8

@@ -25,7 +25,7 @@ from MaKaC.services.implementation.user import UserComparator
 
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
-from indico.modules.groups.core import GroupProxy
+from indico.modules.groups import GroupProxy
 
 #################################
 # User and group search
