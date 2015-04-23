@@ -45,6 +45,7 @@
     @include single-box-shadow();
 
     background: white;
+    color: $black;
     padding: 10px;
 }
 
@@ -129,11 +130,6 @@
 // ============================================================================
 
 .i-box {
-
-    .group-list-description {
-        color: $black;
-    }
-
     ul.group-list {
         color: $light-black;
         list-style: outside none none;
@@ -141,7 +137,7 @@
         padding: 0;
 
         > li:first-child {
-            border-top: 1px solid #ddd;
+            border-top: 1px solid lighten($gray, $color-variation);
         }
 
         > li:last-child:not(.keep-last-border) {
@@ -149,7 +145,7 @@
         }
 
         > li {
-            border-bottom: 1px solid #e5e5e5;
+            border-bottom: 1px solid lighten($gray, $color-variation);
             display: block;
             margin-left: -10px;
             margin-right: -10px;
