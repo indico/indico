@@ -19,10 +19,9 @@ from operator import attrgetter
 
 from indico.core.db import db
 from indico.modules.users import User
-from indico.modules.users.models.groups import LocalGroup
+from indico.modules.groups.models.groups import LocalGroup
 from indico.util.console import cformat
 from indico.util.struct.iterables import committing_iterator
-
 from indico_zodbimport import Importer, convert_to_unicode
 
 

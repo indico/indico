@@ -27,7 +27,8 @@ from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
 
 from indico.core.config import Config
-from indico.modules.users.legacy import AvatarUserWrapper, GroupWrapper
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.groups.legacy import GroupWrapper
 
 
 class BooleanMixin:

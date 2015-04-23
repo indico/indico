@@ -21,7 +21,8 @@ from functools import wraps
 
 from indico.core import signals
 from MaKaC.common import info
-from indico.modules.users.legacy import AvatarUserWrapper, GroupWrapper
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.groups.legacy import GroupWrapper
 from MaKaC.common.contextManager import ContextManager
 
 def isFullyAccess(level):

@@ -32,7 +32,8 @@ from MaKaC.fossils.subcontribution import ISubContribParticipationFullFossil
 from MaKaC.user import AvatarHolder
 import MaKaC.webinterface.pages.contributionReviewing as contributionReviewing
 import MaKaC.domain as domain
-from indico.modules.users.legacy import AvatarUserWrapper, principal_from_fossil
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.util.user import principal_from_fossil
 
 
 class ContributionBase(object):

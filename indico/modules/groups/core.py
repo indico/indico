@@ -23,9 +23,7 @@ from werkzeug.utils import cached_property
 
 from indico.core.db import db
 from indico.modules.auth import Identity, multipass
-from indico.modules.users.legacy import LocalGroupWrapper, LDAPGroupWrapper
-from indico.modules.users.models.groups import LocalGroup
-from indico.modules.users.models.users import User
+from indico.modules.groups.models.groups import LocalGroup
 from indico.util.caching import memoize_request
 from indico.util.string import return_ascii
 
@@ -109,6 +107,7 @@ class _LocalGroupProxy(GroupProxy):
 
     @cached_property
     def as_legacy_group(self):
+        from indico.modules.groups.legacy import LocalGroupWrapper
         return LocalGroupWrapper(self.id)
 
     def has_member(self, user):
@@ -148,6 +147,7 @@ class _MultipassGroupProxy(GroupProxy):
 
     @cached_property
     def as_legacy_group(self):
+        from indico.modules.groups.legacy import LDAPGroupWrapper
         return LDAPGroupWrapper(self.name)
 
     def has_member(self, user):
@@ -165,6 +165,7 @@ class _MultipassGroupProxy(GroupProxy):
 
     @memoize_request
     def get_members(self):
+        from indico.modules.users.models.users import User
         if self.group is None:
             warn('Tried to get members for invalid group {}'.format(self))
             return set()

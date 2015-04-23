@@ -41,7 +41,8 @@ from MaKaC.common.TemplateExec import escapeHTMLForJS
 from indico.core.config import Config
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
-from indico.modules.users.legacy import AvatarUserWrapper, LDAPGroupWrapper
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.groups.legacy import LDAPGroupWrapper
 from indico.util.event import uniqueId
 
 

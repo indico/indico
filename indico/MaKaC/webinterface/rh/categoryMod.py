@@ -28,7 +28,8 @@ from MaKaC.errors import MaKaCError, FormValuesError, NotFoundError
 import MaKaC.conference as conference
 from MaKaC.webinterface.rh.conferenceBase import RHSubmitMaterialBase
 
-from indico.modules.users.legacy import AvatarUserWrapper, GroupWrapper
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.groups.legacy import GroupWrapper
 from indico.util.i18n import _
 
 

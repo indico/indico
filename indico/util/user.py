@@ -63,3 +63,29 @@ def principals_merge_users(iterable, new_id, old_id):
             id_ = new_id
         principals.append((type_, id_))
     return principals
+
+
+def principal_from_fossil(fossil):
+    """Gets a GroupWrapper or AvatarUserWrapper from a fossil"""
+    from indico.modules.groups.core import GroupProxy
+    from indico.modules.users import User
+    type_ = fossil['_type']
+    id_ = fossil['id']
+    if type_ == 'Avatar':
+        user = User.get(int(id_))
+        if user is None:
+            raise ValueError('User does not exist: {}'.format(id_))
+        return user.as_avatar
+    elif type_ == 'LocalGroupWrapper':
+        group = GroupProxy(int(id_))
+        if group.group is None:
+            raise ValueError('Local group does not exist: {}'.format(id_))
+        return group.as_legacy_group
+    elif type_ == 'LDAPGroupWrapper':
+        provider = fossil['provider']
+        group = GroupProxy(id_, provider)
+        if group.group is None:
+            raise ValueError('Multipass group does not exist: {}:{}'.format(provider, id_))
+        return group.as_legacy_group
+    else:
+        raise ValueError('Unexpected fossil type: {}'.format(type_))

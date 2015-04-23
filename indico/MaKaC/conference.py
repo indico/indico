@@ -41,7 +41,8 @@ from MaKaC.contributionReviewing import Review
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.locations import Location
 from indico.modules.users import User
-from indico.modules.users.legacy import AvatarUserWrapper, GroupWrapper
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.groups.legacy import GroupWrapper
 from indico.util.i18n import L_
 from indico.util.string import safe_upper, safe_slice, fix_broken_string, return_ascii
 from MaKaC.review import AbstractFieldContent

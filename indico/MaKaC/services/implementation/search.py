@@ -14,21 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.conference import CategoryManager
-
 from MaKaC.services.implementation.base import ServiceBase
 
 from MaKaC.common import search
 
-from MaKaC.webinterface import urlHandlers
-from MaKaC.fossils.user import IAvatarFossil, IGroupFossil
+from MaKaC.fossils.user import IGroupFossil
 from MaKaC.common.fossilize import fossilize
 
 from MaKaC.services.implementation.user import UserComparator
 
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
-from indico.modules.users.groups import GroupProxy
+from indico.modules.groups.core import GroupProxy
 
 #################################
 # User and group search

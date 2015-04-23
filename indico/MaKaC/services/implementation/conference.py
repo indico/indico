@@ -63,7 +63,8 @@ from indico.modules import ModuleHolder
 from indico.modules.offlineEvents import OfflineEventItem
 from indico.modules.scheduler.tasks.offlineEventGenerator import OfflineEventGeneratorTask
 from indico.modules.scheduler import tasks, Client
-from indico.modules.users.legacy import AvatarUserWrapper, principal_from_fossil
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.util.user import principal_from_fossil
 from indico.web.http_api.util import generate_public_auth_request
 from indico.core.config import Config
 

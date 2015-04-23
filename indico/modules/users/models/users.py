@@ -25,7 +25,6 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table, FavoriteCategory
-from indico.modules.users.models.groups import group_members_table
 from indico.modules.users.models.links import UserLink
 from indico.util.i18n import _
 from indico.util.string import return_ascii
@@ -210,7 +209,7 @@ class User(db.Model):
     #: the local groups this user belongs to
     local_groups = db.relationship(
         'LocalGroup',
-        secondary=group_members_table,
+        secondary='users.group_members',
         lazy=True,
         collection_class=set,
         backref=db.backref('members', lazy=True, collection_class=set),

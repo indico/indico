@@ -31,7 +31,8 @@ from MaKaC.webinterface.wcomponents import WConferenceListItem
 from MaKaC.common.fossilize import fossilize
 from indico.core.index import Catalog
 from indico.web.http_api.util import generate_public_auth_request
-from indico.modules.users.legacy import AvatarUserWrapper, principal_from_fossil
+from indico.modules.users.legacy import AvatarUserWrapper
+from indico.util.user import principal_from_fossil
 from MaKaC import domain
 from indico.core.config import Config
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
