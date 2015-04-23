@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask import request
+
 from indico.modules.auth.controllers import (RHLogin, RHLoginForm, RHLogout, RHAssociateIdentity, RHRegister,
                                              RHResetPassword, RHUserAccounts, RHUserAccountsRemove)
 from indico.web.flask.util import make_compat_redirect_func
@@ -31,13 +33,22 @@ _bp.add_url_rule('/login/<provider>/form', 'login_form', RHLoginForm)
 _bp.add_url_rule('/logout/', 'logout', RHLogout, methods=('GET', 'POST'))
 
 _bp.add_url_rule('/user/identities/associate', 'associate_identity', RHAssociateIdentity, methods=('GET', 'POST'))
-_bp.add_url_rule('/user/accounts/', 'accounts', RHUserAccounts, methods=('GET', 'POST'))
-_bp.add_url_rule('/user/accounts/remove/<identity>', 'remove-account', RHUserAccountsRemove)
 
 _bp.add_url_rule('/register/', 'register', RHRegister, methods=('GET', 'POST'), defaults={'provider': None})
 _bp.add_url_rule('/register/<provider>', 'register', RHRegister, methods=('GET', 'POST'))
 
 _bp.add_url_rule('/reset-password/', 'resetpass', RHResetPassword, methods=('GET', 'POST'))
+
+
+with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
+    _bp.add_url_rule('/accounts/', 'accounts', RHUserAccounts, methods=('GET', 'POST'))
+    _bp.add_url_rule('/accounts/remove/<identity>', 'remove-account', RHUserAccountsRemove)
+
+
+@_bp.url_defaults
+def _add_user_id(endpoint, values):
+    if (endpoint == 'auth.user_profile' or endpoint.startswith('api.key_')) and 'user_id' not in values:
+        values['user_id'] = request.view_args.get('user_id')
 
 
 # Legacy URLs
