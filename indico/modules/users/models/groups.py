@@ -45,12 +45,6 @@ class LocalGroup(db.Model):
     # relationship backrefs:
     # - members (User.local_groups)
 
-    @property
-    def as_legacy_group(self):
-        # TODO: remove this after DB is free of Groups
-        from indico.modules.users.legacy import LocalGroupWrapper
-        return LocalGroupWrapper(self.id)
-
     @return_ascii
     def __repr__(self):
         return '<LocalGroup({}, {})>'.format(self.id, self.name)

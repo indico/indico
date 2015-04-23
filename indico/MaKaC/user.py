@@ -1361,12 +1361,13 @@ class AvatarHolder(ObjectHolder):
                             reg.setAvatar(prin)
                             prin.addRegistrant(reg)
 
-            if objType == "group":
-                for role in links[objType].keys():
-                    if role == "member":
-                        for group in set(links[objType][role]):
-                            group.removeMember(merged)
-                            group.addMember(prin)
+            # TODO: handle this properly in the users module via the merge hook
+            # if objType == "group":
+            #     for role in links[objType].keys():
+            #         if role == "member":
+            #             for group in set(links[objType][role]):
+            #                 group.removeMember(merged)
+            #                 group.addMember(prin)
 
             if objType == "evaluation":
                 for role in links[objType].keys():

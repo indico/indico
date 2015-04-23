@@ -189,7 +189,7 @@ class UserImporter(Importer):
                     # store registrant roles, in order to avoid duplication below
                     registrants = set()
                     for role, objects in entries.iteritems():
-                        if type_ == 'category' and role == 'favorite':
+                        if (type_ == 'category' and role == 'favorite') or type_ == 'group':
                             continue
                         if not objects:
                             continue
