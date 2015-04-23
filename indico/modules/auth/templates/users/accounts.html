@@ -56,34 +56,60 @@
         <div class="i-box titled">
             <div class="i-box-header">
                 <div class="i-box-title">
-                    {%- trans %}Connected Accounts{% endtrans -%}
+                    {%- trans %}External Accounts{% endtrans -%}
                 </div>
             </div>
             <div class="i-box-content">
-                {% if user.external_identities %}
-                    <ul class="group-list no-description with-buttons">
-                        {% for identity in user.external_identities %}
+                <p class="group-list-description">
+                    {% trans %}
+                        External accounts linked with your Indico user.
+                    {% endtrans %}
+                </p>
+                <ul class="group-list with-buttons">
+                    {% if user.external_identities %}
+                        {% for identity in user.external_identities | sort(attribute='last_login_dt', reverse=True) %}
                             <li>
-                                <span>{{ provider_titles[identity.provider] }}</span>
+                                <span class="account-identity-provider">
+                                    {{ provider_titles[identity.provider] }}
+                                </span>
+                                <small>
+                                    ({{ identity.identifier }})
+                                </small>
                                 <span class="right">
+                                    <span class="account-identity-info">
+                                        <span>
+                                            <span class="label">
+                                                {% trans %}
+                                                    Last login:
+                                                {% endtrans %}
+                                            </span>
+                                            <span class="content">
+                                                {{ identity.last_login_dt | format_datetime('short') }}
+                                            </span>
+                                        </span>
+                                    </span>
                                     {% if identity.id == session.login_identity %}
                                         <a class="i-button disabled"
-                                            title="{% trans %}You can't disconnect the account you used to log in{% endtrans %}">
+                                            title="{% trans %}The account used to log in cannot be unlinked{% endtrans %}">
                                     {% else %}
                                         <a href="{{ url_for('auth.remove-account', identity) }}" class="i-button right">
                                     {% endif %}
                                         {% trans %}
-                                            Disconnect
+                                            Unlink
                                         {% endtrans %}
                                     </a>
                                 </span>
                             </li>
                         {% endfor %}
-                    </ul>
-                {% else %}
-                    {% trans %}
-                        You have no external accounts connected.
-                    {% endtrans %}
+                    {% else %}
+                    <li>
+                        {% trans %}
+                            <span class="account-no-identities">
+                                You have no external accounts connected
+                            </span>
+                        {% endtrans %}
+                    </li>
+                </ul>
                 {% endif %}
             </div>
         </div>
