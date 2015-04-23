@@ -9,13 +9,12 @@
         var ScriptRoot = {{ (indico_config.BaseURL + '/js/') | tojson }};
     </script>
 
-    <script src="{{ url_for('assets.js_vars_global') }}"></script>
+    <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
+    <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 
     {% assets 'base_js' -%}
     <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
-    <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=language) }}"></script>
-    <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 
     {% assets 'base_css', 'screen_sass' -%}
         <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">

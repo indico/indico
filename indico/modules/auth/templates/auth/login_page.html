@@ -15,7 +15,7 @@
                         <div class="centered-column">
                             <div class="login-container clearfix">
                                 <a class="logo" href="http://indico.cern.ch">
-                                    <img class="header-logo" src="http://indico.cern.ch/images/logo_indico.png">
+                                    <img class="header-logo" src="/images/logo_indico.png">
                                 </a>
                                 {% include 'flashed_messages.html' %}
                                 <div id="form-wrapper">
@@ -73,31 +73,30 @@
         </div>
     </div>
 
-
     <script>
-        var submit_form = function() {
-            $('#hidden-submit').click();
-        };
+        (function() {
+            'use strict';
 
-        $('.login-form-button').on('click', submit_form);
+            function submit_form() {
+                $('#hidden-submit').click();
+            }
 
-        var load_login_form = function(url) {
-            $.ajax({
-                url: url,
-                type: 'POST',
-                success: function(data) {
-                    $('#form-wrapper').html(data);
-                }
-            });
-        };
+            $('.login-page').on('click', '.i-button.login-form-button', submit_form);
 
-        load_login_form("{{ url_for('auth.login_form', provider=default_provider.name) }}");
+            function load_login_form(url) {
+                $.ajax({
+                    url: url,
+                    success: function(data) {
+                        $('#form-wrapper').html(data);
+                    }
+                });
+            }
 
-        $('.i-button').on('click', function() {
-            if($(this).hasClass('provider-with-form')) {
+            load_login_form({{ url_for('auth.login_form', provider=default_provider.name) | tojson }});
+
+            $('.login-page').on('click', '.i-button.provider-with-form', function() {
                 var new_login = $(this);
                 var old_login = $('.login-form-button');
-                old_login.unbind('click', submit_form);
                 var new_login_btn_pos = new_login.offset().top
                 var old_login_btn_pos = old_login.offset().top;
                 var diff = old_login_btn_pos - new_login_btn_pos
@@ -108,13 +107,11 @@
                 old_login.addClass('provider-with-form');
                 old_login.removeClass('login-form-button');
 
-                new_login.text('{% trans %}Login with {% endtrans %}' + new_login.data('provider'))
+                new_login.text($T('Login with {0}').format(new_login.data('provider')))
                 old_login.text(old_login.data('provider'));
 
-                $('.login-form-button').on('click', submit_form);
-
                 load_login_form(new_login.data('href'));
-            }
-        });
+            });
+        })();
     </script>
 {% endblock %}

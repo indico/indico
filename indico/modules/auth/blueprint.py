@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.core.auth import multipass
+from indico.modules.auth import multipass
 from indico.modules.auth.controllers import RHLogout, RHAssociateIdentity, RHRegister, RHResetPassword
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -24,8 +24,8 @@ auth_blueprint = _bp = IndicoBlueprint('auth', __name__, template_folder='templa
 
 
 _bp.add_url_rule('/login/', 'login', multipass.process_submit, methods=('GET', 'POST'))
-_bp.add_url_rule('/login/<provider>', 'login_external', multipass.process_login, methods=('GET', 'POST'))
-_bp.add_url_rule('/login-form/<provider>', 'login_form', multipass.login_form, methods=('POST', 'GET'))
+_bp.add_url_rule('/login/<provider>/', 'login_external', multipass.process_login, methods=('GET', 'POST'))
+_bp.add_url_rule('/login/<provider>/form', 'login_form', multipass.login_form)
 
 _bp.add_url_rule('/logout/', 'logout', RHLogout, methods=('GET', 'POST'))
 
