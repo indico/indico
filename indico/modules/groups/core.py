@@ -159,9 +159,8 @@ class _MultipassGroupProxy(GroupProxy):
             return True
         # If that didn't succeed, search providers based on the user's emails
         return any(identity_info.identifier in self.group
-                   for email in user.all_emails
                    for identity_info in multipass.search_identities(providers={self.provider}, exact=True,
-                                                                    email=email))
+                                                                    email=user.all_emails))
 
     @memoize_request
     def get_members(self):
