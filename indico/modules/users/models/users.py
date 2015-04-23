@@ -101,6 +101,12 @@ class User(db.Model):
         nullable=False,
         default=False
     )
+    #: if the user is pending (e.g. never logged in, only added to some list)
+    is_pending = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: if the user is deleted (e.g. due to a merge)
     _is_deleted = db.Column(
         'is_deleted',
