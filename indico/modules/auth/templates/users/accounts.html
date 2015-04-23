@@ -65,11 +65,18 @@
                         {% for identity in user.external_identities %}
                             <li>
                                 <span>{{ provider_titles[identity.provider] }}</span>
-                                <a href="{{ url_for('auth.remove-account', identity) }}" class="i-button right">
-                                    {% trans %}
-                                        Disconnect
-                                    {% endtrans %}
-                                </a>
+                                <span class="right">
+                                    {% if identity.id == session.login_identity %}
+                                        <a class="i-button disabled"
+                                            title="{% trans %}You can't disconnect the account you used to log in{% endtrans %}">
+                                    {% else %}
+                                        <a href="{{ url_for('auth.remove-account', identity) }}" class="i-button right">
+                                    {% endif %}
+                                        {% trans %}
+                                            Disconnect
+                                        {% endtrans %}
+                                    </a>
+                                </span>
                             </li>
                         {% endfor %}
                     </ul>
