@@ -11,21 +11,31 @@
             <div class="i-box titled">
                 <div class="i-box-header">
                     <div class="i-box-title">
-                        {%- trans %}Local Account{% endtrans -%}
+                        {% trans %}Local Account{% endtrans %}
                     </div>
                 </div>
                 <div class="i-box-content">
                     {% if not user.local_identity %}
-                        {{ form_header() }}
-                        {{ form_rows(form) }}
-                        {% call form_footer() %}
-                            <input class="i-button big highlight" type="submit" value="{% trans %}Add credentials{% endtrans %}">
-                        {% endcall %}
-                        <script>
-                            validatePasswordConfirmation('#password', '#confirm_password');
-                        </script>
+                        <span id="no-local-acccount">
+                            {% trans %}You don't have a local account yet.{% endtrans %}
+                            <a href="#" class="js-show-form">{% trans %}Create one{% endtrans %}</a>.
+                        </span>
+                        <div id="credentials-form" class="hidden">
+                            {{ form_header(orientation='vertical', classes='no-block-padding') }}
+                            {{ form_rows(form) }}
+                            {% call form_footer() %}
+                                <input class="i-button big highlight" type="submit"
+                                    value="{% trans %}Create account{% endtrans %}">
+                                <a href="#" class="i-button big js-hide-form">
+                                    {% trans %}Cancel{% endtrans %}
+                                </a>
+                            {% endcall %}
+                            <script>
+                                validatePasswordConfirmation('#password', '#confirm_password');
+                            </script>
+                        </div>
                     {% else %}
-                        {{ form_header() }}
+                        {{ form_header(orientation='vertical', classes='no-block-padding') }}
                         {{ form_rows(form) }}
                         {% call form_footer() %}
                             <input class="i-button big highlight" type="submit" value="{% trans %}Modify credentials{% endtrans %}">
@@ -35,15 +45,24 @@
                         </script>
                     {% endif %}
                     {% if user.secondary_local_identities %}
-                        <ul class="group-list no-description with-buttons">
+                        <p>
+                        </p>
+                        <ul id="local-secondary" class="group-list with-buttons">
+                            <li>
+                                {% trans %}Other local accounts used in the past.{% endtrans -%}
+                                <a href="#" class="js-toggle-secondary-accounts">
+                                    {% trans %}Show{% endtrans %}</a>
+                                <a href="#" class="js-toggle-secondary-accounts hidden">
+                                    {% trans %}Hide{% endtrans %}</a>
+                            </li>
                             {% for identity in user.secondary_local_identities %}
-                                <li>
-                                    <i class="icon-user"></i>
-                                    <span>{{ identity.identifier }}</span>
+                                <li class="hidden">
+                                    <span class="account-identity">
+                                        <i class="icon-user"></i>
+                                        <span>{{ identity.identifier }}</span>
+                                    </span>
                                     <a href="{{ url_for('auth.remove-account', identity) }}" class="i-button right">
-                                        {% trans %}
-                                            Remove
-                                        {% endtrans %}
+                                        {% trans %}Remove{% endtrans %}
                                     </a>
                                 </li>
                             {% endfor %}
@@ -60,16 +79,14 @@
                 </div>
             </div>
             <div class="i-box-content">
-                <p class="group-list-description">
-                    {% trans %}
-                        External accounts linked with your Indico user.
-                    {% endtrans %}
+                <p>
+                    {% trans %}External accounts linked with your Indico user.{% endtrans %}
                 </p>
                 <ul class="group-list with-buttons">
                     {% if user.external_identities %}
                         {% for identity in user.external_identities | sort(attribute='last_login_dt', reverse=True) %}
                             <li>
-                                <span class="account-identity-provider">
+                                <span class="account-identity">
                                     {{ provider_titles[identity.provider] }}
                                 </span>
                                 <small>
@@ -79,9 +96,7 @@
                                     <span class="account-identity-info">
                                         <span>
                                             <span class="label">
-                                                {% trans %}
-                                                    Last login:
-                                                {% endtrans %}
+                                                {% trans %}Last login:{% endtrans %}
                                             </span>
                                             <span class="content">
                                                 {{ identity.last_login_dt | format_datetime('short') }}
@@ -94,24 +109,42 @@
                                     {% else %}
                                         <a href="{{ url_for('auth.remove-account', identity) }}" class="i-button right">
                                     {% endif %}
-                                        {% trans %}
-                                            Unlink
-                                        {% endtrans %}
+                                        {% trans %}Unlink{% endtrans %}
                                     </a>
                                 </span>
                             </li>
                         {% endfor %}
                     {% else %}
                     <li>
-                        {% trans %}
-                            <span class="account-no-identities">
-                                You have no external accounts connected
-                            </span>
-                        {% endtrans %}
+                        <span class="account-no-identities">
+                        {% trans %}You have no external accounts connected{% endtrans %}
+                        </span>
                     </li>
                 </ul>
                 {% endif %}
             </div>
         </div>
     </div>
+
+    <script>
+    $(function() {
+        $('.js-show-form').on('click', function(e) {
+            e.preventDefault();
+            $('#no-local-acccount').hide();
+            $('#credentials-form').removeClass('hidden');
+        });
+
+        $('.js-hide-form').on('click', function(e) {
+            e.preventDefault();
+            $('#no-local-acccount').show();
+            $('#credentials-form').addClass('hidden');
+        });
+
+        $('.js-toggle-secondary-accounts').on('click', function(e) {
+            e.preventDefault();
+            $('.js-toggle-secondary-accounts').toggleClass('hidden');
+            $('#local-secondary>li:not(:first-child)').toggleClass('hidden');
+        });
+    });
+    </script>
 {% endblock %}
