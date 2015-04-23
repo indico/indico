@@ -36,11 +36,18 @@ class UserAffiliation(db.Model):
         nullable=False,
         index=True
     )
+
     #: the affiliation
     name = db.Column(
         db.String,
         nullable=False,
         index=True
+    )
+
+    #: The associated :class:VCRoom
+    user = db.relationship(
+        'User',
+        lazy=False
     )
 
     @return_ascii
