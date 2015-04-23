@@ -98,6 +98,9 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
     query = db.session.query(User)
     original_criteria = dict(criteria)
 
+    if not criteria:
+        return set()
+
     if not include_pending:
         query = query.filter(~User.is_pending)
     if not include_deleted:
