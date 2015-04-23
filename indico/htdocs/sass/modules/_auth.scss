@@ -1,11 +1,11 @@
 body {
     background-color: #f9f9f9;
-    font-family: Helvetica, Verdana, Sans;
+    background-position: center;
+    background-size: cover;
+    font-family: Helvetica, Verdana, sans-serif;
     margin: 0;
     padding: 0;
     text-align: center;
-    background-position: center;
-    background-size: cover;
 }
 
 .login-page {
@@ -75,14 +75,12 @@ body {
         margin-top: -1px;
 
         &:first-of-type {
-            // @include border-top-radius();
             border-top-right-radius: 0.2em;
             border-top-left-radius: 0.2em;
             margin-top: 0;
         }
 
         &:last-of-type {
-            // @include border-bottom-radius();
             border-bottom-right-radius: 0.2em;
             border-bottom-left-radius: 0.2em;
         }
@@ -161,7 +159,7 @@ body {
         margin-top: 20px;
     }
 
-    #forgot-my-password {
+    .forgot-my-password {
         text-align: right;
         margin-top: 10px;
     }

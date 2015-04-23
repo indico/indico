@@ -17,10 +17,9 @@
 from __future__ import unicode_literals
 
 from flask import session, redirect, request
-from flask_multipass import Multipass, MultipassException
-from werkzeug.exceptions import NotFound
+from flask_multipass import MultipassException
 
-# from indico.core.auth import multipass
+from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.auth.models.identities import Identity
@@ -29,85 +28,9 @@ from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.common.timezoneUtils import SessionTZ
-# from MaKaC.webinterface.rh.base import RHSimple
 
 
 logger = Logger.get('auth')
-
-
-class IndicoMultipass(Multipass):
-    # @RHSimple.wrap_function
-    # def render_template(self, template_key, **kwargs):
-    #     return super(IndicoMultipass, self).render_template(template_key, **kwargs)
-
-    def process_submit(self):
-        if request.method == 'POST' and request.form['provider']:
-            return self.process_login(provider=request.form['provider'])
-        return self.process_login()
-
-    def process_login(self, provider=None):
-        if self.login_check_callback and self.login_check_callback():
-            self._set_next_url()
-            return self.redirect_success()
-
-        if provider is None:
-            return self._login_page()
-
-        try:
-            provider = self.auth_providers[provider]
-        except KeyError:
-            raise NotFound('Provider does not exist')
-
-        if provider.is_external:
-            return self._login_external(provider)
-        else:
-            return self._login_page(provider)
-
-    def _login_page(self, provider=None):
-        """Renders the login page"""
-        providers = self.auth_providers
-        next_url = request.args.get('next')
-        auth_failed = session.pop('_multipass_auth_failed', False)
-        login_endpoint = 'auth.login'
-        if provider:
-            form = provider.login_form()
-            if not form.is_submitted():
-                self._set_next_url()
-            if form.validate_on_submit():
-                try:
-                    response = provider.process_local_login(form.data)
-                except MultipassException as e:
-                    self.handle_auth_error(e)
-                else:
-                    return response
-        else:
-            form = self.default_auth_provider.login_form()
-        if not auth_failed and len(providers) == 1:
-            provider = providers.values()[0]
-            return redirect(url_for(login_endpoint, provider=provider.name, next=next_url))
-        else:
-            if request.form.get('provider'):
-                default_provider = self.auth_providers[request.form.get('provider')]
-            else:
-                default_provider = self.default_auth_provider
-            return self.render_template('LOGIN_PAGE', providers=self.auth_providers.values(), next=next_url,
-                                        auth_failed=auth_failed, login_endpoint=login_endpoint,
-                                        default_provider=default_provider, form=form)
-
-    def login_form(self, provider):
-        """Generates the HTML of a provider's login form
-
-        Used to update the login form with AJAX when the
-        authentication provider is changed by the user
-        """
-        try:
-            provider = self.auth_providers[provider]
-        except KeyError:
-            raise NotFound('Provider does not exist')
-        form = provider.login_form()
-        return self.render_template('LOGIN_FORM', form=form, provider=provider)
-
-multipass = IndicoMultipass()
 
 
 @multipass.identity_handler
@@ -149,11 +72,6 @@ def process_identity(identity_info):
     if user.is_blocked:
         raise MultipassException(_('Your Indico account has been blocked.'))
     login_user(user, identity)
-
-
-@multipass.login_check
-def is_logged_in():
-    return session.user is not None
 
 
 def login_user(user, identity=None):

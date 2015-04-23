@@ -20,14 +20,34 @@ from flask_multipass import Multipass
 
 
 class IndicoMultipass(Multipass):
-    def render_template(self, template_key, **kwargs):
-        from indico.modules.auth.views import WPAuth
-        from MaKaC.webinterface.rh.base import RHSimple
+    @property
+    def default_local_auth_provider(self):
+        """The default form-based auth provider."""
+        return next((p for p in self.auth_providers.itervalues() if not p.is_external and p.settings.get('default')),
+                    None)
 
-        def _func():
-            return WPAuth.render_string(super(IndicoMultipass, self).render_template(template_key, **kwargs))
+    def init_app(self, app):
+        super(IndicoMultipass, self).init_app(app)
+        with app.app_context():
+            self._check_default_provider()
 
-        return RHSimple(_func).process({})
+    def _check_default_provider(self):
+        # Ensure that there is exactly one form-based default auth provider
+        auth_providers = self.auth_providers.values()
+        external_providers = [p for p in auth_providers if p.is_external]
+        local_providers = [p for p in auth_providers if not p.is_external]
+        if any(p.settings.get('default') for p in external_providers):
+            raise ValueError('The default provider cannot be external')
+        if all(p.is_external for p in auth_providers):
+            return
+        default_providers = [p for p in auth_providers if p.settings.get('default')]
+        if len(default_providers) > 1:
+            raise ValueError('There can only be one default auth provider')
+        elif not default_providers:
+            if len(local_providers) == 1:
+                local_providers[0].settings['default'] = True
+            else:
+                raise ValueError('There is no default auth provider')
 
 
 multipass = IndicoMultipass()

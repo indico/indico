@@ -51,7 +51,7 @@ from indico.modules.auth.providers import IndicoIdentityProvider
 from indico.util.signals import values_from_signal
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
-                                         call_template_hook)
+                                         equalto, call_template_hook)
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
                                    IndicoConfigWrapper)
 from indico.web.flask.wrappers import IndicoFlask
@@ -118,21 +118,7 @@ def configure_app(app, set_path=False):
     app.config['INDICO_SESSION_PERMANENT'] = cfg.getSessionLifetime() > 0
     app.config['INDICO_HTDOCS'] = cfg.getHtdocsDir()
     app.config['INDICO_COMPAT_ROUTES'] = cfg.getRouteOldUrls()
-    app.config['MULTIPASS_AUTH_PROVIDERS'] = cfg.getAuthProviders()
-    app.config['MULTIPASS_IDENTITY_PROVIDERS'] = cfg.getIdentityProviders()
-    app.config['MULTIPASS_PROVIDER_MAP'] = cfg.getProviderMap() or {x: x for x in cfg.getAuthProviders()}
-    if 'indico' in app.config['MULTIPASS_AUTH_PROVIDERS'] or 'indico' in app.config['MULTIPASS_IDENTITY_PROVIDERS']:
-        raise ValueError('The name `indico` is reserved and cannot be used as an Auth/Identity provider name.')
-    if cfg.getLocalIdentities():
-        configure_multipass_local(app)
-    app.config['MULTIPASS_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone',
-                                                  'address'}
-    app.config['MULTIPASS_LOGIN_PAGE_TEMPLATE'] = 'auth/login_page.html'
-    app.config['MULTIPASS_LOGIN_FORM_TEMPLATE'] = 'auth/login_form.html'
-    app.config['MULTIPASS_LOGIN_ENDPOINT'] = 'auth.login'
-    app.config['MULTIPASS_LOGIN_URLS'] = None  # registered in a blueprint
-    app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'misc.index'
-    app.config['MULTIPASS_FAILURE_MESSAGE'] = _(u'Login failed: {error}')
+    configure_multipass(app)
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
     app.config['PLUGINENGINE_PLUGINS'] = cfg.getPlugins()
     if set_path:
@@ -155,11 +141,28 @@ def configure_app(app, set_path=False):
             raise ValueError('Invalid static file method: %s' % method)
 
 
+def configure_multipass(app):
+    cfg = Config.getInstance()
+    app.config['MULTIPASS_AUTH_PROVIDERS'] = cfg.getAuthProviders()
+    app.config['MULTIPASS_IDENTITY_PROVIDERS'] = cfg.getIdentityProviders()
+    app.config['MULTIPASS_PROVIDER_MAP'] = cfg.getProviderMap() or {x: x for x in cfg.getAuthProviders()}
+    if 'indico' in app.config['MULTIPASS_AUTH_PROVIDERS'] or 'indico' in app.config['MULTIPASS_IDENTITY_PROVIDERS']:
+        raise ValueError('The name `indico` is reserved and cannot be used as an Auth/Identity provider name.')
+    if cfg.getLocalIdentities():
+        configure_multipass_local(app)
+    app.config['MULTIPASS_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone',
+                                                  'address'}
+    app.config['MULTIPASS_LOGIN_ENDPOINT'] = 'auth.login'
+    app.config['MULTIPASS_LOGIN_URLS'] = None  # registered in a blueprint
+    app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'misc.index'
+    app.config['MULTIPASS_FAILURE_MESSAGE'] = _(u'Login failed: {error}')
+
+
 def configure_multipass_local(app):
     app.config['MULTIPASS_AUTH_PROVIDERS']['indico'] = {
         'type': IndicoAuthProvider,
-        'title': _('Local Account'),
-        'default': not any(x.get('default') for x in app.config['MULTIPASS_AUTH_PROVIDERS'].itervalues())
+        'title': 'Indico',
+        'default': not any(p.get('default') for p in app.config['MULTIPASS_AUTH_PROVIDERS'].itervalues())
     }
     app.config['MULTIPASS_IDENTITY_PROVIDERS']['indico'] = {
         'type': IndicoIdentityProvider,
@@ -203,6 +206,7 @@ def setup_jinja(app):
     app.add_template_filter(natsort)
     # Tests
     app.add_template_test(instanceof)  # only use this test if you really have to!
+    app.add_template_test(equalto)
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext_context, ngettext_context, True)

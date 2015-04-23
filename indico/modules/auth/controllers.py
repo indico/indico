@@ -16,10 +16,10 @@
 
 from __future__ import unicode_literals
 
-from flask import session, redirect, request, flash, render_template
+from flask import session, redirect, request, flash, render_template, jsonify
 from itsdangerous import BadData
 from markupsafe import Markup
-from werkzeug.exceptions import BadRequest, Forbidden
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.auth import multipass
 from indico.core.config import Config
@@ -40,6 +40,67 @@ from indico.web.forms.base import FormDefaults, IndicoForm
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.rh.base import RH
+
+
+def _get_provider(name, external):
+    try:
+        provider = multipass.auth_providers[name]
+    except KeyError:
+        raise NotFound('Provider does not exist')
+    if provider.is_external != external:
+        raise NotFound('Invalid provider')
+    return provider
+
+
+class RHLogin(RH):
+    """The login page"""
+
+    def _process(self):
+        # User is already logged in
+        if session.user is not None:
+            multipass.set_next_url()
+            return multipass.redirect_success()
+
+        # If we have only one provider, and this provider is external, we go there immediately
+        # However, after a failed login we need to show the page to avoid a redirect loop
+        if not session.pop('_multipass_auth_failed', False) and 'provider' not in request.view_args:
+            single_auth_provider = multipass.single_auth_provider
+            if single_auth_provider and single_auth_provider.is_external:
+                return redirect(url_for('.login', provider=single_auth_provider.name))
+
+        # Save the 'next' url to go to after login
+        multipass.set_next_url()
+
+        # If there's a provider in the URL we start the external login process
+        if 'provider' in request.view_args:
+            provider = _get_provider(request.view_args['provider'], True)
+            return provider.initiate_external_login()
+
+        # If we have a POST request we submitted a login form for a local provider
+        if request.method == 'POST':
+            active_provider = provider = _get_provider(request.form['_provider'], False)
+            form = provider.login_form()
+            if form.validate_on_submit():
+                response = multipass.handle_login_form(provider, form.data)
+                if response:
+                    return response
+        # Otherwise we show the form for the default provider
+        else:
+            active_provider = multipass.default_local_auth_provider
+            form = active_provider.login_form() if active_provider else None
+
+        providers = multipass.auth_providers.values()
+        return render_template('auth/login_page.html', form=form, providers=providers, active_provider=active_provider)
+
+
+class RHLoginForm(RH):
+    """Retrieves a login form (json)"""
+
+    def _process(self):
+        provider = _get_provider(request.view_args['provider'], False)
+        form = provider.login_form()
+        template_module = get_template_module('auth/_login_form.html')
+        return jsonify(success=True, html=template_module.login_form(provider, form))
 
 
 class RHLogout(RH):

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from 'auth/_login_form.html' import login_form %}
 
 {% block head %}
     {% assets 'auth_sass' -%}
@@ -13,59 +14,64 @@
                 <div class="middle">
                     <div class="centered-column-wrapper">
                         <div class="centered-column">
-                            <div class="login-container clearfix">
-                                <a class="logo" href="http://indico.cern.ch">
-                                    <img class="header-logo" src="/images/logo_indico.png">
-                                </a>
-                                {% include 'flashed_messages.html' %}
-                                <div id="form-wrapper">
-                                    <!-- Ajax form goes here -->
+                            {% if active_provider %}
+                                <div class="login-container clearfix">
+                                    <img class="header-logo" src="{{ indico_config.config.getSystemIconURL('logoIndico') }}">
+                                    {% include 'flashed_messages.html' %}
+                                    <div id="form-wrapper">
+                                        {{ login_form(active_provider, form) }}
+                                    </div>
+                                    <button class="i-button login-form-button" data-provider="{{ active_provider.title }}"
+                                            data-href="{{ url_for('auth.login_form', provider=active_provider.name) }}">
+                                        {%- trans name=active_provider.title %}Login with {{ name }}{% endtrans -%}
+                                    </button>
                                 </div>
-                                <button class="i-button login-form-button" data-provider="{{ default_provider.title }}" data-href="{{ url_for('auth.login_form', provider=default_provider.name) }}">{% trans %}Login with {% endtrans %}{{ default_provider.title }}</button>
-                            </div>
-                            {% if indico_config.LocalIdentities %}
+                                {% set other_local_providers = providers|rejectattr('is_external')|reject('equalto', active_provider)|list %}
+                                {% if other_local_providers %}
+                                    <div class="seperator-line-center">
+                                        <span class="seperator-text">{% trans %}or change authentication provider{% endtrans %}</span>
+                                    </div>
+                                    <div class="login-providers providers-with-form">
+                                        {% for provider in other_local_providers %}
+                                            <button class="i-button provider-with-form" data-provider="{{ provider.title }}"
+                                                    data-href="{{ url_for('auth.login_form', provider=provider.name) }}">
+                                                {{- provider.title -}}
+                                            </button>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                                 <div class="seperator-line-center">
-                                    <span class="seperator-text">{% trans %}or change authentication provider{% endtrans %}</span>
+                                    <span class="seperator-text">{% trans %}or connect with{% endtrans %}</span>
                                 </div>
-                                <div class="login-providers providers-with-form">
-                                    {% for provider in providers|sort(attribute='title') if provider.login_form and not provider.default %}
-                                        <button class="i-button provider-with-form" data-provider="{{ provider.title }}" data-href="{{ url_for('auth.login_form', provider=provider.name) }}">{{ provider.title }}</button>
-                                    {% endfor %}
+                            {% else %}
+                                <div class="login-container clearfix">
+                                    <img class="header-logo" src="{{ indico_config.config.getSystemIconURL('logoIndico') }}">
                                 </div>
                             {% endif %}
-                            <div class="seperator-line-center">
-                                <span class="seperator-text">{% trans %}or connect with{% endtrans %}</span>
-                            </div>
                             <div class="login-providers external">
-                                {% for provider in providers|sort(attribute='title') if not provider.login_form%}
-                                    <a href="{{ url_for('auth.login_external', provider=provider.name, next=next) }}" class="i-button external-provider-{{ provider.name }}">{{ provider.title }}</a>
+                                {% for provider in providers|selectattr('is_external')|sort(attribute='title') %}
+                                    <a href="{{ url_for('.login', provider=provider.name) }}"
+                                       class="i-button external-provider-{{ provider.name }}">
+                                       {{- provider.title -}}
+                                    </a>
                                 {% endfor %}
                             </div>
-                            <p class="register">
-                                {% trans url=url_for('.register', next=next) -%}
-                                    If you do not have an Indico account yet, you can <a href="{{ url }}">create one here</a>.
-                                {%- endtrans %}
-                            </p>
+                            {% if indico_config.LocalIdentities %}
+                                <p class="register">
+                                    {% trans url=url_for('.register', next=request.args.get('next')) -%}
+                                        If you do not have an Indico account yet, you can <a href="{{ url }}">create one here</a>.
+                                    {%- endtrans %}
+                                </p>
+                            {% endif %}
                             <div class="link">
                                 <a class="icon-prev" href="/">{% trans %}Back{% endtrans %}</a>
                             </div>
                         </div>
                         <div id="footer" class="footer footerCERN">
-                            <div id="policyOfUse">
-                                <h1>{% trans %}Policy of Use{% endtrans %}</h1>
-                                {% trans mailto='mailto:indico-support@cern.ch' -%}
-                                    If you want to use it for CERN-related projects, please contact{% endtrans %} <a href="{{ mailto }}"> {% trans %}Indico support.
-                                {%- endtrans %}
-                                {% trans url='http://cern.ch/indico' -%}
-                                    Non-CERN institutes may install the Indico software locally under GNU General Public License
-                                    (see the {% endtrans %}<a href="{{ url }}">{% trans %}project web site.
-                                {%- endtrans %}
-                            </div>
-
                             <a id="cern_link" href="http://cern.ch">
-                                <img src="/images/cern_small.png" alt="Indico" class="cern_logo" style="vertical-align: middle; margin: 15px;">
+                                <img src="{{ indico_config.config.getSystemIconURL('cern_small') }}" alt="CERN" class="cern_logo" style="vertical-align: middle; margin: 15px;">
                             </a>
-                            <div class="text">{% trans %}Powered by{% endtrans %}  <a href="http://indico-software.org">Indico</a></div>
+                            <div class="text">{% trans %}Powered by{% endtrans %} <a href="http://indico-software.org">Indico</a></div>
                         </div>
                     </div>
                 </div>
@@ -77,41 +83,45 @@
         (function() {
             'use strict';
 
-            function submit_form() {
-                $('#hidden-submit').click();
-            }
-
-            $('.login-page').on('click', '.i-button.login-form-button', submit_form);
-
-            function load_login_form(url) {
+            function loadLoginForm(url) {
                 $.ajax({
                     url: url,
+                    error: handleAjaxError,
                     success: function(data) {
-                        $('#form-wrapper').html(data);
+                        $('#form-wrapper').html(data.html);
                     }
                 });
             }
 
-            load_login_form({{ url_for('auth.login_form', provider=default_provider.name) | tojson }});
+            function focusForm() {
+                $('#form-wrapper input:not(:hidden):not(:submit)').eq(0).focus();
+            }
 
-            $('.login-page').on('click', '.i-button.provider-with-form', function() {
-                var new_login = $(this);
-                var old_login = $('.login-form-button');
-                var new_login_btn_pos = new_login.offset().top
-                var old_login_btn_pos = old_login.offset().top;
-                var diff = old_login_btn_pos - new_login_btn_pos
-                new_login.animate({ top: "+=" + diff });
-                new_login.addClass('login-form-button');
-                new_login.removeClass('provider-with-form');
-                old_login.animate({ top: "-=" + diff });
-                old_login.addClass('provider-with-form');
-                old_login.removeClass('login-form-button');
+            $('.login-page').on('click', '.i-button.login-form-button', function() {
+                $('#hidden-submit').click();
+            }).on('click', '.i-button.provider-with-form', function() {
+                var newLoginButton = $(this);
+                var oldLoginButton = $('.login-form-button');
+                var diff = oldLoginButton.offset().top - newLoginButton.offset().top;
+                var buttons = newLoginButton.add(oldLoginButton);
+                buttons.prop('disabled', true);
+                newLoginButton.animate({top: '+=' + diff}, function() {
+                    buttons.prop('disabled', false);
+                    focusForm();
+                });
+                newLoginButton.addClass('login-form-button');
+                newLoginButton.removeClass('provider-with-form');
+                oldLoginButton.animate({top: '-=' + diff});
+                oldLoginButton.addClass('provider-with-form');
+                oldLoginButton.removeClass('login-form-button');
 
-                new_login.text($T('Login with {0}').format(new_login.data('provider')))
-                old_login.text(old_login.data('provider'));
+                newLoginButton.text($T('Login with {0}').format(newLoginButton.data('provider')));
+                oldLoginButton.text(oldLoginButton.data('provider'));
 
-                load_login_form(new_login.data('href'));
+                loadLoginForm(newLoginButton.data('href'));
             });
+
+            focusForm();
         })();
     </script>
 {% endblock %}
