@@ -85,9 +85,13 @@ class IndicoMultipass(Multipass):
             provider = next(iter(providers.values()))
             return redirect(url_for(login_endpoint, provider=provider.name, next=next_url))
         else:
+            if request.form.get('provider'):
+                default_provider = self.auth_providers[request.form.get('provider')]
+            else:
+                default_provider = self.default_auth_provider
             return self.render_template('LOGIN_PAGE', providers=self.auth_providers.values(), next=next_url,
                                         auth_failed=auth_failed, login_endpoint=login_endpoint,
-                                        default_provider=self.default_auth_provider, form=form)
+                                        default_provider=default_provider, form=form)
 
     def login_form(self, provider):
         try:
