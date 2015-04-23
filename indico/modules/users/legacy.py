@@ -14,28 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from functools import wraps
 from persistent import Persistent
 
 from indico.modules.users.models.users import User
 from indico.util.caching import memoize_request
 from indico.util.fossilize import fossilizes, Fossilizable
-from indico.util.string import to_unicode, return_ascii
+from indico.util.string import to_unicode, return_ascii, encode_utf8
 from indico.util.user import retrieve_principals
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import avatar_links
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.Locators import Locator
 from MaKaC.fossils.user import IAvatarFossil, IAvatarMinimalFossil
-
-
-def encode_utf8(f):
-    @wraps(f)
-    def _wrapper(*args, **kwargs):
-        rv = f(*args, **kwargs)
-        return rv.encode('utf-8') if isinstance(rv, unicode) else str(rv)
-
-    return _wrapper
 
 
 class AvatarUserWrapper(Persistent, Fossilizable):

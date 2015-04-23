@@ -22,9 +22,9 @@ from persistent.cPersistence import Persistent
 
 from indico.core.auth import multipass
 from indico.modules.groups import GroupProxy
-from indico.modules.users.legacy import encode_utf8, AvatarUserWrapper
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.fossilize import Fossilizable, fossilizes
-from indico.util.string import to_unicode, return_ascii
+from indico.util.string import to_unicode, return_ascii, encode_utf8
 from MaKaC.common.Locators import Locator
 from MaKaC.fossils.user import IGroupFossil
 
