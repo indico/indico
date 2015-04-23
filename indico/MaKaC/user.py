@@ -16,6 +16,7 @@
 
 
 from BTrees.OOBTree import OOTreeSet
+from flask_multipass import IdentityInfo
 from persistent import Persistent
 from pytz import all_timezones
 
@@ -35,7 +36,7 @@ from MaKaC.trashCan import TrashCanManager
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.users import User
-from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.users.legacy import AvatarUserWrapper, AvatarProvisionalWrapper
 from indico.util.caching import memoize_request
 from indico.util.decorators import cached_classproperty
 from indico.util.i18n import _
@@ -1072,6 +1073,14 @@ class Avatar(Persistent, Fossilizable):
         self._lang =lang
 
 
+AVATAR_FIELD_MAP = {
+    "email": "email",
+    "name": "first_name",
+    "surName": "last_name",
+    "organisation": "affiliation"
+}
+
+
 class AvatarHolder(ObjectHolder):
     """Specialised ObjectHolder dealing with user (avatar) objects. Objects of
        this class represent an access point to Avatars of the application and
@@ -1082,87 +1091,17 @@ class AvatarHolder(ObjectHolder):
     counterName = "PRINCIPAL"
     _indexes = [ "email", "name", "surName","organisation", "status" ]
 
-    def match(self, criteria, exact=0, onlyActivated=True, searchInAuthenticators=True):
-        result = {}
-        iset = set()
-        for f, v in criteria.items():
-            v = str(v).strip()
-            if v and f in self._indexes:
-                match = indexes.IndexesHolder().getById(f).matchUser(v, exact=exact, accent_sensitive=False)
-                if match is not None:
-                    if len(iset) == 0:
-                        iset = set(match)
-                    else:
-                        iset = iset & set(match)
-        for userid in iset:
-            av=self.getById(userid)
-            if not onlyActivated or av.isActivated():
-                result[av.getEmail()]=av
-        if searchInAuthenticators:
-            for authenticator in AuthenticatorMgr().getList():
-                matches = authenticator.matchUser(criteria, exact=exact)
-                if matches:
-                    for email, record in matches.iteritems():
-                        emailResultList = [av.getEmails() for av in result.values()]
-                        if not email in emailResultList:
-                            userMatched = self.match({'email': email}, exact=1, searchInAuthenticators=False)
-                            if not userMatched:
-                                av = Avatar(record)
-                                av.setId(record["id"])
-                                av.status = record["status"]
-                                if self._userMatchCriteria(av, criteria, exact):
-                                    result[email] = av
-                            else:
-                                av = userMatched[0]
-                                if self._userMatchCriteria(av, criteria, exact):
-                                    result[av.getEmail()] = av
-        return result.values()
+    def match(self, criteria, exact=False, onlyActivated=True, searchInAuthenticators=False):
+        from indico.modules.users.util import search_users
 
-    def _userMatchCriteria(self, av, criteria, exact):
-        if criteria.has_key("organisation"):
-            if criteria["organisation"]:
-                lMatch = False
-                for org in av.getOrganisations():
-                    if exact:
-                        if criteria["organisation"].lower() == org.lower():
-                            lMatch = True
-                    else:
-                        if criteria["organisation"].lower() in org.lower():
-                            lMatch = True
-                if not lMatch:
-                    return False
+        def _wrap_identities(obj):
+            return AvatarProvisionalWrapper(obj.data) if isinstance(obj, IdentityInfo) else obj.as_avatar
 
-        if criteria.has_key("surName"):
-            if criteria["surName"]:
-                if exact:
-                    if not criteria["surName"].lower() == av.getSurName().lower():
-                        return False
-                else:
-                    if not criteria["surName"].lower() in av.getSurName().lower():
-                        return False
+        results = search_users(exact=exact, include_pending=not onlyActivated, include_deleted=not onlyActivated,
+                               external=searchInAuthenticators,
+                               **{AVATAR_FIELD_MAP[k]: v for (k, v) in criteria.iteritems() if v})
 
-        if criteria.has_key("name"):
-            if criteria["name"]:
-                if exact:
-                    if not criteria["name"].lower() == av.getName().lower():
-                        return False
-                else:
-                    if not criteria["name"].lower() in av.getName().lower():
-                        return False
-
-        if criteria.has_key("email"):
-            if criteria["email"]:
-                lMatch = False
-                for email in av.getEmails():
-                    if exact:
-                        if criteria["email"].lower() == email.lower():
-                            lMatch = True
-                    else:
-                        if criteria["email"].lower() in email.lower():
-                            lMatch = True
-                if not lMatch:
-                    return False
-        return True
+        return [_wrap_identities(obj) for obj in results]
 
     def getById(self, id):
         if isinstance(id, int) or id.isdigit():

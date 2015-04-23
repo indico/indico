@@ -313,4 +313,13 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return u'<AvatarUserWrapper {}: {} ({})>'.format(self.id, self.user.full_name, self.user.email)
 
 
+class AvatarProvisionalWrapper(object):
+    """
+    Wraps provisional data for users that are not in the DB yet
+    """
+    def __init__(self, ident_data):
+        self.data = ident_data
 
+    @encode_utf8
+    def getEmail(self):
+        return self.data['email']
