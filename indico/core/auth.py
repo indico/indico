@@ -39,6 +39,15 @@ class IndicoMultipass(Multipass):
         return next((p for p in self.identity_providers.itervalues()
                      if p.supports_groups and p.settings.get('default_group_provider')), None)
 
+    @property
+    def sync_provider(self):
+        """The synchronization provider.
+
+        This is the identify provider used to sync user data.
+        """
+        return next((p for p in self.identity_providers.itervalues()
+                     if p.supports_refresh and p.settings.get('sync_provider')), None)
+
     def init_app(self, app):
         super(IndicoMultipass, self).init_app(app)
         with app.app_context():
@@ -49,6 +58,11 @@ class IndicoMultipass(Multipass):
         if not self.default_group_provider and any(p.supports_groups for p in self.identity_providers.itervalues()):
             warn('There is no default group provider but you have providers with group support. '
                  'This will break legacy ACLs referencing external groups and room ACLs will use local group IDs.')
+        # Ensure that there is maximum one sync provider
+        sync_providers = [p for p in self.identity_providers.itervalues()
+                          if p.supports_refresh and p.settings.get('sync_provider')]
+        if len(sync_providers) > 1:
+            raise ValueError('There can only be one sync provider.')
         # Ensure that there is exactly one form-based default auth provider
         auth_providers = self.auth_providers.values()
         external_providers = [p for p in auth_providers if p.is_external]

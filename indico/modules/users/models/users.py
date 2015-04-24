@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
+from flask import current_app
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.utils import cached_property
@@ -262,6 +263,9 @@ class User(db.Model):
         """The local identities of the user except the main one"""
         return self.local_identities - {self.local_identity}
 
+    def get_identities_of_provider(self, provider):
+        return {x for x in self.identities if x.provider == provider}
+
     @property
     def locator(self):
         return {'user_id': self.id}
@@ -396,3 +400,24 @@ class User(db.Model):
         :param role: the role to use in the link
         """
         return UserLink.remove_link(self, obj, role)
+
+    def synchronize_data(self):
+        from indico.modules.auth import multipass
+        sync_provider = multipass.sync_provider
+        if not sync_provider:
+            return
+        identities = sorted(self.get_identities_of_provider(sync_provider.name), key=lambda x: x.last_login_dt,
+                            reverse=True)
+        if not identities:
+            return
+        identity = identities[0]
+        synced_fields = self.settings.get('synced_fields')
+        if synced_fields is None:
+            synced_fields = current_app.config['MULTIPASS_IDENTITY_INFO_KEYS']
+        else:
+            synced_fields &= current_app.config['MULTIPASS_IDENTITY_INFO_KEYS']
+        for field in synced_fields:
+            if field == 'email':
+                continue
+            if identity.data[field]:
+                setattr(self, field, identity.data[field])

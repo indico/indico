@@ -95,6 +95,7 @@ def login_user(user, identity=None):
         session['login_identity'] = identity.id
     else:
         session.pop('login_identity', None)
+    user.synchronize_data()
 
 
 @signals.users.profile_sidemenu.connect

@@ -27,5 +27,6 @@ user_settings = UserSettingsProxy('users', {
     'lang': None,
     'timezone': None,
     'force_timezone': False,  # always use the user's timezone instead of an event's timezone
-    'show_past_events': False
+    'show_past_events': False,
+    'synced_fields': None  # None to synchronise all fields, empty set to not synchronize
 })
