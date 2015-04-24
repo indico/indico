@@ -205,7 +205,7 @@ class CategoryProtectionAddUsers(CategoryModifBase):
 
         CategoryModifBase._checkParams(self)
 
-        self._principals = map(principal_from_fossil, self._params['value'])
+        self._principals = [principal_from_fossil(f, allow_pending=True) for f in self._params['value']]
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
@@ -257,8 +257,9 @@ class CategoryAddExistingControlUser(CategoryControlUserListBase):
     def _checkParams(self):
         CategoryControlUserListBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._principals = map(principal_from_fossil, pm.extract("userList", pType=list, allowEmpty=False))
-        self._sendEmailManagers = pm.extract("sendEmailManagers", pType=bool, allowEmpty=True, defaultValue = True)
+        self._principals = [principal_from_fossil(f, allow_pending=True)
+                            for f in pm.extract("userList", pType=list, allowEmpty=False)]
+        self._sendEmailManagers = pm.extract("sendEmailManagers", pType=bool, allowEmpty=True, defaultValue=True)
 
     def _sendMail(self, currentList, newManager):
         if isinstance(newManager, AvatarUserWrapper):

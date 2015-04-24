@@ -1231,7 +1231,7 @@ class ConferenceProtectionAddUsers(ConferenceModifBase):
 
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
-        self._principals = map(principal_from_fossil, self._params['value'])
+        self._principals = [principal_from_fossil(f, allow_pending=True) for f in self._params['value']]
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
@@ -1587,7 +1587,8 @@ class ConferenceProtectionAddExistingManager(ConferenceManagerListBase):
     def _checkParams(self):
         ConferenceManagerListBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._principals = map(principal_from_fossil, pm.extract("userList", pType=list, allowEmpty=False))
+        self._principals = (principal_from_fossil(f, allow_pending=True)
+                            for f in pm.extract("userList", pType=list, allowEmpty=False))
 
     def _getAnswer(self):
         for principal in self._principals:
@@ -1617,7 +1618,8 @@ class ConferenceProtectionAddExistingRegistrar(ConferenceModifBase):
     def _checkParams(self):
         ConferenceModifBase._checkParams(self)
         pm = ParameterManager(self._params)
-        self._principals = map(principal_from_fossil, pm.extract("userList", pType=list, allowEmpty=False))
+        self._principals = [principal_from_fossil(f, allow_pending=True)
+                            for f in pm.extract("userList", pType=list, allowEmpty=False)]
 
     def _getAnswer(self):
         for principal in self._principals:

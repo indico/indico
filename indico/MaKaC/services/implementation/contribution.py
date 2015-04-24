@@ -190,7 +190,7 @@ class ContributionProtectionAddUsers(ContributionModifBase):
 
     def _checkParams(self):
         ContributionModifBase._checkParams(self)
-        self._principals = map(principal_from_fossil, self._params['value'])
+        self._principals = [principal_from_fossil(f, allow_pending=True) for f in self._params['value']]
         self._user = self.getAW().getUser()
 
     def _getAnswer(self):
@@ -723,7 +723,8 @@ class ContributionAddExistingSubmitter(ContributionSubmittersBase):
 
     def _checkParams(self):
         ContributionSubmittersBase._checkParams(self)
-        self._principals = map(principal_from_fossil, self._pm.extract("userList", pType=list, allowEmpty=False))
+        self._principals = [principal_from_fossil(f, allow_pending=True)
+                            for f in self._pm.extract("userList", pType=list, allowEmpty=False)]
 
     def _getAnswer(self):
         for principal in self._principals:
@@ -841,7 +842,8 @@ class ContributionAddExistingManager(ContributionManagerListBase):
 
     def _checkParams(self):
         ContributionManagerListBase._checkParams(self)
-        self._principals = map(principal_from_fossil, self._pm.extract("userList", pType=list, allowEmpty=False))
+        self._principals = [principal_from_fossil(f, allow_pending=True)
+                            for f in self._pm.extract("userList", pType=list, allowEmpty=False)]
 
     def _getAnswer(self):
         for principal in self._principals:
