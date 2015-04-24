@@ -46,9 +46,9 @@ class IndicoMultipass(Multipass):
 
     def _check_default_provider(self):
         # Warn if there is no default group provider
-        if not self.default_group_provider:
-            warn('There is no default group provider. '
-                 'This will break if you have any legacy ACLs or rooms with group-based permissions.')
+        if not self.default_group_provider and any(p.supports_groups for p in self.identity_providers.itervalues()):
+            warn('There is no default group provider but you providers with group support. '
+                 'This will break legacy ACLs referencing external groups and room ACLs will use local group IDs.')
         # Ensure that there is exactly one form-based default auth provider
         auth_providers = self.auth_providers.values()
         external_providers = [p for p in auth_providers if p.is_external]
