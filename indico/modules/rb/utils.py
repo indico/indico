@@ -35,6 +35,15 @@ def rb_check_user_access(user):
     return any(principal.containsUser(user) for principal in principals)
 
 
+def rb_is_admin(user):
+    """Checks if the user is a room booking admin"""
+    from indico.modules.rb import settings as rb_settings
+    if user.user.is_admin:
+        return True
+    principals = retrieve_principals(rb_settings.get('admin_principals'))
+    return any(principal.containsUser(user) for principal in principals)
+
+
 def rb_merge_users(new_id, old_id):
     """Updates RB data after an Avatar merge
 

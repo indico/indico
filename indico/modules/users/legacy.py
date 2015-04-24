@@ -18,11 +18,11 @@ from persistent import Persistent
 
 from indico.core.auth import multipass
 from indico.modules.groups import GroupProxy
+from indico.modules.rb.utils import rb_is_admin
 from indico.modules.users import User
 from indico.util.caching import memoize_request
 from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.string import to_unicode, return_ascii, encode_utf8
-from indico.util.user import retrieve_principals
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import avatar_links
 from MaKaC.common import HelperMaKaCInfo
@@ -274,16 +274,8 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     @memoize_request
     def isRBAdmin(self):
-        """
-        Convenience method for checking whether this user is an admin for the RB module.
-        Returns bool.
-        """
-        from indico.modules.rb import settings as rb_settings
-
-        if self.user.is_admin:
-            return True
-        principals = retrieve_principals(rb_settings.get('admin_principals'))
-        return any(principal.containsUser(self) for principal in principals)
+        """Convenience method for checking whether this user is an admin for the RB module."""
+        return rb_is_admin(self)
 
     @property
     @memoize_request
