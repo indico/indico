@@ -46,9 +46,9 @@ globalname_dict = {
     'LiveSyncUpdateTask': ('indico.modules.scheduler.tasks', 'DeletedTask'),
     'UHConferenceInstantMessaging': ('MaKaC.webinterface.urlHandlers', 'URLHandler'),
     'Avatar': ('indico.modules.users.legacy', 'AvatarUserWrapper'),
-    'Group': ('indico.modules.users.legacy', 'LocalGroupWrapper'),
-    'LDAPGroup': ('indico.modules.users.legacy', 'LDAPGroupWrapper'),
-    'CERNGroup': ('indico.modules.users.legacy', 'LDAPGroupWrapper')
+    'Group': ('indico.modules.groups.legacy', 'LocalGroupWrapper'),
+    'LDAPGroup': ('indico.modules.groups.legacy', 'LDAPGroupWrapper'),
+    'CERNGroup': ('indico.modules.groups.legacy', 'LDAPGroupWrapper')
 }
 
 modulename_dict = {
