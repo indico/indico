@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from warnings import warn
+
 from flask_multipass import Multipass
 
 
@@ -26,12 +28,27 @@ class IndicoMultipass(Multipass):
         return next((p for p in self.auth_providers.itervalues() if not p.is_external and p.settings.get('default')),
                     None)
 
+    @property
+    def default_group_provider(self):
+        """The default group provider.
+
+        This is an identity provider which supports groups and which
+        is used in places where only a group name can be specified,
+        such as legacy data or room ACLs.
+        """
+        return next((p for p in self.identity_providers.itervalues()
+                     if p.supports_groups and p.settings.get('default_group_provider')), None)
+
     def init_app(self, app):
         super(IndicoMultipass, self).init_app(app)
         with app.app_context():
             self._check_default_provider()
 
     def _check_default_provider(self):
+        # Warn if there is no default group provider
+        if not self.default_group_provider:
+            warn('There is no default group provider. '
+                 'This will break if you have any legacy ACLs or rooms with group-based permissions.')
         # Ensure that there is exactly one form-based default auth provider
         auth_providers = self.auth_providers.values()
         external_providers = [p for p in auth_providers if p.is_external]

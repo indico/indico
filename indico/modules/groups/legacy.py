@@ -131,12 +131,11 @@ class LDAPGroupWrapper(GroupWrapper):
 
     @property
     def provider(self):
-        provider_name = self.provider_name
-        if not provider_name:
-            provider_name = next((provider.name for provider in multipass.identity_providers.itervalues()
-                                  if provider.settings.get('legacy_groups')), None)
-            assert provider_name, 'No identity provider has legacy_groups enabled'
-        return provider_name
+        if self.provider_name:
+            return self.provider_name
+        provider = multipass.default_group_provider
+        assert provider, 'No identity provider has default_group_provider enabled'
+        return provider.name
 
     @property
     def group(self):
