@@ -1278,41 +1278,6 @@ class UHUserIdPerformCreation(UserURLHandler):
     _endpoint = 'user.identityCreation-create'
 
 
-class UHGroups(URLHandler):
-    _endpoint = 'admin.groupList'
-
-
-class UHNewGroup(URLHandler):
-    _endpoint = 'admin.groupRegistration'
-
-
-class UHGroupPerformRegistration(URLHandler):
-    _endpoint = 'admin.groupRegistration-update'
-
-
-class UHGroupDetails(URLHandler):
-    _endpoint = 'admin.groupDetails'
-
-
-class UHGroupModification(URLHandler):
-    _endpoint = 'admin.groupModification'
-
-
-class UHGroupPerformModification(URLHandler):
-    _endpoint = 'admin.groupModification-update'
-
-
-class UHPrincipalDetails:
-    @classmethod
-    def getURL(cls, member):
-        if isinstance(member, GroupWrapper):
-            return UHGroupDetails.getURL(member)
-        elif isinstance(member, AvatarUserWrapper):
-            return UHUserDetails.getURL(member)
-        else:
-            return ''
-
-
 class UHDomains(URLHandler):
     _endpoint = 'admin.domainList'
 
