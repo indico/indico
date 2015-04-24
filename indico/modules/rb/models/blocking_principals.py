@@ -16,7 +16,7 @@
 
 from indico.core.db import db
 from indico.util.string import return_ascii
-from MaKaC.user import AvatarHolder, GroupHolder
+from indico.util.user import retrieve_principal
 
 
 class BlockingPrincipal(db.Model):
@@ -42,14 +42,11 @@ class BlockingPrincipal(db.Model):
 
     @property
     def entity(self):
-        if self.entity_type == 'Avatar':
-            return AvatarHolder().getById(self.entity_id)
-        else:  # Group, LDAPGroup
-            return GroupHolder().getById(self.entity_id)
+        return retrieve_principal((self.entity_type, self.entity_id))
 
     @property
     def entity_name(self):
-        return 'User' if self.entity_type == 'Avatar' else 'Group'
+        return 'User' if self.entity_type in {'Avatar', 'User'} else 'Group'
 
     @return_ascii
     def __repr__(self):

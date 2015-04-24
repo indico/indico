@@ -16,7 +16,9 @@
 
 from persistent import Persistent
 
-from indico.modules.users.models.users import User
+from indico.core.auth import multipass
+from indico.modules.groups import GroupProxy
+from indico.modules.users import User
 from indico.util.caching import memoize_request
 from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.string import to_unicode, return_ascii, encode_utf8
@@ -263,15 +265,9 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return d
 
     def is_member_of_group(self, group_name):
-        from MaKaC.user import GroupHolder
-        try:
-            groups = [GroupHolder().getById(group_name)]
-        except KeyError:
-            groups = GroupHolder().match({'name': group_name}, searchInAuthenticators=False, exact=True)
-            if not groups:
-                groups = GroupHolder().match({'name': group_name}, exact=True)
-
-        return groups and groups[0].containsUser(self)
+        group_provider = multipass.default_group_provider
+        group = GroupProxy(group_name, group_provider.name if group_provider else None)
+        return group.has_member(self.user)
 
     def isAdmin(self):
         return self.user.is_admin

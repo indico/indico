@@ -16,34 +16,43 @@
 
 import pytest
 
-from indico.testing.mocks import MockAvatar, MockAvatarHolder, MockGroupHolder, MockGroup
-from MaKaC.user import AvatarHolder, GroupHolder
+from indico.modules.groups.models.groups import LocalGroup
+from indico.modules.rb import settings as rb_settings
+from indico.modules.users import User
 
 
 @pytest.yield_fixture
-def create_user(monkeypatch_methods):
+def create_user(db):
     """Returns a callable which lets you create dummy users"""
-    monkeypatch_methods('MaKaC.user.AvatarHolder', MockAvatarHolder)
+    _users = set()
 
-    _avatars = []
-    ah = AvatarHolder()
-
-    def _create_user(id_, name='Pig', surname='Guinea', rb_admin=False, email=None, groups=None):
-        avatar = MockAvatar()
-        avatar.id = id_
-        avatar.name = name
-        avatar.surname = surname
-        avatar.email = email or '{}@example.com'.format(id_)
-        avatar.groups = groups or set()
-        avatar.rb_admin = rb_admin
-        ah.add(avatar)
-        _avatars.append(avatar)
+    def _create_user(id_, name=u'Pig', surname=u'Guinea', rb_admin=False, email=None, groups=None):
+        user = User.get(id_)
+        if user:
+            return user.as_avatar
+        user = User()
+        user.id = id_
+        user.first_name = name
+        user.last_name = surname
+        user.email = email or u'{}@example.com'.format(id_)
+        user.local_groups = groups or set()
+        db.session.add(user)
+        db.session.flush()
+        if rb_admin:
+            rb_settings.set('admin_principals', rb_settings.get('admin_principals') + [user.as_principal])
+        db.session.flush()
+        _users.add(user)
+        avatar = user.as_avatar
+        avatar.email = user.email
         return avatar
 
     yield _create_user
 
-    for avatar in _avatars:
-        ah.remove(avatar)
+    admins = set(map(tuple, rb_settings.get('admin_principals')))
+    for user in _users:
+        admins.discard(user.as_principal)
+        db.session.delete(user)
+    rb_settings.set('admin_principals', list(admins))
 
 
 @pytest.fixture
@@ -53,27 +62,26 @@ def dummy_user(create_user):
 
 
 @pytest.yield_fixture
-def create_group(monkeypatch_methods):
+def create_group(db):
     """Returns a callable which lets you create dummy groups"""
-    monkeypatch_methods('MaKaC.user.GroupHolder', MockGroupHolder)
-
-    _groups = []
-    gh = GroupHolder()
+    _groups = set()
 
     def _create_group(id_):
-        group = MockGroup()
+        group = LocalGroup()
         group.id = id_
-        gh.add(group)
-        _groups.append(group)
+        group.name = u'dummy-{}'.format(id_)
+        db.session.add(group)
+        db.session.flush()
+        _groups.add(group)
         return group
 
     yield _create_group
 
     for group in _groups:
-        gh.remove(group)
+        db.session.delete(group)
 
 
 @pytest.fixture
 def dummy_group(create_group):
     """Creates a mocked dummy group"""
-    return create_group('dummy')
+    return create_group(1337)

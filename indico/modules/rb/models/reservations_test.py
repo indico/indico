@@ -20,6 +20,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 
 from indico.core.errors import IndicoError
+from indico.modules.rb import settings as rb_settings
 from indico.modules.rb.models.reservations import Reservation, RepeatFrequency, RepeatMapping
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
@@ -116,7 +117,7 @@ def test_booked_for_user(dummy_reservation, dummy_user):
 
 
 def test_booked_for_user_after_change(dummy_reservation, create_user):
-    other_user = create_user('other')
+    other_user = create_user(123)
     dummy_reservation.booked_for_user = other_user
     assert dummy_reservation.booked_for_user == other_user
     assert dummy_reservation.booked_for_id == other_user.id
@@ -133,11 +134,11 @@ def test_booked_for_user_email(dummy_reservation, dummy_user):
 
 
 def test_booked_for_user_email_after_change(dummy_reservation, dummy_user, create_user):
-    dummy_user.email = 'new.email@example.com'
-    assert dummy_reservation.booked_for_user_email == dummy_user.email
-    other_user = create_user('other')
+    dummy_user.user.email = 'new.email@example.com'
+    assert dummy_reservation.booked_for_user_email == dummy_user.user.email
+    other_user = create_user(123)
     dummy_reservation.booked_for_user = other_user
-    assert dummy_reservation.booked_for_user_email == other_user.email
+    assert dummy_reservation.booked_for_user_email == other_user.user.email
 
 
 def test_booked_for_user_email_with_no_id(dummy_reservation):
@@ -162,7 +163,7 @@ def test_created_by_user(dummy_reservation, dummy_user):
 
 
 def test_created_by_user_after_change(dummy_reservation, create_user):
-    other_user = create_user('other')
+    other_user = create_user(123)
     dummy_reservation.created_by_user = other_user
     assert dummy_reservation.created_by_user == other_user
     assert dummy_reservation.created_by_id == other_user.id
@@ -316,9 +317,7 @@ def test_add_edit_log(db, dummy_reservation):
 
 @pytest.mark.parametrize(('is_admin', 'is_owner', 'expected'), bool_matrix('..', expect=any))
 def test_can_be_accepted_rejected(dummy_reservation, create_user, is_admin, is_owner, expected):
-    user = create_user('user')
-    if is_admin:
-        user.rb_admin = True
+    user = create_user(123, rb_admin=is_admin)
     if is_owner:
         dummy_reservation.room.owner = user
     assert dummy_reservation.can_be_accepted(user) == expected
@@ -328,8 +327,7 @@ def test_can_be_accepted_rejected(dummy_reservation, create_user, is_admin, is_o
 @pytest.mark.parametrize(('is_admin', 'is_created_by', 'is_booked_for', 'expected'),
                          bool_matrix('...', expect=any))  # admin/creator/booked-for, one is enough
 def test_can_be_cancelled(dummy_reservation, create_user, is_admin, is_created_by, is_booked_for, expected):
-    user = create_user('user')
-    user.rb_admin = is_admin
+    user = create_user(123, rb_admin=is_admin)
     if is_created_by:
         dummy_reservation.created_by_user = user
     if is_booked_for:
@@ -343,7 +341,7 @@ def test_can_be_cancelled(dummy_reservation, create_user, is_admin, is_created_b
 ))
 def test_can_be_deleted(dummy_reservation, dummy_user, is_admin, expected):
     if is_admin:
-        dummy_user.rb_admin = True
+        rb_settings.set('admin_principals', [dummy_user.user.as_principal])
     assert dummy_reservation.can_be_deleted(dummy_user) == expected
 
 
@@ -355,8 +353,7 @@ def test_can_be_deleted(dummy_reservation, dummy_user, is_admin, expected):
 )
 def test_can_be_modified(dummy_reservation, create_user,
                          is_rejected, is_cancelled, is_admin, is_created_by, is_booked_for, is_room_owner, expected):
-    user = create_user('user')
-    user.rb_admin = is_admin
+    user = create_user(123, rb_admin=is_admin)
     if is_created_by:
         dummy_reservation.created_by_user = user
     if is_booked_for:
@@ -373,8 +370,7 @@ def test_can_be_modified(dummy_reservation, create_user,
     bool_matrix('..', expect=any)
 )
 def test_can_be_rejected(dummy_reservation, create_user, is_admin, is_room_owner, expected):
-    user = create_user('user')
-    user.rb_admin = is_admin
+    user = create_user(123, rb_admin=is_admin)
     if is_room_owner:
         dummy_reservation.room.owner = user
     assert dummy_reservation.can_be_rejected(user) == expected
@@ -440,7 +436,7 @@ def test_get_vc_equipment(db, dummy_reservation, create_equipment_type):
 ))
 def test_is_booked_for(dummy_reservation, dummy_user, create_user, is_booked_for, contact_email, expected):
     if not is_booked_for:
-        other_user = create_user('other')
+        other_user = create_user(123)
         dummy_reservation.booked_for_user = other_user
     dummy_reservation.contact_email = contact_email
     assert dummy_reservation.is_booked_for(dummy_user) == expected

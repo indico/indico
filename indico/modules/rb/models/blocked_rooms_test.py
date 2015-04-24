@@ -107,7 +107,7 @@ def test_approve(create_user, create_reservation, create_blocking, smtp,
     blocking = create_blocking(start_date=date.today(),
                                end_date=date.today() + timedelta(days=1))
     br = blocking.blocked_rooms[0]
-    user = create_user(u'user')
+    user = create_user(123)
     resv = create_reservation(start_dt=datetime.combine(blocking.start_date, time(8)),
                               end_dt=datetime.combine(blocking.start_date, time(10)),
                               created_by_user=user if colliding_reservation else blocking.created_by_user,
@@ -134,7 +134,7 @@ def test_approve(create_user, create_reservation, create_blocking, smtp,
     (False, True)
 ))
 def test_approve_acl(db, create_user, create_reservation, create_blocking, smtp, in_acl, rejected):
-    user = create_user(u'user')
+    user = create_user(123)
     blocking = create_blocking(start_date=date.today(),
                                end_date=date.today() + timedelta(days=1))
     if in_acl:
