@@ -20,9 +20,9 @@ from wtforms.fields import StringField, SelectField, PasswordField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, Length, ValidationError
 
+from indico.core.db import db
 from indico.modules.auth import Identity
-from indico.modules.users import User
-from indico.modules.users.models.emails import UserEmail
+from indico.modules.users import User, UserEmail
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.validators import ConfirmPassword
@@ -33,7 +33,8 @@ def _tolower(s):
 
 
 def _check_existing_email(form, field):
-    if UserEmail.find(email=field.data, is_user_deleted=False).count():
+    if db.session.query(UserEmail).join(User).filter(~User.is_pending, ~UserEmail.is_user_deleted,
+                                                     UserEmail.email == field.data).count():
         raise ValidationError(_('This email address is already in use.'))
 
 

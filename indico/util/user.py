@@ -14,8 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from indico.core.db import db
 from indico.modules.groups import GroupProxy
 from indico.modules.users import User
+
+from MaKaC.common.cache import GenericCache
 
 
 def retrieve_principals(iterable, allow_groups=True, legacy=True):
@@ -70,12 +73,28 @@ def principals_merge_users(iterable, new_id, old_id):
     return principals
 
 
-def principal_from_fossil(fossil, legacy=True):
+def principal_from_fossil(fossil, allow_pending=False, legacy=True):
     """Gets a GroupWrapper or AvatarUserWrapper from a fossil"""
     type_ = fossil['_type']
     id_ = fossil['id']
     if type_ == 'Avatar':
-        user = User.get(int(id_))
+        if id_.isdigit():
+            # regular user
+            user = User.get(int(id_))
+        elif allow_pending:
+            data = GenericCache('pending_identities').get(id_)
+            if not data:
+                raise ValueError("Cannot find user '{}' in cache".format(id_))
+
+            data = {k: '' if v is None else v for (k, v) in data.items()}
+
+            user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'],
+                        address=data.get('address', ''), phone=data.get('phone', ''),
+                        affiliation=data.get('affiliation', ''))
+            db.session.add(user)
+            db.session.flush()
+        else:
+            raise ValueError("Id '{}' is not a number and allow_pending=False".format(id_))
         if user is None:
             raise ValueError('User does not exist: {}'.format(id_))
         return user.as_avatar if legacy else user

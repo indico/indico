@@ -18,9 +18,9 @@ from __future__ import unicode_literals
 
 from flask import render_template
 
+from indico.modules.auth import multipass
 from indico.modules.rb.models.locations import Location
 from indico.web.flask.util import url_rule_to_js, url_for
-from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 from MaKaC.webinterface.common import tools as security_tools
 from MaKaC.export import fileConverter
 from MaKaC.webinterface import urlHandlers
@@ -31,7 +31,11 @@ def generate_global_file(config):
     locations = Location.find_all() if config.getIsRoomBookingActive() else []
     location_names = {loc.name: loc.name for loc in locations}
     default_location = next((loc.name for loc in locations if loc.is_default), None)
-    ext_auths = [(auth.id, auth.name) for auth in AuthenticatorMgr().getList() if auth.id != 'Local']
+    ext_auths = [{
+        'name': auth.name,
+        'title': auth.title,
+        'supports_groups': auth.supports_groups
+        } for auth in multipass.identity_providers.itervalues() if auth.supports_search]
     file_type_icons = dict((k.lower(), v[2]) for k, v in config.getFileTypes().iteritems())
     material_types = dict((evt_type, [(m, m.title()) for m in MaterialFactoryRegistry._allowedMaterials[evt_type]])
                           for evt_type in ['meeting', 'simple_event', 'conference', 'category'])

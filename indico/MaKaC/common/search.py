@@ -29,24 +29,22 @@ def searchUsers(surName="", name="", organisation="", email="", conferenceId=Non
         }
         # search users
         people = AvatarHolder().match(criteria, exact=exactMatch, searchInAuthenticators=searchExt)
+
         # search authors
-        if conferenceId != None:
-            try:
-                conference = ConferenceHolder().getById(conferenceId)
-                authorIndex = conference.getAuthorIndex()
-                authors = authorIndex.match(criteria, exact=exactMatch)
-                # merge with users
-                users = people
-                people = []
-                emails = []
-                for user in users:
-                    people.append(user)
-                    emails.extend(user.getEmails())
-                for author in authors:
-                    if author.getEmail() not in emails:
-                        people.append(author)
-            except Exception:
-                pass
+        if conferenceId is not None:
+            conference = ConferenceHolder().getById(conferenceId)
+            authorIndex = conference.getAuthorIndex()
+            authors = authorIndex.match(criteria, exact=exactMatch)
+            # merge with users
+            users = people
+            people = []
+            emails = []
+            for user in users:
+                people.append(user)
+                emails.extend(user.getEmails())
+            for author in authors:
+                if author.getEmail() not in emails:
+                    people.append(author)
         return people
     else:
         return []

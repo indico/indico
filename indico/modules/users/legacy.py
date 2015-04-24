@@ -313,13 +313,58 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return u'<AvatarUserWrapper {}: {} ({})>'.format(self.id, self.user.full_name, self.user.email)
 
 
-class AvatarProvisionalWrapper(object):
+class AvatarProvisionalWrapper(Fossilizable):
     """
     Wraps provisional data for users that are not in the DB yet
     """
-    def __init__(self, ident_data):
-        self.data = ident_data
+
+    fossilizes(IAvatarFossil, IAvatarMinimalFossil)
+
+    def __init__(self, iinfo):
+        self.identity_info = iinfo
+        self.data = iinfo.data
+
+    def getId(self):
+        return u"{}:{}".format(self.identity_info.provider.name, self.identity_info.identifier)
 
     @encode_utf8
     def getEmail(self):
         return self.data['email']
+
+    def getEmails(self):
+        return [self.data['email']]
+
+    @encode_utf8
+    def getFirstName(self):
+        return self.data['first_name']
+
+    @encode_utf8
+    def getFamilyName(self):
+        return self.data['last_name']
+
+    def getStraightFullName(self):
+        return '{first_name[0]} {last_name[0]}'.format(**self.data)
+
+    def getTitle(self):
+        return u''
+
+    @encode_utf8
+    def getTelephone(self):
+        return self.data['phone']
+
+    @encode_utf8
+    def getOrganisation(self):
+        return self.data['affiliation']
+
+    def getFax(self):
+        return None
+
+    def getAddress(self):
+        return u''
+
+    @return_ascii
+    def __repr__(self):
+        return u'<AvatarProvisionalWrapper {}: {} ({first_name[0]} {last_name[0]})>'.format(
+            self.identity_info.provider.name,
+            self.identity_info.identifier,
+            **self.data)

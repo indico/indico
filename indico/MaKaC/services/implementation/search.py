@@ -23,8 +23,6 @@ from MaKaC.common.fossilize import fossilize
 
 from MaKaC.services.implementation.user import UserComparator
 
-from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
-
 from indico.modules.groups import GroupProxy
 
 #################################

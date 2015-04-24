@@ -1093,15 +1093,20 @@ class AvatarHolder(ObjectHolder):
 
     def match(self, criteria, exact=False, onlyActivated=True, searchInAuthenticators=False):
         from indico.modules.users.util import search_users
+        cache = GenericCache('pending_identities')
 
-        def _wrap_identities(obj):
-            return AvatarProvisionalWrapper(obj.data) if isinstance(obj, IdentityInfo) else obj.as_avatar
+        def _process_identities(obj):
+            if isinstance(obj, IdentityInfo):
+                cache.set(obj.provider.name + ":" + obj.identifier, obj.data)
+                return AvatarProvisionalWrapper(obj)
+            else:
+                return obj.as_avatar
 
         results = search_users(exact=exact, include_pending=not onlyActivated, include_deleted=not onlyActivated,
                                external=searchInAuthenticators,
                                **{AVATAR_FIELD_MAP[k]: v for (k, v) in criteria.iteritems() if v})
 
-        return [_wrap_identities(obj) for obj in results]
+        return [_process_identities(obj) for obj in results]
 
     def getById(self, id):
         if isinstance(id, int) or id.isdigit():
