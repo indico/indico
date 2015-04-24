@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import session, redirect, request, flash, render_template, jsonify
 from itsdangerous import BadData
 from markupsafe import Markup
+from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.auth import multipass
@@ -30,7 +31,7 @@ from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationFor
                                        RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm)
 from indico.modules.auth.util import load_identity_info
 from indico.modules.auth.views import WPAuth
-from indico.modules.users import User
+from indico.modules.users import User, UserEmail
 from indico.util.i18n import _
 from indico.util.signing import secure_serializer
 from indico.web.flask.util import url_for
@@ -223,6 +224,16 @@ class RHRegister(RH):
             handler.email_verified(verified_email)
             flash(_('You have successfully validated your email address and can now proceeed with the registration.'),
                   'success')
+
+            # Check whether there is already an existing pending user with this e-mail
+            try:
+                session['register_pending_user'] = db.session.query(User).join(UserEmail).filter(
+                    User.is_pending, UserEmail.email == verified_email).one().id
+                flash(_("There is already some information in Indico that concerns you. "
+                        "We are going to link it automatically."), 'success')
+            except NoResultFound:
+                pass
+
             return redirect(url_for('.register', provider=self.provider_name))
 
         form = handler.create_form()
@@ -241,8 +252,15 @@ class RHRegister(RH):
                                   url_args={'provider': self.provider_name})
 
     def _create_user(self, data, handler):
-        user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'],
-                    address=data.get('address', ''), phone=data.get('phone', ''), affiliation=data['affiliation'])
+        existing_user_id = session['register_pending_user']
+        if existing_user_id:
+            # Get pending user and set her as non-pending
+            user = User.get(existing_user_id)
+            user.is_pending = False
+        else:
+            user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'],
+                        address=data.get('address', ''), phone=data.get('phone', ''), affiliation=data['affiliation'])
+
         identity = handler.create_identity(data)
         user.identities.add(identity)
         user.secondary_emails = handler.extra_emails - {user.email}
@@ -366,7 +384,17 @@ class LocalRegistrationHandler(RegistrationHandler):
         session['register_verified_email'] = email
 
     def get_form_defaults(self):
-        return FormDefaults(email=session.get('register_verified_email'))
+        email = session.get('register_verified_email')
+        existing_user_id = session.get('register_pending_user')
+        existing_user = User.get(existing_user_id) if existing_user_id else None
+        data = {'email': email}
+
+        if existing_user:
+            data.update(first_name=existing_user.first_name,
+                        last_name=existing_user.last_name,
+                        affiliation=existing_user.affiliation)
+
+        return FormDefaults(**data)
 
     def create_form(self):
         form = super(LocalRegistrationHandler, self).create_form()
