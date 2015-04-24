@@ -90,7 +90,7 @@ def principal_from_fossil(fossil, allow_pending=False, legacy=True):
 
             user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'],
                         address=data.get('address', ''), phone=data.get('phone', ''),
-                        affiliation=data.get('affiliation', ''))
+                        affiliation=data.get('affiliation', ''), is_pending=True)
             db.session.add(user)
             db.session.flush()
         else:
