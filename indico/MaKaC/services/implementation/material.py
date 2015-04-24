@@ -18,6 +18,7 @@
 Schedule-related services
 """
 
+from indico.util.user import principal_from_fossil
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError,NoReportError
 from MaKaC.services.implementation.base import \
      ParameterManager, ProtectedModificationService, ProtectedDisplayService
@@ -26,7 +27,6 @@ import MaKaC.webinterface.locators as locators
 from MaKaC.errors import ModificationError
 
 import MaKaC.conference as conference
-from MaKaC.user import AvatarHolder, GroupHolder
 from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IMaterialFossil,\
         ILinkFossil, ILocalFileFossil, ILocalFileExtendedFossil
@@ -39,22 +39,10 @@ class UserListChange(object):
     def changeUserList(self, obj, newList):
         # clone the list, to avoid problems
         allowedUsers = obj.getAllowedToAccessList()[:]
-
-        # user can be a user or group
-        for user in allowedUsers:
-            if not user.getId() in newList:
-                obj.revokeAccess(user)
-            else:
-                del newList[user.getId()]
-
-        for elem in newList:
-            # TODO: Change this, when DictPickler goes away
-            if ('isGroup' in elem and elem['isGroup']) or \
-                   ('_fossil' in elem and elem['_fossil'] == 'group'):
-                avatar = GroupHolder().getById(elem['id'])
-            else:
-                avatar = AvatarHolder().getById(elem['id'])
-            obj.grantAccess(avatar)
+        for principal in allowedUsers:
+            obj.revokeAccess(principal)
+        for principal in map(principal_from_fossil, newList):
+            obj.grantAccess(principal)
 
 
 class MaterialBase:
