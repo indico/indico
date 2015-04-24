@@ -186,13 +186,9 @@ type ("SimpleSearchPanel", ["IWidget"], {
        if (empty(Indico.Settings.ExtAuthenticators)) {
            return null;
        } else {
-           var authenticatorList = [];
-           each(Indico.Settings.ExtAuthenticators, function(auth) {
-               var searchExternalCB = Html.checkbox({});
-               $B(searchExternalCB, self.criteria.accessor('searchExternal-' + auth[0]));
-               authenticatorList.push(["Search " + auth[1], searchExternalCB]);
-           });
-           return authenticatorList;
+            var searchExternalCB = Html.checkbox({});
+            $B(searchExternalCB, self.criteria.accessor('search-ext'));
+            return [[$T("Users with no Indico account"), searchExternalCB]];
        }
    },
 

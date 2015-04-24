@@ -35,16 +35,7 @@ from indico.modules.groups import GroupProxy
 class SearchBase(ServiceBase):
 
     def _checkParams(self):
-        """ Checks for external authenticators
-            For now the underlying MaKaC.common.search code only supports
-            1 external authenticator, so we just see if a proper external authenticator is present or not
-        """
-        self._searchExt = False
-        for authenticatorName in AuthenticatorMgr().getAuthenticatorIdList():
-            authParamName = "searchExternal-" + authenticatorName
-            if authParamName in self._params and self._params[authParamName]:
-                self._searchExt = True
-                break
+        self._searchExt = self._params.get('search-ext', False)
 
 
 class SearchUsers(SearchBase):
