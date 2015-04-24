@@ -22,7 +22,7 @@ from indico.util.i18n import _
 from MaKaC.services.implementation.base import AdminService, TextModificationBase, LoggedOnlyService
 
 from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.user import AvatarHolder, GroupHolder
+from MaKaC.user import AvatarHolder
 import MaKaC.common.timezoneUtils as timezoneUtils
 from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
 import MaKaC.common.info as info
@@ -94,48 +94,6 @@ class RemoveAdministrator(AdminService):
         return fossilize([u.as_avatar for u in User.find(is_admin=True)])
 
 
-class GroupMemberBase(AdminService):
-
-    def _checkParams(self):
-        AdminService._checkParams(self)
-        self._pm = ParameterManager(self._params)
-        gh = GroupHolder()
-        groupId = self._pm.extract("groupId", pType=str, allowEmpty=False)
-        self._group = gh.getById(groupId)
-        if self._group == None:
-            raise ServiceError("ER-G0", _("Cannot find group with id %s") % groupId)
-
-
-class GroupAddExistingMember(GroupMemberBase):
-
-    def _checkParams(self):
-        GroupMemberBase._checkParams(self)
-        self._userList = self._pm.extract("userList", pType=list, allowEmpty=False)
-
-    def _getAnswer(self):
-        for user in self._userList:
-            user = AvatarHolder().getById(user["id"])
-            if user is None:
-                raise NoReportError(_("The user that you are trying to add does not exist anymore in the database"))
-            self._group.addMember(user)
-        return fossilize(self._group.getMemberList())
-
-
-class GroupRemoveMember(GroupMemberBase):
-
-    def _checkParams(self):
-        GroupMemberBase._checkParams(self)
-        self._userId = self._pm.extract("userId", pType=str, allowEmpty=False)
-
-    def _getAnswer(self):
-        user = AvatarHolder().getById(self._userId)
-        if user is not None:
-            self._group.removeMember(user)
-        else:
-            raise ServiceError("ER-U0", _("Cannot find user with id %s") % self._userId)
-        return fossilize(self._group.getMemberList())
-
-
 class MergeGetCompleteUserInfo(AdminService):
 
     def _checkParams(self):
@@ -193,9 +151,6 @@ methodMap = {
 
     "header.loginAs": AdminLoginAs,
     "header.undoLoginAs": AdminUndoLoginAs,
-
-    "groups.addExistingMember": GroupAddExistingMember,
-    "groups.removeMember": GroupRemoveMember,
 
     "merge.getCompleteUserInfo": MergeGetCompleteUserInfo,
 
