@@ -27,7 +27,7 @@ from indico.modules.users.models.users import UserTitle
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoEnumSelectField
-from indico.web.forms.widgets import SwitchWidget
+from indico.web.forms.widgets import SwitchWidget, SyncWidget
 
 from operator import itemgetter
 from pytz import all_timezones
@@ -35,11 +35,11 @@ from pytz import all_timezones
 
 class UserDetailsForm(IndicoForm):
     title = IndicoEnumSelectField(_('Title'), enum=UserTitle)
-    first_name = StringField(_('First name'), [DataRequired()])
-    last_name = StringField(_('Family name'), [DataRequired()])
-    affiliation = StringField(_('Affiliation'))
+    first_name = StringField(_('First name'), [DataRequired()], widget=SyncWidget())
+    last_name = StringField(_('Family name'), [DataRequired()], widget=SyncWidget())
+    affiliation = StringField(_('Affiliation'), widget=SyncWidget())
     address = TextAreaField(_('Address'))
-    phone = StringField(_('Phone number'))
+    phone = StringField(_('Phone number'), widget=SyncWidget())
 
 
 class UserPreferencesForm(IndicoForm):

@@ -444,6 +444,18 @@ $dropdown-transition: $dropdown-transition-step ease-out;
                 width: 10em;
             }
 
+            > .form-row.i-has-action.i-synced-input {
+                padding-right: 0;
+
+                > input {
+                   width: 90%;
+                }
+
+                > .i-button {
+                    width: 10%;
+                }
+            }
+
             input[type="checkbox"],
             input[type="radio"] {
                 margin: 0;

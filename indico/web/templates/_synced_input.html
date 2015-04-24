@@ -1,0 +1,6 @@
+{%- macro synced_input(id, name=none, value='', classes='') -%}
+    <div class="i-has-action i-synced-input {{ classes }}">
+        <input id="{{ id }}" name="{{ name }}" type="text" value="{{ value }}" {{ kwargs|html_params }}><button id="{{ id }}-action-button" type="button" class="i-button icon-refresh"
+                title="{% trans %}{% endtrans %}" data-tooltip-anchor></button>
+    </div>
+{%- endmacro -%}

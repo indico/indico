@@ -68,6 +68,15 @@ class PasswordWidget(object):
         return HTMLString(render_template('forms/password_widget.html', field=field, input_args=kwargs))
 
 
+class SyncWidget(object):
+    """Renders a text input with a sync addon button"""
+
+    single_line = True
+
+    def __call__(self, field, **kwargs):
+        return HTMLString(render_template('forms/synced_widget.html', field=field, input_args=kwargs))
+
+
 class CKEditorWidget(JinjaWidget):
     """Renders a CKEditor WYSIWYG editor"""
     def __init__(self, simple=False):
