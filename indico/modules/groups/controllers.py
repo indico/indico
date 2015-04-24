@@ -90,7 +90,7 @@ class RHGroupMembers(RHGroupBase):
 
 
 class RHGroupEdit(RHAdminBase):
-    """Admin group creation"""
+    """Admin group modification/creation"""
 
     def _checkParams(self):
         if 'group_id' in request.view_args:
