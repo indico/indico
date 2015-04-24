@@ -69,7 +69,7 @@ class UserImporter(Importer):
     @contextmanager
     def _monkeypatch(self):
         prop = FavoriteCategory.target
-        FavoriteCategory.target = property(lambda fc: self.zodb_root['categories'][str(fc.target_id)],
+        FavoriteCategory.target = property(lambda fc: self.zodb_root['categories'].get(str(fc.target_id)),
                                            prop.fset,
                                            prop.fdel)
         try:
@@ -115,7 +115,7 @@ class UserImporter(Importer):
             settings = self._settings_from_avatar(avatar)
             user_settings.set_multi(user, settings)
             # favorite users cannot be migrated here since the target user might not have been migrated yet
-            user.favorite_categories = set(avatar.linkedTo['category']['favorite'])
+            user.favorite_categories = set(filter(None, avatar.linkedTo['category']['favorite']))
             db.session.flush()
             print cformat('%{green}+++%{reset} '
                           '%{white!}{:6d}%{reset} %{cyan}{}%{reset} [%{blue!}{}%{reset}] '
@@ -172,7 +172,10 @@ class UserImporter(Importer):
     def migrate_admins(self):
         print cformat('%{white!}migrating admins')
         for avatar in committing_iterator(self.zodb_root['adminlist']._AdminList__list):
-            user = User.get(int(avatar.id))
+            try:
+                user = User.get(int(avatar.id))
+            except ValueError:
+                continue
             if user is None:
                 continue
             user.is_admin = True
