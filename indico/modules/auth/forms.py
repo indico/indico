@@ -90,7 +90,8 @@ class ResetPasswordEmailForm(IndicoForm):
     def user(self):
         if not self.is_submitted() or not self.email.data:
             return None
-        return User.find_first(~User.is_deleted, ~User.is_blocked, User.all_emails.contains(self.email.data))
+        return User.find_first(~User.is_deleted, ~User.is_blocked, ~User.is_pending,
+                               User.all_emails.contains(self.email.data))
 
 
 class ResetPasswordForm(IndicoForm):
