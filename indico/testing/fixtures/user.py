@@ -16,6 +16,7 @@
 
 import pytest
 
+from indico.modules.groups import GroupProxy
 from indico.modules.groups.models.groups import LocalGroup
 from indico.modules.rb import settings as rb_settings
 from indico.modules.users import User
@@ -35,7 +36,7 @@ def create_user(db):
         user.first_name = name
         user.last_name = surname
         user.email = email or u'{}@example.com'.format(id_)
-        user.local_groups = groups or set()
+        user.local_groups = {g.group for g in (groups or ())}
         db.session.add(user)
         db.session.flush()
         if rb_admin:
@@ -73,7 +74,7 @@ def create_group(db):
         db.session.add(group)
         db.session.flush()
         _groups.add(group)
-        return group
+        return GroupProxy(group.id, _group=group)
 
     yield _create_group
 

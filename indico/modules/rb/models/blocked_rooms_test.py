@@ -138,7 +138,7 @@ def test_approve_acl(db, create_user, create_reservation, create_blocking, smtp,
     blocking = create_blocking(start_date=date.today(),
                                end_date=date.today() + timedelta(days=1))
     if in_acl:
-        blocking.allowed.append(BlockingPrincipal(entity_type=u'Avatar', entity_id=user.id))
+        blocking.allowed.append(BlockingPrincipal(principal=user.user))
         db.session.flush()
     br = blocking.blocked_rooms[0]
     resv = create_reservation(start_dt=datetime.combine(blocking.start_date, time(8)),

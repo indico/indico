@@ -16,9 +16,10 @@
 
 from datetime import date, datetime, timedelta
 
+from indico.modules.rb.models.locations import Location
+from indico.modules.users import User
 from indico.util.caching import memoize_request
 from indico.util.date_time import get_day_end, round_up_to_minutes
-from indico.modules.rb.models.locations import Location
 from indico.util.user import retrieve_principals, principals_merge_users
 
 
@@ -56,7 +57,11 @@ def rb_merge_users(new_id, old_id):
     from indico.modules.rb.models.reservations import Reservation
     from indico.modules.rb.models.rooms import Room
 
-    BlockingPrincipal.find(entity_type='Avatar', entity_id=old_id).update({'entity_id': new_id})
+    old_user = User.get(int(old_id))
+    new_user = User.get(int(new_id))
+    for bp in BlockingPrincipal.find():
+        if bp.principal == old_user:
+            bp.principal = new_user
     Blocking.find(created_by_id=old_id).update({'created_by_id': new_id})
     Reservation.find(created_by_id=old_id).update({'created_by_id': new_id})
     Reservation.find(booked_for_id=old_id).update({'booked_for_id': new_id})

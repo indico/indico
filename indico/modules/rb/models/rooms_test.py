@@ -631,7 +631,7 @@ def test_can_be_booked(dummy_room, create_user, create_room_attribute, create_gr
     dummy_room.is_active = is_active
     dummy_room.is_reservable = is_reservable
     if in_group:
-        user.user.local_groups.add(create_group(123))
+        user.user.local_groups.add(create_group(123).group)
     if is_owned_by:
         dummy_room.owner = user
     if has_group:
@@ -657,7 +657,7 @@ def test_can_be_prebooked(dummy_room, create_user, create_room_attribute, create
     dummy_room.is_reservable = is_reservable
     dummy_room.reservations_need_confirmation = True
     if in_group:
-        user.user.local_groups.add(create_group(123))
+        user.user.local_groups.add(create_group(123).group)
     if is_owned_by:
         dummy_room.owner = user
     if has_group:
@@ -719,7 +719,7 @@ def test_ownership_functions(dummy_room, create_user, create_room_attribute, cre
     if has_group:
         dummy_room.set_attribute_value(u'manager-group', u'123')
     if in_group:
-        user.user.local_groups.add(create_group(123))
+        user.user.local_groups.add(create_group(123).group)
     assert dummy_room.is_owned_by(user) == expected
     assert Room.user_owns_rooms(user) == expected
     assert set(Room.get_owned_by(user)) == ({dummy_room} if expected else set())

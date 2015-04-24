@@ -181,7 +181,7 @@ class PrincipalField(HiddenField):
 
     def _get_data(self):
         if self.multiple:
-            return self.data
+            return self.data or []
         else:
             return [] if self.data is None else [self.data]
 
