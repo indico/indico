@@ -21,19 +21,6 @@ from MaKaC.services.implementation.base import LoggedOnlyService, AdminService, 
 from MaKaC.user import AvatarHolder
 
 
-class UserComparator(object):
-    @staticmethod
-    def cmpUsers(x, y):
-        cmpResult = cmp(x["familyName"].lower(), y["familyName"].lower())
-        if cmpResult == 0:
-            cmpResult = cmp(x["firstName"].lower(), y["firstName"].lower())
-        return cmpResult
-
-    @staticmethod
-    def cmpGroups(x, y):
-        return cmp(x["name"].lower(), y["name"].lower())
-
-
 class UserBaseService(LoggedOnlyService):
     def _checkParams(self):
         self._pm = ParameterManager(self._params)

@@ -21,8 +21,6 @@ from MaKaC.common import search
 from MaKaC.fossils.user import IGroupFossil
 from MaKaC.common.fossilize import fossilize
 
-from MaKaC.services.implementation.user import UserComparator
-
 from indico.modules.groups import GroupProxy
 
 #################################
@@ -53,8 +51,7 @@ class SearchUsers(SearchBase):
                                      self._confId, self._exactMatch, self._searchExt)
 
         # will use either IAvatarFossil or IContributionParticipationFossil
-        fossilizedResults = fossilize(results)
-        fossilizedResults.sort(cmp=UserComparator.cmpUsers)
+        fossilizedResults = fossilize(sorted(results, key=lambda av: (av.user.full_name, av.user.email)))
 
         return fossilizedResults
 
