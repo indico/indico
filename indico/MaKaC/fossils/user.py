@@ -31,11 +31,19 @@ class IGroupFossil(IFossil):
         pass
     getProvider.produce = lambda x: getattr(x, 'provider', None)
 
+    def getIdentifier(self):
+        pass
+    getIdentifier.produce = lambda x: 'Group:{}:{}'.format(getattr(x, 'provider', ''), x.id)
+
 
 class IAvatarMinimalFossil(IFossil):
 
     def getId(self):
         """ Avatar id"""
+
+    def getIdentifier(self):
+        pass
+    getIdentifier.produce = lambda x: 'User:{}'.format(x.id)
 
     def getStraightFullName(self):
         """ Avatar full name, the one usually displayed """

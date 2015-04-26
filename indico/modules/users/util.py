@@ -73,6 +73,7 @@ def serialize_user(user):
     """Serialize user to JSON-like object"""
     return {
         'id': user.id,
+        'identifier': 'User:{}'.format(user.id),
         'name': user.full_name,
         'familyName': user.last_name,
         'firstName': user.first_name,

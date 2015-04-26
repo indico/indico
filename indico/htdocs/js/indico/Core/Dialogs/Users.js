@@ -118,7 +118,7 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
             var userName = Html.span({}, peopleData.get("firstName"), ' ', peopleData.get("familyName"));
             var userEmail = Html.span({id: self.id + "_" + pair.key + "_email", className: "foundUserEmail"}, Html.br(), Util.truncate(peopleData.get("email"), 40));
 
-            if (this.showToggleFavouriteButtons && IndicoGlobalVars.isUserAuthenticated && peopleData.get('_type') == "AvatarUserWrapper") {
+            if (this.showToggleFavouriteButtons && IndicoGlobalVars.isUserAuthenticated && peopleData.get('_type') == "Avatar") {
                 var favouritizeButtonDiv = Html.div({style: {cssFloat: "right"}}, new Html(create_favorite_button(peopleData.get('id')).get(0)));
                 return [favouritizeButtonDiv, userName, userEmail];
             } else {
@@ -340,7 +340,7 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
                         self.foundPeopleList.setMessage($T("No results for this search..."));
                     } else {
                         each(result, function(user){
-                            if (user._type === "AvatarUserWrapper") {
+                            if (user._type === "Avatar") {
                                 self.foundPeopleList.set('existingAv' + user.id, $O(user));
                             } else if (user._type === "ContributionParticipation") {
                                 self.foundPeopleList.set('existingAuthor' + user.id, $O(user));
@@ -591,7 +591,7 @@ type ("SuggestedUsersPanel", ["IWidget"], {
 
         if (exists(suggestedUsers)) {
             each(suggestedUsers, function(user){
-                if (any(user._type, null) === "AvatarUserWrapper") {
+                if (any(user._type, null) === "Avatar") {
                     self.suggestedUserList.set('existingAv' + user.id, $O(user));
                 } else {
                     self.suggestedUserList.set(user.id, $O(user));
@@ -905,7 +905,7 @@ type("SingleUserField", ["IWidget"], {
         var user = this.user.getAll();
 
         this.variableButtonsDiv.clear();
-        if (IndicoGlobalVars.isUserAuthenticated && this.userChosen && user._type === "AvatarUserWrapper") {
+        if (IndicoGlobalVars.isUserAuthenticated && this.userChosen && user._type === "Avatar") {
             var favButtonDiv = Html.div({style:{display:"inline", paddingLeft:pixels(5)}}, new Html(create_favorite_button(this.user.get('id')).get(0)));
             this.variableButtonsDiv.append(favButtonDiv);
         }
@@ -1334,7 +1334,7 @@ type("UserListWidget", ["ListWidget"],
                 return Html.span({}, removeButtonDiv, Html.span({style:{fontWeight:'bold'}}, 'Group: '), groupName);
             } else {
                 var buttonDiv = Html.div({style: {cssFloat: "right", clear: "both", paddingRight: pixels(10)}});
-                if (IndicoGlobalVars.isUserAuthenticated & this.showToggleFavouriteButtons && userData.get('_type') === "AvatarUserWrapper") {
+                if (IndicoGlobalVars.isUserAuthenticated & this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
                     buttonDiv.append(new Html(create_favorite_button(userData.get('id')).get(0)));
                 }
                 if (this.allowSetRights) {
@@ -1504,11 +1504,11 @@ type("UserListField", ["IWidget"], {
                         each(peopleList, function(person){
                             var key;
                             if (person.isGroup || person._fossil === 'group') {
-                                key = person.id;
+                                key = person.identifier;
                             } else {
-                                key = (person._type === "AvatarUserWrapper") ? "existingAv" + person.id : person.id;
+                                key = (person._type === "Avatar") ? "existingAv" + person.id : person.id;
                             }
-                            if (person._type === "AvatarUserWrapper" && self.userList.get(key)) {
+                            if (person._type === "Avatar" && self.userList.get(key)) {
                                 // it is an existing avatar, unchanged, and already exists: we do nothing
                             } else {
                                 if (self.userList.get(key)) {
@@ -1629,10 +1629,10 @@ type("UserListField", ["IWidget"], {
 
         if (exists(initialUsers)) {
             each(initialUsers, function(user){
-                if (any(user._type, null) === 'AvatarUserWrapper') {
+                if (any(user._type, null) === 'Avatar') {
                     self.userList.set('existingAv' + user.id, $O(user));
                 } else {
-                    self.userList.set(user.id, $O(user));
+                    self.userList.set(user.identifier, $O(user));
                 }
             });
         }
