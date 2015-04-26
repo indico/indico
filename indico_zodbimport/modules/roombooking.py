@@ -485,11 +485,11 @@ class RoomBookingImporter(Importer):
             for old_principal in old_blocking.allowed:
                 principal_id = old_principal._id
                 if old_principal._type == 'Avatar':
-                    principal_id = self.merged_avatars.get(old_principal._id, old_principal._id)
-                bp = BlockingPrincipal(
-                    entity_type=old_principal._type,
-                    entity_id=principal_id
-                )
+                    principal_id = int(self.merged_avatars.get(old_principal._id, old_principal._id))
+                    principal_type = 'User'
+                else:
+                    principal_type = 'Group'
+                bp = BlockingPrincipal(_principal=[principal_type, principal_id])
                 b.allowed.append(bp)
                 print cformat(u'  %{blue!}Allowed:%{reset} {}({})').format(bp.entity_type, bp.entity_id)
             db.session.add(b)
