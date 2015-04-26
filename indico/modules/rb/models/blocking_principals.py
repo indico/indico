@@ -58,8 +58,8 @@ class BlockingPrincipal(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return u'<BlockingPrincipal({0}, {1}, {2})>'.format(
+        return u'<BlockingPrincipal({}, {}, {})>'.format(
+            self.id,
             self.blocking_id,
-            self.entity_id,
-            self.entity_type
+            self.principal
         )
