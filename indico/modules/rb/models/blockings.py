@@ -20,9 +20,9 @@ from sqlalchemy.ext.hybrid import hybrid_method
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
+from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
-from MaKaC.user import AvatarHolder
 
 
 class Blocking(db.Model):
@@ -80,11 +80,11 @@ class Blocking(db.Model):
 
     @property
     def created_by_user(self):
-        return AvatarHolder().getById(self.created_by_id)
+        return User.get(self.created_by_id).as_avatar
 
     @created_by_user.setter
     def created_by_user(self, user):
-        self.created_by_id = user.getId()
+        self.created_by_id = user.id
 
     def can_be_modified(self, user):
         """
