@@ -96,11 +96,11 @@ def test_can_be_overridden_explicit_only(dummy_room, dummy_blocking, create_user
 ))
 def test_can_be_overridden_acl(dummy_blocking, dummy_user, create_user, dummy_group, in_acl, expected):
     user = create_user(123, groups={dummy_group})
-    dummy_blocking.allowed = [BlockingPrincipal(principal=dummy_user.user)]
+    dummy_blocking.allowed = {dummy_user.user}
     if in_acl == 'user':
-        dummy_blocking.allowed.append(BlockingPrincipal(principal=user.user))
+        dummy_blocking.allowed.add(user.user)
     elif in_acl == 'group':
-        dummy_blocking.allowed.append(BlockingPrincipal(principal=dummy_group))
+        dummy_blocking.allowed.add(dummy_group)
     assert dummy_blocking.can_be_overridden(user) == expected
 
 

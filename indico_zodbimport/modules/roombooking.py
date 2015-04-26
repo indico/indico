@@ -490,7 +490,7 @@ class RoomBookingImporter(Importer):
                 else:
                     principal_type = 'Group'
                 bp = BlockingPrincipal(_principal=[principal_type, principal_id])
-                b.allowed.append(bp)
+                b._allowed.add(bp)
                 print cformat(u'  %{blue!}Allowed:%{reset} {}({})').format(bp.entity_type, bp.entity_id)
             db.session.add(b)
         db.session.commit()

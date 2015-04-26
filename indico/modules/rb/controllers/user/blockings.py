@@ -84,7 +84,7 @@ class RHRoomBookingCreateBlocking(RHRoomBookingCreateModifyBlockingBase):
         blocking.end_date = self._form.end_date.data
         blocking.created_by_user = session.avatar
         blocking.reason = self._form.reason.data
-        blocking.allowed = [BlockingPrincipal(principal=principal) for principal in self._form.principals.data]
+        blocking.allowed = self._form.principals.data
         blocking.blocked_rooms = [BlockedRoom(room_id=room_id) for room_id in self._form.blocked_rooms.data]
         db.session.add(blocking)
         db.session.flush()  # synchronizes relationships (e.g. BlockedRoom.room)
@@ -98,7 +98,7 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
         if self._blocking is None:
             raise IndicoError('A blocking with this ID does not exist.')
         defaults = FormDefaults(self._blocking, attrs={'reason'},
-                                principals=[bp.principal for bp in self._blocking.allowed],
+                                principals=self._blocking.allowed,
                                 blocked_rooms=[br.room_id for br in self._blocking.blocked_rooms])
         self._form = BlockingForm(obj=defaults)
         self._form._blocking = self._blocking
@@ -114,7 +114,7 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
         blocking = self._blocking
         blocking.reason = self._form.reason.data
         # Just overwrite the whole list
-        blocking.allowed = [BlockingPrincipal(principal=principal) for principal in self._form.principals.data]
+        blocking.allowed = self._form.principals.data
         # Blocked rooms need some more work as we can't just overwrite them
         old_blocked = {br.room_id for br in blocking.blocked_rooms}
         new_blocked = set(self._form.blocked_rooms.data)
