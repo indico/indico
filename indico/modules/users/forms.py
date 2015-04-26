@@ -36,7 +36,7 @@ class UserDetailsForm(IndicoForm):
     title = IndicoEnumSelectField(_('Title'), enum=UserTitle)
     first_name = StringField(_('First name'), [DataRequired()])
     last_name = StringField(_('Family name'), [DataRequired()])
-    affiliation = StringField(_('Affiliation'), [DataRequired()])
+    affiliation = StringField(_('Affiliation'))
     address = TextAreaField(_('Address'))
     phone = StringField(_('Phone number'))
 

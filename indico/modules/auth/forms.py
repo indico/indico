@@ -54,7 +54,7 @@ class RegistrationEmailForm(IndicoForm):
 class RegistrationForm(IndicoForm):
     first_name = StringField(_('First name'), [DataRequired()])
     last_name = StringField(_('Family name'), [DataRequired()])
-    affiliation = StringField(_('Affiliation'), [DataRequired()])
+    affiliation = StringField(_('Affiliation'))
 
 
 class MultipassRegistrationForm(RegistrationForm):
