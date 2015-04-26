@@ -83,10 +83,12 @@ def apply_db_loggers(debug=False):
                      extra={'sql_log_type': 'start',
                             'sql_source': source_line['items'] if source_line else None,
                             'sql_statement': statement,
+                            'sql_verb': statement.split()[0],
                             'sql_params': parameters})
 
     @listens_for(Engine, 'after_cursor_execute')
     def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
         total = time.time() - context._query_start_time
         logger.debug('Query complete; total time: {}'.format(total), extra={'sql_log_type': 'end',
-                                                                            'sql_duration': total})
+                                                                            'sql_duration': total,
+                                                                            'sql_verb': statement.split()[0]})

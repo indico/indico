@@ -77,6 +77,8 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
 
     def handle_log(self, obj):
         sql_log_type = obj.get('sql_log_type')
+        if self.server.ignore_selects and obj.get('sql_verb') == 'SELECT':
+            return
         if sql_log_type == 'start':
             source = prettify_source(obj['sql_source'], self.server.traceback_frames) if obj['sql_source'] else None
             statement = prettify_statement(obj['sql_statement'])
@@ -103,10 +105,11 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
 class LogRecordSocketReceiver(SocketServer.ThreadingTCPServer):
     allow_reuse_address = True
 
-    def __init__(self, host, port, handler=LogRecordStreamHandler, traceback_frames=1):
+    def __init__(self, host, port, handler=LogRecordStreamHandler, traceback_frames=1, ignore_selects=False):
         SocketServer.ThreadingTCPServer.__init__(self, (host, port), handler)
         self.timeout = 1
         self.traceback_frames = traceback_frames
+        self.ignore_selects = ignore_selects
 
 
 def terminal_size():
@@ -157,6 +160,8 @@ def parse_args():
                         help='The port to bind the UDP listener to')
     parser.add_argument('-t', dest='traceback_frames', type=int, default=1,
                         help='Number of stack frames to show (max. 3)')
+    parser.add_argument('-S', dest='ignore_selects', action='store_true',
+                        help='If SELECTs should be hidden')
     parser.add_argument('--setup-help', action='store_true', help='Explain how to enable logging for script')
     return parser.parse_args()
 
@@ -173,7 +178,8 @@ def main():
         sys.exit(1)
     signal.signal(signal.SIGINT, sigint)
     print 'Listening on 127.0.0.1:{}'.format(args.port)
-    server = LogRecordSocketReceiver('localhost', args.port, traceback_frames=args.traceback_frames)
+    server = LogRecordSocketReceiver('localhost', args.port, traceback_frames=args.traceback_frames,
+                                     ignore_selects=args.ignore_selects)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
