@@ -2828,11 +2828,6 @@ class PersonalDataForm(GeneralSectionForm):
             r['email'] = av.getEmail()
             r['address'] = av.getAddress()
             r['phone'] = av.getTelephone()
-            faxes = av.getFaxes()
-            fax = ''
-            if len(faxes) > 0:
-                fax = faxes[0]
-            r['fax'] = fax
         return r
 
     def getFormValuesFromAvatar(self, av):
@@ -2846,11 +2841,6 @@ class PersonalDataForm(GeneralSectionForm):
             r[self._pdMap['email'].getInput().getHTMLName()] = av.getEmail()
             r[self._pdMap['address'].getInput().getHTMLName()] = av.getAddress()
             r[self._pdMap['phone'].getInput().getHTMLName()] = av.getTelephone()
-            faxes = av.getFaxes()
-            fax = ''
-            if len(faxes) > 0:
-                fax = faxes[0]
-            r[self._pdMap['fax'].getInput().getHTMLName()] = fax
         return r
 
     def getValuesFromRegistrant(self, reg):
@@ -2994,11 +2984,6 @@ class PersonalData(Persistent):
             r["email"] = av.getEmail()
             r["address"] = av.getAddress()
             r["phone"] = av.getTelephone()
-            faxes = av.getFaxes()
-            fax = ""
-            if len(faxes) > 0:
-                fax = faxes[0]
-            r["fax"] = fax
         return r
 
     def getValuesFromRegistrant(self, reg):
