@@ -44,12 +44,6 @@ class UserAffiliation(db.Model):
         index=True
     )
 
-    #: The associated :class:VCRoom
-    user = db.relationship(
-        'User',
-        lazy=False
-    )
-
     @return_ascii
     def __repr__(self):
         return '<UserAffiliation({}, {}, {})>'.format(self.id, self.name, self.user)

@@ -119,8 +119,10 @@ class User(db.Model):
         'UserAffiliation',
         lazy=False,
         uselist=False,
-        cascade='all, delete-orphan'
+        cascade='all, delete-orphan',
+        backref=db.backref('user', lazy=True)
     )
+
     _primary_email = db.relationship(
         'UserEmail',
         lazy=False,
