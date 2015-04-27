@@ -737,6 +737,32 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     }
 }
 
+.i-has-action.i-synced-input {
+    > input[type=checkbox] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+        opacity: 0;
+    }
+    > label.i-synced-label {
+        text-align: center;
+        line-height: 2.5em;
+    }
+
+    > input[type=checkbox]:not(:checked) ~ .i-synced-label {
+        background: $pastel-red;
+
+        &:before { color: $light-gray; }
+    }
+
+    > input[type=checkbox]:checked ~ .i-synced-label {
+        background: $pastel-green;
+
+        &:before { color: $light-gray; }
+    }
+}
+
 dd > .i-has-action {
     vertical-align: middle;
     > .i-button, > input {
