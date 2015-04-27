@@ -1860,7 +1860,7 @@ class WUserRegistration(WTemplated):
         vars["address"] = u.getAddresses()[0]
         vars["email"] = quoteattr( u.getEmails()[0] )
         vars["telephone"] = quoteattr( u.getTelephones()[0] )
-        vars["fax"] =  quoteattr( u.getFaxes()[0] )
+        vars["fax"] =  ''
         return vars
 
     def getVars( self ):
