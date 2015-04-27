@@ -16,6 +16,7 @@
 
 
 import logging
+import os
 import re
 import sys
 import tempfile
@@ -45,7 +46,8 @@ def pytest_configure(config):
         'UploadedFilesTempDir': config.indico_temp_dir.strpath,
         'XMLCacheDir': config.indico_temp_dir.strpath,
         'ArchiveDir': config.indico_temp_dir.strpath,
-        'Plugins': plugins
+        'Plugins': plugins,
+        'SecretKey': os.urandom(16)
     })
     # Make sure we don't write any log files (or worse: send emails)
     Logger.reset()

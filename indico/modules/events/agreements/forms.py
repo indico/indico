@@ -43,8 +43,8 @@ class AgreementEmailForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self._definition = kwargs.pop('definition')
         super(AgreementEmailForm, self).__init__(*args, **kwargs)
-        name = session.user.getStraightFullName()
-        from_addresses = ['{} <{}>'.format(name, email) for email in session.user.getEmails()]
+        name = session.avatar.getStraightFullName()
+        from_addresses = ['{} <{}>'.format(name, email) for email in session.avatar.getEmails()]
         self.from_address.choices = zip(from_addresses, from_addresses)
         placeholders = self._definition.get_email_placeholders()
         self.body.description = render_template('events/agreements/dialogs/placeholder_info.html',

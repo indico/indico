@@ -54,5 +54,5 @@ def test_register_transaction(mocker, new, double, status):
 def test_get_registrant_params(dummy_user, user, params):
     request.values = params
     if user:
-        session.user = dummy_user
+        session.user = dummy_user.user
     assert get_registrant_params() == params

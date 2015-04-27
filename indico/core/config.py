@@ -525,7 +525,12 @@ class Config:
         'SentryLoggingLevel'        : 'WARNING',
         'CategoryCleanup'           : {},
         'JanitorUserId'             : 0,
-        'Plugins'                   : {}
+        'Plugins'                   : {},
+        'AuthProviders'             : {},
+        'IdentityProviders'         : {},
+        'ProviderMap'               : {},
+        'LocalIdentities'           : False,
+        'SecretKey'                 : None
     }
 
     if sys.platform == 'win32':

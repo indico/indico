@@ -37,7 +37,8 @@ def _check_request_definitions(app, **kwargs):
 
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
-    visible = bool(get_request_definitions()) and (event.canModify(session.user) or is_request_manager(session.user))
+    visible = bool(get_request_definitions()) and (event.canModify(session.avatar) or
+                                                   is_request_manager(session.avatar))
     return 'requests', SideMenuItem('Services', url_for('requests.event_requests', event), visible=visible)
 
 

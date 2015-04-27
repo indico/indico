@@ -18,38 +18,38 @@
 HTTP API - Handlers
 """
 
-# python stdlib imports
 import hashlib
 import hmac
 import posixpath
 import re
 import time
 import urllib
+from uuid import UUID
+
+import transaction
 from flask import request, session
 from urlparse import parse_qs
-from ZODB.POSException import ConflictError
-
-# indico imports
 from werkzeug.exceptions import NotFound
-from indico.web.http_api import HTTPAPIHook
-from indico.web.http_api.auth import APIKeyHolder
-from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
-from indico.web.http_api.util import get_query_parameter
-from indico.web.http_api import API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
-from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
-from indico.web.http_api.metadata.serializer import Serializer
-from indico.web.flask.util import ResponseUtil
-from indico.util.contextManager import ContextManager
-from indico.modules.oauth.errors import OAuthError
-from indico.modules.oauth.components import OAuthUtils
 
-# indico legacy imports
 from indico.core.db import DBMgr
 from indico.core.config import Config
 from indico.core.logger import Logger
+from indico.modules.api import APIMode
+from indico.modules.api import settings as api_settings
+from indico.modules.api.models.keys import APIKey
+from indico.modules.oauth.errors import OAuthError
+from indico.modules.oauth.components import OAuthUtils
+from indico.util.contextManager import ContextManager
+from indico.util.string import to_unicode
+from indico.web.http_api import HTTPAPIHook
+from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
+from indico.web.http_api.util import get_query_parameter
+from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
+from indico.web.http_api.metadata.serializer import Serializer
+from indico.web.flask.util import ResponseUtil
+
 from MaKaC.common.fossilize import fossilize, clearCache
 from MaKaC.accessControl import AccessWrapper
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.cache import GenericCache
 from MaKaC.authentication.LDAPAuthentication import LDAPConnector
 
@@ -81,37 +81,39 @@ def normalizeQuery(path, query, remove=('signature',), separate=False):
         return path
 
 
-def validateSignature(ak, minfo, signature, timestamp, path, query):
-    ttl = HelperMaKaCInfo.getMaKaCInfoInstance().getAPISignatureTTL()
-    if not timestamp and not (ak.isPersistentAllowed() and minfo.isAPIPersistentAllowed()):
+def validateSignature(ak, signature, timestamp, path, query):
+    ttl = api_settings.get('signature_ttl')
+    if not timestamp and not (ak.is_persistent_allowed and api_settings.get('allow_persistent')):
         raise HTTPAPIError('Signature invalid (no timestamp)', 403)
     elif timestamp and abs(timestamp - int(time.time())) > ttl:
         raise HTTPAPIError('Signature invalid (bad timestamp)', 403)
-    digest = hmac.new(ak.getSignKey(), normalizeQuery(path, query), hashlib.sha1).hexdigest()
+    digest = hmac.new(ak.secret, normalizeQuery(path, query), hashlib.sha1).hexdigest()
     if signature != digest:
         raise HTTPAPIError('Signature invalid', 403)
 
 
 def checkAK(apiKey, signature, timestamp, path, query):
-    minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-    apiMode = minfo.getAPIMode()
+    apiMode = api_settings.get('security_mode')
     if not apiKey:
-        if apiMode in (API_MODE_ONLYKEY, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED):
+        if apiMode in {APIMode.ONLYKEY, APIMode.ONLYKEY_SIGNED, APIMode.ALL_SIGNED}:
             raise HTTPAPIError('API key is missing', 403)
         return None, True
-    akh = APIKeyHolder()
-    if not akh.hasKey(apiKey):
+    try:
+        UUID(hex=apiKey)
+    except ValueError:
+        raise HTTPAPIError('Malformed API key', 400)
+    ak = APIKey.find_first(token=apiKey, is_active=True)
+    if not ak:
         raise HTTPAPIError('Invalid API key', 403)
-    ak = akh.getById(apiKey)
-    if ak.isBlocked():
+    if ak.is_blocked:
         raise HTTPAPIError('API key is blocked', 403)
     # Signature validation
     onlyPublic = False
     if signature:
-        validateSignature(ak, minfo, signature, timestamp, path, query)
-    elif apiMode == API_MODE_ALL_SIGNED:
+        validateSignature(ak, signature, timestamp, path, query)
+    elif apiMode == APIMode.ALL_SIGNED:
         raise HTTPAPIError('Signature missing', 403)
-    elif apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED):
+    elif apiMode in {APIMode.SIGNED, APIMode.ONLYKEY_SIGNED}:
         onlyPublic = True
     return ak, onlyPublic
 
@@ -121,12 +123,11 @@ def buildAW(ak, onlyPublic=False):
     aw.setIP(str(request.remote_addr))
     if ak and not onlyPublic:
         # If we have an authenticated request, require HTTPS
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         # Dirty hack: Google calendar converts HTTP API requests from https to http
         # Therefore, not working with Indico setup (requiring https for HTTP API authenticated)
-        if not request.is_secure and minfo.isAPIHTTPSRequired() and request.user_agent.browser != 'google':
+        if not request.is_secure and api_settings.get('require_https') and request.user_agent.browser != 'google':
             raise HTTPAPIError('HTTPS is required', 403)
-        aw.setUser(ak.getUser())
+        aw.setUser(ak.user.as_avatar)
     return aw
 
 
@@ -177,7 +178,7 @@ def handler(prefix, path):
         used_session = None
         if cookieAuth:
             used_session = session
-            if not used_session.user:  # ignore guest sessions
+            if not used_session.avatar:  # ignore guest sessions
                 used_session = None
 
         if apiKey or oauthToken or not used_session:
@@ -210,8 +211,8 @@ def handler(prefix, path):
                     raise HTTPAPIError('Invalid CSRF token', 403)
             aw = AccessWrapper()
             if not onlyPublic:
-                aw.setUser(used_session.user)
-            userPrefix = 'user-' + used_session.user.getId() + '_'
+                aw.setUser(used_session.avatar)
+            userPrefix = 'user-' + used_session.avatar.getId() + '_'
             cacheKey = userPrefix + normalizeQuery(path, query,
                                                    remove=('_', 'nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed',
                                                            'csrftoken'))
@@ -237,7 +238,7 @@ def handler(prefix, path):
             else:
                 result, extra, complete, typeMap = res, {}, True, {}
         if result is not None and addToCache:
-            ttl = HelperMaKaCInfo.getMaKaCInfoInstance().getAPICacheTTL()
+            ttl = api_settings.get('cache_ttl')
             cache.set(cacheKey, (result, extra, ts, complete, typeMap), ttl)
     except HTTPAPIError, e:
         error = e
@@ -256,20 +257,14 @@ def handler(prefix, path):
     else:
         if ak and error is None:
             # Commit only if there was an API key and no error
-            for _retry in xrange(10):
-                dbi.sync()
-                normPath, normQuery = normalizeQuery(path, query, remove=('signature', 'timestamp'), separate=True)
-                ak.used(request.remote_addr, normPath, normQuery, not onlyPublic)
-                try:
-                    dbi.endRequest(True)
-                except ConflictError:
-                    pass  # retry
-                else:
-                    break
+            norm_path, norm_query = normalizeQuery(path, query, remove=('signature', 'timestamp'), separate=True)
+            uri = to_unicode('?'.join(filter(None, (norm_path, norm_query))))
+            ak.register_used(request.remote_addr, uri, not onlyPublic)
+            transaction.commit()
         else:
-            # No need to commit stuff if we didn't use an API key
-            # (nothing was written)
-            dbi.endRequest(False)
+            # No need to commit stuff if we didn't use an API key (nothing was written)
+            # XXX do we even need this?
+            transaction.abort()
 
         LDAPConnector.destroy()
 

@@ -14,8 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import re
+
 from wtforms.widgets.core import Input, Select
 from wtforms.validators import Length, Regexp, NumberRange
+
+from indico.web.forms.validators import ConfirmPassword
 
 
 def is_single_line_field(field):
@@ -26,7 +30,7 @@ def is_single_line_field(field):
     return getattr(field.widget, 'single_line', False)
 
 
-def _attrs_for_validators(validators):
+def _attrs_for_validators(field, validators):
     attrs = {}
     for validator in validators:
         if isinstance(validator, Length):
@@ -41,12 +45,19 @@ def _attrs_for_validators(validators):
                 attrs['min'] = validator.min
             if validator.max is not None:
                 attrs['max'] = validator.max
+        elif isinstance(validator, ConfirmPassword):
+            # We don't have access to the form so we need to get the
+            # form's prefix from this field's name...
+            prefix = ''
+            if field.name != field.short_name:
+                prefix = re.sub(re.escape(field.short_name) + '$', '', field.name, 1)
+            attrs['data-confirm-password'] = prefix + validator.fieldname
     return attrs
 
 
 def render_field(field, widget_attrs):
     """Renders a WTForms field, taking into account validators"""
-    args = _attrs_for_validators(field.validators)
+    args = _attrs_for_validators(field, field.validators)
     args['required'] = field.flags.required and not field.flags.conditional
     args.update(widget_attrs)
     return field(**args)

@@ -34,10 +34,10 @@ class EventOrRequestManagerMixin:
         self.protection_overridden = False
         if hasattr(self, 'definition'):
             # check if user can manage *that* request
-            can_manage_request = session.user and self.definition.can_be_managed(session.user)
+            can_manage_request = session.avatar and self.definition.can_be_managed(session.avatar)
         else:
             # check if user can manage any request
-            can_manage_request = session.user and is_request_manager(session.user)
+            can_manage_request = session.avatar and is_request_manager(session.avatar)
         can_manage_event = self._conf.canModify(self.getAW())
         self.protection_overridden = can_manage_request and not can_manage_event
         if not can_manage_request and not can_manage_event:
@@ -54,8 +54,9 @@ class RHRequestsEventRequests(EventOrRequestManagerMixin, RHConferenceModifBase)
             raise NotFound
         requests = Request.find_latest_for_event(self._conf)
         if self.protection_overridden:
-            definitions = {name: def_ for name, def_ in definitions.iteritems() if def_.can_be_managed(session.user)}
-            requests = {name: req for name, req in requests.iteritems() if req.definition.can_be_managed(session.user)}
+            definitions = {name: def_ for name, def_ in definitions.iteritems() if def_.can_be_managed(session.avatar)}
+            requests = {name: req for name, req in requests.iteritems()
+                        if req.definition.can_be_managed(session.avatar)}
         return WPRequestsEventManagement.render_template('event_requests.html', event, event=event,
                                                          definitions=definitions, requests=requests)
 
@@ -82,7 +83,7 @@ class RHRequestsEventRequestDetailsBase(EventOrRequestManagerMixin, RHRequestsEv
     """Base class for the details/edit/manage views of a specific request"""
 
     def _process(self):
-        self.is_manager = self.definition.can_be_managed(session.user)
+        self.is_manager = self.definition.can_be_managed(session.avatar)
         self.form = self.definition.create_form(self.event, self.request)
         self.manager_form = None
         if self.request and self.is_manager:
@@ -117,7 +118,7 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
         if not form.validate_on_submit():
             return
         if not self.request or not self.request.can_be_modified:
-            req = Request(event=self.event, definition=self.definition, created_by_user=session.user)
+            req = Request(event=self.event, definition=self.definition, created_by_user=session.avatar)
             new = True
         else:
             req = self.request
@@ -140,7 +141,7 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
 
     def _checkProtection(self):
         self._checkSessionUser()
-        if self._doProcess and not self.definition.can_be_managed(session.user):
+        if self._doProcess and not self.definition.can_be_managed(session.avatar):
             raise AccessError()
 
     def process_form(self):
@@ -159,10 +160,10 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
         else:
             raise ValueError('No action provided')
         if action == 'accept':
-            self.definition.accept(self.request, self.manager_form.data, session.user)
+            self.definition.accept(self.request, self.manager_form.data, session.avatar)
             flash(_('You have accepted this request.'), 'info')
         elif action == 'reject':
-            self.definition.reject(self.request, self.manager_form.data, session.user)
+            self.definition.reject(self.request, self.manager_form.data, session.avatar)
             flash(_('You have rejected this request.'), 'info')
         elif action == 'save':
             self.definition.manager_save(self.request, self.manager_form.data)

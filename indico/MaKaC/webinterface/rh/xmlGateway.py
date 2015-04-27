@@ -46,8 +46,8 @@ class RHLoginStatus( RHXMLHandlerBase ):
         XG.openTag("response")
         self._genStatus("OK", "Request succesful", XG)
         XG.openTag("login-status")
-        if session.user is not None:
-            XG.writeTag("user-id", session.user.getId())
+        if session.avatar is not None:
+            XG.writeTag("user-id", session.avatar.getId())
         XG.closeTag("login-status")
         XG.closeTag("response")
 
@@ -83,7 +83,7 @@ class RHSignIn( RHXMLHandlerBase ):
         else:
             value = "OK"
             message = "Login succesful"
-            session.user = av
+            session.user = av.user
 
         return self._createResponse(value, message)
 

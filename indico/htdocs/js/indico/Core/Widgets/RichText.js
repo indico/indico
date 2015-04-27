@@ -20,14 +20,6 @@ var __globalEditorTable = {};
 var languages = {'en_GB' : 'en', 'fr_FR' : 'fr'};
 var userLanguage = 'en_GB';
 
-/*jsonRpc(Indico.Urls.JsonRpcService, "user.session.language.get",{}, function(result, error)
-        {
-            if (!error)
-                userLanguage = result;
-            else
-                userLanguage = 'en_GB';
-        });*/
-
 type("RichTextEditor", ["IWidget", "Accessor"],
      {
          draw: function() {

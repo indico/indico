@@ -13,16 +13,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 import uuid
+
+from indico.core.config import Config
+from indico.modules.users import User
+from indico.web.flask.util import url_for
 
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface import urlHandlers
 from MaKaC.common.info import HelperMaKaCInfo
-from indico.core.config import Config
 from MaKaC.i18n import _
-
-from indico.web.flask.util import url_for
 
 
 def getSubjectIndicoTitle():
@@ -204,7 +206,6 @@ class sendAccountCreationModeration:
         self._user = user
 
     def send( self ):
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         name = self._user.getStraightFullName()
         text = """ Dear Administrator,
 %s has created a new account in Indico.
@@ -214,7 +215,7 @@ In order to activate it, please go to this URL:
 """% (name,urlHandlers.UHUserDetails.getURL( self._user ))
         maildata = {
             "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
-            "toList": minfo.getAdminEmails(),
+            "toList": [u.email for u in User.find(is_admin=True)],
             "subject": _("[Indico] New account request from %s") % name,
             "body": text
             }
@@ -226,7 +227,6 @@ class sendAccountCreationNotification:
         self._user = user
 
     def send( self ):
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
         name = self._user.getStraightFullName()
         text = """Dear Administrator,
 %s has created a new account in Indico.
@@ -234,7 +234,7 @@ class sendAccountCreationNotification:
 """ % (name,urlHandlers.UHUserDetails.getURL( self._user ))
         maildata = {
             "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getSupportEmail(),
-            "toList": minfo.getAdminEmails(),
+            "toList": [u.email for u in User.find(is_admin=True)],
             "subject": _("[Indico] New account creation"),
             "body": text
             }

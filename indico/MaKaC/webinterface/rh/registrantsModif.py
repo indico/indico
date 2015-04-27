@@ -534,8 +534,8 @@ class RHRegistrantTransactionPerformModify(RHRegistrantModifBase):
                              currency=self._registrant.getCurrency(),
                              action=action,
                              provider='_manual',
-                             data={'changed_by_name': session.user.getFullName(),
-                                   'changed_by_id': session.user.getId()})
+                             data={'changed_by_name': session.avatar.getFullName(),
+                                   'changed_by_id': session.avatar.getId()})
         self._redirect(urlHandlers.UHRegistrantModification.getURL(self._registrant))
 
 

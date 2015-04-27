@@ -27,12 +27,3 @@ from indico.web.http_api.hooks.user import UserInfoHook
 # be imported and thus their api hooks wouldn't be registered at all
 import indico.modules.events.agreements.api
 import indico.modules.rb.api
-
-
-API_MODE_KEY            = 0  # public requests without API key, authenticated requests with api key
-API_MODE_ONLYKEY        = 1  # all requests require an API key
-API_MODE_SIGNED         = 2  # public requests without API key, authenticated requests with api key and signature
-API_MODE_ONLYKEY_SIGNED = 3  # all requests require an API key, authenticated requests need signature
-API_MODE_ALL_SIGNED     = 4  # all requests require an api key and a signature
-
-API_MODES = (API_MODE_KEY, API_MODE_ONLYKEY, API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)

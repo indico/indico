@@ -60,8 +60,9 @@ def run_migrations_offline():
 
     """
     url = config.get_main_option('sqlalchemy.url')
-    context.configure(url=url, include_schemas=True, include_symbol=_include_symbol, render_item=_render_item,
-                      version_table=version_table, version_table_schema='public')
+    context.configure(url=url, target_metadata=target_metadata, include_schemas=True,
+                      include_symbol=_include_symbol, render_item=_render_item, version_table=version_table,
+                      version_table_schema='public')
 
     with context.begin_transaction():
         context.run_migrations()

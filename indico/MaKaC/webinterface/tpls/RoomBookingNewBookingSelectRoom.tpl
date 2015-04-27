@@ -30,11 +30,11 @@
 </form>
 
 <script>
-    var userId = "rb-user-${ user.getId() if _session.user else 'not-logged' }";
+    var userId = "rb-user-${ user.getId() if _session.avatar else 'not-logged' }";
     var rbUserData = $.jStorage.get(userId, {});
     var maxRoomCapacity = ${ max_room_capacity };
     var rooms = ${ [r.to_serializable('__public_exhaustive__') for r in rooms] | j, n };
-    var myRooms = ${ [r.id for r in _session.user.get_rooms()] | j, n };
+    var myRooms = ${ [r.id for r in _session.avatar.get_rooms()] | j, n };
 
     $(document).ready(function() {
         initWidgets();

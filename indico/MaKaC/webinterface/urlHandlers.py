@@ -19,7 +19,7 @@ import re
 import string
 import urlparse
 
-from flask import request, session, url_for, has_request_context
+from flask import request, session, has_request_context
 
 import MaKaC.user as user
 from MaKaC.common.url import URL, EndpointURL
@@ -28,6 +28,7 @@ from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
 
 from indico.core.config import Config
+from indico.modules.users.legacy import AvatarUserWrapper
 
 
 class BooleanMixin:
@@ -240,27 +241,27 @@ class UHSignOut(URLHandler):
 
 
 class UHOAuthRequestToken(URLHandler):
-    _endpoint = 'oauth.oauth-request_token'
+    _endpoint = 'oauth_old.oauth-request_token'
 
 
 class UHOAuthAuthorization(URLHandler):
-    _endpoint = 'oauth.oauth-authorize'
+    _endpoint = 'oauth_old.oauth-authorize'
 
 
 class UHOAuthAccessTokenURL(URLHandler):
-    _endpoint = 'oauth.oauth-access_token'
+    _endpoint = 'oauth_old.oauth-access_token'
 
 
 class UHOAuthAuthorizeConsumer(UserURLHandler):
-    _endpoint = 'oauth.oauth-authorize_consumer'
+    _endpoint = 'oauth_old.oauth-authorize_consumer'
 
 
 class UHOAuthThirdPartyAuth(UserURLHandler):
-    _endpoint = 'oauth.oauth-thirdPartyAuth'
+    _endpoint = 'oauth_old.oauth-thirdPartyAuth'
 
 
 class UHOAuthUserThirdPartyAuth(UserURLHandler):
-    _endpoint = 'oauth.oauth-userThirdPartyAuth'
+    _endpoint = 'oauth_old.oauth-userThirdPartyAuth'
 
 
 class UHIndicoNews(URLHandler):
@@ -1259,48 +1260,14 @@ class UHUserDisable(UserURLHandler):
     _endpoint = 'user.userRegistration-disable'
 
 
-class UHUserDashboard(UserURLHandler):
-    _endpoint = 'user.userDashboard'
-
-
 class UHUserDetails(UserURLHandler):
-    _endpoint = 'user.userDetails'
-
-
-class UHUserBaskets(UserURLHandler):
-    _endpoint = 'user.userBaskets'
-
-
-class UHUserPreferences(UserURLHandler):
-    _endpoint = 'user.userPreferences'
-
-
-class UHUserAPI(UserURLHandler):
-    _endpoint = 'user.userAPI'
-
-
-class UHUserAPICreate(UserURLHandler):
-    _endpoint = 'user.userAPI-create'
-
-
-class UHUserAPIBlock(UserURLHandler):
-    _endpoint = 'user.userAPI-block'
-
-
-class UHUserAPIDelete(UserURLHandler):
-    _endpoint = 'user.userAPI-delete'
+    # XXX: This UH is deprecated. It's just kept around to have a
+    # quick reference to find code that needs to be rewritten/removed.
+    _endpoint = None
 
 
 class UHUserRegistration(URLHandler):
     _endpoint = 'user.userRegistration'
-
-
-class UHUserIdentityCreation(UserURLHandler):
-    _endpoint = 'user.identityCreation'
-
-
-class UHUserRemoveIdentity(UserURLHandler):
-    _endpoint = 'user.identityCreation-remove'
 
 
 class UHUserExistWithIdentity(UHConfUser):
@@ -1309,10 +1276,6 @@ class UHUserExistWithIdentity(UHConfUser):
 
 class UHUserIdPerformCreation(UserURLHandler):
     _endpoint = 'user.identityCreation-create'
-
-
-class UHUserIdentityChangePassword(UserURLHandler):
-    _endpoint = 'user.identityCreation-changePassword'
 
 
 class UHGroups(URLHandler):
@@ -1344,7 +1307,7 @@ class UHPrincipalDetails:
     def getURL(cls, member):
         if isinstance(member, user.Group):
             return UHGroupDetails.getURL(member)
-        elif isinstance(member, user.Avatar):
+        elif isinstance(member, AvatarUserWrapper):
             return UHUserDetails.getURL(member)
         else:
             return ''
@@ -2219,18 +2182,6 @@ class UHIPBasedACLFullAccessRevoke(URLHandler):
     _endpoint = 'admin.adminServices-ipbasedacl_farevoke'
 
 
-class UHAdminAPIOptions(URLHandler):
-    _endpoint = 'admin.adminServices-apiOptions'
-
-
-class UHAdminAPIOptionsSet(URLHandler):
-    _endpoint = 'admin.adminServices-apiOptionsSet'
-
-
-class UHAdminAPIKeys(URLHandler):
-    _endpoint = 'admin.adminServices-apiKeys'
-
-
 class UHAdminOAuthConsumers(URLHandler):
     _endpoint = 'admin.adminServices-oauthConsumers'
 
@@ -2564,7 +2515,7 @@ class UHConfRegistrationFormCreationDone(URLHandler):
     @classmethod
     def getURL(cls, registrant):
         url = cls._getURL()
-        if not session.user:
+        if not session.avatar:
             url.setParams(registrant.getLocator())
             url.addParam('authkey', registrant.getRandomId())
         else:
@@ -2982,24 +2933,6 @@ class UHConfModifPosterGetBackground(URLHandler):
 
 class UHConfModifPosterPrintingPDF(URLHandler):
     _endpoint = 'event_mgmt.confModifTools-posterPrintingPDF'
-
-
-class UHJsonRpcService(OptionallySecureURLHandler):
-    _endpoint = 'api.jsonrpc'
-
-    @classmethod
-    def getStaticURL(cls, target=None, **params):
-        return ""
-
-
-class UHAPIExport(OptionallySecureURLHandler):
-    _endpoint = 'api.httpapi'
-    _defaultParams = dict(prefix='export')
-
-
-class UHAPIAPI(OptionallySecureURLHandler):
-    _endpoint = 'api.httpapi'
-    _defaultParams = dict(prefix='api')
 
 
 ############

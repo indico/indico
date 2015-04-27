@@ -50,14 +50,14 @@
 
         <!-- global JS variables -->
         <script>
-        <% user = page._rh.getAW().getUser() %>
         % if user:
             IndicoGlobalVars.isUserAuthenticated = true;
-            IndicoGlobalVars.userData = ${ jsonEncode(page._getJavaScriptUserData()) };
         % else:
             IndicoGlobalVars.isUserAuthenticated = false;
         % endif
         </script>
+
+        <script type="text/javascript" src="${ url_for('assets.js_vars_user') }"></script>
 
         <!-- other page-specific things -->
         ${ page._getHeadContent() }
@@ -66,4 +66,3 @@
     </head>
     <body data-user-id="${ user.getId() if user else 'null' }">
         ${ page._getWarningMessage() }
-

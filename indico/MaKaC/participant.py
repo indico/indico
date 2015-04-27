@@ -19,7 +19,6 @@ from persistent import Persistent
 from MaKaC.common import log
 from MaKaC.common.timezoneUtils import nowutc
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.user import Avatar
 from MaKaC.webinterface.mail import GenericMailer
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common import utils
@@ -29,6 +28,7 @@ from indico.core.config import Config
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.fossils.participant import IParticipantMinimalFossil
 
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.contextManager import ContextManager
 
 
@@ -476,10 +476,10 @@ class Participation(Persistent):
 
             toList = []
             creator=self._conference.getCreator()
-            if isinstance(creator, Avatar) :
+            if isinstance(creator, AvatarUserWrapper):
                 toList.append(creator.getEmail())
             for manager in self._conference.getAccessController().getModifierList() :
-                if isinstance(manager, Avatar) :
+                if isinstance(manager, AvatarUserWrapper):
                     toList.append(manager.getEmail())
 
             data = {}

@@ -15,8 +15,9 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import pytest
+from enum import Enum
 
-from indico.core.models.settings import SettingsProxy
+from indico.core.models.settings import SettingsProxy, Setting
 
 
 def test_proxy_strict_nodefaults():
@@ -65,3 +66,17 @@ def test_proxy_delete_all():
     assert proxy.get_all() == {'hello': 'test', 'foo': None}
     proxy.delete_all()
     assert proxy.get_all() == defaults
+
+
+@pytest.mark.usefixtures('db')
+def test_set_enum():
+    class Useless(int, Enum):
+        thing = 1337
+
+    Setting.set_multi('foo', {'foo': Useless.thing})
+    Setting.set('foo', 'bar', Useless.thing)
+    for key in {'foo', 'bar'}:
+        value = Setting.get('foo', key)
+        assert value == Useless.thing
+        assert value == Useless.thing.value
+        assert not isinstance(value, Useless)  # we store it as a plain value!

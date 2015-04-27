@@ -104,14 +104,54 @@ $(document).ready(function() {
         }
     });
 
-    $(".body").on("click", "[data-confirm]", function(event){
-        var self = this;
+    $('.body').on('click', '[data-confirm]:not(button[data-href])', function() {
+        var $this = $(this);
         new ConfirmPopup($(this).data("title"), $(this).data("confirm"), function(confirmed){
-            if(confirmed){
-                window.location = self.getAttribute("href");
+            if (confirmed){
+                if ($this.is('form')) {
+                    $this.submit();
+                } else {
+                    window.location = self.getAttribute("href");
+                }
             }
         }).open();
         return false;
+    });
+
+    $('.body').on('click', 'button[data-method][data-href]', function() {
+        var $this = $(this);
+        var url = $this.data('href');
+        var method = $this.data('method').toUpperCase();
+        var params = $this.data('params') || {};
+        if (!$.isPlainObject(params)) {
+            throw new Error('Invalid params. Must be valid JSON if set.');
+        }
+
+        function execute() {
+            if (method == 'GET') {
+                location.href = build_url(url, params);
+            } else {
+                var form = $('<form>', {
+                    action: url,
+                    method: method
+                });
+                $.each(params, function(key, value) {
+                    form.append($('<input>', {type: 'hidden', name: key, value: value}));
+                });
+                form.appendTo('body').submit();
+            }
+        }
+
+        var promptMsg = $this.data('confirm');
+        if (promptMsg) {
+            new ConfirmPopup($(this).data('title') || $T('Confirm action'), promptMsg, function(confirmed) {
+                if (confirmed) {
+                    execute();
+                }
+            }).open();
+        } else {
+            execute();
+        }
     });
 
     if (navigator.userAgent.match(/Trident\/7\./)) {

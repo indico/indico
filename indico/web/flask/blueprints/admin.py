@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from MaKaC.webinterface.rh import (admins, announcement, taskManager, maintenance, domains, users, groups, templates,
-                                   conferenceModif, services, api, oauth)
+                                   conferenceModif, services, oauth)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -121,11 +121,6 @@ admin.add_url_rule('/protection/ip-acl/add', 'adminServices-ipbasedacl_fagrant',
                    methods=('POST',))
 admin.add_url_rule('/protection/ip-acl/remove', 'adminServices-ipbasedacl_farevoke',
                    services.RHIPBasedACLFullAccessRevoke, methods=('POST',))
-
-# HTTP API
-admin.add_url_rule('/api/', 'adminServices-apiOptions', api.RHAdminAPIOptions)
-admin.add_url_rule('/api/', 'adminServices-apiOptionsSet', api.RHAdminAPIOptionsSet, methods=('POST',))
-admin.add_url_rule('/api/keys', 'adminServices-apiKeys', api.RHAdminAPIKeys)
 
 # OAuth
 admin.add_url_rule('/oauth/consumers', 'adminServices-oauthAuthorized', oauth.RHAdminOAuthAuthorized)

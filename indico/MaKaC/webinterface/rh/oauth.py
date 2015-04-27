@@ -28,12 +28,10 @@ from indico.modules.oauth.components import OAuthUtils
 from MaKaC.common.timezoneUtils import nowutc
 from indico.core.logger import Logger
 from MaKaC.webinterface.rh import base
-from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.urlHandlers import UHOAuthThirdPartyAuth
-from MaKaC.errors import AccessControlError, MaKaCError
+from MaKaC.errors import MaKaCError
 from MaKaC.webinterface.rh.services import RHServicesBase
-from MaKaC.webinterface.rh.users import RHUserBase
-from MaKaC.webinterface.pages.oauth import WPAdminOAuthConsumers, WPAdminOAuthAuthorized, WPOAuthThirdPartyAuth, WPOAuthUserThirdPartyAuth
+from MaKaC.webinterface.pages.oauth import WPAdminOAuthConsumers, WPAdminOAuthAuthorized, WPOAuthThirdPartyAuth
 from indico.core.config import Config
 
 
@@ -216,17 +214,3 @@ class RHOAuthThirdPartyAuth(base.RHProtected):
     def _process(self):
         p = WPOAuthThirdPartyAuth(self)
         return p.display(userId=self._getUser().getId(), **self._reqParams)
-
-
-class RHOAuthUserThirdPartyAuth(RHUserBase):
-    _uh = urlHandlers.UHOAuthUserThirdPartyAuth
-
-    def _checkProtection(self):
-        RHUserBase._checkProtection(self)
-        if self._aw.getUser():
-            if not self._avatar.canModify(self._aw):
-                raise AccessControlError("user")
-
-    def _process(self):
-        p = WPOAuthUserThirdPartyAuth(self, self._avatar)
-        return p.display()

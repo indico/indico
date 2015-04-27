@@ -20,9 +20,9 @@ from persistent import Persistent
 from functools import wraps
 
 from indico.core import signals
-from indico.core.db import DBMgr
 from MaKaC.common import info
 import MaKaC
+from indico.modules.users.legacy import AvatarUserWrapper
 from MaKaC.common.contextManager import ContextManager
 
 def isFullyAccess(level):
@@ -95,7 +95,7 @@ class AccessController(Persistent):
 
     def unlinkAvatars(self, role):
         for prin in itertools.chain(self.getSubmitterList(), self.managers, self.allowed):
-            if isinstance(prin, MaKaC.user.Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.unlinkTo(self.owner, role)
 
     def _getAccessProtection( self ):
@@ -152,15 +152,12 @@ class AccessController(Persistent):
         self._fatherProtection = protected
         self._p_changed = 1
 
-    def grantAccess( self, principal ):
+    def grantAccess(self, principal):
         """grants read access for the related resource to the specified
             principal"""
 
-        # TODO: make this extensible
-        if principal not in self.allowed and \
-               (isinstance(principal, MaKaC.user.Avatar) or \
-                isinstance(principal, MaKaC.user.Group)):
-            self.allowed.append( principal )
+        if principal not in self.allowed and isinstance(principal, (AvatarUserWrapper, MaKaC.user.Group)):
+            self.allowed.append(principal)
             self._p_changed = 1
         signals.acl.access_granted.send(self, principal=principal)
 
@@ -228,7 +225,7 @@ class AccessController(Persistent):
         return any(domain.belongsTo(ip) for domain in self.getRequiredDomainList())
 
     def isAdmin(self, av):
-        return AdminList.getInstance().isAdmin(av)
+        return av and av.user and av.user.is_admin
 
     def canUserAccess(self, av):
         if self.isAdmin(av):
@@ -237,10 +234,9 @@ class AccessController(Persistent):
             if principal is None:
                 self.revokeAccess(principal)
                 continue
-            if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.Group)) and \
-               principal.containsUser(av):
+            if isinstance(principal, (AvatarUserWrapper, MaKaC.user.Group)) and principal.containsUser(av):
                 return True
-        if isinstance(av, MaKaC.user.Avatar):
+        if isinstance(av, AvatarUserWrapper):
             for email in av.getEmails():
                 if email in self.getAccessEmail():
                     self.grantAccess(av)
@@ -281,8 +277,8 @@ class AccessController(Persistent):
         """grants modification access for the related resource to the specified
             principal"""
         # ToDo: should the groups allowed to be managers?
-        if principal not in self.managers and (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.Group)):
-            self.managers.append( principal )
+        if principal not in self.managers and (isinstance(principal, (AvatarUserWrapper, MaKaC.user.Group))):
+            self.managers.append(principal)
             self._p_changed = 1
         signals.acl.modification_granted.send(self, principal=principal)
 
@@ -294,16 +290,16 @@ class AccessController(Persistent):
             self._p_changed = 1
         signals.acl.modification_revoked.send(self, principal=principal)
 
-    def canModify( self, user ):
+    def canModify(self, user):
         """tells whether the specified user has modification privileges"""
-        if AdminList.getInstance().isAdmin( user ):
+        if user and user.user.is_admin:
             return True
 
         for principal in self.managers:
-            if (isinstance(principal, MaKaC.user.Avatar) or isinstance(principal, MaKaC.user.Group)) and principal.containsUser( user ):
+            if isinstance(principal, (AvatarUserWrapper, MaKaC.user.Group)) and principal.containsUser(user):
                 return True
         ret = False
-        if isinstance(user, MaKaC.user.Avatar):
+        if isinstance(user, AvatarUserWrapper):
             for email in user.getEmails():
                 if email in self.getModificationEmail():
                     self.grantModification(user)
@@ -482,73 +478,15 @@ class CategoryAC(AccessController):
         pass
 
 
-
-class _AdminList(Persistent):
-
-    def __init__(self):
-        self.__list = []
-
-    def grant( self, user ):
-        if user not in self.__list:
-            self.__list.append( user )
-            self._p_changed=1
-
-    def revoke( self, user ):
-        if user in self.__list:
-            self.__list.remove( user )
-            self._p_changed=1
-        else:
-            # TODO: this is just a workaround for users which id
-            # is "Nice:jbgl@cern.ch"
-            for u in self.__list:
-                if u.getEmail() in user.getEmails():
-                    self.__list.remove(u)
-                    self._p_changed=1
-                    break
-
-    def revokeById( self, userId ):
-        for u in self.__list:
-            if u.getId() == userId:
-                self.__list.remove(u)
-                self._p_changed=1
-                return True
-        else:
-            return False
-
-    def isAdmin( self, user ):
-        if user in self.__list:
-            return True
-        from MaKaC.user import Group
-        for p in self.__list:
-            if isinstance(p, Group) and p.containsUser(user):
-                return True
-        return False
-
-    def getList( self ):
-        return self.__list
-
-
-class AdminList:
-
-    def getInstance( self ):
-        dbroot = DBMgr.getInstance().getDBConnection().root()
-        if dbroot.has_key("adminlist"):
-            return dbroot["adminlist"]
-        al = _AdminList()
-        dbroot["adminlist"] = al
-        return al
-    getInstance = classmethod(getInstance)
-
-
 class AccessWrapper:
     """This class encapsulates the information about an access to the system. It
             must be initialised by clients if they want to perform access
             control operations over the objects in the system.
     """
 
-    def __init__( self, user=None ):
+    def __init__(self, user=None, ip=None):
         self._currentUser = user
-        self._ip = ""
+        self._ip = ip or ''
 
     def setUser( self, newAvatar ):
         self._currentUser = newAvatar

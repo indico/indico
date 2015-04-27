@@ -236,7 +236,7 @@ type("CategoryChooserWidget", [], {
             }else {
                 this.breadcrumbs.append(cat);
                 var breadcrumbArrow = Html.img({
-                    src: imageSrc("breadcrumbArrow"),
+                    src: imageSrc("breadcrumb_arrow"),
                     alt: '>',
                     title: ''
                     });

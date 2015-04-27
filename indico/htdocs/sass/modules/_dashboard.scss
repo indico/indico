@@ -15,17 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.dashboard-tab {
-    margin-top: 20px;
-}
-
-.quick-access-pane {
-    width: 1000px;
-}
+@import "base/palette";
 
 .dashboard-col {
     display: table-cell;
     width: 1%;
+    vertical-align: top;
 }
 
 .dashboard-col:last-child {
@@ -44,7 +39,6 @@
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     margin-bottom: 44px;
-    width: 490px;
 }
 
 .dashboard-box h3 {
@@ -191,4 +185,30 @@
 
 .item-legend [class*=icon-].active {
     color: #777;
+}
+
+.your-details {
+    margin-bottom: 15px;
+
+    .avatar-image {
+        font-size: 130px;
+        color: $black;
+        margin-right: 34px;
+    }
+
+    .your-details-wrapper {
+        color: $black;
+        font-size: 1.2em;
+        line-height: 1.5;
+        max-width: 300px;
+
+        h3 {
+            margin-top: 0;
+        }
+
+        i {
+            color: $dark-gray;
+            margin-right: 10px;
+        }
+    }
 }

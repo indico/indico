@@ -34,6 +34,7 @@ from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC import schedule
 import MaKaC.common.info as info
 from MaKaC.i18n import _
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.i18n import i18nformat
 
 from MaKaC.webinterface.common.timezones import TimezoneRegistry
@@ -43,7 +44,6 @@ from pytz import timezone
 from MaKaC.common.TemplateExec import truncateTitle
 
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import Avatar
 
 from indico.core.index import Catalog
 from indico.modules import ModuleHolder
@@ -122,7 +122,7 @@ class WCategoryDisplay(WICalExportBase):
         elif confs:
             pastEvents = session.get('fetchPastEventsFrom', set())
             showPastEvents = (self._target.getId() in pastEvents or
-                             (self._aw.getUser() and self._aw.getUser().getPersonalInfo().getShowPastEvents()))
+                             (session.user and session.user.settings.get('show_past_events')))
             cl = wcomponents.WConferenceList(self._target, self._wfReg, showPastEvents)
             params = {"conferenceDisplayURLGen": vars["confDisplayURLGen"]}
             vars["contents"] = cl.getHTML( self._aw, params )
@@ -132,7 +132,7 @@ class WCategoryDisplay(WICalExportBase):
 
         mgrs = []
         for mgr in self._target.getManagerList():
-            if isinstance(mgr, Avatar):
+            if isinstance(mgr, AvatarUserWrapper):
                 mgrs.append(("avatar", mgr.getAbrName()))
             elif isinstance(mgr, Group) and mgr.groupType != "Default":
                 mgrs.append(("group", mgr.getName()))
@@ -144,7 +144,6 @@ class WCategoryDisplay(WICalExportBase):
             vars.update(self._getIcalExportParams(self._aw.getUser(), '/export/categ/%s.ics' % self._target.getId(), {'from':"-7d"}))
 
         vars["isLoggedIn"] = self._aw.getUser() is not None
-        vars["favoriteCategs"] = self._aw.getUser().getLinkTo('category', 'favorite') if self._aw.getUser() else []
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["isNewsActive"] = minfo.isNewsActive()

@@ -18,9 +18,9 @@
 import itertools
 
 # indico imports
+from indico.modules.users.util import get_related_categories
 from indico.util.redis import client as redis_client
-import indico.util.redis.avatar_links as avatar_links
-
+from indico.util.redis import avatar_links
 from indico.web.http_api.fossils import IBasicConferenceMetadataFossil
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
@@ -92,7 +92,7 @@ class UserEventHook(HTTPAPIHook):
 
     def export_categ_events(self, aw):
         self._checkProtection(aw)
-        catIds = [item['categ'].getId() for item in self._avatar.getRelatedCategories().itervalues()]
+        catIds = [item['categ'].getId() for item in get_related_categories(self._avatar.user).itervalues()]
         return UserCategoryEventFetcher(aw, self).category_events(catIds)
 
 

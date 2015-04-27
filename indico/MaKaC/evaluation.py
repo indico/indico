@@ -19,16 +19,15 @@ from persistent   import Persistent
 from registration import Notification
 from MaKaC.common import utils
 from MaKaC.common.Counter import Counter
-from MaKaC.user   import Avatar
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 from pytz import timezone
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
 
+from indico.core.config import Config
 from indico.modules.scheduler import Client
 from indico.modules.scheduler.tasks import AlarmTask
-from indico.core.config import Config
+from indico.modules.users.legacy import AvatarUserWrapper
 
 
 class Evaluation(Persistent):
@@ -335,6 +334,9 @@ class Evaluation(Persistent):
         if ids is not None:
             return [s for s in self._submissions if s.getId() in ids]
         return self._submissions
+
+    def getSubmissionById(self, id_):
+        return next((x for x in self.getSubmissions() if x._id == id_), None)
 
     def getUserSubmission(self, user):
         """ return the submission of the given user, or None if nothing found.
@@ -1397,8 +1399,8 @@ class Submission(Persistent):
                 submitter -- [Avatar/None] submitter who submitted this submission.
         """
         self._evaluation = evaluation
+        self._id = str(evaluation._getSubmissionCounter().newCount())
         self.setSubmitter(submitter)
-        self._id = str( evaluation._getSubmissionCounter().newCount() )
         self._answers = []
         self.submissionDate = nowutc()
         self.modificationDate = None
@@ -1415,6 +1417,11 @@ class Submission(Persistent):
         if self.getConference() == other.getConference():
             return cmp(self.getId(), other.getId())
         return cmp(self.getConference(), other.getConference())
+
+    def getLocator(self):
+        d = self.getConference().getLocator()
+        d['submission_id'] = self._id
+        return d
 
     def removeReferences(self):
         """remove all pointers to other objects."""
@@ -1460,7 +1467,7 @@ class Submission(Persistent):
 
     def setSubmitter(self, submitter):
         """Set the submitter. He is of type None when anonymous, Avatar otherwise."""
-        if isinstance(submitter, Avatar) :
+        if isinstance(submitter, AvatarUserWrapper):
             submitter.linkTo(self, "submitter")
         self._submitter = submitter
     def getSubmitter(self):
@@ -1471,14 +1478,14 @@ class Submission(Persistent):
     def removeSubmitter(self):
         """remove the submitter, i.e. he is set to None."""
         submitter = self.getSubmitter()
-        if isinstance(submitter, Avatar) :
+        if isinstance(submitter, AvatarUserWrapper):
             submitter.unlinkTo(self, "submitter")
         self._submitter = None
 
     def getSubmitterName(self):
         """returns name of submitter"""
         submitter = self.getSubmitter()
-        if not self.isAnonymous() and isinstance(submitter, Avatar) :
+        if not self.isAnonymous() and isinstance(submitter, AvatarUserWrapper):
             return submitter.getFullName()
         else :
             return "Anonymous (%s)"%self.getId()

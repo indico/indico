@@ -22,6 +22,7 @@ from flask import g
 from flask_sqlalchemy import Model
 from sqlalchemy.orm import joinedload, joinedload_all
 from sqlalchemy.orm.attributes import get_history
+from sqlalchemy.orm.exc import NoResultFound
 
 
 class IndicoModel(Model):
@@ -60,6 +61,13 @@ class IndicoModel(Model):
     @classmethod
     def get(cls, oid):
         return cls.query.get(oid)
+
+    @classmethod
+    def get_one(cls, oid):
+        obj = cls.query.get(oid)
+        if obj is None:
+            raise NoResultFound()
+        return obj
 
     def __committed__(self, change):
         """Called after a commit for this object.

@@ -52,6 +52,7 @@ from MaKaC.webinterface.common.person_titles import TitlesRegistry
 from indico.modules.payment import event_settings as payment_event_settings
 from indico.modules.payment import settings as payment_settings
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.fossilize import Fossilizable, fossilizes
 from indico.core.fossils.registration import IRegFormTextInputFieldFossil, IRegFormTelephoneInputFieldFossil, \
     IRegFormTextareaInputFieldFossil, IRegFormNumberInputFieldFossil, IRegFormLabelInputFieldFossil, \
@@ -4641,7 +4642,7 @@ class Registrant(Persistent, Fossilizable):
         return self._avatar
 
     def setAvatar(self, a):
-        if isinstance(self._avatar, MaKaC.user.Avatar):
+        if isinstance(self._avatar, AvatarUserWrapper):
             self._avatar.unlinkTo(self, "registrant")
         self._avatar = a
         a.linkTo(self, "registrant")

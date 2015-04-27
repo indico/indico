@@ -57,7 +57,7 @@ def _inject_vc_room_action_buttons(event, item, **kwargs):
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
     return 'vc', SideMenuItem(_('Videoconference'), url_for('vc.manage_vc_rooms', event),
-                              visible=bool(get_vc_plugins()) and event.canModify(session.user))
+                              visible=bool(get_vc_plugins()) and event.canModify(session.avatar))
 
 
 @signals.event.sidemenu.connect
@@ -102,14 +102,14 @@ def _event_deleted(event, **kwargs):
 
 @signals.indico_menu.connect
 def extend_header_menu(sender, **kwargs):
-    if not session.user or not get_managed_vc_plugins(session.user):
+    if not session.avatar or not get_managed_vc_plugins(session.avatar):
         return
     return HeaderMenuEntry(url_for('vc.vc_room_list'), _('Videoconference'), _('Services'))
 
 
 def _get_user():
-    if has_request_context() and session.user:
-        return session.user
+    if has_request_context() and session.avatar:
+        return session.avatar
     else:
         return AvatarHolder().getById(Config.getInstance().getJanitorUserId())
 

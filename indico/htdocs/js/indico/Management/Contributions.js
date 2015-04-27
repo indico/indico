@@ -133,7 +133,7 @@ type("SubmissionControlListManager", ["ListOfUsersManager"], {
 
     _personName: function(user) {
         var content = this.ListOfUsersManager.prototype._personName.call(this, user);
-        if (user._type == 'Avatar') {
+        if (user._type == 'AvatarUserWrapper') {
             var roles = '';
             var counter = 0;
             if (user.isPrAuthor) {

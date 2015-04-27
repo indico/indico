@@ -36,7 +36,6 @@ from MaKaC.common import info
 from MaKaC import domain
 from MaKaC.webinterface import urlHandlers
 from indico.core import config as Configuration
-from MaKaC.accessControl import AdminList
 from MaKaC.common.url import URL
 from indico.core.config import Config
 from MaKaC.webinterface.common.person_titles import TitlesRegistry
@@ -58,10 +57,13 @@ import MaKaC.common.TemplateExec as templateEngine
 
 from indico.core import signals
 from indico.core.db import DBMgr
+from indico.modules.api import APIMode
+from indico.modules.api import settings as api_settings
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
 from indico.util.date_time import utc_timestamp, is_same_month
 from indico.util.signals import values_from_signal
 from indico.core.index import Catalog
+from indico.web.flask.templating import get_template_module
 from indico.web.menu import HeaderMenuEntry
 
 MIN_PRESENT_EVENTS = 6
@@ -270,17 +272,7 @@ class WHeader(WTemplated):
         return ["Public", _("Public")]
 
     def getVars( self ):
-        vars = WTemplated.getVars( self )
-        #urlHandlers.UHUserDetails.getURL(self._currentuser)
-        # TODO: Remove this after CRBS headers are fixed!
-        if self._currentuser:
-            vars["userInfo"] = """<font size="-1"><a class="topbar" href="%s" target="_blank">%s</a> - <a href="%s">logout</a></font>"""%(urlHandlers.UHUserDetails.getURL(self._currentuser), self._currentuser.getFullName(), vars["logoutURL"])
-            vars["userDetails"] = 'class="topbar" href="%s" target="_blank"'%urlHandlers.UHUserDetails.getURL(self._currentuser)
-
-        else:
-            vars["userInfo"] = """<a href="%s">login</a>"""%(vars["loginURL"])
-            vars["userDetails"] = ""
-        # *****************
+        vars = WTemplated.getVars(self)
 
         vars["currentUser"] = self._currentuser
 
@@ -319,11 +311,10 @@ class WHeader(WTemplated):
         vars['protectionDisclaimerProtected'] = minfo.getProtectionDisclaimerProtected()
         vars['protectionDisclaimerRestricted'] = minfo.getProtectionDisclaimerRestricted()
         #Build a list of items for the administration menu
-        adminList = AdminList.getInstance()
         adminItemList = []
-        if self._currentuser:
-            if self._currentuser.isAdmin() or not adminList.getList():
-                adminItemList.append({'id': 'serverAdmin', 'url': urlHandlers.UHAdminArea.getURL(), 'text': _("Server admin")})
+        if session.user and session.user.is_admin:
+            adminItemList.append({'id': 'serverAdmin', 'url': urlHandlers.UHAdminArea.getURL(),
+                                  'text': _("Server admin")})
 
         vars["adminItemList"] = adminItemList
         vars['extra_items'] = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))
@@ -375,7 +366,6 @@ class WConferenceHeader(WHeader):
         self._locTZ = tzUtil.getDisplayTZ()
 
     def getVars( self ):
-        from indico.web.http_api import API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED
         from indico.web.http_api.util import generate_public_auth_request
 
         vars = WHeader.getVars( self )
@@ -412,22 +402,18 @@ class WConferenceHeader(WHeader):
 
         # This is basically the same WICalExportBase, but we need some extra
         # logic in order to have the detailed URLs
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        apiMode = minfo.getAPIMode()
+        apiMode = api_settings.get('security_mode')
 
         vars["icsIconURL"] = str(Config.getInstance().getSystemIconURL("ical_grey"))
         vars["apiMode"] = apiMode
-        vars["signingEnabled"] = apiMode in (API_MODE_SIGNED, API_MODE_ONLYKEY_SIGNED, API_MODE_ALL_SIGNED)
-        vars["persistentAllowed"] = minfo.isAPIPersistentAllowed()
-        user  = self._aw.getUser()
-        apiKey = user.getAPIKey() if user else None
+        vars["signingEnabled"] = apiMode in {APIMode.SIGNED, APIMode.ONLYKEY_SIGNED, APIMode.ALL_SIGNED}
+        vars["persistentAllowed"] = api_settings.get('allow_persistent')
+        user = self._aw.getUser()
+        apiKey = user.api_key if user else None
 
-        topURLs = generate_public_auth_request(apiMode, apiKey, '/export/event/%s.ics' % \
-            self._conf.getId(), {}, minfo.isAPIPersistentAllowed() and \
-            (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
-        urls = generate_public_auth_request(apiMode, apiKey, '/export/event/%s.ics' % \
-            self._conf.getId(), {'detail': 'contributions'}, minfo.isAPIPersistentAllowed() and \
-            (apiKey.isPersistentAllowed() if apiKey else False), minfo.isAPIHTTPSRequired())
+        topURLs = generate_public_auth_request(apiKey, '/export/event/%s.ics' % self._conf.getId())
+        urls = generate_public_auth_request(apiKey, '/export/event/%s.ics' % self._conf.getId(),
+                                            {'detail': 'contributions'})
 
         vars["requestURLs"] = {
             'publicRequestURL': topURLs["publicRequestURL"],
@@ -436,11 +422,12 @@ class WConferenceHeader(WHeader):
             'authRequestDetailedURL':  urls["authRequestURL"]
         }
 
-        vars["persistentUserEnabled"] = apiKey.isPersistentAllowed() if apiKey else False
-        vars["apiActive"] = apiKey != None
-        vars["userLogged"] = user != None
-        vars['apiKeyUserAgreement'] = minfo.getAPIKeyUserAgreement()
-        vars['apiPersistentUserAgreement'] = minfo.getAPIPersistentUserAgreement()
+        vars["persistentUserEnabled"] = apiKey.is_persistent_allowed if apiKey else False
+        vars["apiActive"] = apiKey is not None
+        vars["userLogged"] = user is not None
+        tpl = get_template_module('api/_messages.html')
+        vars['apiKeyUserAgreement'] = tpl.get_ical_api_key_msg()
+        vars['apiPersistentUserAgreement'] = tpl.get_ical_persistent_msg()
 
         return vars
 

@@ -78,13 +78,15 @@ def init_links(avatar, client=None, assumeEvents=False):
 
     all_events = set()
     event_roles = defaultdict(set)
-    for key, roleDict in avatar.linkedTo.iteritems():
-        for role, items in roleDict.iteritems():
-            for item in items:
-                event = event_from_obj(item) if not assumeEvents else item
-                if event:
-                    all_events.add(event)
-                    event_roles[event].add(key + '_' + role)
+
+    for link in avatar.user.linked_objects.all():
+        obj = link.object
+        if obj is None:
+            continue
+        event = event_from_obj(obj) if not assumeEvents else obj
+        if event:
+            all_events.add(event)
+            event_roles[event].add('{}_{}'.format(link.type, link.role))
 
     # Add avatar to event avatar lists
     for event in all_events:

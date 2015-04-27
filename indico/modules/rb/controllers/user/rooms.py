@@ -57,7 +57,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
         self._room_id = request.args.get('roomID')
 
     def _process(self):
-        key = str(sorted(dict(request.args, lang=session.lang, user=session.user.getId()).items()))
+        key = str(sorted(dict(request.args, lang=session.lang, user=session.avatar.getId()).items()))
         html = self._cache.get(key)
         if not html:
             default_location = Location.default_location
@@ -86,7 +86,7 @@ class RHRoomBookingSearchRooms(RHRoomBookingBase):
     def _checkParams(self):
         defaults = FormDefaults(location=Location.default_location)
         self._form = SearchRoomsForm(self._get_form_data(), obj=defaults)
-        if (not session.user or not session.user.has_rooms) and not hasattr(self, 'search_criteria'):
+        if (not session.avatar or not session.avatar.has_rooms) and not hasattr(self, 'search_criteria'):
             # Remove the form element if the user has no rooms and we are not using a shortcut
             del self._form.is_only_my_rooms
 
@@ -96,7 +96,7 @@ class RHRoomBookingSearchRooms(RHRoomBookingBase):
     def _process(self):
         form = self._form
         if self._is_submitted() and form.validate():
-            rooms = Room.find_with_filters(form.data, session.user)
+            rooms = Room.find_with_filters(form.data, session.avatar)
             return WPRoomBookingSearchRoomsResults(self, self.menu_item, rooms=rooms).display()
         equipment_locations = {eq.id: eq.location_id for eq in EquipmentType.find()}
         return WPRoomBookingSearchRooms(self, form=form, errors=form.error_list, rooms=Room.find_all(),

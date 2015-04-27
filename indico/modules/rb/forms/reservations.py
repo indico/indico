@@ -78,7 +78,7 @@ class NewBookingFormBase(IndicoForm):
             raise ValidationError('Invalid repeat step')
 
     def validate_start_dt(self, field):
-        if field.data.date() < date.today() and not session.user.isAdmin():
+        if field.data.date() < date.today() and not session.user.is_admin:
             raise ValidationError(_(u'The start time cannot be in the past.'))
 
     def validate_end_dt(self, field):
@@ -151,5 +151,5 @@ class ModifyBookingForm(NewBookingSimpleForm):
         del self.submit_prebook
 
     def validate_start_dt(self, field):
-        if field.data.date() < self._old_start_date and not session.user.isAdmin():
+        if field.data.date() < self._old_start_date and not session.user.is_admin:
             raise ValidationError(_(u'The start time cannot be moved into the past.'))

@@ -19,24 +19,21 @@ Asynchronous request handlers for category-related services.
 
 from datetime import datetime
 from flask import session
-from indico.util.redis import suggestions
 from itertools import islice
 from MaKaC.services.implementation.base import ProtectedModificationService, ParameterManager
 from MaKaC.services.implementation.base import ProtectedDisplayService
 from MaKaC.services.implementation.base import TextModificationBase
 from MaKaC.services.implementation.base import ExportToICalBase
-from MaKaC.services.implementation.base import LoggedOnlyService
 
 import MaKaC.conference as conference
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError
+from MaKaC.services.interface.rpc.common import ServiceError
 import MaKaC.webinterface.locators as locators
 from MaKaC.webinterface.wcomponents import WConferenceListItem
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import PrincipalHolder, Avatar, Group, AvatarHolder
+from MaKaC.user import PrincipalHolder, Group
 from indico.core.index import Catalog
 from indico.web.http_api.util import generate_public_auth_request
-from indico.util.redis import write_client as redis_write_client
-import MaKaC.common.info as info
+from indico.modules.users.legacy import AvatarUserWrapper
 from MaKaC import domain
 from indico.core.config import Config
 from MaKaC.webinterface.mail import GenericMailer, GenericNotification
@@ -238,7 +235,7 @@ class CategoryProtectionRemoveUser(CategoryModifBase):
 
         if not userToRemove :
             raise ServiceError("ERR-U0","User does not exist!")
-        elif isinstance(userToRemove, Avatar) or isinstance(userToRemove, Group) :
+        elif isinstance(userToRemove, AvatarUserWrapper) or isinstance(userToRemove, Group):
             self._categ.revokeAccess(userToRemove)
 
 class CategoryContactInfoModification( CategoryTextModificationBase ):
@@ -280,7 +277,7 @@ class CategoryAddExistingControlUser(CategoryControlUserListBase):
         self._sendEmailManagers = pm.extract("sendEmailManagers", pType=bool, allowEmpty=True, defaultValue = True)
 
     def _sendMail(self, currentList, newManager):
-        if isinstance(newManager, Avatar):
+        if isinstance(newManager, AvatarUserWrapper):
             managerName = newManager.getStraightFullName()
         else:
             managerName = newManager.getName()
@@ -336,11 +333,9 @@ class CategoryExportURLs(CategoryDisplayBase, ExportToICalBase):
     def _getAnswer(self):
         result = {}
 
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-
-        urls = generate_public_auth_request(self._apiMode, self._apiKey, '/export/categ/%s.ics'%self._target.getId(), {}, minfo.isAPIPersistentAllowed() and self._apiKey.isPersistentAllowed(), minfo.isAPIHTTPSRequired())
+        urls = generate_public_auth_request(self._apiKey, '/export/categ/%s.ics' % self._target.getId())
         result["publicRequestURL"] = urls["publicRequestURL"]
-        result["authRequestURL"] =  urls["authRequestURL"]
+        result["authRequestURL"] = urls["authRequestURL"]
         return result
 
 class CategoryProtectionToggleDomains(CategoryModifBase):
@@ -361,75 +356,6 @@ class CategoryProtectionToggleDomains(CategoryModifBase):
             self._target.freeDomain(d)
 
 
-class CategoryBasketBase(LoggedOnlyService, CategoryDisplayBase):
-
-    def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
-        CategoryDisplayBase._checkParams(self)
-        userId = ParameterManager(self._params).extract('userId', pType=str, allowEmpty=True)
-        if userId is not None:
-            self._avatar = AvatarHolder().getById(userId)
-        else:
-            self._avatar = self._aw.getUser()
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        CategoryDisplayBase._checkProtection(self)
-        if not self._avatar.canUserModify(self._aw.getUser()):
-            raise ServiceAccessError('Access denied')
-
-
-class CategoryFavoriteAdd(CategoryBasketBase):
-
-    def _getAnswer(self):
-        if self._categ is conference.CategoryManager().getRoot():
-            raise ServiceError('ERR-U0', _('Cannot add root category as favorite'))
-        self._avatar.linkTo(self._categ, 'favorite')
-        if redis_write_client:
-            suggestions.unignore(self._avatar, 'category', self._categ.getId())
-            suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
-
-    def _checkParams(self):
-        CategoryDisplayBase._checkParams(self)
-        CategoryBasketBase._checkParams(self)
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        CategoryBasketBase._checkProtection(self)
-        CategoryDisplayBase._checkProtection(self)
-
-
-class CategoryFavoriteDel(CategoryBasketBase):
-
-    def _getAnswer(self):
-        self._avatar.unlinkTo(self._categ, 'favorite')
-        if redis_write_client:
-            suggestions.unsuggest(self._avatar, 'category', self._categ.getId())
-
-    def _checkParams(self):
-        CategoryDisplayBase._checkParams(self)
-        CategoryBasketBase._checkParams(self)
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        CategoryBasketBase._checkProtection(self)
-        CategoryDisplayBase._checkProtection(self)
-
-
-class CategorySuggestionDel(CategoryBasketBase):
-    def _getAnswer(self):
-        suggestions.unsuggest(self._avatar, 'category', self._categ.getId(), True)
-
-    def _checkParams(self):
-        CategoryDisplayBase._checkParams(self)
-        CategoryBasketBase._checkParams(self)
-
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        CategoryBasketBase._checkProtection(self)
-        CategoryDisplayBase._checkProtection(self)
-
-
 methodMap = {
     "getCategoryList": GetCategoryList,
     "getPastEventsList": GetPastEventsList,
@@ -444,7 +370,4 @@ methodMap = {
     "protection.removeConfCreator": CategoryRemoveControlUser,
     "protection.toggleDomains": CategoryProtectionToggleDomains,
     "api.getExportURLs": CategoryExportURLs,
-    "favorites.addCategory": CategoryFavoriteAdd,
-    "favorites.delCategory": CategoryFavoriteDel,
-    "suggestions.delSuggestion": CategorySuggestionDel
 }

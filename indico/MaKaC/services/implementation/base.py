@@ -169,7 +169,7 @@ class ServiceBase(RequestHandlerBase):
         # Fill in the aw instance with the current information
         self._aw = AccessWrapper()
         self._aw.setIP(request.remote_addr)
-        self._aw.setUser(session.user)
+        self._aw.setUser(session.avatar)
         self._target = None
         self._startTime = None
         self._tohttps = request.is_secure
@@ -340,18 +340,9 @@ class AdminService(LoggedOnlyService):
     """
     A AdminService can only be accessed by administrators
     """
-    def _checkProtection( self ):
-        """
-        Overloads ProtectedService._checkProtection
-        """
-
+    def _checkProtection(self):
         LoggedOnlyService._checkProtection(self)
-
-        # If there are no administrators, allow to add one
-        # Otherwise, forbid access to users that are not admin
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        adminList = minfo.getAdminList()
-        if not self._getUser().isAdmin() and len( adminList.getList() ) !=0 :
+        if not session.user.is_admin:
             raise ServiceAccessError(_("Only administrators can perform this operation"))
 
 class TextModificationBase:
@@ -481,14 +472,12 @@ class TwoListModificationBase:
 class ExportToICalBase(object):
 
     def _checkParams(self):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        self._apiMode = minfo.getAPIMode()
         user = self._getUser()
         if not user:
             raise ServiceAccessError("User is not logged in!")
-        apiKey = user.getAPIKey()
+        apiKey = user.api_key
         if not apiKey:
             raise ServiceAccessError("User has no API key!")
-        elif apiKey.isBlocked():
+        elif apiKey.is_blocked:
             raise ServiceAccessError("This API key is blocked!")
         self._apiKey = apiKey

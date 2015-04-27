@@ -1,0 +1,56 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+%label {
+    @include user-select(none);
+    @include border-radius();
+    @include border-all($gray);
+    @include box-sizing(border-box);
+    display: inline-block;
+    color: $light-black !important;
+    outline: none;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 1em;
+    padding: 4px 10px 4px;
+}
+
+.i-label {
+    @extend %label;
+    margin: 0 5px;
+
+    // same as in _buttons.scss
+    &.accept {
+        background: $green;
+        color: #FDFDFD !important;
+    }
+
+    &.danger {
+        background: $red;
+        color: #FDFDFD !important;
+    }
+
+    &.highlight {
+        background: $blue;
+        color: #FDFDFD !important;
+    }
+
+    &.warning {
+        color: #EFEFEF !important;
+        background: $yellow;
+    }
+}

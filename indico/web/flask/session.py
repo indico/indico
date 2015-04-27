@@ -16,19 +16,19 @@
 
 from __future__ import absolute_import
 
-import cPickle
 import uuid
 from datetime import datetime, timedelta
+
 from flask import request
-from flask.sessions import SessionInterface, SessionMixin
+from flask.sessions import SessionInterface, SessionMixin, session_json_serializer
 from werkzeug.datastructures import CallbackDict
 from werkzeug.utils import cached_property
 
 from indico.core.db import DBMgr
+from indico.modules.users import User
+from indico.util.decorators import cached_writable_property
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.user import AvatarHolder
-from indico.util.decorators import cached_writable_property
 
 
 class BaseSession(CallbackDict, SessionMixin):
@@ -54,26 +54,28 @@ class BaseSession(CallbackDict, SessionMixin):
 # - Always prefix the dict keys backing a property with an underscore (to prevent clashes with externally-set items)
 # - When you store something like the avatar that involves a DB lookup, use cached_writable_property
 class IndicoSession(BaseSession):
-    @cached_writable_property('_avatar')
+    @cached_writable_property('_user')
     def user(self):
-        avatarId = self.get('_avatarId')
-        if not avatarId:
-            return None
-        return AvatarHolder().getById(avatarId)
+        user_id = self.get('_user_id')
+        return User.get(user_id) if user_id is not None else None
 
     @user.setter
-    def user(self, avatar):
-        if avatar is None:
-            self.pop('_avatarId', None)
+    def user(self, user):
+        if user is None:
+            self.pop('_user_id', None)
         else:
-            self['_avatarId'] = avatar.getId()
+            self['_user_id'] = user.id
+
+    @property
+    def avatar(self):
+        return self.user.as_avatar if self.user else None
 
     @property
     def lang(self):
         if '_lang' in self:
             return self['_lang']
         elif self.user:
-            return self.user.getLang()
+            return self.user.settings.get('lang')
         else:
             return None
 
@@ -108,8 +110,8 @@ class IndicoSession(BaseSession):
 
 
 class IndicoSessionInterface(SessionInterface):
-    pickle_based = True
-    serializer = cPickle
+    pickle_based = False
+    serializer = session_json_serializer
     session_class = IndicoSession
     temporary_session_lifetime = timedelta(days=7)
 
@@ -146,7 +148,13 @@ class IndicoSessionInterface(SessionInterface):
             return self.session_class(sid=self.generate_sid(), new=True)
         data = self.storage.get(sid)
         if data is not None:
-            return self.session_class(self.serializer.loads(data), sid=sid)
+            try:
+                data = self.serializer.loads(data)
+            except ValueError:
+                # json loading failed, e.g. because of old pickled session data
+                pass
+            else:
+                return self.session_class(data, sid=sid)
         return self.session_class(sid=self.generate_sid(), new=True)
 
     def save_session(self, app, session, response):

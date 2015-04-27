@@ -90,7 +90,7 @@ class PaymentPluginMixin(object):
         # In the future it might be useful to expose a limited version of the main payment page to those users since
         # right now there is no good way to access both payment methods if there are two of this kind and you have
         # access to both.
-        if session.user and self.can_be_modified(session.user, event):
+        if session.avatar and self.can_be_modified(session.avatar, event):
             return url_for('payment.event_plugin_edit', event, method=re.sub(r'^payment_', '', self.name))
 
     def get_method_name(self, event):

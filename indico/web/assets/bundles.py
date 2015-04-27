@@ -183,6 +183,7 @@ indico_jquery = rjs_bundle(
                'defaults.js',
                'global.js',
                'errors.js',
+               'ajaxcheckbox.js',
                'ajaxdialog.js',
                'clearableinput.js',
                'actioninput.js',
@@ -255,7 +256,7 @@ jquery = rjs_bundle('jquery', *filter(None, [
               'jstorage.js',
               'jquery.placeholder.js')))
 
-utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'i18n.js'))
+utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'i18n.js', 'misc.js', 'forms.js'))
 calendar = rjs_bundle('calendar', *namespace('js/calendar', 'calendar.js', 'calendar-setup.js'))
 
 presentation = rjs_bundle(
@@ -387,6 +388,7 @@ event_display_sass = sass_module_bundle('event_display')
 overviews_sass = sass_module_bundle('overviews')
 vc_sass = sass_module_bundle('vc')
 news_sass = sass_module_bundle('news')
+users_sass = sass_module_bundle('users')
 
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),
@@ -461,6 +463,7 @@ def register_all_css(env, main_css_file):
     env.register('overviews_sass', overviews_sass)
     env.register('vc_sass', vc_sass)
     env.register('news_sass', news_sass)
+    env.register('users_sass', users_sass)
 
 
 core_env = IndicoEnvironment()

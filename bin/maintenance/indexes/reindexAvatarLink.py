@@ -15,8 +15,9 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.db import DBMgr
-from MaKaC.user import AvatarHolder, Avatar, GroupHolder
+from MaKaC.user import AvatarHolder, GroupHolder
 from MaKaC.conference import CategoryManager, ConferenceHolder
+from indico.modules.users.legacy import AvatarUserWrapper
 
 ch = ConferenceHolder()
 ah = AvatarHolder()
@@ -46,7 +47,7 @@ print "Indexing groups..."
 DBMgr.getInstance().startRequest()
 for group in gh.getValuesToList():
     for prin in group.getMemberList():
-        if isinstance(prin, Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(group, "member")
 DBMgr.getInstance().endRequest()
 
@@ -55,15 +56,15 @@ DBMgr.getInstance().endRequest()
 
 def indexCategory(cat):
     for prin in cat.getConferenceCreatorList():
-        if isinstance(prin, Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(cat, "creator")
 
     for prin in cat.getManagerList():
-        if isinstance(prin, Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(cat, "manager")
 
     for prin in cat.getAllowedToAccessList():
-        if isinstance(prin, Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(cat, "access")
 
     for c in cat.getSubCategoryList():
@@ -95,48 +96,48 @@ for confId in confids:
     conf.getCreator().linkTo(conf, "creator")
 
     for prin in conf.getChairList():
-        if isinstance(prin, Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(conf, "chair")
 
     for prin in conf.getManagerList():
-        if isinstance(prin, Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(conf, "manager")
 
     for prin in conf.getAllowedToAccessList():
-        if isinstance(prin, Avatar):
+        if isinstance(prin, AvatarUserWrapper):
             prin.linkTo(conf, "access")
 
     for av in conf.getAbstractMgr().getAuthorizedSubmitterList():
-        if isinstance(av, Avatar):
+        if isinstance(av, AvatarUserWrapper):
             av.linkTo(conf, "abstractSubmitter")
 
     for track in conf.getTrackList():
         for prin in track.getCoordinatorList():
-            if isinstance(prin, Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.linkTo(track, "coordinator")
 
     for al in conf.getAlarmList():
         for prin in al.getToUserList():
-            if isinstance(prin, Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.linkTo(al, "to")
 
     #sessions of the conference
     for ses in conf.getSessionList():
         for prin in ses.getManagerList():
-            if isinstance(prin, Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.linkTo(ses, "manager")
 
         for prin in ses.getAllowedToAccessList():
-            if isinstance(prin, Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.linkTo(ses, "access")
 
         for prin in ses.getCoordinatorList():
-            if isinstance(prin, Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.linkTo(ses, "coordinator")
 
         for mat in ses.getAllMaterialList():
             for prin in mat.getAllowedToAccessList():
-                if isinstance(prin, Avatar):
+                if isinstance(prin, AvatarUserWrapper):
                     prin.linkTo(mat, "access")
 
 
@@ -144,22 +145,22 @@ for confId in confids:
     for cont in conf.getContributionList():
 
         for prin in cont.getManagerList():
-            if isinstance(prin, Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.linkTo(cont, "manager")
 
         for prin in cont.getAllowedToAccessList():
-            if isinstance(prin, Avatar):
+            if isinstance(prin, AvatarUserWrapper):
                 prin.linkTo(cont, "access")
 
         for mat in cont.getAllMaterialList():
             for prin in mat.getAllowedToAccessList():
-                if isinstance(prin, Avatar):
+                if isinstance(prin, AvatarUserWrapper):
                     prin.linkTo(mat, "access")
 
     #abstracts
     for abs in conf.getAbstractMgr().getAbstractList():
 
-        if isinstance(abs.getSubmitter().getUser(), Avatar):
+        if isinstance(abs.getSubmitter().getUser(), AvatarUserWrapper):
             abs.getSubmitter().getUser().linkTo(abs, "submitter")
 
     DBMgr.getInstance().endRequest()

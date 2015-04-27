@@ -519,7 +519,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
             .form-label {
                 float: none;
                 text-align: left;
-                width: 100%;
             }
 
             .form-field {
@@ -570,9 +569,9 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     &.vertical {
         .form-label {
             float: none;
-            text-align: left;
-            width: 100%;
             height: 1em;
+            margin-bottom: -1em;
+            text-align: left;
         }
 
         .form-label-empty {
@@ -583,6 +582,10 @@ $dropdown-transition: $dropdown-transition-step ease-out;
         .form-field {
             width: 100%;
             margin-top: 0.4em;
+        }
+
+        .form-group-footer .form-label {
+            display: none;
         }
     }
 
@@ -623,6 +626,12 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
         & + .form-group-footer {
             margin-top: -1em;
+        }
+    }
+
+    &.no-block-padding {
+        .form-block {
+            padding-left: 0;
         }
     }
 }

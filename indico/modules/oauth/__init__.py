@@ -14,3 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
+from indico.core import signals
+from indico.util.i18n import _
+from indico.web.menu import MenuItem
+
+
+@signals.users.profile_sidemenu.connect
+def _extend_profile_menu(user, **kwargs):
+    return MenuItem(_('Authorized Apps'), 'oauth.user_profile')

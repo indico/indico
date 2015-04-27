@@ -22,8 +22,8 @@ from collections import defaultdict
 
 import pytz
 
-from MaKaC.user import Avatar
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.users.legacy import AvatarUserWrapper
 
 
 class Conversion(object):
@@ -227,7 +227,7 @@ class Conversion(object):
         allowed_emails = []
         allowed_groups = []
         for allowed in obj.getRecursiveAllowedToAccessList():
-            if isinstance(allowed, Avatar):
+            if isinstance(allowed, AvatarUserWrapper):
                 allowed_emails.extend(allowed.getEmails())
             else:
                 allowed_groups.append(allowed.getId())

@@ -119,7 +119,7 @@ def retrieve_associations(file, avatars):
             avatar_data['links']['{}.{}'.format(objtype, role)] = [accessor(link)
                                                                    for link in avatar.linkedTo[objtype][role]
                                                                    if condition is None or condition(link)]
-        if avatar.getAPIKey() is not None:
+        if avatar.api_key is not None:
             echo('Avatar {} has an API key; API key splitting is not implemented yet!'.format(avatar))
         # TODO: check room booking
         data.append(avatar_data)

@@ -295,29 +295,7 @@
                 });
             });
 
-            $('#toggle-manager-notifications').on('change', function() {
-                var $this = $(this);
-                var checked = this.checked;
-                $this.prop('disabled', true);
-                $.ajax({
-                    url: $(this).data('href'),
-                    type: 'POST',
-                    dataType: 'json',
-                    data: {
-                        enabled: checked ? '1' : '0'
-                    },
-                    complete: function() {
-                        $this.prop('disabled', false);
-                    },
-                    error: function(data) {
-                        handleAjaxError(data);
-                        $this.prop('checked', !checked);
-                    },
-                    success: function(data) {
-                        $this.prop('checked', data.enabled);
-                    }
-                });
-            });
+            $('#toggle-manager-notifications').ajaxCheckbox();
 
             function close(data) {
                 if (data) {

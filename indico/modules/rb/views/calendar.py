@@ -146,12 +146,12 @@ class RoomBookingCalendarWidget(object):
 
             if blocked_room:
                 blocking = blocked_room.blocking
-                if blocking.can_be_overridden(session.user, explicit_only=True):
+                if blocking.can_be_overridden(session.avatar, explicit_only=True):
                     attrs['className'] = 'blocked_permitted'
                     attrs['tooltip'] = _('Blocked by {0}:\n{1}\n\n<b>You are permitted to override the blocking.</b>') \
                         .format(blocking.created_by_user.getFullName(), blocking.reason)
                 elif blocked_room.state == BlockedRoom.State.accepted:
-                    if blocking.can_be_overridden(session.user, room=self.specific_room):
+                    if blocking.can_be_overridden(session.avatar, room=self.specific_room):
                         attrs['className'] = 'blocked_override'
                         attrs['tooltip'] = _(
                             'Blocked by {0}:\n{1}\n\n<b>You own this room or are an administrator '

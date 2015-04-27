@@ -31,9 +31,10 @@ from MaKaC.common.utils import isStringHTML
 from MaKaC.i18n import _
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.fossilize import fossilize
-from MaKaC.user import Avatar, AvatarHolder
+from MaKaC.user import AvatarHolder
 from MaKaC.fossils.conference import ILocalFileAbstractMaterialFossil
 
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date, format_datetime
 
@@ -630,7 +631,7 @@ class WContribModifAC(wcomponents.WTemplated):
         result = []
         for submitter in self._contrib.getSubmitterList():
             submitterFossil = fossilize(submitter)
-            if isinstance(submitter, Avatar):
+            if isinstance(submitter, AvatarUserWrapper):
                 isSpeaker = False
                 if self._contrib.getConference().getType() == "conference":
                     isPrAuthor = False

@@ -23,12 +23,14 @@ import sys
 import random
 import StringIO
 from datetime import datetime, timedelta
+from functools import wraps, partial
 from urlparse import urljoin
 from xml.sax.saxutils import escape
 
 import oauth2 as oauth
 import transaction
 from flask import request, session, g, current_app
+from itsdangerous import BadData
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound, Forbidden
 from werkzeug.wrappers import Response
@@ -50,7 +52,6 @@ from MaKaC.errors import (
     NotLoggedError,
     NotFoundError)
 from MaKaC.webinterface.mail import GenericMailer
-import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.errors as errors
 from MaKaC.webinterface.pages.error import WErrorWSGI
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
@@ -63,7 +64,7 @@ from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
 from indico.util.redis import RedisError
-from indico.web.flask.util import ResponseUtil
+from indico.web.flask.util import ResponseUtil, url_for
 
 
 class RequestHandlerBase():
@@ -128,7 +129,7 @@ class RequestHandlerBase():
         """Truncates params"""
         params = {}
         for key, value in self._reqParams.iteritems():
-            if key == 'password':
+            if key in {'password', 'confirm_password'}:
                 params[key] = '[password hidden, len=%d]' % len(value)
             elif isinstance(value, basestring):
                 params[key] = truncate(value, 1024)
@@ -200,7 +201,7 @@ class RH(RequestHandlerBase):
         return self._isMobile
 
     def _setSessionUser(self):
-        self._aw.setUser(session.user)
+        self._aw.setUser(session.avatar)
 
     @property
     def csrf_token(self):
@@ -328,6 +329,16 @@ class RH(RequestHandlerBase):
         else:
             explanation = e.description
         return WErrorWSGI((message, explanation)).getHTML()
+
+    @jsonify_error(status=400)
+    def _processBadRequest(self, e):
+        message = _("Bad Request")
+        return WErrorWSGI((message, e.description)).getHTML()
+
+    @jsonify_error(status=400)
+    def _processBadData(self, e):
+        message = _("Invalid or expired token")
+        return WErrorWSGI((message, e.message)).getHTML()
 
     @jsonify_error(status=403)
     def _processAccessError(self, e):
@@ -637,6 +648,8 @@ class RH(RequestHandlerBase):
             'Exception': 'UnexpectedError',
             'AccessControlError': 'AccessError'
         }.get(type(e).__name__, type(e).__name__)
+        if isinstance(e, BadData):  # we also want its subclasses
+            exception_name = 'BadData'
         return getattr(self, '_process{}'.format(exception_name), self._processUnexpectedError)
 
     def _deleteTempFiles(self):
@@ -648,10 +661,40 @@ class RH(RequestHandlerBase):
     relativeURL = None
 
 
+class RHSimple(RH):
+    """A simple RH that calls a function to build the response
+
+    The main purpose of this RH is to allow external library to
+    display something within the Indico layout (which requires a
+    RH / a ZODB connection in most cases).
+
+    The preferred way to use this class is by using the
+    `RHSimple.wrap_function` decorator.
+
+    :param func: A function returning HTML
+    """
+    def __init__(self, func):
+        RH.__init__(self)
+        self.func = func
+
+    def _process(self):
+        rv = self.func()
+        return rv
+
+    @classmethod
+    def wrap_function(cls, func):
+        """Decorates a function to run within the RH's framework"""
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return cls(partial(func, *args, **kwargs)).process({})
+
+        return wrapper
+
+
 class RHProtected(RH):
 
     def _getLoginURL(self):
-        return urlHandlers.UHSignIn.getURL(self.getRequestURL())
+        return url_for('auth.login', next=request.full_path.rstrip('?'), _external=True, _secure=True)
 
     def _checkSessionUser(self):
         if self._getUser() is None:

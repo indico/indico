@@ -14,24 +14,22 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime                       import datetime
 from flask import session
+
 from MaKaC.webinterface             import wcomponents,urlHandlers
 from MaKaC.webinterface.wcomponents import WUtils
 from MaKaC.webinterface.pages       import conferences
-from xml.sax.saxutils               import quoteattr
 from MaKaC.evaluation               import Evaluation,Question,Box,Choice,Textbox,Textarea,Password,Select,Radio,Checkbox,Submission
 from MaKaC.webinterface.navigation  import NEEvaluationMainInformation,NEEvaluationDisplay,NEEvaluationDisplayModif
 from MaKaC.errors                   import FormValuesError
 from MaKaC.common                   import utils
-from MaKaC.user                     import Avatar
 from MaKaC.i18n                     import _
 from indico.util.i18n import i18nformat
 from MaKaC.common.timezoneUtils import nowutc
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 
 from indico.core.config import Config
+from indico.modules.users.legacy import AvatarUserWrapper
 
 ##############
 #Display Area#
@@ -113,7 +111,8 @@ class WEvaluationDisplay(WConfDisplayBodyBase):
         wvars["body_title"] = self._getTitle()
         wvars["evaluation"] = self._conf.getEvaluation()
         user = wvars["user"]
-        wvars["hasSubmittedEvaluation"] = isinstance(user,Avatar) and user.hasSubmittedEvaluation(self._conf.getEvaluation())
+        wvars["hasSubmittedEvaluation"] = (isinstance(user, AvatarUserWrapper) and
+                                           user.hasSubmittedEvaluation(self._conf.getEvaluation()))
         wvars["actionUrl"] = urlHandlers.UHConfEvaluationSubmit.getURL(self._conf, mode=Evaluation._SUBMIT)
         return wvars
 

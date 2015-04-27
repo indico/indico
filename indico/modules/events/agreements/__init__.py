@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.events.agreements.base import AgreementPersonInfo, AgreementDefinitionBase, EmailPlaceholderBase
@@ -39,7 +41,7 @@ def _check_agreement_definitions(app, **kwargs):
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
     return 'agreements', SideMenuItem('Agreements', url_for('agreements.event_agreements', event),
-                                      visible=bool(get_agreement_definitions()))
+                                      visible=bool(get_agreement_definitions()) and event.canModify(session.avatar))
 
 
 @signals.merge_users.connect

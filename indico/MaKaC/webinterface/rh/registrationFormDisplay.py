@@ -92,9 +92,9 @@ class RHRegistrationFormDisplay(RHRegistrationFormDisplayBaseCheckProtection):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
 
     def _processIfActive(self):
-        if (self._conf.getRegistrationForm().isFull()
-            or not self._conf.getRegistrationForm().inRegistrationPeriod()
-            or (session.user and session.user.isRegisteredInConf(self._conf))):
+        if (self._conf.getRegistrationForm().isFull() or
+                not self._conf.getRegistrationForm().inRegistrationPeriod() or
+                (session.avatar and session.avatar.isRegisteredInConf(self._conf))):
             return redirect(url_for('event.confRegistrationFormDisplay', self._conf))
         return registrationForm.WPRegistrationFormDisplay(self, self._conf).display()
 
@@ -168,7 +168,7 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
             params = {}
             if not rp.doPay() or not payment_event_settings.get(self._conf, 'enabled'):
                 flash(_(u"Your registration has been recorded successfully."), 'success')
-            if not session.user:
+            if not session.avatar:
                 params.update(rp.getLocator(), **{'authkey': rp.getRandomId()})
             else:
                 params.update(self._conf.getLocator())
@@ -191,8 +191,8 @@ class RHRegistrationForm(RHRegistrationFormDisplayBase):
             self._authkey = params.get('authkey', '')
             if self._registrant.getRandomId() != self._authkey or self._authkey == '':
                 raise AccessError()
-        elif session.user:
-            self._registrant = session.user.getRegistrantById(self._conf.getId())
+        elif session.avatar:
+            self._registrant = session.avatar.getRegistrantById(self._conf.getId())
 
     def _processIfActive(self):
         p = registrationForm.WPRegistrationForm(self, self._conf)
@@ -203,7 +203,7 @@ class RHRegistrationFormRegistrantBase(RHRegistrationForm):
     def _checkParams(self, params):
         RHRegistrationForm._checkParams(self, params)
         if self._registrant is None:
-            if not session.user and not params.get('registrantId', None):
+            if not session.avatar and not params.get('registrantId', None):
                 raise MaKaCError(_("registrant id not set"))
             raise NotFoundError(_("You are not registered or your registration has been deleted"))
 
@@ -227,7 +227,7 @@ class RHRegistrationFormModify(RHRegistrationFormDisplayBaseCheckProtection):
 
     def _checkParams(self, params):
         RHRegistrationFormDisplayBase._checkParams(self, params)
-        self._registrant = session.user.getRegistrantById(self._conf.getId()) if session.user else None
+        self._registrant = session.avatar.getRegistrantById(self._conf.getId()) if session.avatar else None
 
     def _processIfActive(self):
         if not self._registrant:

@@ -17,7 +17,6 @@
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
 import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC.webinterface.rh.admins import RCAdmin
 from MaKaC.i18n import _
 
 
@@ -26,16 +25,5 @@ class WPHelp(WPMainBase):
         return wcomponents.WSimpleNavigationDrawer(_("Help"), urlHandlers.UHConferenceHelp.getURL)
 
     def _getBody(self, params):
-        wc = WHelp(self._rh)
+        wc = wcomponents.WTemplated('Help')
         return wc.getHTML(params)
-
-
-class WHelp(wcomponents.WTemplated):
-
-    def __init__(self, rh):
-        self._rh = rh
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["IsAdmin"] = RCAdmin.hasRights(self._rh)
-        return vars

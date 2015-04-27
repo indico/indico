@@ -49,14 +49,53 @@ function userSort(user1, user2) {
     }
 }
 
-function updateFavList(favouriteList) {
-    IndicoGlobalVars['favorite-user-ids'] = {};
-    IndicoGlobalVars['favorite-user-list'] = [];
-    each(favouriteList, function(user) {
-        IndicoGlobalVars['favorite-user-ids'][user.id] = true;
-        IndicoGlobalVars['favorite-user-list'].push(user);
-    });
+function create_favorite_button(user_id) {
+    var active = !!Indico.User.favorite_users[user_id],
+        span = $('<span class="favorite-user icon-star">')
+            .attr({
+                title: active ? $T('Remove from your list of favorite users') : $T('Add to your list of favorite users'),
+                'data-id': user_id
+            })
+            .on('click', function(e) {
+                e.stopPropagation();
+                $(document).trigger('favorites.' + ($(this).hasClass('active') ? 'remove-user' : 'add-user'), user_id);
+            });
+
+    if (active) {
+        span.addClass('active');
+    }
+
+    return span;
 }
+
+$(function() {
+    $(document).on('favorites.remove-user', function(e, user_id) {
+        var $target = $(e.target);
+
+        $.ajax({
+            url: build_url(Indico.Urls.FavoriteUserRemove, {fav_user_id: user_id}),
+            method: 'DELETE',
+            error: handleAjaxError
+        }).done(function() {
+            $('.favorite-user[data-id=' + user_id + ']').removeClass('active');
+            delete Indico.User.favorite_users[user_id];
+        });
+    }).on('favorites.add-user', function(e, user_id) {
+        var $target = $(e.target);
+
+        $.ajax({
+            url: Indico.Urls.FavoriteUserAdd,
+            method: 'POST',
+            dataType: 'json',
+            data: {user_id: [user_id]},
+            error: handleAjaxError,
+            traditional: true
+        }).done(function(result) {
+            $('.favorite-user[data-id=' + user_id + ']').addClass('active');
+            Indico.User.favorite_users[user_id] = result.users[0];
+        });
+    });
+});
 
 /**
  * @param {String} style The class name of the <ul> element inside this FoundPeopleList
@@ -76,18 +115,15 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
         if (peopleData.get('isGroup') || peopleData.get('_type') === 'group') {
             return Html.span({}, peopleData.get("name"));
         } else {
-
-            var userName = Html.span({}, peopleData.get("familyName").toUpperCase(), ', ', peopleData.get("firstName"));
+            var userName = Html.span({}, peopleData.get("firstName"), ' ', peopleData.get("familyName"));
             var userEmail = Html.span({id: self.id + "_" + pair.key + "_email", className: "foundUserEmail"}, Html.br(), Util.truncate(peopleData.get("email"), 40));
 
-            if (this.showToggleFavouriteButtons && IndicoGlobalVars.isUserAuthenticated && peopleData.get('_type') == "Avatar") {
-                var favouritizeButton = new ToggleFavouriteButton(peopleData.getAll(), null, null, this.favouriteButtonObserver).draw();
-                var favouritizeButtonDiv = Html.div({style: {cssFloat: "right"}}, favouritizeButton);
+            if (this.showToggleFavouriteButtons && IndicoGlobalVars.isUserAuthenticated && peopleData.get('_type') == "AvatarUserWrapper") {
+                var favouritizeButtonDiv = Html.div({style: {cssFloat: "right"}}, new Html(create_favorite_button(peopleData.get('id')).get(0)));
                 return [favouritizeButtonDiv, userName, userEmail];
             } else {
                 return [userName, userEmail];
             }
-
         }
     }
 },
@@ -96,7 +132,6 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
      * Constructor for FoundPeopleList
      */
     function(style, onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver) {
-
         if (!exists(style)) {
             style = "UIPeopleList";
         }
@@ -215,7 +250,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
         this.criteria = new WatchObject();
 
         this.foundPeopleList = new FoundPeopleList(null, this.onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver);
-        this.foundPeopleList.setMessage("Fill any of the upper fields and click search...");
+        this.foundPeopleList.setMessage($T("You can use the form above to search for users..."));
         this.extraDiv = any(extraDiv, Html.div({}));
 
         this.searchForm = null;
@@ -305,7 +340,7 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
                         self.foundPeopleList.setMessage($T("No results for this search..."));
                     } else {
                         each(result, function(user){
-                            if (user._type === "Avatar") {
+                            if (user._type === "AvatarUserWrapper") {
                                 self.foundPeopleList.set('existingAv' + user.id, $O(user));
                             } else if (user._type === "ContributionParticipation") {
                                 self.foundPeopleList.set('existingAuthor' + user.id, $O(user));
@@ -532,7 +567,7 @@ type ("SuggestedUsersPanel", ["IWidget"], {
 
         if (this.suggestedUserList.isEmpty()) {
             var message = Html.span({}, $T("There are no suggested users for you at the moment. Why not add some "),
-                                        Html.a({href: build_url(Indico.Urls.Favourites)}, $T("favourites")),
+                                        Html.a({href: Indico.Urls.Favorites}, $T("favourites")),
                                         "?");
             this.suggestedUserList.setMessage(message);
         }
@@ -559,7 +594,7 @@ type ("SuggestedUsersPanel", ["IWidget"], {
 
         if (exists(suggestedUsers)) {
             each(suggestedUsers, function(user){
-                if (any(user._type, null) === "Avatar") {
+                if (any(user._type, null) === "AvatarUserWrapper") {
                     self.suggestedUserList.set('existingAv' + user.id, $O(user));
                 } else {
                     self.suggestedUserList.set(user.id, $O(user));
@@ -568,9 +603,8 @@ type ("SuggestedUsersPanel", ["IWidget"], {
         }
 
         if (includeFavourites) {
-            each(IndicoGlobalVars['favorite-user-list'], function(user){
-                var id = user.id;
-                if (exists(IndicoGlobalVars['favorite-user-ids'][id]) && IndicoGlobalVars['favorite-user-ids'][id] && !self.suggestedUserList.get('existingAv' + id)) {
+            each(Indico.User.favorite_users, function(user, id){
+                if (!self.suggestedUserList.get('existingAv' + id)) {
                     self.suggestedUserList.set('existingAv' + id, $O(user));
                 }
             });
@@ -605,27 +639,6 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
 
     _preload: [
 
-        function(hook) {
-            var self = this;
-
-            if (exists(IndicoGlobalVars['favorite-user-list'])) {
-                hook.set(true);
-            } else {
-                var killProgress = IndicoUI.Dialogs.Util.progress($T("Loading dialog..."));
-                indicoRequest('user.favorites.listUsers', {},
-                    function(result, error) {
-                        if (!error) {
-                            updateFavList(result);
-                            killProgress();
-                            hook.set(true);
-                        } else {
-                            killProgress();
-                            IndicoUI.Dialogs.Util.error(error);
-                        }
-                    }
-                );
-            }
-        }
     ],
 
     __buildSearchPanel: function(container) {
@@ -895,8 +908,8 @@ type("SingleUserField", ["IWidget"], {
         var user = this.user.getAll();
 
         this.variableButtonsDiv.clear();
-        if (IndicoGlobalVars.isUserAuthenticated && this.userChosen && user._type === "Avatar") {
-            var favButtonDiv = Html.div({style:{display:"inline", paddingLeft:pixels(5)}}, new ToggleFavouriteButton(user).draw());
+        if (IndicoGlobalVars.isUserAuthenticated && this.userChosen && user._type === "AvatarUserWrapper") {
+            var favButtonDiv = Html.div({style:{display:"inline", paddingLeft:pixels(5)}}, new Html(create_favorite_button(this.user.get('id')).get(0)));
             this.variableButtonsDiv.append(favButtonDiv);
         }
 
@@ -1324,9 +1337,8 @@ type("UserListWidget", ["ListWidget"],
                 return Html.span({}, removeButtonDiv, Html.span({style:{fontWeight:'bold'}}, 'Group: '), groupName);
             } else {
                 var buttonDiv = Html.div({style: {cssFloat: "right", clear: "both", paddingRight: pixels(10)}});
-                if (IndicoGlobalVars.isUserAuthenticated && exists(IndicoGlobalVars['userData']['favorite-user-ids']) && this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
-                    var favouritizeButton = new ToggleFavouriteButton(userData.getAll(), {}, IndicoGlobalVars['userData']['favorite-user-ids'][userData.get('id')]).draw();
-                    buttonDiv.append(favouritizeButton);
+                if (IndicoGlobalVars.isUserAuthenticated & this.showToggleFavouriteButtons && userData.get('_type') === "AvatarUserWrapper") {
+                    buttonDiv.append(new Html(create_favorite_button(userData.get('id')).get(0)));
                 }
                 if (this.allowSetRights) {
                     buttonDiv.append($("<span></span>").shield({userData: userData}).get(0));
@@ -1497,9 +1509,9 @@ type("UserListField", ["IWidget"], {
                             if (person.isGroup || person._fossil === 'group') {
                                 key = person.id;
                             } else {
-                                key = (person._type === "Avatar") ? "existingAv" + person.id : person.id;
+                                key = (person._type === "AvatarUserWrapper") ? "existingAv" + person.id : person.id;
                             }
-                            if (person._type === "Avatar" && self.userList.get(key)) {
+                            if (person._type === "AvatarUserWrapper" && self.userList.get(key)) {
                                 // it is an existing avatar, unchanged, and already exists: we do nothing
                             } else {
                                 if (self.userList.get(key)) {
@@ -1620,7 +1632,7 @@ type("UserListField", ["IWidget"], {
 
         if (exists(initialUsers)) {
             each(initialUsers, function(user){
-                if (any(user._type, null) === 'Avatar') {
+                if (any(user._type, null) === 'AvatarUserWrapper') {
                     self.userList.set('existingAv' + user.id, $O(user));
                 } else {
                     self.userList.set(user.id, $O(user));
@@ -1655,131 +1667,3 @@ type("UserListField", ["IWidget"], {
      }
 );
 
-
-/**
- * Buttons to add or remove a user to the list of the currently
- * logged in user's favourites.
- */
-type("ToggleFavouriteButton", ["InlineWidget"], {
-    draw: function() {
-        var self = this;
-
-        var imageRemove = Html.img({
-            src: imageSrc("star"),
-            alt: 'Remove from Favorites',
-            title: $T('Remove from your list of favorite users'),
-            style: this.imageStyle
-            });
-
-        var imageAdd = Html.img({
-            src: imageSrc("starGrey"),
-            alt: 'Add to Favorites',
-            title: $T('Add to your list of favorite users'),
-            style: this.imageStyle
-        });
-
-        var imageLoading = Html.img({
-            src: imageSrc("loading", 'gif'),
-            alt: 'Loading',
-            title: $T('Communicating with server'),
-            style: this.imageStyle
-        });
-
-        var starIcon = $B(Html.span(), this.stateWatchValue, function(state){
-            if (state) { // user is favourite
-                return imageRemove;
-            } else { // user is not favourite
-                return imageAdd;
-            }
-        });
-
-        var content = Html.span({}, starIcon);
-
-        imageRemove.observeClick(function(event){
-            content.set(imageLoading);
-            indicoRequest('user.favorites.removeUser',
-                {
-                    value: [{id:self.avatar.id}]
-                },
-                function(result,error){
-                    content.set(starIcon);
-                    if(!error) {
-                        IndicoGlobalVars['favorite-user-ids'][self.avatar.id] = false;
-                        self.stateWatchValue.set(false);
-                        if (exists(self.observer)) {
-                            self.observer(self.avatar, false);
-                        }
-                    } else {
-                        self._error(error); //Implemented in InlineWidget
-                    }
-                });
-            stopPropagation(event);
-        });
-
-        imageAdd.observeClick(function(event){
-            content.set(imageLoading);
-            indicoRequest('user.favorites.addUsers',
-                    {
-                        value: [{id:self.avatar.id}]
-                    },
-                    function(result,error){
-                        content.set(starIcon);
-                        if(!error) {
-                            IndicoGlobalVars['favorite-user-ids'][self.avatar.id] = true;
-                            if (exists(IndicoGlobalVars['favorite-user-list'])) {
-                                IndicoGlobalVars['favorite-user-list'].push(self.avatar);
-                                IndicoGlobalVars['favorite-user-list'].sort(userSort);
-                            }
-                            self.stateWatchValue.set(true);
-                            if (exists(self.observer)) {
-                                self.observer(self.avatar, true);
-                            }
-                        } else {
-                            self._error(error);  //Implemented in InlineWidget
-                        }
-                    });
-
-            stopPropagation(event);
-        });
-
-        return this.IWidget.prototype.draw.call(this, content);
-    }
-},
-    /**
-     * Constructor
-     */
-    function(avatar, customImgStyle, initialState, observer){
-        this.IWidget();
-
-        this.avatar = avatar;
-
-        customImgStyle = any(customImgStyle, {});
-        this.imageStyle = merge({verticalAlign:'middle', cursor:'pointer'});
-
-        this.observer = any(observer, null);
-
-        this.stateWatchValue = null;
-
-        if (!exists(IndicoGlobalVars['favorite-user-ids'])) {
-            IndicoGlobalVars['favorite-user-ids'] = {};
-            /*IndicoGlobalVars['favorite-user-list'] = [];*/
-        }
-        if (!exists(IndicoGlobalVars.userFavouritesWatchValues)) {
-            IndicoGlobalVars.userFavouritesWatchValues = {};
-        }
-
-        if(!exists(IndicoGlobalVars.userFavouritesWatchValues[avatar.id])) {
-            if(exists(IndicoGlobalVars['favorite-user-ids'][avatar.id])) {
-                IndicoGlobalVars.userFavouritesWatchValues[avatar.id] = $V(IndicoGlobalVars['favorite-user-ids'][avatar.id] === true);
-            } else {
-                if (!exists(IndicoGlobalVars['favorite-user-ids']) && !exists(initialState)) {
-                    new AlertPopup($T("Warning"), $T("ToggleFavouriteButton used without IndicoGlobalVars['favorite-user-ids'] variable and without initialState")).open();
-                }
-                initialState = any(initialState, false);
-                IndicoGlobalVars.userFavouritesWatchValues[avatar.id] = $V(initialState);
-            }
-        }
-
-        this.stateWatchValue = IndicoGlobalVars.userFavouritesWatchValues[avatar.id];
-    }
-);

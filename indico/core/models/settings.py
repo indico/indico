@@ -16,8 +16,9 @@
 
 from __future__ import unicode_literals
 
-from functools import wraps
+from functools import wraps, partial, update_wrapper
 
+from enum import Enum
 from flask import g, has_request_context
 from sqlalchemy.dialects.postgresql import JSON
 
@@ -27,6 +28,12 @@ from indico.util.string import return_ascii
 
 _default = object()
 _not_in_db = object()
+
+
+def _coerce_value(value):
+    if isinstance(value, Enum):
+        return value.value
+    return value
 
 
 class SettingsBase(object):
@@ -76,17 +83,17 @@ class SettingsBase(object):
         if setting is None:
             setting = cls(module=module, name=name, **kwargs)
             db.session.add(setting)
-        setting.value = value
+        setting.value = _coerce_value(value)
         db.session.flush()
 
     @classmethod
     def set_multi(cls, module, items, **kwargs):
         existing = cls.get_all_settings(module, **kwargs)
         for name in items.viewkeys() - existing.viewkeys():
-            setting = cls(module=module, name=name, value=items[name], **kwargs)
+            setting = cls(module=module, name=name, value=_coerce_value(items[name]), **kwargs)
             db.session.add(setting)
         for name in items.viewkeys() & existing.viewkeys():
-            existing[name].value = items[name]
+            existing[name].value = _coerce_value(items[name])
         db.session.flush()
 
     @classmethod
@@ -177,8 +184,40 @@ class SettingsProxyBase(object):
         self.module = module
         self.defaults = defaults or {}
         self.strict = strict
+        self._bound_args = None
         if strict and not defaults:
             raise ValueError('cannot use strict mode with no defaults')
+
+    @return_ascii
+    def __repr__(self):
+        if self._bound_args:
+            return '<{}({}, {})>'.format(type(self).__name__, self.module, self._bound_args)
+        else:
+            return '<{}({})>'.format(type(self).__name__, self.module)
+
+    def bind(self, *args):
+        """Returns a version of this proxy that is bound to some arguments.
+
+        This is useful for specialized versions of the proxy such as
+        EventSettingsProxy where one might want to provide an easy-to-use
+        version that does not require the event to be specified in each
+        method.
+
+        :param args: The positional argument that are prepended to each
+                     function call.
+        """
+
+        self_type = type(self)
+        bound = self_type(self.module, self.defaults, self.strict)
+        bound._bound_args = args
+
+        for name in dir(self_type):
+            if name[0] == '_' or name == 'bind':
+                continue
+            func = getattr(bound, name)
+            func = update_wrapper(partial(func, *args), func)
+            setattr(bound, name, func)
+        return bound
 
     def _check_strict(self, name):
         if self.strict and name not in self.defaults:
@@ -254,10 +293,6 @@ class SettingsProxy(SettingsProxyBase):
         """Deletes all settings."""
         Setting.delete_all(self.module)
         self._flush_cache()
-
-    @return_ascii
-    def __repr__(self):
-        return u'<SettingsProxy({})>'.format(self.module)
 
 
 def event_or_id(f):
@@ -340,7 +375,3 @@ class EventSettingsProxy(SettingsProxyBase):
         """
         EventSetting.delete_all(self.module, event_id=event)
         self._flush_cache()
-
-    @return_ascii
-    def __repr__(self):
-        return '<EventSettingsProxy({})>'.format(self.module)

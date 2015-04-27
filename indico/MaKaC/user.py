@@ -19,7 +19,7 @@ import operator
 from BTrees.OOBTree import OOTreeSet, union
 
 from persistent import Persistent
-from accessControl import AdminList, AccessWrapper
+from accessControl import AccessWrapper
 import MaKaC
 from MaKaC.common import filters, indexes
 from MaKaC.common.cache import GenericCache
@@ -39,6 +39,8 @@ from MaKaC.common.fossilize import Fossilizable, fossilizes
 
 from pytz import all_timezones
 
+from indico.modules.users import User
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.caching import memoize_request
 from indico.util.decorators import cached_classproperty
 from indico.util.event import truncate_path
@@ -124,7 +126,7 @@ class Group(Persistent, Fossilizable):
         if self.containsMember(newMember) or newMember.containsMember(self):
             return
         self.members.append(newMember)
-        if isinstance(newMember, Avatar):
+        if isinstance(newMember, AvatarUserWrapper):
             newMember.linkTo(self, "member")
         self._p_changed = 1
 
@@ -135,7 +137,7 @@ class Group(Persistent, Fossilizable):
         if member is None or member not in self.members:
             return
         self.members.remove(member)
-        if isinstance(member, Avatar):
+        if isinstance(member, AvatarUserWrapper):
             member.unlinkTo(self, "member")
         self._p_changed = 1
 
@@ -183,8 +185,7 @@ class Group(Persistent, Fossilizable):
         return self.canUserModify(aw_or_user)
 
     def canUserModify(self, user):
-        return self.containsMember(user) or \
-                                (user in AdminList.getInstance().getList())
+        return self.containsMember(user) or user.user.is_admin
 
     def getLocator(self):
         d = Locator()
@@ -369,7 +370,6 @@ class Avatar(Persistent, Fossilizable):
         from MaKaC.common import utils
         self.key = utils.newKey() #key to activate the account
         self.registrants = {}
-        self.apiKey = None
 
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         self._lang = minfo.getLang()
@@ -470,56 +470,11 @@ class Avatar(Persistent, Fossilizable):
     def getKey(self):
         return self.key
 
-    def getAPIKey(self):
-        try:
-            return self.apiKey
-        except:
-            self.apiKey = None
-            return self.apiKey
-
-    def setAPIKey(self, apiKey):
-        self.apiKey = apiKey
-
-    def getRelatedCategories(self):
-        favorites = self.getLinkTo('category', 'favorite')
-        managed = self.getLinkTo('category', 'manager')
-        res = {}
-        for categ in union(favorites, managed):
-            res[(categ.getTitle(), categ.getId())] = {
-                'categ': categ,
-                'favorite': categ in favorites,
-                'managed': categ in managed,
-                'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
-            }
-        return OrderedDict(sorted(res.items(), key=operator.itemgetter(0)))
-
-    def getSuggestedCategories(self):
-        if not redis_write_client:
-            return []
-        related = union(self.getLinkTo('category', 'favorite'), self.getLinkTo('category', 'manager'))
-        res = []
-        for id, score in suggestions.get_suggestions(self, 'category').iteritems():
-            try:
-                categ = MaKaC.conference.CategoryManager().getById(id)
-            except KeyError:
-                suggestions.unsuggest(self, 'category', id)
-                continue
-            if not categ or categ.isSuggestionsDisabled() or categ in related:
-                continue
-            if any(p.isSuggestionsDisabled() for p in categ.iterParents()):
-                continue
-            aw = AccessWrapper()
-            aw.setUser(self)
-            if request:
-                aw.setIP(request.remote_addr)
-            if not categ.canAccess(aw):
-                continue
-            res.append({
-                'score': score,
-                'categ': categ,
-                'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
-            })
-        return res
+    @property
+    @memoize_request
+    def api_key(self):
+        from indico.modules.api.models.keys import APIKey
+        return APIKey.find_first(user_id=int(self.id), is_active=True)
 
     def resetLinkedTo(self):
         self.linkedTo = {}
@@ -1248,9 +1203,11 @@ class AvatarHolder(ObjectHolder):
         return True
 
 
-
-
     def getById(self, id):
+        if isinstance(id, int) or id.isdigit():
+            user = User.get(int(id))
+            if user:
+                return user.as_avatar
         try:
             return ObjectHolder.getById(self, id)
         except:
@@ -1437,28 +1394,6 @@ class AvatarHolder(ObjectHolder):
 
         # Notify signal listeners about the merge
         signals.merge_users.send(prin, merged=merged)
-
-        # Merge API keys
-        ak_prin = prin.getAPIKey()
-        ak_merged = merged.getAPIKey()
-        if ak_prin and ak_merged:
-            # Keep the more recent API key
-            if not ak_prin.getLastUsedDT() or (ak_merged.getLastUsedDT() and
-                                               ak_merged.getLastUsedDT() > ak_prin.getLastUsedDT()):
-                # Move the merged user's key to the principal
-                ak_prin.remove()
-                ak_merged.setUser(prin)
-                prin.setAPIKey(ak_merged)
-                merged.setAPIKey(None)
-            else:
-                # Just delete the merged user's key. This removes it from the Avatar, too!
-                ak_merged.remove()
-        elif ak_merged:
-            # Only the merged user has an API key => move it to the principal
-            ak_merged.setUser(prin)
-            prin.setAPIKey(ak_merged)
-            merged.setAPIKey(None)
-
 
         # remove merged from holder
         self.remove(merged)

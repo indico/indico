@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from wtforms.validators import StopValidation, ValidationError
+from wtforms.validators import StopValidation, ValidationError, EqualTo
 
 from indico.util.i18n import _, ngettext
 from indico.util.string import is_valid_mail
@@ -57,6 +57,11 @@ class Exclusive(object):
                            u'This field is mutually exclusive with other fields: {}',
                            len(field_names))
             raise ValidationError(msg.format(u', '.join(field_names)))
+
+
+class ConfirmPassword(EqualTo):
+    def __init__(self, fieldname):
+        super(ConfirmPassword, self).__init__(fieldname, message=_('The passwords do not match.'))
 
 
 class IndicoEmail(object):

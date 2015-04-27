@@ -129,8 +129,9 @@ class WPBase():
         self._title = newTitle.strip()
 
     def getCSSFiles(self):
-        return self._asset_env['base_css'].urls() + \
-            self._asset_env['screen_sass'].urls()
+        return (self._asset_env['base_css'].urls() +
+                self._asset_env['screen_sass'].urls() +
+                self._asset_env['users_sass'].urls())
 
     def getJSFiles(self):
         return self._asset_env['base_js'].urls()
@@ -142,22 +143,6 @@ class WPBase():
         return [url
                 for pkg_name in pkg_names
                 for url in self._asset_env[prefix + pkg_name.lower()].urls()]
-
-    def _getJavaScriptUserData(self):
-        """
-        Returns structured data that should be passed on to the client side
-        but depends on user data (can't be in vars.js.tpl)
-        """
-
-        user = self._getAW().getUser()
-
-        from MaKaC.webinterface.asyndico import UserDataFactory
-
-        userData = dict((packageName,
-                         UserDataFactory(user).build(packageName))
-                        for packageName in self._userData)
-
-        return userData
 
     def _getHeadContent( self ):
         """
