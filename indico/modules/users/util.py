@@ -95,7 +95,7 @@ def _build_match(column, value, exact):
 
 def search_users(exact=False, include_deleted=False, include_pending=False, external=False, **criteria):
     unspecified = object()
-    query = db.session.query(User)
+    query = User.query.options(db.joinedload(User.identities), db.joinedload(User._all_emails))
     original_criteria = dict(criteria)
 
     if not criteria:
