@@ -247,7 +247,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return False
 
     def containsUser(self, avatar):
-        return avatar.id == self.id
+        return avatar.id == self.id if avatar else False
 
     containsMember = containsUser
 
