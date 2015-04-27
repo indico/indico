@@ -88,7 +88,7 @@ def serialize_user(user):
 def _build_match(column, value, exact):
     value = value.replace('%', '')
     if exact:
-        return column.ilike(value)
+        return db.func.lower(column) == value.lower()
     else:
         return column.ilike("%{}%".format(value))
 
