@@ -19,13 +19,13 @@
                         Your <strong>primary email</strong> will be used for account-related notifications (e.g. registration emails and billing information).
                     {%- endtrans -%}
                 </p>
-                <ul class="group-list with-buttons">
+                <ul class="group-list with-buttons content-after">
                     <li>
                         <span><strong>{{ user.email }}</strong></span>
                         <span class="i-label">{% trans %}Primary{% endtrans %}</span>
                     </li>
                     {% for email in user.secondary_emails %}
-                        <li class="js-email-row keep-last-border">
+                        <li class="js-email-row">
                             <span>{{ email }}</span>
                             <a class="toggle icon-remove right js-delete-email" href="#" data-href="{{ url_for('.user_emails_delete', email=email) }}" style="margin-left: 10px;"></a>
                             <button type="button" class="i-button right" data-href="{{ url_for('.users_emails_set_primary') }}" data-method='POST' data-params="{{ {'email': email} | tojson | forceescape }}">
