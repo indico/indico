@@ -320,9 +320,9 @@ class AvatarProvisionalWrapper(Fossilizable):
 
     fossilizes(IAvatarFossil, IAvatarMinimalFossil)
 
-    def __init__(self, iinfo):
-        self.identity_info = iinfo
-        self.data = iinfo.data
+    def __init__(self, identity_info):
+        self.identity_info = identity_info
+        self.data = identity_info.data
 
     def getId(self):
         return u"{}:{}".format(self.identity_info.provider.name, self.identity_info.identifier)

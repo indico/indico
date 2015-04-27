@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from flask import session, redirect, request, flash, render_template, jsonify
 from itsdangerous import BadData
 from markupsafe import Markup
-from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.auth import multipass
@@ -31,7 +30,7 @@ from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationFor
                                        RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm)
 from indico.modules.auth.util import load_identity_info
 from indico.modules.auth.views import WPAuth
-from indico.modules.users import User, UserEmail
+from indico.modules.users import User
 from indico.util.i18n import _
 from indico.util.signing import secure_serializer
 from indico.web.flask.util import url_for
@@ -226,13 +225,12 @@ class RHRegister(RH):
                   'success')
 
             # Check whether there is already an existing pending user with this e-mail
-            try:
-                session['register_pending_user'] = db.session.query(User).join(UserEmail).filter(
-                    User.is_pending, UserEmail.email == verified_email).one().id
+            pending = User.find_first(User.all_emails.contains(verified_email), is_pending=True)
+
+            if pending:
+                session['register_pending_user'] = pending.id
                 flash(_("There is already some information in Indico that concerns you. "
-                        "We are going to link it automatically."), 'success')
-            except NoResultFound:
-                pass
+                        "We are going to link it automatically."), 'info')
 
             return redirect(url_for('.register', provider=self.provider_name))
 
@@ -252,7 +250,7 @@ class RHRegister(RH):
                                   url_args={'provider': self.provider_name})
 
     def _create_user(self, data, handler):
-        existing_user_id = session['register_pending_user']
+        existing_user_id = session.get('register_pending_user')
         if existing_user_id:
             # Get pending user and set her as non-pending
             user = User.get(existing_user_id)

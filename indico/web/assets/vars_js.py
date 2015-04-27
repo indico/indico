@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import render_template
 
-from indico.modules.auth import multipass
+from indico.core.auth import multipass
 from indico.modules.rb.models.locations import Location
 from indico.web.flask.util import url_rule_to_js, url_for
 from MaKaC.webinterface.common import tools as security_tools
