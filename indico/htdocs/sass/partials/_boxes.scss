@@ -129,42 +129,40 @@
 // Boxed group lists
 // ============================================================================
 
-.i-box {
-    ul.group-list {
-        color: $light-black;
-        list-style: outside none none;
-        margin: 0 0 -10px 0;
-        padding: 0;
+.i-box ul.group-list {
+    color: $light-black;
+    list-style: outside none none;
+    margin: 0 0 -10px 0;
+    padding: 0;
 
-        > li {
-            border-top: 1px solid lighten($gray, $color-variation);
-            display: block;
-            margin-left: -10px;
-            margin-right: -10px;
-            padding: 10px 10px;
-            overflow: hidden;
+    > li {
+        border-top: 1px solid lighten($gray, $color-variation);
+        display: block;
+        margin-left: -10px;
+        margin-right: -10px;
+        padding: 10px 10px;
+        overflow: hidden;
+    }
+
+    &.content-after {
+        > li:last-child {
+            border-bottom: 1px solid lighten($gray, $color-variation);
         }
+    }
 
-        &.no-description {
-            margin-top: -20px;
+    &.no-content-before {
+        margin-top: -20px;
 
-            > li:first-child {
-                border-top: 0;
-            }
+        > li:first-child {
+            border-top: 0;
         }
+    }
 
-        &.content-after {
-            > li:last-child {
-                border-bottom: 1px solid lighten($gray, $color-variation);
-            }
-        }
+    &.with-buttons {
+        line-height: 1.8em;
 
-        &.with-buttons {
-            line-height: 1.8em;
-
-            .i-button {
-                margin-top: 0;
-            }
+        .i-button {
+            margin-top: 0;
         }
     }
 }
