@@ -569,8 +569,9 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     &.vertical {
         .form-label {
             float: none;
-            text-align: left;
             height: 1em;
+            margin-bottom: -1em;
+            text-align: left;
         }
 
         .form-label-empty {
