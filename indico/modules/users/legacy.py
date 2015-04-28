@@ -327,6 +327,8 @@ class AvatarProvisionalWrapper(Fossilizable):
     def getId(self):
         return u"{}:{}".format(self.identity_info.provider.name, self.identity_info.identifier)
 
+    id = property(getId)
+
     @encode_utf8
     def getEmail(self):
         return self.data['email']
