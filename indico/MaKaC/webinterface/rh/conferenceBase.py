@@ -28,13 +28,13 @@ from MaKaC.conference import LocalFile, Link, Category
 from MaKaC.export import fileConverter
 from MaKaC.conference import Conference, Session, Contribution, SubContribution
 from MaKaC.i18n import _
-from MaKaC.user import AvatarHolder, GroupHolder
 
 from indico.core.logger import Logger
 from MaKaC.common.timezoneUtils import nowutc
 
 from indico.util import json
 from indico.util.contextManager import ContextManager
+from indico.util.user import principal_from_fossil
 
 BYTES_1MB = 1024 * 1024
 
@@ -418,12 +418,8 @@ class RHSubmitMaterialBase(object):
 
                 protectedObject.setProtection(self._statusSelection)
 
-            for userElement in self._userList:
-                if 'isGroup' in userElement and userElement['isGroup']:
-                    avatar = GroupHolder().getById(userElement['id'])
-                else:
-                    avatar = AvatarHolder().getById(userElement['id'])
-                protectedObject.grantAccess(avatar)
+            for principal in map(principal_from_fossil, self._userList):
+                protectedObject.grantAccess(principal)
 
         self._topdf = False
         if self._repositoryIds is None:

@@ -65,7 +65,7 @@
                                 <td class="bookingDisplayTitleCell" valign="top"><span class="titleCellFormat"> ${ _("Allowed users/groups")}</span></td>
                                 <td>
                                     <table class="blockingTable">
-                                        % for principal in blocking.allowed:
+                                        % for principal in blocking._allowed:
                                             <tr class="blockingHover blockingPadding">
                                                 <td>${ principal.entity_name }</td>
                                                 <td>${ principal.entity.getFullName() }</td>

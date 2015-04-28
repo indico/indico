@@ -90,6 +90,10 @@ class Identity(db.Model):
     def data(self, data):
         self._data = dict(data.lists())
 
+    @property
+    def locator(self):
+        return {'identity': self.id}
+
     def register_login(self, ip):
         """Updates the last login information"""
         self.last_login_dt = now_utc()

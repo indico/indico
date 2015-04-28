@@ -22,6 +22,10 @@ from collections import OrderedDict
 from flask import request
 from MaKaC.accessControl import AccessWrapper
 
+from indico.core.db import db
+from indico.modules.users import User
+from indico.modules.users.models.affiliations import UserAffiliation
+from indico.modules.users.models.emails import UserEmail
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import suggestions
@@ -73,6 +77,7 @@ def serialize_user(user):
     """Serialize user to JSON-like object"""
     return {
         'id': user.id,
+        'identifier': 'User:{}'.format(user.id),
         'name': user.full_name,
         'familyName': user.last_name,
         'firstName': user.first_name,
@@ -80,3 +85,57 @@ def serialize_user(user):
         'email': user.email,
         '_type': 'Avatar'
     }
+
+
+def _build_match(column, value, exact):
+    value = value.replace('%', '')
+    if exact:
+        return db.func.lower(column) == value.lower()
+    else:
+        return column.ilike("%{}%".format(value))
+
+
+def search_users(exact=False, include_deleted=False, include_pending=False, external=False, **criteria):
+    unspecified = object()
+    query = User.query.options(db.joinedload(User.identities), db.joinedload(User._all_emails))
+    original_criteria = dict(criteria)
+
+    if not criteria:
+        return set()
+
+    if not include_pending:
+        query = query.filter(~User.is_pending)
+    if not include_deleted:
+        query = query.filter(~User.is_deleted)
+
+    organisation = criteria.pop('affiliation', unspecified)
+    if organisation is not unspecified:
+        query = query.join(UserAffiliation).filter(_build_match(UserAffiliation.name, organisation, exact))
+
+    email = criteria.pop('email', unspecified)
+    if email is not unspecified:
+        query = query.join(UserEmail).filter(_build_match(UserEmail.email, email, exact))
+
+    for k, v in criteria.iteritems():
+        query = query.filter(_build_match(getattr(User, k), v, exact))
+
+    found_emails = {}
+    found_identities = {}
+    for user in query:
+        for identity in user.identities:
+            found_identities[(identity.provider, identity.identifier)] = user
+        for email in user.all_emails:
+            found_emails[email] = user
+
+    # external user providers
+    if external:
+        from indico.core.auth import multipass
+        identities = multipass.search_identities(exact=exact, **original_criteria)
+
+        for ident in identities:
+            if ((ident.provider.name, ident.identifier) not in found_identities and
+                    ident.data['email'].lower() not in found_emails):
+                found_emails[ident.data['email'].lower()] = ident
+                found_identities[(ident.provider, ident.identifier)] = ident
+
+    return set(found_emails.viewvalues())

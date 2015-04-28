@@ -36,6 +36,7 @@ class UserAffiliation(db.Model):
         nullable=False,
         index=True
     )
+
     #: the affiliation
     name = db.Column(
         db.String,

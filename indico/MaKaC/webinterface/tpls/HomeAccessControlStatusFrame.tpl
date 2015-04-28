@@ -30,7 +30,11 @@
 
             var removeUser = function(user, setResult){
                 jsonRpc(Indico.Urls.JsonRpcService, "category.protection.removeAllowedUser",
-                        {'category': ${ self_._rh._target.getId() }, value: {'id': user.get('id')}},
+                        {'category': ${ self_._rh._target.getId() }, value: {
+                            '_type': user.get('_type'),
+                            'id': user.get('id'),
+                            'provider': user.get('provider')
+                        }},
                         function(result, error){
                             if (exists(error)) {
                                 IndicoUtil.errorReport(error);

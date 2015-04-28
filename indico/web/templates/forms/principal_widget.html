@@ -14,8 +14,7 @@
                 // remove existing ones first to avoid duplicates
                 _.each(newPrincipals, function(principal) {
                     principals = _.without(principals, _.findWhere(principals, {
-                        _type: principal._type,
-                        id: principal.id
+                        identifier: principal.identifier
                     }));
                 });
                 principals = principals.concat(newPrincipals);
@@ -24,8 +23,7 @@
             }
             function removePrincipal(principal, setResult) {
                 principals = _.without(principals, _.findWhere(principals, {
-                    _type: principal.get('_type'),
-                    id: principal.get('id')
+                    identifier: principal.get('identifier')
                 }));
                 field.val(JSON.stringify(principals));
                 setResult(true);

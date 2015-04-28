@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.user import AvatarHolder, GroupHolder
+from MaKaC.user import AvatarHolder
 from MaKaC.conference import ConferenceHolder
 
 def searchUsers(surName="", name="", organisation="", email="", conferenceId=None, exactMatch=True, searchExt=False):
@@ -29,37 +29,22 @@ def searchUsers(surName="", name="", organisation="", email="", conferenceId=Non
         }
         # search users
         people = AvatarHolder().match(criteria, exact=exactMatch, searchInAuthenticators=searchExt)
+
         # search authors
-        if conferenceId != None:
-            try:
-                conference = ConferenceHolder().getById(conferenceId)
-                authorIndex = conference.getAuthorIndex()
-                authors = authorIndex.match(criteria, exact=exactMatch)
-                # merge with users
-                users = people
-                people = []
-                emails = []
-                for user in users:
-                    people.append(user)
-                    emails.extend(user.getEmails())
-                for author in authors:
-                    if author.getEmail() not in emails:
-                        people.append(author)
-            except Exception:
-                pass
+        if conferenceId is not None:
+            conference = ConferenceHolder().getById(conferenceId)
+            authorIndex = conference.getAuthorIndex()
+            authors = authorIndex.match(criteria, exact=exactMatch)
+            # merge with users
+            users = people
+            people = []
+            emails = []
+            for user in users:
+                people.append(user)
+                emails.extend(user.getEmails())
+            for author in authors:
+                if author.getEmail() not in emails:
+                    people.append(author)
         return people
-    else:
-        return []
-
-
-def searchGroups(group="", searchExt=False):
-    if group != "":
-        # build criteria
-        criteria = {
-            "name": group
-        }
-        # search not obsolete groups
-        groups = [ group for group in GroupHolder().match(criteria, searchInAuthenticators=searchExt) if not group.isObsolete()]
-        return groups
     else:
         return []

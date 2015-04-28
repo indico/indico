@@ -17,35 +17,25 @@
 from __future__ import unicode_literals
 
 from flask import session, redirect, request
-from flask_multipass import Multipass, MultipassException
+from flask_multipass import MultipassException
 
+from indico.core import signals
+from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.auth.models.identities import Identity
 from indico.modules.auth.util import save_identity_info
-from indico.modules.auth.views import WPAuth
 from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
+from indico.web.menu import MenuItem
 from MaKaC.common.timezoneUtils import SessionTZ
-from MaKaC.webinterface.rh.base import RHSimple
 
 
 logger = Logger.get('auth')
 
 
-class IndicoMultipass(Multipass):
-    @RHSimple.wrap_function
-    def render_template(self, template_key, **kwargs):
-        rv = super(IndicoMultipass, self).render_template(template_key, **kwargs)
-        return WPAuth.render_string(rv)
-
-
-multipass = IndicoMultipass()
-
-
 @multipass.identity_handler
-@RHSimple.wrap_function
 def process_identity(identity_info):
     logger.info('Received identity info: {}'.format(identity_info))
     identity = Identity.query.filter_by(provider=identity_info.provider.name,
@@ -68,9 +58,9 @@ def process_identity(identity_info):
             return redirect(url_for('auth.register', provider=identity_info.provider.name))
         else:
             logger.info('Found user with matching email: {}'.format(user))
-            return redirect(url_for('auth.associate_identity'))
+            return redirect(url_for('auth.link_account', provider=identity_info.provider.name))
     elif identity.user.is_deleted:
-        raise MultipassException(_('Your Indico account has been deleted.'))
+        raise MultipassException(_('Your Indico profile has been deleted.'))
     else:
         user = identity.user
         logger.info('Found existing identity {} for user {}'.format(identity, user))
@@ -82,13 +72,8 @@ def process_identity(identity_info):
         logger.info('Updated data'.format(identity, user))
         identity.data = identity_info.data
     if user.is_blocked:
-        raise MultipassException(_('Your Indico account has been blocked.'))
+        raise MultipassException(_('Your Indico profile has been blocked.'))
     login_user(user, identity)
-
-
-@multipass.login_check
-def is_logged_in():
-    return session.user is not None
 
 
 def login_user(user, identity=None):
@@ -110,3 +95,8 @@ def login_user(user, identity=None):
         session['login_identity'] = identity.id
     else:
         session.pop('login_identity', None)
+
+
+@signals.users.profile_sidemenu.connect
+def _extend_profile_menu(user, **kwargs):
+    return MenuItem(_('Accounts'), 'auth.accounts')

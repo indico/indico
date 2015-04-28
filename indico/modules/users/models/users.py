@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.utils import cached_property
@@ -101,6 +103,12 @@ class User(db.Model):
         nullable=False,
         default=False
     )
+    #: if the user is pending (e.g. never logged in, only added to some list)
+    is_pending = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: if the user is deleted (e.g. due to a merge)
     _is_deleted = db.Column(
         'is_deleted',
@@ -113,8 +121,10 @@ class User(db.Model):
         'UserAffiliation',
         lazy=False,
         uselist=False,
-        cascade='all, delete-orphan'
+        cascade='all, delete-orphan',
+        backref=db.backref('user', lazy=True)
     )
+
     _primary_email = db.relationship(
         'UserEmail',
         lazy=False,
@@ -206,6 +216,19 @@ class User(db.Model):
         collection_class=set,
         backref=db.backref('user', lazy=False)
     )
+    #: the local groups this user belongs to
+    local_groups = db.relationship(
+        'LocalGroup',
+        secondary='users.group_members',
+        lazy=True,
+        collection_class=set,
+        backref=db.backref('members', lazy=True, collection_class=set),
+    )
+
+    @property
+    def as_principal(self):
+        """The serializable principal identifier of this user"""
+        return 'User', self.id
 
     @property
     def as_avatar(self):
@@ -214,14 +237,25 @@ class User(db.Model):
         return AvatarUserWrapper(self.id)
 
     @property
+    def external_identities(self):
+        """The external identities of the user"""
+        return {x for x in self.identities if x.provider != 'indico'}
+
+    @property
     def local_identities(self):
         """The local identities of the user"""
         return {x for x in self.identities if x.provider == 'indico'}
 
     @property
-    def external_identities(self):
-        """The external identities of the user"""
-        return {x for x in self.identities if x.provider != 'indico'}
+    def local_identity(self):
+        """The main (most recently used) local identity"""
+        identities = sorted(self.local_identities, key=attrgetter('last_login_dt'), reverse=True)
+        return identities[0] if identities else None
+
+    @property
+    def secondary_local_identities(self):
+        """The local identities of the user except the main one"""
+        return self.local_identities - {self.local_identity}
 
     @property
     def locator(self):
@@ -302,6 +336,13 @@ class User(db.Model):
         db.session.flush()
         secondary.is_primary = True
         db.session.flush()
+
+    def is_in_group(self, group):
+        """Checks if the user is in a group
+
+        :param group: A :class:`GroupProxy`
+        """
+        return group.has_member(self)
 
     def get_linked_roles(self, type_):
         """Retrieves the roles the user is linked to for a given type"""

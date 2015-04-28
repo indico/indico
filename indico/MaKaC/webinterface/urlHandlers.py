@@ -21,7 +21,6 @@ import urlparse
 
 from flask import request, session, has_request_context
 
-import MaKaC.user as user
 from MaKaC.common.url import URL, EndpointURL
 from MaKaC.common.utils import utf8rep
 from MaKaC.common.timezoneUtils import nowutc
@@ -29,6 +28,7 @@ from MaKaC.common.contextManager import ContextManager
 
 from indico.core.config import Config
 from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.groups.legacy import GroupWrapper
 
 
 class BooleanMixin:
@@ -1276,41 +1276,6 @@ class UHUserExistWithIdentity(UHConfUser):
 
 class UHUserIdPerformCreation(UserURLHandler):
     _endpoint = 'user.identityCreation-create'
-
-
-class UHGroups(URLHandler):
-    _endpoint = 'admin.groupList'
-
-
-class UHNewGroup(URLHandler):
-    _endpoint = 'admin.groupRegistration'
-
-
-class UHGroupPerformRegistration(URLHandler):
-    _endpoint = 'admin.groupRegistration-update'
-
-
-class UHGroupDetails(URLHandler):
-    _endpoint = 'admin.groupDetails'
-
-
-class UHGroupModification(URLHandler):
-    _endpoint = 'admin.groupModification'
-
-
-class UHGroupPerformModification(URLHandler):
-    _endpoint = 'admin.groupModification-update'
-
-
-class UHPrincipalDetails:
-    @classmethod
-    def getURL(cls, member):
-        if isinstance(member, user.Group):
-            return UHGroupDetails.getURL(member)
-        elif isinstance(member, AvatarUserWrapper):
-            return UHUserDetails.getURL(member)
-        else:
-            return ''
 
 
 class UHDomains(URLHandler):

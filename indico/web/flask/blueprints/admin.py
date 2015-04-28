@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import (admins, announcement, taskManager, maintenance, domains, users, groups, templates,
+from MaKaC.webinterface.rh import (admins, announcement, taskManager, maintenance, domains, users, templates,
                                    conferenceModif, services, oauth)
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -78,15 +78,6 @@ admin.add_url_rule('/settings/users/notify-creation', 'userManagement-switchNoti
                    users.RHUserManagementSwitchNotifyAccountCreation)
 admin.add_url_rule('/users/', 'userList', users.RHUsers, methods=('GET', 'POST'))
 admin.add_url_rule('/users/merge', 'userMerge', admins.RHUserMerge, methods=('GET', 'POST'))
-
-# Groups
-admin.add_url_rule('/users/groups/', 'groupList', groups.RHGroups, methods=('GET', 'POST'))
-admin.add_url_rule('/users/groups/<groupId>', 'groupDetails', groups.RHGroupDetails)
-admin.add_url_rule('/users/groups/<groupId>/modify', 'groupModification', groups.RHGroupModification)
-admin.add_url_rule('/users/groups/<groupId>/modify', 'groupModification-update', groups.RHGroupPerformModification,
-                   methods=('POST',))
-admin.add_url_rule('/users/groups/create', 'groupRegistration', groups.RHGroupCreation)
-admin.add_url_rule('/users/groups/create', 'groupRegistration-update', groups.RHGroupPerformCreation, methods=('POST',))
 
 # Layout
 admin.add_url_rule('/layout/', 'adminLayout', admins.RHAdminLayoutGeneral, methods=('GET', 'POST'))

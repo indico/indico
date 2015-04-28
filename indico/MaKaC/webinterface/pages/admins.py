@@ -25,7 +25,6 @@ import MaKaC.common.indexes as indexes
 import MaKaC.common.info as info
 import MaKaC.conference as conference
 import MaKaC.user as user
-from MaKaC.authentication.LDAPAuthentication import LDAPGroup
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -82,7 +81,7 @@ class WPAdminsBase(WPMainBase):
             urlHandlers.UHAdminArea.getURL())
         mainSection.addItem( self._generalSettingsMenuItem)
 
-        self._usersAndGroupsMenuItem = wcomponents.SideMenuItem(_("Users and Groups"),
+        self._usersAndGroupsMenuItem = wcomponents.SideMenuItem(_("Users (legacy)"),
             urlHandlers.UHUserManagement.getURL())
         mainSection.addItem( self._usersAndGroupsMenuItem)
 
@@ -694,8 +693,6 @@ class WPUsersAndGroupsCommon(WPAdminsBase):
                 urlHandlers.UHUserManagement.getURL())
         self._subTabUsers = self._tabCtrl.newTab("users", _("Manage Users"), \
                 urlHandlers.UHUsers.getURL())
-        self._subTabGroups = self._tabCtrl.newTab("groups", _("Manage Groups"), \
-                urlHandlers.UHGroups.getURL())
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
@@ -1010,213 +1007,6 @@ class WPUserBase(WPUserCommon):
     def __init__(self, rh, av=None, **kwargs):
         WPUserCommon.__init__(self, rh, **kwargs)
         self._avatar = av
-
-
-class WPGroupCommon(WPUsersAndGroupsCommon):
-
-    def __init__( self, rh ):
-        WPUsersAndGroupsCommon.__init__( self, rh )
-
-    def _setActiveTab( self ):
-        self._subTabGroups.setActive()
-
-class WHTMLGroupList(wcomponents.WTemplated):
-
-    def __init__(self, groupList):
-        self._groupList = groupList
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        color="white"
-        ul = []
-        vars["groupList"] = ""
-        ul.append( i18nformat("""
-                        <tr>
-                            <td bgcolor="white" style="color:black" align="center"><b>%s _("groups")</b></td>
-                        </tr>
-                        """)%len(self._groupList))
-        for g in self._groupList:
-            if color=="white":
-                color="#ececec"
-            else:
-                color="white"
-            url = vars["groupDetailsURLGen"]( g )
-            if g.isObsolete():
-                obsolete = 'obsolete'
-            else:
-                obsolete = ''
-            ul.append("""<tr>
-                            <td bgcolor="%s"><a href="%s">%s</a></td>
-                            <td bgcolor="%s" align="center">%s</td>
-                         </tr>"""%(color, url, self.htmlText(g.getName()), color, obsolete))
-        if ul:
-            vars["groupList"] += "".join( ul )
-        else:
-            vars["groupList"] += i18nformat("""<tr>
-                            <td><br><span class="blacktext">&nbsp;&nbsp;&nbsp; _("No group returned")</span></td></tr>""")
-        return vars
-
-class WBrowseGroups( wcomponents.WTemplated ):
-
-    def __init__( self, letter=None ):
-        self._letter = letter
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        gh = user.GroupHolder()
-        letters = gh.getBrowseIndex()
-        vars["browseIndex"] = """
-        <span class="nav_border"><a href='' class="nav_link" onClick="document.browseForm.letter.disable=1;document.browseForm.submit();return false;">clear</a></span>"""
-        if self._letter == "all":
-            vars["browseIndex"] += """
-        [all] """
-        else:
-            vars["browseIndex"] += """
-        <span class="nav_border"><a href='' class="nav_link" onClick="document.browseForm.letter.value='all';document.browseForm.submit();return false;">all</a></span> """
-        for letter in letters:
-            if self._letter == letter:
-                vars["browseIndex"] += """\n[%s] """ % letter
-            else:
-                vars["browseIndex"] += """\n<span class="nav_border"><a href='' class="nav_link" onClick="document.browseForm.letter.value='%s';document.browseForm.submit();return false;">%s</a></span> """ % (escape(letter,True),letter)
-        vars["browseResult"] = ""
-        res = []
-        if self._letter != None:
-            if self._letter != "all":
-                res = gh.matchFirstLetter(self._letter, searchInAuthenticators=False)
-            else:
-                res = gh.getValuesToList()
-            res.sort(utils.sortGroupsByName)
-            vars["browseResult"] = WHTMLGroupList(res).getHTML(vars)
-        return vars
-
-class WGroupList(wcomponents.WTemplated):
-
-    def __init__( self, criteria ):
-        self._criteria = criteria
-
-    def _performSearch( self, criteria ):
-        gh = user.GroupHolder()
-        res = gh.match(criteria)
-        return res
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["createGroupURL"] = urlHandlers.UHNewGroup.getURL()
-        vars["nbGroups"] = user.GroupHolder().getLength()
-        vars["browseGroups"] = WBrowseGroups(vars.get("letter",None)).getHTML(vars)
-        vars["browseGroupsURL"] = urlHandlers.UHGroups.getURL()
-        vars["searchGroupsURL"] = urlHandlers.UHGroups.getURL()
-        vars["groups"] = ""
-        if self._criteria and self._criteria["name"] != "":
-            groupList = self._performSearch(self._criteria)
-            vars["groups"] = WHTMLGroupList(groupList).getHTML(vars)
-        return vars
-
-
-class WPGroupList(WPGroupCommon):
-
-    def __init__(self, rh, params):
-        WPGroupCommon.__init__(self,rh)
-        self._params = params
-
-    def _getTabContent( self, params ):
-        criteria = {}
-        if filter(lambda x: self._params[x], self._params):
-            criteria["name"] = self._params.get("sName","")
-        comp = WGroupList(criteria)
-        self._params["groupDetailsURLGen"]=urlHandlers.UHGroupDetails.getURL
-        return comp.getHTML(self._params)
-
-
-class WGroupModification(wcomponents.WTemplated):
-
-    def __init__( self, group=None ):
-        self._group = group
-
-    def __setNewGroupVars( self, vars={} ):
-        vars["Wtitle"] = _("Creating a new group")
-        vars["name"] = ""
-        vars["email"] = ""
-        vars["description"] = ""
-        vars["obsolete"] = False
-
-    def __setGroupVars( self, group, vars ):
-        vars["Wtitle"] = _("Modifying group basic data")
-        vars["name"] = group.getName()
-        vars["email"] = group.getEmail()
-        vars["description"] = group.getDescription()
-        vars["obsolete"] = group.isObsolete()
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["allowModif"] = True
-        if self._group == None:
-            self.__setNewGroupVars( vars )
-            vars["locator"] = ""
-        else:
-            self.__setGroupVars( self._group, vars )
-            vars["locator"] = self._group.getLocator().getWebForm()
-            if isinstance(self._group, LDAPGroup):
-                vars["allowModif"] = False
-        return vars
-
-
-class WPGroupCreation(WPGroupCommon):
-
-    def _getTabContent( self, params ):
-        comp = WGroupModification()
-        pars = {"postURL": urlHandlers.UHGroupPerformRegistration.getURL(), \
-                "backURL": urlHandlers.UHGroups.getURL() }
-        return comp.getHTML( pars )
-
-
-class WPGroupBase( WPGroupCommon ):
-
-    def __init__( self, rh, grp ):
-        WPGroupCommon.__init__( self, rh )
-        self._group = grp
-
-
-class WGroupDetails(wcomponents.WTemplated):
-
-    def __init__( self, group ):
-        self._group = group
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["name"] = self._group.getName()
-        vars["description"] = self._group.getDescription()
-        vars["email"] = self._group.getEmail()
-        vars["locator"] = self._group.getLocator().getWebForm()
-        vars["obsolete"] = self._group.isObsolete()
-        vars["groupId"] = self._group.getId()
-        vars["members"] = fossilize(self._group.getMemberList())
-        vars["groupExists"] = self._group.exists()
-        return vars
-
-
-class WPGroupDetails( WPGroupBase ):
-
-    def _getTabContent( self, params ):
-        c = WGroupDetails( self._group )
-        pars = { \
-    "modifyURL": urlHandlers.UHGroupModification.getURL( self._group ),\
-    "detailsURLGen": urlHandlers.UHPrincipalDetails.getURL, \
-    "backURL": urlHandlers.UHGroups.getURL() }
-        return c.getHTML( pars )
-
-
-class WPGroupModificationBase( WPGroupBase ):
-    pass
-
-
-class WPGroupModification( WPGroupModificationBase ):
-
-    def _getTabContent( self, params ):
-        comp = WGroupModification( self._group )
-        params["postURL"] = urlHandlers.UHGroupPerformModification.getURL(self._group)
-        params["backURL"] = urlHandlers.UHGroupDetails.getURL( self._group )
-        return comp.getHTML( params )
 
 
 class WPUserMerge( WPUserCommon ):

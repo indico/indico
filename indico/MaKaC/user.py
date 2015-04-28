@@ -14,44 +14,36 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from collections import OrderedDict
-import operator
-from BTrees.OOBTree import OOTreeSet, union
 
+from BTrees.OOBTree import OOTreeSet
+from flask_multipass import IdentityInfo
 from persistent import Persistent
-from accessControl import AccessWrapper
+from pytz import all_timezones
+
 import MaKaC
+from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 from MaKaC.common import filters, indexes
 from MaKaC.common.cache import GenericCache
+import MaKaC.common.info as info
 from MaKaC.common.Locators import Locator
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import UserError, MaKaCError
+from MaKaC.common.fossilize import Fossilizable, fossilizes
+from MaKaC.fossils.user import (IAvatarFossil, IAvatarAllDetailsFossil, IGroupFossil, IPersonalInfoFossil,
+                                IAvatarMinimalFossil)
 from MaKaC.trashCan import TrashCanManager
-import MaKaC.common.info as info
-from MaKaC.i18n import _
-from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 
 from indico.core import signals
 from indico.core.logger import Logger
-from MaKaC.fossils.user import IAvatarFossil, IAvatarAllDetailsFossil,\
-                            IGroupFossil, IPersonalInfoFossil, IAvatarMinimalFossil
-from MaKaC.common.fossilize import Fossilizable, fossilizes
-
-from pytz import all_timezones
-
 from indico.modules.users import User
-from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.users.legacy import AvatarUserWrapper, AvatarProvisionalWrapper
 from indico.util.caching import memoize_request
 from indico.util.decorators import cached_classproperty
-from indico.util.event import truncate_path
-from indico.util.user import retrieve_principals
-from indico.util.redis import write_client as redis_write_client
-from indico.util.redis import avatar_links, suggestions
+from indico.util.i18n import _
+from indico.util.redis import avatar_links, suggestions, write_client as redis_write_client
 from indico.util.string import safe_upper, safe_slice
-from flask import request
+from indico.util.user import retrieve_principals
 
-"""Contains the classes that implement the user management subsystem
-"""
 
 class Group(Persistent, Fossilizable):
     fossilizes(IGroupFossil)
@@ -221,6 +213,9 @@ class GroupHolder(ObjectHolder):
     """
     idxName = "groups"
     counterName = "PRINCIPAL"
+
+    def getById(self, id):
+        raise RuntimeError('obsolete')
 
     def add(self, group):
         ObjectHolder.add(self, group)
@@ -1078,6 +1073,14 @@ class Avatar(Persistent, Fossilizable):
         self._lang =lang
 
 
+AVATAR_FIELD_MAP = {
+    "email": "email",
+    "name": "first_name",
+    "surName": "last_name",
+    "organisation": "affiliation"
+}
+
+
 class AvatarHolder(ObjectHolder):
     """Specialised ObjectHolder dealing with user (avatar) objects. Objects of
        this class represent an access point to Avatars of the application and
@@ -1088,145 +1091,28 @@ class AvatarHolder(ObjectHolder):
     counterName = "PRINCIPAL"
     _indexes = [ "email", "name", "surName","organisation", "status" ]
 
-    def matchFirstLetter(self, index, letter, onlyActivated=True, searchInAuthenticators=True):
-        result = {}
-        if index not in self._indexes:
-            return None
-        if index in ["name", "surName", "organisation"]:
-            match = indexes.IndexesHolder().getById(index).matchFirstLetter(letter, accent_sensitive=False)
-        else:
-            match = indexes.IndexesHolder().getById(index).matchFirstLetter(letter)
-        if match is not None:
-            for userid in match:
-                if self.getById(userid) not in result:
-                    av = self.getById(userid)
-                    if not onlyActivated or av.isActivated():
-                        result[av.getEmail()] = av
-        if searchInAuthenticators:
-            for authenticator in AuthenticatorMgr().getList():
-                matches = authenticator.matchUserFirstLetter(index, letter)
-                if matches:
-                    for email, record in matches.iteritems():
-                        emailResultList = [av.getEmails() for av in result.values()]
-                        if email not in emailResultList:
-                            userMatched = self.match({'email': email}, exact=1, searchInAuthenticators=False)
-                            if not userMatched:
-                                av = Avatar(record)
-                                av.setId(record["id"])
-                                av.status = record["status"]
-                                result[email] = av
-                            else:
-                                av = userMatched[0]
-                                result[av.getEmail()] = av
-        return result.values()
+    def match(self, criteria, exact=False, onlyActivated=True, searchInAuthenticators=False):
+        from indico.modules.users.util import search_users
+        cache = GenericCache('pending_identities')
 
-    def match(self, criteria, exact=0, onlyActivated=True, searchInAuthenticators=True):
-        result = {}
-        iset = set()
-        for f, v in criteria.items():
-            v = str(v).strip()
-            if v and f in self._indexes:
-                match = indexes.IndexesHolder().getById(f).matchUser(v, exact=exact, accent_sensitive=False)
-                if match is not None:
-                    if len(iset) == 0:
-                        iset = set(match)
-                    else:
-                        iset = iset & set(match)
-        for userid in iset:
-            av=self.getById(userid)
-            if not onlyActivated or av.isActivated():
-                result[av.getEmail()]=av
-        if searchInAuthenticators:
-            for authenticator in AuthenticatorMgr().getList():
-                matches = authenticator.matchUser(criteria, exact=exact)
-                if matches:
-                    for email, record in matches.iteritems():
-                        emailResultList = [av.getEmails() for av in result.values()]
-                        if not email in emailResultList:
-                            userMatched = self.match({'email': email}, exact=1, searchInAuthenticators=False)
-                            if not userMatched:
-                                av = Avatar(record)
-                                av.setId(record["id"])
-                                av.status = record["status"]
-                                if self._userMatchCriteria(av, criteria, exact):
-                                    result[email] = av
-                            else:
-                                av = userMatched[0]
-                                if self._userMatchCriteria(av, criteria, exact):
-                                    result[av.getEmail()] = av
-        return result.values()
+        def _process_identities(obj):
+            if isinstance(obj, IdentityInfo):
+                cache.set(obj.provider.name + ":" + obj.identifier, obj.data)
+                return AvatarProvisionalWrapper(obj)
+            else:
+                return obj.as_avatar
 
-    def _userMatchCriteria(self, av, criteria, exact):
-        if criteria.has_key("organisation"):
-            if criteria["organisation"]:
-                lMatch = False
-                for org in av.getOrganisations():
-                    if exact:
-                        if criteria["organisation"].lower() == org.lower():
-                            lMatch = True
-                    else:
-                        if criteria["organisation"].lower() in org.lower():
-                            lMatch = True
-                if not lMatch:
-                    return False
+        results = search_users(exact=exact, include_pending=not onlyActivated, include_deleted=not onlyActivated,
+                               external=searchInAuthenticators,
+                               **{AVATAR_FIELD_MAP[k]: v for (k, v) in criteria.iteritems() if v})
 
-        if criteria.has_key("surName"):
-            if criteria["surName"]:
-                if exact:
-                    if not criteria["surName"].lower() == av.getSurName().lower():
-                        return False
-                else:
-                    if not criteria["surName"].lower() in av.getSurName().lower():
-                        return False
-
-        if criteria.has_key("name"):
-            if criteria["name"]:
-                if exact:
-                    if not criteria["name"].lower() == av.getName().lower():
-                        return False
-                else:
-                    if not criteria["name"].lower() in av.getName().lower():
-                        return False
-
-        if criteria.has_key("email"):
-            if criteria["email"]:
-                lMatch = False
-                for email in av.getEmails():
-                    if exact:
-                        if criteria["email"].lower() == email.lower():
-                            lMatch = True
-                    else:
-                        if criteria["email"].lower() in email.lower():
-                            lMatch = True
-                if not lMatch:
-                    return False
-        return True
-
+        return [_process_identities(obj) for obj in results]
 
     def getById(self, id):
         if isinstance(id, int) or id.isdigit():
             user = User.get(int(id))
             if user:
                 return user.as_avatar
-        try:
-            return ObjectHolder.getById(self, id)
-        except:
-            pass
-        try:
-            authId, extId, email = id.split(":")
-        except:
-            return None
-        av = self.match({"email": email}, searchInAuthenticators=False)
-        if av:
-            return av[0]
-        user_data = AuthenticatorMgr().getById(authId).searchUserById(extId)
-        av = Avatar(user_data)
-        identity = user_data["identity"](user_data["login"], av)
-        user_data["authenticator"].add(identity)
-        av.activateAccount()
-        self.add(av)
-        return av
-
 
     def add(self,av):
         """
@@ -1365,12 +1251,13 @@ class AvatarHolder(ObjectHolder):
                             reg.setAvatar(prin)
                             prin.addRegistrant(reg)
 
-            if objType == "group":
-                for role in links[objType].keys():
-                    if role == "member":
-                        for group in set(links[objType][role]):
-                            group.removeMember(merged)
-                            group.addMember(prin)
+            # TODO: handle this properly in the users module via the merge hook
+            # if objType == "group":
+            #     for role in links[objType].keys():
+            #         if role == "member":
+            #             for group in set(links[objType][role]):
+            #                 group.removeMember(merged)
+            #                 group.addMember(prin)
 
             if objType == "evaluation":
                 for role in links[objType].keys():
@@ -1452,42 +1339,6 @@ class AvatarHolder(ObjectHolder):
 
         email.indexUser(prin)
         return True
-
-
-
-# ToDo: This class should ideally derive from TreeHolder as it is thought to
-#   be a index over the "Principal" objects i.e. it will be a top indexing of
-#   the contents of AvatarHolder and GroupHolder. This will allow to
-#   transparently access to Principal objects from its id. To transparently
-#   index all the objects AvatarHolder and GroupHolder must override the
-#   "add" method and, apart from their normal operation, include an adding call
-#   for the PrincipalHolder.
-# The problem is that I have experienced some troubles (it seems not to perform
-#   the adding of objects) while adding an object both to the AvatarHolder and
-#   to this one; so, for the time being, I will implement it in a "dirty" and
-#   non-optimal way to be able to continue working, but the trouble must be
-#   investigated and a better solution found.
-# I'll keep the ObjectHolder interface so it will be easier afterwards to
-#   implement a more optimised solution (just this object needs to be modified)
-class PrincipalHolder:
-    def __init__(self):
-        self.__gh = GroupHolder()
-        self.__ah = AvatarHolder()
-
-    def getById(self, id):
-        try:
-            prin = self.__gh.getById(id)
-            return prin
-        except KeyError, e:
-            pass
-        prin = self.__ah.getById(id)
-        return prin
-
-    def match(self, element_id, exact=1, searchInAuthenticators=True):
-        prin = self.__gh.match({"name": element_id}, searchInAuthenticators=searchInAuthenticators, exact=exact)
-        if not prin:
-            prin = self.__ah.match({"login": element_id}, searchInAuthenticators=searchInAuthenticators, exact=exact)
-        return prin
 
 
 class LoginInfo:

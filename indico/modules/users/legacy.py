@@ -16,27 +16,18 @@
 
 from persistent import Persistent
 
-from functools import wraps
-
-from indico.modules.users.models.users import User
+from indico.core.auth import multipass
+from indico.modules.groups import GroupProxy
+from indico.modules.rb.utils import rb_is_admin
+from indico.modules.users import User
 from indico.util.caching import memoize_request
 from indico.util.fossilize import fossilizes, Fossilizable
-from indico.util.string import to_unicode, return_ascii
-from indico.util.user import retrieve_principals
+from indico.util.string import to_unicode, return_ascii, encode_utf8
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import avatar_links
-
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.Locators import Locator
 from MaKaC.fossils.user import IAvatarFossil, IAvatarMinimalFossil
-
-
-def encode_utf8(f):
-    @wraps(f)
-    def _wrapper(*args, **kwargs):
-        return f(*args, **kwargs).encode('utf-8')
-
-    return _wrapper
 
 
 class AvatarUserWrapper(Persistent, Fossilizable):
@@ -256,7 +247,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return False
 
     def containsUser(self, avatar):
-        return avatar.id == self.id
+        return avatar.id == self.id if avatar else False
 
     containsMember = containsUser
 
@@ -274,31 +265,17 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return d
 
     def is_member_of_group(self, group_name):
-        from MaKaC.user import GroupHolder
-        try:
-            groups = [GroupHolder().getById(group_name)]
-        except KeyError:
-            groups = GroupHolder().match({'name': group_name}, searchInAuthenticators=False, exact=True)
-            if not groups:
-                groups = GroupHolder().match({'name': group_name}, exact=True)
-
-        return groups and groups[0].containsUser(self)
+        group_provider = multipass.default_group_provider
+        group = GroupProxy(group_name, group_provider.name if group_provider else None)
+        return group.has_member(self.user)
 
     def isAdmin(self):
         return self.user.is_admin
 
     @memoize_request
     def isRBAdmin(self):
-        """
-        Convenience method for checking whether this user is an admin for the RB module.
-        Returns bool.
-        """
-        from indico.modules.rb import settings as rb_settings
-
-        if self.user.is_admin:
-            return True
-        principals = retrieve_principals(rb_settings.get('admin_principals'))
-        return any(principal.containsUser(self) for principal in principals)
+        """Convenience method for checking whether this user is an admin for the RB module."""
+        return rb_is_admin(self)
 
     @property
     @memoize_request
@@ -331,4 +308,63 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     @return_ascii
     def __repr__(self):
+        if self.user is None:
+            return u'<AvatarUserWrapper {}: user does not exist>'.format(self.id)
         return u'<AvatarUserWrapper {}: {} ({})>'.format(self.id, self.user.full_name, self.user.email)
+
+
+class AvatarProvisionalWrapper(Fossilizable):
+    """
+    Wraps provisional data for users that are not in the DB yet
+    """
+
+    fossilizes(IAvatarFossil, IAvatarMinimalFossil)
+
+    def __init__(self, identity_info):
+        self.identity_info = identity_info
+        self.data = identity_info.data
+
+    def getId(self):
+        return u"{}:{}".format(self.identity_info.provider.name, self.identity_info.identifier)
+
+    @encode_utf8
+    def getEmail(self):
+        return self.data['email']
+
+    def getEmails(self):
+        return [self.data['email']]
+
+    @encode_utf8
+    def getFirstName(self):
+        return self.data['first_name']
+
+    @encode_utf8
+    def getFamilyName(self):
+        return self.data['last_name']
+
+    def getStraightFullName(self):
+        return '{first_name[0]} {last_name[0]}'.format(**self.data)
+
+    def getTitle(self):
+        return u''
+
+    @encode_utf8
+    def getTelephone(self):
+        return self.data['phone']
+
+    @encode_utf8
+    def getOrganisation(self):
+        return self.data['affiliation']
+
+    def getFax(self):
+        return None
+
+    def getAddress(self):
+        return u''
+
+    @return_ascii
+    def __repr__(self):
+        return u'<AvatarProvisionalWrapper {}: {} ({first_name[0]} {last_name[0]})>'.format(
+            self.identity_info.provider.name,
+            self.identity_info.identifier,
+            **self.data)

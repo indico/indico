@@ -67,7 +67,7 @@ from indico.util.contextManager import ContextManager
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, SSOHandler
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.errors import MaKaCError
-from MaKaC.user import Group, PrincipalHolder
+from MaKaC.user import Group
 
 
 RETRIEVED_FIELDS = ['uid', 'cn', 'mail', 'o', 'ou', 'company', 'givenName',

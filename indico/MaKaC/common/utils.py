@@ -125,30 +125,6 @@ def sortSlotByDate(x,y):
 def sortCategoryByTitle(x,y):
     return cmp(x.getTitle().lower(),y.getTitle().lower())
 
-def sortPrincipalsByName(x,y):
-
-    from MaKaC.user import Group
-    firstNamex, firstNamey = "", ""
-    if x is None:
-        namex = ""
-    elif isinstance(x, Group):
-        namex = x.getName()
-    else:
-        namex = x.getFamilyName()
-        firstNamex = x.getFirstName()
-
-    if y is None:
-        namey = ""
-    elif isinstance(y, Group):
-        namey = y.getName()
-    else:
-        namey = y.getFamilyName()
-        firstNamey = y.getFirstName()
-
-    cmpRes = cmp(namex.lower(),namey.lower())
-    if cmpRes == 0:
-        cmpRes = cmp(firstNamex.lower(),firstNamey.lower())
-    return cmpRes
 
 def validMail(emailstr, allowMultiple=True):
     """

@@ -18,11 +18,10 @@ from __future__ import unicode_literals
 
 from wtforms.fields import StringField, SelectField, PasswordField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, Length, ValidationError
+from wtforms.validators import DataRequired, Length, ValidationError, Optional
 
 from indico.modules.auth import Identity
 from indico.modules.users import User
-from indico.modules.users.models.emails import UserEmail
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.validators import ConfirmPassword
@@ -33,13 +32,46 @@ def _tolower(s):
 
 
 def _check_existing_email(form, field):
-    if UserEmail.find(email=field.data, is_user_deleted=False).count():
+    if User.find_all(~User.is_deleted, ~User.is_pending, User.all_emails.contains(field.data)):
         raise ValidationError(_('This email address is already in use.'))
+
+
+def _check_existing_username(form, field):
+    if Identity.find(provider='indico', identifier=field.data).count():
+        raise ValidationError(_('This username is already in use.'))
 
 
 class LocalLoginForm(IndicoForm):
     identifier = StringField(_('Username'), [DataRequired()], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired()])
+
+
+class LocalLoginAddForm(IndicoForm):
+    username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
+    password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
+    confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
+
+
+class LocalLoginEditForm(IndicoForm):
+    username = StringField(_('Username'), [DataRequired()], filters=[_tolower])
+    password = PasswordField(_('Current password'), [DataRequired()])
+    new_password = PasswordField(_('New password'), [Optional(), Length(min=5)])
+    confirm_new_password = PasswordField(_('Confirm password'), [ConfirmPassword('new_password')])
+
+    def __init__(self, *args, **kwargs):
+        self.identity = kwargs.pop('identity', None)
+        super(LocalLoginEditForm, self).__init__(*args, **kwargs)
+
+    def validate_password(self, field):
+        if field.data != self.identity.password:
+            raise ValidationError(_("Wrong current password"))
+
+    def validate_username(self, field):
+        query = Identity.find(Identity.provider == 'indico',
+                              Identity.identifier == field.data,
+                              Identity.identifier != self.identity.identifier)
+        if query.count():
+            raise ValidationError(_('This username is already in use.'))
 
 
 class SelectEmailForm(IndicoForm):
@@ -54,7 +86,7 @@ class RegistrationEmailForm(IndicoForm):
 class RegistrationForm(IndicoForm):
     first_name = StringField(_('First name'), [DataRequired()])
     last_name = StringField(_('Family name'), [DataRequired()])
-    affiliation = StringField(_('Affiliation'), [DataRequired()])
+    affiliation = StringField(_('Affiliation'))
 
 
 class MultipassRegistrationForm(RegistrationForm):
@@ -65,13 +97,9 @@ class MultipassRegistrationForm(RegistrationForm):
 
 class LocalRegistrationForm(RegistrationForm):
     email = EmailField(_('Email address'))
-    username = StringField(_('Username'), [DataRequired()], filters=[_tolower])
+    username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
-
-    def validate_username(self, field):
-        if Identity.find(provider='indico', identifier=field.data).count():
-            raise ValidationError(_('This username is already in use.'))
 
 
 class ResetPasswordEmailForm(IndicoForm):
@@ -80,16 +108,17 @@ class ResetPasswordEmailForm(IndicoForm):
     def validate_email(self, field):
         user = self.user
         if user is None:
-            raise ValidationError(_('There is no user with this email address.'))
+            raise ValidationError(_('There is no profile with this email address.'))
         elif not user.local_identities:
             # XXX: Should we allow creating a new identity instead? Would be user-friendly for sure!
-            raise ValidationError(_('This account has no username/password associated.'))
+            raise ValidationError(_('This profile has no local account.'))
 
     @property
     def user(self):
         if not self.is_submitted() or not self.email.data:
             return None
-        return User.find_first(~User.is_deleted, ~User.is_blocked, User.all_emails.contains(self.email.data))
+        return User.find_first(~User.is_deleted, ~User.is_blocked, ~User.is_pending,
+                               User.all_emails.contains(self.email.data))
 
 
 class ResetPasswordForm(IndicoForm):

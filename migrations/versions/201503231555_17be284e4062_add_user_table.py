@@ -31,6 +31,7 @@ def upgrade():
                     sa.Column('is_admin', sa.Boolean(), nullable=False, index=True),
                     sa.Column('is_blocked', sa.Boolean(), nullable=False),
                     sa.Column('is_deleted', sa.Boolean(), nullable=False),
+                    sa.Column('is_pending', sa.Boolean(), nullable=False),
                     sa.ForeignKeyConstraint(['merged_into_id'], ['users.users.id']),
                     sa.PrimaryKeyConstraint('id'),
                     schema='users')

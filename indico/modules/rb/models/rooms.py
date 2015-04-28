@@ -18,7 +18,6 @@ import ast
 import json
 from datetime import date
 
-from dateutil.relativedelta import relativedelta
 from sqlalchemy import and_, func, or_, cast, Date
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy.orm import joinedload
@@ -26,12 +25,10 @@ from sqlalchemy.orm import joinedload
 from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.common.Locators import Locator
 from MaKaC.common.cache import GenericCache
-from MaKaC.user import AvatarHolder
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.util.cache import versioned_cache, cached
 from indico.core.db.sqlalchemy.util.queries import escape_like
-from indico.core.errors import IndicoError
 from indico.core.errors import NoReportError
 from indico.modules.rb.utils import rb_check_user_access
 from indico.modules.rb.models.blockings import Blocking
@@ -42,6 +39,7 @@ from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttribut
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
+from indico.modules.users import User
 from indico.util.date_time import round_up_month
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
@@ -335,11 +333,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     @property
     def owner(self):
-        return AvatarHolder().getById(self.owner_id)
+        return User.get(self.owner_id).as_avatar
 
     @owner.setter
     def owner(self, user):
-        self.owner_id = user.getId()
+        self.owner_id = user.id
 
     @property
     def notification_emails(self):
@@ -665,7 +663,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         manager_group = self.get_attribute_value('manager-group')
         if not manager_group:
             return False
-        return avatar.is_member_of_group(manager_group.encode('utf-8'))
+        return avatar.is_member_of_group(manager_group)
 
     @hybrid_method
     def is_in_digest_window(self, exclude_first_day=False):

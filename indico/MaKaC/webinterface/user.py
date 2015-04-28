@@ -24,10 +24,9 @@ class UserModificationBase ( object ):
         It will store the Avatar object in self._targetUser
     """
 
-    def _checkParams( self ):
+    def _checkParams(self):
         if 'user' in self._params:
-            ph = user.PrincipalHolder()
-            self._targetUser = ph.getById(self._params['user'])
+            self._targetUser = user.AvatarHolder().getById(self._params['user'])
         else:
             self._targetUser = None
 
@@ -67,19 +66,18 @@ class UserListModificationBase ( object):
         avatars = []
         newUsers = []
         editedAvatars = []
-        ph = user.PrincipalHolder()
 
         for userDict in userList:
             id = userDict['id']
-            if id.startswith('newUser'):
+            if str(id).startswith('newUser'):
                 newUsers.append(userDict)
-            elif id.startswith('edited'):
-                editedAvatars.append((ph.getById(id[6:]), userDict))
+            elif str(id).startswith('edited'):
+                editedAvatars.append((user.AvatarHolder().getById(id[6:]), userDict))
             else:
-                principal = ph.getById(id)
+                principal = user.AvatarHolder().getById(id)
                 if principal is None:
                     raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % userDict["email"])
-                avatars.append(ph.getById(id))
+                avatars.append(user.AvatarHolder().getById(id))
 
         return avatars, newUsers, editedAvatars
 

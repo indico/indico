@@ -14,13 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_method
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
+from indico.modules.rb.models.blocking_principals import BlockingPrincipal
+from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
-from MaKaC.user import AvatarHolder
 
 
 class Blocking(db.Model):
@@ -55,11 +57,13 @@ class Blocking(db.Model):
         nullable=False
     )
 
-    allowed = db.relationship(
+    _allowed = db.relationship(
         'BlockingPrincipal',
         backref='blocking',
-        cascade='all, delete-orphan'
+        cascade='all, delete-orphan',
+        collection_class=set
     )
+    allowed = association_proxy('_allowed', 'principal', creator=lambda v: BlockingPrincipal(principal=v))
     blocked_rooms = db.relationship(
         'BlockedRoom',
         backref='blocking',
@@ -76,11 +80,11 @@ class Blocking(db.Model):
 
     @property
     def created_by_user(self):
-        return AvatarHolder().getById(self.created_by_id)
+        return User.get(self.created_by_id).as_avatar
 
     @created_by_user.setter
     def created_by_user(self, user):
-        self.created_by_id = user.getId()
+        self.created_by_id = user.id
 
     def can_be_modified(self, user):
         """
@@ -112,7 +116,7 @@ class Blocking(db.Model):
                 return True
             elif room and room.is_owned_by(user):
                 return True
-        for principal in self.allowed:
+        for principal in self._allowed:
             if principal.entity.containsUser(user):
                 return True
         return False

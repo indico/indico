@@ -65,7 +65,6 @@ class UserLink(db.Model):
     @cached_property
     def object(self):
         """Retrieves the linked object"""
-        from MaKaC.user import GroupHolder
         from MaKaC.webinterface.locators import WebLocator
 
         mapping = {
@@ -81,9 +80,7 @@ class UserLink(db.Model):
         }
 
         try:
-            if self.type == 'group':
-                return GroupHolder().getById(self.data['locator']['groupId'])
-            elif self.type == 'evaluation':
+            if self.type == 'evaluation':
                 loc = WebLocator()
                 loc.setConference(self.data['locator'])
                 return loc.getObject().getEvaluation().getSubmissionById(self.data['locator']['submission_id'])
@@ -168,8 +165,6 @@ class UserLink(db.Model):
                          'roles': {'submitter'}},
             'registration': {'cls': MaKaC.registration.Registrant,
                              'roles': {'registrant'}},
-            'group': {'cls': MaKaC.user.Group,
-                      'roles': {'member'}},
             'evaluation': {'cls': MaKaC.evaluation.Submission,
                            'roles': {'submitter'}}
         }

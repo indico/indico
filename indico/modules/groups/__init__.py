@@ -14,30 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
 
-from indico.core.db import DBMgr
-from MaKaC.user import GroupHolder
+from indico.core import signals
+from indico.modules.groups.core import GroupProxy
+from indico.util.i18n import _
+from indico.web.flask.util import url_for
 
-"""
-Set as obsolete the groups listed in a file
-"""
 
-fileGroups='GroupsDeletedInAD.txt'
+__all__ = ('GroupProxy',)
 
-DBMgr.getInstance().startRequest()
-error = False
-gh = GroupHolder()
-groupIdx=gh._getIdx()
 
-groupsObsoletes = open(fileGroups,'r')
-for group in groupsObsoletes.readlines():
-    gr=groupIdx.get(group.rstrip())
-    if gr != None:
-        gr.setObsolete(True)
-
-if not error:
-    DBMgr.getInstance().endRequest()
-    print "Groups set as obsoleted."
-    print "No error. The change are saved"
-else:
-    print "There were errors. The changes was not saved"
+@signals.admin_sidemenu.connect
+def _extend_admin_menu(sender, **kwargs):
+    from MaKaC.webinterface.wcomponents import SideMenuItem
+    return 'groups', SideMenuItem(_("Groups"), url_for('groups.groups'))

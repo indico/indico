@@ -31,26 +31,27 @@ from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
 
+from MaKaC.common import HelperMaKaCInfo
+from MaKaC.webinterface.pages.error import WErrorWSGI
+
 import indico.util.date_time as date_time_util
 from indico.core.config import Config
 from indico.core import signals
-from indico.util.i18n import gettext_context, ngettext_context, babel
+from indico.util.i18n import gettext_context, ngettext_context, babel, _
 from indico.core.logger import Logger
-from MaKaC.i18n import _
-from MaKaC.webinterface.pages.error import WErrorWSGI
 
+from indico.core.auth import multipass
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.plugins import plugin_engine, include_plugin_css_assets, include_plugin_js_assets, url_for_plugin
-from indico.modules.auth import multipass
 from indico.modules.auth.providers import IndicoAuthProvider
 from indico.modules.auth.providers import IndicoIdentityProvider
 from indico.util.signals import values_from_signal
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
-                                         call_template_hook)
+                                         equalto, call_template_hook)
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
                                    IndicoConfigWrapper)
 from indico.web.flask.wrappers import IndicoFlask
@@ -72,6 +73,7 @@ from indico.core.plugins.blueprints import plugins_blueprint
 from indico.modules.api.blueprint import api_blueprint
 from indico.modules.auth.blueprint import auth_blueprint
 from indico.modules.events.agreements.blueprint import agreements_blueprint
+from indico.modules.groups.blueprint import groups_blueprint
 from indico.modules.payment.blueprint import payment_blueprint
 from indico.modules.vc.blueprint import vc_blueprint, vc_compat_blueprint
 from indico.modules.events.registration.blueprint import event_registration_blueprint
@@ -84,7 +86,7 @@ from indico.web.assets.blueprint import assets_blueprint
 BLUEPRINTS = (legacy, misc, user, oauth, rooms, category, category_mgmt, event_display,
               event_creation, event_mgmt, files, admin, rooms_admin, plugins_blueprint, payment_blueprint,
               event_registration_blueprint, requests_blueprint, agreements_blueprint, vc_blueprint, assets_blueprint,
-              api_blueprint, users_blueprint, oauth_blueprint, auth_blueprint)
+              api_blueprint, users_blueprint, oauth_blueprint, auth_blueprint, groups_blueprint)
 COMPAT_BLUEPRINTS = map(make_compat_blueprint, (misc, user, oauth, rooms, category, category_mgmt, event_display,
                                                 event_creation, event_mgmt, files, admin, rooms_admin))
 COMPAT_BLUEPRINTS += (vc_compat_blueprint,)
@@ -116,21 +118,7 @@ def configure_app(app, set_path=False):
     app.config['INDICO_SESSION_PERMANENT'] = cfg.getSessionLifetime() > 0
     app.config['INDICO_HTDOCS'] = cfg.getHtdocsDir()
     app.config['INDICO_COMPAT_ROUTES'] = cfg.getRouteOldUrls()
-    app.config['MULTIPASS_AUTH_PROVIDERS'] = cfg.getAuthProviders()
-    app.config['MULTIPASS_IDENTITY_PROVIDERS'] = cfg.getIdentityProviders()
-    app.config['MULTIPASS_PROVIDER_MAP'] = cfg.getProviderMap() or {x: x for x in cfg.getAuthProviders()}
-    if 'indico' in app.config['MULTIPASS_AUTH_PROVIDERS'] or 'indico' in app.config['MULTIPASS_IDENTITY_PROVIDERS']:
-        raise ValueError('The name `indico` is reserved and cannot be used as an Auth/Identity provider name.')
-    if cfg.getLocalIdentities():
-        configure_multipass_local(app)
-    app.config['MULTIPASS_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone',
-                                                  'address'}
-    app.config['MULTIPASS_LOGIN_SELECTOR_TEMPLATE'] = 'auth/login_selector.html'
-    app.config['MULTIPASS_LOGIN_FORM_TEMPLATE'] = 'auth/login_form.html'
-    app.config['MULTIPASS_LOGIN_ENDPOINT'] = 'auth.login'
-    app.config['MULTIPASS_LOGIN_URLS'] = None  # registered in a blueprint
-    app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'misc.index'
-    app.config['MULTIPASS_FAILURE_MESSAGE'] = _(u'Login failed: {error}')
+    configure_multipass(app)
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
     app.config['PLUGINENGINE_PLUGINS'] = cfg.getPlugins()
     if set_path:
@@ -153,10 +141,28 @@ def configure_app(app, set_path=False):
             raise ValueError('Invalid static file method: %s' % method)
 
 
+def configure_multipass(app):
+    cfg = Config.getInstance()
+    app.config['MULTIPASS_AUTH_PROVIDERS'] = cfg.getAuthProviders()
+    app.config['MULTIPASS_IDENTITY_PROVIDERS'] = cfg.getIdentityProviders()
+    app.config['MULTIPASS_PROVIDER_MAP'] = cfg.getProviderMap() or {x: x for x in cfg.getAuthProviders()}
+    if 'indico' in app.config['MULTIPASS_AUTH_PROVIDERS'] or 'indico' in app.config['MULTIPASS_IDENTITY_PROVIDERS']:
+        raise ValueError('The name `indico` is reserved and cannot be used as an Auth/Identity provider name.')
+    if cfg.getLocalIdentities():
+        configure_multipass_local(app)
+    app.config['MULTIPASS_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone',
+                                                  'address'}
+    app.config['MULTIPASS_LOGIN_ENDPOINT'] = 'auth.login'
+    app.config['MULTIPASS_LOGIN_URLS'] = None  # registered in a blueprint
+    app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'misc.index'
+    app.config['MULTIPASS_FAILURE_MESSAGE'] = _(u'Login failed: {error}')
+
+
 def configure_multipass_local(app):
     app.config['MULTIPASS_AUTH_PROVIDERS']['indico'] = {
         'type': IndicoAuthProvider,
-        'title': _('Local Account')
+        'title': 'Indico',
+        'default': not any(p.get('default') for p in app.config['MULTIPASS_AUTH_PROVIDERS'].itervalues())
     }
     app.config['MULTIPASS_IDENTITY_PROVIDERS']['indico'] = {
         'type': IndicoIdentityProvider,
@@ -200,9 +206,11 @@ def setup_jinja(app):
     app.add_template_filter(natsort)
     # Tests
     app.add_template_test(instanceof)  # only use this test if you really have to!
+    app.add_template_test(equalto)
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext_context, ngettext_context, True)
+    app.add_template_global(lambda: HelperMaKaCInfo.getMaKaCInfoInstance().getLang(), 'get_default_language')
     # webassets
     app.jinja_env.add_extension('webassets.ext.jinja2.AssetsExtension')
     app.jinja_env.assets_environment = core_env

@@ -16,13 +16,13 @@
     <p>
         {% if not identity_info.email_verified %}
             {% trans name=user.full_name -%}
-                We have found an existing Indico account <strong>{{ name }}</strong> which will be associated
+                We have found an existing Indico profile <strong>{{ name }}</strong> which will be linked
                 with this provider once you have verified that <strong>{{ emails }}</strong>
                 is actually your email address.
             {%- endtrans %}
         {% else %}
             {% trans name=user.full_name -%}
-                We have found an existing Indico account <strong>{{ name }}</strong> which will be associated
+                We have found an existing Indico profile <strong>{{ name }}</strong> which will be linked
                 with this provider once you click the button below.
             {%- endtrans %}
         {% endif %}

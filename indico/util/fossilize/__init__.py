@@ -262,7 +262,7 @@ class Fossilizable(object):
         :type useAttrCache: boolean
         """
 
-        mapClassType = dict(mapClassType or {}, AvatarUserWrapper='Avatar')
+        mapClassType = dict(mapClassType or {}, AvatarUserWrapper='Avatar', AvatarProvisionalWrapper='Avatar')
         interface = cls.__obtainInterface(obj, interfaceArg)
 
         name = interface.getName()

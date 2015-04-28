@@ -55,12 +55,15 @@ def _get_all_locales():
 class UserImporter(Importer):
     def __init__(self, **kwargs):
         self.ldap_provider_name = kwargs.pop('ldap_provider_name')
+        self.ignore_local_accounts = kwargs.pop('ignore_local_accounts')
         super(UserImporter, self).__init__(**kwargs)
 
     @staticmethod
     def decorate_command(command):
         command = click.option('--ldap-provider-name', default='legacy-ldap',
                                help="Provider name to use for existing LDAP identities")(command)
+        command = click.option('--ignore-local-accounts', is_flag=True, default=False,
+                               help="Do not migrate existing local accounts")(command)
         return command
 
     def has_data(self):
@@ -69,7 +72,7 @@ class UserImporter(Importer):
     @contextmanager
     def _monkeypatch(self):
         prop = FavoriteCategory.target
-        FavoriteCategory.target = property(lambda fc: self.zodb_root['categories'][str(fc.target_id)],
+        FavoriteCategory.target = property(lambda fc: self.zodb_root['categories'].get(str(fc.target_id)),
                                            prop.fset,
                                            prop.fdel)
         try:
@@ -89,6 +92,8 @@ class UserImporter(Importer):
 
     def migrate_users(self):
         print cformat('%{white!}migrating users')
+
+        seen_identities = set()
 
         for avatar in committing_iterator(self._iter_avatars(), 5000):
             if getattr(avatar, '_mergeTo', None):
@@ -115,26 +120,57 @@ class UserImporter(Importer):
             settings = self._settings_from_avatar(avatar)
             user_settings.set_multi(user, settings)
             # favorite users cannot be migrated here since the target user might not have been migrated yet
-            user.favorite_categories = set(avatar.linkedTo['category']['favorite'])
+            user.favorite_categories = set(filter(None, avatar.linkedTo['category']['favorite']))
             db.session.flush()
             print cformat('%{green}+++%{reset} '
                           '%{white!}{:6d}%{reset} %{cyan}{}%{reset} [%{blue!}{}%{reset}] '
                           '{{%{cyan!}{}%{reset}}}').format(user.id, user.full_name, user.email,
                                                            ', '.join(user.secondary_emails))
-            for old_identity in avatar.identities:
-                identity = None
-                if old_identity.__class__.__name__ == 'LocalIdentity':
-                    identity = Identity(provider='indico', identifier=old_identity.login)
-                    if not hasattr(old_identity, 'algorithm'):  # plaintext password
-                        identity.password = old_identity.password
-                    else:
-                        assert old_identity.algorithm == 'bcrypt'
-                        identity.password_hash = old_identity.password
-                elif old_identity.__class__.__name__ == 'LDAPIdentity':
-                    identity = Identity(provider=self.ldap_provider_name, identifier=old_identity.login)
-                if identity:
-                    print cformat('%{blue!}<->%{reset}  %{yellow}{}%{reset}').format(identity)
-                    user.identities.add(identity)
+            # migrate identities of non-deleted avatars
+            if not user.is_deleted:
+                for old_identity in avatar.identities:
+                    identity = None
+                    username = convert_to_unicode(old_identity.login).strip().lower()
+
+                    if not username:
+                        print cformat("%{red!}!!!%{reset} "
+                                      "%{yellow!}Empty username: {}. Skipping identity.").format(
+                                          old_identity)
+                        continue
+
+                    provider = {
+                        'LocalIdentity': 'indico',
+                        'LDAPIdentity': self.ldap_provider_name
+                    }[old_identity.__class__.__name__]
+
+                    if (provider, username) in seen_identities:
+                        print cformat("%{red!}!!!%{reset} "
+                                      "%{yellow!}Duplicate identity: {}, {}. Skipping.").format(provider, username)
+                        continue
+
+                    if provider == 'indico' and not self.ignore_local_accounts:
+                        identity = Identity(provider=provider, identifier=username)
+
+                        if not hasattr(old_identity, 'algorithm'):  # plaintext password
+                            if not old_identity.password:
+                                # password is empty, skip identity
+                                print cformat("%{red!}!!!%{reset} "
+                                              "%{yellow!}Identity '{}' has empty password. Skipping identity.").format(
+                                                  old_identity.login)
+                                continue
+                            identity.password = old_identity.password
+                        else:
+                            assert old_identity.algorithm == 'bcrypt'
+                            identity.password_hash = old_identity.password
+
+                    elif provider == self.ldap_provider_name:
+                        identity = Identity(provider=provider, identifier=username)
+
+                    if identity:
+                        print cformat('%{blue!}<->%{reset}  %{yellow}{}%{reset}').format(identity)
+                        user.identities.add(identity)
+                        seen_identities.add((provider, username))
+
             for merged_avatar in getattr(avatar, '_mergeFrom', ()):
                 merged = self._user_from_avatar(merged_avatar, is_deleted=True, merged_into_id=user.id)
                 print cformat('%{blue!}***%{reset} '
@@ -172,7 +208,10 @@ class UserImporter(Importer):
     def migrate_admins(self):
         print cformat('%{white!}migrating admins')
         for avatar in committing_iterator(self.zodb_root['adminlist']._AdminList__list):
-            user = User.get(int(avatar.id))
+            try:
+                user = User.get(int(avatar.id))
+            except ValueError:
+                continue
             if user is None:
                 continue
             user.is_admin = True
@@ -183,18 +222,19 @@ class UserImporter(Importer):
         for avatars in grouper(self._iter_avatars(), 2500, skip_missing=True):
             avatars = {int(a.id): a for a in avatars}
             users = ((u, avatars[u.id]) for u in User.find(User.id.in_(avatars)))
+
             for user, avatar in committing_iterator(self.flushing_iterator(users, 250)):
+                registrants = set()
                 user_shown = False
                 for type_, entries in avatar.linkedTo.iteritems():
                     # store registrant roles, in order to avoid duplication below
-                    registrants = set()
                     for role, objects in entries.iteritems():
-                        if type_ == 'category' and role == 'favorite':
+                        if (type_ == 'category' and role == 'favorite') or type_ == 'group':
                             continue
                         if not objects:
                             continue
                         if type_ == 'registration' and role == 'registrant':
-                            registrants.add(object)
+                            registrants |= set(objects)
                         if not user_shown:
                             print cformat('%{green}+++%{reset} '
                                           '%{white!}{:6d}%{reset} %{cyan}{}%{reset}').format(user.id, user.full_name)
@@ -211,7 +251,7 @@ class UserImporter(Importer):
                                               '{}').format(unicode(e), obj)
 
                 # add old "registrant" entries to registration/registrant
-                for reg in avatar.registrants.itervalues():
+                for reg in getattr(avatar, 'registrants', {}).itervalues():
                     if reg.getConference().getOwner() and reg not in registrants:
                         UserLink.create_link(user, reg, 'registrant', 'registration')
                         print cformat('%{cyan!}<->%{reset}        '
@@ -265,7 +305,7 @@ class UserImporter(Importer):
             for u in (user, coll):
                 print cformat('%{magenta!}---%{reset} '
                               '%{yellow!}Deleting {} - primary email collision%{reset} '
-                              '[%{blue!}{}%{reset}]').format(user.id, user.email)
+                              '[%{blue!}{}%{reset}]').format(u.id, u.email)
                 u.is_deleted = True
                 db.session.flush()
         # if the user was already deleted we don't care about primary email collisions

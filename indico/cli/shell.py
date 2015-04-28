@@ -32,7 +32,7 @@ from indico.core.index import Catalog
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import Conference, ConferenceHolder, CategoryManager
-from MaKaC.user import AvatarHolder, GroupHolder
+from MaKaC.user import AvatarHolder
 from indico.web.flask.util import IndicoConfigWrapper
 
 
@@ -96,7 +96,6 @@ class IndicoShell(Shell):
             add_to_context(ConferenceHolder)
             add_to_context(CategoryManager)
             add_to_context(AvatarHolder)
-            add_to_context(GroupHolder)
             add_to_context(Catalog)
             add_to_context(IndexesHolder)
             add_to_context(IndicoConfigWrapper(Config.getInstance()), 'config')

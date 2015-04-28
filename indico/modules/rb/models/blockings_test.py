@@ -44,15 +44,13 @@ def test_is_active_at(create_blocking, check_date, expected):
 
 def test_created_by_user(dummy_blocking, dummy_user, create_user):
     assert dummy_blocking.created_by_user == dummy_user
-    dummy_blocking.created_by_user = user = create_user(u'user')
+    dummy_blocking.created_by_user = user = create_user(123)
     assert dummy_blocking.created_by_user == user
-    dummy_blocking.created_by_id = u'xxx'
-    assert dummy_blocking.created_by_user is None
 
 
 @pytest.mark.parametrize(('is_admin', 'is_creator', 'expected'), bool_matrix('..', expect=any))
 def test_can_be_modified_deleted(dummy_blocking, create_user, is_admin, is_creator, expected):
-    user = create_user('user', rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin)
     if is_creator:
         dummy_blocking.created_by_user = user
     assert dummy_blocking.can_be_modified(user) == expected
@@ -66,7 +64,7 @@ def test_can_be_modified_deleted(dummy_blocking, create_user, is_admin, is_creat
 )
 def test_can_be_overridden(dummy_room, dummy_blocking, create_user,
                            is_creator, is_admin, has_room, is_room_owner, expected):
-    user = create_user('user', rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin)
     if is_room_owner:
         dummy_room.owner = user
     if is_creator:
@@ -81,7 +79,7 @@ def test_can_be_overridden(dummy_room, dummy_blocking, create_user,
 )
 def test_can_be_overridden_explicit_only(dummy_room, dummy_blocking, create_user,
                                          is_creator, is_admin, has_room, is_room_owner, expected):
-    user = create_user('user', rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin)
     if is_room_owner:
         dummy_room.owner = user
     if is_creator:
@@ -95,12 +93,12 @@ def test_can_be_overridden_explicit_only(dummy_room, dummy_blocking, create_user
     (False,   False)
 ))
 def test_can_be_overridden_acl(dummy_blocking, dummy_user, create_user, dummy_group, in_acl, expected):
-    user = create_user('user', groups={dummy_group.id})
-    dummy_blocking.allowed = [BlockingPrincipal(entity_type='Avatar', entity_id=dummy_user.id)]
+    user = create_user(123, groups={dummy_group})
+    dummy_blocking.allowed = {dummy_user.user}
     if in_acl == 'user':
-        dummy_blocking.allowed.append(BlockingPrincipal(entity_type='Avatar', entity_id=user.id))
+        dummy_blocking.allowed.add(user.user)
     elif in_acl == 'group':
-        dummy_blocking.allowed.append(BlockingPrincipal(entity_type='Group', entity_id=dummy_group.id))
+        dummy_blocking.allowed.add(dummy_group)
     assert dummy_blocking.can_be_overridden(user) == expected
 
 
