@@ -235,7 +235,11 @@ class User(db.Model):
     def as_avatar(self):
         # TODO: remove this after DB is free of Avatars
         from indico.modules.users.legacy import AvatarUserWrapper
-        return AvatarUserWrapper(self.id, _user=self)
+        avatar = AvatarUserWrapper(self.id)
+
+        # avoid garbage collection
+        avatar.user
+        return avatar
 
     @property
     def external_identities(self):

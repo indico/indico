@@ -38,19 +38,18 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     def __init__(self, user_id, _user=None):
         self.id = str(user_id)
-        if _user is not None:
-            self._v_user = _user
 
     @property
+    @memoize_request
     def original_user(self):
-        return getattr(self, '_v_user',
-                       User.query.options(db.joinedload(User.merged_into_user)).filter_by(id=int(self.id)).one())
+        return User.get(int(self.id))
 
     @property
+    @memoize_request
     def user(self):
         user = self.original_user
         if user.is_deleted:
-            return user.merged_into_user if user.merged_into_user else None
+            return user.merged_into_user if user.merged_into_id is not None else None
         else:
             return user
 
