@@ -58,9 +58,9 @@ def process_identity(identity_info):
             return redirect(url_for('auth.register', provider=identity_info.provider.name))
         else:
             logger.info('Found user with matching email: {}'.format(user))
-            return redirect(url_for('auth.associate_identity', provider=identity_info.provider.name))
+            return redirect(url_for('auth.link_account', provider=identity_info.provider.name))
     elif identity.user.is_deleted:
-        raise MultipassException(_('Your Indico account has been deleted.'))
+        raise MultipassException(_('Your Indico profile has been deleted.'))
     else:
         user = identity.user
         logger.info('Found existing identity {} for user {}'.format(identity, user))
@@ -72,7 +72,7 @@ def process_identity(identity_info):
         logger.info('Updated data'.format(identity, user))
         identity.data = identity_info.data
     if user.is_blocked:
-        raise MultipassException(_('Your Indico account has been blocked.'))
+        raise MultipassException(_('Your Indico profile has been blocked.'))
     login_user(user, identity)
 
 

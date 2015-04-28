@@ -108,10 +108,10 @@ class ResetPasswordEmailForm(IndicoForm):
     def validate_email(self, field):
         user = self.user
         if user is None:
-            raise ValidationError(_('There is no user with this email address.'))
+            raise ValidationError(_('There is no profile with this email address.'))
         elif not user.local_identities:
             # XXX: Should we allow creating a new identity instead? Would be user-friendly for sure!
-            raise ValidationError(_('This account has no username/password associated.'))
+            raise ValidationError(_('This profile has no local account.'))
 
     @property
     def user(self):
