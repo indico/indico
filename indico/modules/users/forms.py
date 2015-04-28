@@ -16,6 +16,10 @@
 
 from __future__ import unicode_literals
 
+from operator import itemgetter
+
+from flask import request
+from pytz import all_timezones
 from wtforms.fields.core import SelectField, BooleanField
 from wtforms.fields.html5 import EmailField
 from wtforms.fields.simple import StringField, TextAreaField
@@ -29,9 +33,6 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoEnumSelectField
 from indico.web.forms.widgets import SwitchWidget, SyncWidget
 
-from operator import itemgetter
-from pytz import all_timezones
-
 
 class UserDetailsForm(IndicoForm):
     title = IndicoEnumSelectField(_('Title'), enum=UserTitle)
@@ -40,6 +41,11 @@ class UserDetailsForm(IndicoForm):
     affiliation = StringField(_('Affiliation'), widget=SyncWidget())
     address = TextAreaField(_('Address'))
     phone = StringField(_('Phone number'), widget=SyncWidget())
+
+    @property
+    def synced_fields(self):
+        """The fields which are set as synced for the current request."""
+        return set(request.form.getlist('synced_fields'))
 
 
 class UserPreferencesForm(IndicoForm):

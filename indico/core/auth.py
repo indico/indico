@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from warnings import warn
 
+from flask import current_app
 from flask_multipass import Multipass
 
 
@@ -46,7 +47,22 @@ class IndicoMultipass(Multipass):
         This is the identify provider used to sync user data.
         """
         return next((p for p in self.identity_providers.itervalues()
-                     if p.supports_refresh and p.settings.get('sync_provider')), None)
+                     if p.supports_refresh and p.settings.get('synced_fields')), None)
+
+    @property
+    def synced_fields(self):
+        """The keys to be synchronized
+
+        This is the set of keys to be synced to user data.
+        The ``email`` can never be synchronised.
+        """
+        provider = self.sync_provider
+        if provider is None:
+            return set()
+        synced_fields = set(provider.settings.get('synced_fields'))
+        synced_fields &= set(current_app.config['MULTIPASS_IDENTITY_INFO_KEYS'])
+        synced_fields.discard('email')
+        return synced_fields
 
     def init_app(self, app):
         super(IndicoMultipass, self).init_app(app)
@@ -60,7 +76,7 @@ class IndicoMultipass(Multipass):
                  'This will break legacy ACLs referencing external groups and room ACLs will use local group IDs.')
         # Ensure that there is maximum one sync provider
         sync_providers = [p for p in self.identity_providers.itervalues()
-                          if p.supports_refresh and p.settings.get('sync_provider')]
+                          if p.supports_refresh and p.settings.get('synced_fields')]
         if len(sync_providers) > 1:
             raise ValueError('There can only be one sync provider.')
         # Ensure that there is exactly one form-based default auth provider

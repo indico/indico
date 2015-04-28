@@ -81,9 +81,12 @@ class RHUserDashboard(RHUserBase):
 
 class RHPersonalData(RHUserBase):
     def _process(self):
-        form = UserDetailsForm(obj=FormDefaults(self.user, skip_attrs={'title'}, title=self.user._title))
+        form = UserDetailsForm(obj=FormDefaults(self.user, skip_attrs={'title'}, title=self.user._title),
+                               synced_fields=self.user.synced_fields, synced_values=self.user.synced_values)
         if form.validate_on_submit():
-            form.populate_obj(self.user)
+            self.user.synced_fields = form.synced_fields
+            form.populate_obj(self.user, skip=self.user.synced_fields)
+            self.user.synchronize_data(refresh=True)
             flash(_('Your account details were successfully updated.'), 'success')
             return redirect(url_for('.user_profile'))
         return WPUser.render_template('account.html', user=self.user, form=form)

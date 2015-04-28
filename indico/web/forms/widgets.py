@@ -101,7 +101,7 @@ class SwitchWidget(object):
 
     def __call__(self, field, **kwargs):
         kwargs.update({
-            'checked':  getattr(field, 'checked', field.data),
+            'checked': getattr(field, 'checked', field.data),
             'on_label': self.on_label,
             'off_label': self.off_label
         })

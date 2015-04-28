@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from flask import current_app
+from flask import flash
+from flask_multipass import IdentityRetrievalFailed
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.utils import cached_property
@@ -263,9 +264,6 @@ class User(db.Model):
         """The local identities of the user except the main one"""
         return self.local_identities - {self.local_identity}
 
-    def get_identities_of_provider(self, provider):
-        return {x for x in self.identities if x.provider == provider}
-
     @property
     def locator(self):
         return {'user_id': self.id}
@@ -306,6 +304,40 @@ class User(db.Model):
     def full_name(self):
         """Returns the user's name in 'Firstname Lastname' notation."""
         return self.get_full_name(last_name_first=False, last_name_upper=False, abbrev_first_name=False)
+
+    @property
+    def synced_fields(self):
+        """The fields of the user whose values are currently synced.
+
+        This set is always a subset of the synced fields define in
+        synced fields of the idp in 'indico.conf'.
+        """
+        synced_fields = self.settings.get('synced_fields')
+        # If synced_fields is missing or None, then all fields are synced
+        if synced_fields is None:
+            return multipass.synced_fields
+        else:
+            return set(synced_fields) & multipass.synced_fields
+
+    @synced_fields.setter
+    def synced_fields(self, value):
+        value = set(value) & multipass.synced_fields
+        if value == multipass.synced_fields:
+            self.settings.delete('synced_fields')
+        else:
+            self.settings.set('synced_fields', list(value))
+
+    @property
+    def synced_values(self):
+        """The values from the synced identity for the user.
+
+        Those value are not the actual user's values and might differ if
+        they are not set as synchronized.
+        """
+        identity = self._get_synced_identity(refresh=False)
+        if identity is None:
+            return {}
+        return {field: identity.data.get(field) for field in multipass.synced_fields}
 
     @return_ascii
     def __repr__(self):
@@ -401,23 +433,46 @@ class User(db.Model):
         """
         return UserLink.remove_link(self, obj, role)
 
-    def synchronize_data(self):
-        from indico.modules.auth import multipass
-        sync_provider = multipass.sync_provider
-        if not sync_provider:
+    def synchronize_data(self, refresh=False):
+        """
+        Synchronize the fields of the user from the sync identity.
+
+        This will take only into account ``user.sync_fields``.
+
+        :param refresh: bool -- Whether to refresh the synced identity
+                        with the sync provider before or not. (Only if
+                        the sync provider support refresh.)
+        """
+        identity = self._get_synced_identity(refresh=refresh)
+        if identity is None:
             return
-        identities = sorted(self.get_identities_of_provider(sync_provider.name), key=lambda x: x.last_login_dt,
-                            reverse=True)
-        if not identities:
-            return
-        identity = identities[0]
-        synced_fields = self.settings.get('synced_fields')
-        if synced_fields is None:
-            synced_fields = current_app.config['MULTIPASS_IDENTITY_INFO_KEYS']
-        else:
-            synced_fields &= current_app.config['MULTIPASS_IDENTITY_INFO_KEYS']
-        for field in synced_fields:
-            if field == 'email':
+        for field in self.synced_fields:
+            old_value = getattr(self, field)
+            new_value = identity.data.get(field)
+            if new_value is None:
                 continue
-            if identity.data[field]:
-                setattr(self, field, identity.data[field])
+            if field in ('first_name', 'last_name') and not new_value:
+                continue
+            if old_value == new_value:
+                continue
+            flash(_("Your {field_name} has been synchronised from '{old_value}' to '{new_value}'.").format(
+                  field_name=syncable_fields[field], old_value=old_value, new_value=new_value))
+            setattr(self, field, new_value)
+
+    def _get_synced_identity(self, refresh=False):
+        sync_provider = multipass.sync_provider
+        if sync_provider is None:
+            return None
+        identities = sorted([x for x in self.identities if x.provider == sync_provider.name],
+                            key=attrgetter('last_login_dt'), reverse=True)
+        if not identities:
+            return None
+        identity = identities[0]
+        if refresh and identity.multipass_data is not None:
+            try:
+                identity_info = sync_provider.refresh_identity(identity.identifier, identity.multipass_data)
+            except IdentityRetrievalFailed:
+                identity_info = None
+            if identity_info:
+                identity.data = identity_info.data
+        return identity
