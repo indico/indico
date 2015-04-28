@@ -69,15 +69,15 @@ admin.add_url_rule('/networks/<domainId>/details', 'domainDetails', domains.RHDo
 admin.add_url_rule('/networks/', 'domainList', domains.RHDomains, methods=('GET', 'POST'))
 
 # Users
-admin.add_url_rule('/settings/users/', 'userManagement', users.RHUserManagement)
-admin.add_url_rule('/settings/users/creation', 'userManagement-switchAuthorisedAccountCreation',
+admin.add_url_rule('/settings/users-old/', 'userManagement', users.RHUserManagement)
+admin.add_url_rule('/settings/users-old/creation', 'userManagement-switchAuthorisedAccountCreation',
                    users.RHUserManagementSwitchAuthorisedAccountCreation)
-admin.add_url_rule('/settings/users/moderate-creation', 'userManagement-switchModerateAccountCreation',
+admin.add_url_rule('/settings/users-old/moderate-creation', 'userManagement-switchModerateAccountCreation',
                    users.RHUserManagementSwitchModerateAccountCreation)
-admin.add_url_rule('/settings/users/notify-creation', 'userManagement-switchNotifyAccountCreation',
+admin.add_url_rule('/settings/users-old/notify-creation', 'userManagement-switchNotifyAccountCreation',
                    users.RHUserManagementSwitchNotifyAccountCreation)
-admin.add_url_rule('/users/', 'userList', users.RHUsers, methods=('GET', 'POST'))
-admin.add_url_rule('/users/merge', 'userMerge', admins.RHUserMerge, methods=('GET', 'POST'))
+admin.add_url_rule('/users-old/', 'userList', users.RHUsers, methods=('GET', 'POST'))
+admin.add_url_rule('/users-old/merge', 'userMerge', admins.RHUserMerge, methods=('GET', 'POST'))
 
 # Layout
 admin.add_url_rule('/layout/', 'adminLayout', admins.RHAdminLayoutGeneral, methods=('GET', 'POST'))

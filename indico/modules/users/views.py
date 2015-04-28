@@ -23,6 +23,7 @@ from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.web.menu import MenuItem
 
+from MaKaC.webinterface.pages.admins import WPAdminsBase
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
@@ -59,3 +60,10 @@ class WPUser(WPJinjaMixin, WPMainBase):
 class WPUserDashboard(WPUser):
     def getCSSFiles(self):
         return WPUser.getCSSFiles(self) + self._asset_env['dashboard_sass'].urls()
+
+
+class WPUsersAdmin(WPJinjaMixin, WPAdminsBase):
+    template_prefix = 'users/'
+
+    def _setActiveSideMenuItem(self):
+        self.extra_menu_items['users'].setActive()

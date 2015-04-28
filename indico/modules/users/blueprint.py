@@ -22,11 +22,19 @@ from indico.modules.users.controllers import (RHUserDashboard, RHPersonalData, R
                                               RHUserEmails, RHUserEmailsVerify, RHUserEmailsDelete,
                                               RHUserEmailsSetPrimary, RHUserFavoritesUsersAdd,
                                               RHUserFavoritesUserRemove, RHUserFavoritesCategoryAPI,
-                                              RHUserSuggestionsRemove)
+                                              RHUserSuggestionsRemove, RHUsersAdminSettings, RHUsersAdminCreate,
+                                              RHUsersAdminMerge)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 users_blueprint = _bp = IndicoBlueprint('users', __name__, template_folder='templates', url_prefix='/user')
 
+# Admin
+_bp.add_url_rule('!/admin/users/', 'users_admin', RHUsersAdminSettings, methods=('GET', 'POST'))
+_bp.add_url_rule('!/admin/users/create/', 'users_create', RHUsersAdminCreate, methods=('GET', 'POST'))
+_bp.add_url_rule('!/admin/users/merge/', 'users_merge', RHUsersAdminMerge, methods=('GET', 'POST'))
+
+
+# User profile
 with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/dashboard/', 'user_dashboard', RHUserDashboard)
     _bp.add_url_rule('/suggestions/categories/<category_id>', 'user_suggestions_remove', RHUserSuggestionsRemove,

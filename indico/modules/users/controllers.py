@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
+from operator import attrgetter
 
 from flask import session, request, flash, jsonify, redirect
 from pytz import timezone
@@ -26,9 +27,11 @@ from indico.core import signals
 from indico.core.notifications import make_email
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
-from indico.modules.users.util import get_related_categories, get_suggested_categories, serialize_user, merge_users
-from indico.modules.users.views import WPUserDashboard, WPUser
-from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm
+from indico.modules.users.util import (get_related_categories, get_suggested_categories,
+                                       serialize_user, search_users, merge_users)
+from indico.modules.users.views import WPUserDashboard, WPUser, WPUsersAdmin
+from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm
+from indico.modules.auth.forms import LocalRegistrationForm
 from indico.util.date_time import timedelta_split
 from indico.util.i18n import _
 from indico.util.redis import suggestions
@@ -45,6 +48,7 @@ from MaKaC.common.cache import GenericCache
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.conference import CategoryManager
+from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RHProtected
 
 
@@ -233,3 +237,36 @@ class RHUserEmailsSetPrimary(RHUserBase):
             self.user.make_email_primary(email)
             flash(_('Your primary email was updated successfully.'), 'success')
         return redirect(url_for('.user_emails'))
+
+
+class RHUsersAdminSettings(RHAdminBase):
+    """Admin users overview"""
+
+    def _process(self):
+        form = SearchForm(obj=FormDefaults(exact=True))
+        form_data = form.data
+        search_results = None
+        num_of_users = 0  # TODO: Fetch number of total users
+        if form.validate_on_submit():
+            search_results = list(search_users(form_data.pop('exact'), form_data.pop('include_deleted'),
+                                  form_data.pop('include_pending'), form_data.pop('external'), **form_data))
+            search_results.sort(key=attrgetter('last_name', 'first_name'))
+        return WPUsersAdmin.render_template('users_admin.html', form=form, search_results=search_results,
+                                            num_of_users=num_of_users)
+
+
+class RHUsersAdminCreate(RHAdminBase):
+    """Create user (admin)"""
+
+    # TODO: Complete the function
+    def _process(self):
+        form = LocalRegistrationForm()
+        return WPUsersAdmin.render_template('users_create.html', form=form)
+
+
+class RHUsersAdminMerge(RHAdminBase):
+    """Merge users (admin)"""
+
+    # TODO: Complete the function
+    def _process(self):
+        return WPUsersAdmin.render_template('users_merge.html')

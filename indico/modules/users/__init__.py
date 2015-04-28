@@ -16,9 +16,12 @@
 
 from __future__ import unicode_literals
 
+from indico.core import signals
 from indico.modules.users.ext import ExtraUserPreferences
 from indico.modules.users.models.users import User
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
+from indico.util.i18n import _
+from indico.web.flask.util import url_for
 
 
 __all__ = ('ExtraUserPreferences', 'User', 'UserSetting', 'UserSettingsProxy', 'user_settings')
@@ -30,3 +33,9 @@ user_settings = UserSettingsProxy('users', {
     'show_past_events': False,
     'synced_fields': None  # None to synchronise all fields, empty set to not synchronize
 })
+
+
+@signals.admin_sidemenu.connect
+def _extend_admin_menu(sender, **kwargs):
+    from MaKaC.webinterface.wcomponents import SideMenuItem
+    return 'users', SideMenuItem(_("Users"), url_for('users.users_admin'))

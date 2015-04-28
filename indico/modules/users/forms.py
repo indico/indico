@@ -117,3 +117,14 @@ class UserEmailsForm(IndicoForm):
     def validate_email(self, field):
         if UserEmail.find(~User.is_pending, is_user_deleted=False, email=field.data, _join=User).count():
             raise ValidationError(_('This email address is already in use.'))
+
+
+class SearchForm(IndicoForm):
+    last_name = StringField(_('Family name'))
+    first_name = StringField(_('First name'))
+    email = EmailField(_('Email'), filters=[lambda x: x.lower() if x else x])
+    affiliation = StringField(_('Affiliation'))
+    exact = BooleanField(_('Exact match'))
+    include_deleted = BooleanField(_('Include deleted'))
+    include_pending = BooleanField(_('Include pending'))
+    external = BooleanField(_('External'))
