@@ -155,7 +155,6 @@
     </div>
 
     <script>
-    $(function() {
         $('.js-show-form').on('click', function(e) {
             e.preventDefault();
             $('#no-local-acccount').hide();
@@ -173,6 +172,5 @@
             $('.js-toggle-secondary-accounts').toggle();
             $('#local-secondary > li:not(:first-child)').toggle();
         });
-    });
     </script>
 {% endblock %}
