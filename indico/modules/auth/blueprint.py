@@ -18,8 +18,8 @@ from __future__ import unicode_literals
 
 from flask import request
 
-from indico.modules.auth.controllers import (RHLogin, RHLoginForm, RHLogout, RHAssociateIdentity, RHRegister,
-                                             RHResetPassword, RHUserAccounts, RHUserAccountsRemove)
+from indico.modules.auth.controllers import (RHLogin, RHLoginForm, RHLogout, RHRegister, RHLinkAccount,
+                                             RHResetPassword, RHAccounts, RHRemoveAccount)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -29,8 +29,7 @@ auth_blueprint = _bp = IndicoBlueprint('auth', __name__, template_folder='templa
 _bp.add_url_rule('/login/', 'login', RHLogin, methods=('GET', 'POST'))
 _bp.add_url_rule('/login/<provider>/', 'login', RHLogin)
 _bp.add_url_rule('/login/<provider>/form', 'login_form', RHLoginForm)
-_bp.add_url_rule('/login/<provider>/link-account', 'associate_identity', RHAssociateIdentity, methods=('GET', 'POST'))
-
+_bp.add_url_rule('/login/<provider>/link-account', 'link_account', RHLinkAccount, methods=('GET', 'POST'))
 _bp.add_url_rule('/logout/', 'logout', RHLogout, methods=('GET', 'POST'))
 
 _bp.add_url_rule('/register/', 'register', RHRegister, methods=('GET', 'POST'), defaults={'provider': None})
@@ -39,8 +38,8 @@ _bp.add_url_rule('/register/<provider>', 'register', RHRegister, methods=('GET',
 _bp.add_url_rule('/reset-password/', 'resetpass', RHResetPassword, methods=('GET', 'POST'))
 
 with _bp.add_prefixed_rules('/user/<int:user_id>', '/user'):
-    _bp.add_url_rule('/accounts/', 'accounts', RHUserAccounts, methods=('GET', 'POST'))
-    _bp.add_url_rule('/accounts/<identity>/remove/', 'remove_account', RHUserAccountsRemove, methods=('POST',))
+    _bp.add_url_rule('/accounts/', 'accounts', RHAccounts, methods=('GET', 'POST'))
+    _bp.add_url_rule('/accounts/<identity>/remove/', 'remove_account', RHRemoveAccount, methods=('POST',))
 
 
 @_bp.url_defaults

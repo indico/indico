@@ -125,8 +125,8 @@ def _send_confirmation(email, salt, endpoint, template, template_args=None, url_
     return redirect(url_for(endpoint, **url_args))
 
 
-class RHAssociateIdentity(RH):
-    """Associates a new identity with an existing user.
+class RHLinkAccount(RH):
+    """Links a new identity with an existing user.
 
     This RH is only used if the identity information contains an
     email address and an existing user was found.
@@ -147,14 +147,14 @@ class RHAssociateIdentity(RH):
 
     def _process(self):
         if self.verification_email_sent and 'token' in request.args:
-            email = secure_serializer.loads(request.args['token'], max_age=3600, salt='associate-identity-email')
+            email = secure_serializer.loads(request.args['token'], max_age=3600, salt='link-identity-email')
             if email not in self.emails:
                 raise BadData('Emails do not match')
             session['login_identity_info']['email_verified'] = True
             session.modified = True
             flash(_('You have successfully validated your email address and can now proceeed with the login.'),
                   'success')
-            return redirect(url_for('.associate_identity', provider=self.identity_info['provider']))
+            return redirect(url_for('.link_account', provider=self.identity_info['provider']))
 
         if self.must_choose_email:
             form = SelectEmailForm()
@@ -170,7 +170,7 @@ class RHAssociateIdentity(RH):
             else:
                 flash(_('The validation email has already been sent.'), 'warning')
 
-        return WPAuth.render_template('associate_identity.html', identity_info=self.identity_info, user=self.user,
+        return WPAuth.render_template('link_identity.html', identity_info=self.identity_info, user=self.user,
                                       email_sent=self.verification_email_sent, emails=' / '.join(self.emails),
                                       form=form, must_choose_email=self.must_choose_email)
 
@@ -187,8 +187,8 @@ class RHAssociateIdentity(RH):
     def _send_confirmation(self, email):
         session['login_identity_info']['verification_email_sent'] = True
         session['login_identity_info']['data']['email'] = email  # throw away other emails
-        return _send_confirmation(email, 'associate-identity-email', '.associate_identity',
-                                  'auth/emails/associate_identity_verify_email.txt', {'user': self.user},
+        return _send_confirmation(email, 'link-identity-email', '.link_account',
+                                  'auth/emails/link_identity_verify_email.txt', {'user': self.user},
                                   url_args={'provider': self.identity_info['provider']})
 
 
@@ -196,8 +196,8 @@ class RHRegister(RH):
     """Creates a new indico user.
 
     This handles two cases:
-    - creation of a new account with a locally stored username and password
-    - creation of a new account based on information from an identity provider
+    - creation of a new user with a locally stored username and password
+    - creation of a new user based on information from an identity provider
     """
 
     def _checkParams(self):
@@ -278,13 +278,13 @@ class RHRegister(RH):
         user.settings.set('lang', session.lang or minfo.getLang())
         db.session.flush()
         login_user(user, identity)
-        msg = _('You have sucessfully registered your Indico account. '
-                'Check <a href="{url}">your profile</a> for further account details and settings.')
+        msg = _('You have sucessfully registered your Indico profile. '
+                'Check <a href="{url}">your profile</a> for further details and settings.')
         flash(Markup(msg).format(url=url_for('users.user_profile')), 'success')
         return handler.redirect_success()
 
 
-class RHUserAccounts(RHUserBase):
+class RHAccounts(RHUserBase):
     """Displays user accounts"""
 
     def _create_form(self):
@@ -318,8 +318,8 @@ class RHUserAccounts(RHUserBase):
         return WPUser.render_template('accounts.html', form=form, user=self.user, provider_titles=provider_titles)
 
 
-class RHUserAccountsRemove(RHUserBase):
-    """Removes an account"""
+class RHRemoveAccount(RHUserBase):
+    """Removes an identity linked to a user"""
 
     def _checkParams(self):
         RHUserBase._checkParams(self)
@@ -492,7 +492,7 @@ class RHResetPassword(RH):
             user = form.user
             # The only case where someone would have more than one identity is after a merge.
             # And the worst case that can happen here is that we send the user a different
-            # username than the one he expects. But he still gets back into his account.
+            # username than the one he expects. But he still gets back into his profile.
             # Showing a list of usernames would be a little bit more user-friendly but less
             # secure as we'd expose valid usernames for a specific user to an untrusted person.
             identity = next(iter(user.local_identities))

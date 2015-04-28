@@ -3,7 +3,7 @@
 {% set show_extra_form = local and not must_verify_email %}
 
 {% block title %}
-    {% trans %}Create a new Indico account{% endtrans %}
+    {% trans %}Create a new Indico profile{% endtrans %}
 {% endblock %}
 
 {% block content %}
@@ -12,7 +12,7 @@
     {% if must_verify_email and not email_sent %}
         <p>
             {% trans -%}
-                To create a new Indico account you first need to verify your email address.
+                To create a new Indico profile you first need to verify your email address.
             {%- endtrans %}
         </p>
     {% endif %}
@@ -34,7 +34,7 @@
             {% if must_verify_email %}
                 <input class="i-button big highlight" type="submit" value="{% trans %}Send me a verification email{% endtrans %}">
             {% else %}
-                <input class="i-button big highlight" type="submit" value="{% trans %}Create my Indico account{% endtrans %}">
+                <input class="i-button big highlight" type="submit" value="{% trans %}Create my Indico profile{% endtrans %}">
             {% endif %}
         {% endcall %}
     {% endif %}
