@@ -46,8 +46,6 @@ def test_created_by_user(dummy_blocking, dummy_user, create_user):
     assert dummy_blocking.created_by_user == dummy_user
     dummy_blocking.created_by_user = user = create_user(123)
     assert dummy_blocking.created_by_user == user
-    dummy_blocking.created_by_id = u'xxx'
-    assert dummy_blocking.created_by_user is None
 
 
 @pytest.mark.parametrize(('is_admin', 'is_creator', 'expected'), bool_matrix('..', expect=any))
