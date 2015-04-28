@@ -28,7 +28,7 @@ from indico.core.notifications import make_email
 from indico.modules.auth import logger, Identity, login_user
 from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationForm, LocalRegistrationForm,
                                        RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm,
-                                       LocalLoginAddForm, LocalLoginEditForm)
+                                       AddLocalIdentityForm, EditLocalIdentityForm)
 from indico.modules.auth.util import load_identity_info
 from indico.modules.auth.views import WPAuth
 from indico.modules.users import User
@@ -290,9 +290,9 @@ class RHAccounts(RHUserBase):
     def _create_form(self):
         if self.user.local_identity:
             defaults = FormDefaults(username=self.user.local_identity.identifier)
-            local_account_form = LocalLoginEditForm(identity=self.user.local_identity, obj=defaults)
+            local_account_form = EditLocalIdentityForm(identity=self.user.local_identity, obj=defaults)
         else:
-            local_account_form = LocalLoginAddForm()
+            local_account_form = AddLocalIdentityForm()
         return local_account_form
 
     def _handle_add_local_account(self, form):
@@ -309,9 +309,9 @@ class RHAccounts(RHUserBase):
     def _process(self):
         form = self._create_form()
         if form.validate_on_submit():
-            if isinstance(form, LocalLoginAddForm):
+            if isinstance(form, AddLocalIdentityForm):
                 self._handle_add_local_account(form)
-            elif isinstance(form, LocalLoginEditForm):
+            elif isinstance(form, EditLocalIdentityForm):
                 self._handle_edit_local_account(form)
             return redirect(url_for('auth.accounts'))
         provider_titles = {name: provider.title for name, provider in multipass.auth_providers.iteritems()}
@@ -334,8 +334,8 @@ class RHRemoveAccount(RHUserBase):
             raise BadRequest("The main local identity can't be removed")
         self.user.identities.remove(self.identity)
         provider_title = multipass.identity_providers[self.identity.provider].title
-        flash(_("{} ({}) successfully removed from your accounts"
-              .format(provider_title, self.identity.identifier)), 'success')
+        flash(_("{provider} ({identifier}) successfully removed from your accounts"
+              .format(provider=provider_title, identifier=self.identity.identifier)), 'success')
         return redirect(url_for('.accounts'))
 
 

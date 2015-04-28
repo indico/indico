@@ -46,13 +46,13 @@ class LocalLoginForm(IndicoForm):
     password = PasswordField(_('Password'), [DataRequired()])
 
 
-class LocalLoginAddForm(IndicoForm):
+class AddLocalIdentityForm(IndicoForm):
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
 
 
-class LocalLoginEditForm(IndicoForm):
+class EditLocalIdentityForm(IndicoForm):
     username = StringField(_('Username'), [DataRequired()], filters=[_tolower])
     password = PasswordField(_('Current password'), [DataRequired()])
     new_password = PasswordField(_('New password'), [Optional(), Length(min=5)])
@@ -60,7 +60,7 @@ class LocalLoginEditForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.identity = kwargs.pop('identity', None)
-        super(LocalLoginEditForm, self).__init__(*args, **kwargs)
+        super(EditLocalIdentityForm, self).__init__(*args, **kwargs)
 
     def validate_password(self, field):
         if field.data != self.identity.password:
