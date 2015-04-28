@@ -102,10 +102,10 @@
                                         </span>
                                     </span>
                                     {% if identity.id == session.login_identity %}
-                                        <a class="i-button disabled"
+                                        <button class="i-button" disabled
                                             title="{% trans %}The account used to log in cannot be unlinked{% endtrans %}">
                                             {% trans %}Unlink{% endtrans %}
-                                        </a>
+                                        </button>
                                     {% else %}
                                         <button class="i-button right"
                                             data-href="{{ url_for('.remove_account', identity) }}"
