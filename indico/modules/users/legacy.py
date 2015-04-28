@@ -17,6 +17,7 @@
 from persistent import Persistent
 
 from indico.core.auth import multipass
+from indico.core.db import db
 from indico.modules.groups import GroupProxy
 from indico.modules.rb.utils import rb_is_admin
 from indico.modules.users import User
@@ -41,12 +42,20 @@ class AvatarUserWrapper(Persistent, Fossilizable):
             self._v_user = _user
 
     @property
-    @memoize_request
+    def original_user(self):
+        return getattr(self, '_v_user',
+                       User.query.options(db.joinedload(User.merged_into_user)).filter_by(id=int(self.id)).one())
+
+    @property
     def user(self):
-        return getattr(self, '_v_user', User.get(int(self.id)))
+        user = self.original_user
+        if user.is_deleted:
+            return user.merged_into_user if user.merged_into_user else None
+        else:
+            return user
 
     def getId(self):
-        return self.id
+        return str(self.user.id)
 
     @property
     def api_key(self):
@@ -244,12 +253,12 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     def hasSubmittedEvaluation(self, evaluation):
         for submission in evaluation.getSubmissions():
             submitter = submission.getSubmitter()
-            if submitter and submitter.id == self.id:
+            if submitter and submitter.id == self.user.id:
                 return True
         return False
 
     def containsUser(self, avatar):
-        return avatar.id == self.id if avatar else False
+        return avatar.id == self.user.id if avatar else False
 
     containsMember = containsUser
 
@@ -259,11 +268,11 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return self.canUserModify(aw_or_user)
 
     def canUserModify(self, avatar):
-        return avatar.id == self.id or avatar.user.is_admin
+        return avatar.id == str(self.user.id) or avatar.user.is_admin
 
     def getLocator(self):
         d = Locator()
-        d["userId"] = self.id
+        d["userId"] = self.user.id
         return d
 
     def is_member_of_group(self, group_name):
@@ -303,7 +312,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         if not isinstance(other, (AvatarUserWrapper, User)):
             return False
         other_id = int(other.id)
-        return int(self.id) == other_id
+        return int(self.user.id) == other_id
 
     def __hash__(self):
         return hash(self.id)
@@ -312,7 +321,11 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     def __repr__(self):
         if self.user is None:
             return u'<AvatarUserWrapper {}: user does not exist>'.format(self.id)
-        return u'<AvatarUserWrapper {}: {} ({})>'.format(self.id, self.user.full_name, self.user.email)
+        elif self.original_user.merged_into_user:
+            return u'<AvatarUserWrapper {}: {} ({}) [{}]>'.format(
+                self.id, self.original_user.full_name, self.original_user.email, self.user.id)
+        else:
+            return u'<AvatarUserWrapper {}: {} ({})>'.format(self.id, self.user.full_name, self.user.email)
 
 
 class AvatarProvisionalWrapper(Fossilizable):
