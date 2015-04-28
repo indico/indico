@@ -51,7 +51,6 @@ from indico.web.flask.util import ResponseUtil
 from MaKaC.common.fossilize import fossilize, clearCache
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common.cache import GenericCache
-from MaKaC.authentication.LDAPAuthentication import LDAPConnector
 
 
 # Remove the extension at the end or before the querystring
@@ -265,8 +264,6 @@ def handler(prefix, path):
             # No need to commit stuff if we didn't use an API key (nothing was written)
             # XXX do we even need this?
             transaction.abort()
-
-        LDAPConnector.destroy()
 
         # Log successful POST api requests
         if error is None and request.method == 'POST':

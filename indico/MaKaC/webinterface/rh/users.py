@@ -22,7 +22,6 @@ import MaKaC.webinterface.pages.admins as adminPages
 import MaKaC.common.info as info
 import MaKaC.errors as errors
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common import pendingQueues
 from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.user import Avatar, AvatarHolder, LoginInfo

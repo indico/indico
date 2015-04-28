@@ -23,34 +23,9 @@ legacy = IndicoBlueprint('legacy', __name__)
 
 
 # Routes for xmlGateway.py
-legacy.add_url_rule('/xmlGateway.py',
-                    'xmlGateway',
-                    mod_rh_xmlGateway.RHLoginStatus,
-                    methods=('GET', 'POST'))
-
 legacy.add_url_rule('/xmlGateway.py/getCategoryInfo',
                     'xmlGateway-getCategoryInfo',
                     mod_rh_xmlGateway.RHCategInfo,
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/getStatsIndico',
-                    'xmlGateway-getStatsIndico',
-                    mod_rh_xmlGateway.RHStatsIndico,
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/loginStatus',
-                    'xmlGateway-loginStatus',
-                    mod_rh_xmlGateway.RHLoginStatus,
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/signIn',
-                    'xmlGateway-signIn',
-                    mod_rh_xmlGateway.RHSignIn,
-                    methods=('GET', 'POST'))
-
-legacy.add_url_rule('/xmlGateway.py/signOut',
-                    'xmlGateway-signOut',
-                    mod_rh_xmlGateway.RHSignOut,
                     methods=('GET', 'POST'))
 
 

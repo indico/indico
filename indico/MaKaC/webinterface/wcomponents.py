@@ -48,7 +48,6 @@ from MaKaC.common.TemplateExec import escapeHTMLForJS
 from MaKaC.errors import MaKaCError
 from MaKaC.webinterface import displayMgr
 from MaKaC.common.ContextHelp import ContextHelp
-from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 from MaKaC.common.TemplateExec import truncateTitle
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager

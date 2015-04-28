@@ -32,7 +32,6 @@ from MaKaC.webinterface.pages.errors import WPError404
 import MaKaC.conference as conference
 from indico.core.config import Config
 from indico.core.db import DBMgr
-from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 from MaKaC.webinterface.rh.login import RHSignInBase, RHResetPasswordBase

@@ -25,7 +25,6 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.mail as mail
 import MaKaC.webinterface.pages.signIn as signIn
 from MaKaC.user import LoginInfo
-from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.user import AvatarHolder
 from MaKaC.common import pendingQueues
 import MaKaC.common.timezoneUtils as timezoneUtils

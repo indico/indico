@@ -45,8 +45,6 @@ from MaKaC import __version__
 from MaKaC.common.indexes import IndexesHolder
 from MaKaC.conference import ConferenceHolder, CategoryManager
 from MaKaC.webinterface import displayMgr
-from MaKaC.authentication.LocalAuthentication import LocalAuthenticator, LocalIdentity
-from MaKaC.authentication.LDAPAuthentication import LDAPIdentity, LDAPAuthenticator
 from MaKaC.user import AvatarHolder
 from MaKaC.review import AbstractField
 
@@ -251,57 +249,6 @@ def conferenceMigration1_2(dbi, prevVersion):
         if i % 10000 == 9999:
             dbi.commit()
         i += 1
-    dbi.commit()
-
-
-@since('1.2')
-def localIdentityMigration(dbi, prevVersion):
-    """Generate the new password with a salt"""
-
-    auth = LocalAuthenticator()
-    total = len(auth.getList())
-    for i, identity in enumerate(auth.getList()):
-        print '\r  Processing %d/%d' % (i + 1, total),
-        if not hasattr(identity, 'algorithm'):
-            identity.setPassword(identity.password)
-        if i % 1000 == 999:
-            dbi.commit()
-    print
-    dbi.commit()
-
-
-@since('1.2')
-def removeNiceIdentities(dbi, prevVersion):
-    """
-    Remove the NiceIdentities from the avatars
-    """
-
-    for i, avatar in enumerate(AvatarHolder().getList()):
-        for identity in avatar.getIdentityList()[:]:
-            if not isinstance(identity, (LocalIdentity, LDAPIdentity)):
-                avatar.removeIdentity(identity)
-        if i % 100 == 99:
-            dbi.commit()
-    dbi.commit()
-
-
-@since('1.2')
-def lowercaseLDAPIdentities(dbi, prevVersion):
-    """Convert all LDAP identities to lowercase"""
-    auth = LDAPAuthenticator()
-    total = len(auth.getList())
-    idx = auth.getIdx()
-    for i, identity in enumerate(auth.getList()):
-        print '\r  Processing %d/%d' % (i + 1, total),
-        # getId() returns getLogin().lower()
-        if identity.getLogin() == identity.getId() or identity.getLogin() not in idx:
-            continue
-        del idx[identity.getLogin()]
-        assert identity.getId() not in idx
-        idx[identity.getId()] = identity
-        if i % 1000 == 999:
-            dbi.commit()
-    print
     dbi.commit()
 
 

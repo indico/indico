@@ -21,7 +21,6 @@ from persistent import Persistent
 from pytz import all_timezones
 
 import MaKaC
-from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
 from MaKaC.common import indexes
 from MaKaC.common.cache import GenericCache
 import MaKaC.common.info as info

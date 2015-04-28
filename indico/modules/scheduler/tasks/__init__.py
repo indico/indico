@@ -21,8 +21,6 @@ import zope.interface
 from persistent import Persistent
 from flask import render_template
 
-from MaKaC.authentication.LDAPAuthentication import LDAPConnector
-
 from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.date_time import int_timestamp, format_datetime
 from indico.modules.scheduler.fossils import ITaskFossil
@@ -190,7 +188,6 @@ class BaseTask(TimedEvent):
             self.run()
             self.endedOn = self._getCurrentDateTime()
         finally:
-            LDAPConnector.destroy()
             self.running = False
 
     def tearDown(self):
