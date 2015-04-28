@@ -141,7 +141,13 @@ class UserImporter(Importer):
                     provider = {
                         'LocalIdentity': 'indico',
                         'LDAPIdentity': self.ldap_provider_name
-                    }[old_identity.__class__.__name__]
+                    }.get(old_identity.__class__.__name__)
+
+                    if provider is None:
+                        print cformat("%{red!}!!!%{reset} "
+                                      "%{yellow!}Unsupported provider: {}. Skipping identity.").format(
+                            old_identity.__class__.__name__)
+                        continue
 
                     if (provider, username) in seen_identities:
                         print cformat("%{red!}!!!%{reset} "
