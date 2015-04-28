@@ -78,7 +78,7 @@ def principal_from_fossil(fossil, allow_pending=False, legacy=True):
     type_ = fossil['_type']
     id_ = fossil['id']
     if type_ == 'Avatar':
-        if id_.isdigit() or isinstance(id_, int):
+        if isinstance(id_, int) or id_.isdigit():
             # regular user
             user = User.get(int(id_))
         elif allow_pending:
