@@ -22,281 +22,27 @@ from pytz import all_timezones
 
 import MaKaC
 from MaKaC.authentication.AuthenticationMgr import AuthenticatorMgr
-from MaKaC.common import filters, indexes
+from MaKaC.common import indexes
 from MaKaC.common.cache import GenericCache
 import MaKaC.common.info as info
 from MaKaC.common.Locators import Locator
 from MaKaC.common.ObjectHolders import ObjectHolder
-from MaKaC.errors import UserError, MaKaCError
+from MaKaC.errors import UserError
 from MaKaC.common.fossilize import Fossilizable, fossilizes
-from MaKaC.fossils.user import (IAvatarFossil, IAvatarAllDetailsFossil, IGroupFossil, IPersonalInfoFossil,
+from MaKaC.fossils.user import (IAvatarFossil, IAvatarAllDetailsFossil, IPersonalInfoFossil,
                                 IAvatarMinimalFossil)
 from MaKaC.trashCan import TrashCanManager
 
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.users import User
-from indico.modules.users.legacy import AvatarUserWrapper, AvatarProvisionalWrapper
+from indico.modules.users.legacy import AvatarProvisionalWrapper
 from indico.util.caching import memoize_request
 from indico.util.decorators import cached_classproperty
 from indico.util.i18n import _
 from indico.util.redis import avatar_links, suggestions, write_client as redis_write_client
 from indico.util.string import safe_upper, safe_slice
 from indico.util.user import retrieve_principals
-
-
-class Group(Persistent, Fossilizable):
-    fossilizes(IGroupFossil)
-
-    """
-    """
-    groupType = "Default"
-
-    def __init__(self, groupData=None):
-        self.id = ""
-        self.name = ""
-        self.description = ""
-        self.email = ""
-        self.members = []
-        self.obsolete = False
-
-    def __cmp__(self, other):
-        if type(self) is not type(other):
-            # This is actually dangerous and the ZODB manual says not to do this
-            # because it relies on memory order. However, this branch should never
-            # be taken anyway since we do not store different types in the same set
-            # or use them as keys.
-            return cmp(hash(self), hash(other))
-        return cmp(self.getId(), other.getId())
-
-    def setId(self, newId):
-        self.id = str(newId)
-
-    def getId(self):
-        return self.id
-
-    def setName(self, newName):
-        self.name = newName.strip()
-        GroupHolder().notifyGroupNameChange(self)
-
-    def getName(self):
-        return self.name
-    getFullName = getName
-
-    def setDescription(self, newDesc):
-        self.description = newDesc.strip()
-
-    def getDescription(self):
-        return self.description
-
-    def setEmail(self, newEmail):
-        self.email = newEmail.strip()
-
-    def getEmail(self):
-        try:
-            return self.email
-        except:
-            self.email = ""
-        return self.email
-
-    def isObsolete(self):
-        if not hasattr(self, "obsolete"):
-            self.obsolete = False
-        return self.obsolete
-
-    def setObsolete(self, obsolete):
-        self.obsolete = obsolete
-
-    def _cleanGroupMembershipCache(self, avatar):
-        group_membership = GenericCache('groupmembership')
-        key = "{0}-{1}".format(self.getId(), avatar.getId())
-        group_membership.delete(key)
-
-    def addMember(self, newMember):
-        if newMember == self:
-            raise MaKaCError(_("It is not possible to add a group as member of itself"))
-        if self.containsMember(newMember) or newMember.containsMember(self):
-            return
-        self.members.append(newMember)
-        if isinstance(newMember, AvatarUserWrapper):
-            newMember.linkTo(self, "member")
-        self._p_changed = 1
-
-        # We need to clean the gooup membership cache
-        self._cleanGroupMembershipCache(newMember)
-
-    def removeMember(self, member):
-        if member is None or member not in self.members:
-            return
-        self.members.remove(member)
-        if isinstance(member, AvatarUserWrapper):
-            member.unlinkTo(self, "member")
-        self._p_changed = 1
-
-        # We need to clean the gooup membership cache
-        self._cleanGroupMembershipCache(member)
-
-    def getMemberList(self):
-        return self.members
-
-    def _containsUser(self, avatar):
-        if avatar == None:
-            return 0
-        for member in self.members:
-            if member.containsUser(avatar):
-                return 1
-        return 0
-
-    def containsUser(self, avatar):
-        group_membership = GenericCache('groupmembership')
-        if avatar is None:
-            return False
-        key = "{0}-{1}".format(self.getId(), avatar.getId())
-        user_in_group = group_membership.get(key)
-        if user_in_group is None:
-            user_in_group = self._containsUser(avatar)
-            group_membership.set(key, user_in_group, time=1800)
-        return user_in_group
-
-    def containsMember(self, member):
-        if member == None:
-            return 0
-        if member in self.members:
-            return 1
-        for m in self.members:
-            try:
-                if m.containsMember(member):
-                    return 1
-            except AttributeError, e:
-                continue
-        return 0
-
-    def canModify(self, aw_or_user):
-        if hasattr(aw_or_user, 'getUser'):
-            aw_or_user = aw_or_user.getUser()
-        return self.canUserModify(aw_or_user)
-
-    def canUserModify(self, user):
-        return self.containsMember(user) or user.user.is_admin
-
-    def getLocator(self):
-        d = Locator()
-        d["groupId"] = self.getId()
-        return d
-
-    def exists(self):
-        return True
-
-
-class _GroupFFName(filters.FilterField):
-    _id="name"
-
-    def satisfies(self,group):
-        for value in self._values:
-            if value.strip() != "":
-                if value.strip() == "*":
-                    return True
-                if str(group.getName()).lower().find((str(value).strip().lower()))!=-1:
-                    return True
-        return False
-
-
-class _GroupFilterCriteria(filters.FilterCriteria):
-    _availableFields={"name":_GroupFFName}
-
-    def __init__(self,criteria={}):
-        filters.FilterCriteria.__init__(self,None,criteria)
-
-
-class GroupHolder(ObjectHolder):
-    """
-    """
-    idxName = "groups"
-    counterName = "PRINCIPAL"
-
-    def getById(self, id):
-        raise RuntimeError('obsolete')
-
-    def add(self, group):
-        ObjectHolder.add(self, group)
-        self.getIndex().indexGroup(group)
-
-    def remove(self, group):
-        ObjectHolder.remove(self, group)
-        self.getIndex().unindexGroup(group)
-
-    def notifyGroupNameChange(self, group):
-        self.getIndex().unindexGroup(group)
-        self.getIndex().indexGroup(group)
-
-    def getIndex(self):
-        index = indexes.IndexesHolder().getById("group")
-        if index.getLength() == 0:
-            self._reIndex(index)
-        return index
-
-    def _reIndex(self, index):
-        for group in self.getList():
-            index.indexGroup(group)
-
-    def getBrowseIndex(self):
-        return self.getIndex().getBrowseIndex()
-
-    def getLength(self):
-        return self.getIndex().getLength()
-
-    def matchFirstLetter(self, letter, searchInAuthenticators=True):
-        result = []
-        index = self.getIndex()
-        if searchInAuthenticators:
-            self._updateGroupMatchFirstLetter(letter)
-        match = index.matchFirstLetter(letter)
-        if match != None:
-            for groupid in match:
-                if groupid != "":
-                    if self.getById(groupid) not in result:
-                        gr=self.getById(groupid)
-                        result.append(gr)
-        return result
-
-    def match(self, criteria, searchInAuthenticators=True, exact=False):
-        crit={}
-        result = []
-        for f,v in criteria.items():
-            crit[f]=[v]
-        if crit.has_key("groupname"):
-            crit["name"] = crit["groupname"]
-        if searchInAuthenticators:
-            self._updateGroupMatch(crit["name"][0],exact)
-        match = self.getIndex().matchGroup(crit["name"][0], exact=exact)
-
-        if match != None:
-            for groupid in match:
-                gr = self.getById(groupid)
-                if gr not in result:
-                    result.append(gr)
-        return result
-
-    def update(self, group):
-        if self.hasKey(group.getId()):
-            current_group = self.getById(group.getId())
-            current_group.setDescription(group.getDescription())
-
-    def _updateGroupMatch(self, name, exact=False):
-        for auth in AuthenticatorMgr().getList():
-            for group in auth.matchGroup(name, exact):
-                if not self.hasKey(group.getId()):
-                    self.add(group)
-                else:
-                    self.update(group)
-
-    def _updateGroupMatchFirstLetter(self, letter):
-        for auth in AuthenticatorMgr().getList():
-            for group in auth.matchGroupFirstLetter(letter):
-                if not self.hasKey(group.getId()):
-                    self.add(group)
-                else:
-                    self.update(group)
 
 
 class Avatar(Persistent, Fossilizable):
@@ -1401,8 +1147,6 @@ class PersonalBasket(Persistent):
             return self._categories
         elif (type(element) == Avatar):
             return self._users
-        elif (type(element) == Group):
-            return self._userGroups
         else:
             raise Exception(_("Unknown Element Type"))
 

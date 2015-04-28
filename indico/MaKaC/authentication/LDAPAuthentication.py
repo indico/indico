@@ -67,7 +67,6 @@ from indico.util.contextManager import ContextManager
 from MaKaC.authentication.baseAuthentication import Authenthicator, PIdentity, SSOHandler
 from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.errors import MaKaCError
-from MaKaC.user import Group
 
 
 RETRIEVED_FIELDS = ['uid', 'cn', 'mail', 'o', 'ou', 'company', 'givenName',
@@ -599,50 +598,6 @@ class LDAPConnector(object):
             return memberUids
         else:
             raise Exception("Unknown LDAP group style, choices are: SLAPD or ActiveDirectory")
-
-class LDAPGroup(Group):
-    groupType = "LDAP"
-
-    def __str__(self):
-        return "<LDAPGroup id: %s name: %s desc: %s>" % (self.getId(),
-                                                         self.getName(),
-                                                         self.getDescription())
-
-    def addMember(self, newMember):
-        pass
-
-    def removeMember(self, member):
-        pass
-
-    def getMemberList(self):
-        uidList = AuthenticatorMgr().getById('LDAP').getGroupMemberList(self.getName())
-        avatarLists = []
-        for uid in uidList:
-            # First, try locally (fast)
-            lst = PrincipalHolder().match(uid, exact=1, searchInAuthenticators=False)
-            if not lst:
-                # If not found, try external
-                lst = PrincipalHolder().match(uid, exact=1)
-            avatarLists.append(lst)
-        return [avList[0] for avList in avatarLists if avList]
-
-    def _containsUser(self, avatar):
-
-        # used when checking acces to private events restricted for certain groups
-        if not avatar:
-            return False
-        for aid in avatar.getIdentityList(create_identities=True):
-            if aid.getAuthenticatorTag() == 'LDAP':
-                login = aid.getLogin()
-                if login and AuthenticatorMgr().getById('LDAP').isUserInGroup(login, self.getName()):
-                    return True
-        return False
-
-    def containsMember(self, avatar):
-        return 0
-
-    def exists(self):
-        return AuthenticatorMgr().getById('LDAP').groupExists(self.getName())
 
 
 class LDAPTools:
