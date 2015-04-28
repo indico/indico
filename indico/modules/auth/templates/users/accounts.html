@@ -30,9 +30,6 @@
                                     {% trans %}Cancel{% endtrans %}
                                 </a>
                             {% endcall %}
-                            <script>
-                                validatePasswordConfirmation('#password', '#confirm_password');
-                            </script>
                         </div>
                     {% else %}
                         {{ form_header(orientation='vertical', classes='no-block-padding') }}
@@ -40,9 +37,6 @@
                         {% call form_footer() %}
                             <input class="i-button big highlight" type="submit" value="{% trans %}Modify credentials{% endtrans %}">
                         {% endcall %}
-                        <script>
-                            validatePasswordConfirmation('#new_password', '#confirm_new_password');
-                        </script>
                     {% endif %}
                     {% if user.secondary_local_identities %}
                         <p>
