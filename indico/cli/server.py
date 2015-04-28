@@ -21,7 +21,6 @@ import os
 import signal
 import socket
 import sys
-from SocketServer import TCPServer
 
 import werkzeug.serving
 from flask import current_app
@@ -163,13 +162,9 @@ class WerkzeugServer(object):
         if not self.ssl:
             self.ssl_context = None
         elif not self.ssl_cert and not self.ssl_key:
-            self._patch_shutdown_request()
             self.ssl_context = 'adhoc'
         else:
-            self._patch_shutdown_request()
-            self.ssl_context = SSL.Context(SSL.SSLv23_METHOD)
-            self.ssl_context.use_privatekey_file(self.ssl_key)
-            self.ssl_context.use_certificate_chain_file(self.ssl_cert)
+            self.ssl_context = (self.ssl_cert, self.ssl_key)
 
     def make_server(self):
         assert self._server is None
@@ -221,28 +216,6 @@ class WerkzeugServer(object):
             cfg_dir = Config.getInstance().getConfigurationDir()
             extra_files = [os.path.join(cfg_dir, name) for name in ('logging.conf', 'indico.conf')]
             werkzeug.serving.run_with_reloader(self._run_new_server, extra_files)
-
-    @staticmethod
-    def _patch_shutdown_request():
-        # Fix SocketServer's shutdown not working with pyopenssl
-        def my_shutdown_request(self, request):
-            """Called to shutdown and close an individual request."""
-            try:
-                #explicitly shutdown.  socket.close() merely releases
-                #the socket and waits for GC to perform the actual close.
-                try:
-                    request.shutdown(socket.SHUT_WR)
-                except TypeError:
-                    # ssl sockets don't support an argument
-                    try:
-                        request.shutdown()
-                    except SSL.Error:
-                        pass
-            except socket.error:
-                pass  # some platforms may raise ENOTCONN here
-            self.close_request(request)
-
-        TCPServer.shutdown_request = my_shutdown_request
 
 
 def _can_bind_port(port):
