@@ -58,7 +58,7 @@ def process_identity(identity_info):
             return redirect(url_for('auth.register', provider=identity_info.provider.name))
         else:
             logger.info('Found user with matching email: {}'.format(user))
-            return redirect(url_for('auth.associate_identity'))
+            return redirect(url_for('auth.associate_identity', provider=identity_info.provider.name))
     elif identity.user.is_deleted:
         raise MultipassException(_('Your Indico account has been deleted.'))
     else:

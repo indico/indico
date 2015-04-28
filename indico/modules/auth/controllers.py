@@ -154,7 +154,7 @@ class RHAssociateIdentity(RH):
             session.modified = True
             flash(_('You have successfully validated your email address and can now proceeed with the login.'),
                   'success')
-            return redirect(url_for('.associate_identity'))
+            return redirect(url_for('.associate_identity', provider=self.identity_info['provider']))
 
         if self.must_choose_email:
             form = SelectEmailForm()
@@ -188,7 +188,8 @@ class RHAssociateIdentity(RH):
         session['login_identity_info']['verification_email_sent'] = True
         session['login_identity_info']['data']['email'] = email  # throw away other emails
         return _send_confirmation(email, 'associate-identity-email', '.associate_identity',
-                                  'auth/emails/associate_identity_verify_email.txt', {'user': self.user})
+                                  'auth/emails/associate_identity_verify_email.txt', {'user': self.user},
+                                  url_args={'provider': self.identity_info['provider']})
 
 
 class RHRegister(RH):
@@ -301,7 +302,8 @@ class RHUserAccounts(RHUserBase):
 
     def _handle_edit_local_account(self, form):
         self.user.local_identity.identifier = form.data['username']
-        self.user.local_identity.password = form.data['password']
+        if form.data['new_password']:
+            self.user.local_identity.password = form.data['new_password']
         flash(_("Your local account credentials have been updated successfully"), 'success')
 
     def _process(self):
@@ -323,7 +325,7 @@ class RHUserAccountsRemove(RHUserBase):
         RHUserBase._checkParams(self)
         self.identity = Identity.get_one(request.view_args['identity'])
         if self.identity.user != self.user:
-            raise Forbidden("This identity doesn't belong to the user".format(self.identity.id))
+            raise NotFound()
 
     def _process(self):
         if session['login_identity'] == self.identity.id:
@@ -332,9 +334,9 @@ class RHUserAccountsRemove(RHUserBase):
             raise BadRequest("The main local identity can't be removed")
         self.user.identities.remove(self.identity)
         provider_title = multipass.identity_providers[self.identity.provider].title
-        flash(_("Account {} ({}) successfully removed from your accounts"
-              .format(self.identity.identifier, provider_title)), 'success')
-        return redirect(url_for('auth.accounts'))
+        flash(_("{} ({}) successfully removed from your accounts"
+              .format(provider_title, self.identity.identifier)), 'success')
+        return redirect(url_for('.accounts'))
 
 
 class RegistrationHandler(object):

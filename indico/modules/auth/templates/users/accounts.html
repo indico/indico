@@ -18,9 +18,9 @@
                     {% if not user.local_identity %}
                         <span id="no-local-acccount">
                             {% trans %}You don't have a local account yet.{% endtrans %}
-                            <a href="#" class="js-show-form">{% trans %}Create one{% endtrans %}</a>.
+                            <a href="#" class="js-show-form">{% trans %}Create one{% endtrans %}</a>
                         </span>
-                        <div id="credentials-form" class="hidden">
+                        <div id="credentials-form" style="display: none">
                             {{ form_header(orientation='vertical', classes='no-block-padding') }}
                             {{ form_rows(form) }}
                             {% call form_footer() %}
@@ -52,18 +52,22 @@
                                 {% trans %}Other local accounts used in the past.{% endtrans -%}
                                 <a href="#" class="js-toggle-secondary-accounts">
                                     {% trans %}Show{% endtrans %}</a>
-                                <a href="#" class="js-toggle-secondary-accounts hidden">
+                                <a href="#" class="js-toggle-secondary-accounts" style="display: none">
                                     {% trans %}Hide{% endtrans %}</a>
                             </li>
                             {% for identity in user.secondary_local_identities %}
-                                <li class="hidden">
+                                <li style="display: none">
                                     <span class="account-identity">
                                         <i class="icon-user"></i>
                                         <span>{{ identity.identifier }}</span>
                                     </span>
-                                    <a href="{{ url_for('auth.remove-account', identity) }}" class="i-button right">
+                                    <button class="i-button right"
+                                        data-href="{{ url_for('.remove_account', identity) }}"
+                                        data-method="post"
+                                        data-title="{% trans %}Remove account{% endtrans %}"
+                                        data-confirm="{% trans %}Do you really want to remove this account?{% endtrans %}">
                                         {% trans %}Remove{% endtrans %}
-                                    </a>
+                                    </button>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -80,7 +84,7 @@
             </div>
             <div class="i-box-content">
                 <p>
-                    {% trans %}External accounts linked with your Indico user.{% endtrans %}
+                    {% trans %}External accounts linked with your Indico profile.{% endtrans %}
                 </p>
                 <ul class="group-list with-buttons">
                     {% if user.external_identities %}
@@ -106,11 +110,17 @@
                                     {% if identity.id == session.login_identity %}
                                         <a class="i-button disabled"
                                             title="{% trans %}The account used to log in cannot be unlinked{% endtrans %}">
+                                            {% trans %}Unlink{% endtrans %}
+                                        </a>
                                     {% else %}
-                                        <a href="{{ url_for('auth.remove-account', identity) }}" class="i-button right">
+                                        <button class="i-button right"
+                                            data-href="{{ url_for('.remove_account', identity) }}"
+                                            data-method="post"
+                                            data-title="{% trans %}Unlink account{% endtrans %}"
+                                            data-confirm="{% trans %}Do you really want to unlink this account?{% endtrans %}">
+                                            {% trans %}Unlink{% endtrans %}
+                                        </button>
                                     {% endif %}
-                                        {% trans %}Unlink{% endtrans %}
-                                    </a>
                                 </span>
                             </li>
                         {% endfor %}
@@ -131,19 +141,19 @@
         $('.js-show-form').on('click', function(e) {
             e.preventDefault();
             $('#no-local-acccount').hide();
-            $('#credentials-form').removeClass('hidden');
+            $('#credentials-form').show();
         });
 
         $('.js-hide-form').on('click', function(e) {
             e.preventDefault();
             $('#no-local-acccount').show();
-            $('#credentials-form').addClass('hidden');
+            $('#credentials-form').hide();
         });
 
         $('.js-toggle-secondary-accounts').on('click', function(e) {
             e.preventDefault();
-            $('.js-toggle-secondary-accounts').toggleClass('hidden');
-            $('#local-secondary>li:not(:first-child)').toggleClass('hidden');
+            $('.js-toggle-secondary-accounts').toggle();
+            $('#local-secondary > li:not(:first-child)').toggle();
         });
     });
     </script>
