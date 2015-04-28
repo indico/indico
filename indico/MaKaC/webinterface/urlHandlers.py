@@ -209,10 +209,6 @@ class UHOAuthThirdPartyAuth(UserURLHandler):
     _endpoint = 'oauth_old.oauth-thirdPartyAuth'
 
 
-class UHOAuthUserThirdPartyAuth(UserURLHandler):
-    _endpoint = 'oauth_old.oauth-userThirdPartyAuth'
-
-
 class UHIndicoNews(URLHandler):
     _endpoint = 'misc.news'
 
@@ -1126,34 +1122,10 @@ class UHConfCloseModifKey(UHConfUser):
     _endpoint = 'event_mgmt.conferenceModification-closeModifKey'
 
 
-class UHUserCreated(UHConfUser):
-    _endpoint = 'user.userRegistration-created'
-
-
-class UHUserActive(UserURLHandler):
-    _endpoint = 'user.userRegistration-active'
-
-
-class UHUserDisable(UserURLHandler):
-    _endpoint = 'user.userRegistration-disable'
-
-
 class UHUserDetails(UserURLHandler):
     # XXX: This UH is deprecated. It's just kept around to have a
     # quick reference to find code that needs to be rewritten/removed.
     _endpoint = None
-
-
-class UHUserRegistration(URLHandler):
-    _endpoint = 'user.userRegistration'
-
-
-class UHUserExistWithIdentity(UHConfUser):
-    _endpoint = 'user.userRegistration-UserExist'
-
-
-class UHUserIdPerformCreation(UserURLHandler):
-    _endpoint = 'user.identityCreation-create'
 
 
 class UHDomains(URLHandler):

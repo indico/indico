@@ -14,17 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import uuid
-
 from indico.core.config import Config
-from indico.modules.users import User
-from indico.web.flask.util import url_for
 
-from MaKaC.common.cache import GenericCache
 from MaKaC.common.mail import GenericMailer
-from MaKaC.webinterface import urlHandlers
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.i18n import _
 
 
 def getSubjectIndicoTitle():
@@ -36,8 +29,9 @@ def getSubjectIndicoTitle():
         systitle="%s @ %s"%(systitle, minfo.getOrganisation().strip())
     return systitle
 
-class personMail:
 
+class personMail:
+    @staticmethod
     def send(addto, addcc, addfrom, subject, body):
         addto = addto.replace("\r\n","")
         tolist = addto.split(",")
@@ -50,10 +44,9 @@ class personMail:
             "body": body
             }
         GenericMailer.send(GenericNotification(maildata))
-    send = staticmethod( send )
 
 
-class GenericNotification :
+class GenericNotification:
 
     def __init__(self, data=None):
         if data is None:
@@ -149,8 +142,8 @@ class GenericNotification :
 
 
 class Mailer:
-
-    def send( notification, fromAddress="" ):
+    @staticmethod
+    def send(notification, fromAddress=""):
         info = HelperMaKaCInfo.getMaKaCInfoInstance()
         if fromAddress.strip() == "":
             fromAddr = "%s <%s>"%(info.getTitle(), Config.getInstance().getSupportEmail())
@@ -167,79 +160,4 @@ Indico project <http://indico-software.org/>
             "subject": "[Indico] %s" % notification.getSubject(),
             "body": text
             }
-        GenericMailer.send(GenericNotification(maildata))
-    send = staticmethod( send )
-
-
-class sendAccountCreationModeration:
-
-    def __init__( self, user ):
-        self._user = user
-
-    def send( self ):
-        name = self._user.getStraightFullName()
-        text = """ Dear Administrator,
-%s has created a new account in Indico.
-
-In order to activate it, please go to this URL:
-<%s>
-"""% (name,urlHandlers.UHUserDetails.getURL( self._user ))
-        maildata = {
-            "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
-            "toList": [u.email for u in User.find(is_admin=True)],
-            "subject": _("[Indico] New account request from %s") % name,
-            "body": text
-            }
-        GenericMailer.send(GenericNotification(maildata))
-
-class sendAccountCreationNotification:
-
-    def __init__( self, user ):
-        self._user = user
-
-    def send( self ):
-        name = self._user.getStraightFullName()
-        text = """Dear Administrator,
-%s has created a new account in Indico.
-<%s>
-""" % (name,urlHandlers.UHUserDetails.getURL( self._user ))
-        maildata = {
-            "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getSupportEmail(),
-            "toList": [u.email for u in User.find(is_admin=True)],
-            "subject": _("[Indico] New account creation"),
-            "body": text
-            }
-        GenericMailer.send(GenericNotification(maildata))
-
-class sendAccountActivated:
-
-    def __init__( self, user ):
-        self._user = user
-
-    def send( self ):
-        text =  _("""Welcome to Indico,
-Your registration has been accepted by the site administrator.
-
-You can now login using the following username: %s
-
-Thank you for using Indico.
-                """)%(self._user.getIdentityList()[0].getLogin())
-        maildata = {
-            "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
-            "toList": [self._user.getEmail()],
-            "subject": _("[%s] Registration accepted") % getSubjectIndicoTitle(),
-            "body": text
-            }
-        GenericMailer.send(GenericNotification(maildata))
-
-class sendAccountDisabled:
-
-    def __init__( self, user ):
-        self._user = user
-
-    def send( self ):
-        text =  _("""Dear user,
-Your account has been disabled by the site administrator.
-                """)
-        maildata = { "fromAddr": "Indico Mailer<%s>"%Config.getInstance().getNoReplyEmail(), "toList": [self._user.getEmail()], "subject": _("[%s] Account disabled")%getSubjectIndicoTitle(), "body": text }
         GenericMailer.send(GenericNotification(maildata))
