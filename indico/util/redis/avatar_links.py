@@ -49,7 +49,7 @@ def get_links(avatar, minDT=None, maxDT=None, client=None):
 def merge_avatars(destination, source, client=None):
     if client is None:
         client = redis_write_client
-    scripts.avatar_event_links_merge_avatars(destination.getId(), source.getId(), client=client)
+    scripts.avatar_event_links_merge_avatars(destination.id, source.id, client=client)
 
 
 def delete_avatar(avatar, client=None):
