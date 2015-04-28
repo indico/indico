@@ -43,7 +43,11 @@
                         </p>
                         <ul id="local-secondary" class="group-list with-buttons">
                             <li>
-                                {% trans %}Other local accounts used in the past.{% endtrans -%}
+                                {% trans count = user.secondary_local_identities|count -%}
+                                    You have another local account that has been used in the past.
+                                {% pluralize %}
+                                    You have {{ count }} other local accounts that have been used in the past.
+                                {%- endtrans -%}
                                 <a href="#" class="js-toggle-secondary-accounts">
                                     {% trans %}Show{% endtrans %}</a>
                                 <a href="#" class="js-toggle-secondary-accounts" style="display: none">
