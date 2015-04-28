@@ -1,0 +1,30 @@
+<div class="i-has-action i-synced-input form-row">
+    <input id="{{ field.id }}-action-button" name="synced_fields" type="checkbox" value="{{ field.short_name }}"
+           {%- if field.synced %} checked {% endif %}>
+  {%- if textarea -%}
+        <textarea id="{{ field.id }}" name="{{ field.name }}" {{ kwargs | html_params }}
+                  data-synced-value="{{ field.synced_value|tojson|forceescape }}" {%- if field.synced %} readonly {% endif %}>
+            {{- field._value() -}}
+        </textarea>
+  {%- else -%}
+        <input id="{{ field.id }}" name="{{ field.name }}" type="text" value="{{ field._value() }}" {{ kwargs | html_params }}
+               data-synced-value="{{ field.synced_value|tojson|forceescape }}" {%- if field.synced %} readonly {% endif %}>
+  {%- endif -%}
+  <label for="{{ field.id }}-action-button" class="i-button i-synced-label icon-refresh" data-tooltip-anchor
+         title="{% trans provider_name=field.provider_name %}Click to toggle the synchronisation from {{ provider_name }}.{% endtrans %}"></label>
+</div>
+<script>
+    $('#{{ field.id }}-action-button').on('click', function() {
+        var $field = $('#{{ field.id }}');
+        var syncedValue;
+        if (this.checked) {
+            $field.prop('readonly', true);
+            syncedValue = JSON.parse($field.attr('data-synced-value'))
+            if (syncedValue !== null) {
+                $field.val(syncedValue);
+            }
+        } else {
+            $field.prop('readonly', false);
+        }
+    });
+</script>

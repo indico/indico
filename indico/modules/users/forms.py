@@ -18,29 +18,76 @@ from __future__ import unicode_literals
 
 from operator import itemgetter
 
-from flask import request
+from flask import render_template, request
 from pytz import all_timezones
-from wtforms.fields.core import SelectField, BooleanField
+from wtforms.fields.core import SelectField, BooleanField, StringField
 from wtforms.fields.html5 import EmailField
-from wtforms.fields.simple import StringField, TextAreaField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.fields.simple import TextAreaField
+from wtforms.validators import DataRequired, StopValidation, ValidationError
+from wtforms.widgets import TextInput, TextArea
+from wtforms.widgets.core import HTMLString
 
+from indico.core.auth import multipass
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import UserTitle
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoEnumSelectField
-from indico.web.forms.widgets import SwitchWidget, SyncWidget
+from indico.web.forms.widgets import SwitchWidget
+
+
+class SyncedInputWidget(object):
+    """Renders a text input with a sync button when needed."""
+
+    @property
+    def single_line(self):
+        return not self.textarea
+
+    def __init__(self, textarea=False):
+        self.textarea = textarea
+        self.default_widget = TextArea() if textarea else TextInput()
+
+    def __call__(self, field, **kwargs):
+        # Render a sync button for fields which can be synced, if the idp provides a value for the field.
+        if field.short_name in multipass.synced_fields and field.synced_value is not None:
+            return HTMLString(render_template('forms/synced_input_widget.html', field=field, textarea=self.textarea,
+                                              kwargs=kwargs))
+        else:
+            return self.default_widget(field, **kwargs)
+
+
+def _used_if_not_synced(form, field):
+    """validator to prevent validation error on synced inputs.
+
+    Synced inputs are disabled in the form and don't send any value.
+    In that case, we disable validation from the input.
+    """
+    if field.short_name in form.synced_fields:
+        field.errors[:] = []
+        raise StopValidation()
 
 
 class UserDetailsForm(IndicoForm):
     title = IndicoEnumSelectField(_('Title'), enum=UserTitle)
-    first_name = StringField(_('First name'), [DataRequired()], widget=SyncWidget())
-    last_name = StringField(_('Family name'), [DataRequired()], widget=SyncWidget())
-    affiliation = StringField(_('Affiliation'), widget=SyncWidget())
-    address = TextAreaField(_('Address'))
-    phone = StringField(_('Phone number'), widget=SyncWidget())
+    first_name = StringField(_('First Name'), [_used_if_not_synced, DataRequired()], widget=SyncedInputWidget())
+    last_name = StringField(_('Family name'), [_used_if_not_synced, DataRequired()], widget=SyncedInputWidget())
+    affiliation = StringField(_('Affiliation'), widget=SyncedInputWidget())
+    address = TextAreaField(_('Address'), widget=SyncedInputWidget(textarea=True))
+    phone = StringField(_('Phone number'), widget=SyncedInputWidget())
+
+    def __init__(self, *args, **kwargs):
+        synced_fields = kwargs.pop('synced_fields')
+        synced_values = kwargs.pop('synced_values')
+        super(UserDetailsForm, self).__init__(*args, **kwargs)
+        if self.is_submitted():
+            synced_fields = self.synced_fields
+        provider = multipass.sync_provider
+        provider_name = provider.title if provider is not None else 'unknown identity provider'
+        for field in multipass.synced_fields:
+            self[field].synced = self[field].short_name in synced_fields
+            self[field].synced_value = synced_values.get(field)
+            self[field].provider_name = provider_name
 
     @property
     def synced_fields(self):

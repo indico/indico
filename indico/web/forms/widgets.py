@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask import render_template
-from wtforms.widgets.core import HTMLString, PasswordInput
+from wtforms.widgets.core import HTMLString
 
 
 class ConcatWidget(object):
@@ -66,15 +66,6 @@ class PasswordWidget(object):
 
     def __call__(self, field, **kwargs):
         return HTMLString(render_template('forms/password_widget.html', field=field, input_args=kwargs))
-
-
-class SyncWidget(object):
-    """Renders a text input with a sync addon button"""
-
-    single_line = True
-
-    def __call__(self, field, **kwargs):
-        return HTMLString(render_template('forms/synced_widget.html', field=field, input_args=kwargs))
 
 
 class CKEditorWidget(JinjaWidget):

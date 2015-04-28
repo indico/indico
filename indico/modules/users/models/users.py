@@ -46,6 +46,17 @@ class UserTitle(TitledIntEnum):
     prof = 5
 
 
+#: Fields which can be synced as keys and a mapping to a more human
+#: readable version, used for flashing messages
+syncable_fields = {
+    'first_name': _("first name"),
+    'last_name': _("last name"),
+    'affiliation': _("affiliation"),
+    'address': _("address"),
+    'phone': _("phone")
+}
+
+
 class User(db.Model):
     """Indico users"""
     __tablename__ = 'users'
