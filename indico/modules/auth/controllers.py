@@ -27,10 +27,13 @@ from indico.core.db import db
 from indico.core.notifications import make_email
 from indico.modules.auth import logger, Identity, login_user
 from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationForm, LocalRegistrationForm,
-                                       RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm)
+                                       RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm,
+                                       LocalLoginAddForm, LocalLoginEditForm)
 from indico.modules.auth.util import load_identity_info
 from indico.modules.auth.views import WPAuth
 from indico.modules.users import User
+from indico.modules.users.controllers import RHUserBase
+from indico.modules.users.views import WPUser
 from indico.util.i18n import _
 from indico.util.signing import secure_serializer
 from indico.web.flask.util import url_for
@@ -122,8 +125,8 @@ def _send_confirmation(email, salt, endpoint, template, template_args=None, url_
     return redirect(url_for(endpoint, **url_args))
 
 
-class RHAssociateIdentity(RH):
-    """Associates a new identity with an existing user.
+class RHLinkAccount(RH):
+    """Links a new identity with an existing user.
 
     This RH is only used if the identity information contains an
     email address and an existing user was found.
@@ -144,14 +147,14 @@ class RHAssociateIdentity(RH):
 
     def _process(self):
         if self.verification_email_sent and 'token' in request.args:
-            email = secure_serializer.loads(request.args['token'], max_age=3600, salt='associate-identity-email')
+            email = secure_serializer.loads(request.args['token'], max_age=3600, salt='link-identity-email')
             if email not in self.emails:
                 raise BadData('Emails do not match')
             session['login_identity_info']['email_verified'] = True
             session.modified = True
             flash(_('You have successfully validated your email address and can now proceeed with the login.'),
                   'success')
-            return redirect(url_for('.associate_identity'))
+            return redirect(url_for('.link_account', provider=self.identity_info['provider']))
 
         if self.must_choose_email:
             form = SelectEmailForm()
@@ -167,7 +170,7 @@ class RHAssociateIdentity(RH):
             else:
                 flash(_('The validation email has already been sent.'), 'warning')
 
-        return WPAuth.render_template('associate_identity.html', identity_info=self.identity_info, user=self.user,
+        return WPAuth.render_template('link_identity.html', identity_info=self.identity_info, user=self.user,
                                       email_sent=self.verification_email_sent, emails=' / '.join(self.emails),
                                       form=form, must_choose_email=self.must_choose_email)
 
@@ -184,16 +187,17 @@ class RHAssociateIdentity(RH):
     def _send_confirmation(self, email):
         session['login_identity_info']['verification_email_sent'] = True
         session['login_identity_info']['data']['email'] = email  # throw away other emails
-        return _send_confirmation(email, 'associate-identity-email', '.associate_identity',
-                                  'auth/emails/associate_identity_verify_email.txt', {'user': self.user})
+        return _send_confirmation(email, 'link-identity-email', '.link_account',
+                                  'auth/emails/link_identity_verify_email.txt', {'user': self.user},
+                                  url_args={'provider': self.identity_info['provider']})
 
 
 class RHRegister(RH):
     """Creates a new indico user.
 
     This handles two cases:
-    - creation of a new account with a locally stored username and password
-    - creation of a new account based on information from an identity provider
+    - creation of a new user with a locally stored username and password
+    - creation of a new user based on information from an identity provider
     """
 
     def _checkParams(self):
@@ -217,6 +221,8 @@ class RHRegister(RH):
         return secure_serializer.loads(request.args['token'], max_age=3600, salt='register-email')
 
     def _process(self):
+        if session.user:
+            return redirect(url_for('misc.index'))
         handler = MultipassRegistrationHandler(self) if self.identity_info else LocalRegistrationHandler(self)
         verified_email = self._get_verified_email()
         if verified_email is not None:
@@ -272,10 +278,65 @@ class RHRegister(RH):
         user.settings.set('lang', session.lang or minfo.getLang())
         db.session.flush()
         login_user(user, identity)
-        msg = _('You have sucessfully registered your Indico account. '
-                'Check <a href="{url}">your profile</a> for further account details and settings.')
+        msg = _('You have sucessfully registered your Indico profile. '
+                'Check <a href="{url}">your profile</a> for further details and settings.')
         flash(Markup(msg).format(url=url_for('users.user_profile')), 'success')
         return handler.redirect_success()
+
+
+class RHAccounts(RHUserBase):
+    """Displays user accounts"""
+
+    def _create_form(self):
+        if self.user.local_identity:
+            defaults = FormDefaults(username=self.user.local_identity.identifier)
+            local_account_form = LocalLoginEditForm(identity=self.user.local_identity, obj=defaults)
+        else:
+            local_account_form = LocalLoginAddForm()
+        return local_account_form
+
+    def _handle_add_local_account(self, form):
+        identity = Identity(provider='indico', identifier=form.data['username'], password=form.data['password'])
+        self.user.identities.add(identity)
+        flash(_("Local account added successfully"), 'success')
+
+    def _handle_edit_local_account(self, form):
+        self.user.local_identity.identifier = form.data['username']
+        if form.data['new_password']:
+            self.user.local_identity.password = form.data['new_password']
+        flash(_("Your local account credentials have been updated successfully"), 'success')
+
+    def _process(self):
+        form = self._create_form()
+        if form.validate_on_submit():
+            if isinstance(form, LocalLoginAddForm):
+                self._handle_add_local_account(form)
+            elif isinstance(form, LocalLoginEditForm):
+                self._handle_edit_local_account(form)
+            return redirect(url_for('auth.accounts'))
+        provider_titles = {name: provider.title for name, provider in multipass.auth_providers.iteritems()}
+        return WPUser.render_template('accounts.html', form=form, user=self.user, provider_titles=provider_titles)
+
+
+class RHRemoveAccount(RHUserBase):
+    """Removes an identity linked to a user"""
+
+    def _checkParams(self):
+        RHUserBase._checkParams(self)
+        self.identity = Identity.get_one(request.view_args['identity'])
+        if self.identity.user != self.user:
+            raise NotFound()
+
+    def _process(self):
+        if session['login_identity'] == self.identity.id:
+            raise BadRequest("The identity used to log in can't be removed")
+        if self.user.local_identity == self.identity:
+            raise BadRequest("The main local identity can't be removed")
+        self.user.identities.remove(self.identity)
+        provider_title = multipass.identity_providers[self.identity.provider].title
+        flash(_("{} ({}) successfully removed from your accounts"
+              .format(provider_title, self.identity.identifier)), 'success')
+        return redirect(url_for('.accounts'))
 
 
 class RegistrationHandler(object):
@@ -431,7 +492,7 @@ class RHResetPassword(RH):
             user = form.user
             # The only case where someone would have more than one identity is after a merge.
             # And the worst case that can happen here is that we send the user a different
-            # username than the one he expects. But he still gets back into his account.
+            # username than the one he expects. But he still gets back into his profile.
             # Showing a list of usernames would be a little bit more user-friendly but less
             # secure as we'd expose valid usernames for a specific user to an untrusted person.
             identity = next(iter(user.local_identities))

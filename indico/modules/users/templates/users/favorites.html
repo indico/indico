@@ -17,11 +17,11 @@
                     </div>
                     <div class="i-box-content">
                         {% if user.favorite_users %}
-                            <ul class="group-list no-description" id="favorite-users">
+                            <ul class="group-list no-content-before" id="favorite-users">
                                 {{ favorite_users_list(user) }}
                             </ul>
                         {% else %}
-                            <p class="group-list-description">{% trans %}You have not marked any user as favorite.{% endtrans %}</p>
+                            <p>{% trans %}You have not marked any user as favorite.{% endtrans %}</p>
                         {% endif %}
                     </div>
                 </div>
@@ -36,7 +36,7 @@
                     </div>
                     <div class="i-box-content">
                         {% if user.favorite_categories %}
-                            <ul class="group-list no-description">
+                            <ul class="group-list no-content-before">
                                 {% for category in user.favorite_categories|sort(attribute='name') %}
                                     <li data-categ-id="{{ category.id }}" class="favorite-categ js-category-row">
                                         <span>{{ category.name }}</span>
@@ -46,7 +46,7 @@
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            <p class="group-list-description">{% trans %}You have not marked any category as favorite.{% endtrans %}</p>
+                            <p>{% trans %}You have not marked any category as favorite.{% endtrans %}</p>
                         {% endif %}
                     </div>
                 </div>
