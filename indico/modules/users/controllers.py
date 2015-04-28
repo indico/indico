@@ -26,7 +26,7 @@ from indico.core import signals
 from indico.core.notifications import make_email
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
-from indico.modules.users.util import get_related_categories, get_suggested_categories, serialize_user
+from indico.modules.users.util import get_related_categories, get_suggested_categories, serialize_user, merge_users
 from indico.modules.users.views import WPUserDashboard, WPUser
 from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm
 from indico.util.date_time import timedelta_split
@@ -184,25 +184,32 @@ class RHUserEmailsVerify(RHUserBase):
     def _validate(self, data):
         if not data:
             flash(_('The verification token is invalid or expired.'), 'error')
-            return False
+            return False, None
         user = User.get(data['user_id'])
         if not user or user != self.user:
             flash(_('This token is for a different Indico user. Please login with the correct account'), 'error')
-            return False
+            return False, None
         existing = UserEmail.find_first(is_user_deleted=False, email=data['email'])
-        if existing:
+        if existing and not existing.user.is_pending:
             if existing.user == self.user:
                 flash(_('This email address is already attached to your account.'))
             else:
                 flash(_('This email address is already in use by another account.'), 'error')
-            return False
-        return True
+            return False, existing.user
+        return True, existing.user
 
     def _process(self):
         token = request.view_args['token']
         data = self.token_storage.get(token)
-        if self._validate(data):
+        valid, existing = self._validate(data)
+        if valid:
             self.token_storage.delete(token)
+
+            if existing.is_pending:
+                flash(_("Merged data from existing '{}' identity").format(existing.email))
+                merge_users(existing, self.user)
+                existing.is_pending = False
+
             self.user.secondary_emails.add(data['email'])
             flash(_('The email address {email} has been added to your account.').format(email=data['email']), 'success')
         return redirect(url_for('.user_emails'))
