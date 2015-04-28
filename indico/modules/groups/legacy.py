@@ -67,7 +67,7 @@ class GroupWrapper(Persistent, Fossilizable):
         return False
 
     def containsUser(self, avatar):
-        return self.group.has_member(avatar.user)
+        return self.group.has_member(avatar.user) if avatar else False
 
     def getMemberList(self):
         return sorted([x.as_avatar for x in self.group.get_members()], key=attrgetter('user.last_name'))
