@@ -67,7 +67,9 @@ class LocalLoginEditForm(IndicoForm):
             raise ValidationError(_("Wrong current password"))
 
     def validate_username(self, field):
-        query = Identity.find(Identity.identifier != self.identity.identifier, provider='indico', identifier=field.data)
+        query = Identity.find(Identity.provider == 'indico',
+                              Identity.identifier == field.data,
+                              Identity.identifier != self.identity.identifier)
         if query.count():
             raise ValidationError(_('This username is already in use.'))
 
