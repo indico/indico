@@ -55,13 +55,29 @@
                                         <i class="icon-user"></i>
                                         <span>{{ identity.identifier }}</span>
                                     </span>
-                                    <button class="i-button right"
-                                        data-href="{{ url_for('.remove_account', identity) }}"
-                                        data-method="post"
-                                        data-title="{% trans %}Remove account{% endtrans %}"
-                                        data-confirm="{% trans %}Do you really want to remove this account?{% endtrans %}">
-                                        {% trans %}Remove{% endtrans %}
-                                    </button>
+                                    <span class="right">
+                                        <span class="account-identity-info">
+                                            <span>
+                                                <span class="label">
+                                                    {% trans %}Last login:{% endtrans %}
+                                                </span>
+                                                <span class="content">
+                                                    {% if identity.last_login_dt %}
+                                                        {{ identity.last_login_dt | format_datetime('short') }}
+                                                    {% else %}
+                                                        {% trans %}Never{% endtrans %}
+                                                    {% endif %}
+                                                </span>
+                                            </span>
+                                        </span>
+                                        <button class="i-button"
+                                            data-href="{{ url_for('.remove_account', identity) }}"
+                                            data-method="post"
+                                            data-title="{% trans %}Remove account{% endtrans %}"
+                                            data-confirm="{% trans %}Do you really want to remove this account?{% endtrans %}">
+                                            {% trans %}Remove{% endtrans %}
+                                        </button>
+                                    </span>
                                 </li>
                             {% endfor %}
                         </ul>
@@ -82,7 +98,7 @@
                 </p>
                 <ul class="group-list with-buttons">
                     {% if user.external_identities %}
-                        {% for identity in user.external_identities | sort(attribute='last_login_dt', reverse=True) %}
+                        {% for identity in user.external_identities | sort(attribute='safe_last_login_dt', reverse=True) %}
                             <li>
                                 <span class="account-identity">
                                     {{ provider_titles[identity.provider] }}
@@ -97,7 +113,11 @@
                                                 {% trans %}Last login:{% endtrans %}
                                             </span>
                                             <span class="content">
-                                                {{ identity.last_login_dt | format_datetime('short') }}
+                                                {% if identity.last_login_dt %}
+                                                    {{ identity.last_login_dt | format_datetime('short') }}
+                                                {% else %}
+                                                    {% trans %}Never{% endtrans %}
+                                                {% endif %}
                                             </span>
                                         </span>
                                     </span>

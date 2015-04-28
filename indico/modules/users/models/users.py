@@ -249,7 +249,7 @@ class User(db.Model):
     @property
     def local_identity(self):
         """The main (most recently used) local identity"""
-        identities = sorted(self.local_identities, key=attrgetter('last_login_dt'), reverse=True)
+        identities = sorted(self.local_identities, key=attrgetter('safe_last_login_dt'), reverse=True)
         return identities[0] if identities else None
 
     @property

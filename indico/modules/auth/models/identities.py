@@ -16,12 +16,14 @@
 
 from __future__ import unicode_literals
 
+from datetime import datetime
+
 from sqlalchemy.dialects.postgresql import JSON, INET
 from werkzeug.datastructures import MultiDict
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
-from indico.util.date_time import now_utc
+from indico.util.date_time import now_utc, as_utc
 from indico.util.passwords import PasswordProperty
 from indico.util.string import return_ascii
 
@@ -93,6 +95,11 @@ class Identity(db.Model):
     @property
     def locator(self):
         return {'identity': self.id}
+
+    @property
+    def safe_last_login_dt(self):
+        """last_login_dt that is safe for sorting (no None values)"""
+        return self.last_login_dt or as_utc(datetime(1970, 1, 1))
 
     def register_login(self, ip):
         """Updates the last login information"""
