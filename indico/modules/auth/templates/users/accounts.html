@@ -16,11 +16,11 @@
                 </div>
                 <div class="i-box-content">
                     {% if not user.local_identity %}
-                        <span id="no-local-acccount">
+                        <span id="no-local-acccount" {%- if form.is_submitted() %} style="display: none;"{% endif %}>
                             {% trans %}You don't have a local account yet.{% endtrans %}
                             <a href="#" class="js-show-form">{% trans %}Create one{% endtrans %}</a>
                         </span>
-                        <div id="credentials-form" style="display: none">
+                        <div id="credentials-form" {%- if not form.is_submitted() %} style="display: none;"{% endif %}>
                             {{ form_header(orientation='vertical', classes='no-block-padding') }}
                             {{ form_rows(form) }}
                             {% call form_footer() %}
