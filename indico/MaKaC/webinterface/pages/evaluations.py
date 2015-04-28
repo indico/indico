@@ -24,12 +24,13 @@ from MaKaC.webinterface.navigation  import NEEvaluationMainInformation,NEEvaluat
 from MaKaC.errors                   import FormValuesError
 from MaKaC.common                   import utils
 from MaKaC.i18n                     import _
-from indico.util.i18n import i18nformat
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.webinterface.pages.conferences import WConfDisplayBodyBase
 
 from indico.core.config import Config
 from indico.modules.users.legacy import AvatarUserWrapper
+from indico.util.i18n import i18nformat
+from indico.web.flask.util import url_for
 
 ##############
 #Display Area#
@@ -258,29 +259,6 @@ class WEvaluationClosed(WEvaluationDisplay):
         wvars["startDate"] = sDate.strftime("%A %d %B %Y")
         wvars["endDate"] = eDate.strftime("%A %d %B %Y")
         return wvars
-
-
-class WPEvaluationSignIn( WPEvaluationBase ):
-    """[DisplayArea] Invite user to login/signin."""
-    navigationEntry = NEEvaluationDisplay
-
-    def _getBody( self, params ):
-        return WEvaluationSignIn( self._conf ).getHTML(params)
-
-    def _defineSectionMenu( self ):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._newEvaluationOpt)
-
-class WEvaluationSignIn(wcomponents.WTemplated):
-    """[DisplayArea] Invite user to login/signin."""
-
-    def __init__(self, conf):
-        self._conf = conf
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["signInURL"] = urlHandlers.UHConfSignIn.getURL(self._conf, urlHandlers.UHConfEvaluationDisplay.getURL(self._conf))
-        return vars
 
 
 class WPEvaluationInactive( WPEvaluationBase ):

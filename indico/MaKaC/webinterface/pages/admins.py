@@ -874,7 +874,7 @@ class WUserList(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["nbUsers"] = indexes.IndexesHolder().getById("email").getLength()
-        vars["createUserURL"] = urlHandlers.UHUserCreation.getURL()
+        vars["createUserURL"] = '#'
         vars["mergeUsersURL"] = urlHandlers.UHUserMerge.getURL()
         vars["searchUsersURL"] = urlHandlers.UHUsers.getURL()
         vars["browseUsersURL"] = urlHandlers.UHUsers.getURL()
@@ -920,93 +920,6 @@ class WPUserList(WPUserCommon):
         comp = WUserList(criteria, onlyActivated=onlyActivated)
 
         return comp.getHTML(self._params)
-
-
-class WPUserCreation(WPUserCommon):
-
-    def __init__(self, rh, params, participation=None):
-        WPUserCommon.__init__(self, rh)
-        self._params = params
-        self._participation = participation
-
-    def _getTabContent(self, params):
-        pars = self._params
-        p = wcomponents.WUserRegistration()
-        pars["defaultLang"] = pars.get("lang", "")
-        pars["defaultTZ"] = pars.get("timezone", "")
-        pars["defaultTZMode"] = pars.get("displayTZMode", "")
-        pars["postURL"] = urlHandlers.UHUserCreation.getURL()
-
-        if pars["msg"] != "":
-            pars["msg"] = "<table bgcolor=\"gray\"><tr><td bgcolor=\"white\">\n<font size=\"+1\" color=\"red\"><b>%s</b></font>\n</td></tr></table>" % pars["msg"]
-
-        if self._participation is not None:
-            pars["email"] = self._participation.getEmail()
-            pars["name"] = self._participation.getFirstName()
-            pars["surName"] = self._participation.getFamilyName()
-            pars["title"] = self._participation.getTitle()
-            pars["organisation"] = self._participation.getAffiliation()
-            pars["address"] = self._participation.getAddress()
-            pars["telephone"] = self._participation.getPhone()
-            pars["fax"] = self._participation.getFax()
-
-        return p.getHTML(pars)
-
-
-class WPUserCreationNonAdmin(WPUserCreation):
-
-    def _getNavigationDrawer(self):
-        pass
-
-    def _getBody(self, params):
-        return WPUserCreation._getTabContent(self, params)
-
-
-class WPUserCreated(WPUserCommon):
-
-    def __init__(self, rh, av):
-        WPUserCommon.__init__(self, rh)
-        self._av = av
-
-    def _getTabContent(self, params):
-        p = wcomponents.WUserCreated(self._av)
-        pars = {"signInURL": urlHandlers.UHSignIn.getURL()}
-        return p.getHTML(pars)
-
-
-class WPUserCreatedNonAdmin(WPUserCreated):
-
-    def _getNavigationDrawer(self):
-        pass
-
-    def _getBody(self, params):
-        return WPUserCreated._getTabContent(self, params)
-
-
-class WPUserExistWithIdentity( WPUserCommon ):
-
-    def __init__(self, rh, av):
-        WPUserCommon.__init__(self, rh)
-        self._av = av
-
-    def _getTabContent(self, params ):
-        p = wcomponents.WUserSendIdentity(self._av)
-        pars = {"postURL" : urlHandlers.UHSendLogin.getURL(self._av)}
-        return p.getHTML( pars )
-
-class WPUserExistWithIdentityNonAdmin(WPUserExistWithIdentity):
-
-    def _getNavigationDrawer(self):
-        pass
-
-    def _getBody(self, params):
-        return WPUserExistWithIdentity._getTabContent(self, params)
-
-
-class WPUserBase(WPUserCommon):
-    def __init__(self, rh, av=None, **kwargs):
-        WPUserCommon.__init__(self, rh, **kwargs)
-        self._avatar = av
 
 
 class WPUserMerge( WPUserCommon ):

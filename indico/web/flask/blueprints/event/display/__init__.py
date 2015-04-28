@@ -25,5 +25,4 @@ import indico.web.flask.blueprints.event.display.contributions
 import indico.web.flask.blueprints.event.display.schedule
 import indico.web.flask.blueprints.event.display.evaluation
 import indico.web.flask.blueprints.event.display.registration
-import indico.web.flask.blueprints.event.display.users
 import indico.web.flask.blueprints.event.display.misc

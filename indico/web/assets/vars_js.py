@@ -51,7 +51,7 @@ def generate_global_file(config):
             'ImagesBase': config.getImagesBaseURL(),
             'SecureImagesBase': config.getImagesBaseSecureURL(),
 
-            'Login': urlHandlers.UHSignIn.getURL().js_router,
+            'Login': url_for('auth.login'),
             'Favorites': url_for('users.user_favorites'),
             'FavoriteUserAdd': url_for('users.user_favorites_users_add'),
             'FavoriteUserRemove': url_rule_to_js('users.user_favorites_user_remove'),

@@ -22,7 +22,6 @@ from indico.web.flask.blueprints.event.display import event
 event.add_url_rule('/evaluation/', 'confDisplayEvaluation', evaluationDisplay.RHEvaluationMainInformation)
 event.add_url_rule('/evaluation/evaluate', 'confDisplayEvaluation-display', evaluationDisplay.RHEvaluationDisplay)
 event.add_url_rule('/evaluation/evaluate', 'confDisplayEvaluation-modif', evaluationDisplay.RHEvaluationDisplay)
-event.add_url_rule('/evaluation/signin', 'confDisplayEvaluation-signIn', evaluationDisplay.RHEvaluationSignIn)
 event.add_url_rule('/evaluation/evaluate', 'confDisplayEvaluation-submit', evaluationDisplay.RHEvaluationSubmit,
                    methods=('POST',))
 event.add_url_rule('/evaluation/evaluate/success', 'confDisplayEvaluation-submitted',

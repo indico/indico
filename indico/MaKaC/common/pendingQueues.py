@@ -27,6 +27,7 @@ from MaKaC.user import AvatarHolder
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
 from indico.core.config import Config
+from indico.web.flask.util import url_for
 from MaKaC.common import mail
 ###---------------------------- General Pending Queues ---------------------------------
 
@@ -219,9 +220,11 @@ class PendingConfSubmittersHolder(PendingHolder):
 
 class _PendingConfSubmitterNotification(_PendingNotification):
 
-    def getBody( self ):
-        url = urlHandlers.UHUserCreation.getURL()
-        url.addParam("cpEmail",self._psList[0].getEmail())
+    def getBody(self):
+        # we go to the login page since local registration might be disabled
+        # in the future it would be nice to use a different messages depending
+        # if local identities are enabled or not
+        url = url_for('auth.login', _external=True, _secure=True)
         return """
     You have been granted with file submission rights for the following event:%s
     Please create an account in Indico in order to use these rights. You can create your account at the following URL:
@@ -311,8 +314,10 @@ class PendingSubmittersHolder(PendingHolder):
 class _PendingSubmitterNotification(_PendingNotification):
 
     def getBody( self ):
-        url = urlHandlers.UHUserCreation.getURL()
-        url.addParam("cpEmail",self._psList[0].getEmail())
+        # we go to the login page since local registration might be disabled
+        # in the future it would be nice to use a different messages depending
+        # if local identities are enabled or not
+        url = url_for('auth.login', _external=True, _secure=True)
         return """
     You have been added as author/speaker of the following contributions:%s
     and material submission rights have been granted to you.
@@ -417,8 +422,10 @@ class PendingManagersHolder(PendingHolder):
 class _PendingManagerNotification(_PendingNotification):
 
     def getBody( self ):
-        url = urlHandlers.UHUserCreation.getURL()
-        url.addParam("cpEmail",self._psList[0].getEmail())
+        # we go to the login page since local registration might be disabled
+        # in the future it would be nice to use a different messages depending
+        # if local identities are enabled or not
+        url = url_for('auth.login', _external=True, _secure=True)
         return """
     You have been added as convener of the following sessions:%s
     And session modification rights have been granted to you.
@@ -512,8 +519,10 @@ class PendingConfManagersHolder(PendingHolder):
 
 class _PendingConfManagerNotification(_PendingNotification):
     def getBody( self ):
-        url = urlHandlers.UHUserCreation.getURL()
-        url.addParam("cpEmail",self._psList[0].getEmail())
+        # we go to the login page since local registration might be disabled
+        # in the future it would be nice to use a different messages depending
+        # if local identities are enabled or not
+        url = url_for('auth.login', _external=True, _secure=True)
         return """
     You have been added as manager of the following Event:%s
     And modification rights have been granted to you.
@@ -603,8 +612,10 @@ class PendingCoordinatorsHolder(PendingHolder):
 class _PendingCoordinatorNotification(_PendingNotification):
 
     def getBody( self ):
-        url = urlHandlers.UHUserCreation.getURL()
-        url.addParam("cpEmail",self._psList[0].getEmail())
+        # we go to the login page since local registration might be disabled
+        # in the future it would be nice to use a different messages depending
+        # if local identities are enabled or not
+        url = url_for('auth.login', _external=True, _secure=True)
         return """
     You have been added as convener of the following sessions:%s
     And session coordination rights have been granted to you.

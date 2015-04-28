@@ -27,8 +27,6 @@ from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.common.contextManager import ContextManager
 
 from indico.core.config import Config
-from indico.modules.users.legacy import AvatarUserWrapper
-from indico.modules.groups.legacy import GroupWrapper
 
 
 class BooleanMixin:
@@ -189,55 +187,6 @@ def setSSLPort(url):
 
 class UHWelcome(URLHandler):
     _endpoint = 'misc.index'
-
-
-class UHSignIn(URLHandler):
-    _endpoint = 'user.signIn'
-
-    @classmethod
-    def getURL(cls, returnURL=''):
-        if Config.getInstance().getLoginURL():
-            url = URL(Config.getInstance().getLoginURL())
-        else:
-            url = cls._getURL()
-        if returnURL:
-            url.addParam('returnURL', returnURL)
-        return url
-
-
-class UHSignInSSO(SecureURLHandler):
-    _endpoint = "user.signIn-sso"
-
-
-class UHActiveAccount(URLHandler):
-    _endpoint = 'user.signIn-active'
-
-
-class UHSendActivation(URLHandler):
-    _endpoint = 'user.signIn-sendActivation'
-
-
-class UHDisabledAccount(URLHandler):
-    _endpoint = 'user.signIn-disabledAccount'
-
-
-class UHSendLogin(URLHandler):
-    _endpoint = 'user.signIn-sendLogin'
-
-
-class UHUnactivatedAccount(URLHandler):
-    _endpoint = 'user.signIn-unactivatedAccount'
-
-
-class UHSignOut(URLHandler):
-    _endpoint = 'user.logOut'
-
-    @classmethod
-    def getURL(cls, returnURL=''):
-        url = cls._getURL()
-        if returnURL:
-            url.addParam('returnURL', returnURL)
-        return url
 
 
 class UHOAuthRequestToken(URLHandler):
@@ -1145,51 +1094,8 @@ class UHUsers(URLHandler):
     _endpoint = 'admin.userList'
 
 
-class UHUserCreation(URLHandler):
-    _endpoint = 'user.userRegistration'
-
-    @classmethod
-    def getURL(cls, returnURL=''):
-        if Config.getInstance().getRegistrationURL():
-            url = URL(Config.getInstance().getRegistrationURL())
-        else:
-            url = cls._getURL()
-        if returnURL:
-            url.addParam('returnURL', returnURL)
-        return url
-
-
 class UHUserMerge(URLHandler):
     _endpoint = 'admin.userMerge'
-
-
-class UHConfSignIn(SecureURLHandler):
-    _endpoint = 'event.confLogin'
-
-    @classmethod
-    def getURL(cls, conf, returnURL=""):
-        url = cls._getURL()
-        if conf is not None:
-            url.setParams(conf.getLocator())
-        if returnURL:
-            url.addParam('returnURL', returnURL)
-        return url
-
-
-class UHConfUserCreation(URLHandler):
-    _endpoint = 'event.confUser'
-
-    @classmethod
-    def getURL(cls, conf, returnURL=''):
-        if Config.getInstance().getRegistrationURL():
-            url = URL(Config.getInstance().getRegistrationURL())
-        else:
-            url = cls._getURL()
-        if conf is not None:
-            url.setParams(conf.getLocator())
-        if returnURL:
-            url.addParam('returnURL', returnURL)
-        return url
 
 
 class UHConfUser(URLHandler):
@@ -1202,34 +1108,6 @@ class UHConfUser(URLHandler):
                 loc.update(av.getLocator())
             url.setParams(loc)
         return url
-
-
-class UHConfDisabledAccount(UHConfUser):
-    _endpoint = 'event.confLogin-disabledAccount'
-
-
-class UHConfUnactivatedAccount(UHConfUser):
-    _endpoint = 'event.confLogin-unactivatedAccount'
-
-
-class UHConfUserCreated(UHConfUser):
-    _endpoint = 'event.confUser-created'
-
-
-class UHConfSendLogin(UHConfUser):
-    _endpoint = 'event.confLogin-sendLogin'
-
-
-class UHConfSendActivation(UHConfUser):
-    _endpoint = 'event.confLogin-sendActivation'
-
-
-class UHConfUserExistWithIdentity(UHConfUser):
-    _endpoint = 'event.confUser-userExists'
-
-
-class UHConfActiveAccount(UHConfUser):
-    _endpoint = 'event.confLogin-active'
 
 
 class UHConfEnterAccessKey(UHConfUser):
@@ -2462,18 +2340,6 @@ class UHConfRegistrationFormConditions(URLHandler):
     _endpoint = 'event.confRegistrationFormDisplay-conditions'
 
 
-class UHConfRegistrationFormSignIn(URLHandler):
-    _endpoint = 'event.confRegistrationFormDisplay-signIn'
-
-    @classmethod
-    def getURL(cls, conf, returnURL=''):
-        url = cls._getURL()
-        url.setParams(conf.getLocator())
-        if returnURL:
-            url.addParam("returnURL", returnURL)
-        return url
-
-
 class UHConfRegistrationFormCreationDone(URLHandler):
     _endpoint = 'event.confRegistrationFormDisplay-creationDone'
 
@@ -2914,18 +2780,6 @@ class UHConfEvaluationDisplay(URLHandler):
 
 class UHConfEvaluationDisplayModif(URLHandler):
     _endpoint = 'event.confDisplayEvaluation-modif'
-
-
-class UHConfEvaluationSignIn(URLHandler):
-    _endpoint = 'event.confDisplayEvaluation-signIn'
-
-    @classmethod
-    def getURL(cls, conf, returnURL=''):
-        url = cls._getURL()
-        url.setParams(conf.getLocator())
-        if returnURL:
-            url.addParam('returnURL', returnURL)
-        return url
 
 
 class UHConfEvaluationSubmit(URLHandler):

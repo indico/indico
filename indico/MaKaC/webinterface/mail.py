@@ -171,35 +171,6 @@ Indico project <http://indico-software.org/>
     send = staticmethod( send )
 
 
-class sendConfirmationRequest:
-
-    def __init__(self, user, conf=None):
-        self._user = user
-        self._conf = conf
-
-    def send( self ):
-        url = urlHandlers.UHConfActiveAccount.getURL(self._conf) if self._conf else urlHandlers.UHActiveAccount.getURL()
-        text =  _("""Welcome to Indico,
-You have created a new account on the Indico conference management system.
-
-In order to activate your new account and being able to be authenticated by the system, please open on your web browser the following URL:
-
-%s?userId=%s&key=%s
-
-Once you've done it, your account will be fully operational so you can log in and start using the system normally.
-
-Thank you for using our system.
-                """)%(url,
-                        self._user.getId(), \
-                        self._user.getKey())
-        maildata = {
-            "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
-            "toList": [self._user.getEmail()],
-            "subject": _("[%s] Confirmation request") % getSubjectIndicoTitle(),
-            "body": text
-            }
-        GenericMailer.send(GenericNotification(maildata))
-
 class sendAccountCreationModeration:
 
     def __init__( self, user ):
@@ -272,58 +243,3 @@ Your account has been disabled by the site administrator.
                 """)
         maildata = { "fromAddr": "Indico Mailer<%s>"%Config.getInstance().getNoReplyEmail(), "toList": [self._user.getEmail()], "subject": _("[%s] Account disabled")%getSubjectIndicoTitle(), "body": text }
         GenericMailer.send(GenericNotification(maildata))
-
-
-def send_login_info(user, event=None):
-    token_storage = GenericCache('resetpass')
-    endpoint = 'event.confLogin-resetPassword' if event else 'user.signIn-resetPassword'
-
-    idList = user.getIdentityList()
-    logins = []
-    for id in idList:
-        if not hasattr(id, 'setPassword'):
-            config = Config.getInstance()
-            extra_message = config.getAuthenticatorConfigById(id.getAuthenticatorTag()).get("ResetPasswordMessage")
-            msg = _("Sorry, you are using an externally managed account (%s) to login into Indico.") % id.getLogin()
-            if extra_message:
-                msg += "\n" + extra_message
-            logins.append({
-                'tag': id.getAuthenticatorTag(),
-                'login': id.getLogin(),
-                'error': msg
-            })
-        else:
-            tag = id.getAuthenticatorTag()
-            login = id.getLogin()
-            data = {'tag': tag, 'login': login}
-            token = str(uuid.uuid4())
-            while token_storage.get(token):
-                token = str(uuid.uuid4())
-            token_storage.set(token, data, 6*3600)
-            url = url_for(endpoint, event, token=token, _external=True, _secure=True)
-            logins.append({
-                'tag': tag,
-                'login': login,
-                'link': url
-            })
-    if not logins:
-        url = urlHandlers.UHUserDetails.getURL(user)
-        text = _("Sorry, we did not find your login.\nPlease, create one here:\n%s") % url
-    else:
-        text = _("You can use the following links within the next six hours to reset your password.")
-        for entry in logins:
-            text += "\n\n==================\n"
-            if 'link' in entry:
-                text += _("Click below to reset your password for the %s login '%s':\n") % (entry['tag'],
-                                                                                            entry['login'])
-                text += entry['link']
-            else:
-                text += entry['error']
-            text += "\n==================\n"
-    maildata = {
-        "fromAddr": "Indico Mailer <%s>" % Config.getInstance().getNoReplyEmail(),
-        "toList": [user.getEmail()],
-        "subject": _("[%s] Login Information") % getSubjectIndicoTitle(),
-        "body": text
-    }
-    GenericMailer.send(GenericNotification(maildata))

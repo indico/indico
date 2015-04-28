@@ -14,14 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import flash
+
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface                      import urlHandlers
 from MaKaC.webinterface.pages                import evaluations
 from MaKaC.evaluation                        import Evaluation,Question,Submission
 from MaKaC.errors                            import FormValuesError
-from MaKaC.common.info import HelperMaKaCInfo
 
 from indico.core.config import Config
+from indico.util.i18n import _
 
 
 class RHBaseEvaluation( RHConferenceBaseDisplay ):
@@ -69,22 +71,6 @@ class RHEvaluationMainInformation( RHBaseEvaluation ):
             return evaluations.WPEvaluationMainInformation(self, self._conf).display()
 
 
-class RHEvaluationSignIn( RHBaseEvaluation ):
-    """Invite user to login/signin."""
-    _uh = urlHandlers.UHConfEvaluationSignIn
-    _tohttps = True
-    _isMobile = False
-
-    def _getLoginURL(self):
-        return RHConferenceBaseDisplay._getLoginURL(self, urlHandlers.UHConfEvaluationDisplay.getURL(self._conf))
-
-    def _processIfActive(self):
-        if self._getUser():
-            self._redirect(urlHandlers.UHConfEvaluationDisplay.getURL(self._conf))
-        else:
-            return self._wpEvaluation("SignIn").display()
-
-
 class RHEvaluationDisplayBase( RHBaseEvaluation ):
     """Base for evaluation display."""
     _uh = urlHandlers.UHConfEvaluationDisplay
@@ -92,8 +78,9 @@ class RHEvaluationDisplayBase( RHBaseEvaluation ):
     def _checkProtection( self ):
         RHBaseEvaluation._checkProtection(self)
         if self._evaluation.inEvaluationPeriod() and self._evaluation.isMandatoryAccount() and not self._getUser():
-            self._redirect(urlHandlers.UHConfEvaluationSignIn.getURL(self._conf))
+            flash(_("Please log in to access this event's evaluation form."))
             self._doProcess = False
+            self._checkSessionUser()
 
 
 class RHEvaluationDisplay(RHEvaluationDisplayBase):

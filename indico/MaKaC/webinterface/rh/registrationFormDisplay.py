@@ -13,15 +13,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from flask import session, request, flash, redirect
+from flask import session, flash, redirect
 from cStringIO import StringIO
 
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay, RHConfSignIn
+from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.registrationForm as registrationForm
 from MaKaC import registration
 from MaKaC.errors import FormValuesError, MaKaCError, AccessError, NotFoundError
-from indico.core.config import Config
 from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
 
@@ -33,7 +32,7 @@ from indico.modules.payment import event_settings as payment_event_settings
 from indico.web.flask.util import send_file, url_for
 
 from indico.util import json
-from indico.util.i18n import set_best_lang
+from indico.util.i18n import set_best_lang, _
 
 
 class RHBaseRegistrationForm(RHConferenceBaseDisplay):
@@ -58,32 +57,15 @@ class RHBaseRegistrationForm(RHConferenceBaseDisplay):
             return self._processIfActive()
 
 
-class RHRegistrationFormSignIn(RHBaseRegistrationForm, RHConfSignIn):
-    _uh = urlHandlers.UHConfRegistrationFormSignIn
-
-    def _checkParams(self, params):
-        RHBaseRegistrationForm._checkParams(self, params)
-        RHConfSignIn._checkParams(self, params)
-        self._signInPage = registrationForm.WPRegistrationFormSignIn(self, self._conf)
-
-    def _processIfActive(self):
-        return self._makeLoginProcess()
-
-
 class RHRegistrationFormDisplayBase(RHBaseRegistrationForm):
     _uh = urlHandlers.UHConfRegistrationFormDisplay
-
-    def _getLoginURL(self):
-        urlLogin = str(urlHandlers.UHConfRegistrationFormSignIn.getURL(self._conf, request.url))
-        if Config.getInstance().getLoginURL().startswith("https"):
-            urlLogin = urlLogin.replace("http://", "https://")
-        return urlLogin
 
 
 class RHRegistrationFormDisplayBaseCheckProtection(RHRegistrationFormDisplayBase):
     def _checkProtection(self):
         RHRegistrationFormDisplayBase._checkProtection(self)
         if self._regForm.inRegistrationPeriod() and self._regForm.isMandatoryAccount() and self._getUser() is None:
+            flash(_("Please log in to access this event's registration form."))
             self._redirect(self._getLoginURL())
             self._doProcess = False
 

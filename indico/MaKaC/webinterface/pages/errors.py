@@ -191,9 +191,6 @@ class WAccessKeyError( WTemplated ):
     def getVars( self ):
         from MaKaC.conference import Conference,Material, Resource
         vars = WTemplated.getVars( self )
-        vars["loginURL"] = ""
-        if self._rh._getUser() is None:
-            vars["loginURL"] = str(urlHandlers.UHSignIn.getURL(returnURL=request.url))
         if isinstance(self._rh._target,Conference):
             vars["type"] = "event"
             vars["url"] = quoteattr( str( urlHandlers.UHConfEnterAccessKey.getURL(self._rh._target) ) )
@@ -312,9 +309,6 @@ class WModificationKeyError( WTemplated ):
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        vars["loginURL"] = ""
-        if self._rh._getUser() is None:
-            vars["loginURL"] = str(urlHandlers.UHSignIn.getURL(returnURL=request.url))
         vars["msg"] = self._msg
         redirectURL = ""
         if hasattr(self._rh, "_redirectURL"):

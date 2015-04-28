@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.modules.auth.controllers import (RHLogin, RHLoginForm, RHLogout, RHAssociateIdentity, RHRegister,
                                              RHResetPassword)
+from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 auth_blueprint = _bp = IndicoBlueprint('auth', __name__, template_folder='templates')
@@ -35,3 +36,9 @@ _bp.add_url_rule('/register/', 'register', RHRegister, methods=('GET', 'POST'), 
 _bp.add_url_rule('/register/<provider>', 'register', RHRegister, methods=('GET', 'POST'))
 
 _bp.add_url_rule('/reset-password/', 'resetpass', RHResetPassword, methods=('GET', 'POST'))
+
+
+# Legacy URLs
+auth_compat_blueprint = _compat_bp = IndicoBlueprint('compat_auth', __name__)
+_compat_bp.add_url_rule('/user/login', 'login', make_compat_redirect_func(_bp, 'login'))
+_compat_bp.add_url_rule('/user/register', 'register', make_compat_redirect_func(_bp, 'register'))

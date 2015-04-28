@@ -17,8 +17,6 @@
 import string
 from xml.sax.saxutils import quoteattr
 
-from flask import session, request
-
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
@@ -828,43 +826,6 @@ class WConfRegFormDeactivated(WConfDisplayBodyBase):
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)
         wvars["body_title"] = self._getTitle()
-        return wvars
-
-
-
-
-class WPRegistrationFormSignIn(conferences.WPConferenceDefaultDisplayBase):
-    navigationEntry = navigation.NERegistrationFormDisplay
-
-    def _getBody(self, params):
-        urlCreateAccount = urlHandlers.UHConfUserCreation.getURL(self._conf)
-        urlCreateAccount.addParam("returnURL", urlHandlers.UHConfRegistrationFormDisplay.getURL(self._conf))
-        p = {
-            "postURL": urlHandlers.UHConfSignIn.getURL(self._conf),
-            "returnURL": urlHandlers.UHConfRegistrationFormDisplay.getURL(self._conf),
-            "createAccountURL": urlCreateAccount,
-            "forgotPassordURL": urlHandlers.UHConfSendLogin.getURL(self._conf),
-            "login": "",
-            "msg": ""
-        }
-        wc = WConfRegistrationFormSignIn(self._conf, p)
-        return wc.getHTML(p)
-
-    def _defineSectionMenu(self):
-        conferences.WPConferenceDefaultDisplayBase._defineSectionMenu(self)
-        self._sectionMenu.setCurrentItem(self._regFormOpt)
-
-
-class WConfRegistrationFormSignIn(wcomponents.WTemplated):
-
-    def __init__(self, conf, p):
-        self._conf = conf
-        self._params = p
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        wc = wcomponents.WSignIn()
-        wvars["signIn"] = wc.getHTML(self._params)
         return wvars
 
 

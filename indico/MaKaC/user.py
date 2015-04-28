@@ -1086,25 +1086,6 @@ class AvatarHolder(ObjectHolder):
         return True
 
 
-class LoginInfo:
-
-    def __init__(self, login, password):
-        self.setLogin(login)
-        self.setPassword(password)
-
-    def setLogin(self, newLogin):
-        self.login = newLogin.strip()
-
-    def getLogin(self):
-        return self.login
-
-    def setPassword(self, newPassword):
-        self.password = newPassword
-
-    def getPassword(self):
-        return self.password
-
-
 class PersonalInfo(Persistent, Fossilizable):
 
     fossilizes(IPersonalInfoFossil)

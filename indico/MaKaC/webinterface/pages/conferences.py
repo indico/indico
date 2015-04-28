@@ -39,7 +39,6 @@ import MaKaC.common.utils
 import MaKaC.review as review
 from MaKaC.review import AbstractTextField
 from MaKaC.webinterface.pages.base import WPDecorated
-from MaKaC.webinterface.pages.signIn import WPResetPasswordBase
 from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
 from MaKaC.webinterface.materialFactories import ConfMFRegistry, PaperFactory, SlidesFactory, PosterFactory
 from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
@@ -131,15 +130,8 @@ class WPConferenceBase(base.WPDecorated):
              }
         return wc.getHTML(p)
 
-    def getLoginURL( self ):
-        wf = self._rh.getWebFactory()
-        if wf:
-            return WPDecorated.getLoginURL(self)
-
-        return urlHandlers.UHConfSignIn.getURL(self._conf, request.url)
-
-    def getLogoutURL( self ):
-        return urlHandlers.UHSignOut.getURL(str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
+    def getLogoutURL(self):
+        return url_for('auth.logout', next=str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
 
 
 class WPConferenceDisplayBase(WPConferenceBase):
@@ -469,121 +461,6 @@ class WConfDisplayMenu(wcomponents.WTemplated):
     def __init__(self, menu):
         wcomponents.WTemplated.__init__(self)
         self._menu = menu
-
-
-class WPConfSignIn( WPConferenceDefaultDisplayBase ):
-
-    def __init__(self, rh, conf, login="", msg = ""):
-        self._login = login
-        self._msg = msg
-        WPConferenceBase.__init__( self, rh, conf)
-
-    def _getBody( self, params ):
-        wc = wcomponents.WSignIn()
-        p = { \
-    "postURL": urlHandlers.UHConfSignIn.getURL( self._conf ), \
-    "returnURL": params["returnURL"], \
-    "createAccountURL": urlHandlers.UHConfUserCreation.getURL( self._conf ), \
-    "forgotPassordURL": urlHandlers.UHConfSendLogin.getURL( self._conf ), \
-    "login": self._login, \
-    "msg": self._msg }
-        return wc.getHTML( p )
-
-
-class WPConfResetPassword(WPResetPasswordBase, WPConferenceDefaultDisplayBase):
-    pass
-
-
-class WPConfAccountAlreadyActivated( WPConferenceDefaultDisplayBase ):
-
-    def __init__(self, rh, conf, av):
-        WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
-        self._av = av
-
-    def _getBody( self, params ):
-        wc = wcomponents.WAccountAlreadyActivated( self._av)
-        params["mailLoginURL"] = urlHandlers.UHConfSendLogin.getURL( self._conf, self._av)
-        return wc.getHTML( params )
-
-class WPConfAccountActivated( WPConferenceDefaultDisplayBase ):
-
-    def __init__(self, rh, conf, av, returnURL=""):
-        WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
-        self._av = av
-        self._returnURL=returnURL
-
-    def _getBody( self, params ):
-        wc = wcomponents.WAccountActivated( self._av)
-        params["mailLoginURL"] = urlHandlers.UHConfSendLogin.getURL(self._conf, self._av)
-        params["loginURL"] = urlHandlers.UHConfSignIn.getURL(self._conf)
-        if self._returnURL.strip()!="":
-            params["loginURL"] = self._returnURL
-        return wc.getHTML( params )
-
-class WPConfAccountDisabled( WPConferenceDefaultDisplayBase ):
-
-    def __init__(self, rh, conf, av):
-        WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
-        self._av = av
-
-    def _getBody( self, params ):
-        wc = wcomponents.WAccountDisabled( self._av )
-        #params["mailLoginURL"] = urlHandlers.UHSendLogin.getURL(self._av)
-
-        return wc.getHTML( params )
-
-class WPConfUnactivatedAccount( WPConferenceDefaultDisplayBase ):
-
-    def __init__(self, rh, conf, av):
-        WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
-        self._av = av
-
-    def _getBody( self, params ):
-        wc = wcomponents.WUnactivatedAccount( self._av )
-        params["mailActivationURL"] = urlHandlers.UHConfSendActivation.getURL( self._conf, self._av)
-
-        return wc.getHTML( params )
-
-
-class WPConfUserCreation( WPConferenceDefaultDisplayBase ):
-
-    def __init__(self, rh, conf, params):
-        self._params = params
-        WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
-
-    def _getBody(self, params ):
-        pars = self._params
-        p = wcomponents.WUserRegistration()
-        postURL = urlHandlers.UHConfUserCreation.getURL( self._conf )
-        postURL.addParam("returnURL", self._params.get("returnURL",""))
-        pars["postURL"] =  postURL
-        if pars["msg"] != "":
-            pars["msg"] = "<table bgcolor=\"gray\"><tr><td bgcolor=\"white\">\n<font size=\"+1\" color=\"red\"><b>%s</b></font>\n</td></tr></table>"%pars["msg"]
-        return p.getHTML( pars )
-
-
-class WPConfUserCreated( WPConferenceDefaultDisplayBase ):
-
-    def __init__(self, rh, conf, av):
-        WPConferenceDefaultDisplayBase.__init__( self, rh, conf )
-        self._av = av
-
-    def _getBody(self, params ):
-        p = wcomponents.WUserCreated(self._av)
-        pars = {"signInURL" : urlHandlers.UHConfSignIn.getURL( self._conf )}
-        return p.getHTML( pars )
-
-
-class WPConfUserExistWithIdentity( WPConferenceDefaultDisplayBase ):
-
-    def __init__(self, rh, conf, av):
-        WPConferenceDefaultDisplayBase.__init__(self, rh, conf)
-        self._av = av
-
-    def _getBody(self, params ):
-        p = wcomponents.WUserSendIdentity(self._av)
-        pars = {"postURL" : urlHandlers.UHConfSendLogin.getURL(self._conf, self._av)}
-        return p.getHTML( pars )
 
 
 class WConfDetailsBase( wcomponents.WTemplated ):

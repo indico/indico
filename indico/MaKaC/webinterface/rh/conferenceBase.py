@@ -60,18 +60,6 @@ class RHConferenceSite( RHCustomizable ):
         self._conf = self._target = l.getObject()
         ContextManager.set("currentConference", self._conf)
 
-    def _getLoginURL(self, return_url=None):
-        url = return_url or self.getRequestURL()
-        if url == "":
-            url = urlHandlers.UHConferenceDisplay.getURL( self._conf )
-        wr = webFactoryRegistry.WebFactoryRegistry()
-        self._wf = wr.getFactory( self._conf )
-        if self._wf is not None or self._conf is None:
-            return urlHandlers.UHSignIn.getURL( url )
-        else:
-            return urlHandlers.UHConfSignIn.getURL( self._target, url )
-
-
 
 class RHConferenceBase( RHConferenceSite ):
     pass

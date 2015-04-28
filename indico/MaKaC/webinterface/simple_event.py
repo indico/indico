@@ -489,15 +489,6 @@ class WPSEEvaluationClosed (WPSEEvaluationBase, evaluations.WPEvaluationClosed):
     def _getBody(self, params):
         return evaluations.WPEvaluationClosed._getBody(self, params)
 
-class WPSEEvaluationSignIn (WPSEEvaluationBase, evaluations.WPEvaluationSignIn):
-    """[Meeting] Invite user to login/signin."""
-
-    def __init__(self, rh, conf):
-        WPSimpleEventDisplay.__init__(self, rh, conf)
-
-    def _getBody(self, params):
-        return evaluations.WPEvaluationSignIn._getBody(self, params)
-
 class WPSEEvaluationInactive (WPSEEvaluationBase, evaluations.WPEvaluationInactive):
     """[Meeting] Inactive evaluation."""
 

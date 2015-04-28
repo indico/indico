@@ -38,8 +38,6 @@ event.add_url_rule('/registration/modify', 'confRegistrationFormDisplay-modify',
                    registrationFormDisplay.RHRegistrationFormModify)
 event.add_url_rule('/registration/modify', 'confRegistrationFormDisplay-performModify',
                    registrationFormDisplay.RHRegistrationFormPerformModify, methods=('POST',))
-event.add_url_rule('/registration/signin', 'confRegistrationFormDisplay-signIn',
-                   registrationFormDisplay.RHRegistrationFormSignIn)
 event.add_url_rule('/registration/userdata', 'confRegistrationFormDisplay-userData',
                    registrationFormDisplay.RHRegistrationFormUserData)
 
