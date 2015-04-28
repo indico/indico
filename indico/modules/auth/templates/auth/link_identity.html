@@ -17,13 +17,13 @@
         {% if not identity_info.email_verified %}
             {% trans name=user.full_name -%}
                 We have found an existing Indico profile <strong>{{ name }}</strong> which will be linked
-                with this provider once you have verified that <strong>{{ emails }}</strong>
+                with this account once you have verified that <strong>{{ emails }}</strong>
                 is actually your email address.
             {%- endtrans %}
         {% else %}
             {% trans name=user.full_name -%}
                 We have found an existing Indico profile <strong>{{ name }}</strong> which will be linked
-                with this provider once you click the button below.
+                with this account once you click the button below.
             {%- endtrans %}
         {% endif %}
     </p>
@@ -41,7 +41,7 @@
                 <a class="i-button big" href="{{ url_for('auth.logout') }}">{% trans %}Cancel{% endtrans %}</a>
                 {% if identity_info.email_verified %}
                     <input class="i-button big highlight" type="submit"
-                           value="{% trans %}Add this provider and log in{% endtrans %}">
+                           value="{% trans %}Add this account and log in{% endtrans %}">
                 {% elif not email_sent %}
                     <input class="i-button big highlight" type="submit"
                            value="{% trans %}Send me a verification email{% endtrans %}">
