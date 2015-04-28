@@ -234,10 +234,10 @@ class WPDecorated(WPBase):
         return "DisplayArea"
 
     def getLoginURL(self):
-        return url_for('auth.login', next=request.full_path.rstrip('?'))
+        return url_for('auth.login', next=request.relative_url)
 
     def getLogoutURL(self):
-        return url_for('auth.logout', next=request.full_path.rstrip('?'))
+        return url_for('auth.logout', next=request.relative_url)
 
     def _getHeader( self ):
         """
@@ -300,10 +300,10 @@ class WPDecorated(WPBase):
 class WPNotDecorated(WPBase):
 
     def getLoginURL(self):
-        return url_for('auth.login', next=request.full_path.rstrip('?'))
+        return url_for('auth.login', next=request.relative_url)
 
     def getLogoutURL(self):
-        return url_for('auth.logout', next=request.full_path.rstrip('?'))
+        return url_for('auth.logout', next=request.relative_url)
 
     def _display(self, params):
         params = dict(params, **self._kwargs)

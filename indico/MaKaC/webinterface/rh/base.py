@@ -694,7 +694,7 @@ class RHSimple(RH):
 class RHProtected(RH):
 
     def _getLoginURL(self):
-        return url_for('auth.login', next=request.full_path.rstrip('?'), _external=True, _secure=True)
+        return url_for('auth.login', next=request.relative_url, _external=True, _secure=True)
 
     def _checkSessionUser(self):
         if self._getUser() is None:

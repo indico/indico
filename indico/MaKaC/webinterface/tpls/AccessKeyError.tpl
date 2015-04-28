@@ -8,7 +8,7 @@
         <td align="center">
         <form action=${ url } method="POST">
         %if not _session.user:
-            <a class="loginHighlighted" style="padding:4px 17px" href="${ url_for('auth.login', next=_request.full_path.rstrip('?')) }"><strong style="color: white;">Login</strong></a>&nbsp;${ _("or enter the access key here:")}
+            <a class="loginHighlighted" style="padding:4px 17px" href="${ url_for('auth.login', next=_request.relative_url) }"><strong style="color: white;">Login</strong></a>&nbsp;${ _("or enter the access key here:")}
         %else:
             ${ _("Please enter it here:")}
         % endif

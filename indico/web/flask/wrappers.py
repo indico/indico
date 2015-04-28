@@ -48,6 +48,15 @@ class IndicoRequest(Request):
     def id(self):
         return '{0:012x}'.format(id(self))
 
+    @cached_property
+    def relative_url(self):
+        """The request's path including its query string if applicable.
+
+        This basically `full_path` but without the ugly trailing
+        questionmark if there is no query string.
+        """
+        return self.full_path.rstrip(u'?')
+
     def __repr__(self):
         rv = super(IndicoRequest, self).__repr__()
         if isinstance(rv, unicode):
