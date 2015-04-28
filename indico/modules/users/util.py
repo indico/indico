@@ -22,13 +22,14 @@ from collections import OrderedDict
 from flask import request
 from MaKaC.accessControl import AccessWrapper
 
+from indico.core import signals
 from indico.core.db import db
 from indico.modules.users import User
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
-from indico.util.redis import suggestions
+from indico.util.redis import suggestions, avatar_links
 from MaKaC.conference import CategoryManager
 
 
@@ -139,3 +140,57 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
                 found_identities[(ident.provider, ident.identifier)] = ident
 
     return set(found_emails.viewvalues())
+
+
+def merge_users(source, target, force=False):
+    """Merge two users together, unifying all related data
+
+    :param source: source user (will be set as deleted)
+    :param target: target user (final)
+    """
+
+    if source.is_deleted and not force:
+        raise ValueError('Source user {} has been deleted. Merge aborted.'.format(source))
+
+    if target.is_deleted:
+        raise ValueError('Target user {} has been deleted. Merge aborted.'.format(target))
+
+    # merge links
+    for link in source.linked_objects:
+        if link.object is None:
+            # remove link if object does no longer exist
+            db.session.delete(link)
+        else:
+            link.user = target
+
+    # de-duplicate links
+    unique_links = {(link.object, link.role): link for link in target.linked_objects}
+    to_delete = set(target.linked_objects) - set(unique_links.viewvalues())
+
+    for link in to_delete:
+        db.session.delete(link)
+
+    UserEmail.find(user_id=source.id).update({
+        UserEmail.user_id: target.id,
+        UserEmail.is_primary: False
+    })
+
+    # Merge identities
+    for identity in set(source.identities):
+        identity.user = target
+
+    # Merge avatars in redis
+    if redis_write_client:
+        avatar_links.merge_avatars(target, source)
+        suggestions.merge_avatars(target, source)
+
+    # Merge avatars in RB
+    from indico.modules.rb.utils import rb_merge_users
+    rb_merge_users(str(target.id), str(source.id))
+
+    # Notify signal listeners about the merge
+    signals.merge_users.send(target.as_avatar, merged=source.as_avatar)
+
+    # Mark source as merged
+    source.merged_into_user = target
+    source.is_deleted = True
