@@ -26,6 +26,8 @@ from werkzeug.datastructures import OrderedMultiDict, MultiDict
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.errors import IndicoError
+from indico.modules.auth import Identity
+from indico.modules.users import User
 from indico.modules.rb.utils import rb_check_user_access
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping, RepeatFrequency, ConflictingOccurrences
 from indico.modules.rb.models.locations import Location
@@ -35,7 +37,6 @@ from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.metadata import ical
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
-from MaKaC.authentication import AuthenticatorMgr
 from MaKaC.common.info import HelperMaKaCInfo
 
 
@@ -179,12 +180,14 @@ class BookRoomHook(HTTPAPIHook):
             raise HTTPAPIError('You cannot make bookings in the past')
 
         username = get_query_parameter(self._queryParams, 'username')
-        avatars = username and filter(None, AuthenticatorMgr().getAvatarByLogin(username).itervalues())
-        if not avatars:
+        if not username:
+            raise HTTPAPIError('No username provided')
+        users = User.find_all(~User.is_deleted, Identity.identifier == username)
+        if not users:
             raise HTTPAPIError('Username does not exist')
-        elif len(avatars) != 1:
-            raise HTTPAPIError('Ambiguous username ({} users found)'.format(len(avatars)))
-        avatar = avatars[0]
+        elif len(users) != 1:
+            raise HTTPAPIError('Ambiguous username ({} users found)'.format(len(users)))
+        avatar = users[0].as_avatar
 
         self._params = {
             'room_id': get_query_parameter(self._queryParams, 'roomid'),
