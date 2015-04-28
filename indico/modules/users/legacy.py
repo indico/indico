@@ -35,13 +35,15 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     fossilizes(IAvatarFossil, IAvatarMinimalFossil)
 
-    def __init__(self, user_id):
+    def __init__(self, user_id, _user=None):
         self.id = str(user_id)
+        if _user is not None:
+            self._v_user = _user
 
     @property
     @memoize_request
     def user(self):
-        return User.get(int(self.id))
+        return getattr(self, '_v_user', User.get(int(self.id)))
 
     def getId(self):
         return self.id
