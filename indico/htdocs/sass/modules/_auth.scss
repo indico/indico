@@ -91,7 +91,6 @@ body {
 
         &.external {
             .i-button {
-                color: white !important;
             }
         }
 
@@ -99,6 +98,7 @@ body {
             @include login-form-button();
 
             &.external-provider-facebook {
+                color: white !important;
                 background-color: #3b579d;
                 border-color: #3b579d;
                 &:hover {
@@ -108,6 +108,7 @@ body {
             }
 
             &.external-provider-twitter {
+                color: white !important;
                 background-color: #4092cc;
                 border-color: #4092cc;
 
@@ -118,6 +119,7 @@ body {
             }
 
             &.external-provider-github {
+                color: white !important;
                 background-color: #666;
                 border-color: #666;
 
