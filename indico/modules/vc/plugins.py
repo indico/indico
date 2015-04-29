@@ -35,6 +35,10 @@ PREFIX_RE = re.compile('^vc_')
 
 class VCPluginMixin(object):
     settings_form = VCPluginSettingsFormBase
+    strict_settings = True
+    default_settings = {'managers': [],
+                        'acl': [],
+                        'notification_emails': []}
     #: the :class:`IndicoForm` to use for the videoconference room form
     vc_room_form = None
     #: the :class:`IndicoForm` to use for the videoconference room attach form
