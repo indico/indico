@@ -48,6 +48,7 @@ from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.plugins import plugin_engine, include_plugin_css_assets, include_plugin_js_assets, url_for_plugin
 from indico.modules.auth.providers import IndicoAuthProvider
 from indico.modules.auth.providers import IndicoIdentityProvider
+from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.util.signals import values_from_signal
 from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
@@ -191,6 +192,8 @@ def setup_jinja(app):
     app.add_template_global(render_field, '_render_field')
     app.add_template_global(format_currency)
     app.add_template_global(get_currency_name)
+    app.add_template_global(url_for_login)
+    app.add_template_global(url_for_logout)
     # Filters (indico functions returning UTF8)
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_date))
     app.add_template_filter(EnsureUnicodeExtension.wrap_func(date_time_util.format_time))

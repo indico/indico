@@ -26,6 +26,7 @@ import mako.exceptions as exceptions
 import MaKaC
 import xml.sax.saxutils
 
+from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.date_time import format_number, format_datetime, format_date, format_time
 from indico.util.i18n import ngettext
@@ -404,3 +405,5 @@ def registerHelpers(objDict):
     objDict['url_rule_to_js'] = url_rule_to_js
     objDict['render_template'] = render_template
     objDict['template_hook'] = mako_call_template_hook
+    objDict['url_for_login'] = url_for_login
+    objDict['url_for_logout'] = url_for_logout

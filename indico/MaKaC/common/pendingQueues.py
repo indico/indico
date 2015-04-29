@@ -20,6 +20,7 @@ from indico.core.db import DBMgr
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.mail import GenericNotification
 from MaKaC.common.info import HelperMaKaCInfo
+from indico.modules.auth.util import url_for_login
 from indico.modules.scheduler import Scheduler
 from indico.modules.scheduler.tasks import OneShotTask
 from persistent import Persistent
@@ -27,7 +28,6 @@ from MaKaC.user import AvatarHolder
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
 from indico.core.config import Config
-from indico.web.flask.util import url_for
 from MaKaC.common import mail
 ###---------------------------- General Pending Queues ---------------------------------
 
@@ -224,7 +224,7 @@ class _PendingConfSubmitterNotification(_PendingNotification):
         # we go to the login page since local registration might be disabled
         # in the future it would be nice to use a different messages depending
         # if local identities are enabled or not
-        url = url_for('auth.login', _external=True, _secure=True)
+        url = url_for_login()
         return """
     You have been granted with file submission rights for the following event:%s
     Please create an account in Indico in order to use these rights. You can create your account at the following URL:
@@ -317,7 +317,7 @@ class _PendingSubmitterNotification(_PendingNotification):
         # we go to the login page since local registration might be disabled
         # in the future it would be nice to use a different messages depending
         # if local identities are enabled or not
-        url = url_for('auth.login', _external=True, _secure=True)
+        url = url_for_login()
         return """
     You have been added as author/speaker of the following contributions:%s
     and material submission rights have been granted to you.
@@ -425,7 +425,7 @@ class _PendingManagerNotification(_PendingNotification):
         # we go to the login page since local registration might be disabled
         # in the future it would be nice to use a different messages depending
         # if local identities are enabled or not
-        url = url_for('auth.login', _external=True, _secure=True)
+        url = url_for_login()
         return """
     You have been added as convener of the following sessions:%s
     And session modification rights have been granted to you.
@@ -522,7 +522,7 @@ class _PendingConfManagerNotification(_PendingNotification):
         # we go to the login page since local registration might be disabled
         # in the future it would be nice to use a different messages depending
         # if local identities are enabled or not
-        url = url_for('auth.login', _external=True, _secure=True)
+        url = url_for_login()
         return """
     You have been added as manager of the following Event:%s
     And modification rights have been granted to you.
@@ -615,7 +615,7 @@ class _PendingCoordinatorNotification(_PendingNotification):
         # we go to the login page since local registration might be disabled
         # in the future it would be nice to use a different messages depending
         # if local identities are enabled or not
-        url = url_for('auth.login', _external=True, _secure=True)
+        url = url_for_login()
         return """
     You have been added as convener of the following sessions:%s
     And session coordination rights have been granted to you.

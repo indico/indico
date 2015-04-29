@@ -59,12 +59,13 @@ from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import DBMgr
 from indico.core.logger import Logger
+from indico.modules.auth.util import url_for_login
 from indico.util import json
 from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
 from indico.util.redis import RedisError
-from indico.web.flask.util import ResponseUtil, url_for
+from indico.web.flask.util import ResponseUtil
 
 
 class RequestHandlerBase():
@@ -694,7 +695,7 @@ class RHSimple(RH):
 class RHProtected(RH):
 
     def _getLoginURL(self):
-        return url_for('auth.login', next=request.relative_url, _external=True, _secure=True)
+        return url_for_login(request.relative_url)
 
     def _checkSessionUser(self):
         if self._getUser() is None:

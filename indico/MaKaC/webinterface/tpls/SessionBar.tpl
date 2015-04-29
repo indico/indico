@@ -33,7 +33,7 @@ protection = getProtection(target) if target else None
             if after_login_url == '/':
                 after_login_url = None
         %>
-        <a class="i-button icon-enter" href="${ url_for('auth.login', next=after_login_url, _external=True, _secure=True) }">${ _("Login")}</a>
+        <a class="i-button icon-enter" href="${ url_for_login(after_login_url) }">${ _("Login")}</a>
         % endif
       </div>
     </div>
