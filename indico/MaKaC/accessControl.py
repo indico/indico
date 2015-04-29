@@ -311,8 +311,11 @@ class AccessController(Persistent):
     def getModifierList( self ):
         """returns a list of those principals which have modification
             privileges"""
-        if None in self.managers:
-            self.revokeModification(None)
+        for principal in list(self.managers):
+            if principal is None:
+                self.revokeModification(principal)
+            elif isinstance(principal, AvatarUserWrapper) and principal.user is None:
+                self.revokeModification(principal)
         return self.managers
 
     def requireDomain( self, domain ):

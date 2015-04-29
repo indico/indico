@@ -36,7 +36,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     fossilizes(IAvatarFossil, IAvatarMinimalFossil)
 
-    def __init__(self, user_id, _user=None):
+    def __init__(self, user_id):
         self.id = str(user_id)
 
     @property
@@ -48,7 +48,9 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     @memoize_request
     def user(self):
         user = self.original_user
-        if user.is_deleted:
+        if user is None:
+            return None
+        elif user.is_deleted:
             return user.merged_into_user if user.merged_into_id is not None else None
         else:
             return user
@@ -257,6 +259,8 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return False
 
     def containsUser(self, avatar):
+        if self.user is None:
+            return False
         return int(avatar.id) == self.user.id if avatar else False
 
     containsMember = containsUser

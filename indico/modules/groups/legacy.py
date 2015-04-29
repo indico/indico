@@ -67,6 +67,8 @@ class GroupWrapper(Persistent, Fossilizable):
         return False
 
     def containsUser(self, avatar):
+        if self.group is None:
+            return False
         return self.group.has_member(avatar.user) if avatar else False
 
     def getMemberList(self):
