@@ -1070,30 +1070,6 @@ class UHTickerTapeAction(URLHandler):
     _endpoint = 'event_mgmt.confModifDisplay-tickerTapeAction'
 
 
-class UHUserManagement(URLHandler):
-    _endpoint = 'admin.userManagement'
-
-
-class UHUserManagementSwitchAuthorisedAccountCreation(URLHandler):
-    _endpoint = 'admin.userManagement-switchAuthorisedAccountCreation'
-
-
-class UHUserManagementSwitchNotifyAccountCreation(URLHandler):
-    _endpoint = 'admin.userManagement-switchNotifyAccountCreation'
-
-
-class UHUserManagementSwitchModerateAccountCreation(URLHandler):
-    _endpoint = 'admin.userManagement-switchModerateAccountCreation'
-
-
-class UHUsers(URLHandler):
-    _endpoint = 'admin.userList'
-
-
-class UHUserMerge(URLHandler):
-    _endpoint = 'admin.userMerge'
-
-
 class UHConfUser(URLHandler):
     @classmethod
     def getURL(cls, conference, av=None):

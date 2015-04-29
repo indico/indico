@@ -104,35 +104,6 @@ class RHGeneralInfoPerformModification( RHAdminBase ):
             self._minfo.setLang( params["lang"] )
         self._redirect( urlHandlers.UHAdminArea.getURL() )
 
-class RHUserMerge(RHAdminBase):
-
-    def _checkParams( self, params ):
-        ah = user.AvatarHolder()
-        self._params = params
-        RHAdminBase._checkParams( self, params )
-
-        self.prin = ah.getById(self._params.get("prinId", None))
-        self.toMerge = ah.getById(self._params.get("toMergeId", None))
-
-        self.merge = False
-        if self._params.get("merge", None):
-            self.merge = True
-            if self.prin is not None and self.toMerge is not None and self.prin == self.toMerge:
-                raise FormValuesError(_("One cannot merge a user with him/herself"))
-
-
-    def _process( self ):
-        if self.merge:
-            if self.prin and self.toMerge:
-                ah = user.AvatarHolder()
-                ah.mergeAvatar(self.prin, self.toMerge)
-                url = urlHandlers.UHUserMerge.getURL()
-                url.addParam("prinId", self.prin.getId())
-                self._redirect(url)
-                return _("[Done]")
-
-        p = admins.WPUserMerge( self, self.prin, self.toMerge )
-        return p.display()
 
 class RHStyles(RHAdminBase):
     _uh = urlHandlers.UHAdminsStyles
