@@ -2843,21 +2843,6 @@ class PersonalDataForm(GeneralSectionForm):
             r[self._pdMap['phone'].getInput().getHTMLName()] = av.getTelephone()
         return r
 
-    def getValuesFromRegistrant(self, reg):
-        r = {}
-        r['title'] = reg.getTitle()
-        r['firstName'] = reg.getFirstName()
-        r['surname'] = reg.getFamilyName()
-        r['position'] = reg.getPosition()
-        r['institution'] = reg.getInstitution()
-        r['address'] = reg.getAddress()
-        r['city'] = reg.getCity()
-        r['country'] = reg.getCountry()
-        r['phone'] = reg.getPhone()
-        r['fax'] = reg.getFax()
-        r['email'] = reg.getEmail()
-        r['personalHomepage'] = reg.getPersonalHomepage()
-        return r
 
 
 class PersonalDataFormItem(Persistent): # old
@@ -2965,43 +2950,6 @@ class PersonalData(Persistent):
             newItem.setEnabled(item.isEnabled())
             newItem.setMandatory(item.isMandatory())
         return form
-
-    def getValuesFromAvatar(self, av):
-        r = {}
-        r["title"] = ""
-        r["firstName"] = ""
-        r["surname"] = ""
-        r["institution"] = ""
-        r["email"] = ""
-        r["address"] = ""
-        r["phone"] = ""
-        r["fax"] = ""
-        if av is not None:
-            r["title"] = av.getTitle()
-            r["firstName"] = av.getFirstName()
-            r["surname"] = av.getFamilyName()
-            r["institution"] = av.getOrganisation()
-            r["email"] = av.getEmail()
-            r["address"] = av.getAddress()
-            r["phone"] = av.getTelephone()
-        return r
-
-    def getValuesFromRegistrant(self, reg):
-        r = {}
-        r["title"] = reg.getTitle()
-        r["firstName"] = reg.getFirstName()
-        r["surname"] = reg.getFamilyName()
-        r["position"] = reg.getPosition()
-        r["institution"] = reg.getInstitution()
-        r["address"] = reg.getAddress()
-        r["city"] = reg.getCity()
-        r["country"] = reg.getCountry()
-        r["phone"] = reg.getPhone()
-        r["fax"] = reg.getFax()
-        r["email"] = reg.getEmail()
-        r["personalHomepage"] = reg.getPersonalHomepage()
-
-        return r
 
     def getData(self):
         return self._data
