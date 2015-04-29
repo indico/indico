@@ -527,7 +527,7 @@ class Config:
         'AuthProviders'             : {},
         'IdentityProviders'         : {},
         'ProviderMap'               : {},
-        'LocalIdentities'           : False,
+        'LocalIdentities'           : True,
         'SecretKey'                 : None
     }
 
