@@ -242,92 +242,9 @@ MaxUploadFileSize = 0
 #StaticFileMethod = None
 
 
-#------------------------------------------------------------------------------
-# AUTHENTICATION
-#------------------------------------------------------------------------------
-# Indico ships with a fully working user authentication system (Local) but you
-# can use an external system.
-#
-# If you want to have all users authenticate only to an external user management
-# system (for example: MyAuthSystem) you should write:
-#
-#     AuthenticatorList = [('MyAuthSystem', {})]
-#
-# Where the second element of the tuple is a dictionary with the configuration.
-#
-# If you want to authenticate users against more than one authentication system
-# you can write them like this (systems will be queried about users from left
-# to right):
-#
-#     AuthenticatorList = [('Local', {}), ('LDAP', {}), ('MyAuthSystem', {})]
-#
-# If you want to setup SSO in your authenticator you should setup the variable
-# SSOActive to True.
-#
-# AuthenticatorList = [('MyAuthSystem', {'SSOActive': True})]
-#
-# You can also can configure the mapping of the SSO attributes with the variable SSOMapping. An example:
-#
-# AuthenticatorList = [ ('Local', {}),
-#                        ('MyAuthSystem', {'SSOActive': True,
-#                                          'LogoutCallbackURL': 'https://example.com/wsignout',
-#                                          'SSOMapping': { 'email': 'ADFS_EMAIL',
-#                                                           'login': 'ADFS_LOGIN',
-#                                                           'personId': 'ADFS_PERSONID',
-#                                                           'phone': 'ADFS_PHONENUMBER',
-#                                                           'fax': 'ADFS_FAXNUMBER',
-#                                                           'lastname': 'ADFS_LASTNAME',
-#                                                           'firstname': 'ADFS_FIRSTNAME',
-#                                                           'institute': 'ADFS_HOMEINSTITUTE'},
-#                                          'ResetPasswordMessage': 'Please contact helpdesk or access this url: http://example.com'
-#                                          })]
-#
-#
-# Please note that some authentication systems may require extra dependency libs.
-# For instance, for LDAP authentication, you will also need to install the python-ldap lib:
-#
-#  $ pip install python-ldap
-#
-#
-# As an example if you want to setup the LDAP Authenticator you should define as following:
-#
-# AuthenticatorList  = [('LDAP', {# by default the port is 389 if you do not specify.
-#                                 'uri': '[ldap|ldaps]://myldapserver.example.com:port',
-#
-#                                 # use TLS (do so, if your server allows)
-#                                 'useTLS': True,
-#
-#                                 # filter parameters for users, base DN to use
-#                                 'peopleDNQuery': ('uid={0}', 'DC=example,DC=com'),
-#
-#                                 # filter parameters for groups, base DN to use
-#                                 'groupDNQuery': ('cn={0}', 'OU=Groups,DC=example,DC=com'),
-#
-#                                 # SLAPD or ActiveDirectory
-#                                 'groupStyle': 'SLAPD',
-#
-#                                 # access credentials of a user with read access
-#                                  'accessCredentials': ('CN=user,OU=Users,DC=example,DC=com','secret_password')
-#
-#                                 # custom user filter
-#                                  'customUserFilter': "(objectCategory=user)"
-#
-#                                 # The LDAP record attribute that will be matched as the username for the login.
-#                                 # (defaults to 'uid' if not specified)
-#                                  'loginAttribute' : 'uid'
-#                                 }
-#
-#
-# The default configuration will use only Indico's authentication system.
-
-AuthenticatorList = [('Local', {})]
-
-# If you only want to allow users to login via SSO you can disable the normal login page.
-# DisplayLoginPage = True
-
 # Sessions are only stored for a certain time. You can modify the duration here. By setting
 # the lifetime to 0 the cookie will expire when the browser is closed.
-# SessionLifetime = 86400 * 31
+#SessionLifetime = 86400 * 31
 
 
 #------------------------------------------------------------------------------

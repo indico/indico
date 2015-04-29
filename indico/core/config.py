@@ -497,8 +497,6 @@ class Config:
         'PublicSupportEmail'        : 'root@localhost',
         'NoReplyEmail'              : 'noreply-root@localhost',
         'FileConverter'             : {"conversion_server": "", "response_url": "http://localhost/getConvertedFile.py"},
-        'DisplayLoginPage'          : "yes",
-        'AuthenticatorList'         : [('Local',{})],
         'ReportNumberSystems'       : {},
         'Profile'                   : 'no',
         'StaticFileMethod'          : None,
@@ -731,9 +729,6 @@ class Config:
         else:
             return val
 
-    def getDisplayLoginPage(self):
-        return self._yesOrNoVariable('DisplayLoginPage')
-
     def getAuthenticatedEnforceSecure(self):
         return self._yesOrNoVariable('AuthenticatedEnforceSecure') and self.getBaseSecureURL()
 
@@ -899,12 +894,6 @@ class Config:
         if std == "":
             std = self.getUploadedFilesTempDir()
         return std
-
-    def getAuthenticatorConfigById(self, authId):
-        for auth, config in self.getAuthenticatorList():
-            if auth == authId:
-                return config
-        return {}
 
     def getImagesBaseURL(self):
         if ContextManager.get('offlineMode', False):
