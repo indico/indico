@@ -50,10 +50,10 @@ class UserTitle(TitledIntEnum):
 #: readable version, used for flashing messages
 syncable_fields = {
     'first_name': _("first name"),
-    'last_name': _("last name"),
+    'last_name': _("family name"),
     'affiliation': _("affiliation"),
     'address': _("address"),
-    'phone': _("phone")
+    'phone': _("phone number")
 }
 
 
@@ -342,8 +342,8 @@ class User(db.Model):
     def synced_values(self):
         """The values from the synced identity for the user.
 
-        Those value are not the actual user's values and might differ if
-        they are not set as synchronized.
+        Those values are not the actual user's values and might differ
+        if they are not set as synchronized.
         """
         identity = self._get_synced_identity(refresh=False)
         if identity is None:
@@ -445,14 +445,14 @@ class User(db.Model):
         return UserLink.remove_link(self, obj, role)
 
     def synchronize_data(self, refresh=False):
-        """
-        Synchronize the fields of the user from the sync identity.
+        """Synchronize the fields of the user from the sync identity.
 
-        This will take only into account ``user.sync_fields``.
+        This will take only into account :attr:`synced_fields`.
 
         :param refresh: bool -- Whether to refresh the synced identity
-                        with the sync provider before or not. (Only if
-                        the sync provider support refresh.)
+                        with the sync provider before instead of using
+                        the stored data. (Only if the sync provider
+                        supports refresh.)
         """
         identity = self._get_synced_identity(refresh=refresh)
         if identity is None:

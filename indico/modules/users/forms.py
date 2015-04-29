@@ -49,7 +49,7 @@ class SyncedInputWidget(object):
         self.default_widget = TextArea() if textarea else TextInput()
 
     def __call__(self, field, **kwargs):
-        # Render a sync button for fields which can be synced, if the idp provides a value for the field.
+        # Render a sync button for fields which can be synced, if the identity provider provides a value for the field.
         if field.short_name in multipass.synced_fields and field.synced_value is not None:
             return HTMLString(render_template('forms/synced_input_widget.html', field=field, textarea=self.textarea,
                                               kwargs=kwargs))
@@ -58,7 +58,7 @@ class SyncedInputWidget(object):
 
 
 def _used_if_not_synced(form, field):
-    """validator to prevent validation error on synced inputs.
+    """Validator to prevent validation error on synced inputs.
 
     Synced inputs are disabled in the form and don't send any value.
     In that case, we disable validation from the input.

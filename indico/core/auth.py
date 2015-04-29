@@ -44,7 +44,7 @@ class IndicoMultipass(Multipass):
     def sync_provider(self):
         """The synchronization provider.
 
-        This is the identify provider used to sync user data.
+        This is the identity provider used to sync user data.
         """
         return next((p for p in self.identity_providers.itervalues()
                      if p.supports_refresh and p.settings.get('synced_fields')), None)

@@ -15,16 +15,15 @@
 </div>
 <script>
     $('#{{ field.id }}-action-button').on('click', function() {
-        var $field = $('#{{ field.id }}');
+        var field = $('#{{ field.id }}');
         var syncedValue;
+
+        field.prop('readonly', this.checked);
         if (this.checked) {
-            $field.prop('readonly', true);
-            syncedValue = JSON.parse($field.attr('data-synced-value'))
+            syncedValue = JSON.parse(field.attr('data-synced-value'))
             if (syncedValue !== null) {
-                $field.val(syncedValue);
+                field.val(syncedValue);
             }
-        } else {
-            $field.prop('readonly', false);
         }
     });
 </script>
