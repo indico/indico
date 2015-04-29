@@ -99,11 +99,11 @@ def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
 
     for k in new_values:
         if new_values[k].__class__ == str:
-            regexp = re.compile('^(%s\s*=\s*[\'"]{1})([^\'"]*)([\'"]{1})' % k, re.MULTILINE)
+            regexp = re.compile('^(%s\s*=\s*)([\'"])([^\'"]*)([\'"])' % k, re.MULTILINE)
             if regexp.search(new_contents):
-                new_contents = re.sub(regexp, "\\g<1>%s\\3" % result_values[k], new_contents)
+                new_contents = re.sub(regexp, "\\g<1>%r" % result_values[k], new_contents)
             else:
-                new_contents = "%s\n%s = '%s'" % (new_contents, k, result_values[k])
+                new_contents = "%s\n%s = %r" % (new_contents, k, result_values[k])
         elif new_values[k].__class__ == int:
             regexp = re.compile('^(%s\s*=\s*)([0-9]+)' % k, re.MULTILINE)
             if regexp.search(new_contents):
