@@ -75,6 +75,11 @@ AuthenticatedEnforceSecure = "yes"
 #    3: The above & require an empty or valid referer for normal POST requests
 CSRFLevel = 2
 
+# To sign data such as activation tokens used in emails, Indico needs a secret
+# key.  It should be a random string; the preferred way to generate it is using
+# `import os; os.urandom(32)` in a Python shell.
+#SecretKey = ''
+
 #------------------------------------------------------------------------------
 # Development
 #------------------------------------------------------------------------------
@@ -309,3 +314,61 @@ OAuthAccessTokenTTL = 10000
 # List of plugins to be loaded on server start.
 #
 # Plugins = {'example'}
+
+#------------------------------------------------------------------------------
+# AUTHENTICATION
+#------------------------------------------------------------------------------
+# If you do not need integration with an existing authentication infrastructure
+# such as LDAP, OAuth or a SSO system like Shibboleth, you do not have to set
+# anything here. Having local identities enabled is sufficient:
+#LocalIdentities = True
+
+# For advanced authentication and user information retrieval, Indico uses the
+# Flask-Multipass library, so you can use any registered multipass auth/identity
+# provider in Indico.  Using such providers requires additional configuration.
+# Please note that the name of an identity provider MUST NOT be changed once
+# it has been used, as it is referenced internally. Changing the title is fine
+# though.
+#
+# For documentation on the providers and their config options see the
+# documentation of multipass on the following site:
+# https://flask-multipass.readthedocs.org/en/latest/
+#
+# In addition to the settings handled by multipass, you may use the following
+# settings:
+#
+# Auth providers:
+# - `default`
+#    This must be set to `True` for exactly one form-based authentication
+#    provide in case you have more than one form-based provider.  If omitted,
+#    the default login form will be for local indico accounts (if enabled).
+#
+# Identity providers:
+# - `default_group_provider`
+#   If you have any identity providers which provide groups, it is highly
+#   recommended to enable this for exactly one of these providers.  This
+#   is extremely important if you migrated an old database and have ACLs
+#   which don't contain provider references yet.
+# - `trusted_email`
+#   If all emails received from the provider are trustworthy, i.e. it is
+#   guaranteed that the emails actually belong to the user.  This should
+#   be enabled e.g. for corporate SSO systems so people do not have to go
+#   through an email verification step the first time they login/signup.
+# - `synced_fields`
+#   This may be set in no more than one identity provider and enables user
+#   data synchronization. Its value should be a set of user attributes that
+#   can be synchronized. The following attributes are supported:
+#   'first_name', 'last_name', 'affiliation', 'phone', 'address'
+#
+# Indico uses the following identity info keys from multipass, so you need
+# to configure the mappings in your identity providers accordingly:
+# 'first_name', 'last_name', 'email', 'affiliation', 'phone', 'address'
+# All keys are optional, so if a provider does not contain data for a field,
+# you can override `identity_info_keys` and only specify the keys you want.
+#
+# Auth and identity providers with the same name are linked automatically
+# unless ProviderMap is specified.  If specified it should be a dictionary
+# suitable for the MULTIPASS_PROVIDER_MAP setting of multipass.
+#AuthProviders = {}
+#IdentityProviders = {}
+#ProviderMap = {}

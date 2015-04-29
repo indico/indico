@@ -338,6 +338,7 @@ def _extractDirsFromConf(conf):
 def _replacePrefixInConf(filePath, prefix):
     fdata = open(filePath).read()
     fdata = re.sub(r'/opt/indico', prefix, fdata)
+    fdata = re.sub(r"^#\s*SecretKey = ''", "SecretKey = {!r}".format(os.urandom(32)), fdata)
     open(filePath, 'w').write(fdata)
 
 def _updateDbConfigFiles(cfg_dir, uid=None, port=None, **kwargs):
