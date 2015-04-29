@@ -34,7 +34,7 @@ function loginAs() {
                     }
                 }
             );
-        });
+        }, null, false);
     popup.execute();
 }
 

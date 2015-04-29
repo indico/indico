@@ -48,7 +48,7 @@ type("ListOfUsersManager", [], {
         //          showToggleFavouriteButtons, chooseProcess)
         var chooseUsersPopup = new ChooseUsersPopup(title, allowSearch, confId, enableGroups, includeFavourites, suggestedUsers,
                                                     onlyOne, showToggleFavouriteButtons, false,
-                function(userList) {self._manageUserList(self.methods["addExisting"], self._getAddExistingParams(userList, extraParams));}, extraDiv);
+                function(userList) {self._manageUserList(self.methods["addExisting"], self._getAddExistingParams(userList, extraParams));}, extraDiv, self.allowExternal);
         chooseUsersPopup.execute();
     },
 
@@ -374,7 +374,7 @@ type("ListOfUsersManager", [], {
 },
 
     function(confId, methods, userListParams, inPlaceListElem, userCaption, elementClass, allowGroups,
-             rightsToShow, nameOptions, userOptions, initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu) {
+             rightsToShow, nameOptions, userOptions, initialList, allowEmptyEmail, blockOnRemove, inPlaceMenu, allowExternal) {
 	    var self = this;
         this.confId = confId;
         this.methods = methods;
@@ -420,6 +420,7 @@ type("ListOfUsersManager", [], {
         }
 
         this.addManagementMenu();
+        this.allowExternal = _.isBoolean(allowExternal) ? allowExternal : true;
     }
 );
 

@@ -148,6 +148,8 @@ class PrincipalField(HiddenField):
     def __init__(self, *args, **kwargs):
         self.groups = kwargs.pop('groups', False)
         self.multiple = kwargs.pop('multiple', True)
+        # Whether it is allowed to search for external users
+        self.allow_external = kwargs.pop('allow_external', True)
         # if we want serializable objects (usually for json) or the real thing (User/GroupProxy)
         self.serializable = kwargs.pop('serializable', True)
         super(PrincipalField, self).__init__(*args, **kwargs)

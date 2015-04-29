@@ -90,6 +90,6 @@
 var adminListManager = new ListOfUsersManager(null,
         {'addExisting': 'admin.general.addExistingAdmin', 'remove': 'admin.general.removeAdmin'},
         {}, $E('inPlaceAdministrators'), "administrator", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
-        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ administrators | n,j});
+        {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ administrators | n,j}, null, null, null, false);
 
 </script>

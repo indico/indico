@@ -90,7 +90,7 @@
             }
 
             $('.js-add-user').on('click', function(){
-                var chooseUsersPopup = new ChooseUsersPopup($T('Search Users'), true, null, false, false, null, false, false, false, addFavoriteUsers);
+                var chooseUsersPopup = new ChooseUsersPopup($T('Search Users'), true, null, false, false, null, false, false, false, addFavoriteUsers, null, false);
                 chooseUsersPopup.execute();
             });
 

@@ -182,8 +182,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
     */
    _createAuthenticatorSearch: function() {
        var self = this;
-
-       if (empty(Indico.Settings.ExtAuthenticators)) {
+       if (empty(Indico.Settings.ExtAuthenticators) || !this.allowExternal) {
            return null;
        } else {
             var searchExternalCB = Html.checkbox({});
@@ -238,7 +237,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
     /**
      * Constructor for SimpleSearchPanel
      */
-    function(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv) {
+    function(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv, allowExternal) {
 
         this.IWidget();
         this.onlyOne = any(onlyOne, false);
@@ -257,6 +256,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
 
         this.submissionRights = submissionRights;
         this.grantRights = grantRights;
+        this.allowExternal = allowExternal;
    }
 );
 
@@ -362,8 +362,8 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
     /**
      * Constructor for UserSearchPanel
      */
-    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv){
-        this.SimpleSearchPanel(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv);
+    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv, allowExternal){
+        this.SimpleSearchPanel(onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv, allowExternal);
         if(exists(conferenceId)) {
             this.criteria.set("conferenceId", conferenceId);
         }
@@ -514,7 +514,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
     /**
      * Constructor for UserAndGroupsSearchPanel
      */
-    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv){
+    function(onlyOne, selectionObserver, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv, allowExternal){
         this.IWidget();
         this.onlyOne = any(onlyOne, false);
         this.parentSelectionObserver = selectionObserver;
@@ -523,7 +523,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
 
         this.userPanel = new UserSearchPanel(this.onlyOne, function(selectedList){
             self.__selectionObserver("users", selectedList);
-        }, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv);
+        }, conferenceId, showToggleFavouriteButtons, favouriteButtonObserver, submissionRights, grantRights, extraDiv, allowExternal);
         this.groupPanel = new GroupSearchPanel(this.onlyOne, function(selectedList){
             self.__selectionObserver("groups", selectedList);
         }, showToggleFavouriteButtons);
@@ -641,13 +641,13 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
                 self.__selectionObserver("searchUsers", selectedList);
             }, this.conferenceId, this.showToggleFavouriteButtons, function(avatar, action) {
                 self.__searchPanelFavouriteButtonObserver(avatar, action);
-            }, this.submissionRights, this.grantRights, self.extraDiv);
+            }, this.submissionRights, this.grantRights, self.extraDiv, self.allowExternal);
         } else {
             this.searchPanel = new UserSearchPanel(this.onlyOne, function(selectedList) {
                 self.__selectionObserver("searchUsers", selectedList);
             }, this.conferenceId, this.showToggleFavouriteButtons, function(avatar, action) {
                 self.__searchPanelFavouriteButtonObserver(avatar, action);
-            }, this.submissionRights, this.grantRights, self.extraDiv);
+            }, this.submissionRights, this.grantRights, self.extraDiv, self.allowExternal);
         }
         var returnedDom = this.searchPanel.draw();
         container.append(returnedDom);
@@ -792,7 +792,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
              conferenceId, enableGroups,
              includeFavourites, suggestedUsers,
              onlyOne, showToggleFavouriteButtons,
-             submissionRights, chooseProcess, extraDiv) {
+             submissionRights, chooseProcess, extraDiv, allowExternal) {
 
         var self = this;
 
@@ -826,6 +826,7 @@ type("ChooseUsersPopup", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
                 self.open();
             });
         this.ExclusivePopupWithButtons(title, positive);
+        this.allowExternal = _.isBoolean(allowExternal) ? allowExternal : true;
     }
 );
 
@@ -968,7 +969,7 @@ type("SingleUserField", ["IWidget"], {
                                                            true, self.conferenceId, self.enableGroups,
                                                            self.includeFavourites, self.suggestedUsers,
                                                            true, true, false,
-                                                           chooseUserHandler);
+                                                           chooseUserHandler, null, self.allowExternal);
                 userChoosePopup.execute();
             });
 
@@ -990,7 +991,7 @@ type("SingleUserField", ["IWidget"], {
              includeFavourites, suggestedUsers,
              conferenceId, enableGroups,
              allowNew, allowDelete,
-             assignProcess, removeProcess) {
+             assignProcess, removeProcess, allowExternal) {
 
         var self = this;
 
@@ -1031,6 +1032,7 @@ type("SingleUserField", ["IWidget"], {
 
         // div that will have the remove and favouritize buttons
         this.buttonsDiv = Html.div({style:{display:"inline"}});
+        this.allowExternal = _.isBoolean(allowExternal) ? allowExternal : true;
 
     }
 );
@@ -1521,7 +1523,8 @@ type("UserListField", ["IWidget"], {
 
             chooseUserButton.observeClick(function() {
                 var chooseUsersPopup = new ChooseUsersPopup(title, self.allowSearch, self.conferenceId, self.enableGroups,
-                        self.includeFavourites, self.suggestedUsers, false, self.showToggleFavouriteButtons, self.allowSetRights, peopleAddedHandler);
+                        self.includeFavourites, self.suggestedUsers, false, self.showToggleFavouriteButtons, self.allowSetRights, peopleAddedHandler,
+                        null, self.allowExternal);
                 chooseUsersPopup.execute();
             });
 
@@ -1615,7 +1618,7 @@ type("UserListField", ["IWidget"], {
              initialUsers, includeFavourites, suggestedUsers,
              allowSearch, enableGroups, conferenceId, privileges,
              allowNew, allowSetRights, allowEdit, showToggleFavouriteButtons,
-             newProcess, editProcess, removeProcess) {
+             newProcess, editProcess, removeProcess, allowExternal) {
 
         var self = this;
         this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons,this);
@@ -1657,6 +1660,7 @@ type("UserListField", ["IWidget"], {
         this.allowNew = any(allowNew, true);
         this.showToggleFavouriteButtons = any(showToggleFavouriteButtons, true);
         this.newProcess = any(newProcess, userListNothing);
+        this.allowExternal = _.isBoolean(allowExternal) ? allowExternal : true;
      }
 );
 
