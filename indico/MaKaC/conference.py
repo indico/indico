@@ -6387,9 +6387,8 @@ class Session(CommonObjectBase, Locatable):
 
     def removeCoordinatorEmail(self, email):
         if email in self.getCoordinatorEmailList():
-            if email in self.getCoordinatorEmailList():
-                self.getCoordinatorEmailList().remove(email)
-                self._p_changed = 1
+            self.getCoordinatorEmailList().remove(email)
+            self._p_changed = 1
 
     def addCoordinator( self, sb, sendEmail=True ):
         """Grants coordination privileges to user.
