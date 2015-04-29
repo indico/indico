@@ -193,13 +193,7 @@ class _MultipassGroupProxy(GroupProxy):
         if self.group is None:
             warn('Tried to check if {} is in invalid group {}'.format(user, self))
             return False
-        # First check the user's existing identities
-        if any(x.identifier in self.group for x in user.identities if x.provider == self.provider):
-            return True
-        # If that didn't succeed, search providers based on the user's emails
-        return any(identity_info.identifier in self.group
-                   for identity_info in multipass.search_identities(providers={self.provider}, exact=True,
-                                                                    email=user.all_emails))
+        return any(x[1] in self.group for x in user.iter_identifiers(check_providers=True, providers={self.provider}))
 
     @memoize_request
     def get_members(self):

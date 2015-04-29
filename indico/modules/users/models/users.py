@@ -22,6 +22,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.utils import cached_property
 
+from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.users.models.affiliations import UserAffiliation
@@ -323,6 +324,30 @@ class User(db.Model):
         first_name = '{}.'.format(self.first_name[0].upper()) if abbrev_first_name else self.first_name
         full_name = '{}, {}'.format(last_name, first_name) if last_name_first else '{} {}'.format(first_name, last_name)
         return full_name if not show_title or not self.title else '{} {}'.format(self.title, full_name)
+
+    def iter_identifiers(self, check_providers=False, providers=None):
+        """Yields ``(provider, identifier)`` tuples for the user.
+
+        :param check_providers: If True, providers are searched for
+                                additional identifiers once all existing
+                                identifiers have been yielded.
+        :param providers: May be a set containing provider names to
+                          get only identifiers from the specified
+                          providers.
+        """
+        done = set()
+        for identity in self.identities:
+            if providers is not None and identity.provider not in providers:
+                continue
+            item = (identity.provider, identity.identifier)
+            done.add(item)
+            yield item
+        if not check_providers:
+            return
+        for identity_info in multipass.search_identities(providers=providers, exact=True, email=self.all_emails):
+            item = (identity_info.provider.name, identity_info.identifier)
+            if item not in done:
+                yield item
 
     def make_email_primary(self, email):
         """Promotes a secondary email address to the primary email address
