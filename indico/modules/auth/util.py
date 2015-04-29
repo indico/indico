@@ -30,7 +30,7 @@ def save_identity_info(identity_info, user):
         'multipass_data': identity_info.multipass_data,
         'data': dict(identity_info.data.lists()),
         'indico_user_id': user.id if user else None,
-        'email_verified': bool(identity_info.data['email'] and trusted_email)
+        'email_verified': bool(identity_info.data.get('email') and trusted_email)
     }
 
 

@@ -401,7 +401,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
         form = super(MultipassRegistrationHandler, self).create_form()
         # We only want the phone/address fields if the provider gave us data for it
         for field in {'address', 'phone'}:
-            if field in form and not self.identity_info['data'][field]:
+            if field in form and not self.identity_info['data'].get(field):
                 delattr(form, field)
         emails = self.identity_info['data'].getlist('email')
         form.email.choices = zip(emails, emails)
