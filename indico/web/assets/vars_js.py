@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import render_template
 
 from indico.core.auth import multipass
+from indico.modules.auth.util import url_for_login
 from indico.modules.rb.models.locations import Location
 from indico.web.flask.util import url_rule_to_js, url_for
 from MaKaC.webinterface.common import tools as security_tools
@@ -51,7 +52,7 @@ def generate_global_file(config):
             'ImagesBase': config.getImagesBaseURL(),
             'SecureImagesBase': config.getImagesBaseSecureURL(),
 
-            'Login': url_for('auth.login'),
+            'Login': url_for_login(),
             'Favorites': url_for('users.user_favorites'),
             'FavoriteUserAdd': url_for('users.user_favorites_users_add'),
             'FavoriteUserRemove': url_rule_to_js('users.user_favorites_user_remove'),

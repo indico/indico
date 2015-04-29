@@ -19,6 +19,8 @@ from __future__ import unicode_literals
 from flask import session
 from werkzeug.datastructures import MultiDict
 
+from indico.web.flask.util import url_for
+
 
 def save_identity_info(identity_info, user):
     """Saves information from IdentityInfo in the session"""
@@ -45,3 +47,13 @@ def load_identity_info():
     info['data'] = MultiDict()
     info['data'].update(data)
     return info
+
+
+def url_for_login(next_url=None):
+    next_url = next_url.rstrip('?') if isinstance(next_url, basestring) else None
+    return url_for('auth.login', next=next_url, _external=True, _secure=True)
+
+
+def url_for_logout(next_url=None):
+    next_url = next_url.rstrip('?') if isinstance(next_url, basestring) else None
+    return url_for('auth.logout', next=next_url)

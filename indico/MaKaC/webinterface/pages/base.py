@@ -20,11 +20,11 @@ from urlparse import urlparse
 from flask import request, session, render_template, g, jsonify
 
 import MaKaC.webinterface.wcomponents as wcomponents
-import MaKaC.webinterface.urlHandlers as urlHandlers
 from indico.core import signals
 from indico.web import assets
 from indico.web.flask.util import url_for
 from indico.core.config import Config
+from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
 from MaKaC.common.info import HelperMaKaCInfo
@@ -233,11 +233,12 @@ class WPDecorated(WPBase):
     def _getSiteArea(self):
         return "DisplayArea"
 
-    def getLoginURL(self):
-        return url_for('auth.login', next=request.relative_url)
+    def getLoginURL( self ):
+        return url_for_login(next_url=request.relative_url)
 
-    def getLogoutURL(self):
-        return url_for('auth.logout', next=request.relative_url)
+    def getLogoutURL( self ):
+        return url_for_logout(next_url=request.relative_url)
+
 
     def _getHeader( self ):
         """
@@ -300,10 +301,10 @@ class WPDecorated(WPBase):
 class WPNotDecorated(WPBase):
 
     def getLoginURL(self):
-        return url_for('auth.login', next=request.relative_url)
+        return url_for_login(next_url=request.relative_url)
 
     def getLogoutURL(self):
-        return url_for('auth.logout', next=request.relative_url)
+        return url_for_logout(next_url=request.relative_url)
 
     def _display(self, params):
         params = dict(params, **self._kwargs)
@@ -314,6 +315,3 @@ class WPNotDecorated(WPBase):
 
     def _getNavigationDrawer(self):
         return None
-
-
-

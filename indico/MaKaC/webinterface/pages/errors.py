@@ -23,11 +23,12 @@ from xml.sax.saxutils import quoteattr
 
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from indico.core.config import Config
+from indico.util.i18n import i18nformat
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.i18n import _
-from indico.util.i18n import i18nformat
+
 
 class WGenericError( WTemplated ):
 

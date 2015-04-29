@@ -64,6 +64,7 @@ from MaKaC.common.fossilize import fossilize
 from MaKaC.fossils.conference import IConferenceEventInfoFossil
 from MaKaC.common.Conversion import Conversion
 from indico.modules import ModuleHolder
+from indico.modules.auth.util import url_for_logout
 from MaKaC.paperReviewing import ConferencePaperReview as CPR
 from MaKaC.conference import Session, Contribution, LocalFile
 from indico.core.config import Config
@@ -131,7 +132,7 @@ class WPConferenceBase(base.WPDecorated):
         return wc.getHTML(p)
 
     def getLogoutURL(self):
-        return url_for('auth.logout', next=str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
+        return url_for_logout(str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
 
 
 class WPConferenceDisplayBase(WPConferenceBase):
