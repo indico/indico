@@ -463,7 +463,8 @@ What do you want to do [c/a]? ''')
                 for dirName in ['bin','doc','etc','htdocs','tmp','log','cache','db','archive'])
 
 
-def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, force_no_db = False, uid=None, gid=None, dbDir=LOCALDATABASEDIR):
+def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, force_no_db=False, uid=None,
+                        gid=None, dbDir=LOCALDATABASEDIR, upgrade_config=True):
     from indico.core.config import Config
 
     if 'db' in targetDirs:
@@ -486,7 +487,7 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
         if not os.path.exists(newConf):
             # just copy if there is no config yet
             shutil.copy(sourceConf, newConf)
-        else:
+        elif upgrade_config:
             print "Upgrading indico.conf...",
             # upgrade the existing one
             upgrade_indico_conf(newConf, sourceConf)
