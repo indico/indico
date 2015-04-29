@@ -33,7 +33,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import UserTitle
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoEnumSelectField
+from indico.web.forms.fields import IndicoEnumSelectField, PrincipalField
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -128,3 +128,10 @@ class SearchForm(IndicoForm):
     include_deleted = BooleanField(_('Include deleted'))
     include_pending = BooleanField(_('Include pending'))
     external = BooleanField(_('External'))
+
+
+class MergeForm(IndicoForm):
+    source_user = PrincipalField(_('Source user'), [DataRequired()], multiple=False, serializable=False,
+                                 description=_('The user that will be merged into the target one'))
+    target_user = PrincipalField(_('Target user'), [DataRequired()], multiple=False, serializable=False,
+                                 description=_('The user that will remain active in the end'))

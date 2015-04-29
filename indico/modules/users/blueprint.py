@@ -23,7 +23,7 @@ from indico.modules.users.controllers import (RHUserDashboard, RHPersonalData, R
                                               RHUserEmailsSetPrimary, RHUserFavoritesUsersAdd,
                                               RHUserFavoritesUserRemove, RHUserFavoritesCategoryAPI,
                                               RHUserSuggestionsRemove, RHUsersAdminSettings, RHUsersAdminCreate,
-                                              RHUsersAdminMerge)
+                                              RHUsersAdminMerge, RHUsersAdminMergeCheck)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 users_blueprint = _bp = IndicoBlueprint('users', __name__, template_folder='templates', url_prefix='/user')
@@ -32,6 +32,7 @@ users_blueprint = _bp = IndicoBlueprint('users', __name__, template_folder='temp
 _bp.add_url_rule('!/admin/users/', 'users_admin', RHUsersAdminSettings, methods=('GET', 'POST'))
 _bp.add_url_rule('!/admin/users/create/', 'users_create', RHUsersAdminCreate, methods=('GET', 'POST'))
 _bp.add_url_rule('!/admin/users/merge/', 'users_merge', RHUsersAdminMerge, methods=('GET', 'POST'))
+_bp.add_url_rule('!/admin/users/merge/check/', 'users_merge_check', RHUsersAdminMergeCheck)
 
 
 # User profile

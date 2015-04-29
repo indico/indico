@@ -25,3 +25,14 @@
     background: $light-gray;
     padding: 1em 1.5em;
 }
+
+.merge-info {
+    padding: 0;
+    margin: 0;
+    float: right;
+    list-style-type: none;
+
+    span.caption {
+        font-weight: bold;
+    }
+}

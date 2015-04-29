@@ -31,7 +31,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.util import (get_related_categories, get_suggested_categories,
                                        serialize_user, search_users, merge_users)
 from indico.modules.users.views import WPUserDashboard, WPUser, WPUsersAdmin
-from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm
+from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm, MergeForm
 from indico.modules.auth.forms import LocalRegistrationForm
 from indico.util.date_time import timedelta_split
 from indico.util.i18n import _
@@ -40,6 +40,7 @@ from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
 from indico.util.signals import values_from_signal
 from indico.util.string import make_unique_token
+from indico.util.user import retrieve_principal
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -51,6 +52,9 @@ from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.conference import CategoryManager
 from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RHProtected
+
+IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
+UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url'})
 
 
 class RHUserBase(RHProtected):
@@ -244,9 +248,6 @@ class RHUsersAdminSettings(RHAdminBase):
     """Admin users overview"""
 
     def _process(self):
-        identity_attributes = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
-        UserEntry = namedtuple('UserEntry', identity_attributes | {'profile_url'})
-
         form = SearchForm(obj=FormDefaults(exact=True))
         form_data = form.data
         search_results = None
@@ -264,13 +265,13 @@ class RHUsersAdminSettings(RHAdminBase):
                                       include_pending=include_pending, external=external, **form_data):
                 if isinstance(entry, User):
                     search_results.append(UserEntry(profile_url=url_for('.user_profile', entry),
-                                                    **{k: getattr(entry, k) for k in identity_attributes}))
+                                                    **{k: getattr(entry, k) for k in IDENTITY_ATTRIBUTES}))
                 else:
                     search_results.append(UserEntry(
                         profile_url=None, full_name="{first_name} {last_name}".format(**entry.data.to_dict()),
-                        **{k: entry.data.get(k) for k in (identity_attributes - {'full_name'})}))
+                        **{k: entry.data.get(k) for k in (IDENTITY_ATTRIBUTES - {'full_name'})}))
 
-            search_results.sort(key=attrgetter('last_name', 'first_name'))
+            search_results.sort(key=attrgetter('first_name', 'last_name'))
         return WPUsersAdmin.render_template('users_admin.html', form=form, search_results=search_results,
                                             num_of_users=num_of_users, num_deleted_users=num_deleted_users)
 
@@ -278,7 +279,6 @@ class RHUsersAdminSettings(RHAdminBase):
 class RHUsersAdminCreate(RHAdminBase):
     """Create user (admin)"""
 
-    # TODO: Complete the function
     def _process(self):
         form = LocalRegistrationForm()
         return WPUsersAdmin.render_template('users_create.html', form=form)
@@ -287,6 +287,43 @@ class RHUsersAdminCreate(RHAdminBase):
 class RHUsersAdminMerge(RHAdminBase):
     """Merge users (admin)"""
 
-    # TODO: Complete the function
     def _process(self):
-        return WPUsersAdmin.render_template('users_merge.html')
+        form = MergeForm()
+        if form.validate_on_submit():
+            source = form['source_user'].data
+            target = form['target_user'].data
+            merge_users(source, target)
+            return redirect(url_for('.user_profile', user_id=target.id))
+
+        return WPUsersAdmin.render_template('users_merge.html', form=form)
+
+
+class RHUsersAdminMergeCheck(RHAdminBase):
+    def _process(self):
+        source = User.get_one(request.args['source'])
+        target = User.get_one(request.args['target'])
+
+        problems = []
+
+        if source == target:
+            problems.append((_("Users are the same!"), 'error'))
+
+        if (source.first_name.strip().lower() != target.first_name.strip().lower() or
+                source.last_name.strip().lower() != target.last_name.strip().lower()):
+            problems.append((_("Users' names seem to be different!"), 'warning'))
+
+        if source.is_pending:
+            problems.append((_("Source user has never logged in to Indico!"), 'warning'))
+
+        if target.is_pending:
+            problems.append((_("Target user has never logged in to Indico!"), 'warning'))
+
+        if source.is_deleted:
+            problems.append((_("Source user has been deleted!"), 'error'))
+
+        if source.is_deleted:
+            problems.append((_("Target user has been deleted!"), 'error'))
+
+        return jsonify({
+            'problems': problems
+        })
