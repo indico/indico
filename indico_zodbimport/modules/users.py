@@ -38,6 +38,13 @@ from indico_zodbimport import Importer, convert_to_unicode
 
 
 USER_TITLE_MAP = {x.title: x for x in UserTitle}
+SYNCED_FIELD_MAP = {
+    'firstName': 'first_name',
+    'surName': 'last_name',
+    'affiliation': 'affiliation',
+    'address': 'address',
+    'phone': 'phone'
+}
 
 
 def _sanitize_email(email):
@@ -291,17 +298,26 @@ class UserImporter(Importer):
         if not timezone or timezone not in all_timezones_set:
             timezone = getattr(self.zodb_root['MaKaCInfo']['main'], '_timezone', 'UTC')
         language = avatar._lang
+
         if language not in _get_all_locales():
             language = getattr(self.zodb_root['MaKaCInfo']['main'], '_lang', 'en_GB')
         show_past_events = False
+
         if hasattr(avatar, 'personalInfo'):
             show_past_events = bool(getattr(avatar.personalInfo, '_showPastEvents', False))
-        return {
+
+        settings = {
             'lang': language,
             'timezone': timezone,
             'force_timezone': avatar.displayTZMode == 'MyTimezone',
             'show_past_events': show_past_events,
         }
+
+        unlocked_fields = {SYNCED_FIELD_MAP.get(field) for field in getattr(avatar, 'unlockedFields', [])} - {None}
+        if unlocked_fields:
+            settings['synced_fields'] = list(set(SYNCED_FIELD_MAP.viewvalues()) - unlocked_fields)
+
+        return settings
 
     def _fix_collisions(self, user):
         is_deleted = user.is_deleted
