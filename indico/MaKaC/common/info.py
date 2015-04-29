@@ -233,16 +233,6 @@ class MaKaCInfo(Persistent):
         self._defaultConference = dConf
         return self._defaultConference
 
-    def setProxy(self, proxy):
-        self._proxy = proxy
-
-    def useProxy(self):
-        try:
-            return self._proxy
-        except:
-            self._proxy = False
-        return self._proxy
-
     def getDefaultTemplateSet( self ):
         try:
             return self._defaultTemplateSet

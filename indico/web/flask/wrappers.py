@@ -25,10 +25,9 @@ from flask_pluginengine import PluginFlaskMixin
 from werkzeug.datastructures import ImmutableOrderedMultiDict
 from werkzeug.utils import cached_property
 
-from MaKaC.common import HelperMaKaCInfo
+from indico.core.config import Config
 from indico.web.flask.session import IndicoSessionInterface
 from indico.web.flask.util import make_view_func
-from indico.core.db import DBMgr
 from indico.util.json import IndicoJSONEncoder
 
 
@@ -38,10 +37,8 @@ class IndicoRequest(Request):
     @cached_property
     def remote_addr(self):
         """The remote address of the client."""
-        with DBMgr.getInstance().global_connection():
-            if HelperMaKaCInfo.getMaKaCInfoInstance().useProxy():
-                if self.access_route:
-                    return self.access_route[0]
+        if Config.getInstance().getUseProxy() and self.access_route:
+            return self.access_route[0]
         return super(IndicoRequest, self).remote_addr
 
     @cached_property

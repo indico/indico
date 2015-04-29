@@ -251,6 +251,12 @@ MaxUploadFileSize = 0
 # the lifetime to 0 the cookie will expire when the browser is closed.
 #SessionLifetime = 86400 * 31
 
+# If indico is behind a proxy, the user's IP needs to be retrieved from the
+# HTTP_X_FORWARDED_FOR header. To enable this behavior, set UseProxy to True.
+# Note that this MUST NOT be enabled if the machine is accessible directly or
+# users will be able to spoof their IP address!
+#UseProxy = False
+
 
 #------------------------------------------------------------------------------
 # LOGGING

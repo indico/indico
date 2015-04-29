@@ -8,7 +8,7 @@
     </tr>
     <tr>
       <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Proxy")}</span></td>
-      <td bgcolor="white" width="100%" valign="top" class="blacktext">${ ("No", "yes")[minfo.useProxy()] }</td>
+      <td bgcolor="white" width="100%" valign="top" class="blacktext">${ ("No", "Yes")[use_proxy] }</td>
       <td rowspan="4" valign="top">
         <form action="${ ModifURL }" method="POST">
         <input type="submit" class="btn" value="${ _("modify")}">

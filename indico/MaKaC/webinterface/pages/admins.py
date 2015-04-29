@@ -1161,6 +1161,7 @@ class WAdminsSystem(wcomponents.WTemplated):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["minfo"] = minfo
         vars["ModifURL"] = urlHandlers.UHAdminsSystemModif.getURL()
+        vars['use_proxy'] = Config.getInstance().getUseProxy()
         return vars
 
 

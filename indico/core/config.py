@@ -513,6 +513,7 @@ class Config:
         'CheckinURL'                : 'http://old.indico-software.org/wiki/apps/check-in',
         'SCSSDebugInfo'             : True,
         'SessionLifetime'           : 86400 * 31,
+        'UseProxy'                  : False,
         'RouteOldUrls'              : False,
         'CustomCountries'           : {},
         'PDFLatexProgram'           : 'pdflatex',
