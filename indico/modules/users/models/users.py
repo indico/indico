@@ -348,7 +348,7 @@ class User(db.Model):
         identity = self._get_synced_identity(refresh=False)
         if identity is None:
             return {}
-        return {field: identity.data.get(field) for field in multipass.synced_fields}
+        return {field: (identity.data.get(field) or '') for field in multipass.synced_fields}
 
     @return_ascii
     def __repr__(self):
@@ -459,9 +459,7 @@ class User(db.Model):
             return
         for field in self.synced_fields:
             old_value = getattr(self, field)
-            new_value = identity.data.get(field)
-            if new_value is None:
-                continue
+            new_value = identity.data.get(field) or ''
             if field in ('first_name', 'last_name') and not new_value:
                 continue
             if old_value == new_value:
