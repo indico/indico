@@ -363,7 +363,7 @@ class AvatarProvisionalWrapper(Fossilizable):
         return self.data['last_name']
 
     def getStraightFullName(self):
-        return '{first_name[0]} {last_name[0]}'.format(**self.data)
+        return '{first_name} {last_name}'.format(**self.data.to_dict())
 
     def getTitle(self):
         return u''
@@ -384,7 +384,7 @@ class AvatarProvisionalWrapper(Fossilizable):
 
     @return_ascii
     def __repr__(self):
-        return u'<AvatarProvisionalWrapper {}: {} ({first_name[0]} {last_name[0]})>'.format(
+        return u'<AvatarProvisionalWrapper {}: {} ({first_name} {last_name})>'.format(
             self.identity_info.provider.name,
             self.identity_info.identifier,
-            **self.data)
+            **self.data.to_dict())
