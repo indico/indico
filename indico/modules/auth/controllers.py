@@ -206,7 +206,7 @@ class RHRegister(RH):
         if self.provider_name is not None:
             self.identity_info = info = load_identity_info()
             if not info:
-                return redirect(url_for('.login', provider=self.provider_name))
+                return redirect(url_for('.login'))
             elif info['indico_user_id'] is not None or info['provider'] != self.provider_name:
                 # If we have a matching user id, we shouldn't be on the registration page
                 # If the provider doesn't match it would't be a big deal but the request doesn't make sense
