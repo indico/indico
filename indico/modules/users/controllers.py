@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from collections import namedtuple
 from datetime import datetime
 from operator import attrgetter
 
@@ -243,16 +244,35 @@ class RHUsersAdminSettings(RHAdminBase):
     """Admin users overview"""
 
     def _process(self):
+        identity_attributes = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
+        UserEntry = namedtuple('UserEntry', identity_attributes | {'profile_url'})
+
         form = SearchForm(obj=FormDefaults(exact=True))
         form_data = form.data
         search_results = None
-        num_of_users = 0  # TODO: Fetch number of total users
+        num_of_users = User.query.count()
+        num_deleted_users = User.find(is_deleted=True).count()
         if form.validate_on_submit():
-            search_results = list(search_users(form_data.pop('exact'), form_data.pop('include_deleted'),
-                                  form_data.pop('include_pending'), form_data.pop('external'), **form_data))
+            search_results = []
+            exact = form_data.pop('exact')
+            include_deleted = form_data.pop('include_deleted')
+            include_pending = form_data.pop('include_pending')
+            external = form_data.pop('external')
+            form_data = {k: v for (k, v) in form_data.iteritems() if v and v.strip()}
+
+            for entry in search_users(exact=exact, include_deleted=include_deleted,
+                                      include_pending=include_pending, external=external, **form_data):
+                if isinstance(entry, User):
+                    search_results.append(UserEntry(profile_url=url_for('.user_profile', entry),
+                                                    **{k: getattr(entry, k) for k in identity_attributes}))
+                else:
+                    search_results.append(UserEntry(
+                        profile_url=None, full_name="{first_name} {last_name}".format(**entry.data.to_dict()),
+                        **{k: entry.data.get(k) for k in (identity_attributes - {'full_name'})}))
+
             search_results.sort(key=attrgetter('last_name', 'first_name'))
         return WPUsersAdmin.render_template('users_admin.html', form=form, search_results=search_results,
-                                            num_of_users=num_of_users)
+                                            num_of_users=num_of_users, num_deleted_users=num_deleted_users)
 
 
 class RHUsersAdminCreate(RHAdminBase):

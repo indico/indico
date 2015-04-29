@@ -12,15 +12,13 @@
                 </div>
                 <div class="i-box-buttons toolbar right">
                     <div class="group">
-                        <a class="i-button icon-plus" href="{{ url_for('.users_create') }}">Create new user</a>
                         <a class="i-button icon-users" href="{{ url_for('.users_merge') }}">Merge users</a>
-                        <a class="i-button" onclick="loginAs();">Login as</a>
                     </div>
                 </div>
             </div>
             <div class="i-box-content">
                 <div class="info-message-box fixed-width">
-                    <div class="message-text">{% trans num_of_users=num_of_users %}The database currently hosts {{ num_of_users }} users{% endtrans %}</div>
+                    <div class="message-text">{% trans num_of_users=num_of_users %}There are {{ num_of_users }} users, {{ num_deleted_users }} of which are deleted{% endtrans %}</div>
                 </div>
                 <h2>{% trans %}Search users{% endtrans %}</h2>
                 {{ form_header() }}
@@ -42,7 +40,13 @@
                         <ul class="group-list">
                             {% for user_entry in search_results -%}
                                 <li>
-                                    <span><a href="{{ url_for('.user_profile', user_entry) }}">{{ user_entry.full_name }}</a></span>
+                                    <span>
+                                        {%- if user_entry.profile_url -%}
+                                            <a href="{{ user_entry.profile_url }}">{{ user_entry.full_name }}</a>
+                                        {%- else -%}
+                                            {{ user_entry.full_name }}
+                                        {%- endif -%}
+                                    </span>
                                     <span class="right">{{ user_entry.email }}
                                         {% if user_entry.affiliation -%}
                                             ({{ user_entry.affiliation }})
