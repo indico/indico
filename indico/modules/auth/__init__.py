@@ -52,9 +52,12 @@ def process_identity(identity_info):
             elif len(users) > 1:
                 # TODO: handle this case somehow.. let the user select which user to log in to?
                 raise NotImplementedError('Multiple emails matching multiple users')
-        save_identity_info(identity_info, user)
-        if user is None:
-            logger.info('Email search did not find an existing user')
+        save_identity_info(identity_info, user if user and not user.is_pending else None)
+        if not user or user.is_pending:
+            if user and user.is_pending:
+                logger.info('Found pending user with matching email: {}'.format(user))
+            else:
+                logger.info('Email search did not find an existing user')
             return redirect(url_for('auth.register', provider=identity_info.provider.name))
         else:
             logger.info('Found user with matching email: {}'.format(user))
@@ -63,6 +66,9 @@ def process_identity(identity_info):
         raise MultipassException(_('Your Indico profile has been deleted.'))
     else:
         user = identity.user
+        if user.is_pending:
+            # This should never happen!
+            raise ValueError('Got identity for pending user')
         logger.info('Found existing identity {} for user {}'.format(identity, user))
     # Update the identity with the latest information
     if identity.multipass_data != identity_info.multipass_data:

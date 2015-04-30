@@ -230,22 +230,29 @@ class RHRegister(RH):
             flash(_('You have successfully validated your email address and can now proceeed with the registration.'),
                   'success')
 
-            # Check whether there is already an existing pending user with this e-mail
-            pending = User.find_first(User.all_emails.contains(verified_email), is_pending=True)
-
-            if pending:
-                session['register_pending_user'] = pending.id
-                flash(_("There is already some information in Indico that concerns you. "
-                        "We are going to link it automatically."), 'info')
-
             return redirect(url_for('.register', provider=self.provider_name))
 
         form = handler.create_form()
+        # Check for pending users if we have verified emails
+        pending = None
+        if not handler.must_verify_email:
+            pending = User.find_first(~User.is_deleted, User.is_pending,
+                                      User.all_emails.contains(db.func.any(list(handler.get_all_emails(form)))))
+
         if form.validate_on_submit():
             if handler.must_verify_email:
                 return self._send_confirmation(form.email.data)
             else:
-                return self._create_user(form, handler)
+                return self._create_user(form, handler, pending)
+        elif not form.is_submitted() and pending:
+            # If we have a pending user, populate empty fields with data from that user
+            for field in form:
+                value = getattr(pending, field.short_name, '')
+                if value and not field.data:
+                    field.data = value
+        if pending:
+            flash(_("There is already some information in Indico that concerns you. "
+                    "We are going to link it automatically."), 'info')
         return WPAuth.render_template('register.html', form=form, local=(not self.identity_info),
                                       must_verify_email=handler.must_verify_email, widget_attrs=handler.widget_attrs,
                                       email_sent=session.pop('register_verification_email_sent', False))
@@ -255,20 +262,23 @@ class RHRegister(RH):
         return _send_confirmation(email, 'register-email', '.register', 'auth/emails/register_verify_email.txt',
                                   url_args={'provider': self.provider_name})
 
-    def _create_user(self, form, handler):
+    def _create_user(self, form, handler, pending_user):
         data = form.data
-        existing_user_id = session.get('register_pending_user')
-        if existing_user_id:
-            # Get pending user and set it as non-pending
-            user = User.get(existing_user_id)
+        if pending_user:
+            user = pending_user
             user.is_pending = False
         else:
-            user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'],
-                        address=data.get('address', ''), phone=data.get('phone', ''), affiliation=data['affiliation'])
-
+            user = User()
+        form.populate_obj(user, skip={'email'})
+        if form.email.data in user.secondary_emails:
+            # This can happen if there's a pending user who has a secondary email
+            # for some weird reason which should now become the primary email...
+            user.make_email_primary(form.email.data)
+        else:
+            user.email = form.email.data
         identity = handler.create_identity(data)
         user.identities.add(identity)
-        user.secondary_emails = handler.extra_emails - {user.email}
+        user.secondary_emails |= handler.get_all_emails(form) - {user.email}
         user.favorite_users.add(user)
         db.session.add(user)
         minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
@@ -283,6 +293,7 @@ class RHRegister(RH):
         msg = _('You have sucessfully registered your Indico profile. '
                 'Check <a href="{url}">your profile</a> for further details and settings.')
         flash(Markup(msg).format(url=url_for('users.user_profile')), 'success')
+        db.session.flush()
         return handler.redirect_success()
 
 
@@ -372,11 +383,12 @@ class RegistrationHandler(object):
     def must_verify_email(self):
         raise NotImplementedError
 
-    @property
-    def extra_emails(self):
-        # Extra emails that user should get as secondary emails.
-        # To make this easier to use in some cases, the set may contain the primary email, too.
-        return set()
+    def get_all_emails(self, form):
+        # All (verified!) emails that should be set on the user.
+        # This MUST include the primary email from the form if available.
+        # Any additional emails will be set as secondary emails
+        # The emails returned here are used to check for pending users
+        return {form.email.data} if form.validate_on_submit() else set()
 
     def create_identity(self, data):
         raise NotImplementedError
@@ -391,6 +403,11 @@ class RegistrationHandler(object):
 class MultipassRegistrationHandler(RegistrationHandler):
     def __init__(self, rh):
         self.identity_info = rh.identity_info
+
+    @property
+    def from_sync_provider(self):
+        # If the multipass login came from the provider that's used for synchronization
+        return multipass.sync_provider and multipass.sync_provider.name == self.identity_info['provider']
 
     def email_verified(self, email):
         session['login_identity_info']['data']['email'] = email
@@ -411,7 +428,7 @@ class MultipassRegistrationHandler(RegistrationHandler):
         return form
 
     def form(self, **kwargs):
-        if multipass.sync_provider and multipass.sync_provider.name == self.identity_info['provider']:
+        if self.from_sync_provider:
             synced_values = {k: v or '' for k, v in self.identity_info['data'].iteritems()}
             return MultipassRegistrationForm(synced_fields=multipass.synced_fields, synced_values=synced_values,
                                              **kwargs)
@@ -422,9 +439,9 @@ class MultipassRegistrationHandler(RegistrationHandler):
     def must_verify_email(self):
         return not self.identity_info['email_verified']
 
-    @property
-    def extra_emails(self):
-        return set(self.identity_info['data'].getlist('email'))
+    def get_all_emails(self, form):
+        emails = super(MultipassRegistrationHandler, self).get_all_emails(form)
+        return emails | set(self.identity_info['data'].getlist('email'))
 
     def create_identity(self, data):
         del session['login_identity_info']
@@ -432,7 +449,8 @@ class MultipassRegistrationHandler(RegistrationHandler):
                         data=self.identity_info['data'], multipass_data=self.identity_info['multipass_data'])
 
     def update_user(self, user, form):
-        user.synced_fields = form.synced_fields | {field for field in multipass.synced_fields if field not in form}
+        if self.from_sync_provider:
+            user.synced_fields = form.synced_fields | {field for field in multipass.synced_fields if field not in form}
 
     def redirect_success(self):
         return multipass.redirect_success()
@@ -452,6 +470,12 @@ class LocalRegistrationHandler(RegistrationHandler):
     @property
     def must_verify_email(self):
         return 'register_verified_email' not in session
+
+    def get_all_emails(self, form):
+        emails = super(LocalRegistrationHandler, self).get_all_emails(form)
+        if not self.must_verify_email:
+            emails.add(session['register_verified_email'])
+        return emails
 
     def email_verified(self, email):
         session['register_verified_email'] = email
