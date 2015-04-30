@@ -27,6 +27,7 @@ from indico.modules.auth import Identity
 from indico.modules.groups.models.groups import LocalGroup
 from indico.util.caching import memoize_request
 from indico.util.string import return_ascii
+from MaKaC.common.cache import GenericCache
 
 
 class GroupProxy(object):
@@ -190,10 +191,18 @@ class _MultipassGroupProxy(GroupProxy):
         return LDAPGroupWrapper(self.name)
 
     def has_member(self, user):
-        if self.group is None:
+        cache = GenericCache('group-membership')
+        key = '{}:{}:{}'.format(self.provider, self.name, user.id)
+        rv = cache.get(key)
+        if rv is not None:
+            return rv
+        elif self.group is None:
             warn('Tried to check if {} is in invalid group {}'.format(user, self))
-            return False
-        return any(x[1] in self.group for x in user.iter_identifiers(check_providers=True, providers={self.provider}))
+            rv = False
+        else:
+            rv = any(x[1] in self.group for x in user.iter_identifiers(check_providers=True, providers={self.provider}))
+        cache.set(key, rv, 1800)
+        return rv
 
     @memoize_request
     def get_members(self):
