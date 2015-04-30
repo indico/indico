@@ -49,7 +49,7 @@ def process_identity(identity_info):
             users = User.query.filter(~User.is_deleted, User.all_emails.contains(db.func.any(list(emails)))).all()
             if len(users) == 1:
                 user = users[0]
-            elif len(users) > 2:
+            elif len(users) > 1:
                 # TODO: handle this case somehow.. let the user select which user to log in to?
                 raise NotImplementedError('Multiple emails matching multiple users')
         save_identity_info(identity_info, user)
