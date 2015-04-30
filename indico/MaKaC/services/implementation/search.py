@@ -51,7 +51,7 @@ class SearchUsers(SearchBase):
                                      self._confId, self._exactMatch, self._searchExt)
 
         # will use either IAvatarFossil or IContributionParticipationFossil
-        fossilizedResults = fossilize(sorted(results, key=lambda av: (av.user.full_name, av.user.email)))
+        fossilizedResults = fossilize(sorted(results, key=lambda av: (av.getStraightFullName(), av.getEmail())))
 
         return fossilizedResults
 
