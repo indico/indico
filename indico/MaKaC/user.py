@@ -17,18 +17,11 @@
 
 from flask_multipass import IdentityInfo
 
-import MaKaC
-from MaKaC.common import indexes
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.ObjectHolders import ObjectHolder
-from MaKaC.errors import UserError
 
-from indico.core import signals
-from indico.core.logger import Logger
 from indico.modules.users import User
 from indico.modules.users.legacy import AvatarProvisionalWrapper
-from indico.util.i18n import _
-from indico.util.redis import avatar_links, suggestions, write_client as redis_write_client
 
 
 AVATAR_FIELD_MAP = {
@@ -47,7 +40,6 @@ class AvatarHolder(ObjectHolder):
     """
     idxName = "avatars"
     counterName = "PRINCIPAL"
-    _indexes = [ "email", "name", "surName","organisation", "status" ]
 
     def match(self, criteria, exact=False, onlyActivated=True, searchInAuthenticators=False):
         from indico.modules.users.util import search_users
@@ -71,17 +63,3 @@ class AvatarHolder(ObjectHolder):
             user = User.get(int(id))
             if user:
                 return user.as_avatar
-
-    def add(self,av):
-        """
-            Before adding the user, check if the email address isn't used
-        """
-        if av.getEmail() is None or av.getEmail()=="":
-            raise UserError(_("User not created. You must enter an email address"))
-        emailmatch = self.match({'email': av.getEmail()}, exact=1, searchInAuthenticators=False)
-        if emailmatch != None and len(emailmatch) > 0 and emailmatch[0] != '':
-            raise UserError(_("User not created. The email address %s is already used.")% av.getEmail())
-        id = ObjectHolder.add(self,av)
-        for i in self._indexes:
-            indexes.IndexesHolder().getById(i).indexUser(av)
-        return id
