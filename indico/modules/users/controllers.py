@@ -299,6 +299,7 @@ class RHUsersAdminMerge(RHAdminBase):
             source = form['source_user'].data
             target = form['target_user'].data
             merge_users(source, target)
+            flash(_('The users have been successfully merged.'), 'success')
             return redirect(url_for('.user_profile', user_id=target.id))
 
         return WPUsersAdmin.render_template('users_merge.html', form=form)
@@ -327,7 +328,7 @@ class RHUsersAdminMergeCheck(RHAdminBase):
         if source.is_deleted:
             problems.append((_("Source user has been deleted!"), 'error'))
 
-        if source.is_deleted:
+        if target.is_deleted:
             problems.append((_("Target user has been deleted!"), 'error'))
 
         return jsonify({
