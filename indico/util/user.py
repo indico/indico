@@ -88,11 +88,14 @@ def principal_from_fossil(fossil, allow_pending=False, legacy=True):
 
             data = {k: '' if v is None else v for (k, v) in data.items()}
 
-            user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'],
-                        address=data.get('address', ''), phone=data.get('phone', ''),
-                        affiliation=data.get('affiliation', ''), is_pending=True)
-            db.session.add(user)
-            db.session.flush()
+            # check if there is not already a pending user with that e-mail
+            user = User.find_first(email=data['email'], is_pending=True)
+            if not user:
+                user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'],
+                            address=data.get('address', ''), phone=data.get('phone', ''),
+                            affiliation=data.get('affiliation', ''), is_pending=True)
+                db.session.add(user)
+                db.session.flush()
         else:
             raise ValueError("Id '{}' is not a number and allow_pending=False".format(id_))
         if user is None:
