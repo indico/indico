@@ -93,6 +93,9 @@ class GroupWrapper(Persistent, Fossilizable):
             return False
         return self.group == other.group
 
+    def __ne__(self, other):
+        return not (self == other)
+
     def __hash__(self):
         return hash(self.group)
 

@@ -41,26 +41,38 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     @property
     @memoize_request
-    def original_user(self):
+    def _original_user(self):
+        # A proper user, with an id that can be mapped directly to sqlalchemy
         if isinstance(self.id, int) or self.id.isdigit():
             return User.get(int(self.id))
+        # A user who had no real indico account but an ldap identifier/email.
+        # In this case we try to find his real user and replace the ID of this object
+        # with that user's ID.
         data = self.id.split(':')
+        # TODO: Once everything is in SQLAlchemy this whole thing needs to go away!
+        user = None
         if data[0] == 'LDAP':
             identifier = data[1]
             email = data[2]
+            # You better have only one ldap provider or at least different identifiers ;)
             identity = Identity.find_first(Identity.provider != 'indico', Identity.identifier == identifier)
             if identity:
-                return identity.user
+                user = identity.user
         elif data[0] == 'Nice':
             email = data[1]
         else:
             return None
-        return User.find_first(User.all_emails.contains(email))
+        if not user:
+            user = User.find_first(User.all_emails.contains(email))
+        if user:
+            self._old_id = self.id
+            self.id = str(user.id)
+        return user
 
     @property
     @memoize_request
     def user(self):
-        user = self.original_user
+        user = self._original_user
         if user is None:
             return None
         elif user.is_deleted:
@@ -327,19 +339,26 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     def __eq__(self, other):
         if not isinstance(other, (AvatarUserWrapper, User)):
             return False
-        other_id = int(other.id)
-        return int(self.user.id) == other_id
+        elif str(self.id) == str(other.id):
+            return True
+        elif self.user:
+            return str(self.user.id) == str(other.id)
+        else:
+            return False
+
+    def __ne__(self, other):
+        return not (self == other)
 
     def __hash__(self):
-        return hash(self.id)
+        return hash(str(self.id))
 
     @return_ascii
     def __repr__(self):
         if self.user is None:
             return u'<AvatarUserWrapper {}: user does not exist>'.format(self.id)
-        elif self.original_user.merged_into_user:
+        elif self._original_user.merged_into_user:
             return u'<AvatarUserWrapper {}: {} ({}) [{}]>'.format(
-                self.id, self.original_user.full_name, self.original_user.email, self.user.id)
+                self.id, self._original_user.full_name, self._original_user.email, self.user.id)
         else:
             return u'<AvatarUserWrapper {}: {} ({})>'.format(self.id, self.user.full_name, self.user.email)
 
