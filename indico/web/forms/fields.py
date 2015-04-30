@@ -149,7 +149,7 @@ class PrincipalField(HiddenField):
         self.groups = kwargs.pop('groups', False)
         self.multiple = kwargs.pop('multiple', True)
         # Whether it is allowed to search for external users with no indico account
-        self.allow_external = kwargs.pop('allow_external', True)
+        self.allow_external = kwargs.pop('allow_external', False)
         # if we want serializable objects (usually for json) or the real thing (User/GroupProxy)
         self.serializable = kwargs.pop('serializable', True)
         super(PrincipalField, self).__init__(*args, **kwargs)
