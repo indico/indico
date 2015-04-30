@@ -42,8 +42,14 @@ class LocalGroup(db.Model):
         index=True
     )
 
-    # relationship backrefs:
-    # - members (User.local_groups)
+    #: the local groups this user belongs to
+    members = db.relationship(
+        'User',
+        secondary='users.group_members',
+        lazy=True,
+        collection_class=set,
+        backref=db.backref('local_groups', lazy=True, collection_class=set),
+    )
 
     @return_ascii
     def __repr__(self):

@@ -231,14 +231,9 @@ class User(db.Model):
         collection_class=set,
         backref=db.backref('user', lazy=False)
     )
-    #: the local groups this user belongs to
-    local_groups = db.relationship(
-        'LocalGroup',
-        secondary='users.group_members',
-        lazy=True,
-        collection_class=set,
-        backref=db.backref('members', lazy=True, collection_class=set),
-    )
+
+    # relationship backrefs:
+    # - local_groups (User.local_groups)
 
     @property
     def as_principal(self):
