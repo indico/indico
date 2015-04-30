@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import (admins, announcement, taskManager, maintenance, domains, users, templates,
+from MaKaC.webinterface.rh import (admins, announcement, taskManager, maintenance, domains, templates,
                                    conferenceModif, services, oauth)
 from indico.web.flask.wrappers import IndicoBlueprint
 
