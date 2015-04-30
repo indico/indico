@@ -919,3 +919,9 @@ class Config:
             return "static/fonts"
         else:
             return url_parse("%s/fonts" % self.getBaseURL()).path
+
+    def getScriptBaseURL(self):
+        if ContextManager.get('offlineMode', False):
+            return 'static/js'
+        else:
+            return url_parse('%s/js' % self.getBaseURL()).path

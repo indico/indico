@@ -17,7 +17,7 @@
 
 
 if(!window.indicoOfflineSite) {
-    include(ScriptRoot + "ckeditor/ckeditor.js");
+    include(ScriptRoot + '/ckeditor/ckeditor.js');
 }
 
 var indicoSource = null;
