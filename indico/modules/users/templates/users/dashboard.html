@@ -20,9 +20,11 @@
                                 <i class="icon-info" title="{% trans %}User ID{% endtrans %}"></i><span>{{ user.id }}</span>
                             </div>
                         {% endif %}
-                        <div>
-                            <i class="icon-users"></i><span>{{ user.affiliation }}</span>
-                        </div>
+                        {% if user.affiliation %}
+                            <div>
+                                <i class="icon-users"></i><span>{{ user.affiliation }}</span>
+                            </div>
+                        {% endif %}
                         <div>
                             <i class="icon-mail"></i><span>{{ user.email }}</span>
                         </div>
