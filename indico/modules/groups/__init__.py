@@ -29,3 +29,11 @@ __all__ = ('GroupProxy',)
 def _extend_admin_menu(sender, **kwargs):
     from MaKaC.webinterface.wcomponents import SideMenuItem
     return 'groups', SideMenuItem(_("Groups"), url_for('groups.groups'))
+
+
+@signals.merge_users.connect
+def _merge_users(user, merged, **kwargs):
+    target = user.user
+    source = merged.user
+    target.local_groups |= source.local_groups
+    source.local_groups.clear()
