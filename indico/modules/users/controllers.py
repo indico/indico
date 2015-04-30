@@ -21,6 +21,7 @@ from datetime import datetime
 from operator import attrgetter
 
 from flask import session, request, flash, jsonify, redirect
+from markupsafe import Markup
 from pytz import timezone
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -65,6 +66,12 @@ class RHUserBase(RHProtected):
             self.user = User.get(request.view_args['user_id'])
             if self.user is None:
                 raise NotFound('This user does not exist')
+            elif self.user.is_deleted:
+                if self.user.merged_into_id is not None:
+                    msg = _('This user has been merged into <a href="{url}">another user</a>.')
+                    flash(Markup(msg).format(url=url_for(request.endpoint, self.user.merged_into_user)), 'warning')
+                else:
+                    flash(_('This user is marked as deleted.'), 'warning')
 
     def _checkProtection(self):
         RHProtected._checkProtection(self)
