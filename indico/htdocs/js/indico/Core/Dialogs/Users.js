@@ -277,41 +277,25 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
      * Form to fill in user search data
      */
     _createSearchForm: function() {
-        var self = this;
+        var self = this,
+            do_search = function() {
+                self._searchAction();
+                return false;
+            };
 
-        var familyName = new EnterObserverTextBox("text",{style:{width:"100%"},id:'userSearchFocusField'}, function() {
-            self._searchAction();
-            return false;
-        });
+        this.fields = {
+            'surName': new EnterObserverTextBox("text", {style: {width: "100%"}, id:'userSearchFocusField'}, do_search),
+            'name': new EnterObserverTextBox("text", {style: {width: "100%"}}, do_search),
+            'email': new EnterObserverTextBox("text", {style: {width: "100%"}}, do_search),
+            'organisation': new EnterObserverTextBox("text", {style: {width: "100%"}}, do_search),
+            'exactMatch': Html.checkbox({})
+        };
 
-        var firstName = new EnterObserverTextBox("text",{style:{width:"100%"}}, function() {
-            self._searchAction();
-            return false;
-        });
-
-        var email = new EnterObserverTextBox("text",{style:{width:"100%"}}, function() {
-            self._searchAction();
-            return false;
-        });
-
-        var organisation = new EnterObserverTextBox("text",{style:{width:"100%"}}, function() {
-            self._searchAction();
-            return false;
-        });
-
-        var exactMatch = Html.checkbox({});
-
-        $B(familyName, this.criteria.accessor('surName'));
-        $B(firstName, this.criteria.accessor('name'));
-        $B(organisation, this.criteria.accessor('organisation'));
-        $B(email, this.criteria.accessor('email'));
-        $B(exactMatch, this.criteria.accessor('exactMatch'));
-
-        var fieldList = [[$T("Family name"), familyName.draw()],
-                         [$T("First name"), firstName.draw()],
-                         [$T("E-mail"), email.draw()],
-                         [$T("Organisation"), organisation.draw()],
-                         [$T("Exact Match"), exactMatch]];
+        var fieldList = [[$T("Family name"), this.fields.surName.draw()],
+                         [$T("First name"), this.fields.name.draw()],
+                         [$T("E-mail"), this.fields.email.draw()],
+                         [$T("Organisation"), this.fields.organisation.draw()],
+                         [$T("Exact Match"), this.fields.exactMatch]];
 
         var authenticatorSearch = this._createAuthenticatorSearch();
         if (exists(authenticatorSearch)) {
@@ -329,6 +313,10 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
 
         self.searchButton.dom.disabled = true;
         this.foundPeopleList.setMessage(Html.div({style: {paddingTop: '20px'}}, progressIndicator(false, true)));
+
+        _.each(this.fields, function(widget, key) {
+            self.criteria.set(key, widget.get());
+        });
 
         indicoRequest(
             'search.users',
@@ -371,6 +359,7 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
         if(exists(conferenceId)) {
             this.criteria.set("conferenceId", conferenceId);
         }
+        this.fields = {};
     }
 );
 
