@@ -182,6 +182,11 @@ def merge_users(source, target, force=False):
     # Make sure we don't have stale data after the bulk update we just performed
     db.session.expire_all()
 
+    # Update favorites
+    target.favorite_users |= source.favorite_users
+    target.favorite_of |= source.favorite_of
+    target.favorite_categories |= source.favorite_categories
+
     # Merge identities
     for identity in set(source.identities):
         identity.user = target
