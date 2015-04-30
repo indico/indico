@@ -148,14 +148,14 @@ class PrincipalField(HiddenField):
     def __init__(self, *args, **kwargs):
         self.groups = kwargs.pop('groups', False)
         self.multiple = kwargs.pop('multiple', True)
-        # Whether it is allowed to search for external users
+        # Whether it is allowed to search for external users with no indico account
         self.allow_external = kwargs.pop('allow_external', True)
         # if we want serializable objects (usually for json) or the real thing (User/GroupProxy)
         self.serializable = kwargs.pop('serializable', True)
         super(PrincipalField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
-        principal = principal_from_fossil(principal, legacy=False)
+        principal = principal_from_fossil(principal, allow_pending=self.allow_external, legacy=False)
         return principal.as_principal if self.serializable else principal
 
     def process_formdata(self, valuelist):
