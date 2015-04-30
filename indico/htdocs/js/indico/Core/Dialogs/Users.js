@@ -50,6 +50,10 @@ function userSort(user1, user2) {
 }
 
 function create_favorite_button(user_id) {
+    var integerRegex = /^[0-9]+$/;
+    if (!integerRegex.test(user_id)) {  // external user
+        return $('<span>');
+    }
     var active = !!Indico.User.favorite_users[user_id],
         span = $('<span class="favorite-user icon-star">')
             .attr({
