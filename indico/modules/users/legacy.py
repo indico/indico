@@ -17,10 +17,10 @@
 from persistent import Persistent
 
 from indico.core.auth import multipass
-from indico.core.db import db
 from indico.modules.groups import GroupProxy
 from indico.modules.rb.utils import rb_is_admin
 from indico.modules.users import User
+from indico.modules.auth import Identity
 from indico.util.caching import memoize_request
 from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.string import to_unicode, return_ascii, encode_utf8
@@ -42,7 +42,20 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     @property
     @memoize_request
     def original_user(self):
-        return User.get(int(self.id))
+        if isinstance(self.id, int) or self.id.isdigit():
+            return User.get(int(self.id))
+        data = self.id.split(':')
+        if data[0] == 'LDAP':
+            identifier = data[1]
+            email = data[2]
+            identity = Identity.find_first(Identity.provider != 'indico', Identity.identifier == identifier)
+            if identity:
+                return identity.user
+        elif data[0] == 'Nice':
+            email = data[1]
+        else:
+            return None
+        return User.find_first(User.all_emails.contains(email))
 
     @property
     @memoize_request
