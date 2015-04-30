@@ -16,13 +16,13 @@
 
 from __future__ import unicode_literals
 
-import operator
 from collections import OrderedDict
+from operator import itemgetter
 
 from flask import request
-from MaKaC.accessControl import AccessWrapper
 
 from indico.core import signals
+from indico.core.auth import multipass
 from indico.core.db import db
 from indico.modules.users import User
 from indico.modules.users.models.affiliations import UserAffiliation
@@ -30,6 +30,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.util.event import truncate_path
 from indico.util.redis import write_client as redis_write_client
 from indico.util.redis import suggestions, avatar_links
+from MaKaC.accessControl import AccessWrapper
 from MaKaC.conference import CategoryManager
 
 
@@ -45,7 +46,7 @@ def get_related_categories(user):
             'managed': categ in managed,
             'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
         }
-    return OrderedDict(sorted(res.items(), key=operator.itemgetter(0)))
+    return OrderedDict(sorted(res.items(), key=itemgetter(0)))
 
 
 def get_suggested_categories(user):
@@ -132,7 +133,6 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
 
     # external user providers
     if external:
-        from indico.core.auth import multipass
         identities = multipass.search_identities(exact=exact, **original_criteria)
 
         for ident in identities:
