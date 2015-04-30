@@ -73,3 +73,14 @@ class IndicoEmail(object):
         if field.data and not is_valid_mail(field.data, self.multi):
             msg = _(u'Invalid email address list') if self.multi else _(u'Invalid email address')
             raise ValidationError(msg)
+
+
+def used_if_not_synced(form, field):
+    """Validator to prevent validation error on synced inputs.
+
+    Synced inputs are disabled in the form and don't send any value.
+    In that case, we disable validation from the input.
+    """
+    if field.short_name in form.synced_fields:
+        field.errors[:] = []
+        raise StopValidation()

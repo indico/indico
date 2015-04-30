@@ -23,8 +23,9 @@ from wtforms.validators import DataRequired, Length, ValidationError, Optional
 from indico.modules.auth import Identity
 from indico.modules.users import User
 from indico.util.i18n import _
-from indico.web.forms.base import IndicoForm
-from indico.web.forms.validators import ConfirmPassword
+from indico.web.forms.base import IndicoForm, SyncedInputsMixin
+from indico.web.forms.validators import ConfirmPassword, used_if_not_synced
+from indico.web.forms.widgets import SyncedInputWidget
 
 
 def _tolower(s):
@@ -89,10 +90,13 @@ class RegistrationForm(IndicoForm):
     affiliation = StringField(_('Affiliation'))
 
 
-class MultipassRegistrationForm(RegistrationForm):
+class MultipassRegistrationForm(SyncedInputsMixin, IndicoForm):
+    first_name = StringField(_('First Name'), [used_if_not_synced, DataRequired()], widget=SyncedInputWidget())
+    last_name = StringField(_('Family name'), [used_if_not_synced, DataRequired()], widget=SyncedInputWidget())
+    affiliation = StringField(_('Affiliation'), widget=SyncedInputWidget())
     email = SelectField(_('Email address'), [DataRequired(), _check_existing_email])
-    address = StringField(_('Address'))
-    phone = StringField(_('Phone number'))
+    address = StringField(_('Address'), widget=SyncedInputWidget(textarea=True))
+    phone = StringField(_('Phone number'), widget=SyncedInputWidget())
 
 
 class LocalRegistrationForm(RegistrationForm):

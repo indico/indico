@@ -245,7 +245,7 @@ class RHRegister(RH):
             if handler.must_verify_email:
                 return self._send_confirmation(form.email.data)
             else:
-                return self._create_user(form.data, handler)
+                return self._create_user(form, handler)
         return WPAuth.render_template('register.html', form=form, local=(not self.identity_info),
                                       must_verify_email=handler.must_verify_email, widget_attrs=handler.widget_attrs,
                                       email_sent=session.pop('register_verification_email_sent', False))
@@ -255,10 +255,11 @@ class RHRegister(RH):
         return _send_confirmation(email, 'register-email', '.register', 'auth/emails/register_verify_email.txt',
                                   url_args={'provider': self.provider_name})
 
-    def _create_user(self, data, handler):
+    def _create_user(self, form, handler):
+        data = form.data
         existing_user_id = session.get('register_pending_user')
         if existing_user_id:
-            # Get pending user and set her as non-pending
+            # Get pending user and set it as non-pending
             user = User.get(existing_user_id)
             user.is_pending = False
         else:
@@ -276,6 +277,7 @@ class RHRegister(RH):
             timezone = minfo.getTimezone()
         user.settings.set('timezone', timezone)
         user.settings.set('lang', session.lang or minfo.getLang())
+        handler.update_user(user, form)
         db.session.flush()
         login_user(user, identity)
         msg = _('You have sucessfully registered your Indico profile. '
@@ -379,13 +381,14 @@ class RegistrationHandler(object):
     def create_identity(self, data):
         raise NotImplementedError
 
+    def update_user(self, user, form):
+        pass
+
     def redirect_success(self):
         raise NotImplementedError
 
 
 class MultipassRegistrationHandler(RegistrationHandler):
-    form = MultipassRegistrationForm
-
     def __init__(self, rh):
         self.identity_info = rh.identity_info
 
@@ -407,6 +410,14 @@ class MultipassRegistrationHandler(RegistrationHandler):
         form.email.choices = zip(emails, emails)
         return form
 
+    def form(self, **kwargs):
+        if multipass.sync_provider and multipass.sync_provider.name == self.identity_info['provider']:
+            synced_values = {k: v or '' for k, v in self.identity_info['data'].iteritems()}
+            return MultipassRegistrationForm(synced_fields=multipass.synced_fields, synced_values=synced_values,
+                                             **kwargs)
+        else:
+            return MultipassRegistrationForm(**kwargs)
+
     @property
     def must_verify_email(self):
         return not self.identity_info['email_verified']
@@ -419,6 +430,9 @@ class MultipassRegistrationHandler(RegistrationHandler):
         del session['login_identity_info']
         return Identity(provider=self.identity_info['provider'], identifier=self.identity_info['identifier'],
                         data=self.identity_info['data'], multipass_data=self.identity_info['multipass_data'])
+
+    def update_user(self, user, form):
+        user.synced_fields = form.synced_fields | {field for field in multipass.synced_fields if field not in form}
 
     def redirect_success(self):
         return multipass.redirect_success()

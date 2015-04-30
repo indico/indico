@@ -15,7 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask import render_template
+from wtforms.widgets import TextInput, TextArea
 from wtforms.widgets.core import HTMLString
+
+from indico.core.auth import multipass
 
 
 class ConcatWidget(object):
@@ -97,6 +100,26 @@ class SwitchWidget(object):
             'off_label': self.off_label
         })
         return HTMLString(render_template('forms/switch_widget.html', field=field, kwargs=kwargs))
+
+
+class SyncedInputWidget(object):
+    """Renders a text input with a sync button when needed."""
+
+    @property
+    def single_line(self):
+        return not self.textarea
+
+    def __init__(self, textarea=False):
+        self.textarea = textarea
+        self.default_widget = TextArea() if textarea else TextInput()
+
+    def __call__(self, field, **kwargs):
+        # Render a sync button for fields which can be synced, if the identity provider provides a value for the field.
+        if field.short_name in multipass.synced_fields and field.synced_value is not None:
+            return HTMLString(render_template('forms/synced_input_widget.html', field=field, textarea=self.textarea,
+                                              kwargs=kwargs))
+        else:
+            return self.default_widget(field, **kwargs)
 
 
 class SelectizeWidget(object):
