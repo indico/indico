@@ -40,7 +40,6 @@ from indico.util.redis import client as redis_client
 from indico.util.redis import write_client as redis_write_client
 from indico.util.signals import values_from_signal
 from indico.util.string import make_unique_token
-from indico.util.user import retrieve_principal
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -208,7 +207,7 @@ class RHUserEmailsVerify(RHUserBase):
             else:
                 flash(_('This email address is already in use by another account.'), 'error')
             return False, existing.user
-        return True, existing.user
+        return True, existing.user if existing else None
 
     def _process(self):
         token = request.view_args['token']
@@ -217,7 +216,7 @@ class RHUserEmailsVerify(RHUserBase):
         if valid:
             self.token_storage.delete(token)
 
-            if existing.is_pending:
+            if existing and existing.is_pending:
                 flash(_("Merged data from existing '{}' identity").format(existing.email))
                 merge_users(existing, self.user)
                 existing.is_pending = False
