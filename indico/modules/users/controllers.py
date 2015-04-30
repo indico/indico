@@ -58,6 +58,8 @@ UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url'})
 
 
 class RHUserBase(RHProtected):
+    flash_user_status = True
+
     def _checkParams(self):
         if not session.avatar:
             return
@@ -66,12 +68,17 @@ class RHUserBase(RHProtected):
             self.user = User.get(request.view_args['user_id'])
             if self.user is None:
                 raise NotFound('This user does not exist')
-            elif self.user.is_deleted:
-                if self.user.merged_into_id is not None:
-                    msg = _('This user has been merged into <a href="{url}">another user</a>.')
-                    flash(Markup(msg).format(url=url_for(request.endpoint, self.user.merged_into_user)), 'warning')
-                else:
-                    flash(_('This user is marked as deleted.'), 'warning')
+            elif request.method == 'GET' and not request.is_xhr and self.flash_user_status:
+                # Show messages about the user's status if it's a simple GET request
+                if self.user.is_deleted:
+                    if self.user.merged_into_id is not None:
+                        msg = _('This user has been merged into <a href="{url}">another user</a>.')
+                        flash(Markup(msg).format(url=url_for(request.endpoint, self.user.merged_into_user)), 'warning')
+                    else:
+                        flash(_('This user is marked as deleted.'), 'warning')
+                if self.user.is_pending:
+                    flash(_('This user is marked as pending, i.e. it has been attached to something but never '
+                            'logged in.'), 'warning')
 
     def _checkProtection(self):
         RHProtected._checkProtection(self)
@@ -197,6 +204,7 @@ class RHUserEmails(RHUserBase):
 
 
 class RHUserEmailsVerify(RHUserBase):
+    flash_user_status = False
     token_storage = GenericCache('confirm-email')
 
     def _validate(self, data):
