@@ -1377,11 +1377,7 @@ class ConferenceAddExistingChairPerson(ConferenceChairPersonBase):
 
     def _getAnswer(self):
         for person in self._userList:
-            ah = AvatarHolder()
-            av = ah.getById(person["id"])
-            if av is None:
-                raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % person["email"])
-            self._newChair(av)
+            self._newChair(principal_from_fossil(person, allow_pending=True))
 
         return self._getChairPersonsList()
 

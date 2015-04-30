@@ -301,13 +301,9 @@ class ContributionAddExistingParticipant(ContributionParticipantsBase):
 
     def _getAnswer(self):
         for user in self._userList:
-            if user["_type"] == "Avatar": # new speaker
-                ah = AvatarHolder()
-                av = ah.getById(user["id"])
-                if av is None:
-                    raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % user["email"])
-                part = self._newParticipant(av)
-            elif user["_type"] == "ContributionParticipation": # adding existing author to speaker
+            if user["_type"] == "Avatar":  # new speaker
+                part = self._newParticipant(principal_from_fossil(user, allow_pending=True))
+            elif user["_type"] == "ContributionParticipation":  # adding existing author to speaker
                 part = self._contribution.getAuthorById(user["id"])
                 self._contribution.addSpeaker(part)
             if self._submissionRights and part:

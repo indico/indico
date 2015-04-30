@@ -14,9 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from indico.util.user import principal_from_fossil
 from MaKaC import user
 from MaKaC.services.implementation.base import ParameterManager
-from MaKaC.services.interface.rpc.common import ServiceError, NoReportError
+from MaKaC.services.interface.rpc.common import ServiceError
 
 
 class UserModificationBase ( object ):
@@ -74,10 +75,7 @@ class UserListModificationBase ( object):
             elif str(id).startswith('edited'):
                 editedAvatars.append((user.AvatarHolder().getById(id[6:]), userDict))
             else:
-                principal = user.AvatarHolder().getById(id)
-                if principal is None:
-                    raise NoReportError(_("The user with email %s that you are adding does not exist anymore in the database") % userDict["email"])
-                avatars.append(user.AvatarHolder().getById(id))
+                avatars.append(principal_from_fossil(userDict, allow_pending=True))
 
         return avatars, newUsers, editedAvatars
 
