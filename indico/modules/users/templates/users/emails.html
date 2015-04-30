@@ -24,7 +24,7 @@
                         <span><strong>{{ user.email }}</strong></span>
                         <span class="i-label">{% trans %}Primary{% endtrans %}</span>
                     </li>
-                    {% for email in user.secondary_emails %}
+                    {% for email in user.secondary_emails|sort %}
                         <li class="js-email-row">
                             <span>{{ email }}</span>
                             <a class="toggle icon-remove right js-delete-email" href="#" data-href="{{ url_for('.user_emails_delete', email=email) }}" style="margin-left: 10px;"></a>
