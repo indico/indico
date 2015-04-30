@@ -26,6 +26,7 @@ import sys
 import urlparse
 
 from flask import request, current_app
+from werkzeug.urls import url_parse
 
 import MaKaC
 from indico.core.db import DBMgr
@@ -886,7 +887,6 @@ class Config:
     def getArchivedFileURL(self, localFile):
         return "%s/getFile.py?%s" % (self.getBaseURL(), localFile.getLocator().getURLForm() )
 
-
     def hasFileConverter(self):
         return self.getFileConverter().get("conversion_server", "") != ""
 
@@ -900,22 +900,22 @@ class Config:
         if ContextManager.get('offlineMode', False):
             return "static/images"
         else:
-            return "%s/images" % self.getBaseURL()
+            return url_parse("%s/images" % self.getBaseURL()).path
 
     def getImagesBaseSecureURL(self):
         if ContextManager.get('offlineMode', False):
             return "static/images"
         else:
-            return "%s/images" % self.getBaseSecureURL()
+            return url_parse("%s/images" % self.getBaseSecureURL()).path
 
     def getCssBaseURL(self):
         if ContextManager.get('offlineMode', False):
             return "static/css"
         else:
-            return "%s/css" % self.getBaseURL()
+            return url_parse("%s/css" % self.getBaseURL()).path
 
     def getFontsBaseURL(self):
         if ContextManager.get('offlineMode', False):
             return "static/fonts"
         else:
-            return "%s/fonts" % self.getBaseURL()
+            return url_parse("%s/fonts" % self.getBaseURL()).path

@@ -188,12 +188,6 @@ class WTemplated():
 
         tempHTML = templateEngine.render(self.tplFile, vars, self)
 
-        if self._rh and request.is_secure:
-            imagesBaseURL = Config.getInstance().getImagesBaseURL()
-            imagesBaseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL())
-            tempHTML = tempHTML.replace(imagesBaseURL, imagesBaseSecureURL)
-            tempHTML = tempHTML.replace(escapeHTMLForJS(imagesBaseURL), escapeHTMLForJS(imagesBaseSecureURL))
-
         if helpText == None:
             return tempHTML
         else:

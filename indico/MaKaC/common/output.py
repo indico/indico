@@ -130,12 +130,8 @@ class outputGenerator(object):
         self.getOutput(conf, stylesheet, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession, showDate, showContribution)
         html = self.text
         if request.is_secure:
-            imagesBaseURL = Config.getInstance().getImagesBaseURL()
-            imagesBaseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getImagesBaseSecureURL())
             baseURL = Config.getInstance().getBaseURL()
             baseSecureURL = urlHandlers.setSSLPort(Config.getInstance().getBaseSecureURL())
-            html = html.replace(imagesBaseURL, imagesBaseSecureURL)
-            html = html.replace(escapeHTMLForJS(imagesBaseURL), escapeHTMLForJS(imagesBaseSecureURL))
             html = html.replace(baseURL, baseSecureURL)
             html = html.replace(escapeHTMLForJS(baseURL), escapeHTMLForJS(baseSecureURL))
         return html
