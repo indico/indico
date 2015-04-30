@@ -244,8 +244,13 @@ class AccessController(Persistent):
                     av.linkTo(self.getOwner(), "manager")
         return False
 
-    def getAccessList( self ):
+    def getAccessList(self):
         """returns a list of those principals which have access privileges"""
+        for principal in list(self.allowed):
+            if principal is None:
+                self.revokeAccess(principal)
+            elif isinstance(principal, AvatarUserWrapper) and principal.user is None:
+                self.revokeAccess(principal)
         return self.allowed
 
     def getModificationEmail(self):
