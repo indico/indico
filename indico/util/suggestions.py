@@ -69,6 +69,8 @@ def _get_blocks(events, attended):
 
 
 def _get_category_score(avatar, categ, attended_events, debug=False):
+    # avoid stale SQLAlchemy object
+    user = avatar.user
     if debug:
         print repr(categ)
     idx = IndexesHolder().getById('categoryDateAll')
@@ -87,7 +89,7 @@ def _get_category_score(avatar, categ, attended_events, debug=False):
             first_event_date = b[0].getStartDate().replace(hour=0, minute=0)
 
     # Favorite categories get a higher base score
-    favorite = categ in avatar.user.favorite_categories
+    favorite = categ in user.favorite_categories
     score = 1 if favorite else 0
     if debug:
         print '{0:+.3f} - initial'.format(score)
