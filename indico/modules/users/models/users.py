@@ -20,6 +20,7 @@ from operator import attrgetter
 
 from flask import flash
 from flask_multipass import IdentityRetrievalFailed
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_property
 from werkzeug.utils import cached_property
@@ -485,3 +486,10 @@ class User(db.Model):
             if identity_info:
                 identity.data = identity_info.data
         return identity
+
+
+@listens_for(User._primary_email, 'set')
+@listens_for(User._secondary_emails, 'append')
+def _user_email_added(target, value, *unused):
+    # Make sure that a newly added email has the same deletion state as the user itself
+    value.is_user_deleted = target.is_deleted

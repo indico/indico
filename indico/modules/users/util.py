@@ -157,7 +157,7 @@ def merge_users(source, target, force=False):
     if target.is_deleted:
         raise ValueError('Target user {} has been deleted. Merge aborted.'.format(target))
 
-    # merge links
+    # Merge links
     for link in source.linked_objects:
         if link.object is None:
             # remove link if object does no longer exist
@@ -165,17 +165,22 @@ def merge_users(source, target, force=False):
         else:
             link.user = target
 
-    # de-duplicate links
+    # De-duplicate links
     unique_links = {(link.object, link.role): link for link in target.linked_objects}
     to_delete = set(target.linked_objects) - set(unique_links.viewvalues())
 
     for link in to_delete:
         db.session.delete(link)
 
+    # Move emails to the target user
+    primary_source_email = source.email
     UserEmail.find(user_id=source.id).update({
         UserEmail.user_id: target.id,
         UserEmail.is_primary: False
     })
+
+    # Make sure we don't have stale data after the bulk update we just performed
+    db.session.expire_all()
 
     # Merge identities
     for identity in set(source.identities):
@@ -192,7 +197,13 @@ def merge_users(source, target, force=False):
 
     # Notify signal listeners about the merge
     signals.merge_users.send(target.as_avatar, merged=source.as_avatar)
+    db.session.flush()
 
     # Mark source as merged
     source.merged_into_user = target
     source.is_deleted = True
+    db.session.flush()
+
+    # Restore the source user's primary email
+    source.email = primary_source_email
+    db.session.flush()
