@@ -79,7 +79,7 @@ class Importer(object):
         return command
 
     def __repr__(self):
-        return '<{}({}, {}, {})>'.format(type(self).__name__, self.sqlalchemy_uri, self.zodb_uri)
+        return '<{}({}, {})>'.format(type(self).__name__, self.sqlalchemy_uri, self.zodb_uri)
 
     def run(self):
         self.setup()
