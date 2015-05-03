@@ -327,7 +327,7 @@ class RHAccounts(RHUserBase):
             elif isinstance(form, EditLocalIdentityForm):
                 self._handle_edit_local_account(form)
             return redirect(url_for('auth.accounts'))
-        provider_titles = {name: provider.title for name, provider in multipass.auth_providers.iteritems()}
+        provider_titles = {name: provider.title for name, provider in multipass.identity_providers.iteritems()}
         return WPUser.render_template('accounts.html', form=form, user=self.user, provider_titles=provider_titles)
 
 

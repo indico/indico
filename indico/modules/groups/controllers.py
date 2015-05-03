@@ -54,7 +54,7 @@ class RHGroups(RHAdminBase):
             search_providers = None if not providers or not form.provider.data else {form.provider.data}
             search_results = GroupProxy.search(form.name.data, exact=form.exact.data, providers=search_providers)
             search_results.sort(key=attrgetter('provider', 'name'))
-        provider_titles = {p.name: p.title for p in multipass.auth_providers.itervalues()}
+        provider_titles = {p.name: p.title for p in multipass.identity_providers.itervalues()}
         provider_titles[None] = _('Local')
         return WPGroupsAdmin.render_template('groups.html', groups=groups, providers=providers, form=form,
                                              search_results=search_results, provider_titles=provider_titles)
@@ -76,7 +76,7 @@ class RHGroupDetails(RHGroupBase):
 
     def _process(self):
         group = self.group
-        provider_title = multipass.auth_providers[group.provider].title if not group.is_local else _('Local')
+        provider_title = multipass.identity_providers[group.provider].title if not group.is_local else _('Local')
         return WPGroupsAdmin.render_template('group_details.html', group=group, provider_title=provider_title)
 
 
