@@ -30,7 +30,7 @@ class APIKey(db.Model):
     """API keys for users"""
     __tablename__ = 'api_keys'
     __table_args__ = (db.Index(None, 'user_id', unique=True, postgresql_where=db.text('is_active')),
-                      {'schema': 'indico'})
+                      {'schema': 'users'})
 
     #: api key id
     id = db.Column(
