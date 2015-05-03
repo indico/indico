@@ -50,7 +50,7 @@
                             {% endif %}
                             <div class="login-providers external">
                                 {% for provider in providers|selectattr('is_external')|sort(attribute='title') %}
-                                    <a href="{{ url_for('.login', provider=provider.name) }}"
+                                    <a href="{{ url_for('.login', provider=provider.name, _method='GET') }}"
                                        class="i-button external-provider-{{ provider.name }}">
                                        {{- provider.title -}}
                                     </a>
