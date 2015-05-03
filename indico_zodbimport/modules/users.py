@@ -18,11 +18,16 @@ from __future__ import unicode_literals
 
 import re
 from contextlib import contextmanager
+from datetime import timedelta
+from uuid import uuid4
 
 import click
+import pytz
+from babel.dates import get_timezone
 from pytz import all_timezones_set
 
 from indico.core.db import db
+from indico.modules.api import APIKey
 from indico.modules.auth import Identity
 from indico.modules.users import User, user_settings
 from indico.modules.users.models.favorites import FavoriteCategory
@@ -134,6 +139,8 @@ class UserImporter(Importer):
                           '%{white!}{:6d}%{reset} %{cyan}{}%{reset} [%{blue!}{}%{reset}] '
                           '{{%{cyan!}{}%{reset}}}').format(user.id, user.full_name, user.email,
                                                            ', '.join(user.secondary_emails))
+            # migrate API keys
+            self._migrate_api_keys(avatar, user)
             # migrate identities of non-deleted avatars
             if not user.is_deleted:
                 for old_identity in avatar.identities:
@@ -194,6 +201,31 @@ class UserImporter(Importer):
                 self._fix_collisions(merged)
                 db.session.add(merged)
                 db.session.flush()
+
+    def _migrate_api_keys(self, avatar, user):
+        ak = getattr(avatar, 'apiKey', None)
+        if not ak:
+            return
+        last_used_uri = None
+        if ak._lastPath and ak._lastQuery:
+            last_used_uri = '{}?{}'.format(convert_to_unicode(ak._lastPath), convert_to_unicode(ak._lastQuery))
+        elif ak._lastPath:
+            last_used_uri = convert_to_unicode(ak._lastPath)
+
+        api_key = APIKey(token=ak._key, secret=ak._signKey, is_blocked=ak._isBlocked,
+                         is_persistent_allowed=getattr(ak, '_persistentAllowed', False),
+                         created_dt=self._to_utc(ak._createdDT), last_used_dt=self._to_utc(ak._lastUsedDT),
+                         last_used_ip=ak._lastUsedIP, last_used_uri=last_used_uri,
+                         last_used_auth=ak._lastUseAuthenticated, use_count=ak._useCount)
+        user.api_key = api_key
+        print cformat('%{blue!}<->%{reset}  %{yellow}{}%{reset}').format(api_key)
+
+        for old_key in ak._oldKeys:
+            # We have no creation time so we use *something* older..
+            fake_created_dt = self._to_utc(ak._createdDT) - timedelta(hours=1)
+            # We don't have anything besides the api key for old keys, so we use a random secret
+            user.old_api_keys.append(APIKey(token=old_key, secret=unicode(uuid4()), created_dt=fake_created_dt,
+                                            is_active=False))
 
     def migrate_favorite_users(self):
         print cformat('%{white!}migrating favorite users')
@@ -367,6 +399,12 @@ class UserImporter(Importer):
             # if the user was already deleted we don't care about secondary email collisions
             if not is_deleted and email in user.secondary_emails:
                 self.users_by_secondary_email[email] = user
+
+    def _to_utc(self, dt):
+        if dt is None:
+            return None
+        server_tz = get_timezone(getattr(self.zodb_root['MaKaCInfo']['main'], '_timezone', 'UTC'))
+        return server_tz.localize(dt).astimezone(pytz.utc)
 
     def _iter_avatars(self):
         return self.zodb_root['avatars'].itervalues()
