@@ -66,6 +66,15 @@ class IndicoFlask(PluginFlaskMixin, Flask):
     request_class = IndicoRequest
     session_interface = IndicoSessionInterface()
 
+    def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
+        from MaKaC.webinterface.rh.base import RHSimple
+        # Endpoints from Flask-Multipass need to be wrapped in the RH
+        # logic to get the autocommit logic and error handling for code
+        # running inside the identity handler.
+        if endpoint is not None and endpoint.startswith('_flaskmultipass'):
+            view_func = RHSimple.wrap_function(view_func)
+        return super(IndicoFlask, self).add_url_rule(rule, endpoint=endpoint, view_func=view_func, **options)
+
 
 class IndicoBlueprintSetupState(BlueprintSetupState):
     @contextmanager
