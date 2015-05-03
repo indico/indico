@@ -95,7 +95,8 @@ class UserImporter(Importer):
         self.fix_sequences('users', {'users'})
         self.migrate_favorite_users()
         self.migrate_admins()
-        self.migrate_links()
+        with db.session.no_autoflush:
+            self.migrate_links()
 
     def migrate_users(self):
         print cformat('%{white!}migrating users')
@@ -236,7 +237,7 @@ class UserImporter(Importer):
             avatars = {int(a.id): a for a in avatars}
             users = ((u, avatars[u.id]) for u in User.find(User.id.in_(avatars)))
 
-            for user, avatar in committing_iterator(self.flushing_iterator(users, 250)):
+            for user, avatar in committing_iterator(self.flushing_iterator(users, 250), 2500):
                 registrants = set()
                 user_shown = False
                 for type_, entries in avatar.linkedTo.iteritems():
