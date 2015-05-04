@@ -128,7 +128,7 @@ class UserImporter(Importer):
                     continue
 
             user = self._user_from_avatar(avatar)
-            self._fix_collisions(user)
+            self._fix_collisions(user, avatar)
             db.session.add(user)
             settings = self._settings_from_avatar(avatar)
             user_settings.set_multi(user, settings)
@@ -198,7 +198,7 @@ class UserImporter(Importer):
                               '%{white!}{:6d}%{reset} %{cyan}{}%{reset} [%{blue!}{}%{reset}] '
                               '{{%{cyan!}{}%{reset}}}').format(merged.id, merged.full_name, merged.email,
                                                                ', '.join(merged.secondary_emails))
-                self._fix_collisions(merged)
+                self._fix_collisions(merged, merged_avatar)
                 db.session.add(merged)
                 db.session.flush()
 
@@ -352,12 +352,17 @@ class UserImporter(Importer):
 
         return settings
 
-    def _fix_collisions(self, user):
+    def _fix_collisions(self, user, avatar):
         is_deleted = user.is_deleted
         # Mark both users as deleted if there's a primary email collision
         coll = self.users_by_primary_email.get(user.email)
         if coll and not is_deleted:
-            for u in (user, coll):
+            if bool(avatar.identities) ^ bool(coll.identities):
+                # exactly one of them has identities - keep the one that does
+                to_delete = {coll if avatar.identities else user}
+            else:
+                to_delete = {user, coll}
+            for u in to_delete:
                 print cformat('%{magenta!}---%{reset} '
                               '%{yellow!}Deleting {} - primary email collision%{reset} '
                               '[%{blue!}{}%{reset}]').format(u.id, u.email)
