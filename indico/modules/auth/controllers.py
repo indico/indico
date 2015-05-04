@@ -21,6 +21,7 @@ from itsdangerous import BadData
 from markupsafe import Markup
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
+from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.config import Config
 from indico.core.db import db
@@ -289,6 +290,10 @@ class RHRegister(RH):
         user.settings.set('lang', session.lang or minfo.getLang())
         handler.update_user(user, form)
         db.session.flush()
+
+        # notify everyone of user creation
+        signals.users.registered.send(user)
+
         login_user(user, identity)
         msg = _('You have sucessfully registered your Indico profile. '
                 'Check <a href="{url}">your profile</a> for further details and settings.')

@@ -21,6 +21,11 @@ from blinker import Namespace
 _signals = Namespace()
 
 
+registered = _signals.signal('registered', """
+Called once a user registers (either locally or joins through a provider). The
+*sender* is the new user object.
+""")
+
 profile_sidemenu = _signals.signal('profile-sidemenu', """
 Expected to return `MenuItem` instances to be added to the user profile side menu.
 The *sender* is the user whose profile is currently being displayed.
