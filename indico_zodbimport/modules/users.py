@@ -258,7 +258,7 @@ class UserImporter(Importer):
                 user = User.get(int(avatar.id))
             except ValueError:
                 continue
-            if user is None:
+            if user is None or user.is_deleted:
                 continue
             user.is_admin = True
             print cformat('%{green}+++%{reset} %{cyan}{}').format(user)
