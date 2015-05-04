@@ -14,27 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, timedelta
-import MaKaC.common.indexes as indexes
-from indico.core.db import DBMgr
+from datetime import timedelta
+
+from persistent import Persistent
+
+from MaKaC.common import indexes, mail
+from MaKaC.common.info import HelperMaKaCInfo
+from MaKaC.common.timezoneUtils import nowutc
+from MaKaC.user import AvatarHolder
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.mail import GenericNotification
-from MaKaC.common.info import HelperMaKaCInfo
+
+from indico.core import signals
+from indico.core.config import Config
+from indico.core.logger import Logger
 from indico.modules.auth.util import url_for_login
 from indico.modules.scheduler import Scheduler
 from indico.modules.scheduler.tasks import OneShotTask
-from persistent import Persistent
-from MaKaC.user import AvatarHolder
-from MaKaC.common.timezoneUtils import nowutc
-from MaKaC.i18n import _
-from indico.core.config import Config
-from MaKaC.common import mail
-from indico.core import signals
-from indico.core.logger import Logger
 
-###---------------------------- General Pending Queues ---------------------------------
-
-#---GENERAL----
 
 logger = Logger.get('pending')
 
