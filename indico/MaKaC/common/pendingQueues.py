@@ -29,9 +29,15 @@ from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.i18n import _
 from indico.core.config import Config
 from MaKaC.common import mail
+from indico.core import signals
+from indico.core.logger import Logger
+
 ###---------------------------- General Pending Queues ---------------------------------
 
 #---GENERAL----
+
+logger = Logger.get('pending')
+
 
 class PendingHolder(object):
     """ This is an index that holds all the requests to add pending people to become
@@ -1031,3 +1037,22 @@ class ConfPendingQueuesMgr(Persistent):
 
     def notifyModification(self):
         self._p_changed=1
+
+
+@signals.users.registered.connect
+def _on_user_register(sender, **kwargs):
+    """Remove newly-added users from pending lists
+    """
+    pending_submitter = PendingSubmittersHolder().getPendingByEmail(sender.email)
+    if pending_submitter:
+        principal = pending_submitter[0]
+        mgr = principal.getConference().getPendingQueuesMgr()
+        logger.info('Removed pending submitter {0} from {1}'.format(sender, principal.getConference()))
+        mgr.removePendingSubmitter(principal)
+
+    pending_evt_submitter = PendingConfSubmittersHolder().getPendingByEmail(sender.email)
+    if pending_evt_submitter:
+        principal = pending_evt_submitter[0]
+        mgr = principal.getConference().getPendingQueuesMgr()
+        logger.info('Removed pending event submitter {0} from {1}'.format(sender, principal.getConference()))
+        mgr.removePendingConfSubmitter(principal)
