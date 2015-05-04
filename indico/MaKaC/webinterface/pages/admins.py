@@ -17,6 +17,7 @@
 import os
 import re
 from cgi import escape
+from operator import methodcaller
 
 from pytz import timezone
 
@@ -179,7 +180,8 @@ class WAdmins(wcomponents.WTemplated):
         url = urlHandlers.UHAdminSwitchNewsActive.getURL()
         icon = iconEnabled if minfo.isNewsActive() else iconDisabled
         vars["features"] = i18nformat("""<a href="%s"><img src="%s" border="0" style="float:left; padding-right: 5px">_("News Pages")</a>""") % (url, icon)
-        vars["administrators"] = fossilize([u.as_avatar for u in User.find(is_admin=True)])
+        vars["administrators"] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True)],
+                                                  key=methodcaller('getFullName')))
         return vars
 
 
