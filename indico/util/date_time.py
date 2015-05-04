@@ -32,7 +32,7 @@ from dateutil.relativedelta import relativedelta
 
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.timezoneUtils import nowutc, DisplayTZ
-from indico.util.i18n import get_current_locale
+from indico.util.i18n import get_current_locale, _
 
 
 now_utc = nowutc
