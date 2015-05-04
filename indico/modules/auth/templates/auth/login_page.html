@@ -46,6 +46,7 @@
                             {% else %}
                                 <div class="login-container clearfix">
                                     <img class="header-logo" src="{{ indico_config.config.getSystemIconURL('logoIndico') }}">
+                                    {% include 'flashed_messages.html' %}
                                 </div>
                             {% endif %}
                             <div class="login-providers external">
