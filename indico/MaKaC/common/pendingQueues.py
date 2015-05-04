@@ -1037,19 +1037,19 @@ class ConfPendingQueuesMgr(Persistent):
 
 
 @signals.users.registered.connect
-def _on_user_register(sender, **kwargs):
+def _on_user_register(user, **kwargs):
     """Remove newly-added users from pending lists
     """
-    pending_submitter = PendingSubmittersHolder().getPendingByEmail(sender.email)
+    pending_submitter = PendingSubmittersHolder().getPendingByEmail(user.email)
     if pending_submitter:
         principal = pending_submitter[0]
         mgr = principal.getConference().getPendingQueuesMgr()
-        logger.info('Removed pending submitter {0} from {1}'.format(sender, principal.getConference()))
+        logger.info('Removed pending submitter {0} from {1}'.format(user, principal.getConference()))
         mgr.removePendingSubmitter(principal)
 
-    pending_evt_submitter = PendingConfSubmittersHolder().getPendingByEmail(sender.email)
+    pending_evt_submitter = PendingConfSubmittersHolder().getPendingByEmail(user.email)
     if pending_evt_submitter:
         principal = pending_evt_submitter[0]
         mgr = principal.getConference().getPendingQueuesMgr()
-        logger.info('Removed pending event submitter {0} from {1}'.format(sender, principal.getConference()))
+        logger.info('Removed pending event submitter {0} from {1}'.format(user, principal.getConference()))
         mgr.removePendingConfSubmitter(principal)
