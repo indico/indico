@@ -48,22 +48,24 @@ settings = SettingsProxy('api', {
 
 @signals.merge_users.connect
 def _merge_users(user, merged, **kwargs):
+    target = user.user
+    source = merged.user
     # Get the current active API keys
-    ak_user = user.api_key
-    ak_merged = merged.api_key
+    ak_user = target.api_key
+    ak_merged = source.api_key
     # Move all inactive keys to the new user
-    APIKey.find(user_id=int(merged.id), is_active=False).update({'user_id': int(user.id)})
+    APIKey.find(user_id=source.id, is_active=False).update({'user_id': target.id})
     if ak_merged and not ak_user:
-        ak_merged.user = user
+        ak_merged.user = target
     elif ak_user and ak_merged:
         # Both have a key, keep the main one unless it's unused and the merged one isn't.
         if ak_user.use_count or not ak_merged.use_count:
             ak_merged.is_active = False
-            ak_merged.user = user
+            ak_merged.user = target
         else:
             ak_user.is_active = False
             db.session.flush()  # flush the deactivation so we can reassociate the user
-            ak_merged.user = user
+            ak_merged.user = target
 
 
 @signals.admin_sidemenu.connect
