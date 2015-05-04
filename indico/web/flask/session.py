@@ -16,11 +16,11 @@
 
 from __future__ import absolute_import
 
+import cPickle
 import uuid
 from datetime import datetime, timedelta
-
 from flask import request
-from flask.sessions import SessionInterface, SessionMixin, session_json_serializer
+from flask.sessions import SessionInterface, SessionMixin
 from werkzeug.datastructures import CallbackDict
 from werkzeug.utils import cached_property
 
@@ -110,8 +110,8 @@ class IndicoSession(BaseSession):
 
 
 class IndicoSessionInterface(SessionInterface):
-    pickle_based = False
-    serializer = session_json_serializer
+    pickle_based = True
+    serializer = cPickle
     session_class = IndicoSession
     temporary_session_lifetime = timedelta(days=7)
 
@@ -148,13 +148,7 @@ class IndicoSessionInterface(SessionInterface):
             return self.session_class(sid=self.generate_sid(), new=True)
         data = self.storage.get(sid)
         if data is not None:
-            try:
-                data = self.serializer.loads(data)
-            except ValueError:
-                # json loading failed, e.g. because of old pickled session data
-                pass
-            else:
-                return self.session_class(data, sid=sid)
+            return self.session_class(self.serializer.loads(data), sid=sid)
         return self.session_class(sid=self.generate_sid(), new=True)
 
     def save_session(self, app, session, response):
