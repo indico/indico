@@ -24,7 +24,7 @@ from flask import request
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.db import db
-from indico.modules.users import User
+from indico.modules.users import User, logger
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.util.event import truncate_path
@@ -214,3 +214,5 @@ def merge_users(source, target, force=False):
     # Restore the source user's primary email
     source.email = primary_source_email
     db.session.flush()
+
+    logger.info("User {} merged into user {}".format(source.id, target.id))
