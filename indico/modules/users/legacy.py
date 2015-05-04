@@ -210,6 +210,8 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     def getEmail(self):
         return self.user.email
 
+    email = property(getEmail)
+
     def setEmail(self, email, reindex=False):
         self.user.email = to_unicode(email)
 
