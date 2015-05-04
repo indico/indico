@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core import signals
+from indico.core.logger import Logger
 from indico.modules.users.ext import ExtraUserPreferences
 from indico.modules.users.models.users import User
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
@@ -25,6 +26,8 @@ from indico.web.flask.util import url_for
 
 
 __all__ = ('ExtraUserPreferences', 'User', 'UserSetting', 'UserSettingsProxy', 'user_settings')
+
+logger = Logger.get('users')
 
 user_settings = UserSettingsProxy('users', {
     'lang': None,

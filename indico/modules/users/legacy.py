@@ -19,7 +19,7 @@ from persistent import Persistent
 from indico.core.auth import multipass
 from indico.modules.groups import GroupProxy
 from indico.modules.rb.utils import rb_is_admin
-from indico.modules.users import User
+from indico.modules.users import User, logger
 from indico.modules.auth import Identity
 from indico.util.caching import memoize_request
 from indico.util.fossilize import fossilizes, Fossilizable
@@ -67,6 +67,8 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         if user:
             self._old_id = self.id
             self.id = str(user.id)
+            logger.info("Updated legacy user id ({} => {})"
+                        .format(self._old_id, self.id))
         return user
 
     @property
