@@ -111,7 +111,7 @@ $(document).ready(function() {
                 if ($this.is('form')) {
                     $this.submit();
                 } else {
-                    window.location = self.getAttribute("href");
+                    window.location = $this.attr('href');
                 }
             }
         }).open();
