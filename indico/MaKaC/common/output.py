@@ -174,14 +174,6 @@ class outputGenerator(object):
                 return rb_room.full_name
         return room_name
 
-    def _getExternalUserAccounts(self, user):
-        accounts = []
-        for identity in user.getIdentityList(create_identities=True):
-            if identity.getAuthenticatorTag() != 'Local':
-                accounts.append(identity.getLogin())
-
-        return accounts
-
     def _generateLinkField(self, url, obj, text, out):
         out.openTag("datafield", [["tag", "856"], ["ind1", "4"], ["ind2", " "]])
         out.writeTag("subfield", str(url.getURL(obj)), [["code", "u"]])
@@ -223,19 +215,21 @@ class outputGenerator(object):
 
         # Populate two lists holding email/group strings instead of
         # Avatar/Group objects
-        allowed_logins = []
+        allowed_logins = set()
         allowed_groups = []
 
         objId = uniqueId(obj) if specifyId else None
 
         for user_obj in allowed_users:
             if isinstance(user_obj, AvatarUserWrapper):
-                for account in self._getExternalUserAccounts(user_obj):
-                    allowed_logins.append(account)
+                # user names for all non-local accounts
+                for (provider, identifier) in user_obj.user.iter_identifiers():
+                    if provider != 'indico':
+                        allowed_logins.add(identifier)
             elif isinstance(user_obj, LDAPGroupWrapper):
                 allowed_groups.append(user_obj.getId())
             else:
-                allowed_logins.append(user_obj.getId())
+                allowed_logins.add(user_obj.getId())
 
         if len(allowed_groups) + len(allowed_logins) > 0:
             # Create XML list of groups
