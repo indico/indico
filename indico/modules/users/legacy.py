@@ -228,10 +228,8 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         self.user.secondary_emails = {to_unicode(email.strip().lower()) for email in emails}
 
     def hasEmail(self, email):
-        return email.lower() in self.user.all_emails
-
-    def hasSecondaryEmail(self, email):
-        return email.lower() in self.user.secondary_emails
+        user = self.user  # avoid 'stale association proxy'
+        return email.lower() in user.all_emails
 
     @encode_utf8
     def getTelephone(self):
