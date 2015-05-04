@@ -73,12 +73,10 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     @memoize_request
     def user(self):
         user = self._original_user
-        if user is None:
-            return None
-        elif user.is_deleted:
-            return user.merged_into_user if user.merged_into_id is not None else None
-        else:
-            return user
+        if user is not None and user.is_deleted and user.merged_into_id is not None:
+            while user.merged_into_id is not None:
+                user = user.merged_into_user
+        return user
 
     def getId(self):
         return str(self.user.id)
