@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from functools import wraps
+
 from persistent import Persistent
 
 from indico.core.auth import multipass
@@ -29,6 +31,15 @@ from indico.util.redis import avatar_links
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.Locators import Locator
 from MaKaC.fossils.user import IAvatarFossil, IAvatarMinimalFossil
+
+
+def none_if_no_user(f):
+    @wraps(f)
+    def wrapper(self, *args, **kwargs):
+        if self.user is None:
+            return None
+        return f(self, *args, **kwargs)
+    return wrapper
 
 
 class AvatarUserWrapper(Persistent, Fossilizable):
@@ -80,6 +91,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         else:
             return user
 
+    @none_if_no_user
     def getId(self):
         return str(self.user.id)
 
@@ -109,9 +121,6 @@ class AvatarUserWrapper(Persistent, Fossilizable):
                     if event:
                         avatar_links.del_link(self, event, '{}_{}'.format(link.type, link.role))
 
-    def getLinkedTo(self):
-        return None
-
     def getStatus(self):
         return 'deleted' if self.user.is_deleted else 'activated'
 
@@ -127,6 +136,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         self.user.first_name = to_unicode(name)
 
     @encode_utf8
+    @none_if_no_user
     def getName(self):
         return self.user.first_name
 
@@ -136,29 +146,34 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         self.user.last_name = to_unicode(surname)
 
     @encode_utf8
+    @none_if_no_user
     def getSurName(self):
         return self.user.last_name
 
     getFamilyName = getSurName
 
     @encode_utf8
+    @none_if_no_user
     def getFullName(self):
         return self.user.get_full_name(last_name_first=True, last_name_upper=True,
                                        abbrev_first_name=False, show_title=False)
 
     @encode_utf8
+    @none_if_no_user
     def getStraightFullName(self, upper=True):
-        return self.user.get_full_name(last_name_first=False, last_name_upper=True,
+        return self.user.get_full_name(last_name_first=False, last_name_upper=upper,
                                        abbrev_first_name=False, show_title=False)
 
     getDirectFullNameNoTitle = getStraightFullName
 
     @encode_utf8
+    @none_if_no_user
     def getAbrName(self):
         return self.user.get_full_name(last_name_first=True, last_name_upper=False,
                                        abbrev_first_name=True, show_title=False)
 
     @encode_utf8
+    @none_if_no_user
     def getStraightAbrName(self):
         return self.user.get_full_name(last_name_first=False, last_name_upper=False,
                                        abbrev_first_name=True, show_title=False)
@@ -167,6 +182,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         self.user.affiliation = to_unicode(affiliation)
 
     @encode_utf8
+    @none_if_no_user
     def getOrganisation(self):
         return self.user.affiliation
 
@@ -176,6 +192,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         self.user.title = to_unicode(title)
 
     @encode_utf8
+    @none_if_no_user
     def getTitle(self):
         return self.user.title
 
@@ -193,10 +210,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         self.user.settings.set('force_timezone', display_tz == 'MyTimezone')
 
     @encode_utf8
-    def getAddresses(self):
-        return [self.user.address]
-
-    @encode_utf8
+    @none_if_no_user
     def getAddress(self):
         return self.user.address
 
@@ -209,6 +223,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return set(user.all_emails)
 
     @encode_utf8
+    @none_if_no_user
     def getEmail(self):
         return self.user.email
 
@@ -234,6 +249,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return email.lower() in self.user.secondary_emails
 
     @encode_utf8
+    @none_if_no_user
     def getTelephone(self):
         return self.user.phone
 
