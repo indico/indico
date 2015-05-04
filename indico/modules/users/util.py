@@ -79,11 +79,13 @@ def serialize_user(user):
     """Serialize user to JSON-like object"""
     return {
         'id': user.id,
+        'title': user.title,
         'identifier': 'User:{}'.format(user.id),
         'name': user.full_name,
         'familyName': user.last_name,
         'firstName': user.first_name,
         'affiliation': user.affiliation,
+        'phone': user.phone,
         'email': user.email,
         '_type': 'Avatar'
     }
