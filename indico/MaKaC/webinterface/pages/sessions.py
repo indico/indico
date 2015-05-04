@@ -576,6 +576,7 @@ class WSessionModifAC(wcomponents.WTemplated):
             pendingUser = {}
             pendingUser["email"] = email
             pendingUser["pending"] = True
+            pendingUser['_type'] = 'Avatar'
             result.append(pendingUser)
         return result
 
