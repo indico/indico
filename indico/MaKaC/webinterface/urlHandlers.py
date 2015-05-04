@@ -176,7 +176,7 @@ def setSSLPort(url):
     SSL port is extracted from loginURL (MaKaCConfig)
     """
     # Set proper PORT for images requested via SSL
-    sslURL = Config.getInstance().getLoginURL() or Config.getInstance().getBaseSecureURL()
+    sslURL = Config.getInstance().getBaseSecureURL()
     sslPort = ':%d' % (urlparse.urlsplit(sslURL).port or 443)
 
     # If there is NO port, nothing will happen (production indico)
