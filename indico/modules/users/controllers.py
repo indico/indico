@@ -128,6 +128,7 @@ class RHUserPreferences(RHUserBase):
             for pref in extra_preferences:
                 pref.process_form_data(data)
             self.user.settings.set_multi(data)
+            session.lang = self.user.settings.get('lang')
             session.timezone = (self.user.settings.get('timezone') if self.user.settings.get('force_timezone')
                                 else 'LOCAL')
             flash(_('Preferences saved'), 'success')
