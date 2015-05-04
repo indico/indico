@@ -43,9 +43,7 @@ def create_user(db):
             rb_settings.set('admin_principals', rb_settings.get('admin_principals') + [user.as_principal])
         db.session.flush()
         _users.add(user)
-        avatar = user.as_avatar
-        avatar.email = user.email
-        return avatar
+        return user.as_avatar
 
     yield _create_user
 
