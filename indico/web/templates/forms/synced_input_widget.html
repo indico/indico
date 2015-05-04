@@ -11,7 +11,7 @@
                data-synced-value="{{ field.synced_value|tojson|forceescape }}" {%- if field.synced %} readonly {% endif %}>
   {%- endif -%}
   <label for="{{ field.id }}-action-button" class="i-button i-synced-label icon-refresh" data-tooltip-anchor
-         title="{% trans provider_name=field.provider_name %}Click to toggle the synchronisation from {{ provider_name }}.{% endtrans %}"></label>
+         title="{% trans provider_name=field.provider_name %}Click to toggle synchronisation ({{ provider_name }}).{% endtrans %}"></label>
 </div>
 <script>
     $('#{{ field.id }}-action-button').on('click', function() {
