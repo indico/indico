@@ -146,6 +146,40 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
     return set(found_emails.viewvalues())
 
 
+def get_user_by_email(email, create_pending=False):
+    """finds a user based on his email address.
+
+    :param email: The email address of the user.
+    :param create_pending: If True, this function searches for external
+                           users and creates a new pending User in case
+                           no existing user was found.
+    :return: A :class:`.User` instance or ``None`` if not exactly one
+             user was found.
+    """
+    email = email.lower().strip()
+    if not email:
+        return None
+    if not create_pending:
+        res = User.find_all(~User.is_deleted, User.all_emails.contains(email))
+    else:
+        res = search_users(exact=True, include_pending=True, external=True, email=email)
+    if len(res) != 1:
+        return None
+    user_or_identity = next(iter(res))
+    if isinstance(user_or_identity, User):
+        return user_or_identity
+    elif not create_pending:
+        return None
+    # Create a new pending user
+    data = user_or_identity.data
+    user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'],
+                address=data.get('address', ''), phone=data.get('phone', ''),
+                affiliation=data.get('affiliation', ''), is_pending=True)
+    db.session.add(user)
+    db.session.flush()
+    return user
+
+
 def merge_users(source, target, force=False):
     """Merge two users together, unifying all related data
 
