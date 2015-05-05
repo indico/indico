@@ -4989,7 +4989,7 @@ class WConfAuthorIndex(WConfDisplayBodyBase):
             if len(authors) == 0:
                 continue
             else:
-                auth = next((x for x in authors if x.getContribution().getConference() is not None), None)
+                auth = next((x for x in authors if x.getContribution() and x.getContribution().getConference()), None)
                 if auth is None:
                     continue
 
