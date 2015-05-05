@@ -81,39 +81,33 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return user
 
     def getId(self):
-        return str(self.user.id)
+        return str(self.user.id) if self.user else str(self.id)
 
     @property
     def api_key(self):
-        return self.user.api_key
+        return self.user.api_key if self.user else None
 
     def linkTo(self, obj, role):
-        # deleted users shouldn't be able to be linked
-        # TODO: log deleted users?
-
-        if not self.user.is_deleted:
-            link = self.user.link_to(obj, role)
-            if link and redis_write_client:
-                event = avatar_links.event_from_obj(obj)
-                if event:
-                    avatar_links.add_link(self, event, '{}_{}'.format(link.type, link.role))
+        if not self.user or self.user.is_deleted:
+            return
+        link = self.user.link_to(obj, role)
+        if link and redis_write_client:
+            event = avatar_links.event_from_obj(obj)
+            if event:
+                avatar_links.add_link(self, event, '{}_{}'.format(link.type, link.role))
 
     def unlinkTo(self, obj, role):
-        # deleted users shouldn't be able to be linked
-        # TODO: log deleted users?
-        if not self.user.is_deleted:
-            links = self.user.unlink_to(obj, role)
-            if redis_write_client:
-                for link in links:
-                    event = avatar_links.event_from_obj(obj)
-                    if event:
-                        avatar_links.del_link(self, event, '{}_{}'.format(link.type, link.role))
-
-    def getLinkedTo(self):
-        return None
+        if not self.user or self.user.is_deleted:
+            return
+        links = self.user.unlink_to(obj, role)
+        if redis_write_client:
+            for link in links:
+                event = avatar_links.event_from_obj(obj)
+                if event:
+                    avatar_links.del_link(self, event, '{}_{}'.format(link.type, link.role))
 
     def getStatus(self):
-        return 'deleted' if self.user.is_deleted else 'activated'
+        return 'deleted' if not self.user or self.user.is_deleted else 'activated'
 
     def isActivated(self):
         # All accounts are activated during the transition period
@@ -121,14 +115,14 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     def isDisabled(self):
         # The user has been blocked or deleted (due to merge)
-        return self.user.is_blocked or self.user.is_deleted
+        return not self.user or self.user.is_blocked or self.user.is_deleted
 
     def setName(self, name, reindex=False):
         self.user.first_name = to_unicode(name)
 
     @encode_utf8
     def getName(self):
-        return self.user.first_name
+        return self.user.first_name if self.user else ''
 
     getFirstName = getName
 
@@ -137,29 +131,37 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     @encode_utf8
     def getSurName(self):
-        return self.user.last_name
+        return self.user.last_name if self.user else ''
 
     getFamilyName = getSurName
 
     @encode_utf8
     def getFullName(self):
+        if not self.user:
+            return ''
         return self.user.get_full_name(last_name_first=True, last_name_upper=True,
                                        abbrev_first_name=False, show_title=False)
 
     @encode_utf8
     def getStraightFullName(self, upper=True):
-        return self.user.get_full_name(last_name_first=False, last_name_upper=True,
+        if not self.user:
+            return ''
+        return self.user.get_full_name(last_name_first=False, last_name_upper=upper,
                                        abbrev_first_name=False, show_title=False)
 
     getDirectFullNameNoTitle = getStraightFullName
 
     @encode_utf8
     def getAbrName(self):
+        if not self.user:
+            return ''
         return self.user.get_full_name(last_name_first=True, last_name_upper=False,
                                        abbrev_first_name=True, show_title=False)
 
     @encode_utf8
     def getStraightAbrName(self):
+        if not self.user:
+            return ''
         return self.user.get_full_name(last_name_first=False, last_name_upper=False,
                                        abbrev_first_name=True, show_title=False)
 
@@ -168,7 +170,7 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     @encode_utf8
     def getOrganisation(self):
-        return self.user.affiliation
+        return self.user.affiliation if self.user else ''
 
     getAffiliation = getOrganisation
 
@@ -177,28 +179,25 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     @encode_utf8
     def getTitle(self):
-        return self.user.title
+        return self.user.title if self.user else ''
 
     def setTimezone(self, tz):
         self.user.settings.set('timezone', to_unicode(tz))
 
     @encode_utf8
     def getTimezone(self):
-        return self.user.settings.get('timezone', HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone())
+        default = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        return self.user.settings.get('timezone', default) if self.user else default
 
     def getDisplayTZMode(self):
-        return 'MyTimezone' if self.user.settings.get('force_timezone') else 'Event Timezone'
+        return 'MyTimezone' if self.user and self.user.settings.get('force_timezone') else 'Event Timezone'
 
     def setDisplayTZMode(self, display_tz='Event Timezone'):
         self.user.settings.set('force_timezone', display_tz == 'MyTimezone')
 
     @encode_utf8
-    def getAddresses(self):
-        return [self.user.address]
-
-    @encode_utf8
     def getAddress(self):
-        return self.user.address
+        return self.user.address if self.user else ''
 
     def setAddress(self, address):
         self.user.address = to_unicode(address)
@@ -206,36 +205,26 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     def getEmails(self):
         # avoid 'stale association proxy'
         user = self.user
-        return set(user.all_emails)
+        return set(user.all_emails) if user else set()
 
     @encode_utf8
     def getEmail(self):
-        return self.user.email
+        return self.user.email if self.user else ''
 
     email = property(getEmail)
 
     def setEmail(self, email, reindex=False):
         self.user.email = to_unicode(email)
 
-    def getSecondaryEmails(self):
-        return self.user.secondary_emails
-
-    def addSecondaryEmail(self, email, reindex=False):
-        return self.user.secondary_emails.add(to_unicode(email.strip().lower()))
-
-    def removeSecondaryEmail(self, email, reindex=False):
-        self.user.secondary_emails.remove(email)
-
-    def setSecondaryEmails(self, emails, reindex=False):
-        self.user.secondary_emails = {to_unicode(email.strip().lower()) for email in emails}
-
     def hasEmail(self, email):
         user = self.user  # avoid 'stale association proxy'
+        if not user:
+            return False
         return email.lower() in user.all_emails
 
     @encode_utf8
     def getTelephone(self):
-        return self.user.phone
+        return self.user.phone if self.user else ''
 
     def getFax(self):
         # Some older code still clones fax, etc...
@@ -249,34 +238,21 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     setPhone = setTelephone
 
-    def clearAuthenticatorPersonalData(self):
-        pass
-
-    def setAuthenticatorPersonalData(self, field, value):
-        pass
-
-    def getIdentityById(self, id, tag):
-        return True
-
-    def addRegistrant(self, r):
-        # This doesn't seem to be needed, as it is stored in linkedTo as well
-        # TODO: Check that it can be deleted
-        pass
-
-    def removeRegistrant(self, r):
-        # This doesn't seem to be needed, as it is stored in linkedTo as well
-        # TODO: Check that it can be deleted
-        pass
-
     def isRegisteredInConf(self, conf):
+        if not self.user:
+            return False
         return any(obj for obj in self.user.get_linked_objects('registration', 'registrant')
                    if obj.getConference() == conf)
 
     def getRegistrantById(self, conf_id):
+        if not self.user:
+            return None
         return next((obj for obj in self.user.get_linked_objects('registration', 'registrant')
                     if obj.getConference().id == conf_id), None)
 
     def hasSubmittedEvaluation(self, evaluation):
+        if not self.user:
+            return False
         for submission in evaluation.getSubmissions():
             submitter = submission.getSubmitter()
             if submitter and submitter.id == self.user.id:
@@ -296,24 +272,33 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return self.canUserModify(aw_or_user)
 
     def canUserModify(self, avatar):
+        if not self.user:
+            return False
         return avatar.id == str(self.user.id) or avatar.user.is_admin
 
     def getLocator(self):
         d = Locator()
-        d["userId"] = self.user.id
+        if self.user:
+            d["userId"] = self.user.id
         return d
 
     def is_member_of_group(self, group_name):
+        if not self.user:
+            return False
         group_provider = multipass.default_group_provider
         group = GroupProxy(group_name, group_provider.name if group_provider else None)
         return group.has_member(self.user)
 
     def isAdmin(self):
+        if not self.user:
+            return False
         return self.user.is_admin
 
     @memoize_request
     def isRBAdmin(self):
         """Convenience method for checking whether this user is an admin for the RB module."""
+        if not self.user:
+            return False
         return rb_is_admin(self)
 
     @property
@@ -321,17 +306,21 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     def has_rooms(self):
         """Checks if the user has any rooms"""
         from indico.modules.rb.models.rooms import Room  # avoid circular import
+        if not self.user:
+            return False
         return Room.user_owns_rooms(self)
 
     @memoize_request
     def get_rooms(self):
         """Returns the rooms this user is responsible for"""
         from indico.modules.rb.models.rooms import Room  # avoid circular import
+        if not self.user:
+            return False
         return Room.get_owned_by(self)
 
     @encode_utf8
     def getLang(self):
-        return self.user.settings.get('lang')
+        return self.user.settings.get('lang') if self.user else HelperMaKaCInfo.getMaKaCInfoInstance().getLang()
 
     def setLang(self, lang):
         self.user.settings.set('lang', to_unicode(lang))

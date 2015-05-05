@@ -4653,8 +4653,6 @@ class Conference(CommonObjectBase, Locatable):
         self._registrationForm.notifyRegistrantRemoval(self.getRegistrants()[id])
         del self.getRegistrantsByEmail()[self.getRegistrantById(id).getEmail()]
         del self.getRegistrants()[id]
-        if part.getAvatar() is not None:
-            part.getAvatar().removeRegistrant(part)
         signals.event.registrant_changed.send(self, user=part.getAvatar(), registrant=part, action='removed')
         TrashCanManager().add(part)
         self.notifyModification()

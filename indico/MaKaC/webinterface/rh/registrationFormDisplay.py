@@ -139,7 +139,6 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
         rp.setValues(self._getRequestParams(), user)
 
         if user is not None:
-            user.addRegistrant(rp)
             rp.setAvatar(user)
 
         notify_registration_confirmation(self._conf, rp)
