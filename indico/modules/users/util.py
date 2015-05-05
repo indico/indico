@@ -100,6 +100,25 @@ def _build_match(column, value, exact):
 
 
 def search_users(exact=False, include_deleted=False, include_pending=False, external=False, **criteria):
+    """Searches for users.
+
+    :param exact: Indicates if only exact matches should be returned.
+                  This is MUCH faster than a non-exact saerch,
+                  especially when searching external users.
+    :param include_deleted: Indicates if also users marked as deleted
+                            should be returned.
+    :param include_pending: Indicates if also users who are still
+                            pending should be returned.
+    :param external: Indicates if identity providers should be searched
+                     for matching users.
+    :param criteria: A dict containing any of the following keys:
+                     first_name, last_name, email, affiliation, phone,
+                     address
+    :return: A set of matching users. If `external` was set, it may
+             contain both :class:`~flask_multipass.IdentityInfo` objects
+             for external users not yet in Indico and :class:`.User`
+             objects for existing users.
+    """
     unspecified = object()
     query = User.query.options(db.joinedload(User.identities),
                                db.joinedload(User._all_emails),
