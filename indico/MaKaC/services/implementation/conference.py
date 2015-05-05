@@ -64,6 +64,7 @@ from indico.modules.offlineEvents import OfflineEventItem
 from indico.modules.scheduler.tasks.offlineEventGenerator import OfflineEventGeneratorTask
 from indico.modules.scheduler import tasks, Client
 from indico.modules.users.legacy import AvatarUserWrapper
+from indico.modules.users.util import get_user_by_email
 from indico.util.user import principal_from_fossil
 from indico.web.http_api.util import generate_public_auth_request
 from indico.core.config import Config
@@ -947,10 +948,10 @@ class ConferenceAddParticipant(ConferenceModifBase, ConferenceAddEditParticipant
 
     def _getAnswer(self):
         eventManager = self._getUser()
-        av = AvatarHolder().match({"email": self._email.strip()}, exact=1, searchInAuthenticators=True)
+        user = get_user_by_email(self._email, create_pending=True)
         participation = self._conf.getParticipation()
-        if av != None and av != []:
-            participant = self._generateParticipant(av[0])
+        if user:
+            participant = self._generateParticipant(user.as_avatar)
         else:
             participant = self._generateParticipant()
         if participation.alreadyParticipating(participant) != 0 :
