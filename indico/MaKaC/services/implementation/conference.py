@@ -1025,15 +1025,9 @@ class ConferenceAddParticipants(ConferenceParticipantBase, ConferenceParticipant
         result = {}
         infoWarning = []
 
-        for user in self._userList:
-            selected = AvatarHolder().getById(user['id'])
-            if selected is None and user["_type"] == "Avatar":
-                raise NoReportError(_("""The user with email %s that you are adding does
-                                    not exist anymore in the database""") % user["email"])
-            if isinstance(selected, AvatarUserWrapper):
-                self._addParticipant(self._generateParticipant(selected), participation)
-            else:
-                self._addParticipant(self._generateParticipant(), participation)
+        avatars = [principal_from_fossil(x, allow_pending=True, allow_groups=False) for x in self._userList]
+        for avatar in avatars:
+            self._addParticipant(self._generateParticipant(avatar), participation)
 
         result["added"] = ("".join(self._added)).replace("\n", "")
         if self._usersPending:
@@ -1087,16 +1081,11 @@ class ConferenceInviteParticipants(ConferenceParticipantBase, ConferenceParticip
 
         data["subject"] = self._emailSubject
         data["body"] = self._emailBody
-        for user in self._userList:
-            selected = AvatarHolder().getById(user['id'])
-            if isinstance(selected, AvatarUserWrapper):
-                participant = self._generateParticipant(selected)
-                if self._inviteParticipant(participant, participation):
-                    self._sendEmailWithFormat(participant, data)
-            else:
-                participant = self._generateParticipant()
-                if self._inviteParticipant(participant, participation):
-                    self._sendEmailWithFormat(participant, data)
+        avatars = [principal_from_fossil(x, allow_pending=True, allow_groups=False) for x in self._userList]
+        for avatar in avatars:
+            participant = self._generateParticipant(avatar)
+            if self._inviteParticipant(participant, participation):
+                self._sendEmailWithFormat(participant, data)
         result["added"] = ("".join(self._added)).replace("\n","")
         if self._usersPending:
             infoWarning.append(self._getWarningAlreadyAdded(self._usersPending, "pending"))

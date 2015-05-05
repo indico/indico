@@ -73,7 +73,7 @@ def principals_merge_users(iterable, new_id, old_id):
     return principals
 
 
-def principal_from_fossil(fossil, allow_pending=False, legacy=True):
+def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy=True):
     """Gets a GroupWrapper or AvatarUserWrapper from a fossil"""
     type_ = fossil['_type']
     id_ = fossil['id']
@@ -101,6 +101,8 @@ def principal_from_fossil(fossil, allow_pending=False, legacy=True):
         if user is None:
             raise ValueError('User does not exist: {}'.format(id_))
         return user.as_avatar if legacy else user
+    elif not allow_groups:
+        raise ValueError('Unexpected fossil type: {}'.format(type_))
     elif type_ == 'LocalGroupWrapper':
         group = GroupProxy(int(id_))
         if group.group is None:
