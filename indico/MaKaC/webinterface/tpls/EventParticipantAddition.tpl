@@ -7,7 +7,7 @@
 
         var uf = new UserListField('VeryShortPeopleListDiv', 'PeopleList',
                 null, true, null,
-                true, false, false, {"grant-manager": [${ jsonEncode(_("event modification"))}, false], "presenter-grant-submission": [$T("submission rights"), false]},
+                true, false, null, {"grant-manager": [${ jsonEncode(_("event modification"))}, false], "presenter-grant-submission": [$T("submission rights"), false]},
                 true, false, true,
                 userListNothing, userListNothing, userListNothing);
 
