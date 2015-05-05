@@ -57,10 +57,11 @@ class WAuthorDisplay( wcomponents.WTemplated ):
         contribList = []
         for auth in authorList:
             contrib = auth.getContribution()
-            if contrib is not None:
-                contribList.append({'title': contrib.getTitle(),
-                                    'url': str(urlHandlers.UHContributionDisplay.getURL(auth.getContribution())),
-                                    'materials': fossilize(contrib.getAllMaterialList())})
+            if contrib is None or not contrib.getConference():
+                continue
+            contribList.append({'title': contrib.getTitle(),
+                                'url': str(urlHandlers.UHContributionDisplay.getURL(auth.getContribution())),
+                                'materials': fossilize(contrib.getAllMaterialList())})
         vars["contributions"] = contribList
         vars["fullName"] = author.getFullName()
         if self._aw.getUser() is not None:
