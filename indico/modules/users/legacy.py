@@ -393,9 +393,13 @@ class AvatarProvisionalWrapper(Fossilizable):
     def getTelephone(self):
         return self.data['phone']
 
+    getPhone = getTelephone
+
     @encode_utf8
     def getOrganisation(self):
         return self.data['affiliation']
+
+    getAffiliation = getOrganisation
 
     def getFax(self):
         return None
