@@ -231,7 +231,6 @@ class RHRegister(RH):
             handler.email_verified(verified_email)
             flash(_('You have successfully validated your email address and can now proceeed with the registration.'),
                   'success')
-
             return redirect(url_for('.register', provider=self.provider_name))
 
         form = handler.create_form()

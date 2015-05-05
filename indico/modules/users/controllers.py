@@ -27,7 +27,7 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.notifications import make_email
-from indico.modules.users import User
+from indico.modules.users import User, logger
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.util import (get_related_categories, get_suggested_categories,
                                        serialize_user, search_users, merge_users)
@@ -233,8 +233,9 @@ class RHUserEmailsVerify(RHUserBase):
             self.token_storage.delete(token)
 
             if existing and existing.is_pending:
-                flash(_("Merged data from existing '{}' identity").format(existing.email))
+                logger.info("Found pending user {} to be merged into {}".format(existing, self.user))
                 merge_users(existing, self.user)
+                flash(_("Merged data from existing '{}' identity").format(existing.email))
                 existing.is_pending = False
 
             self.user.secondary_emails.add(data['email'])
@@ -307,6 +308,7 @@ class RHUsersAdminMerge(RHAdminBase):
         if form.validate_on_submit():
             source = form['source_user'].data
             target = form['target_user'].data
+            logger.info("User {} initiated merge of {} into {}".format(session.user, source, target))
             merge_users(source, target)
             flash(_('The users have been successfully merged.'), 'success')
             return redirect(url_for('.user_profile', user_id=target.id))
