@@ -53,6 +53,7 @@
             .ui-datepicker-prev,
             .ui-datepicker-next {
                 background: none !important;
+                cursor: default;
             }
         }
 
@@ -98,6 +99,10 @@
             }
         }
 
+        &.ui-state-disabled .ui-datepicker-current-day a {
+            cursor: default;
+        }
+
         .ui-state-default {
             background: $light-blue;
         }
@@ -134,6 +139,10 @@
         &:not(.ui-state-disabled) button.ui-datepicker-current:hover {
             background: $blue;
             color: white;
+        }
+
+        &.ui-state-disabled button.ui-datepicker-current {
+            cursor: default;
         }
     }
 }

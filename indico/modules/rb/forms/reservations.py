@@ -163,7 +163,7 @@ class ModifyBookingForm(NewBookingSimpleForm):
         new_end_dt = field.data
         now = datetime.now()
 
-        if self._old_end_dt < now and new_end_dt != self._old_end_dt and not session.user.isAdmin():
+        if self._old_end_dt < now and new_end_dt != self._old_end_dt and not session.user.is_admin:
             raise ValidationError(_(u"The end time is in the past and cannot be modified."))
-        if self._old_end_dt >= now and new_end_dt < now and not session.user.isAdmin():
+        if self._old_end_dt >= now and new_end_dt < now and not session.user.is_admin:
             raise ValidationError(_(u'The end time cannot be moved into the past.'))
