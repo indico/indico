@@ -70,6 +70,7 @@ class RHLogin(RH):
         if not session.pop('_multipass_auth_failed', False) and 'provider' not in request.view_args:
             single_auth_provider = multipass.single_auth_provider
             if single_auth_provider and single_auth_provider.is_external:
+                multipass.set_next_url()
                 return redirect(url_for('.login', provider=single_auth_provider.name))
 
         # Save the 'next' url to go to after login
