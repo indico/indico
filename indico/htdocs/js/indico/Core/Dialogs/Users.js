@@ -589,9 +589,14 @@ type ("SuggestedUsersPanel", ["IWidget"], {
         }
 
         if (includeFavourites) {
-            each(Indico.User.favorite_users, function(user, id){
-                if (!self.suggestedUserList.get('existingAv' + id)) {
-                    self.suggestedUserList.set('existingAv' + id, $O(user));
+            var favorites = _.values(Indico.User.favorite_users).sort(function(a, b) {
+                var name1 = '{0} {1}'.format(a.firstName, a.familyName);
+                var name2 = '{0} {1}'.format(b.firstName, b.familyName);
+                return (name1 == name2) ? 0 : (name1 < name2) ? -1 : 1;
+            });
+            _.each(favorites, function(user){
+                if (!self.suggestedUserList.get('existingAv' + user.id)) {
+                    self.suggestedUserList.set('existingAv' + user.id, $O(user));
                 }
             });
         }
