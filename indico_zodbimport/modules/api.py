@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from indico.core.db import db
 from indico.modules.api import settings as api_settings
 from indico.util.console import cformat
 
@@ -37,3 +38,4 @@ class APIImporter(Importer):
         }
         for old, new in settings_map.iteritems():
             api_settings.set(new, getattr(self.zodb_root['MaKaCInfo']['main'], old))
+        db.session.commit()
