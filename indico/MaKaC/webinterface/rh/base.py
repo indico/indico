@@ -227,7 +227,11 @@ class RH(RequestHandlerBase):
             self._responseUtil.headers["Pragma"] = "no-cache"
 
     def _redirect(self, targetURL, status=303):
-        targetURL = str(targetURL)
+        if isinstance(targetURL, Response):
+            status = targetURL.status_code
+            targetURL = targetURL.headers['Location']
+        else:
+            targetURL = str(targetURL)
         if "\r" in targetURL or "\n" in targetURL:
             raise MaKaCError(_("http header CRLF injection detected"))
         self._responseUtil.redirect = (targetURL, status)
