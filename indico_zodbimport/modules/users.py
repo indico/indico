@@ -193,6 +193,8 @@ class UserImporter(Importer):
                         seen_identities.add((provider, username))
 
             for merged_avatar in getattr(avatar, '_mergeFrom', ()):
+                if merged_avatar.id == avatar.id:
+                    continue
                 merged = self._user_from_avatar(merged_avatar, is_deleted=True, merged_into_id=user.id)
                 print cformat('%{blue!}***%{reset} '
                               '%{white!}{:6d}%{reset} %{cyan}{}%{reset} [%{blue!}{}%{reset}] '
