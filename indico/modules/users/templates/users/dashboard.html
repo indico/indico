@@ -40,6 +40,33 @@
                         </div>
                     </div>
                 </div>
+                {% if redis_enabled %}
+                    <div id="yourEvents" class="dashboard-box">
+                        <h3>
+                            {% trans %}Your events at hand{% endtrans %}
+                            {% if session.user.is_admin %}
+                                <a href="#" id="refresh-redis-links" style="float: right;" class="icon-refresh" title="{% trans %}Admin tool: Refresh Redis links{% endtrans %}"></a>
+                                <script>
+                                    $('#refresh-redis-links').on('click', function(e) {
+                                        e.preventDefault();
+                                        var killProgress = IndicoUI.Dialogs.Util.progress();
+                                        indicoRequest('user.refreshRedisLinks', {
+                                            userId: {{ user.id | tojson }}
+                                        }, function(result, error) {
+                                            if(error) {
+                                                killProgress();
+                                                IndicoUtil.errorReport(error);
+                                                return;
+                                            }
+                                            location.reload();
+                                        });
+                                    });
+                                </script>
+                            {% endif %}
+                        </h3>
+                        <ol></ol>
+                    </div>
+                {% endif %}
                 {% if suggested_categories %}
                     <div id="suggestedCategories" class="dashboard-box suggestions">
                         <h3>{% trans %}You might be interested in the following categories...{% endtrans %}</h3>
@@ -70,33 +97,6 @@
                                 </li>
                             {% endfor %}
                         </ol>
-                    </div>
-                {% endif %}
-                {% if redis_enabled %}
-                    <div id="yourEvents" class="dashboard-box">
-                        <h3>
-                            {% trans %}Your events at hand{% endtrans %}
-                            {% if session.user.is_admin %}
-                                <a href="#" id="refresh-redis-links" style="float: right;" class="icon-refresh" title="{% trans %}Admin tool: Refresh Redis links{% endtrans %}"></a>
-                                <script>
-                                    $('#refresh-redis-links').on('click', function(e) {
-                                        e.preventDefault();
-                                        var killProgress = IndicoUI.Dialogs.Util.progress();
-                                        indicoRequest('user.refreshRedisLinks', {
-                                            userId: {{ user.id | tojson }}
-                                        }, function(result, error) {
-                                            if(error) {
-                                                killProgress();
-                                                IndicoUtil.errorReport(error);
-                                                return;
-                                            }
-                                            location.reload();
-                                        });
-                                    });
-                                </script>
-                            {% endif %}
-                        </h3>
-                        <ol></ol>
                     </div>
                 {% endif %}
             </div>
