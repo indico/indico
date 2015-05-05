@@ -38,6 +38,7 @@ from indico.modules.rb.models.utils import unimplemented
 from indico.modules.rb.notifications.reservations import (notify_confirmation, notify_cancellation,
                                                           notify_creation, notify_modification,
                                                           notify_rejection)
+from indico.modules.users import User
 from indico.util.date_time import now_utc, format_date, format_time, get_month_end, round_up_month
 from indico.util.i18n import _, N_
 from indico.util.serializer import Serializer
@@ -45,7 +46,6 @@ from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.util import url_for
 from MaKaC.common.Locators import Locator
-from MaKaC.user import AvatarHolder
 
 
 class ConflictingOccurrences(Exception):
@@ -256,7 +256,11 @@ class Reservation(Serializer, db.Model):
 
     @property
     def booked_for_user(self):
-        return AvatarHolder().getById(self.booked_for_id) if self.booked_for_id else None
+        if self.booked_for_id is None:
+            return None
+        with db.session.no_autoflush:
+            user = User.get(int(self.booked_for_id))
+        return user.as_avatar if user else None
 
     @booked_for_user.setter
     def booked_for_user(self, user):
@@ -274,7 +278,11 @@ class Reservation(Serializer, db.Model):
 
     @property
     def created_by_user(self):
-        return AvatarHolder().getById(self.created_by_id) if self.created_by_id else None
+        if self.created_by_id is None:
+            return None
+        with db.session.no_autoflush:
+            user = User.get(int(self.created_by_id))
+        return user.as_avatar if user else None
 
     @created_by_user.setter
     def created_by_user(self, user):
