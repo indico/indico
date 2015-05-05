@@ -198,8 +198,8 @@ MaxUploadFileSize = 0
 # If you are interested in this feature please contact us at:
 #   indico-team@cern.ch
 #
-# FileConverter        = {"conversion_server": "localhost", "response_url": "http://localhost/conversion-finished"}
-
+# FileConverter = {"conversion_server": "http://conversion.cern.ch/getSegFile.py",
+#                  "response_url": "http://localhost/conversion-finished"}
 
 #------------------------------------------------------------------------------
 # AUTOMATIC MAINTENANCE
