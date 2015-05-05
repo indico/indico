@@ -389,7 +389,6 @@ class RHSubmitMaterialBase(object):
             if self._topdf and not isinstance(resource, Link):
                 file_ext = os.path.splitext(resource.getFileName())[1].strip().lower()
                 if fileConverter.CDSConvFileConverter.hasAvailableConversionsFor(file_ext):
-                    # Logger.get('conv').debug('Queueing %s for conversion' % resource.getFilePath())
                     fileConverter.CDSConvFileConverter.convert(resource.getFilePath(), 'pdf', mat)
                     resource.setPDFConversionRequestDate(nowutc())
 

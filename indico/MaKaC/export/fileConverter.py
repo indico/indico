@@ -32,6 +32,8 @@ from indico.util.network import resolve_host
 SEGMENT_SIZE = 500000
 DEFAUTL_ENCODING = "utf-8"
 
+logger = Logger.get('converter')
+
 def get_content_type(filename):
     return mimetypes.guess_type(filename)[0] or 'application/octet-stream'
 
@@ -68,8 +70,8 @@ class CDSConvFileConverter(FileConverter):
         responseURL = Config.getInstance().getFileConverterResponseURL()
         serverURL = Config.getInstance().getFileConverterServerURL()
         up = urlparse.urlparse(serverURL)
-        if up[0] == "":
-            #writeLog("Wrong conversion server URL")
+        if not up[0]:
+            logger.error('Invalid conversion server URL: {}'.format(serverURL))
             return
         host = up[1]
         selector = up[2]
@@ -78,8 +80,8 @@ class CDSConvFileConverter(FileConverter):
         localFile = localFile.replace("\\", "/")
         filename = localFile.split("/")[-1]
         if not os.access(localFile, os.F_OK):
-            #writeLog("Local file to upload invalid")
-            return False
+            logger.error('Impossible to open file to upload: {}'.format(localFile))
+            return
         fic = open(localFile, "rb")
         segnum = 0
         segsize = SEGMENT_SIZE
@@ -144,17 +146,16 @@ class CDSConvFileConverter(FileConverter):
             content_type = 'multipart/form-data; boundary=%s' % BOUNDARY
 
             try:
-                Logger.get('cdsconv').info("Uploading %s to %s" % (localFile, host))
+                logger.info("Uploading {} to {}".format(localFile, host))
                 h = httplib.HTTPConnection(host, timeout=5)
                 h.request('POST', selector, body, {'content-type': content_type})
                 h.getresponse()
             except socket.timeout:
-                Logger.get('cdsconv').exception("Timeout connecting to %s" % host)
+                logger.exception("Timeout connecting to " + host)
                 break
             except Exception:
-                Logger.get('cdsconv').exception("Error connecting to %s" % host)
+                logger.exception("Error connecting to " + host)
             if lastseg == 1 :
-                #print "\n%s\n"%(h.getfile().read())
                 break
         fic.close()
         #writeLog("File uploaded")
@@ -252,6 +253,7 @@ class CDSConvFileConverter(FileConverter):
 
         # check that the request comes from the conversion server
         if requestIP not in ip_addrs:
+            logger.error('Request coming from {} not accepted (allowed IPs: {})'.format(requestIP, ip_addrs))
             return
 
         if params["status"] == '1':
@@ -273,14 +275,14 @@ class CDSConvFileConverter(FileConverter):
                         f.setFileName( fileName )
                         f.setFilePath( filePath )
                         mat.addResource( f )
+                        logger.info("File '{}' stored in {}".format(f.getName(), locator))
                 return filePath
             else:
-                #writeLog("Locator does not exist for file \"%s\": \n-locator:%s\nmessage:%s"%(params["filename"], params["directory"], params["error_message"]))
+                logger.error('Locator could not be resolved: {}'.format(params))
                 pass
         else:
-            #Here it should be processed the received error from the conversion server.
-            #writeLog("Error converting file \"%s\": \n-locator:%s\nmessage:%s"%(params["filename"], params["directory"], params["error_message"]))
-            pass
+            logger.error('Error converting file: {}'.format(params))
+
     storeConvertedFile=staticmethod(storeConvertedFile)
 
     def hasAvailableConversionsFor(ext):
