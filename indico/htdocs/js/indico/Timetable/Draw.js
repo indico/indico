@@ -904,6 +904,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
                     contribs.push(value);
                 }
             });
+            contribs = _.sortBy(contribs, function(c) { return [c.startDate, c.title]; });
             var popup = new ContributionsPopup(("Contribution details"),contribs, self.eventData.isPoster, false, function() {self.popupAllowClose = true; return true;}, true);
             popup.open();
         });
@@ -945,13 +946,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         if (contribs.length === 0) {
             return null;
         }
-
-        contribs.sort(function(a,b) {
-            if (a.startDate.time > b.startDate.time) {
-                return 1;
-            }
-            return -1;
-        });
+        contribs = _.sortBy(contribs, function(c) { return [c.startDate, c.title]; });
         var i = 0;
         each(contribs, function(value) {
             if (++i <= maxNumContribs) {
@@ -1837,6 +1832,7 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
         },
 
         _posterBlocks: function(data) {
+            data = _.sortBy(data, function(d) { return [d.startDate, d.title]; });
             var self = this;
 
             var blockDiv = Html.div({style:
