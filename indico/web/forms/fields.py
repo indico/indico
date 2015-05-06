@@ -143,6 +143,22 @@ class IndicoPasswordField(PasswordField):
 
 
 class PrincipalField(HiddenField):
+    """A field that lets you select Indico users/groups ("principals")
+
+    :param groups: If groups should be selectable.
+    :param multiple: If a list of principals or just a single principal
+                     should be selectable/returned.
+    :param allow_external: If "search users with no indico account"
+                           should be available.  Selecting such a user
+                           will automatically create a pending user once
+                           the form is submitted, even if other fields
+                           in the form fail to validate!
+    :param serializable: If True, the field will use a principal tuple
+                         such as ``('User', user_id)`` instead of the
+                         actual :class:`.User` or :class:`.GroupProxy`
+                         object.
+    """
+
     widget = PrincipalWidget()
 
     def __init__(self, *args, **kwargs):
