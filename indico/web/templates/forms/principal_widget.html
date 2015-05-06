@@ -53,7 +53,7 @@
                     {{ field.name|tojson }},
                     true, true, null,
                     null, false,
-                    false, true,
+                    false, {{ (not field.flags.required)|tojson }},
                     addUser, removeUser, {{ field.allow_external|tojson }});
         {% endif %}
 
