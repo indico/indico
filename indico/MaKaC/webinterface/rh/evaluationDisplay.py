@@ -23,6 +23,7 @@ from MaKaC.evaluation                        import Evaluation,Question,Submissi
 from MaKaC.errors                            import FormValuesError
 
 from indico.core.config import Config
+from indico.modules.auth.util import redirect_to_login
 from indico.util.i18n import _
 
 
@@ -79,8 +80,9 @@ class RHEvaluationDisplayBase( RHBaseEvaluation ):
         RHBaseEvaluation._checkProtection(self)
         if self._evaluation.inEvaluationPeriod() and self._evaluation.isMandatoryAccount() and not self._getUser():
             flash(_("Please log in to access this event's evaluation form."))
+            self._redirect(redirect_to_login(reason=_("You are trying to participate in an evaluation that requires "
+                                                      "you to be logged in.")))
             self._doProcess = False
-            self._checkSessionUser()
 
 
 class RHEvaluationDisplay(RHEvaluationDisplayBase):

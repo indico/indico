@@ -26,6 +26,7 @@ from MaKaC.webinterface.rh.registrantsModif import RHRegistrantListModif
 
 from MaKaC.common.utils import validMail
 from MaKaC.PDFinterface.conference import TicketToPDF
+from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.registration.notifications import (notify_registration_confirmation,
                                                               notify_registration_modification)
 from indico.modules.payment import event_settings as payment_event_settings
@@ -65,8 +66,8 @@ class RHRegistrationFormDisplayBaseCheckProtection(RHRegistrationFormDisplayBase
     def _checkProtection(self):
         RHRegistrationFormDisplayBase._checkProtection(self)
         if self._regForm.inRegistrationPeriod() and self._regForm.isMandatoryAccount() and self._getUser() is None:
-            flash(_("Please log in to access this event's registration form."))
-            self._redirect(self._getLoginURL())
+            self._redirect(redirect_to_login(reason=_("You are trying to register for an event that requires you to be "
+                                                      "logged in.")))
             self._doProcess = False
 
 
