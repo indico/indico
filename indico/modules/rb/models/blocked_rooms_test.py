@@ -19,7 +19,6 @@ from datetime import date, timedelta, datetime, time
 import pytest
 
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
-from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.testing.util import bool_matrix, extract_emails
 
@@ -111,12 +110,12 @@ def test_approve(create_user, create_reservation, create_blocking, smtp,
     resv = create_reservation(start_dt=datetime.combine(blocking.start_date, time(8)),
                               end_dt=datetime.combine(blocking.start_date, time(10)),
                               created_by_user=user if colliding_reservation else blocking.created_by_user,
-                              booked_for_user=user if colliding_reservation else blocking.created_by_user)
+                              booked_for_user=user.user if colliding_reservation else blocking.created_by_user.user)
     resv2 = create_reservation(start_dt=datetime.combine(blocking.start_date + timedelta(days=1), time(8)),
                                end_dt=datetime.combine(blocking.end_date + timedelta(days=1), time(10)),
                                repeat_frequency=RepeatFrequency.DAY,
                                created_by_user=user if colliding_occurrence else blocking.created_by_user,
-                               booked_for_user=user if colliding_occurrence else blocking.created_by_user)
+                               booked_for_user=user.user if colliding_occurrence else blocking.created_by_user.user)
     assert br.state == BlockedRoom.State.pending
     br.approve(notify_blocker=notify_blocker)
     assert br.state == BlockedRoom.State.accepted
@@ -144,7 +143,7 @@ def test_approve_acl(db, create_user, create_reservation, create_blocking, smtp,
     resv = create_reservation(start_dt=datetime.combine(blocking.start_date, time(8)),
                               end_dt=datetime.combine(blocking.start_date, time(10)),
                               created_by_user=user,
-                              booked_for_user=user)
+                              booked_for_user=user.user)
     assert br.state == BlockedRoom.State.pending
     br.approve(notify_blocker=False)
     assert br.state == BlockedRoom.State.accepted
