@@ -192,7 +192,16 @@ def remove_tags(text):
 
 def render_markdown(text, **kwargs):
     """ Mako markdown to html filter """
-    return markdown.markdown(bleach.clean(text, tags=BLEACH_ALLOWED_TAGS), **kwargs).encode('utf-8')
+    math_segments = []
+    placeholder = u"\uE000"
+
+    def math_replace(m):
+        math_segments.append(m.group(0))
+        return placeholder
+
+    text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', math_replace, text)
+    res = markdown.markdown(bleach.clean(text, tags=BLEACH_ALLOWED_TAGS), **kwargs)
+    return re.sub(placeholder, lambda _: math_segments.pop(0), res).encode('utf-8')
 
 
 def sanitize_for_platypus(text):
