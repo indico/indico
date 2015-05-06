@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from flask import session, redirect, request
 from werkzeug.datastructures import MultiDict
 
 from indico.web.flask.util import url_for
@@ -47,6 +47,20 @@ def load_identity_info():
     info['data'] = MultiDict()
     info['data'].update(data)
     return info
+
+
+def redirect_to_login(next_url=None, reason=None):
+    """Redirects to the login page.
+
+    :param next_url: URL to be redirected upon successful login. If not
+                     specified, it will be set to ``request.relative_url``.
+    :param reason: Why the user is redirected to a login page.
+    """
+    if not next_url:
+        next_url = request.relative_url
+    if reason:
+        session['login_reason'] = reason
+    return redirect(url_for_login(next_url))
 
 
 def url_for_login(next_url=None):

@@ -17,6 +17,11 @@
                             {% if active_provider %}
                                 <div class="login-container clearfix">
                                     <img class="header-logo" src="{{ indico_config.config.getSystemIconURL('logoIndico') }}">
+                                    {% if login_reason %}
+                                        <div class="login-reason-box">
+                                            {{ login_reason }}
+                                        </div>
+                                    {% endif %}
                                     {% include 'flashed_messages.html' %}
                                     <div id="form-wrapper">
                                         {{ login_form(active_provider, form) }}

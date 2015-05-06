@@ -60,6 +60,8 @@ class RHLogin(RH):
     """The login page"""
 
     def _process(self):
+        login_reason = session.pop('login_reason', None)
+
         # User is already logged in
         if session.user is not None:
             multipass.set_next_url()
@@ -95,7 +97,8 @@ class RHLogin(RH):
             form = active_provider.login_form() if active_provider else None
 
         providers = multipass.auth_providers.values()
-        return render_template('auth/login_page.html', form=form, providers=providers, active_provider=active_provider)
+        return render_template('auth/login_page.html', form=form, providers=providers, active_provider=active_provider,
+                               login_reason=login_reason)
 
 
 class RHLoginForm(RH):
