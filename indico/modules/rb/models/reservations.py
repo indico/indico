@@ -18,6 +18,7 @@ from collections import defaultdict, OrderedDict
 from datetime import datetime, date
 
 from sqlalchemy import Date, Time
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import joinedload
@@ -143,7 +144,10 @@ class Reservation(Serializer, db.Model):
         default=0
     )  # 1, 2, 3, etc.
     booked_for_id = db.Column(
-        db.String
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=True,
         # Must be nullable for legacy data :(
     )
     booked_for_name = db.Column(
@@ -229,6 +233,16 @@ class Reservation(Serializer, db.Model):
         backref='reservations',
         lazy='dynamic'
     )
+    #: The user this booking was made for.
+    #: Assigning a user here also updates `booked_for_name`.
+    booked_for_user = db.relationship(
+        'User',
+        lazy=False,
+        backref=db.backref(
+            'reservations_booked_for',
+            lazy='dynamic'
+        )
+    )
 
     @hybrid_property
     def is_archived(self):
@@ -255,21 +269,8 @@ class Reservation(Serializer, db.Model):
         return self.is_accepted & ~(self.is_rejected | self.is_cancelled)
 
     @property
-    def booked_for_user(self):
-        if self.booked_for_id is None:
-            return None
-        with db.session.no_autoflush:
-            return User.get(int(self.booked_for_id))
-
-    @booked_for_user.setter
-    def booked_for_user(self, user):
-        self.booked_for_id = user.id
-        self.booked_for_name = user.full_name
-
-    @property
     def booked_for_user_email(self):
-        user = self.booked_for_user
-        return user.email if user else None
+        return self.booked_for_user.email if self.booked_for_user else None
 
     @property
     def contact_emails(self):
@@ -737,3 +738,8 @@ class Reservation(Serializer, db.Model):
 
         notify_modification(self, changes)
         return True
+
+
+@listens_for(Reservation.booked_for_user, 'set')
+def _booked_for_user_set(target, user, *unused):
+    target.booked_for_name = user.full_name if user else ''

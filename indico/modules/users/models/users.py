@@ -241,6 +241,7 @@ class User(db.Model):
 
     # relationship backrefs:
     # - local_groups (User.local_groups)
+    # - reservations_booked_for (Reservation.booked_for_user)
 
     @property
     def as_principal(self):

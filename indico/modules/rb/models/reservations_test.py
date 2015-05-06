@@ -116,17 +116,14 @@ def test_booked_for_user(dummy_reservation, dummy_user):
     assert dummy_reservation.booked_for_user == dummy_user
 
 
-def test_booked_for_user_after_change(dummy_reservation, create_user):
-    other_user = create_user(123).user
+def test_booked_for_user_after_change(db, dummy_reservation, create_user):
+    other_user = create_user(123, 'foo', 'bar').user
+    assert dummy_reservation.booked_for_name != other_user.full_name
     dummy_reservation.booked_for_user = other_user
+    db.session.flush()
     assert dummy_reservation.booked_for_user == other_user
     assert dummy_reservation.booked_for_id == other_user.id
     assert dummy_reservation.booked_for_name == other_user.full_name
-
-
-def test_booked_for_user_with_no_id(dummy_reservation):
-    dummy_reservation.booked_for_id = None
-    assert dummy_reservation.booked_for_user is None
 
 
 def test_booked_for_user_email(dummy_reservation, dummy_user):
@@ -141,8 +138,8 @@ def test_booked_for_user_email_after_change(dummy_reservation, dummy_user, creat
     assert dummy_reservation.booked_for_user_email == other_user.user.email
 
 
-def test_booked_for_user_email_with_no_id(dummy_reservation):
-    dummy_reservation.booked_for_id = None
+def test_booked_for_user_email_with_no_user(dummy_reservation):
+    dummy_reservation.booked_for_user = None
     assert dummy_reservation.booked_for_user_email is None
 
 
