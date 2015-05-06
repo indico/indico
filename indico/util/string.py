@@ -305,6 +305,8 @@ def encode_utf8(f):
     @functools.wraps(f)
     def _wrapper(*args, **kwargs):
         rv = f(*args, **kwargs)
+        if not rv:
+            return ''
         return rv.encode('utf-8') if isinstance(rv, unicode) else str(rv)
 
     return _wrapper
