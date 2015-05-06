@@ -126,7 +126,7 @@ class _LocalGroupProxy(GroupProxy):
 
     @property
     def name(self):
-        return self.group.name
+        return self.group.name if self.group else '({})'.format(self.id)
 
     @cached_property
     def group(self):
@@ -158,7 +158,10 @@ class _LocalGroupProxy(GroupProxy):
 
     @return_ascii
     def __repr__(self):
-        return '<LocalGroupProxy({}, {})>'.format(self.id, self.group.name)
+        if not self.group:
+            return '<LocalGroupProxy({} [missing])>'.format(self.id)
+        else:
+            return '<LocalGroupProxy({}, {})>'.format(self.id, self.group.name)
 
 
 class _MultipassGroupProxy(GroupProxy):

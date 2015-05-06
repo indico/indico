@@ -1341,10 +1341,7 @@ type("UserListWidget", ["ListWidget"],
                 }
                 buttonDiv.append(removeButton);
 
-                var userName = Html.span({},
-                        $B(Html.span(), userData.accessor('familyName'), function(name){return name.toUpperCase();}),
-                        ', ',
-                        $B(Html.span(), userData.accessor('firstName')));
+                var userName = Html.span({}, $B(Html.span(), userData.accessor('name')));
 
                 return Html.span({}, buttonDiv, userName);
             }

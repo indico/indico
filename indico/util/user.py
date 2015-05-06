@@ -103,12 +103,12 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy
         return user.as_avatar if legacy else user
     elif not allow_groups:
         raise ValueError('Unexpected fossil type: {}'.format(type_))
-    elif type_ == 'LocalGroupWrapper':
+    elif type_ in {'LocalGroupWrapper', 'LocalGroup'}:
         group = GroupProxy(int(id_))
         if group.group is None:
             raise ValueError('Local group does not exist: {}'.format(id_))
         return group.as_legacy_group if legacy else group
-    elif type_ == 'LDAPGroupWrapper':
+    elif type_ in {'LDAPGroupWrapper', 'MultipassGroup'}:
         provider = fossil['provider']
         group = GroupProxy(id_, provider)
         if group.group is None:

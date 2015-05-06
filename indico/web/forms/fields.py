@@ -23,8 +23,9 @@ from wtforms.widgets.core import CheckboxInput, Select
 from wtforms.fields.core import RadioField, SelectMultipleField, SelectFieldBase
 
 from indico.modules.groups import GroupProxy
+from indico.modules.groups.util import serialize_group
 from indico.modules.users import User
-from indico.util.fossilize import fossilize
+from indico.modules.users.util import serialize_user
 from indico.util.user import retrieve_principals, principal_from_fossil
 from indico.util.string import is_valid_mail
 from indico.util.i18n import _
@@ -192,14 +193,15 @@ class PrincipalField(HiddenField):
 
     def _value(self):
         if self.serializable:
-            return map(fossilize, retrieve_principals(self._get_data()))
+            data = retrieve_principals(self._get_data(), legacy=False)
         else:
-            data = sorted(self._get_data(), key=lambda x: (x.last_name if isinstance(x, User) else x.name).lower())
-            return fossilize(x.as_avatar if isinstance(x, User) else x.as_legacy_group for x in data)
+            data = self._get_data()
+        data.sort(key=lambda x: (x.full_name if isinstance(x, User) else x.name).lower())
+        return [serialize_user(x) if isinstance(x, User) else serialize_group(x) for x in data]
 
     def _get_data(self):
         if self.multiple:
-            return self.data or []
+            return sorted(self.data) if self.data else []
         else:
             return [] if self.data is None else [self.data]
 
