@@ -452,12 +452,12 @@ class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBooki
         self.past_date = self.date_changed = False
         changes = {'room_id': self._room.id}
 
-        if self._reservation.created_by_id != session.avatar.id:
+        if self._reservation.created_by_user != session.user:
             # if the user is cloning someone else's booking, set him/her as booked_for
-            changes.update(booked_for_id=session.avatar.id,
-                           booked_for_name=session.avatar.getStraightFullName().decode('utf-8'),
-                           contact_email=session.avatar.getEmail().decode('utf-8'),
-                           contact_phone=session.avatar.getPhone().decode('utf-8'))
+            changes.update(booked_for_user=session.user,
+                           booked_for_name=session.user.full_name,
+                           contact_email=session.user.email,
+                           contact_phone=session.user.phone)
 
         defaults = FormDefaults(self._reservation,
                                 skip_attrs=set(changes),
@@ -556,10 +556,10 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
                 raise IndicoError('Invalid room')
             # Show step 3 page
             confirm_form_defaults = FormDefaults(form.data,
-                                                 booked_for_id=session.avatar.id,
-                                                 booked_for_name=session.avatar.getStraightFullName().decode('utf-8'),
-                                                 contact_email=session.avatar.getEmail().decode('utf-8'),
-                                                 contact_phone=session.avatar.getPhone().decode('utf-8'))
+                                                 booked_for_user=session.user,
+                                                 booked_for_name=session.user.full_name,
+                                                 contact_email=session.user.email,
+                                                 contact_phone=session.user.phone)
             return self._show_confirm(room, form, self._step, confirm_form_defaults)
 
     def _process_confirm(self):

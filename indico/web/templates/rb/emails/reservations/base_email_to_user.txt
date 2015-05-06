@@ -1,5 +1,5 @@
 {% extends 'rb/emails/base_email.txt' %}
-{% block recipient %}{{ reservation.created_by_user.getFirstName() }}{% endblock %}
+{% block recipient %}{{ reservation.created_by_user.first_name }}{% endblock %}
 
 {% block email_body -%}
 {% block body %}{% endblock %}

@@ -109,12 +109,12 @@ def test_approve(create_user, create_reservation, create_blocking, smtp,
     user = create_user(123)
     resv = create_reservation(start_dt=datetime.combine(blocking.start_date, time(8)),
                               end_dt=datetime.combine(blocking.start_date, time(10)),
-                              created_by_user=user if colliding_reservation else blocking.created_by_user,
+                              created_by_user=user.user if colliding_reservation else blocking.created_by_user.user,
                               booked_for_user=user.user if colliding_reservation else blocking.created_by_user.user)
     resv2 = create_reservation(start_dt=datetime.combine(blocking.start_date + timedelta(days=1), time(8)),
                                end_dt=datetime.combine(blocking.end_date + timedelta(days=1), time(10)),
                                repeat_frequency=RepeatFrequency.DAY,
-                               created_by_user=user if colliding_occurrence else blocking.created_by_user,
+                               created_by_user=user.user if colliding_occurrence else blocking.created_by_user.user,
                                booked_for_user=user.user if colliding_occurrence else blocking.created_by_user.user)
     assert br.state == BlockedRoom.State.pending
     br.approve(notify_blocker=notify_blocker)
@@ -142,7 +142,7 @@ def test_approve_acl(db, create_user, create_reservation, create_blocking, smtp,
     br = blocking.blocked_rooms[0]
     resv = create_reservation(start_dt=datetime.combine(blocking.start_date, time(8)),
                               end_dt=datetime.combine(blocking.start_date, time(10)),
-                              created_by_user=user,
+                              created_by_user=user.user,
                               booked_for_user=user.user)
     assert br.state == BlockedRoom.State.pending
     br.approve(notify_blocker=False)

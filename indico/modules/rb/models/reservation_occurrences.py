@@ -187,7 +187,7 @@ class ReservationOccurrence(db.Model, Serializer):
             q = q.filter(or_(*criteria))
 
         if filters.get('is_only_mine') and avatar:
-            q = q.filter((Reservation.booked_for_id == avatar.id) | (Reservation.created_by_id == avatar.id))
+            q = q.filter((Reservation.booked_for_id == avatar.user.id) | (Reservation.created_by_id == avatar.user.id))
         if filters.get('room_ids'):
             q = q.filter(Room.id.in_(filters['room_ids']))
 

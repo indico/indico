@@ -126,13 +126,13 @@ class BlockedRoom(db.Model):
         reason = u'Conflict with blocking {}: {}'.format(self.blocking.id, self.blocking.reason)
 
         for reservation in reservations:
-            if self.blocking.can_be_overridden(reservation.created_by_user, reservation.room):
+            if self.blocking.can_be_overridden(reservation.created_by_user.as_avatar, reservation.room):
                 continue
             reservation.reject(self.blocking.created_by_user, reason)
 
         for occurrence in occurrences:
             reservation = occurrence.reservation
-            if self.blocking.can_be_overridden(reservation.created_by_user, reservation.room):
+            if self.blocking.can_be_overridden(reservation.created_by_user.as_avatar, reservation.room):
                 continue
             occurrence.reject(self.blocking.created_by_user, reason)
 

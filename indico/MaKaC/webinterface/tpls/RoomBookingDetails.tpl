@@ -302,7 +302,7 @@
                           ${ _('By') }&nbsp;&nbsp;
                         </td>
                         <td align="left" class="blacktext">
-                          ${ reservation.created_by_user.getFullName() if reservation.created_by_user else '' }
+                          ${ reservation.created_by_user.full_name if reservation.created_by_user else '' }
                         </td>
                       </tr>
                       <tr>

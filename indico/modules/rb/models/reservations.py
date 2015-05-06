@@ -39,7 +39,6 @@ from indico.modules.rb.models.utils import unimplemented
 from indico.modules.rb.notifications.reservations import (notify_confirmation, notify_cancellation,
                                                           notify_creation, notify_modification,
                                                           notify_rejection)
-from indico.modules.users import User
 from indico.util.date_time import now_utc, format_date, format_time, get_month_end, round_up_month
 from indico.util.i18n import _, N_
 from indico.util.serializer import Serializer
@@ -155,7 +154,10 @@ class Reservation(Serializer, db.Model):
         nullable=False
     )
     created_by_id = db.Column(
-        db.String
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=True,
         # Must be nullable for legacy data :(
     )
     room_id = db.Column(
@@ -238,8 +240,19 @@ class Reservation(Serializer, db.Model):
     booked_for_user = db.relationship(
         'User',
         lazy=False,
+        foreign_keys=[booked_for_id],
         backref=db.backref(
             'reservations_booked_for',
+            lazy='dynamic'
+        )
+    )
+    #: The user who created this booking.
+    created_by_user = db.relationship(
+        'User',
+        lazy=False,
+        foreign_keys=[created_by_id],
+        backref=db.backref(
+            'reservations',
             lazy='dynamic'
         )
     )
@@ -275,18 +288,6 @@ class Reservation(Serializer, db.Model):
     @property
     def contact_emails(self):
         return set(filter(None, map(unicode.strip, self.contact_email.split(u','))))
-
-    @property
-    def created_by_user(self):
-        if self.created_by_id is None:
-            return None
-        with db.session.no_autoflush:
-            user = User.get(int(self.created_by_id))
-        return user.as_avatar if user else None
-
-    @created_by_user.setter
-    def created_by_user(self, user):
-        self.created_by_id = user.getId()
 
     @property
     def details_url(self):
@@ -370,7 +371,7 @@ class Reservation(Serializer, db.Model):
         reservation.room = room
         reservation.booked_for_name = reservation.booked_for_user.full_name
         reservation.is_accepted = not prebook
-        reservation.created_by_user = user
+        reservation.created_by_user = user.user
         reservation.create_occurrences(True)
         if not any(occ.is_valid for occ in reservation.occurrences):
             raise NoReportError(_('Reservation has no valid occurrences'))
@@ -516,7 +517,7 @@ class Reservation(Serializer, db.Model):
         db.session.flush()
 
         if user is None:
-            user = self.created_by_user
+            user = self.created_by_user.as_avatar
 
         # Check for conflicts with nonbookable periods
         if not user.isRBAdmin() and not self.room.is_owned_by(user):
@@ -611,7 +612,7 @@ class Reservation(Serializer, db.Model):
         return self.booked_for_user == user.user or bool(self.contact_emails & set(user.user.all_emails))
 
     def is_owned_by(self, avatar):
-        return self.created_by_id == avatar.id
+        return self.created_by_user == avatar.user
 
     def modify(self, data, user):
         """Modifies an existing reservation.

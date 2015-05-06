@@ -159,15 +159,18 @@ def test_created_by_user(dummy_reservation, dummy_user):
     assert dummy_reservation.created_by_user == dummy_user
 
 
-def test_created_by_user_after_change(dummy_reservation, create_user):
+def test_created_by_user_after_change(db, dummy_reservation, create_user):
     other_user = create_user(123)
-    dummy_reservation.created_by_user = other_user
+    dummy_reservation.created_by_user = other_user.user
+    db.session.flush()
     assert dummy_reservation.created_by_user == other_user
-    assert dummy_reservation.created_by_id == other_user.id
+    assert dummy_reservation.created_by_id == other_user.user.id
 
 
-def test_created_by_user_with_no_id(dummy_reservation):
+def test_created_by_user_with_no_id(db, dummy_reservation):
     dummy_reservation.created_by_id = None
+    db.session.flush()
+    db.session.expire(dummy_reservation)
     assert dummy_reservation.created_by_user is None
 
 
@@ -326,7 +329,7 @@ def test_can_be_accepted_rejected(dummy_reservation, create_user, is_admin, is_o
 def test_can_be_cancelled(dummy_reservation, create_user, is_admin, is_created_by, is_booked_for, expected):
     user = create_user(123, rb_admin=is_admin)
     if is_created_by:
-        dummy_reservation.created_by_user = user
+        dummy_reservation.created_by_user = user.user
     if is_booked_for:
         dummy_reservation.booked_for_user = user.user
     assert dummy_reservation.can_be_cancelled(user) == expected
@@ -352,7 +355,7 @@ def test_can_be_modified(dummy_reservation, create_user,
                          is_rejected, is_cancelled, is_admin, is_created_by, is_booked_for, is_room_owner, expected):
     user = create_user(123, rb_admin=is_admin)
     if is_created_by:
-        dummy_reservation.created_by_user = user
+        dummy_reservation.created_by_user = user.user
     if is_booked_for:
         dummy_reservation.booked_for_user = user.user
     if is_room_owner:

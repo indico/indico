@@ -65,7 +65,7 @@ def create_reservation(db, dummy_room, dummy_user):
         params.setdefault('booking_reason', u'Testing')
         params.setdefault('room', dummy_room)
         params.setdefault('booked_for_user', dummy_user.user)
-        params.setdefault('created_by_user', dummy_user)
+        params.setdefault('created_by_user', dummy_user.user)
         reservation = Reservation(**params)
         reservation.create_occurrences(skip_conflicts=False)
         db.session.add(reservation)
