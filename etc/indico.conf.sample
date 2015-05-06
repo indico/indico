@@ -371,6 +371,9 @@ OAuthAccessTokenTTL = 10000
 # 'first_name', 'last_name', 'email', 'affiliation', 'phone', 'address'
 # All keys are optional, so if a provider does not contain data for a field,
 # you can override `identity_info_keys` and only specify the keys you want.
+# However, if a provider does not have at least  'email', external users
+# returned by this provider will never show up in search results. Likewise,
+# an external user with no email will not appear in search results.
 #
 # Auth and identity providers with the same name are linked automatically
 # unless ProviderMap is specified.  If specified it should be a dictionary

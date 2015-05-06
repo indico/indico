@@ -91,7 +91,8 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy
             # check if there is not already a pending user with that e-mail
             user = User.find_first(email=data['email'], is_pending=True)
             if not user:
-                user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'],
+                user = User(first_name=data.get('first_name') or '', last_name=data.get('last_name') or '',
+                            email=data['email'],
                             address=data.get('address', ''), phone=data.get('phone', ''),
                             affiliation=data.get('affiliation', ''), is_pending=True)
                 db.session.add(user)

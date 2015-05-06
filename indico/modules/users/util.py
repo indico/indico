@@ -157,6 +157,9 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
         identities = multipass.search_identities(exact=exact, **original_criteria)
 
         for ident in identities:
+            if not ident.data.get('email'):
+                # Skip users with no email
+                continue
             if ((ident.provider.name, ident.identifier) not in found_identities and
                     ident.data['email'].lower() not in found_emails):
                 found_emails[ident.data['email'].lower()] = ident
@@ -191,7 +194,7 @@ def get_user_by_email(email, create_pending=False):
         return None
     # Create a new pending user
     data = user_or_identity.data
-    user = User(first_name=data['first_name'], last_name=data['last_name'], email=data['email'],
+    user = User(first_name=data.get('first_name') or '', last_name=data.get('last_name') or '', email=data['email'],
                 address=data.get('address', ''), phone=data.get('phone', ''),
                 affiliation=data.get('affiliation', ''), is_pending=True)
     db.session.add(user)

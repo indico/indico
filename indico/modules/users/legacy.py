@@ -377,27 +377,27 @@ class AvatarProvisionalWrapper(Fossilizable):
 
     @encode_utf8
     def getFirstName(self):
-        return self.data['first_name']
+        return self.data.get('first_name', '')
 
     @encode_utf8
     def getFamilyName(self):
-        return self.data['last_name']
+        return self.data.get('last_name', '')
 
     def getStraightFullName(self):
-        return '{first_name} {last_name}'.format(**self.data.to_dict())
+        return '{} {}'.format(self.data.get('first_name', ''), self.data.get('last_name', ''))
 
     def getTitle(self):
-        return u''
+        return ''
 
     @encode_utf8
     def getTelephone(self):
-        return self.data['phone']
+        return self.data.get('phone', '')
 
     getPhone = getTelephone
 
     @encode_utf8
     def getOrganisation(self):
-        return self.data['affiliation']
+        return self.data.get('affiliation', '')
 
     getAffiliation = getOrganisation
 
