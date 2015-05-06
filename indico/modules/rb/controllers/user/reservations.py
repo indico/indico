@@ -383,10 +383,7 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
         defaults = FormDefaults(room_id=self._room.id,
                                 start_dt=start_dt,
                                 end_dt=end_dt,
-                                booked_for_id=session.avatar.id,
-                                booked_for_name=session.avatar.getStraightFullName().decode('utf-8'),
-                                contact_email=session.avatar.getEmail().decode('utf-8'),
-                                contact_phone=session.avatar.getPhone().decode('utf-8'))
+                                booked_for_user=session.user)
 
         return self._make_confirm_form(self._room, defaults=defaults, form_class=NewBookingSimpleForm)
 

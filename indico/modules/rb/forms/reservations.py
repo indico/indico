@@ -25,7 +25,7 @@ from wtforms.widgets.core import HiddenInput
 from wtforms.fields.simple import HiddenField, TextAreaField, SubmitField
 
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField
+from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField, PrincipalField
 from indico.web.forms.validators import IndicoEmail, UsedIf
 from indico.modules.rb.models.reservations import RepeatMapping, RepeatFrequency
 from indico.util.i18n import _
@@ -110,8 +110,8 @@ class NewBookingPeriodForm(NewBookingFormBase):
 
 
 class NewBookingConfirmForm(NewBookingPeriodForm):
-    booked_for_id = HiddenField(_(u'User'), [InputRequired()])
-    booked_for_name = StringField()  # just for displaying
+    booked_for_user = PrincipalField(_(u'User'), [DataRequired()], multiple=False, allow_external=True,
+                                     serializable=False)
     contact_email = StringField(_(u'Email'), [InputRequired(), IndicoEmail(multi=True)])
     contact_phone = StringField(_(u'Telephone'))
     booking_reason = TextAreaField(_(u'Reason'), [DataRequired()])

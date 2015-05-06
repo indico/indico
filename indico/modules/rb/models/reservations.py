@@ -259,18 +259,17 @@ class Reservation(Serializer, db.Model):
         if self.booked_for_id is None:
             return None
         with db.session.no_autoflush:
-            user = User.get(int(self.booked_for_id))
-        return user.as_avatar if user else None
+            return User.get(int(self.booked_for_id))
 
     @booked_for_user.setter
     def booked_for_user(self, user):
-        self.booked_for_id = user.getId()
-        self.booked_for_name = user.getFullName()
+        self.booked_for_id = user.id
+        self.booked_for_name = user.full_name
 
     @property
     def booked_for_user_email(self):
         user = self.booked_for_user
-        return self.booked_for_user.getEmail() if user else None
+        return user.email if user else None
 
     @property
     def contact_emails(self):
@@ -348,7 +347,7 @@ class Reservation(Serializer, db.Model):
                         permissions, always use the given mode.
         """
 
-        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booked_for_id',
+        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booked_for_user',
                            'contact_email', 'contact_phone', 'booking_reason', 'used_equipment',
                            'needs_assistance', 'uses_vc', 'needs_vc_assistance')
 
@@ -368,7 +367,7 @@ class Reservation(Serializer, db.Model):
             if field in data:
                 setattr(reservation, field, data[field])
         reservation.room = room
-        reservation.booked_for_name = reservation.booked_for_user.getFullName()
+        reservation.booked_for_name = reservation.booked_for_user.full_name
         reservation.is_accepted = not prebook
         reservation.created_by_user = user
         reservation.create_occurrences(True)
@@ -608,7 +607,7 @@ class Reservation(Serializer, db.Model):
     def is_booked_for(self, user):
         if user is None:
             return False
-        return self.booked_for_user == user or bool(set(self.contact_emails) & set(user.getEmails()))
+        return self.booked_for_user == user.user or bool(self.contact_emails & set(user.user.all_emails))
 
     def is_owned_by(self, avatar):
         return self.created_by_id == avatar.id
@@ -620,7 +619,7 @@ class Reservation(Serializer, db.Model):
         :param user: The :class:`Avatar` who modifies the booking.
         """
 
-        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'booked_for_id',
+        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'booked_for_user',
                            'contact_email', 'contact_phone', 'booking_reason', 'used_equipment',
                            'needs_assistance', 'uses_vc', 'needs_vc_assistance')
         # fields affecting occurrences
@@ -636,7 +635,7 @@ class Reservation(Serializer, db.Model):
             'start_dt/time': "start time",
             'end_dt/time': "end time",
             'repetition': "booking type",
-            'booked_for_id': "'Booked for' user",
+            'booked_for_user': "'Booked for' user",
             'contact_email': "contact email",
             'contact_phone': "contact phone number",
             'booking_reason': "booking reason",
@@ -664,12 +663,12 @@ class Reservation(Serializer, db.Model):
                 old = sorted(old.all())
                 converter = lambda x: u', '.join(x.name for x in x)
             if old != new:
+                # Booked for user updates the (redundant) name
+                if field == 'booked_for_user':
+                    old = self.booked_for_name
+                    new = self.booked_for_name = data[field].full_name
                 # Apply the change
                 setattr(self, field, data[field])
-                # Booked for id updates also update the (redundant) name
-                if field == 'booked_for_id':
-                    old = self.booked_for_name
-                    new = self.booked_for_name = self.booked_for_user.getFullName().decode('utf-8')
                 # If any occurrence-related field changed we need to recreate the occurrences
                 if field in occurrence_fields:
                     update_occurrences = True
@@ -707,7 +706,7 @@ class Reservation(Serializer, db.Model):
             else:
                 log.append(u"The {} was changed from '{}' to '{}'".format(field_title, old, new))
 
-        self.edit_logs.append(ReservationEditLog(user_name=user.getFullName(), info=log))
+        self.edit_logs.append(ReservationEditLog(user_name=user.user.full_name, info=log))
 
         # Recreate all occurrences if necessary
         if update_occurrences:
