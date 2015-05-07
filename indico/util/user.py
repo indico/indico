@@ -14,9 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from functools import wraps
+
 from indico.core.db import db
 from indico.modules.groups import GroupProxy
 from indico.modules.users import User
+from indico.util.decorators import smart_decorator
 
 from MaKaC.common.cache import GenericCache
 
@@ -117,3 +120,32 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy
         return group.as_legacy_group if legacy else group
     else:
         raise ValueError('Unexpected fossil type: {}'.format(type_))
+
+
+@smart_decorator
+def unify_user_args(fn, legacy=False):
+    """Decorator that unifies new/legacy user arguments.
+
+    Any argument of the decorated function that contains either a
+    :class:`AvatarUserWrapper` or a :class:`.User` will be converted
+    to the object type specified by the `legacy` argument.
+
+    :param legacy: If True, all arguments containing users will receive
+                   an :class:`AvatarUserWrapper`. Otherwise, they will
+                   receive a :class:`.User`.
+    """
+    if legacy:
+        def _convert(arg):
+            return arg.as_avatar if isinstance(arg, User) else arg
+    else:
+        def _convert(arg):
+            from indico.modules.users.legacy import AvatarUserWrapper
+            return arg.user if isinstance(arg, AvatarUserWrapper) else arg
+
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        args = map(_convert, args)
+        kwargs = {k: _convert(v) for k, v in kwargs.iteritems()}
+        return fn(*args, **kwargs)
+
+    return wrapper
