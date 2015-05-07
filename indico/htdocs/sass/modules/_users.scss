@@ -56,3 +56,58 @@
         font-style: italic;
     }
 }
+
+.category-box {
+    position: relative;
+    .category-title {
+        font-style: bold;
+    }
+    .category-path {
+        font-size: 0.8em;
+        line-height: 1;
+
+        display: block;
+
+        margin-top: 0.4em;
+        ul {
+            font-style: italic;
+
+            display: inline-block;
+            overflow: hidden;
+
+            max-width: 92%;
+            padding: 0;
+
+            list-style: none;
+
+            text-align: left;
+            li {
+                display: inline-block;
+                overflow: hidden;
+
+                padding: 0;
+
+                white-space: nowrap;
+                text-overflow: ellipsis;
+
+                border-bottom: 0;
+                &:last-child {
+                    max-width: 100%;
+                }
+                & + li:before {
+                    padding: 0 0.2em;
+
+                    content: '»';
+                }
+            }
+        }
+    }
+    [class*='icon-'] {
+        position: relative;
+        top: 0.5em;
+        bottom: 0.5em;
+
+        margin-top: 0.2em;
+        padding: 0 0;
+    }
+}
