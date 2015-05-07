@@ -65,6 +65,9 @@ class GroupProxy(object):
     def __hash__(self):
         raise NotImplementedError
 
+    def __contains__(self, user):
+        return self.has_member(user)
+
     @cached_property
     def group(self):
         """The underlying group object"""
@@ -82,7 +85,10 @@ class GroupProxy(object):
         raise NotImplementedError
 
     def has_member(self, user):
-        """Checks if the user is a member of the group"""
+        """Checks if the user is a member of the group.
+
+        This can also be accessed using the ``in`` operator.
+        """
         raise NotImplementedError
 
     def get_members(self):
@@ -143,7 +149,7 @@ class _LocalGroupProxy(GroupProxy):
         return LocalGroupWrapper(self.id)
 
     def has_member(self, user):
-        return self.group in user.local_groups
+        return user and self.group in user.local_groups
 
     def get_members(self):
         return set(self.group.members)
@@ -194,6 +200,8 @@ class _MultipassGroupProxy(GroupProxy):
         return LDAPGroupWrapper(self.name)
 
     def has_member(self, user):
+        if not user:
+            return False
         cache = GenericCache('group-membership')
         key = '{}:{}:{}'.format(self.provider, self.name, user.id)
         rv = cache.get(key)

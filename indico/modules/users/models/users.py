@@ -349,6 +349,10 @@ class User(db.Model):
             return {}
         return {field: (identity.data.get(field) or '') for field in multipass.synced_fields}
 
+    def __contains__(self, user):
+        """Convenience method for `user in user_or_group`."""
+        return self == user
+
     @return_ascii
     def __repr__(self):
         return '<User({}, {}, {}, {})>'.format(self.id, self.first_name, self.last_name, self.email)
@@ -415,13 +419,6 @@ class User(db.Model):
         db.session.flush()
         secondary.is_primary = True
         db.session.flush()
-
-    def is_in_group(self, group):
-        """Checks if the user is in a group
-
-        :param group: A :class:`GroupProxy`
-        """
-        return group.has_member(self)
 
     def get_linked_roles(self, type_):
         """Retrieves the roles the user is linked to for a given type"""
