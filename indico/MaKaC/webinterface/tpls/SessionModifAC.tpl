@@ -17,7 +17,7 @@ ${ accessControlFrame }
             </tr>
             <tr>
                 <td nowrap style="width:80%">
-                    <input type="button" id="inPlaceAddCoordinatorButton" onclick="coordinationControlManager.addExistingUser();" value='${ _("Add coordinator") }'></input>
+                    <input class="i-button" type="button" id="inPlaceAddCoordinatorButton" onclick="coordinationControlManager.addExistingUser();" value='${ _("Add coordinator") }'></input>
                 </td>
                 <td></td>
             </tr>

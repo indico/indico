@@ -13,7 +13,7 @@
                         </tr>
                         <tr>
                             <td nowrap style="width:60%; padding-top:5px;">
-                                <input type="button" onclick="trackCoordinatorListManager.addExistingUser();" value='${ _("Add track coordinator") }'></input>
+                                <input class="i-button" type="button" onclick="trackCoordinatorListManager.addExistingUser();" value='${ _("Add track coordinator") }'></input>
                             </td>
                             <td></td>
                         </tr>

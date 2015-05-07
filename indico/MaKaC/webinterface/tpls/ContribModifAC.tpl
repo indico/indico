@@ -17,7 +17,7 @@ ${ accessControlFrame }
                 </tr>
                 <tr>
                     <td nowrap valign="top" style="width: 21%; text-align:left;">
-                        <input type="button" value='${ _("Add submitter") }' onclick="submitterManager.addExistingUser();">
+                        <input class="i-button" type="button" value='${ _("Add submitter") }' onclick="submitterManager.addExistingUser();">
                     </td>
                 </tr>
             </table>
