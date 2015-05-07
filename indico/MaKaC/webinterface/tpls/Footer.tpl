@@ -30,6 +30,9 @@ else:
     ${ template_hook('page-footer') }
 </div>
 
+% if 'injected_js' in _g:
+    ${'\n'.join(_g.injected_js)}
+% endif
 % if Config.getInstance().getWorkerName():
   <!-- worker: ${ Config.getInstance().getWorkerName() } -->
 % endif
