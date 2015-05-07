@@ -198,11 +198,11 @@ def test_marker_description(db, create_room, create_equipment_type,
 
 
 def test_owner(dummy_room, dummy_user):
-    assert dummy_room.owner == dummy_user
+    assert dummy_room.owner == dummy_user.user
 
 
 def test_owner_after_change(dummy_room, create_user):
-    other_user = create_user(123)
+    other_user = create_user(123, legacy=False)
     dummy_room.owner = other_user
     assert dummy_room.owner == other_user
 
@@ -633,7 +633,7 @@ def test_can_be_booked(dummy_room, create_user, create_room_attribute, create_gr
     if in_group:
         user.local_groups.add(create_group(123).group)
     if is_owned_by:
-        dummy_room.owner = user.as_avatar
+        dummy_room.owner = user
     if has_group:
         dummy_room.set_attribute_value(u'allowed-booking-group', u'123')
     assert dummy_room.can_be_booked(user, ignore_admin=ignore_admin) == expected
@@ -652,12 +652,12 @@ def test_can_be_booked(dummy_room, create_user, create_room_attribute, create_gr
 def test_can_be_prebooked(dummy_room, create_user, create_room_attribute, create_group,
                           is_admin, ignore_admin, is_active, is_owned_by, is_reservable, has_group, in_group, expected):
     create_room_attribute(u'allowed-booking-group')
-    user = create_user(123, rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin, legacy=False)
     dummy_room.is_active = is_active
     dummy_room.is_reservable = is_reservable
     dummy_room.reservations_need_confirmation = True
     if in_group:
-        user.user.local_groups.add(create_group(123).group)
+        user.local_groups.add(create_group(123).group)
     if is_owned_by:
         dummy_room.owner = user
     if has_group:
@@ -684,7 +684,7 @@ def test_can_be_booked_prebooked_no_rb_access(db, dummy_room, dummy_user, create
 
 @pytest.mark.parametrize(('is_owner', 'is_admin', 'expected'), bool_matrix('..', expect=any))
 def test_can_be_overridden(dummy_room, create_user, is_owner, is_admin, expected):
-    user = create_user(123, rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin, legacy=False)
     if is_owner:
         dummy_room.owner = user
     assert dummy_room.can_be_overridden(user) == expected
@@ -712,14 +712,14 @@ def test_can_be_no_user(dummy_room):
                          bool_matrix('...', expect=lambda x: x[0] or all(x[1:])))
 def test_ownership_functions(dummy_room, create_user, create_room_attribute, create_group,
                              is_owner, has_group, in_group, expected):
-    user = create_user(123)
+    user = create_user(123, legacy=False)
     create_room_attribute(u'manager-group')
     if is_owner:
         dummy_room.owner = user
     if has_group:
         dummy_room.set_attribute_value(u'manager-group', u'123')
     if in_group:
-        user.user.local_groups.add(create_group(123).group)
+        user.local_groups.add(create_group(123).group)
     assert dummy_room.is_owned_by(user) == expected
     assert Room.user_owns_rooms(user) == expected
     assert set(Room.get_owned_by(user)) == ({dummy_room} if expected else set())
@@ -735,7 +735,7 @@ def test_ownership_functions(dummy_room, create_user, create_room_attribute, cre
     (False, False, 10,   15, False)
 ))
 def test_check_advance_days(create_user, dummy_room, is_admin, is_owner, max_advance_days, days_delta, success):
-    user = create_user(123, rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin, legacy=False)
     dummy_room.max_advance_days = max_advance_days
     end_date = date.today() + timedelta(days=days_delta)
     if is_owner:
@@ -757,7 +757,7 @@ def test_check_advance_days_no_user(dummy_room):
 
 @pytest.mark.parametrize(('is_admin', 'is_owner', 'fits', 'success'), bool_matrix('...', expect=any))
 def test_check_bookable_hours(db, dummy_room, create_user, is_admin, is_owner, fits, success):
-    user = create_user(123, rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin, legacy=False)
     if is_owner:
         dummy_room.owner = user
     dummy_room.bookable_hours = [BookableHours(start_time=time(12), end_time=time(14))]

@@ -22,7 +22,7 @@ from wtforms.fields.core import SelectMultipleField, StringField, BooleanField, 
 from wtforms.validators import DataRequired, InputRequired, NumberRange, ValidationError
 from wtforms_components import TimeField
 from wtforms.widgets.core import HiddenInput
-from wtforms.fields.simple import HiddenField, TextAreaField, SubmitField
+from wtforms.fields.simple import TextAreaField, SubmitField
 
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField, PrincipalField

@@ -40,7 +40,6 @@ from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttribut
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
-from indico.modules.users import User
 from indico.util.date_time import round_up_month
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
@@ -165,7 +164,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         db.String
     )
     owner_id = db.Column(
-        db.String,
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
         nullable=False
     )
     is_active = db.Column(
@@ -233,6 +234,21 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         backref='room',
         cascade='all, delete-orphan',
         lazy='dynamic'
+    )
+
+    #: The owner of the room. If the room has the `manager-group`
+    #: attribute set, any users in that group are also considered
+    #: owners when it comes to management privileges.
+    #: Use :meth:`is_owned_by` for ownership checks that should
+    #: also check against the management group.
+    owner = db.relationship(
+        'User',
+        # subquery load since a normal joinedload breaks `get_with_data`
+        lazy='subquery',
+        backref=db.backref(
+            'owned_rooms',
+            lazy='dynamic'
+        )
     )
 
     @hybrid_property
@@ -332,14 +348,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             infos.append(_(u'videoconference'))
 
         return u', '.join(map(unicode, infos))
-
-    @property
-    def owner(self):
-        return User.get(self.owner_id).as_avatar
-
-    @owner.setter
-    def owner(self, user):
-        self.owner_id = user.id
 
     @property
     def notification_emails(self):

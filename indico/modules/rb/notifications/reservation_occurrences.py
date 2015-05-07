@@ -84,7 +84,7 @@ def notify_upcoming_occurrence(occurrence):
     cc_list = []
     room = occurrence.reservation.room
     if room.notification_for_responsible:
-        cc_list.append(room.owner.getEmail())
+        cc_list.append(room.owner.email)
 
     if not to_list and not cc_list:
         return
@@ -118,7 +118,7 @@ def notify_reservation_digest(reservation, occurrences):
     cc_list = []
     room = reservation.room
     if room.notification_for_responsible:
-        cc_list.append(room.owner.getEmail())
+        cc_list.append(room.owner.email)
 
     if not to_list and not cc_list:
         return

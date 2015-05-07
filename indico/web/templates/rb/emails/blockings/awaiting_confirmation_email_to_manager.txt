@@ -1,5 +1,5 @@
 {% extends 'rb/emails/base_email.txt' %}
-{% block recipient %}{{ owner.getFirstName() }}{% endblock %}
+{% block recipient %}{{ owner.first_name }}{% endblock %}
 
 {% block email_body -%}
 {{ blocking.created_by_user.full_name }} has created a blocking for {{ "some rooms" if blocked_rooms | length > 1 else "a room" }} you manage.

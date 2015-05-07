@@ -65,7 +65,7 @@ def test_can_be_overridden(dummy_room, dummy_blocking, create_user,
                            is_creator, is_admin, has_room, is_room_owner, expected):
     user = create_user(123, rb_admin=is_admin, legacy=False)
     if is_room_owner:
-        dummy_room.owner = user.as_avatar
+        dummy_room.owner = user
     if is_creator:
         dummy_blocking.created_by_user = user
     assert dummy_blocking.can_be_overridden(user, dummy_room if has_room else None) == expected
@@ -80,7 +80,7 @@ def test_can_be_overridden_explicit_only(dummy_room, dummy_blocking, create_user
                                          is_creator, is_admin, has_room, is_room_owner, expected):
     user = create_user(123, rb_admin=is_admin, legacy=False)
     if is_room_owner:
-        dummy_room.owner = user.as_avatar
+        dummy_room.owner = user
     if is_creator:
         dummy_blocking.created_by_user = user
     assert dummy_blocking.can_be_overridden(user, dummy_room if has_room else None, explicit_only=True) == expected

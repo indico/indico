@@ -77,6 +77,7 @@ def create_reservation(db, dummy_room, dummy_user):
 
     for reservation in _reservations:
         db.session.delete(reservation)
+    db.session.flush()
 
 
 @pytest.fixture
@@ -108,24 +109,30 @@ def dummy_occurrence(create_occurrence):
     return create_occurrence()
 
 
-@pytest.fixture
+@pytest.yield_fixture
 def create_room(db, dummy_location, dummy_user):
     """Returns a callable which lets you create rooms"""
+    _rooms = set()
 
     def _create_room(**params):
         params.setdefault('building', u'1')
         params.setdefault('floor', u'2')
         params.setdefault('number', u'3')
         params.setdefault('name', '')
-        params.setdefault('owner_id', dummy_user.id)
+        params.setdefault('owner', dummy_user.user)
         params.setdefault('location', dummy_location)
         room = Room(**params)
         room.update_name()
         db.session.add(room)
         db.session.flush()
+        _rooms.add(room)
         return room
 
-    return _create_room
+    yield _create_room
+
+    for room in _rooms:
+        db.session.delete(room)
+    db.session.flush()
 
 
 @pytest.fixture
@@ -190,6 +197,7 @@ def create_blocking(db, dummy_room, dummy_user):
 
     for blocking in _blockings:
         db.session.delete(blocking)
+    db.session.flush()
 
 
 @pytest.fixture

@@ -22,7 +22,7 @@ from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.fields.core import StringField, RadioField, IntegerField, BooleanField, FloatField, FieldList, FormField
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError
 from wtforms.widgets.core import HiddenInput
-from wtforms.fields.simple import HiddenField, TextAreaField, FileField
+from wtforms.fields.simple import TextAreaField, FileField
 from wtforms_components import TimeField
 
 from indico.modules.rb.models.locations import Location
@@ -30,7 +30,7 @@ from indico.modules.rb.models.equipment import EquipmentType
 from indico.util.i18n import _
 from indico.util.struct.iterables import group_nested
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField
+from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField, PrincipalField
 from indico.web.forms.validators import UsedIf
 from indico.web.forms.widgets import ConcatWidget
 
@@ -114,7 +114,7 @@ class RoomForm(IndicoForm):
                                             [Optional(), NumberRange(min=1, max=9)], default=1)
     notification_for_responsible = BooleanField(_(u'Remind room manager too'))
     notifications_enabled = BooleanField(_(u'Reminders enabled'), default=True)
-    owner_id = HiddenField(_(u'Responsible user'), [DataRequired()])
+    owner = PrincipalField(_(u'Owner'), [DataRequired()], multiple=False, allow_external=True, serializable=False)
     key_location = StringField(_(u'Where is key?'))
     telephone = StringField(_(u'Telephone'))
     capacity = IntegerField(_(u'Capacity'), [DataRequired(), NumberRange(min=1)], default=20)

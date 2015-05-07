@@ -242,6 +242,9 @@ class User(db.Model):
     # relationship backrefs:
     # - local_groups (User.local_groups)
     # - reservations_booked_for (Reservation.booked_for_user)
+    # - reservations (Reservation.created_by_user)
+    # - blockings (Blocking.created_by_user)
+    # - owned_rooms (Room.owner) - use `Room.get_owned_by()` if you also want managed rooms!
 
     @property
     def as_principal(self):

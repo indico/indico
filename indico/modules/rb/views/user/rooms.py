@@ -136,7 +136,7 @@ class WRoomBookingRoomDetails(WTemplated):
         wvars['attrs'] = {attr.attribute.name: attr for attr in room.attributes
                           if not attr.attribute.is_hidden or rb_is_admin(session.user)}
 
-        wvars['owner_name'] = room.owner.getFullName()
+        wvars['owner_name'] = room.owner.full_name
 
         wvars['bookable_hours'] = room.bookable_hours.all()
         wvars['nonbookable_periods'] = room.nonbookable_periods.all()

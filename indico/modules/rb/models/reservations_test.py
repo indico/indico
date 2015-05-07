@@ -133,9 +133,9 @@ def test_booked_for_user_email(dummy_reservation, dummy_user):
 def test_booked_for_user_email_after_change(dummy_reservation, dummy_user, create_user):
     dummy_user.user.email = 'new.email@example.com'
     assert dummy_reservation.booked_for_user_email == dummy_user.user.email
-    other_user = create_user(123)
-    dummy_reservation.booked_for_user = other_user.user
-    assert dummy_reservation.booked_for_user_email == other_user.user.email
+    other_user = create_user(123, legacy=False)
+    dummy_reservation.booked_for_user = other_user
+    assert dummy_reservation.booked_for_user_email == other_user.email
 
 
 def test_booked_for_user_email_with_no_user(dummy_reservation):
@@ -160,11 +160,11 @@ def test_created_by_user(dummy_reservation, dummy_user):
 
 
 def test_created_by_user_after_change(db, dummy_reservation, create_user):
-    other_user = create_user(123)
-    dummy_reservation.created_by_user = other_user.user
+    other_user = create_user(123, legacy=False)
+    dummy_reservation.created_by_user = other_user
     db.session.flush()
     assert dummy_reservation.created_by_user == other_user
-    assert dummy_reservation.created_by_id == other_user.user.id
+    assert dummy_reservation.created_by_id == other_user.id
 
 
 def test_created_by_user_with_no_id(db, dummy_reservation):
@@ -317,7 +317,7 @@ def test_add_edit_log(db, dummy_reservation):
 
 @pytest.mark.parametrize(('is_admin', 'is_owner', 'expected'), bool_matrix('..', expect=any))
 def test_can_be_accepted_rejected(dummy_reservation, create_user, is_admin, is_owner, expected):
-    user = create_user(123, rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin, legacy=False)
     if is_owner:
         dummy_reservation.room.owner = user
     assert dummy_reservation.can_be_accepted(user) == expected
@@ -327,11 +327,11 @@ def test_can_be_accepted_rejected(dummy_reservation, create_user, is_admin, is_o
 @pytest.mark.parametrize(('is_admin', 'is_created_by', 'is_booked_for', 'expected'),
                          bool_matrix('...', expect=any))  # admin/creator/booked-for, one is enough
 def test_can_be_cancelled(dummy_reservation, create_user, is_admin, is_created_by, is_booked_for, expected):
-    user = create_user(123, rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin, legacy=False)
     if is_created_by:
-        dummy_reservation.created_by_user = user.user
+        dummy_reservation.created_by_user = user
     if is_booked_for:
-        dummy_reservation.booked_for_user = user.user
+        dummy_reservation.booked_for_user = user
     assert dummy_reservation.can_be_cancelled(user) == expected
 
 
@@ -353,11 +353,11 @@ def test_can_be_deleted(dummy_reservation, dummy_user, is_admin, expected):
 )
 def test_can_be_modified(dummy_reservation, create_user,
                          is_rejected, is_cancelled, is_admin, is_created_by, is_booked_for, is_room_owner, expected):
-    user = create_user(123, rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin, legacy=False)
     if is_created_by:
-        dummy_reservation.created_by_user = user.user
+        dummy_reservation.created_by_user = user
     if is_booked_for:
-        dummy_reservation.booked_for_user = user.user
+        dummy_reservation.booked_for_user = user
     if is_room_owner:
         dummy_reservation.room.owner = user
     dummy_reservation.is_rejected = is_rejected
@@ -370,7 +370,7 @@ def test_can_be_modified(dummy_reservation, create_user,
     bool_matrix('..', expect=any)
 )
 def test_can_be_rejected(dummy_reservation, create_user, is_admin, is_room_owner, expected):
-    user = create_user(123, rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin, legacy=False)
     if is_room_owner:
         dummy_reservation.room.owner = user
     assert dummy_reservation.can_be_rejected(user) == expected

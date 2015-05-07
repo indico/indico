@@ -132,18 +132,12 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
                                     for nbd in form.nonbookable_periods.data if all(nbd.viewvalues())]
 
     def _process(self):
-        room_owner = None
-        if self._form.owner_id.data:
-            room_owner = AvatarHolder().getById(self._form.owner_id.data)
-        elif self._room.id is not None:
-            room_owner = self._room.owner
-
         if self._form.validate_on_submit():
             self._save()
             self._redirect(UH.UHRoomBookingRoomDetails.getURL(self._room))
         else:
             return room_views.WPRoomBookingRoomForm(self, form=self._form, room=self._room, location=self._location,
-                                                    errors=self._form.error_list, room_owner=room_owner).display()
+                                                    errors=self._form.error_list).display()
 
 
 class RHRoomBookingModifyRoom(RHRoomBookingCreateModifyRoomBase):
