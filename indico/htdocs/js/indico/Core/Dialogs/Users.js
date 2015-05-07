@@ -1628,8 +1628,10 @@ type("UserListField", ["IWidget"], {
             each(initialUsers, function(user){
                 if (any(user._type, null) === 'Avatar') {
                     self.userList.set('existingAv' + user.id, $O(user));
-                } else {
+                } else if (user._type === 'LDAPGroupWrapper' || user._type === 'LocalGroupWrapper') {
                     self.userList.set(user.identifier, $O(user));
+                } else {
+                    self.userList.set(user.id, $O(user));
                 }
             });
         }
