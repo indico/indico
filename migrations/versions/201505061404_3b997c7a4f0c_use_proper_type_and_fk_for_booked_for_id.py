@@ -1,7 +1,7 @@
 """Use proper type and FK for booked_for_id
 
 Revision ID: 3b997c7a4f0c
-Revises: 2b4b4bce2165
+Revises: 2bb9dc6f5c28
 Create Date: 2015-05-06 14:04:14.590496
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '3b997c7a4f0c'
-down_revision = '2b4b4bce2165'
+down_revision = '2bb9dc6f5c28'
 
 
 def upgrade():
