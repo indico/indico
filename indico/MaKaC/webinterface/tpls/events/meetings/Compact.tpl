@@ -65,7 +65,7 @@
     </tr>
     % if len(item.getSchedule().getEntries()) > 0:
         <% countContribs = 0 %>
-        % for subitem in item.getSchedule().getEntries():
+        % for subitem in sorted(item.getSchedule().getEntries(), key=lambda x: (x.getStartDate(), x.getTitle())):
                 <%
                     if subitem.__class__.__name__ != 'BreakTimeSchEntry':
                         subitem = subitem.getOwner()
