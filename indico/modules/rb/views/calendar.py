@@ -149,24 +149,24 @@ class RoomBookingCalendarWidget(object):
                 if blocking.can_be_overridden(session.avatar, explicit_only=True):
                     attrs['className'] = 'blocked_permitted'
                     attrs['tooltip'] = _('Blocked by {0}:\n{1}\n\n<b>You are permitted to override the blocking.</b>') \
-                        .format(blocking.created_by_user.getFullName(), blocking.reason)
+                        .format(blocking.created_by_user.full_name, blocking.reason)
                 elif blocked_room.state == BlockedRoom.State.accepted:
                     if blocking.can_be_overridden(session.avatar, room=self.specific_room):
                         attrs['className'] = 'blocked_override'
                         attrs['tooltip'] = _(
                             'Blocked by {0}:\n{1}\n\n<b>You own this room or are an administrator '
                             'and are thus permitted to override the blocking. Please use this '
-                            'privilege with care!</b>').format(blocking.created_by_user.getFullName(), blocking.reason)
+                            'privilege with care!</b>').format(blocking.created_by_user.full_name, blocking.reason)
                     else:
                         attrs['className'] = 'blocked'
-                        attrs['tooltip'] = _('Blocked by {0}:\n{1}').format(blocking.created_by_user.getFullName(),
+                        attrs['tooltip'] = _('Blocked by {0}:\n{1}').format(blocking.created_by_user.full_name,
                                                                             blocking.reason)
                 elif blocked_room.state == BlockedRoom.State.pending:
                     attrs['className'] = 'preblocked'
                     attrs['tooltip'] = _(
                         'Blocking requested by {0}:\n{1}\n\n'
                         '<b>If this blocking is approved, any colliding bookings will be rejected!</b>') \
-                        .format(blocking.created_by_user.getFullName(), blocking.reason)
+                        .format(blocking.created_by_user.full_name, blocking.reason)
             days_data[str(day)] = attrs
 
         return days_data
@@ -323,7 +323,7 @@ class Bar(Serializer):
             return None
         return {
             'id': self.blocking.id,
-            'creator': self.blocking.created_by_user.getFullName(),
+            'creator': self.blocking.created_by_user.full_name,
             'reason': self.blocking.reason,
             'blocking_url': url_for('rooms.blocking_details', blocking_id=self.blocking.id)
         }

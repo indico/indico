@@ -128,13 +128,13 @@ class BlockedRoom(db.Model):
         for reservation in reservations:
             if self.blocking.can_be_overridden(reservation.created_by_user.as_avatar, reservation.room):
                 continue
-            reservation.reject(self.blocking.created_by_user, reason)
+            reservation.reject(self.blocking.created_by_user.as_avatar, reason)
 
         for occurrence in occurrences:
             reservation = occurrence.reservation
             if self.blocking.can_be_overridden(reservation.created_by_user.as_avatar, reservation.room):
                 continue
-            occurrence.reject(self.blocking.created_by_user, reason)
+            occurrence.reject(self.blocking.created_by_user.as_avatar, reason)
 
         if notify_blocker:
             # We only need to notify the blocking creator if the blocked room wasn't approved yet.

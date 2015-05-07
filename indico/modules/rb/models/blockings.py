@@ -34,7 +34,9 @@ class Blocking(db.Model):
         primary_key=True
     )
     created_by_id = db.Column(
-        db.String,
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
         nullable=False
     )
     created_dt = db.Column(
@@ -69,6 +71,15 @@ class Blocking(db.Model):
         backref='blocking',
         cascade='all, delete-orphan'
     )
+    #: The user who created this blocking.
+    created_by_user = db.relationship(
+        'User',
+        lazy=False,
+        backref=db.backref(
+            'blockings',
+            lazy='dynamic'
+        )
+    )
 
     @hybrid_method
     def is_active_at(self, d):
@@ -77,14 +88,6 @@ class Blocking(db.Model):
     @is_active_at.expression
     def is_active_at(self, d):
         return (self.start_date <= d) & (d <= self.end_date)
-
-    @property
-    def created_by_user(self):
-        return User.get(self.created_by_id).as_avatar
-
-    @created_by_user.setter
-    def created_by_user(self, user):
-        self.created_by_id = user.id
 
     def can_be_modified(self, user):
         """
@@ -125,7 +128,7 @@ class Blocking(db.Model):
     def __repr__(self):
         return u'<Blocking({0}, {1}, {2}, {3}, {4})>'.format(
             self.id,
-            self.created_by_id,
+            self.created_by_user,
             self.reason,
             self.start_date,
             self.end_date

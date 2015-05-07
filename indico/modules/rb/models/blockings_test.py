@@ -43,8 +43,8 @@ def test_is_active_at(create_blocking, check_date, expected):
 
 
 def test_created_by_user(dummy_blocking, dummy_user, create_user):
-    assert dummy_blocking.created_by_user == dummy_user
-    dummy_blocking.created_by_user = user = create_user(123)
+    assert dummy_blocking.created_by_user == dummy_user.user
+    dummy_blocking.created_by_user = user = create_user(123).user
     assert dummy_blocking.created_by_user == user
 
 
@@ -52,7 +52,7 @@ def test_created_by_user(dummy_blocking, dummy_user, create_user):
 def test_can_be_modified_deleted(dummy_blocking, create_user, is_admin, is_creator, expected):
     user = create_user(123, rb_admin=is_admin)
     if is_creator:
-        dummy_blocking.created_by_user = user
+        dummy_blocking.created_by_user = user.user
     assert dummy_blocking.can_be_modified(user) == expected
     assert dummy_blocking.can_be_deleted(user) == expected
 
@@ -68,7 +68,7 @@ def test_can_be_overridden(dummy_room, dummy_blocking, create_user,
     if is_room_owner:
         dummy_room.owner = user
     if is_creator:
-        dummy_blocking.created_by_user = user
+        dummy_blocking.created_by_user = user.user
     assert dummy_blocking.can_be_overridden(user, dummy_room if has_room else None) == expected
 
 
@@ -83,7 +83,7 @@ def test_can_be_overridden_explicit_only(dummy_room, dummy_blocking, create_user
     if is_room_owner:
         dummy_room.owner = user
     if is_creator:
-        dummy_blocking.created_by_user = user
+        dummy_blocking.created_by_user = user.user
     assert dummy_blocking.can_be_overridden(user, dummy_room if has_room else None, explicit_only=True) == expected
 
 

@@ -82,7 +82,7 @@ class RHRoomBookingCreateBlocking(RHRoomBookingCreateModifyBlockingBase):
         self._blocking = blocking = Blocking()
         blocking.start_date = self._form.start_date.data
         blocking.end_date = self._form.end_date.data
-        blocking.created_by_user = session.avatar
+        blocking.created_by_user = session.user
         blocking.reason = self._form.reason.data
         blocking.allowed = self._form.principals.data
         blocking.blocked_rooms = [BlockedRoom(room_id=room_id) for room_id in self._form.blocked_rooms.data]
@@ -160,7 +160,7 @@ class RHRoomBookingBlockingList(RHRoomBookingBase):
     def _process(self):
         criteria = []
         if self.only_mine:
-            criteria += [Blocking.created_by_id == self._getUser().getId()]
+            criteria += [Blocking.created_by_user == session.user]
         if self.timeframe == 'year':
             criteria += [Blocking.start_date <= date(date.today().year, 12, 31),
                          Blocking.end_date >= date(date.today().year, 1, 1)]

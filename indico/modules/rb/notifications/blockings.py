@@ -22,7 +22,7 @@ def notify_request_response(blocked_room):
     Notifies blocking creator about approval/rejection of his
     blocking request for a room
     """
-    to = blocked_room.blocking.created_by_user.getEmail()
+    to = blocked_room.blocking.created_by_user.email
     verb = blocked_room.State(blocked_room.state).title.upper()
     subject = 'Room blocking {}'.format(verb)
     body = render_template('rb/emails/blockings/state_email_to_user.txt',

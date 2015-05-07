@@ -62,9 +62,9 @@ def rb_merge_users(new_id, old_id):
     for bp in BlockingPrincipal.find():
         if bp.principal == old_user:
             bp.principal = new_user
-    Blocking.find(created_by_id=old_id).update({'created_by_id': new_id})
-    Reservation.find(created_by_id=int(old_id)).update({Reservation.created_by_id: int(new_id)})
-    Reservation.find(booked_for_id=int(old_id)).update({Reservation.booked_for_id: int(new_id)})
+    Blocking.find(created_by_id=old_user.id).update({Blocking.created_by_id: new_user.id})
+    Reservation.find(created_by_id=old_user.id).update({Reservation.created_by_id: new_user.id})
+    Reservation.find(booked_for_id=old_user.id).update({Reservation.booked_for_id: new_user.id})
     Room.find(owner_id=old_id).update({'owner_id': new_id})
     for key in ('authorized_principals', 'admin_principals'):
         principals = rb_settings.get(key)

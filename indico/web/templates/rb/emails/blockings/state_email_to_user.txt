@@ -1,5 +1,5 @@
 {% extends 'rb/emails/base_email.txt' %}
-{% block recipient %}{{ blocking.created_by_user.getFirstName() }}{% endblock %}
+{% block recipient %}{{ blocking.created_by_user.first_name }}{% endblock %}
 
 {% block email_body -%}
 Your room blocking request has been {{ verb }} by a room manager.

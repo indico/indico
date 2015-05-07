@@ -2,7 +2,7 @@
 {% block recipient %}{{ owner.getFirstName() }}{% endblock %}
 
 {% block email_body -%}
-{{ blocking.created_by_user.getFullName() }} has created a blocking for {{ "some rooms" if blocked_rooms | length > 1 else "a room" }} you manage.
+{{ blocking.created_by_user.full_name }} has created a blocking for {{ "some rooms" if blocked_rooms | length > 1 else "a room" }} you manage.
 
 {% if blocked_rooms | length == 1 -%}
 Room: {{ blocked_rooms[0].room.full_name }}

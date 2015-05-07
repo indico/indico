@@ -164,16 +164,18 @@ def create_equipment_type(db, dummy_location):
     return _create_equipment_type
 
 
-@pytest.fixture
+@pytest.yield_fixture
 def create_blocking(db, dummy_room, dummy_user):
     """Returns a callable which lets you create blockings"""
+    _blockings = set()
+
     def _create_blocking(**params):
         room = params.pop('room', dummy_room)
         state = params.pop('state', BlockedRoom.State.pending)
         params.setdefault('start_date', date.today())
         params.setdefault('end_date', date.today())
         params.setdefault('reason', u'Blocked')
-        params.setdefault('created_by_user', dummy_user)
+        params.setdefault('created_by_user', dummy_user.user)
         blocking = Blocking(**params)
         if room is not None:
             br = BlockedRoom(room=room, state=state, blocking=blocking)
@@ -181,9 +183,13 @@ def create_blocking(db, dummy_room, dummy_user):
                 br.approve(notify_blocker=False)
         db.session.add(blocking)
         db.session.flush()
+        _blockings.add(blocking)
         return blocking
 
-    return _create_blocking
+    yield _create_blocking
+
+    for blocking in _blockings:
+        db.session.delete(blocking)
 
 
 @pytest.fixture

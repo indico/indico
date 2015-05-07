@@ -28,7 +28,7 @@
                                     <table width="100%">
                                         <tr>
                                             <td class="subFieldWidth" align="right" valign="top"><small> ${ _("By")}&nbsp;&nbsp;</small></td>
-                                            <td align="left" class="blacktext">${ blocking.created_by_user.getFullName() }</td>
+                                            <td align="left" class="blacktext">${ blocking.created_by_user.full_name }</td>
                                         </tr>
                                         <tr>
                                             <td align="right" valign="top"><small> ${ _("Date")}&nbsp;&nbsp;</small></td>

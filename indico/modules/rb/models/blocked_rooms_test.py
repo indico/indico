@@ -92,8 +92,7 @@ def test_reject(dummy_user, dummy_blocking, smtp, with_user, with_reason):
         kwargs['reason'] = u'foo'
     br.reject(**kwargs)
     assert br.state == BlockedRoom.State.rejected
-    mail = extract_emails(smtp, one=True, to=dummy_blocking.created_by_user.getEmail(),
-                          subject='Room blocking REJECTED')
+    mail = extract_emails(smtp, one=True, to=dummy_blocking.created_by_user.email, subject='Room blocking REJECTED')
     if with_reason:
         assert kwargs['reason'] in mail.as_string()
     assert not smtp.outbox
@@ -106,16 +105,16 @@ def test_approve(create_user, create_reservation, create_blocking, smtp,
     blocking = create_blocking(start_date=date.today(),
                                end_date=date.today() + timedelta(days=1))
     br = blocking.blocked_rooms[0]
-    user = create_user(123)
+    user = create_user(123).user
     resv = create_reservation(start_dt=datetime.combine(blocking.start_date, time(8)),
                               end_dt=datetime.combine(blocking.start_date, time(10)),
-                              created_by_user=user.user if colliding_reservation else blocking.created_by_user.user,
-                              booked_for_user=user.user if colliding_reservation else blocking.created_by_user.user)
+                              created_by_user=user if colliding_reservation else blocking.created_by_user,
+                              booked_for_user=user if colliding_reservation else blocking.created_by_user)
     resv2 = create_reservation(start_dt=datetime.combine(blocking.start_date + timedelta(days=1), time(8)),
                                end_dt=datetime.combine(blocking.end_date + timedelta(days=1), time(10)),
                                repeat_frequency=RepeatFrequency.DAY,
-                               created_by_user=user.user if colliding_occurrence else blocking.created_by_user.user,
-                               booked_for_user=user.user if colliding_occurrence else blocking.created_by_user.user)
+                               created_by_user=user if colliding_occurrence else blocking.created_by_user,
+                               booked_for_user=user if colliding_occurrence else blocking.created_by_user)
     assert br.state == BlockedRoom.State.pending
     br.approve(notify_blocker=notify_blocker)
     assert br.state == BlockedRoom.State.accepted
@@ -124,7 +123,7 @@ def test_approve(create_user, create_reservation, create_blocking, smtp,
     for occ in resv2.occurrences:
         assert occ.is_rejected == (colliding_occurrence and blocking.is_active_at(occ.date))
     if notify_blocker:
-        extract_emails(smtp, one=True, to=blocking.created_by_user.getEmail(), subject='Room blocking ACCEPTED')
+        extract_emails(smtp, one=True, to=blocking.created_by_user.email, subject='Room blocking ACCEPTED')
     assert len(smtp.outbox) == 2 * (colliding_occurrence + colliding_reservation)  # 2 emails per rejection
 
 
@@ -133,17 +132,17 @@ def test_approve(create_user, create_reservation, create_blocking, smtp,
     (False, True)
 ))
 def test_approve_acl(db, create_user, create_reservation, create_blocking, smtp, in_acl, rejected):
-    user = create_user(123)
+    user = create_user(123).user
     blocking = create_blocking(start_date=date.today(),
                                end_date=date.today() + timedelta(days=1))
     if in_acl:
-        blocking.allowed.add(user.user)
+        blocking.allowed.add(user)
         db.session.flush()
     br = blocking.blocked_rooms[0]
     resv = create_reservation(start_dt=datetime.combine(blocking.start_date, time(8)),
                               end_dt=datetime.combine(blocking.start_date, time(10)),
-                              created_by_user=user.user,
-                              booked_for_user=user.user)
+                              created_by_user=user,
+                              booked_for_user=user)
     assert br.state == BlockedRoom.State.pending
     br.approve(notify_blocker=False)
     assert br.state == BlockedRoom.State.accepted
