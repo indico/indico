@@ -17,7 +17,7 @@
         <td class="blacktext" bgcolor="white" width="80%">
             <table width="100%">
                 <tr>
-                    <td><ul id="inPlaceConfCreators" class="UIPeopleList"></ul></td>
+                    <td><ul id="inPlaceConfCreators" class="user-list"></ul></td>
                 </tr>
                 <tr>
                     <td nowrap style="width:80%">
@@ -47,7 +47,7 @@ var methodsCC = {'addExisting': 'category.protection.addExistingConfCreator',
 var paramsCC = {categId: '${ categoryId }', kindOfList: 'confCreation'};
 
 var modificationControlManagerCC = new ListOfUsersManager(null,
-		methodsCC, paramsCC, $E('inPlaceConfCreators'), "user", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
+		methodsCC, paramsCC, $E('inPlaceConfCreators'), "user", "item-user", true, {}, {title: false, affiliation: false, email:true},
         {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ confCreators | n,j});
 
 var pm = new IndicoUtil.parameterManager();

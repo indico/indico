@@ -83,7 +83,7 @@ var listOfAddHandlers = {};
     };
 
     // Create the component for each track
-    var uf = new UserListField('reviewersPRUserListDiv', 'userList',
+    var uf = new UserListField('reviewersPRUserListDiv', 'user-list',
             ${ jsonEncode(fossilize(coordinatorsByTrack[i])) },
             true,null,
             true, false, null, null,

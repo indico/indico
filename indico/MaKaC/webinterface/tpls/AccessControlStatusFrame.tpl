@@ -200,7 +200,7 @@ from MaKaC import conference as cmod
     // ---- List of users allowed to view the categ/event/material/resource
 
     var allowedUsersList = new UserListField(
-            'userListDiv', 'userList',
+            'userListDiv', 'user-list',
             allowedList, true, null,
             true, true, null, null,
             false, false, false, true,

@@ -72,7 +72,7 @@
         <td bgcolor="white" width="60%">
             <table width="100%">
                 <tr>
-                    <td><ul id="inPlaceAdministrators" class="UIPeopleList"></ul></td>
+                    <td><ul id="inPlaceAdministrators" class="user-list"></ul></td>
                 </tr>
                 <tr>
                     <td nowrap style="width:60%; padding-top:5px;">
@@ -89,7 +89,7 @@
 
 var adminListManager = new ListOfUsersManager(null,
         {'addExisting': 'admin.general.addExistingAdmin', 'remove': 'admin.general.removeAdmin'},
-        {}, $E('inPlaceAdministrators'), "administrator", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
+        {}, $E('inPlaceAdministrators'), "administrator", "item-user", true, {}, {title: false, affiliation: false, email:true},
         {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ administrators | n,j}, null, null, null, false);
 
 </script>

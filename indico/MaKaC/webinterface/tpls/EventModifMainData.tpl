@@ -186,7 +186,7 @@ additionalInfo = confObj.getContactInfo()
         <table width="100%">
             <tr>
                 <td class="blacktext" style="width: 79%">
-                    <ul id="chairPersonsList" class="UIAuthorList"></ul>
+                    <ul id="chairPersonsList" class="user-list"></ul>
                 </td>
                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
                     <span id="addNewChairSpan" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">

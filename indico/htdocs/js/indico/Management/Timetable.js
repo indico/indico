@@ -455,7 +455,7 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
                 this.isEdit?nullRoomInfo(info.get('roomInfo')):true, self.favoriteRooms, null, self.bookedRooms, ttdata, info, undefined, parentName);
 
         var presListWidget = new UserListField(
-            'LongPeopleListDiv', 'PeopleList',
+            'LongPeopleListDiv', 'user-list',
             self.isEdit?self.info.get("presenters"):null, true, null,
             true, false, self.info.get("conference"), null,
             true, true, true, true,
@@ -593,14 +593,14 @@ type("AddNewContributionDialog", ["ServiceDialogWithButtons", "PreLoadHandler"],
         var self = this;
 
         var authorListWidget = new UserListField(
-            'LongPeopleListDiv', 'PeopleList',
+            'LongPeopleListDiv', 'user-list',
             self.info.get("authors"), true, null,
             true, false, this.args.get('conference'), null,
             true, true, true, true,
             userListNothing, userListNothing, userListNothing);
 
         var coauthorListWidget = new UserListField(
-                'LongPeopleListDiv', 'PeopleList',
+                'LongPeopleListDiv', 'user-list',
                 self.info.get("coauthors"), true, null,
                 true, false, this.args.get('conference'), null,
                 true, true, true, true,

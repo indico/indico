@@ -13,7 +13,7 @@ ${ accessControlFrame }
         <td width="100%" style="padding-bottom:20px;">
             <table width="80%">
                 <tr>
-                    <td id="parentTDSubmitters" style="width:79%;"><ul id="inPlaceSubmitters" class="UIPeopleList"></ul></td>
+                    <td id="parentTDSubmitters" style="width:79%;"><ul id="inPlaceSubmitters" class="user-list"></ul></td>
                 </tr>
                 <tr>
                     <td nowrap valign="top" style="width: 21%; text-align:left;">
@@ -40,7 +40,7 @@ var params = {confId: '${ confId }', contribId: '${ contribId }'};
 
 
 var modificationControlManager = new ListOfUsersManager('${ confId }',
-        methodsMgr, params, $E('inPlaceManagers'), "manager", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
+        methodsMgr, params, $E('inPlaceManagers'), "manager", "item-user", true, {}, {title: false, affiliation: false, email:true},
         {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ managers | n,j});
 
 </script>

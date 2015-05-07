@@ -8,7 +8,7 @@
         <td bgcolor="white" width="80%">
             <table width="100%">
                 <tr>
-                    <td><ul id="inPlaceManagers" class="UIPeopleList"></ul></td>
+                    <td><ul id="inPlaceManagers" class="user-list"></ul></td>
                 </tr>
                 <tr>
                     <td nowrap style="width:80%">
@@ -62,7 +62,7 @@ var methods = {'addExisting': 'event.protection.addExistingManager',
 var params = {confId: '${ confId }'};
 
 var modificationControlManager = new ListOfUsersManager('${ confId }',
-        methods, params, $E('inPlaceManagers'), "manager", "UIPerson", true, {}, {title: false, affiliation: false, email:true},
+        methods, params, $E('inPlaceManagers'), "manager", "item-user", true, {}, {title: false, affiliation: false, email:true},
         {remove: true, edit: false, favorite: true, arrows: false, menu: false}, ${ managers | n,j});
 
 </script>

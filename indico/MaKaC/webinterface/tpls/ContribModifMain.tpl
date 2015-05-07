@@ -126,7 +126,7 @@
                                             <tr>
                                                 <td style="width: 79%">
                                                     <div data-id="prAuthorsDiv" class="sortblock" style="width:100%">
-                                                        <ul id="inPlacePrimaryAuthors" class="UIAuthorList" data-mode-copy="['inPlaceSpeakers']"></ul>
+                                                        <ul id="inPlacePrimaryAuthors" class="user-list" data-mode-copy="['inPlaceSpeakers']"></ul>
                                                     </div>
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
@@ -148,7 +148,7 @@
                                             <tr>
                                                 <td style="width: 79%">
                                                     <div data-id="coAuthorsDiv" class="sortblock" style="width:100%">
-                                                        <ul id="inPlaceCoAuthors" class="UIAuthorList"  data-mode-copy="['inPlaceSpeakers']"></ul>
+                                                        <ul id="inPlaceCoAuthors" class="user-list"  data-mode-copy="['inPlaceSpeakers']"></ul>
                                                     </div>
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">
@@ -171,7 +171,7 @@
                                             <tr>
                                                 <td style="width: 79%">
                                                     <div data-id="prAuthorsDiv" class="sortblock" style="width:100%">
-                                                        <ul id="inPlaceSpeakers" class="UIAuthorList"  data-mode-copy="['inPlacePrimaryAuthors', 'inPlaceCoAuthors']"></ul>
+                                                        <ul id="inPlaceSpeakers" class="user-list"  data-mode-copy="['inPlacePrimaryAuthors', 'inPlaceCoAuthors']"></ul>
                                                     </div>
                                                 </td>
                                                 <td nowrap valign="top" style="width: 21%; text-align:right; padding-top:5px; padding-bottom:5px;">

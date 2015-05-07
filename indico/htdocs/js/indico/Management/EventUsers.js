@@ -57,38 +57,11 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
     },
 
     _personName: function(user) {
-        var content = this.ListOfUsersManager.prototype._personName.call(this, user);
+        var data = this.ListOfUsersManager.prototype._personName.call(this, user);
         if (!user.showSubmitterCB) {
-            content += '<small class="roleSmall"> Submitter </small>';
+            data.roles = ['Submitter'];
         }
-        return content;
-    },
-
-    _drawUserList: function() {
-        var self = this;
-        var container = $(this.inPlaceListElem.dom).html('');
-
-        this.usersList.each(function(val, idx) {
-            var user = val;
-            var elemStyle = self.elementClass;
-            var row = $('<li/>').attr('class', elemStyle);
-            _(self._component_order).each(function(opt, idx){
-                if (self.userOptions[opt]) {
-                    var comp = self._components[opt].call(self, user, self.userOptions[opt]);
-                    row.append(comp);
-                }
-            });
-            var spanClass = 'authorMove';
-            if (self.kindOfUser == "chairperson") {
-                spanClass = 'author';
-            }
-            row.append($('<span class=' + spanClass + ' />').append(
-                self._personName(user)));
-            row.data('user', user);
-
-            container.append(row);
-        });
-        this._checkEmptyList();
+        return data;
     },
 
     canDrop: function(authorEmail) {

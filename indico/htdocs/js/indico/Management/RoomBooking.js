@@ -463,7 +463,7 @@ type("RoomListWidget", ["ListWidget"],
         this.removeProcess = removeProcess;
         this.useValue = useValue || false;
         if (!exists(style)) {
-            style = "UIPeopleList";
+            style = "user-list";
         }
         this.ListWidget(style);
     }

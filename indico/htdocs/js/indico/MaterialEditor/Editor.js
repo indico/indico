@@ -546,7 +546,7 @@ type("AddMaterialDialog", ["AddEditMaterialDialog","ExclusivePopupWithButtons"],
         this.password = Html.input('password',{});
 
         this.userList = new UserListField(
-            'ShortPeopleListDiv', 'PeopleList',
+            'ShortPeopleListDiv', 'user-list',
             null, true, null,
             true, true, null, null,
             false, false, false, true,
@@ -775,7 +775,7 @@ type("EditMaterialResourceBase", ["AddEditMaterialDialog", "ServiceDialogWithBut
     _drawUserList: function(){
 
         return new UserListField(
-                'ShortPeopleListDiv', 'PeopleList',
+                'ShortPeopleListDiv', 'user-list',
                 this.allowedUsers, true, null,
                 true, true, null, null,
                 false, false, false, true,

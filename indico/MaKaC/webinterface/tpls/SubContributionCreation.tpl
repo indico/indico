@@ -28,7 +28,7 @@
             <td width="100%" style="padding-bottom:20px;">
                 <table width="100%" style="padding-top:6px;">
                     <tr>
-                        <td id="parentTDPresenters" style="width:79%; display:none"><ul id="inPlacePresenters" class="UIPeopleList"></ul></td>
+                        <td id="parentTDPresenters" style="width:79%; display:none"><ul id="inPlacePresenters" class="user-list"></ul></td>
                         <td nowrap valign="top" style="width: 21%; text-align:left;">
                             <span id="inPlacePresentersMenu" onmouseover="this.className = 'mouseover'" onmouseout="this.className = ''">
                                 <a class="dropDownMenu fakeLink" onclick="presenterManager.addManagementMenu();">${ _("Add presenter") }</a>

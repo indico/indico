@@ -43,11 +43,11 @@ type("SessionControlManager", ["ListOfUsersManager"], {
     },
 
     _personName: function(user) {
-        var content = this.ListOfUsersManager.prototype._personName.call(this, user);
+        var data = this.ListOfUsersManager.prototype._personName.call(this, user);
         if (user.isConvener) {
-            content += '<small class="roleSmall"> Convener </small>';
+            data.roles = ['Convener'];
         }
-        return content;
+        return data;
     },
 
     onMenu: function(element, user) {
@@ -73,7 +73,7 @@ type("SessionControlManager", ["ListOfUsersManager"], {
 },
 
     function(confId, methods, params, inPlaceListElem, userCaption, initialList) {
-        this.ListOfUsersManager(confId, methods, params, inPlaceListElem, userCaption, "UIPerson", true, {},
+        this.ListOfUsersManager(confId, methods, params, inPlaceListElem, userCaption, "item-user", true, {},
                 {title: false, affiliation: false, email:true},
                 {remove: true, edit: false, favorite: true, arrows: false, menu: true}, initialList);
     }

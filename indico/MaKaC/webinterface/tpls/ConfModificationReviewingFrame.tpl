@@ -98,7 +98,7 @@
                             }else removeReferee();
                         };
 
-                        var uf = new UserListField('reviewersPRUserListDiv', 'userList',
+                        var uf = new UserListField('reviewersPRUserListDiv', 'user-list',
                                 ${ jsonEncode(fossilize(ConfReview.getRefereesList())) },
                                 true,null,
                                 true, false, null, null,
@@ -170,7 +170,7 @@
 
                         };
 
-                        var uf = new UserListField('reviewersPRUserListDiv', 'userList',
+                        var uf = new UserListField('reviewersPRUserListDiv', 'user-list',
                                 ${ jsonEncode(fossilize(ConfReview.getReviewersList())) },
                                 true,null,
                                 true, false, null, null,
@@ -242,7 +242,7 @@
                                 }).open();
                             }else removeEditor();
                         };
-                        var uf = new UserListField('reviewersPRUserListDiv', 'userList',
+                        var uf = new UserListField('reviewersPRUserListDiv', 'user-list',
                                                    ${ jsonEncode(fossilize(ConfReview.getEditorsList())) },
                                                    true,null,
                                                    true, false, null, null,

@@ -114,7 +114,7 @@ extend(IndicoUI.Dialogs,
                            roomEditor = new RoomBookingReservationWidget(Indico.Data.Locations, info.get('roomInfo'), parentRoomInfo, true, favoriteRooms, null, bookedRooms, timetable.parentTimetable?timetable.parentTimetable.getData():timetable.getData(), info, undefined, $T('event'));
 
                            var convListWidget = new UserListField(
-                               'VeryShortPeopleListDiv', 'PeopleList',
+                               'VeryShortPeopleListDiv', 'user-list',
                                null, true, null,
                                true, false, null, null,
                                true, false, true, true,
@@ -403,7 +403,7 @@ extend(IndicoUI.Dialogs,
                                    info);
 
                            var convListWidget = new UserListField(
-                               'VeryShortPeopleListDiv', 'PeopleList',
+                               'VeryShortPeopleListDiv', 'user-list',
                                isEdit?params.conveners:params.sessionConveners, true, null,
                                true, false, null, null,
                                true, false, true, true,

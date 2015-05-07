@@ -17,18 +17,157 @@
 
 @import "base/palette";
 
-.favorite-user {
-    height: 1.2em;
-    color: $pastel-blue;
 
-    &.active {
-        color: $blue;
-    }
-
+@mixin user-action($color) {
+    display: inline;
+    height: 1.3em;
+    font-size: 1.3em;
+    line-height: 1.3em;
+    margin-left: 0.3em;
     cursor: pointer;
+    vertical-align: baseline;
+    color: $color;
+    opacity: 0.7;
 
-    font-size: 1.2em;
-    line-height: 1.2em;
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.suggested-users .user-list,
+.user-search-results .user-list {
+    overflow: auto;
+
+    li {
+        cursor: pointer;
+    }
+}
+
+.user-search-results {
+    height: 200px;
+    border: 1px solid $gray;
+    width: 450px;
+    overflow: auto;
+}
+
+.user-list {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+
+    max-width: 500px;
+
+    li {
+        display: table;
+        box-sizing: border-box;
+        width: 100%;
+        height: 3em;
+        padding: 0.4em;
+
+        &:before {
+            display: table-cell;
+            width: 2em;
+            vertical-align: middle;
+            font-size: 1.5em;
+            color: $gray;
+            font-family: 'icomoon-ultimate';
+        }
+
+        &.item-user:before {
+            content: "\48";
+        }
+
+        &.item-group:before {
+            content: "\47";
+        }
+
+        &.selected {
+            background-color: $pastel-blue;
+
+            &:hover {
+                background-color: transparentize($pastel-blue, 10%);
+            }
+        }
+
+        &:hover {
+            background-color: $light-gray;
+        }
+
+        &:not(last-child) {
+            border-bottom: 1px solid lighten($gray, 20%);
+        }
+
+        .info {
+            display: table-cell;
+            vertical-align: middle;
+
+            > * {
+                display: inline-block;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+
+            .name {
+                display: block;
+            }
+
+            .email, .affiliation {
+                color: $dark-gray;
+                font-size: 0.8em;
+            }
+
+            .email + .role, {
+                margin-left: 1em;
+            }
+
+            .affiliation + .role, {
+                margin-left: 1em;
+            }
+
+            .affiliation {
+                max-width: 300px;
+            }
+
+            .role {
+                font-size: 0.8em;
+                margin: 0.2em 0.2em 0 0;
+                padding: 0.2em;
+                border-radius: 0.3em;
+                background-color: transparentize($blue, 20%);
+                color: $light-gray;
+            }
+        }
+
+        .actions {
+            display: table-cell;
+            text-align: right;
+            vertical-align: middle;
+            width: 0;
+
+            .remove-user {
+                @include user-action($red);
+            }
+
+            .edit-user {
+                @include user-action($light-black);
+            }
+
+            .user-menu {
+                @include user-action($light-black);
+            }
+
+            .favorite-user {
+                &:not(.active) {
+                    @include user-action($pastel-blue);
+                }
+                &.active {
+                    @include user-action($blue);
+                }
+            }
+
+        }
+    }
 }
 
 .account-identity {

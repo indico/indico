@@ -13,7 +13,7 @@ ${ accessControlFrame }
   <td bgcolor="white" width="80%">
         <table width="100%">
             <tr>
-                <td><ul id="inPlaceCoordinators" class="UIPeopleList"></ul></td>
+                <td><ul id="inPlaceCoordinators" class="user-list"></ul></td>
             </tr>
             <tr>
                 <td nowrap style="width:80%">

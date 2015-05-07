@@ -103,7 +103,7 @@ $(function() {
 
 /**
  * @param {String} style The class name of the <ul> element inside this FoundPeopleList
- *                       If left to null, it will be "UIPeopleList"
+ *                       If left to null, it will be "user-list"
  *
  * @param {Function} selectionObserver A function that will be called when the selection varies. The function will be called without arguments
  *                                     (it can use public methods of FoundPeopleList to get information).
@@ -119,12 +119,12 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
         if (peopleData.get('isGroup') || peopleData.get('_type') === 'group') {
             return Html.span({}, peopleData.get("name"));
         } else {
-            var userName = Html.span({}, peopleData.get("firstName"), ' ', peopleData.get("familyName"));
-            var userEmail = Html.span({id: self.id + "_" + pair.key + "_email", className: "foundUserEmail"}, Html.br(), Util.truncate(peopleData.get("email"), 40));
+            var userName = Html.span("name", peopleData.get("firstName"), ' ', peopleData.get("familyName"));
+            var userEmail = Html.span({id: self.id + "_" + pair.key + "_email", className: "email"}, Util.truncate(peopleData.get("email"), 40));
 
             if (this.showToggleFavouriteButtons && IndicoGlobalVars.isUserAuthenticated && peopleData.get('_type') == "Avatar") {
-                var favouritizeButtonDiv = Html.div({style: {cssFloat: "right"}}, new Html(create_favorite_button(peopleData.get('id')).get(0)));
-                return [favouritizeButtonDiv, userName, userEmail];
+                var favouritizeButtonDiv = Html.div("actions", new Html(create_favorite_button(peopleData.get('id')).get(0)));
+                return [Html.div("info", userName, userEmail), favouritizeButtonDiv];
             } else {
                 return [userName, userEmail];
             }
@@ -137,7 +137,7 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
      */
     function(style, onlyOne, selectionObserver, showToggleFavouriteButtons, favouriteButtonObserver) {
         if (!exists(style)) {
-            style = "UIPeopleList";
+            style = "user-list";
         }
 
         this.onlyOne = any(onlyOne,false);
@@ -146,7 +146,7 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
 
         /*this.lastTargetListItem = null;*/
 
-        this.SelectableListWidget(selectionObserver, this.onlyOne, style, "selectedUser", "unselectedUser"); //, this.__mouseoverObserver);
+        this.SelectableListWidget(selectionObserver, this.onlyOne, style, "selected", "unselected"); //, this.__mouseoverObserver);
     }
 );
 
@@ -223,7 +223,7 @@ type ("SimpleSearchPanel", ["IWidget"], {
            self._search();
        });
 
-       this.foundPeopleListDiv = Html.div("UISearchPeopleListDiv", this.foundPeopleList.draw());
+       this.foundPeopleListDiv = Html.div("user-search-results", this.foundPeopleList.draw());
 
        this.container = Html.div({}, this.searchForm.get(), this.searchButtonDiv, this.foundPeopleListDiv, this.extraDiv);
 
@@ -558,7 +558,7 @@ type ("SuggestedUsersPanel", ["IWidget"], {
             this.suggestedUserList.setMessage(message);
         }
 
-        this.suggestedUserListDiv = Html.div("UISuggestedPeopleListDiv", this.suggestedUserList.draw());
+        this.suggestedUserListDiv = Html.div("suggested-users", this.suggestedUserList.draw());
 
         return this.IWidget.prototype.draw.call(this, Widget.block([this.titleDiv, this.suggestedUserListDiv]));
     }
@@ -1291,45 +1291,44 @@ type("UserListWidget", ["ListWidget"],
             var self = this;
             var userData = user.get();
 
-            var editButton = Widget.link(command(function() {
-                 var editPopup = new UserDataPopup(
-                     'Change user data',
-                     userData.clone(),
-                     function(newData, suicideHook) {
-                         if (editPopup.parameterManager.check()) {
-                             //  editProcess will be passed a WatchObject representing the user.
-                             self.editProcess(userData, function(result) {
-                                 if (result) {
-                                     userData.update(newData.getAll());
-                                     if (!startsWith('' + userData.get('id'), 'newUser')) {
-                                         userData.set('id', 'edited' + userData.get('id'));
-                                     }
-                                     self.userListField.inform();
-                                 }
-                             });
-                             suicideHook();
-                         }
-                     }
+            var edit_button = $('<i class="edit-user icon-edit">').click(function() {
+                var editPopup = new UserDataPopup(
+                    'Change user data',
+                    userData.clone(),
+                    function(newData, suicideHook) {
+                        if (editPopup.parameterManager.check()) {
+                            //  editProcess will be passed a WatchObject representing the user.
+                            self.editProcess(userData, function(result) {
+                                if (result) {
+                                    userData.update(newData.getAll());
+                                    if (!startsWith('' + userData.get('id'), 'newUser')) {
+                                        userData.set('id', 'edited' + userData.get('id'));
+                                    }
+                                    self.userListField.inform();
+                                }
+                            });
+                            suicideHook();
+                        }
+                    }
                  );
                  editPopup.open();
-            }, IndicoUI.Buttons.editButton()));
+            });
 
-            var removeButton = Widget.link(command(function() {
-                             // removeProcess will be passed a WatchObject representing the user.
-                             self.removeProcess(userData, function(result) {
-                                     if (result) {
-                                         self.set(user.key, null);
-                                         self.userListField.inform();
-                                     }
-                                 });
-                             }, IndicoUI.Buttons.removeButton()));
+            var remove_button = $('<i class="remove-user icon-close">').click(function() {
+                self.removeProcess(userData, function(result) {
+                    if (result) {
+                        self.set(user.key, null);
+                        self.userListField.inform();
+                    }
+                });
+            });
+
+            var buttonDiv = Html.div("actions", new Html(remove_button.get(0)));
 
             if (userData.get('isGroup') || userData.get('_fossil') === 'group') {
-                var removeButtonDiv = Html.div({style: {cssFloat: "right", clear: "both", paddingRight: pixels(10)}}, removeButton);
                 var groupName = $B(Html.span(), userData.accessor('name'));
-                return Html.span({}, removeButtonDiv, Html.span({style:{fontWeight:'bold'}}, 'Group: '), groupName);
+                return [groupName, buttonDiv];
             } else {
-                var buttonDiv = Html.div({style: {cssFloat: "right", clear: "both", paddingRight: pixels(10)}});
                 if (IndicoGlobalVars.isUserAuthenticated & this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
                     buttonDiv.append(new Html(create_favorite_button(userData.get('id')).get(0)));
                 }
@@ -1337,20 +1336,19 @@ type("UserListWidget", ["ListWidget"],
                     buttonDiv.append($("<span></span>").shield({userData: userData}).get(0));
                 }
                 if (this.allowEdit) {
-                    buttonDiv.append(editButton) ;
+                    buttonDiv.append(new Html(edit_button.get(0)));
                 }
-                buttonDiv.append(removeButton);
+                buttonDiv.append(new Html(remove_button.get(0)));
 
                 var userName = Html.span({}, $B(Html.span(), userData.accessor('name')));
-
-                return Html.span({}, buttonDiv, userName);
+                return [userName, buttonDiv];
             }
          }
      },
 
      function(style, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons, userListField) {
 
-         this.style = any(style, "UIPeopleList");
+         this.style = any(style, "user-list");
          this.allowSetRights = allowSetRights;
          this.allowEdit = allowEdit;
          this.editProcess = any(editProcess, singleUserNothing);
@@ -1618,7 +1616,7 @@ type("UserListField", ["IWidget"], {
         var self = this;
         this.userList = new UserListWidget(userListStyle, allowSetRights, allowEdit, editProcess, removeProcess, showToggleFavouriteButtons,this);
         self.newUserCounter = 0;
-        this.userDivStyle = any(userDivStyle, "UIPeopleListDiv");
+        this.userDivStyle = any(userDivStyle, "user-list");
         this.setUpParameters();
 
         if (exists(initialUsers)) {
