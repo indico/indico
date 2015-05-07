@@ -1741,33 +1741,10 @@ li.unselectable {
     color: #888888;
 }
 
-div.UIPeopleListDiv { /* for lists of users in forms */
-    margin-top: 10px;
-    margin-bottom: 10px;
-    height: 200px;
-    width: 300px;
-    border: 1px solid #CCCCCC;
-    overflow: auto;
-}
-
 div.PluginOptionPeopleListDiv {
     border: 1px dashed #CCCCCC;
     min-height: 25px;
     min-width: 320px;
-}
-
-div.UISearchPeopleListDiv, div.UISuggestedPeopleListDiv {
-    overflow: auto;
-}
-
-div.UISearchPeopleListDiv {
-    height: 200px;
-    border: 1px solid #CCCCCC;
-    margin-top:10px;
-    max-width:450px;
-    min-width:450px;
-    overflow:auto;
-    width:100%;
 }
 
 div.UISuggestedPeopleListDiv {
@@ -1775,7 +1752,7 @@ div.UISuggestedPeopleListDiv {
     height: 300px;
 }
 
-ul.PeopleList, ul.UIPeopleList, ul.UISuggestedPeopleList, ul.UIAuthorList { /* UIPeopleList: for all lists of users, among them, found users */
+ul.UISuggestedPeopleList, ul.UIAuthorList {
     border: none;
     display: block;
     list-style-type: none;
@@ -1783,7 +1760,7 @@ ul.PeopleList, ul.UIPeopleList, ul.UISuggestedPeopleList, ul.UIAuthorList { /* U
     margin: 0;
 }
 
-ul.PeopleList li, ul.UIPeopleList li, ul.UISuggestedPeopleList li, ul.UIAuthorList li {
+ul.UISuggestedPeopleList li, ul.UIAuthorList li {
     margin: 0;
     display: block;
     margin-bottom: 0px;
@@ -1793,36 +1770,20 @@ ul.PeopleList li, ul.UIPeopleList li, ul.UISuggestedPeopleList li, ul.UIAuthorLi
     vertical-align: middle;
 }
 
-ul.UIPeopleList li, ul.UISuggestedPeopleList, ul.UIAuthorList li {
+ul.UISuggestedPeopleList, ul.UIAuthorList li {
     border-bottom: 1px dotted #DDDDDD;
     cursor: pointer;
 }
 
-ul.PeopleList li:hover {
-    background: #ECECEC;
-}
-
-ul.UIPeopleList li:hover, ul.UISuggestedPeopleList li:hover {
+ul.UISuggestedPeopleList li:hover {
     background-color: #FFF6DF !important;
 }
 
-ul.UIPeopleList li.listMessage, ul.UISuggestedPeopleList li.listMessage {
-    border-bottom: none;
-    font-style: italic;
-    padding: 10px;
-    cursor: auto;
-    line-height: normal;
-}
-
-ul.UIPeopleList li.listMessage:hover, ul.UISuggestedPeopleList li.listMessage:hover
-{
-    background-color: transparent !important;
-}
-ul.UIPeopleList li .nameLink, ul.UIAuthorList li .nameLink {
+ul.UIAuthorList li .nameLink {
     padding: 0px 0px 4px 30px;
 }
 
-ul.UIPeopleList li .foundUserEmail, ul.UISuggestedPeopleList li .foundUserEmail {
+ul.UISuggestedPeopleList li .foundUserEmail {
     font-style: italic;
     font-size: 8pt;
     padding-left: 5px;
@@ -1830,20 +1791,8 @@ ul.UIPeopleList li .foundUserEmail, ul.UISuggestedPeopleList li .foundUserEmail 
     display:none;
 }
 
-ul.UIPeopleList li:hover > .foundUserEmail, ul.UISuggestedPeopleList li:hover > .foundUserEmail {
+ul.UISuggestedPeopleList li:hover > .foundUserEmail {
     display:inline;
-}
-
-ul.UIPeopleList li.selectedUser {
-    background-color: #CDEB8B !important;
-}
-
-ul.UIPeopleList li.unselectedUser {
-}
-
-ul.UIPeopleList li.unselectable {
-    cursor: default;
-    color: #888888;
 }
 
 div.searchUsersButtonDiv {
@@ -1926,23 +1875,6 @@ div.UITitleBar .UITitleText h1{
 div#UILoadDiv h1{
     color: black;
     margin-top: 30px;
-}
-
-ul.UIPeopleList li.UIPerson
-{
-    background: transparent url("../images/user.png") left top no-repeat;
-}
-
-ul.UIPeopleList li.UIGroup
-{
-    background: transparent url("../images/group.png") left top no-repeat;
-
-}
-
-ul.UIPeopleList li.UIError
-{
-    background: #EEEEEE url("../images/remove.png") left center no-repeat;
-    padding-left: 20px;
 }
 
 .arrowExpandIcon
@@ -2838,32 +2770,6 @@ div.reviewersPRUserListDiv {
     overflow: auto;
 }
 
-ul.userList, ul.allowedUserList {
-    padding-left: 0;
-    margin: 0;
-    list-style-type: none;
-    display: block;
-    border: medium none;
-
-}
-
-ul.userList li , ul.allowedUserList li {
-    padding-right: 5px;
-    display: block;
-    line-height: 28px;
-    margin: 0 0 0;
-    padding-left: 5px;
-    vertical-align: middle;
-}
-
-ul.allowedUserList li {
-    line-height: 21px;
-}
-
-ul.userList li:hover, ul.allowedUserList li:hover {
-    background-color: #ECECEC;
-}
-
 span.userListInfo {
     display: block;
     padding-left: 70px;
@@ -2906,13 +2812,6 @@ div.ACModifButtonEntry {
 
 div.ACUserListDiv {
     margin-bottom: 20px;
-}
-
-div.ACUserListDiv ul.UIPeopleList {
-    background-color: #FAFAFA;
-    border: 1px solid #999999;
-    min-height: 200px;
-    width: 550px;
 }
 
 .bannerTitle
