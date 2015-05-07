@@ -368,8 +368,12 @@ class User(db.Model):
                                   use only the first character
         :param show_title: if the title of the user should be included
         """
-        last_name = self.last_name.upper() if last_name_upper else self.last_name
-        first_name = '{}.'.format(self.first_name[0].upper()) if abbrev_first_name else self.first_name
+        # Pending users might not have a first/last name...
+        first_name = self.first_name or 'Unknown'
+        last_name = self.last_name or 'Unknown'
+        if last_name_upper:
+            last_name = last_name.upper()
+        first_name = '{}.'.format(first_name[0].upper()) if abbrev_first_name else first_name
         full_name = '{}, {}'.format(last_name, first_name) if last_name_first else '{} {}'.format(first_name, last_name)
         return full_name if not show_title or not self.title else '{} {}'.format(self.title, full_name)
 

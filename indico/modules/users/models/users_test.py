@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import itertools
+
 import pytest
 from speaklater import is_lazy_string
 
@@ -59,6 +61,21 @@ def test_get_full_name(last_name_first, last_name_upper, abbrev_first_name, expe
     titled_name = user.get_full_name(last_name_first=last_name_first, last_name_upper=last_name_upper,
                                      abbrev_first_name=abbrev_first_name, show_title=True)
     assert titled_name == 'Mr. {}'.format(expected)
+
+
+@pytest.mark.parametrize(('first_name', 'last_name'), (
+    ('Guinea', ''),
+    ('',       'Pig'),
+    ('',       '')
+))
+def test_get_full_name_empty_names(first_name, last_name):
+    user = User(first_name=first_name, last_name=last_name, title=UserTitle.none)
+    for last_name_first, last_name_upper, abbrev_first_name in itertools.product((True, False), repeat=3):
+        # Just make sure it doesn't fail. We don't really care about the output.
+        # It's only allowed for pending users so in most cases it only shows up
+        # in the ``repr`` of such a user.
+        user.get_full_name(last_name_first=last_name_first, last_name_upper=last_name_upper,
+                           abbrev_first_name=abbrev_first_name)
 
 
 def test_emails(db):
