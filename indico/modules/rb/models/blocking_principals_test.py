@@ -21,12 +21,9 @@ pytest_plugins = 'indico.modules.rb.testing.fixtures'
 
 
 def test_entity_user(dummy_user):
-    principal = BlockingPrincipal(principal=dummy_user.user)
-    assert principal.entity == dummy_user
-    assert principal.entity_name == 'User'
+    user = dummy_user.user
+    assert BlockingPrincipal(principal=user).principal == user
 
 
 def test_entity_group(dummy_group):
-    principal = BlockingPrincipal(principal=dummy_group)
-    assert principal.entity == dummy_group.as_legacy_group
-    assert principal.entity_name == 'Group'
+    assert BlockingPrincipal(principal=dummy_group).principal == dummy_group

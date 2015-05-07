@@ -31,6 +31,7 @@ from indico.util import date_time
 from indico.util.date_time import iterdays, format_date
 from indico.util.serializer import Serializer
 from indico.util.string import return_ascii
+from indico.util.user import unify_user_args
 
 
 class ReservationOccurrence(db.Model, Serializer):
@@ -168,7 +169,7 @@ class ReservationOccurrence(db.Model, Serializer):
                                           _join=Reservation)
 
     @staticmethod
-    def find_with_filters(filters, avatar=None):
+    def find_with_filters(filters, user=None):
         from indico.modules.rb.models.rooms import Room
         from indico.modules.rb.models.reservations import Reservation
 
@@ -186,8 +187,8 @@ class ReservationOccurrence(db.Model, Serializer):
                 criteria.append(db_dates_overlap(ReservationOccurrence, 'start_dt', day_start_dt, 'end_dt', day_end_dt))
             q = q.filter(or_(*criteria))
 
-        if filters.get('is_only_mine') and avatar:
-            q = q.filter((Reservation.booked_for_id == avatar.user.id) | (Reservation.created_by_id == avatar.user.id))
+        if filters.get('is_only_mine') and user:
+            q = q.filter((Reservation.booked_for_id == user.id) | (Reservation.created_by_id == user.id))
         if filters.get('room_ids'):
             q = q.filter(Room.id.in_(filters['room_ids']))
 
@@ -229,6 +230,7 @@ class ReservationOccurrence(db.Model, Serializer):
         return q.order_by(Room.id)
 
     @proxy_to_reservation_if_last_valid_occurrence
+    @unify_user_args
     def cancel(self, user, reason=None, silent=False):
         self.is_cancelled = True
         self.rejection_reason = reason
@@ -236,18 +238,19 @@ class ReservationOccurrence(db.Model, Serializer):
             log = [u'Day cancelled: {}'.format(format_date(self.date).decode('utf-8'))]
             if reason:
                 log.append(u'Reason: {}'.format(reason))
-            self.reservation.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=log))
+            self.reservation.add_edit_log(ReservationEditLog(user_name=user.full_name, info=log))
             from indico.modules.rb.notifications.reservation_occurrences import notify_cancellation
             notify_cancellation(self)
 
     @proxy_to_reservation_if_last_valid_occurrence
+    @unify_user_args
     def reject(self, user, reason, silent=False):
         self.is_rejected = True
         self.rejection_reason = reason
         if not silent:
             log = [u'Day rejected: {}'.format(format_date(self.date).decode('utf-8')),
                    u'Reason: {}'.format(reason)]
-            self.reservation.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=log))
+            self.reservation.add_edit_log(ReservationEditLog(user_name=user.full_name, info=log))
             from indico.modules.rb.notifications.reservation_occurrences import notify_rejection
             notify_rejection(self)
 

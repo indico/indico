@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
@@ -41,10 +43,6 @@ class BlockingPrincipal(db.Model):
     )
 
     @property
-    def entity(self):
-        return retrieve_principal(self._principal, legacy=True)
-
-    @property
     def principal(self):
         return retrieve_principal(self._principal, legacy=False)
 
@@ -52,13 +50,9 @@ class BlockingPrincipal(db.Model):
     def principal(self, value):
         self._principal = value.as_principal
 
-    @property
-    def entity_name(self):
-        return 'User' if self._principal[0] in {'Avatar', 'User'} else 'Group'
-
     @return_ascii
     def __repr__(self):
-        return u'<BlockingPrincipal({}, {}, {})>'.format(
+        return '<BlockingPrincipal({}, {}, {})>'.format(
             self.id,
             self.blocking_id,
             self.principal

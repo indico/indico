@@ -187,12 +187,12 @@ class BookRoomHook(HTTPAPIHook):
             raise HTTPAPIError('Username does not exist')
         elif len(users) != 1:
             raise HTTPAPIError('Ambiguous username ({} users found)'.format(len(users)))
-        avatar = users[0].as_avatar
+        user = users[0]
 
         self._params = {
             'room_id': get_query_parameter(self._queryParams, 'roomid'),
             'reason': get_query_parameter(self._queryParams, 'reason'),
-            'booked_for': avatar,
+            'booked_for': user,
             'from': self._fromDT,
             'to': self._toDT
         }
@@ -219,9 +219,9 @@ class BookRoomHook(HTTPAPIHook):
             'repeat_frequency': RepeatFrequency.NEVER,
             'repeat_interval': 0,
             'room_id': self._room.id,
-            'booked_for_id': self._params['booked_for'].getId(),
-            'contact_email': self._params['booked_for'].getEmail(),
-            'contact_phone': self._params['booked_for'].getTelephone(),
+            'booked_for_user': self._params['booked_for'],
+            'contact_email': self._params['booked_for'].email,
+            'contact_phone': self._params['booked_for'].phone,
             'booking_reason': self._params['reason']
         })
         try:

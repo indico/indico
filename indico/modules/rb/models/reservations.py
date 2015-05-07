@@ -39,11 +39,13 @@ from indico.modules.rb.models.utils import unimplemented
 from indico.modules.rb.notifications.reservations import (notify_confirmation, notify_cancellation,
                                                           notify_creation, notify_modification,
                                                           notify_rejection)
+from indico.modules.rb.utils import rb_is_admin
 from indico.util.date_time import now_utc, format_date, format_time, get_month_end, round_up_month
 from indico.util.i18n import _, N_
 from indico.util.serializer import Serializer
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
+from indico.util.user import unify_user_args
 from indico.web.flask.util import url_for
 from MaKaC.common.Locators import Locator
 
@@ -344,7 +346,7 @@ class Reservation(Serializer, db.Model):
 
         :param room: The Room that's being booked.
         :param data: A dict containing the booking data, usually from a :class:`NewBookingConfirmForm` instance
-        :param user: The :class:`Avatar` who creates the booking.
+        :param user: The :class:`.User` who creates the booking.
         :param prebook: Instead of determining the booking type from the user's
                         permissions, always use the given mode.
         """
@@ -371,7 +373,7 @@ class Reservation(Serializer, db.Model):
         reservation.room = room
         reservation.booked_for_name = reservation.booked_for_user.full_name
         reservation.is_accepted = not prebook
-        reservation.created_by_user = user.user
+        reservation.created_by_user = user
         reservation.create_occurrences(True)
         if not any(occ.is_valid for occ in reservation.occurrences):
             raise NoReportError(_('Reservation has no valid occurrences'))
@@ -447,9 +449,10 @@ class Reservation(Serializer, db.Model):
                                 ReservationOccurrence.filter_overlap(occurrences),
                                 _join=ReservationOccurrence)
 
+    @unify_user_args
     def accept(self, user):
         self.is_accepted = True
-        self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=['Reservation accepted']))
+        self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=['Reservation accepted']))
         notify_confirmation(self)
 
         valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
@@ -459,6 +462,7 @@ class Reservation(Serializer, db.Model):
                 continue
             occurrence.reject(user, u'Rejected due to collision with a confirmed reservation')
 
+    @unify_user_args
     def cancel(self, user, reason=None, silent=False):
         self.is_cancelled = True
         self.rejection_reason = reason
@@ -467,8 +471,9 @@ class Reservation(Serializer, db.Model):
         if not silent:
             notify_cancellation(self)
             log_msg = u'Reservation cancelled: {}'.format(reason) if reason else 'Reservation cancelled'
-            self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
+            self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
 
+    @unify_user_args
     def reject(self, user, reason, silent=False):
         self.is_rejected = True
         self.rejection_reason = reason
@@ -477,50 +482,55 @@ class Reservation(Serializer, db.Model):
         if not silent:
             notify_rejection(self)
             log_msg = u'Reservation rejected: {}'.format(reason)
-            self.add_edit_log(ReservationEditLog(user_name=user.getFullName(), info=[log_msg]))
+            self.add_edit_log(ReservationEditLog(user_name=user.full_name, info=[log_msg]))
 
     def add_edit_log(self, edit_log):
         self.edit_logs.append(edit_log)
         db.session.flush()
 
+    @unify_user_args
     def can_be_accepted(self, user):
         if user is None:
             return False
-        return user.isRBAdmin() or self.room.is_owned_by(user)
+        return rb_is_admin(user) or self.room.is_owned_by(user)
 
+    @unify_user_args
     def can_be_cancelled(self, user):
         if user is None:
             return False
-        return self.is_owned_by(user) or user.isRBAdmin() or self.is_booked_for(user)
+        return self.is_owned_by(user) or rb_is_admin(user) or self.is_booked_for(user)
 
+    @unify_user_args
     def can_be_deleted(self, user):
         if user is None:
             return False
-        return user.isRBAdmin()
+        return rb_is_admin(user)
 
+    @unify_user_args
     def can_be_modified(self, user):
         if user is None:
             return False
         if self.is_rejected or self.is_cancelled:
             return False
-        if user.isRBAdmin():
+        if rb_is_admin(user):
             return True
         return self.created_by_user == user or self.is_booked_for(user) or self.room.is_owned_by(user)
 
+    @unify_user_args
     def can_be_rejected(self, user):
         if user is None:
             return False
-        return user.isRBAdmin() or self.room.is_owned_by(user)
+        return rb_is_admin(user) or self.room.is_owned_by(user)
 
     def create_occurrences(self, skip_conflicts, user=None):
         ReservationOccurrence.create_series_for_reservation(self)
         db.session.flush()
 
         if user is None:
-            user = self.created_by_user.as_avatar
+            user = self.created_by_user
 
         # Check for conflicts with nonbookable periods
-        if not user.isRBAdmin() and not self.room.is_owned_by(user):
+        if not rb_is_admin(user) and not self.room.is_owned_by(user):
             nonbookable_periods = self.room.nonbookable_periods.filter(NonBookablePeriod.end_dt > self.start_dt)
             for occurrence in self.occurrences:
                 if not occurrence.is_valid:
@@ -609,16 +619,17 @@ class Reservation(Serializer, db.Model):
     def is_booked_for(self, user):
         if user is None:
             return False
-        return self.booked_for_user == user.user or bool(self.contact_emails & set(user.user.all_emails))
+        return self.booked_for_user == user or bool(self.contact_emails & set(user.all_emails))
 
-    def is_owned_by(self, avatar):
-        return self.created_by_user == avatar.user
+    @unify_user_args
+    def is_owned_by(self, user):
+        return self.created_by_user == user
 
     def modify(self, data, user):
         """Modifies an existing reservation.
 
         :param data: A dict containing the booking data, usually from a :class:`ModifyBookingForm` instance
-        :param user: The :class:`Avatar` who modifies the booking.
+        :param user: The :class:`.User` who modifies the booking.
         """
 
         populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'booked_for_user',
@@ -708,7 +719,7 @@ class Reservation(Serializer, db.Model):
             else:
                 log.append(u"The {} was changed from '{}' to '{}'".format(field_title, old, new))
 
-        self.edit_logs.append(ReservationEditLog(user_name=user.user.full_name, info=log))
+        self.edit_logs.append(ReservationEditLog(user_name=user.full_name, info=log))
 
         # Recreate all occurrences if necessary
         if update_occurrences:

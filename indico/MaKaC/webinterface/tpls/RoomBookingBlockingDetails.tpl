@@ -1,5 +1,5 @@
-    <% canModify = blocking.can_be_modified(user) %>
-    <% canDelete = blocking.can_be_deleted(user) %>
+    <% canModify = blocking.can_be_modified(_session.user) %>
+    <% canDelete = blocking.can_be_deleted(_session.user) %>
     <span class="groupTitleNoBorder">Room Blocking</span><br />
     <table cellpadding="0" cellspacing="0" border="0" width="100%">
         <tr>
@@ -65,10 +65,12 @@
                                 <td class="bookingDisplayTitleCell" valign="top"><span class="titleCellFormat"> ${ _("Allowed users/groups")}</span></td>
                                 <td>
                                     <table class="blockingTable">
-                                        % for principal in blocking._allowed:
+                                        % for principal in sorted(blocking.allowed, key=lambda x: (not x.is_group, x.name)):
                                             <tr class="blockingHover blockingPadding">
-                                                <td>${ principal.entity_name }</td>
-                                                <td>${ principal.entity.getFullName() }</td>
+                                                <td>
+                                                    <i class="icon-${'users' if principal.is_group else 'user'}"></i>
+                                                    ${ principal.name }
+                                                </td>
                                             </tr>
                                         % endfor
                                     </table>

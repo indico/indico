@@ -20,29 +20,30 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.users import User
 from indico.util.caching import memoize_request
 from indico.util.date_time import get_day_end, round_up_to_minutes
-from indico.util.user import retrieve_principals, principals_merge_users
+from indico.util.user import retrieve_principals, principals_merge_users, unify_user_args
 
 
+@unify_user_args
 @memoize_request
 def rb_check_user_access(user):
     """Checks if the user has access to the room booking system"""
     from indico.modules.rb import settings as rb_settings
-
-    if user.isRBAdmin():
+    if rb_is_admin(user):
         return True
-    principals = retrieve_principals(rb_settings.get('authorized_principals'))
+    principals = retrieve_principals(rb_settings.get('authorized_principals'), legacy=False)
     if not principals:  # everyone has access
         return True
-    return any(principal.containsUser(user) for principal in principals)
+    return any(user in principal for principal in principals)
 
 
+@unify_user_args
 def rb_is_admin(user):
     """Checks if the user is a room booking admin"""
     from indico.modules.rb import settings as rb_settings
-    if user.user.is_admin:
+    if user.is_admin:
         return True
-    principals = retrieve_principals(rb_settings.get('admin_principals'))
-    return any(principal.containsUser(user) for principal in principals)
+    principals = retrieve_principals(rb_settings.get('admin_principals'), legacy=False)
+    return any(user in principal for principal in principals)
 
 
 def rb_merge_users(new_id, old_id):

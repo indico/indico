@@ -117,7 +117,7 @@ def test_booked_for_user(dummy_reservation, dummy_user):
 
 
 def test_booked_for_user_after_change(db, dummy_reservation, create_user):
-    other_user = create_user(123, 'foo', 'bar').user
+    other_user = create_user(123, first_name='foo', last_name='bar', legacy=False)
     assert dummy_reservation.booked_for_name != other_user.full_name
     dummy_reservation.booked_for_user = other_user
     db.session.flush()
@@ -436,9 +436,9 @@ def test_get_vc_equipment(db, dummy_reservation, create_equipment_type):
 ))
 def test_is_booked_for(dummy_reservation, dummy_user, create_user, is_booked_for, contact_email, expected):
     if not is_booked_for:
-        dummy_reservation.booked_for_user = create_user(123).user
+        dummy_reservation.booked_for_user = create_user(123, legacy=False)
     dummy_reservation.contact_email = contact_email
-    assert dummy_reservation.is_booked_for(dummy_user) == expected
+    assert dummy_reservation.is_booked_for(dummy_user.user) == expected
 
 
 def test_is_booked_for_no_user(dummy_reservation):

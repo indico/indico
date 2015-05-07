@@ -627,13 +627,13 @@ def test_has_live_reservations(dummy_room, create_reservation):
 def test_can_be_booked(dummy_room, create_user, create_room_attribute, create_group,
                        is_admin, ignore_admin, is_active, is_owned_by, is_reservable, has_group, in_group, expected):
     create_room_attribute(u'allowed-booking-group')
-    user = create_user(123, rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin, legacy=False)
     dummy_room.is_active = is_active
     dummy_room.is_reservable = is_reservable
     if in_group:
-        user.user.local_groups.add(create_group(123).group)
+        user.local_groups.add(create_group(123).group)
     if is_owned_by:
-        dummy_room.owner = user
+        dummy_room.owner = user.as_avatar
     if has_group:
         dummy_room.set_attribute_value(u'allowed-booking-group', u'123')
     assert dummy_room.can_be_booked(user, ignore_admin=ignore_admin) == expected

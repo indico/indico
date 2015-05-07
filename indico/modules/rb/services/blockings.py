@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
+
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.util.i18n import _
 from MaKaC.services.implementation.base import ServiceBase
@@ -46,5 +48,5 @@ class RoomBookingBlockingReject(RoomBookingBlockingProcessBase):
             raise ServiceError(_('You have to specify a rejection reason'))
 
     def _getAnswer(self):
-        self.blocked_room.reject(self._getUser(), self.reason)
+        self.blocked_room.reject(session.user, self.reason)
         return {'state': self.blocked_room.state_name}

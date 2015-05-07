@@ -31,7 +31,7 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.utils import get_default_booking_interval
+from indico.modules.rb.utils import get_default_booking_interval, rb_is_admin
 from indico.modules.rb.views.user.reservations import (WPRoomBookingSearchBookings, WPRoomBookingSearchBookingsResults,
                                                        WPRoomBookingCalendar, WPRoomBookingNewBookingSelectRoom,
                                                        WPRoomBookingNewBookingSelectPeriod,
@@ -70,14 +70,14 @@ class _SuccessUrlDetailsMixin:
 class RHRoomBookingAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
-        if not self._reservation.can_be_accepted(session.avatar):
+        if not self._reservation.can_be_accepted(session.user):
             raise IndicoError("You are not authorized to perform this action")
 
     def _process(self):
         if self._reservation.find_overlapping().filter(Reservation.is_accepted).count():
             raise IndicoError("This reservation couldn't be accepted due to conflicts with other reservations")
         if self._reservation.is_pending:
-            self._reservation.accept(session.avatar)
+            self._reservation.accept(session.user)
             flash(_(u'Booking accepted'), 'success')
         self._redirect(self._get_success_url())
 
@@ -85,12 +85,12 @@ class RHRoomBookingAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 class RHRoomBookingCancelBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
-        if not self._reservation.can_be_cancelled(session.avatar):
+        if not self._reservation.can_be_cancelled(session.user):
             raise IndicoError("You are not authorized to perform this action")
 
     def _process(self):
         if not self._reservation.is_cancelled and not self._reservation.is_rejected:
-            self._reservation.cancel(session.avatar)
+            self._reservation.cancel(session.user)
             flash(_(u'Booking cancelled'), 'success')
         self._redirect(self._get_success_url())
 
@@ -102,12 +102,12 @@ class RHRoomBookingRejectBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
-        if not self._reservation.can_be_rejected(session.avatar):
+        if not self._reservation.can_be_rejected(session.user):
             raise IndicoError("You are not authorized to perform this action")
 
     def _process(self):
         if not self._reservation.is_cancelled and not self._reservation.is_rejected:
-            self._reservation.reject(session.avatar, self._reason)
+            self._reservation.reject(session.user, self._reason)
             flash(_(u'Booking rejected'), 'success')
         self._redirect(self._get_success_url())
 
@@ -120,12 +120,12 @@ class RHRoomBookingCancelBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookin
 
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
-        if not self._reservation.can_be_cancelled(session.avatar):
+        if not self._reservation.can_be_cancelled(session.user):
             raise IndicoError("You are not authorized to perform this action")
 
     def _process(self):
         if self._occurrence.is_valid:
-            self._occurrence.cancel(session.avatar)
+            self._occurrence.cancel(session.user)
             flash(_(u'Booking occurrence cancelled'), 'success')
         self._redirect(self._get_success_url())
 
@@ -139,12 +139,12 @@ class RHRoomBookingRejectBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookin
 
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
-        if not self._reservation.can_be_rejected(session.avatar):
+        if not self._reservation.can_be_rejected(session.user):
             raise IndicoError("You are not authorized to perform this action")
 
     def _process(self):
         if self._occurrence.is_valid:
-            self._occurrence.reject(session.avatar, self._reason)
+            self._occurrence.reject(session.user, self._reason)
             flash(_(u'Booking occurrence rejected'), 'success')
         self._redirect(self._get_success_url())
 
@@ -172,9 +172,9 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
         form = self._form
         if self._is_submitted() and form.validate():
             if form.data.get('is_only_my_rooms'):
-                form.room_ids.data = [room.id for room in Room.find_all() if room.is_owned_by(session.avatar)]
+                form.room_ids.data = [room.id for room in Room.find_all() if room.is_owned_by(session.user)]
 
-            occurrences = ReservationOccurrence.find_with_filters(form.data, session.avatar).all()
+            occurrences = ReservationOccurrence.find_with_filters(form.data, session.user).all()
             rooms = self._filter_displayed_rooms([r for r in self._rooms if r.id in set(form.room_ids.data)],
                                                  occurrences)
             return WPRoomBookingSearchBookingsResults(self, rooms=rooms, occurrences=occurrences,
@@ -184,7 +184,7 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
                                                       menu_item=self.menu_item).display()
 
         return WPRoomBookingSearchBookings(self, errors=form.error_list, rooms=self._rooms,
-                                           user_has_rooms=session.avatar.has_rooms).display()
+                                           user_has_rooms=Room.user_owns_rooms(session.user)).display()
 
 
 class RHRoomBookingSearchBookingsShortcutBase(RHRoomBookingSearchBookings):
@@ -218,7 +218,7 @@ class _RoomsWithBookingsMixin:
 
 class _MyRoomsMixin:
     def _filter_displayed_rooms(self, rooms, occurrences):
-        return [r for r in rooms if r.is_owned_by(session.avatar)]
+        return [r for r in rooms if r.is_owned_by(session.user)]
 
 
 class RHRoomBookingSearchMyBookings(_RoomsWithBookingsMixin, RHRoomBookingSearchBookingsShortcutBase):
@@ -260,9 +260,9 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         if not room.notification_for_assistance:
             del form.needs_assistance
 
-        can_book = room.can_be_booked(session.avatar)
-        can_prebook = room.can_be_prebooked(session.avatar)
-        if room.is_auto_confirm or (not can_prebook or (can_book and room.can_be_booked(session.avatar, True))):
+        can_book = room.can_be_booked(session.user)
+        can_prebook = room.can_be_prebooked(session.user)
+        if room.is_auto_confirm or (not can_prebook or (can_book and room.can_be_booked(session.user, True))):
             # The user has actually the permission to book (not just because he's an admin)
             # Or he simply can't even prebook the room
             del form.submit_prebook
@@ -333,7 +333,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         else:
             # Otherwise the existence of the book submit button means the user can book
             prebook = 'submit_book' not in form
-        reservation = Reservation.create_from_data(room, form.data, session.avatar, prebook)
+        reservation = Reservation.create_from_data(room, form.data, session.user, prebook)
         db.session.add(reservation)
         db.session.flush()
         return reservation
@@ -411,7 +411,7 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
         if form.validate_on_submit() and not form.submit_check.data:
             return self._create_booking_response(form, room)
 
-        can_override = room.can_be_overridden(session.avatar)
+        can_override = room.can_be_overridden(session.user)
         return self._get_view(form=form,
                               room=room,
                               rooms=rooms,
@@ -539,7 +539,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
 
         # GET or form errors => show step 1 page
         return self._get_view('select_room', errors=form.error_list, rooms=self._rooms, form=form,
-                              max_room_capacity=Room.max_capacity, can_override=session.avatar.isRBAdmin(),
+                              max_room_capacity=Room.max_capacity, can_override=rb_is_admin(session.user),
                               date_changed=not form.is_submitted() and self.date_changed).display()
 
     def _process_select_period(self):
@@ -566,7 +566,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
         # The form needs the room to create the equipment list, so we need to get it "manually"...
         room = Room.get(int(request.form['room_id']))
         form = self._make_confirm_form(room)
-        if not room.can_be_booked(session.avatar) and not room.can_be_prebooked(session.avatar):
+        if not room.can_be_booked(session.user) and not room.can_be_prebooked(session.user):
             raise IndicoError('You cannot book this room')
         if form.validate_on_submit():
             return self._create_booking_response(form, room)
@@ -586,7 +586,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
 
 class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBookingBase):
     def _checkProtection(self):
-        if not self._reservation.can_be_modified(session.avatar):
+        if not self._reservation.can_be_modified(session.user):
             raise AccessError
 
     def _get_view(self, **kwargs):
@@ -614,7 +614,7 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
 
         if form.validate_on_submit() and not form.submit_check.data:
             try:
-                self._reservation.modify(form.data, session.avatar)
+                self._reservation.modify(form.data, session.user)
                 flash(_(u'Booking updated'), 'success')
             except NoReportError as e:
                 transaction.abort()
@@ -626,7 +626,7 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
                               start_dt=form.start_dt.data, end_dt=form.end_dt.data, only_conflicts=False,
                               repeat_frequency=form.repeat_frequency.data, repeat_interval=form.repeat_interval.data,
                               reservation=self._reservation,
-                              can_override=room.can_be_overridden(session.avatar)).display()
+                              can_override=room.can_be_overridden(session.user)).display()
 
 
 class RHRoomBookingCalendar(RHRoomBookingBase):

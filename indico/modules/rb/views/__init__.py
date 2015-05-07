@@ -22,6 +22,8 @@ from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.wcomponents import BasicSideMenu, SideMenuItem, SideMenuSection
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.utils import rb_is_admin
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
@@ -46,9 +48,9 @@ class WPRoomBookingBase(WPRoomBookingHeadContentMixin, WPMainBase):
         return WPMainBase.getCSSFiles(self) + self._asset_env['roombooking_sass'].urls()
 
     def _getSideMenu(self):
-        self._leftMenu = BasicSideMenu(session.avatar is not None)
-        user_has_rooms = session.avatar is not None and session.avatar.has_rooms
-        user_is_admin = session.avatar is not None and session.avatar.isRBAdmin()
+        self._leftMenu = BasicSideMenu(session.user is not None)
+        user_has_rooms = session.user is not None and Room.user_owns_rooms(session.user)
+        user_is_admin = session.user is not None and rb_is_admin(session.user)
 
         self._roomsBookingOpt = SideMenuSection(currentPage=url_for('rooms.book'))
 

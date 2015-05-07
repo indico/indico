@@ -27,15 +27,17 @@ def create_user(db):
     """Returns a callable which lets you create dummy users"""
     _users = set()
 
-    def _create_user(id_, name=u'Pig', surname=u'Guinea', rb_admin=False, email=None, groups=None):
+    def _create_user(id_, first_name=u'Guinea', last_name=u'Pig', rb_admin=False, admin=False, email=None, groups=None,
+                     legacy=True):
         user = User.get(id_)
         if user:
-            return user.as_avatar
+            return user.as_avatar if legacy else user
         user = User()
         user.id = id_
-        user.first_name = name
-        user.last_name = surname
+        user.first_name = first_name
+        user.last_name = last_name
         user.email = email or u'{}@example.com'.format(id_)
+        user.is_admin = admin
         user.local_groups = {g.group for g in (groups or ())}
         db.session.add(user)
         db.session.flush()
@@ -43,7 +45,7 @@ def create_user(db):
             rb_settings.set('admin_principals', rb_settings.get('admin_principals') + [user.as_principal])
         db.session.flush()
         _users.add(user)
-        return user.as_avatar
+        return user.as_avatar if legacy else user
 
     yield _create_user
 

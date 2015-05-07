@@ -14,13 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.hybrid import hybrid_method
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
-from indico.modules.users import User
+from indico.modules.rb.utils import rb_is_admin
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 
@@ -95,9 +97,7 @@ class Blocking(db.Model):
         - owner (the one who created the blocking)
         - admin (of course)
         """
-        if not user:
-            return False
-        return user == self.created_by_user or user.isRBAdmin()
+        return user and (user == self.created_by_user or rb_is_admin(user))
 
     def can_be_deleted(self, user):
         return self.can_be_modified(user)
@@ -115,18 +115,15 @@ class Blocking(db.Model):
         if self.created_by_user == user:
             return True
         if not explicit_only:
-            if user.isRBAdmin():
+            if rb_is_admin(user):
                 return True
             elif room and room.is_owned_by(user):
                 return True
-        for principal in self._allowed:
-            if principal.entity.containsUser(user):
-                return True
-        return False
+        return any(user in principal for principal in self.allowed)
 
     @return_ascii
     def __repr__(self):
-        return u'<Blocking({0}, {1}, {2}, {3}, {4})>'.format(
+        return '<Blocking({0}, {1}, {2}, {3}, {4})>'.format(
             self.id,
             self.created_by_user,
             self.reason,

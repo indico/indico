@@ -24,6 +24,7 @@ from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.utils import rb_is_admin
 from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
 from indico.util.i18n import _
@@ -133,7 +134,7 @@ class WRoomBookingRoomDetails(WTemplated):
         room = wvars['room']
 
         wvars['attrs'] = {attr.attribute.name: attr for attr in room.attributes
-                          if not attr.attribute.is_hidden or session.avatar.isRBAdmin()}
+                          if not attr.attribute.is_hidden or rb_is_admin(session.user)}
 
         wvars['owner_name'] = room.owner.getFullName()
 

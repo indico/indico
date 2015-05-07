@@ -26,11 +26,11 @@ class RHRoomBookingProtected(RHProtected):
     def _checkSessionUser(self):
         if not Config.getInstance().getIsRoomBookingActive():
             raise AccessError()
-        if not session.avatar:
+        if not session.user:
             self._redirect(self._getLoginURL())
             self._doProcess = False
             return
-        if not rb_check_user_access(session.avatar):
+        if not rb_check_user_access(session.user):
             raise AccessError()
 
 

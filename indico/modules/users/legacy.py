@@ -282,13 +282,6 @@ class AvatarUserWrapper(Persistent, Fossilizable):
             d["userId"] = self.user.id
         return d
 
-    def is_member_of_group(self, group_name):
-        if not self.user:
-            return False
-        group_provider = multipass.default_group_provider
-        group = GroupProxy(group_name, group_provider.name if group_provider else None)
-        return group.has_member(self.user)
-
     def isAdmin(self):
         if not self.user:
             return False

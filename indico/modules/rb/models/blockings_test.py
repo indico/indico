@@ -18,7 +18,6 @@ from datetime import datetime, date
 
 import pytest
 
-from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
 from indico.testing.util import bool_matrix
 
@@ -44,15 +43,15 @@ def test_is_active_at(create_blocking, check_date, expected):
 
 def test_created_by_user(dummy_blocking, dummy_user, create_user):
     assert dummy_blocking.created_by_user == dummy_user.user
-    dummy_blocking.created_by_user = user = create_user(123).user
+    dummy_blocking.created_by_user = user = create_user(123, legacy=False)
     assert dummy_blocking.created_by_user == user
 
 
 @pytest.mark.parametrize(('is_admin', 'is_creator', 'expected'), bool_matrix('..', expect=any))
 def test_can_be_modified_deleted(dummy_blocking, create_user, is_admin, is_creator, expected):
-    user = create_user(123, rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin, legacy=False)
     if is_creator:
-        dummy_blocking.created_by_user = user.user
+        dummy_blocking.created_by_user = user
     assert dummy_blocking.can_be_modified(user) == expected
     assert dummy_blocking.can_be_deleted(user) == expected
 
@@ -64,11 +63,11 @@ def test_can_be_modified_deleted(dummy_blocking, create_user, is_admin, is_creat
 )
 def test_can_be_overridden(dummy_room, dummy_blocking, create_user,
                            is_creator, is_admin, has_room, is_room_owner, expected):
-    user = create_user(123, rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin, legacy=False)
     if is_room_owner:
-        dummy_room.owner = user
+        dummy_room.owner = user.as_avatar
     if is_creator:
-        dummy_blocking.created_by_user = user.user
+        dummy_blocking.created_by_user = user
     assert dummy_blocking.can_be_overridden(user, dummy_room if has_room else None) == expected
 
 
@@ -79,11 +78,11 @@ def test_can_be_overridden(dummy_room, dummy_blocking, create_user,
 )
 def test_can_be_overridden_explicit_only(dummy_room, dummy_blocking, create_user,
                                          is_creator, is_admin, has_room, is_room_owner, expected):
-    user = create_user(123, rb_admin=is_admin)
+    user = create_user(123, rb_admin=is_admin, legacy=False)
     if is_room_owner:
-        dummy_room.owner = user
+        dummy_room.owner = user.as_avatar
     if is_creator:
-        dummy_blocking.created_by_user = user.user
+        dummy_blocking.created_by_user = user
     assert dummy_blocking.can_be_overridden(user, dummy_room if has_room else None, explicit_only=True) == expected
 
 
@@ -93,10 +92,10 @@ def test_can_be_overridden_explicit_only(dummy_room, dummy_blocking, create_user
     (False,   False)
 ))
 def test_can_be_overridden_acl(dummy_blocking, dummy_user, create_user, dummy_group, in_acl, expected):
-    user = create_user(123, groups={dummy_group})
+    user = create_user(123, groups={dummy_group}, legacy=False)
     dummy_blocking.allowed = {dummy_user.user}
     if in_acl == 'user':
-        dummy_blocking.allowed.add(user.user)
+        dummy_blocking.allowed.add(user)
     elif in_acl == 'group':
         dummy_blocking.allowed.add(dummy_group)
     assert dummy_blocking.can_be_overridden(user) == expected

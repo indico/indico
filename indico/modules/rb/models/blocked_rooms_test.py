@@ -87,7 +87,7 @@ def test_reject(dummy_user, dummy_blocking, smtp, with_user, with_reason):
     assert br.state == BlockedRoom.State.pending
     kwargs = {}
     if with_user:
-        kwargs['user'] = dummy_user
+        kwargs['user'] = dummy_user.user
     if with_reason:
         kwargs['reason'] = u'foo'
     br.reject(**kwargs)
@@ -105,7 +105,7 @@ def test_approve(create_user, create_reservation, create_blocking, smtp,
     blocking = create_blocking(start_date=date.today(),
                                end_date=date.today() + timedelta(days=1))
     br = blocking.blocked_rooms[0]
-    user = create_user(123).user
+    user = create_user(123, legacy=False)
     resv = create_reservation(start_dt=datetime.combine(blocking.start_date, time(8)),
                               end_dt=datetime.combine(blocking.start_date, time(10)),
                               created_by_user=user if colliding_reservation else blocking.created_by_user,
@@ -132,7 +132,7 @@ def test_approve(create_user, create_reservation, create_blocking, smtp,
     (False, True)
 ))
 def test_approve_acl(db, create_user, create_reservation, create_blocking, smtp, in_acl, rejected):
-    user = create_user(123).user
+    user = create_user(123, legacy=False)
     blocking = create_blocking(start_date=date.today(),
                                end_date=date.today() + timedelta(days=1))
     if in_acl:
