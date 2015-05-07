@@ -35,6 +35,7 @@ from indico.modules.users.views import WPUserDashboard, WPUser, WPUsersAdmin
 from indico.modules.users.forms import UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm, MergeForm
 from indico.modules.auth.forms import LocalRegistrationForm
 from indico.util.date_time import timedelta_split
+from indico.util.event import truncate_path
 from indico.util.i18n import _
 from indico.util.redis import suggestions
 from indico.util.redis import client as redis_client
@@ -138,7 +139,9 @@ class RHUserPreferences(RHUserBase):
 
 class RHUserFavorites(RHUserBase):
     def _process(self):
-        return WPUser.render_template('favorites.html', user=self.user)
+        categories = sorted([(cat, truncate_path(cat.getCategoryPathTitles()[:-1], chars=50))
+                             for cat in self.user.favorite_categories], key=lambda c: (c[0].name, c[1]))
+        return WPUser.render_template('favorites.html', user=self.user, favorite_categories=categories)
 
 
 class RHUserFavoritesUsersAdd(RHUserBase):

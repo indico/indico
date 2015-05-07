@@ -42,7 +42,7 @@ def get_related_categories(user):
             'categ': categ,
             'favorite': categ in favorites,
             'managed': categ in managed,
-            'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
+            'path': truncate_path(categ.getCategoryPathTitles()[:-1], chars=50)
         }
     return OrderedDict(sorted(res.items(), key=itemgetter(0)))
 
@@ -68,7 +68,7 @@ def get_suggested_categories(user):
         res.append({
             'score': score,
             'categ': categ,
-            'path': truncate_path(categ.getCategoryPathTitles(), 30, False)
+            'path': truncate_path(categ.getCategoryPathTitles()[:-1], chars=50)
         })
     return res
 

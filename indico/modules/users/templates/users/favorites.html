@@ -1,5 +1,6 @@
 {% extends 'users/base.html' %}
 {% from 'users/_favorites.html' import favorite_users_list %}
+{% from '_category_path.html' import category_path %}
 
 {% block subtitle -%}
     {% trans %}Favourites{% endtrans %}
@@ -35,13 +36,14 @@
                         </div>
                     </div>
                     <div class="i-box-content">
-                        {% if user.favorite_categories %}
+                        {% if favorite_categories %}
                             <ul class="group-list no-content-before">
-                                {% for category in user.favorite_categories|sort(attribute='name') %}
-                                    <li data-categ-id="{{ category.id }}" class="favorite-categ js-category-row">
-                                        <span>{{ category.name }}</span>
+                                {% for category, truncated_path in favorite_categories %}
+                                    <li data-categ-id="{{ category.id }}" class="favorite-categ category-box js-category-row">
+                                        <span class="category-title">{{ category.name }}</span>
                                         <a class="toggle icon-close right js-delete-category" title="{% trans %}Remove from favorites{% endtrans %}" href="#"
                                            data-href="{{ url_for('.user_favorites_category_api', category_id=category.id) }}"></a>
+                                        {{ category_path(category, truncated_path) }}
                                     </li>
                                 {% endfor %}
                             </ul>
