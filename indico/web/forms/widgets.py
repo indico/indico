@@ -14,11 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import re
+
 from flask import render_template
 from wtforms.widgets import TextInput, TextArea
 from wtforms.widgets.core import HTMLString
 
 from indico.core.auth import multipass
+from indico.web.util import inject_js
+from indico.web.flask.templating import get_template_module
+
+html_commment_re = re.compile(r'<!--.*?-->', re.MULTILINE)
 
 
 class ConcatWidget(object):
@@ -45,10 +51,11 @@ class PrincipalWidget(object):
 
 class JinjaWidget(object):
     """Renders a field using a custom Jinja template"""
-    def __init__(self, template, plugin=None, **context):
+    def __init__(self, template, plugin=None, single_line=False, **context):
         self.template = template
         self.plugin = plugin
         self.context = context
+        self.single_line = single_line
 
     def __call__(self, field, **kwargs):
         if self.plugin:
@@ -58,8 +65,13 @@ class JinjaWidget(object):
             template = '{}:{}'.format(plugin, self.template)
         else:
             template = self.template
-
-        return HTMLString(render_template(template, field=field, **dict(self.context, **kwargs)))
+        template_module = get_template_module(template, field=field, **dict(self.context, **kwargs))
+        javascript = template_module.javascript()
+        if '<script' in javascript:
+            inject_js(template_module.javascript())
+        elif html_commment_re.sub('', javascript).strip():
+            raise ValueError("Template did not provide valid javascript")
+        return HTMLString(template_module.html())
 
 
 class PasswordWidget(object):
