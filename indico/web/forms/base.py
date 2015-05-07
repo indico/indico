@@ -155,9 +155,8 @@ class SyncedInputsMixin(object):
     """Mixin for a form having inputs using the ``SyncedInputWidget``.
 
     This mixin will process the synced fields, adding them the necessary
-    attributes for them to render and work properly.
-    The fields which are synced are  defined by
-    ``multipass.synced_fields``.
+    attributes for them to render and work properly.  The fields which
+    are synced are defined by ``multipass.synced_fields``.
 
     :param synced_fields: set -- a subset of ``multipass.synced_fields``
                           which corresponds to the fields currently
@@ -165,13 +164,20 @@ class SyncedInputsMixin(object):
     :param synced_values: dict -- a map of all the synced fields (as
                           defined by ``multipass.synced_fields``) and
                           the values they would have if they were synced
-                          (regardless of whether it is or not)
+                          (regardless of whether it is or not).  Fields
+                          not present in this dict do not show the sync
+                          button at all.
     """
 
     def __init__(self, *args, **kwargs):
         synced_fields = kwargs.pop('synced_fields', set())
         synced_values = kwargs.pop('synced_values', {})
         super(SyncedInputsMixin, self).__init__(*args, **kwargs)
+        self.syncable_fields = set(synced_values)
+        for key in ('first_name', 'last_name'):
+            if not synced_values.get(key):
+                synced_values.pop(key, None)
+                self.syncable_fields.discard(key)
         if self.is_submitted():
             synced_fields = self.synced_fields
         provider = multipass.sync_provider
@@ -184,4 +190,4 @@ class SyncedInputsMixin(object):
     @property
     def synced_fields(self):
         """The fields which are set as synced for the current request."""
-        return set(request.form.getlist('synced_fields'))
+        return set(request.form.getlist('synced_fields')) & self.syncable_fields
