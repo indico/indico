@@ -12,7 +12,7 @@
                 </tr>
                 <tr>
                     <td nowrap style="width:80%">
-                        <input type="button" id="inPlaceAddManagerButton" onclick="modificationControlManager.addExistingUser();" value='${ _("Add manager") }'></input>
+                        <input class="i-button" type="button" id="inPlaceAddManagerButton" onclick="modificationControlManager.addExistingUser();" value='${ _("Add manager") }'></input>
                     </td>
                     <td></td>
                 </tr>

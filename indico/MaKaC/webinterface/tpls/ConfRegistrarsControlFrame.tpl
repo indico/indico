@@ -11,7 +11,7 @@
                 </tr>
                 <tr>
                     <td nowrap style="width:80%">
-                        <input type="button" id="inPlaceAddManagerButton" onclick="registrationControlManager.addExistingUser();" value='${ _("Add registrar") }'></input>
+                        <input class="i-button" type="button" id="inPlaceAddManagerButton" onclick="registrationControlManager.addExistingUser();" value='${ _("Add registrar") }'></input>
                     </td>
                     <td></td>
                 </tr>

@@ -7,11 +7,11 @@
         <td bgcolor="white" width="80%">
             <table width="100%">
                 <tr>
-                    <td><ul id="inPlaceManagers" class="UIPeopleList"></ul></td>
+                    <td><ul id="inPlaceManagers" class="user-list"></ul></td>
                 </tr>
                 <tr>
                     <td nowrap style="width:80%">
-                        <input type="button" id="inPlaceAddManagerButton" onclick="modificationControlManager.addExistingUser();" value='${ _("Add manager") }'></input>
+                        <input class="i-button" type="button" id="inPlaceAddManagerButton" onclick="modificationControlManager.addExistingUser();" value='${ _("Add manager") }'></input>
                     </td>
                     <td></td>
                 </tr>
