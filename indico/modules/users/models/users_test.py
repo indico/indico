@@ -18,6 +18,7 @@ import itertools
 
 import pytest
 from speaklater import is_lazy_string
+from sqlalchemy.exc import IntegrityError
 
 from indico.modules.users import User
 from indico.modules.users.models.users import UserTitle
@@ -142,3 +143,19 @@ def test_title(db):
     assert user.title == UserTitle.prof.title
     assert is_lazy_string(user.title)
     assert User.find_one(title=UserTitle.prof) == user
+
+
+@pytest.mark.parametrize(('first_name', 'last_name'), (
+    ('Guinea', ''),
+    ('',       'Pig'),
+    ('',       '')
+))
+def test_no_names(db, first_name, last_name):
+    with pytest.raises(IntegrityError):
+        db.session.add(User(first_name=first_name, last_name=last_name))
+        db.session.flush()
+
+
+def test_no_names_pending(db):
+    db.session.add(User(first_name='', last_name='', is_pending=True))
+    db.session.flush()

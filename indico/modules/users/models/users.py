@@ -62,6 +62,8 @@ class User(db.Model):
     """Indico users"""
     __tablename__ = 'users'
     __table_args__ = (db.CheckConstraint('id != merged_into_id', 'not_merged_self'),
+                      db.CheckConstraint("is_pending OR (first_name != '' AND last_name != '')",
+                                         'not_pending_proper_names'),
                       {'schema': 'users'})
 
     #: the unique id of the user
