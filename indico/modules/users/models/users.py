@@ -60,6 +60,10 @@ syncable_fields = {
 
 class User(db.Model):
     """Indico users"""
+
+    # Useful when dealing with both users and groups in the same code
+    is_group = False
+
     __tablename__ = 'users'
     __table_args__ = (db.CheckConstraint('id != merged_into_id', 'not_merged_self'),
                       db.CheckConstraint("is_pending OR (first_name != '' AND last_name != '')",
@@ -314,6 +318,9 @@ class User(db.Model):
     def full_name(self):
         """Returns the user's name in 'Firstname Lastname' notation."""
         return self.get_full_name(last_name_first=False, last_name_upper=False, abbrev_first_name=False)
+
+    # Convenience property to have a common `name` property for both groups and users
+    name = full_name
 
     @property
     def synced_fields(self):

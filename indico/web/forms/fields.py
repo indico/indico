@@ -196,7 +196,7 @@ class PrincipalField(HiddenField):
             data = retrieve_principals(self._get_data(), legacy=False)
         else:
             data = self._get_data()
-        data.sort(key=lambda x: (x.full_name if isinstance(x, User) else x.name).lower())
+        data.sort(key=lambda x: x.name.lower())
         return [serialize_user(x) if isinstance(x, User) else serialize_group(x) for x in data]
 
     def _get_data(self):

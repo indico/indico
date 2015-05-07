@@ -42,6 +42,9 @@ class GroupProxy(object):
     :param provider: The provider of a multipass group
     """
 
+    # Useful when dealing with both users and groups in the same code
+    is_group = True
+
     def __new__(cls, name_or_id, provider=None, _group=None):
         """Creates the correct GroupProxy for the group type"""
         if provider is None or provider == 'indico':
