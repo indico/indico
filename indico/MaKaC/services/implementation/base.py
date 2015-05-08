@@ -168,7 +168,6 @@ class ServiceBase(RequestHandlerBase):
         self._requestStarted = False
         # Fill in the aw instance with the current information
         self._aw = AccessWrapper()
-        self._aw.setIP(request.remote_addr)
         self._aw.setUser(session.avatar)
         self._target = None
         self._startTime = None

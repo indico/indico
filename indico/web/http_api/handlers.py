@@ -119,7 +119,6 @@ def checkAK(apiKey, signature, timestamp, path, query):
 
 def buildAW(ak, onlyPublic=False):
     aw = AccessWrapper()
-    aw.setIP(str(request.remote_addr))
     if ak and not onlyPublic:
         # If we have an authenticated request, require HTTPS
         # Dirty hack: Google calendar converts HTTP API requests from https to http

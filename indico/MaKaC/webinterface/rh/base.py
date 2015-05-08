@@ -472,7 +472,6 @@ class RH(RequestHandlerBase):
         # keep a link to the web session in the access wrapper
         # this is used for checking access/modification key existence
         # in the user session
-        self._aw.setIP(request.remote_addr)
         self._setSessionUser()
         if self._getAuth():
             if self._getUser():

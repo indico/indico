@@ -65,7 +65,7 @@ def get_suggested_categories(user):
             continue
         if any(p.isSuggestionsDisabled() for p in categ.iterParents()):
             continue
-        if not categ.canAccess(AccessWrapper(user.as_avatar, request.remote_addr)):
+        if not categ.canAccess(AccessWrapper(user.as_avatar)):
             continue
         res.append({
             'score': score,

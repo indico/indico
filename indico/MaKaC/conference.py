@@ -1423,7 +1423,7 @@ class Category(CommonObjectBase):
             return True
         if not self.isProtected():
             # domain checking only triggered if the category is PUBLIC
-            return self.canIPAccess(aw.getIP()) or \
+            return self.canIPAccess(request.remote_addr) or \
                 self.isAllowedToCreateConference(aw.getUser()) or \
                 self.isAllowedToAccess(aw.getUser())
         return self.isAllowedToCreateConference(aw.getUser()) or \
@@ -3709,7 +3709,7 @@ class Conference(CommonObjectBase, Locatable):
 
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(aw.getIP()):
+        if self.__ac.isHarvesterIP(request.remote_addr):
             return True
 
         # Managers have always access
@@ -3723,7 +3723,7 @@ class Conference(CommonObjectBase, Locatable):
                 return self.canKeyAccess(aw)
         else:
             # Domain control is triggered just for PUBLIC events
-            return self.canIPAccess(aw.getIP())
+            return self.canIPAccess(request.remote_addr)
 
     def canKeyAccess(self, aw, key=None):
         accessKey = self.getAccessKey()
@@ -6175,7 +6175,7 @@ class Session(CommonObjectBase, Locatable):
     def canAccess( self, aw ):
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(aw.getIP()):
+        if self.__ac.isHarvesterIP(request.remote_addr):
             return True
         #####################################################
 
@@ -6184,7 +6184,7 @@ class Session(CommonObjectBase, Locatable):
             return True
 
         flag_allowed_to_access = self.isAllowedToAccess(aw.getUser())
-        if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and \
+        if not self.canIPAccess(request.remote_addr) and not self.canUserModify(aw.getUser()) and \
                 not flag_allowed_to_access:
             return False
         if not self.isProtected():
@@ -8902,14 +8902,14 @@ class Contribution(CommonObjectBase, Locatable):
     def canAccess( self, aw ):
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(aw.getIP()):
+        if self.__ac.isHarvesterIP(request.remote_addr):
             return True
         #####################################################
 
         if self.canModify(aw):
             return True
 
-        if not self.canIPAccess(aw.getIP()) and not self.isAllowedToAccess( aw.getUser() ):
+        if not self.canIPAccess(request.remote_addr) and not self.isAllowedToAccess(aw.getUser()):
             return False
         if not self.isProtected():
             return True
@@ -10909,7 +10909,7 @@ class Material(CommonObjectBase):
 
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(aw.getIP()):
+        if self.__ac.isHarvesterIP(request.remote_addr):
             return True
         #####################################################
 
@@ -10918,7 +10918,7 @@ class Material(CommonObjectBase):
             return True
 
         canUserAccess = self.isAllowedToAccess(aw.getUser())
-        canIPAccess = self.canIPAccess(aw.getIP())
+        canIPAccess = self.canIPAccess(request.remote_addr)
         if not self.isProtected():
             return canUserAccess or canIPAccess
         else:
@@ -11358,7 +11358,7 @@ class Resource(CommonObjectBase):
     def canAccess( self, aw ):
         # Allow harvesters (Invenio, offline cache) to access
         # protected pages
-        if self.__ac.isHarvesterIP(aw.getIP()):
+        if self.__ac.isHarvesterIP(request.remote_addr):
             return True
         #####################################################
 
@@ -11366,7 +11366,7 @@ class Resource(CommonObjectBase):
         if self.canModify(aw):
             return True
 
-        if not self.canIPAccess(aw.getIP()) and not self.canUserModify(aw.getUser()) and \
+        if not self.canIPAccess(request.remote_addr) and not self.canUserModify(aw.getUser()) and \
                 not self.isAllowedToAccess(aw.getUser()):
             return False
         if not self.isProtected():
