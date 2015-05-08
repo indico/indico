@@ -1,2 +1,7 @@
+{% extends 'forms/base_widget.html' %}
 {% from '_switch.html' import switch %}
-{{ switch(id=field.id, name=field.name, value=field._value(), **kwargs) }}
+
+
+{% block html %}
+    {{ switch(id=field.id, name=field.name, value=field._value(), **kwargs) }}
+{% endblock %}

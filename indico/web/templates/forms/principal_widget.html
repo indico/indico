@@ -1,10 +1,12 @@
 {% extends 'forms/base_widget.html' %}
 
+
 {% block html %}
     <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() | tojson | forceescape }}">
     <input type="text" id="display-{{ field.id }}" placeholder="{% trans %}Choose user...{% endtrans %}" readonly>
     <button id="choose-{{ field.id }}" class="i-button">{% trans %}Choose{% endtrans %}</button>
 {% endblock %}
+
 
 {% block javascript %}
     <script>

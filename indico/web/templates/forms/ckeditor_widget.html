@@ -1,17 +1,26 @@
-<input type="hidden" name="{{ field.name }}" id="{{ field.id }}" value="{{ field._value() }}">
-<div id="{{ field.id }}-editor" style="margin-bottom: 10px;"></div>
-<script>
-    (function() {
-        'use strict';
+{% extends 'forms/base_widget.html' %}
 
-        var field = $('#{{ field.id }}');
-        var editor = new RichTextEditor(600, 300, {{ simple | tojson }});
-        editor.set(field.val());
-        editor.onLoad(function() {
-            editor.onChange(function() {
-                field.val(editor.get());
+
+{% block html %}
+    <input type="hidden" name="{{ field.name }}" id="{{ field.id }}" value="{{ field._value() }}">
+    <div id="{{ field.id }}-editor" style="margin-bottom: 10px;"></div>
+{% endblock %}
+
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+
+            var field = $('#{{ field.id }}');
+            var editor = new RichTextEditor(600, 300, {{ simple | tojson }});
+            editor.set(field.val());
+            editor.onLoad(function() {
+                editor.onChange(function() {
+                    field.val(editor.get());
+                });
             });
-        });
-        $E('{{ field.id }}-editor').set(editor.draw());
-    })();
-</script>
+            $E('{{ field.id }}-editor').set(editor.draw());
+        })();
+    </script>
+{% endblock %}
