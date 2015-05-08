@@ -1,6 +1,11 @@
-{% for subfield in field %}
-    <div class="i-radio">
-        {{ subfield(required=field.flags.required) }}
-        {{ subfield.label }}
-    </div>
-{% endfor %}
+{% extends 'forms/base_widget.html' %}
+
+
+{% block html %}
+    {% for subfield in field %}
+        <div class="i-radio">
+            {{ subfield(required=field.flags.required) }}
+            {{ subfield.label }}
+        </div>
+    {% endfor %}
+{% endblock %}
