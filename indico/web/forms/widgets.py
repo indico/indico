@@ -43,12 +43,6 @@ class ConcatWidget(object):
         return HTMLString(self.separator.join(html))
 
 
-class PrincipalWidget(object):
-    """Renders a user/group selector widget"""
-    def __call__(self, field, **kwargs):
-        return HTMLString(render_template('forms/principal_widget.html', field=field))
-
-
 class JinjaWidget(object):
     """Renders a field using a custom Jinja template"""
     def __init__(self, template, plugin=None, single_line=False, **context):

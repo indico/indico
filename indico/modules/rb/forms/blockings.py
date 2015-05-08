@@ -24,12 +24,12 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.rooms import Room
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import JSONField, PrincipalField
+from indico.web.forms.fields import JSONField, PrincipalListField
 
 
 class BlockingForm(IndicoForm):
     reason = TextAreaField(_(u'Reason'), [DataRequired()])
-    principals = PrincipalField(groups=True, serializable=False, allow_external=True)
+    principals = PrincipalListField(groups=True, serializable=False, allow_external=True)
     blocked_rooms = JSONField(default=[])
 
     def validate_blocked_rooms(self, field):

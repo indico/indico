@@ -29,7 +29,7 @@ from indico.modules.users.util import serialize_user
 from indico.util.user import retrieve_principals, principal_from_fossil
 from indico.util.string import is_valid_mail
 from indico.util.i18n import _
-from indico.web.forms.widgets import PrincipalWidget, RadioButtonsWidget, JinjaWidget, PasswordWidget
+from indico.web.forms.widgets import RadioButtonsWidget, JinjaWidget, PasswordWidget
 
 
 class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
@@ -144,11 +144,9 @@ class IndicoPasswordField(PasswordField):
 
 
 class PrincipalField(HiddenField):
-    """A field that lets you select Indico users/groups ("principals")
+    """A field that lets you select an Indico user/group ("principal")
 
     :param groups: If groups should be selectable.
-    :param multiple: If a list of principals or just a single principal
-                     should be selectable/returned.
     :param allow_external: If "search users with no indico account"
                            should be available.  Selecting such a user
                            will automatically create a pending user once
@@ -160,11 +158,10 @@ class PrincipalField(HiddenField):
                          object.
     """
 
-    widget = PrincipalWidget()
+    widget = JinjaWidget('forms/principal_widget.html')
 
     def __init__(self, *args, **kwargs):
         self.groups = kwargs.pop('groups', False)
-        self.multiple = kwargs.pop('multiple', True)
         # Whether it is allowed to search for external users with no indico account
         self.allow_external = kwargs.pop('allow_external', False)
         # if we want serializable objects (usually for json) or the real thing (User/GroupProxy)
@@ -178,10 +175,7 @@ class PrincipalField(HiddenField):
     def process_formdata(self, valuelist):
         if valuelist:
             data = map(self._convert_principal, json.loads(valuelist[0]))
-            if self.multiple:
-                self.data = data if self.serializable else set(data)
-            else:
-                self.data = None if not data else data[0]
+            self.data = None if not data else data[0]
 
     def pre_validate(self, form):
         if self.groups:
@@ -200,10 +194,21 @@ class PrincipalField(HiddenField):
         return [serialize_user(x) if isinstance(x, User) else serialize_group(x) for x in data]
 
     def _get_data(self):
-        if self.multiple:
-            return sorted(self.data) if self.data else []
-        else:
-            return [] if self.data is None else [self.data]
+        return [] if self.data is None else [self.data]
+
+
+class PrincipalListField(PrincipalField):
+    """A field that lets you select a list Indico user/group ("principal")"""
+
+    widget = JinjaWidget('forms/principal_list_widget.html')
+
+    def _get_data(self):
+        return sorted(self.data) if self.data else []
+
+    def process_formdata(self, valuelist):
+        if valuelist:
+            data = map(self._convert_principal, json.loads(valuelist[0]))
+            self.data = data if self.serializable else set(data)
 
 
 class MultipleItemsField(HiddenField):
