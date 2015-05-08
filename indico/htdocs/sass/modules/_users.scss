@@ -59,55 +59,95 @@
 
 .category-box {
     position: relative;
-    .category-title {
-        font-style: bold;
+
+    display: block;
+
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0.5rem !important;
+    > div {
+        position: relative;
+
+        display: table;
+        overflow: hidden;
+
+        width: 100%;
+
+        table-layout: fixed;
     }
-    .category-path {
-        font-size: 0.8em;
-        line-height: 1;
+    .category-info,
+    .category-action {
+        position: relative;
 
-        display: block;
+        display: table-cell;
+        float: none;
 
-        margin-top: 0.4em;
-        ul {
-            font-style: italic;
+        padding: 0;
 
-            display: inline-block;
+        vertical-align: middle;
+    }
+    .category-info {
+        .category-title,
+        .category-path {
+            display: block;
             overflow: hidden;
 
-            max-width: 92%;
-            padding: 0;
+            white-space: nowrap;
+        }
+        .category-title {
+            font-size: 1em;
+            font-weight: bold;
 
-            list-style: none;
+            text-overflow: ellipsis;
+        }
+        .category-path {
+            font-size: 0.8em;
+            line-height: 1;
 
-            text-align: left;
-            li {
-                display: inline-block;
+            margin-top: 0.4em;
+            ul {
+                font-weight: normal;
+                font-style: italic;
+
                 overflow: hidden;
 
+                max-width: 92%;
                 padding: 0;
 
-                white-space: nowrap;
-                text-overflow: ellipsis;
+                list-style: none;
 
-                border-bottom: 0;
-                &:last-child {
-                    max-width: 100%;
-                }
-                & + li:before {
-                    padding: 0 0.2em;
+                text-align: left;
 
-                    content: '»';
+                color: $dark-gray;
+                li {
+                    display: inline-block;
+                    overflow: hidden;
+
+                    padding: 0;
+
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+
+                    border-bottom: 0;
+                    &:last-child {
+                        max-width: 100%;
+                    }
+                    & + li:before {
+                        padding: 0 0.2em;
+
+                        content: '»';
+                    }
                 }
             }
         }
     }
-    [class*='icon-'] {
-        position: relative;
-        top: 0.5em;
-        bottom: 0.5em;
+    .category-action {
+        width: 1.2em;
+    }
+    .category-action-extra {
+        font-size: 0.8em;
+        font-weight: normal;
 
-        margin-top: 0.2em;
-        padding: 0 0;
+        margin-top: 0.2rem;
     }
 }

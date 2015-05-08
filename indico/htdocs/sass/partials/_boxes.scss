@@ -88,6 +88,27 @@
     padding: 10px;
 }
 
+.i-box.no-padding {
+    padding: 0;
+    &.titled > .i-box-content {
+        margin-top: 0;
+    }
+    > .i-box-header {
+        margin: 0;
+        padding: 10px;
+    }
+    > .i-box-content > ul.group-list {
+        margin: 0;
+        > li {
+            margin: 0;
+            margin-right: 0;
+            margin-left: 0;
+            padding: 10px;
+        }
+    }
+}
+
+
 
 // ============================================================================
 // Group of boxes
