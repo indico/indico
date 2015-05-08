@@ -257,7 +257,7 @@ def merge_users(source, target, force=False):
         suggestions.merge_avatars(target, source)
 
     # Merge avatars in RB
-    from indico.modules.rb.utils import rb_merge_users
+    from indico.modules.rb.util import rb_merge_users
     rb_merge_users(str(target.id), str(source.id))
 
     # Notify signal listeners about the merge

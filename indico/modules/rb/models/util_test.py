@@ -20,7 +20,7 @@ import pytest
 
 from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservations import RepeatFrequency
-from indico.modules.rb.models.utils import unimplemented
+from indico.modules.rb.models.util import unimplemented
 from indico.testing.util import bool_matrix
 
 

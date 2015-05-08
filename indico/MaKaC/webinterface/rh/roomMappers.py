@@ -16,7 +16,7 @@
 
 from flask import session
 
-from indico.modules.rb.utils import rb_is_admin
+from indico.modules.rb.util import rb_is_admin
 import MaKaC.webinterface.pages.admins as adminPages
 import MaKaC.roomMapping as roomMapping
 import MaKaC.webinterface.urlHandlers as urlHandlers

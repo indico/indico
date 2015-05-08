@@ -18,7 +18,7 @@ from persistent import Persistent
 
 from indico.core.auth import multipass
 from indico.modules.groups import GroupProxy
-from indico.modules.rb.utils import rb_is_admin
+from indico.modules.rb.util import rb_is_admin
 from indico.modules.users import User, logger
 from indico.modules.auth import Identity
 from indico.util.caching import memoize_request

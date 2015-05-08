@@ -24,7 +24,7 @@ from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb.utils import rb_is_admin
+from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
 from indico.util.i18n import _

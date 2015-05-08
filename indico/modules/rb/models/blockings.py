@@ -22,7 +22,7 @@ from sqlalchemy.ext.hybrid import hybrid_method
 from indico.core.db import db
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
-from indico.modules.rb.utils import rb_is_admin
+from indico.modules.rb.util import rb_is_admin
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 

@@ -22,7 +22,7 @@ from MaKaC.webinterface.rh.admins import RHAdminBase
 
 from indico.util.i18n import _
 from indico.core.errors import AccessError
-from indico.modules.rb.utils import rb_is_admin
+from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb.views.admin import mappers as mapper_views
 
 

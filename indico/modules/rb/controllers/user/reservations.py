@@ -31,7 +31,7 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.utils import get_default_booking_interval, rb_is_admin
+from indico.modules.rb.util import get_default_booking_interval, rb_is_admin
 from indico.modules.rb.views.user.reservations import (WPRoomBookingSearchBookings, WPRoomBookingSearchBookingsResults,
                                                        WPRoomBookingCalendar, WPRoomBookingNewBookingSelectRoom,
                                                        WPRoomBookingNewBookingSelectPeriod,

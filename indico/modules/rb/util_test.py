@@ -17,7 +17,7 @@
 import pytest
 
 from indico.modules.rb import settings as rb_settings
-from indico.modules.rb.utils import rb_is_admin, rb_check_user_access
+from indico.modules.rb.util import rb_is_admin, rb_check_user_access
 from indico.testing.util import bool_matrix
 
 
@@ -25,7 +25,7 @@ from indico.testing.util import bool_matrix
 def test_rb_check_user_access(mocker, dummy_user, dummy_group, is_rb_admin, acl_empty, in_acl, expected):
     user = dummy_user.user
     if is_rb_admin:
-        mocker.patch('indico.modules.rb.utils.rb_is_admin', return_value=True)
+        mocker.patch('indico.modules.rb.util.rb_is_admin', return_value=True)
     acl = []
     if not acl_empty:
         acl.append(dummy_group.as_principal)

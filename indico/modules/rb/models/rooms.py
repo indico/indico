@@ -31,7 +31,7 @@ from indico.core.db.sqlalchemy.util.cache import versioned_cache, cached
 from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.core.errors import NoReportError
 from indico.modules.groups import GroupProxy
-from indico.modules.rb.utils import rb_check_user_access, rb_is_admin
+from indico.modules.rb.util import rb_check_user_access, rb_is_admin
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence

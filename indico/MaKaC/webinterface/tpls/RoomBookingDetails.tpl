@@ -1,6 +1,6 @@
 <% valid_occurrences = reservation.occurrences.filter_by(is_valid=True).all() %>
 <% import itertools %>
-<% from indico.modules.rb.utils import rb_is_admin %>
+<% from indico.modules.rb.util import rb_is_admin %>
 
 <script type="text/javascript">
     var occurrences = ${ [formatDate(occ.date) for occ in valid_occurrences] | n,j };

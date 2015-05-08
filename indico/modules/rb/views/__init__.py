@@ -23,7 +23,7 @@ from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.webinterface.wcomponents import BasicSideMenu, SideMenuItem, SideMenuSection
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.utils import rb_is_admin
+from indico.modules.rb.util import rb_is_admin
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 

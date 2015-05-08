@@ -19,7 +19,7 @@ from flask import session
 from MaKaC.errors import MaKaCError
 
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.utils import rb_is_admin
+from indico.modules.rb.util import rb_is_admin
 from indico.util.i18n import _
 
 

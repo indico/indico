@@ -17,7 +17,7 @@
 from flask import session
 
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
-from indico.modules.rb.utils import rb_is_admin
+from indico.modules.rb.util import rb_is_admin
 from indico.util.i18n import _
 from MaKaC.services.implementation.base import ServiceBase
 from MaKaC.services.interface.rpc.common import ServiceError

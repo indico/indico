@@ -18,7 +18,7 @@ from flask import session
 
 from indico.core.config import Config
 from indico.core.errors import AccessError
-from indico.modules.rb.utils import rb_check_user_access
+from indico.modules.rb.util import rb_check_user_access
 from MaKaC.webinterface.rh.base import RHProtected
 
 

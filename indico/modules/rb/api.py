@@ -28,7 +28,7 @@ from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.modules.auth import Identity
 from indico.modules.users import User
-from indico.modules.rb.utils import rb_check_user_access
+from indico.modules.rb.util import rb_check_user_access
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping, RepeatFrequency, ConflictingOccurrences
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
