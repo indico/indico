@@ -23,7 +23,8 @@
             alwaysClearable: false,
             clearClass: 'clearableinput',
             emptyvalue: '',
-            focusAfter: true
+            focusAfter: true,
+            clearOnEscape: true,
         },
 
         _create: function() {
@@ -46,9 +47,11 @@
                     self._onInput();
                 })
                 .on("keyup", function(e) {
-                    if (e.which == K.ESCAPE) {
-                        input.val('value');
-                        self._clear();
+                    if (opt.clearOnEscape) {
+                        if (e.which == K.ESCAPE) {
+                            input.val('value');
+                            self._clear();
+                        }
                     }
                     // TODO remove when support for IE9 is dropped
                     if (e.which == K.BACKSPACE || e.which == K.DELETE) {
@@ -58,6 +61,7 @@
 
             self.buttonBox.append(self.clearIcon);
             input.after(self.buttonBox);
+            self._updateClearIcon();
 
             if (opt.focus) {
                 input.focus();
