@@ -33,6 +33,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.models.settings import SettingsProxy, EventSettingsProxy
+from indico.modules.users import UserSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import _, NullDomain
 from indico.util.struct.enum import IndicoEnum
@@ -78,12 +79,15 @@ class IndicoPlugin(Plugin):
     default_settings = {}
     #: A dictionary containing default values for event-specific settings
     default_event_settings = {}
+    #: A dictionary containing default values for user-specific settings
+    default_user_settings = {}
     #: If the plugin should link to a details/config page in the admin interface
     configurable = False
     #: The group category that the plugin belongs to
     category = None
-    #: If `settings` and `event_settings` should use strict mode, i.e. only allow keys in
-    #: `default_settings` or `default_event_settings`
+    #: If `settings`, `event_settings` and `user_settings` should use strict
+    #: mode, i.e. only allow keys in  `default_settings` , `default_event_settings`
+    #: or `default_user_settings`
     strict_settings = False
 
     def init(self):
@@ -279,6 +283,17 @@ class IndicoPlugin(Plugin):
         with instance.plugin_context():  # in case the default settings come from a property
             return EventSettingsProxy('plugin_{}'.format(cls.name), instance.default_event_settings,
                                       cls.strict_settings)
+
+    @cached_classproperty
+    @classmethod
+    def user_settings(cls):
+        """:class:`UserSettingsProxy` for the plugin's user-specific settings"""
+        if cls.name is None:
+            raise RuntimeError('Plugin has not been loaded yet')
+        instance = cls.instance
+        with instance.plugin_context():  # in case the default settings come from a property
+            return UserSettingsProxy('plugin_{}'.format(cls.name), instance.default_user_settings,
+                                     cls.strict_settings)
 
 
 def include_plugin_js_assets(bundle_name):
