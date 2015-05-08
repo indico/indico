@@ -83,12 +83,6 @@ class CKEditorWidget(JinjaWidget):
         super(CKEditorWidget, self).__init__('forms/ckeditor_widget.html', simple=simple)
 
 
-class RadioButtonsWidget(JinjaWidget):
-    """Renders a radio button group"""
-    def __init__(self):
-        super(RadioButtonsWidget, self).__init__('forms/radio_buttons_widget.html')
-
-
 class SwitchWidget(object):
     """Renders a switch widget"""
     def __init__(self, on_label=None, off_label=None):
