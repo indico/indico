@@ -1015,7 +1015,6 @@ class AbstractMgr(Persistent):
             self._authorizedSubmitter = PersistentList()
         if not av in self._authorizedSubmitter:
             self._authorizedSubmitter.append(av)
-            av.linkTo(self, "abstractSubmitter")
 
     def removeAuthorizedSubmitter(self, av):
         try:
@@ -1025,7 +1024,6 @@ class AbstractMgr(Persistent):
             self._authorizedSubmitter = PersistentList()
         if av in self._authorizedSubmitter:
             self._authorizedSubmitter.remove(av)
-            av.unlinkTo(self, "abstractSubmitter")
 
     def getCFAStatus(self):
         return self._activated
