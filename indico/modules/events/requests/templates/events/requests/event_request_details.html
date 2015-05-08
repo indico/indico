@@ -59,9 +59,9 @@
         {% call form_fieldset(legend=_('Request details'), description=_('These are the details provided by the event manager.')) %}
             {% if show_management %}
                 {% call form_row_static(_('Created by')) %}
-                    <a href="mailto:{{ req.created_by_user.getEmail() }}">{{ req.created_by_user.getStraightFullName() }}</a>
-                    {% if req.created_by_user.getPhone() %}
-                        (Phone: {{ req.created_by_user.getPhone() }})
+                    <a href="mailto:{{ req.created_by_user.email }}">{{ req.created_by_user.full_name }}</a>
+                    {% if req.created_by_user.phone %}
+                        (Phone: {{ req.created_by_user.phone }})
                     {% endif %}
                 {% endcall %}
                 {{ form_row_static(_('Created at'), req.created_dt | format_datetime) }}
@@ -97,7 +97,7 @@
         {{ form_header(id='request-manage-form', classes='management-area', action=url_for('.event_requests_process', req)) }}
         {% call form_fieldset(legend=_('Manage service request')) %}
             {% if req.processed_by_user %}
-                {{ form_row_static(_('Processed by'), req.processed_by_user.getStraightFullName()) }}
+                {{ form_row_static(_('Processed by'), req.processed_by_user.full_name) }}
             {% endif %}
             {% if req.processed_dt %}
                 {{ form_row_static(_('Processed at'), req.processed_dt | format_datetime) }}

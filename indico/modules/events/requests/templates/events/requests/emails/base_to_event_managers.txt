@@ -11,7 +11,7 @@
         {% block request_message %}{% endblock %}
 
         Event: {{ event.getTitle() }}
-        Requested by: {{ req.created_by_user.getStraightFullName() }}
+        Requested by: {{ req.created_by_user.full_name }}
         Details: {{ url_for('requests.event_requests_details', req, _external=True) }}
         {%- if self.request_details() %}
             {# empty line #}

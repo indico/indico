@@ -71,6 +71,8 @@ class Request(db.Model):
     #: ID of the user creating the request
     created_by_id = db.Column(
         db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
         nullable=False
     )
     #: the date/time the request was created
@@ -83,6 +85,8 @@ class Request(db.Model):
     #: ID of the user processing the request
     processed_by_id = db.Column(
         db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
         nullable=True
     )
     #: the date/time the request was accepted/rejected
@@ -96,6 +100,27 @@ class Request(db.Model):
         nullable=True
     )
 
+    #: The user who created the request
+    created_by_user = db.relationship(
+        'User',
+        lazy=False,
+        foreign_keys=[created_by_id],
+        backref=db.backref(
+            'requests_created',
+            lazy='dynamic'
+        )
+    )
+    #: The user who processed the request
+    processed_by_user = db.relationship(
+        'User',
+        lazy=False,
+        foreign_keys=[processed_by_id],
+        backref=db.backref(
+            'requests_processed',
+            lazy='dynamic'
+        )
+    )
+
     @property
     def event(self):
         from MaKaC.conference import ConferenceHolder
@@ -104,24 +129,6 @@ class Request(db.Model):
     @event.setter
     def event(self, event):
         self.event_id = int(event.getId())
-
-    @property
-    def created_by_user(self):
-        from MaKaC.user import AvatarHolder
-        return AvatarHolder().getById(str(self.created_by_id))
-
-    @created_by_user.setter
-    def created_by_user(self, user):
-        self.created_by_id = int(user.getId())
-
-    @property
-    def processed_by_user(self):
-        from MaKaC.user import AvatarHolder
-        return AvatarHolder().getById(str(self.processed_by_id))
-
-    @processed_by_user.setter
-    def processed_by_user(self, user):
-        self.processed_by_id = int(user.getId())
 
     @property
     def definition(self):

@@ -1,14 +1,14 @@
 {% extends 'emails/base.txt' %}
 
 {% set request_created_by = req.created_by_user %}
-{% set event_created_by = event.getCreator() %}
+{% set event_created_by = event.getCreator().user %}
 
 
 {% macro user_details(user) -%}
-    Name:     {{ user.getStraightFullName() }}
-    Email:    {{ user.getEmail() }}
-    {%- if user.getPhone() %}
-    Phone:    {{ user.getPhone() }}
+    Name:     {{ user.full_name }}
+    Email:    {{ user.email }}
+    {%- if user.phone %}
+    Phone:    {{ user.phone }}
     {%- endif -%}
 {%- endmacro %}
 

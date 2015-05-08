@@ -37,8 +37,8 @@ def _check_request_definitions(app, **kwargs):
 
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
-    visible = bool(get_request_definitions()) and (event.canModify(session.avatar) or
-                                                   is_request_manager(session.avatar))
+    visible = bool(get_request_definitions()) and (event.canModify(session.user) or
+                                                   is_request_manager(session.user))
     return 'requests', SideMenuItem('Services', url_for('requests.event_requests', event), visible=visible)
 
 
@@ -46,8 +46,8 @@ def _extend_event_management_menu(event, **kwargs):
 def _merge_users(user, merged, **kwargs):
     new_id = int(user.id)
     old_id = int(merged.id)
-    Request.find(created_by_id=old_id).update({'created_by_id': new_id})
-    Request.find(processed_by_id=old_id).update({'processed_by_id': new_id})
+    Request.find(created_by_id=old_id).update({Request.created_by_id: new_id})
+    Request.find(processed_by_id=old_id).update({Request.processed_by_id: new_id})
 
 
 @signals.event.deleted.connect
