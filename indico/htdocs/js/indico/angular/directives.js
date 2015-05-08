@@ -226,13 +226,8 @@ ndDirectives.directive("contenteditable", function() {
 
             // creation
             elem.actioninput({
-                focusAfter: false,
+                focusOnClear: false,
                 enterKeyEnabled: !scope.multiline,
-
-                // view -> model
-                callback: function() {
-                    actions.close();
-                },
 
                 // view -> model
                 actionCallback: function() {
@@ -243,8 +238,13 @@ ndDirectives.directive("contenteditable", function() {
                     actions.close();
                 },
 
+                // view -> model
+                onClear: function() {
+                    actions.close();
+                },
+
                 // angular -> jquery
-                onchange: function() {
+                onInput: function() {
                     elem.val(elem.html());
                 }
             });
