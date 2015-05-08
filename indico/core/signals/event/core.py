@@ -114,7 +114,7 @@ has_read_access = _signals.signal('has-read-access', """
 Called when resolving the read access permissions for an event. The `sender` is the event,
 and the following parameters are available:
 
-* `user` - the user that is trying to access the event (:class:`Avatar` or ``None``)
+* `user` - the user that is trying to access the event (:class:`.User` or ``None``)
 
-Should return `True` or `False`.
+Should return ``True`` or ``False``.
 """)
