@@ -282,7 +282,7 @@ type("ListOfUsersManager", [], {
         this.usersList.each(function(val, idx) {
             var user = val;
             var elemStyle = self.elementClass;
-            if (~user._type.indexOf('Group'))
+            if (user._type && ~user._type.indexOf('Group'))
                 elemStyle = "UIGroup";
 
             var row = $('<li/>').attr('class', elemStyle);
