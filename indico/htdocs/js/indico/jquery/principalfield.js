@@ -14,6 +14,8 @@
  */
 
 (function($) {
+    'use strict';
+
     $.widget('indico.principalfield', {
         options: {
             eventId: null,
@@ -32,7 +34,7 @@
 
         _update: function _update() {
             var self = this;
-            users = self.users ? JSON.stringify(self.users) : '[]';
+            var users = self.users ? JSON.stringify(self.users) : '[]';
             self.element.val(users);
             self.element.trigger('change');
             self.options.onUpdate(self.users);
