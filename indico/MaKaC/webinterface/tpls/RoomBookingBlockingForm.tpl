@@ -137,7 +137,7 @@
         };
 
 
-        var blockedRoomList = new RoomListWidget('PeopleList', function(roomToRemove, setResult) {
+        var blockedRoomList = new RoomListWidget('user-list', function(roomToRemove, setResult) {
             setResult(true);
             blockedRoomList.set(roomToRemove, null);
             serializeRooms();

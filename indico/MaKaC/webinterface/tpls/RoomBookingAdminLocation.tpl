@@ -323,7 +323,7 @@ indicoRequest(
         if (!error) {
             var aspectsListField = new MapAspectListField(
                 'AspectsListDiv',
-                'PeopleList',
+                'user-list',
                 result,
                 newAspectsHandler,
                 editAspectHandler,
