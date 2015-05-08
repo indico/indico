@@ -219,7 +219,6 @@ class Agreement(db.Model):
         self.state = AgreementState.pending
         self.attachment = None
         self.attachment_filename = None
-        self.data = None
         self.reason = None
         self.signed_dt = None
         self.signed_from_ip = None
