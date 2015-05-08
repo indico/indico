@@ -13,6 +13,8 @@
 {% block javascript %}
     <script>
         (function() {
+            'use strict';
+
             var SEARCH_URL = {{ field.search_url | tojson}};
 
             var params = {

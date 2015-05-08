@@ -39,6 +39,8 @@
 {% block javascript %}
     <script>
         (function() {
+            'use strict';
+
             var widget = $('#{{ field.id }}-widget');
             var field = $('#{{ field.id }}');
             var data = JSON.parse(field.val());
