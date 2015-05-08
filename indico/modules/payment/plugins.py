@@ -79,7 +79,7 @@ class PaymentPluginMixin(object):
     def can_be_modified(self, user, event):
         """Checks if the user is allowed to enable/disable/modify the payment method.
 
-        :param user: the :class:`Avatar` of the user
+        :param user: the :class:`.User` repesenting the user
         :param event: the :class:`Conference`
         """
         return event.canModify(user)
@@ -90,7 +90,7 @@ class PaymentPluginMixin(object):
         # In the future it might be useful to expose a limited version of the main payment page to those users since
         # right now there is no good way to access both payment methods if there are two of this kind and you have
         # access to both.
-        if session.avatar and self.can_be_modified(session.avatar, event):
+        if session.user and self.can_be_modified(session.user, event):
             return url_for('payment.event_plugin_edit', event, method=re.sub(r'^payment_', '', self.name))
 
     def get_method_name(self, event):
