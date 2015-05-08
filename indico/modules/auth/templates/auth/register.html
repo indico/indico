@@ -1,5 +1,5 @@
 {% extends 'layout/full_page_base.html' %}
-{% from 'forms/form_widget.html' import form_header, form_row, form_rows, form_fieldset, form_footer %}
+{% from 'forms/_form.html' import form_header, form_row, form_rows, form_fieldset, form_footer %}
 {% set show_extra_form = local and not must_verify_email %}
 
 {% block title %}
