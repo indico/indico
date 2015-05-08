@@ -46,33 +46,6 @@ def rb_is_admin(user):
     return any(user in principal for principal in principals)
 
 
-def rb_merge_users(new_id, old_id):
-    """Updates RB data after an Avatar merge
-
-    :param new_id: Target user
-    :param old_id: Source user (being deleted in the merge)
-    """
-    from indico.modules.rb import settings as rb_settings
-    from indico.modules.rb.models.blocking_principals import BlockingPrincipal
-    from indico.modules.rb.models.blockings import Blocking
-    from indico.modules.rb.models.reservations import Reservation
-    from indico.modules.rb.models.rooms import Room
-
-    old_user = User.get(int(old_id))
-    new_user = User.get(int(new_id))
-    for bp in BlockingPrincipal.find():
-        if bp.principal == old_user:
-            bp.principal = new_user
-    Blocking.find(created_by_id=old_user.id).update({Blocking.created_by_id: new_user.id})
-    Reservation.find(created_by_id=old_user.id).update({Reservation.created_by_id: new_user.id})
-    Reservation.find(booked_for_id=old_user.id).update({Reservation.booked_for_id: new_user.id})
-    Room.find(owner_id=old_user.id).update({Room.owner_id: new_user.id})
-    for key in ('authorized_principals', 'admin_principals'):
-        principals = rb_settings.get(key)
-        principals = principals_merge_users(principals, new_id, old_id)
-        rb_settings.set(key, principals)
-
-
 def get_default_booking_interval(duration=90, precision=15, force_today=False):
     """Get the default booking interval for a room.
 

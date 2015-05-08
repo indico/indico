@@ -256,10 +256,6 @@ def merge_users(source, target, force=False):
         avatar_links.merge_avatars(target, source)
         suggestions.merge_avatars(target, source)
 
-    # Merge avatars in RB
-    from indico.modules.rb.util import rb_merge_users
-    rb_merge_users(str(target.id), str(source.id))
-
     # Notify signal listeners about the merge
     signals.merge_users.send(target.as_avatar, merged=source.as_avatar)
     db.session.flush()
