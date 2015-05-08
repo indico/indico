@@ -22,10 +22,10 @@
             clearClass: 'clearableinput',
             clearOnEscape: true,
             emptyvalue: '',
-            focusAfter: true,
+            focusOnClear: true,
             focusOnStart: false,
-            onchange: function() {},
-            callback: function() {},
+            onClear: function() {},
+            onInput: function() {},
         },
 
         _create: function() {
@@ -69,8 +69,8 @@
             var self = this;
             self.element.val(self.options.emptyvalue).trigger('propertychange');
             self._refreshClearIcon();
-            self.options.callback();
-            if (self.options.focusAfter) {
+            self.options.onClear();
+            if (self.options.focusOnClear) {
                 self.element.focus();
             } else {
                 self.element.blur();
@@ -79,7 +79,7 @@
 
         _handleInput: function() {
             var self = this;
-            self.options.onchange();
+            self.options.onInput();
             self._refreshClearIcon();
         },
 

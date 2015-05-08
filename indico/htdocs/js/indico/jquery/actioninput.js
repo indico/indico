@@ -53,7 +53,7 @@
 
             opt.actionCallback();
 
-            if (opt.focusAfter) {
+            if (opt.focusOnClear) {
                 input.focus();
             } else {
                 input.blur();

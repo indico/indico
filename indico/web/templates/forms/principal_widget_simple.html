@@ -18,8 +18,8 @@
             {% if not field.flags.required %}
                 display.clearableinput({
                     clearOnEscape: false,
-                    focusAfter: false,
-                    callback: function() {
+                    focusOnClear: false,
+                    onClear: function() {
                         field.principalfield('remove');
                     }
                 });
