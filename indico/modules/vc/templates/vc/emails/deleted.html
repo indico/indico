@@ -6,6 +6,6 @@
 
 {% block header -%}
 <p>
-    The videoconferencing room "{{ vc_room.name }}" has been deleted by {{ user.getStraightFullName() }}.
+    The videoconferencing room "{{ vc_room.name }}" has been deleted by {{ user.full_name }}.
 </p>
 {%- endblock %}

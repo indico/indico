@@ -43,12 +43,6 @@ ROOM_NAME_RE = re.compile(r'[\w\-]+')
 class VCRoomField(HiddenField):
     widget = SelectizeWidget()
 
-    def _convert_principal(self, principal):
-        if principal['_type'] == 'Avatar':
-            return u'Avatar', principal['id']
-        else:
-            return u'Group', principal['id']
-
     def process_formdata(self, valuelist):
         if valuelist and valuelist[0].isdigit():
             self.data = VCRoom.get(valuelist[0])

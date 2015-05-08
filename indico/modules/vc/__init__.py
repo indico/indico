@@ -21,6 +21,7 @@ from flask import render_template, has_request_context, session
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
+from indico.modules.users import User
 from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLinkType, VCRoom
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.plugins import VCPluginMixin
@@ -30,7 +31,6 @@ from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry
 from indico.util.i18n import _
 from MaKaC.conference import EventCloner
-from MaKaC.user import AvatarHolder
 from MaKaC.webinterface.displayMgr import EventMenuEntry
 from MaKaC.webinterface.wcomponents import SideMenuItem
 
@@ -57,7 +57,7 @@ def _inject_vc_room_action_buttons(event, item, **kwargs):
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
     return 'vc', SideMenuItem(_('Videoconference'), url_for('vc.manage_vc_rooms', event),
-                              visible=bool(get_vc_plugins()) and event.canModify(session.avatar))
+                              visible=bool(get_vc_plugins()) and event.canModify(session.user))
 
 
 @signals.event.sidemenu.connect
@@ -96,22 +96,16 @@ def _contrib_deleted(contrib, **kwargs):
 def _event_deleted(event, **kwargs):
     if not event.id.isdigit():
         return
+    user = session.user if has_request_context() and session.user else User.get(Config.getInstance().getJanitorUserId())
     for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True, include_deleted=True):
-        event_vc_room.delete(_get_user())
+        event_vc_room.delete(user)
 
 
 @signals.indico_menu.connect
 def extend_header_menu(sender, **kwargs):
-    if not session.avatar or not get_managed_vc_plugins(session.avatar):
+    if not session.user or not get_managed_vc_plugins(session.user):
         return
     return HeaderMenuEntry(url_for('vc.vc_room_list'), _('Videoconference'), _('Services'))
-
-
-def _get_user():
-    if has_request_context() and session.avatar:
-        return session.avatar
-    else:
-        return AvatarHolder().getById(Config.getInstance().getJanitorUserId())
 
 
 class VCCloner(EventCloner):
@@ -142,4 +136,4 @@ def _get_vc_cloner(event, **kwargs):
 def _merge_users(user, merged, **kwargs):
     new_id = int(user.id)
     old_id = int(merged.id)
-    VCRoom.find(created_by_id=old_id).update({'created_by_id': new_id})
+    VCRoom.find(created_by_id=old_id).update({VCRoom.created_by_id: new_id})

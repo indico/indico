@@ -58,15 +58,15 @@ class VCPluginMixin(object):
 
     @property
     def logo_url(self):
-        raise NotImplementedError('VC Plugin must have a logo URL')
+        raise NotImplementedError('VC plugin must have a logo URL')
 
     @property
     def icon_url(self):
-        raise NotImplementedError('VC Plugin must have an icon URL')
+        raise NotImplementedError('VC plugin must have an icon URL')
 
     @classproperty
-    @classmethod
-    def category(self):
+    @staticmethod
+    def category():
         from indico.core.plugins import PluginCategory
         return PluginCategory.videoconference
 
@@ -209,20 +209,21 @@ class VCPluginMixin(object):
         if not acl:
             return True
 
-        principals = retrieve_principals(acl)
-        return any(principal.containsUser(user) for principal in principals)
+        principals = retrieve_principals(acl, legacy=False)
+        return any(user in principal for principal in principals)
 
     def can_manage_vc_room(self, user, room):
         """Checks if a user can manage a vc room"""
-        return (user.isAdmin() or
+        return (user.is_admin or
                 self.can_manage_vc(user) or
                 any(evt_assoc.event.canModify(user) for evt_assoc in room.events))
 
     def can_manage_vc(self, user):
         """Checks if a user has management rights on this VC system"""
-        if user.isAdmin():
+        if user.is_admin:
             return True
-        return any(principal.containsUser(user) for principal in retrieve_principals(self.settings.get('managers')))
+        principals = retrieve_principals(self.settings.get('managers'), legacy=False)
+        return any(user in principal for principal in principals)
 
     def _merge_users(self, user, merged, **kwargs):
         new_id = int(user.id)

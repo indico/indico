@@ -28,7 +28,6 @@ from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
-from MaKaC.user import AvatarHolder
 from MaKaC.conference import ConferenceHolder
 
 
@@ -70,6 +69,7 @@ class VCRoom(db.Model):
     #: ID of the creator
     created_by_id = db.Column(
         db.Integer,
+        db.ForeignKey('users.users.id'),
         nullable=False,
         index=True
     )
@@ -90,6 +90,16 @@ class VCRoom(db.Model):
         nullable=False
     )
 
+    #: The user who created the videoconference room
+    created_by_user = db.relationship(
+        'User',
+        lazy=False,
+        backref=db.backref(
+            'vc_rooms',
+            lazy='dynamic'
+        )
+    )
+
     @property
     def plugin(self):
         from indico.modules.vc.util import get_vc_plugins
@@ -98,15 +108,6 @@ class VCRoom(db.Model):
     @property
     def locator(self):
         return {'vc_room_id': self.id, 'service': self.type}
-
-    @property
-    def created_by_user(self):
-        """The Avatar who created the videoconference room."""
-        return AvatarHolder().getById(str(self.created_by_id))
-
-    @created_by_user.setter
-    def created_by_user(self, user):
-        self.created_by_id = int(user.getId())
 
     @return_ascii
     def __repr__(self):

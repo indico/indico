@@ -47,11 +47,11 @@ def notify_deleted(plugin, room, room_assoc, event, user):
     """
     name = get_overridable_template_name('emails/deleted.html', plugin, core_prefix='vc/')
     tpl = get_template_module(name, plugin=plugin, vc_room=room, event=event, vc_room_event=room_assoc, user=user)
-    _send('create', user, plugin, event, room, tpl.get_subject(), tpl.get_body())
+    _send('delete', user, plugin, event, room, tpl.get_subject(), tpl.get_body())
 
 
 def _send(action, user, plugin, event, room, subject, body):
-    to_list = {user.getEmail()}
+    to_list = {user.email}
     cc_list = plugin.get_notification_cc_list(action, room, event) - to_list
     bcc_list = plugin.get_notification_bcc_list(action, room, event) - cc_list - to_list
 
