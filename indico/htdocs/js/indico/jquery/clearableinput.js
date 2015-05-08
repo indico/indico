@@ -25,6 +25,7 @@
             emptyvalue: '',
             focusAfter: true,
             clearOnEscape: true,
+            focusOnStart: false,
         },
 
         _create: function() {
@@ -63,8 +64,8 @@
             input.after(self.buttonBox);
             self._updateClearIcon();
 
-            if (opt.focus) {
-                input.focus();
+            if (self.options.focusOnStart) {
+                self.element.focus();
             }
         },
 
