@@ -105,19 +105,16 @@
     border-bottom: none;
 }
 
-.dashboard-box ol li > a:hover .event-title,
-.dashboard-box ol li > a:hover .category-name {
+.dashboard-box ol li > a:hover .event-title {
     text-decoration: underline;
 }
 
-.dashboard-box ol .event-title,
-.dashboard-box ol .category-name {
+.dashboard-box ol .event-title {
     vertical-align: middle;
 }
 
 .dashboard-box ol .event-date,
-.dashboard-box ol .event-category,
-.dashboard-box ol .category-path {
+.dashboard-box ol .event-category {
     color: #666;
     display: inline-block;
     font-weight: normal;
@@ -130,8 +127,7 @@
     width: 85px;
 }
 
-.dashboard-box ol .event-category,
-.dashboard-box ol .category-path {
+.dashboard-box ol .event-category {
     display: block;
     font-size: 11px;
 }
@@ -168,10 +164,6 @@
 
 .dashboard-box .event-title.truncate-target {
     max-width: 300px;
-}
-
-.dashboard-box .category-name.truncate-target {
-    max-width: 445px;
 }
 
 #happeningCategories .event-title.truncate-target {

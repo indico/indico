@@ -1,6 +1,6 @@
 {% extends 'users/base.html' %}
 {% from 'users/_favorites.html' import favorite_users_list %}
-{% from '_category_path.html' import category_path %}
+{% from 'users/_category.html' import favorite_category %}
 
 {% block subtitle -%}
     {% trans %}Favourites{% endtrans %}
@@ -29,7 +29,7 @@
                 <button class="i-button highlight js-add-user" style="margin-top: 15px;">{% trans %}Add Indico user{% endtrans %}</button>
             </div>
             <div class="column col-50">
-                <div class="i-box titled">
+                <div class="i-box titled no-padding">
                     <div class="i-box-header">
                         <div class="i-box-title">
                             {%- trans %}Favorite Categories{% endtrans -%}
@@ -39,12 +39,7 @@
                         {% if favorite_categories %}
                             <ul class="group-list no-content-before">
                                 {% for category, truncated_path in favorite_categories %}
-                                    <li data-categ-id="{{ category.id }}" class="favorite-categ category-box js-category-row">
-                                        <span class="category-title">{{ category.name }}</span>
-                                        <a class="toggle icon-close right js-delete-category" title="{% trans %}Remove from favorites{% endtrans %}" href="#"
-                                           data-href="{{ url_for('.user_favorites_category_api', category_id=category.id) }}"></a>
-                                        {{ category_path(category, truncated_path) }}
-                                    </li>
+                                    {{ favorite_category(category, truncated_path) }}
                                 {% endfor %}
                             </ul>
                         {% else %}
@@ -104,7 +99,7 @@
                     method: 'DELETE',
                     error: handleAjaxError,
                     success: function() {
-                        $this.closest('.js-category-row').fadeOut(function() {
+                        $this.closest('li.category-box').fadeOut(function() {
                             $(this).remove();
                             delete Indico.User.favorite_users[$(this).closest('li').data('user-id')];
                         });
