@@ -36,5 +36,9 @@
             $('#contact_email').val(user.email);
             $('#contact_phone').val(user.phone);
         }
-    }).trigger('change');
+    });
+
+    % if not reservation:
+        $('#booked_for_user').trigger('change');
+    % endif
 </script>
