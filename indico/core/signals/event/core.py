@@ -24,6 +24,7 @@ A single entry can be returned directly, multiple entries must be yielded.
 
 deleted = _signals.signal('deleted', """
 Called when an event is deleted. The *sender* is the event object.
+The `user` kwarg contains the user performing the deletion if available.
 """)
 
 data_changed = _signals.signal('data-changed', """

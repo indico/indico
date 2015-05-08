@@ -2669,7 +2669,7 @@ class Conference(CommonObjectBase, Locatable):
     def delete(self, user=None):
         """deletes the conference from the system.
         """
-        signals.event.deleted.send(self)
+        signals.event.deleted.send(self, user=user)
 
         EventSetting.delete_event(self.id)
 
@@ -2687,15 +2687,6 @@ class Conference(CommonObjectBase, Locatable):
             if not alarm.getEndedOn():
                 self.removeAlarm(alarm)
 
-        # Cancel the associated room bookings
-        if Config.getInstance().getIsRoomBookingActive() and self.getId().isdigit():
-            reservations = Reservation.find(Reservation.event_id == int(self.getId()),
-                                            ~Reservation.is_cancelled,
-                                            ~Reservation.is_rejected)
-            for resv in reservations:
-                resv.event_id = None
-                resv.cancel(user or session.avatar, u'Associated event was deleted')
-
         # For each conference we have a list of managers. If we delete the conference but we don't delete
         # the link in every manager to the conference then, when the manager goes to his "My profile" he
         # will see a link to a conference that doesn't exist. Therefore, we need to delete that link as well
@@ -2711,8 +2702,7 @@ class Conference(CommonObjectBase, Locatable):
             avatar_links.delete_event(self)
 
         # Remote short URL mappings
-        sum = ShortURLMapper()
-        sum.remove(self)
+        ShortURLMapper().remove(self)
 
         TrashCanManager().add(self)
 

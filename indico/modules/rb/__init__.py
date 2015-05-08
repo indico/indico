@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
 from indico.core.models.settings import SettingsProxy
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
@@ -51,3 +53,15 @@ def _merge_users(user, merged, **kwargs):
         principals = settings.get(key)
         principals = principals_merge_users(principals, target.id, source.id)
         settings.set(key, principals)
+
+
+@signals.event.deleted.connect
+def _event_deleted(event, user, **kwargs):
+    if not event.id.isdigit():
+        return
+    reservations = Reservation.find(Reservation.event_id == int(event.id),
+                                    ~Reservation.is_cancelled,
+                                    ~Reservation.is_rejected)
+    for resv in reservations:
+        resv.event_id = None
+        resv.cancel(user or session.user, 'Associated event was deleted')
