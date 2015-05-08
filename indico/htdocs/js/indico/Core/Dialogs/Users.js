@@ -121,12 +121,13 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
         } else {
             var userName = Html.span("name", peopleData.get("firstName"), ' ', peopleData.get("familyName"));
             var userEmail = Html.span({id: self.id + "_" + pair.key + "_email", className: "email"}, Util.truncate(peopleData.get("email"), 40));
+            var affiliation = Html.$($('<span class="affiliation">').text(peopleData.get('affiliation')));
 
             if (this.showToggleFavouriteButtons && IndicoGlobalVars.isUserAuthenticated && peopleData.get('_type') == "Avatar") {
                 var favouritizeButtonDiv = Html.div("actions", new Html(create_favorite_button(peopleData.get('id')).get(0)));
-                return [Html.div("info", userName, userEmail), favouritizeButtonDiv];
+                return [Html.div("info", userName, userEmail, affiliation), favouritizeButtonDiv];
             } else {
-                return [userName, userEmail];
+                return [userName, userEmail, affiliation];
             }
         }
     }
