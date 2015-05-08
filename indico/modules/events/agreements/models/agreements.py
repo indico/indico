@@ -96,7 +96,10 @@ class Agreement(db.Model):
     )
     #: ID of a linked user
     user_id = db.Column(
-        db.Integer
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=True
     )
     #: The date and time the agreement was signed
     signed_dt = db.Column(
@@ -121,6 +124,16 @@ class Agreement(db.Model):
     #: Definition-specific data of the agreement
     data = db.Column(
         JSON
+    )
+
+    #: The user this agreement is linked to
+    user = db.relationship(
+        'User',
+        lazy=False,
+        backref=db.backref(
+            'agreements',
+            lazy='dynamic'
+        )
     )
 
     @hybrid_property
@@ -169,17 +182,6 @@ class Agreement(db.Model):
     def locator(self):
         return {'confId': self.event_id,
                 'id': self.id}
-
-    @property
-    def user(self):
-        if self.user_id is None:
-            return None
-        from MaKaC.user import AvatarHolder
-        return AvatarHolder().getById(str(self.user_id))
-
-    @user.setter
-    def user(self, user):
-        self.user_id = user.getId()
 
     @return_ascii
     def __repr__(self):

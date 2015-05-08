@@ -23,7 +23,7 @@ from indico.modules.events.agreements.models.agreements import Agreement, Agreem
 
 
 @pytest.fixture
-def create_person(dummy_user):
+def create_person():
     """Returns a callable which lets you create AgreementPersonInfo"""
 
     def _create_person(name, email, data=None):
@@ -34,7 +34,7 @@ def create_person(dummy_user):
 
 
 @pytest.fixture
-def create_agreement(db, mocker, dummy_event, dummy_person):
+def create_agreement(db, dummy_event, dummy_person):
     """Returns a a callable which lets you create agreements"""
 
     def _create_agreement(state):

@@ -18,14 +18,14 @@
     {% if session %}
         <br><br>
         Best regards<br>
-        {{ session.avatar.getName() }}
+        {{ session.user.full_name }}
     {% endif %}
 {%- endblock %}
 
 {% block footer_title %}Agreements{% endblock %}
 {% block footer %}
     {# Show default footer if sent from command line #}
-    {% if not session.avatar %}
+    {% if not session.user %}
         {{ super() }}
     {% endif %}
 {% endblock %}

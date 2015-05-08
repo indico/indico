@@ -46,7 +46,7 @@ class AgreementExportHook(HTTPAPIHook):
             raise HTTPAPIError('No such event', 404)
 
     def _hasAccess(self, aw):
-        return self._definition.can_access_api(aw.getUser(), self._event)
+        return self._definition.can_access_api(aw.getUser().user, self._event)
 
     def export_agreements(self, aw):
         sent_agreements = {a.identifier: a for a in Agreement.find(event_id=self._event.getId(),

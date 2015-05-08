@@ -41,11 +41,11 @@ def _check_agreement_definitions(app, **kwargs):
 @signals.event_management.sidemenu.connect
 def _extend_event_management_menu(event, **kwargs):
     return 'agreements', SideMenuItem('Agreements', url_for('agreements.event_agreements', event),
-                                      visible=bool(get_agreement_definitions()) and event.canModify(session.avatar))
+                                      visible=bool(get_agreement_definitions()) and event.canModify(session.user))
 
 
 @signals.merge_users.connect
 def _merge_users(user, merged, **kwargs):
     new_id = int(user.id)
     old_id = int(merged.id)
-    Agreement.find(user_id=old_id).update({'user_id': new_id})
+    Agreement.find(user_id=old_id).update({Agreement.user_id: new_id})

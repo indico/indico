@@ -245,6 +245,7 @@ class User(db.Model):
     # - reservations (Reservation.created_by_user)
     # - blockings (Blocking.created_by_user)
     # - owned_rooms (Room.owner) - use `Room.get_owned_by()` if you also want managed rooms!
+    # - agreements (Agreement.user)
 
     @property
     def as_principal(self):

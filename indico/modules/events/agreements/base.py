@@ -33,13 +33,13 @@ class AgreementPersonInfo(object):
     def __init__(self, name=None, email=None, user=None, data=None):
         if user:
             if not name:
-                name = user.getStraightFullName()
+                name = user.full_name
             if not email:
-                email = user.getEmail()
+                email = user.email
         if not name:
             raise ValueError('name is missing')
         self.name = name
-        # Note: If you have persons with no email, you *MUST* have data that uniquely identifies such speakers
+        # Note: If you have persons with no email, you *MUST* have data that uniquely identifies such persons
         self.email = email or None
         self.user = user
         self.data = data

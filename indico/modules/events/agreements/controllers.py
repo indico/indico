@@ -20,10 +20,11 @@ import os
 from io import BytesIO
 
 from flask import flash, jsonify, redirect, request, session
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.core.db import db
 from indico.core.errors import AccessError, NoReportError
+from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.agreements.forms import AgreementForm, AgreementEmailForm, AgreementAnswerSubmissionForm
 from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
 from indico.modules.events.agreements.notifications import notify_agreement_reminder, notify_new_signature_to_manager
@@ -47,10 +48,13 @@ class RHAgreementForm(RHConferenceBaseDisplay):
             raise NotFound('The agreement is not active anymore')
 
     def _checkSessionUser(self):
-        if session.avatar is None:
-            self._redirect(self._getLoginURL())
-        if self.agreement.user != session.avatar:
-            raise AccessError()
+        if session.user is None:
+            self._redirect(redirect_to_login(reason=_('You are trying to sign an agreement that requires '
+                                                      'you to be logged in')))
+            self._doProcess = False
+        if self.agreement.user != session.user:
+            raise Forbidden(_('Please log in as {name} to sign this agreement.')
+                            .format(name=self.agreement.user.full_name))
 
     def _checkProtection(self):
         RHConferenceBaseDisplay._checkProtection(self)

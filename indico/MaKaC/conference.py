@@ -108,7 +108,8 @@ from indico.core.config import Config
 from indico.util.date_time import utc_timestamp
 from indico.util.signals import values_from_signal
 from indico.util.redis import write_client as redis_write_client
-import indico.util.redis.avatar_links as avatar_links
+from indico.util.user import unify_user_args
+from indico.util.redis import avatar_links
 from indico.web.flask.util import url_for
 
 
@@ -3768,6 +3769,7 @@ class Conference(CommonObjectBase, Locatable):
         if isinstance(prin, AvatarUserWrapper):
             prin.unlinkTo(self, "manager")
 
+    @unify_user_args(legacy=True)
     def canUserModify( self, av ):
         if av == None:
             return False
@@ -3778,6 +3780,7 @@ class Conference(CommonObjectBase, Locatable):
                 return True
         return False
 
+    @unify_user_args(legacy=True)
     def canModify(self, aw_or_user):
         """Tells whether an access wrapper is allowed to modify the current
             conference: only if the user is granted to modify the conference and
