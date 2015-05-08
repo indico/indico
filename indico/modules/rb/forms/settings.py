@@ -18,13 +18,13 @@ from wtforms.fields.core import IntegerField, BooleanField
 from wtforms.validators import InputRequired, NumberRange
 
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import EmailListField, PrincipalField
+from indico.web.forms.fields import EmailListField, PrincipalListField
 from indico.util.i18n import _
 
 
 class SettingsForm(IndicoForm):
-    admin_principals = PrincipalField(_(u'Administrators'), groups=True)
-    authorized_principals = PrincipalField(_(u'Authorized users/groups'), groups=True)
+    admin_principals = PrincipalListField(_(u'Administrators'), groups=True)
+    authorized_principals = PrincipalListField(_(u'Authorized users/groups'), groups=True)
     assistance_emails = EmailListField(_(u'Assistance email addresses (one per line)'))
     notification_hour = IntegerField(_(u'Hour at which booking reminders should be sent'),
                                      [InputRequired(), NumberRange(0, 23)])
