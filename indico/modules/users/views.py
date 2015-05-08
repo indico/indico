@@ -18,7 +18,10 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
+from flask import request
+
 from indico.core import signals
+from indico.modules.users import User
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.web.menu import MenuItem
@@ -41,7 +44,12 @@ class WPUser(WPJinjaMixin, WPMainBase):
     template_prefix = 'users/'
 
     def _getNavigationDrawer(self):
-        return WSimpleNavigationDrawer(_('My Profile'))
+        if 'user_id' in request.view_args:
+            user = User.get(request.view_args['user_id'])
+            profile_breadcrumb = _('Profile of {name}').format(name=user.full_name)
+        else:
+            profile_breadcrumb = _('My Profile')
+        return WSimpleNavigationDrawer(profile_breadcrumb)
 
     def _getBody(self, params):
         extra_items = sorted(values_from_signal(signals.users.profile_sidemenu.send(params['user'])),
@@ -52,7 +60,6 @@ class WPUser(WPJinjaMixin, WPMainBase):
             MenuItem(_('Emails'), 'users.user_emails'),
             MenuItem(_('Preferences'), 'users.user_preferences'),
             MenuItem(_('Favorites'), 'users.user_favorites'),
-            # TODO: other menu items
         ] + extra_items
         return self._getPageContent(params)
 
