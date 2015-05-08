@@ -14,38 +14,29 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-#import syslog
-from flask import session, request
+from flask import session, request, redirect
+
+from indico.util.string import to_unicode
+from indico.web.flask.util import url_for
 import MaKaC.webinterface.rh.base as base
-import MaKaC.common.info as info
-from indico.core.config import Config
+from MaKaC.common.info import HelperMaKaCInfo
+
 
 class RHResetTZ(base.RH):
-
     def _process(self):
-        #syslog.syslog("In RHResetTZ id: " + str(sess.id))
-        parms = self._getRequestParams()
-
-        tz = None
-        if not parms.has_key("activeTimezone") or parms["activeTimezone"] == "My":
-            if self._aw.getUser():
-                tz = self._aw.getUser().getTimezone()
-            else:
-                tz = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+        if 'activeTimezone' not in request.values or request.values['activeTimezone'] == 'My':
+            tz = HelperMaKaCInfo.getMaKaCInfoInstance().getTimezone()
+            if session.user:
+                tz = session.user.settings.get('timezone', tz)
         else:
-            tz = parms["activeTimezone"]
+            tz = request.values['activeTimezone']
 
-        try:
-            if parms["saveToProfile"] == "on":
-                user = session.avatar
-                if tz == "LOCAL":
-                    user.setDisplayTZMode("Event Timezone")
-                else:
-                    user.setTimezone(tz)
-                    user.setDisplayTZMode("MyTimezone")
-        except:
-            pass
+        if request.values.get('saveToProfile') == 'on' and session.user:
+            if tz == 'LOCAL':
+                session.user.settings.set('force_timezone', False)
+            else:
+                session.user.settings.set('force_timezone', True)
+                session.user.settings.set('timezone', to_unicode(tz))
 
         session.timezone = tz
-        # redirect to the calling URL with the new session tz.
-        self._redirect(request.referrer or Config.getInstance().getBaseURL())
+        return redirect(request.referrer or url_for('misc.index'))

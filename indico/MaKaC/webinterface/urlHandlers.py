@@ -2294,7 +2294,7 @@ class UHConfRegistrationFormCreationDone(URLHandler):
     @classmethod
     def getURL(cls, registrant):
         url = cls._getURL()
-        if not session.avatar:
+        if not session.user:
             url.setParams(registrant.getLocator())
             url.addParam('authkey', registrant.getRandomId())
         else:

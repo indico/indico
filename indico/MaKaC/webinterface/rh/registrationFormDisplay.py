@@ -150,7 +150,7 @@ class RHRegistrationFormCreation(RHRegistrationFormDisplayBaseCheckProtection):
             params = {}
             if not rp.doPay() or not payment_event_settings.get(self._conf, 'enabled'):
                 flash(_(u"Your registration has been recorded successfully."), 'success')
-            if not session.avatar:
+            if not session.user:
                 params.update(rp.getLocator(), **{'authkey': rp.getRandomId()})
             else:
                 params.update(self._conf.getLocator())
@@ -185,7 +185,7 @@ class RHRegistrationFormRegistrantBase(RHRegistrationForm):
     def _checkParams(self, params):
         RHRegistrationForm._checkParams(self, params)
         if self._registrant is None:
-            if not session.avatar and not params.get('registrantId', None):
+            if not session.user and not params.get('registrantId', None):
                 raise MaKaCError(_("registrant id not set"))
             raise NotFoundError(_("You are not registered or your registration has been deleted"))
 

@@ -61,7 +61,7 @@ class RHUserBase(RHProtected):
     flash_user_status = True
 
     def _checkParams(self):
-        if not session.avatar:
+        if not session.user:
             return
         self.user = session.user
         if 'user_id' in request.view_args:

@@ -19,12 +19,10 @@ from persistent.dict import PersistentDict
 
 import MaKaC.webinterface.pages.admins as admins
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.user as user
 import MaKaC.common.info as info
-from MaKaC.errors import AdminError, FormValuesError
+from MaKaC.errors import AdminError
 from MaKaC.common import HelperMaKaCInfo
 from MaKaC.webinterface.rh.base import RHProtected
-from indico.util.i18n import _
 
 
 class RHAdminBase(RHProtected):
@@ -34,7 +32,7 @@ class RHAdminBase(RHProtected):
 
     def _checkProtection(self):
         RHProtected._checkProtection(self)
-        if not session.avatar and not self._doProcess:
+        if not session.user and not self._doProcess:
             return
         if not session.user.is_admin:
             raise AdminError("area")

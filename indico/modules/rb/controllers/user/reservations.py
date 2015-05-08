@@ -183,8 +183,8 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
                                                       form=form, form_data=self._form_data,
                                                       menu_item=self.menu_item).display()
 
-        return WPRoomBookingSearchBookings(self, errors=form.error_list, rooms=self._rooms,
-                                           user_has_rooms=Room.user_owns_rooms(session.user)).display()
+        my_rooms = [r.id for r in Room.get_owned_by(session.user)]
+        return WPRoomBookingSearchBookings(self, errors=form.error_list, rooms=self._rooms, my_rooms=my_rooms).display()
 
 
 class RHRoomBookingSearchBookingsShortcutBase(RHRoomBookingSearchBookings):
@@ -539,8 +539,9 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
 
         # GET or form errors => show step 1 page
         return self._get_view('select_room', errors=form.error_list, rooms=self._rooms, form=form,
+                              my_rooms=[r.id for r in Room.get_owned_by(session.user)],
                               max_room_capacity=Room.max_capacity, can_override=rb_is_admin(session.user),
-                              date_changed=not form.is_submitted() and self.date_changed).display()
+                              date_changed=not form.is_submitted() and self.date_changed, ).display()
 
     def _process_select_period(self):
         form = self._make_select_period_form()
