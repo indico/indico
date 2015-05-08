@@ -1327,8 +1327,8 @@ type("UserListWidget", ["ListWidget"],
             var buttonDiv = Html.div("actions", new Html(remove_button.get(0)));
 
             if (userData.get('isGroup') || userData.get('_fossil') === 'group') {
-                var groupName = $B(Html.span(), userData.accessor('name'));
-                return [groupName, buttonDiv];
+                var groupName = $B(Html.span("name"), userData.accessor('name'));
+                return [Html.span("info", groupName), buttonDiv];
             } else {
                 if (IndicoGlobalVars.isUserAuthenticated & this.showToggleFavouriteButtons && userData.get('_type') === "Avatar") {
                     buttonDiv.append(new Html(create_favorite_button(userData.get('id')).get(0)));
@@ -1341,7 +1341,7 @@ type("UserListWidget", ["ListWidget"],
                 }
                 buttonDiv.append(new Html(remove_button.get(0)));
 
-                var userName = Html.span({}, $B(Html.span(), userData.accessor('name')));
+                var userName = Html.span("info", $B(Html.span("name"), userData.accessor('name')));
                 return [userName, buttonDiv];
             }
          }
