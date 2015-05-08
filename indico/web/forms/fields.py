@@ -29,7 +29,7 @@ from indico.modules.users.util import serialize_user
 from indico.util.user import retrieve_principals, principal_from_fossil
 from indico.util.string import is_valid_mail
 from indico.util.i18n import _
-from indico.web.forms.widgets import RadioButtonsWidget, JinjaWidget, PasswordWidget
+from indico.web.forms.widgets import JinjaWidget, PasswordWidget
 
 
 class IndicoQuerySelectMultipleField(QuerySelectMultipleField):
@@ -58,7 +58,7 @@ class IndicoSelectMultipleCheckboxField(SelectMultipleField):
 
 
 class IndicoRadioField(RadioField):
-    widget = RadioButtonsWidget()
+    widget = JinjaWidget('forms/radio_buttons_widget.html')
 
 
 class JSONField(HiddenField):
