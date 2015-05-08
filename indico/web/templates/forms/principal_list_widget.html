@@ -14,6 +14,8 @@
 {% block javascript %}
     <script>
         (function() {
+            'use strict';
+
             var field = $('#{{ field.id }}');
             var principals = JSON.parse(field.val());
 

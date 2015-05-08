@@ -24,6 +24,8 @@
 {% block javascript %}
     <script>
         (function() {
+            'use strict';
+
             var columns = {{ field.fields | tojson }};
             var widget = $('#{{ field.id }}-widget');
             var widgetBody = widget.children('table').children('tbody');
