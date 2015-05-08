@@ -21,7 +21,7 @@
 
 {% block javascript %}
     <script>
-        $(function() {
+        (function() {
             'use strict';
 
             function update_dropdown_state() {
@@ -37,6 +37,6 @@
             $('.i-linking.i-radio input[type="radio"]')
                 .off('change').on('change', update_dropdown_state)
                 .each(update_dropdown_state);
-        });
+        })();
     </script>
 {% endblock %}
