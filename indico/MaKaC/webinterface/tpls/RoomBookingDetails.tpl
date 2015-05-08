@@ -1,5 +1,6 @@
 <% valid_occurrences = reservation.occurrences.filter_by(is_valid=True).all() %>
 <% import itertools %>
+<% from indico.modules.rb.utils import rb_is_admin %>
 
 <script type="text/javascript">
     var occurrences = ${ [formatDate(occ.date) for occ in valid_occurrences] | n,j };
@@ -407,7 +408,7 @@
                     </form>
                   </td>
                 </tr>
-                % if edit_logs and (reservation.created_by_user == user or reservation.room.is_owned_by(user) or user.isRBAdmin()):
+                % if edit_logs and (reservation.created_by_user == user or reservation.room.is_owned_by(user) or rb_is_admin(user)):
                   <tr><td>&nbsp;</td></tr>
                   <!-- BOOKING HISTORY -->
                   <tr>
@@ -519,7 +520,7 @@
                   </td>
                 </tr>
               % endif
-              % if (not reservation.is_accepted and (user.isRBAdmin() or reservation.room.is_owned_by(user)) and reservation.find_overlapping().count()):
+              % if (not reservation.is_accepted and (rb_is_admin(user) or reservation.room.is_owned_by(user)) and reservation.find_overlapping().count()):
                 <% conflicting_occurrences = reservation.get_conflicting_occurrences() %>
                 % if conflicting_occurrences:
                   <tr><td>&nbsp;</td></tr>

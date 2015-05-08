@@ -287,30 +287,6 @@ class AvatarUserWrapper(Persistent, Fossilizable):
             return False
         return self.user.is_admin
 
-    @memoize_request
-    def isRBAdmin(self):
-        """Convenience method for checking whether this user is an admin for the RB module."""
-        if not self.user:
-            return False
-        return rb_is_admin(self)
-
-    @property
-    @memoize_request
-    def has_rooms(self):
-        """Checks if the user has any rooms"""
-        from indico.modules.rb.models.rooms import Room  # avoid circular import
-        if not self.user:
-            return False
-        return Room.user_owns_rooms(self)
-
-    @memoize_request
-    def get_rooms(self):
-        """Returns the rooms this user is responsible for"""
-        from indico.modules.rb.models.rooms import Room  # avoid circular import
-        if not self.user:
-            return False
-        return Room.get_owned_by(self)
-
     @encode_utf8
     def getLang(self):
         return self.user.settings.get('lang') if self.user else HelperMaKaCInfo.getMaKaCInfoInstance().getLang()

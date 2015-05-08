@@ -14,23 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
 
 from MaKaC import roomMapping
 from MaKaC.webinterface import locators, urlHandlers
-
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
-from indico.core.errors import AccessError
 from indico.util.i18n import _
-
+from indico.core.errors import AccessError
+from indico.modules.rb.utils import rb_is_admin
 from indico.modules.rb.views.admin import mappers as mapper_views
 
 
 class RHRoomMapperProtected(RHAdminBase):
     def _checkProtection(self):
-        if not self._getUser():
+        if not session.user:
             self._checkSessionUser()
-        elif not self._getUser().isRBAdmin():
+        elif not rb_is_admin(session.user):
             raise AccessError(_('You are not authorized to take this action.'))
 
 
