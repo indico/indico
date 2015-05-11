@@ -35,7 +35,7 @@
                         {{ form_header(orientation='vertical', classes='no-block-padding') }}
                         {{ form_rows(form) }}
                         {% call form_footer() %}
-                            <input class="i-button big highlight" type="submit" value="{% trans %}Modify credentials{% endtrans %}">
+                            <input class="i-button big highlight" type="submit" value="{% trans %}Modify credentials{% endtrans %}" data-disabled-until-change>
                         {% endcall %}
                     {% endif %}
                     {% if user.secondary_local_identities %}
@@ -145,7 +145,7 @@
                     {% else %}
                     <li>
                         <span class="account-no-identities">
-                        {% trans %}You have no external accounts connected{% endtrans %}
+                            {% trans %}You have no external accounts connected{% endtrans %}
                         </span>
                     </li>
                 </ul>
