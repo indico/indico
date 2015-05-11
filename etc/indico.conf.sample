@@ -327,7 +327,11 @@ OAuthAccessTokenTTL = 10000
 # If you do not need integration with an existing authentication infrastructure
 # such as LDAP, OAuth or a SSO system like Shibboleth, you do not have to set
 # anything here. Having local identities enabled is sufficient:
-#LocalIdentities = True
+# LocalIdentities = True
+
+# When `LocalIdentities` is set to False, a link to an external registration
+# page can be configured here:
+# ExternalRegistrationURL = ''
 
 # For advanced authentication and user information retrieval, Indico uses the
 # Flask-Multipass library, so you can use any registered multipass auth/identity

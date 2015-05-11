@@ -68,6 +68,12 @@
                                         If you do not have an Indico account yet, you can <a href="{{ url }}">create one here</a>.
                                     {%- endtrans %}
                                 </p>
+                            {% elif indico_config.ExternalRegistrationURL %}
+                                <p class="register">
+                                    {% trans url=indico_config.ExternalRegistrationURL -%}
+                                        If you do not have an account yet, you can <a href="{{ url }}" target="_blank">create one here</a>.
+                                    {%- endtrans %}
+                                </p>
                             {% endif %}
                             <div class="link">
                                 <a class="icon-prev" href="/">{% trans %}Back{% endtrans %}</a>

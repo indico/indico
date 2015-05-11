@@ -528,6 +528,7 @@ class Config:
         'IdentityProviders'         : {},
         'ProviderMap'               : {},
         'LocalIdentities'           : True,
+        'ExternalRegistrationURL'   : '',
         'SecretKey'                 : None
     }
 
