@@ -51,8 +51,3 @@ admin_sidemenu = _signals.signal('admin-sidemenu', """
 Expected to return `(extra_menu_item_name, SideMenuItem)` tuples to be added to
 the admin side menu.
 """)
-
-merge_users = _signals.signal('merge-users', """
-Called when two users are merged. The *sender* is the main user while the merged
-user (i.e. the one being deleted in the merge) is passed via the *merged* kwarg.
-""")

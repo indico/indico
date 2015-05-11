@@ -38,10 +38,8 @@ settings = SettingsProxy('roombooking', {
 })
 
 
-@signals.merge_users.connect
-def _merge_users(user, merged, **kwargs):
-    target = user.user
-    source = merged.user
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
     for bp in BlockingPrincipal.find():
         if bp.principal == source:
             bp.principal = target

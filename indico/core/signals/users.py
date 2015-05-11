@@ -26,6 +26,11 @@ Called once a user registers (either locally or joins through a provider). The
 *sender* is the new user object.
 """)
 
+merged = _signals.signal('merged', """
+Called when two users are merged. The *sender* is the main user while the merged
+user (i.e. the one being deleted in the merge) is passed via the *source* kwarg.
+""")
+
 profile_sidemenu = _signals.signal('profile-sidemenu', """
 Expected to return `MenuItem` instances to be added to the user profile side menu.
 The *sender* is the user whose profile is currently being displayed.

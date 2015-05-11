@@ -257,7 +257,7 @@ def merge_users(source, target, force=False):
         suggestions.merge_avatars(target, source)
 
     # Notify signal listeners about the merge
-    signals.merge_users.send(target.as_avatar, merged=source.as_avatar)
+    signals.users.merged.send(target, source=source)
     db.session.flush()
 
     # Mark source as merged

@@ -31,9 +31,7 @@ def _extend_admin_menu(sender, **kwargs):
     return 'groups', SideMenuItem(_("Groups"), url_for('groups.groups'))
 
 
-@signals.merge_users.connect
-def _merge_users(user, merged, **kwargs):
-    target = user.user
-    source = merged.user
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
     target.local_groups |= source.local_groups
     source.local_groups.clear()

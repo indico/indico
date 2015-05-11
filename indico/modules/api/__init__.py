@@ -46,10 +46,8 @@ settings = SettingsProxy('api', {
 })
 
 
-@signals.merge_users.connect
-def _merge_users(user, merged, **kwargs):
-    target = user.user
-    source = merged.user
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
     # Get the current active API keys
     ak_user = target.api_key
     ak_merged = source.api_key

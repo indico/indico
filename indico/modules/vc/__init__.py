@@ -132,8 +132,6 @@ def _get_vc_cloner(event, **kwargs):
     return VCCloner(event)
 
 
-@signals.merge_users.connect
-def _merge_users(user, merged, **kwargs):
-    new_id = int(user.id)
-    old_id = int(merged.id)
-    VCRoom.find(created_by_id=old_id).update({VCRoom.created_by_id: new_id})
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
+    VCRoom.find(created_by_id=source.id).update({VCRoom.created_by_id: target.id})

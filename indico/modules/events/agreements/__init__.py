@@ -44,8 +44,6 @@ def _extend_event_management_menu(event, **kwargs):
                                       visible=bool(get_agreement_definitions()) and event.canModify(session.user))
 
 
-@signals.merge_users.connect
-def _merge_users(user, merged, **kwargs):
-    new_id = int(user.id)
-    old_id = int(merged.id)
-    Agreement.find(user_id=old_id).update({Agreement.user_id: new_id})
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
+    Agreement.find(user_id=source.id).update({Agreement.user_id: target.id})

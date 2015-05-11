@@ -42,12 +42,10 @@ def _extend_event_management_menu(event, **kwargs):
     return 'requests', SideMenuItem('Services', url_for('requests.event_requests', event), visible=visible)
 
 
-@signals.merge_users.connect
-def _merge_users(user, merged, **kwargs):
-    new_id = int(user.id)
-    old_id = int(merged.id)
-    Request.find(created_by_id=old_id).update({Request.created_by_id: new_id})
-    Request.find(processed_by_id=old_id).update({Request.processed_by_id: new_id})
+@signals.users.merged.connect
+def _merge_users(target, source, **kwargs):
+    Request.find(created_by_id=source.id).update({Request.created_by_id: target.id})
+    Request.find(processed_by_id=source.id).update({Request.processed_by_id: target.id})
 
 
 @signals.event.deleted.connect

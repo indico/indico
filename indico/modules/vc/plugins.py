@@ -50,7 +50,7 @@ class VCPluginMixin(object):
         super(VCPluginMixin, self).init()
         if not self.name.startswith('vc_'):
             raise Exception('Videoconference plugins must be named vc_*')
-        self.connect(signals.merge_users, self._merge_users)
+        self.connect(signals.users.merged, self._merge_users)
 
     @property
     def service_name(self):
@@ -225,8 +225,6 @@ class VCPluginMixin(object):
         principals = retrieve_principals(self.settings.get('managers'), legacy=False)
         return any(user in principal for principal in principals)
 
-    def _merge_users(self, user, merged, **kwargs):
-        new_id = int(user.id)
-        old_id = int(merged.id)
+    def _merge_users(self, target, source, **kwargs):
         for key in {'managers', 'acl'}:
-            self.settings.set(key, principals_merge_users(self.settings.get(key), new_id, old_id))
+            self.settings.set(key, principals_merge_users(self.settings.get(key), target.id, source.id))
