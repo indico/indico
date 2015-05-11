@@ -34,7 +34,7 @@
 
             $('.i-linking > .i-linking-dropdown > select > option[value=""]').prop('disabled', true);
 
-            $('.i-linking.i-radio input[type="radio"]')
+            $('.i-linking.i-radio > input[type="radio"]')
                 .off('change').on('change', update_dropdown_state)
                 .each(update_dropdown_state);
         })();
