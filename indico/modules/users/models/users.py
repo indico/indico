@@ -132,7 +132,7 @@ class User(db.Model):
         default=False
     )
     #: if the user is deleted (e.g. due to a merge)
-    _is_deleted = db.Column(
+    is_deleted = db.Column(
         'is_deleted',
         db.Boolean,
         nullable=False,
@@ -191,7 +191,7 @@ class User(db.Model):
         'User',
         secondary=favorite_user_table,
         primaryjoin=id == favorite_user_table.c.user_id,
-        secondaryjoin=(id == favorite_user_table.c.target_id) & ~_is_deleted,
+        secondaryjoin=(id == favorite_user_table.c.target_id) & ~is_deleted,
         lazy=True,
         collection_class=set,
         backref=db.backref('favorite_of', lazy=True, collection_class=set),
@@ -301,19 +301,6 @@ class User(db.Model):
     @title.setter
     def title(self, value):
         self._title = value
-
-    @hybrid_property
-    def is_deleted(self):
-        return self._is_deleted
-
-    @is_deleted.setter
-    def is_deleted(self, value):
-        self._is_deleted = value
-        # not using _all_emails here since it only contains newly added emails after an expire/commit
-        if self._primary_email:
-            self._primary_email.is_user_deleted = value
-        for email in self._secondary_emails:
-            email.is_user_deleted = value
 
     @cached_property
     def settings(self):
@@ -506,3 +493,13 @@ class User(db.Model):
 def _user_email_added(target, value, *unused):
     # Make sure that a newly added email has the same deletion state as the user itself
     value.is_user_deleted = target.is_deleted
+
+
+@listens_for(User.is_deleted, 'set')
+def _user_deleted(target, value, *unused):
+    # Reflect the user deletion state in the email table.
+    # Not using _all_emails here since it only contains newly added emails after an expire/commit
+    if target._primary_email:
+        target._primary_email.is_user_deleted = value
+    for email in target._secondary_emails:
+        email.is_user_deleted = value
