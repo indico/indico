@@ -1194,6 +1194,11 @@ class WPConferenceTimeTable(WPConferenceDefaultDisplayBase):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + \
                self._includeJSPackage('Timetable')
 
+    def _getHeadContent(self):
+        content = WPConferenceDefaultDisplayBase._getHeadContent(self)
+        return content + '<link rel="stylesheet" type="text/css" href="{}/css/timetable.css">'.format(
+            self._getBaseURL())
+
     def _getBody( self, params ):
         wc = WConferenceTimeTable( self._conf, self._getAW()  )
         return wc.getHTML(params)
