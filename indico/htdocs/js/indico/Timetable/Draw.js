@@ -1832,7 +1832,7 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
         },
 
         _posterBlocks: function(data) {
-            data = _.sortBy(data, function(d) { return [d.startDate, d.title]; });
+            data = _.sortBy(data, function(d) { return [d.startDate.date, d.startDate.time, d.title]; });
             var self = this;
 
             var blockDiv = Html.div({style:
