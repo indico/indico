@@ -904,7 +904,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
                     contribs.push(value);
                 }
             });
-            contribs = _.sortBy(contribs, function(c) { return [c.startDate, c.title]; });
+            contribs = _.sortBy(contribs, function(c) { return [c.startDate.date, c.startDate.time, c.title]; });
             var popup = new ContributionsPopup(("Contribution details"),contribs, self.eventData.isPoster, false, function() {self.popupAllowClose = true; return true;}, true);
             popup.open();
         });
@@ -946,7 +946,7 @@ type("TimetableBlockPopup", ["BalloonPopup", "TimetableBlockBase"], {
         if (contribs.length === 0) {
             return null;
         }
-        contribs = _.sortBy(contribs, function(c) { return [c.startDate, c.title]; });
+        contribs = _.sortBy(contribs, function(c) { return [c.startDate.date, c.startDate.time, c.title]; });
         var i = 0;
         each(contribs, function(value) {
             if (++i <= maxNumContribs) {
