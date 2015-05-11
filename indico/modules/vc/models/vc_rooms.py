@@ -1,4 +1,3 @@
-
 # This file is part of Indico.
 # Copyright (C) 2002 - 2015 European Organization for Nuclear Research (CERN).
 #
