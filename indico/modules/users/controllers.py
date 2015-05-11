@@ -109,9 +109,9 @@ class RHPersonalData(RHUserBase):
             self.user.synced_fields = form.synced_fields
             form.populate_obj(self.user, skip=self.user.synced_fields)
             self.user.synchronize_data(refresh=True)
-            flash(_('Your account details were successfully updated.'), 'success')
+            flash(_('Your personal data was successfully updated.'), 'success')
             return redirect(url_for('.user_profile'))
-        return WPUser.render_template('account.html', user=self.user, form=form)
+        return WPUser.render_template('personal_data.html', user=self.user, form=form)
 
 
 class RHUserPreferences(RHUserBase):
