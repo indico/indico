@@ -35,6 +35,7 @@ except ImportError:
 
 
 BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small']
+LATEX_MATH_PLACEHOLDER = u"\uE000"
 
 
 def encode_if_unicode(s):
@@ -190,18 +191,34 @@ def remove_tags(text):
     return remove_extra_spaces(pattern.sub(' ', text))
 
 
-def render_markdown(text, **kwargs):
-    """ Mako markdown to html filter """
-    math_segments = []
-    placeholder = u"\uE000"
+def render_markdown(text, escape_latex_math=True, md=None, **kwargs):
+    """ Mako markdown to HTML filter
+        :param text: Markdown source to convert to HTML
+        :param escape_latex_math: Whether math expression should
+                                  be left untouched
+        :param md: An alternative markdown processor (can be used
+                   to generate e.g. a different format)
+        :param kwargs: Extra arguments to pass on to the markdown
+                       processor
+    """
+    if escape_latex_math:
+        math_segments = []
 
-    def math_replace(m):
-        math_segments.append(m.group(0))
-        return placeholder
+        def _math_replace(m):
+            math_segments.append(m.group(0))
+            return LATEX_MATH_PLACEHOLDER
 
-    text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', math_replace, text)
-    res = markdown.markdown(bleach.clean(text, tags=BLEACH_ALLOWED_TAGS), **kwargs)
-    return re.sub(placeholder, lambda _: math_segments.pop(0), res).encode('utf-8')
+        text = re.sub(r'\$[^\$]+\$|\$\$(^\$)\$\$', _math_replace, to_unicode(text))
+
+    if md is None:
+        result = markdown.markdown(bleach.clean(text, tags=BLEACH_ALLOWED_TAGS), **kwargs)
+    else:
+        result = md(text, **kwargs)
+
+    if escape_latex_math:
+        return re.sub(LATEX_MATH_PLACEHOLDER, lambda _: math_segments.pop(0), result)
+    else:
+        return result
 
 
 def sanitize_for_platypus(text):
