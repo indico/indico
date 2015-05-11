@@ -1,5 +1,5 @@
 {% extends 'layout/base.html' %}
-{% from 'forms/form_widget.html' import form_header, form_rows, form_footer %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 
 {% macro group_table(groups, show_members=false, show_provider=false) %}
     <table class="i-table-widget">

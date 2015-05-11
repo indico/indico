@@ -1,6 +1,6 @@
 {% extends 'layout/base.html' %}
 {% from 'message_box.html' import message_box %}
-{% from 'forms/form_widget.html' import form_header, form_fieldset, form_footer, form_rows, form_row_static %}
+{% from 'forms/_form.html' import form_header, form_fieldset, form_footer, form_rows, form_row_static %}
 
 {% set show_management = is_manager and req and not req.state.name == 'withdrawn' %}
 

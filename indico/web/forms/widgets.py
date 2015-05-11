@@ -14,11 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import render_template
+import re
+
 from wtforms.widgets import TextInput, TextArea
 from wtforms.widgets.core import HTMLString
 
 from indico.core.auth import multipass
+from indico.web.util import inject_js
+from indico.web.flask.templating import get_template_module
+
+html_commment_re = re.compile(r'<!--.*?-->', re.MULTILINE)
 
 
 class ConcatWidget(object):
@@ -37,18 +42,13 @@ class ConcatWidget(object):
         return HTMLString(self.separator.join(html))
 
 
-class PrincipalWidget(object):
-    """Renders a user/group selector widget"""
-    def __call__(self, field, **kwargs):
-        return HTMLString(render_template('forms/principal_widget.html', field=field))
-
-
 class JinjaWidget(object):
     """Renders a field using a custom Jinja template"""
-    def __init__(self, template, plugin=None, **context):
+    def __init__(self, template, plugin=None, single_line=False, **context):
         self.template = template
         self.plugin = plugin
         self.context = context
+        self.single_line = single_line
 
     def __call__(self, field, **kwargs):
         if self.plugin:
@@ -58,17 +58,25 @@ class JinjaWidget(object):
             template = '{}:{}'.format(plugin, self.template)
         else:
             template = self.template
+        template_module = get_template_module(template, field=field, **dict(self.context, **kwargs))
+        javascript = template_module.javascript()
+        if '<script' in javascript:
+            inject_js(template_module.javascript())
+        elif html_commment_re.sub('', javascript).strip():
+            raise ValueError("Template did not provide valid javascript")
+        return HTMLString(template_module.html())
 
-        return HTMLString(render_template(template, field=field, **dict(self.context, **kwargs)))
 
-
-class PasswordWidget(object):
+class PasswordWidget(JinjaWidget):
     """Renders a password input"""
 
     single_line = True
 
+    def __init__(self):
+        super(PasswordWidget, self).__init__('forms/password_widget.html')
+
     def __call__(self, field, **kwargs):
-        return HTMLString(render_template('forms/password_widget.html', field=field, input_args=kwargs))
+        return super(PasswordWidget, self).__call__(field, input_args=kwargs)
 
 
 class CKEditorWidget(JinjaWidget):
@@ -77,19 +85,15 @@ class CKEditorWidget(JinjaWidget):
         super(CKEditorWidget, self).__init__('forms/ckeditor_widget.html', simple=simple)
 
 
-class RadioButtonsWidget(JinjaWidget):
-    """Renders a radio button group"""
-    def __init__(self):
-        super(RadioButtonsWidget, self).__init__('forms/radio_buttons_widget.html')
+class SwitchWidget(JinjaWidget):
+    """Renders a switch widget
 
+    :param on_label: Text to override default ON label
+    :param off_label: Text to override default OFF label
+    """
 
-class SwitchWidget(object):
-    """Renders a switch widget"""
     def __init__(self, on_label=None, off_label=None):
-        """
-        :param on_label: Text to override default ON label
-        :param off_label: Text to override default OFF label
-        """
+        super(SwitchWidget, self).__init__('forms/switch_widget.html')
         self.on_label = on_label
         self.off_label = off_label
 
@@ -99,31 +103,31 @@ class SwitchWidget(object):
             'on_label': self.on_label,
             'off_label': self.off_label
         })
-        return HTMLString(render_template('forms/switch_widget.html', field=field, kwargs=kwargs))
+        return super(SwitchWidget, self).__call__(field, kwargs=kwargs)
 
 
-class SyncedInputWidget(object):
+class SyncedInputWidget(JinjaWidget):
     """Renders a text input with a sync button when needed."""
 
-    @property
-    def single_line(self):
-        return not self.textarea
-
     def __init__(self, textarea=False):
+        super(SyncedInputWidget, self).__init__('forms/synced_input_widget.html', single_line=not textarea)
         self.textarea = textarea
         self.default_widget = TextArea() if textarea else TextInput()
 
     def __call__(self, field, **kwargs):
         # Render a sync button for fields which can be synced, if the identity provider provides a value for the field.
         if field.short_name in multipass.synced_fields and field.synced_value is not None:
-            return HTMLString(render_template('forms/synced_input_widget.html', field=field, textarea=self.textarea,
-                                              kwargs=kwargs))
+            return super(SyncedInputWidget, self).__call__(field, textarea=self.textarea, kwargs=kwargs)
         else:
             return self.default_widget(field, **kwargs)
 
 
-class SelectizeWidget(object):
+class SelectizeWidget(JinjaWidget):
     """Renders a selectizer-based widget"""
+
+    def __init__(self):
+        super(SelectizeWidget, self).__init__('forms/selectize_widget.html')
+
     def __call__(self, field, **kwargs):
         choices = []
         if field.data is not None:
@@ -141,4 +145,4 @@ class SelectizeWidget(object):
         }
 
         options.update(kwargs.pop('options', {}))
-        return HTMLString(render_template('forms/selectize_widget.html', field=field, options=options))
+        return super(SelectizeWidget, self).__call__(field, options=options)

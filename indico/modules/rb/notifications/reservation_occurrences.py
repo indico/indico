@@ -79,7 +79,7 @@ def notify_upcoming_occurrence(occurrence):
     to_list = []
     reservation_user = occurrence.reservation.booked_for_user
     if reservation_user is not None:
-        to_list.append(reservation_user.getEmail())
+        to_list.append(reservation_user.email)
 
     cc_list = []
     room = occurrence.reservation.room
@@ -113,7 +113,7 @@ def notify_reservation_digest(reservation, occurrences):
     to_list = []
     reservation_user = reservation.booked_for_user
     if reservation_user is not None:
-        to_list.append(reservation_user.getEmail())
+        to_list.append(reservation_user.email)
 
     cc_list = []
     room = reservation.room

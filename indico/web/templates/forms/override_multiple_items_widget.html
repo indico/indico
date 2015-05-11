@@ -1,57 +1,68 @@
-{% set value = field._value() %}
-<input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value | tojson | forceescape }}">
-<div id="{{ field.id }}-widget">
-    <table class="i-table-widget">
-        <thead data-tooltip-anchor>
-            <tr>
-                {% for _, title in field.fields -%}
-                    <th>{{ title }}</th>
-                {% endfor -%}
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in field.field_data %}
+{% extends 'forms/base_widget.html' %}
+
+
+{% block html %}
+    {% set value = field._value() %}
+    <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ value | tojson | forceescape }}">
+    <div id="{{ field.id }}-widget">
+        <table class="i-table-widget">
+            <thead data-tooltip-anchor>
                 <tr>
-                    {% for name, _ in field.fields %}
-                        <td>
-                            {% if name in field.edit_fields %}
-                                <input class="table-input" type="text" placeholder="{{ row[name] }}"
-                                       value="{{ field.get_overridden_value(row, name) }}"
-                                       data-key="{{ field.get_row_key(row) }}" data-field="{{ name }}"
-                                       {% if disabled %}disabled{% endif %}>
-                            {% else %}
-                                {{ row[name] }}
-                            {% endif %}
-                        </td>
-                    {% endfor %}
+                    {% for _, title in field.fields -%}
+                        <th>{{ title }}</th>
+                    {% endfor -%}
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-<script>
-    (function() {
-        var widget = $('#{{ field.id }}-widget');
-        var field = $('#{{ field.id }}');
-        var data = JSON.parse(field.val());
+            </thead>
+            <tbody>
+                {% for row in field.field_data %}
+                    <tr>
+                        {% for name, _ in field.fields %}
+                            <td>
+                                {% if name in field.edit_fields %}
+                                    <input class="table-input" type="text" placeholder="{{ row[name] }}"
+                                           value="{{ field.get_overridden_value(row, name) }}"
+                                           data-key="{{ field.get_row_key(row) }}" data-field="{{ name }}"
+                                           {% if disabled %}disabled{% endif %}>
+                                {% else %}
+                                    {{ row[name] }}
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
 
-        widget.on('input change', 'input', function() {
-            var $this = $(this);
-            if (data[$this.data('key')] === undefined) {
-                data[$this.data('key')] = {};
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+
+            var widget = $('#{{ field.id }}-widget');
+            var field = $('#{{ field.id }}');
+            var data = JSON.parse(field.val());
+
+            widget.on('input change', 'input', function() {
+                var $this = $(this);
+                if (data[$this.data('key')] === undefined) {
+                    data[$this.data('key')] = {};
+                }
+                data[$this.data('key')][$this.data('field')] = $this.val();
+                updateField();
+            });
+
+            widget.find('input').each(function() {
+                var $this = $(this);
+                var rowData = data[$this.data('key')] || {};
+                $this.val(rowData[$this.data('field')] || '');
+            });
+
+            function updateField() {
+                field.val(JSON.stringify(data));
             }
-            data[$this.data('key')][$this.data('field')] = $this.val();
-            updateField();
-        });
-
-        widget.find('input').each(function() {
-            var $this = $(this);
-            var rowData = data[$this.data('key')] || {};
-            $this.val(rowData[$this.data('field')] || '');
-        });
-
-        function updateField() {
-            field.val(JSON.stringify(data));
-        }
-    })();
-</script>
+        })();
+    </script>
+{% endblock %}

@@ -117,11 +117,11 @@ def test_booked_for_user(dummy_reservation, dummy_user):
 
 
 def test_booked_for_user_after_change(dummy_reservation, create_user):
-    other_user = create_user(123)
+    other_user = create_user(123).user
     dummy_reservation.booked_for_user = other_user
     assert dummy_reservation.booked_for_user == other_user
     assert dummy_reservation.booked_for_id == other_user.id
-    assert dummy_reservation.booked_for_name == other_user.getFullName()
+    assert dummy_reservation.booked_for_name == other_user.full_name
 
 
 def test_booked_for_user_with_no_id(dummy_reservation):
@@ -137,7 +137,7 @@ def test_booked_for_user_email_after_change(dummy_reservation, dummy_user, creat
     dummy_user.user.email = 'new.email@example.com'
     assert dummy_reservation.booked_for_user_email == dummy_user.user.email
     other_user = create_user(123)
-    dummy_reservation.booked_for_user = other_user
+    dummy_reservation.booked_for_user = other_user.user
     assert dummy_reservation.booked_for_user_email == other_user.user.email
 
 
@@ -331,7 +331,7 @@ def test_can_be_cancelled(dummy_reservation, create_user, is_admin, is_created_b
     if is_created_by:
         dummy_reservation.created_by_user = user
     if is_booked_for:
-        dummy_reservation.booked_for_user = user
+        dummy_reservation.booked_for_user = user.user
     assert dummy_reservation.can_be_cancelled(user) == expected
 
 
@@ -357,7 +357,7 @@ def test_can_be_modified(dummy_reservation, create_user,
     if is_created_by:
         dummy_reservation.created_by_user = user
     if is_booked_for:
-        dummy_reservation.booked_for_user = user
+        dummy_reservation.booked_for_user = user.user
     if is_room_owner:
         dummy_reservation.room.owner = user
     dummy_reservation.is_rejected = is_rejected
@@ -436,8 +436,7 @@ def test_get_vc_equipment(db, dummy_reservation, create_equipment_type):
 ))
 def test_is_booked_for(dummy_reservation, dummy_user, create_user, is_booked_for, contact_email, expected):
     if not is_booked_for:
-        other_user = create_user(123)
-        dummy_reservation.booked_for_user = other_user
+        dummy_reservation.booked_for_user = create_user(123).user
     dummy_reservation.contact_email = contact_email
     assert dummy_reservation.is_booked_for(dummy_user) == expected
 

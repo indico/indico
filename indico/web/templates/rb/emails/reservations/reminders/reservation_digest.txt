@@ -1,5 +1,5 @@
 {% extends 'rb/emails/base_email.txt' %}
-{% block recipient %}{{ owner.getName() if owner else 'user' }}{% endblock %}
+{% block recipient %}{{ owner.first_name if owner else 'user' }}{% endblock %}
 
 {% block email_body -%}
 This is a reminder digest about a weekly booking under your name:
