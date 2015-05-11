@@ -37,12 +37,14 @@
             validatePasswordConfirmation(passwordField, confirmField);
         });
 
-        var disabled_until_change_buttons = $('form [data-disabled-until-change]');
-        disabled_until_change_buttons.closest('form').each(function() {
-            $(this).data('serialized', $(this).serialize());
+        var buttons = $('form [data-disabled-until-change]');
+        buttons.prop('disabled', true).closest('form').each(function() {
+            var $this = $(this);
+            $this.data('initialData', $this.serialize());
         }).on('change input', function() {
-            var untouched = $(this).serialize() == $(this).data('serialized');
-            disabled_until_change_buttons.prop('disabled', untouched);
-        }).end().prop('disabled', true);
+            var $this = $(this);
+            var untouched = $this.serialize() == $this.data('initialData');
+            buttons.prop('disabled', untouched);
+        });
     });
 })();

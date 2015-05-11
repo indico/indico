@@ -25,7 +25,7 @@
                             {{ form_rows(form) }}
                             {% call form_footer() %}
                                 <input class="i-button big highlight" type="submit"
-                                    value="{% trans %}Create account{% endtrans %}">
+                                       value="{% trans %}Create account{% endtrans %}" data-disabled-until-change>
                                 <a href="#" class="i-button big js-hide-form">
                                     {% trans %}Cancel{% endtrans %}
                                 </a>
