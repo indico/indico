@@ -342,38 +342,6 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
                                    for room, count in self._iter_allowed_rooms()]),  mimetype='application/json')
 
 
-class RHVCRoomModify(RHVCSystemEventBase):
-    """Modifies the VC room that owns a specific event-room association."""
-
-    def _process(self):
-        result = {}
-        json_data = request.get_json()
-
-        if json_data is None:
-            raise BadRequest("'application/json' expected")
-        elif len(json_data) > 1 or 'data' not in json_data:
-            raise BadRequest("can only change 'data' fields for now")
-        elif not isinstance(json_data['data'], dict):
-            raise BadRequest("'data' should be a dictionary")
-
-        data = json_data['data']
-        self.plugin.update_data_vc_room(self.vc_room, data)
-
-        if data:
-            result['error'] = {'message': 'fields not accepted: {}'.format(', '.join(data))}
-        else:
-            try:
-                self.plugin.update_room(self.vc_room, self.event)
-            except VCRoomError as err:
-                result['error'] = {'message': err.message}
-                result['success'] = False
-                transaction.abort()
-            else:
-                flash(_("You are now the moderator of the room '{room.name}'".format(room=self.vc_room)), 'success')
-                result['success'] = True
-        return jsonify(result)
-
-
 class RHVCRoomList(RHProtected):
     """Provides a list of videoconference rooms"""
 
