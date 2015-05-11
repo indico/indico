@@ -36,5 +36,13 @@
             var passwordField = $(this.form).find('input[name="' + confirmField.data('confirmPassword') + '"]');
             validatePasswordConfirmation(passwordField, confirmField);
         });
+
+        var disabled_until_change_buttons = $('form [data-disabled-until-change]');
+        disabled_until_change_buttons.closest('form').each(function() {
+            $(this).data('serialized', $(this).serialize());
+        }).on('change input', function() {
+            var untouched = $(this).serialize() == $(this).data('serialized');
+            disabled_until_change_buttons.prop('disabled', untouched);
+        }).end().prop('disabled', true);
     });
 })();
