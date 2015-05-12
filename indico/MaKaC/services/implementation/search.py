@@ -38,10 +38,10 @@ class SearchUsers(SearchBase):
 
     def _checkParams(self):
         SearchBase._checkParams(self)
-        self._surName = self._params.get("surName", "")
-        self._name = self._params.get("name", "")
-        self._organisation = self._params.get("organisation", "")
-        self._email = self._params.get("email", "")
+        self._surName = self._params.get("surName", "").strip()
+        self._name = self._params.get("name", "").strip()
+        self._organisation = self._params.get("organisation", "").strip()
+        self._email = self._params.get("email", "").strip()
         self._confId = self._params.get("conferenceId", None)
         self._exactMatch = self._params.get("exactMatch", False)
 
