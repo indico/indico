@@ -81,13 +81,17 @@ class IndicoPlugin(Plugin):
     default_event_settings = {}
     #: A dictionary containing default values for user-specific settings
     default_user_settings = {}
+    #: A set containing the names of settings which store ACLs
+    acl_settings = frozenset()
+    #: A set containing the names of event-specific settings which store ACLs
+    acl_event_settings = frozenset()
     #: If the plugin should link to a details/config page in the admin interface
     configurable = False
     #: The group category that the plugin belongs to
     category = None
     #: If `settings`, `event_settings` and `user_settings` should use strict
-    #: mode, i.e. only allow keys in  `default_settings` , `default_event_settings`
-    #: or `default_user_settings`
+    #: mode, i.e. only allow keys in `default_settings`, `default_event_settings`
+    #: or `default_user_settings` (or the related `acl_settings` sets)
     strict_settings = False
 
     def init(self):
@@ -271,7 +275,8 @@ class IndicoPlugin(Plugin):
             raise RuntimeError('Plugin has not been loaded yet')
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
-            return SettingsProxy('plugin_{}'.format(cls.name), instance.default_settings, cls.strict_settings)
+            return SettingsProxy('plugin_{}'.format(cls.name), instance.default_settings, cls.strict_settings,
+                                 acls=cls.acl_settings)
 
     @cached_classproperty
     @classmethod
@@ -282,7 +287,7 @@ class IndicoPlugin(Plugin):
         instance = cls.instance
         with instance.plugin_context():  # in case the default settings come from a property
             return EventSettingsProxy('plugin_{}'.format(cls.name), instance.default_event_settings,
-                                      cls.strict_settings)
+                                      cls.strict_settings, acls=cls.acl_event_settings)
 
     @cached_classproperty
     @classmethod

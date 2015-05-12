@@ -55,6 +55,12 @@ class LocalGroup(db.Model):
     def __repr__(self):
         return '<LocalGroup({}, {})>'.format(self.id, self.name)
 
+    @property
+    def proxy(self):
+        """Returns a GroupProxy wrapping this group"""
+        from indico.modules.groups import GroupProxy
+        return GroupProxy(self.id, _group=self)
+
 
 group_members_table = db.Table(
     'group_members',

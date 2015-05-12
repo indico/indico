@@ -17,7 +17,7 @@
 from itertools import ifilter
 from flask_pluginengine import plugin_context
 
-from indico.core.models.settings import EventSetting
+from indico.core.models.settings import EventSetting, EventSettingPrincipal
 from indico.modules.rb.models.reservations import Reservation
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.fossils.subcontribution import ISubContribParticipationFossil,\
@@ -2673,6 +2673,7 @@ class Conference(CommonObjectBase, Locatable):
         signals.event.deleted.send(self, user=user)
 
         EventSetting.delete_event(self.id)
+        EventSettingPrincipal.delete_event(self.id)
 
         self.notifyContributions()
 

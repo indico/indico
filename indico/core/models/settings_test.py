@@ -18,6 +18,7 @@ import pytest
 from enum import Enum
 
 from indico.core.models.settings import SettingsProxy, Setting
+from indico.modules.users import User
 
 
 def test_proxy_strict_nodefaults():
@@ -80,3 +81,60 @@ def test_set_enum():
         assert value == Useless.thing
         assert value == Useless.thing.value
         assert not isinstance(value, Useless)  # we store it as a plain value!
+
+
+@pytest.mark.usefixtures('db')
+def test_acls_invalid():
+    user = User()
+    proxy = SettingsProxy('foo', {'reg': None}, acls={'acl'})
+    pytest.raises(ValueError, proxy.get, 'acl')
+    pytest.raises(ValueError, proxy.set, 'acl', 'foo')
+    pytest.raises(ValueError, proxy.get_acl, 'reg')
+    pytest.raises(ValueError, proxy.set_acl, 'reg', {user})
+    pytest.raises(ValueError, proxy.is_in_acl, 'reg', user)
+    pytest.raises(ValueError, proxy.add_to_acl, 'reg', user)
+    pytest.raises(ValueError, proxy.remove_from_acl, 'reg', user)
+
+
+@pytest.mark.usefixtures('db')
+def test_get_all_acls():
+    proxy = SettingsProxy('foo', {'reg': None}, acls={'acl'})
+    assert proxy.get_all() == {'reg': None, 'acl': set()}
+
+
+@pytest.mark.usefixtures('db')
+def test_acls(dummy_user, create_user):
+    user = dummy_user.user
+    other_user = create_user(123, legacy=False)
+    proxy = SettingsProxy('foo', acls={'acl'})
+    assert proxy.get_acl('acl') == set()
+    proxy.set_acl('acl', {user})
+    assert proxy.get_acl('acl') == {user}
+    assert proxy.is_in_acl('acl', user)
+    assert not proxy.is_in_acl('acl', other_user)
+    proxy.add_to_acl('acl', other_user)
+    assert proxy.is_in_acl('acl', other_user)
+    assert proxy.get_acl('acl') == {user, other_user}
+    proxy.remove_from_acl('acl', user)
+    assert proxy.get_acl('acl') == {other_user}
+
+
+def test_delete_propagate(mocker):
+    Setting = mocker.patch('indico.core.models.settings.Setting')
+    SettingPrincipal = mocker.patch('indico.core.models.settings.SettingPrincipal')
+    proxy = SettingsProxy('foo', {'reg': None}, acls={'acl'})
+    proxy.delete('reg', 'acl')
+    Setting.delete.assert_called_once_with('foo', 'reg')
+    SettingPrincipal.delete.assert_called_with('foo', 'acl')
+
+
+def test_set_multi_propagate(mocker):
+    Setting = mocker.patch('indico.core.models.settings.Setting')
+    SettingPrincipal = mocker.patch('indico.core.models.settings.SettingPrincipal')
+    proxy = SettingsProxy('foo', {'reg': None}, acls={'acl'})
+    proxy.set_multi({
+        'reg': 'bar',
+        'acl': {'u'}
+    })
+    Setting.set_multi.assert_called_once_with('foo', {'reg': 'bar'})
+    SettingPrincipal.set_acl_multi.assert_called_with('foo', {'acl': {'u'}})

@@ -19,12 +19,12 @@ from __future__ import unicode_literals
 from functools import wraps
 
 from indico.core.db import db
-from indico.core.models.settings import SettingsBase, SettingsProxyBase, _get_all, _get, _default
+from indico.core.models.settings import JSONSettingsBase, SettingsProxyBase, _get_all, _get, _default
 from indico.modules.users import User
 from indico.util.string import return_ascii
 
 
-class UserSetting(SettingsBase, db.Model):
+class UserSetting(JSONSettingsBase, db.Model):
     """User-specific settings"""
     __table_args__ = (db.Index(None, 'user_id', 'module', 'name'),
                       db.Index(None, 'user_id', 'module'),
@@ -78,7 +78,7 @@ class UserSettingsProxy(SettingsProxyBase):
         :param no_defaults: Only return existing settings and ignore defaults.
         :return: Dict containing the settings
         """
-        return _get_all(UserSetting, self, no_defaults, **user)
+        return _get_all(UserSetting, None, self, no_defaults, **user)
 
     @user_or_id
     def get(self, user, name, default=_default):
@@ -89,7 +89,7 @@ class UserSettingsProxy(SettingsProxyBase):
         :param default: Default value in case the setting does not exist
         :return: The settings's value or the default value
         """
-        self._check_strict(name)
+        self._check_name(name)
         return _get(UserSetting, self, name, default, self._cache, **user)
 
     @user_or_id
@@ -100,7 +100,7 @@ class UserSettingsProxy(SettingsProxyBase):
         :param name: Setting name
         :param value: Setting value; must be JSON-serializable
         """
-        self._check_strict(name)
+        self._check_name(name)
         UserSetting.set(self.module, name, value, **user)
         self._flush_cache()
 
@@ -112,7 +112,7 @@ class UserSettingsProxy(SettingsProxyBase):
         :param items: Dict containing the new settings
         """
         for name in items:
-            self._check_strict(name)
+            self._check_name(name)
         UserSetting.set_multi(self.module, items, **user)
         self._flush_cache()
 
@@ -124,7 +124,7 @@ class UserSettingsProxy(SettingsProxyBase):
         :param names: One or more names of settings to delete
         """
         for name in names:
-            self._check_strict(name)
+            self._check_name(name)
         UserSetting.delete(self.module, names, **user)
         self._flush_cache()
 

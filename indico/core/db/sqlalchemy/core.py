@@ -81,8 +81,11 @@ def _transaction_ended(session, transaction):
     # transaction) e.g. when calling `transaction.abort()`.
     # in this case we need to clear the memoization cache to avoid
     # accessing memoized objects (which are now session-less)
-    if has_app_context() and 'memoize_cache' in g:
-        del g.memoize_cache
+    if has_app_context():
+        if 'memoize_cache' in g:
+            del g.memoize_cache
+        if 'settings_cache' in g:
+            del g.settings_cache
     if has_request_context() and hasattr(flask_session, '_user'):
         delattr(flask_session, '_user')
 
