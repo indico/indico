@@ -132,6 +132,8 @@ class PrincipalSettingsBase(PrincipalMixin, SettingsBase):
     """Base class for principal setting tables"""
 
     __tablename__ = 'settings_principals'
+    # Additional columns used to identitfy a setting (e.g. user/event id)
+    extra_key_cols = ()
 
     @classmethod
     def get_all_acls(cls, module, **kwargs):
@@ -181,7 +183,12 @@ class PrincipalSettingsBase(PrincipalMixin, SettingsBase):
 
     @classmethod
     def merge_users(cls, module, target, source):
-        cls.find(module=module, type=PrincipalType.user, user=source).update({cls.user_id: target.id})
+        settings = [(setting.module, setting.name, {x: getattr(setting, x) for x in cls.extra_key_cols})
+                    for setting in cls.find(module=module, type=PrincipalType.user, user=source)]
+        for module, name, extra in settings:
+            cls.remove_principal(module, name, source, **extra)
+            cls.add_principal(module, name, target, **extra)
+        db.session.flush()
 
 
 class CoreSettingsMixin(object):
@@ -249,6 +256,7 @@ class EventSetting(JSONSettingsBase, EventSettingsMixin, db.Model):
 
 class EventSettingPrincipal(PrincipalSettingsBase, EventSettingsMixin, db.Model):
     principal_backref_name = 'in_event_settings_acls'
+    extra_key_cols = ('event_id',)
 
     @declared_attr
     def __table_args__(cls):
@@ -268,7 +276,7 @@ def _get_all(cls, acl_cls, proxy, no_defaults, **kwargs):
         return rv
     settings = dict(proxy.defaults)
     if acl_cls:
-        settings.update({name: set() for name in proxy.acls})
+        settings.update({name: set() for name in proxy.acl_names})
     settings.update(cls.get_all(proxy.module, **kwargs))
     if acl_cls:
         settings.update(acl_cls.get_all_acls(proxy.module, **kwargs))
@@ -303,6 +311,24 @@ def _get_acl(cls, proxy, name, cache, **kwargs):
         return acl
 
 
+class ACLProxyBase(object):
+    """Base Proxy class for ACL settings"""
+
+    def __init__(self, proxy):
+        self.proxy = proxy
+        self.module = self.proxy.module
+
+    @property
+    def _cache(self):
+        return self.proxy._cache
+
+    def _check_name(self, name):
+        self.proxy._check_name(name, True)
+
+    def _flush_cache(self):
+        self.proxy._flush_cache()
+
+
 class SettingsProxyBase(object):
     """Base proxy class to access settings for a certain module
 
@@ -314,15 +340,20 @@ class SettingsProxyBase(object):
                  separate table
     """
 
+    acl_proxy_class = None
+
     def __init__(self, module, defaults=None, strict=True, acls=None):
         self.module = module
         self.defaults = defaults or {}
         self.strict = strict
-        self.acls = set(acls or ())
+        self.acl_names = set(acls or ())
+        self.acls = self.acl_proxy_class(self) if self.acl_proxy_class else None
         self._bound_args = None
         if strict and not defaults and not acls:
             raise ValueError('cannot use strict mode with no defaults')
-        if self.acls & self.defaults.viewkeys():
+        if acls and not self.acl_proxy_class:
+            raise ValueError('this proxy does not support acl settings')
+        if acls and self.acl_names & self.defaults.viewkeys():
             raise ValueError('acl settings cannot have a default value')
 
     @return_ascii
@@ -349,7 +380,7 @@ class SettingsProxyBase(object):
         bound._bound_args = args
 
         for name in dir(self_type):
-            if name[0] == '_' or name == 'bind':
+            if name[0] == '_' or name == 'bind' or not callable(getattr(self_type, name)):
                 continue
             func = getattr(bound, name)
             func = update_wrapper(partial(func, *args), func)
@@ -358,13 +389,13 @@ class SettingsProxyBase(object):
 
     def _check_name(self, name, acl=False):
         strict = self.strict or acl  # acl settings always use strict mode
-        collection = self.acls if acl else self.defaults
+        collection = self.acl_names if acl else self.defaults
         if strict and name not in collection:
             raise ValueError('invalid setting: {}.{}'.format(self.module, name))
 
     def _split_names(self, names):
         # Returns a ``(regular_names, acl_names)`` tuple
-        return {x for x in names if x not in self.acls}, {x for x in names if x in self.acls}
+        return {x for x in names if x not in self.acl_names}, {x for x in names if x in self.acl_names}
 
     def _split_call(self, value, regular_func, acl_func):
         # Util to call different functions depending if the name is an acl or regular setting
@@ -401,8 +432,69 @@ class SettingsProxyBase(object):
             return rv
 
 
+class ACLProxy(ACLProxyBase):
+    """Proxy class for core ACL settings"""
+
+    def get(self, name):
+        """Retrieves an ACL setting
+
+        :param name: Setting name
+        """
+        self._check_name(name)
+        return _get_acl(SettingPrincipal, self, name, self._cache)
+
+    def set(self, name, acl):
+        """Replaces an ACL with a new one
+
+        :param name: Setting name
+        :param acl: A set containing principals (users/groups)
+        """
+        self._check_name(name)
+        SettingPrincipal.set_acl(self.module, name, acl)
+        self._flush_cache()
+
+    def contains_user(self, name, user):
+        """Checks if a user is in an ACL.
+
+        To pass this check, the user can either be in the ACL itself
+        or in a group in the ACL.
+
+        :param name: Setting name
+        :param user: A :class:`.User`
+        """
+        self._check_name(name)
+        return SettingPrincipal.is_in_acl(self.module, name, user)
+
+    def add_principal(self, name, principal):
+        """Adds a principal to an ACL
+
+        :param name: Setting name
+        :param principal: A :class:`.User` or a :class:`.GroupProxy`
+        """
+        self._check_name(name)
+        SettingPrincipal.add_principal(self.module, name, principal)
+        self._flush_cache()
+
+    def remove_principal(self, name, principal):
+        """Removes a principal from an ACL
+
+        :param name: Setting name
+        :param principal: A :class:`.User` or a :class:`.GroupProxy`
+        """
+        self._check_name(name)
+        SettingPrincipal.remove_principal(self.module, name, principal)
+        self._flush_cache()
+
+    def merge_users(self, target, source):
+        """Replaces all ACL user entries for `source` with `target`"""
+        SettingPrincipal.merge_users(self.module, target, source)
+        self._flush_cache()
+
+
 class SettingsProxy(SettingsProxyBase):
     """Proxy class to access settings for a certain module"""
+
+    acl_proxy_class = ACLProxy
 
     def get_all(self, no_defaults=False):
         """Retrieves all settings, including ACLs
@@ -458,56 +550,6 @@ class SettingsProxy(SettingsProxyBase):
         SettingPrincipal.delete_all(self.module)
         self._flush_cache()
 
-    def get_acl(self, name):
-        """Retrieves an ACL setting
-
-        :param name: Setting name
-        """
-        self._check_name(name, True)
-        return _get_acl(SettingPrincipal, self, name, self._cache)
-
-    def set_acl(self, name, acl):
-        """Replaces an ACL with a new one
-
-        :param name: Setting name
-        :param acl: A set containing principals (users/groups)
-        """
-        self._check_name(name, True)
-        SettingPrincipal.set_acl(self.module, name, acl)
-        self._flush_cache()
-
-    def is_in_acl(self, name, user):
-        """Checks if a user is in an ACL.
-
-        To pass this check, the user can either be in the ACL itself
-        or in a group in the ACL.
-
-        :param name: Setting name
-        :param user: A :class:`.User`
-        """
-        self._check_name(name, True)
-        return SettingPrincipal.is_in_acl(self.module, name, user)
-
-    def add_to_acl(self, name, principal):
-        """Adds a principal to an ACL
-
-        :param name: Setting name
-        :param principal: A :class:`.User` or a :class:`.GroupProxy`
-        """
-        self._check_name(name, True)
-        SettingPrincipal.add_principal(self.module, name, principal)
-        self._flush_cache()
-
-    def remove_from_acl(self, name, principal):
-        """Removes a principal from an ACL
-
-        :param name: Setting name
-        :param principal: A :class:`.User` or a :class:`.GroupProxy`
-        """
-        self._check_name(name, True)
-        SettingPrincipal.remove_principal(self.module, name, principal)
-        self._flush_cache()
-
 
 def event_or_id(f):
     @wraps(f)
@@ -520,8 +562,79 @@ def event_or_id(f):
     return wrapper
 
 
+class EventACLProxy(ACLProxyBase):
+    """Proxy class for event-specific ACL settings"""
+
+    @event_or_id
+    def get(self, event, name):
+        """Retrieves an ACL setting
+
+        :param event: Event (or its ID)
+        :param name: Setting name
+        """
+        self._check_name(name)
+        return _get_acl(EventSettingPrincipal, self, name, self._cache, event_id=event)
+
+    @event_or_id
+    def set(self, event, name, acl):
+        """Replaces an ACL with a new one
+
+        :param event: Event (or its ID)
+        :param name: Setting name
+        :param acl: A set containing principals (users/groups)
+        """
+        self._check_name(name)
+        EventSettingPrincipal.set_acl(self.module, name, acl, event_id=event)
+        self._flush_cache()
+
+    @event_or_id
+    def contains_user(self, event, name, user):
+        """Checks if a user is in an ACL.
+
+        To pass this check, the user can either be in the ACL itself
+        or in a group in the ACL.
+
+        :param event: Event (or its ID)
+        :param name: Setting name
+        :param user: A :class:`.User`
+        """
+        self._check_name(name)
+        return EventSettingPrincipal.is_in_acl(self.module, name, user, event_id=event)
+
+    @event_or_id
+    def add_principal(self, event, name, principal):
+        """Adds a principal to an ACL
+
+        :param event: Event (or its ID)
+        :param name: Setting name
+        :param principal: A :class:`.User` or a :class:`.GroupProxy`
+        """
+        self._check_name(name)
+        EventSettingPrincipal.add_principal(self.module, name, principal, event_id=event)
+        self._flush_cache()
+
+    @event_or_id
+    def remove_principal(self, event, name, principal):
+        """Removes a principal from an ACL
+
+        :param event: Event (or its ID)
+        :param name: Setting name
+        :param principal: A :class:`.User` or a :class:`.GroupProxy`
+        """
+        self._check_name(name)
+        EventSettingPrincipal.remove_principal(self.module, name, principal, event_id=event)
+        self._flush_cache()
+
+    def merge_users(self, target, source):
+        """Replaces all ACL user entries for `source` with `target`"""
+        EventSettingPrincipal.merge_users(self.module, target, source)
+        self._flush_cache()
+
+
 class EventSettingsProxy(SettingsProxyBase):
     """Proxy class to access event-specific settings for a certain module"""
+
+    acl_proxy_class = EventACLProxy
 
     @event_or_id
     def get_all(self, event, no_defaults=False):
@@ -589,59 +702,4 @@ class EventSettingsProxy(SettingsProxyBase):
         """
         EventSetting.delete_all(self.module, event_id=event)
         EventSettingPrincipal.delete_all(self.module, event_id=event)
-        self._flush_cache()
-
-    def get_acl(self, event, name):
-        """Retrieves an ACL setting
-
-        :param event: Event (or its ID)
-        :param name: Setting name
-        """
-        self._check_name(name, True)
-        return _get_acl(SettingPrincipal, self, name, self._cache, event_id=event)
-
-    def set_acl(self, event, name, acl):
-        """Replaces an ACL with a new one
-
-        :param event: Event (or its ID)
-        :param name: Setting name
-        :param acl: A set containing principals (users/groups)
-        """
-        self._check_name(name, True)
-        EventSettingPrincipal.set_acl(self.module, name, acl, event_id=event)
-        self._flush_cache()
-
-    def is_in_acl(self, event, name, user):
-        """Checks if a user is in an ACL.
-
-        To pass this check, the user can either be in the ACL itself
-        or in a group in the ACL.
-
-        :param event: Event (or its ID)
-        :param name: Setting name
-        :param user: A :class:`.User`
-        """
-        self._check_name(name, True)
-        return EventSettingPrincipal.is_in_acl(self.module, name, user, event_id=event)
-
-    def add_to_acl(self, event, name, principal):
-        """Adds a principal to an ACL
-
-        :param event: Event (or its ID)
-        :param name: Setting name
-        :param principal: A :class:`.User` or a :class:`.GroupProxy`
-        """
-        self._check_name(name, True)
-        EventSettingPrincipal.add_principal(self.module, name, principal, event_id=event)
-        self._flush_cache()
-
-    def remove_from_acl(self, event, name, principal):
-        """Removes a principal from an ACL
-
-        :param event: Event (or its ID)
-        :param name: Setting name
-        :param principal: A :class:`.User` or a :class:`.GroupProxy`
-        """
-        self._check_name(name, True)
-        EventSettingPrincipal.remove_principal(self.module, name, principal, event_id=event)
         self._flush_cache()

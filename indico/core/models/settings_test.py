@@ -89,11 +89,11 @@ def test_acls_invalid():
     proxy = SettingsProxy('foo', {'reg': None}, acls={'acl'})
     pytest.raises(ValueError, proxy.get, 'acl')
     pytest.raises(ValueError, proxy.set, 'acl', 'foo')
-    pytest.raises(ValueError, proxy.get_acl, 'reg')
-    pytest.raises(ValueError, proxy.set_acl, 'reg', {user})
-    pytest.raises(ValueError, proxy.is_in_acl, 'reg', user)
-    pytest.raises(ValueError, proxy.add_to_acl, 'reg', user)
-    pytest.raises(ValueError, proxy.remove_from_acl, 'reg', user)
+    pytest.raises(ValueError, proxy.acls.get, 'reg')
+    pytest.raises(ValueError, proxy.acls.set, 'reg', {user})
+    pytest.raises(ValueError, proxy.acls.contains_user, 'reg', user)
+    pytest.raises(ValueError, proxy.acls.add_principal, 'reg', user)
+    pytest.raises(ValueError, proxy.acls.remove_principal, 'reg', user)
 
 
 @pytest.mark.usefixtures('db')
@@ -107,16 +107,16 @@ def test_acls(dummy_user, create_user):
     user = dummy_user.user
     other_user = create_user(123, legacy=False)
     proxy = SettingsProxy('foo', acls={'acl'})
-    assert proxy.get_acl('acl') == set()
-    proxy.set_acl('acl', {user})
-    assert proxy.get_acl('acl') == {user}
-    assert proxy.is_in_acl('acl', user)
-    assert not proxy.is_in_acl('acl', other_user)
-    proxy.add_to_acl('acl', other_user)
-    assert proxy.is_in_acl('acl', other_user)
-    assert proxy.get_acl('acl') == {user, other_user}
-    proxy.remove_from_acl('acl', user)
-    assert proxy.get_acl('acl') == {other_user}
+    assert proxy.acls.get('acl') == set()
+    proxy.acls.set('acl', {user})
+    assert proxy.acls.get('acl') == {user}
+    assert proxy.acls.contains_user('acl', user)
+    assert not proxy.acls.contains_user('acl', other_user)
+    proxy.acls.add_principal('acl', other_user)
+    assert proxy.acls.contains_user('acl', other_user)
+    assert proxy.acls.get('acl') == {user, other_user}
+    proxy.acls.remove_principal('acl', user)
+    assert proxy.acls.get('acl') == {other_user}
 
 
 def test_delete_propagate(mocker):
