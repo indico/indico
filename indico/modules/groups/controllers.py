@@ -41,7 +41,7 @@ class RHGroups(RHAdminBase):
 
     def _process(self):
         query = LocalGroup.query.options(joinedload(LocalGroup.members)).order_by(db.func.lower(LocalGroup.name))
-        groups = [GroupProxy(g.id, _group=g) for g in query]
+        groups = [g.proxy for g in query]
         providers = [p for p in multipass.identity_providers.itervalues() if p.supports_groups]
         form = SearchForm(obj=FormDefaults(exact=True))
         if not providers:

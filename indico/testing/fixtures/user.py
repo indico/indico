@@ -74,7 +74,7 @@ def create_group(db):
         db.session.add(group)
         db.session.flush()
         _groups.add(group)
-        return GroupProxy(group.id, _group=group)
+        return group.proxy
 
     yield _create_group
 
