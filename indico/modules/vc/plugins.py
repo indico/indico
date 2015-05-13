@@ -25,7 +25,7 @@ from indico.util.decorators import classproperty
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.models.vc_rooms import VCRoomLinkType
 from indico.util.string import remove_accents
-from indico.util.user import retrieve_principals, retrieve_principal, principals_merge_users, iter_acl
+from indico.util.user import retrieve_principal
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults
 
@@ -36,9 +36,8 @@ PREFIX_RE = re.compile('^vc_')
 class VCPluginMixin(object):
     settings_form = VCPluginSettingsFormBase
     strict_settings = True
-    default_settings = {'managers': [],
-                        'acl': [],
-                        'notification_emails': []}
+    default_settings = {'notification_emails': []}
+    acl_settings = {'acl', 'managers'}
     #: the :class:`IndicoForm` to use for the videoconference room form
     vc_room_form = None
     #: the :class:`IndicoForm` to use for the videoconference room attach form
@@ -205,12 +204,9 @@ class VCPluginMixin(object):
         if self.can_manage_vc(user):
             return True
 
-        acl = self.settings.get('acl')
-        if not acl:
+        if not self.settings.acls.get('acl'):  # everyone has access
             return True
-
-        principals = retrieve_principals(acl, legacy=False)
-        return any(user in principal for principal in iter_acl(principals))
+        return self.settings.acls.contains_user('acl', user)
 
     def can_manage_vc_room(self, user, room):
         """Checks if a user can manage a vc room"""
@@ -222,9 +218,7 @@ class VCPluginMixin(object):
         """Checks if a user has management rights on this VC system"""
         if user.is_admin:
             return True
-        principals = retrieve_principals(self.settings.get('managers'), legacy=False)
-        return any(user in principal for principal in iter_acl(principals))
+        return self.settings.acls.contains_user('managers', user)
 
     def _merge_users(self, target, source, **kwargs):
-        for key in {'managers', 'acl'}:
-            self.settings.set(key, principals_merge_users(self.settings.get(key), target.id, source.id))
+        self.settings.acls.merge_users(target, source)
