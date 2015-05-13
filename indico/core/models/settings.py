@@ -301,12 +301,14 @@ def _get(cls, proxy, name, default, cache, **kwargs):
             return setting
 
 
-def _get_acl(cls, proxy, name, cache, **kwargs):
+def _get_acl(cls, proxy, name, cache, cached_only=False, **kwargs):
     """Helper function for SettingsProxy.get_acl"""
     cache_key = proxy.module, name, frozenset(kwargs.viewitems())
     try:
         return cache[cache_key]
     except KeyError:
+        if cached_only:
+            return None
         cache[cache_key] = acl = cls.get_acl(proxy.module, name, **kwargs)
         return acl
 
@@ -463,6 +465,10 @@ class ACLProxy(ACLProxyBase):
         :param user: A :class:`.User`
         """
         self._check_name(name)
+        # If we've already cached the whole ACL, check it directly
+        acl = _get_acl(SettingPrincipal, self, name, self._cache, cached_only=True)
+        if acl is not None:
+            return any(user in principal for principal in acl)
         return SettingPrincipal.is_in_acl(self.module, name, user)
 
     def add_principal(self, name, principal):
