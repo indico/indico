@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 import urllib
+from MaKaC.common.search import get_authors_from_author_index
 from MaKaC.common.TemplateExec import render
 
 import MaKaC.webinterface.wcomponents as wcomponents
@@ -293,7 +294,7 @@ class WSubContribModifMain(wcomponents.WTemplated):
         vars["contribId"] = self._subContrib.getContribution().getId()
         vars["subContribId"] = self._subContrib.getId()
         vars["presenters"] = fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
-        vars["authors"] = fossilize(self._subContrib.getContribution().getAllAuthors())
+        vars["suggested_authors"] = fossilize(get_authors_from_author_index(self._subContrib.getConference(), 10))
         vars["eventType"] = self._subContrib.getConference().getType()
         return vars
 
