@@ -75,21 +75,6 @@ def retrieve_principal(principal, allow_groups=True, legacy=True):
         raise ValueError('Unexpected type: {}'.format(type_))
 
 
-def principals_merge_users(iterable, new_id, old_id):
-    """Creates a new principal list with one user being replaced with another one
-
-    :param iterable: Iterable containing `(type, id)` tuples
-    :param new_id: Target user
-    :param old_id: Source user (being deleted in the merge)
-    """
-    principals = []
-    for type_, id_ in iterable:
-        if type_ in {'Avatar', 'User'} and int(id_) == int(old_id):
-            id_ = new_id
-        principals.append((type_, id_))
-    return principals
-
-
 def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy=True):
     """Gets a GroupWrapper or AvatarUserWrapper from a fossil"""
     from indico.modules.groups import GroupProxy
