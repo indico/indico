@@ -12,20 +12,20 @@
 
     <div class="i-requests-list i-badges-list-left">
         {%- for name, definition in definitions.items()|sort(attribute='1.title') %}
-            {% set request = requests[name] %}
-            <a class="i-badge i-request-{{ request.state.name if request else 'none' }}"
+            {% set req = requests[name] %}
+            <a class="i-badge i-request-{{ req.state.name if req else 'none' }}"
                href="{{ url_for('requests.event_requests_details', event, type=name) }}">
                 <div class="i-badge-legend">
                     <span class="i-badge-legend-right">
-                        {%- if not request -%}
+                        {%- if not req -%}
                             {# nothing to show #}
-                        {%- elif request.state.name == 'pending' -%}
+                        {%- elif req.state.name == 'pending' -%}
                             {% trans %}Pending{% endtrans %}
-                        {%- elif request.state.name == 'accepted' -%}
+                        {%- elif req.state.name == 'accepted' -%}
                             {% trans %}Accepted{% endtrans %}
-                        {%- elif request.state.name == 'rejected' -%}
+                        {%- elif req.state.name == 'rejected' -%}
                             {% trans %}Rejected{% endtrans %}
-                        {%- elif request.state.name == 'withdrawn' -%}
+                        {%- elif req.state.name == 'withdrawn' -%}
                             {% trans %}Withdrawn{% endtrans %}
                         {%- endif -%}
                     </span>
