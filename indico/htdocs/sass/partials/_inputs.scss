@@ -473,6 +473,11 @@ $dropdown-transition: $dropdown-transition-step ease-out;
                 }
             }
 
+            button {
+                height: 2.5em;
+                vertical-align: top;
+            }
+
             input.table-input {
                 width: 100% !important;
             }
