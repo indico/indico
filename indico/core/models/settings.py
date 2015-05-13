@@ -164,12 +164,6 @@ class PrincipalSettingsBase(PrincipalMixin, SettingsBase):
             cls.set_acl(module, name, acl, **kwargs)
 
     @classmethod
-    def is_in_acl(cls, module, name, user, **kwargs):
-        # TODO: This could be improved to actually query using the user
-        # and his groups instead of getting the whole ACL!
-        return any(user in principal for principal in iter_acl(cls.get_acl(module, name, **kwargs)))
-
-    @classmethod
     def add_principal(cls, module, name, principal, **kwargs):
         if principal not in cls.get_acl(module, name):
             db.session.add(cls(module=module, name=name, principal=principal, **kwargs))
@@ -465,12 +459,7 @@ class ACLProxy(ACLProxyBase):
         :param name: Setting name
         :param user: A :class:`.User`
         """
-        self._check_name(name)
-        # If we've already cached the whole ACL, check it directly
-        acl = _get_acl(SettingPrincipal, self, name, self._cache, cached_only=True)
-        if acl is not None:
-            return any(user in principal for principal in iter_acl(acl))
-        return SettingPrincipal.is_in_acl(self.module, name, user)
+        return any(user in principal for principal in iter_acl(self.get(name)))
 
     def add_principal(self, name, principal):
         """Adds a principal to an ACL
@@ -605,8 +594,7 @@ class EventACLProxy(ACLProxyBase):
         :param name: Setting name
         :param user: A :class:`.User`
         """
-        self._check_name(name)
-        return EventSettingPrincipal.is_in_acl(self.module, name, user, event_id=event)
+        return any(user in principal for principal in iter_acl(self.get(event, name)))
 
     @event_or_id
     def add_principal(self, event, name, principal):
