@@ -20,7 +20,7 @@ from indico.util.user import iter_acl, unify_user_args
 
 
 def test_iter_acl():
-    user = MagicMock(is_group=False)
+    user = MagicMock(is_group=False, spec=['is_group'])
     local_group = MagicMock(is_group=True, is_local=True)
     remote_group = MagicMock(is_group=True, is_local=False)
     acl = [remote_group, user, local_group]

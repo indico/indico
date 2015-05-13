@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import itertools
 from functools import wraps
 
 from indico.core.db import db
@@ -33,12 +32,7 @@ def iter_acl(acl):
 
     :param acl: any iterable containing users/groups
     """
-    acl = tuple(acl)  # in case an iterator was passed
-    return itertools.chain(
-        (x for x in acl if not x.is_group),
-        (x for x in acl if x.is_group and x.is_local),
-        (x for x in acl if x.is_group and not x.is_local)
-    )
+    return sorted(acl, key=lambda x: (x.is_group, not getattr(x, 'is_local', None)))
 
 
 def retrieve_principals(iterable, allow_groups=True, legacy=True):
