@@ -244,18 +244,18 @@ var methods = {'addNew': 'contribution.participants.addNewParticipant',
     //(confId, params, inPlaceListElem, inPlaceMenu, kindOfUser, userCaption, eventType, elementClass, initialList)
     var primaryAuthorManager = new ParticipantsListManager(confId, methods,
         {confId: confId, contribId: '${ id }', kindOfList: "prAuthor"}, $E('inPlacePrimaryAuthors'), $E('inPlacePrimaryAuthorsMenu'),
-        "prAuthor", "primary author", "conference", "UIAuthorMove", ${primaryAuthors | n,j});
+        "prAuthor", "primary author", "conference", "UIAuthorMove", ${primaryAuthors | n,j}, ${suggested_authors | n,j});
     $('#inPlacePrimaryAuthors').data('manager', primaryAuthorManager);
 
     var coAuthorManager = new ParticipantsListManager(confId, methods,
         {confId: confId, contribId: '${ id }', kindOfList: "coAuthor"}, $E('inPlaceCoAuthors'), $E('inPlaceCoAuthorsMenu'),
-        "coAuthor", "co-author", "conference", "UIAuthorMove", ${coAuthors | n,j});
+        "coAuthor", "co-author", "conference", "UIAuthorMove", ${coAuthors | n,j}, ${suggested_authors | n,j});
     $('#inPlaceCoAuthors').data('manager', coAuthorManager);
 
 % endif:
     var speakerManager = new ParticipantsListManager(confId, methods,
         {confId: confId, contribId: '${ id }', kindOfList: "speaker"}, $E('inPlaceSpeakers'), $E('inPlaceSpeakersMenu'),
-        "speaker", "speaker", "${eventType}", "UIAuthorMove", ${speakers | n,j});
+        "speaker", "speaker", "${eventType}", "UIAuthorMove", ${speakers | n,j}, ${suggested_authors | n,j});
     $('#inPlaceSpeakers').data('manager', speakerManager);
 
 //Drag and drop for the authors
