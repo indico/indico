@@ -69,7 +69,7 @@
     });
 
 var presenterManager = new AddSubContributionPresenterListManager($E('inPlacePresenters'),
-        $E('inPlacePresentersMenu'), $E('parentTDPresenters'),  "presenter", ${ authors | n,j }, '${ eventType }');
+        $E('inPlacePresentersMenu'), $E('parentTDPresenters'),  "presenter", ${ suggested_authors | n,j }, '${ eventType }');
 
 function setPresentersParam(data) {
     var usersList = presenterManager.getUsersList();

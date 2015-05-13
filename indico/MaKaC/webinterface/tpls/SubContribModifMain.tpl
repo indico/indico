@@ -63,6 +63,6 @@
 
 var speakerManager = new SubContributionPresenterListManager('${ confId }',
         {confId: '${ confId }', contribId: '${ contribId }', subContribId: '${ subContribId }'},
-        $E('inPlaceSpeakers'), $E('inPlaceSpeakersMenu'), "presenter", ${presenters | n,j}, ${authors | n,j}, '${ eventType }');
+        $E('inPlaceSpeakers'), $E('inPlaceSpeakersMenu'), "presenter", ${presenters | n,j}, ${suggested_authors | n,j}, '${ eventType }');
 
 </script>
