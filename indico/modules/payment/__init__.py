@@ -17,7 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.core import signals
-from indico.core.models.settings import SettingsProxy, EventSettingsProxy
+from indico.core.settings import SettingsProxy
+from indico.modules.events.settings import EventSettingsProxy
 from indico.modules.payment.plugins import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
                                             PaymentEventSettingsFormBase)
 from indico.util.i18n import _

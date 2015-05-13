@@ -16,11 +16,5 @@
 
 from __future__ import unicode_literals
 
-from indico.core import signals
-from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
-
-
-@signals.event.deleted.connect
-def _event_deleted(event, **kwargs):
-    EventSetting.delete_event(event.id)
-    EventSettingPrincipal.delete_event(event.id)
+from indico.core.settings.proxy import SettingsProxyBase, ACLProxyBase
+from indico.core.settings.core import SettingsProxy

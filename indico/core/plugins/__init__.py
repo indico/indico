@@ -32,7 +32,8 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
-from indico.core.models.settings import SettingsProxy, EventSettingsProxy
+from indico.core.settings import SettingsProxy
+from indico.modules.events.settings import EventSettingsProxy
 from indico.modules.users import UserSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import _, NullDomain

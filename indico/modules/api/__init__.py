@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.core.db import db
-from indico.core.models.settings import SettingsProxy
+from indico.core.settings import SettingsProxy
 from indico.modules.api.models.keys import APIKey
 from indico.util.i18n import _
 from indico.util.struct.enum import IndicoEnum

@@ -20,8 +20,8 @@ from hashlib import sha1
 
 from flask import render_template
 
-from indico.core.models.settings import EventSettingsProxy
 from indico.modules.events.agreements.models.agreements import Agreement
+from indico.modules.events.settings import EventSettingsProxy
 from indico.util.caching import make_hashable, memoize_request
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import _

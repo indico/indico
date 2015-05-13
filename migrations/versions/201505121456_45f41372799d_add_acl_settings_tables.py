@@ -9,7 +9,7 @@ import sqlalchemy as sa
 from alembic import op
 
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.core.models.principals import PrincipalType
+from indico.core.db.sqlalchemy.principals import PrincipalType
 
 
 # revision identifiers, used by Alembic.

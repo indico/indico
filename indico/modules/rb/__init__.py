@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core import signals
-from indico.core.models.settings import SettingsProxy
+from indico.core.settings import SettingsProxy
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.reservations import Reservation

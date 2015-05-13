@@ -15,9 +15,8 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import pytest
-from enum import Enum
 
-from indico.core.models.settings import SettingsProxy, Setting
+from indico.core.settings import SettingsProxy
 from indico.modules.users import User
 
 
@@ -70,20 +69,6 @@ def test_proxy_delete_all():
 
 
 @pytest.mark.usefixtures('db')
-def test_set_enum():
-    class Useless(int, Enum):
-        thing = 1337
-
-    Setting.set_multi('foo', {'foo': Useless.thing})
-    Setting.set('foo', 'bar', Useless.thing)
-    for key in {'foo', 'bar'}:
-        value = Setting.get('foo', key)
-        assert value == Useless.thing
-        assert value == Useless.thing.value
-        assert not isinstance(value, Useless)  # we store it as a plain value!
-
-
-@pytest.mark.usefixtures('db')
 def test_acls_invalid():
     user = User()
     proxy = SettingsProxy('foo', {'reg': None}, acls={'acl'})
@@ -120,8 +105,8 @@ def test_acls(dummy_user, create_user):
 
 
 def test_delete_propagate(mocker):
-    Setting = mocker.patch('indico.core.models.settings.Setting')
-    SettingPrincipal = mocker.patch('indico.core.models.settings.SettingPrincipal')
+    Setting = mocker.patch('indico.core.settings.core.Setting')
+    SettingPrincipal = mocker.patch('indico.core.settings.core.SettingPrincipal')
     proxy = SettingsProxy('foo', {'reg': None}, acls={'acl'})
     proxy.delete('reg', 'acl')
     Setting.delete.assert_called_once_with('foo', 'reg')
@@ -129,8 +114,8 @@ def test_delete_propagate(mocker):
 
 
 def test_set_multi_propagate(mocker):
-    Setting = mocker.patch('indico.core.models.settings.Setting')
-    SettingPrincipal = mocker.patch('indico.core.models.settings.SettingPrincipal')
+    Setting = mocker.patch('indico.core.settings.core.Setting')
+    SettingPrincipal = mocker.patch('indico.core.settings.core.SettingPrincipal')
     proxy = SettingsProxy('foo', {'reg': None}, acls={'acl'})
     proxy.set_multi({
         'reg': 'bar',

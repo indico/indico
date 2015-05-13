@@ -14,13 +14,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+import pytest
+from enum import Enum
 
-from indico.core import signals
-from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
+from indico.core.settings.models.settings import Setting
 
 
-@signals.event.deleted.connect
-def _event_deleted(event, **kwargs):
-    EventSetting.delete_event(event.id)
-    EventSettingPrincipal.delete_event(event.id)
+@pytest.mark.usefixtures('db')
+def test_set_enum():
+    class Useless(int, Enum):
+        thing = 1337
+
+    Setting.set_multi('foo', {'foo': Useless.thing})
+    Setting.set('foo', 'bar', Useless.thing)
+    for key in {'foo', 'bar'}:
+        value = Setting.get('foo', key)
+        assert value == Useless.thing
+        assert value == Useless.thing.value
+        assert not isinstance(value, Useless)  # we store it as a plain value!

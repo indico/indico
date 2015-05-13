@@ -19,7 +19,9 @@ from __future__ import unicode_literals
 from functools import wraps
 
 from indico.core.db import db
-from indico.core.models.settings import JSONSettingsBase, SettingsProxyBase, _get_all, _get, _default
+from indico.core.settings.models.base import JSONSettingsBase
+from indico.core.settings import SettingsProxyBase
+from indico.core.settings.util import get_setting, get_all_settings
 from indico.modules.users import User
 from indico.util.string import return_ascii
 
@@ -78,10 +80,10 @@ class UserSettingsProxy(SettingsProxyBase):
         :param no_defaults: Only return existing settings and ignore defaults.
         :return: Dict containing the settings
         """
-        return _get_all(UserSetting, None, self, no_defaults, **user)
+        return get_all_settings(UserSetting, None, self, no_defaults, **user)
 
     @user_or_id
-    def get(self, user, name, default=_default):
+    def get(self, user, name, default=SettingsProxyBase.default_sentinel):
         """Retrieves the value of a single setting.
 
         :param user: ``{'user': user}`` or ``{'user_id': id}``
@@ -90,7 +92,7 @@ class UserSettingsProxy(SettingsProxyBase):
         :return: The settings's value or the default value
         """
         self._check_name(name)
-        return _get(UserSetting, self, name, default, self._cache, **user)
+        return get_setting(UserSetting, self, name, default, self._cache, **user)
 
     @user_or_id
     def set(self, user, name, value):

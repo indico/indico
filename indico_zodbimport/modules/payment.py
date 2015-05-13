@@ -20,14 +20,13 @@ import re
 from functools import partial
 
 from indico.core.db import db
-from indico.core.models.settings import EventSetting
+from indico.modules.events.models.settings import EventSetting
 from indico.modules.payment import event_settings as payment_event_settings
 from indico.modules.payment import settings as global_settings
 from indico.modules.payment.models.transactions import PaymentTransaction, TransactionStatus
 from indico.util.console import cformat
 from indico.util.date_time import as_utc
 from indico.util.struct.iterables import committing_iterator
-
 from indico_zodbimport import Importer
 from indico_zodbimport.util import convert_to_unicode
 

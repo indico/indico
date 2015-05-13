@@ -3,7 +3,7 @@ branch = true
 source = indico
 include =
     indico/core/db/sqlalchemy/*.py
-    indico/core/models/*.py
+    indico/core/settings/*.py
     indico/modules/events/agreements/*.py
     indico/modules/payment/*.py
     indico/modules/rb/*.py
