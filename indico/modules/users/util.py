@@ -123,6 +123,7 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
     query = User.query.options(db.joinedload(User.identities),
                                db.joinedload(User._all_emails),
                                db.joinedload(User.merged_into_user))
+    criteria = {key: value.strip() for key, value in criteria.iteritems() if value.strip()}
     original_criteria = dict(criteria)
 
     if not criteria:
