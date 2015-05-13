@@ -19,8 +19,6 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from operator import itemgetter
 
-from flask import request
-
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.db import db
