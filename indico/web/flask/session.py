@@ -19,14 +19,17 @@ from __future__ import absolute_import
 import cPickle
 import uuid
 from datetime import datetime, timedelta
-from flask import request
+
+from flask import request, flash
 from flask.sessions import SessionInterface, SessionMixin
+from markupsafe import Markup
 from werkzeug.datastructures import CallbackDict
 from werkzeug.utils import cached_property
 
 from indico.core.db import DBMgr
 from indico.modules.users import User
 from indico.util.decorators import cached_writable_property
+from indico.util.i18n import _
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.info import HelperMaKaCInfo
 
@@ -57,7 +60,21 @@ class IndicoSession(BaseSession):
     @cached_writable_property('_user')
     def user(self):
         user_id = self.get('_user_id')
-        return User.get(user_id) if user_id is not None else None
+        user = User.get(user_id) if user_id is not None else None
+        if user and user.is_deleted:
+            merged_into_user = user.merged_into_user
+            user = None
+            # If the user is deleted and the request is likely to be seen by
+            # the user, we forcefully log him out and inform him about it.
+            if not request.is_xhr and request.blueprint != 'assets':
+                self.clear()
+                if merged_into_user:
+                    msg = _(u'Your profile has been merged into <strong>{}</strong>. '
+                            u'Please log in using that profile.')
+                    flash(Markup(msg).format(merged_into_user.full_name), 'warning')
+                else:
+                    flash(_(u'Your profile has been deleted.'), 'error')
+        return user
 
     @user.setter
     def user(self, user):
