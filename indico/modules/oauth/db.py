@@ -124,6 +124,10 @@ class Token(Persistent):
         self._user = user
         self._authorized = authorized
 
+    @property
+    def user(self):
+        return self._user.user
+
     def getId(self):
         return self._key
 
