@@ -341,7 +341,7 @@ def test_can_be_cancelled(dummy_reservation, create_user, is_admin, is_created_b
 ))
 def test_can_be_deleted(dummy_reservation, dummy_user, is_admin, expected):
     if is_admin:
-        rb_settings.set('admin_principals', [dummy_user.user.as_principal])
+        rb_settings.acls.add_principal('admin_principals', dummy_user.user)
     assert dummy_reservation.can_be_deleted(dummy_user) == expected
 
 

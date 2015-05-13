@@ -42,18 +42,15 @@ def create_user(db):
         db.session.add(user)
         db.session.flush()
         if rb_admin:
-            rb_settings.set('admin_principals', rb_settings.get('admin_principals') + [user.as_principal])
+            rb_settings.acls.add_principal('admin_principals', user)
         db.session.flush()
         _users.add(user)
         return user.as_avatar if legacy else user
 
     yield _create_user
 
-    admins = set(map(tuple, rb_settings.get('admin_principals')))
     for user in _users:
-        admins.discard(user.as_principal)
         db.session.delete(user)
-    rb_settings.set('admin_principals', list(admins))
 
 
 @pytest.fixture

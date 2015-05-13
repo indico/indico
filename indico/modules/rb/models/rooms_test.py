@@ -670,14 +670,12 @@ def test_can_be_prebooked(dummy_room, create_user, create_room_attribute, create
     (True,  True,  True),
     (True,  False, False),
 ))
-def test_can_be_booked_prebooked_no_rb_access(db, dummy_room, dummy_user, create_user, has_acl, in_acl, expected):
-    user = create_user(123)
+def test_can_be_booked_prebooked_no_rb_access(dummy_room, dummy_user, create_user, has_acl, in_acl, expected):
+    user = create_user(123, legacy=False)
     if has_acl:
-        acl = [(u'Avatar', dummy_user.id)]
+        rb_settings.acls.add_principal('authorized_principals', dummy_user.user)
         if in_acl:
-            acl.append((u'Avatar', user.id))
-        rb_settings.set('authorized_principals', acl)
-        db.session.flush()
+            rb_settings.acls.add_principal('authorized_principals', user)
     assert dummy_room.can_be_booked(user) == expected
     assert dummy_room.can_be_prebooked(user) == expected
 

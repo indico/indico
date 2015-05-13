@@ -22,16 +22,14 @@ from indico.testing.util import bool_matrix
 
 
 @pytest.mark.parametrize(('is_rb_admin', 'acl_empty', 'in_acl', 'expected'), bool_matrix('...', expect=any))
-def test_rb_check_user_access(mocker, dummy_user, dummy_group, is_rb_admin, acl_empty, in_acl, expected):
+def test_rb_check_user_access(db, mocker, dummy_user, dummy_group, is_rb_admin, acl_empty, in_acl, expected):
     user = dummy_user.user
     if is_rb_admin:
         mocker.patch('indico.modules.rb.util.rb_is_admin', return_value=True)
-    acl = []
     if not acl_empty:
-        acl.append(dummy_group.as_principal)
+        rb_settings.acls.add_principal('authorized_principals', dummy_group)
     if in_acl:
-        acl.append(user.as_principal)
-    rb_settings.set('authorized_principals', acl)
+        rb_settings.acls.add_principal('authorized_principals', user)
     assert rb_check_user_access(user) == expected
 
 

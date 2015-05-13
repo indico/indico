@@ -24,18 +24,15 @@ from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
-from indico.util.user import principals_merge_users
 
 
 settings = SettingsProxy('roombooking', {
-    'admin_principals': [],
-    'authorized_principals': [],
     'assistance_emails': [],
     'vc_support_emails': [],
     'notification_hour': 6,
     'notification_before_days': 1,
     'notifications_enabled': True
-})
+}, acls={'admin_principals', 'authorized_principals'})
 
 
 @signals.users.merged.connect
@@ -47,10 +44,7 @@ def _merge_users(target, source, **kwargs):
     Reservation.find(created_by_id=source.id).update({Reservation.created_by_id: target.id})
     Reservation.find(booked_for_id=source.id).update({Reservation.booked_for_id: target.id})
     Room.find(owner_id=source.id).update({Room.owner_id: target.id})
-    for key in ('authorized_principals', 'admin_principals'):
-        principals = settings.get(key)
-        principals = principals_merge_users(principals, target.id, source.id)
-        settings.set(key, principals)
+    settings.acls.merge_users(target, source)
 
 
 @signals.event.deleted.connect
