@@ -47,10 +47,10 @@ from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.mail import GenericMailer
 from MaKaC.webinterface.common.tools import escape_html
 
+from indico.modules.events.api import CategoryEventHook
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.groups.legacy import GroupWrapper
 from indico.web.flask.util import send_file, endpoint_for_url
-from indico.web.http_api.hooks.event import CategoryEventHook
 from indico.web.http_api.metadata.serializer import Serializer
 
 

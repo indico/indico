@@ -21,9 +21,10 @@ Indico HTTP export API
 from indico.web.http_api.hooks.base import DataFetcher, HTTPAPIHook
 from indico.web.http_api.exceptions import LimitExceededException
 from indico.web.http_api.hooks.file import FileHook
-from indico.web.http_api.hooks.registration import RegistrantsHook
-from indico.web.http_api.hooks.user import UserInfoHook
 # The following imports are NOT unused - without them these modules would never
 # be imported and thus their api hooks wouldn't be registered at all
+import indico.modules.events.api
 import indico.modules.events.agreements.api
+import indico.modules.events.registration.api
 import indico.modules.rb.api
+import indico.modules.users.api

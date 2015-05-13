@@ -31,8 +31,8 @@ from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 from indico.core.config import Config
 from indico.util.i18n import _
+from indico.modules.events.api import ContributionHook
 from indico.web.flask.util import send_file
-from indico.web.http_api.hooks.event import ContributionHook
 from indico.web.http_api.metadata.serializer import Serializer
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from MaKaC.PDFinterface.base import LatexRunner

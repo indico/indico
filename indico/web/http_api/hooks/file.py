@@ -18,8 +18,8 @@
 from indico.web.flask.util import send_file
 from indico.web.http_api.metadata.serializer import Serializer
 
+from indico.modules.events.api import EventBaseHook
 from indico.web.http_api.hooks.base import HTTPAPIHook
-from indico.web.http_api.hooks.event import EventBaseHook
 from indico.web.http_api.responses import HTTPAPIError
 
 # legacy imports

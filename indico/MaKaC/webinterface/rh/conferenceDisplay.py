@@ -46,12 +46,12 @@ import MaKaC.common.timezoneUtils as timezoneUtils
 from reportlab.platypus.doctemplate import LayoutError
 from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
-from indico.web.http_api.metadata.serializer import Serializer
-from indico.web.http_api.hooks.event import CategoryEventHook
-from indico.web.flask.util import send_file
 from indico.core import signals
+from indico.modules.events.api import CategoryEventHook
 from indico.util.i18n import set_best_lang
 from indico.util.signals import values_from_signal
+from indico.web.http_api.metadata.serializer import Serializer
+from indico.web.flask.util import send_file
 
 
 class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
