@@ -14,14 +14,31 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import itertools
 from functools import wraps
 
 from indico.core.db import db
-from indico.modules.groups import GroupProxy
-from indico.modules.users import User
 from indico.util.decorators import smart_decorator
 
 from MaKaC.common.cache import GenericCache
+
+
+def iter_acl(acl):
+    """Iterates over an ACL in the most efficient order.
+
+    This first yields users, then local groups, and eventually
+    multipass groups as a remote group check is much more expensive
+    than checking if two users are the same (``==``) or if a user is
+    in a local group (SQL query).
+
+    :param acl: any iterable containing users/groups
+    """
+    acl = tuple(acl)  # in case an iterator was passed
+    return itertools.chain(
+        (x for x in acl if not x.is_group),
+        (x for x in acl if x.is_group and x.is_local),
+        (x for x in acl if x.is_group and not x.is_local)
+    )
 
 
 def retrieve_principals(iterable, allow_groups=True, legacy=True):
@@ -42,7 +59,10 @@ def retrieve_principal(principal, allow_groups=True, legacy=True):
     :param allow_groups: If group principals are allowed
     :param legacy: If legacy wrappers or new objects should be returned.
     """
+    from indico.modules.groups import GroupProxy
     from indico.modules.groups.legacy import LocalGroupWrapper, LDAPGroupWrapper
+    from indico.modules.users import User
+
     type_, id_ = principal
     if type_ in {'Avatar', 'User'}:
         user = User.get(int(id_))
@@ -78,6 +98,9 @@ def principals_merge_users(iterable, new_id, old_id):
 
 def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy=True):
     """Gets a GroupWrapper or AvatarUserWrapper from a fossil"""
+    from indico.modules.groups import GroupProxy
+    from indico.modules.users import User
+
     type_ = fossil['_type']
     id_ = fossil['id']
     if type_ == 'Avatar':
@@ -134,6 +157,8 @@ def unify_user_args(fn, legacy=False):
                    an :class:`AvatarUserWrapper`. Otherwise, they will
                    receive a :class:`.User`.
     """
+    from indico.modules.users import User
+
     if legacy:
         def _convert(arg):
             return arg.as_avatar if isinstance(arg, User) else arg

@@ -14,7 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.util.user import unify_user_args
+from mock import MagicMock
+
+from indico.util.user import iter_acl, unify_user_args
+
+
+def test_iter_acl():
+    user = MagicMock(is_group=False)
+    local_group = MagicMock(is_group=True, is_local=True)
+    remote_group = MagicMock(is_group=True, is_local=False)
+    acl = [remote_group, user, local_group]
+    assert list(iter_acl(iter(acl))) == [user, local_group, remote_group]
 
 
 def test_unify_user_args_new(dummy_user):

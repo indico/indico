@@ -25,7 +25,7 @@ from indico.util.decorators import classproperty
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.models.vc_rooms import VCRoomLinkType
 from indico.util.string import remove_accents
-from indico.util.user import retrieve_principals, retrieve_principal, principals_merge_users
+from indico.util.user import retrieve_principals, retrieve_principal, principals_merge_users, iter_acl
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults
 
@@ -210,7 +210,7 @@ class VCPluginMixin(object):
             return True
 
         principals = retrieve_principals(acl, legacy=False)
-        return any(user in principal for principal in principals)
+        return any(user in principal for principal in iter_acl(principals))
 
     def can_manage_vc_room(self, user, room):
         """Checks if a user can manage a vc room"""
@@ -223,7 +223,7 @@ class VCPluginMixin(object):
         if user.is_admin:
             return True
         principals = retrieve_principals(self.settings.get('managers'), legacy=False)
-        return any(user in principal for principal in principals)
+        return any(user in principal for principal in iter_acl(principals))
 
     def _merge_users(self, target, source, **kwargs):
         for key in {'managers', 'acl'}:

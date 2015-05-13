@@ -29,6 +29,7 @@ from indico.core.db.sqlalchemy.util.models import merge_table_args
 from indico.core.models.principals import PrincipalMixin, PrincipalType
 from indico.util.decorators import classproperty
 from indico.util.string import return_ascii
+from indico.util.user import iter_acl
 
 
 _default = object()
@@ -166,7 +167,7 @@ class PrincipalSettingsBase(PrincipalMixin, SettingsBase):
     def is_in_acl(cls, module, name, user, **kwargs):
         # TODO: This could be improved to actually query using the user
         # and his groups instead of getting the whole ACL!
-        return any(user in principal for principal in cls.get_acl(module, name, **kwargs))
+        return any(user in principal for principal in iter_acl(cls.get_acl(module, name, **kwargs)))
 
     @classmethod
     def add_principal(cls, module, name, principal, **kwargs):
@@ -468,7 +469,7 @@ class ACLProxy(ACLProxyBase):
         # If we've already cached the whole ACL, check it directly
         acl = _get_acl(SettingPrincipal, self, name, self._cache, cached_only=True)
         if acl is not None:
-            return any(user in principal for principal in acl)
+            return any(user in principal for principal in iter_acl(acl))
         return SettingPrincipal.is_in_acl(self.module, name, user)
 
     def add_principal(self, name, principal):

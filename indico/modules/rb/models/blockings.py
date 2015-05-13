@@ -25,6 +25,7 @@ from indico.modules.rb.models.blocking_principals import BlockingPrincipal
 from indico.modules.rb.util import rb_is_admin
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
+from indico.util.user import iter_acl
 
 
 class Blocking(db.Model):
@@ -119,7 +120,7 @@ class Blocking(db.Model):
                 return True
             elif room and room.is_owned_by(user):
                 return True
-        return any(user in principal for principal in self.allowed)
+        return any(user in principal for principal in iter_acl(self.allowed))
 
     @return_ascii
     def __repr__(self):
