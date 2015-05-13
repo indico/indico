@@ -23,6 +23,7 @@ from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, NoReportError
 
 from MaKaC.common.PickleJar import DictPickler
+from MaKaC.common.search import make_participation_from_obj
 
 import MaKaC.conference as conference
 from MaKaC.services.implementation.base import TextModificationBase
@@ -34,6 +35,7 @@ from MaKaC.user import AvatarHolder
 import MaKaC.webinterface.pages.contributionReviewing as contributionReviewing
 import MaKaC.domain as domain
 from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.string import to_unicode
 from indico.util.user import principal_from_fossil
@@ -285,15 +287,7 @@ class ContributionAddExistingParticipant(ContributionParticipantsBase):
                     raise ServiceAccessError(_("The email address %s (belonging to a user you are adding) is already used by another author in the list of primary authors or co-authors. Author(s) not added.") % user["email"])
 
     def _newParticipant(self, a):
-        part = conference.ContributionParticipation()
-        part.setTitle(a.getTitle())
-        part.setFirstName(a.getName())
-        part.setFamilyName(a.getSurName())
-        part.setAffiliation(a.getOrganisation())
-        part.setEmail(a.getEmail())
-        part.setAddress(a.getAddress())
-        part.setPhone(a.getTelephone())
-        part.setFax(a.getFax())
+        part = make_participation_from_obj(a)
         if self._kindOfList == "prAuthor":
             self._contribution.addPrimaryAuthor(part)
         elif self._kindOfList == "coAuthor":
@@ -307,11 +301,11 @@ class ContributionAddExistingParticipant(ContributionParticipantsBase):
             if user["_type"] == "Avatar":  # new speaker
                 part = self._newParticipant(principal_from_fossil(user, allow_pending=True))
             elif user["_type"] == "ContributionParticipation":  # adding existing author to speaker
-                part = self._contribution.getAuthorById(user["id"])
-                self._contribution.addSpeaker(part)
+                author_index_author_id = "{familyName} {firstName} {email}".format(**user).lower()
+                author = self._conf.getAuthorIndex().getById(author_index_author_id)[0]
+                part = self._newParticipant(author)
             if self._submissionRights and part:
                 self._contribution.grantSubmission(part)
-
         if self._kindOfList == "prAuthor":
             return self._getParticipantsList(self._contribution.getPrimaryAuthorList())
         elif self._kindOfList == "coAuthor":
@@ -602,10 +596,14 @@ class SubContributionAddExistingParticipant(SubContributionParticipantsBase):
                 raise ServiceAccessError(_("The email address (%s) of a user you are trying to add is already used by another participant or the user is already added to the list. Participant(s) not added.") % user["email"])
 
     def _getAnswer(self):
-        ah = AvatarHolder()
         for user in self._userList:
             spk = conference.SubContribParticipation()
-            spk.setDataFromAvatar(ah.getById(user["id"]))
+            if user["_type"] == "Avatar":
+                spk.setDataFromAvatar(User.get(int(user['id'])).as_avatar)
+            elif user["_type"] == "ContributionParticipation":
+                author_index_author_id = "{} {} {}".format(user['familyName'], user['firstName'], user['email']).lower()
+                author = self._conf.getAuthorIndex().getById(author_index_author_id)[0]
+                spk = make_participation_from_obj(author, contrib_participation=spk)
             self._subContrib.newSpeaker(spk)
         return fossilize(self._subContrib.getSpeakerList(), ISubContribParticipationFullFossil)
 

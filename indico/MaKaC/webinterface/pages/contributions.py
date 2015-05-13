@@ -23,6 +23,7 @@ import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
 import MaKaC.webinterface.materialFactories as materialFactories
+from MaKaC.common.search import get_authors_from_author_index
 from MaKaC.webinterface.pages.metadata import WICalExportBase
 from MaKaC.webinterface.pages.conferences import WPConferenceBase, WPConferenceModifBase, WPConferenceDefaultDisplayBase
 from MaKaC.webinterface.pages.main import WPMainBase
@@ -483,6 +484,8 @@ class WContribModifMain(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
+
+        vars["suggested_authors"] = self._getParticipantsList(get_authors_from_author_index(self._contrib.getConference(), 10))
         vars["eventType"] = self._eventType
         vars["withdrawnNotice"] = self._getWithdrawnNoticeHTML()
         vars["locator"] = self._contrib.getLocator().getWebForm()
@@ -704,7 +707,7 @@ class WSubContributionCreation(wcomponents.WTemplated):
         vars["durationMinutes"] = vars.get("durationMinutes", "15")
         vars["keywords"] = vars.get("keywords", "")
         vars["locator"] = self.__owner.getLocator().getWebForm()
-        vars["authors"] = fossilize(self._contribution.getAllAuthors())
+        vars["suggested_authors"] = fossilize(get_authors_from_author_index(self._contribution.getConference(), 10))
         vars["eventType"] = self._contribution.getConference().getType()
         return vars
 

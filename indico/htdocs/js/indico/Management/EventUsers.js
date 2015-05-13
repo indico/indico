@@ -117,17 +117,13 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
         var self = this;
         this.inPlaceMenu.observeClick(function(e) {
             var menuItems = {};
-            var suggestedAuthors = true;
-            if (self.kindOfUser == 'speaker' && self.eventType == "conference") {
-                suggestedAuthors = self._getAuthorsList();
-            }
 
             menuItems["searchUser"] = {action: function() {
                 var privilegesDiv = Html.div({style:{marginTop: pixels(10)}});
                 var checkbox = Html.checkbox({style:{verticalAlign:"middle"}}, true);
                 checkbox.dom.id = "presenter-grant-submission";
                 privilegesDiv.append(Html.span({},checkbox, "Grant all the selected users with submission rights"));
-                self._addExistingUser($T("Add ")+self.userCaption, true, this.confId, false, true, suggestedAuthors, false, true, {"presenter-grant-submission": function(){return $("#presenter-grant-submission")[0].checked;}}, privilegesDiv);
+                self._addExistingUser($T("Add ")+self.userCaption, true, this.confId, false, true, self.suggestedAuthors, false, true, {"presenter-grant-submission": function(){return $("#presenter-grant-submission")[0].checked;}}, privilegesDiv);
             }, display: $T('Add Indico User')};
             menuItems["addNew"] = {action: function() {
                 self._addNonExistingUser();
@@ -160,17 +156,13 @@ type("ParticipantsListManager", ["ListOfUsersManager"], {
                     }
                 }
         );
-    },
-
-    _getAuthorsList: function() {
-        return primaryAuthorManager.getUsersList().allItems().concat(coAuthorManager.getUsersList().allItems());
     }
-
 },
 
-    function(confId, methods, params, inPlaceListElem, inPlaceMenu, kindOfUser, userCaption, eventType, elementClass, initialList) {
+    function(confId, methods, params, inPlaceListElem, inPlaceMenu, kindOfUser, userCaption, eventType, elementClass, initialList, suggestedAuthors) {
         this.kindOfUser = kindOfUser;
         this.eventType = eventType;
+        this.suggestedAuthors = suggestedAuthors
         this.rightsToShow = {submission: true, management: false, coordination: false};
         this.nameOptions = {title: false, affiliation: true, email:false};
         if (kindOfUser == "chairperson") {
