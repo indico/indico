@@ -117,7 +117,7 @@ type ("FoundPeopleList", ["SelectableListWidget"], {
         var peopleData = pair.get();
 
         if (peopleData.get('isGroup') || peopleData.get('_type') === 'group') {
-            return Html.span({}, peopleData.get("name"));
+            return Html.div("info", Html.span("name", peopleData.get("name")));
         } else {
             var userName = Html.span("name", peopleData.get("firstName"), ' ', peopleData.get("familyName"));
             var userEmail = Html.span({id: self.id + "_" + pair.key + "_email", className: "email"}, Util.truncate(peopleData.get("email"), 40));
