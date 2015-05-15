@@ -266,9 +266,10 @@ var attachedFilesManager = new AbstractFilesManager($E('inPlaceMaterial'), $E('i
 // authors
 var initialPrAuthors = ${ jsonEncode(prAuthors) };
 var initialCoAuthors = ${ jsonEncode(coAuthors) };
+var suggestedAuthors = ${ jsonEncode(suggested_authors) };
 
 // manage both lists of authors.
-var authorsManager = new AuthorsManager(initialPrAuthors, initialCoAuthors, ${jsonEncode(showSelectAsSpeaker)});
+var authorsManager = new AuthorsManager(initialPrAuthors, initialCoAuthors, ${jsonEncode(showSelectAsSpeaker)}, suggestedAuthors);
 
 function setAuthorsParam() {
     var usersList = authorsManager.getPrAuthors().getUsersList();

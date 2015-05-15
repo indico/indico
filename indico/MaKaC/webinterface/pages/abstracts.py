@@ -19,6 +19,7 @@ from xml.sax.saxutils import quoteattr
 import urllib
 from pytz import timezone
 
+from MaKaC.common.search import get_authors_from_author_index
 import MaKaC.webinterface.wcomponents as wcomponents
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.navigation as navigation
@@ -430,6 +431,7 @@ class WAbstractDataModification(WConfDisplayBodyBase):
         vars["abstractTitle"] = quoteattr(str(vars.get("title", "")))
         vars["prAuthors"] = fossilize(vars.get("prAuthors", []))
         vars["coAuthors"] = fossilize(vars.get("coAuthors", []))
+        vars["suggested_authors"] = fossilize(get_authors_from_author_index(self._conf, 10))
         cfaMgr = self._conf.getAbstractMgr()
         vars["tracksMandatory"] = cfaMgr.areTracksMandatory()
         vars["tracks"] = self._conf.getTrackList()
@@ -765,6 +767,7 @@ class WAbstractManagment(wcomponents.WTemplated):
             co_authors.append(self._getAuthorHTML(author))
         vars["primary_authors"] = "<br>".join(primary_authors)
         vars["co_authors"] = "<br>".join(co_authors)
+        vars["suggested_authors"] = fossilize(get_authors_from_author_index(self._conf, 10))
         speakers = []
         for spk in self._abstract.getSpeakerList():
             speakers.append(self._getAuthorHTML(spk))
