@@ -103,5 +103,5 @@ admin.add_url_rule('/protection/ip-acl/remove', 'adminServices-ipbasedacl_farevo
                    services.RHIPBasedACLFullAccessRevoke, methods=('POST',))
 
 # OAuth
-admin.add_url_rule('/oauth/consumers', 'adminServices-oauthAuthorized', oauth.RHAdminOAuthAuthorized)
-admin.add_url_rule('/oauth/authorized', 'adminServices-oauthConsumers', oauth.RHAdminOAuthConsumers)
+admin.add_url_rule('/oauth/authorized', 'adminServices-oauthAuthorized', oauth.RHAdminOAuthAuthorized)
+admin.add_url_rule('/oauth/consumers', 'adminServices-oauthConsumers', oauth.RHAdminOAuthConsumers)
