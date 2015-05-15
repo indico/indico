@@ -201,6 +201,16 @@ class CategoryProtectionUserList(CategoryModifBase):
         return fossilize(self._categ.getAllowedToAccessList())
 
 class CategoryProtectionAddUsers(CategoryModifBase):
+    def _getAccessList(self):
+        result = fossilize(self._categ.getAllowedToAccessList())
+        # get pending users
+        for email in self._categ.getAccessController().getAccessEmail():
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
+
     def _checkParams(self):
 
         CategoryModifBase._checkParams(self)
@@ -211,6 +221,7 @@ class CategoryProtectionAddUsers(CategoryModifBase):
     def _getAnswer(self):
         for principal in self._principals:
             self._categ.grantAccess(principal)
+        return self._getAccessList()
 
 class CategoryProtectionRemoveUser(CategoryModifBase):
 

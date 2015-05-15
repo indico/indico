@@ -177,7 +177,17 @@ class SessionProtectionUserList(SessionModifBase):
         #will use IAvatarFossil or IGroupFossil
         return fossilize(self._session.getAllowedToAccessList())
 
+
 class SessionProtectionAddUsers(SessionModifBase):
+    def _getAccessList(self):
+        result = fossilize(self._session.getAllowedToAccessList())
+        # get pending users
+        for email in self._session.getAccessController().getAccessEmail():
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
 
     def _checkParams(self):
         SessionModifBase._checkParams(self)
@@ -187,6 +197,8 @@ class SessionProtectionAddUsers(SessionModifBase):
     def _getAnswer(self):
         for principal in self._principals:
             self._session.grantAccess(principal)
+        return self._getAccessList()
+
 
 class SessionProtectionRemoveUser(SessionModifBase):
 

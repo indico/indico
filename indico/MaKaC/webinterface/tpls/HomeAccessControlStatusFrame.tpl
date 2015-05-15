@@ -53,7 +53,7 @@
                                 IndicoUtil.errorReport(error);
                                 setResult(false);
                             } else {
-                                setResult(true);
+                                setResult(true, result);
                             }
                         });
             };

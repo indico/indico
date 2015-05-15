@@ -16,9 +16,7 @@
  */
 
 function userListNothing(data, func) {
-    each(data, function() {
-        func(true);
-    });
+    func(true, data);
 }
 
 function singleUserNothing(user, func) {
@@ -1489,11 +1487,10 @@ type("UserListField", ["IWidget"], {
             }
 
             var peopleAddedHandler = function(peopleList){
-
                 // newProcess will be passed a list of WatchObjects representing the users.
-                self.newProcess(peopleList, function(value) {
+                self.newProcess(peopleList, function(value, results) {
                     if (value) {
-                        each(peopleList, function(person){
+                        each(results, function(person){
                             var key;
                             if (person.isGroup || person._fossil === 'group') {
                                 key = person.identifier;

@@ -192,7 +192,7 @@ from MaKaC import conference as cmod
                         % if type == 'Category' or type == 'Home' :
                         killProgress();
                         % endif
-                        setResult(true);
+                        setResult(true, result);
                     }
                 });
     };

@@ -586,11 +586,12 @@ class ConferenceReviewingAssignTeamPRM(ConferenceReviewingPRMBase, UserListModif
         ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
-        for user in self._avatars:
-            if not user in self._confPaperReview._paperReviewManagersList:
-                self._confPaperReview.addPaperReviewManager(user)
+        for avatar in self._avatars:
+            if avatar not in self._confPaperReview._paperReviewManagersList:
+                self._confPaperReview.addPaperReviewManager(avatar)
 
-        return True
+        return fossilize(self._confPaperReview._paperReviewManagersList)
+
 
 class ConferenceReviewingRemoveTeamPRM(ConferenceReviewingPRMBase, UserModificationBase):
     """ Removes paper review manager from reviewers team for the conference
@@ -622,7 +623,8 @@ class ConferenceReviewingAssignTeamReferee(ConferenceReviewingPRMBase, UserListM
             if not user in self._confPaperReview._refereesList:
                 self._confPaperReview.addReferee(user)
 
-        return True
+        return fossilize(self._confPaperReview._refereesList)
+
 
 class ConferenceReviewingRemoveTeamReferee(ConferenceReviewingPRMBase, UserModificationBase):
     """ Removes referee from reviewers team for the conference
@@ -656,11 +658,11 @@ class ConferenceReviewingAssignTeamEditor(ConferenceReviewingPRMBase, UserListMo
         ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
-        for user in self._avatars:
-            if not user in self._confPaperReview._editorsList:
-                self._confPaperReview.addEditor(user)
+        for avatar in self._avatars:
+            if avatar not in self._confPaperReview._editorsList:
+                self._confPaperReview.addEditor(avatar)
 
-        return True
+        return fossilize(self._confPaperReview._editorsList)
 
 class ConferenceReviewingRemoveTeamEditor(ConferenceReviewingPRMBase, UserModificationBase):
     """ Removes editor from reviewers team for the conference
@@ -694,11 +696,12 @@ class ConferenceReviewingAssignTeamReviewer(ConferenceReviewingPRMBase, UserList
         ConferenceReviewingPRMBase._checkProtection(self)
 
     def _getAnswer(self):
-        for user in self._avatars:
-            if not user in self._confPaperReview._reviewersList:
-                self._confPaperReview.addReviewer(user)
+        for avatar in self._avatars:
+            if avatar not in self._confPaperReview._reviewersList:
+                self._confPaperReview.addReviewer(avatar)
 
-        return True
+        return fossilize(self._confPaperReview._reviewersList)
+
 
 class ConferenceReviewingRemoveTeamReviewer(ConferenceReviewingPRMBase, UserModificationBase):
     """ Removes editor from reviewers team for the conference

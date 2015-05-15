@@ -54,7 +54,7 @@ var listOfAddHandlers = {};
                 },
                 function(result,error) {
                     if (!error) {
-                        setResult(true);
+                        setResult(true, result);
                     } else {
                         IndicoUtil.errorReport(error);
                         setResult(false);

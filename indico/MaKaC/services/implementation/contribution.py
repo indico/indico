@@ -188,6 +188,16 @@ class ContributionProtectionUserList(ContributionModifBase):
 
 class ContributionProtectionAddUsers(ContributionModifBase):
 
+    def _getAccessList(self):
+        result = fossilize(self._contribution.getAccessList())
+        # get pending users
+        for email in self._contribution.getAccessController().getEmail():
+            pendingUser = {}
+            pendingUser["email"] = email
+            pendingUser["pending"] = True
+            result.append(pendingUser)
+        return result
+
     def _checkParams(self):
         ContributionModifBase._checkParams(self)
         self._principals = [principal_from_fossil(f, allow_pending=True) for f in self._params['value']]
@@ -196,7 +206,7 @@ class ContributionProtectionAddUsers(ContributionModifBase):
     def _getAnswer(self):
         for principal in self._principals:
             self._contribution.grantAccess(principal)
-
+        return self._getAccessList()
 
 class ContributionProtectionRemoveUser(ContributionModifBase):
     def _checkParams(self):
