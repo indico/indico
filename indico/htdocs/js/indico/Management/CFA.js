@@ -256,15 +256,16 @@ type("AuthorsManager", [], {
 
 },
 
-function(initialPrAuthors, initialCoAuthors, showSpeaker) {
+function(initialPrAuthors, initialCoAuthors, showSpeaker, suggestedAuthors) {
     this.showSpeaker = any(showSpeaker, false);
 	this.root = 'author_';
     this.counter = -1;
+    this.suggestedAuthors = suggestedAuthors;
     this.prAuthors = new AuthorListManager($E('inPlacePrAuthors'),
-            $E('inPlacePrAuthorsMenu'),  "primary author", initialPrAuthors, this);
+            $E('inPlacePrAuthorsMenu'),  "primary author", initialPrAuthors, this, this.suggestedAuthors);
 
     this.coAuthors = new AuthorListManager($E('inPlaceCoAuthors'),
-            $E('inPlaceCoAuthorsMenu'),  "co-author", initialCoAuthors, this);
+            $E('inPlaceCoAuthorsMenu'),  "co-author", initialCoAuthors, this, this.suggestedAuthors);
 });
 
 
@@ -280,7 +281,7 @@ type("AuthorListManager", [], {
             var menuItems = {};
 
             menuItems["searchUser"] = {action: function(){ self._addExistingUser($T("Add author"), true, this.confId, false,
-                    true, true, false, true); }, display: $T('Search User')};
+                    true, self.suggestedAuthors, false, true); }, display: $T('Search User')};
             menuItems["defineNew"] = {action: function(){ self._addNonExistingUser(); }, display: $T('Define New')};
 
             var menu = new PopupMenu(menuItems, [self.inPlaceMenu], "popupList", true);
@@ -585,11 +586,12 @@ type("AuthorListManager", [], {
 
 },
 
-    function(inPlaceListElem, inPlaceMenu, userCaption, initialList, authorsManager) {
+    function(inPlaceListElem, inPlaceMenu, userCaption, initialList, authorsManager, suggestedAuthors) {
         this.inPlaceListElem = inPlaceListElem;
         this.inPlaceMenu = inPlaceMenu;
         this.userCaption = userCaption;
         this.authorsManager = authorsManager;
+        this.suggestedAuthors = suggestedAuthors;
         if (this.userCaption == 'primary author') {
             this.presenterDiv = 'prPresenterDiv_';
             this.cb = 'prCb_';
