@@ -29,7 +29,7 @@
                 principals = principals.concat(newPrincipals);
                 field.val(JSON.stringify(principals));
                 field.trigger('change');
-                setResult(true);
+                setResult(true, principals);
             }
             function removePrincipal(principal, setResult) {
                 principals = _.without(principals, _.findWhere(principals, {
