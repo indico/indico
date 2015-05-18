@@ -1,8 +1,8 @@
 [loggers]
-keys=root
+keys=root,celery
 
 [handlers]
-keys=indico,other,smtp
+keys=indico,other,celery,smtp
 
 [formatters]
 keys=defaultFormatter,mailFormatter
@@ -12,6 +12,11 @@ keys=defaultFormatter,mailFormatter
 [logger_root]
 level=WARNING
 handlers=indico,other,smtp
+
+[logger_celery]
+level=INFO
+handlers=celery,smtp
+qualname=celery
 
 # By default, the args are taken from the indico.conf file.
 # For setting your custom arguments, uncomment the args entry below.
@@ -26,6 +31,14 @@ formatter=defaultFormatter
 [handler_other]
 class=FileHandler
 level=WARNING
+formatter=defaultFormatter
+#args=('',)
+
+# By default, the args are taken from the indico.conf file.
+# For setting your custom arguments, uncomment the args entry below.
+[handler_celery]
+class=FileHandler
+level=NOTSET
 formatter=defaultFormatter
 #args=('',)
 

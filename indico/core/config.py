@@ -529,7 +529,9 @@ class Config:
         'ProviderMap'               : {},
         'LocalIdentities'           : True,
         'ExternalRegistrationURL'   : '',
-        'SecretKey'                 : None
+        'SecretKey'                 : None,
+        'CeleryBroker'              : None,
+        'CeleryResultBackend'       : None,
     }
 
     if sys.platform == 'win32':

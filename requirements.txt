@@ -72,3 +72,4 @@ git+https://github.com/indico/flask-multipass.git
 click==3.3
 colorclass==1.0.2
 itsdangerous==0.24
+celery==3.1.18

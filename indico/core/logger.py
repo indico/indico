@@ -20,7 +20,7 @@ import logging
 import logging.handlers
 import logging.config
 import ConfigParser
-from flask import request, session
+from flask import request, session, has_request_context
 from ZODB.POSException import POSError
 
 from indico.core.config import Config
@@ -32,10 +32,7 @@ class AddIDFilter(logging.Filter):
         if not logging.Filter.filter(self, record):
             return False
         # Add request ID if available
-        try:
-            record.request_id = request.id
-        except RuntimeError:
-            record.request_id = '0' * 12
+        record.request_id = request.id if has_request_context() else '0' * 12
         return True
 
 
@@ -44,6 +41,13 @@ class ExtraIndicoFilter(AddIDFilter):
         if record.name.split('.')[0] == 'indico':
             return False
         return AddIDFilter.filter(self, record)
+
+
+class CeleryFilter(AddIDFilter):
+    def filter(self, record):
+        if not AddIDFilter.filter(self, record):
+            return False
+        return record.name.split('.')[0] == 'celery'
 
 
 class IndicoMailFormatter(logging.Formatter):
@@ -209,6 +213,7 @@ class Logger:
         # Lists of filters for each handler
         filters = {'indico': [AddIDFilter('indico')],
                    'other': [ExtraIndicoFilter()],
+                   'celery': [CeleryFilter()],
                    'smtp': [AddIDFilter('indico')]}
 
         config = Config.getInstance()
@@ -224,6 +229,7 @@ class Logger:
             defaultArgs = {
                 'indico': ("FileHandler", "('%s', 'a')" % cls._log_path('indico.log'), 'DEBUG'),
                 'other': ("FileHandler", "('%s', 'a')" % cls._log_path('other.log'), 'DEBUG'),
+                'celery': ("FileHandler", "('%s', 'a')" % cls._log_path('celery.log'), 'DEBUG'),
                 'smtp': (
                     "handlers.SMTPHandler", "(%s, 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
                     % (smtpServer, serverName, config.getSupportEmail(), serverName), "ERROR")
